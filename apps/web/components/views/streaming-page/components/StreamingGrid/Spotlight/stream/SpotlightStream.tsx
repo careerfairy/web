@@ -1,13 +1,13 @@
 import { Box } from "@mui/material"
-import { UserStreamComponent } from "../gallery/UserStreamComponent"
-import { useSpotlight } from "./SpotlightProvider"
-import { sxStyles } from "types/commonTypes"
-import { VideoTrackAspectRatio } from "../../streaming/VideoTrackAspectRatio"
+import { useRemoteUserTrack } from "agora-rtc-react"
 import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
-import { useRemoteUserTrack } from "agora-rtc-react"
+import { sxStyles } from "types/commonTypes"
+import { VideoTrackAspectRatio } from "../../../streaming/VideoTrackAspectRatio"
+import { UserStreamComponent } from "../../gallery/UserStreamComponent"
+import { useSpotlight } from "../SpotlightProvider"
 
 const styles = sxStyles({
    root: {

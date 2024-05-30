@@ -21,6 +21,7 @@ import {
    LivestreamQueryOptions,
    LivestreamQuestion,
    LivestreamQuestionComment,
+   LivestreamVideo,
    MarkLivestreamPollAsCurrentRequest,
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
@@ -64,7 +65,7 @@ import {
    writeBatch,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { errorLogAndNotify, getQueryStringFromUrl } from "util/CommonUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
@@ -91,7 +92,7 @@ export type SetModeOptionsType<Mode extends LivestreamMode> =
       : Mode extends "desktop"
       ? { mode: "desktop"; screenSharerAgoraUID: string }
       : Mode extends "video"
-      ? { mode: "video"; youtubeVideoURL: string }
+      ? { mode: "video" }
       : Mode extends "presentation"
       ? { mode: "presentation" }
       : never
@@ -402,17 +403,15 @@ export class LivestreamService {
             })
 
          case LivestreamModes.VIDEO:
-            if (!options.youtubeVideoURL) {
-               throw new Error("YouTube video URL is required to start a video")
-            }
             /**
              * TODO:
              * Batch operations (both must succeed or fail)
              * 1. Set mode to video on livestreams/{id}
              * 2. Save the video URL at /livestreams/{id}/videos/video. Look at old implementation for reference
              */
-            return
-
+            return this.updateLivestream(livestreamId, {
+               mode: options.mode,
+            })
          case LivestreamModes.DEFAULT:
             return this.updateLivestream(livestreamId, {
                mode: options.mode,
@@ -1044,6 +1043,38 @@ export class LivestreamService {
    incrementLivestreamPage = async (livestreamId: string, amount: number) => {
       const ref = this.getPresentationRef(livestreamId)
       return updateDoc(ref, { page: increment(amount) })
+   }
+
+   getVideoRef = (livestreamId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "videos",
+         "video"
+      ).withConverter(createGenericConverter<LivestreamVideo>())
+   }
+
+   setLivestreamVideo = async ({
+      livestreamId,
+      url,
+      updater,
+   }: {
+      livestreamId: string
+      url: string
+      updater: string
+   }) => {
+      const ref = this.getVideoRef(livestreamId)
+      const secondsInUrl = Number(getQueryStringFromUrl(url, "t"))
+
+      return setDoc(ref, {
+         id: ref.id,
+         url,
+         second: secondsInUrl || 0,
+         state: "playing",
+         lastPlayed: Timestamp.now(),
+         updater,
+      })
    }
 }
 

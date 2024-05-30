@@ -763,3 +763,16 @@ export interface LivestreamPresentation extends Identifiable {
    /** The size of the PDF in bytes */
    fileSize?: number
 }
+
+/**
+ * A YouTube video for a live stream
+ * Document Path: livestreams/{livestreamId}/videos/video
+ */
+export interface LivestreamVideo extends Identifiable {
+   url: string
+   second: number
+   state: "playing" | "paused"
+   lastPlayed: firebase.firestore.Timestamp
+   /** The ID of the user that can update the video */
+   updater: string
+}
