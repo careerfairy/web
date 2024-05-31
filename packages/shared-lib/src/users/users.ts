@@ -17,6 +17,36 @@ import {
 } from "../livestreams"
 import Timestamp = firebase.firestore.Timestamp
 
+export const UserCategories = {
+   Application: {
+      id: "application",
+      name: "Application process",
+   },
+   Jobs: {
+      id: "jobs",
+      name: "Jobs",
+   },
+   DayInTheLife: {
+      id: "day-in-the-life",
+      name: "Day in the life",
+   },
+   Role: {
+      id: "role",
+      name: "Role",
+   },
+   CompanyCulture: {
+      id: "company-culture",
+      name: "Company culture",
+   },
+   Events: {
+      id: "events",
+      name: "Events",
+   },
+} as const
+
+export const userCategoriesArray = Object.values(UserCategories)
+
+export type UserCategory = (typeof UserCategories)[keyof typeof UserCategories]
 export interface UserData extends Identifiable {
    authId: string
    firstName: string
@@ -45,6 +75,11 @@ export interface UserData extends Identifiable {
    validationPin: number
    interestsIds?: string[]
 
+   /**
+    * Content Tag IDs
+    * e.g: ["BusinessDevelopment", "Consulting"]
+    */
+   tagIds?: string[]
    // from the rewards/credit system
    // negative or positive
    credits?: number
