@@ -1,5 +1,4 @@
 import { OptionGroup } from "../commonTypes"
-import { sparksCategoriesArray } from "../sparks/sparks"
 
 type DropdownItem = {
    id: string
@@ -1680,9 +1679,36 @@ export const BusinessFunctionsTagValues: OptionGroup[] = [
    },
 ]
 
+export const ContentTopicsTagValues: OptionGroup[] = [
+   {
+      id: "ApplicationProcess",
+      name: "Application process",
+   },
+   {
+      id: "CompanyCulture",
+      name: "Company culture",
+   },
+   {
+      id: "DayInTheLife",
+      name: "Day in the life",
+   },
+   {
+      id: "Events",
+      name: "Events",
+   },
+   {
+      id: "Jobs",
+      name: "Jobs",
+   },
+   {
+      id: "Role",
+      name: "Role",
+   },
+]
+
 export const TagValues: OptionGroup[] = [
    BusinessFunctionsTagValues,
-   sparksCategoriesArray,
+   ContentTopicsTagValues,
    languageOptionCodes,
 ].flat()
 
