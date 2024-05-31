@@ -323,6 +323,7 @@ export class RankedSparkRepository {
          .filter((rankedSpark) => {
             const sparkFieldValue = rankedSpark.model.spark[field]
 
+            // When adding other fields to Spark it should be omitted
             if (sparkFieldValue && Array.isArray(sparkFieldValue)) {
                return sparkFieldValue.some((value) =>
                   values.includes(value?.id)
