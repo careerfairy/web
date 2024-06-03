@@ -3,6 +3,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, Grid } from "@mui/material"
 import SparkFetchWrapper from "HOCs/spark/SparkFetchWrapper"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useFirebaseDelete from "components/custom-hook/utils/useFirebaseDelete"
 import ExitIcon from "components/views/common/icons/ExitIcon"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
@@ -21,6 +22,7 @@ import {
    sparksSelectedSparkId,
 } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
+import useCanPublishMoreSparks from "../../../../sparks/forms/hooks/useCanPublishMoreSparks"
 import ConfirmDeleteSparkDialog from "../../components/ConfirmDeleteSparkDialog"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 import CreatorCard from "./components/CreatorCard"
@@ -30,8 +32,6 @@ import { SubmittingOverlay } from "./components/SubmittingOverlay"
 import VideoUpload from "./components/VideoUpload"
 import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
 import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import useCanPublishMoreSparks from "../../../../sparks/forms/hooks/useCanPublishMoreSparks"
 
 const styles = sxStyles({
    flex: {
@@ -333,6 +333,7 @@ const FormComponent: FC = () => {
             <ConfirmDeleteSparkDialog
                sparkId={values.id}
                groupId={group.id}
+               creator={values.creator}
                open={isDeleteSparkDialogOpen}
                handleClose={handleCloseDeleteSparkDialog}
                onDeleted={handleForceCloseDialog}

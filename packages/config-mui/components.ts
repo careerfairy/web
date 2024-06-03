@@ -120,10 +120,15 @@ export const getComponents = (theme: Theme): Components => ({
          {
             props: { variant: "outlined", color: "grey" },
             style: {
-               color: theme.palette.text.primary,
+               color:
+                  theme.palette.mode === "light"
+                     ? // @ts-ignore
+                       theme.palette.neutral[500]
+                     : theme.palette.text.primary,
                borderColor:
                   theme.palette.mode === "light"
-                     ? "rgba(0, 0, 0, 0.23)"
+                     ? // @ts-ignore
+                       theme.palette.neutral[200]
                      : "rgba(255, 255, 255, 0.23)",
                "&.Mui-disabled": {
                   border: `1px solid ${theme.palette.action.disabledBackground}`,

@@ -58,6 +58,7 @@ export type AddCreatorData = Pick<
    | "avatarUrl"
    | "linkedInUrl"
    | "story"
+   | "roles"
 >
 
 export type UpdateCreatorData = Partial<AddCreatorData> & Identifiable
