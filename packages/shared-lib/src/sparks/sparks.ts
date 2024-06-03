@@ -43,7 +43,9 @@ export interface Spark extends Identifiable {
     * Content Tag IDs
     * e.g: ["Day in the life", "Jobs"]
     */
-   tagIds?: string[]
+   contentTopicsTagIds?: string[]
+   languageTagIds?: string[]
+   allLinkedCustomJobsTagIds?: string[]
    /**
     * Description / Question of the spark
     */
