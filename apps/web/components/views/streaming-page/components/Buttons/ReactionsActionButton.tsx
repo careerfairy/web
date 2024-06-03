@@ -9,7 +9,6 @@ import {
    speedDialIconClasses,
 } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import {
    BrandedSpeedDial,
