@@ -1,8 +1,8 @@
+import { Box, Button } from "@mui/material"
+import { Video } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useLocalTracks } from "../../context"
-import { UserStreamProvider } from "../../context/UserStream"
-import { LocalStream } from "../streaming"
-import { useSettingsMenu } from "./SettingsMenuContext"
+import { useMediaStream } from "./useMediaStream"
 
 const styles = sxStyles({
    video: {
@@ -16,24 +16,43 @@ const styles = sxStyles({
          },
       },
    },
+   centered: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
 })
 
 export const TempCameraSetup = () => {
-   const { localUser } = useLocalTracks()
-   const { tempCameraTrack } = useSettingsMenu()
+   const tempVideoStreamRef = useMediaStream()
+   const { cameraOn } = useLocalTracks()
+
+   if (!cameraOn) return <TurnOnCameraButton />
 
    return (
-      <UserStreamProvider user={localUser}>
-         <LocalStream
-            localCameraTrack={tempCameraTrack.localCameraTrack}
-            isLoading={tempCameraTrack.isLoading}
-            hideDetails
-            hideSpeakingIndicator
-            sx={styles.video}
-            cameraOn
-            containVideo
-            hideGradient
-         />
-      </UserStreamProvider>
+      <Box
+         component="video"
+         width="100%"
+         height="100%"
+         sx={styles.video}
+         ref={tempVideoStreamRef}
+         muted
+         autoPlay
+      />
+   )
+}
+
+export const TurnOnCameraButton = () => {
+   const { toggleCamera } = useLocalTracks()
+   return (
+      <Box sx={[styles.video, styles.centered]}>
+         <Button
+            variant="contained"
+            onClick={toggleCamera}
+            startIcon={<Video />}
+         >
+            Turn on camera
+         </Button>
+      </Box>
    )
 }

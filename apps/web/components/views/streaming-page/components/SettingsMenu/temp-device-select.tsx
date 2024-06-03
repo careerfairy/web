@@ -1,4 +1,7 @@
 import { Box } from "@mui/material"
+import { sxStyles } from "types/commonTypes"
+import { useLocalTracks } from "../../context"
+import { useAgoraDevices } from "../../context/AgoraDevices"
 import {
    getCameraErrorMessage,
    getMicrophoneErrorMessage,
@@ -6,9 +9,6 @@ import {
 } from "../../util"
 import { DeviceErrorWrapper } from "../DeviceErrorWrapper"
 import { DeviceSelect } from "../streaming/DeviceSelect"
-import { useSettingsMenu } from "./SettingsMenuContext"
-import { sxStyles } from "types/commonTypes"
-import { useAgoraDevices } from "../../context/AgoraDevices"
 
 const styles = sxStyles({
    root: {
@@ -22,12 +22,13 @@ const styles = sxStyles({
 
 export const TempCameraSelect = () => {
    const { fetchCamerasError, cameras } = useAgoraDevices()
-   const { setTempCameraId, tempCameraId, tempCameraTrack } = useSettingsMenu()
+   const { setActiveCameraId, activeCameraId, localCameraTrack } =
+      useLocalTracks()
    return (
       <Box sx={styles.root}>
          <DeviceErrorWrapper
             errorMessage={getCameraErrorMessage(
-               fetchCamerasError || tempCameraTrack.error
+               fetchCamerasError || localCameraTrack.error
             )}
          >
             <Box component="span" sx={styles.select}>
@@ -35,11 +36,11 @@ export const TempCameraSelect = () => {
                   key={cameras.length}
                   label="Select Camera"
                   options={cameras}
-                  onDeviceSelect={setTempCameraId}
-                  value={tempCameraId}
+                  onDeviceSelect={setActiveCameraId}
+                  value={activeCameraId}
                   permissionDenied={
                      getRTCErrorCode(
-                        fetchCamerasError || tempCameraTrack.error
+                        fetchCamerasError || localCameraTrack.error
                      ) === "PERMISSION_DENIED"
                   }
                />
@@ -52,14 +53,14 @@ export const TempCameraSelect = () => {
 export const TempMicrophoneSelect = () => {
    const { fetchMicsError, microphones } = useAgoraDevices()
 
-   const { setTempMicrophoneId, tempMicrophoneId, tempMicrophoneTrack } =
-      useSettingsMenu()
+   const { setActiveMicrophoneId, activeMicrophoneId, localMicrophoneTrack } =
+      useLocalTracks()
 
    return (
       <Box sx={styles.root}>
          <DeviceErrorWrapper
             errorMessage={getMicrophoneErrorMessage(
-               fetchMicsError || tempMicrophoneTrack.error
+               fetchMicsError || localMicrophoneTrack.error
             )}
          >
             <Box component="span" sx={styles.select}>
@@ -67,11 +68,11 @@ export const TempMicrophoneSelect = () => {
                   key={microphones.length}
                   label="Select Microphone"
                   options={microphones}
-                  onDeviceSelect={setTempMicrophoneId}
-                  value={tempMicrophoneId}
+                  onDeviceSelect={setActiveMicrophoneId}
+                  value={activeMicrophoneId}
                   permissionDenied={
                      getRTCErrorCode(
-                        fetchMicsError || tempMicrophoneTrack.error
+                        fetchMicsError || localMicrophoneTrack.error
                      ) === "PERMISSION_DENIED"
                   }
                />
