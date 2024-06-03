@@ -14,9 +14,7 @@ const useGroupSparks = (groupId: string, options?: Options) => {
       return query(
          collection(FirestoreInstance, "sparks"),
          where("group.id", "==", groupId),
-         ...(options?.isPublished
-            ? [where("published", "==", options?.isPublished)]
-            : []),
+         ...(options?.isPublished ? [where("published", "==", true)] : []),
          orderBy("createdAt", "desc"),
          ...(options?.limit ? [limit(options.limit)] : [])
       )
