@@ -22,16 +22,29 @@ const styles = sxStyles({
 export const JobList = () => {
    return (
       <SuspenseWithBoundary fallback={<JobListSkeleton />}>
-         <Content />
+         <ContentWrapper />
       </SuspenseWithBoundary>
    )
 }
 
-const Content = () => {
+const ContentWrapper = () => {
    const { livestreamId, isHost } = useStreamingContext()
    const { data: hostCompany } = useLivestreamCompanyHostSWR(livestreamId)
+
+   if (!hostCompany) return null
+
+   return (
+      <Content
+         livestreamId={livestreamId}
+         isHost={isHost}
+         hostCompanyId={hostCompany.id}
+      />
+   )
+}
+
+const Content = ({ livestreamId, isHost, hostCompanyId }) => {
    const { jobs: atsJobs } = useLivestreamJobs(livestreamId)
-   const livestreamCustomJobs = useGroupCustomJobs(hostCompany.id, {
+   const livestreamCustomJobs = useGroupCustomJobs(hostCompanyId, {
       livestreamId: livestreamId,
    })
    const [selectedJob, setSelectedJob] = useState(null)

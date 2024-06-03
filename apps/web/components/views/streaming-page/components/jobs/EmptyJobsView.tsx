@@ -21,6 +21,7 @@ const styles = sxStyles({
       justifyContent: "center",
       alignItems: "center",
       alignSelf: "stretch",
+      spacing: 1.5,
    },
    textTitle: {
       color: (theme) => theme.palette.neutral[600],
@@ -42,7 +43,7 @@ export const EmptyJobsView = () => {
    return (
       <Stack sx={styles.root}>
          <Box component={Briefcase} sx={styles.icon} size={48} />
-         <Stack spacing={1.5} sx={styles.textWrapper}>
+         <Stack sx={styles.textWrapper}>
             <Stack spacing={0.5}>
                <Typography variant="brandedBody" sx={styles.textTitle}>
                   No jobs linked
