@@ -1,18 +1,18 @@
-import { useFormikContext } from "formik"
-import { JobFormValues } from "./JobFormDialog"
+import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
+import CustomRichTextEditor from "components/util/CustomRichTextEditor"
+import GBLocale from "date-fns/locale/en-GB"
+import { useFormikContext } from "formik"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
+import DateUtil from "../../../../../../util/DateUtil"
+import { getTextFieldProps } from "../../../../../helperFunctions/streamFormFunctions"
+import { datePickerDefaultStyles } from "../../../../calendar/utils"
+import BrandedAutocomplete from "../../../../common/inputs/BrandedAutocomplete"
 import BrandedTextField, {
    FormBrandedTextField,
 } from "../../../../common/inputs/BrandedTextField"
-import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { getTextFieldProps } from "../../../../../helperFunctions/streamFormFunctions"
-import BrandedAutocomplete from "../../../../common/inputs/BrandedAutocomplete"
-import { datePickerDefaultStyles } from "../../../../calendar/utils"
-import GBLocale from "date-fns/locale/en-GB"
-import DateUtil from "../../../../../../util/DateUtil"
-import CustomRichTextEditor from "components/util/CustomRichTextEditor"
+import { JobFormValues } from "./JobFormDialog"
 
 const JobForm = ({ quillInputRef }) => {
    const { values, setFieldValue, errors, touched } =
@@ -96,7 +96,7 @@ const JobForm = ({ quillInputRef }) => {
                   customInput={
                      <BrandedTextField
                         name="deadline"
-                        label="Application Deadline"
+                        label="Application Deadline (Required)"
                         placeholder="Insert date"
                         fullWidth
                         error={Boolean(errors.deadline)}
