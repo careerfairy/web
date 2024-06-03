@@ -101,7 +101,7 @@ export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
    const { agoraUserId, livestreamId } = useStreamingContext()
    const streamIsMobile = useStreamIsMobile()
    const dispatch = useAppDispatch()
-
+   
    const reactionsRef = useRef(null)
 
    const { trigger: sendEmote } = useSendEmote(livestreamId, agoraUserId)
