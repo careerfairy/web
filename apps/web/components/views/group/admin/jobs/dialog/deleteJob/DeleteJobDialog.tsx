@@ -1,19 +1,19 @@
-import SteppedDialog, {
-   useStepper,
-} from "../../../../../stepped-dialog/SteppedDialog"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { CircularProgress, Stack } from "@mui/material"
+import { FC, useCallback, useEffect, useState } from "react"
+import { Trash2 as DeleteIcon } from "react-feather"
 import { useDispatch, useSelector } from "react-redux"
+import JobFetchWrapper from "../../../../../../../HOCs/job/JobFetchWrapper"
+import { openDeleteJobWithLinkedContent } from "../../../../../../../store/reducers/adminJobsReducer"
 import { jobsFormSelectedJobIdSelector } from "../../../../../../../store/selectors/adminJobsSelectors"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
-import JobFetchWrapper from "../../../../../../../HOCs/job/JobFetchWrapper"
-import { Trash2 as DeleteIcon } from "react-feather"
-import { CircularProgress, Stack } from "@mui/material"
 import useCustomJobDelete from "../../../../../../custom-hook/custom-job/useCustomJobDelete"
-import React, { FC, useCallback, useEffect, useState } from "react"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import SteppedDialog, {
+   useStepper,
+} from "../../../../../stepped-dialog/SteppedDialog"
 import { JobDialogStep } from "../index"
-import { openDeleteJobWithLinkedLivestreams } from "../../../../../../../store/reducers/adminJobsReducer"
-import DeleteJobDialogWithLinkedLivestreams from "./DeleteJobDialogWithLinkedLivestreams"
+import DeleteJobDialogWithLinkedContent from "./DeleteJobDialogWithLinkedContent"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -89,19 +89,21 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { handleClose } = useStepper<JobDialogStep>()
    const { isDeleting, handleDelete } = useCustomJobDelete(selectedJobId)
-   const [hasLinkedLivestreams, setHasLinkedLivestreams] = useState(false)
+   const [hasLinkedContent, setHasLinkedContent] = useState(false)
 
    useEffect(() => {
-      if (!isDeleting) {
-         setHasLinkedLivestreams(job?.livestreams?.length > 0)
+      if (!isDeleting && job) {
+         setHasLinkedContent(
+            Boolean(job.livestreams.length || job.sparks.length)
+         )
       }
-   }, [isDeleting, job?.livestreams?.length])
+   }, [isDeleting, job])
 
    useEffect(() => {
-      if (hasLinkedLivestreams) {
-         dispatch(openDeleteJobWithLinkedLivestreams())
+      if (hasLinkedContent) {
+         dispatch(openDeleteJobWithLinkedContent())
       }
-   }, [dispatch, hasLinkedLivestreams])
+   }, [dispatch, hasLinkedContent])
 
    const handleJobDelete = useCallback(async () => {
       await handleDelete()
@@ -113,7 +115,7 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
          containerSx={styles.content}
          sx={[
             styles.wrapContainer,
-            hasLinkedLivestreams ? styles.reducePadding : null,
+            hasLinkedContent ? styles.reducePadding : null,
          ]}
          hideCloseButton
          withActions
@@ -121,10 +123,10 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
          <>
             <SteppedDialog.Content sx={styles.container}>
                <Stack spacing={3} sx={styles.info}>
-                  {hasLinkedLivestreams ? (
-                     <DeleteJobDialogWithLinkedLivestreams job={job} />
+                  {hasLinkedContent ? (
+                     <DeleteJobDialogWithLinkedContent job={job} />
                   ) : (
-                     <DeleteJobWithoutLinkedLivestreams />
+                     <DeleteJobWithoutLinkedContent />
                   )}
                </Stack>
             </SteppedDialog.Content>
@@ -148,7 +150,7 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
                   loading={isDeleting}
                   sx={styles.actionBtn}
                >
-                  {hasLinkedLivestreams ? "Delete" : "Yes, I'm sure"}
+                  {hasLinkedContent ? "Delete" : "Yes, I'm sure"}
                </SteppedDialog.Button>
             </SteppedDialog.Actions>
          </>
@@ -156,21 +158,19 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
    )
 }
 
-const DeleteJobWithoutLinkedLivestreams = () => {
-   return (
-      <>
-         <DeleteIcon color={"#FF4545"} size={48} />
+const DeleteJobWithoutLinkedContent = () => (
+   <>
+      <DeleteIcon color={"#FF4545"} size={48} />
 
-         <SteppedDialog.Title sx={styles.title}>
-            Delete job opening?
-         </SteppedDialog.Title>
+      <SteppedDialog.Title sx={styles.title}>
+         Delete job opening?
+      </SteppedDialog.Title>
 
-         <SteppedDialog.Subtitle sx={styles.subtitle}>
-            Are you sure you want to delete this job opening? All data inserted
-            and applicants’ details will be lost.
-         </SteppedDialog.Subtitle>
-      </>
-   )
-}
+      <SteppedDialog.Subtitle sx={styles.subtitle}>
+         Are you sure you want to delete this job opening? All data inserted and
+         applicants’ details will be lost.
+      </SteppedDialog.Subtitle>
+   </>
+)
 
 export default DeleteJobDialog
