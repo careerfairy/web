@@ -1,8 +1,8 @@
+import firebase from "firebase/compat"
+import BaseFirebaseRepository from "../BaseFirebaseRepository"
+import { Timestamp } from "../firebaseTypes"
 import { UserData } from "../users"
 import { CustomJob, CustomJobApplicant, PublicCustomJob } from "./customJobs"
-import BaseFirebaseRepository from "../BaseFirebaseRepository"
-import firebase from "firebase/compat"
-import { Timestamp } from "../firebaseTypes"
 
 export interface ICustomJobRepository {
    /**
@@ -105,7 +105,9 @@ export class FirebaseCustomJobRepository
          createdAt: this.fieldValue.serverTimestamp() as Timestamp,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
          livestreams: linkedLivestreamId ? [linkedLivestreamId] : [],
+         sparks: [],
          id: ref.id,
+         published: Boolean(linkedLivestreamId),
       }
 
       await ref.set(newJob, { merge: true })
