@@ -1,8 +1,20 @@
-import { ButtonBase, ButtonBaseProps, Typography } from "@mui/material"
-import React from "react"
+import {
+   Box,
+   ButtonBase,
+   ButtonBaseProps,
+   CircularProgress,
+   Typography,
+} from "@mui/material"
+import { ReactNode, forwardRef } from "react"
+import { AlertCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { VirtualBackgroundMode } from "../../types"
+import { BrandedTooltip } from "../BrandedTooltip"
 
 const styles = sxStyles({
+   buttonWrapper: {
+      width: "inherit",
+   },
    root: {
       display: "flex",
       flexDirection: "column",
@@ -23,10 +35,22 @@ const styles = sxStyles({
       },
       transition: (theme) =>
          theme.transitions.create(["background-color", "color"]),
+      position: "relative",
    },
    active: {
       color: "white",
       bgcolor: "primary.500",
+   },
+   warningIconWrapper: {
+      p: 1,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      "& svg": {
+         color: "warning.600",
+         width: 20,
+         height: 20,
+      },
    },
    label: {
       mt: 1.25,
@@ -36,26 +60,79 @@ const styles = sxStyles({
    labelActive: {
       color: "white",
    },
+   loader: {
+      display: "flex",
+   },
+   tooltip: {
+      display: "inline",
+   },
+   tooltipPopper: {
+      maxWidth: 219,
+   },
 })
 
 type Props = {
    label: string
-   icon: React.ReactNode
+   icon: ReactNode
    active?: boolean
+   loading?: boolean
+   error?: Error | boolean
+   mode: VirtualBackgroundMode
 } & ButtonBaseProps
 
-export const BackgroundModeButton = ({
-   label,
-   icon,
-   active,
-   ...rest
-}: Props) => {
+export const BackgroundModeButton = forwardRef<HTMLButtonElement, Props>(
+   ({ label, icon, active, loading, error, disabled, mode, ...rest }, ref) => {
+      const isActive = active && !loading
+
+      const isDisabled = Boolean(disabled || error)
+      return (
+         <BrandedTooltip
+            placement="top"
+            PopperProps={{
+               sx: styles.tooltipPopper,
+            }}
+            sx={styles.tooltip}
+            title={getButtonTooltip(mode, error)}
+         >
+            <Box component="span" sx={styles.buttonWrapper}>
+               <ButtonBase
+                  {...rest}
+                  sx={[styles.root, isActive && styles.active]}
+                  disabled={isDisabled}
+                  ref={ref}
+               >
+                  {Boolean(error) && (
+                     <Box sx={styles.warningIconWrapper}>
+                        <AlertCircle />
+                     </Box>
+                  )}
+                  {loading ? <Loader /> : icon}
+                  <Typography
+                     sx={[styles.label, isActive && styles.labelActive]}
+                  >
+                     {label}
+                  </Typography>
+               </ButtonBase>
+            </Box>
+         </BrandedTooltip>
+      )
+   }
+)
+
+BackgroundModeButton.displayName = "BackgroundModeButton"
+
+const Loader = () => {
    return (
-      <ButtonBase {...rest} sx={[styles.root, active && styles.active]}>
-         {icon}
-         <Typography sx={[styles.label, active && styles.labelActive]}>
-            {label}
-         </Typography>
-      </ButtonBase>
+      <Box component="span" sx={styles.loader}>
+         <CircularProgress color="inherit" size={23} />
+      </Box>
    )
+}
+
+function getButtonTooltip(type: VirtualBackgroundMode, error: Error | boolean) {
+   if (!error) {
+      return ""
+   }
+
+   return `Your browser doesn't support the ${type} functionality. No effect has been applied`
 }

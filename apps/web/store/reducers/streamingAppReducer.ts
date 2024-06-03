@@ -10,6 +10,7 @@ import {
    type UID,
 } from "agora-rtc-react"
 import { RtmStatusCode } from "agora-rtm-sdk"
+import { VirtualBackgroundMode } from "components/views/streaming-page/types"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { v4 as uuidv4 } from "uuid"
 
@@ -104,6 +105,7 @@ export interface StreamingAppState {
       type: EmoteType
       id: string
    }[]
+   virtualBackgroundMode: VirtualBackgroundMode
    isLoggedInOnDifferentBrowser: boolean
 }
 
@@ -142,6 +144,7 @@ const initialState: StreamingAppState = {
       connectionState: null,
    },
    emotes: [],
+   virtualBackgroundMode: VirtualBackgroundMode.OFF,
    isLoggedInOnDifferentBrowser: false,
 }
 
@@ -350,6 +353,16 @@ const streamingAppSlice = createSlice({
       clearEmotes(state) {
          state.emotes = []
       },
+
+      /* ==========================
+         ||   Virtual Background   ||
+         ========================== */
+      setVirtualBackgroundMode(
+         state,
+         action: PayloadAction<VirtualBackgroundMode>
+      ) {
+         state.virtualBackgroundMode = action.payload
+      },
    },
 })
 
@@ -383,6 +396,7 @@ export const {
       addEmote,
       removeEmote,
       clearEmotes,
+      setVirtualBackgroundMode,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
