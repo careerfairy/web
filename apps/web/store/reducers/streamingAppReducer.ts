@@ -48,6 +48,8 @@ export interface StreamingAppState {
    settingsMenu: {
       isOpen: boolean
    }
+   uploadPDFPresentationDialogOpen: boolean
+   shareVideoDialogOpen: boolean
    /**
     * A mapping from user IDs to objects containing their current audio levels and the timestamp when their audio level was last above 60.
     * Audio levels are represented as integers ranging from 0 to 100.
@@ -107,6 +109,8 @@ const initialState: StreamingAppState = {
    settingsMenu: {
       isOpen: false,
    },
+   uploadPDFPresentationDialogOpen: false,
+   shareVideoDialogOpen: false,
    audioLevels: {},
    livestreamState: {
       mode: LivestreamModes.DEFAULT,
@@ -317,6 +321,16 @@ const streamingAppSlice = createSlice({
             }
          }
       },
+
+      setUploadPDFPresentationDialogOpen(
+         state,
+         action: PayloadAction<boolean>
+      ) {
+         state.uploadPDFPresentationDialogOpen = action.payload
+      },
+      setShareVideoDialogOpen(state, action: PayloadAction<boolean>) {
+         state.shareVideoDialogOpen = action.payload
+      },
    },
 })
 
@@ -346,6 +360,8 @@ export const {
       setHasJobs,
       incrementNumberOfHandRaiseNotifications,
       resetNumberOfHandRaiseNotifications,
+      setUploadPDFPresentationDialogOpen,
+      setShareVideoDialogOpen,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice

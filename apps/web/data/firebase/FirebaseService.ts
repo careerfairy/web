@@ -23,6 +23,7 @@ import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamImpression,
+   LivestreamPresentation,
    LivestreamPromotions,
    UserLivestreamData,
    pickPublicDataFromLivestream,
@@ -42,13 +43,13 @@ import {
 } from "@careerfairy/shared-lib/users"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
 import DateUtil from "util/DateUtil"
 import { v4 as uuidv4 } from "uuid"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import {
-   getQueryStringFromUrl,
    getReferralInformation,
    shouldUseEmulators,
 } from "../../util/CommonUtil"
@@ -584,10 +585,10 @@ class FirebaseService {
 
    setCurrentVideo = (streamRef, url, updater) => {
       const ref = streamRef.collection("videos").doc("video")
-      const secondsIn = Number(getQueryStringFromUrl(url, "t"))
+
       return ref.set({
          url: url,
-         second: secondsIn || 0,
+         second: getSecondsPassedFromYoutubeUrl(url),
          state: "playing",
          updater,
          lastPlayed: this.getServerTimestamp(),
@@ -969,16 +970,28 @@ class FirebaseService {
       })
    }
 
-   setLivestreamPresentation = (livestreamId, downloadUrl) => {
+   setLivestreamPresentation = (
+      livestreamId: string,
+      downloadUrl: string,
+      file: File,
+      storagePath: string
+   ) => {
       const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("presentations")
          .doc("presentation")
-      return ref.set({
-         downloadUrl: downloadUrl,
+
+      const presentation: LivestreamPresentation = {
+         downloadUrl,
          page: 1,
-      })
+         fileName: file.name || livestreamId,
+         fileSize: file.size || 0,
+         id: ref.id,
+         storagePath,
+      }
+
+      return ref.set(presentation)
    }
 
    increaseLivestreamPresentationPageNumber = (

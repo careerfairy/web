@@ -1,6 +1,7 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 import { getCountryOptionByCountryCode } from "@careerfairy/shared-lib/constants/forms"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
    SerializedSpark,
    SparkPresenter,
@@ -81,6 +82,27 @@ export class SparksService {
          this.functions,
          "deleteSpark_v3"
       )(data)
+   }
+
+   /**
+    * Retrieves all sparks created by a specific creator within a specified group.
+    *
+    * @param creatorId The unique identifier for the creator.
+    * @param creatorGroupId The group identifier to which the creator belongs.
+    * @returns A promise that resolves to an array of Spark objects.
+    */
+   async getCreatorSparks(
+      creatorId: Creator["id"],
+      creatorGroupId: Creator["groupId"]
+   ): Promise<Spark[]> {
+      const q = query(
+         collection(FirestoreInstance, "sparks"),
+         where("creator.id", "==", creatorId),
+         where("creator.groupId", "==", creatorGroupId),
+         orderBy("createdAt", "desc")
+      ).withConverter(createGenericConverter<Spark>())
+      const result = await getDocs(q)
+      return result.docs.map((doc) => doc.data())
    }
 
    /**

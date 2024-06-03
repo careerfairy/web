@@ -4,7 +4,7 @@ import { Identifiable, OptionGroup, UTMParams } from "../commonTypes"
 import { PublicCustomJob } from "../customJobs/customJobs"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { Group, GroupQuestion } from "../groups"
-import { Creator } from "../groups/creators"
+import { Creator, CreatorRole } from "../groups/creators"
 import {
    UserData,
    UserLivestreamGroupQuestionAnswers,
@@ -417,6 +417,7 @@ export interface Speaker extends Identifiable {
    rank?: number
    email?: string
    linkedInUrl?: string
+   roles: CreatorRole[]
 }
 
 export interface LiveSpeaker extends Identifiable {
@@ -747,4 +748,64 @@ export type FilterLivestreamsOptions = {
 export type CategoryDataOption = {
    livestream: LivestreamEvent
    userData: UserData
+}
+
+/**
+ * A PDF presentation for a live stream
+ * Document Path: livestreams/{livestreamId}/presentations/presentation
+ */
+export interface LivestreamPresentation extends Identifiable {
+   downloadUrl: string
+   page: number
+   fileName?: string
+   /** The path to the PDF in the storage */
+   storagePath?: string
+   /** The size of the PDF in bytes */
+   fileSize?: number
+}
+
+/**
+ * A YouTube video for a live stream
+ * Document Path: livestreams/{livestreamId}/videos/video
+ */
+export interface LivestreamVideo extends Identifiable {
+   url: string
+   second: number
+   state: "playing" | "paused"
+   lastPlayed: firebase.firestore.Timestamp
+   /** The ID of the user that can update the video */
+   updater: string
+}
+
+/**
+ * The type of the emote reactions viewers can send to the stream
+ */
+export enum EmoteType {
+   /**
+    * The user pressed the clapping button
+    */
+   CLAPPING = "clapping",
+   /**
+    * The user pressed the like button
+    */
+   LIKE = "like",
+   /**
+    * The user pressed the heart button
+    */
+   HEART = "heart",
+   /**
+    * The user pressed the confused button
+    */
+   CONFUSED = "confused",
+}
+
+export interface LivestreamEmote extends Identifiable {
+   name: EmoteType
+   timestamp: firebase.firestore.Timestamp
+   userUid: string | null
+   agoraUserId: string
+   /** @deprecated */
+   authorEmail?: string
+   /** @deprecated */
+   streamerId?: string
 }

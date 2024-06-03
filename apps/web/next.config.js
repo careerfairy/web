@@ -118,6 +118,8 @@ const csp = {
       "https://vimeo.com",
       "https://api.stripe.com",
       "https://www.google.com", // Google Ads services
+      "https://capig.stape.tech", // Pixel Conversion API Gateway
+      "https://www.googletagmanager.com",
    ],
    "img-src": [
       "'self'",
@@ -166,12 +168,16 @@ const csp = {
 if (notProduction) {
    csp["default-src"].push("localhost:*")
    csp["default-src"].push("127.0.0.1:*")
+   csp["default-src"].push("http://127.0.0.1:*")
    csp["connect-src"].push("localhost:*")
    csp["connect-src"].push("127.0.0.1:*")
+   csp["connect-src"].push("http://127.0.0.1:*")
    csp["img-src"].push("localhost:*")
    csp["img-src"].push("127.0.0.1:*")
+   csp["img-src"].push("http://127.0.0.1:*")
    csp["media-src"].push("localhost:*")
    csp["media-src"].push("127.0.0.1:*")
+   csp["media-src"].push("http://127.0.0.1:*")
 }
 
 if (isVercelPreview) {

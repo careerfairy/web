@@ -1,10 +1,10 @@
 import dayjs from "dayjs"
-import calendar from "dayjs/plugin/calendar"
 import advancedFormat from "dayjs/plugin/advancedFormat"
-import utc from "dayjs/plugin/utc"
-import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
-import relativeTime from "dayjs/plugin/relativeTime"
+import calendar from "dayjs/plugin/calendar"
 import duration from "dayjs/plugin/duration"
+import relativeTime from "dayjs/plugin/relativeTime"
+import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
+import utc from "dayjs/plugin/utc"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -370,5 +370,9 @@ export default class DateUtil {
       }
 
       return `${formattedMinutes}:${formattedSeconds}`
+   }
+
+   static getSecondsBetweenDates(startDate: Date, endDate: Date) {
+      return (endDate.getTime() - startDate.getTime()) / 1000
    }
 }

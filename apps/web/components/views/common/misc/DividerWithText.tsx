@@ -12,28 +12,25 @@ const styles = sxStyles({
       borderBottom: "1px solid #DCDCDC",
       width: "100%",
    },
-   content: {
-      paddingTop: 1,
-      paddingBottom: 1,
-      paddingRight: 2,
-      paddingLeft: 2,
-      color: "#DCDCDC",
-      fontSize: "1.14286rem",
-      fontWeight: 400,
-      letterSpacing: "-0.03121rem",
-   },
 })
 
 type Props = {
    maxWidth?: BoxProps["maxWidth"]
    children: React.ReactNode
+   textPadding?: BoxProps["px"]
+   verticalPadding?: BoxProps["py"]
 }
 
-const DividerWithText: FC<Props> = ({ children, maxWidth }) => {
+const DividerWithText: FC<Props> = ({
+   children,
+   maxWidth,
+   textPadding = 2,
+   verticalPadding = 1,
+}) => {
    return (
       <Box maxWidth={maxWidth} sx={styles.container}>
          <Box sx={styles.border} />
-         <Box component="span" sx={styles.content}>
+         <Box component="span" px={textPadding} py={verticalPadding}>
             {children}
          </Box>
          <Box sx={styles.border} />
