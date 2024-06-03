@@ -315,7 +315,10 @@ export class RankedSparkRepository {
     * @returns Array of ranked sparks filtered by the specified field ID
     */
    private getSparksFilteredByField(
-      field: keyof Omit<Spark, "tagIds">,
+      field: keyof Omit<
+         Spark,
+         "contentTopicsTagIds" | "languageTagIds" | "allLinkedCustomJobsTagIds"
+      >,
       values: unknown[],
       limit: number
    ): RankedSpark[] {

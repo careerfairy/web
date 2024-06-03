@@ -44,7 +44,10 @@ export interface LivestreamEvent extends Identifiable {
     * Content Tag IDs
     * e.g: ["BusinessDevelopment", "Consulting"]
     */
-   tagIds?: string[]
+   businessFunctionsTagIds?: string[]
+   contentTopicsTagIds?: string[]
+   allLinkedCustomJobsTagIds?: string[]
+
    isRecording?: boolean
    language?: LivestreamLanguage
    hidden: boolean

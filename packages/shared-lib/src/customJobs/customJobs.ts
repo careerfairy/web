@@ -30,7 +30,7 @@ export interface CustomJob extends Identifiable {
     * Content Tag IDs
     * e.g: ["BusinessDevelopment", "Consulting"]
     */
-   tagIds?: string[]
+   businessFunctionsTagIds?: string[]
 }
 
 export type PublicCustomJob = Pick<

@@ -79,7 +79,10 @@ export interface UserData extends Identifiable {
     * Content Tag IDs
     * e.g: ["BusinessDevelopment", "Consulting"]
     */
-   tagIds?: string[]
+   businessFunctionsTagIds?: string[]
+   contentTopicsTagIds?: string[]
+   languageTagIds?: string[] // Based on userData spoken languages
+
    // from the rewards/credit system
    // negative or positive
    credits?: number
