@@ -1,5 +1,5 @@
-import { Box, Button } from "@mui/material"
-import { Video } from "react-feather"
+import { Box, Button, Typography } from "@mui/material"
+import { VideoOff } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useLocalTracks } from "../../context"
 import { useMediaStream } from "./useMediaStream"
@@ -20,6 +20,27 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+   },
+   buttonContainer: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: (theme) => theme.brand.white[500],
+      height: "100%",
+      width: "70%",
+      color: "neutral.600",
+   },
+   icon: {
+      color: "inherit",
+      width: 32,
+      height: 32,
+   },
+   text: {
+      mt: 2,
+      color: "inherit",
+      textAlign: "center",
+      mb: 0.75,
    },
 })
 
@@ -44,15 +65,19 @@ export const TempCameraSetup = () => {
 
 export const TurnOnCameraButton = () => {
    const { toggleCamera } = useLocalTracks()
+
    return (
       <Box sx={[styles.video, styles.centered]}>
-         <Button
-            variant="contained"
-            onClick={toggleCamera}
-            startIcon={<Video />}
-         >
-            Turn on camera
-         </Button>
+         <Box sx={styles.buttonContainer}>
+            <Box sx={styles.icon} component={VideoOff} />
+            <Typography sx={styles.text} variant="small">
+               Your camera is off, <br />
+               effects won&apos;t be applied
+            </Typography>
+            <Button size="small" variant="contained" onClick={toggleCamera}>
+               Switch camera on
+            </Button>
+         </Box>
       </Box>
    )
 }

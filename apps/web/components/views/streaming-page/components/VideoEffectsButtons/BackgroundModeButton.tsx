@@ -3,10 +3,10 @@ import {
    ButtonBase,
    ButtonBaseProps,
    CircularProgress,
+   TooltipProps,
    Typography,
 } from "@mui/material"
 import { ReactNode, forwardRef } from "react"
-import { AlertCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { VirtualBackgroundMode } from "../../types"
 import { BrandedTooltip } from "../BrandedTooltip"
@@ -26,7 +26,6 @@ const styles = sxStyles({
       bgcolor: (theme) => theme.brand.white[300],
       border: (theme) => `1px solid ${theme.brand.purple[100]}`,
       borderRadius: 2,
-      color: "#0000008A",
       "& svg": {
          color: "inherit",
          fontSize: 24,
@@ -36,29 +35,17 @@ const styles = sxStyles({
       transition: (theme) =>
          theme.transitions.create(["background-color", "color"]),
       position: "relative",
+      color: (theme) => theme.palette.neutral[400],
    },
    active: {
       color: "white",
       bgcolor: "primary.500",
    },
-   warningIconWrapper: {
-      p: 1,
-      position: "absolute",
-      top: 0,
-      right: 0,
-      "& svg": {
-         color: "warning.600",
-         width: 20,
-         height: 20,
-      },
-   },
    label: {
       mt: 1.25,
       fontSize: 12,
-      color: (theme) => theme.palette.neutral[400],
-   },
-   labelActive: {
-      color: "white",
+
+      color: "inherit",
    },
    loader: {
       display: "flex",
@@ -69,7 +56,27 @@ const styles = sxStyles({
    tooltipPopper: {
       maxWidth: 219,
    },
+   disabled: {
+      "&:disabled": {
+         opacity: 0.3,
+         bgcolor: (theme) => theme.brand.white[400],
+         color: (theme) => theme.brand.black[700],
+      },
+   },
 })
+
+const customSlotProps: TooltipProps["slotProps"] = {
+   popper: {
+      modifiers: [
+         {
+            name: "offset",
+            options: {
+               offset: [0, -12], // move down 12px to match Figma Design
+            },
+         },
+      ],
+   },
+}
 
 type Props = {
    label: string
@@ -93,25 +100,21 @@ export const BackgroundModeButton = forwardRef<HTMLButtonElement, Props>(
             }}
             sx={styles.tooltip}
             title={getButtonTooltip(mode, error)}
+            slotProps={customSlotProps}
          >
             <Box component="span" sx={styles.buttonWrapper}>
                <ButtonBase
                   {...rest}
-                  sx={[styles.root, isActive && styles.active]}
+                  sx={[
+                     styles.root,
+                     isActive && styles.active,
+                     isDisabled && styles.disabled,
+                  ]}
                   disabled={isDisabled}
                   ref={ref}
                >
-                  {Boolean(error) && (
-                     <Box sx={styles.warningIconWrapper}>
-                        <AlertCircle />
-                     </Box>
-                  )}
                   {loading ? <Loader /> : icon}
-                  <Typography
-                     sx={[styles.label, isActive && styles.labelActive]}
-                  >
-                     {label}
-                  </Typography>
+                  <Typography sx={styles.label}>{label}</Typography>
                </ButtonBase>
             </Box>
          </BrandedTooltip>

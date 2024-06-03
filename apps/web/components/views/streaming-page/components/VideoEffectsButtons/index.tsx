@@ -30,7 +30,7 @@ const ACCEPTED_FILE_TYPES = ["png", "jpeg", "jpg", "PNG", "JPEG", "JPG"]
 
 export const VideoEffectsButtons = () => {
    const { livestreamId } = useStreamingContext()
-   const { localCameraTrack } = useLocalTracks()
+   const { localCameraTrack, cameraOn } = useLocalTracks()
    const virtualBackgroundMode = useVirtualBackgroundMode()
 
    const {
@@ -83,8 +83,8 @@ export const VideoEffectsButtons = () => {
                label="No Effect"
                icon={<Slash />}
                onClick={() => clearMutation()}
-               disabled={loading}
                mode={VirtualBackgroundMode.OFF}
+               disabled={loading || !cameraOn}
             />
          </Grid>
          <Grid item xs={4}>
@@ -94,8 +94,8 @@ export const VideoEffectsButtons = () => {
                loading={blurringLoading}
                icon={<BlurIcon />}
                onClick={() => blurringMutation()}
-               disabled={loading}
                mode={VirtualBackgroundMode.BLUR}
+               disabled={loading || !cameraOn}
                error={blurringError || !isCompatible}
             />
          </Grid>
@@ -113,8 +113,8 @@ export const VideoEffectsButtons = () => {
                   active={virtualBackgroundMode === VirtualBackgroundMode.IMAGE}
                   loading={imageLoading || isUploadingImage}
                   icon={<PlaceholderImageIcon />}
-                  disabled={loading}
                   mode={VirtualBackgroundMode.IMAGE}
+                  disabled={loading || !cameraOn}
                   error={imageError || !isCompatible}
                />
             </FileUploader>
