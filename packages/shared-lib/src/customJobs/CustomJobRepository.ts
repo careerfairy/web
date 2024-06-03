@@ -126,7 +126,9 @@ export class FirebaseCustomJobRepository
          createdAt: this.fieldValue.serverTimestamp() as Timestamp,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
          livestreams: linkedLivestreamId ? [linkedLivestreamId] : [],
+         sparks: [],
          id: ref.id,
+         published: Boolean(linkedLivestreamId),
       }
       console.log("🚀 ~ newJob:", newJob)
 

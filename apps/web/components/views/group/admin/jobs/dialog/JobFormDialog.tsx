@@ -1,28 +1,28 @@
-import { useSelector } from "react-redux"
-import { jobsFormSelectedJobIdSelector } from "../../../../../../store/selectors/adminJobsSelectors"
-import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
-import SteppedDialog, {
-   useStepper,
-} from "../../../../stepped-dialog/SteppedDialog"
-import { FC, useCallback, useRef } from "react"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
-import * as Yup from "yup"
-import { Formik } from "formik"
-import JobFetchWrapper from "../../../../../../HOCs/job/JobFetchWrapper"
-import { v4 as uuidv4 } from "uuid"
+import { CUSTOM_JOB_CONSTANTS } from "@careerfairy/shared-lib/customJobs/constants"
 import {
    JobType,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import * as yup from "yup"
-import { URL_REGEX } from "../../../../../util/constants"
 import { Box, CircularProgress } from "@mui/material"
-import { Timestamp } from "../../../../../../data/firebase/FirebaseInstance"
-import { customJobRepo } from "../../../../../../data/RepositoryInstances"
-import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
-import { CUSTOM_JOB_CONSTANTS } from "@careerfairy/shared-lib/customJobs/constants"
+import { Formik } from "formik"
 import dynamic from "next/dynamic"
+import { FC, useCallback, useRef } from "react"
+import { useSelector } from "react-redux"
+import { v4 as uuidv4 } from "uuid"
+import * as Yup from "yup"
+import * as yup from "yup"
+import JobFetchWrapper from "../../../../../../HOCs/job/JobFetchWrapper"
+import { customJobRepo } from "../../../../../../data/RepositoryInstances"
+import { Timestamp } from "../../../../../../data/firebase/FirebaseInstance"
+import { jobsFormSelectedJobIdSelector } from "../../../../../../store/selectors/adminJobsSelectors"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
+import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
+import { URL_REGEX } from "../../../../../util/constants"
+import SteppedDialog, {
+   useStepper,
+} from "../../../../stepped-dialog/SteppedDialog"
 
 const styles = sxStyles({
    container: {
@@ -82,9 +82,7 @@ const JobFormDialog: FC<Props> = ({
             const formattedJob: PublicCustomJob = {
                ...values,
                jobType: values.jobType as JobType,
-               deadline: values.deadline
-                  ? Timestamp.fromDate(values.deadline)
-                  : null,
+               deadline: Timestamp.fromDate(values.deadline),
                postingUrl:
                   values.postingUrl.indexOf("http") === 0
                      ? values.postingUrl
@@ -258,13 +256,16 @@ const validationSchema = (quillRef) => {
          ),
       salary: yup.string(),
       noDateValidation: yup.boolean(),
-      deadline: yup.date().when("noDateValidation", {
-         is: false,
-         then: yup
-            .date()
-            .nullable()
-            .min(new Date(), "The date must be in the future"),
-      }),
+      deadline: yup
+         .date()
+         .when("noDateValidation", {
+            is: false,
+            then: yup
+               .date()
+               .nullable()
+               .min(new Date(), "The date must be in the future"),
+         })
+         .required("Required"),
       postingUrl: yup
          .string()
          .matches(URL_REGEX, { message: "Must be a valid url" })
