@@ -35,7 +35,7 @@ export const adminJobsSlice = createSlice({
          state.deleteJobDialogOpen = true
          state.selectedJobId = action.payload
       },
-      openDeleteJobWithLinkedLivestreams: (state) => {
+      openDeleteJobWithLinkedContent: (state) => {
          state.deleteJobWithLinkedLivestreamsDialogOpen = true
       },
    },
@@ -43,7 +43,7 @@ export const adminJobsSlice = createSlice({
 
 // Export actions
 export const {
-   openDeleteJobWithLinkedLivestreams,
+   openDeleteJobWithLinkedContent,
    openJobsDialog,
    closeJobsDialog,
    openDeleteJobDialogOpen,
