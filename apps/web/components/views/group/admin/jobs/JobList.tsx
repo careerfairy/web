@@ -144,10 +144,8 @@ const styles = sxStyles({
    },
    jobState: {
       display: "flex",
-      width: "8px",
       borderRadius: "16px 0 0 16px",
       p: "8px",
-      m: "1px 0 1px 2px",
    },
    listItemContainer: {
       display: "flex",
