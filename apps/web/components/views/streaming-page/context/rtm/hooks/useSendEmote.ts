@@ -1,6 +1,8 @@
 import { EmoteType } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
+import { useAppDispatch } from "components/custom-hook/store"
 import { livestreamService } from "data/firebase/LivestreamService"
+import { addEmote } from "store/reducers/streamingAppReducer"
 import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { dataLayerEvent } from "util/analyticsUtils"
@@ -16,8 +18,12 @@ export const useSendEmote = (livestreamId: string, agoraUserId: string) => {
    const rtmClient = useRTMClient()
    const rtmChannel = useRTMChannel()
    const { authenticatedUser } = useAuth()
+   const dispatch = useAppDispatch()
 
    const sendEmoteFetcher: Fetcher = async (_, opts) => {
+      // Optimistically dispatch emote locally for the UI
+      dispatch(addEmote(opts.arg.emoteType))
+
       // Save the emote document in firestore for pdf reporting, we don't need to await this
       livestreamService
          .addEmote(
@@ -56,8 +62,6 @@ export const useSendEmote = (livestreamId: string, agoraUserId: string) => {
          text: opts.arg.emoteType,
          messageType: "TEXT",
       })
-
-      // TODO: Optimistically dispatch emote locally to the UI
 
       await rtmChannel.sendMessage(message)
    }

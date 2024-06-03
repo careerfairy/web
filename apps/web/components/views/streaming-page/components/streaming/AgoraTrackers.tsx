@@ -13,7 +13,6 @@ import {
    useRTMClient,
    useRTMClientEvent,
 } from "../../context/rtm"
-import { useSnackbar } from "notistack"
 
 export const AgoraTrackers = () => {
    const rtcClient = useRTCClient()
@@ -22,7 +21,6 @@ export const AgoraTrackers = () => {
    const rtmClient = useRTMClient()
 
    const dispatch = useAppDispatch()
-   const { enqueueSnackbar } = useSnackbar()
 
    /**
     * A hook that tracks and dispatches the audio levels of users in a streaming session.
@@ -55,12 +53,6 @@ export const AgoraTrackers = () => {
          // ticket: https://linear.app/careerfairy/issue/CF-816/handle-videoaudio-track-autoplay-faliure
       }
    }, [rtcClient])
-
-   useRTMChannelEvent(rtmChannel, "ChannelMessage", (message, memberId) => {
-      enqueueSnackbar(`Emote sent by ${memberId}: ${message.text}`, {
-         variant: "success",
-      })
-   })
 
    useRTMChannelEvent(rtmChannel, "MemberCountUpdated", (newCount) => {
       dispatch(setViewCount(newCount))

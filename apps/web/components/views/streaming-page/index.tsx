@@ -168,6 +168,14 @@ const OngoingPollTracker = dynamic(
    { ssr: false }
 )
 
+const EmotesRenderer = dynamic(
+   () =>
+      import("./components/emotes/EmotesRenderer").then(
+         (mod) => mod.EmotesRenderer
+      ),
+   { ssr: false }
+)
+
 type Props = {
    isHost: boolean
 }
@@ -243,6 +251,7 @@ const Component = ({ isHost }: Props) => {
                         {isHost ? null : <ThanksForJoiningHandRaiseDialog />}
                         {isHost ? <UploadPDFPresentationDialog /> : null}
                         {isHost ? <ShareVideoDialog /> : null}
+                        <EmotesRenderer />
                         <SessionConflictModal />
                         <SessionDisconnectedModal />
                      </RTMSignalingProvider>
