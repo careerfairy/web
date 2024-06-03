@@ -100,7 +100,8 @@ export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
    const [progress, setProgress] = useState(0)
    const { agoraUserId, livestreamId } = useStreamingContext()
    const streamIsMobile = useStreamIsMobile()
-
+   const dispatch = useAppDispatch()
+   
    const reactionsRef = useRef(null)
 
    const { trigger: sendEmote } = useSendEmote(livestreamId, agoraUserId)
@@ -136,8 +137,7 @@ export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
 
    const handleSendEmote = (emoteType: EmoteType) => {
       sendEmote({ emoteType })
-
-      if (userData?.isAdmin) return // Do not disable the buttons for admins
+      if (userData?.isAdmin) return // Do not disable and close the buttons for admins
       handleClose()
       setIconsDisabled(true)
       setProgress(0)

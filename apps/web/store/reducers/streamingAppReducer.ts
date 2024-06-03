@@ -1,4 +1,5 @@
 import {
+   EmoteType,
    LivestreamMode,
    LivestreamModes,
 } from "@careerfairy/shared-lib/livestreams"
@@ -10,6 +11,10 @@ import {
 } from "agora-rtc-react"
 import { RtmStatusCode } from "agora-rtm-sdk"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { v4 as uuidv4 } from "uuid"
+
+/** Max number of emote nodes that can be rendered at once */
+const MAX_EMOTES_TO_RENDER = 30
 
 export const ActiveViews = {
    CHAT: "chat",
@@ -95,6 +100,10 @@ export interface StreamingAppState {
          reason: ConnectionDisconnectedReason
       } | null
    }
+   emotes: {
+      type: EmoteType
+      id: string
+   }[]
    isLoggedInOnDifferentBrowser: boolean
 }
 
@@ -132,6 +141,7 @@ const initialState: StreamingAppState = {
    rtcState: {
       connectionState: null,
    },
+   emotes: [],
    isLoggedInOnDifferentBrowser: false,
 }
 
@@ -326,6 +336,20 @@ const streamingAppSlice = createSlice({
       setShareVideoDialogOpen(state, action: PayloadAction<boolean>) {
          state.shareVideoDialogOpen = action.payload
       },
+      addEmote(state, action: PayloadAction<EmoteType>) {
+         if (state.emotes.length >= MAX_EMOTES_TO_RENDER) {
+            state.emotes.shift()
+         }
+         state.emotes.push({ type: action.payload, id: uuidv4() })
+      },
+      removeEmote(state, action: PayloadAction<string>) {
+         state.emotes = state.emotes.filter(
+            (emote) => emote.id !== action.payload
+         )
+      },
+      clearEmotes(state) {
+         state.emotes = []
+      },
    },
 })
 
@@ -356,6 +380,9 @@ export const {
       resetNumberOfHandRaiseNotifications,
       setUploadPDFPresentationDialogOpen,
       setShareVideoDialogOpen,
+      addEmote,
+      removeEmote,
+      clearEmotes,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
