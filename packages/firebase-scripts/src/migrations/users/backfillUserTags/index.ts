@@ -7,13 +7,12 @@ import { logAction } from "../../../util/logger"
 import { throwMigrationError } from "../../../util/misc"
 import { DataWithRef } from "../../../util/types"
 
-const RUNNING_VERSION = "0.1"
 const counter = new Counter()
 
 // types
 type UserDataWithRef = DataWithRef<true, UserData>
 
-const BUSINESS_FUNCTIONS_INTERESTS_MAPPINGS = {
+const INTERESTS_IDS_BUSINESS_FUNCTIONS_TAGS_MAP = {
    Le9yVcgRtkReAdwyh6tq: [], // Startups,
    MPY3KTjYH1GiePa4I0kZ: ["ResearchDevelopment"], // Research & Development,
    OjIkyLu7oxICHqweTT04: ["BusinessDevelopment"], // Business,
@@ -26,7 +25,7 @@ const BUSINESS_FUNCTIONS_INTERESTS_MAPPINGS = {
    zzBbeQvTajFdx10kz6X0: ["ProductManagement"], // Product Management
 }
 
-const CONTENT_TOPICS_INTERESTS_MAPPINGS = {
+const INTERESTS_IDS_CONTENT_TOPICS_TAGS_MAP = {
    Le9yVcgRtkReAdwyh6tq: [], // Startups,
    MPY3KTjYH1GiePa4I0kZ: [], // Research & Development,
    OjIkyLu7oxICHqweTT04: [], // Business,
@@ -41,9 +40,7 @@ const CONTENT_TOPICS_INTERESTS_MAPPINGS = {
 
 export async function run() {
    try {
-      Counter.log(
-         `Fetching data for Backfilling Users data - Category tagging - v${RUNNING_VERSION} `
-      )
+      Counter.log("Fetching data for Backfilling Users data - Category tagging")
 
       const [allUsers] = await logAction(
          () => Promise.all([userRepo.getAllUsers(true)]),
@@ -54,10 +51,6 @@ export async function run() {
 
       counter.addToReadCount(allUsers.length)
 
-      // const usersDict: Record<string, UserData> =
-      //    convertDocArrayToDict(allUsers)
-
-      // cascade group metadata to Job Applications
       await cascadeUserInterestsToCategoryTags(allUsers)
    } catch (error) {
       console.error(error)
@@ -67,14 +60,9 @@ export async function run() {
    }
 }
 
-const cascadeUserInterestsToCategoryTags = async (
-   // usersDictionary: Record<string, UserData>
-   users: UserDataWithRef[]
-) => {
-   console.log("🚀 ~ usersDictionary:", users)
+const cascadeUserInterestsToCategoryTags = async (users: UserDataWithRef[]) => {
    const batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
 
-   // const userKeys = Object.keys(usersDictionary)
    const totalNumDocs = users.length
 
    writeProgressBar.start(totalNumDocs, 0)
@@ -87,36 +75,39 @@ const cascadeUserInterestsToCategoryTags = async (
       usersChunk.forEach((user) => {
          writeProgressBar.increment() // Increment progress bar
 
-         if (user.interestIds?.length) {
-            user.businessFunctionsTagIds = mapUserInterestsToTagIds(
-               (id) => BUSINESS_FUNCTIONS_INTERESTS_MAPPINGS[id],
-               user.interestIds
-            )
-            user.contentTopicsTagIds = mapUserInterestsToTagIds(
-               (id) => CONTENT_TOPICS_INTERESTS_MAPPINGS[id],
-               user.interestIds
-            )
+         const toUpdate: Pick<
+            UserData,
+            "businessFunctionsTagIds" | "contentTopicsTagIds"
+         > = {
+            businessFunctionsTagIds: [],
+            contentTopicsTagIds: [],
          }
 
-         if (user.languages) {
-            user.languageTagIds = mapUserInterestsToTagIds(
-               (id) => BUSINESS_FUNCTIONS_INTERESTS_MAPPINGS[id],
-               user.interestIds
+         if (user.interestsIds?.length) {
+            toUpdate.businessFunctionsTagIds = mapUserInterestsToTagIds(
+               (id) => INTERESTS_IDS_BUSINESS_FUNCTIONS_TAGS_MAP[id],
+               user.interestsIds
             )
-
-            // businessFunctionsTagIds?: string[]
-            // contentTopicsTagIds?: string[]
-            // languageTagIds?: string[] // Based on userData spoken languages
+            toUpdate.contentTopicsTagIds = mapUserInterestsToTagIds(
+               (id) => INTERESTS_IDS_CONTENT_TOPICS_TAGS_MAP[id],
+               user.interestsIds
+            )
          }
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         batch.update(user._ref as any, toUpdate)
       })
 
       await batch.commit() // Wait for batch to commit
    }
 
    writeProgressBar.stop()
-   Counter.log("All Job Applications batches committed! :)")
+   Counter.log("All Users tags back filled from interestsIds :)")
 }
 
+/**
+ * There should be no need for removing duplicates as long as
+ * the input of ids is without such also.
+ */
 function mapUserInterestsToTagIds(
    mapper: (id: string) => string[],
    interestIds?: string[]
