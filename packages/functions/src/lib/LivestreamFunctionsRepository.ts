@@ -177,6 +177,16 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @param handRaise - The new hand raise state.
     */
    updateHandRaise(livestreamId: string, handRaise: boolean): Promise<void>
+
+   /**
+    * TODO add documentation
+    * @param livestreamId
+    * @param tags
+    */
+   syncCustomJobBusinessFunctionTagsToLivestream(
+      livestreamId: string,
+      tags: string[]
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -652,5 +662,15 @@ export class LivestreamFunctionsRepository
       batch.update(livestreamRef, updateData)
 
       return batch.commit()
+   }
+
+   async syncCustomJobBusinessFunctionTagsToLivestream(
+      livestreamId: string,
+      tags: string[]
+   ): Promise<void> {
+      functions.logger.log(`Sync tags with live stream ${livestreamId}.`)
+      const ref = this.firestore.collection("livestreams").doc(livestreamId)
+
+      return ref.update({ linkedCustomJobsTagIds: tags })
    }
 }
