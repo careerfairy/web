@@ -119,7 +119,7 @@ export const useAutoSave = () => {
       ) => {
          const removedSpeakers = previousSpeakers?.filter(
             (prevSpeaker) =>
-               !newSpeakers.some(
+               !newSpeakers?.some(
                   (newSpeaker) => newSpeaker.id === prevSpeaker.id
                )
          )
