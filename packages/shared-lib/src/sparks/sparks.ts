@@ -45,7 +45,7 @@ export interface Spark extends Identifiable {
     */
    contentTopicsTagIds?: string[]
    languageTagIds?: string[]
-   allLinkedCustomJobsTagIds?: string[]
+   linkedCustomJobsTagIds?: string[]
    /**
     * Description / Question of the spark
     */
