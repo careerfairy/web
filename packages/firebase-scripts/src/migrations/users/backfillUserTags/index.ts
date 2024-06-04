@@ -1,17 +1,16 @@
-import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { UserData } from "@careerfairy/shared-lib/src/users"
 import Counter from "../../../lib/Counter"
+import { firestore } from "../../../lib/firebase"
 import { userRepo } from "../../../repositories"
 import { writeProgressBar } from "../../../util/bulkWriter"
 import { logAction } from "../../../util/logger"
 import { throwMigrationError } from "../../../util/misc"
-// import { DataWithRef } from "../../../util/types"
-
+import { DataWithRef } from "../../../util/types"
 const RUNNING_VERSION = "0.1"
 const counter = new Counter()
 
 // types
-// type UserDataWithRef = DataWithRef<true, UserData>
+type UserDataWithRef = DataWithRef<true, UserData>
 
 export async function run() {
    try {
@@ -20,7 +19,7 @@ export async function run() {
       )
 
       const [allUsers] = await logAction(
-         () => Promise.all([userRepo.getAllUsers()]),
+         () => Promise.all([userRepo.getAllUsers(true)]),
          "Fetching all Users"
       )
 
@@ -28,11 +27,11 @@ export async function run() {
 
       counter.addToReadCount(allUsers.length)
 
-      const usersDict: Record<string, UserData> =
-         convertDocArrayToDict(allUsers)
+      // const usersDict: Record<string, UserData> =
+      //    convertDocArrayToDict(allUsers)
 
       // cascade group metadata to Job Applications
-      await cascadeUserInterestsToCategoryTags(usersDict)
+      await cascadeUserInterestsToCategoryTags(allUsers)
    } catch (error) {
       console.error(error)
       throwMigrationError(error.message)
@@ -42,54 +41,43 @@ export async function run() {
 }
 
 const cascadeUserInterestsToCategoryTags = async (
-   usersDictionary: Record<string, UserData>
+   // usersDictionary: Record<string, UserData>
+   users: UserDataWithRef[]
 ) => {
-   console.log("🚀 ~ usersDictionary:", usersDictionary)
-   // const batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
+   console.log("🚀 ~ usersDictionary:", users)
+   const batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
 
-   // const totalDocs = jobApplications
-   // const totalNumDocs = jobApplications.length
+   // const userKeys = Object.keys(usersDictionary)
+   const totalNumDocs = users.length
 
-   // writeProgressBar.start(totalNumDocs, 0)
+   writeProgressBar.start(totalNumDocs, 0)
 
-   // for (let i = 0; i < totalNumDocs; i += batchSize) {
-   //    const batch = firestore.batch()
+   for (let i = 0; i < totalNumDocs; i += batchSize) {
+      const batch = firestore.batch()
 
-   //    const customJobsApplicantsChunk = totalDocs.slice(i, i + batchSize) // Slice the data into batches
+      const usersChunk = users.slice(i, i + batchSize) // Slice the data into batches
 
-   //    customJobsApplicantsChunk.forEach((customJobApplicant) => {
-   //       writeProgressBar.increment() // Increment progress bar
+      usersChunk.forEach((user) => {
+         console.log("🚀 ~ usersChunk.forEach ~ user:", user)
+         writeProgressBar.increment() // Increment progress bar
 
-   //       // Get event hosts from groupsDict
-   //       const jobGroup = groupsDict[customJobApplicant.groupId]
+         // if (hasMetadataToUpdate) {
+         //    // update customJob with metadata
+         //    const toUpdate =
+         //       pickPublicDataFromCustomJobApplicant(user)
 
-   //       if (jobGroup) {
-   //          // get metadata from event hosts
-   //          const metadata = getMetaDataFromCustomJobGroup(jobGroup)
+         //    toUpdate.companyCountry = metadata.companyCountry
+         //    toUpdate.companyIndustries = metadata.companyIndustries
+         //    toUpdate.companySize = metadata.companySize
 
-   //          // Return metadata if there is at least ONE field that is not empty
-   //          const hasMetadataToUpdate = Object.values(metadata).some(
-   //             (field) => !isEmpty(field)
-   //          )
+         //    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         //    batch.update(user._ref as any, toUpdate)
+         //    counter.writeIncrement() // Increment write counter
+         // }
+      })
 
-   //          if (hasMetadataToUpdate) {
-   //             // update customJob with metadata
-   //             const toUpdate =
-   //                pickPublicDataFromCustomJobApplicant(customJobApplicant)
-
-   //             toUpdate.companyCountry = metadata.companyCountry
-   //             toUpdate.companyIndustries = metadata.companyIndustries
-   //             toUpdate.companySize = metadata.companySize
-
-   //             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   //             batch.update(customJobApplicant._ref as any, toUpdate)
-   //             counter.writeIncrement() // Increment write counter
-   //          }
-   //       }
-   //    })
-
-   //    await batch.commit() // Wait for batch to commit
-   // }
+      await batch.commit() // Wait for batch to commit
+   }
 
    writeProgressBar.stop()
    Counter.log("All Job Applications batches committed! :)")
