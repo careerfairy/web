@@ -317,7 +317,7 @@ export class RankedSparkRepository {
    private getSparksFilteredByField(
       field: keyof Omit<
          Spark,
-         "contentTopicsTagIds" | "languageTagIds" | "allLinkedCustomJobsTagIds"
+         "contentTopicsTagIds" | "languageTagIds" | "linkedCustomJobsTagIds"
       >,
       values: unknown[],
       limit: number
