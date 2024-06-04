@@ -14,6 +14,7 @@ import {
    sparkRepo,
 } from "./api/repositories"
 
+import { getArrayDifference } from "@careerfairy/shared-lib/utils"
 import config from "./config"
 import { handleUserStatsBadges } from "./lib/badge"
 import { rewardSideEffectsUserStats } from "./lib/reward"
@@ -341,8 +342,10 @@ export const onWriteCustomJobs = functions
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
 
+      const newCustomJob = change.after.data() as CustomJob
+      const oldCustomJob = change.before.data() as CustomJob
+
       if (changeTypes.isCreate) {
-         const newCustomJob = change.after.data() as CustomJob
          sideEffectPromises.push(
             customJobRepo.createCustomJobStats(newCustomJob)
          )
@@ -356,6 +359,26 @@ export const onWriteCustomJobs = functions
             customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
             customJobRepo.syncCustomJobDataToJobApplications(updatedCustomJob)
          )
+
+         if (
+            getArrayDifference(
+               newCustomJob?.businessFunctionsTagIds || [],
+               oldCustomJob?.businessFunctionsTagIds || []
+            )
+         ) {
+            const livestreamPromises = Promise.all(
+               newCustomJob.livestreams.map((livestreamId) =>
+                  livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestream(
+                     livestreamId,
+                     newCustomJob?.businessFunctionsTagIds
+                  )
+               )
+            )
+            sideEffectPromises.push(
+               livestreamPromises
+               // sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(newCustomJob?.businessFunctionsTagIds)
+            )
+         }
       }
 
       if (changeTypes.isDelete) {
