@@ -51,7 +51,6 @@ export interface UserData extends Identifiable {
     */
    businessFunctionsTagIds?: string[]
    contentTopicsTagIds?: string[]
-   languageTagIds?: string[] // Based on userData spoken languages
 
    // from the rewards/credit system
    // negative or positive
