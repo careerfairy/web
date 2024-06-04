@@ -135,7 +135,7 @@ const buildRegistrationQuestions = (
       ? groupQuestionsMap
       : { [group.groupId]: groupQuestionsMap[group.groupId] }
 
-   return Object.keys(filteredGroupQuestionsMap).flatMap((groupId) => {
+   return Object.keys(filteredGroupQuestionsMap || {}).flatMap((groupId) => {
       const livestreamQuestionMap = filteredGroupQuestionsMap[groupId]
       const questions = Object.values(livestreamQuestionMap?.questions)?.map(
          (question) => {
@@ -200,7 +200,7 @@ const convertLivestreamObjectToForm = ({
    }
 
    general.categories.values = existingInterests.filter((interest) =>
-      livestream.interestsIds.includes(interest.id)
+      livestream.interestsIds?.includes(interest.id)
    )
    general.categories.options = existingInterests
 
