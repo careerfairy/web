@@ -6,16 +6,43 @@ import { writeProgressBar } from "../../../util/bulkWriter"
 import { logAction } from "../../../util/logger"
 import { throwMigrationError } from "../../../util/misc"
 import { DataWithRef } from "../../../util/types"
+
 const RUNNING_VERSION = "0.1"
 const counter = new Counter()
 
 // types
 type UserDataWithRef = DataWithRef<true, UserData>
 
+const BUSINESS_FUNCTIONS_INTERESTS_MAPPINGS = {
+   Le9yVcgRtkReAdwyh6tq: [], // Startups,
+   MPY3KTjYH1GiePa4I0kZ: ["ResearchDevelopment"], // Research & Development,
+   OjIkyLu7oxICHqweTT04: ["BusinessDevelopment"], // Business,
+   ZXvJo51KI8HHXbUiC7Jl: [], // Resume & Cover Letter,
+   bcs4xerUoed6G28AVjSZ: ["Marketing"], // Marketing,
+   njgCUBkijDTSlKtAkAYx: [], // Large Companies,
+   pyfkBYzhJ3ewnmGAoz1l: [], // Career Development,
+   wMn0IAckmeK7bNSads0V: [], // Interview Preparation,
+   yl0wwi5wQ6oHEt8ovoRb: [], // Public Sector
+   zzBbeQvTajFdx10kz6X0: ["ProductManagement"], // Product Management
+}
+
+const CONTENT_TOPICS_INTERESTS_MAPPINGS = {
+   Le9yVcgRtkReAdwyh6tq: [], // Startups,
+   MPY3KTjYH1GiePa4I0kZ: [], // Research & Development,
+   OjIkyLu7oxICHqweTT04: [], // Business,
+   ZXvJo51KI8HHXbUiC7Jl: ["ApplicationProcess"], // Resume & Cover Letter,
+   bcs4xerUoed6G28AVjSZ: [], // Marketing,
+   njgCUBkijDTSlKtAkAYx: [], // Large Companies,
+   pyfkBYzhJ3ewnmGAoz1l: ["Role"], // Career Development,
+   wMn0IAckmeK7bNSads0V: ["ApplicationProcess"], // Interview Preparation,
+   yl0wwi5wQ6oHEt8ovoRb: [], // Public Sector
+   zzBbeQvTajFdx10kz6X0: [], // Product Management
+}
+
 export async function run() {
    try {
       Counter.log(
-         `Fetching data for Backfilling Users data - Category tagging - v${RUNNING_VERSION}`
+         `Fetching data for Backfilling Users data - Category tagging - v${RUNNING_VERSION} `
       )
 
       const [allUsers] = await logAction(
@@ -58,22 +85,29 @@ const cascadeUserInterestsToCategoryTags = async (
       const usersChunk = users.slice(i, i + batchSize) // Slice the data into batches
 
       usersChunk.forEach((user) => {
-         console.log("🚀 ~ usersChunk.forEach ~ user:", user)
          writeProgressBar.increment() // Increment progress bar
 
-         // if (hasMetadataToUpdate) {
-         //    // update customJob with metadata
-         //    const toUpdate =
-         //       pickPublicDataFromCustomJobApplicant(user)
+         if (user.interestIds?.length) {
+            user.businessFunctionsTagIds = mapUserInterestsToTagIds(
+               (id) => BUSINESS_FUNCTIONS_INTERESTS_MAPPINGS[id],
+               user.interestIds
+            )
+            user.contentTopicsTagIds = mapUserInterestsToTagIds(
+               (id) => CONTENT_TOPICS_INTERESTS_MAPPINGS[id],
+               user.interestIds
+            )
+         }
 
-         //    toUpdate.companyCountry = metadata.companyCountry
-         //    toUpdate.companyIndustries = metadata.companyIndustries
-         //    toUpdate.companySize = metadata.companySize
+         if (user.languages) {
+            user.languageTagIds = mapUserInterestsToTagIds(
+               (id) => BUSINESS_FUNCTIONS_INTERESTS_MAPPINGS[id],
+               user.interestIds
+            )
 
-         //    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-         //    batch.update(user._ref as any, toUpdate)
-         //    counter.writeIncrement() // Increment write counter
-         // }
+            // businessFunctionsTagIds?: string[]
+            // contentTopicsTagIds?: string[]
+            // languageTagIds?: string[] // Based on userData spoken languages
+         }
       })
 
       await batch.commit() // Wait for batch to commit
@@ -81,4 +115,15 @@ const cascadeUserInterestsToCategoryTags = async (
 
    writeProgressBar.stop()
    Counter.log("All Job Applications batches committed! :)")
+}
+
+function mapUserInterestsToTagIds(
+   mapper: (id: string) => string[],
+   interestIds?: string[]
+): string[] {
+   if (!interestIds?.length) {
+      return []
+   }
+
+   return interestIds?.map(mapper).flat()
 }
