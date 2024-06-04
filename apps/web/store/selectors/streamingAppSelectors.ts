@@ -76,7 +76,15 @@ export const useOpenStream = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.openStream)
 
 export const useCompanyLogoUrl = () =>
-   useAppSelector((state) => state.streamingApp.livestreamState.companyLogoUrl)
+   useAppSelector((state) => {
+      const { companyLogoUrl, test } = state.streamingApp.livestreamState
+      return test ? "/logo-green.png" : companyLogoUrl
+   })
+export const useCompanyName = () =>
+   useAppSelector((state) => {
+      const { companyName, test } = state.streamingApp.livestreamState
+      return test ? "Test Company" : companyName
+   })
 
 export const useStreamHandRaiseEnabled = () =>
    useAppSelector(
@@ -103,3 +111,12 @@ export const useEmotes = () =>
 
 export const useVirtualBackgroundMode = () =>
    useAppSelector((state) => state.streamingApp.virtualBackgroundMode)
+
+export const useShowWaitingRoom = (isHost: boolean) =>
+   useAppSelector((state) => {
+      const { hasStarted, hasEnded } = state.streamingApp.livestreamState
+      return !isHost && !hasEnded && hasStarted === undefined
+   })
+
+export const useIsTestLivestream = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.test)

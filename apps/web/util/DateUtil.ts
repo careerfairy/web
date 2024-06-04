@@ -267,8 +267,16 @@ export default class DateUtil {
       return differenceInTime / (1000 * 60 * 60 * 24)
    }
 
-   static calculateTimeLeft(time: Date) {
-      const difference = time.getTime() - new Date().getTime()
+   /**
+    * Calculates the time left until a specified date or timestamp.
+    *
+    * @param {Date | number} time - The target time as a Date object or a timestamp in milliseconds.
+    * @return An object containing the time left in days, hours, minutes, and seconds.
+    *                  Example: { Days: 0, Hours: 0, Minutes: 0, Seconds: 0 }
+    */
+   static calculateTimeLeft(time: Date | number) {
+      const targetTime = typeof time === "number" ? time : time.getTime()
+      const difference = targetTime - new Date().getTime()
       let timeLeft = {
          Days: 0,
          Hours: 0,
