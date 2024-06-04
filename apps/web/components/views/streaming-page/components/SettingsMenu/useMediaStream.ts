@@ -25,7 +25,7 @@ export const useMediaStream = () => {
 
    /**
     * Clones your current camera track and adds it to a new MediaStream.
-    * The happens when:
+    * This happens when:
     * 1. The camera is on
     * 2. The camera is on and the track is live
     * 3. The virtual background mode changes

@@ -15,7 +15,7 @@ const styles = sxStyles({
    buttonWrapper: {
       width: "inherit",
    },
-   root: {
+   root: (theme) => ({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -23,8 +23,8 @@ const styles = sxStyles({
       px: 1.75,
       width: "100%",
       height: "100%",
-      bgcolor: (theme) => theme.brand.white[300],
-      border: (theme) => `1px solid ${theme.brand.purple[100]}`,
+      bgcolor: theme.brand.white[300],
+      border: `1px solid ${theme.brand.purple[100]}`,
       borderRadius: 2,
       "& svg": {
          color: "inherit",
@@ -32,11 +32,10 @@ const styles = sxStyles({
          width: 24,
          height: 24,
       },
-      transition: (theme) =>
-         theme.transitions.create(["background-color", "color"]),
+      transition: theme.transitions.create(["background-color", "color"]),
       position: "relative",
-      color: (theme) => theme.palette.neutral[400],
-   },
+      color: theme.palette.neutral[400],
+   }),
    active: {
       color: "white",
       bgcolor: "primary.500",
@@ -56,13 +55,13 @@ const styles = sxStyles({
    tooltipPopper: {
       maxWidth: 219,
    },
-   disabled: {
+   disabled: (theme) => ({
       "&:disabled": {
          opacity: 0.3,
-         bgcolor: (theme) => theme.brand.white[400],
-         color: (theme) => theme.brand.black[700],
+         bgcolor: theme.brand.white[400],
+         color: theme.brand.black[700],
       },
-   },
+   }),
 })
 
 const customSlotProps: TooltipProps["slotProps"] = {
