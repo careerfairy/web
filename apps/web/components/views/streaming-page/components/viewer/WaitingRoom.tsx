@@ -1,20 +1,28 @@
-import { Box, BoxProps, Typography } from "@mui/material"
-import { Fragment, ReactNode, forwardRef } from "react"
-import {
-   useHasEnded,
-   useHasStarted,
-} from "store/selectors/streamingAppSelectors"
+import { Box, BoxProps, Container } from "@mui/material"
 import Slide from "@mui/material/Slide"
+import { Fragment, ReactNode, forwardRef } from "react"
+import { useShowWaitingRoom } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
+import { CountDown } from "./CountDown"
+import { Footer } from "./Footer"
+import { HostDetails } from "./HostDetails"
+import { StatusTitle } from "./StatusTitle"
+import { TopBar } from "./TopBar"
 
 const styles = sxStyles({
    waitingRoom: {
       width: "100%",
-      height: "100vh",
+      minHeight: "100vh",
       display: "flex",
       flexDirection: "column",
-      justifyContent: "center",
       alignItems: "center",
+      position: "relative",
+   },
+   container: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      my: "auto",
    },
 })
 
@@ -24,10 +32,7 @@ type Props = {
 }
 
 export const WaitingRoom = ({ children, isHost }: Props) => {
-   const hasStarted = useHasStarted()
-   const hasEnded = useHasEnded()
-
-   const showWaitingRoom = !isHost && !hasEnded && hasStarted === undefined
+   const showWaitingRoom = useShowWaitingRoom(isHost)
 
    return (
       <Fragment>
@@ -54,7 +59,13 @@ export const WaitingRoom = ({ children, isHost }: Props) => {
 const WaitingRoomView = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
    return (
       <Box ref={ref} {...props} sx={styles.waitingRoom}>
-         <Typography variant="brandedH1">Waiting Room</Typography>
+         <TopBar />
+         <Container maxWidth={false} disableGutters sx={styles.container}>
+            <HostDetails />
+            <StatusTitle />
+            <CountDown />
+         </Container>
+         <Footer />
       </Box>
    )
 })
