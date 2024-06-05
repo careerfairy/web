@@ -6,6 +6,7 @@ import {
    resetLivestreamState,
    setHandRaiseEnabled,
    setHasEnded,
+   setHasJobs,
    setLivestreamMode,
    setNumberOfParticipants,
    setOpenStream,
@@ -77,6 +78,10 @@ export const LivestreamStateTrackers = (): null => {
    useEffect(() => {
       dispatch(setHandRaiseEnabled(Boolean(livestream.handRaiseActive)))
    }, [dispatch, livestream.handRaiseActive])
+
+   useEffect(() => {
+      dispatch(setHasJobs(Boolean(livestream.hasJobs)))
+   }, [dispatch, livestream.hasJobs])
 
    // Clean up the state on unmount
    useEffect(() => {
