@@ -14,7 +14,7 @@ import {
    sparkRepo,
 } from "./api/repositories"
 
-import { getArrayDifference } from "@careerfairy/shared-lib/utils"
+import _ from "lodash"
 import config from "./config"
 import { handleUserStatsBadges } from "./lib/badge"
 import { rewardSideEffectsUserStats } from "./lib/reward"
@@ -385,23 +385,38 @@ export const onWriteCustomJobs = functions
          )
       }
 
+      const businessFunctionTagsChanged = Boolean(
+         _.xor(
+            newCustomJob?.businessFunctionsTagIds ?? [],
+            oldCustomJob?.businessFunctionsTagIds ?? []
+         ).length
+      )
+
+      console.log(
+         "🚀 ~ .onWrite ~ businessFunctionTagsChanged:",
+         businessFunctionTagsChanged
+      )
       if (
          (changeTypes.isUpdate || changeTypes.isCreate) &&
-         getArrayDifference(
-            newCustomJob?.businessFunctionsTagIds || [],
-            oldCustomJob?.businessFunctionsTagIds || []
-         )
+         businessFunctionTagsChanged
       ) {
-         sideEffectPromises.push(
-            livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
-               newCustomJob.livestreams,
-               newCustomJob.businessFunctionsTagIds
-            ),
-            sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
-               newCustomJob.livestreams,
-               newCustomJob.businessFunctionsTagIds
+         if (newCustomJob.livestreams.length) {
+            sideEffectPromises.push(
+               livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+                  newCustomJob.livestreams,
+                  newCustomJob.businessFunctionsTagIds
+               )
             )
-         )
+         }
+
+         if (newCustomJob.sparks.length) {
+            sideEffectPromises.push(
+               sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
+                  newCustomJob.sparks,
+                  newCustomJob.businessFunctionsTagIds
+               )
+            )
+         }
       }
 
       return handleSideEffects(sideEffectPromises)

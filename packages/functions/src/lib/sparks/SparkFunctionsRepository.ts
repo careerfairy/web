@@ -285,12 +285,13 @@ export interface ISparkFunctionsRepository {
    getSparksByIds(sparkIds: string[]): Promise<Spark[]>
 
    /**
-    * TODO: add doc
-    * @param livestreamIds
-    * @param tags
+    * Synchronizes the given tags in @param tags (list of IDs) to the Sparks
+    * associated with the list of Spark IDs @param sparkIds.
+    * @param sparkIds IDs list of the sparks for which the tags will be associated.
+    * @param tags IDs list of tags to associated to the Sparks identified by @param tags.
     */
    syncCustomJobBusinessFunctionTagsToSparks(
-      livestreamIds: string[],
+      sparkIds: string[],
       tags: string[]
    ): Promise<void>
 }
@@ -1027,8 +1028,8 @@ export class SparkFunctionsRepository
       const errors = results.filter((res) => res.status == "rejected")
 
       if (errors.length) {
-         logAndThrow("Error synching tags with live streams", {
-            livestreamIds: sparkIds,
+         logAndThrow("Error synching tags with Sparks", {
+            sparkIds: sparkIds,
             tags: tags,
             errors: errors,
          })
