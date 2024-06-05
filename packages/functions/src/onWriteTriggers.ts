@@ -371,7 +371,10 @@ export const onWriteCustomJobs = functions
             customJobRepo.syncDeletedCustomJobDataToJobApplications(
                deletedCustomJob
             ),
-            customJobRepo.syncDeletedCustomJobToLinkedContent(deletedCustomJob)
+            customJobRepo.syncDeletedCustomJobToLinkedLivestreams(
+               deletedCustomJob
+            ),
+            customJobRepo.syncDeletedCustomJobToLinkedSparks(deletedCustomJob)
          )
       }
 

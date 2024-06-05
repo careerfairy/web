@@ -2,6 +2,7 @@ import functions = require("firebase-functions")
 import { array, string } from "yup"
 import { customJobRepo, userRepo } from "./api/repositories"
 import config from "./config"
+import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 import {
    dataValidation,
@@ -165,10 +166,14 @@ export const deleteExpiredCustomJobs = functions
    .onRun(async () => {
       functions.logger.info("Starting execution of deleteExpiredCustomJobs")
 
-      const promises = [
-         customJobRepo.deleteExpiredCustomJobs(),
-         customJobRepo.syncExpiredCustomJobs(),
-      ]
+      try {
+         const promises = [
+            customJobRepo.deleteExpiredCustomJobs(),
+            customJobRepo.syncExpiredCustomJobs(),
+         ]
 
-      return Promise.all(promises)
+         return Promise.all(promises)
+      } catch (e) {
+         logAndThrow(e)
+      }
    })
