@@ -71,10 +71,18 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    syncCustomJobDataGroupMetaData(groupId: string, group: Group): Promise<void>
 
    /**
-    * This method syncs the deleted job on all the linked content
+    * This method syncs the deleted job on all the linked live streams
     * @param deletedCustomJob
     */
-   syncDeletedCustomJobToLinkedContent(
+   syncDeletedCustomJobToLinkedLivestreams(
+      deletedCustomJob: CustomJob
+   ): Promise<void>
+
+   /**
+    * This method syncs the deleted job on all the linked sparks
+    * @param deletedCustomJob
+    */
+   syncDeletedCustomJobToLinkedSparks(
       deletedCustomJob: CustomJob
    ): Promise<void>
 }
@@ -294,19 +302,18 @@ export class CustomJobFunctionsRepository
       await Promise.allSettled(promises)
    }
 
-   async syncDeletedCustomJobToLinkedContent(
+   async syncDeletedCustomJobToLinkedLivestreams(
       deletedCustomJob: CustomJob
    ): Promise<void> {
       const batch = this.firestore.batch()
 
-      const { livestreams, sparks, groupId } = deletedCustomJob
+      const { livestreams, groupId } = deletedCustomJob
       const groupCustomJobs = await customJobRepo.getCustomJobsByGroupId(
          groupId
       )
       const linkedLivestreams = await livestreamsRepo.getLivestreamsByIds(
          livestreams
       )
-      const linkedSparks = await sparkRepo.getSparksByIds(sparks)
 
       // Filter out the deleted custom job from the group's custom jobs
       const filteredGroupJobs = groupCustomJobs.filter(
@@ -338,6 +345,35 @@ export class CustomJobFunctionsRepository
          }
       )
 
+      // update live streams hasJobs flag
+      livestreamsToUpdate.map((livestream) => {
+         const ref = this.firestore.collection("livestreams").doc(livestream.id)
+
+         batch.update(ref, {
+            hasJobs: true,
+         })
+      })
+
+      return batch.commit()
+   }
+
+   async syncDeletedCustomJobToLinkedSparks(
+      deletedCustomJob: CustomJob
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const { sparks, groupId } = deletedCustomJob
+      const groupCustomJobs = await customJobRepo.getCustomJobsByGroupId(
+         groupId
+      )
+
+      const linkedSparks = await sparkRepo.getSparksByIds(sparks)
+
+      // Filter out the deleted custom job from the group's custom jobs
+      const filteredGroupJobs = groupCustomJobs.filter(
+         (job) => job.id !== deletedCustomJob.id
+      )
+
       const sparksToUpdate = linkedSparks.filter((spark) => {
          // Check if any other custom job in the group links to this spark
          const hasMoreCustomJobsThanTheDeletedOne = filteredGroupJobs.some(
@@ -354,15 +390,6 @@ export class CustomJobFunctionsRepository
 
          // Otherwise, mark this spark for update
          return true
-      })
-
-      // update live streams hasJobs flag
-      livestreamsToUpdate.map((livestream) => {
-         const ref = this.firestore.collection("livestreams").doc(livestream.id)
-
-         batch.update(ref, {
-            hasJobs: true,
-         })
       })
 
       // update sparks hasJobs flag
