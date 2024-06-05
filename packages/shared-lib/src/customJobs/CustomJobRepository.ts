@@ -2,6 +2,7 @@ import firebase from "firebase/compat"
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import { Timestamp } from "../firebaseTypes"
 import { UserData } from "../users"
+import { chunkArray } from "../utils"
 import {
    CustomJob,
    CustomJobApplicant,
@@ -279,14 +280,19 @@ export class FirebaseCustomJobRepository
          .where("deadline", "<", getMaxDaysAfterDeadline())
 
       const snapshot = await customJobRef.get()
+      const chunks = chunkArray(snapshot.docs, 450)
 
-      const batch = this.firestore.batch()
+      const promises = chunks.map(async (chunk) => {
+         const batch = this.firestore.batch()
 
-      snapshot.forEach((doc) => {
-         batch.delete(doc.ref)
+         chunk.forEach((doc) => {
+            batch.delete(doc.ref)
+         })
+
+         return batch.commit()
       })
 
-      return batch.commit()
+      await Promise.allSettled(promises)
    }
 
    async syncExpiredCustomJobs(): Promise<void> {
@@ -295,16 +301,21 @@ export class FirebaseCustomJobRepository
          .where("deadline", "<", new Date())
 
       const snapshot = await customJobRef.get()
+      const chunks = chunkArray(snapshot.docs, 450)
 
-      const batch = this.firestore.batch()
+      const promises = chunks.map(async (chunk) => {
+         const batch = this.firestore.batch()
 
-      snapshot.forEach((doc) => {
-         batch.update(doc.ref, {
-            published: false,
+         chunk.forEach((doc) => {
+            batch.update(doc.ref, {
+               published: false,
+            })
          })
+
+         return batch.commit()
       })
 
-      return batch.commit()
+      await Promise.allSettled(promises)
    }
 
    async getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]> {
