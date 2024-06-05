@@ -148,7 +148,7 @@ export class LivestreamPresenter extends BaseModel {
     * @returns {boolean} True if the user should enter the waiting room, false otherwise.
     */
    waitingRoomIsOpen(): boolean {
-      if (!this.useNewUI) {
+      if (!this.useNewUI || this.hasEnded || this.isPast()) {
          return false
       }
 
