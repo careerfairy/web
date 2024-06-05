@@ -39,9 +39,6 @@ const styles = sxStyles({
    jobWarningIndicator: {
       backgroundColor: (theme) => `${theme.palette.warning["600"]} !important`,
    },
-   jobWarningIndicator: {
-      backgroundColor: (theme) => `${theme.palette.warning["600"]} !important`,
-   },
    tabsLabel: {
       fontSize: "16px",
       lineHeight: "27px",
@@ -118,11 +115,6 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
       : false
 
-   const tabs = useMemo(() => {
-      const jobHasNoContent = Boolean(
-      job.livestreams.length == 0 && job.sparks.length == 0
-   )
-
    const tabs = useMemo(
       () => [
          {
@@ -160,8 +152,9 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             label: "Job Opening",
             component: () => <JobPosting job={job} group={group} />,
          },
-      ]
-   }, [allowToDisplayApplicantsData, group, job, jobHasNoContent, jobHubV1])
+      ],
+      [allowToDisplayApplicantsData, group, job, jobHasNoContent, jobHubV1]
+   )
 
    if (!job) {
       return void push(`/group/${group.id}/admin/jobs`)
