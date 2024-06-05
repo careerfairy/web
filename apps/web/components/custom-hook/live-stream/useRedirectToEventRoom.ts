@@ -26,7 +26,9 @@ const useRedirectToEventRoom = (
       if (
          !isLoadingAuth &&
          livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
-         livestreamPresenter.shouldGoToWaitingRoom()
+         (livestreamPresenter.isLive() ||
+            (livestreamPresenter.useNewUI &&
+               livestreamPresenter.shouldGoToWaitingRoom()))
       ) {
          setIsRedirecting(true)
          void replace(livestreamPresenter.getViewerEventRoomLink()).finally(
