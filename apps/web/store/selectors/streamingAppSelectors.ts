@@ -1,6 +1,7 @@
 import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
 import { type UID } from "agora-rtc-react"
 import { useAppSelector } from "components/custom-hook/store"
+import { cfLogo } from "constants/images"
 import { type RootState } from "store"
 import { StreamLayouts } from "store/reducers/streamingAppReducer"
 
@@ -78,7 +79,7 @@ export const useOpenStream = () =>
 export const useCompanyLogoUrl = () =>
    useAppSelector((state) => {
       const { companyLogoUrl, test } = state.streamingApp.livestreamState
-      return test ? "/logo-green.png" : companyLogoUrl
+      return test ? cfLogo : companyLogoUrl
    })
 export const useCompanyName = () =>
    useAppSelector((state) => {
