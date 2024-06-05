@@ -35,6 +35,10 @@ export const CountDown = () => {
                   sx={streamIsMobile ? undefined : styles.time}
                   fontWeight={700}
                >
+                  {/**
+                   * Minutes and Seconds are double digits in waiting room design,
+                   * single in the dialog
+                   */}
                   {key === "Minutes" || key === "Seconds"
                      ? padWithZero(timeLeft[key])
                      : timeLeft[key]}

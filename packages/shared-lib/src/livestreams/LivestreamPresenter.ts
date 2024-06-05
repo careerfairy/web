@@ -142,12 +142,12 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    /**
-    * Determines if the user should go to the waiting room.
-    * The user should go to the waiting room 5 minutes before the start of the livestream.
+    * Checks if the user should enter the waiting room (for new UI only).
+    * User enters 5 minutes before the live stream starts.
     *
-    * @returns {boolean} - True if the user should go to the waiting room, false otherwise.
+    * @returns {boolean} True if the user should enter the waiting room, false otherwise.
     */
-   shouldGoToWaitingRoom(): boolean {
+   waitingRoomIsOpen(): boolean {
       if (!this.useNewUI) {
          return false
       }

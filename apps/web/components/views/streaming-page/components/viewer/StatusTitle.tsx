@@ -19,6 +19,7 @@ export const StatusTitle = () => {
          maxWidth={streamIsMobile ? "auto" : 848}
          px={streamIsMobile ? 2 : 0}
          {...getMarginStyles(streamIsLandscape)}
+         component="h1"
       >
          {hasLivestreamStarted
             ? "Don’t panic, the hosts are getting ready! They will welcome you in few seconds."
