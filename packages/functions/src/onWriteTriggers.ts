@@ -392,10 +392,6 @@ export const onWriteCustomJobs = functions
          ).length
       )
 
-      console.log(
-         "🚀 ~ .onWrite ~ businessFunctionTagsChanged:",
-         businessFunctionTagsChanged
-      )
       if (
          (changeTypes.isUpdate || changeTypes.isCreate) &&
          businessFunctionTagsChanged
