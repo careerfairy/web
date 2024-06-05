@@ -180,9 +180,9 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    updateHandRaise(livestreamId: string, handRaise: boolean): Promise<void>
 
    /**
-    * TODO add documentation
-    * @param livestreamId
-    * @param tags
+    * Synchronizes the provided tag ids list @param tags, to the given live streams in @param livestreamIds.
+    * @param livestreamIds ID list of live streams which the tags will be associated to to.
+    * @param tags ID list of tags to associate to the live streams.
     */
    syncCustomJobBusinessFunctionTagsToLivestreams(
       livestreamIds: string[],
