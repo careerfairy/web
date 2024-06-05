@@ -1,8 +1,8 @@
-import { Button, ButtonProps } from "@mui/material"
-import { forwardRef } from "react"
+import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { forwardRef } from "react"
 
-export type ResponsiveButtonProps = ButtonProps
+export type ResponsiveButtonProps = LoadingButtonProps
 
 export const ResponsiveStreamButton = forwardRef<
    HTMLButtonElement,
@@ -11,9 +11,9 @@ export const ResponsiveStreamButton = forwardRef<
    const isMobile = useStreamIsMobile()
 
    return (
-      <Button ref={ref} size={isMobile ? "small" : "medium"} {...props}>
+      <LoadingButton ref={ref} size={isMobile ? "small" : "medium"} {...props}>
          {props.children}
-      </Button>
+      </LoadingButton>
    )
 })
 

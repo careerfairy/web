@@ -84,6 +84,7 @@ export interface StreamingAppState {
       openStream: boolean
       companyLogoUrl: string
       handRaiseEnabled: boolean
+      hasJobs: boolean
    } | null
    rtmSignalingState: {
       failedToConnect: boolean
@@ -132,6 +133,7 @@ const initialState: StreamingAppState = {
       companyLogoUrl: "",
       handRaiseEnabled: false,
       numberOfHandRaiseNotifications: 0,
+      hasJobs: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -275,6 +277,9 @@ const streamingAppSlice = createSlice({
       toggleSettingsMenu(state) {
          state.settingsMenu.isOpen = !state.settingsMenu.isOpen
       },
+      setHasJobs(state, action: PayloadAction<boolean>) {
+         state.livestreamState.hasJobs = action.payload
+      },
 
       /* ==========================
          ||   Signaling State   ||
@@ -376,6 +381,7 @@ export const {
       setRTCConnectionState,
       openPolls,
       setHandRaiseEnabled,
+      setHasJobs,
       incrementNumberOfHandRaiseNotifications,
       resetNumberOfHandRaiseNotifications,
       setUploadPDFPresentationDialogOpen,

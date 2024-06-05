@@ -89,6 +89,9 @@ export const useNumberOfHandRaiseNotifications = () =>
          state.streamingApp.livestreamState.numberOfHandRaiseNotifications
    )
 
+export const useStreamHasJobs = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.hasJobs)
+
 export const useUploadPDFPresentationDialogOpen = () =>
    useAppSelector((state) => state.streamingApp.uploadPDFPresentationDialogOpen)
 
