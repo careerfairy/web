@@ -153,10 +153,10 @@ export class LivestreamPresenter extends BaseModel {
       }
 
       const FIVE_MINUTES_IN_MS = 5 * 60 * 1000
-      const currentTime = new Date()
-      const startTime = new Date(this.start)
+      const currentTime = Date.now()
+      const startTime = this.start.getTime()
 
-      return startTime.getTime() - currentTime.getTime() <= FIVE_MINUTES_IN_MS
+      return startTime - currentTime <= FIVE_MINUTES_IN_MS
    }
 
    isTest(): boolean {
