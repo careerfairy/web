@@ -39,9 +39,6 @@ const styles = sxStyles({
    jobWarningIndicator: {
       backgroundColor: (theme) => `${theme.palette.warning["600"]} !important`,
    },
-   jobWarningIndicator: {
-      backgroundColor: (theme) => `${theme.palette.warning["600"]} !important`,
-   },
    tabsLabel: {
       fontSize: "16px",
       lineHeight: "27px",
