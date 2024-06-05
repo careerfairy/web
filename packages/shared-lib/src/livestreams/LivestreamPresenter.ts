@@ -1,4 +1,11 @@
 import { BaseModel, fromSerializedDate } from "../BaseModel"
+import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
+import {
+   fromDateConverter,
+   fromDateFirestoreFn,
+   toDate,
+} from "../firebaseTypes"
+import { AdminGroupsClaim } from "../users"
 import {
    AuthorInfo,
    IEmailSent,
@@ -10,16 +17,9 @@ import {
    LivestreamLanguage,
    LivestreamMode,
    LivestreamStatus,
-   Speaker,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
+   Speaker,
 } from "./livestreams"
-import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
-import { AdminGroupsClaim } from "../users"
-import {
-   fromDateConverter,
-   fromDateFirestoreFn,
-   toDate,
-} from "../firebaseTypes"
 
 export const MAX_DAYS_TO_SHOW_RECORDING = 5
 
@@ -73,6 +73,7 @@ export class LivestreamPresenter extends BaseModel {
       public readonly address: string,
       public readonly denyRecordingAccess: boolean,
       public readonly hasJobs: boolean,
+      public readonly useNewUI: boolean,
 
       // ATS Jobs
       /**
@@ -138,6 +139,24 @@ export class LivestreamPresenter extends BaseModel {
 
    isLive(): boolean {
       return this.hasStarted && !this.hasEnded && !this.isPast()
+   }
+
+   /**
+    * Determines if the user should go to the waiting room.
+    * The user should go to the waiting room 5 minutes before the start of the livestream.
+    *
+    * @returns {boolean} - True if the user should go to the waiting room, false otherwise.
+    */
+   shouldGoToWaitingRoom(): boolean {
+      if (!this.useNewUI) {
+         return false
+      }
+
+      const FIVE_MINUTES_IN_MS = 5 * 60 * 1000
+      const currentTime = new Date()
+      const startTime = new Date(this.start)
+
+      return startTime.getTime() - currentTime.getTime() <= FIVE_MINUTES_IN_MS
    }
 
    isTest(): boolean {
@@ -261,6 +280,9 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    getViewerEventRoomLink(): string {
+      if (this.useNewUI) {
+         return `/streaming/viewer/${this.id}`
+      }
       return `/streaming/${this.id}/viewer`
    }
 
@@ -309,6 +331,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.address ?? "",
          livestream.denyRecordingAccess ?? false,
          livestream.hasJobs ?? false,
+         livestream.useNewUI ?? false,
          livestream.jobs ?? [],
          livestream.targetCountries ?? [],
          livestream.targetUniversities ?? [],
@@ -376,6 +399,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.address,
          livestream.denyRecordingAccess,
          livestream.hasJobs,
+         livestream.useNewUI,
          livestream.jobs,
          livestream.targetCountries,
          livestream.targetUniversities,

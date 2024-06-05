@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
+import { useAuth } from "../../../HOCs/AuthProvider"
 
 /**
  * Custom React Hook to handle redirection to a Livestream Event room.
@@ -25,8 +25,8 @@ const useRedirectToEventRoom = (
       if (isRedirecting || !livestreamPresenter || !shouldRedirect) return
       if (
          !isLoadingAuth &&
-         livestreamPresenter.isLive() &&
-         livestreamPresenter.isUserRegistered(authenticatedUser.email)
+         livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
+         livestreamPresenter.shouldGoToWaitingRoom()
       ) {
          setIsRedirecting(true)
          void replace(livestreamPresenter.getViewerEventRoomLink()).finally(
