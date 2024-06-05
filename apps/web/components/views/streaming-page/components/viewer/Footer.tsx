@@ -1,31 +1,26 @@
 import { Box, Typography } from "@mui/material"
-import { useStreamIsMobile } from "components/custom-hook/streaming"
+import {
+   useStreamIsLandscape,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
-      position: "absolute",
-      bottom: 0,
+      mt: "auto",
+      mx: "auto",
       backgroundColor: "#FDFDFD",
       textAlign: "center",
       justifyContent: "center",
       display: "flex",
-      pb: {
-         xs: 2.75,
-         md: 1.25,
-         tablet: 3.75,
-      },
-      pt: {
-         xs: 5.5,
-         tablet: 7.75,
-      },
-      borderTopLeftRadius: "67% 184px",
-      borderTopRightRadius: "67% 184px",
+      borderTopLeftRadius: "67% 284px",
+      borderTopRightRadius: "67% 284px",
    },
    tip: {
+      color: "neutral.800",
       maxWidth: {
          xs: 286,
-         md: 418,
+         sm: 418,
          tablet: 508,
       },
    },
@@ -33,13 +28,19 @@ const styles = sxStyles({
 
 export const Footer = () => {
    const streamIsMobile = useStreamIsMobile()
+   const streamIsLandscape = useStreamIsLandscape()
+
    return (
-      <Box width={streamIsMobile ? "100%" : "80%"} sx={styles.root}>
+      <Box
+         sx={styles.root}
+         width={streamIsMobile ? "100%" : "80%"}
+         minHeight={streamIsLandscape ? 75 : streamIsMobile ? 80 : 155}
+         pt={streamIsLandscape ? 3.125 : streamIsMobile ? 2.5 : 7.75}
+      >
          <Typography
-            variant={streamIsMobile ? "xsmall" : "medium"}
-            color="neutral.800"
-            component="p"
             sx={styles.tip}
+            variant={streamIsMobile ? "xsmall" : "medium"}
+            component="p"
          >
             <Box component="span" fontWeight={600} color="primary.main">
                Tip:
