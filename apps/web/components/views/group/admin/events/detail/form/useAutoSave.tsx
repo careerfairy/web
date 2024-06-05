@@ -86,6 +86,8 @@ const getSpeakersThatAreCreators = (
    speakers: LivestreamFormSpeakersTabValues["values"] | Speaker[],
    options: LivestreamFormSpeakersTabValues["options"]
 ) => {
+   if (!speakers) return []
+
    return speakers.filter((speaker) => {
       const isCreator = options.some(
          (option) => option.id === speaker.id && option.isCreator
