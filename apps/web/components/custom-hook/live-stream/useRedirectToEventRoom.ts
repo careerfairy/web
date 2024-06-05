@@ -23,20 +23,25 @@ const useRedirectToEventRoom = (
 
    useEffect(() => {
       if (isRedirecting || !livestreamPresenter || !shouldRedirect) return
-      if (
-         !isLoadingAuth &&
-         livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
-         (livestreamPresenter.isLive() ||
-            livestreamPresenter.waitingRoomIsOpen())
-      ) {
-         setIsRedirecting(true)
-         void replace(livestreamPresenter.getViewerEventRoomLink()).finally(
-            () => {
-               setIsRedirecting(false)
-            }
-         )
-      }
+
+      const intervalId = setInterval(() => {
+         if (
+            !isLoadingAuth &&
+            livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
+            (livestreamPresenter.isLive() ||
+               livestreamPresenter.waitingRoomIsOpen())
+         ) {
+            setIsRedirecting(true)
+            void replace(livestreamPresenter.getViewerEventRoomLink()).finally(
+               () => {
+                  setIsRedirecting(false)
+               }
+            )
+         }
+      }, 1000)
+
       return () => {
+         clearInterval(intervalId)
          setIsRedirecting(false)
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
