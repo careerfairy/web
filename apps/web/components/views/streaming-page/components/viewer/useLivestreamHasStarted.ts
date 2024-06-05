@@ -10,7 +10,7 @@ export const useHasLivestreamStarted = () => {
       () => {
          setHasLivestreamStarted(startsAt < Date.now())
       },
-      startsAt < Date.now() ? 1000 : null
+      hasLivestreamStarted ? null : 1000
    )
 
    return hasLivestreamStarted
