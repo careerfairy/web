@@ -14,11 +14,11 @@ import PublishIcon from "@mui/icons-material/Publish"
 import GetStreamerLinksIcon from "@mui/icons-material/Share"
 import { Box, CircularProgress } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useMetaDataActions } from "components/custom-hook/useMetaDataActions"
 import { defaultTableOptions, tableIcons } from "components/util/tableUtils"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
 import { useRouter } from "next/router"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -35,6 +35,7 @@ import PdfReportDownloadDialog from "../PdfReportDownloadDialog"
 import ToolbarActionsDialog from "../ToolbarActionsDialog"
 import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog"
 import CompanyLogo from "./CompanyLogo"
+import DeleteEventDialog from "./DeleteEventDialog"
 import GroupLogos from "./GroupLogos"
 import ManageEndOfEventDialog from "./ManageEndOfEventDialog"
 import ManageStreamActions from "./ManageStreamActions"
@@ -523,15 +524,20 @@ const EventsTable = ({
                icons={tableIcons}
             />
          </Box>
-         <AreYouSureModal
-            open={Boolean(streamIdToBeDeleted)}
-            handleClose={() => setStreamIdToBeDeleted(null)}
-            handleConfirm={handleDeleteStream}
-            loading={deletingEvent}
-            message={`Are you sure this ${
-               isDraft ? "draft" : "stream"
-            }? you will be no longer able to recover it`}
-         />
+         {streamIdToBeDeleted ? (
+            <SuspenseWithBoundary fallback={<CircularProgress />}>
+               <DeleteEventDialog
+                  groupId={group.groupId}
+                  livestreamId={streamIdToBeDeleted}
+                  handleClose={() => setStreamIdToBeDeleted(null)}
+                  handleConfirm={handleDeleteStream}
+                  loading={deletingEvent}
+                  message={`Are you sure this ${
+                     isDraft ? "draft" : "stream"
+                  }? you will be no longer able to recover it`}
+               />
+            </SuspenseWithBoundary>
+         ) : null}
          <StreamerLinksDialog
             livestreamId={targetLivestreamStreamerLinksId}
             openDialog={Boolean(targetLivestreamStreamerLinksId)}
