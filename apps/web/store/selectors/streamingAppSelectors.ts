@@ -100,3 +100,6 @@ export const useShareVideoDialogOpen = () =>
 
 export const useEmotes = () =>
    useAppSelector((state) => state.streamingApp.emotes)
+
+export const useVirtualBackgroundMode = () =>
+   useAppSelector((state) => state.streamingApp.virtualBackgroundMode)

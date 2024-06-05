@@ -1,7 +1,5 @@
 import { Box, DialogTitle, IconButton, Stack, Typography } from "@mui/material"
-import React from "react"
 import { X as CloseIcon, Settings } from "react-feather"
-import { useSettingsMenu } from "./SettingsMenuContext"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -27,9 +25,12 @@ const styles = sxStyles({
    },
 })
 
-export const Title = () => {
-   const { handleClose, isMobile } = useSettingsMenu()
+type Props = {
+   handleClose: () => void
+   isMobile: boolean
+}
 
+export const Title = ({ handleClose, isMobile }: Props) => {
    return (
       <DialogTitle sx={[styles.title, isMobile && styles.titleSticky]}>
          <Stack
