@@ -359,26 +359,6 @@ export const onWriteCustomJobs = functions
             customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
             customJobRepo.syncCustomJobDataToJobApplications(updatedCustomJob)
          )
-
-         if (
-            getArrayDifference(
-               newCustomJob?.businessFunctionsTagIds || [],
-               oldCustomJob?.businessFunctionsTagIds || []
-            )
-         ) {
-            const livestreamPromises = Promise.all(
-               newCustomJob.livestreams.map((livestreamId) =>
-                  livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestream(
-                     livestreamId,
-                     newCustomJob?.businessFunctionsTagIds
-                  )
-               )
-            )
-            sideEffectPromises.push(
-               livestreamPromises
-               // sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(newCustomJob?.businessFunctionsTagIds)
-            )
-         }
       }
 
       if (changeTypes.isDelete) {
@@ -390,6 +370,36 @@ export const onWriteCustomJobs = functions
             ),
             customJobRepo.syncDeletedCustomJobDataToJobApplications(
                deletedCustomJob
+            )
+         )
+
+         sideEffectPromises.push(
+            livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+               newCustomJob.livestreams,
+               []
+            ),
+            sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
+               newCustomJob.livestreams,
+               []
+            )
+         )
+      }
+
+      if (
+         (changeTypes.isUpdate || changeTypes.isCreate) &&
+         getArrayDifference(
+            newCustomJob?.businessFunctionsTagIds || [],
+            oldCustomJob?.businessFunctionsTagIds || []
+         )
+      ) {
+         sideEffectPromises.push(
+            livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+               newCustomJob.livestreams,
+               newCustomJob.businessFunctionsTagIds
+            ),
+            sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
+               newCustomJob.livestreams,
+               newCustomJob.businessFunctionsTagIds
             )
          )
       }

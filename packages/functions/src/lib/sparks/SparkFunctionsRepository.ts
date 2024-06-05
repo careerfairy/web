@@ -47,6 +47,7 @@ import { addAddedToFeedAt } from "../../util/sparks"
 import BigQueryCreateInsertService from "../bigQuery/BigQueryCreateInsertService"
 import SparkRecommendationService from "../recommendation/SparkRecommendationService"
 import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
+import { logAndThrow } from "../validations"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 
 export interface ISparkFunctionsRepository {
@@ -282,6 +283,16 @@ export interface ISparkFunctionsRepository {
     * @returns Promise of an array of Spark
     */
    getSparksByIds(sparkIds: string[]): Promise<Spark[]>
+
+   /**
+    * TODO: add doc
+    * @param livestreamIds
+    * @param tags
+    */
+   syncCustomJobBusinessFunctionTagsToSparks(
+      livestreamIds: string[],
+      tags: string[]
+   ): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -993,6 +1004,35 @@ export class SparkFunctionsRepository
             ...snapshot.data(),
             id: snapshot.id,
          }))
+   }
+
+   async syncCustomJobBusinessFunctionTagsToSparks(
+      sparkIds: string[],
+      tags: string[]
+   ): Promise<void> {
+      functions.logger.log(`Sync tags with Sparks ${sparkIds}.`)
+      const sparks = this.firestore
+         .collection("sparks")
+         .where("id", "in", sparkIds) // TODO: Check if limit using IN
+         .withConverter(createGenericConverter<Spark>())
+
+      const snapshot = await sparks.get()
+
+      const updatePromises = snapshot.docs?.map((doc) => {
+         return doc.ref.update({ linkedCustomJobsTagIds: tags })
+      })
+
+      const results = await Promise.allSettled(updatePromises)
+
+      const errors = results.filter((res) => res.status == "rejected")
+
+      if (errors.length) {
+         logAndThrow("Error synching tags with live streams", {
+            livestreamIds: sparkIds,
+            tags: tags,
+            errors: errors,
+         })
+      }
    }
 }
 
