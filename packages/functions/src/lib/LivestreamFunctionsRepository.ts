@@ -48,6 +48,7 @@ import {
 import type { FunctionsLogger } from "../util"
 import { addOperations } from "./stats/livestream"
 import type { OperationsToMake } from "./stats/util"
+import { logAndThrow } from "./validations"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -183,8 +184,8 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @param livestreamId
     * @param tags
     */
-   syncCustomJobBusinessFunctionTagsToLivestream(
-      livestreamId: string,
+   syncCustomJobBusinessFunctionTagsToLivestreams(
+      livestreamIds: string[],
       tags: string[]
    ): Promise<void>
 }
@@ -664,13 +665,32 @@ export class LivestreamFunctionsRepository
       return batch.commit()
    }
 
-   async syncCustomJobBusinessFunctionTagsToLivestream(
-      livestreamId: string,
+   async syncCustomJobBusinessFunctionTagsToLivestreams(
+      livestreamIds: string[],
       tags: string[]
    ): Promise<void> {
-      functions.logger.log(`Sync tags with live stream ${livestreamId}.`)
-      const ref = this.firestore.collection("livestreams").doc(livestreamId)
+      functions.logger.log(`Sync tags with live streams ${livestreamIds}.`)
+      const events = this.firestore
+         .collection("livestreams")
+         .where("id", "in", livestreamIds) // TODO: Check if limit using IN
+         .withConverter(createCompatGenericConverter<LivestreamEvent>())
 
-      return ref.update({ linkedCustomJobsTagIds: tags })
+      const snapshot = await events.get()
+
+      const updatePromises = snapshot.docs?.map((doc) => {
+         return doc.ref.update({ linkedCustomJobsTagIds: tags })
+      })
+
+      const results = await Promise.allSettled(updatePromises)
+
+      const errors = results.filter((res) => res.status == "rejected")
+
+      if (errors.length) {
+         logAndThrow("Error synching tags with live streams", {
+            livestreamIds: livestreamIds,
+            tags: tags,
+            errors: errors,
+         })
+      }
    }
 }
