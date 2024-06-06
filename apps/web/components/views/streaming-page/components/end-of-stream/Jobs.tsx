@@ -1,6 +1,6 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, Stack } from "@mui/material"
+import { Container, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
 import { useCombinedJobs } from "components/custom-hook/streaming/useCombinedJobs"
@@ -9,42 +9,39 @@ import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import JobCard from "../jobs/JobCard"
 import JobDialog from "../jobs/JobDialog"
-import { EmptyJobsView } from "./EmptyJobsView"
-import { JobCardSkeleton, JobListSkeleton } from "./JobListSkeleton"
+import { Heading } from "./Heading"
 
 const styles = sxStyles({
-   jobList: {
-      gap: 1.5,
+   root: {
+      mx: "auto",
    },
 })
 
-export const JobList = () => {
+export const Jobs = () => {
    return (
-      <SuspenseWithBoundary fallback={<JobListSkeleton />}>
+      <SuspenseWithBoundary fallback={<></>}>
          <ContentWrapper />
       </SuspenseWithBoundary>
    )
 }
 
 const ContentWrapper = () => {
-   const { livestreamId, isHost } = useStreamingContext()
+   const { livestreamId } = useStreamingContext()
    const { data: hostCompany } = useLivestreamCompanyHostSWR(livestreamId)
 
    if (!hostCompany) return null
 
-   return (
-      <Content
-         livestreamId={livestreamId}
-         isHost={isHost}
-         hostCompanyId={hostCompany.id}
-      />
-   )
+   return <Content groupId={hostCompany?.id} />
 }
 
-const Content = ({ livestreamId, isHost, hostCompanyId }) => {
-   const [selectedJob, setSelectedJob] = useState(null)
+type ContentProps = {
+   groupId: string
+}
+export const Content = ({ groupId }: ContentProps) => {
+   const { livestreamId } = useStreamingContext()
 
-   const jobsToShow = useCombinedJobs(livestreamId, hostCompanyId)
+   const jobsToShow = useCombinedJobs(livestreamId, groupId)
+   const [selectedJob, setSelectedJob] = useState<Job | CustomJob | null>(null)
 
    const onCloseDialog = useCallback(() => {
       setSelectedJob(null)
@@ -54,19 +51,20 @@ const Content = ({ livestreamId, isHost, hostCompanyId }) => {
       setSelectedJob(job)
    }, [])
 
-   if (isHost && jobsToShow.length == 0) {
-      return <EmptyJobsView />
-   }
+   if (!jobsToShow) return null
 
    return (
-      <>
-         <Stack sx={styles.jobList}>
+      <Container sx={styles.root}>
+         <Heading>
+            {`Don't miss out! Apply now for the exciting jobs you saw live.`}
+         </Heading>
+         <Stack spacing={1.5}>
             {jobsToShow.map((job: Job | CustomJob) => (
-               <Box key={job.id}>
-                  <SuspenseWithBoundary fallback={<JobCardSkeleton />}>
-                     <JobCard job={job} handleSelectJob={handleJobClick} />
-                  </SuspenseWithBoundary>
-               </Box>
+               <JobCard
+                  key={job.id}
+                  job={job}
+                  handleSelectJob={handleJobClick}
+               />
             ))}
          </Stack>
          {selectedJob ? (
@@ -77,6 +75,6 @@ const Content = ({ livestreamId, isHost, hostCompanyId }) => {
                open={Boolean(selectedJob)}
             />
          ) : null}
-      </>
+      </Container>
    )
 }

@@ -85,6 +85,7 @@ export interface StreamingAppState {
       openStream: boolean
       companyLogoUrl: string
       companyName: string
+      title: string
       handRaiseEnabled: boolean
       hasJobs: boolean
       test: boolean
@@ -136,6 +137,7 @@ const initialState: StreamingAppState = {
       openStream: false,
       companyLogoUrl: "",
       companyName: "",
+      title: "",
       handRaiseEnabled: false,
       numberOfHandRaiseNotifications: 0,
       hasJobs: false,
@@ -262,6 +264,9 @@ const streamingAppSlice = createSlice({
       },
       setCompanyName(state, action: PayloadAction<string>) {
          state.livestreamState.companyName = action.payload
+      },
+      setTitle(state, action: PayloadAction<string>) {
+         state.livestreamState.title = action.payload
       },
       setHandRaiseEnabled(state, action: PayloadAction<boolean>) {
          if (state.livestreamState.handRaiseEnabled !== action.payload) {
@@ -393,6 +398,7 @@ export const {
       setCompanyLogoUrl,
       setTest,
       setCompanyName,
+      setTitle,
       resetLivestreamState,
       toggleSidePanel,
       closeSidePanel,

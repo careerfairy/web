@@ -15,6 +15,7 @@ import {
    setStarted,
    setStartsAt,
    setTest,
+   setTitle,
 } from "store/reducers/streamingAppReducer"
 import { setCompanyLogoUrl } from "../../../../../store/reducers/streamingAppReducer"
 
@@ -80,6 +81,10 @@ export const LivestreamStateTrackers = (): null => {
    useEffect(() => {
       dispatch(setCompanyName(livestream.company ?? ""))
    }, [dispatch, livestream.company])
+
+   useEffect(() => {
+      dispatch(setTitle(livestream.title ?? ""))
+   }, [dispatch, livestream.title])
 
    useEffect(() => {
       dispatch(setTest(Boolean(livestream.test)))
