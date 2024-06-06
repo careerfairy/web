@@ -1,6 +1,6 @@
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
 
 /**
@@ -20,9 +20,16 @@ const useRedirectToEventRoom = (
    const { authenticatedUser, isLoadingAuth } = useAuth()
    const { replace } = useRouter()
    const [isRedirecting, setIsRedirecting] = useState(false)
+   const hasRedirected = useRef(false)
 
    useEffect(() => {
-      if (isRedirecting || !livestreamPresenter || !shouldRedirect) return
+      if (
+         isRedirecting ||
+         !livestreamPresenter ||
+         !shouldRedirect ||
+         hasRedirected.current
+      )
+         return
 
       const intervalId = setInterval(() => {
          if (
@@ -32,11 +39,13 @@ const useRedirectToEventRoom = (
                livestreamPresenter.waitingRoomIsOpen())
          ) {
             setIsRedirecting(true)
-            void replace(livestreamPresenter.getViewerEventRoomLink()).finally(
-               () => {
+            void replace(livestreamPresenter.getViewerEventRoomLink())
+               .then(() => {
+                  hasRedirected.current = true
+               })
+               .finally(() => {
                   setIsRedirecting(false)
-               }
-            )
+               })
          }
       }, 1000)
 

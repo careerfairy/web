@@ -43,10 +43,10 @@ export const Footer = () => {
             component="p"
          >
             <Box component="span" fontWeight={600} color="primary.main">
-               Tip:
+               Pro tip:
             </Box>{" "}
-            During the stream, your microphone and webcam will not be accessible
-            to anyone unless you raise your hand.
+            Use the raise hand functionality to ask your questions directly to
+            the live stream speakers.
          </Typography>
       </Box>
    )
