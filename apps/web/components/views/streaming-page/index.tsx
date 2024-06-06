@@ -11,7 +11,7 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
-import { WaitingRoom } from "./components/viewer/WaitingRoom"
+import { WaitingRoom } from "./components/viewer/waiting-room/WaitingRoom"
 
 const ShareVideoDialog = dynamic(
    () =>
