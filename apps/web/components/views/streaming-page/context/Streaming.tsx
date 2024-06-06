@@ -90,7 +90,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 
    const response = useAgoraRtcToken({
       channelName: livestreamId,
-      isStreamer: shouldStream,
+      isStreamer: isHost,
       sentToken: isHost ? hostAuthToken : undefined,
       streamDocumentPath: `livestreams/${livestreamId}`,
       uid: agoraUserId,
