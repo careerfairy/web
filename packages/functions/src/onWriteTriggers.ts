@@ -14,6 +14,7 @@ import {
    sparkRepo,
 } from "./api/repositories"
 
+import { getArrayDifference } from "@careerfairy/shared-lib/utils"
 import _ from "lodash"
 import config from "./config"
 import { handleUserStatsBadges } from "./lib/badge"
@@ -345,6 +346,19 @@ export const onWriteCustomJobs = functions
       const newCustomJob = change.after.data() as CustomJob
       const oldCustomJob = change.before.data() as CustomJob
 
+      const businessFunctionTagsChanged = Boolean(
+         _.xor(
+            newCustomJob?.businessFunctionsTagIds ?? [],
+            oldCustomJob?.businessFunctionsTagIds ?? []
+         ).length
+      )
+
+      const hasLinkedEvents = Boolean(newCustomJob.livestreams.length)
+
+      const hasLinkedSparks = Boolean(newCustomJob.sparks.length)
+
+      const hasLinkedContent = hasLinkedEvents || hasLinkedSparks
+
       if (changeTypes.isCreate) {
          sideEffectPromises.push(
             customJobRepo.createCustomJobStats(newCustomJob)
@@ -373,45 +387,90 @@ export const onWriteCustomJobs = functions
             )
          )
 
-         sideEffectPromises.push(
-            livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
-               newCustomJob.livestreams,
-               []
-            ),
-            sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
-               newCustomJob.livestreams,
-               []
-            )
-         )
-      }
-
-      const businessFunctionTagsChanged = Boolean(
-         _.xor(
-            newCustomJob?.businessFunctionsTagIds ?? [],
-            oldCustomJob?.businessFunctionsTagIds ?? []
-         ).length
-      )
-
-      if (
-         (changeTypes.isUpdate || changeTypes.isCreate) &&
-         businessFunctionTagsChanged
-      ) {
-         if (newCustomJob.livestreams.length) {
+         if (deletedCustomJob.livestreams.length) {
             sideEffectPromises.push(
                livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
-                  newCustomJob.livestreams,
-                  newCustomJob.businessFunctionsTagIds
+                  deletedCustomJob.livestreams,
+                  []
                )
             )
          }
 
-         if (newCustomJob.sparks.length) {
+         if (deletedCustomJob.sparks.length) {
             sideEffectPromises.push(
                sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
-                  newCustomJob.sparks,
-                  newCustomJob.businessFunctionsTagIds
+                  deletedCustomJob.sparks,
+                  []
                )
             )
+         }
+      }
+
+      /**
+       * Cascade the businessFunctionsTagIds down to the Sparks and Live streams upon the only when the customJob
+       * has linked content (Sparks or Live streams), and there has been a change to the content link or to the business function tags.
+       */
+      if (changeTypes.isUpdate || changeTypes.isCreate) {
+         const removedLivestreams = getArrayDifference(
+            newCustomJob.livestreams ?? [],
+            oldCustomJob.livestreams ?? []
+         ) as string[]
+         const removedSparks = getArrayDifference(
+            newCustomJob.sparks ?? [],
+            oldCustomJob.sparks ?? []
+         ) as string[]
+
+         const linkedEventsChanged = Boolean(
+            _.xor(
+               newCustomJob.livestreams ?? [],
+               oldCustomJob.livestreams ?? []
+            ).length
+         )
+
+         const linkedSparksChanged = Boolean(
+            _.xor(newCustomJob.sparks ?? [], oldCustomJob.sparks ?? []).length
+         )
+
+         if (removedLivestreams.length) {
+            sideEffectPromises.push(
+               livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+                  removedLivestreams,
+                  []
+               )
+            )
+         }
+
+         if (removedSparks.length) {
+            sideEffectPromises.push(
+               sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
+                  removedSparks,
+                  []
+               )
+            )
+         }
+
+         if (hasLinkedContent) {
+            if (hasLinkedEvents) {
+               if (linkedEventsChanged || businessFunctionTagsChanged) {
+                  sideEffectPromises.push(
+                     livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+                        newCustomJob.livestreams,
+                        newCustomJob.businessFunctionsTagIds
+                     )
+                  )
+               }
+            }
+
+            if (hasLinkedSparks) {
+               if (linkedSparksChanged || businessFunctionTagsChanged) {
+                  sideEffectPromises.push(
+                     sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
+                        newCustomJob.sparks,
+                        newCustomJob.businessFunctionsTagIds
+                     )
+                  )
+               }
+            }
          }
       }
 
