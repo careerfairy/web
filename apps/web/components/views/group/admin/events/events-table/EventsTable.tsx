@@ -525,7 +525,7 @@ const EventsTable = ({
             />
          </Box>
          {streamIdToBeDeleted ? (
-            <SuspenseWithBoundary fallback={<CircularProgress />}>
+            <SuspenseWithBoundary fallback={<></>}>
                <DeleteEventDialog
                   groupId={group.groupId}
                   livestreamId={streamIdToBeDeleted}
