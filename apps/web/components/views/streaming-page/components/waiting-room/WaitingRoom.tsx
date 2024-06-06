@@ -3,12 +3,11 @@ import { useStreamIsLandscape } from "components/custom-hook/streaming"
 import { ReactNode, forwardRef } from "react"
 import { useShowWaitingRoom } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
-import { Header } from "../../TopBar/Header"
-import { LogoBackButton } from "../../TopBar/LogoBackButton"
 import { CountDown } from "./CountDown"
 import { Footer } from "./Footer"
 import { HostDetails } from "./HostDetails"
 import { StatusTitle } from "./StatusTitle"
+import { WaitingRoomHeader } from "./WaitingRoomHeader"
 
 const styles = sxStyles({
    root: {
@@ -52,9 +51,7 @@ const WaitingRoomView = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
 
    return (
       <Box ref={ref} {...props} sx={styles.root}>
-         <Header>
-            <LogoBackButton />
-         </Header>
+         <WaitingRoomHeader />
          <Box flexGrow={streamIsLandscape ? 0.35 : 1} />
          <Container maxWidth={false} disableGutters sx={styles.container}>
             <HostDetails />
