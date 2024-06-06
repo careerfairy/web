@@ -1,4 +1,5 @@
 import { createCompatGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    GroupAdmin,
    GroupAdminNewEventEmailInfo,
@@ -34,10 +35,14 @@ import {
    createLiveStreamStatsDoc,
 } from "@careerfairy/shared-lib/livestreams/stats"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import { chunkArray } from "@careerfairy/shared-lib/utils"
+import {
+   chunkArray,
+   getArrayDifference,
+   removeDuplicates,
+} from "@careerfairy/shared-lib/utils"
 import type { Change } from "firebase-functions"
 import * as functions from "firebase-functions"
-import { isEmpty } from "lodash"
+import _, { isEmpty } from "lodash"
 import { DateTime } from "luxon"
 import {
    DocumentSnapshot,
@@ -45,7 +50,7 @@ import {
    Timestamp,
    firestore as firestoreAdmin,
 } from "../api/firestoreAdmin"
-import type { FunctionsLogger } from "../util"
+import { FunctionsLogger, getChangeTypes } from "../util"
 import { addOperations } from "./stats/livestream"
 import type { OperationsToMake } from "./stats/util"
 import { logAndThrow } from "./validations"
@@ -185,8 +190,9 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @param tags ID list of tags to associate to the live streams.
     */
    syncCustomJobBusinessFunctionTagsToLivestreams(
-      livestreamIds: string[],
-      tags: string[]
+      afterJob: CustomJob,
+      beforeJob: CustomJob,
+      changeType: ReturnType<typeof getChangeTypes>
    ): Promise<void>
 }
 
@@ -666,20 +672,175 @@ export class LivestreamFunctionsRepository
    }
 
    async syncCustomJobBusinessFunctionTagsToLivestreams(
-      livestreamIds: string[],
-      tags: string[]
+      afterJob: CustomJob,
+      beforeJob: CustomJob,
+      changeType: ReturnType<typeof getChangeTypes>
    ): Promise<void> {
-      functions.logger.log(`Sync tags with live streams ${livestreamIds}.`)
-      const events = this.firestore
+      functions.logger.log("Sync tags with live streams.")
+
+      const updatePromises = []
+
+      const businessFunctionTagsChanged = Boolean(
+         _.xor(
+            afterJob.businessFunctionsTagIds ?? [],
+            beforeJob.businessFunctionsTagIds ?? []
+         ).length
+      )
+
+      const hasLinkedEvents = Boolean(afterJob.livestreams.length)
+      console.log(
+         "🚀 ~ businessFunctionTagsChanged:",
+         businessFunctionTagsChanged
+      )
+
+      const addedLivestreams = getArrayDifference(
+         beforeJob.livestreams ?? [],
+         afterJob.livestreams ?? []
+      ) as string[]
+      console.log("🚀 ~ addedLivestreams:", addedLivestreams)
+      const removedLivestreams = getArrayDifference(
+         afterJob.livestreams ?? [],
+         beforeJob.livestreams ?? []
+      ) as string[]
+      console.log("🚀 ~ removedLivestreams:", removedLivestreams)
+
+      if (!hasLinkedEvents && !removedLivestreams.length) return
+
+      const allEffectedEventIds = removedLivestreams.concat(
+         afterJob.livestreams
+      )
+      console.log("🚀 ~ allEffectedEventIds:", allEffectedEventIds)
+
+      const eventsQuery = this.firestore
          .collection("livestreams")
-         .where("id", "in", livestreamIds) // TODO: Check if limit using IN
+         .where("id", "in", allEffectedEventIds) // TODO: Check if limit using IN
          .withConverter(createCompatGenericConverter<LivestreamEvent>())
 
-      const snapshot = await events.get()
+      const customJobsQuery = this.firestore
+         .collection("customJobs")
+         .where("livestreams", "array-contains-any", allEffectedEventIds) // TODO: LIMIT 30
+         .withConverter(createCompatGenericConverter<CustomJob>())
 
-      const updatePromises = snapshot.docs?.map((doc) => {
-         return doc.ref.update({ linkedCustomJobsTagIds: tags })
-      })
+      const customJobsSnapshot = await customJobsQuery.get()
+      const eventsSnapshot = await eventsQuery.get()
+
+      const customJobs =
+         customJobsSnapshot.docs?.map((jobDoc) => jobDoc.data()) || []
+
+      /**
+       * Create a map allowing to retrieve for a given live stream id, all of the
+       * @field businessFunctionsTagIds of @type CustomJob, for all custom jobs associated to that live stream
+       * while ignoring the tags associated via the current custom job, which will be needed when
+       * a custom job is deleted, only its tags are to be removed from the live stream, tags inferred from other
+       * jobs must still remain.
+       */
+      const livestreamCustomJobsTagMap = Object.fromEntries(
+         allEffectedEventIds.map((id) => {
+            const eventJobs =
+               customJobs.filter((job) => job.livestreams.includes(id)) || []
+            const unrelatedCustomJobsTags = eventJobs
+               .filter((job) => job.id != afterJob.id)
+               .map((job) => job.businessFunctionsTagIds)
+               .flat()
+               .filter(Boolean)
+
+            return [id, unrelatedCustomJobsTags]
+         })
+      )
+      console.log(
+         "🚀 ~ livestreamCustomJobsTagMap:",
+         livestreamCustomJobsTagMap
+      )
+
+      // When a customJob is being updated or created, if there are no tags, nothing to do
+      if (changeType.isCreate || changeType.isUpdate) {
+         console.log("🚀 ~ isCreate|isDelete")
+
+         if (hasLinkedEvents) {
+            let eventsToUpdate = addedLivestreams
+
+            // Less updates by only updating the current linked events when the tag has changed
+            // other wise the tags sync will only be for the added live streams
+            if (businessFunctionTagsChanged) {
+               eventsToUpdate = eventsToUpdate.concat(afterJob.livestreams)
+            }
+            // Update livestreams tags for all events still on the customJob (update or create)
+            // Filter the snapshots as the query includes also removed live streams from the customJob
+            eventsSnapshot.docs
+               ?.filter((event) => eventsToUpdate.includes(event.id))
+               ?.map((eventDoc) => {
+                  const eventLinkedJobTags =
+                     eventDoc.data().linkedCustomJobsTagIds ?? []
+
+                  // Always remove duplicates as adding or removing can produce duplicates
+                  const mergedTags = removeDuplicates(
+                     afterJob.businessFunctionsTagIds.concat(eventLinkedJobTags)
+                  )
+
+                  return eventDoc.ref.update({
+                     linkedCustomJobsTagIds: mergedTags,
+                  })
+               })
+               ?.forEach((promise) => updatePromises.push(promise))
+         }
+
+         if (removedLivestreams.length) {
+            eventsSnapshot.docs
+               ?.filter((event) => removedLivestreams.includes(event.id))
+               ?.map((eventDoc) => {
+                  const eventLinkedJobTags =
+                     eventDoc.data().linkedCustomJobsTagIds ?? []
+
+                  // When removing, keep only tags which were inferred by other custom jobs (other the one being updated)
+                  const tagsData = eventLinkedJobTags.filter(
+                     (jobTag) =>
+                        livestreamCustomJobsTagMap[eventDoc.id].includes(
+                           jobTag
+                        ) && !afterJob.businessFunctionsTagIds.includes(jobTag)
+                  )
+
+                  const mergedTags = removeDuplicates(tagsData)
+                  return eventDoc.ref.update({
+                     linkedCustomJobsTagIds: mergedTags,
+                  })
+               })
+               ?.forEach((promise) => updatePromises.push(promise))
+         }
+      } else if (changeType.isDelete) {
+         console.log("🚀 ~ isDelete")
+         // Remove all job tags from beforeJob for all linked live streams
+         if (beforeJob.livestreams.length) {
+            // Update livestreams tags for all events still on the customJob (update or create)
+            // Filter the snapshots as the query includes also removed live streams from the customJob
+            eventsSnapshot.docs
+               ?.filter((event) => beforeJob.livestreams.includes(event.id))
+               ?.map((eventDoc) => {
+                  const eventLinkedJobTags =
+                     eventDoc.data().linkedCustomJobsTagIds ?? []
+
+                  const tagsData = eventLinkedJobTags.filter((jobTag) => {
+                     const eventTagsExcludingCurrentJob =
+                        livestreamCustomJobsTagMap[eventDoc.id]
+                     console.log(
+                        "🚀 ~ tagsData ~ eventTagsExcludingCurrentJob:",
+                        eventTagsExcludingCurrentJob
+                     )
+                     return (
+                        eventTagsExcludingCurrentJob.includes(jobTag) &&
+                        !beforeJob.businessFunctionsTagIds.includes(jobTag)
+                     )
+                  })
+
+                  // Always remove duplicates as adding or removing can produce duplicates
+                  const mergedTags = removeDuplicates(tagsData)
+
+                  return eventDoc.ref.update({
+                     linkedCustomJobsTagIds: mergedTags,
+                  })
+               })
+               ?.forEach((promise) => updatePromises.push(promise))
+         }
+      }
 
       const results = await Promise.allSettled(updatePromises)
 
@@ -687,10 +848,82 @@ export class LivestreamFunctionsRepository
 
       if (errors.length) {
          logAndThrow("Error synching tags with live streams", {
-            livestreamIds: livestreamIds,
-            tags: tags,
+            livestreamIds: afterJob.livestreams,
+            customJobId: afterJob.id,
             errors: errors,
          })
       }
+
+      functions.logger.log(
+         `Updated live streams linked to customJob ${afterJob.id}`
+      )
    }
+
+   // async syncRemovedCustomJobLivestreamTas(
+   //    customJob: CustomJob ,
+   //    removedLivestreamIds: string[]
+   // ): Promise<void> {
+   //    functions.logger.log(`Sync tags with live streams ${customJob.livestreams}.`)
+   //    const eventsQuery = this.firestore
+   //       .collection("livestreams")
+   //       .where("id", "in", customJob.livestreams) // TODO: Check if limit using IN
+   //       .withConverter(createCompatGenericConverter<LivestreamEvent>())
+
+   //    const customJobsQuery = this.firestore
+   //       .collection("customJobs")
+   //       .where("livestreams", "in", customJob.livestreams) // TODO: Check if limit using IN
+   //       .withConverter(createCompatGenericConverter<CustomJob>())
+
+   //    const snapshot = await eventsQuery.get()
+
+   //    const customJobsSnapshot = await customJobsQuery.get()
+
+   //    const customJobs = customJobsSnapshot.docs?.map(jobDoc => jobDoc.data())
+
+   //    /**
+   //     * Create a map allowing to retrieve for a given live stream id, all of the
+   //     * @field businessFunctionsTagIds of @type CustomJob, for all custom jobs associated to that live stream
+   //     * while ignoring the tags associated via the current custom job, which will be needed when
+   //     * a custom job is deleted, only its tags are to be removed from the live stream, tags inferred from other
+   //     * jobs must still remain.
+   //     */
+   //    const livestreamCustomJobsTagMap = Object.fromEntries(
+   //       customJob.livestreams.map((id) => {
+   //          const eventJobs = customJobs.filter( job => job.livestreams.includes(id)) || []
+   //          const unrelatedCustomJobsTags = eventJobs.filter( job => job.id != customJob.id).map( job => job.businessFunctionsTagIds).flat()
+
+   //          return [id, unrelatedCustomJobsTags]
+   //       })
+   //    )
+
+   //    const updatePromises = snapshot.docs?.map((eventDoc) => {
+   //       const eventLinkedJobTags = eventDoc.data().linkedCustomJobsTagIds ?? []
+
+   //       let tagsData = []
+
+   //       if(remove){
+   //          // When removing, keep only tags which were inferred by other custom jobs (other than the one being deleted)
+   //          tagsData = eventLinkedJobTags.filter( jobTag => livestreamCustomJobsTagMap[eventDoc.id].includes(jobTag) && !customJob.businessFunctionsTagIds.includes(jobTag))
+   //       }else{
+   //          tagsData = customJob.businessFunctionsTagIds.concat( eventLinkedJobTags )
+   //       }
+
+   //       // Always remove duplicates as adding or removing can produce duplicates
+   //       const mergedTags = removeDuplicates(tagsData)
+
+   //       return eventDoc.ref.update({ linkedCustomJobsTagIds: mergedTags })
+   //    })
+
+   //    const results = await Promise.allSettled(updatePromises)
+
+   //    const errors = results.filter((res) => res.status == "rejected")
+
+   //    if (errors.length) {
+   //       logAndThrow("Error synching tags with live streams", {
+   //          livestreamIds: customJob.livestreams,
+   //          tags: customJob.businessFunctionsTagIds,
+   //          errors: errors,
+   //       })
+   //    }
+   // }
 }

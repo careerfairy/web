@@ -30,6 +30,7 @@ import {
 } from "@careerfairy/shared-lib/src/commonTypes"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
+import { removeDuplicates } from "@careerfairy/shared-lib/utils"
 import { DocumentSnapshot } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
@@ -292,7 +293,8 @@ export interface ISparkFunctionsRepository {
     */
    syncCustomJobBusinessFunctionTagsToSparks(
       sparkIds: string[],
-      tags: string[]
+      tags: string[],
+      remove?: boolean
    ): Promise<void>
 }
 
@@ -1009,7 +1011,8 @@ export class SparkFunctionsRepository
 
    async syncCustomJobBusinessFunctionTagsToSparks(
       sparkIds: string[],
-      tags: string[]
+      tags: string[],
+      remove?: boolean
    ): Promise<void> {
       functions.logger.log(`Sync tags with Sparks ${sparkIds}.`)
       const sparks = this.firestore
@@ -1020,7 +1023,14 @@ export class SparkFunctionsRepository
       const snapshot = await sparks.get()
 
       const updatePromises = snapshot.docs?.map((doc) => {
-         return doc.ref.update({ linkedCustomJobsTagIds: tags })
+         const sparkLinkedJobTags = doc.data().linkedCustomJobsTagIds ?? []
+
+         const tagsData = remove
+            ? sparkLinkedJobTags.filter((jobTag) => !tags.includes(jobTag))
+            : tags.concat(sparkLinkedJobTags)
+
+         const mergedTags = removeDuplicates(tagsData)
+         return doc.ref.update({ linkedCustomJobsTagIds: mergedTags })
       })
 
       const results = await Promise.allSettled(updatePromises)
