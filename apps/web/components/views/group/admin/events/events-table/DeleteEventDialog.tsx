@@ -1,15 +1,18 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LoadingButton } from "@mui/lab"
 import {
    Button,
    Dialog,
    DialogActions,
    DialogContent,
+   Drawer,
    Stack,
 } from "@mui/material"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import DeleteLinkedContentDialog from "components/views/common/DeleteLinkedContentDialog"
 import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
-import React from "react"
+import React, { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -38,6 +41,9 @@ const styles = sxStyles({
    actionBtn: {
       width: "160px",
    },
+   paperRoot: {
+      borderRadius: (theme) => theme.spacing(2, 2, 0, 0),
+   },
 })
 
 type Props = {
@@ -58,6 +64,7 @@ const DeleteEventDialog: React.FC<Props> = ({
    message,
 }) => {
    const linkedJobs = useGroupCustomJobs(groupId, { livestreamId })
+   const isMobile = useIsMobile()
 
    if (!linkedJobs?.length) {
       return (
@@ -71,40 +78,82 @@ const DeleteEventDialog: React.FC<Props> = ({
       )
    }
 
+   if (isMobile) {
+      return (
+         <Drawer
+            open={true}
+            anchor="bottom"
+            PaperProps={{
+               sx: styles.paperRoot,
+            }}
+         >
+            <Content
+               linkedJobs={linkedJobs}
+               handleClose={handleClose}
+               loading={loading}
+               handleConfirm={handleConfirm}
+            />
+         </Drawer>
+      )
+   }
+
    return (
       <Dialog open={true} onClose={handleClose} maxWidth="xs">
-         <DialogContent sx={styles.container}>
-            <Stack spacing={3} sx={styles.info}>
-               <DeleteLinkedContentDialog
-                  linkedJobs={linkedJobs}
-                  contentType="livestream"
-               />
-            </Stack>
-         </DialogContent>
-
-         <DialogActions sx={styles.actions}>
-            <Button
-               variant="outlined"
-               color="grey"
-               onClick={handleClose}
-               sx={[styles.cancelBtn, styles.actionBtn]}
-            >
-               Cancel
-            </Button>
-
-            <LoadingButton
-               color="error"
-               disabled={loading}
-               loading={loading}
-               onClick={handleConfirm}
-               variant="contained"
-               sx={styles.actionBtn}
-            >
-               Delete
-            </LoadingButton>
-         </DialogActions>
+         <Content
+            linkedJobs={linkedJobs}
+            handleClose={handleClose}
+            loading={loading}
+            handleConfirm={handleConfirm}
+         />
       </Dialog>
    )
 }
+
+type ContentProps = {
+   linkedJobs: CustomJob[]
+   handleClose: () => void
+   loading: boolean
+   handleConfirm: () => void
+}
+
+const Content: FC<ContentProps> = ({
+   linkedJobs,
+   handleClose,
+   loading,
+   handleConfirm,
+}) => (
+   <>
+      <DialogContent sx={styles.container}>
+         <Stack spacing={3} sx={styles.info}>
+            <DeleteLinkedContentDialog
+               linkedJobs={linkedJobs}
+               contentType="livestream"
+            />
+         </Stack>
+      </DialogContent>
+
+      <DialogActions sx={styles.actions}>
+         <Button
+            variant="outlined"
+            color="grey"
+            onClick={handleClose}
+            sx={[styles.cancelBtn, styles.actionBtn]}
+         >
+            Cancel
+         </Button>
+
+         <LoadingButton
+            color="error"
+            disabled={loading}
+            loading={loading}
+            onClick={handleConfirm}
+            variant="contained"
+            sx={styles.actionBtn}
+         >
+            Delete
+         </LoadingButton>
+      </DialogActions>
+   </>
+)
 
 export default DeleteEventDialog
