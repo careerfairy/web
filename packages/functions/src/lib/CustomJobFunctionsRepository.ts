@@ -11,8 +11,8 @@ import { CustomJobMetaData } from "@careerfairy/shared-lib/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
-import { customJobRepo, livestreamsRepo, sparkRepo } from "src/api/repositories"
 import { Timestamp } from "../api/firestoreAdmin"
+import { livestreamsRepo, sparkRepo } from "../api/repositories"
 
 export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    /**
@@ -308,9 +308,7 @@ export class CustomJobFunctionsRepository
       const batch = this.firestore.batch()
 
       const { livestreams, groupId } = deletedCustomJob
-      const groupCustomJobs = await customJobRepo.getCustomJobsByGroupId(
-         groupId
-      )
+      const groupCustomJobs = await this.getCustomJobsByGroupId(groupId)
       const linkedLivestreams = await livestreamsRepo.getLivestreamsByIds(
          livestreams
       )
@@ -363,9 +361,7 @@ export class CustomJobFunctionsRepository
       const batch = this.firestore.batch()
 
       const { sparks, groupId } = deletedCustomJob
-      const groupCustomJobs = await customJobRepo.getCustomJobsByGroupId(
-         groupId
-      )
+      const groupCustomJobs = await this.getCustomJobsByGroupId(groupId)
 
       const linkedSparks = await sparkRepo.getSparksByIds(sparks)
 
