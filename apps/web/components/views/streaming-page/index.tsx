@@ -13,6 +13,14 @@ import { useRouter } from "next/router"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/waiting-room/WaitingRoom"
 
+const EndOfStream = dynamic(
+   () =>
+      import("./components/end-of-stream/EndOfStream").then(
+         (mod) => mod.EndOfStream
+      ),
+   { ssr: false }
+)
+
 const ShareVideoDialog = dynamic(
    () =>
       import(
@@ -232,15 +240,17 @@ const Component = ({ isHost }: Props) => {
                         <AgoraDevicesProvider>
                            <LocalTracksProvider>
                               <ScreenShareProvider>
-                                 <Layout>
-                                    <Fragment>
-                                       <TopBar />
-                                       <MiddleContent />
-                                       <BottomBar />
-                                       <StreamSetupWidget />
-                                       <SettingsMenu />
-                                    </Fragment>
-                                 </Layout>
+                                 <EndOfStream isHost={isHost}>
+                                    <Layout>
+                                       <Fragment>
+                                          <TopBar />
+                                          <MiddleContent />
+                                          <BottomBar />
+                                          <StreamSetupWidget />
+                                          <SettingsMenu />
+                                       </Fragment>
+                                    </Layout>
+                                 </EndOfStream>
                                  <ToggleStreamModeButton />
                               </ScreenShareProvider>
                            </LocalTracksProvider>
