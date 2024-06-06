@@ -1,20 +1,20 @@
-import React, { useCallback, useMemo } from "react"
-import SteppedDialog, {
-   useStepper,
-} from "../../../../stepped-dialog/SteppedDialog"
+import { useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
 import {
-   deleteJobsDialogOpenSelector,
    deleteJobWithLinkedLivestreamsDialogOpenSelector,
+   deleteJobsDialogOpenSelector,
    jobsDialogOpenSelector,
    jobsFormSelectedJobIdSelector,
 } from "../../../../../../store/selectors/adminJobsSelectors"
-import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
+import { sxStyles } from "../../../../../../types/commonTypes"
 import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import PrivacyPolicyDialog from "./PrivacyPolicyDialog"
+import SteppedDialog, {
+   useStepper,
+} from "../../../../stepped-dialog/SteppedDialog"
 import JobFormDialog from "./JobFormDialog"
+import PrivacyPolicyDialog from "./PrivacyPolicyDialog"
 import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
 const styles = sxStyles({
@@ -23,7 +23,7 @@ const styles = sxStyles({
       borderRadius: 5,
    },
    smallDialog: {
-      maxWidth: 450,
+      maxWidth: { md: 450 },
       top: { xs: "calc(100dvh - 320px)", md: 0 },
    },
    jobWithList: {
