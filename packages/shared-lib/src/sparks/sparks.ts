@@ -40,6 +40,13 @@ export interface Spark extends Identifiable {
    category: SparkCategory
 
    /**
+    * Content Tag IDs
+    * e.g: ["Day in the life", "Jobs"]
+    */
+   contentTopicsTagIds?: string[]
+   languageTagIds?: string[]
+   linkedCustomJobsTagIds?: string[]
+   /**
     * Description / Question of the spark
     */
    question: string

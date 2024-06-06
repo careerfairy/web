@@ -40,6 +40,14 @@ export interface LivestreamEvent extends Identifiable {
    universityIds?: string[]
    levelOfStudyIds?: string[]
    fieldOfStudyIds?: string[]
+   /**
+    * Content Tag IDs
+    * e.g: ["BusinessDevelopment", "Consulting"]
+    */
+   businessFunctionsTagIds?: string[]
+   contentTopicsTagIds?: string[]
+   linkedCustomJobsTagIds?: string[]
+
    isRecording?: boolean
    language?: LivestreamLanguage
    hidden: boolean
