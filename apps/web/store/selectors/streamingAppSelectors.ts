@@ -87,6 +87,9 @@ export const useCompanyName = () =>
       return test ? "Test Company" : companyName
    })
 
+export const useStreamTitle = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.title)
+
 export const useStreamHandRaiseEnabled = () =>
    useAppSelector(
       (state) => state.streamingApp.livestreamState.handRaiseEnabled
