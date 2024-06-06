@@ -26,6 +26,11 @@ export interface CustomJob extends Identifiable {
    // optional fields
    salary?: string
    deleted?: boolean
+   /**
+    * Content Tag IDs
+    * e.g: ["BusinessDevelopment", "Consulting"]
+    */
+   businessFunctionsTagIds?: string[]
 }
 
 export type PublicCustomJob = Pick<
