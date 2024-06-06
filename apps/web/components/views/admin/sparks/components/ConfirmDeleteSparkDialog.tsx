@@ -1,3 +1,4 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    CreatorRoles,
    PublicCreator,
@@ -5,15 +6,16 @@ import {
 import { LoadingButton } from "@mui/lab"
 import {
    Button,
-   CircularProgress,
    Dialog,
    DialogActions,
    DialogContent,
+   Drawer,
    Stack,
 } from "@mui/material"
 import Box from "@mui/material/Box"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import DeleteLinkedContentDialog from "components/views/common/DeleteLinkedContentDialog"
 import { groupRepo } from "data/RepositoryInstances"
@@ -57,6 +59,9 @@ const styles = sxStyles({
    actionBtn: {
       width: "160px",
    },
+   paperRoot: {
+      borderRadius: (theme) => theme.spacing(2, 2, 0, 0),
+   },
 })
 
 type Props = {
@@ -81,8 +86,8 @@ const ConfirmDeleteSparkDialog: FC<Props> = ({
    }
 
    return (
-      <SuspenseWithBoundary fallback={<CircularProgress />}>
-         <Content
+      <SuspenseWithBoundary fallback={<></>}>
+         <DeleteSparkContent
             sparkId={sparkId}
             groupId={groupId}
             creator={creator}
@@ -94,7 +99,7 @@ const ConfirmDeleteSparkDialog: FC<Props> = ({
    )
 }
 
-const Content: FC<Props> = ({
+const DeleteSparkContent: FC<Props> = ({
    sparkId,
    groupId,
    creator,
@@ -105,6 +110,7 @@ const Content: FC<Props> = ({
    const [isDeletingSpark, setIsDeletingSpark] = useState(false)
    const { errorNotification } = useSnackbarNotifications()
    const linkedJobs = useGroupCustomJobs(groupId, { sparkId })
+   const isMobile = useIsMobile()
 
    // Define primary action for the confirmation dialog
    const primaryAction = useMemo<ConfirmationDialogAction>(
@@ -201,41 +207,82 @@ const Content: FC<Props> = ({
       )
    }
 
+   if (isMobile) {
+      return (
+         <Drawer
+            open={open}
+            anchor="bottom"
+            PaperProps={{
+               sx: styles.paperRoot,
+            }}
+         >
+            <Content
+               linkedJobs={linkedJobs}
+               handleClose={handleClose}
+               isDeletingSpark={isDeletingSpark}
+               primaryAction={primaryAction}
+            />
+         </Drawer>
+      )
+   }
+
    // If the spark is linked to custom jobs, display a dialog with a DeleteLinkedContentDialog
    return (
       <Dialog open={open} onClose={handleClose} maxWidth="xs">
-         <DialogContent sx={styles.container}>
-            <Stack spacing={3} sx={styles.info}>
-               <DeleteLinkedContentDialog
-                  linkedJobs={linkedJobs}
-                  contentType="spark"
-               />
-            </Stack>
-         </DialogContent>
-
-         <DialogActions sx={styles.actions}>
-            <Button
-               variant="outlined"
-               color="grey"
-               onClick={handleClose}
-               sx={[styles.cancelBtn, styles.actionBtn]}
-            >
-               Cancel
-            </Button>
-
-            <LoadingButton
-               color="error"
-               disabled={isDeletingSpark}
-               loading={isDeletingSpark}
-               onClick={() => primaryAction.callback()}
-               variant="contained"
-               sx={styles.actionBtn}
-            >
-               Delete
-            </LoadingButton>
-         </DialogActions>
+         <Content
+            linkedJobs={linkedJobs}
+            handleClose={handleClose}
+            isDeletingSpark={isDeletingSpark}
+            primaryAction={primaryAction}
+         />
       </Dialog>
    )
 }
 
+type ContentProps = {
+   linkedJobs: CustomJob[]
+   handleClose: () => void
+   isDeletingSpark: boolean
+   primaryAction: any
+}
+
+const Content: FC<ContentProps> = ({
+   linkedJobs,
+   handleClose,
+   isDeletingSpark,
+   primaryAction,
+}) => (
+   <>
+      <DialogContent sx={styles.container}>
+         <Stack spacing={3} sx={styles.info}>
+            <DeleteLinkedContentDialog
+               linkedJobs={linkedJobs}
+               contentType="spark"
+            />
+         </Stack>
+      </DialogContent>
+
+      <DialogActions sx={styles.actions}>
+         <Button
+            variant="outlined"
+            color="grey"
+            onClick={handleClose}
+            sx={[styles.cancelBtn, styles.actionBtn]}
+         >
+            Cancel
+         </Button>
+
+         <LoadingButton
+            color="error"
+            disabled={isDeletingSpark}
+            loading={isDeletingSpark}
+            onClick={() => primaryAction.callback()}
+            variant="contained"
+            sx={styles.actionBtn}
+         >
+            Delete
+         </LoadingButton>
+      </DialogActions>
+   </>
+)
 export default ConfirmDeleteSparkDialog
