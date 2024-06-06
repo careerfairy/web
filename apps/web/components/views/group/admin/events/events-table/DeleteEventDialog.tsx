@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab"
 import {
    Button,
    Dialog,
@@ -91,15 +92,16 @@ const DeleteEventDialog: React.FC<Props> = ({
                Cancel
             </Button>
 
-            <Button
+            <LoadingButton
                color="error"
                disabled={loading}
+               loading={loading}
                onClick={handleConfirm}
                variant="contained"
                sx={styles.actionBtn}
             >
                Delete
-            </Button>
+            </LoadingButton>
          </DialogActions>
       </Dialog>
    )

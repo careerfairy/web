@@ -2,6 +2,7 @@ import {
    CreatorRoles,
    PublicCreator,
 } from "@careerfairy/shared-lib/groups/creators"
+import { LoadingButton } from "@mui/lab"
 import {
    Button,
    CircularProgress,
@@ -222,15 +223,16 @@ const Content: FC<Props> = ({
                Cancel
             </Button>
 
-            <Button
+            <LoadingButton
                color="error"
                disabled={isDeletingSpark}
+               loading={isDeletingSpark}
                onClick={() => primaryAction.callback()}
                variant="contained"
                sx={styles.actionBtn}
             >
                Delete
-            </Button>
+            </LoadingButton>
          </DialogActions>
       </Dialog>
    )
