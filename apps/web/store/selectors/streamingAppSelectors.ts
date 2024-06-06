@@ -119,5 +119,11 @@ export const useShowWaitingRoom = (isHost: boolean) =>
       return !isHost && !hasEnded && hasStarted === undefined
    })
 
+export const useShowEndScreen = (isHost: boolean) =>
+   useAppSelector((state) => {
+      const { hasStarted, hasEnded } = state.streamingApp.livestreamState
+      return !isHost && hasEnded && hasStarted === false
+   })
+
 export const useIsTestLivestream = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.test)
