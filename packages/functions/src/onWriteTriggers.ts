@@ -348,8 +348,8 @@ export const onWriteCustomJobs = functions
 
       const businessFunctionTagsChanged = Boolean(
          _.xor(
-            newCustomJob?.businessFunctionsTagIds ?? [],
-            oldCustomJob?.businessFunctionsTagIds ?? []
+            newCustomJob.businessFunctionsTagIds ?? [],
+            oldCustomJob.businessFunctionsTagIds ?? []
          ).length
       )
 
