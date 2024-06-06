@@ -1,18 +1,17 @@
 import { Box, BoxProps, Container } from "@mui/material"
-import Slide from "@mui/material/Slide"
 import { useStreamIsLandscape } from "components/custom-hook/streaming"
-import { Fragment, ReactNode, forwardRef } from "react"
+import { ReactNode, forwardRef } from "react"
 import { useShowWaitingRoom } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
-import { Header } from "../TopBar/Header"
-import { LogoBackButton } from "../TopBar/LogoBackButton"
+import { Header } from "../../TopBar/Header"
+import { LogoBackButton } from "../../TopBar/LogoBackButton"
 import { CountDown } from "./CountDown"
 import { Footer } from "./Footer"
 import { HostDetails } from "./HostDetails"
 import { StatusTitle } from "./StatusTitle"
 
 const styles = sxStyles({
-   waitingRoom: {
+   root: {
       width: "100%",
       minHeight: "100vh",
       display: "flex",
@@ -31,36 +30,28 @@ type Props = {
    isHost: boolean
 }
 
+/**
+ * WaitingRoom component determines whether to show the waiting room view or the children components
+ * based on the host status and the state of the live stream.
+ *
+ * The waiting room is shown if the user is not the host, the live stream has not ended,
+ * and the live stream has not started yet.
+ */
 export const WaitingRoom = ({ children, isHost }: Props) => {
    const showWaitingRoom = useShowWaitingRoom(isHost)
 
-   return (
-      <Fragment>
-         <Slide
-            direction="left"
-            in={!showWaitingRoom}
-            mountOnEnter
-            unmountOnExit
-         >
-            <Box>{children}</Box>
-         </Slide>
-         <Slide
-            direction="right"
-            in={showWaitingRoom}
-            mountOnEnter
-            unmountOnExit
-         >
-            <WaitingRoomView />
-         </Slide>
-      </Fragment>
-   )
+   if (showWaitingRoom) {
+      return <WaitingRoomView />
+   }
+
+   return <>{children}</>
 }
 
 const WaitingRoomView = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
    const streamIsLandscape = useStreamIsLandscape()
 
    return (
-      <Box ref={ref} {...props} sx={styles.waitingRoom}>
+      <Box ref={ref} {...props} sx={styles.root}>
          <Header>
             <LogoBackButton />
          </Header>
