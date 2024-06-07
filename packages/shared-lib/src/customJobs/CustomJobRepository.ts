@@ -139,7 +139,6 @@ export class FirebaseCustomJobRepository
          id: ref.id,
          published: Boolean(linkedLivestreamId),
       }
-      console.log("🚀 ~ newJob:", newJob)
 
       await ref.set(newJob, { merge: true })
 
