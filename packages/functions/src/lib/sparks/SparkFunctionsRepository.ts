@@ -47,7 +47,12 @@ import {
    Storage,
    Timestamp,
 } from "../../api/firestoreAdmin"
-import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
+import {
+   customJobRepo,
+   livestreamsRepo,
+   sparkRepo,
+   userRepo,
+} from "../../api/repositories"
 import { createGenericConverter } from "../../util/firestore-admin"
 import { addAddedToFeedAt } from "../../util/sparks"
 import BigQueryCreateInsertService from "../bigQuery/BigQueryCreateInsertService"
@@ -1057,22 +1062,12 @@ export class SparkFunctionsRepository
 
       const allEffectedSparkIds = removedSparks.concat(afterJob.sparks)
 
-      const sparksQuery = this.firestore
-         .collection("sparks")
-         .where("id", "in", allEffectedSparkIds) // TODO: Check if limit using IN - Chunk items
-         .withConverter(createGenericConverter<Spark>())
+      const sparks = await this.getSparksByIds(allEffectedSparkIds)
 
-      const customJobsQuery = this.firestore
-         .collection("customJobs")
-         .where("sparks", "array-contains-any", allEffectedSparkIds) // TODO: LIMIT 30 - Chunk items
-         .withConverter(createGenericConverter<CustomJob>())
-
-      const customJobsSnapshot = await customJobsQuery.get()
-      const sparksSnapshot = await sparksQuery.get()
-
-      const customJobs =
-         customJobsSnapshot.docs?.map((jobDoc) => jobDoc.data()) || []
-
+      const customJobs = await customJobRepo.getCustomJobsByLinkedContentIds(
+         "sparks",
+         allEffectedSparkIds
+      )
       /**
        * Create a map allowing to retrieve for a given spark id, all of the
        * @field businessFunctionsTagIds of @type CustomJob, for all custom jobs associated to that spark
@@ -1083,7 +1078,11 @@ export class SparkFunctionsRepository
       const sparksCustomJobsTagMap = Object.fromEntries(
          allEffectedSparkIds.map((id) => {
             const sparkJobs =
-               customJobs.filter((job) => job.sparks.includes(id)) || []
+               customJobs?.filter((job) => {
+                  console.log("🚀 ~ customJobs?.filter ~ job:", job)
+
+                  return job.sparks?.includes(id)
+               }) || []
             const unrelatedCustomJobsTags = sparkJobs
                .filter((job) => job.id != afterJob.id)
                .map((job) => job.businessFunctionsTagIds)
@@ -1106,11 +1105,11 @@ export class SparkFunctionsRepository
             }
             // Update spark tags for all sparks still on the customJob (update or create)
             // Filter the snapshots as the query includes also removed sparks from the customJob
-            sparksSnapshot.docs
+            sparks
                ?.filter((spark) => sparksToUpdate.includes(spark.id))
                ?.map((sparkDoc) => {
                   const sparkLinkedJobTags =
-                     sparkDoc.data().linkedCustomJobsTagIds ?? []
+                     sparkDoc.linkedCustomJobsTagIds ?? []
 
                   // Always remove duplicates as adding or removing can produce duplicates
                   const mergedTags = removeDuplicates(
@@ -1119,7 +1118,12 @@ export class SparkFunctionsRepository
                      ) || []
                   )
 
-                  return sparkDoc.ref.update({
+                  const ref = this.firestore
+                     .collection("sparks")
+                     .withConverter(createGenericConverter<Spark>())
+                     .doc(sparkDoc.id)
+
+                  return ref.update({
                      linkedCustomJobsTagIds: mergedTags,
                   })
                })
@@ -1127,14 +1131,19 @@ export class SparkFunctionsRepository
          }
 
          if (removedSparks.length) {
-            sparksSnapshot.docs
+            sparks
                ?.filter((spark) => removedSparks.includes(spark.id))
                ?.map((sparkDoc) => {
                   // When removing, keep only tags which were inferred by other custom jobs (other the one being updated)
                   const mergedTags = removeDuplicates(
                      sparksCustomJobsTagMap[sparkDoc.id]
                   )
-                  return sparkDoc.ref.update({
+                  const ref = this.firestore
+                     .collection("sparks")
+                     .withConverter(createGenericConverter<Spark>())
+                     .doc(sparkDoc.id)
+
+                  return ref.update({
                      linkedCustomJobsTagIds: mergedTags,
                   })
                })
@@ -1172,21 +1181,12 @@ export class SparkFunctionsRepository
       )
          return
 
-      const sparksQuery = this.firestore
-         .collection("sparks")
-         .where("id", "in", beforeJob.sparks) // TODO: Check if limit using IN - Chunk items
-         .withConverter(createGenericConverter<Spark>())
+      const sparks = await this.getSparksByIds(beforeJob.sparks)
 
-      const customJobsQuery = this.firestore
-         .collection("customJobs")
-         .where("sparks", "array-contains-any", beforeJob.sparks) // TODO: LIMIT 30 - Chunk items
-         .withConverter(createGenericConverter<CustomJob>())
-
-      const customJobsSnapshot = await customJobsQuery.get()
-      const sparksSnapshot = await sparksQuery.get()
-
-      const customJobs =
-         customJobsSnapshot.docs?.map((jobDoc) => jobDoc.data()) || []
+      const customJobs = await customJobRepo.getCustomJobsByLinkedContentIds(
+         "sparks",
+         beforeJob.sparks
+      )
 
       /**
        * Create a map allowing to retrieve for a given spark id, all of the
@@ -1198,7 +1198,9 @@ export class SparkFunctionsRepository
       const sparksCustomJobsTagMap = Object.fromEntries(
          beforeJob.sparks.map((id) => {
             const sparkJobs =
-               customJobs.filter((job) => job.sparks.includes(id)) || []
+               customJobs?.filter((job) => {
+                  return job.sparks.includes(id)
+               }) || []
             const unrelatedCustomJobsTags = sparkJobs
                .filter((job) => job.id != beforeJob.id)
                .map((job) => job.businessFunctionsTagIds)
@@ -1213,11 +1215,10 @@ export class SparkFunctionsRepository
       if (beforeJob.sparks.length) {
          // Update sparks tags for all events still on the customJob (update or create)
          // Filter the snapshots as the query includes also removed sparks from the customJob
-         sparksSnapshot.docs
+         sparks
             ?.filter((spark) => beforeJob.sparks.includes(spark.id))
             ?.map((sparkDoc) => {
-               const sparkLinkedJobTags =
-                  sparkDoc.data().linkedCustomJobsTagIds ?? []
+               const sparkLinkedJobTags = sparkDoc.linkedCustomJobsTagIds ?? []
                const sparkTagsExcludingCurrentJob =
                   sparksCustomJobsTagMap[sparkDoc.id]
                const tagsData = sparkLinkedJobTags.filter((jobTag) => {
@@ -1229,8 +1230,12 @@ export class SparkFunctionsRepository
 
                // Always remove duplicates as adding or removing can produce duplicates
                const mergedTags = removeDuplicates(tagsData)
+               const ref = this.firestore
+                  .collection("sparks")
+                  .withConverter(createGenericConverter<Spark>())
+                  .doc(sparkDoc.id)
 
-               return sparkDoc.ref.update({
+               return ref.update({
                   linkedCustomJobsTagIds: mergedTags,
                })
             })
