@@ -58,39 +58,37 @@ const StyledBrandedAutocomplete = styled(
                )
             }}
             options={newOptions}
-            renderOption={(optionProps, option, { selected, index }) => {
-               return (
-                  <>
-                     {Boolean(index === 0 && initialOptionSection) &&
-                        initialOptionSection}
-                     {Boolean(hasOptions) && (
-                        <MenuItem
-                           {...optionProps}
-                           key={JSON.stringify(option)}
-                           sx={{
-                              '&[aria-selected="true"]': {
-                                 backgroundColor: "#FAFAFA !important",
-                              },
-                           }}
-                        >
-                           {getOptionElement ? (
-                              getOptionElement(option)
-                           ) : (
-                              <ListItemText
-                                 key={`${optionProps.id}-text`}
-                                 primary={getOptionLabel(option)}
-                                 sx={{ padding: "16px" }}
-                              />
-                           )}
+            renderOption={(optionProps, option, { selected, index }) => (
+               <>
+                  {Boolean(index === 0 && initialOptionSection) &&
+                     initialOptionSection}
+                  {Boolean(hasOptions) && (
+                     <MenuItem
+                        {...optionProps}
+                        key={JSON.stringify(option)}
+                        sx={{
+                           '&[aria-selected="true"]': {
+                              backgroundColor: "#FAFAFA !important",
+                           },
+                        }}
+                     >
+                        {getOptionElement ? (
+                           getOptionElement(option)
+                        ) : (
+                           <ListItemText
+                              key={`${optionProps.id}-text`}
+                              primary={getOptionLabel(option)}
+                              sx={{ padding: "16px" }}
+                           />
+                        )}
 
-                           {props.multiple ? (
-                              <BrandedCheckbox checked={selected} />
-                           ) : null}
-                        </MenuItem>
-                     )}
-                  </>
-               )
-            }}
+                        {props.multiple ? (
+                           <BrandedCheckbox checked={selected} />
+                        ) : null}
+                     </MenuItem>
+                  )}
+               </>
+            )}
             {...props}
             color="primary"
             getOptionLabel={getOptionLabel}
