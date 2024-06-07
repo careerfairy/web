@@ -1,5 +1,7 @@
 import firebase from "firebase/compat"
-import BaseFirebaseRepository from "../BaseFirebaseRepository"
+import BaseFirebaseRepository, {
+   mapFirestoreDocuments,
+} from "../BaseFirebaseRepository"
 import { Timestamp } from "../firebaseTypes"
 import { UserData } from "../users"
 import { chunkArray } from "../utils"
@@ -40,6 +42,12 @@ export interface ICustomJobRepository {
     * @param jobId
     */
    getCustomJobById(jobId: string): Promise<CustomJob>
+
+   /**
+    * To get a custom jobs by ids from the CustomJob root collection
+    * @param jobIds
+    */
+   getCustomJobByIds(jobIds: string[]): Promise<CustomJob[]>
 
    /**
     * To get a custom job application by user and job id from the jobApplications root collection
@@ -131,7 +139,6 @@ export class FirebaseCustomJobRepository
          id: ref.id,
          published: Boolean(linkedLivestreamId),
       }
-      console.log("🚀 ~ newJob:", newJob)
 
       await ref.set(newJob, { merge: true })
 
@@ -170,6 +177,17 @@ export class FirebaseCustomJobRepository
          return this.addIdToDoc<CustomJob>(snapshot)
       }
       return null
+   }
+
+   async getCustomJobByIds(jobIds: string[]): Promise<CustomJob[]> {
+      // CAUTION: IDs must not surpass length of 30
+      const ref = this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("id", "in", jobIds)
+
+      const customJobs = await ref.get()
+
+      return mapFirestoreDocuments<CustomJob>(customJobs)
    }
 
    async getUserJobApplication(
@@ -256,17 +274,25 @@ export class FirebaseCustomJobRepository
       toRemove: boolean
    ): Promise<void> {
       const batch = this.firestore.batch()
+      const jobsToUpdate = await this.getCustomJobByIds(jobIdsToUpdate)
 
-      jobIdsToUpdate.forEach((jobId) => {
-         const ref = this.firestore.collection(this.COLLECTION_NAME).doc(jobId)
+      jobsToUpdate.forEach((job) => {
+         const ref = this.firestore.collection(this.COLLECTION_NAME).doc(job.id)
+         const jobIsNotExpired = job.deadline?.toDate() >= new Date()
 
          if (toRemove) {
+            const amountOfLinkedContent =
+               job.livestreams.length + job.sparks.length
+
             batch.update(ref, {
                livestreams: this.fieldValue.arrayRemove(livestreamId),
+               // if there are more than 1 linked content it means that will continue to have linked content after this removal
+               published: jobIsNotExpired && amountOfLinkedContent > 1,
             })
          } else {
             batch.update(ref, {
                livestreams: this.fieldValue.arrayUnion(livestreamId),
+               published: jobIsNotExpired,
             })
          }
       })
