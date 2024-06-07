@@ -143,6 +143,7 @@ const MultiChipSelect = ({
       if (!selectAllFieldLabel) return
 
       if (value.length > 0 && value.length == options.length) {
+         setSelectedAll(true)
          setFieldValue(id, [selectAllOption])
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
