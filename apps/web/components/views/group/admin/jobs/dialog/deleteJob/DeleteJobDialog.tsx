@@ -1,5 +1,5 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { CircularProgress, Stack } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { FC, useCallback, useEffect, useState } from "react"
 import { Trash2 as DeleteIcon } from "react-feather"
 import { useDispatch, useSelector } from "react-redux"
@@ -122,13 +122,13 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
       >
          <>
             <SteppedDialog.Content sx={styles.container}>
-               <Stack spacing={3} sx={styles.info}>
+               <Box sx={styles.info}>
                   {hasLinkedContent ? (
                      <DeleteJobDialogWithLinkedContent job={job} />
                   ) : (
                      <DeleteJobWithoutLinkedContent />
                   )}
-               </Stack>
+               </Box>
             </SteppedDialog.Content>
 
             <SteppedDialog.Actions sx={styles.actions}>
@@ -160,7 +160,9 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
 
 const DeleteJobWithoutLinkedContent = () => (
    <>
-      <DeleteIcon color={"#FF4545"} size={48} />
+      <Box mb={2}>
+         <DeleteIcon color={"#FF4545"} size={48} />
+      </Box>
 
       <SteppedDialog.Title sx={styles.title}>
          Delete job opening?
