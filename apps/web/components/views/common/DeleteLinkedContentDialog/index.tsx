@@ -8,6 +8,7 @@ import { sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    title: {
       fontSize: { xs: "18px", md: "20px" },
+      px: "30px",
    },
    subtitle: {
       maxWidth: "unset",

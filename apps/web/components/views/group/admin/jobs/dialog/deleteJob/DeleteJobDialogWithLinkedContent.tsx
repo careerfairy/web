@@ -7,12 +7,12 @@ import { Radio } from "react-feather"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
 import useCustomJobLinkedLivestreams from "../../../../../../custom-hook/custom-job/useCustomJobLinkedLivestreams"
-import Loader from "../../../../../loader/Loader"
 import SteppedDialog from "../../../../../stepped-dialog/SteppedDialog"
 
 const styles = sxStyles({
    title: {
       fontSize: { xs: "18px", md: "20px" },
+      px: "30px",
    },
    subtitle: {
       maxWidth: "unset",
@@ -21,7 +21,6 @@ const styles = sxStyles({
    listWrapper: {
       width: "100%",
       px: 3,
-      py: 2,
       my: 3,
       background: "#F6F6FA",
       borderRadius: "4px",
@@ -46,25 +45,19 @@ type Props = {
    job: CustomJob | null
 }
 const DeleteJobDialogWithLinkedContent: FC<Props> = ({ job }) => {
-   const hasLinkedContent = Boolean(job.livestreams.length || job.sparks.length)
-
    return (
       <>
-         <Radio color={"#FF4545"} size={48} />
+         <Box mb={2}>
+            <Radio color={"#FF4545"} size={48} />
+         </Box>
 
          <SteppedDialog.Title sx={styles.title}>
             This job post is linked to the following content:
          </SteppedDialog.Title>
 
-         {hasLinkedContent ? (
-            <SuspenseWithBoundary fallback={<Loader />}>
-               <ListContent job={job} />
-            </SuspenseWithBoundary>
-         ) : (
-            <Box sx={[styles.listWrapper, styles.loading]}>
-               <CircularProgress size={20} color="inherit" />
-            </Box>
-         )}
+         <SuspenseWithBoundary fallback={<CircularProgress />}>
+            <ListContent job={job} />
+         </SuspenseWithBoundary>
 
          <SteppedDialog.Subtitle sx={styles.subtitle}>
             Deleting this job post will unlink it from this content.
@@ -109,11 +102,10 @@ const ListContent: FC<ListContentProps> = ({ job }) => {
          }
       )
    } else if (livestream && !spark) {
-
-   /**
-    * If only livestream exists, add it to the contentToShow array
-    * and check if there's a second livestream to add as well
-    */
+      /**
+       * If only livestream exists, add it to the contentToShow array
+       * and check if there's a second livestream to add as well
+       */
       const [, secondLivestream] = linkedLivestreams
 
       contentToShow.push({
@@ -137,11 +129,10 @@ const ListContent: FC<ListContentProps> = ({ job }) => {
          })
       }
    } else if (spark && !livestream) {
-
-   /**
-    * If only spark exists, add it to the contentToShow array
-    * and check if there's a second spark to add as well
-    */
+      /**
+       * If only spark exists, add it to the contentToShow array
+       * and check if there's a second spark to add as well
+       */
       const [, secondSpark] = linkedSparks
 
       contentToShow.push({
