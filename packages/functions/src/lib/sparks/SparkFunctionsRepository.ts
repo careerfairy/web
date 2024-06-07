@@ -1,4 +1,5 @@
 import BaseFirebaseRepository from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import {
    Creator,
@@ -30,12 +31,16 @@ import {
 } from "@careerfairy/shared-lib/src/commonTypes"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import { removeDuplicates } from "@careerfairy/shared-lib/utils"
+import {
+   getArrayDifference,
+   removeDuplicates,
+} from "@careerfairy/shared-lib/utils"
 import { DocumentSnapshot } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
+import _ from "lodash"
 import { DateTime } from "luxon"
-import { FunctionsLogger } from "src/util"
+import { FunctionsLogger, getChangeTypes } from "src/util"
 import {
    FieldValue,
    Firestore,
@@ -292,9 +297,17 @@ export interface ISparkFunctionsRepository {
     * @param tags IDs list of tags to associated to the Sparks identified by @param tags.
     */
    syncCustomJobBusinessFunctionTagsToSparks(
-      sparkIds: string[],
-      tags: string[],
-      remove?: boolean
+      afterJob: CustomJob,
+      beforeJob: CustomJob,
+      changeType: ReturnType<typeof getChangeTypes>
+   ): Promise<void>
+
+   /**
+    * TODO: add documentation
+    * @param beforeJob
+    */
+   syncDeletedCustomJobBusinessFunctionTagsToSparks(
+      beforeJob: CustomJob
    ): Promise<void>
 }
 
@@ -1010,40 +1023,236 @@ export class SparkFunctionsRepository
    }
 
    async syncCustomJobBusinessFunctionTagsToSparks(
-      sparkIds: string[],
-      tags: string[],
-      remove?: boolean
+      afterJob: CustomJob,
+      beforeJob: CustomJob,
+      changeType: ReturnType<typeof getChangeTypes>
    ): Promise<void> {
-      functions.logger.log(`Sync tags with Sparks ${sparkIds}.`)
-      const sparks = this.firestore
+      functions.logger.log("Sync customJobs tags with Sparks.")
+      const updatePromises = []
+
+      const businessFunctionTagsChanged = Boolean(
+         _.xor(
+            afterJob.businessFunctionsTagIds ?? [],
+            beforeJob.businessFunctionsTagIds ?? []
+         ).length
+      )
+
+      const hasLinkedSparks = Boolean(afterJob.sparks.length)
+      console.log(
+         "🚀 ~ businessFunctionTagsChanged:",
+         businessFunctionTagsChanged
+      )
+
+      const addedSparks = getArrayDifference(
+         beforeJob.sparks ?? [],
+         afterJob.sparks ?? []
+      ) as string[]
+      console.log("🚀 ~ addedSparks:", addedSparks)
+      const removedSparks = getArrayDifference(
+         afterJob.sparks ?? [],
+         beforeJob.sparks ?? []
+      ) as string[]
+      console.log("🚀 ~ removedSparks:", removedSparks)
+
+      if (!hasLinkedSparks && !removedSparks.length) return
+
+      const allEffectedSparkIds = removedSparks.concat(afterJob.sparks)
+      console.log("🚀 ~ allEffectedSparkIds:", allEffectedSparkIds)
+
+      const sparksQuery = this.firestore
          .collection("sparks")
-         .where("id", "in", sparkIds) // TODO: Check if limit using IN
+         .where("id", "in", allEffectedSparkIds) // TODO: Check if limit using IN
          .withConverter(createGenericConverter<Spark>())
 
-      const snapshot = await sparks.get()
+      const customJobsQuery = this.firestore
+         .collection("customJobs")
+         .where("sparks", "array-contains-any", allEffectedSparkIds) // TODO: LIMIT 30
+         .withConverter(createGenericConverter<CustomJob>())
 
-      const updatePromises = snapshot.docs?.map((doc) => {
-         const sparkLinkedJobTags = doc.data().linkedCustomJobsTagIds ?? []
+      const customJobsSnapshot = await customJobsQuery.get()
+      const sparksSnapshot = await sparksQuery.get()
 
-         const tagsData = remove
-            ? sparkLinkedJobTags.filter((jobTag) => !tags.includes(jobTag))
-            : tags.concat(sparkLinkedJobTags)
+      const customJobs =
+         customJobsSnapshot.docs?.map((jobDoc) => jobDoc.data()) || []
 
-         const mergedTags = removeDuplicates(tagsData)
-         return doc.ref.update({ linkedCustomJobsTagIds: mergedTags })
-      })
+      /**
+       * Create a map allowing to retrieve for a given spark id, all of the
+       * @field businessFunctionsTagIds of @type CustomJob, for all custom jobs associated to that spark
+       * while ignoring the tags associated via the current custom job, which will be needed when
+       * a custom job is deleted. Only its tags are to be removed from the spark, tags inferred from other
+       * jobs must still remain.
+       */
+      const sparksCustomJobsTagMap = Object.fromEntries(
+         allEffectedSparkIds.map((id) => {
+            const sparkJobs =
+               customJobs.filter((job) => job.sparks.includes(id)) || []
+            const unrelatedCustomJobsTags = sparkJobs
+               .filter((job) => job.id != afterJob.id)
+               .map((job) => job.businessFunctionsTagIds)
+               .flat()
+               .filter(Boolean)
+
+            return [id, unrelatedCustomJobsTags]
+         })
+      )
+      console.log("🚀 ~ sparksCustomJobsTagMap:", sparksCustomJobsTagMap)
+
+      // When a customJob is being updated or created, if there are no tags, nothing to do
+      if (changeType.isCreate || changeType.isUpdate) {
+         console.log("🚀 ~ isCreate|isDelete")
+
+         if (hasLinkedSparks) {
+            let sparksToUpdate = addedSparks
+
+            // Less updates by only updating the current linked sparks when the tag has changed
+            // other wise the tags sync will only be for the added sparks
+            if (businessFunctionTagsChanged) {
+               sparksToUpdate = sparksToUpdate.concat(afterJob.sparks)
+            }
+            // Update spark tags for all sparks still on the customJob (update or create)
+            // Filter the snapshots as the query includes also removed sparks from the customJob
+            sparksSnapshot.docs
+               ?.filter((spark) => sparksToUpdate.includes(spark.id))
+               ?.map((sparkDoc) => {
+                  const sparkLinkedJobTags =
+                     sparkDoc.data().linkedCustomJobsTagIds ?? []
+
+                  // Always remove duplicates as adding or removing can produce duplicates
+                  const mergedTags = removeDuplicates(
+                     afterJob.businessFunctionsTagIds.concat(sparkLinkedJobTags)
+                  )
+
+                  return sparkDoc.ref.update({
+                     linkedCustomJobsTagIds: mergedTags,
+                  })
+               })
+               ?.forEach((promise) => updatePromises.push(promise))
+         }
+
+         if (removedSparks.length) {
+            sparksSnapshot.docs
+               ?.filter((spark) => removedSparks.includes(spark.id))
+               ?.map((sparkDoc) => {
+                  // When removing, keep only tags which were inferred by other custom jobs (other the one being updated)
+                  const mergedTags = removeDuplicates(
+                     sparksCustomJobsTagMap[sparkDoc.id]
+                  )
+                  return sparkDoc.ref.update({
+                     linkedCustomJobsTagIds: mergedTags,
+                  })
+               })
+               ?.forEach((promise) => updatePromises.push(promise))
+         }
+      }
 
       const results = await Promise.allSettled(updatePromises)
 
       const errors = results.filter((res) => res.status == "rejected")
 
       if (errors.length) {
-         logAndThrow("Error synching tags with Sparks", {
-            sparkIds: sparkIds,
-            tags: tags,
+         logAndThrow("Error synching tags with sparks", {
+            sparkIds: afterJob.sparks,
+            customJobId: afterJob.id,
             errors: errors,
          })
       }
+
+      functions.logger.log(`Updated sparks linked to customJob ${afterJob.id}`)
+   }
+
+   async syncDeletedCustomJobBusinessFunctionTagsToSparks(
+      beforeJob: CustomJob
+   ): Promise<void> {
+      functions.logger.log("Sync deleted customJobs tags with Sparks.")
+      const updatePromises = []
+
+      if (!beforeJob.sparks.length) return
+
+      const sparksQuery = this.firestore
+         .collection("sparks")
+         .where("id", "in", beforeJob.sparks) // TODO: Check if limit using IN
+         .withConverter(createGenericConverter<Spark>())
+
+      const customJobsQuery = this.firestore
+         .collection("customJobs")
+         .where("sparks", "array-contains-any", beforeJob.sparks) // TODO: LIMIT 30
+         .withConverter(createGenericConverter<CustomJob>())
+
+      const customJobsSnapshot = await customJobsQuery.get()
+      const sparksSnapshot = await sparksQuery.get()
+
+      const customJobs =
+         customJobsSnapshot.docs?.map((jobDoc) => jobDoc.data()) || []
+
+      /**
+       * Create a map allowing to retrieve for a given spark id, all of the
+       * @field businessFunctionsTagIds of @type CustomJob, for all custom jobs associated to that spark
+       * while ignoring the tags associated via the current custom job, which will be needed when
+       * a custom job is deleted. Only its tags are to be removed from the spark, tags inferred from other
+       * jobs must still remain.
+       */
+      const sparksCustomJobsTagMap = Object.fromEntries(
+         beforeJob.sparks.map((id) => {
+            const sparkJobs =
+               customJobs.filter((job) => job.sparks.includes(id)) || []
+            const unrelatedCustomJobsTags = sparkJobs
+               .filter((job) => job.id != beforeJob.id)
+               .map((job) => job.businessFunctionsTagIds)
+               .flat()
+               .filter(Boolean)
+
+            return [id, unrelatedCustomJobsTags]
+         })
+      )
+      console.log("🚀 ~ sparksCustomJobsTagMap:", sparksCustomJobsTagMap)
+
+      console.log("🚀 ~ isDelete")
+      // Remove all job tags from beforeJob for all linked sparks
+      if (beforeJob.sparks.length) {
+         // Update sparks tags for all events still on the customJob (update or create)
+         // Filter the snapshots as the query includes also removed sparks from the customJob
+         sparksSnapshot.docs
+            ?.filter((spark) => beforeJob.sparks.includes(spark.id))
+            ?.map((sparkDoc) => {
+               const sparkLinkedJobTags =
+                  sparkDoc.data().linkedCustomJobsTagIds ?? []
+
+               const tagsData = sparkLinkedJobTags.filter((jobTag) => {
+                  const sparkTagsExcludingCurrentJob =
+                     sparksCustomJobsTagMap[sparkDoc.id]
+                  console.log(
+                     "🚀 ~ tagsData ~ sparkTagsExcludingCurrentJob:",
+                     sparkTagsExcludingCurrentJob
+                  )
+                  return (
+                     sparkTagsExcludingCurrentJob.includes(jobTag) &&
+                     !beforeJob.businessFunctionsTagIds.includes(jobTag)
+                  )
+               })
+
+               // Always remove duplicates as adding or removing can produce duplicates
+               const mergedTags = removeDuplicates(tagsData)
+
+               return sparkDoc.ref.update({
+                  linkedCustomJobsTagIds: mergedTags,
+               })
+            })
+            ?.forEach((promise) => updatePromises.push(promise))
+      }
+
+      const results = await Promise.allSettled(updatePromises)
+
+      const errors = results.filter((res) => res.status == "rejected")
+
+      if (errors.length) {
+         logAndThrow("Error synching deleted customJob tags with sparks", {
+            sparkIds: beforeJob.sparks,
+            customJobId: beforeJob.id,
+            errors: errors,
+         })
+      }
+
+      functions.logger.log(`Updated sparks linked to customJob ${beforeJob.id}`)
    }
 }
 
