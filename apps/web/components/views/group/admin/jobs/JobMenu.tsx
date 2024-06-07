@@ -33,7 +33,7 @@ const JobMenu: FC<Props> = ({ jobId }) => {
    )
    return (
       <MoreMenuWithEditAndRemoveOptions
-         labels={["Edit speaker's details", "Remove speaker"]}
+         labels={["Edit job opening details", "Delete job opening"]}
          handleEdit={handleEditJob}
          handleRemove={handleRemoveJob}
       />
