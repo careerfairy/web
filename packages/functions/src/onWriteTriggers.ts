@@ -14,8 +14,6 @@ import {
    sparkRepo,
 } from "./api/repositories"
 
-import { getArrayDifference } from "@careerfairy/shared-lib/utils"
-import _ from "lodash"
 import config from "./config"
 import { handleUserStatsBadges } from "./lib/badge"
 import { rewardSideEffectsUserStats } from "./lib/reward"
@@ -343,19 +341,9 @@ export const onWriteCustomJobs = functions
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
 
-      const newCustomJob = change.after.data() as CustomJob
-      const oldCustomJob = change.before.data() as CustomJob
-
-      const businessFunctionTagsChanged = Boolean(
-         _.xor(
-            newCustomJob.businessFunctionsTagIds ?? [],
-            oldCustomJob.businessFunctionsTagIds ?? []
-         ).length
-      )
-
-      const hasLinkedSparks = Boolean(newCustomJob.sparks.length)
-
       if (changeTypes.isCreate) {
+         const newCustomJob = change.after.data() as CustomJob
+
          sideEffectPromises.push(
             customJobRepo.createCustomJobStats(newCustomJob)
          )
@@ -363,6 +351,8 @@ export const onWriteCustomJobs = functions
 
       // Run side effects for all custom jobs changes
       if (changeTypes.isUpdate) {
+         const newCustomJob = change.after.data() as CustomJob
+
          sideEffectPromises.push(
             customJobRepo.syncCustomJobDataToCustomJobStats(newCustomJob),
             customJobRepo.syncCustomJobDataToJobApplications(newCustomJob)
@@ -378,60 +368,38 @@ export const onWriteCustomJobs = functions
             ),
             customJobRepo.syncDeletedCustomJobDataToJobApplications(
                deletedCustomJob
+            ),
+            sparkRepo.syncDeletedCustomJobBusinessFunctionTagsToSparks(
+               deletedCustomJob
+            ),
+            livestreamsRepo.syncDeleteCustomJobBusinessFunctionTagsToLivestreams(
+               deletedCustomJob
             )
          )
-
-         if (deletedCustomJob.sparks.length) {
-            sideEffectPromises.push(
-               sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
-                  deletedCustomJob.sparks,
-                  []
-               )
-            )
-         }
       }
 
-      sideEffectPromises.push(
-         livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
-            newCustomJob,
-            oldCustomJob,
-            changeTypes
+      if (changeTypes.isCreate || changeTypes.isUpdate) {
+         console.log(
+            "🚀 ~ .onWrite ~ syncCustomJobBusinessFunctionTagsToSparks -> "
          )
-      )
+         const newCustomJob = change.after.data() as CustomJob
+         const oldCustomJob = change.before.data() as CustomJob
 
-      /**
-       * Cascade the businessFunctionsTagIds down to the Sparks and Live streams upon the only when the customJob
-       * has linked content (Sparks or Live streams), and there has been a change to the content link or to the business function tags.
-       */
-      if (changeTypes.isUpdate || changeTypes.isCreate) {
-         const removedSparks = getArrayDifference(
-            newCustomJob.sparks ?? [],
-            oldCustomJob.sparks ?? []
-         ) as string[]
-
-         const linkedSparksChanged = Boolean(
-            _.xor(newCustomJob.sparks ?? [], oldCustomJob.sparks ?? []).length
-         )
-
-         if (removedSparks.length) {
-            sideEffectPromises.push(
-               sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
-                  removedSparks,
-                  []
-               )
+         sideEffectPromises.push(
+            livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+               newCustomJob,
+               oldCustomJob,
+               changeTypes
             )
-         }
+         )
 
-         if (hasLinkedSparks) {
-            if (linkedSparksChanged || businessFunctionTagsChanged) {
-               sideEffectPromises.push(
-                  sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
-                     newCustomJob.sparks,
-                     newCustomJob.businessFunctionsTagIds
-                  )
-               )
-            }
-         }
+         sideEffectPromises.push(
+            sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
+               newCustomJob,
+               oldCustomJob,
+               changeTypes
+            )
+         )
       }
 
       return handleSideEffects(sideEffectPromises)
