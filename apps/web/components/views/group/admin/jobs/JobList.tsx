@@ -166,6 +166,12 @@ const styles = sxStyles({
    warningAlert: {
       ml: 2,
       color: (theme) => theme.palette.warning["600"],
+      height: "18px",
+      width: "18px",
+   },
+   warningContainer: {
+      display: "flex",
+      alignItems: "center",
    },
 })
 
@@ -250,27 +256,29 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
 
                                     {jobHubV1 &&
                                     isValidButNoLinkedContent(job) ? (
-                                       <Tooltip
-                                          title={
-                                             <Typography
-                                                sx={styles.tooltipMessage}
-                                             >
-                                                No content linked to this job
-                                                opening
-                                             </Typography>
-                                          }
-                                          placement="top"
-                                          componentsProps={{
-                                             tooltip: {
-                                                sx: styles.tooltip,
-                                             },
-                                          }}
-                                       >
-                                          <Box
-                                             component={AlertCircle}
-                                             sx={styles.warningAlert}
-                                          />
-                                       </Tooltip>
+                                       <Box sx={styles.warningContainer}>
+                                          <Tooltip
+                                             title={
+                                                <Typography
+                                                   sx={styles.tooltipMessage}
+                                                >
+                                                   No content linked to this job
+                                                   opening
+                                                </Typography>
+                                             }
+                                             placement="top"
+                                             componentsProps={{
+                                                tooltip: {
+                                                   sx: styles.tooltip,
+                                                },
+                                             }}
+                                          >
+                                             <Box
+                                                component={AlertCircle}
+                                                sx={styles.warningAlert}
+                                             />
+                                          </Tooltip>
+                                       </Box>
                                     ) : null}
                                  </Grid>
 
