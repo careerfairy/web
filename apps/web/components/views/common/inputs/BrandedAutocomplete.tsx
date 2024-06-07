@@ -76,7 +76,7 @@ const StyledBrandedAutocomplete = styled(
                            getOptionElement(option)
                         ) : (
                            <ListItemText
-                              key={`${optionProps.id}-text`}
+                              key={`${JSON.stringify(option)}-text`}
                               primary={getOptionLabel(option)}
                               sx={{ padding: "16px" }}
                            />
