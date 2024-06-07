@@ -379,9 +379,6 @@ export const onWriteCustomJobs = functions
       }
 
       if (changeTypes.isCreate || changeTypes.isUpdate) {
-         console.log(
-            "🚀 ~ .onWrite ~ syncCustomJobBusinessFunctionTagsToSparks -> "
-         )
          const newCustomJob = change.after.data() as CustomJob
          const oldCustomJob = change.before.data() as CustomJob
 

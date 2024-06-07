@@ -291,10 +291,12 @@ export interface ISparkFunctionsRepository {
    getSparksByIds(sparkIds: string[]): Promise<Spark[]>
 
    /**
-    * Synchronizes the given tags in @param tags (list of IDs) to the Sparks
-    * associated with the list of Spark IDs @param sparkIds.
-    * @param sparkIds IDs list of the sparks for which the tags will be associated.
-    * @param tags IDs list of tags to associated to the Sparks identified by @param tags.
+    * Synchronizes the the business function tags from a customJob, to all the associated
+    * sparks, also updates the tags on sparks which were removed from the jobs.
+    * This means fetching all other jobs for the unlinked sparks, and keep for that spark only
+    * the other jobs tags.
+    * @param afterJob customJob after update
+    * @param beforeJob customJob before data update
     */
    syncCustomJobBusinessFunctionTagsToSparks(
       afterJob: CustomJob,
@@ -303,8 +305,9 @@ export interface ISparkFunctionsRepository {
    ): Promise<void>
 
    /**
-    * TODO: add documentation
-    * @param beforeJob
+    * Synchronizes the the business function tags from a customJob, after a deletion is done,
+    * removing all tags from the current job if any other jobs do not also provide the same tag.
+    * @param beforeJob customJob being deleted
     */
    syncDeletedCustomJobBusinessFunctionTagsToSparks(
       beforeJob: CustomJob
@@ -1027,7 +1030,8 @@ export class SparkFunctionsRepository
       beforeJob: CustomJob,
       changeType: ReturnType<typeof getChangeTypes>
    ): Promise<void> {
-      functions.logger.log("Sync customJobs tags with Sparks.")
+      functions.logger.log(`Sync customJobs tags with Sparks: ${afterJob.id}`)
+
       const updatePromises = []
 
       const businessFunctionTagsChanged = Boolean(
@@ -1038,35 +1042,29 @@ export class SparkFunctionsRepository
       )
 
       const hasLinkedSparks = Boolean(afterJob.sparks.length)
-      console.log(
-         "🚀 ~ businessFunctionTagsChanged:",
-         businessFunctionTagsChanged
-      )
 
       const addedSparks = getArrayDifference(
          beforeJob.sparks ?? [],
          afterJob.sparks ?? []
       ) as string[]
-      console.log("🚀 ~ addedSparks:", addedSparks)
+
       const removedSparks = getArrayDifference(
          afterJob.sparks ?? [],
          beforeJob.sparks ?? []
       ) as string[]
-      console.log("🚀 ~ removedSparks:", removedSparks)
 
       if (!hasLinkedSparks && !removedSparks.length) return
 
       const allEffectedSparkIds = removedSparks.concat(afterJob.sparks)
-      console.log("🚀 ~ allEffectedSparkIds:", allEffectedSparkIds)
 
       const sparksQuery = this.firestore
          .collection("sparks")
-         .where("id", "in", allEffectedSparkIds) // TODO: Check if limit using IN
+         .where("id", "in", allEffectedSparkIds) // TODO: Check if limit using IN - Chunk items
          .withConverter(createGenericConverter<Spark>())
 
       const customJobsQuery = this.firestore
          .collection("customJobs")
-         .where("sparks", "array-contains-any", allEffectedSparkIds) // TODO: LIMIT 30
+         .where("sparks", "array-contains-any", allEffectedSparkIds) // TODO: LIMIT 30 - Chunk items
          .withConverter(createGenericConverter<CustomJob>())
 
       const customJobsSnapshot = await customJobsQuery.get()
@@ -1095,12 +1093,9 @@ export class SparkFunctionsRepository
             return [id, unrelatedCustomJobsTags]
          })
       )
-      console.log("🚀 ~ sparksCustomJobsTagMap:", sparksCustomJobsTagMap)
 
       // When a customJob is being updated or created, if there are no tags, nothing to do
       if (changeType.isCreate || changeType.isUpdate) {
-         console.log("🚀 ~ isCreate|isDelete")
-
          if (hasLinkedSparks) {
             let sparksToUpdate = addedSparks
 
@@ -1119,7 +1114,9 @@ export class SparkFunctionsRepository
 
                   // Always remove duplicates as adding or removing can produce duplicates
                   const mergedTags = removeDuplicates(
-                     afterJob.businessFunctionsTagIds.concat(sparkLinkedJobTags)
+                     afterJob.businessFunctionsTagIds?.concat(
+                        sparkLinkedJobTags
+                     ) || []
                   )
 
                   return sparkDoc.ref.update({
@@ -1163,19 +1160,26 @@ export class SparkFunctionsRepository
    async syncDeletedCustomJobBusinessFunctionTagsToSparks(
       beforeJob: CustomJob
    ): Promise<void> {
-      functions.logger.log("Sync deleted customJobs tags with Sparks.")
+      functions.logger.log(
+         `Sync deleted customJobs tags with Sparks for customJbo: ${beforeJob.id}`
+      )
+
       const updatePromises = []
 
-      if (!beforeJob.sparks.length) return
+      if (
+         !beforeJob.sparks.length ||
+         !beforeJob.businessFunctionsTagIds?.length
+      )
+         return
 
       const sparksQuery = this.firestore
          .collection("sparks")
-         .where("id", "in", beforeJob.sparks) // TODO: Check if limit using IN
+         .where("id", "in", beforeJob.sparks) // TODO: Check if limit using IN - Chunk items
          .withConverter(createGenericConverter<Spark>())
 
       const customJobsQuery = this.firestore
          .collection("customJobs")
-         .where("sparks", "array-contains-any", beforeJob.sparks) // TODO: LIMIT 30
+         .where("sparks", "array-contains-any", beforeJob.sparks) // TODO: LIMIT 30 - Chunk items
          .withConverter(createGenericConverter<CustomJob>())
 
       const customJobsSnapshot = await customJobsQuery.get()
@@ -1204,9 +1208,7 @@ export class SparkFunctionsRepository
             return [id, unrelatedCustomJobsTags]
          })
       )
-      console.log("🚀 ~ sparksCustomJobsTagMap:", sparksCustomJobsTagMap)
 
-      console.log("🚀 ~ isDelete")
       // Remove all job tags from beforeJob for all linked sparks
       if (beforeJob.sparks.length) {
          // Update sparks tags for all events still on the customJob (update or create)
@@ -1216,16 +1218,11 @@ export class SparkFunctionsRepository
             ?.map((sparkDoc) => {
                const sparkLinkedJobTags =
                   sparkDoc.data().linkedCustomJobsTagIds ?? []
-
+               const sparkTagsExcludingCurrentJob =
+                  sparksCustomJobsTagMap[sparkDoc.id]
                const tagsData = sparkLinkedJobTags.filter((jobTag) => {
-                  const sparkTagsExcludingCurrentJob =
-                     sparksCustomJobsTagMap[sparkDoc.id]
-                  console.log(
-                     "🚀 ~ tagsData ~ sparkTagsExcludingCurrentJob:",
-                     sparkTagsExcludingCurrentJob
-                  )
                   return (
-                     sparkTagsExcludingCurrentJob.includes(jobTag) &&
+                     sparkTagsExcludingCurrentJob.includes(jobTag) ||
                      !beforeJob.businessFunctionsTagIds.includes(jobTag)
                   )
                })
@@ -1252,7 +1249,9 @@ export class SparkFunctionsRepository
          })
       }
 
-      functions.logger.log(`Updated sparks linked to customJob ${beforeJob.id}`)
+      functions.logger.log(
+         `Updated sparks linked to deleted customJob ${beforeJob.id}`
+      )
    }
 }
 
