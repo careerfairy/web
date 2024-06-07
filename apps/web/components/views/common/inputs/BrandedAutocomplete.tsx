@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FC, ReactElement } from "react"
+import {
+   Autocomplete,
+   AutocompleteProps,
+   ListItemText,
+   MenuItem,
+} from "@mui/material"
 import { styled } from "@mui/material/styles"
+import { useField } from "formik"
+import { FC, ReactElement } from "react"
 import BrandedCheckbox from "./BrandedCheckbox"
-import { ListItemText, MenuItem } from "@mui/material"
-import { Autocomplete, AutocompleteProps } from "@mui/material"
 import BrandedTextField, {
    BrandedTextFieldProps,
    FormBrandedTextField,
 } from "./BrandedTextField"
-import { useField } from "formik"
 
 type StyledBrandedAutocompleteProps<
    T extends { id: string; name: string } = any
@@ -36,10 +40,9 @@ const StyledBrandedAutocomplete = styled(
       options,
       ...props
    }: StyledBrandedAutocompleteProps) => {
-      // If an {initialOptionSection} exists, add an extra option at the beginning of the list
-      const newOptions = initialOptionSection
-         ? [{ title: "INITIAL_SECTION" }, ...options]
-         : options
+      const hasOptions = options.length > 0
+      const newOptions = hasOptions ? options : [{ title: "INITIAL_SECTION" }]
+
       return (
          <Autocomplete
             getOptionDisabled={(optionEl) => {
@@ -55,38 +58,40 @@ const StyledBrandedAutocomplete = styled(
                )
             }}
             options={newOptions}
-            {...props}
-            renderOption={(optionProps, option, { selected, index }) => (
-               <>
-                  {index === 0 && initialOptionSection ? (
-                     initialOptionSection
-                  ) : (
-                     <MenuItem
-                        {...optionProps}
-                        key={optionProps.id}
-                        sx={{
-                           '&[aria-selected="true"]': {
-                              backgroundColor: "#FAFAFA !important",
-                           },
-                        }}
-                     >
-                        {getOptionElement ? (
-                           getOptionElement(option)
-                        ) : (
-                           <ListItemText
-                              key={`${optionProps.id}-text`}
-                              primary={getOptionLabel(option)}
-                              sx={{ padding: "16px" }}
-                           />
-                        )}
+            renderOption={(optionProps, option, { selected, index }) => {
+               return (
+                  <>
+                     {Boolean(index === 0 && initialOptionSection) &&
+                        initialOptionSection}
+                     {Boolean(hasOptions) && (
+                        <MenuItem
+                           {...optionProps}
+                           key={JSON.stringify(option)}
+                           sx={{
+                              '&[aria-selected="true"]': {
+                                 backgroundColor: "#FAFAFA !important",
+                              },
+                           }}
+                        >
+                           {getOptionElement ? (
+                              getOptionElement(option)
+                           ) : (
+                              <ListItemText
+                                 key={`${optionProps.id}-text`}
+                                 primary={getOptionLabel(option)}
+                                 sx={{ padding: "16px" }}
+                              />
+                           )}
 
-                        {props.multiple ? (
-                           <BrandedCheckbox checked={selected} />
-                        ) : null}
-                     </MenuItem>
-                  )}
-               </>
-            )}
+                           {props.multiple ? (
+                              <BrandedCheckbox checked={selected} />
+                           ) : null}
+                        </MenuItem>
+                     )}
+                  </>
+               )
+            }}
+            {...props}
             color="primary"
             getOptionLabel={getOptionLabel}
             renderInput={renderInput}
