@@ -50,6 +50,7 @@ import {
    Timestamp,
    firestore as firestoreAdmin,
 } from "../api/firestoreAdmin"
+import { customJobRepo } from "../api/repositories"
 import { FunctionsLogger, getChangeTypes } from "../util"
 import { addOperations } from "./stats/livestream"
 import type { OperationsToMake } from "./stats/util"
@@ -717,21 +718,12 @@ export class LivestreamFunctionsRepository
          afterJob.livestreams
       )
 
-      const eventsQuery = this.firestore
-         .collection("livestreams")
-         .where("id", "in", allEffectedEventIds) // TODO: Check if limit using IN - Chunk items
-         .withConverter(createCompatGenericConverter<LivestreamEvent>())
+      const livestreams = await this.getLivestreamsByIds(allEffectedEventIds)
 
-      const customJobsQuery = this.firestore
-         .collection("customJobs")
-         .where("livestreams", "array-contains-any", allEffectedEventIds) // TODO: Check if limit using IN - Chunk items
-         .withConverter(createCompatGenericConverter<CustomJob>())
-
-      const customJobsSnapshot = await customJobsQuery.get()
-      const eventsSnapshot = await eventsQuery.get()
-
-      const customJobs =
-         customJobsSnapshot.docs?.map((jobDoc) => jobDoc.data()) || []
+      const customJobs = await customJobRepo.getCustomJobsByLinkedContentIds(
+         "livestreams",
+         allEffectedEventIds
+      )
 
       /**
        * Create a map allowing to retrieve for a given live stream id, all of the
@@ -743,7 +735,7 @@ export class LivestreamFunctionsRepository
       const livestreamCustomJobsTagMap = Object.fromEntries(
          allEffectedEventIds.map((id) => {
             const eventJobs =
-               customJobs.filter((job) => job.livestreams.includes(id)) || []
+               customJobs?.filter((job) => job.livestreams.includes(id)) || []
             const unrelatedCustomJobsTags = eventJobs
                .filter((job) => job.id != afterJob.id)
                .map((job) => job.businessFunctionsTagIds)
@@ -766,11 +758,11 @@ export class LivestreamFunctionsRepository
             }
             // Update livestreams tags for all events still on the customJob (update or create)
             // Filter the snapshots as the query includes also removed live streams from the customJob
-            eventsSnapshot.docs
+            livestreams
                ?.filter((event) => eventsToUpdate.includes(event.id))
                ?.map((eventDoc) => {
                   const eventLinkedJobTags =
-                     eventDoc.data().linkedCustomJobsTagIds ?? []
+                     eventDoc.linkedCustomJobsTagIds ?? []
 
                   // Always remove duplicates as adding or removing can produce duplicates
                   const mergedTags = removeDuplicates(
@@ -779,7 +771,14 @@ export class LivestreamFunctionsRepository
                      ) || []
                   )
 
-                  return eventDoc.ref.update({
+                  const ref = this.firestore
+                     .collection("livestreams")
+                     .withConverter(
+                        createCompatGenericConverter<LivestreamEvent>()
+                     )
+                     .doc(eventDoc.id)
+
+                  return ref.update({
                      linkedCustomJobsTagIds: mergedTags,
                   })
                })
@@ -787,14 +786,22 @@ export class LivestreamFunctionsRepository
          }
 
          if (removedLivestreams.length) {
-            eventsSnapshot.docs
+            livestreams
                ?.filter((event) => removedLivestreams.includes(event.id))
                ?.map((eventDoc) => {
                   // When removing, keep only tags which were inferred by other custom jobs (other the one being updated)
                   const mergedTags = removeDuplicates(
                      livestreamCustomJobsTagMap[eventDoc.id]
                   )
-                  return eventDoc.ref.update({
+
+                  const ref = this.firestore
+                     .collection("livestreams")
+                     .withConverter(
+                        createCompatGenericConverter<LivestreamEvent>()
+                     )
+                     .doc(eventDoc.id)
+
+                  return ref.update({
                      linkedCustomJobsTagIds: mergedTags,
                   })
                })
@@ -834,22 +841,12 @@ export class LivestreamFunctionsRepository
       )
          return
 
-      const eventsQuery = this.firestore
-         .collection("livestreams")
-         .where("id", "in", beforeJob.livestreams) // TODO: Check if limit using IN
-         .withConverter(createCompatGenericConverter<LivestreamEvent>())
+      const livestreams = await this.getLivestreamsByIds(beforeJob.livestreams)
 
-      const customJobsQuery = this.firestore
-         .collection("customJobs")
-         .where("livestreams", "array-contains-any", beforeJob.livestreams) // TODO: LIMIT 30
-         .withConverter(createCompatGenericConverter<CustomJob>())
-
-      const customJobsSnapshot = await customJobsQuery.get()
-      const eventsSnapshot = await eventsQuery.get()
-
-      const customJobs =
-         customJobsSnapshot.docs?.map((jobDoc) => jobDoc.data()) || []
-
+      const customJobs = await customJobRepo.getCustomJobsByLinkedContentIds(
+         "livestreams",
+         beforeJob.livestreams
+      )
       /**
        * Create a map allowing to retrieve for a given event id, all of the
        * @field businessFunctionsTagIds of @type CustomJob, for all custom jobs associated to that event
@@ -860,7 +857,7 @@ export class LivestreamFunctionsRepository
       const eventsCustomJobsTagMap = Object.fromEntries(
          beforeJob.livestreams.map((id) => {
             const eventJobs =
-               customJobs.filter((job) => job.livestreams.includes(id)) || []
+               customJobs?.filter((job) => job.livestreams.includes(id)) || []
             const unrelatedCustomJobsTags = eventJobs
                .filter((job) => job.id != beforeJob.id)
                .map((job) => job.businessFunctionsTagIds)
@@ -875,11 +872,10 @@ export class LivestreamFunctionsRepository
       if (beforeJob.livestreams.length) {
          // Update event tags for all events still on the customJob (update or create)
          // Filter the snapshots as the query includes also removed live streams from the customJob
-         eventsSnapshot.docs
+         livestreams
             ?.filter((event) => beforeJob.livestreams.includes(event.id))
             ?.map((eventDoc) => {
-               const eventLinkedJobTags =
-                  eventDoc.data().linkedCustomJobsTagIds ?? []
+               const eventLinkedJobTags = eventDoc.linkedCustomJobsTagIds ?? []
                const eventTagsExcludingCurrentJob =
                   eventsCustomJobsTagMap[eventDoc.id]
                const tagsData = eventLinkedJobTags.filter((jobTag) => {
@@ -892,7 +888,14 @@ export class LivestreamFunctionsRepository
                // Always remove duplicates as adding or removing can produce duplicates
                const mergedTags = removeDuplicates(tagsData)
 
-               return eventDoc.ref.update({
+               const ref = this.firestore
+                  .collection("livestreams")
+                  .withConverter(
+                     createCompatGenericConverter<LivestreamEvent>()
+                  )
+                  .doc(eventDoc.id)
+
+               return ref.update({
                   linkedCustomJobsTagIds: mergedTags,
                })
             })
