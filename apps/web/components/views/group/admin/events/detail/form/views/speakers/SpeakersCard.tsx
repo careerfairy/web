@@ -25,20 +25,26 @@ const styles = sxStyles({
    descriptionPlaceholder: {
       color: "neutral.500",
       fontStyle: "italic",
-      alignItems: "center",
+      alignItems: {
+         xs: "center",
+         md: "start",
+      },
       alignContent: "center",
       justifyContent: "space-between",
       textAlign: {
          xs: "center",
-         md: "initial",
+         md: "left",
       },
-      flexDirection: {
-         xs: "column",
-         md: "row",
-      },
+      flexDirection: "column",
       gap: {
          xs: 3,
          md: "initial",
+      },
+   },
+   addStoryButton: {
+      marginTop: {
+         xs: "initial",
+         md: 2,
       },
    },
    moreMenu: {
@@ -175,6 +181,7 @@ const SpeakersCard = ({
                      variant="outlined"
                      color="secondary"
                      onClick={handleEdit}
+                     sx={styles.addStoryButton}
                   >
                      Add personal story
                   </Button>
