@@ -104,7 +104,7 @@ export interface ICustomJobRepository {
    syncExpiredCustomJobs(): Promise<void>
 
    /**
-    * Get all group custom jobs by group IDs
+    * Get all group custom jobs
     * @param groupId
     */
    getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]>
