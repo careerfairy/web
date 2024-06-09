@@ -691,31 +691,36 @@ export class LivestreamFunctionsRepository
    ): Promise<void> {
       functions.logger.log(`Sync tags with live streams: ${afterJob.id}`)
 
+      // When creating data manually on firefoo an empty object is created first
+      // this prevents doing any processing if no id is present, the remaining checks
+      // for linked content is null safe and will also result in an early return for empty objects
+      if (!afterJob?.id) return
+
       const updatePromises = []
 
       const businessFunctionTagsChanged = Boolean(
          _.xor(
-            afterJob.businessFunctionsTagIds ?? [],
-            beforeJob.businessFunctionsTagIds ?? []
+            afterJob?.businessFunctionsTagIds ?? [],
+            beforeJob?.businessFunctionsTagIds ?? []
          ).length
       )
 
-      const hasLinkedEvents = Boolean(afterJob.livestreams.length)
+      const hasLinkedEvents = Boolean(afterJob?.livestreams?.length)
 
       const addedLivestreams = getArrayDifference(
-         beforeJob.livestreams ?? [],
-         afterJob.livestreams ?? []
+         beforeJob?.livestreams ?? [],
+         afterJob?.livestreams ?? []
       ) as string[]
 
       const removedLivestreams = getArrayDifference(
-         afterJob.livestreams ?? [],
-         beforeJob.livestreams ?? []
+         afterJob?.livestreams ?? [],
+         beforeJob?.livestreams ?? []
       ) as string[]
 
       if (!hasLinkedEvents && !removedLivestreams.length) return
 
       const allEffectedEventIds = removedLivestreams.concat(
-         afterJob.livestreams
+         afterJob?.livestreams ?? []
       )
 
       const livestreams = await this.getLivestreamsByIds(allEffectedEventIds)
