@@ -1037,30 +1037,34 @@ export class SparkFunctionsRepository
    ): Promise<void> {
       functions.logger.log(`Sync customJobs tags with Sparks: ${afterJob.id}`)
 
+      // When creating data manually on firefoo an empty object is created first
+      // this prevents doing any processing if no id is present, the remaining checks
+      // for linked content is null safe and will also result in an early return for empty objects
+      if (!afterJob?.id) return
       const updatePromises = []
 
       const businessFunctionTagsChanged = Boolean(
          _.xor(
             afterJob.businessFunctionsTagIds ?? [],
-            beforeJob.businessFunctionsTagIds ?? []
+            beforeJob?.businessFunctionsTagIds ?? []
          ).length
       )
 
-      const hasLinkedSparks = Boolean(afterJob.sparks.length)
+      const hasLinkedSparks = Boolean(afterJob?.sparks?.length)
 
       const addedSparks = getArrayDifference(
-         beforeJob.sparks ?? [],
-         afterJob.sparks ?? []
+         beforeJob?.sparks ?? [],
+         afterJob?.sparks ?? []
       ) as string[]
 
       const removedSparks = getArrayDifference(
-         afterJob.sparks ?? [],
-         beforeJob.sparks ?? []
+         afterJob?.sparks ?? [],
+         beforeJob?.sparks ?? []
       ) as string[]
 
       if (!hasLinkedSparks && !removedSparks.length) return
 
-      const allEffectedSparkIds = removedSparks.concat(afterJob.sparks)
+      const allEffectedSparkIds = removedSparks.concat(afterJob?.sparks ?? [])
 
       const sparks = await this.getSparksByIds(allEffectedSparkIds)
 
@@ -1079,8 +1083,6 @@ export class SparkFunctionsRepository
          allEffectedSparkIds.map((id) => {
             const sparkJobs =
                customJobs?.filter((job) => {
-                  console.log("🚀 ~ customJobs?.filter ~ job:", job)
-
                   return job.sparks?.includes(id)
                }) || []
             const unrelatedCustomJobsTags = sparkJobs
