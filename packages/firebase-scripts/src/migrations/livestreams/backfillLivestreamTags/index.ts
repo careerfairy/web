@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import { uniq } from "lodash"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { livestreamRepo } from "../../../repositories"
@@ -106,7 +107,10 @@ const cascadeEventInterestsToCategoryTags = async (
          ) {
             toUpdate.businessFunctionsTagIds.push("Consulting")
          }
-
+         toUpdate.businessFunctionsTagIds = uniq(
+            toUpdate.businessFunctionsTagIds
+         )
+         toUpdate.contentTopicsTagIds = uniq(toUpdate.contentTopicsTagIds)
          // eslint-disable-next-line @typescript-eslint/no-explicit-any
          batch.update(event._ref as any, toUpdate)
       })
