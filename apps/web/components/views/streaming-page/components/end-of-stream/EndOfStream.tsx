@@ -18,6 +18,7 @@ const styles = sxStyles({
       flexDirection: "column",
       position: "relative",
       pb: 4.5,
+      bgcolor: "#F7F8FC",
    },
    contentContainer: {
       alignItems: "center",
