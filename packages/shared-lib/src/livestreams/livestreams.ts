@@ -721,6 +721,7 @@ export enum ImpressionLocation {
    embeddedPastLivestreams = "embeddedPastLivestreams",
    landingPageCarousel = "landingPageCarousel",
    viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
+   endOfStreamLivestreams = "endOfStreamLivestreams",
    unknown = "unknown",
 }
 
