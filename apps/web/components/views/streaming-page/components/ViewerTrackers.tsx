@@ -1,5 +1,6 @@
 import { useAuth } from "HOCs/AuthProvider"
 import { useTrackUserParticipation } from "components/custom-hook/streaming/useTrackUserParticipation"
+import { usePreFetchRecommendedEvents } from "components/custom-hook/useRecommendedEvents"
 import { useStreamingContext } from "../context"
 
 /**
@@ -14,6 +15,7 @@ export const ViewerTrackers = () => {
    const { livestreamId } = useStreamingContext()
 
    useTrackUserParticipation(livestreamId, userData, userStats)
+   usePreFetchRecommendedEvents()
 
    return null
 }

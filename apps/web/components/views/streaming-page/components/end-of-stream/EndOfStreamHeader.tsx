@@ -24,7 +24,7 @@ export const EndOfStreamHeader = () => {
    return (
       <Header>
          <Stack sx={styles.root}>
-            {streamIsMobile ? <LogoBackButton /> : <PlatformStreamLogo />}
+            {streamIsMobile ? <PlatformStreamLogo /> : <LogoBackButton />}
             <IconButton
                component={Link}
                noLinkStyle
