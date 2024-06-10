@@ -4,10 +4,7 @@ import {
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
 import Image from "next/image"
-import {
-   useCompanyName,
-   useStreamTitle,
-} from "store/selectors/streamingAppSelectors"
+import { useStreamTitle } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -19,11 +16,11 @@ const styles = sxStyles({
    },
    marginDesktop: {
       mt: 11.25,
-      mb: 12.5,
+      mb: 8.75,
    },
    marginTablet: {
       mt: 1,
-      mb: 2.5,
+      mb: 4,
    },
    marginMobile: {
       mt: 3.5,
@@ -63,7 +60,6 @@ export const Hero = () => {
    const streamIsMobile = useStreamIsMobile()
    const streamIsLandscape = useStreamIsLandscape()
 
-   const streamCompany = useCompanyName()
    const streamTitle = useStreamTitle()
 
    return (
@@ -101,8 +97,6 @@ export const Hero = () => {
             fontWeight={streamIsMobile ? 700 : 600}
          >
             {streamTitle}
-            <br />
-            with {streamCompany}
          </Typography>
       </Container>
    )

@@ -1,25 +1,20 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Container, Stack } from "@mui/material"
+import { Skeleton, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
 import { useCombinedJobs } from "components/custom-hook/streaming/useCombinedJobs"
-import { useCallback, useState } from "react"
-import { sxStyles } from "types/commonTypes"
+import { useState } from "react"
 import { useStreamingContext } from "../../context"
 import JobCard from "../jobs/JobCard"
 import JobDialog from "../jobs/JobDialog"
+import { JobCardSkeleton } from "../jobs/JobListSkeleton"
+import { EndOfStreamContainer } from "./Container"
 import { Heading } from "./Heading"
-
-const styles = sxStyles({
-   root: {
-      mx: "auto",
-   },
-})
 
 export const Jobs = () => {
    return (
-      <SuspenseWithBoundary fallback={<></>}>
+      <SuspenseWithBoundary fallback={<Loader />}>
          <ContentWrapper />
       </SuspenseWithBoundary>
    )
@@ -39,22 +34,17 @@ type ContentProps = {
 }
 export const Content = ({ groupId }: ContentProps) => {
    const { livestreamId } = useStreamingContext()
-
    const jobsToShow = useCombinedJobs(livestreamId, groupId)
    const [selectedJob, setSelectedJob] = useState<Job | CustomJob | null>(null)
 
-   const onCloseDialog = useCallback(() => {
+   const onCloseDialog = () => {
       setSelectedJob(null)
-   }, [])
+   }
 
-   const handleJobClick = useCallback((job: Job | CustomJob) => {
-      setSelectedJob(job)
-   }, [])
-
-   if (!jobsToShow) return null
+   if (!jobsToShow) return null // we Need to fetch the jobs before even rendering the Header
 
    return (
-      <Container sx={styles.root}>
+      <EndOfStreamContainer>
          <Heading>
             {`Don't miss out! Apply now for the exciting jobs you saw live.`}
          </Heading>
@@ -63,7 +53,7 @@ export const Content = ({ groupId }: ContentProps) => {
                <JobCard
                   key={job.id}
                   job={job}
-                  handleSelectJob={handleJobClick}
+                  handleSelectJob={setSelectedJob}
                />
             ))}
          </Stack>
@@ -75,6 +65,21 @@ export const Content = ({ groupId }: ContentProps) => {
                open={Boolean(selectedJob)}
             />
          ) : null}
-      </Container>
+      </EndOfStreamContainer>
+   )
+}
+
+const Loader = () => {
+   return (
+      <EndOfStreamContainer>
+         <Heading>
+            <Skeleton width={250} />
+         </Heading>
+         <Stack spacing={1.5}>
+            <JobCardSkeleton />
+            <JobCardSkeleton />
+            <JobCardSkeleton />
+         </Stack>
+      </EndOfStreamContainer>
    )
 }

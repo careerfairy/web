@@ -1,11 +1,14 @@
 import { Box, BoxProps, Stack } from "@mui/material"
-import { useStreamIsLandscape } from "components/custom-hook/streaming"
 import { ReactNode, forwardRef } from "react"
-import { useShowEndScreen } from "store/selectors/streamingAppSelectors"
+import {
+   useShowEndScreen,
+   useStreamHasJobs,
+} from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { EndOfStreamHeader } from "./EndOfStreamHeader"
 import { Hero } from "./Hero"
 import { Jobs } from "./Jobs"
+import { Streams } from "./Streams"
 
 const styles = sxStyles({
    root: {
@@ -14,6 +17,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       position: "relative",
+      pb: 4.5,
    },
    contentContainer: {
       alignItems: "center",
@@ -42,15 +46,15 @@ export const EndOfStream = ({ children, isHost }: Props) => {
 }
 
 const EndOfStreamView = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
-   const streamIsLandscape = useStreamIsLandscape()
+   const hasJobs = useStreamHasJobs()
 
    return (
       <Box ref={ref} {...props} sx={styles.root}>
          <EndOfStreamHeader />
          <Hero />
-         <Box flexGrow={streamIsLandscape ? 0.35 : 1} />
          <Stack sx={styles.contentContainer} spacing={3}>
-            <Jobs />
+            {Boolean(hasJobs) && <Jobs />}
+            <Streams />
          </Stack>
       </Box>
    )
