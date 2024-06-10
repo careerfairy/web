@@ -12,10 +12,11 @@ import { WaitingRoomHeader } from "./WaitingRoomHeader"
 const styles = sxStyles({
    root: {
       width: "100%",
-      minHeight: "100vh",
+      minHeight: "100dvh",
       display: "flex",
       flexDirection: "column",
       position: "relative",
+      bgcolor: "#F7F8FC",
    },
    container: {
       display: "flex",

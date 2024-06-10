@@ -22,7 +22,7 @@ export const StatusTitle = () => {
          component="h1"
       >
          {hasLivestreamStarted
-            ? "Don’t panic, the hosts are getting ready! They will welcome you in few seconds."
+            ? "The hosts are making the final preparations and will welcome you shortly."
             : "The live stream is about to start!"}
       </Typography>
    )

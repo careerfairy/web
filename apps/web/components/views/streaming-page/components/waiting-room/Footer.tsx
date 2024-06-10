@@ -13,8 +13,9 @@ const styles = sxStyles({
       textAlign: "center",
       justifyContent: "center",
       display: "flex",
-      borderTopLeftRadius: "67% 284px",
-      borderTopRightRadius: "67% 284px",
+      borderTopLeftRadius: "100% 284px",
+      borderTopRightRadius: "100% 284px",
+      maxWidth: 1099,
    },
    tip: {
       color: "neutral.800",
@@ -35,7 +36,7 @@ export const Footer = () => {
          sx={styles.root}
          width={streamIsMobile ? "100%" : "80%"}
          minHeight={streamIsLandscape ? 75 : streamIsMobile ? 80 : 155}
-         pt={streamIsLandscape ? 3.125 : streamIsMobile ? 2.5 : 7.75}
+         pt={streamIsLandscape ? 3.125 : streamIsMobile ? 3 : 7.75}
       >
          <Typography
             sx={styles.tip}
