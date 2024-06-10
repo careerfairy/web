@@ -1,4 +1,4 @@
-import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
+import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Skeleton } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
