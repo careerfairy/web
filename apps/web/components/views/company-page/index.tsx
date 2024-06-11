@@ -1,34 +1,38 @@
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Group } from "@careerfairy/shared-lib/groups"
-import Header from "./Header"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Box, Container, Grid, Stack } from "@mui/material"
+import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { doc } from "firebase/firestore"
 import {
+   MutableRefObject,
    createContext,
    forwardRef,
-   MutableRefObject,
    useContext,
    useEffect,
    useMemo,
    useRef,
 } from "react"
-import { Box, Container, Grid, Stack } from "@mui/material"
-import AboutSection from "./AboutSection"
-import MediaSection from "./MediaSection"
-import TestimonialSection from "./TestimonialSection"
-import EventSection from "./EventSection"
 import { useFirestoreDocData } from "reactfire"
-import { doc } from "firebase/firestore"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import useListenToStreams from "../../custom-hook/useListenToStreams"
-import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { groupRepo } from "../../../data/RepositoryInstances"
-import { errorLogAndNotify } from "../../../util/CommonUtil"
-import { FollowCompany, SignUp } from "./ctas"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import { groupRepo } from "../../../data/RepositoryInstances"
+import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
+import { errorLogAndNotify } from "../../../util/CommonUtil"
+import useListenToStreams from "../../custom-hook/useListenToStreams"
+import AboutSection from "./AboutSection"
+import EventSection from "./EventSection"
+import Header from "./Header"
+import MediaSection from "./MediaSection"
+import MentorsSection from "./MentorsSection"
 import NewsletterSection from "./NewsletterSection"
 import ProgressBanner from "./ProgressBanner"
 import SparksSection from "./SparksSection"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import TestimonialSection from "./TestimonialSection"
+import { FollowCompany, SignUp } from "./ctas"
 
 type Props = {
    group: Group
@@ -73,6 +77,7 @@ export type SectionRefs = {
 type ICompanyPageContext = {
    group: Group
    groupPresenter: GroupPresenter
+   groupCreators: Creator[]
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
    pastLivestreams: LivestreamEvent[]
@@ -82,6 +87,7 @@ type ICompanyPageContext = {
 const CompanyPageContext = createContext<ICompanyPageContext>({
    group: null,
    groupPresenter: null,
+   groupCreators: [],
    editMode: false,
    upcomingLivestreams: [],
    pastLivestreams: [],
@@ -99,6 +105,7 @@ const CompanyPageOverview = ({
    upcomingLivestreams,
    pastLivestreams,
 }: Props) => {
+   const { mentorsV1 } = useFeatureFlags()
    const { isLoggedIn, isLoggedOut } = useAuth()
    const isMobile = useIsMobile()
    const groupRef = useMemo(
@@ -112,6 +119,8 @@ const CompanyPageOverview = ({
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
       initialData: group,
    })
+
+   const { data: groupCreators } = useGroupCreators(group.id)
 
    const contextUpcomingLivestream = useListenToStreams({
       filterByGroupId: group.groupId,
@@ -159,6 +168,7 @@ const CompanyPageOverview = ({
       () => ({
          group: contextGroup,
          groupPresenter: presenter,
+         groupCreators: groupCreators,
          editMode,
          upcomingLivestreams: contextUpcomingLivestream || upcomingLivestreams,
          pastLivestreams: contextPastLivestreams || pastLivestreams,
@@ -172,6 +182,7 @@ const CompanyPageOverview = ({
       [
          contextGroup,
          presenter,
+         groupCreators,
          editMode,
          contextUpcomingLivestream,
          upcomingLivestreams,
@@ -203,11 +214,19 @@ const CompanyPageOverview = ({
                         {isMobile && !editMode ? (
                            <>
                               <EventSection />
-                              <TestimonialSection />
+                              {mentorsV1 ? (
+                                 <MentorsSection />
+                              ) : (
+                                 <TestimonialSection />
+                              )}
                            </>
                         ) : (
                            <>
-                              <TestimonialSection />
+                              {mentorsV1 ? (
+                                 <MentorsSection />
+                              ) : (
+                                 <TestimonialSection />
+                              )}
                               <EventSection />
                            </>
                         )}
