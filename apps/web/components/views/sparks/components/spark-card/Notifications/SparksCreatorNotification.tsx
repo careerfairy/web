@@ -7,6 +7,8 @@ import { LINKEDIN_COLOR } from "components/util/colors"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { useCallback, useEffect, useState } from "react"
 import { Linkedin } from "react-feather"
+import { useSelector } from "react-redux"
+import { progressPercentageSelector } from "store/selectors/sparksFeedSelectors"
 import CreatorAvatar from "../../CreatorAvatar"
 import { SparksPopUpBase } from "./SparksPopUpBase"
 
@@ -56,6 +58,7 @@ type Props = {
 export const SparksCreatorNotification = ({ creator }: Props) => {
    const [showNotification, setShowNotification] = useState(false)
    const { trackEvent } = useSparksFeedTracker()
+   const percentageOfVideoPlayed = useSelector(progressPercentageSelector)
 
    const discoverHandleClick = useCallback(() => {
       window.open(creator.linkedInUrl, "_blank")
@@ -69,12 +72,15 @@ export const SparksCreatorNotification = ({ creator }: Props) => {
    }, [])
 
    useEffect(() => {
-      const timer = setTimeout(() => {
+      if (
+         percentageOfVideoPlayed >=
+         SPARK_CONSTANTS.PLAYED_PERCENTAGE_TO_SHOW_LINKEDIN_NOTIFICATION
+      ) {
          setShowNotification(true)
-      }, SPARK_CONSTANTS.SECONDS_TO_SHOW_CREATOR_LINKEDIN_NOTIFICATION)
+      }
 
-      return () => clearTimeout(timer)
-   }, [])
+      return () => setShowNotification(false)
+   }, [percentageOfVideoPlayed])
 
    if (creator.linkedInUrl === "" || !creator.linkedInUrl) {
       return null
