@@ -2,11 +2,18 @@ import {
    SparkCardNotificationTypes,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import Box from "@mui/material/Box"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { Button, Fade, Grow, Stack } from "@mui/material"
+import Box from "@mui/material/Box"
+import { useAuth } from "HOCs/AuthProvider"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import { sparkService } from "data/firebase/SparksService"
 import {
    FC,
    SyntheticEvent,
@@ -16,25 +23,18 @@ import {
    useRef,
    useState,
 } from "react"
-import { sxStyles } from "types/commonTypes"
-import SparkCategoryChip from "./SparkCategoryChip"
-import SparkDetails from "./SparkDetails"
-import SparkQuestion from "./SparkQuestion"
-import VideoPreview from "./VideoPreview"
-import SparksEventNotification from "./Notifications/SparksEventNotification"
 import { useSelector } from "react-redux"
 import {
    eventDetailsDialogVisibilitySelector,
    videosMuttedSelector,
 } from "store/selectors/sparksFeedSelectors"
-import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
-import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
-import useFingerPrint from "components/custom-hook/useFingerPrint"
-import { sparkService } from "data/firebase/SparksService"
-import { useAuth } from "HOCs/AuthProvider"
-import UnmuteIcon from "@mui/icons-material/VolumeOff"
+import { sxStyles } from "types/commonTypes"
 import FullCardNotification from "./Notifications/FullCardNotification"
+import { SparksPopUpManager } from "./Notifications/SparksPopUpManager"
+import SparkCategoryChip from "./SparkCategoryChip"
+import SparkDetails from "./SparkDetails"
+import SparkQuestion from "./SparkQuestion"
+import VideoPreview from "./VideoPreview"
 
 const styles = sxStyles({
    root: {
@@ -242,9 +242,7 @@ const SparksFeedCard: FC<Props> = ({
             onClick={handleClickCard}
             sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
          >
-            {isOverlayedOntop ? (
-               <SparksEventNotification spark={spark} />
-            ) : null}
+            {isOverlayedOntop ? <SparksPopUpManager spark={spark} /> : null}
 
             <Box
                sx={[
