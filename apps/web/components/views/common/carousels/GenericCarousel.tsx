@@ -1,9 +1,11 @@
 import { Box, SxProps } from "@mui/material"
-import useEmblaCarousel, {
+import {
+   EmblaCarouselType,
    EmblaOptionsType,
    EmblaPluginType,
+   UseEmblaCarouselType,
 } from "embla-carousel-react"
-import React, { ReactNode, useCallback, useEffect, useRef } from "react"
+import React, { ReactNode, createContext, useContext } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -23,6 +25,10 @@ const styles = sxStyles({
    },
 })
 
+const EmblaCarouselContext = createContext<EmblaCarouselType | undefined>(
+   undefined
+)
+
 type EmblaCarouselProps = {
    children: ReactNode
    options?: EmblaOptionsType
@@ -36,56 +42,60 @@ type EmblaCarouselProps = {
    sx?: SxProps
    containerSx?: SxProps
    slideSx?: SxProps
+   emblaRef: UseEmblaCarouselType[0]
+   emblaApi: UseEmblaCarouselType[1]
 }
 
 export const GenericCarousel = ({
    children,
-   options,
-   plugins,
    gap,
    slideWidth,
    sx,
    containerSx,
    slideSx,
+   emblaRef,
+   emblaApi,
 }: EmblaCarouselProps) => {
-   const [emblaRef, emblaApi] = useEmblaCarousel(options, plugins)
-   const emblaContainerRef = useRef<HTMLDivElement>(null)
-
-   const onSelect = useCallback(() => {
-      if (!emblaApi) return
-   }, [emblaApi])
-
-   useEffect(() => {
-      if (!emblaApi) return
-      emblaApi.on("select", onSelect)
-      return () => {
-         emblaApi.off("select", onSelect)
-      }
-   }, [emblaApi, onSelect])
-
    return (
-      <Box
-         id="generic-embla-carousel"
-         sx={combineStyles(styles.viewport, sx)}
-         ref={emblaRef}
-      >
+      <EmblaCarouselContext.Provider value={emblaApi}>
          <Box
-            id="generic-embla-carousel-container"
-            ref={emblaContainerRef}
-            marginLeft={`calc(${gap} * -1)`}
-            sx={combineStyles(styles.container, containerSx)}
+            id="generic-embla-carousel-viewport"
+            sx={combineStyles(styles.viewport, sx)}
+            ref={emblaRef}
          >
-            {React.Children.map(children, (child) => (
-               <Box
-                  id="generic-embla-carousel-slide"
-                  paddingLeft={gap}
-                  sx={combineStyles(styles.slide, slideSx)}
-                  flex={slideWidth ? `0 0 ${slideWidth}` : "0 0 auto"}
-               >
-                  {child}
-               </Box>
-            ))}
+            <Box
+               id="generic-embla-carousel-container"
+               marginLeft={`calc(${gap} * -1)`}
+               sx={combineStyles(styles.container, containerSx)}
+            >
+               {React.Children.map(children, (child) => (
+                  <Box
+                     id="generic-embla-carousel-slide"
+                     paddingLeft={gap}
+                     sx={combineStyles(styles.slide, slideSx)}
+                     flex={slideWidth ? `0 0 ${slideWidth}` : "0 0 auto"}
+                  >
+                     {child}
+                  </Box>
+               ))}
+            </Box>
          </Box>
-      </Box>
+      </EmblaCarouselContext.Provider>
    )
+}
+
+/**
+ * Custom hook to access the EmblaCarousel context.
+ * Throws an error if used outside of an EmblaCarouselContext.Provider.
+ * @returns {EmblaCarouselType} The EmblaCarousel API.
+ */
+export const useGenericCarousel = (): EmblaCarouselType => {
+   const context = useContext(EmblaCarouselContext)
+
+   if (context === undefined) {
+      throw new Error(
+         "useEmblaCarouselContext must be used within an EmblaCarouselContext.Provider"
+      )
+   }
+   return context
 }

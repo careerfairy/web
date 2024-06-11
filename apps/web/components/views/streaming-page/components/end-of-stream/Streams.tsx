@@ -11,6 +11,7 @@ import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import Link from "components/views/common/Link"
 import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
+import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import { ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -26,11 +27,6 @@ const styles = sxStyles({
    },
    withRightPadding: {
       pr: 2,
-   },
-   streamCard: {
-      height: 150,
-      borderRadius: 2,
-      bgcolor: "red",
    },
    showCardBoxShadows: {
       pb: 0.5,
@@ -123,6 +119,13 @@ const ResponsiveCarousel = ({
 
    const streamIsMobile = useStreamIsMobile()
 
+   const [emblaRef, emblaApi] = useEmblaCarousel(
+      {
+         active: !disableSwipe,
+      },
+      plugins
+   )
+
    return (
       <GenericCarousel
          slideWidth={
@@ -130,10 +133,8 @@ const ResponsiveCarousel = ({
          }
          gap={streamIsMobile ? "12px" : "16px"}
          sx={styles.showCardBoxShadows}
-         plugins={plugins}
-         options={{
-            active: !disableSwipe,
-         }}
+         emblaRef={emblaRef}
+         emblaApi={emblaApi}
       >
          {children}
       </GenericCarousel>
