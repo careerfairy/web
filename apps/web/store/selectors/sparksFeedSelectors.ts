@@ -95,3 +95,6 @@ export const interactionSourceSelector = (state: RootState) =>
 
 export const progressPercentageSelector = (state: RootState) =>
    state.sparksFeed.progressPercentage
+
+export const anonymousUserCountryCodeSelector = (state: RootState) =>
+   state.sparksFeed.anonymousUserCountryCode
