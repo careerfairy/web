@@ -23,8 +23,8 @@ const styles = sxStyles({
       mb: 4,
    },
    marginMobile: {
-      mt: 3.5,
-      mb: 5.25,
+      mt: 2.5,
+      mb: 4.5,
    },
    rocket: {
       fontSize: "96px",
@@ -34,9 +34,15 @@ const styles = sxStyles({
    },
 })
 
-const getRocketGutter = (streamIsLandscape: boolean) => {
+const getRocketGutter = (
+   streamIsLandscape: boolean,
+   streamIsMobile: boolean
+) => {
    if (streamIsLandscape) {
       return 20
+   }
+   if (streamIsMobile) {
+      return 15
    }
 
    return 32 // desktop/mobile-portrait
@@ -79,7 +85,7 @@ export const Hero = () => {
                height={streamIsMobile ? 103 : 139}
             />
          </Grow>
-         <Box height={getRocketGutter(streamIsLandscape)} />
+         <Box height={getRocketGutter(streamIsLandscape, streamIsMobile)} />
          <Typography
             component="h4"
             variant={streamIsMobile ? "medium" : "desktopBrandedH4"}
