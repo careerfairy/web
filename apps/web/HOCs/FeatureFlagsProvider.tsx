@@ -8,6 +8,7 @@ type FlagKeys =
    | "sparksB2BOnboardingFlag"
    | "livestreamCreationFlowV2"
    | "jobHubV1"
+   | "mentorsV1"
 
 const testGoups = ["rTUGXDAG2XAtpVcgvAcc", "qENR2aNDhehkLDYryTRN"]
 
@@ -71,6 +72,13 @@ export const flagsInitialState = {
     * Hide or Show
     */
    jobHubV1: {
+      enabled: false,
+   },
+   /**
+    * B2B Live stream creation flow version 2
+    * Hide or Show
+    */
+   mentorsV1: {
       enabled: false,
    },
 } satisfies Record<FlagKeys, FeatureFlag>
