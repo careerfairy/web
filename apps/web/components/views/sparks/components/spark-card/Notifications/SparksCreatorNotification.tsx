@@ -1,10 +1,11 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { LINKEDIN_COLOR } from "components/util/colors"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Linkedin } from "react-feather"
 import CreatorAvatar from "../../CreatorAvatar"
 import { SparksPopUpBase } from "./SparksPopUpBase"
@@ -53,6 +54,7 @@ type Props = {
 }
 
 export const SparksCreatorNotification = ({ creator }: Props) => {
+   const [showNotification, setShowNotification] = useState(false)
    const { trackEvent } = useSparksFeedTracker()
 
    const discoverHandleClick = useCallback(() => {
@@ -66,7 +68,17 @@ export const SparksCreatorNotification = ({ creator }: Props) => {
       ev.stopPropagation()
    }, [])
 
-   const showNotification: boolean = useMemo(() => true, [])
+   useEffect(() => {
+      const timer = setTimeout(() => {
+         setShowNotification(true)
+      }, SPARK_CONSTANTS.SECONDS_TO_SHOW_CREATOR_LINKEDIN_NOTIFICATION)
+
+      return () => clearTimeout(timer)
+   }, [])
+
+   if (creator.linkedInUrl === "" || !creator.linkedInUrl) {
+      return null
+   }
 
    return (
       <SparksPopUpBase
