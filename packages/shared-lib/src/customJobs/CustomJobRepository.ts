@@ -104,7 +104,7 @@ export interface ICustomJobRepository {
    syncExpiredCustomJobs(): Promise<void>
 
    /**
-    * Get all group custom jobs
+    * Get all group custom jobs by group IDs
     * @param groupId
     */
    getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]>
@@ -180,14 +180,34 @@ export class FirebaseCustomJobRepository
    }
 
    async getCustomJobByIds(jobIds: string[]): Promise<CustomJob[]> {
-      // CAUTION: IDs must not surpass length of 30
-      const ref = this.firestore
-         .collection(this.COLLECTION_NAME)
-         .where("id", "in", jobIds)
+      const chunks = chunkArray(jobIds, 10)
+      const promises = []
 
-      const customJobs = await ref.get()
+      for (const chunk of chunks) {
+         promises.push(
+            this.firestore
+               .collection(this.COLLECTION_NAME)
+               .where("id", "in", chunk)
+               .get()
+               .then(mapFirestoreDocuments)
+         )
+      }
 
-      return mapFirestoreDocuments<CustomJob>(customJobs)
+      const responses = await Promise.allSettled(promises)
+
+      return responses
+         .filter((r) => {
+            if (r.status === "fulfilled") {
+               return true
+            } else {
+               // only log for debugging purposes
+               console.error("Promise failed", r)
+            }
+
+            return false
+         })
+         .map((r) => (r as PromiseFulfilledResult<CustomJob[]>).value)
+         .flat()
    }
 
    async getUserJobApplication(
