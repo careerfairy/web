@@ -10,6 +10,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
+import { FeedbackQuestions } from "./components/feedback-questions/FeedbackQuestions"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/viewer/WaitingRoom"
 
@@ -239,6 +240,9 @@ const Component = ({ isHost }: Props) => {
                                        <BottomBar />
                                        <StreamSetupWidget />
                                        <SettingsMenu />
+                                       {!isHost && authenticatedUser ? (
+                                          <FeedbackQuestions />
+                                       ) : null}
                                     </Fragment>
                                  </Layout>
                                  <ToggleStreamModeButton />
@@ -261,6 +265,6 @@ const Component = ({ isHost }: Props) => {
             <LivestreamStateTrackers />
          </>
       ),
-      [agoraUserId, isHost, livestream.id]
+      [agoraUserId, isHost, livestream.id, authenticatedUser]
    )
 }

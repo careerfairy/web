@@ -457,7 +457,13 @@ export interface EventRatingAnswer extends Identifiable {
    message?: string
    rating?: number
    timestamp?: firebase.firestore.Timestamp
+   user?: Pick<UserData, "id" | "userEmail">
 }
+
+export type FeedbackQuestionUserAnswer = Pick<
+   EventRatingAnswer,
+   "message" | "rating"
+>
 
 export type LivestreamEventPublicData = Partial<
    Pick<

@@ -62,7 +62,7 @@ export const feedbackQuestionFormInitialValues: FeedbackQuestionFormValues[] = [
    },
 ]
 
-type EventRatingWithType = EventRating & { type?: FeedbackQuestionType }
+export type EventRatingWithType = EventRating & { type?: FeedbackQuestionType }
 
 export const mapRatingToFeedbackQuestions = (
    rating: EventRatingWithType
