@@ -91,7 +91,7 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
    }, [
       anonymousUserCountryCode,
       spark.group.targetedCountries,
-      userData.universityCountryCode,
+      userData?.universityCountryCode,
    ])
 
    useEffect(() => {
