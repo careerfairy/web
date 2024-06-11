@@ -28,6 +28,7 @@ export default function useRegistrationHandler() {
       serverUserEmail,
       goToView,
       currentSparkId,
+      mode,
    } = useLiveStreamDialog()
    const { push, asPath, pathname } = useRouter()
    const { forceShowReminder } = useUserReminders()
@@ -129,26 +130,25 @@ export default function useRegistrationHandler() {
    ])
 
    const redirectToLogin = useCallback(() => {
+      const url = new URL(asPath, window.location.origin)
       const isOnSparksFeed = pathname.includes("/sparks/[sparkId]")
       const utmParams = isOnSparksFeed
          ? { utm_source: "careerfairy", utm_medium: "sparks" }
          : null
 
-      const isOnJobDetailsDialog = asPath.includes("job-details")
+      if (url.pathname.includes("job-details")) {
+         url.pathname = url.pathname.split("job-details")[0]
+      }
 
-      const rawPath = isOnJobDetailsDialog
-         ? asPath.split("job-details")[0]
-         : asPath
-
-      const path = rawPath.includes("?")
-         ? rawPath.replace("?", "/register?")
-         : `${rawPath}/register`
+      if (mode === "page") {
+         url.pathname += "/register"
+      }
 
       return push({
          pathname: `/login`,
-         query: { absolutePath: path, ...utmParams },
+         query: { absolutePath: url.toString(), ...utmParams },
       })
-   }, [asPath, pathname, push])
+   }, [asPath, pathname, push, mode])
 
    /**
     * Handle the register button click
