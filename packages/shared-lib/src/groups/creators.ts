@@ -47,6 +47,7 @@ export type PublicCreator = Pick<
    | "groupId"
    | "story"
    | "id"
+   | "linkedInUrl"
 >
 
 export type AddCreatorData = Pick<
