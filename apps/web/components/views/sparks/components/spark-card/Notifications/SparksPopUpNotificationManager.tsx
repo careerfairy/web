@@ -7,12 +7,12 @@ type Props = {
    spark: SparkPresenter
 }
 
-export const SparksPopUpManager = ({ spark }: Props) => {
+export const SparksPopUpNotificationManager = ({ spark }: Props) => {
    const hasEventNotification = useHasEventNotification(spark)
 
    return hasEventNotification ? (
       <SparksEventNotification spark={spark} />
    ) : (
-      <SparksCreatorNotification creator={spark.creator} />
+      <SparksCreatorNotification spark={spark} />
    )
 }
