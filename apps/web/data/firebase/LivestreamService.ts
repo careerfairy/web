@@ -1181,7 +1181,6 @@ export class LivestreamService {
       userData: StreamerDetails,
       answer: FeedbackQuestionUserAnswer
    ) => {
-      console.log(userData)
       const ref = doc(
          FirestoreInstance,
          "livestreams",

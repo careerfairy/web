@@ -10,6 +10,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
+import { FeedbackQuestions } from "./components/feedback-questions/FeedbackQuestions"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/waiting-room/WaitingRoom"
 
