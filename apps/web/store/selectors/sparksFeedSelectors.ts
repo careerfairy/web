@@ -92,3 +92,6 @@ export const autoAction = (state: RootState) => state.sparksFeed.autoAction
 
 export const interactionSourceSelector = (state: RootState) =>
    state.sparksFeed.interactionSource
+
+export const progressPercentageSelector = (state: RootState) =>
+   state.sparksFeed.progressPercentage
