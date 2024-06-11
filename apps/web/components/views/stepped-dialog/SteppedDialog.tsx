@@ -1,9 +1,9 @@
 import {
    Box,
    BoxProps,
-   Container as MuiContainer,
    Dialog,
    IconButton,
+   Container as MuiContainer,
    Stack,
    StackProps,
    Theme,
@@ -14,13 +14,17 @@ import {
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import SwipeableViews from "react-swipeable-views"
 
+import CloseIcon from "@mui/icons-material/CloseRounded"
+import { LoadingButton, LoadingButtonProps } from "@mui/lab"
+import { SxProps } from "@mui/material/styles"
+import { TransitionProps } from "@mui/material/transitions"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { AnimatedTabPanel } from "materialUI/GlobalPanels/GlobalPanels"
 import {
    ComponentType,
-   createContext,
    FC,
    JSXElementConstructor,
+   createContext,
    useCallback,
    useContext,
    useEffect,
@@ -29,10 +33,6 @@ import {
 } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
-import CloseIcon from "@mui/icons-material/CloseRounded"
-import { LoadingButton, LoadingButtonProps } from "@mui/lab"
-import { SxProps } from "@mui/material/styles"
-import { TransitionProps } from "@mui/material/transitions"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -49,7 +49,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       maxHeight: "none",
-      maxWidth: 770,
+      maxWidth: { md: 770 },
       overflowY: "auto",
    },
    content: {
