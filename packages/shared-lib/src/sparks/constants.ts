@@ -40,6 +40,11 @@ export const SPARK_CONSTANTS = {
    SECONDS_TO_SHOW_EVENT_NOTIFICATION: 6000,
 
    /**
+    * The number of seconds into the spark video before showing the creator's LinkedIn notification
+    */
+   SECONDS_TO_SHOW_CREATOR_LINKEDIN_NOTIFICATION: 10000,
+
+   /**
     * The year we started tracking likes
     */
    LIKES_TRACKING_START_YEAR: 2023,
