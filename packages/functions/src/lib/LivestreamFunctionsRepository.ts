@@ -759,7 +759,7 @@ export class LivestreamFunctionsRepository
             // Less updates by only updating the current linked events when the tag has changed
             // other wise the tags sync will only be for the added live streams
             if (businessFunctionTagsChanged) {
-               eventsToUpdate = eventsToUpdate.concat(afterJob.livestreams)
+               eventsToUpdate = afterJob.livestreams
             }
             // Update livestreams tags for all events still on the customJob (update or create)
             // Filter the snapshots as the query includes also removed live streams from the customJob

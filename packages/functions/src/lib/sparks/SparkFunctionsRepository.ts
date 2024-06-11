@@ -1103,7 +1103,7 @@ export class SparkFunctionsRepository
             // Less updates by only updating the current linked sparks when the tag has changed
             // other wise the tags sync will only be for the added sparks
             if (businessFunctionTagsChanged) {
-               sparksToUpdate = sparksToUpdate.concat(afterJob.sparks)
+               sparksToUpdate = afterJob.sparks
             }
             // Update spark tags for all sparks still on the customJob (update or create)
             // Filter the snapshots as the query includes also removed sparks from the customJob
