@@ -30,7 +30,7 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { sxStyles } from "types/commonTypes"
 import FullCardNotification from "./Notifications/FullCardNotification"
-import { SparksPopUpManager } from "./Notifications/SparksPopUpManager"
+import { SparksPopUpNotificationManager } from "./Notifications/SparksPopUpNotificationManager"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
 import SparkQuestion from "./SparkQuestion"
@@ -242,7 +242,9 @@ const SparksFeedCard: FC<Props> = ({
             onClick={handleClickCard}
             sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
          >
-            {isOverlayedOntop ? <SparksPopUpManager spark={spark} /> : null}
+            {isOverlayedOntop ? (
+               <SparksPopUpNotificationManager spark={spark} />
+            ) : null}
 
             <Box
                sx={[
