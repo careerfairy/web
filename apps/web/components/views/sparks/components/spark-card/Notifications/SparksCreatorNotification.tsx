@@ -1,14 +1,18 @@
-import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Stack, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { LINKEDIN_COLOR } from "components/util/colors"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Linkedin } from "react-feather"
 import { useSelector } from "react-redux"
-import { progressPercentageSelector } from "store/selectors/sparksFeedSelectors"
+import {
+   anonymousUserCountryCodeSelector,
+   progressPercentageSelector,
+} from "store/selectors/sparksFeedSelectors"
 import CreatorAvatar from "../../CreatorAvatar"
 import { SparksPopUpBase } from "./SparksPopUpBase"
 
@@ -52,24 +56,43 @@ const LinkedInCta = (
 )
 
 type Props = {
-   creator: PublicCreator
+   spark: SparkPresenter
 }
 
-export const SparksCreatorNotification = ({ creator }: Props) => {
+export const SparksCreatorNotification = ({ spark }: Props) => {
+   const { userData } = useAuth()
    const [showNotification, setShowNotification] = useState(false)
    const { trackEvent } = useSparksFeedTracker()
    const percentageOfVideoPlayed = useSelector(progressPercentageSelector)
+   const anonymousUserCountryCode = useSelector(
+      anonymousUserCountryCodeSelector
+   )
 
    const discoverHandleClick = useCallback(() => {
-      window.open(creator.linkedInUrl, "_blank")
+      window.open(spark.creator.linkedInUrl, "_blank")
       trackEvent(SparkEventActions.Click_ReachOut_LinkedIn)
-   }, [creator.linkedInUrl, trackEvent])
+   }, [spark.creator.linkedInUrl, trackEvent])
 
    const cancelHandleClick = useCallback((ev) => {
-      //dispatch(removeEventNotifications())
+      setShowNotification(false)
       ev.preventDefault()
       ev.stopPropagation()
    }, [])
+
+   const userMeetsTargetCriteria = useMemo(() => {
+      const userCountryCode =
+         anonymousUserCountryCode || userData?.universityCountryCode
+      const isTargetedUser =
+         spark.group.targetedCountries.filter(
+            (country) => (country.id = userCountryCode)
+         ).length > 0
+
+      return isTargetedUser
+   }, [
+      anonymousUserCountryCode,
+      spark.group.targetedCountries,
+      userData.universityCountryCode,
+   ])
 
    useEffect(() => {
       if (
@@ -82,22 +105,26 @@ export const SparksCreatorNotification = ({ creator }: Props) => {
       return () => setShowNotification(false)
    }, [percentageOfVideoPlayed])
 
-   if (creator.linkedInUrl === "" || !creator.linkedInUrl) {
+   if (
+      spark.creator.linkedInUrl === "" ||
+      !spark.creator.linkedInUrl ||
+      !userMeetsTargetCriteria
+   ) {
       return null
    }
 
    return (
       <SparksPopUpBase
          showNotification={showNotification}
-         pictureUrl={creator.avatarUrl}
-         message={<NotificationMessage name={creator.firstName} />}
+         pictureUrl={spark.creator.avatarUrl}
+         message={<NotificationMessage name={spark.creator.firstName} />}
          cancelHandleClick={cancelHandleClick}
          ctaHandleClick={discoverHandleClick}
          cta={LinkedInCta}
          ctaSx={{
             backgroundColor: `${LINKEDIN_COLOR} !important`,
          }}
-         pictureSlot={<CreatorAvatar creator={creator} size={50} />}
+         pictureSlot={<CreatorAvatar creator={spark.creator} size={50} />}
       />
    )
 }
