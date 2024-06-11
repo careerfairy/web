@@ -1,19 +1,22 @@
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { Box } from "@mui/material"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
+import { useTheme } from "@mui/material/styles"
+import useMediaQuery from "@mui/material/useMediaQuery"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/legacy/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
-import { setVideosMuted } from "store/reducers/sparksFeedReducer"
-import { sxStyles } from "types/commonTypes"
 import { usePrevious } from "react-use"
-import { useTheme } from "@mui/material/styles"
-import useMediaQuery from "@mui/material/useMediaQuery"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import {
+   setProgressPercentage,
+   setVideosMuted,
+} from "store/reducers/sparksFeedReducer"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
@@ -146,9 +149,10 @@ const VideoPreview: FC<Props> = ({
          if (!autoPlaying) {
             setProgress(progress.played * 100)
             onProgress(progress)
+            dispatch(setProgressPercentage(progress.played))
          }
       },
-      [autoPlaying, onProgress]
+      [autoPlaying, dispatch, onProgress]
    )
 
    const prevIdentifier = usePrevious(identifier)
