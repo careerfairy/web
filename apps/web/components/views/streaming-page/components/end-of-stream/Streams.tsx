@@ -1,4 +1,7 @@
-import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Skeleton } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
@@ -14,8 +17,10 @@ import {
    GenericCarouselProps,
 } from "components/views/common/carousels/GenericCarousel"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
+import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+import { useRouter } from "next/router"
 import React from "react"
 import { sxStyles } from "types/commonTypes"
 import { EndOfStreamContainer } from "./Container"
@@ -53,8 +58,10 @@ export const Streams = () => {
 const plugins = [WheelGesturesPlugin()]
 
 const Content = () => {
-   const { isLoggedIn } = useAuth()
+   const { isLoggedIn, authenticatedUser } = useAuth()
+   const { push, query, pathname } = useRouter()
    const streamIsMobile = useStreamIsMobile()
+   const selectedLivestreamId = query.selectedLivestreamId as string | null
 
    const { events: recommendedEvents } = useRecommendedEvents({
       suspense: true,
@@ -69,6 +76,32 @@ const Content = () => {
    const streams = isLoggedIn ? recommendedEvents : nextEvents
    const hasMoreThanThreeEvents = streams.length > 3
 
+   const handleOpenLivestreamDialog = (event: LivestreamEvent) => {
+      push(
+         {
+            pathname,
+            query: {
+               ...query,
+               selectedLivestreamId: event.id,
+            },
+         },
+         undefined,
+         { shallow: true }
+      )
+   }
+
+   const handleCloseLivestreamDialog = () => {
+      delete query.selectedLivestreamId
+      push(
+         {
+            pathname,
+            query,
+         },
+         undefined,
+         { shallow: true }
+      )
+   }
+
    return (
       <EndOfStreamContainer
          sx={Boolean(streamIsMobile) && styles.noRightPadding}
@@ -82,8 +115,11 @@ const Content = () => {
                   index={index}
                   totalElements={streams.length}
                   location={ImpressionLocation.endOfStreamLivestreams}
-                  event={event}
                   isRecommended
+                  event={event}
+                  onCardClick={() => {
+                     handleOpenLivestreamDialog(event)
+                  }}
                />
             ))}
          </ResponsiveCarousel>
@@ -106,6 +142,14 @@ const Content = () => {
                </Button>
             </Box>
          )}
+         <LivestreamDialog
+            open={Boolean(selectedLivestreamId)}
+            livestreamId={selectedLivestreamId}
+            handleClose={handleCloseLivestreamDialog}
+            mode="stand-alone"
+            page={"details"}
+            serverUserEmail={authenticatedUser?.email}
+         />
       </EndOfStreamContainer>
    )
 }
