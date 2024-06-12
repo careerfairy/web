@@ -83,8 +83,8 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
       const userCountryCode =
          anonymousUserCountryCode || userData?.universityCountryCode
       const isTargetedUser =
-         spark.group.targetedCountries.filter(
-            (country) => (country.id = userCountryCode)
+         spark.group.targetedCountries?.filter(
+            (country) => country.id === userCountryCode
          ).length > 0
 
       return isTargetedUser
