@@ -74,5 +74,6 @@ export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
       groupId: creator.groupId ?? null,
       story: creator.story ?? null,
       id: creator.id ?? null,
+      linkedInUrl: creator.linkedInUrl ?? null,
    }
 }
