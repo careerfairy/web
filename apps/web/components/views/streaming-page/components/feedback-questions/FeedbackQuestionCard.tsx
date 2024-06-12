@@ -8,12 +8,13 @@ import {
    Typography,
 } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { FeedbackQuestionType } from "components/views/group/admin/events/detail/form/views/questions/commons"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "../../context"
 import RatingQuestion from "./RatingQuestion"
+import SentimentQuestion from "./SentimentQuestion"
 
 const styles = sxStyles({
    dialog: {
@@ -45,6 +46,13 @@ const styles = sxStyles({
    },
 })
 
+export const QuestionsComponents = {
+   [FeedbackQuestionType.STAR_RATING]: (props) => <RatingQuestion {...props} />,
+   [FeedbackQuestionType.SENTIMENT_RATING]: (props) => (
+      <SentimentQuestion {...props} />
+   ),
+}
+
 export const FeedbackQuestionCard = ({
    question,
    questionNumber,
@@ -53,7 +61,7 @@ export const FeedbackQuestionCard = ({
 }) => {
    const { livestreamId, agoraUserId } = useStreamingContext()
    const { userData } = useAuth()
-   const { errorNotification } = useSnackbarNotifications()
+   const QuestionAction = QuestionsComponents[question?.type] || <></>
 
    const handleClose = () => {
       try {
@@ -74,6 +82,7 @@ export const FeedbackQuestionCard = ({
    }
 
    const handleSubmit = (event, value: number) => {
+      console.log(value)
       try {
          livestreamService.answerFeedbackQuestion(
             livestreamId,
@@ -83,10 +92,11 @@ export const FeedbackQuestionCard = ({
             { rating: value }
          )
       } catch (error) {
-         errorNotification(
-            error,
-            "An error occurred while answering the question."
-         )
+         errorLogAndNotify(error, {
+            livestreamId: livestreamId,
+            questionId: question.id,
+            user: userData.id,
+         })
       }
       onAnswer(question)
    }
@@ -109,7 +119,7 @@ export const FeedbackQuestionCard = ({
                      <Typography variant="brandedBody">
                         {question.question}
                      </Typography>
-                     <RatingQuestion
+                     <QuestionAction
                         name={question.id}
                         onChange={handleSubmit}
                      />
