@@ -5,7 +5,9 @@ import { Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { LINKEDIN_COLOR } from "components/util/colors"
+import Link from "components/views/common/Link"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Linkedin } from "react-feather"
 import { useSelector } from "react-redux"
@@ -17,11 +19,21 @@ import {
 import CreatorAvatar from "../../CreatorAvatar"
 import { SparksPopUpBase } from "./SparksPopUpBase"
 
+const getSparksUtmParamsIfExist = (pathname: string) => {
+   const isOnSparksFeed = pathname.includes("/sparks/[sparkId]")
+
+   if (isOnSparksFeed) {
+      return `&utm_source=careerfairy&utm_medium=sparks`
+   }
+
+   return ""
+}
+
 type NotificationMessageProps = {
    name: string
 }
 
-const NotificationMessage = ({ name }: NotificationMessageProps) => {
+const LoggedInNotificationMessage = ({ name }: NotificationMessageProps) => {
    const isMobile = useIsMobile()
    return (
       <Typography
@@ -44,6 +56,29 @@ const NotificationMessage = ({ name }: NotificationMessageProps) => {
    )
 }
 
+const LoggedOutNotificationMessage = ({ name }: NotificationMessageProps) => {
+   const isMobile = useIsMobile()
+   return (
+      <Typography
+         color={"text.primary"}
+         variant={isMobile ? "body1" : "body2"}
+         component={"span"}
+      >
+         Want to ask
+         <Typography
+            fontSize={"inherit"}
+            color={LINKEDIN_COLOR}
+            display={"inline"}
+            fontWeight={600}
+         >
+            {" "}
+            {name}{" "}
+         </Typography>
+         your own questions? Create an account to access her details.
+      </Typography>
+   )
+}
+
 const LinkedInCta = (
    <Stack direction="row" alignItems="center" gap="12px">
       <Linkedin
@@ -56,12 +91,31 @@ const LinkedInCta = (
    </Stack>
 )
 
+const SignUpButton = () => {
+   const { asPath, pathname } = useRouter()
+
+   return (
+      <Link
+         color="inherit"
+         href={`/signup?absolutePath=${asPath}${getSparksUtmParamsIfExist(
+            pathname
+         )}`}
+         sx={{
+            width: "100%",
+            textDecoration: "none",
+         }}
+      >
+         Sign Up
+      </Link>
+   )
+}
+
 type Props = {
    spark: SparkPresenter
 }
 
 export const SparksCreatorNotification = ({ spark }: Props) => {
-   const { userData } = useAuth()
+   const { userData, isLoggedIn } = useAuth()
 
    const [hasUserClickedAnyButton, setHasUserClickedAnyButton] = useState(false)
    const [playingCriteriaHasBeenMet, setPlayingCriteriaHasBeenMet] =
@@ -73,7 +127,7 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
       anonymousUserCountryCodeSelector
    )
 
-   const discoverHandleClick = useCallback(() => {
+   const linkedInHandleClick = useCallback(() => {
       window.open(spark.creator.linkedInUrl, "_blank")
       trackEvent(SparkEventActions.Click_ReachOut_LinkedIn)
       setHasUserClickedAnyButton(true)
@@ -134,13 +188,21 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
             userMeetsTargetCriteria && playingCriteriaHasBeenMet
          )}
          pictureUrl={spark.creator.avatarUrl}
-         message={<NotificationMessage name={spark.creator.firstName} />}
+         message={
+            isLoggedIn ? (
+               <LoggedInNotificationMessage name={spark.creator.firstName} />
+            ) : (
+               <LoggedOutNotificationMessage name={spark.creator.firstName} />
+            )
+         }
          cancelHandleClick={cancelHandleClick}
-         ctaHandleClick={discoverHandleClick}
-         cta={LinkedInCta}
-         ctaSx={{
-            backgroundColor: `${LINKEDIN_COLOR} !important`,
-         }}
+         ctaHandleClick={isLoggedIn ? linkedInHandleClick : undefined}
+         cta={isLoggedIn ? LinkedInCta : <SignUpButton />}
+         ctaSx={
+            Boolean(isLoggedIn) && {
+               backgroundColor: `${LINKEDIN_COLOR} !important`,
+            }
+         }
          pictureSlot={<CreatorAvatar creator={spark.creator} size={50} />}
       />
    )
