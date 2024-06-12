@@ -37,7 +37,7 @@ export const FeedbackQuestions = () => {
    >(feedbackQuestions as FeedbackQuestion[])
 
    const getQuestionIndex = useCallback(
-      (question) => {
+      (question: FeedbackQuestion) => {
          return feedbackQuestionsData.findIndex(
             (feedbackQuestion) => feedbackQuestion.id == question.id
          )
@@ -46,7 +46,7 @@ export const FeedbackQuestions = () => {
    )
 
    const markAsAnswered = useCallback(
-      (question) => {
+      (question: FeedbackQuestion) => {
          const questionIndex = getQuestionIndex(question)
          const newQuestionsData = [...feedbackQuestionsData]
          newQuestionsData[questionIndex].answered = true
@@ -56,7 +56,7 @@ export const FeedbackQuestions = () => {
    )
 
    const handleAnswer = useCallback(
-      (question) => {
+      (question: FeedbackQuestion) => {
          const removeActiveQuestion = [...activeQuestions]
          removeActiveQuestion.shift()
          setActiveQuestions(removeActiveQuestion)
@@ -100,7 +100,7 @@ export const FeedbackQuestions = () => {
    )
 
    const isAlreadyActive = useCallback(
-      (question) => {
+      (question: FeedbackQuestion) => {
          return activeQuestions.some(
             (activeQuestion) => activeQuestion.id == question.id
          )

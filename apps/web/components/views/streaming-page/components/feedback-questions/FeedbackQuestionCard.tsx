@@ -8,7 +8,10 @@ import {
    Typography,
 } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { FeedbackQuestionType } from "components/views/group/admin/events/detail/form/views/questions/commons"
+import {
+   EventRatingWithType,
+   FeedbackQuestionType,
+} from "components/views/group/admin/events/detail/form/views/questions/commons"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -51,6 +54,14 @@ export const QuestionsComponents = {
    [FeedbackQuestionType.SENTIMENT_RATING]: (props) => (
       <SentimentQuestion {...props} />
    ),
+   [FeedbackQuestionType.TEXT]: (props) => <RatingQuestion {...props} />,
+}
+
+type FeedbackQuestionCardProps = {
+   question: EventRatingWithType
+   questionNumber: number
+   open: boolean
+   onAnswer: (question: EventRatingWithType) => void
 }
 
 export const FeedbackQuestionCard = ({
@@ -58,10 +69,10 @@ export const FeedbackQuestionCard = ({
    questionNumber,
    open,
    onAnswer,
-}) => {
+}: FeedbackQuestionCardProps) => {
    const { livestreamId, agoraUserId } = useStreamingContext()
    const { userData } = useAuth()
-   const QuestionAction = QuestionsComponents[question?.type] || <></>
+   const QuestionAction = QuestionsComponents[question.type]
 
    const handleClose = () => {
       try {
