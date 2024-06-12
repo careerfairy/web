@@ -1,3 +1,4 @@
+import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { useAuth } from "HOCs/AuthProvider"
 import { sparkService } from "data/firebase/SparksService"
 import useSWR from "swr"
@@ -28,7 +29,7 @@ export const useUserSparks = () => {
             userId: authenticatedUser.email || null,
          })
 
-         return sparks
+         return sparks.map(SparkPresenter.toFirebaseObject)
       },
       {
          ...reducedRemoteCallsOptions,

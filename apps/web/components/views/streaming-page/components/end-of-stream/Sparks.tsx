@@ -1,20 +1,17 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { Skeleton } from "@mui/material"
+import { Box, Skeleton } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useUserSparks } from "components/custom-hook/spark/useUserSparks"
-import {
-   useStreamIsLandscape,
-   useStreamIsMobile,
-} from "components/custom-hook/streaming"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import {
    GenericCarousel,
+   GenericCarouselProps,
    useGenericCarousel,
 } from "components/views/common/carousels/GenericCarousel"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
-import SparkCarouselCardSkeleton from "components/views/sparks/components/spark-card/SparkCarouselCardSkeleton"
-import useEmblaCarousel from "embla-carousel-react/components/useEmblaCarousel"
+import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
-import { ReactNode } from "react"
+import React from "react"
 import { sxStyles } from "types/commonTypes"
 import { EndOfStreamContainer } from "./Container"
 import { Heading } from "./Heading"
@@ -26,23 +23,32 @@ const styles = sxStyles({
    noRightPadding: {
       pr: 0,
    },
-   showCardBoxShadows: {
-      pb: 0.5,
-      mb: -0.5,
-      px: 0.2,
-      mx: -0.2,
+   sparkCardWrapper: {
+      position: "relative",
+      width: "100%",
+      paddingTop: "145.23%",
+      "& > *": {
+         position: "absolute !important",
+         top: 0,
+         right: 0,
+         bottom: 0,
+         left: 0,
+      },
+   },
+   skeleton: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 3,
    },
 })
 
-export const Streams = () => {
+export const Sparks = () => {
    return (
       <SuspenseWithBoundary fallback={<Loader />}>
          <Content />
       </SuspenseWithBoundary>
    )
 }
-
-const plugins = [WheelGesturesPlugin()]
 
 const Content = () => {
    const { data: sparks } = useUserSparks()
@@ -64,15 +70,16 @@ const Content = () => {
 }
 
 type ResponsiveCarouselProps = {
-   children: ReactNode
+   children: GenericCarouselProps["children"]
    disableSwipe?: boolean
 }
+
+const plugins = [WheelGesturesPlugin()]
+
 const ResponsiveCarousel = ({
    children,
    disableSwipe,
 }: ResponsiveCarouselProps) => {
-   const streamIsLandscape = useStreamIsLandscape()
-
    const streamIsMobile = useStreamIsMobile()
 
    const [emblaRef, emblaApi] = useEmblaCarousel(
@@ -82,16 +89,24 @@ const ResponsiveCarousel = ({
       plugins
    )
 
+   const gap = streamIsMobile ? 12 : 16
+   const slideWidth = (streamIsMobile ? 241 : 272) + gap
+
    return (
       <GenericCarousel
-         slideWidth={
-            streamIsLandscape ? "360px" : streamIsMobile ? "323px" : "33.3%"
-         }
-         gap={streamIsMobile ? "12px" : "16px"}
+         gap={`${gap}px`}
          emblaRef={emblaRef}
          emblaApi={emblaApi}
+         preventEdgeTouch
       >
-         {children}
+         {React.Children.map(children, (child) => (
+            <GenericCarousel.Slide
+               slideWidth={`${slideWidth}px`}
+               key={child.key}
+            >
+               {child}
+            </GenericCarousel.Slide>
+         ))}
       </GenericCarousel>
    )
 }
@@ -100,9 +115,22 @@ type SparkCardProps = {
    spark: Spark
 }
 const SparkCard = ({ spark }: SparkCardProps) => {
-   const emblaApi = useGenericCarousel()
+   const { emblaApi } = useGenericCarousel()
    return (
-      <SparkCarouselCard spark={spark} onGoNext={() => emblaApi.scrollNext()} />
+      <Box sx={styles.sparkCardWrapper}>
+         <SparkCarouselCard
+            spark={spark}
+            onGoNext={() => emblaApi.scrollNext()}
+         />
+      </Box>
+   )
+}
+
+const SparkCardSkeleton = () => {
+   return (
+      <Box sx={styles.sparkCardWrapper}>
+         <Skeleton sx={styles.skeleton} variant="rectangular" />
+      </Box>
    )
 }
 
@@ -113,9 +141,10 @@ const Loader = () => {
             <Skeleton width={280} />
          </Heading>
          <ResponsiveCarousel disableSwipe>
-            <SparkCarouselCardSkeleton />
-            <SparkCarouselCardSkeleton />
-            <SparkCarouselCardSkeleton />
+            <SparkCardSkeleton />
+            <SparkCardSkeleton />
+            <SparkCardSkeleton />
+            <SparkCardSkeleton />
          </ResponsiveCarousel>
       </EndOfStreamContainer>
    )
