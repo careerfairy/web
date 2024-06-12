@@ -43,6 +43,11 @@ Sentry.init({
       // Default sample rate for all others (replaces tracesSampleRate)
       return 0.05
    },
+
+   integrations: isDisabled() ? [] : [Sentry.replayIntegration()],
+
+   // Session Replay
+   replaysOnErrorSampleRate: isDisabled() ? 0 : 1.0, // Record all errors replay
 })
 
 const isDisabled = () => {
