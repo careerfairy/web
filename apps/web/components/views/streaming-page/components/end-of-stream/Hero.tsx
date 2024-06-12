@@ -15,7 +15,7 @@ const styles = sxStyles({
       textAlign: "center",
    },
    marginDesktop: {
-      mt: 11.25,
+      mt: 7.25,
       mb: 8.75,
    },
    marginTablet: {
@@ -73,16 +73,19 @@ export const Hero = () => {
          maxWidth="sm"
          sx={[
             styles.root,
-            streamIsLandscape && styles.marginTablet,
-            streamIsMobile ? styles.marginMobile : styles.marginDesktop,
+            streamIsLandscape
+               ? styles.marginTablet
+               : streamIsMobile
+               ? styles.marginMobile
+               : styles.marginDesktop,
          ]}
       >
          <Grow in timeout={1000}>
             <Image
                src="/illustrations/rocket-green.png"
                alt="rocket"
-               width={streamIsMobile ? 95 : 128}
-               height={streamIsMobile ? 103 : 139}
+               width={streamIsMobile ? 95 : 128 * 0.7}
+               height={streamIsMobile ? 103 : 139 * 0.7}
             />
          </Grow>
          <Box height={getRocketGutter(streamIsLandscape, streamIsMobile)} />
