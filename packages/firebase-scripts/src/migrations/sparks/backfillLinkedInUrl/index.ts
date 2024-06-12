@@ -1,6 +1,6 @@
 import { Creator } from "@careerfairy/shared-lib/src/groups/creators"
 import * as cliProgress from "cli-progress"
-import { BulkWriter, Timestamp } from "firebase-admin/firestore"
+import { BulkWriter } from "firebase-admin/firestore"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { groupRepo } from "../../../repositories"
@@ -114,7 +114,6 @@ const backfillLinkedInUrl = async (
                ...spark.creator,
                linkedInUrl: creatorsMap.get(spark.creator.id).linkedInUrl,
             },
-            lastModifiedByScript: Timestamp.fromMillis(Date.now()),
          })
          .then(() => handleBulkWriterSuccess(counter))
          .catch((error) => {
