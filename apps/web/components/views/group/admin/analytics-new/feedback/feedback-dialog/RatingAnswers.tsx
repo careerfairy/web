@@ -38,7 +38,11 @@ export const RatingAnswers: FC<FeedbackAnswersContentProps> = ({
                      spacing={1}
                   >
                      <Typography fontWeight={600} variant="body1">
-                        {censorEmail(voter.user.userEmail)}
+                        {censorEmail(
+                           voter.user?.userEmail
+                              ? voter.user?.userEmail
+                              : voter.id
+                        )}
                      </Typography>
                      <StyledRating
                         value={normalizeRating(feedbackQuestion, voter)}

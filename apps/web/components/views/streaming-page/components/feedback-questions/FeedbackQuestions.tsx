@@ -25,7 +25,7 @@ export const FeedbackQuestions = () => {
    const hasStarted = useHasStarted()
    const hasEnded = useHasEnded()
    const [minutesPassed, setMinutesPassed] = useState(
-      DateUtil.getMinutesPassed(new Date(startedAt))
+      hasStarted ? DateUtil.getMinutesPassed(new Date(startedAt)) : 0
    )
    /** The queue of questions that will show up to the user */
    const [activeQuestions, setActiveQuestions] = useState<FeedbackQuestion[]>(
@@ -81,7 +81,7 @@ export const FeedbackQuestions = () => {
                         agoraUserId
                      )
 
-                  // save answer data to avoid fetching it again
+                  // Save answer data to avoid fetching it again
                   markAsAnswered(question)
 
                   return !hasAnswered
