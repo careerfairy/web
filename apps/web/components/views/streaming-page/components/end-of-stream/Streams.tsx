@@ -9,11 +9,14 @@ import {
 } from "components/custom-hook/streaming"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import Link from "components/views/common/Link"
-import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
+import {
+   GenericCarousel,
+   GenericCarouselProps,
+} from "components/views/common/carousels/GenericCarousel"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
-import { ReactNode } from "react"
+import React from "react"
 import { sxStyles } from "types/commonTypes"
 import { EndOfStreamContainer } from "./Container"
 import { Heading } from "./Heading"
@@ -108,7 +111,7 @@ const Content = () => {
 }
 
 type ResponsiveCarouselProps = {
-   children: ReactNode
+   children: GenericCarouselProps["children"]
    disableSwipe?: boolean
 }
 const ResponsiveCarousel = ({
@@ -126,17 +129,24 @@ const ResponsiveCarousel = ({
       plugins
    )
 
+   const slideWidth = streamIsLandscape
+      ? "360px"
+      : streamIsMobile
+      ? "323px"
+      : "33.3%"
+
    return (
       <GenericCarousel
-         slideWidth={
-            streamIsLandscape ? "360px" : streamIsMobile ? "323px" : "33.3%"
-         }
          gap={streamIsMobile ? "12px" : "16px"}
          sx={styles.showCardBoxShadows}
          emblaRef={emblaRef}
          emblaApi={emblaApi}
       >
-         {children}
+         {React.Children.map(children, (child) => (
+            <GenericCarousel.Slide slideWidth={slideWidth}>
+               {child}
+            </GenericCarousel.Slide>
+         ))}
       </GenericCarousel>
    )
 }
