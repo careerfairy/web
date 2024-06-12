@@ -222,6 +222,8 @@ type EventPreviewCardProps = {
    // If true, the chip labels will be hidden
    hideChipLabels?: boolean
    disableClick?: boolean
+   /* Overrides the default Link click behavior of the card */
+   onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
 }
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (
@@ -237,6 +239,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          bottomElement,
          hideChipLabels,
          disableClick,
+         onCardClick,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -339,11 +342,16 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          [startDate]
       )
 
-      const handleDetailsClick = useCallback(() => {
-         if (isOnMarketingLandingPage) {
-            setSelectedEventId(event?.id)
-         }
-      }, [event?.id, isOnMarketingLandingPage, setSelectedEventId])
+      const handleDetailsClick = useCallback(
+         (e: React.MouseEvent<HTMLElement>) => {
+            if (isOnMarketingLandingPage) {
+               setSelectedEventId(event?.id)
+            }
+
+            onCardClick?.(e)
+         },
+         [event?.id, isOnMarketingLandingPage, onCardClick, setSelectedEventId]
+      )
 
       const isLive = useMemo(
          () => event?.hasStarted && !isPast,
@@ -398,7 +406,9 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          router,
       ])
 
-      const Wrapper = event ? Link : Fragment
+      const isLink = event && !onCardClick
+
+      const Wrapper = isLink ? Link : Fragment
 
       return (
          <>
@@ -414,7 +424,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                })}
             >
                <CardActionArea
-                  component={event ? "a" : "div"}
+                  component={isLink ? "a" : "div"}
                   sx={[event && styles.cursorPointer, styles.cardWrapper]}
                   ref={trackImpressionsRef}
                   target={isInIframe() ? "_blank" : undefined}
