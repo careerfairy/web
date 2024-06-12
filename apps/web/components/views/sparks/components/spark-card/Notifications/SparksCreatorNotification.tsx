@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { Linkedin } from "react-feather"
 import { useSelector } from "react-redux"
 import {
+   activeSparkSelector,
    anonymousUserCountryCodeSelector,
    progressPercentageSelector,
 } from "store/selectors/sparksFeedSelectors"
@@ -61,8 +62,12 @@ type Props = {
 
 export const SparksCreatorNotification = ({ spark }: Props) => {
    const { userData } = useAuth()
-   const [showNotification, setShowNotification] = useState(false)
+
+   const [hasUserClickedAnyButton, setHasUserClickedAnyButton] = useState(false)
+   const [playingCriteriaHasBeenMet, setPlayingCriteriaHasBeenMet] =
+      useState(false)
    const { trackEvent } = useSparksFeedTracker()
+   const activeSpark = useSelector(activeSparkSelector)
    const percentageOfVideoPlayed = useSelector(progressPercentageSelector)
    const anonymousUserCountryCode = useSelector(
       anonymousUserCountryCodeSelector
@@ -71,10 +76,11 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
    const discoverHandleClick = useCallback(() => {
       window.open(spark.creator.linkedInUrl, "_blank")
       trackEvent(SparkEventActions.Click_ReachOut_LinkedIn)
+      setHasUserClickedAnyButton(true)
    }, [spark.creator.linkedInUrl, trackEvent])
 
    const cancelHandleClick = useCallback((ev) => {
-      setShowNotification(false)
+      setHasUserClickedAnyButton(true)
       ev.preventDefault()
       ev.stopPropagation()
    }, [])
@@ -82,6 +88,7 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
    const userMeetsTargetCriteria = useMemo(() => {
       const userCountryCode =
          anonymousUserCountryCode || userData?.universityCountryCode
+
       const isTargetedUser =
          spark.group.targetedCountries?.filter(
             (country) => country.id === userCountryCode
@@ -96,14 +103,22 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
 
    useEffect(() => {
       if (
+         !hasUserClickedAnyButton &&
+         activeSpark &&
+         activeSpark.id === spark?.id &&
          percentageOfVideoPlayed >=
-         SPARK_CONSTANTS.PLAYED_PERCENTAGE_TO_SHOW_LINKEDIN_NOTIFICATION
+            SPARK_CONSTANTS.PLAYED_PERCENTAGE_TO_SHOW_LINKEDIN_NOTIFICATION
       ) {
-         setShowNotification(true)
+         setPlayingCriteriaHasBeenMet(true)
       }
 
-      return () => setShowNotification(false)
-   }, [percentageOfVideoPlayed])
+      return () => setPlayingCriteriaHasBeenMet(false)
+   }, [
+      activeSpark,
+      hasUserClickedAnyButton,
+      percentageOfVideoPlayed,
+      spark?.id,
+   ])
 
    if (
       spark.creator.linkedInUrl === "" ||
@@ -115,7 +130,9 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
 
    return (
       <SparksPopUpBase
-         showNotification={showNotification}
+         showNotification={Boolean(
+            userMeetsTargetCriteria && playingCriteriaHasBeenMet
+         )}
          pictureUrl={spark.creator.avatarUrl}
          message={<NotificationMessage name={spark.creator.firstName} />}
          cancelHandleClick={cancelHandleClick}
