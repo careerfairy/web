@@ -148,4 +148,5 @@ export const SparkInteractionSources = {
    Livestream_Registration_Flow: "livestream_registration_flow",
    Company_Page: "company_page",
    New_Spark_Notification: "new_spark_notification",
+   Livestream_End_Screen: "Livestream_End_Screen",
 } as const
