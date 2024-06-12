@@ -67,7 +67,7 @@ const LoggedOutNotificationMessage = ({ name }: NotificationMessageProps) => {
          Want to ask
          <Typography
             fontSize={"inherit"}
-            color={LINKEDIN_COLOR}
+            color={"primary"}
             display={"inline"}
             fontWeight={600}
          >
