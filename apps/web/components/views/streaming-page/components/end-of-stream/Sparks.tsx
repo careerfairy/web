@@ -60,7 +60,7 @@ const Content = () => {
       >
          <Heading>Discover more interesting topic with Sparks!</Heading>
 
-         <ResponsiveCarousel disableSwipe={!streamIsMobile}>
+         <ResponsiveCarousel>
             {sparks.map((spark) => (
                <SparkCard key={spark.id} spark={spark} />
             ))}
