@@ -1,8 +1,10 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Box, Skeleton } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useUserSparks } from "components/custom-hook/spark/useUserSparks"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import {
    GenericCarousel,
    GenericCarouselProps,
@@ -120,6 +122,14 @@ const SparkCard = ({ spark }: SparkCardProps) => {
       <Box sx={styles.sparkCardWrapper}>
          <SparkCarouselCard
             spark={spark}
+            onClick={() =>
+               window.open(
+                  `${getBaseUrl()}/sparks/${spark.id}?interactionSource=${
+                     SparkInteractionSources.Livestream_End_Screen
+                  }`,
+                  "_blank"
+               )
+            }
             onGoNext={() => emblaApi.scrollNext()}
          />
       </Box>
