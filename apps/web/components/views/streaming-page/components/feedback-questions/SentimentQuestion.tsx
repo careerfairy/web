@@ -65,7 +65,7 @@ const Icon = ({ src, alt }: ImageProps) => {
 }
 
 const customIcons: {
-   [index: string]: {
+   [index: number]: {
       icon: React.ReactElement
    }
 } = {
