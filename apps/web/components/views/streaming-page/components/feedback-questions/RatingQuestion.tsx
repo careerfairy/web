@@ -84,8 +84,8 @@ const RatingQuestion = ({
    )
 }
 
-const ButtonContainer = ({ value, ...rest }: IconContainerProps) => {
-   return <span {...rest}>{value}</span>
+const ButtonContainer = ({ value, ...props }: IconContainerProps) => {
+   return <span {...props}>{value}</span>
 }
 
 export default RatingQuestion
