@@ -10,7 +10,6 @@ import { useAuth } from "HOCs/AuthProvider"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
-import { FeedbackQuestions } from "./components/feedback-questions/FeedbackQuestions"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/viewer/WaitingRoom"
 
@@ -106,6 +105,15 @@ const StreamSetupWidget = dynamic(
 )
 const SettingsMenu = dynamic(
    () => import("./components/SettingsMenu").then((mod) => mod.SettingsMenu),
+   {
+      ssr: false,
+   }
+)
+const FeedbackQuestions = dynamic(
+   () =>
+      import("./components/feedback-questions/FeedbackQuestions").then(
+         (mod) => mod.FeedbackQuestions
+      ),
    {
       ssr: false,
    }

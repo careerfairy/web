@@ -62,7 +62,7 @@ const RatingQuestion = ({
    onChange,
    value,
    name,
-   ...rest
+   ...props
 }: RatingProps) => {
    return (
       <Box sx={styles.ratingWrapper}>
@@ -74,7 +74,7 @@ const RatingQuestion = ({
             max={5}
             onChange={onChange}
             IconContainerComponent={ButtonContainer}
-            {...rest}
+            {...props}
          />
          <Box sx={styles.subText}>
             <Typography variant="small">Not satisfied</Typography>
