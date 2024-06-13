@@ -163,6 +163,14 @@ const csp = {
       "*.youtube.com",
       "*.googleapis.com",
    ],
+   "worker-src": [
+      "'self'", // For Sentry Replay
+      "blob:", // For Sentry Replay
+   ],
+   "child-src": [
+      "'self'", // For Sentry Replay
+      "blob:", // For Sentry Replay
+   ],
 }
 
 if (notProduction) {
