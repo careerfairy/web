@@ -1,7 +1,7 @@
 /* eslint-disable no-var */
-import LocalStorageUtil from "./LocalStorageUtil"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import * as Sentry from "@sentry/nextjs"
+import LocalStorageUtil from "./LocalStorageUtil"
 
 export function getRandom(arr, n) {
    var result = new Array(n),
@@ -246,6 +246,10 @@ export const shouldUseEmulators = () => {
  * @returns the workflow id or the dev name or "unknown" if neither is set
  */
 export const getWorkflowId = (): string => {
+   console.log("🚀 - getWorkflowId", {
+      devName: process.env.NEXT_PUBLIC_DEV_NAME,
+      workflowId: process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
+   })
    return (
       process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
       process.env.NEXT_PUBLIC_DEV_NAME ||
