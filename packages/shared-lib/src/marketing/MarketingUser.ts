@@ -1,5 +1,5 @@
+import firebase from "firebase/compat/app"
 import { Identifiable, UTMParams } from "../commonTypes"
-import firebase from "firebase/compat"
 
 /**
  * Firestore document

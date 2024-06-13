@@ -1,3 +1,8 @@
+import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
+import CelebrationIcon from "@mui/icons-material/Celebration"
+import CheckIcon from "@mui/icons-material/Check"
+import CircleIcon from "@mui/icons-material/Circle"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import {
    List,
    ListItem,
@@ -10,23 +15,18 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
-import React, { useCallback, useState } from "react"
-import { alpha, styled } from "@mui/material/styles"
+import Box from "@mui/material/Box"
+import IconButton from "@mui/material/IconButton"
 import StepConnector, {
    stepConnectorClasses,
 } from "@mui/material/StepConnector"
-import IconButton from "@mui/material/IconButton"
+import { alpha, styled } from "@mui/material/styles"
 import { createStyles } from "@mui/styles"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
-import Box from "@mui/material/Box"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
-import CircleIcon from "@mui/icons-material/Circle"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import CheckIcon from "@mui/icons-material/Check"
-import CelebrationIcon from "@mui/icons-material/Celebration"
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import useBadgeStepProgress from "../../../custom-hook/useBadgeStepProgress"
 import CareerCoinIcon from "components/views/common/CareerCoinIcon"
+import { useCallback, useState } from "react"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import useBadgeStepProgress from "../../../custom-hook/useBadgeStepProgress"
 
 const styles = createStyles({
    step: {
@@ -106,6 +106,7 @@ export const BadgeStepper = ({ badge }: { badge: Badge }) => {
                sx={styles.step}
             >
                <StepLabel
+                  // @ts-ignore
                   StepIconComponent={IconContainer}
                   StepIconProps={
                      {
