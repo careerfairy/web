@@ -246,10 +246,6 @@ export const shouldUseEmulators = () => {
  * @returns the workflow id or the dev name or "unknown" if neither is set
  */
 export const getWorkflowId = (): string => {
-   console.log("🚀 - getWorkflowId", {
-      devName: process.env.NEXT_PUBLIC_DEV_NAME,
-      workflowId: process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
-   })
    return (
       process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
       process.env.NEXT_PUBLIC_DEV_NAME ||
