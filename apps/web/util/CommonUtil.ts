@@ -1,7 +1,7 @@
 /* eslint-disable no-var */
-import LocalStorageUtil from "./LocalStorageUtil"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import * as Sentry from "@sentry/nextjs"
+import LocalStorageUtil from "./LocalStorageUtil"
 
 export function getRandom(arr, n) {
    var result = new Array(n),

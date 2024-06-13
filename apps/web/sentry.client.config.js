@@ -7,6 +7,10 @@ import { isConsentEnabled } from "./util/ConsentUtils"
 
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
 
+const isDisabled = () => {
+   return !isConsentEnabled("Sentry Error Monitoring")
+}
+
 Sentry.init({
    dsn:
       SENTRY_DSN ||
@@ -43,8 +47,9 @@ Sentry.init({
       // Default sample rate for all others (replaces tracesSampleRate)
       return 0.05
    },
-})
 
-const isDisabled = () => {
-   return !isConsentEnabled("Sentry Error Monitoring")
-}
+   integrations: isDisabled() ? [] : [Sentry.replayIntegration()],
+
+   // Session Replay
+   replaysOnErrorSampleRate: isDisabled() ? 0 : 1.0, // Record all errors replay
+})
