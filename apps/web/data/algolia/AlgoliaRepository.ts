@@ -93,6 +93,11 @@ const handleSearch = <AlgoliaResponseType>(
    filters: string,
    page: number
 ) => {
+   console.log("🚀 - handleSearch", {
+      isTestEnvironment: isTestEnvironment(),
+      workflowId: getWorkflowId(),
+      filters,
+   })
    return index.search<AlgoliaResponseType>(query, {
       filters:
          (isTestEnvironment() ? `workflowId:${getWorkflowId()} AND ` : "") +
