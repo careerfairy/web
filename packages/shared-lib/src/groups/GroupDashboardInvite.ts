@@ -1,7 +1,7 @@
-import firebase from "firebase/compat"
-import Timestamp = firebase.firestore.Timestamp
+import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
 import { GROUP_DASHBOARD_ROLE } from "./index"
+import Timestamp = firebase.firestore.Timestamp
 
 // Collection groupInvites/[inviteId]
 export interface GroupDashboardInvite extends Identifiable {

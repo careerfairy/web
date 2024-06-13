@@ -1,4 +1,6 @@
-import React, { Dispatch, memo, useCallback, useEffect, useState } from "react"
+import CheckBoxIcon from "@mui/icons-material/CheckBox"
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
+import ChipDeleteIcon from "@mui/icons-material/HighlightOffRounded"
 import {
    Autocomplete,
    Box,
@@ -8,16 +10,19 @@ import {
    FormControl,
    TextField,
 } from "@mui/material"
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
-import CheckBoxIcon from "@mui/icons-material/CheckBox"
+import { alpha, styled } from "@mui/material/styles"
+import { makeStyles } from "@mui/styles"
+import {
+   Dispatch,
+   ReactNode,
+   memo,
+   useCallback,
+   useEffect,
+   useState,
+} from "react"
 import isEqual from "react-fast-compare"
 import { IColors } from "../../../types/commonTypes"
-import { ReactJSXElement } from "@emotion/react/types/jsx-namespace"
-import { styled } from "@mui/material/styles"
 import { StyledCheckbox } from "../group/admin/common/inputs"
-import { alpha } from "@mui/material/styles"
-import ChipDeleteIcon from "@mui/icons-material/HighlightOffRounded"
-import { makeStyles } from "@mui/styles"
 import BrandedTooltip from "./tooltips/BrandedTooltip"
 
 const useStyles = makeStyles({
@@ -39,24 +44,39 @@ const maxChipCount = 3
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
 
+const defaultSelectedItems = []
+const defaultOnSelectItems = () => {}
+const defaultInputProps = {}
+const defaultChipProps = {}
+const defaultExtraOptions = {}
+const defaultSetFieldValue = () => {}
+const defaultGetLabelFn = (option) => option.name
+const defaultGetListLabelFn = (option) => option.name
+const defaultGetValueFn = (option) => option.id
+const defaultGetKeyFn = (option) => option.id
+const defaultGetGroupByFn = () => ""
+const defaultDisabledValues = []
+const defaultGetDisabledFn = defaultGetValueFn
+const defaultHandleBlur = () => {}
+
 const MultiListSelect = ({
    inputName,
    allValues,
-   selectedItems = [],
-   onSelectItems = () => {},
+   selectedItems = defaultSelectedItems,
+   onSelectItems = defaultOnSelectItems,
    disabled = false,
-   getLabelFn = (option) => option.name, // displayed name
-   getListLabelFn = (option) => option.name, // display name in the option list
-   inputProps = {},
+   getLabelFn = defaultGetLabelFn, // displayed name
+   getListLabelFn = defaultGetListLabelFn, // display name in the option list
+   inputProps = defaultInputProps,
    isCheckbox = false, // Select items are checkboxes
    isChipUnderTextfield = false,
-   chipProps = {},
-   extraOptions = {}, // props to pass to autocomplete
-   setFieldValue = () => {}, // formik field
-   getValueFn = (option) => option.id, // field value
-   getKeyFn = (option) => option.id, // field id
-   getGroupByFn = () => "",
-   disabledValues = [],
+   chipProps = defaultChipProps,
+   extraOptions = defaultExtraOptions, // props to pass to autocomplete
+   setFieldValue = defaultSetFieldValue, // formik field
+   getValueFn = defaultGetValueFn, // field value
+   getKeyFn = defaultGetKeyFn, // field id
+   getGroupByFn = defaultGetGroupByFn,
+   disabledValues = defaultDisabledValues,
    limit = false,
    /**
     * Enables a "Select All" option
@@ -64,11 +84,11 @@ const MultiListSelect = ({
     */
    selectAllOption = null,
    checkboxColor = "primary",
-   getDisabledFn = getValueFn,
+   getDisabledFn = defaultGetDisabledFn,
    hasError = false,
    errorMessage = "",
    errorMessageClassName = "",
-   handleBlur = () => {},
+   handleBlur = defaultHandleBlur,
    useStyledTextfield = false,
    useStyledCheckbox = false,
    noColorOnSelect = false,
@@ -364,7 +384,7 @@ type Props = {
    selectedItems: any[]
    disabled?: boolean
    getLabelFn?: (obj: any) => string
-   getListLabelFn?: (obj: any) => string | ReactJSXElement
+   getListLabelFn?: (obj: any) => string | ReactNode
    getValueFn?: (obj: any) => string
    getKeyFn?: (obj: any) => string
    getGroupByFn?: (obj: any) => string
