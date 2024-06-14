@@ -1,8 +1,12 @@
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { LoadingButton } from "@mui/lab"
 import { Grid, Typography } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import { ControlledBrandedCheckBox } from "components/views/common/inputs/ControlledBrandedCheckbox"
+import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import { userRepo } from "data/RepositoryInstances"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
@@ -15,10 +19,6 @@ import { StudyDomainSelector } from "./StudyDomainSelector"
 import { UniversityCountrySelector } from "./UniversityCountrySelector"
 import { UniversitySelector } from "./UniversitySelector"
 import { PersonalInfoFormValues, personalInfoSchema } from "./schema"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
-import { ControlledBrandedCheckBox } from "components/views/common/inputs/ControlledBrandedCheckbox"
-import { UserData } from "@careerfairy/shared-lib/users"
 
 const styles = sxStyles({
    submit: {
@@ -57,7 +57,7 @@ const PersonalInfo = ({ userData }: Props) => {
             value: userData?.university?.name || "",
          },
          universityCountryCode: userData?.universityCountryCode || "",
-         unsubscribed: userData?.unsubscribed || false,
+         unsubscribed: !userData?.unsubscribed || false,
          fieldOfStudy: {
             id: userData?.fieldOfStudy?.id || "",
             value: userData?.fieldOfStudy?.name || "",
@@ -224,7 +224,7 @@ const SubmitButton = () => {
                   : {}),
             },
             universityCountryCode: data.universityCountryCode,
-            unsubscribed: data.unsubscribed,
+            unsubscribed: !data.unsubscribed,
          })
          reset(data)
          successNotification("Your profile has been updated!")
