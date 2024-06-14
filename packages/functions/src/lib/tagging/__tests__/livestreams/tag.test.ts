@@ -8,6 +8,24 @@ import {
 } from "../../testHelpers"
 import { getCustomJobsByLinkedContentIds } from "../../utils/utils"
 
+/**
+ * Test Overview
+ *
+ * These tests are to cover most scenarios when synchronizing tags from a customJob to its linked content, in this case
+ * Livestreams, where the consistency of the data must be ensured taking into consideration other customJobs which might be linked
+ * to the Livestreams as well as prevent tag duplication and other modification scenarios.
+ *
+ *
+ * With the way function syncCustomJobLinkedContentTags was implemented in a generic way, it leaves the burden
+ * of determining customJob links (to Livestreams in this case) via async functions passed as parameters, and during these unit tests
+ * there will be no connection to the database, meaning the relationships must be stored in memory, reason why the global constants below are used
+ * during various tests.
+ *
+ * Special notice to 'allCustomJobs', as the syncCustomJobLinkedContentTags function receives a lambda which checks this variable
+ * for customJobs by ids, meaning if it is not present in this variable the syncCustomJobLinkedContentTags function will not behave as expected
+ * since it will not have a view of all existing jobs. Locally created customJobs or Livestreams can be added to this list, see example in
+ * test 'Should add live stream tags if link is added to customJob'.
+ */
 const getId = <T extends Identifiable>(data: T) => data.id
 
 const eventsWithoutTags = createNewLivestreamsData(2)

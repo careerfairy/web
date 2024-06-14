@@ -9,6 +9,27 @@ import _ from "lodash"
 import { getChangeTypes } from "src/util"
 // TODO: Update documentation
 
+/**
+ * Synchronizes all of linked content tags (@field linkedCustomJobsTagIds of @type LivestreamEvent | Spark) related to a customJob (livestream, sparks, or future content).
+ * Based on an operation on a customJob (create, update or delete), determines which linked content needs updating of @field linkedCustomJobsTagIds, taking into consideration
+ * its existing relationship with other customJobs and their tags.
+ *
+ *
+ * As linked content when associated with a customJob can be set in different fields (currently "livestreams" and "sparks") and these will defer
+ * in types, the parameters linkedContentIdsGetter and customJobsByLinkedContentFetcher, allows the generic retrieval of the content ids and also
+ * allows fetching of other customJobs related to said content which is then used for calculating the latest tags based on all customJobs for the same
+ * content.
+ * @param afterJob customJob after a change, when the operation is delete it will be null. Delete check is made first and the @param afterJob is not used
+ * in that scenario. This parameter can also be null when local testing, as initially firefoo creates an empty object.
+ * @param beforeJob customJob before a change, during create it can be null and the code is ready to deal with null cases for the @param beforeJob.
+ * @param changeType Type of change being made on a customJob (create, update or delete).
+ * @param linkedContentIdsGetter Function which allows to get the ids of the linked content.
+ * @param linkedContentFetcher Function which allows to fetch the linked content by providing a list of content ids.
+ * @param customJobsByLinkedContentFetcher Functions which allows to fetch all of customJobs associated to a content.
+ * @returns LinkedContentType Generic type with the content having the @field linkedCustomJobsTagIds updated with the
+ * latest data after the customJob has been modified. This data is ready to be saved and only modifies linkedCustomJobsTagIds.
+ * This can be @type LivestreamEvent[] or Spark[].
+ */
 export const syncCustomJobLinkedContentTags = async <
    LinkedContentType extends LivestreamEvent | Spark
 >(
@@ -87,7 +108,7 @@ export const syncCustomJobLinkedContentTags = async <
                // Forces refresh of tags based on latest data
                const contentTagsExcludingCurrentJob =
                   contentCustomJobsTagMap[contentDoc.id]
-               // Always remove duplicates as adding or removing can produce duplicates
+
                const tags = contentTagsExcludingCurrentJob.concat(
                   afterJob.businessFunctionsTagIds ?? []
                )
