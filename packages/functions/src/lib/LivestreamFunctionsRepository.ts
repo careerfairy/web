@@ -707,6 +707,9 @@ export class LivestreamFunctionsRepository
                .withConverter(createCompatGenericConverter<LivestreamEvent>())
                .doc(event.id)
 
+            functions.logger.log(
+               `live stream ${event.id} tags after sync: ${event.linkedCustomJobsTagIds}`
+            )
             return ref.update({
                linkedCustomJobsTagIds: event.linkedCustomJobsTagIds,
             })

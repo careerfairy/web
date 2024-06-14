@@ -1049,6 +1049,10 @@ export class SparkFunctionsRepository
                .withConverter(createGenericConverter<Spark>())
                .doc(spark.id)
 
+            functions.logger.log(
+               `live stream ${spark.id} tags after sync: ${spark.linkedCustomJobsTagIds}`
+            )
+
             return ref.update({
                linkedCustomJobsTagIds: spark.linkedCustomJobsTagIds,
             })
