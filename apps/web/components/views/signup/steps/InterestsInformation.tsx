@@ -158,6 +158,7 @@ const UserInterestTagsInformation = ({
             tagIds={Object.keys(userTags)}
             tagsMap={userTags}
             setUserTags={setUserTags}
+            data-testid="registration-interests-information-step"
          />
       </>
    )
@@ -176,12 +177,7 @@ const TagInterests = ({
    setUserTags: setUserTags,
 }: TagInterestsProps) => {
    return (
-      <Grid
-         container
-         spacing={2}
-         justifyContent="center"
-         data-testid="registration-interests-information-step"
-      >
+      <Grid container spacing={2} justifyContent="center">
          <Grid container>
             <Typography sx={styles.inputLabel} variant="h5">
                {label}
