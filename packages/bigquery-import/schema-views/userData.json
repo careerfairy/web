@@ -41,14 +41,6 @@
          "type": "stringified_map"
       },
       {
-         "name": "businessFunctionsTagIds",
-         "type": "stringified_map"
-      },
-      {
-         "name": "contentTopicsTagIds",
-         "type": "stringified_map"
-      },
-      {
          "name": "groupIds",
          "type": "stringified_map"
       },
