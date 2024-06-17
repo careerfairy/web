@@ -1,9 +1,12 @@
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CircularProgress } from "@mui/material"
 import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import dynamic from "next/dynamic"
-import { useCallback, useMemo, useRef } from "react"
+import { FC, useCallback, useMemo, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
 import {
@@ -36,10 +39,10 @@ export enum JobDialogStepEnum {
 
 const styles = sxStyles({
    dialog: {
-      top: { xs: "70px", md: 0 },
+      top: { xs: "20dvh", md: 0 },
       borderRadius: 5,
    },
-   smallDialog: {
+   smallDeleteDialog: {
       maxWidth: { md: 450 },
       top: { xs: "calc(100dvh - 320px)", md: 0 },
    },
@@ -82,7 +85,15 @@ const getViews = (quillInputRef, job?: CustomJob) =>
       },
    ] as const
 
-const JobDialog = () => {
+type Props = {
+   afterCreateCustomJob?: (job: PublicCustomJob) => void
+   afterUpdateCustomJob?: (job: PublicCustomJob) => void
+}
+
+const JobDialog: FC<Props> = ({
+   afterCreateCustomJob,
+   afterUpdateCustomJob,
+}) => {
    const { handleClose } = useStepper<JobDialogStep>()
    const { group } = useGroupFromState()
    const dispatch = useDispatch()
@@ -99,7 +110,7 @@ const JobDialog = () => {
       handleClose()
    }, [dispatch, handleClose])
 
-   const currentStep = useMemo(() => {
+   const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
          return JobDialogStepEnum.DELETE_JOB
       }
@@ -112,7 +123,12 @@ const JobDialog = () => {
       <SuspenseWithBoundary fallback={<CircularProgress />}>
          <JobFetchWrapper jobId={selectedJobId}>
             {(job) => (
-               <JobFormikProvider job={job} quillInputRef={quillInputRef}>
+               <JobFormikProvider
+                  job={job}
+                  quillInputRef={quillInputRef}
+                  afterCreateCustomJob={afterCreateCustomJob}
+                  afterUpdateCustomJob={afterUpdateCustomJob}
+               >
                   <SteppedDialog
                      key={
                         isJobFormDialogOpen || isDeleteJobDialogOpen
@@ -123,11 +139,11 @@ const JobDialog = () => {
                      handleClose={handleCloseDialog}
                      open={isJobFormDialogOpen || isDeleteJobDialogOpen}
                      views={getViews(quillInputRef, job)}
-                     initialStep={currentStep}
+                     initialStep={initialStep}
                      transition={SlideUpTransition}
                      sx={[
                         styles.dialog,
-                        isDeleteJobDialogOpen ? styles.smallDialog : null,
+                        isDeleteJobDialogOpen ? styles.smallDeleteDialog : null,
                         isDeleteJobDialogWithLinkedLivestreamsOpen
                            ? styles.jobWithList
                            : null,

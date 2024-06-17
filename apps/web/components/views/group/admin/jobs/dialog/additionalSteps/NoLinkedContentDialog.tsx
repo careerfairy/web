@@ -1,5 +1,7 @@
 import { Stack } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { AlertCircle } from "react-feather"
+import { JobDialogStepEnum } from ".."
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import SteppedDialog, {
    useStepper,
@@ -34,10 +36,23 @@ const styles = sxStyles({
       mt: 4,
       width: "350px",
    },
+   mobileDialog: {
+      top: "calc(100dvh - 500px)",
+   },
 })
 
 const NoLinkedContentDialog = () => {
-   const { handleClose } = useStepper()
+   const { handleClose, currentStep } = useStepper()
+   const isMobile = useIsMobile()
+
+   const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
+
+   if (dialogElement) {
+      dialogElement.style.top =
+         isMobile && currentStep === JobDialogStepEnum.NO_LINKED_CONTENT
+            ? styles.mobileDialog.top
+            : "revert-layer"
+   }
 
    return (
       <SteppedDialog.Container
