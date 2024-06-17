@@ -37,7 +37,7 @@ const InterestsInformation = () => {
    return (
       <ConditionalWrapper condition={Boolean(userData)}>
          <Stack
-            gap={"16px"}
+            gap={"32px"}
             direction={"column"}
             spacing={2}
             data-testid={"registration-interests-information-step"}
