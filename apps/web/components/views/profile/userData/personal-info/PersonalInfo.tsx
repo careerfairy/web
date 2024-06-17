@@ -154,6 +154,13 @@ const PersonalInfo = ({ userData }: Props) => {
                   name="levelOfStudy"
                />
             </Grid>
+            <Grid item xs={12} sm={6}>
+               <InterestsInformation
+                  gap="12px"
+                  businessFunctionsLabel="topics of interest"
+                  contentTopicsLabel="areas of interest"
+               />
+            </Grid>
             <Grid item xs={12}>
                <Typography sx={styles.subtitle} variant="h5">
                   Social
