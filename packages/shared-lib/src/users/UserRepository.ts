@@ -632,8 +632,8 @@ export class FirebaseUserRepository
          position,
          firstName,
          lastName,
-         businessFunctionsTagIds,
-         contentTopicsTagIds,
+         businessFunctionTagIds,
+         contentTopicTagIds,
       } = fields
 
       const genderToUpdate = gender ? { gender } : {}
@@ -658,11 +658,11 @@ export class FirebaseUserRepository
       const positionToUpdate = position ? { position } : {}
       const firstNameToUpdate = firstName ? { firstName } : {}
       const lastNameToUpdate = lastName ? { lastName } : {}
-      const businessFunctionsToUpdate = businessFunctionsTagIds
-         ? { businessFunctionsTagIds }
+      const businessFunctionsToUpdate = businessFunctionTagIds
+         ? { businessFunctionTagIds }
          : {}
-      const contentTopicsToUpdate = contentTopicsTagIds
-         ? { contentTopicsTagIds }
+      const contentTopicsToUpdate = contentTopicTagIds
+         ? { contentTopicTagIds }
          : {}
 
       const toUpdate = {
