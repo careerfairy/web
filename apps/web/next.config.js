@@ -72,6 +72,7 @@ const csp = {
       "https://js.stripe.com",
       "https://scripts.simpleanalyticscdn.com", // Google Ads services
       "https://www.googleadservices.com", // Google Ads services
+      "https://cdn.prod.website-files.com", // Webflow
    ],
    "style-src": [
       "'self'",
@@ -83,6 +84,7 @@ const csp = {
       "'unsafe-inline'",
       "client.crisp.chat",
       "https://assets-global.website-files.com",
+      "https://cdn.prod.website-files.com", // Webflow
    ],
    "connect-src": [
       "'self'",
@@ -162,6 +164,14 @@ const csp = {
       "careerfairy-e1fd9.firebaseapp.com",
       "*.youtube.com",
       "*.googleapis.com",
+   ],
+   "worker-src": [
+      "'self'", // For Sentry Replay
+      "blob:", // For Sentry Replay
+   ],
+   "child-src": [
+      "'self'", // For Sentry Replay
+      "blob:", // For Sentry Replay
    ],
 }
 
