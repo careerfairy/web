@@ -4,12 +4,10 @@ import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { LINKEDIN_COLOR } from "components/util/colors"
 import Link from "components/views/common/Link"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Linkedin } from "react-feather"
 import { useSelector } from "react-redux"
 import {
    activeSparkSelector,
@@ -17,7 +15,10 @@ import {
    progressPercentageSelector,
 } from "store/selectors/sparksFeedSelectors"
 import CreatorAvatar from "../../CreatorAvatar"
+import { LinkedInIcon } from "./LinkedInIcon"
 import { SparksPopUpBase } from "./SparksPopUpBase"
+
+const LINKEDIN_COLOR = "#3A70E2"
 
 const getSparksUtmParamsIfExist = (pathname: string) => {
    const isOnSparksFeed = pathname.includes("/sparks/[sparkId]")
@@ -81,12 +82,7 @@ const LoggedOutNotificationMessage = ({ name }: NotificationMessageProps) => {
 
 const LinkedInCta = (
    <Stack direction="row" alignItems="center" gap="12px">
-      <Linkedin
-         size={14}
-         fill="white"
-         strokeWidth={1}
-         style={{ marginTop: "-2px" }}
-      />
+      <LinkedInIcon width={14} height={14} sx={{ marginTop: "-2px" }} />
       Reach out
    </Stack>
 )
