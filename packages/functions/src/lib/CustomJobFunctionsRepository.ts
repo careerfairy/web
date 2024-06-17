@@ -13,6 +13,7 @@ import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import { livestreamsRepo, sparkRepo } from "src/api/repositories"
 import { Timestamp } from "../api/firestoreAdmin"
+import { livestreamsRepo, sparkRepo } from "../api/repositories"
 
 export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    /**
