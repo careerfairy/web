@@ -1,12 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close"
-import {
-   Box,
-   IconButton,
-   Snackbar,
-   SnackbarContent,
-   Stack,
-   Typography,
-} from "@mui/material"
+import { IconButton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import {
    EventRatingWithType,
@@ -20,18 +13,6 @@ import RatingQuestion from "./RatingQuestion"
 import SentimentQuestion from "./SentimentQuestion"
 
 const styles = sxStyles({
-   dialog: {
-      display: "inline-flex",
-      padding: 2,
-      flexDirection: "column",
-      alignItems: "flex-start",
-      gap: 1.5,
-      maxWidth: "356px",
-      borderRadius: "12px",
-      background: "white",
-      boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
-      color: (theme) => theme.palette.neutral[900],
-   },
    content: {
       display: "flex",
       flexDirection: "column",
@@ -60,14 +41,12 @@ export const QuestionsComponents = {
 type FeedbackQuestionCardProps = {
    question: EventRatingWithType
    questionNumber: number
-   open: boolean
    onAnswer: (question: EventRatingWithType) => void
 }
 
 export const FeedbackQuestionCard = ({
    question,
    questionNumber,
-   open,
    onAnswer,
 }: FeedbackQuestionCardProps) => {
    const { livestreamId, agoraUserId } = useStreamingContext()
@@ -93,7 +72,6 @@ export const FeedbackQuestionCard = ({
    }
 
    const handleSubmit = (event, value: number) => {
-      console.log(value)
       try {
          livestreamService.answerFeedbackQuestion(
             livestreamId,
@@ -113,31 +91,17 @@ export const FeedbackQuestionCard = ({
    }
 
    return (
-      <Snackbar key={question.id} open={open}>
-         <SnackbarContent
-            sx={styles.dialog}
-            message={
-               <Box>
-                  <Stack spacing={"20px"} sx={styles.content}>
-                     <Stack sx={styles.header}>
-                        <Typography variant="brandedH5" sx={styles.headerText}>
-                           Question {questionNumber}
-                        </Typography>
-                        <IconButton onClick={handleClose}>
-                           <CloseIcon />
-                        </IconButton>
-                     </Stack>
-                     <Typography variant="brandedBody">
-                        {question.question}
-                     </Typography>
-                     <QuestionAction
-                        name={question.id}
-                        onChange={handleSubmit}
-                     />
-                  </Stack>
-               </Box>
-            }
-         />
-      </Snackbar>
+      <Stack spacing={"20px"} sx={styles.content}>
+         <Stack sx={styles.header}>
+            <Typography variant="brandedH5" sx={styles.headerText}>
+               Question {questionNumber}
+            </Typography>
+            <IconButton onClick={handleClose}>
+               <CloseIcon />
+            </IconButton>
+         </Stack>
+         <Typography variant="brandedBody">{question.question}</Typography>
+         <QuestionAction name={question.id} onChange={handleSubmit} />
+      </Stack>
    )
 }

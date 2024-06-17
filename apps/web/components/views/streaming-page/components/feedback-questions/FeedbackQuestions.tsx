@@ -1,6 +1,7 @@
 import { useFeedbackQuestions } from "components/views/group/admin/events/detail/form/views/questions/useFeedbackQuestions"
 import { useCallback, useEffect, useState } from "react"
 
+import { Slide, SlideProps, Snackbar, SnackbarContent } from "@mui/material"
 import { EventRatingWithType } from "components/views/group/admin/events/detail/form/views/questions/commons"
 import { livestreamService } from "data/firebase/LivestreamService"
 import {
@@ -8,10 +9,30 @@ import {
    useHasStarted,
    useStartedAt,
 } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import DateUtil from "util/DateUtil"
 import { useStreamingContext } from "../../context"
 import { FeedbackQuestionCard } from "./FeedbackQuestionCard"
+
+const styles = sxStyles({
+   dialog: {
+      display: "inline-flex",
+      padding: 2,
+      flexDirection: "column",
+      alignItems: "flex-start",
+      gap: 1.5,
+      width: "352px",
+      borderRadius: "12px",
+      background: "white",
+      boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
+      color: (theme) => theme.palette.neutral[900],
+      "& .MuiSnackbarContent-message": {
+         padding: 0,
+         width: "100%",
+      },
+   },
+})
 
 type FeedbackQuestion = EventRatingWithType & { answered: boolean }
 
@@ -24,6 +45,7 @@ export const FeedbackQuestions = () => {
    const startedAt = useStartedAt()
    const hasStarted = useHasStarted()
    const hasEnded = useHasEnded()
+   const [open, setOpen] = useState<boolean>(false)
    const [minutesPassed, setMinutesPassed] = useState(
       hasStarted ? DateUtil.getMinutesPassed(new Date(startedAt)) : 0
    )
@@ -34,7 +56,12 @@ export const FeedbackQuestions = () => {
    /** The local answers data to avoid too many fetch requests */
    const [feedbackQuestionsData, setFeedbackQuestionsData] = useState<
       FeedbackQuestion[]
-   >(feedbackQuestions as FeedbackQuestion[])
+   >(
+      // sort to get question number
+      feedbackQuestions.sort((q1, q2) =>
+         q1.appearAfter > q2.appearAfter ? 1 : -1
+      ) as FeedbackQuestion[]
+   )
 
    const getQuestionIndex = useCallback(
       (question: FeedbackQuestion) => {
@@ -57,6 +84,7 @@ export const FeedbackQuestions = () => {
 
    const handleAnswer = useCallback(
       (question: FeedbackQuestion) => {
+         if (activeQuestions.length == 1) setOpen(false)
          const removeActiveQuestion = [...activeQuestions]
          removeActiveQuestion.shift()
          setActiveQuestions(removeActiveQuestion)
@@ -113,6 +141,7 @@ export const FeedbackQuestions = () => {
          const shouldActivate = await questionShouldBeActive(question)
          if (shouldActivate && !isAlreadyActive(question)) {
             setActiveQuestions((prev) => [...prev, { ...question }])
+            setOpen(true)
          }
       })
    }, [feedbackQuestionsData, isAlreadyActive, questionShouldBeActive])
@@ -136,16 +165,24 @@ export const FeedbackQuestions = () => {
       }
    }, [minutesPassed, checkFeedbackQuestions])
 
-   if (!activeQuestions?.length) return null
-
    return (
-      <>
-         <FeedbackQuestionCard
-            question={activeQuestions[0]}
-            questionNumber={getQuestionIndex(activeQuestions[0]) + 1}
-            open={Boolean(activeQuestions.length)}
-            onAnswer={handleAnswer}
+      <Snackbar open={open} TransitionComponent={SlideTransition}>
+         <SnackbarContent
+            sx={styles.dialog}
+            message={
+               activeQuestions[0] ? (
+                  <FeedbackQuestionCard
+                     question={activeQuestions[0]}
+                     questionNumber={getQuestionIndex(activeQuestions[0]) + 1}
+                     onAnswer={handleAnswer}
+                  />
+               ) : null
+            }
          />
-      </>
+      </Snackbar>
    )
+}
+
+function SlideTransition(props: SlideProps) {
+   return <Slide {...props} direction="up" />
 }
