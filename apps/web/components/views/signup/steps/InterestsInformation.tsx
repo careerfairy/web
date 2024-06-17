@@ -1,100 +1,219 @@
-import { sxStyles } from "../../../../types/commonTypes"
-import { Grid, Typography } from "@mui/material"
-import React, { useCallback, useEffect, useState } from "react"
-import MultiListSelect from "../../common/MultiListSelect"
-import { useInterests } from "../../../custom-hook/useCollection"
-import { useAuth } from "../../../../HOCs/AuthProvider"
 import {
-   formatToOptionArray,
-   mapOptions,
-   multiListSelectMapValueFn,
-} from "../utils"
-import { userRepo } from "../../../../data/RepositoryInstances"
+   BusinessFunctionsTagValues,
+   ContentTopicsTagValues,
+} from "@careerfairy/shared-lib/constants/tags"
 import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+import { Chip, Grid, Stack, Typography } from "@mui/material"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { userRepo } from "data/RepositoryInstances"
+import { Dispatch, SetStateAction, useCallback, useState } from "react"
+import { useDebounce } from "react-use"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { sxStyles } from "../../../../types/commonTypes"
+import { mapOptions } from "../utils"
 
 const styles = sxStyles({
    inputLabel: {
       textTransform: "uppercase",
       fontSize: "0.8rem !important",
       fontWeight: "bold",
+      mx: "3px",
+      mb: "6px",
+   },
+   chip: {
+      mr: "8px",
+      mt: "8px",
+      p: "14px 6px",
+      borderRadius: "60px",
+
+      border: (theme) => `1px solid ${theme.palette.secondary.light}`,
+      background: (theme) => theme.brand.white[300],
+      color: (theme) => theme.palette.neutral[700],
+      fontFamily: "Poppins",
+      fontSize: "14px",
+      fontStyle: "normal",
+      fontWeight: "400",
+      lineHeight: "20px",
+      "&:last-child": {
+         mr: "0px",
+      },
+   },
+   selectedChip: {
+      borderRadius: "60px",
+      border: (theme) => `1px solid ${theme.palette.secondary.light}`,
+      background: (theme) => theme.palette.primary.main,
+      color: (theme) => theme.brand.white[50],
+      fontFamily: "Poppins",
+      fontSize: "14px",
+      fontStyle: "normal",
+      fontWeight: 400,
+      lineHeight: "20px",
    },
 })
 
-const SELECTED_INTERESTS_FIELD_NAME = "interestsIds"
+type TagsMap = {
+   [k: string]: {
+      state: boolean
+      option: OptionGroup
+   }
+}
 
 const InterestsInformation = () => {
-   const { data: allInterests } = useInterests()
-   const { authenticatedUser: user, userData } = useAuth()
-
-   const [inputValues, setInputValues] = useState({
-      [SELECTED_INTERESTS_FIELD_NAME]: [] as OptionGroup[],
-   })
-
-   useEffect(() => {
-      if (userData) {
-         const { interestsIds } = userData
-
-         setInputValues({
-            [SELECTED_INTERESTS_FIELD_NAME]: formatToOptionArray(
-               interestsIds,
-               allInterests
-            ),
-         })
-      }
-   }, [userData, allInterests])
+   const { userData } = useAuth()
 
    const handleSelectedInterestsChange = useCallback(
-      async (name: string, selectedInterests: OptionGroup[]) => {
+      async (userEmail: string, name: string, selectedTags: OptionGroup[]) => {
          try {
-            await userRepo.updateAdditionalInformation(user.email, {
-               [name]: mapOptions(selectedInterests),
+            return await userRepo.updateAdditionalInformation(userEmail, {
+               [name]: mapOptions(selectedTags),
             })
          } catch (error) {
-            console.log(error)
+            errorLogAndNotify(error)
          }
       },
-      [user.email]
+      []
+   )
+
+   const BUSINESS_FUNCTIONS_INTERESTS_LABEL =
+      "What kind of work are you excited about?"
+
+   const CONTENT_TOPIC_INTERESTS_LABEL =
+      "Choose the topics that spark your curiosity!"
+
+   return (
+      <ConditionalWrapper condition={Boolean(userData)}>
+         <Stack gap={"32px"} direction={"column"} spacing={2}>
+            <UserInterestTagsInformation
+               handleInterestTagChange={handleSelectedInterestsChange}
+               tags={ContentTopicsTagValues}
+               field="contentTopicTagIds"
+               label={CONTENT_TOPIC_INTERESTS_LABEL}
+            />
+            <UserInterestTagsInformation
+               handleInterestTagChange={handleSelectedInterestsChange}
+               tags={BusinessFunctionsTagValues}
+               field="businessFunctionTagIds"
+               label={BUSINESS_FUNCTIONS_INTERESTS_LABEL}
+            />
+         </Stack>
+      </ConditionalWrapper>
+   )
+}
+
+type UserInterestTagsInformationProps = {
+   handleInterestTagChange: (
+      userEmail: string,
+      name: string,
+      selectedTags: OptionGroup[]
+   ) => Promise<void>
+   tags: OptionGroup[]
+   field: "businessFunctionTagIds" | "contentTopicTagIds"
+   label: string
+}
+
+const UserInterestTagsInformation = ({
+   handleInterestTagChange,
+   tags,
+   field,
+   label,
+}: UserInterestTagsInformationProps) => {
+   const { userData } = useAuth()
+
+   const [userTags, setUserTags] = useState<TagsMap>(() => {
+      return Object.fromEntries(
+         tags.map((tag) => {
+            return [
+               tag.id,
+               {
+                  state: userData[field]?.includes(tag.id) || false,
+                  option: tag,
+               },
+            ]
+         })
+      )
+   })
+
+   const updatedTags = Object.keys(userTags)
+      .filter((id) => userTags[id].state)
+      .map((id) => userTags[id].option)
+
+   useDebounce(() => handleTagChangeDebounced(updatedTags), 1000, [updatedTags])
+
+   const handleTagChangeDebounced = useCallback(
+      async (selectedTags: OptionGroup[]) => {
+         return await handleInterestTagChange(
+            userData.userEmail,
+            field,
+            selectedTags
+         )
+      },
+      [field, handleInterestTagChange, userData.userEmail]
    )
 
    return (
       <>
-         <Grid
-            container
-            spacing={2}
-            justifyContent="center"
-            data-testid="registration-interests-information-step"
-         >
-            <Grid item xs={12} sm={8}>
-               <Typography sx={styles.inputLabel} variant="h5">
-                  Select your interests
-               </Typography>
-            </Grid>
-            <Grid item xs={12} sm={8}>
-               <MultiListSelect
-                  inputName={SELECTED_INTERESTS_FIELD_NAME}
-                  isCheckbox
-                  limit={5}
-                  selectedItems={inputValues[SELECTED_INTERESTS_FIELD_NAME]}
-                  allValues={allInterests}
-                  setFieldValue={handleSelectedInterestsChange}
-                  inputProps={multiSelectInputProps}
-                  getValueFn={multiListSelectMapValueFn}
-                  chipProps={multiSelectChipProps}
-               />
-            </Grid>
-         </Grid>
+         <TagInterests
+            label={label}
+            tagIds={Object.keys(userTags)}
+            tagsMap={userTags}
+            setUserTags={setUserTags}
+         />
       </>
    )
 }
 
-const multiSelectInputProps = {
-   label: "Select 5 to improve your site experience",
-   placeholder: "Select from the following list",
-   className: "registrationInput",
+type TagInterestsProps = {
+   label: string
+   tagIds: string[]
+   tagsMap: TagsMap
+   setUserTags: Dispatch<SetStateAction<TagsMap>>
 }
+const TagInterests = ({
+   label,
+   tagIds: tagIds,
+   tagsMap: tagsMap,
+   setUserTags: setUserTags,
+}: TagInterestsProps) => {
+   return (
+      <Grid
+         container
+         spacing={2}
+         justifyContent="center"
+         data-testid="registration-interests-information-step"
+      >
+         <Grid container>
+            <Typography sx={styles.inputLabel} variant="h5">
+               {label}
+            </Typography>
+         </Grid>
+         <Grid container>
+            {tagIds.map((tagId) => {
+               return (
+                  <Chip
+                     onClick={() => {
+                        const selected = tagsMap[tagId]
 
-const multiSelectChipProps = {
-   color: "primary",
+                        const functions = {
+                           ...tagsMap,
+                        }
+
+                        functions[tagId].state = !selected.state
+
+                        setUserTags(functions)
+                     }}
+                     clickable
+                     sx={[
+                        styles.chip,
+                        tagsMap[tagId].state ? styles.selectedChip : null,
+                     ]}
+                     key={tagId}
+                     label={tagsMap[tagId].option.name}
+                  />
+               )
+            })}
+         </Grid>
+      </Grid>
+   )
 }
-
 export default InterestsInformation

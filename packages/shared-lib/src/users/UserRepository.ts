@@ -170,7 +170,7 @@ export interface IUserRepository {
    getStats(userDataId: string): Promise<UserStats>
 
    updateResume(userEmail: string, resumeUrl: string): Promise<void>
-   
+
    deleteResume(userEmail: string): Promise<void>
 
    welcomeDialogComplete(userEmail: string): Promise<void>
@@ -632,6 +632,8 @@ export class FirebaseUserRepository
          position,
          firstName,
          lastName,
+         businessFunctionTagIds,
+         contentTopicTagIds,
       } = fields
 
       const genderToUpdate = gender ? { gender } : {}
@@ -656,6 +658,12 @@ export class FirebaseUserRepository
       const positionToUpdate = position ? { position } : {}
       const firstNameToUpdate = firstName ? { firstName } : {}
       const lastNameToUpdate = lastName ? { lastName } : {}
+      const businessFunctionsToUpdate = businessFunctionTagIds
+         ? { businessFunctionTagIds }
+         : {}
+      const contentTopicsToUpdate = contentTopicTagIds
+         ? { contentTopicTagIds }
+         : {}
 
       const toUpdate = {
          ...genderToUpdate,
@@ -672,6 +680,8 @@ export class FirebaseUserRepository
          ...positionToUpdate,
          ...firstNameToUpdate,
          ...lastNameToUpdate,
+         ...businessFunctionsToUpdate,
+         ...contentTopicsToUpdate,
       }
 
       return userRef.update(toUpdate)
@@ -834,7 +844,7 @@ export class FirebaseUserRepository
       const docRef = this.firestore.collection("userData").doc(userEmail)
 
       const toUpdate = {
-         userResume: firebase.firestore.FieldValue.delete()
+         userResume: firebase.firestore.FieldValue.delete(),
       }
 
       return docRef.update(toUpdate)
