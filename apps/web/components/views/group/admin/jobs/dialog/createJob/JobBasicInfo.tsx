@@ -1,5 +1,7 @@
+import { BusinessFunctionsTagValues } from "@careerfairy/shared-lib/constants/tags"
 import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { getTextFieldProps } from "components/helperFunctions/streamFormFunctions"
 import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
@@ -8,7 +10,9 @@ import SteppedDialog, {
 } from "components/views/stepped-dialog/SteppedDialog"
 import { useFormikContext } from "formik"
 import { sxStyles } from "types/commonTypes"
-import { JobFormValues } from "../CustomJobFormikProvider"
+import { JobDialogStepEnum } from ".."
+import { basicInfoSchema } from "../CustomJobFormikProvider"
+import { JobFormValues } from "./types"
 
 const styles = sxStyles({
    container: {
@@ -27,7 +31,7 @@ const styles = sxStyles({
       alignItems: "center",
    },
    form: {
-      my: "40px",
+      my: "24px",
    },
    title: {
       fontSize: { xs: "28px", md: "32px" },
@@ -40,14 +44,31 @@ const styles = sxStyles({
       color: "neutral.500",
    },
    wrapperContainer: {
-      height: { md: "auto !important" },
+      height: { xs: "unset", md: "auto !important" },
+   },
+   mobileDialog: {
+      top: "calc(100dvh - 480px)",
    },
 })
 
 const JobBasicInfo = () => {
-   const { moveToNext } = useStepper()
-   const { values, setFieldValue, errors, touched } =
-      useFormikContext<JobFormValues>()
+   const { moveToNext, currentStep } = useStepper()
+   const isMobile = useIsMobile()
+   const {
+      values: { basicInfo: basicInfoValues },
+      setFieldValue,
+      errors: { basicInfo: basicInfoErrors = {} },
+      touched: { basicInfo: basicInfoTouched = {} },
+   } = useFormikContext<JobFormValues>()
+
+   const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
+
+   if (dialogElement) {
+      dialogElement.style.top =
+         isMobile && currentStep === JobDialogStepEnum.FORM_BASIC_INFO
+            ? styles.mobileDialog.top
+            : "revert-layer"
+   }
 
    return (
       <SteppedDialog.Container
@@ -72,7 +93,7 @@ const JobBasicInfo = () => {
                   <Grid container spacing={2} sx={styles.form}>
                      <Grid xs={12} item>
                         <FormBrandedTextField
-                           name="title"
+                           name="basicInfo.title"
                            label="Job Title (required)"
                            placeholder="E.g., Mechanical Engineer"
                            fullWidth
@@ -83,27 +104,51 @@ const JobBasicInfo = () => {
                         <BrandedAutocomplete
                            id={"jobType"}
                            options={jobTypeOptions}
-                           defaultValue={values.jobType}
+                           defaultValue={basicInfoValues.jobType}
                            getOptionLabel={(option) => option.label || ""}
                            isOptionEqualToValue={(option, value) =>
                               option.value === value.value
                            }
-                           value={getValue(values.jobType)}
+                           value={getValue(basicInfoValues.jobType)}
                            disableClearable
                            textFieldProps={getTextFieldProps(
-                              "Job Type (Required)",
+                              "Job Type",
                               "jobType",
-                              touched,
-                              errors
+                              basicInfoTouched,
+                              basicInfoErrors
                            )}
                            onChange={(_, selected) =>
-                              setFieldValue("jobType", selected?.value)
+                              setFieldValue(
+                                 "basicInfo.jobType",
+                                 selected?.value
+                              )
                            }
                         />
                      </Grid>
 
                      <Grid xs={12} item>
-                        {/* TODO-GS add here the new tag input */}
+                        <BrandedAutocomplete
+                           id={"businessTags"}
+                           options={BusinessFunctionsTagValues}
+                           defaultValue={basicInfoValues.businessTags}
+                           getOptionLabel={(option) => option.name || ""}
+                           isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                           }
+                           value={basicInfoValues.businessTags}
+                           disableCloseOnSelect
+                           multiple
+                           limit={5}
+                           textFieldProps={getTextFieldProps(
+                              "Business function (Required)",
+                              "businessTags",
+                              basicInfoTouched,
+                              basicInfoErrors
+                           )}
+                           onChange={(_, selected) =>
+                              setFieldValue("basicInfo.businessTags", selected)
+                           }
+                        />
                      </Grid>
                   </Grid>
                </>
@@ -114,6 +159,7 @@ const JobBasicInfo = () => {
                   variant="contained"
                   color="secondary"
                   onClick={moveToNext}
+                  disabled={!basicInfoSchema.isValidSync(basicInfoValues)}
                >
                   Next
                </SteppedDialog.Button>
