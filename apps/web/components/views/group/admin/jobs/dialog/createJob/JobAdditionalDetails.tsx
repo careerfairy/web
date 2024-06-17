@@ -84,12 +84,12 @@ const JobAdditionalDetails: FC<Props> = ({ quillInputRef }) => {
       isSubmitting,
    } = useFormikContext<JobFormValues>()
 
+   // This effect is used to handle the closing of the dialog when the user can move to the next step
    useEffect(() => {
       if (canMoveNext && !isSubmitting) {
          handleClose()
       }
       setCanMoveNext(isSubmitting)
-
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [isSubmitting, handleClose])
 
