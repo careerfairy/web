@@ -93,9 +93,9 @@ const SignUpButton = () => {
    return (
       <Link
          color="inherit"
-         href={`/signup?absolutePath=${asPath}${getSparksUtmParamsIfExist(
-            pathname
-         )}`}
+         href={`/signup?absolutePath=${encodeURIComponent(
+            asPath
+         )}${getSparksUtmParamsIfExist(pathname)}`}
          sx={{
             width: "100%",
             textDecoration: "none",
@@ -170,11 +170,7 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
       spark?.id,
    ])
 
-   if (
-      spark.creator.linkedInUrl === "" ||
-      !spark.creator.linkedInUrl ||
-      !userMeetsTargetCriteria
-   ) {
+   if (!spark.creator.linkedInUrl || !userMeetsTargetCriteria) {
       return null
    }
 
