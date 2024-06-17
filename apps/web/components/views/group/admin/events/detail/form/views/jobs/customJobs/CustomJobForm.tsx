@@ -1,4 +1,5 @@
 import {
+   CustomJob,
    PublicCustomJob,
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
@@ -56,7 +57,7 @@ const CustomJobForm = () => {
    )
 
    const handleUpdateCustomJob = useCallback(
-      (updatedJob: PublicCustomJob) => {
+      (updatedJob: CustomJob) => {
          const indexToUpdate = customJobs.findIndex(
             (job) => job.id === updatedJob.id
          )

@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material"
+import { Box, Grid, Typography } from "@mui/material"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
 import { datePickerDefaultStyles } from "components/views/calendar/utils"
 import BrandedTextField, {
@@ -9,11 +9,15 @@ import SteppedDialog, {
 } from "components/views/stepped-dialog/SteppedDialog"
 import GBLocale from "date-fns/locale/en-GB"
 import { useFormikContext } from "formik"
-import { FC, MutableRefObject } from "react"
+import { FC, MutableRefObject, useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
+import { Briefcase } from "react-feather"
+import { useSelector } from "react-redux"
+import { jobsFormSelectedJobIdSelector } from "store/selectors/adminJobsSelectors"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
-import { JobFormValues } from "../CustomJobFormikProvider"
+import { JobFormValues } from "./types"
 
 const styles = sxStyles({
    container: {
@@ -33,7 +37,7 @@ const styles = sxStyles({
       alignItems: "center",
    },
    form: {
-      my: "40px",
+      my: "24px",
    },
    title: {
       fontSize: { xs: "28px", md: "32px" },
@@ -46,18 +50,48 @@ const styles = sxStyles({
       color: "neutral.500",
    },
    wrapperContainer: {
-      height: { md: "auto !important" },
+      height: { xs: "80dvh", md: "auto !important" },
       maxHeight: "800px",
+   },
+   subtitle2: {
+      display: "flex",
+      alignItems: { md: "center" },
+      ml: 1.5,
+   },
+   subText: {
+      fontSize: { xs: "16px", md: "18px" },
+      fontWeight: "600",
+      lineHeight: { xs: "24px", md: "28px" },
+      color: (theme) => theme.palette.neutral[600],
+      ml: 1,
    },
 })
 
 type Props = {
-   quillInputRef: MutableRefObject<undefined>
+   quillInputRef: MutableRefObject<any>
 }
 
 const JobAdditionalDetails: FC<Props> = ({ quillInputRef }) => {
-   const { moveToNext, moveToPrev } = useStepper()
-   const { values, setFieldValue, errors } = useFormikContext<JobFormValues>()
+   const { moveToPrev, handleClose } = useStepper()
+   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const [canMoveNext, setCanMoveNext] = useState(false)
+   const {
+      values: { additionalInfo: additionalInfoValues },
+      setFieldValue,
+      errors: { additionalInfo: additionalInfoErrors = {} },
+      touched: { additionalInfo: additionalInfoTouched = {} },
+      submitForm,
+      isSubmitting,
+   } = useFormikContext<JobFormValues>()
+
+   useEffect(() => {
+      if (canMoveNext && !isSubmitting) {
+         handleClose()
+      }
+      setCanMoveNext(isSubmitting)
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [isSubmitting, handleClose])
 
    return (
       <SteppedDialog.Container
@@ -80,10 +114,16 @@ const JobAdditionalDetails: FC<Props> = ({ quillInputRef }) => {
                      listing.
                   </SteppedDialog.Subtitle>
 
-                  <Grid container spacing={2} sx={styles.form}>
+                  <Grid container spacing={1.5} sx={styles.form}>
+                     <Box sx={styles.subtitle2}>
+                        <Briefcase color="grey" size={20} />
+                        <Typography variant={"h6"} sx={styles.subText}>
+                           Discovery Trainee Process Industries eMineTM{" "}
+                        </Typography>
+                     </Box>
                      <Grid xs={12} item>
                         <FormBrandedTextField
-                           name="salary"
+                           name="additionalInfo.salary"
                            label="Salary Range"
                            placeholder="E.g., 85’000-95’000 CHF"
                            fullWidth
@@ -92,7 +132,7 @@ const JobAdditionalDetails: FC<Props> = ({ quillInputRef }) => {
 
                      <Grid xs={12} item>
                         <FormBrandedTextField
-                           name="description"
+                           name="additionalInfo.description"
                            label="Job Description (Required)"
                            placeholder="Tell your viewers more on what to expect about this job"
                            fullWidth
@@ -116,7 +156,7 @@ const JobAdditionalDetails: FC<Props> = ({ quillInputRef }) => {
                            ]}
                         >
                            <DatePicker
-                              selected={values.deadline}
+                              selected={additionalInfoValues.deadline}
                               minDate={DateUtil.getTomorrowDate()}
                               dateFormat={"dd/MM/yyyy"}
                               locale={GBLocale}
@@ -127,19 +167,25 @@ const JobAdditionalDetails: FC<Props> = ({ quillInputRef }) => {
                               shouldCloseOnSelect={true}
                               customInput={
                                  <BrandedTextField
-                                    name="deadline"
+                                    name="additionalInfo.deadline"
                                     label="Application Deadline (Required)"
                                     placeholder="Insert date"
                                     fullWidth
-                                    error={Boolean(errors.deadline)}
+                                    error={Boolean(
+                                       additionalInfoTouched.deadline &&
+                                          additionalInfoErrors.deadline
+                                    )}
                                     // @ts-ignore
                                     helperText={
-                                       errors.deadline ? errors.deadline : null
+                                       additionalInfoTouched.deadline &&
+                                       additionalInfoErrors.deadline
+                                          ? additionalInfoErrors.deadline
+                                          : null
                                     }
                                  />
                               }
                               onChange={(value) =>
-                                 setFieldValue("deadline", value)
+                                 setFieldValue("additionalInfo.deadline", value)
                               }
                            />
                         </Box>
@@ -147,7 +193,7 @@ const JobAdditionalDetails: FC<Props> = ({ quillInputRef }) => {
 
                      <Grid xs={12} md={6} item>
                         <FormBrandedTextField
-                           name="postingUrl"
+                           name="additionalInfo.postingUrl"
                            label="Job posting URL (required)"
                            placeholder="E.g., www.careerpage.com/role"
                            fullWidth
@@ -170,9 +216,10 @@ const JobAdditionalDetails: FC<Props> = ({ quillInputRef }) => {
                <SteppedDialog.Button
                   variant="contained"
                   color="secondary"
-                  onClick={moveToNext}
+                  onClick={submitForm}
+                  loading={isSubmitting}
                >
-                  Next
+                  {selectedJobId ? "Update" : "Create"}
                </SteppedDialog.Button>
             </SteppedDialog.Actions>
          </>
