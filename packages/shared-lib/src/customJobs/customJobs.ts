@@ -46,6 +46,7 @@ export type PublicCustomJob = Pick<
    | "salary"
    | "deleted"
    | "deadline"
+   | "businessFunctionsTagIds"
 >
 
 export type PublicCustomJobApplicant = Pick<
@@ -83,6 +84,7 @@ export const pickPublicDataFromCustomJob = (
       deadline: job.deadline ?? null,
       salary: job.salary ?? null,
       deleted: job.deleted ?? false,
+      businessFunctionsTagIds: job.businessFunctionsTagIds ?? [],
    }
 }
 
