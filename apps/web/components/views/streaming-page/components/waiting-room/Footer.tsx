@@ -1,0 +1,54 @@
+import { Box, Typography } from "@mui/material"
+import {
+   useStreamIsLandscape,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   root: {
+      mt: "auto",
+      mx: "auto",
+      backgroundColor: "#FDFDFD",
+      textAlign: "center",
+      justifyContent: "center",
+      display: "flex",
+      borderTopLeftRadius: "100% 284px",
+      borderTopRightRadius: "100% 284px",
+      maxWidth: 1099,
+   },
+   tip: {
+      color: "neutral.800",
+      maxWidth: {
+         xs: 286,
+         sm: 418,
+         tablet: 508,
+      },
+   },
+})
+
+export const Footer = () => {
+   const streamIsMobile = useStreamIsMobile()
+   const streamIsLandscape = useStreamIsLandscape()
+
+   return (
+      <Box
+         sx={styles.root}
+         width={streamIsMobile ? "100%" : "80%"}
+         minHeight={streamIsLandscape ? 75 : streamIsMobile ? 80 : 155}
+         pt={streamIsLandscape ? 3.125 : streamIsMobile ? 3 : 7.75}
+      >
+         <Typography
+            sx={styles.tip}
+            variant={streamIsMobile ? "xsmall" : "medium"}
+            component="p"
+         >
+            <Box component="span" fontWeight={600} color="primary.main">
+               Pro tip:
+            </Box>{" "}
+            Use the raise hand functionality to ask your questions directly to
+            the live stream speakers.
+         </Typography>
+      </Box>
+   )
+}

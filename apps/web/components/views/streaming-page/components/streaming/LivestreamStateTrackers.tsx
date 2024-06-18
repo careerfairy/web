@@ -4,6 +4,7 @@ import { useLivestreamData } from "components/custom-hook/streaming"
 import { useEffect } from "react"
 import {
    resetLivestreamState,
+   setCompanyName,
    setHandRaiseEnabled,
    setHasEnded,
    setHasJobs,
@@ -13,6 +14,7 @@ import {
    setScreenSharerId,
    setStarted,
    setStartsAt,
+   setTest,
 } from "store/reducers/streamingAppReducer"
 import { setCompanyLogoUrl } from "../../../../../store/reducers/streamingAppReducer"
 
@@ -74,6 +76,14 @@ export const LivestreamStateTrackers = (): null => {
    useEffect(() => {
       dispatch(setCompanyLogoUrl(livestream.companyLogoUrl))
    }, [dispatch, livestream.companyLogoUrl])
+
+   useEffect(() => {
+      dispatch(setCompanyName(livestream.company ?? ""))
+   }, [dispatch, livestream.company])
+
+   useEffect(() => {
+      dispatch(setTest(Boolean(livestream.test)))
+   }, [dispatch, livestream.test])
 
    useEffect(() => {
       dispatch(setHandRaiseEnabled(Boolean(livestream.handRaiseActive)))
