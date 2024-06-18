@@ -126,6 +126,7 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
    const linkedInHandleClick = useCallback(() => {
       window.open(spark.creator.linkedInUrl, "_blank")
       trackEvent(SparkEventActions.Click_ReachOut_LinkedIn)
+      console.log("Click_ReachOut_LinkedIn sent to server")
       setHasUserClickedAnyButton(true)
    }, [spark.creator.linkedInUrl, trackEvent])
 
@@ -169,6 +170,31 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
       percentageOfVideoPlayed,
       spark?.id,
    ])
+
+   console.log(
+      "🚀 ~ SparksCreatorNotification ~ spark.creator.linkedInUrl:",
+      spark.creator.linkedInUrl
+   )
+   console.log(
+      "🚀 ~ SparksCreatorNotification ~ userMeetsTargetCriteria:",
+      userMeetsTargetCriteria
+   )
+   console.log(
+      "🚀 ~ SparksCreatorNotification ~ playingCriteriaHasBeenMet:",
+      playingCriteriaHasBeenMet
+   )
+   console.log(
+      "🚀 ~ useEffect ~ percentageOfVideoPlayed:",
+      percentageOfVideoPlayed
+   )
+   console.log(
+      "🚀 ~ userMeetsTargetCriteria ~ anonymousUserCountryCode:",
+      anonymousUserCountryCode
+   )
+   console.log(
+      "🚀 ~ userMeetsTargetCriteria ~ userData?.universityCountryCode:",
+      userData?.universityCountryCode
+   )
 
    if (!spark.creator.linkedInUrl || !userMeetsTargetCriteria) {
       return null
