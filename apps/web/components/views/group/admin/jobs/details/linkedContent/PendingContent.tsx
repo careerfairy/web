@@ -36,7 +36,7 @@ const styles = sxStyles({
    },
    message: {
       fontSize: "16px",
-      fontWeight: "400px",
+      fontWeight: "400",
    },
    btn: {
       color: (theme) => theme.palette.common.white,
