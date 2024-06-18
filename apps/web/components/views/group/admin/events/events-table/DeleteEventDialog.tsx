@@ -1,0 +1,159 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { LoadingButton } from "@mui/lab"
+import {
+   Button,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   Drawer,
+   Stack,
+} from "@mui/material"
+import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import DeleteLinkedContentDialog from "components/views/common/DeleteLinkedContentDialog"
+import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
+import React, { FC } from "react"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   container: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      height: "100%",
+      width: "100%",
+      px: 4,
+   },
+   info: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      textAlign: "center",
+   },
+   actions: {
+      justifyContent: "space-evenly",
+      px: 4,
+      py: 3,
+   },
+   cancelBtn: {
+      color: "grey",
+   },
+   actionBtn: {
+      width: "160px",
+   },
+   paperRoot: {
+      borderRadius: (theme) => theme.spacing(2, 2, 0, 0),
+   },
+})
+
+type Props = {
+   groupId: string
+   livestreamId: string
+   handleClose: () => void
+   handleConfirm: () => void
+   loading: boolean
+   message: string
+}
+
+const DeleteEventDialog: React.FC<Props> = ({
+   groupId,
+   livestreamId,
+   handleClose,
+   handleConfirm,
+   loading,
+   message,
+}) => {
+   const linkedJobs = useGroupCustomJobs(groupId, { livestreamId })
+   const isMobile = useIsMobile()
+
+   if (!linkedJobs?.length) {
+      return (
+         <AreYouSureModal
+            open={true}
+            handleClose={handleClose}
+            handleConfirm={handleConfirm}
+            loading={loading}
+            message={message}
+         />
+      )
+   }
+
+   if (isMobile) {
+      return (
+         <Drawer
+            open={true}
+            anchor="bottom"
+            PaperProps={{
+               sx: styles.paperRoot,
+            }}
+         >
+            <Content
+               linkedJobs={linkedJobs}
+               handleClose={handleClose}
+               loading={loading}
+               handleConfirm={handleConfirm}
+            />
+         </Drawer>
+      )
+   }
+
+   return (
+      <Dialog open={true} onClose={handleClose} maxWidth="xs">
+         <Content
+            linkedJobs={linkedJobs}
+            handleClose={handleClose}
+            loading={loading}
+            handleConfirm={handleConfirm}
+         />
+      </Dialog>
+   )
+}
+
+type ContentProps = {
+   linkedJobs: CustomJob[]
+   handleClose: () => void
+   loading: boolean
+   handleConfirm: () => void
+}
+
+const Content: FC<ContentProps> = ({
+   linkedJobs,
+   handleClose,
+   loading,
+   handleConfirm,
+}) => (
+   <>
+      <DialogContent sx={styles.container}>
+         <Stack spacing={3} sx={styles.info}>
+            <DeleteLinkedContentDialog
+               linkedJobs={linkedJobs}
+               contentType="livestream"
+            />
+         </Stack>
+      </DialogContent>
+
+      <DialogActions sx={styles.actions}>
+         <Button
+            variant="outlined"
+            color="grey"
+            onClick={handleClose}
+            sx={[styles.cancelBtn, styles.actionBtn]}
+         >
+            Cancel
+         </Button>
+
+         <LoadingButton
+            color="error"
+            disabled={loading}
+            loading={loading}
+            onClick={handleConfirm}
+            variant="contained"
+            sx={styles.actionBtn}
+         >
+            Delete
+         </LoadingButton>
+      </DialogActions>
+   </>
+)
+
+export default DeleteEventDialog
