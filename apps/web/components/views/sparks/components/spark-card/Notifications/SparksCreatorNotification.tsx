@@ -1,5 +1,4 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
@@ -12,7 +11,6 @@ import { useSelector } from "react-redux"
 import {
    activeSparkSelector,
    anonymousUserCountryCodeSelector,
-   progressPercentageSelector,
 } from "store/selectors/sparksFeedSelectors"
 import CreatorAvatar from "../../CreatorAvatar"
 import { LinkedInIcon } from "./LinkedInIcon"
@@ -108,9 +106,13 @@ const SignUpButton = () => {
 
 type Props = {
    spark: SparkPresenter
+   shouldShowLinkedInCTA: boolean
 }
 
-export const SparksCreatorNotification = ({ spark }: Props) => {
+export const SparksCreatorNotification = ({
+   spark,
+   shouldShowLinkedInCTA,
+}: Props) => {
    const { userData, isLoggedIn } = useAuth()
 
    const [hasUserClickedAnyButton, setHasUserClickedAnyButton] = useState(false)
@@ -118,7 +120,6 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
       useState(false)
    const { trackEvent } = useSparksFeedTracker()
    const activeSpark = useSelector(activeSparkSelector)
-   const percentageOfVideoPlayed = useSelector(progressPercentageSelector)
    const anonymousUserCountryCode = useSelector(
       anonymousUserCountryCodeSelector
    )
@@ -126,7 +127,6 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
    const linkedInHandleClick = useCallback(() => {
       window.open(spark.creator.linkedInUrl, "_blank")
       trackEvent(SparkEventActions.Click_ReachOut_LinkedIn)
-      console.log("Click_ReachOut_LinkedIn sent to server")
       setHasUserClickedAnyButton(true)
    }, [spark.creator.linkedInUrl, trackEvent])
 
@@ -157,46 +157,20 @@ export const SparksCreatorNotification = ({ spark }: Props) => {
          !hasUserClickedAnyButton &&
          activeSpark &&
          activeSpark.id === spark?.id &&
-         percentageOfVideoPlayed >=
-            SPARK_CONSTANTS.PLAYED_PERCENTAGE_TO_SHOW_LINKEDIN_NOTIFICATION
+         shouldShowLinkedInCTA
       ) {
          setPlayingCriteriaHasBeenMet(true)
       }
 
       return () => setPlayingCriteriaHasBeenMet(false)
-   }, [
-      activeSpark,
-      hasUserClickedAnyButton,
-      percentageOfVideoPlayed,
-      spark?.id,
-   ])
+   }, [activeSpark, hasUserClickedAnyButton, shouldShowLinkedInCTA, spark?.id])
 
-   console.log(
-      "🚀 ~ SparksCreatorNotification ~ spark.creator.linkedInUrl:",
-      spark.creator.linkedInUrl
-   )
-   console.log(
-      "🚀 ~ SparksCreatorNotification ~ userMeetsTargetCriteria:",
-      userMeetsTargetCriteria
-   )
-   console.log(
-      "🚀 ~ SparksCreatorNotification ~ playingCriteriaHasBeenMet:",
-      playingCriteriaHasBeenMet
-   )
-   console.log(
-      "🚀 ~ useEffect ~ percentageOfVideoPlayed:",
-      percentageOfVideoPlayed
-   )
-   console.log(
-      "🚀 ~ userMeetsTargetCriteria ~ anonymousUserCountryCode:",
-      anonymousUserCountryCode
-   )
-   console.log(
-      "🚀 ~ userMeetsTargetCriteria ~ userData?.universityCountryCode:",
-      userData?.universityCountryCode
-   )
-
-   if (!spark.creator.linkedInUrl || !userMeetsTargetCriteria) {
+   if (
+      !shouldShowLinkedInCTA ||
+      !spark.creator.linkedInUrl ||
+      !userMeetsTargetCriteria ||
+      activeSpark.isCardNotification
+   ) {
       return null
    }
 

@@ -31,6 +31,7 @@ import {
 import { sxStyles } from "types/commonTypes"
 import FullCardNotification from "./Notifications/FullCardNotification"
 import { SparksPopUpNotificationManager } from "./Notifications/SparksPopUpNotificationManager"
+import { useLinkedInNotificationStateManagement } from "./Notifications/useLinkedInNotificationStateManagement"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
 import SparkQuestion from "./SparkQuestion"
@@ -177,6 +178,9 @@ const SparksFeedCard: FC<Props> = ({
 
    const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
 
+   const { onSparkPercentagePlayed, shouldShowLinkedInCTA } =
+      useLinkedInNotificationStateManagement()
+
    const companyPageLink = spark.group.publicProfile
       ? `/company/${companyNameSlugify(spark.group.universityName)}`
       : undefined
@@ -221,6 +225,11 @@ const SparksFeedCard: FC<Props> = ({
       [spark.isCardNotification]
    )
 
+   const showPopupNotifications = useMemo(
+      () => Boolean(isOverlayedOntop && shouldShowLinkedInCTA),
+      [isOverlayedOntop, shouldShowLinkedInCTA]
+   )
+
    if (!visitorId) return null
 
    const cardNotificationStyle = () => {
@@ -235,15 +244,17 @@ const SparksFeedCard: FC<Props> = ({
             return [styles.conversionCardContent]
       }
    }
-
    return (
       <>
          <Box
             onClick={handleClickCard}
             sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
          >
-            {isOverlayedOntop ? (
-               <SparksPopUpNotificationManager spark={spark} />
+            {showPopupNotifications ? (
+               <SparksPopUpNotificationManager
+                  spark={spark}
+                  shouldShowLinkedInCTA={shouldShowLinkedInCTA}
+               />
             ) : null}
 
             <Box
@@ -270,6 +281,7 @@ const SparksFeedCard: FC<Props> = ({
                      pausing={eventDetailsDialogVisibility || paused}
                      onVideoPlay={onVideoPlay}
                      onVideoEnded={onVideoEnded}
+                     onPercentagePlayed={onSparkPercentagePlayed}
                      light={isOverlayedOntop}
                      containPreviewOnTablet
                      identifier={identifier}
