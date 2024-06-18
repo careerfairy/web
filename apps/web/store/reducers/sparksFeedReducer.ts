@@ -47,7 +47,6 @@ interface SparksState {
    interactionSource: string
    anonymousUserCountryCode?: string
    countrySpecificFeed?: boolean
-   progressPercentage: number
 }
 
 const initialState: SparksState = {
@@ -77,7 +76,6 @@ const initialState: SparksState = {
    interactionSource: null,
    anonymousUserCountryCode: null,
    countrySpecificFeed: null,
-   progressPercentage: 0.0,
 }
 
 // Async thunk to fetch the next sparks
@@ -243,9 +241,6 @@ const sparksFeedSlice = createSlice({
       setConversionCardInterval: (state, action: PayloadAction<number>) => {
          state.conversionCardInterval = action.payload
       },
-      setProgressPercentage: (state, action: PayloadAction<number>) => {
-         state.progressPercentage = action.payload
-      },
       removeNotificationsByType: (
          state,
          action: PayloadAction<SparkCardNotificationTypes>
@@ -278,7 +273,6 @@ const sparksFeedSlice = createSlice({
          state.videosMuted = false
          state.playing = true
          state.conversionCardInterval = 0
-         state.progressPercentage = 0.0
       },
       disableCountrySpecificFeed: (state) => {
          state.countrySpecificFeed = null
@@ -478,7 +472,6 @@ export const {
    setConversionCardInterval,
    removeNotificationsByType,
    disableCountrySpecificFeed,
-   setProgressPercentage,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer
