@@ -34,13 +34,25 @@ import Heading from "components/views/portal/common/Heading"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
-import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
+import dynamic from "next/dynamic"
 import { sxStyles } from "types/commonTypes"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
 } from "../../components/views/livestream-dialog"
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
+
+const SparksCarouselWithSuspenseComponent = dynamic(
+   () =>
+      import(
+         "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+      ),
+   {
+      ssr: false,
+      loading: () => <FallbackComponent header={<Heading>SPARKS</Heading>} />,
+   }
+)
 
 const styles = sxStyles({
    sparksCarouselHeader: {

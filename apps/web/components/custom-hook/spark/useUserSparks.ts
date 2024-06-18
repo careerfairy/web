@@ -14,7 +14,15 @@ const fetcher = async (userId?: string) => {
       numberOfSparks: 10,
       userId: userId || null,
    })
+
    return sparks.map(SparkPresenter.toFirebaseObject)
+}
+
+type Options = {
+   /**
+    * Disable the hook from making a request
+    */
+   disabled?: boolean
 }
 
 /**
@@ -23,12 +31,14 @@ const fetcher = async (userId?: string) => {
  *
  * @returns SWR response object containing user sparks data.
  */
-export const useUserSparks = () => {
+export const useUserSparks = (options: Options = {}) => {
+   const { disabled = false } = options
    const { authenticatedUser } = useAuth()
 
-   const key = authenticatedUser.isLoaded
-      ? getKey(authenticatedUser.email)
-      : null
+   const key =
+      authenticatedUser.isLoaded && !disabled
+         ? getKey(authenticatedUser.email)
+         : null
 
    return useSWR(key, async () => fetcher(authenticatedUser.email), {
       ...reducedRemoteCallsOptions,
