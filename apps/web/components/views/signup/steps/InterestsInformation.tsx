@@ -83,17 +83,22 @@ const InterestsInformation = () => {
 
    return (
       <ConditionalWrapper condition={Boolean(userData)}>
-         <Stack gap={"32px"} direction={"column"} spacing={2}>
+         <Stack
+            gap={"32px"}
+            direction={"column"}
+            spacing={2}
+            data-testid={"registration-interests-information-step"}
+         >
             <UserInterestTagsInformation
                handleInterestTagChange={handleSelectedInterestsChange}
                tags={ContentTopicsTagValues}
-               field="contentTopicTagIds"
+               field="contentTopicsTagIds"
                label={CONTENT_TOPIC_INTERESTS_LABEL}
             />
             <UserInterestTagsInformation
                handleInterestTagChange={handleSelectedInterestsChange}
                tags={BusinessFunctionsTagValues}
-               field="businessFunctionTagIds"
+               field="businessFunctionsTagIds"
                label={BUSINESS_FUNCTIONS_INTERESTS_LABEL}
             />
          </Stack>
@@ -108,7 +113,7 @@ type UserInterestTagsInformationProps = {
       selectedTags: OptionGroup[]
    ) => Promise<void>
    tags: OptionGroup[]
-   field: "businessFunctionTagIds" | "contentTopicTagIds"
+   field: "businessFunctionsTagIds" | "contentTopicsTagIds"
    label: string
 }
 
@@ -138,7 +143,7 @@ const UserInterestTagsInformation = ({
       .filter((id) => userTags[id].state)
       .map((id) => userTags[id].option)
 
-   useDebounce(() => handleTagChangeDebounced(updatedTags), 1000, [updatedTags])
+   useDebounce(() => handleTagChangeDebounced(updatedTags), 10, [updatedTags])
 
    const handleTagChangeDebounced = useCallback(
       async (selectedTags: OptionGroup[]) => {
@@ -158,7 +163,7 @@ const UserInterestTagsInformation = ({
             tagIds={Object.keys(userTags)}
             tagsMap={userTags}
             setUserTags={setUserTags}
-            data-testid="registration-interests-information-step"
+            field={field}
          />
       </>
    )
@@ -168,6 +173,7 @@ type TagInterestsProps = {
    label: string
    tagIds: string[]
    tagsMap: TagsMap
+   field: string
    setUserTags: Dispatch<SetStateAction<TagsMap>>
 }
 const TagInterests = ({
@@ -175,6 +181,7 @@ const TagInterests = ({
    tagIds: tagIds,
    tagsMap: tagsMap,
    setUserTags: setUserTags,
+   field,
 }: TagInterestsProps) => {
    return (
       <Grid container spacing={2} justifyContent="center">
@@ -187,6 +194,7 @@ const TagInterests = ({
             {tagIds.map((tagId) => {
                return (
                   <Chip
+                     data-testid={`${field}_${tagId}_option`}
                      onClick={() => {
                         const selected = tagsMap[tagId]
 
