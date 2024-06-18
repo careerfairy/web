@@ -23,7 +23,7 @@ import { sparkService } from "data/firebase/SparksService"
 import ConfirmationDialog, {
    ConfirmationDialogAction,
 } from "materialUI/GlobalModals/ConfirmationDialog"
-import { FC, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Trash2 as DeleteIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -73,14 +73,14 @@ type Props = {
    onDeleted: () => void
 }
 
-const ConfirmDeleteSparkDialog: FC<Props> = ({
+const ConfirmDeleteSparkDialog = ({
    sparkId,
    groupId,
    creator,
    handleClose,
    onDeleted,
    open,
-}) => {
+}: Props) => {
    if (!open) {
       return null
    }
@@ -99,14 +99,14 @@ const ConfirmDeleteSparkDialog: FC<Props> = ({
    )
 }
 
-const DeleteSparkContent: FC<Props> = ({
+const DeleteSparkContent = ({
    sparkId,
    groupId,
    creator,
    handleClose,
    onDeleted,
    open,
-}) => {
+}: Props) => {
    const [isDeletingSpark, setIsDeletingSpark] = useState(false)
    const { errorNotification } = useSnackbarNotifications()
    const linkedJobs = useGroupCustomJobs(groupId, { sparkId })
@@ -246,12 +246,12 @@ type ContentProps = {
    primaryAction: any
 }
 
-const Content: FC<ContentProps> = ({
+const Content = ({
    linkedJobs,
    handleClose,
    isDeletingSpark,
    primaryAction,
-}) => (
+}: ContentProps) => (
    <>
       <DialogContent sx={styles.container}>
          <Stack spacing={3} sx={styles.info}>

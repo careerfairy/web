@@ -1,7 +1,7 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { List, ListItem, Typography } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
-import { FC, ReactElement } from "react"
+import { ReactElement } from "react"
 import { Radio } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -40,7 +40,7 @@ type Props = {
    contentType: "spark" | "livestream"
 }
 
-const DeleteLinkedContentDialog: FC<Props> = ({ linkedJobs, contentType }) => {
+const DeleteLinkedContentDialog = ({ linkedJobs, contentType }: Props) => {
    const isSpark = contentType === "spark"
 
    return (
@@ -68,7 +68,7 @@ type ListContentProps = {
    jobs: CustomJob[]
 }
 
-const ListContent: FC<ListContentProps> = ({ jobs }) => {
+const ListContent = ({ jobs }: ListContentProps) => {
    const [firstJob, secondJob] = jobs
    const contentToShow: { id: string; message: ReactElement }[] = []
 
