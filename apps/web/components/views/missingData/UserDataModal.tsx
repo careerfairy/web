@@ -1,5 +1,3 @@
-import React, { useState } from "react"
-import InterestsSelector from "../signup/personaliseInformation/InterestsSelector"
 import {
    Box,
    Button,
@@ -9,19 +7,35 @@ import {
    DialogTitle,
    Tooltip,
 } from "@mui/material"
-import MultiStepWrapper from "../common/MultiStepWrapper"
 import Typography from "@mui/material/Typography"
+import { useState } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import MultiStepWrapper from "../common/MultiStepWrapper"
 import { FieldOfStudyUpdater } from "../signup/userInformation/FieldOfStudySelector"
 import { LevelOfStudyUpdater } from "../signup/userInformation/LevelOfStudySelector"
+import { BusinessFunctionsTagSelector } from "../signup/userInformation/tags/BusinessFunctionsTagSelector"
+import { ContentTopicsTagSelector } from "../signup/userInformation/tags/ContentTopicsTagSelector"
 
 export const missingDataFields = [
    {
-      description: "Interests",
+      description: "Business Functions",
       isMissing: (userData) => {
-         return !userData.interestsIds || userData.interestsIds.length === 0
+         return (
+            !userData.businessFunctionsTagIds ||
+            userData.businessFunctionsTagIds.length === 0
+         )
       },
-      component: () => InterestsSelector,
+      component: () => BusinessFunctionsTagSelector,
+   },
+   {
+      description: "Content Topics",
+      isMissing: (userData) => {
+         return (
+            !userData.contentTopicsTagIds ||
+            userData.contentTopicsTagIds.length === 0
+         )
+      },
+      component: () => ContentTopicsTagSelector,
    },
    {
       description: "Field of study",
@@ -95,7 +109,7 @@ const UserDataModal = ({ isModalOpen, handleModalClose, missingFields }) => {
                >
                   <Button
                      onClick={handleModalClose}
-                     disabled={isLastField && isCurrentFieldComplete}
+                     disabled={isLastField ? isCurrentFieldComplete : null}
                   >
                      Dismiss
                   </Button>
