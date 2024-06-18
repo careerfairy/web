@@ -1,14 +1,13 @@
-import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
-import { FC, useCallback } from "react"
-import { SectionAnchor, useCompanyPage, TabValue } from ".."
-import { useMountedState } from "react-use"
-import { useRouter } from "next/router"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Box, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import { useRouter } from "next/router"
+import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
 import { setCameFromCompanyPageLink } from "store/reducers/sparksFeedReducer"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
+import { SectionAnchor, TabValue, useCompanyPage } from ".."
 
 type Props = {
    groupId: string
@@ -22,7 +21,6 @@ const SparksSection: FC<Props> = ({ groupId }) => {
       group,
       sectionRefs: { eventSectionRef },
    } = useCompanyPage()
-   const isMounted = useMountedState()
    const router = useRouter()
 
    const handleSparksClicked = useCallback(
@@ -43,7 +41,7 @@ const SparksSection: FC<Props> = ({ groupId }) => {
       [dispatch, group.id, router]
    )
 
-   return isMounted() ? (
+   return (
       <Box>
          <SectionAnchor
             ref={eventSectionRef}
@@ -61,7 +59,7 @@ const SparksSection: FC<Props> = ({ groupId }) => {
             sx={{ pl: 0 }}
          />
       </Box>
-   ) : null
+   )
 }
 
 export default SparksSection
