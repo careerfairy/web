@@ -273,9 +273,7 @@ test.describe("Signup Page Functionality", () => {
       expect(firstSpokenLanguageId).toEqual(userDataSpokenLanguages[0])
       expect(firstCountriesOfInterestId).toEqual(userDataCountriesOfInterest[0])
       expect(firstRegionOfInterestId).toEqual(userDataRegionsOfInterest[0])
-      // console.log("🚀 ~ test.describe ~ firstBusinessFunctionTagId:", firstBusinessFunctionTagId, userBusinessFunctionsTagIds)
       expect(firstBusinessFunctionTagId).toEqual(userBusinessFunctionsTagIds[0])
-      // console.log("🚀 ~ test.describe ~ firstContentTopicTagId:", firstContentTopicTagId, userContentTopicsTagIds)
       expect(firstContentTopicTagId).toEqual(userContentTopicsTagIds[0])
    })
 
