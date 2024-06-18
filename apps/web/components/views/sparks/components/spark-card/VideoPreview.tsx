@@ -12,10 +12,7 @@ import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
-import {
-   setProgressPercentage,
-   setVideosMuted,
-} from "store/reducers/sparksFeedReducer"
+import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -100,6 +97,7 @@ type Props = {
    onSecondPassed?: (secondsPassed: number) => void
    onVideoEnded?: () => void
    onVideoPlay?: () => void
+   onPercentagePlayed?: (percentagePlayed: number) => void
    pausing?: boolean
    muted?: boolean
    light?: boolean
@@ -114,6 +112,7 @@ const VideoPreview: FC<Props> = ({
    onSecondPassed,
    onVideoEnded,
    onVideoPlay,
+   onPercentagePlayed,
    pausing: shouldPause,
    thumbnailUrl,
    muted,
@@ -149,10 +148,10 @@ const VideoPreview: FC<Props> = ({
          if (!autoPlaying) {
             setProgress(progress.played * 100)
             onProgress(progress)
-            dispatch(setProgressPercentage(progress.played))
+            onPercentagePlayed(progress.played)
          }
       },
-      [autoPlaying, dispatch, onProgress]
+      [autoPlaying, onPercentagePlayed, onProgress]
    )
 
    const prevIdentifier = usePrevious(identifier)
