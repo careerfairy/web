@@ -665,14 +665,6 @@ export class FirebaseUserRepository
          ? { contentTopicsTagIds }
          : {}
 
-      console.log(
-         "🚀 ~ updateAdditionalInformation ~ businessFunctionsToUpdate:",
-         businessFunctionsToUpdate
-      )
-      console.log(
-         "🚀 ~ updateAdditionalInformation ~ contentTopicsToUpdate:",
-         contentTopicsToUpdate
-      )
       const toUpdate = {
          ...genderToUpdate,
          ...spokenLanguagesToUpdate,
