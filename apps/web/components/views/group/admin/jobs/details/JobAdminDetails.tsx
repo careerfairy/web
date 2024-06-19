@@ -63,7 +63,6 @@ const styles = sxStyles({
    },
    tabs: {
       borderBottom: (theme) => `1px solid ${theme.palette.neutral[100]}`,
-
       "& .MuiTabs-scrollButtons": {
          width: "auto !important",
       },
@@ -116,8 +115,8 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
       : false
 
-   const tabs = useMemo(() => {
-      const tabs = [
+   const tabs = useMemo(
+      () => [
          {
             label: "Applicants",
             component: () =>
@@ -144,9 +143,9 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             label: "Job Opening",
             component: () => <JobPosting job={job} group={group} />,
          },
-      ]
-      return tabs
-   }, [allowToDisplayApplicantsData, group, job, jobHasNoContent, jobHubV1])
+      ],
+      [allowToDisplayApplicantsData, group, job, jobHasNoContent, jobHubV1]
+   )
 
    if (!job) {
       return void push(`/group/${group.id}/admin/jobs`)
