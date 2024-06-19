@@ -5,21 +5,14 @@ import { useHasEventNotification } from "./useHasEventNotification"
 
 type Props = {
    spark: SparkPresenter
-   shouldShowLinkedInCTA?: boolean
 }
 
-export const SparksPopUpNotificationManager = ({
-   spark,
-   shouldShowLinkedInCTA,
-}: Props) => {
+export const SparksPopUpNotificationManager = ({ spark }: Props) => {
    const hasEventNotification = useHasEventNotification(spark)
 
    return hasEventNotification ? (
       <SparksEventNotification spark={spark} />
    ) : (
-      <SparksCreatorNotification
-         spark={spark}
-         shouldShowLinkedInCTA={shouldShowLinkedInCTA}
-      />
+      <SparksCreatorNotification spark={spark} />
    )
 }
