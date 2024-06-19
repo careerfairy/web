@@ -33,6 +33,10 @@ export type LivestreamFormGeneralTabValues = {
    language: LivestreamLanguage
    summary: string
    reasonsToJoin: string[]
+   categories: {
+      values: GroupOption[]
+      options: GroupOption[]
+   }
    businessFunctionsTagIds: GroupOption[]
    contentTopicsTagIds: GroupOption[]
    targetCountries: GroupOption[]

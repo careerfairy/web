@@ -4,15 +4,14 @@ import {
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group, GroupQuestion } from "@careerfairy/shared-lib/groups"
-import {
-   Creator,
-   mapSpeakerToCreator,
-} from "@careerfairy/shared-lib/groups/creators"
+import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
+import { Interest } from "@careerfairy/shared-lib/interests"
 import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { useAuth } from "HOCs/AuthProvider"
 import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
+import { useInterests } from "components/custom-hook/useCollection"
 import { Formik } from "formik"
 import { ReactNode } from "react"
 import { useGroupQuestions } from "../useGroupQuestions"
@@ -40,6 +39,10 @@ const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
    language: null,
    summary: "",
    reasonsToJoin: [],
+   categories: {
+      values: [],
+      options: [],
+   },
    businessFunctionsTagIds: [],
    contentTopicsTagIds: [],
    targetCountries: [],
@@ -74,6 +77,24 @@ const formInitialValues: LivestreamFormValues = {
    speakers: { ...formSpeakersTabInitialValues },
    questions: { ...formQuestionsTabInitialValues },
    jobs: { ...formJobsTabInitialValues },
+}
+
+const mapSpeakerToCreator = (speaker: Speaker): Creator => {
+   return {
+      id: speaker.id,
+      groupId: null,
+      documentType: "groupCreator",
+      firstName: speaker.firstName || null,
+      lastName: speaker.lastName || null,
+      position: speaker.position || null,
+      email: speaker.email || null,
+      avatarUrl: speaker.avatar || null,
+      createdAt: null,
+      updatedAt: null,
+      linkedInUrl: speaker.linkedInUrl || "",
+      story: speaker.background || null,
+      roles: speaker.roles || [CreatorRoles.Speaker],
+   }
 }
 
 const unionCreatorsAndSpeakers = (
@@ -138,6 +159,7 @@ const buildRegistrationQuestions = (
 type ConvertLivestreamObjectToFormArgs = {
    livestream: LivestreamEvent
    group: Group
+   existingInterests: Interest[]
    groupQuestions: GroupQuestion[]
    feedbackQuestions: FeedbackQuestionFormValues[]
    customJobs: PublicCustomJob[]
@@ -148,6 +170,7 @@ type ConvertLivestreamObjectToFormArgs = {
 const convertLivestreamObjectToForm = ({
    livestream,
    group,
+   existingInterests,
    groupQuestions,
    feedbackQuestions,
    customJobs,
@@ -178,6 +201,11 @@ const convertLivestreamObjectToForm = ({
          : group?.bannerImageUrl ||
            formGeneralTabInitialValues.backgroundImageUrl
    }
+
+   general.categories.values = existingInterests.filter((interest) =>
+      livestream.interestsIds?.includes(interest.id)
+   )
+   general.categories.options = existingInterests
 
    general.language =
       livestream.language || formGeneralTabInitialValues.language
@@ -270,6 +298,7 @@ type Props = {
 
 const LivestreamFormikProvider = ({ livestream, group, children }: Props) => {
    const { userData } = useAuth()
+   const { data: existingInterests } = useInterests()
    const { data: creators } = useGroupCreators(group?.id)
    const { groupQuestions } = useGroupQuestions(group?.id)
    const { feedbackQuestions } = useFeedbackQuestions(
@@ -284,6 +313,7 @@ const LivestreamFormikProvider = ({ livestream, group, children }: Props) => {
       ? convertLivestreamObjectToForm({
            livestream,
            group,
+           existingInterests,
            groupQuestions,
            feedbackQuestions,
            customJobs: initialSelectedCustomJobs,
