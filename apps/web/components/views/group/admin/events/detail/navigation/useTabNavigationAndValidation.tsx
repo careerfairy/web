@@ -25,7 +25,7 @@ export const useTabNavigationAndValidation = (general, speakers) => {
       handleValidationOpenDialog,
       handleValidationCloseDialog,
    ] = useDialogStateHandler()
-
+   console.log("🚀 ~ useTabNavigationAndValidation ~ general:", general)
    const isGeneralTabInvalid =
       !livestreamFormGeneralTabSchema.isValidSync(general) &&
       tabsVisited[TAB_VALUES.GENERAL]
