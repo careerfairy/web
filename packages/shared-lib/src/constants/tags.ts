@@ -88,3 +88,7 @@ export const TagValues: OptionGroup[] = [
 export const TagValuesLookup = Object.fromEntries(
    TagValues.map((tag) => [tag.id, tag.name])
 )
+
+export const TagsLookup = Object.fromEntries(
+   TagValues.map((tag) => [tag.id, tag])
+)

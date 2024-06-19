@@ -128,6 +128,8 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .required()
          .min(1, getSelectAtLeastOneMessage("level of study")),
       groupIds: yup.array().of(yup.string()),
+      contentTopicsTagIds: yup.array().of(groupOptionShape).required(),
+      businessFunctionsTagIds: yup.array().of(groupOptionShape).required(),
    })
 
 const livestreamFormSpeakersTabValuesSchema = yup
