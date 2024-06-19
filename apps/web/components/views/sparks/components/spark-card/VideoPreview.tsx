@@ -148,7 +148,7 @@ const VideoPreview: FC<Props> = ({
          if (!autoPlaying) {
             setProgress(progress.played * 100)
             onProgress(progress)
-            onPercentagePlayed(progress.played)
+            onPercentagePlayed?.(progress.played)
          }
       },
       [autoPlaying, onPercentagePlayed, onProgress]
