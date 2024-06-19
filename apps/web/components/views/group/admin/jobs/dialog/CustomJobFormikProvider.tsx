@@ -10,7 +10,7 @@ import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifica
 import { customJobRepo } from "data/RepositoryInstances"
 import { Timestamp } from "data/firebase/FirebaseInstance"
 import { Formik } from "formik"
-import { FC, MutableRefObject, ReactNode, useCallback } from "react"
+import { MutableRefObject, ReactNode, useCallback } from "react"
 import { useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "store/selectors/adminJobsSelectors"
 import { v4 as uuidv4 } from "uuid"
@@ -72,13 +72,13 @@ const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
    }
 }
 
-const JobFormikProvider: FC<Props> = ({
+const JobFormikProvider = ({
    job,
    children,
    quillInputRef,
    afterCreateCustomJob,
    afterUpdateCustomJob,
-}) => {
+}: Props) => {
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { group } = useGroupFromState()
    const { successNotification, errorNotification } = useSnackbarNotifications()
