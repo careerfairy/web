@@ -5,13 +5,13 @@ import GBLocale from "date-fns/locale/en-GB"
 import { useFormikContext } from "formik"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import DateUtil from "../../../../../../util/DateUtil"
-import { getTextFieldProps } from "../../../../../helperFunctions/streamFormFunctions"
-import { datePickerDefaultStyles } from "../../../../calendar/utils"
-import BrandedAutocomplete from "../../../../common/inputs/BrandedAutocomplete"
+import DateUtil from "../../../../../../../util/DateUtil"
+import { getTextFieldProps } from "../../../../../../helperFunctions/streamFormFunctions"
+import { datePickerDefaultStyles } from "../../../../../calendar/utils"
+import BrandedAutocomplete from "../../../../../common/inputs/BrandedAutocomplete"
 import BrandedTextField, {
    FormBrandedTextField,
-} from "../../../../common/inputs/BrandedTextField"
+} from "../../../../../common/inputs/BrandedTextField"
 import { JobFormValues } from "./JobFormDialog"
 
 const JobForm = ({ quillInputRef }) => {
