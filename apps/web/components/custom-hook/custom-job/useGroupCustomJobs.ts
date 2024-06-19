@@ -1,10 +1,11 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
 type Options = {
    livestreamId?: string
+   sparkId?: string
 }
 
 /**
@@ -14,7 +15,7 @@ type Options = {
  * @param options
  */
 const useGroupCustomJobs = (groupId: string, options: Options = {}) => {
-   const { livestreamId = "" } = options
+   const { livestreamId = "", sparkId = "" } = options
 
    const collectionRef = query(
       collection(useFirestore(), "customJobs"),
@@ -22,6 +23,7 @@ const useGroupCustomJobs = (groupId: string, options: Options = {}) => {
       ...(livestreamId
          ? [where("livestreams", "array-contains", livestreamId)]
          : []),
+      ...(sparkId ? [where("sparks", "array-contains", sparkId)] : []),
       orderBy("createdAt", "desc")
    )
 
