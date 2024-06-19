@@ -5,8 +5,10 @@ import {
 import { CircularProgress } from "@mui/material"
 import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { useFormikContext } from "formik"
 import dynamic from "next/dynamic"
-import { FC, useCallback, useMemo, useRef } from "react"
+import { useCallback, useMemo, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
 import {
@@ -25,6 +27,7 @@ import JobFormikProvider from "./CustomJobFormikProvider"
 import NoLinkedContentDialog from "./additionalSteps/NoLinkedContentDialog"
 import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
 import JobBasicInfo from "./createJob/JobBasicInfo"
+import JobFormDialog, { JobFormValues } from "./createJob/JobFormDialog"
 import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
 export type JobDialogStep = ReturnType<typeof getViews>[number]["key"]
@@ -59,22 +62,31 @@ const JobAdditionalDetails = dynamic(
    }
 )
 
-const getViews = (quillInputRef, job?: CustomJob) =>
+const getViews = (jobHubV1: boolean, quillInputRef, job?: CustomJob) =>
    [
       {
          key: "privacy-policy",
          Component: () => <PrivacyPolicyDialog />,
       },
-      {
-         key: "create-job-basic-info",
-         Component: () => <JobBasicInfo />,
-      },
-      {
-         key: "create-job-additional-details",
-         Component: () => (
-            <JobAdditionalDetails quillInputRef={quillInputRef} />
-         ),
-      },
+      ...(jobHubV1
+         ? [
+              {
+                 key: "create-job-basic-info",
+                 Component: () => <JobBasicInfo />,
+              },
+              {
+                 key: "create-job-additional-details",
+                 Component: () => (
+                    <JobAdditionalDetails quillInputRef={quillInputRef} />
+                 ),
+              },
+           ]
+         : [
+              {
+                 key: "oldJobForm",
+                 Component: () => <JobFormDialog />,
+              },
+           ]),
       {
          key: "no-linked-content",
          Component: () => <NoLinkedContentDialog />,
@@ -90,34 +102,9 @@ type Props = {
    afterUpdateCustomJob?: (job: PublicCustomJob) => void
 }
 
-const JobDialog: FC<Props> = ({
-   afterCreateCustomJob,
-   afterUpdateCustomJob,
-}) => {
-   const { handleClose } = useStepper<JobDialogStep>()
-   const { group } = useGroupFromState()
-   const dispatch = useDispatch()
-   const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
-   const isDeleteJobDialogOpen = useSelector(deleteJobsDialogOpenSelector)
+const JobDialog = ({ afterCreateCustomJob, afterUpdateCustomJob }: Props) => {
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
-   const isDeleteJobDialogWithLinkedLivestreamsOpen = useSelector(
-      deleteJobWithLinkedLivestreamsDialogOpenSelector
-   )
    const quillInputRef = useRef()
-
-   const handleCloseDialog = useCallback(() => {
-      dispatch(closeJobsDialog())
-      handleClose()
-   }, [dispatch, handleClose])
-
-   const initialStep = useMemo(() => {
-      if (isDeleteJobDialogOpen) {
-         return JobDialogStepEnum.DELETE_JOB
-      }
-      return group.privacyPolicyActive || selectedJobId
-         ? JobDialogStepEnum.FORM_BASIC_INFO
-         : JobDialogStepEnum.PRIVACY_POLICY
-   }, [group.privacyPolicyActive, isDeleteJobDialogOpen, selectedJobId])
 
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
@@ -129,30 +116,64 @@ const JobDialog: FC<Props> = ({
                   afterCreateCustomJob={afterCreateCustomJob}
                   afterUpdateCustomJob={afterUpdateCustomJob}
                >
-                  <SteppedDialog
-                     key={
-                        isJobFormDialogOpen || isDeleteJobDialogOpen
-                           ? "open"
-                           : "closed"
-                     }
-                     bgcolor="#FCFCFC"
-                     handleClose={handleCloseDialog}
-                     open={isJobFormDialogOpen || isDeleteJobDialogOpen}
-                     views={getViews(quillInputRef, job)}
-                     initialStep={initialStep}
-                     transition={SlideUpTransition}
-                     sx={[
-                        styles.dialog,
-                        isDeleteJobDialogOpen ? styles.smallDeleteDialog : null,
-                        isDeleteJobDialogWithLinkedLivestreamsOpen
-                           ? styles.jobWithList
-                           : null,
-                     ]}
-                  />
+                  <Content job={job} />
                </JobFormikProvider>
             )}
          </JobFetchWrapper>
       </SuspenseWithBoundary>
+   )
+}
+
+type ContentProps = {
+   job: CustomJob
+}
+
+const Content = ({ job }: ContentProps) => {
+   const { handleClose } = useStepper<JobDialogStep>()
+   const { group } = useGroupFromState()
+   const dispatch = useDispatch()
+   const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
+   const isDeleteJobDialogOpen = useSelector(deleteJobsDialogOpenSelector)
+   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const isDeleteJobDialogWithLinkedLivestreamsOpen = useSelector(
+      deleteJobWithLinkedLivestreamsDialogOpenSelector
+   )
+   const quillInputRef = useRef()
+   const { jobHubV1 } = useFeatureFlags()
+   const { resetForm } = useFormikContext<JobFormValues>()
+
+   const handleCloseDialog = useCallback(() => {
+      dispatch(closeJobsDialog())
+      handleClose()
+      resetForm()
+   }, [dispatch, handleClose, resetForm])
+
+   const initialStep = useMemo(() => {
+      if (isDeleteJobDialogOpen) {
+         return JobDialogStepEnum.DELETE_JOB
+      }
+      return group.privacyPolicyActive || selectedJobId
+         ? JobDialogStepEnum.FORM_BASIC_INFO
+         : JobDialogStepEnum.PRIVACY_POLICY
+   }, [group.privacyPolicyActive, isDeleteJobDialogOpen, selectedJobId])
+
+   return (
+      <SteppedDialog
+         key={isJobFormDialogOpen || isDeleteJobDialogOpen ? "open" : "closed"}
+         bgcolor="#FCFCFC"
+         handleClose={handleCloseDialog}
+         open={isJobFormDialogOpen || isDeleteJobDialogOpen}
+         views={getViews(jobHubV1, quillInputRef, job)}
+         initialStep={initialStep}
+         transition={SlideUpTransition}
+         sx={[
+            styles.dialog,
+            isDeleteJobDialogOpen ? styles.smallDeleteDialog : null,
+            isDeleteJobDialogWithLinkedLivestreamsOpen
+               ? styles.jobWithList
+               : null,
+         ]}
+      />
    )
 }
 
