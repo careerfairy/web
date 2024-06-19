@@ -1,4 +1,5 @@
 import { createCompatGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    GroupAdmin,
    GroupAdminNewEventEmailInfo,
@@ -45,9 +46,12 @@ import {
    Timestamp,
    firestore as firestoreAdmin,
 } from "../api/firestoreAdmin"
-import type { FunctionsLogger } from "../util"
+import { customJobRepo } from "../api/repositories"
+import { FunctionsLogger, getChangeTypes } from "../util"
 import { addOperations } from "./stats/livestream"
 import type { OperationsToMake } from "./stats/util"
+import { syncCustomJobLinkedContentTags } from "./tagging/tags"
+import { logAndThrow } from "./validations"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -177,6 +181,20 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @param handRaise - The new hand raise state.
     */
    updateHandRaise(livestreamId: string, handRaise: boolean): Promise<void>
+
+   /**
+    * Synchronizes the the business function tags from a customJob, to all the associated
+    * live streams, also updates the tags on live streams which were removed from the jobs.
+    * This means fetching all other jobs for the unlinked live streams, and keep for that event only
+    * the other jobs tags.
+    * @param afterJob customJob after update
+    * @param beforeJob customJob before data update
+    */
+   syncCustomJobBusinessFunctionTagsToLivestreams(
+      afterJob: CustomJob,
+      beforeJob: CustomJob,
+      changeType: ReturnType<typeof getChangeTypes>
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -652,5 +670,66 @@ export class LivestreamFunctionsRepository
       batch.update(livestreamRef, updateData)
 
       return batch.commit()
+   }
+
+   async syncCustomJobBusinessFunctionTagsToLivestreams(
+      afterJob: CustomJob,
+      beforeJob: CustomJob,
+      changeType: ReturnType<typeof getChangeTypes>
+   ): Promise<void> {
+      functions.logger.log(
+         `Sync tags with live streams from customJob: ${afterJob.id}`
+      )
+
+      // When creating data manually on firefoo an empty object is created first
+      // this prevents doing any processing if no id is present, the remaining checks
+      // for linked content is null safe and will also result in an early return for empty objects
+      if (!afterJob?.id) return
+
+      const updatePromises = []
+      const updatedEvents = await syncCustomJobLinkedContentTags(
+         afterJob,
+         beforeJob,
+         changeType,
+         (job) => job.livestreams,
+         (livestreamIds) => this.getLivestreamsByIds(livestreamIds),
+         (livestreamIds) =>
+            customJobRepo.getCustomJobsByLinkedContentIds(
+               "livestreams",
+               livestreamIds
+            )
+      )
+
+      updatedEvents
+         .map((event) => {
+            const ref = this.firestore
+               .collection("livestreams")
+               .withConverter(createCompatGenericConverter<LivestreamEvent>())
+               .doc(event.id)
+
+            functions.logger.log(
+               `live stream ${event.id} tags after sync: ${event.linkedCustomJobsTagIds}`
+            )
+            return ref.update({
+               linkedCustomJobsTagIds: event.linkedCustomJobsTagIds,
+            })
+         })
+         .forEach((updatePromise) => updatePromises.push(updatePromise))
+
+      const results = await Promise.allSettled(updatePromises)
+
+      const errors = results.filter((res) => res.status == "rejected")
+
+      if (errors.length) {
+         logAndThrow("Error synching tags with live streams", {
+            livestreamIds: afterJob.livestreams,
+            customJobId: afterJob.id,
+            errors: errors,
+         })
+      }
+
+      functions.logger.log(
+         `Updated live streams linked to customJob ${afterJob.id}`
+      )
    }
 }
