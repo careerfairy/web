@@ -37,6 +37,8 @@ export type LivestreamFormGeneralTabValues = {
       values: GroupOption[]
       options: GroupOption[]
    }
+   businessFunctionsTagIds: GroupOption[]
+   contentTopicsTagIds: GroupOption[]
    targetCountries: GroupOption[]
    targetUniversities: GroupOption[]
    targetFieldsOfStudy: FieldOfStudy[]
