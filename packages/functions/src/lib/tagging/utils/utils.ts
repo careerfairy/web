@@ -2,7 +2,7 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export const getCustomJobsByLinkedContentIds = (
    customJobs: CustomJob[],
-   linkField: "sparks" | "livestreams",
+   linkField: keyof Pick<CustomJob, "sparks" | "livestreams">,
    ids: string[]
 ): Promise<CustomJob[]> => {
    return Promise.resolve(

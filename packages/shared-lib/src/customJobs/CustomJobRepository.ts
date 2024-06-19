@@ -263,7 +263,7 @@ export class FirebaseCustomJobRepository
    }
 
    async getCustomJobsByLinkedContentIds(
-      linkField: "sparks" | "livestreams",
+      linkField: keyof Pick<CustomJob, "sparks" | "livestreams">,
       ids: string[]
    ): Promise<CustomJob[]> {
       if (!ids.length) return []
@@ -273,7 +273,7 @@ export class FirebaseCustomJobRepository
       for (const chunk of chunks) {
          promises.push(
             this.firestore
-               .collection("customJobs")
+               .collection(this.COLLECTION_NAME)
                .where(linkField, "array-contains-any", chunk)
                .get()
                .then(mapFirestoreDocuments)

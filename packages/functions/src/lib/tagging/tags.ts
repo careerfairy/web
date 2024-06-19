@@ -61,7 +61,7 @@ export const syncCustomJobLinkedContentTags = async <
    const afterJobLinkedContentIds = linkedContentIdsGetter(afterJob) ?? []
    const beforeJobLinkedContentIds = linkedContentIdsGetter(beforeJob) ?? []
 
-   const hasLinkedContent = Boolean(linkedContentIdsGetter(afterJob))
+   const hasLinkedContent = Boolean(linkedContentIdsGetter(afterJob)?.length)
 
    const addedContent = getArrayDifference(
       beforeJobLinkedContentIds,
