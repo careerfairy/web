@@ -1,5 +1,5 @@
-import { FunctionsInstance } from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
+import { FunctionsInstance } from "./FirebaseInstance"
 import HttpsCallableResult = firebase.functions.HttpsCallableResult
 
 export class CustomJobService {
@@ -34,7 +34,7 @@ export class CustomJobService {
       jobIds: string[]
    ): Promise<HttpsCallableResult> {
       return this.firebaseFunctions.httpsCallable(
-         "updateCustomJobWithLinkedLivestreams"
+         "updateCustomJobWithLinkedLivestreams_v2"
       )({
          livestreamId,
          jobIds,
@@ -54,7 +54,7 @@ export class CustomJobService {
       groupId: string
    ): Promise<HttpsCallableResult> {
       return this.firebaseFunctions.httpsCallable(
-         "transferCustomJobsFromDraftToPublishedLivestream"
+         "transferCustomJobsFromDraftToPublishedLivestream_v2"
       )({
          draftId,
          livestreamId,
