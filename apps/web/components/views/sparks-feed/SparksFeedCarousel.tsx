@@ -298,7 +298,6 @@ const SparksFeedCarousel: FC = () => {
                      playing={isPlaying}
                      spark={activeSpark}
                      identifier={activeSpark.id + currentPlayingIndex}
-                     isOverlayedOntop
                   />
                </Slide>
             </ViewportBox>
