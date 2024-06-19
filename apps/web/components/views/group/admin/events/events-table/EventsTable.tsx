@@ -532,7 +532,7 @@ const EventsTable = ({
                   handleClose={() => setStreamIdToBeDeleted(null)}
                   handleConfirm={handleDeleteStream}
                   loading={deletingEvent}
-                  message={`Are you sure this ${
+                  message={`Are you sure you want to delete this ${
                      isDraft ? "draft" : "stream"
                   }? you will be no longer able to recover it`}
                />

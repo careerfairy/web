@@ -9,10 +9,10 @@ type Options = {
 }
 
 /**
- * Fetch Custom Jobs based on groupId
+ * Retrieves custom jobs associated with a specific group ID
  *
- * @param groupId
- * @param options
+ * @param {string} groupId - The ID of the group to fetch custom jobs for.
+ * @param {Options} options - Optional parameters to filter custom jobs by livestream ID or spark ID.
  */
 const useGroupCustomJobs = (groupId: string, options: Options = {}) => {
    const { livestreamId = "", sparkId = "" } = options
