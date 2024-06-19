@@ -72,7 +72,7 @@ const JobFormDialog: FC<Props> = ({
 }) => {
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { group } = useGroupFromState()
-   const { handleClose } = useStepper()
+   const { handleClose, moveToNext } = useStepper()
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const quillInputRef = useRef()
 
@@ -160,7 +160,7 @@ const JobFormDialog: FC<Props> = ({
                               <SteppedDialog.Button
                                  variant="outlined"
                                  color="grey"
-                                 onClick={handleClose}
+                                 onClick={moveToNext}
                                  sx={styles.cancelBtn}
                               >
                                  Cancel
