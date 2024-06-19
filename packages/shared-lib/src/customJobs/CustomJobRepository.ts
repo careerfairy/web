@@ -29,7 +29,7 @@ export interface ICustomJobRepository {
     * To update an existing custom job on the CustomJob root collection
     * @param job
     */
-   updateCustomJob(job: PublicCustomJob): Promise<void>
+   updateCustomJob(job: Partial<CustomJob>): Promise<void>
 
    /**
     * To delete a custom job on the CustomJob root collection
@@ -157,13 +157,13 @@ export class FirebaseCustomJobRepository
       return newJob
    }
 
-   async updateCustomJob(job: CustomJob): Promise<void> {
+   async updateCustomJob(job: Partial<CustomJob>): Promise<void> {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc(job.id)
 
       const isJobPublished =
          !job?.deleted && (job.livestreams.length > 0 || job.sparks.length > 0)
 
-      const updatedJob: CustomJob = {
+      const updatedJob: Partial<CustomJob> = {
          ...job,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
          published: isJobPublished,
