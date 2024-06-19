@@ -11,6 +11,7 @@ import { useSelector } from "react-redux"
 import {
    activeSparkSelector,
    anonymousUserCountryCodeSelector,
+   shouldShowLinkedInPopUpNotificationSelector,
 } from "store/selectors/sparksFeedSelectors"
 import CreatorAvatar from "../../CreatorAvatar"
 import { LinkedInIcon } from "./LinkedInIcon"
@@ -106,23 +107,23 @@ const SignUpButton = () => {
 
 type Props = {
    spark: SparkPresenter
-   shouldShowLinkedInCTA: boolean
 }
 
-export const SparksCreatorNotification = ({
-   spark,
-   shouldShowLinkedInCTA,
-}: Props) => {
+export const SparksCreatorNotification = ({ spark }: Props) => {
    const { userData, isLoggedIn } = useAuth()
 
-   const [hasUserClickedAnyButton, setHasUserClickedAnyButton] = useState(false)
-   const [playingCriteriaHasBeenMet, setPlayingCriteriaHasBeenMet] =
-      useState(false)
    const { trackEvent } = useSparksFeedTracker()
    const activeSpark = useSelector(activeSparkSelector)
    const anonymousUserCountryCode = useSelector(
       anonymousUserCountryCodeSelector
    )
+   const shouldShowLinkedInCTA = useSelector(
+      shouldShowLinkedInPopUpNotificationSelector
+   )
+
+   const [hasUserClickedAnyButton, setHasUserClickedAnyButton] = useState(false)
+   const [playingCriteriaHasBeenMet, setPlayingCriteriaHasBeenMet] =
+      useState(false)
 
    const linkedInHandleClick = useCallback(() => {
       window.open(spark.creator.linkedInUrl, "_blank")
