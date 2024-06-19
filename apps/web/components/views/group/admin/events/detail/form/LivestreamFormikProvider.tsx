@@ -1,3 +1,4 @@
+import { TagsLookup } from "@careerfairy/shared-lib/constants/tags"
 import {
    PublicCustomJob,
    pickPublicDataFromCustomJob,
@@ -42,6 +43,8 @@ const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
       values: [],
       options: [],
    },
+   businessFunctionsTagIds: [],
+   contentTopicsTagIds: [],
    targetCountries: [],
    targetUniversities: [],
    targetFieldsOfStudy: [],
@@ -240,6 +243,18 @@ const convertLivestreamObjectToForm = ({
       general.targetFieldsOfStudy
    )
 
+   general.businessFunctionsTagIds = (
+      livestream.businessFunctionsTagIds ||
+      formGeneralTabInitialValues.businessFunctionsTagIds
+   ).map((id) => {
+      return TagsLookup[id]
+   })
+   general.contentTopicsTagIds = (
+      livestream.contentTopicsTagIds ||
+      formGeneralTabInitialValues.contentTopicsTagIds
+   ).map((id) => {
+      return TagsLookup[id]
+   })
    // This is to ensure backwards compatibility
    const filteredSpeakers = livestream.speakers.filter(
       (speaker) => speaker.firstName && speaker.lastName
