@@ -1,7 +1,7 @@
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { Chip, Grid } from "@mui/material"
-import { Dispatch, SetStateAction, useCallback, useState } from "react"
-import { useDebounce } from "react-use"
+import { useCallback } from "react"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../types/commonTypes"
 
@@ -51,7 +51,10 @@ type SelectorProps = {
       selectedTags: OptionGroup[]
    ) => Promise<void>
    tags: OptionGroup[]
-   field: "businessFunctionsTagIds" | "contentTopicsTagIds"
+   field: keyof Pick<
+      UserData,
+      "businessFunctionsTagIds" | "contentTopicsTagIds"
+   >
 }
 
 export const Selector = ({
@@ -61,27 +64,19 @@ export const Selector = ({
 }: SelectorProps) => {
    const { userData } = useAuth()
 
-   const [userTags, setUserTags] = useState<TagsMap>(() => {
-      return Object.fromEntries(
-         tags.map((tag) => {
-            return [
-               tag.id,
-               {
-                  state: userData[field]?.includes(tag.id) || false,
-                  option: tag,
-               },
-            ]
-         })
-      )
-   })
+   const tagsMap: TagsMap = Object.fromEntries(
+      tags.map((tag) => {
+         return [
+            tag.id,
+            {
+               state: userData[field]?.includes(tag.id) || false,
+               option: tag,
+            },
+         ]
+      })
+   )
 
-   const updatedTags = Object.keys(userTags)
-      .filter((id) => userTags[id].state)
-      .map((id) => userTags[id].option)
-
-   useDebounce(() => handleTagChangeDebounced(updatedTags), 100, [updatedTags])
-
-   const handleTagChangeDebounced = useCallback(
+   const handleTagChange = useCallback(
       async (selectedTags: OptionGroup[]) => {
          return await handleInterestTagChange(
             userData.userEmail,
@@ -95,9 +90,8 @@ export const Selector = ({
    return (
       <>
          <TagValuesSelector
-            tagIds={Object.keys(userTags)}
-            tagsMap={userTags}
-            setUserTags={setUserTags}
+            tagsMap={tagsMap}
+            setUserTags={handleTagChange}
             field={field}
          />
       </>
@@ -105,14 +99,12 @@ export const Selector = ({
 }
 
 type TagValuesSelectorProps = {
-   tagIds: string[]
    tagsMap: TagsMap
    field: string
-   setUserTags: Dispatch<SetStateAction<TagsMap>>
+   setUserTags: (selectedTags: OptionGroup[]) => Promise<void>
 }
 
 const TagValuesSelector = ({
-   tagIds: tagIds,
    tagsMap: tagsMap,
    setUserTags: setUserTags,
    field,
@@ -120,20 +112,22 @@ const TagValuesSelector = ({
    return (
       <Grid container spacing={2} justifyContent="center">
          <Grid container>
-            {tagIds.map((tagId) => {
+            {Object.keys(tagsMap).map((tagId) => {
                return (
                   <Chip
                      data-testid={`${field}_${tagId}_option`}
                      onClick={() => {
                         const selected = tagsMap[tagId]
 
-                        const functions = {
+                        const tags = {
                            ...tagsMap,
                         }
 
-                        functions[tagId].state = !selected.state
-
-                        setUserTags(functions)
+                        tags[tagId].state = !selected.state
+                        const upToDateTags = Object.keys(tags)
+                           .filter((tagId) => tags[tagId].state)
+                           .map((tagId) => tags[tagId].option)
+                        setUserTags(upToDateTags)
                      }}
                      clickable
                      sx={[

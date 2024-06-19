@@ -1,4 +1,5 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { Stack } from "@mui/material"
 import Selector from "components/views/signup/userInformation/tags/Selector"
 import { mapOptions } from "components/views/signup/utils"
@@ -8,7 +9,10 @@ import { errorLogAndNotify } from "util/CommonUtil"
 
 type ContentTagsSelectorProps = {
    tags: OptionGroup[]
-   field: "businessFunctionsTagIds" | "contentTopicsTagIds"
+   field: keyof Pick<
+      UserData,
+      "businessFunctionsTagIds" | "contentTopicsTagIds"
+   >
 }
 
 export const ContentTagsSelector = (props: ContentTagsSelectorProps) => {
