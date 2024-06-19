@@ -183,6 +183,11 @@ export const mapFormValuesToLivestreamObject = (
    const mappedContentTopicsTagIds =
       formValues.general.contentTopicsTagIds?.map((tag) => tag.id) || []
 
+   const mappedBusinessFunctionsTagIds =
+      formValues.general.businessFunctionsTagIds?.map((tag) => tag.id) || []
+   const mappedContentTopicsTagIds =
+      formValues.general.contentTopicsTagIds?.map((tag) => tag.id) || []
+
    const creatorsIds = formValues.speakers.options
       .filter((option) => option.isCreator)
       .filter((creator) => {
