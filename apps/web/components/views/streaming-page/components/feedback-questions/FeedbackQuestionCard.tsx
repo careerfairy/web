@@ -1,3 +1,4 @@
+import { FeedbackQuestionUserAnswer } from "@careerfairy/shared-lib/livestreams"
 import CloseIcon from "@mui/icons-material/Close"
 import { IconButton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
@@ -11,6 +12,7 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "../../context"
 import RatingQuestion from "./RatingQuestion"
 import SentimentQuestion from "./SentimentQuestion"
+import { TextQuestion } from "./TextQuestion"
 
 const styles = sxStyles({
    content: {
@@ -35,7 +37,7 @@ export const QuestionsComponents = {
    [FeedbackQuestionType.SENTIMENT_RATING]: (props) => (
       <SentimentQuestion {...props} />
    ),
-   [FeedbackQuestionType.TEXT]: (props) => <RatingQuestion {...props} />,
+   [FeedbackQuestionType.TEXT]: (props) => <TextQuestion {...props} />,
 }
 
 type FeedbackQuestionCardProps = {
@@ -71,14 +73,14 @@ export const FeedbackQuestionCard = ({
       onAnswer(question)
    }
 
-   const handleSubmit = (event, value: number) => {
+   const handleSubmit = (answer: FeedbackQuestionUserAnswer) => {
       try {
          livestreamService.answerFeedbackQuestion(
             livestreamId,
             question.id,
             agoraUserId,
             { id: userData.id, userEmail: userData.userEmail },
-            { rating: value }
+            answer
          )
       } catch (error) {
          errorLogAndNotify(error, {
@@ -101,7 +103,10 @@ export const FeedbackQuestionCard = ({
             </IconButton>
          </Stack>
          <Typography variant="brandedBody">{question.question}</Typography>
-         <QuestionAction name={question.id} onChange={handleSubmit} />
+         <QuestionAction
+            questionId={question.id}
+            onAnswerSubmit={handleSubmit}
+         />
       </Stack>
    )
 }
