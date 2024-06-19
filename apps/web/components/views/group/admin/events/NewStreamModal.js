@@ -192,10 +192,12 @@ const NewStreamModal = ({
       selectedJobs,
       selectedCustomJobs
    ) => {
+      console.log("🚀 ~ ON SUBMIT -> values:", values)
       let livestream
 
       try {
          setSubmitting(true)
+
          livestream = buildLivestreamObject(
             values,
             updateMode,
@@ -294,6 +296,7 @@ const NewStreamModal = ({
             }))
          }
       }
+      console.log("🚀 ~ values:", values)
    }
 
    const handleSubmit = () => {

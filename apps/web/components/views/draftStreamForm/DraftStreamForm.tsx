@@ -1,4 +1,5 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { TagsLookup } from "@careerfairy/shared-lib/constants/tags"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { Group } from "@careerfairy/shared-lib/groups"
@@ -161,6 +162,8 @@ export const getLivestreamInitialValues = (group: Group) => ({
    reasonsToJoinLivestream_v2: [],
    speakers: { [uuidv4()]: speakerObj },
    creatorsIds: [],
+   contentTopicsTagIds: [],
+   businessFunctionsTagIds: [],
    status: {},
    language: languageCodes[0],
    targetFieldsOfStudy: [],
@@ -234,6 +237,8 @@ export interface DraftFormValues {
    }
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: FieldOfStudy[]
+   contentTopicsTagIds: OptionGroup[]
+   businessFunctionsTagIds: OptionGroup[]
    promotionChannelsCodes: OptionGroup[]
    promotionCountriesCodes: OptionGroup[]
    promotionUniversitiesCodes: OptionGroup[]
@@ -423,6 +428,12 @@ const DraftStreamForm = ({
                   companyId: livestream.companyId || "",
                   title: livestream.title || "",
                   groupIds: livestream.groupIds || [],
+                  contentTopicsTagIds: (
+                     livestream.contentTopicsTagIds || []
+                  ).map((tagId) => TagsLookup[tagId]),
+                  businessFunctionsTagIds: (
+                     livestream.businessFunctionsTagIds || []
+                  ).map((tagId) => TagsLookup[tagId]),
                   interestsIds: livestream.interestsIds || [],
                   start: livestream.start.toDate() || new Date(),
                   groupQuestionsMap: livestream.groupQuestionsMap || {},
