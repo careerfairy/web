@@ -262,10 +262,11 @@ exports.getSparksAnalytics_v2 = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob
-exports.updateCustomJobWithLinkedLivestreams =
+exports.updateCustomJobWithLinkedLivestreams_v2 =
    customJobs.updateCustomJobWithLinkedLivestreams
-exports.transferCustomJobsFromDraftToPublishedLivestream =
+exports.transferCustomJobsFromDraftToPublishedLivestream_v2 =
    customJobs.transferCustomJobsFromDraftToPublishedLivestream
+exports.deleteExpiredCustomJobs = customJobs.deleteExpiredCustomJobs
 
 // Group Subscription Plan Functions
 exports.startPlan_v3 = groupPlans.startPlan
