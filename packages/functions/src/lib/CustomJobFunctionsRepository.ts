@@ -11,8 +11,8 @@ import { CustomJobMetaData } from "@careerfairy/shared-lib/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
+import { livestreamsRepo, sparkRepo } from "src/api/repositories"
 import { Timestamp } from "../api/firestoreAdmin"
-import { livestreamsRepo } from "../api/repositories"
 
 export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    /**
@@ -42,6 +42,12 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    removeLinkedLivestream(livestreamId: string): Promise<void>
 
    /**
+    * This method removes the spark ID from all the linked Jobs
+    * @param sparkId
+    */
+   removeLinkedSpark(sparkId: string): Promise<void>
+
+   /**
     * This method syncs the JobApplication job field based on the received customJob
     * @param updatedCustomJob
     */
@@ -69,6 +75,14 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
     * @param deletedCustomJob
     */
    syncDeletedCustomJobToLinkedLivestreams(
+      deletedCustomJob: CustomJob
+   ): Promise<void>
+
+   /**
+    * This method syncs the deleted job on all the linked sparks
+    * @param deletedCustomJob
+    */
+   syncDeletedCustomJobToLinkedSparks(
       deletedCustomJob: CustomJob
    ): Promise<void>
 }
@@ -147,8 +161,49 @@ export class CustomJobFunctionsRepository
       }
 
       docs.forEach((doc) => {
+         const job = doc.data() as CustomJob
+         let isJobPublished = job.published
+
+         // If the job has no linked sparks and is removing its last linked live stream, we want to unpublish this custom job
+         if (job.livestreams.length === 1 && job.sparks.length === 0) {
+            isJobPublished = false
+         }
+
          batch.update(doc.ref, {
             livestreams: this.fieldValue.arrayRemove(livestreamId),
+            published: isJobPublished,
+         })
+      })
+
+      return batch.commit()
+   }
+
+   async removeLinkedSpark(sparkId: string): Promise<void> {
+      const batch = this.firestore.batch()
+
+      functions.logger.log(`Remove linked jobs from spark ${sparkId}`)
+
+      const docs = await this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("sparks", "array-contains", sparkId)
+         .get()
+
+      if (docs.empty) {
+         return
+      }
+
+      docs.forEach((doc) => {
+         const job = doc.data() as CustomJob
+         let isJobPublished = job.published
+
+         // If the job has no linked live streams and is removing its last linked spark, we want to unpublish this custom job
+         if (job.sparks.length === 1 && job.livestreams.length === 0) {
+            isJobPublished = false
+         }
+
+         batch.update(doc.ref, {
+            sparks: this.fieldValue.arrayRemove(sparkId),
+            published: isJobPublished,
          })
       })
 
@@ -293,7 +348,52 @@ export class CustomJobFunctionsRepository
          const ref = this.firestore.collection("livestreams").doc(livestream.id)
 
          batch.update(ref, {
-            hasJobs: false,
+            hasJobs: true,
+         })
+      })
+
+      return batch.commit()
+   }
+
+   async syncDeletedCustomJobToLinkedSparks(
+      deletedCustomJob: CustomJob
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const { sparks, groupId } = deletedCustomJob
+      const groupCustomJobs = await this.getCustomJobsByGroupId(groupId)
+
+      const linkedSparks = await sparkRepo.getSparksByIds(sparks)
+
+      // Filter out the deleted custom job from the group's custom jobs
+      const filteredGroupJobs = groupCustomJobs.filter(
+         (job) => job.id !== deletedCustomJob.id
+      )
+
+      const sparksToUpdate = linkedSparks.filter((spark) => {
+         // Check if any other custom job in the group links to this spark
+         const hasMoreCustomJobsThanTheDeletedOne = filteredGroupJobs.some(
+            (customJob) =>
+               customJob.sparks.some(
+                  (linkedSparks) => linkedSparks === spark.id
+               )
+         )
+
+         // If another custom job links to this spark, do nothing
+         if (hasMoreCustomJobsThanTheDeletedOne) {
+            return false
+         }
+
+         // Otherwise, mark this spark for update
+         return true
+      })
+
+      // update sparks hasJobs flag
+      sparksToUpdate.map((spark) => {
+         const ref = this.firestore.collection("sparks").doc(spark.id)
+
+         batch.update(ref, {
+            hasJobs: true,
          })
       })
 
