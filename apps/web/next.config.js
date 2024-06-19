@@ -122,6 +122,7 @@ const csp = {
       "https://www.google.com", // Google Ads services
       "https://capig.stape.tech", // Pixel Conversion API Gateway
       "https://www.googletagmanager.com",
+      "https://pagead2.googlesyndication.com", // Google Ads
    ],
    "img-src": [
       "'self'",
