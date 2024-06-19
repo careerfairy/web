@@ -9,7 +9,7 @@ import {
 import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import FirebaseService from "data/firebase/FirebaseService"
 import { Timestamp } from "firebase/firestore"
-import { get, has, isEqual, omit, set } from "lodash"
+import { get, has, isArray, isEqual, omit, set } from "lodash"
 import { LivestreamFormQuestionsTabValues, LivestreamFormValues } from "./types"
 
 export enum TAB_VALUES {
@@ -181,7 +181,14 @@ export const mapFormValuesToLivestreamObject = (
 
       if (has(formValues, fromProperty)) {
          const value = get(formValues, fromProperty)
-         set(result, toProperty, value)
+         // Sanitize values, as for various reasons arrays containing undefined can appear
+         // which happens for required field which do not meet the necessary length for example
+         let sanitizedValue = value
+         if (isArray(value)) {
+            sanitizedValue = (value as any[]).filter(Boolean)
+         }
+
+         set(result, toProperty, sanitizedValue)
       }
    })
 
