@@ -178,8 +178,7 @@ const SparksFeedCard: FC<Props> = ({
 
    const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
 
-   const { onSparkPercentagePlayed, shouldShowLinkedInCTA } =
-      useLinkedInNotificationStateManagement()
+   const { onSparkPercentagePlayed } = useLinkedInNotificationStateManagement()
 
    const companyPageLink = spark.group.publicProfile
       ? `/company/${companyNameSlugify(spark.group.universityName)}`
@@ -225,11 +224,6 @@ const SparksFeedCard: FC<Props> = ({
       [spark.isCardNotification]
    )
 
-   const showPopupNotifications = useMemo(
-      () => Boolean(isOverlayedOntop && shouldShowLinkedInCTA),
-      [isOverlayedOntop, shouldShowLinkedInCTA]
-   )
-
    if (!visitorId) return null
 
    const cardNotificationStyle = () => {
@@ -250,11 +244,10 @@ const SparksFeedCard: FC<Props> = ({
             onClick={handleClickCard}
             sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
          >
-            {showPopupNotifications ? (
-               <SparksPopUpNotificationManager
-                  spark={spark}
-                  shouldShowLinkedInCTA={shouldShowLinkedInCTA}
-               />
+            {isOverlayedOntop ? (
+               <Box key={identifier}>
+                  <SparksPopUpNotificationManager spark={spark} />
+               </Box>
             ) : null}
 
             <Box
