@@ -1,4 +1,5 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { Stack, Typography } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { userRepo } from "data/RepositoryInstances"
@@ -30,7 +31,10 @@ const styles = sxStyles({
 })
 type TagsSelectorProps = {
    tags: OptionGroup[]
-   field: "businessFunctionsTagIds" | "contentTopicsTagIds"
+   field: keyof Pick<
+      UserData,
+      "businessFunctionsTagIds" | "contentTopicsTagIds"
+   >
    label?: string
    description?: string
    labelSx?: any
