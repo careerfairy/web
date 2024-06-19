@@ -189,6 +189,11 @@ export const mapFormValuesToLivestreamObject = (
       formValues.general.categories?.values?.map((category) => category.id) ||
       []
 
+   const mappedBusinessFunctionsTagIds =
+      formValues.general.businessFunctionsTagIds?.map((tag) => tag.id) || []
+   const mappedContentTopicsTagIds =
+      formValues.general.contentTopicsTagIds?.map((tag) => tag.id) || []
+
    const creatorsIds = formValues.speakers.options
       .filter((option) => option.isCreator)
       .filter((creator) => {
@@ -215,6 +220,22 @@ export const mapFormValuesToLivestreamObject = (
 
    if (mappedSpeakers?.length > 0) {
       result.speakers = mappedSpeakers
+   }
+
+   if (mappedSpeakers?.length > 0) {
+      result.speakers = mappedSpeakers
+   }
+
+   if (mappedSpeakers?.length > 0) {
+      result.speakers = mappedSpeakers
+   }
+
+   if (mappedBusinessFunctionsTagIds.length > 0) {
+      result.businessFunctionsTagIds = mappedBusinessFunctionsTagIds
+   }
+
+   if (mappedContentTopicsTagIds.length > 0) {
+      result.contentTopicsTagIds = mappedContentTopicsTagIds
    }
 
    if (Object.keys(mappedRegistrationQuestions).length > 0) {

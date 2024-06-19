@@ -102,6 +102,10 @@ export const buildLivestreamObject = (
       reasonsToJoinLivestream_v2: values.reasonsToJoinLivestream_v2,
       speakers: buildSpeakersArray(values),
       creatorsIds: values.creatorsIds,
+      businessFunctionsTagIds: values.businessFunctionsTagIds.map(
+         (tag) => tag.id
+      ),
+      contentTopicsTagIds: values.contentTopicsTagIds.map((tag) => tag.id),
       language: values.language,
       lastUpdated: firebase.getServerTimestamp(),
       hasEnded: false,
