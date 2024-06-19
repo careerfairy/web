@@ -88,3 +88,14 @@ export const TagValues: OptionGroup[] = [
 export const TagValuesLookup = Object.fromEntries(
    TagValues.map((tag) => [tag.id, tag.name])
 )
+
+export const getBusinessTagsByIds = (tagIds: string[]): OptionGroup[] => {
+   const tagIdSet = new Set(tagIds)
+
+   return BusinessFunctionsTagValues.filter((tag) => tagIdSet.has(tag.id)).map(
+      (tag) => ({
+         id: tag.id,
+         name: tag.name,
+      })
+   )
+}
