@@ -160,7 +160,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userContentTopicTags() {
       if (this.user.contentTopicsTagIds?.length) {
-         // Fetch recommended events based on the user's field of study against events company targeted fields of study
+         // Fetch recommended events based on the user's content topics tag ids against events content topic tags
          this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnContentTopicTags(
                this.user.contentTopicsTagIds,
@@ -174,7 +174,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userBusinessFunctionsTags() {
       if (this.user.businessFunctionsTagIds?.length) {
-         // Fetch recommended events based on the user's field of study against events company targeted fields of study
+         // Fetch recommended events based on the user's business functions tag ids against events business functions tags
          this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnBusinessFunctionTags(
                this.user.businessFunctionsTagIds,
