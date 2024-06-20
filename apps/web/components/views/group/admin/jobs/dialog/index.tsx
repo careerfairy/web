@@ -5,7 +5,6 @@ import {
 import { CircularProgress } from "@mui/material"
 import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import dynamic from "next/dynamic"
 import {
    MutableRefObject,
