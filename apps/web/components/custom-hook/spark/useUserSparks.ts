@@ -45,7 +45,7 @@ export const useUserSparks = () => {
  * Custom hook to preload user sparks before the actual hook is called which will:
  * 1. Preload the user sparks in SWR cache
  * 2. Warm up the Google Cloud Function For 15 mins
- * 3. Backfill the sparks speed for the user, if they never had one to begin with
+ * 3. Backfill the sparks feed for the user, if they never had one to begin with
  */
 export const usePrefetchUserSparks = () => {
    const { authenticatedUser } = useAuth()
