@@ -7,7 +7,7 @@ import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import dynamic from "next/dynamic"
-import { useCallback, useMemo, useRef } from "react"
+import { MutableRefObject, useCallback, useMemo, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
 import {
