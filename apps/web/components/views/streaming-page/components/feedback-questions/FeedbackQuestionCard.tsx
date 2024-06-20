@@ -7,12 +7,12 @@ import {
    FeedbackQuestionType,
 } from "components/views/group/admin/events/detail/form/views/questions/commons"
 import { livestreamService } from "data/firebase/LivestreamService"
+import { ComponentType } from "react"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "../../context"
 import RatingQuestion from "./RatingQuestion"
 import SentimentQuestion from "./SentimentQuestion"
-import { TextQuestion } from "./TextQuestion"
 
 const styles = sxStyles({
    content: {
@@ -32,12 +32,13 @@ const styles = sxStyles({
    },
 })
 
-export const QuestionsComponents = {
-   [FeedbackQuestionType.STAR_RATING]: (props) => <RatingQuestion {...props} />,
-   [FeedbackQuestionType.SENTIMENT_RATING]: (props) => (
-      <SentimentQuestion {...props} />
-   ),
-   [FeedbackQuestionType.TEXT]: (props) => <TextQuestion {...props} />,
+export const QuestionsComponents: Record<
+   Exclude<FeedbackQuestionType, FeedbackQuestionType.TEXT_WITH_RATING>,
+   ComponentType
+> = {
+   [FeedbackQuestionType.STAR_RATING]: RatingQuestion,
+   [FeedbackQuestionType.SENTIMENT_RATING]: SentimentQuestion,
+   [FeedbackQuestionType.TEXT]: RatingQuestion,
 }
 
 type FeedbackQuestionCardProps = {
