@@ -19,7 +19,7 @@ const styles: StylesProps = {
          alignSelf: "stretch",
          gap: "12px",
       },
-      "& .MuiRating-icon": {
+      "& .MuiRating-icon": (theme) => ({
          display: "flex",
          flexDirection: "column",
          justifyContent: "center",
@@ -30,9 +30,9 @@ const styles: StylesProps = {
          alignSelf: "stretch",
          fontSize: "14px",
          lineHeight: "150%" /* 21px */,
-         color: (theme) => theme.palette.neutral[600],
-         background: (theme) => theme.brand.black[400],
-      },
+         color: theme.palette.neutral[600],
+         background: theme.brand.black[400],
+      }),
       "& .MuiRating-iconHover": {
          color: "white",
          background: (theme) => theme.palette.primary.main,
