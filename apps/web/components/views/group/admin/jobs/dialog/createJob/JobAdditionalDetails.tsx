@@ -9,7 +9,7 @@ import SteppedDialog, {
 } from "components/views/stepped-dialog/SteppedDialog"
 import GBLocale from "date-fns/locale/en-GB"
 import { useFormikContext } from "formik"
-import { MutableRefObject, useEffect, useState } from "react"
+import { MutableRefObject } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { Briefcase } from "react-feather"
@@ -72,9 +72,8 @@ type Props = {
 }
 
 const JobAdditionalDetails = ({ quillInputRef }: Props) => {
-   const { moveToPrev, handleClose } = useStepper()
+   const { moveToPrev } = useStepper()
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
-   const [canMoveNext, setCanMoveNext] = useState(false)
    const {
       values: { additionalInfo: additionalInfoValues },
       setFieldValue,
@@ -84,15 +83,6 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
       isSubmitting,
       dirty,
    } = useFormikContext<JobFormValues>()
-
-   // This effect is used to handle the closing of the dialog when the user can move to the next step
-   useEffect(() => {
-      if (canMoveNext && !isSubmitting) {
-         handleClose()
-      }
-      setCanMoveNext(isSubmitting)
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [isSubmitting, handleClose])
 
    return (
       <SteppedDialog.Container
