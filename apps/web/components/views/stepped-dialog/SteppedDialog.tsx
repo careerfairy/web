@@ -449,15 +449,13 @@ const ActionsOffset: FC<BoxProps> = ({ height = actionsHeight }) => {
 
 const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
    return (
-      <span>
-         <LoadingButton
-            sx={combineStyles(sx, styles.button)}
-            color="secondary"
-            {...props}
-         >
-            {children}
-         </LoadingButton>
-      </span>
+      <LoadingButton
+         sx={combineStyles(sx, styles.button)}
+         color="secondary"
+         {...props}
+      >
+         {children}
+      </LoadingButton>
    )
 }
 

@@ -132,7 +132,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                     label: "Linked content",
                     component: () =>
                        jobHasNoContent ? (
-                          <PendingContent job={job} group={group} />
+                          <PendingContent job={job} />
                        ) : (
                           <LinkedContent job={job} />
                        ),
