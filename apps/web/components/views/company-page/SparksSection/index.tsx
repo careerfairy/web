@@ -1,8 +1,11 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Box, Typography } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
+import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
+import { GroupSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
@@ -11,6 +14,18 @@ import { SectionAnchor, TabValue, useCompanyPage } from ".."
 
 type Props = {
    groupId: string
+}
+
+const CarouselHeader = () => {
+   return (
+      <Typography variant="h4" fontWeight={"600"} color="black">
+         Sparks
+      </Typography>
+   )
+}
+
+const Loader = () => {
+   return <FallbackComponent header={<CarouselHeader />} />
 }
 
 const SparksSection: FC<Props> = ({ groupId }) => {
@@ -22,6 +37,7 @@ const SparksSection: FC<Props> = ({ groupId }) => {
       sectionRefs: { eventSectionRef },
    } = useCompanyPage()
    const router = useRouter()
+   const isMounted = useIsMounted()
 
    const handleSparksClicked = useCallback(
       (spark: Spark) => {
@@ -47,17 +63,19 @@ const SparksSection: FC<Props> = ({ groupId }) => {
             ref={eventSectionRef}
             tabValue={TabValue.livesStreams}
          />
-         <SparksCarouselWithSuspenseComponent
-            header={
-               <Typography variant="h4" fontWeight={"600"} color="black">
-                  Sparks
-               </Typography>
-            }
-            groupId={groupId}
-            handleSparksClicked={handleSparksClicked}
-            showArrows={!isMobile}
-            sx={{ pl: 0 }}
-         />
+         {isMounted ? (
+            <SuspenseWithBoundary fallback={<Loader />}>
+               <GroupSparksCarousel
+                  header={<CarouselHeader />}
+                  groupId={groupId}
+                  handleSparksClicked={handleSparksClicked}
+                  showArrows={!isMobile}
+                  sx={{ pl: 0 }}
+               />
+            </SuspenseWithBoundary>
+         ) : (
+            <Loader />
+         )}
       </Box>
    )
 }

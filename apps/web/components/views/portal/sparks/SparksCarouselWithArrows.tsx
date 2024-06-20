@@ -1,7 +1,6 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, IconButton, Stack, SxProps, Theme } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useSparks from "components/custom-hook/spark/useSparks"
 import { useUserSparks } from "components/custom-hook/spark/useUserSparks"
 import SparksCarousel, {
@@ -27,7 +26,6 @@ const styles = sxStyles({
       minWidth: { xs: "25px", md: "30px" },
       ml: 2,
    },
-   sparksContentPaddingLeft: 2,
    defaultSparks: {
       pl: 2,
    },
@@ -41,7 +39,6 @@ const styles = sxStyles({
 
 type Props = {
    header: ReactNode
-   groupId?: string
    handleSparksClicked: (spark: Spark) => void
    sx?: SxProps<Theme>
    headerSx?: SxProps<Theme>
@@ -56,54 +53,44 @@ const sparksCarouselEmblaOptions: EmblaOptionsType = {
    loop: false,
    skipSnaps: true,
 }
-const SparksCarouselWithSuspenseComponent: FC<Props> = ({
-   header,
-   groupId,
-   handleSparksClicked,
-   showArrows = false,
-   arrows,
-   sx,
-   headerSx,
-}) => {
+
+export const GroupSparksCarousel = (props: Props & { groupId: string }) => {
+   const { data: groupSparks } = useSparks({
+      totalItems: 8,
+      groupId: props.groupId,
+   })
+
+   return <SparksCarouselWithArrows {...props} sparks={groupSparks} />
+}
+
+export const UserSparksCarousel: FC<Props> = ({ header, ...props }) => {
+   const { data: userSparks } = useUserSparks()
+   const { isLoadingAuth } = useAuth()
+
+   if (isLoadingAuth) return <FallbackComponent header={header} />
+
    return (
-      <SuspenseWithBoundary fallback={<FallbackComponent header={header} />}>
-         <Component
-            header={header}
-            groupId={groupId}
-            handleSparksClicked={handleSparksClicked}
-            showArrows={showArrows}
-            arrows={arrows}
-            sx={sx}
-            headerSx={headerSx}
-         />
-      </SuspenseWithBoundary>
+      <SparksCarouselWithArrows
+         {...props}
+         header={header}
+         sparks={userSparks}
+      />
    )
 }
 
-const Component: FC<Props> = ({
+type CarouselProps = Props & {
+   sparks: Spark[]
+}
+
+const SparksCarouselWithArrows: FC<CarouselProps> = ({
    header,
-   groupId,
    handleSparksClicked,
    showArrows,
    arrows: Arrows,
    sx,
    headerSx,
+   sparks,
 }) => {
-   const shouldFetchGroupSparks = Boolean(groupId)
-   const { authenticatedUser } = useAuth()
-
-   const { data: groupSparks } = useSparks({
-      totalItems: 8,
-      groupId,
-      disabled: !shouldFetchGroupSparks,
-   })
-
-   const { data: userSparks } = useUserSparks({
-      disabled: shouldFetchGroupSparks,
-   })
-
-   const sparksContent = shouldFetchGroupSparks ? groupSparks : userSparks
-
    const childRef = useRef<ChildRefType | null>(null)
 
    const onClickPrev = () => {
@@ -113,9 +100,7 @@ const Component: FC<Props> = ({
       childRef?.current?.goNext()
    }
 
-   if (!authenticatedUser.isLoaded) return <FallbackComponent header={header} />
-
-   if (!sparksContent) return null
+   if (!sparks?.length) return null
 
    return (
       <Box sx={combineStyles(styles.defaultSparks, sx)}>
@@ -138,7 +123,7 @@ const Component: FC<Props> = ({
             </Box>
             <SparksCarousel
                ref={childRef}
-               sparks={sparksContent}
+               sparks={sparks}
                onSparkClick={handleSparksClicked}
                isAdmin={false}
                options={sparksCarouselEmblaOptions}
@@ -197,5 +182,3 @@ export const MobileSparksArrows: FC<ArrowsProps> = ({
       </Box>
    )
 }
-
-export default SparksCarouselWithSuspenseComponent

@@ -43,10 +43,10 @@ import {
 } from "../../components/views/livestream-dialog"
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
 
-const SparksCarouselWithSuspenseComponent = dynamic(
+const UserSparksCarousel = dynamic(
    () =>
-      import(
-         "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+      import("components/views/portal/sparks/SparksCarouselWithArrows").then(
+         (mod) => mod.UserSparksCarousel
       ),
    {
       ssr: false,
@@ -128,7 +128,7 @@ const PortalPage = ({
                      </Box>
                      <Container disableGutters>
                         <WidgetsWrapper>
-                           <SparksCarouselWithSuspenseComponent
+                           <UserSparksCarousel
                               header={<Heading>SPARKS</Heading>}
                               headerSx={styles.sparksCarouselHeader}
                               handleSparksClicked={handleSparksClicked}
