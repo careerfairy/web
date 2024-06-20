@@ -5,6 +5,7 @@ import { Slide, SlideProps, Snackbar, SnackbarContent } from "@mui/material"
 import { EventRatingWithType } from "components/views/group/admin/events/detail/form/views/questions/commons"
 import { livestreamService } from "data/firebase/LivestreamService"
 import {
+   useHasEnded,
    useHasStarted,
    useStartedAt,
 } from "store/selectors/streamingAppSelectors"
@@ -43,6 +44,7 @@ export const FeedbackQuestions = () => {
    )
    const startedAt = useStartedAt()
    const hasStarted = useHasStarted()
+   const hasEnded = useHasEnded()
    const [open, setOpen] = useState<boolean>(false)
    const [minutesPassed, setMinutesPassed] = useState(
       hasStarted ? DateUtil.getMinutesPassed(new Date(startedAt)) : 0
@@ -93,7 +95,10 @@ export const FeedbackQuestions = () => {
 
    const questionShouldBeActive = useCallback(
       async (question: FeedbackQuestion) => {
-         if (minutesPassed >= question.appearAfter) {
+         if (
+            minutesPassed >= question.appearAfter ||
+            (hasEnded && minutesPassed <= question.appearAfter)
+         ) {
             if (!question.answered) {
                // Check the database
                try {
@@ -119,7 +124,7 @@ export const FeedbackQuestions = () => {
          }
          return false
       },
-      [livestreamId, agoraUserId, minutesPassed, markAsAnswered]
+      [livestreamId, agoraUserId, minutesPassed, markAsAnswered, hasEnded]
    )
 
    const isAlreadyActive = useCallback(
@@ -148,17 +153,16 @@ export const FeedbackQuestions = () => {
          }, 1000)
 
          return () => {
-            setMinutesPassed(null)
             return clearInterval(interval)
          }
       }
    }, [startedAt, hasStarted])
 
    useEffect(() => {
-      if (minutesPassed) {
+      if (minutesPassed || hasEnded) {
          checkFeedbackQuestions()
       }
-   }, [minutesPassed, checkFeedbackQuestions])
+   }, [minutesPassed, checkFeedbackQuestions, hasEnded])
 
    return (
       <Snackbar open={open} TransitionComponent={SlideTransition}>
