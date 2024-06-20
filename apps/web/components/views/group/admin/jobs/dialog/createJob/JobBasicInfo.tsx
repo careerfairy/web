@@ -140,7 +140,7 @@ const JobBasicInfo = () => {
                            multiple
                            limit={5}
                            textFieldProps={getTextFieldProps(
-                              "Business function (Required)",
+                              "Business function (required)",
                               "businessTags",
                               basicInfoTouched,
                               basicInfoErrors

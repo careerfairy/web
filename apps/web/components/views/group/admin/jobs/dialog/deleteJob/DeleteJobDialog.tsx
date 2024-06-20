@@ -61,7 +61,8 @@ const styles = sxStyles({
       color: "grey",
    },
    actionBtn: {
-      width: "160px",
+      width: "100%",
+      maxWidth: "300px",
       height: "40px",
       boxShadow: "none",
    },
