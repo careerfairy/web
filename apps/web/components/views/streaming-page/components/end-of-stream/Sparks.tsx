@@ -60,7 +60,7 @@ const Content = () => {
       <EndOfStreamContainer
          sx={Boolean(streamIsMobile) && styles.noRightPadding}
       >
-         <Heading>Discover more interesting topic with Sparks!</Heading>
+         <Heading>Discover more interesting topics with Sparks!</Heading>
 
          <ResponsiveCarousel>
             {sparks.map((spark) => (
