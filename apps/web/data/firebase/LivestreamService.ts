@@ -30,6 +30,7 @@ import {
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
    ResetLivestreamQuestionRequest,
+   StreamerDetails,
    ToggleHandRaiseRequest,
    UpdateLivestreamPollRequest,
    UserLivestreamData,
@@ -74,14 +75,6 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
-
-type StreamerDetails = {
-   firstName: string
-   lastName: string
-   role: string
-   avatarUrl: string
-   linkedInUrl: string
-}
 
 /**
  * Defines the options for setting a live stream's mode.
@@ -243,11 +236,11 @@ export class LivestreamService {
          const data = snapshot.docs[0].data()
 
          return {
-            firstName: data.firstName,
-            lastName: data.lastName,
+            firstName: data.firstName || "",
+            lastName: data.lastName || "",
             role: data.position || data.fieldOfStudy.name || "",
-            avatarUrl: data.avatar,
-            linkedInUrl: data.linkedinUrl,
+            avatarUrl: data.avatar || "",
+            linkedInUrl: data.linkedinUrl || "",
          }
       }
 
@@ -1162,7 +1155,7 @@ export class LivestreamService {
       livestreamId: string,
       questionId: string,
       voterId: string,
-      userData: Pick<UserData, "id" | "userEmail">
+      userData: StreamerDetails
    ) => {
       const ref = doc(
          FirestoreInstance,
@@ -1185,9 +1178,10 @@ export class LivestreamService {
       livestreamId: string,
       questionId: string,
       voterId: string,
-      userData: Pick<UserData, "id" | "userEmail">,
+      userData: StreamerDetails,
       answer: FeedbackQuestionUserAnswer
    ) => {
+      console.log(userData)
       const ref = doc(
          FirestoreInstance,
          "livestreams",
