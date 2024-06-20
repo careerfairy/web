@@ -104,7 +104,11 @@ export const PaperBackground = ({ ...props }) => {
    return <Box sx={styles.paperBackground} {...props} />
 }
 
-export const PillsBackground = ({ isSmallBackground, bgColor, ...props }) => {
+export const PillsBackground = ({
+   isSmallBackground = undefined,
+   bgColor = "",
+   ...props
+}) => {
    return (
       <Box
          sx={[
