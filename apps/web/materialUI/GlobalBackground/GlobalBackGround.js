@@ -1,10 +1,9 @@
-import React from "react"
 import { Box } from "@mui/material"
+import { keyframes } from "@mui/material/styles"
 import {
    alternateStudentBackground,
    pillsBackgroundTransparent,
 } from "../../constants/images"
-import { keyframes } from "@mui/material/styles"
 
 const styles = {
    globalBackgroundStyles: {
@@ -105,14 +104,14 @@ export const PaperBackground = ({ ...props }) => {
    return <Box sx={styles.paperBackground} {...props} />
 }
 
-export const PillsBackground = ({ ...props }) => {
+export const PillsBackground = ({ isSmallBackground, bgColor, ...props }) => {
    return (
       <Box
          sx={[
             styles.pillsBackground({
                isOnDialog: props?.isOnDialog,
-               isSmallBackground: props?.isSmallBackground,
-               bgColor: props?.bgColor,
+               isSmallBackground: isSmallBackground,
+               bgColor: bgColor,
             }),
             props?.styles,
          ]}
