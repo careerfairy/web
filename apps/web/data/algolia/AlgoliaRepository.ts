@@ -97,6 +97,7 @@ const handleSearch = <AlgoliaResponseType>(
    const workflowId = getWorkflowId()
 
    if (isTest) {
+      // This console log is required to ensure the compiler outputs the workflow ID for the CI
       console.log(`🚀 - Workflow ID: ${workflowId}`)
    }
 
