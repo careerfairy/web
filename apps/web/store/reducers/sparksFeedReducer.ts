@@ -47,6 +47,7 @@ interface SparksState {
    interactionSource: string
    anonymousUserCountryCode?: string
    countrySpecificFeed?: boolean
+   shouldShowLinkedInPopUpNotification: boolean
 }
 
 const initialState: SparksState = {
@@ -76,6 +77,7 @@ const initialState: SparksState = {
    interactionSource: null,
    anonymousUserCountryCode: null,
    countrySpecificFeed: null,
+   shouldShowLinkedInPopUpNotification: false,
 }
 
 // Async thunk to fetch the next sparks
@@ -156,6 +158,7 @@ const sparksFeedSlice = createSlice({
       swipeToSparkByIndex: (state, action: PayloadAction<number>) => {
          const newIndex = action.payload
          if (newIndex >= 0 && newIndex < state.sparks.length) {
+            state.shouldShowLinkedInPopUpNotification = false
             state.currentPlayingIndex = newIndex
          }
       },
@@ -241,6 +244,12 @@ const sparksFeedSlice = createSlice({
       setConversionCardInterval: (state, action: PayloadAction<number>) => {
          state.conversionCardInterval = action.payload
       },
+      setShouldShowLinkedInPopUpNotification: (
+         state,
+         action: PayloadAction<boolean>
+      ) => {
+         state.shouldShowLinkedInPopUpNotification = action.payload
+      },
       removeNotificationsByType: (
          state,
          action: PayloadAction<SparkCardNotificationTypes>
@@ -273,6 +282,7 @@ const sparksFeedSlice = createSlice({
          state.videosMuted = false
          state.playing = true
          state.conversionCardInterval = 0
+         state.shouldShowLinkedInPopUpNotification = false
       },
       disableCountrySpecificFeed: (state) => {
          state.countrySpecificFeed = null
@@ -468,6 +478,7 @@ export const {
    setAutoAction,
    setVideosMuted,
    setVideoPlaying,
+   setShouldShowLinkedInPopUpNotification,
    togglePlaying,
    setConversionCardInterval,
    removeNotificationsByType,
