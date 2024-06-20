@@ -75,7 +75,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
    const { moveToPrev } = useStepper()
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const {
-      values: { additionalInfo: additionalInfoValues },
+      values: { additionalInfo: additionalInfoValues, basicInfo },
       setFieldValue,
       errors: { additionalInfo: additionalInfoErrors = {} },
       touched: { additionalInfo: additionalInfoTouched = {} },
@@ -109,7 +109,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                      <Box sx={styles.subtitle2}>
                         <Briefcase color="grey" size={20} />
                         <Typography variant={"h6"} sx={styles.subText}>
-                           Discovery Trainee Process Industries eMineTM{" "}
+                           {basicInfo.title}
                         </Typography>
                      </Box>
                      <Grid xs={12} item>
