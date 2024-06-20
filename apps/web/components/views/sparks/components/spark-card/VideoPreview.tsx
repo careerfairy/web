@@ -1,19 +1,19 @@
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { Box } from "@mui/material"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
+import { useTheme } from "@mui/material/styles"
+import useMediaQuery from "@mui/material/useMediaQuery"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/legacy/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
+import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
-import { usePrevious } from "react-use"
-import { useTheme } from "@mui/material/styles"
-import useMediaQuery from "@mui/material/useMediaQuery"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 const styles = sxStyles({
    root: {
@@ -97,6 +97,7 @@ type Props = {
    onSecondPassed?: (secondsPassed: number) => void
    onVideoEnded?: () => void
    onVideoPlay?: () => void
+   onPercentagePlayed?: (percentagePlayed: number) => void
    pausing?: boolean
    muted?: boolean
    light?: boolean
@@ -111,6 +112,7 @@ const VideoPreview: FC<Props> = ({
    onSecondPassed,
    onVideoEnded,
    onVideoPlay,
+   onPercentagePlayed,
    pausing: shouldPause,
    thumbnailUrl,
    muted,
@@ -146,9 +148,10 @@ const VideoPreview: FC<Props> = ({
          if (!autoPlaying) {
             setProgress(progress.played * 100)
             onProgress(progress)
+            onPercentagePlayed?.(progress.played)
          }
       },
-      [autoPlaying, onProgress]
+      [autoPlaying, onPercentagePlayed, onProgress]
    )
 
    const prevIdentifier = usePrevious(identifier)
