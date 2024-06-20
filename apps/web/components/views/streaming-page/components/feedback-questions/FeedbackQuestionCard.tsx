@@ -1,6 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close"
 import { IconButton, Stack, Typography } from "@mui/material"
-import { useAuth } from "HOCs/AuthProvider"
+import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import {
    EventRatingWithType,
    FeedbackQuestionType,
@@ -50,7 +50,7 @@ export const FeedbackQuestionCard = ({
    onAnswer,
 }: FeedbackQuestionCardProps) => {
    const { livestreamId, agoraUserId } = useStreamingContext()
-   const { userData } = useAuth()
+   const { data: streamerDetails } = useStreamerDetails(agoraUserId)
    const QuestionAction = QuestionsComponents[question.type]
 
    const handleClose = () => {
@@ -59,13 +59,13 @@ export const FeedbackQuestionCard = ({
             livestreamId,
             question.id,
             agoraUserId,
-            { id: userData.id, userEmail: userData.userEmail }
+            streamerDetails
          )
       } catch (error) {
          errorLogAndNotify(error, {
             livestreamId: livestreamId,
             questionId: question.id,
-            user: userData.id,
+            agoraUserId: agoraUserId,
          })
       }
       onAnswer(question)
@@ -77,14 +77,14 @@ export const FeedbackQuestionCard = ({
             livestreamId,
             question.id,
             agoraUserId,
-            { id: userData.id, userEmail: userData.userEmail },
+            streamerDetails,
             { rating: value }
          )
       } catch (error) {
          errorLogAndNotify(error, {
             livestreamId: livestreamId,
             questionId: question.id,
-            user: userData.id,
+            agoraUserId: agoraUserId,
          })
       }
       onAnswer(question)
