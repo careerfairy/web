@@ -21,6 +21,9 @@ export type UseLivestreamsSWROptions = {
    companyIndustries?: string[]
    companyCountries?: string[]
    targetFieldsOfStudy?: FieldOfStudy[]
+   businessFunctionsTagIds?: string[]
+   contentTopicTagIds?: string[]
+   languages?: string[]
    withRecordings?: boolean
    withTest?: boolean
    withHidden?: boolean

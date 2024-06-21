@@ -304,6 +304,8 @@ export interface ISparkFunctionsRepository {
       beforeJob: CustomJob,
       changeType: ReturnType<typeof getChangeTypes>
    ): Promise<void>
+
+   fetchSparksWithTags(): Promise<Spark[]>
 }
 
 export class SparkFunctionsRepository
@@ -1072,6 +1074,10 @@ export class SparkFunctionsRepository
       }
 
       functions.logger.log(`Updated sparks linked to customJob ${afterJob.id}`)
+   }
+
+   async fetchSparksWithTags(): Promise<Spark[]> {
+      return []
    }
 }
 
