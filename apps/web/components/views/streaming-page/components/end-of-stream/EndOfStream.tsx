@@ -9,6 +9,7 @@ import { sxStyles } from "types/commonTypes"
 import { EndOfStreamHeader } from "./EndOfStreamHeader"
 import { Hero } from "./Hero"
 import { Jobs } from "./Jobs"
+import { Sparks } from "./Sparks"
 import { NextStreams, RecommendedStreams } from "./Streams"
 
 const styles = sxStyles({
@@ -58,6 +59,7 @@ const EndOfStreamView = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
          <Stack sx={styles.contentContainer} spacing={3}>
             {Boolean(hasJobs) && <Jobs />}
             {isLoggedIn ? <RecommendedStreams /> : <NextStreams />}
+            <Sparks />
          </Stack>
       </Box>
    )

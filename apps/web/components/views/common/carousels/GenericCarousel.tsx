@@ -34,7 +34,7 @@ const EmblaCarouselContext = createContext<
    GenericCarouselContextType | undefined
 >(undefined)
 
-type SlideElement = ReactElement<SlideProps>
+export type SlideElement = ReactElement<SlideProps>
 
 export type GenericCarouselProps = {
    /** children must be Slide components */
@@ -47,6 +47,8 @@ export type GenericCarouselProps = {
    containerSx?: SxProps
    emblaRef: UseEmblaCarouselType[0]
    emblaApi: UseEmblaCarouselType[1]
+   /** Prevents the last slide from touching the edge of the viewport */
+   preventEdgeTouch?: boolean
 }
 
 export const GenericCarousel = ({
@@ -56,6 +58,7 @@ export const GenericCarousel = ({
    containerSx,
    emblaRef,
    emblaApi,
+   preventEdgeTouch,
 }: GenericCarouselProps) => {
    const value = useMemo<GenericCarouselContextType>(
       () => ({ gap, emblaApi }),
@@ -75,6 +78,7 @@ export const GenericCarousel = ({
                sx={combineStyles(styles.container, containerSx)}
             >
                {children}
+               {Boolean(preventEdgeTouch) && <GenericCarousel.Slide />}
             </Box>
          </Box>
       </EmblaCarouselContext.Provider>
