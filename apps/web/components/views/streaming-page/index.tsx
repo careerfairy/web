@@ -249,20 +249,20 @@ const Component = ({ isHost }: Props) => {
                         <AgoraDevicesProvider>
                            <LocalTracksProvider>
                               <ScreenShareProvider>
-                               <EndOfStream isHost={isHost}>
-                                 <Layout>
-                                    <Fragment>
-                                       <TopBar />
-                                       <MiddleContent />
-                                       <BottomBar />
-                                       <StreamSetupWidget />
-                                       <SettingsMenu />
-                                       {!isHost && authenticatedUser ? (
-                                          <FeedbackQuestions />
-                                       ) : null}
-                                    </Fragment>
-                                 </Layout>
-                               </EndOfStream>
+                                 <EndOfStream isHost={isHost}>
+                                    <Layout>
+                                       <Fragment>
+                                          <TopBar />
+                                          <MiddleContent />
+                                          <BottomBar />
+                                          <StreamSetupWidget />
+                                          <SettingsMenu />
+                                       </Fragment>
+                                    </Layout>
+                                 </EndOfStream>
+                                 {!isHost && authenticatedUser ? (
+                                    <FeedbackQuestions />
+                                 ) : null}
                                  <ToggleStreamModeButton />
                               </ScreenShareProvider>
                            </LocalTracksProvider>
