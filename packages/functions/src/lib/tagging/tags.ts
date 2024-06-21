@@ -5,8 +5,13 @@ import {
    getArrayDifference,
    removeDuplicates,
 } from "@careerfairy/shared-lib/utils"
+import * as functions from "firebase-functions"
 import _ from "lodash"
-import { getChangeTypes } from "src/util"
+import { livestreamsRepo, sparkRepo } from "../../api/repositories"
+import config from "../../config"
+import { middlewares } from "../../middlewares/middlewares"
+import { getChangeTypes } from "../../util"
+import { TagsHitsDataParser } from "./TagsHitsDataParser"
 // TODO: Update documentation
 
 /**
@@ -231,3 +236,18 @@ const contentCustomJobsExcludingMap = (
       })
    )
 }
+
+export const fetchContentHits = functions.region(config.region).https.onCall(
+   middlewares(async () => {
+      console.log("🚀 ~ fRUNNING etchContentHits:", fetchContentHits)
+      const eventsWithTags = await livestreamsRepo.fetchLivestreamsWithTags()
+      console.log("🚀 ~ eventsWithTags len:", eventsWithTags?.length)
+      const sparksWithTags = await sparkRepo.fetchSparksWithTags()
+
+      const parser = new TagsHitsDataParser(eventsWithTags, sparksWithTags)
+
+      const res = parser.build()
+
+      return res
+   })
+)
