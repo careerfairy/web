@@ -1,5 +1,7 @@
 import { useAuth } from "HOCs/AuthProvider"
+import { usePrefetchUserSparks } from "components/custom-hook/spark/useUserSparks"
 import { useTrackUserParticipation } from "components/custom-hook/streaming/useTrackUserParticipation"
+import { usePreFetchRecommendedEvents } from "components/custom-hook/useRecommendedEvents"
 import { useStreamingContext } from "../context"
 
 /**
@@ -14,6 +16,8 @@ export const ViewerTrackers = () => {
    const { livestreamId } = useStreamingContext()
 
    useTrackUserParticipation(livestreamId, userData, userStats)
+   usePreFetchRecommendedEvents()
+   usePrefetchUserSparks()
 
    return null
 }

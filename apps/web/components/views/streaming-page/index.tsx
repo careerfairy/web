@@ -11,7 +11,15 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
-import { WaitingRoom } from "./components/viewer/WaitingRoom"
+import { WaitingRoom } from "./components/waiting-room/WaitingRoom"
+
+const EndOfStream = dynamic(
+   () =>
+      import("./components/end-of-stream/EndOfStream").then(
+         (mod) => mod.EndOfStream
+      ),
+   { ssr: false }
+)
 
 const ShareVideoDialog = dynamic(
    () =>
@@ -241,6 +249,7 @@ const Component = ({ isHost }: Props) => {
                         <AgoraDevicesProvider>
                            <LocalTracksProvider>
                               <ScreenShareProvider>
+                               <EndOfStream isHost={isHost}>
                                  <Layout>
                                     <Fragment>
                                        <TopBar />
@@ -253,6 +262,7 @@ const Component = ({ isHost }: Props) => {
                                        ) : null}
                                     </Fragment>
                                  </Layout>
+                               </EndOfStream>
                                  <ToggleStreamModeButton />
                               </ScreenShareProvider>
                            </LocalTracksProvider>

@@ -278,6 +278,45 @@ export class RankedLivestreamRepository {
       })
    }
 
+   public getEventsBasedOnContentTopicTags(
+      tagIds: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "contentTopicsTagIds",
+         tagIds,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.POINTS_PER_CONTENT_TOPIC_TAG_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: tagIds,
+         targetLivestreamIdsGetter: (stream) => stream.getContentTopicsTagIds(),
+      })
+   }
+
+   public getEventsBasedOnBusinessFunctionTags(
+      tagIds: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "businessFunctionsTagIds",
+         tagIds,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.POINTS_PER_BUSINESS_FUNCTION_TAG_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: tagIds,
+         targetLivestreamIdsGetter: (stream) =>
+            stream.getBusinessFunctionTagIds(),
+      })
+   }
+
    /**
     * Even though its very similar to other methods, this one uses implicit points, reason
     * why its a separate method. This allows independent logic for implicit points without having to change
