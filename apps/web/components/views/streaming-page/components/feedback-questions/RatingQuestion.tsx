@@ -1,3 +1,4 @@
+import { FeedbackQuestionUserAnswer } from "@careerfairy/shared-lib/livestreams"
 import { Rating, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import { IconContainerProps, RatingProps } from "@mui/material/Rating"
@@ -23,7 +24,7 @@ const styles = sxStyles({
          alignItems: "center",
          flex: "1 0 0",
          borderRadius: "4px",
-         padding: "14px",
+         padding: "8.5px 14px",
          alignSelf: "stretch",
          fontSize: "14px",
          lineHeight: "150%" /* 21px */,
@@ -57,22 +58,28 @@ const styles = sxStyles({
    },
 })
 
+type RatingQuestionProps = RatingProps & {
+   questionId: string
+   onAnswerSubmit: (answer: FeedbackQuestionUserAnswer) => void
+}
+
 const RatingQuestion = ({
+   questionId,
+   onAnswerSubmit,
    readOnly,
-   onChange,
    value,
-   name,
    ...props
-}: RatingProps) => {
+}: RatingQuestionProps) => {
    return (
       <Box sx={styles.ratingWrapper}>
          <Rating
-            name={name}
+            name={questionId}
             value={Number(value)}
-            size="large"
             readOnly={readOnly}
             max={5}
-            onChange={onChange}
+            onChange={(_event, value: number) => {
+               onAnswerSubmit({ rating: value })
+            }}
             IconContainerComponent={ButtonContainer}
             {...props}
          />

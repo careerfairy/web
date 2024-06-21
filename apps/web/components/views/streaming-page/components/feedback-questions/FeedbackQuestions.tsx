@@ -37,11 +37,29 @@ const styles = sxStyles({
 type FeedbackQuestion = EventRatingWithType & { answered: boolean }
 
 export const FeedbackQuestions = () => {
-   const { livestreamId, agoraUserId } = useStreamingContext()
+   const { livestreamId } = useStreamingContext()
+
    const { feedbackQuestions } = useFeedbackQuestions(
       livestreamId,
       "livestreams"
    )
+
+   const sortQuestions = (questions) =>
+      questions.sort((q1, q2) => (q1.appearAfter > q2.appearAfter ? 1 : -1))
+
+   return (
+      <FeedbackQuestionsComponent
+         feedbackQuestions={sortQuestions(feedbackQuestions)}
+      />
+   )
+}
+
+export const FeedbackQuestionsComponent = ({
+   feedbackQuestions,
+}: {
+   feedbackQuestions: FeedbackQuestion[]
+}) => {
+   const { livestreamId, agoraUserId } = useStreamingContext()
    const startedAt = useStartedAt()
    const hasStarted = useHasStarted()
    const hasEnded = useHasEnded()
@@ -49,19 +67,18 @@ export const FeedbackQuestions = () => {
    const [minutesPassed, setMinutesPassed] = useState(
       hasStarted ? DateUtil.getMinutesPassed(new Date(startedAt)) : 0
    )
-   /** The queue of questions that will show up to the user */
-   const [activeQuestions, setActiveQuestions] = useState<FeedbackQuestion[]>(
-      []
-   )
+   /** The queue of questions that will show up to the user
+    * Using a Map disregards duplicates, and the object indirection
+    * avoids recreating a new Map at every set state */
+   const [activeQuestions, setActiveQuestions] = useState<{
+      questions: Map<FeedbackQuestion["id"], FeedbackQuestion>
+   }>({ questions: new Map() })
+
    /** The local answers data to avoid too many fetch requests */
-   const [feedbackQuestionsData, setFeedbackQuestionsData] = useState<
-      FeedbackQuestion[]
-   >(
-      // sort to get question number
-      feedbackQuestions.sort((q1, q2) =>
-         q1.appearAfter > q2.appearAfter ? 1 : -1
-      ) as FeedbackQuestion[]
-   )
+   const [feedbackQuestionsData, setFeedbackQuestionsData] =
+      useState<FeedbackQuestion[]>(feedbackQuestions)
+
+   const [firstActiveQuestion] = activeQuestions.questions.values()
 
    const getQuestionIndex = useCallback(
       (question: FeedbackQuestion) => {
@@ -84,10 +101,11 @@ export const FeedbackQuestions = () => {
 
    const handleAnswer = useCallback(
       (question: FeedbackQuestion) => {
-         if (activeQuestions.length == 1) setOpen(false)
-         const removeActiveQuestion = [...activeQuestions]
-         removeActiveQuestion.shift()
-         setActiveQuestions(removeActiveQuestion)
+         if (activeQuestions.questions.size == 1) setOpen(false)
+         setActiveQuestions((prev) => {
+            prev.questions.delete(question.id)
+            return { questions: prev.questions }
+         })
          markAsAnswered(question)
       },
       [activeQuestions, markAsAnswered]
@@ -97,7 +115,7 @@ export const FeedbackQuestions = () => {
       async (question: FeedbackQuestion) => {
          if (
             minutesPassed >= question.appearAfter ||
-            (question.isForEnd && hasEnded)
+            (hasEnded && minutesPassed <= question.appearAfter)
          ) {
             if (!question.answered) {
                // Check the database
@@ -124,14 +142,12 @@ export const FeedbackQuestions = () => {
          }
          return false
       },
-      [livestreamId, agoraUserId, minutesPassed, hasEnded, markAsAnswered]
+      [livestreamId, agoraUserId, minutesPassed, markAsAnswered, hasEnded]
    )
 
    const isAlreadyActive = useCallback(
       (question: FeedbackQuestion) => {
-         return activeQuestions.some(
-            (activeQuestion) => activeQuestion.id == question.id
-         )
+         return activeQuestions.questions.has(question.id)
       },
       [activeQuestions]
    )
@@ -140,11 +156,20 @@ export const FeedbackQuestions = () => {
       feedbackQuestionsData.forEach(async (question: FeedbackQuestion) => {
          const shouldActivate = await questionShouldBeActive(question)
          if (shouldActivate && !isAlreadyActive(question)) {
-            setActiveQuestions((prev) => [...prev, { ...question }])
+            setActiveQuestions((prev) => {
+               prev.questions.set(question.id, question)
+               return { questions: prev.questions }
+            })
             setOpen(true)
          }
       })
    }, [feedbackQuestionsData, isAlreadyActive, questionShouldBeActive])
+
+   useEffect(() => {
+      // listen for changes in questions mid live stream
+      setFeedbackQuestionsData(feedbackQuestions)
+      setActiveQuestions({ questions: new Map() })
+   }, [feedbackQuestions])
 
    useEffect(() => {
       if (hasStarted && startedAt) {
@@ -153,27 +178,26 @@ export const FeedbackQuestions = () => {
          }, 1000)
 
          return () => {
-            setMinutesPassed(null)
             return clearInterval(interval)
          }
       }
    }, [startedAt, hasStarted])
 
    useEffect(() => {
-      if (minutesPassed) {
+      if (minutesPassed || hasEnded) {
          checkFeedbackQuestions()
       }
-   }, [minutesPassed, checkFeedbackQuestions])
+   }, [minutesPassed, checkFeedbackQuestions, hasEnded])
 
    return (
       <Snackbar open={open} TransitionComponent={SlideTransition}>
          <SnackbarContent
             sx={styles.dialog}
             message={
-               activeQuestions[0] ? (
+               firstActiveQuestion ? (
                   <FeedbackQuestionCard
-                     question={activeQuestions[0]}
-                     questionNumber={getQuestionIndex(activeQuestions[0]) + 1}
+                     question={firstActiveQuestion}
+                     questionNumber={getQuestionIndex(firstActiveQuestion) + 1}
                      onAnswer={handleAnswer}
                   />
                ) : null

@@ -1,3 +1,4 @@
+import { FeedbackQuestionUserAnswer } from "@careerfairy/shared-lib/livestreams"
 import { IconContainerProps } from "@mui/material"
 import Box from "@mui/material/Box"
 import Rating, { RatingProps } from "@mui/material/Rating"
@@ -26,7 +27,7 @@ const styles: StylesProps = {
          alignItems: "center",
          flex: "1 0 0",
          borderRadius: "4px",
-         padding: "14px",
+         padding: "9.5px 14px",
          alignSelf: "stretch",
          fontSize: "14px",
          lineHeight: "150%" /* 21px */,
@@ -61,7 +62,7 @@ const styles: StylesProps = {
 }
 
 const Icon = ({ src, alt }: ImageProps) => {
-   return <Image src={src} alt={alt} width={23} height={23} quality={100} />
+   return <Image src={src} alt={alt} width={20} height={20} quality={100} />
 }
 
 const customIcons: {
@@ -86,23 +87,29 @@ const customIcons: {
    },
 }
 
+type SentimentQuestionProps = RatingProps & {
+   questionId: string
+   onAnswerSubmit: (answer: FeedbackQuestionUserAnswer) => void
+}
+
 const SentimentQuestion = ({
+   questionId,
+   onAnswerSubmit,
    readOnly,
-   onChange,
    value,
-   name,
    ...rest
-}: RatingProps) => {
+}: SentimentQuestionProps) => {
    return (
       <Box sx={styles.ratingWrapper}>
          <Rating
-            name={name}
+            name={questionId}
             value={Number(value)}
             readOnly={readOnly}
-            size="large"
             IconContainerComponent={IconContainer}
             max={5}
-            onChange={onChange}
+            onChange={(_event, value: number) => {
+               onAnswerSubmit({ rating: value })
+            }}
             {...rest}
          />
          <Box sx={styles.subText}>
