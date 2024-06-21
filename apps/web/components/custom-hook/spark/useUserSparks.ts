@@ -18,27 +18,18 @@ const fetcher = async (userId?: string) => {
    return sparks.map(SparkPresenter.toFirebaseObject)
 }
 
-type Options = {
-   /**
-    * Disable the hook from making a request
-    */
-   disabled?: boolean
-}
-
 /**
  * Custom hook to fetch user sparks.
  * Utilizes SWR for data fetching and caching.
  *
  * @returns SWR response object containing user sparks data.
  */
-export const useUserSparks = (options: Options = {}) => {
-   const { disabled = false } = options
+export const useUserSparks = () => {
    const { authenticatedUser } = useAuth()
 
-   const key =
-      authenticatedUser.isLoaded && !disabled
-         ? getKey(authenticatedUser.email)
-         : null
+   const key = authenticatedUser.isLoaded
+      ? getKey(authenticatedUser.email)
+      : null
 
    return useSWR(key, async () => fetcher(authenticatedUser.email), {
       ...reducedRemoteCallsOptions,
