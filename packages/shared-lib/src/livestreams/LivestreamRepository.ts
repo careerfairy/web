@@ -116,6 +116,11 @@ export interface ILivestreamRepository {
       limit?: number
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
+   pastEventsQuery(
+      showHidden?: boolean,
+      limit?: number
+   ): firebase.firestore.Query<firebase.firestore.DocumentData>
+
    registeredEventsQuery(
       userEmail: string,
       limit?: number
@@ -375,6 +380,8 @@ export interface ILivestreamRepository {
       userId: string,
       limit?: number
    ): Promise<LivestreamEvent[]>
+
+   fetchLivestreamsWithTags(): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -627,6 +634,24 @@ export class FirebaseLivestreamRepository
          .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
          .orderBy("start", "asc")
+
+      if (showHidden === false) {
+         query = query.where("hidden", "==", false)
+      }
+
+      if (limit) {
+         query = query.limit(limit)
+      }
+
+      return query
+   }
+
+   pastEventsQuery(showHidden = false, limit?: number) {
+      let query = this.firestore
+         .collection("livestreams")
+         .where("hasEnded", "==", true)
+         .where("test", "==", false)
+      // .orderBy("start", "asc")
 
       if (showHidden === false) {
          query = query.where("hidden", "==", false)
@@ -1635,6 +1660,18 @@ export class FirebaseLivestreamRepository
          sortedLivestreamsIds.indexOf(event.id)
       )
       return sortedLivestreams
+   }
+
+   async fetchLivestreamsWithTags(): Promise<LivestreamEvent[]> {
+      const query = this.firestore
+         .collection("livestreams")
+         .where("test", "==", false)
+
+      const snap = await query.get()
+      return mapFirestoreDocuments<LivestreamEvent>(snap)?.filter(
+         (e) =>
+            e.businessFunctionsTagIds?.length || e.contentTopicsTagIds?.length
+      )
    }
 }
 
