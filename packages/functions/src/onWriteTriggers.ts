@@ -343,6 +343,7 @@ export const onWriteCustomJobs = functions
 
       if (changeTypes.isCreate) {
          const newCustomJob = change.after.data() as CustomJob
+
          sideEffectPromises.push(
             customJobRepo.createCustomJobStats(newCustomJob)
          )
@@ -350,11 +351,11 @@ export const onWriteCustomJobs = functions
 
       // Run side effects for all custom jobs changes
       if (changeTypes.isUpdate) {
-         const updatedCustomJob = change.after.data() as CustomJob
+         const newCustomJob = change.after.data() as CustomJob
 
          sideEffectPromises.push(
-            customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
-            customJobRepo.syncCustomJobDataToJobApplications(updatedCustomJob)
+            customJobRepo.syncCustomJobDataToCustomJobStats(newCustomJob),
+            customJobRepo.syncCustomJobDataToJobApplications(newCustomJob)
          )
       }
 
@@ -367,6 +368,37 @@ export const onWriteCustomJobs = functions
             ),
             customJobRepo.syncDeletedCustomJobDataToJobApplications(
                deletedCustomJob
+            ),
+            sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
+               deletedCustomJob,
+               deletedCustomJob,
+               changeTypes
+            ),
+            livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+               deletedCustomJob,
+               deletedCustomJob,
+               changeTypes
+            )
+         )
+      }
+
+      if (changeTypes.isCreate || changeTypes.isUpdate) {
+         const newCustomJob = change.after.data() as CustomJob
+         const oldCustomJob = change.before.data() as CustomJob
+
+         sideEffectPromises.push(
+            livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+               newCustomJob,
+               oldCustomJob,
+               changeTypes
+            )
+         )
+
+         sideEffectPromises.push(
+            sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
+               newCustomJob,
+               oldCustomJob,
+               changeTypes
             )
          )
       }

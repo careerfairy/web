@@ -132,7 +132,7 @@ export class LivestreamService {
    ) {
       const { livestream: currentLivestream, userData: userData } = options
 
-      if (currentLivestream.test) return true
+      if (currentLivestream.test || currentLivestream.openStream) return true
       try {
          if (
             userData &&

@@ -11,7 +11,6 @@ export class RankedLivestreamEvent {
       this.model = model
       this.id = model.id
       // Divide popularity by the median value and ensure the minimum value is 1
-      //TODO: Confirm persistance of rule
       this.points = model?.popularity
          ? model.popularity / 120 < 1
             ? 1
@@ -126,6 +125,14 @@ export class RankedLivestreamEvent {
     */
    getCompanyTargetFieldsOfStudies(): string[] {
       return this.model?.companyTargetedFieldsOfStudies || []
+   }
+
+   getContentTopicsTagIds(): string[] {
+      return this.model?.contentTopicsTagIds || []
+   }
+
+   getBusinessFunctionTagIds(): string[] {
+      return this.model?.businessFunctionsTagIds || []
    }
 
    addPoints(points: number) {

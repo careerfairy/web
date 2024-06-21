@@ -10,30 +10,32 @@ import useFunctionsSWR, {
 } from "./utils/useFunctionsSWRFetcher"
 
 type Config = {
-   limit: FirebaseInArrayLimit
+   limit?: FirebaseInArrayLimit
+   suspense?: boolean
 }
 
-const functionName = "getRecommendedEvents_v3"
-const useRecommendedEvents = (
-   config: Config = {
-      limit: 10,
-   }
-) => {
+const functionName = "getRecommendedEvents_v4"
+const useRecommendedEvents = (config?: Config) => {
    const firestore = useFirestore()
    const fetcher = useFunctionsSWR<string[]>()
    const { authenticatedUser } = useAuth()
 
+   const limit = config?.limit || 10
+   const suspense = config?.suspense || false
+
    const { data: eventIds } = useSWR<string[]>(
-      [
-         functionName,
-         {
-            limit: config.limit,
-         },
-      ],
+      authenticatedUser.email
+         ? [
+              functionName,
+              {
+                 limit,
+              },
+           ]
+         : null,
       fetcher,
       {
          ...reducedRemoteCallsOptions,
-         suspense: false,
+         suspense,
       }
    )
 
@@ -52,7 +54,7 @@ const useRecommendedEvents = (
       collectionRef as any,
       {
          idField: "id",
-         suspense: false,
+         suspense,
       }
    )
 
@@ -94,14 +96,14 @@ const filterRegisteredOrPastEvents = (
       (event) => !(event.hasEnded || event.registeredUsers?.includes(userId))
    )
 
+type PreFetchConfig = {
+   limit?: FirebaseInArrayLimit
+}
 /*
  * Hook to preload the recommended eventIds and store them in the SWR cache
  * */
-export const usePreFetchRecommendedEvents = (
-   config: Config = {
-      limit: 10,
-   }
-) => {
+export const usePreFetchRecommendedEvents = (config?: PreFetchConfig) => {
+   const limit = config?.limit || 10
    const { isLoggedIn } = useAuth()
 
    const fetcher = useFunctionsSWR<string[]>()
@@ -113,13 +115,13 @@ export const usePreFetchRecommendedEvents = (
             [
                functionName,
                {
-                  limit: config.limit,
+                  limit,
                },
             ],
             fetcher
          )
       }
-   }, [config.limit, fetcher, isLoggedIn])
+   }, [limit, fetcher, isLoggedIn])
 
    return null
 }
