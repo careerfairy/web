@@ -47,33 +47,46 @@ const styles = sxStyles({
    },
 })
 
-export const Streams = () => {
+export const RecommendedStreams = () => {
+   const { authenticatedUser } = useAuth()
+
+   const { events: recommendedEvents } = useRecommendedEvents({
+      suspense: true,
+   })
+
+   if (!authenticatedUser.isLoaded) return <Loader />
+
    return (
       <SuspenseWithBoundary fallback={<Loader />}>
-         <Content />
+         <Content streams={recommendedEvents} />
+      </SuspenseWithBoundary>
+   )
+}
+
+export const NextStreams = () => {
+   const { data: nextEvents } = useNextLivestreamsSWR({
+      suspense: true,
+   })
+
+   return (
+      <SuspenseWithBoundary fallback={<Loader />}>
+         <Content streams={nextEvents} />
       </SuspenseWithBoundary>
    )
 }
 
 const plugins = [WheelGesturesPlugin()]
 
-const Content = () => {
-   const { isLoggedIn, authenticatedUser } = useAuth()
+type ContentProps = {
+   streams: LivestreamEvent[]
+}
+
+const Content = ({ streams }: ContentProps) => {
+   const { authenticatedUser } = useAuth()
    const { push, query, pathname } = useRouter()
    const streamIsMobile = useStreamIsMobile()
    const selectedLivestreamId = query.selectedLivestreamId as string | null
 
-   const { events: recommendedEvents } = useRecommendedEvents({
-      suspense: true,
-      disabled: !isLoggedIn,
-   })
-
-   const { data: nextEvents } = useNextLivestreamsSWR({
-      suspense: true,
-      disabled: isLoggedIn,
-   })
-
-   const streams = isLoggedIn ? recommendedEvents : nextEvents
    const hasMoreThanThreeEvents = streams.length > 3
 
    const handleOpenLivestreamDialog = (event: LivestreamEvent) => {
