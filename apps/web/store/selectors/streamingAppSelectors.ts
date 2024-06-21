@@ -87,6 +87,9 @@ export const useCompanyName = () =>
       return test ? "Test Company" : companyName
    })
 
+export const useStreamTitle = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.title)
+
 export const useStreamHandRaiseEnabled = () =>
    useAppSelector(
       (state) => state.streamingApp.livestreamState.handRaiseEnabled
@@ -117,6 +120,12 @@ export const useShowWaitingRoom = (isHost: boolean) =>
    useAppSelector((state) => {
       const { hasStarted, hasEnded } = state.streamingApp.livestreamState
       return !isHost && !hasEnded && hasStarted === undefined
+   })
+
+export const useShowEndScreen = (isHost: boolean) =>
+   useAppSelector((state) => {
+      const { hasStarted, hasEnded } = state.streamingApp.livestreamState
+      return !isHost && hasEnded && hasStarted === false
    })
 
 export const useIsTestLivestream = () =>
