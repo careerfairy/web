@@ -26,9 +26,7 @@ export const AllActions = {
    Jobs: (props: ActionButtonProps) => (
       <JobsActionButton {...props} key="Jobs" />
    ),
-   Reactions: (props: ActionButtonProps) => (
-      <ReactionsActionButton {...props} key="Reactions" />
-   ),
+   Reactions: () => <ReactionsActionButton key="Reactions" />,
    Chat: (props: ActionButtonProps) => (
       <ChatActionButton {...props} key="Chat" />
    ),

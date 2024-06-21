@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import useSnackbarNotifications from "../useSnackbarNotifications"
-import useFirebaseUpload from "../useFirebaseUpload"
 import { userRepo } from "../../../data/RepositoryInstances"
 import { rewardService } from "../../../data/firebase/RewardService"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import { FileUploaderProps } from "../../views/common/FileUploader"
+import useFirebaseUpload from "../useFirebaseUpload"
+import useSnackbarNotifications from "../useSnackbarNotifications"
 
 type UseUploadCV = {
    handleUploadCV: (file: File) => Promise<void>
@@ -19,13 +19,17 @@ type UseUploadCV = {
    fileUploaderProps: FileUploaderProps
 }
 
+type UseUploadCVOptions = {
+   onSuccess?: () => void
+}
+
 /**
  * Hook that provides functionality to upload a user's CV to Firebase storage.
  * @returns An object containing upload related state and methods.
  */
-const useUploadCV = (): UseUploadCV => {
+const useUploadCV = ({ onSuccess }: UseUploadCVOptions = {}) => {
    const { userPresenter, userData } = useAuth()
-   const { errorNotification } = useSnackbarNotifications()
+   const { errorNotification, successNotification } = useSnackbarNotifications()
 
    const [loading, setLoading] = useState(false)
    const [dragActive, setDragActive] = useState(false)
@@ -40,13 +44,22 @@ const useUploadCV = (): UseUploadCV => {
 
             await userRepo.updateResume(userData?.userEmail, url)
             rewardService.userAction("USER_CV_UPLOAD").catch(errorLogAndNotify)
+            successNotification("Your CV was uploaded!")
+            onSuccess && onSuccess()
          } catch (error) {
-            errorNotification("Error uploading CV")
+            errorNotification(error)
          } finally {
             setLoading(false)
          }
       },
-      [upload, userPresenter, userData, errorNotification]
+      [
+         upload,
+         userPresenter,
+         userData,
+         errorNotification,
+         successNotification,
+         onSuccess,
+      ]
    )
 
    const handleError = useCallback(
@@ -76,7 +89,7 @@ const useUploadCV = (): UseUploadCV => {
             types: ["pdf"],
             multiple: false,
             maxSize: 10,
-            disabled: isLoading || cvUploaded,
+            disabled: isLoading,
             onDraggingStateChange: setDragActive,
             handleChange: handleUploadCV,
          },

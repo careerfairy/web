@@ -1,13 +1,4 @@
-import React, {
-   memo,
-   useCallback,
-   useContext,
-   useEffect,
-   useMemo,
-   useRef,
-   useState,
-} from "react"
-import RTCContext, { RtcPropsInterface } from "./RTCContext"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import AgoraRTC, {
    IAgoraRTCClient,
    ILocalAudioTrack,
@@ -16,19 +7,29 @@ import AgoraRTC, {
    ScreenVideoTrackInitConfig,
    UID,
 } from "agora-rtc-sdk-ng"
-import { agoraServiceInstance } from "../../data/agora/AgoraService"
+import { useForcedProxyMode } from "components/custom-hook/streaming/useForcedProxyMode"
 import { useRouter } from "next/router"
-import useStreamRef from "../../components/custom-hook/useStreamRef"
-import { useFirebaseService } from "../firebase/FirebaseServiceContext"
+import {
+   memo,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { LocalStream } from "../../types/streaming"
-import useAgoraClientConfig from "../../components/custom-hook/useAgoraClientConfig"
-import * as actions from "../../store/actions"
-import useAgoraError from "../../components/custom-hook/useAgoraError"
-import { errorLogAndNotify, isMobileBrowser } from "../../util/CommonUtil"
-import { streamerBreakoutRoomModalOpen } from "../../store/selectors/streamSelectors"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { setVideoEffectsOff } from "store/actions/streamActions"
+import useAgoraClientConfig from "../../components/custom-hook/useAgoraClientConfig"
+import useAgoraError from "../../components/custom-hook/useAgoraError"
+import useStreamRef from "../../components/custom-hook/useStreamRef"
+import { agoraServiceInstance } from "../../data/agora/AgoraService"
+import * as actions from "../../store/actions"
+import { streamerBreakoutRoomModalOpen } from "../../store/selectors/streamSelectors"
+import { LocalStream } from "../../types/streaming"
+import { errorLogAndNotify, isMobileBrowser } from "../../util/CommonUtil"
+import { useFirebaseService } from "../firebase/FirebaseServiceContext"
+import RTCContext, { RtcPropsInterface } from "./RTCContext"
 
 const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
@@ -59,16 +60,7 @@ const RTCProvider = ({
    const { handleRtcError, handleDeviceError, handleScreenShareDeniedError } =
       useAgoraError()
 
-   const forcedProxyMode = useMemo(() => {
-      if (router.query.withProxyMode) {
-         const parsed = parseInt(router.query.withProxyMode as string)
-         if (!isNaN(parsed) && parsed > 0) {
-            return parsed
-         }
-      }
-
-      return false
-   }, [router.query.withProxyMode])
+   const forcedProxyMode = useForcedProxyMode()
 
    const [localStream, setLocalStream] = useState<LocalStream>({
       uid: uid,
@@ -105,7 +97,7 @@ const RTCProvider = ({
       try {
          if (rtcClient) {
             await rtcClient.leave()
-            if (Boolean(forcedProxyMode)) {
+            if (forcedProxyMode) {
                rtcClient.stopProxyServer()
             }
          }
@@ -130,7 +122,7 @@ const RTCProvider = ({
             streamDocumentPath: streamRef.path,
          })
 
-         if (Boolean(forcedProxyMode)) {
+         if (forcedProxyMode) {
             rtcClient.startProxyServer(forcedProxyMode as number)
          }
 
@@ -199,7 +191,7 @@ const RTCProvider = ({
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
-         let tracks = []
+         const tracks = []
          if (localStream.videoTrack) {
             tracks.push(localStream.videoTrack)
          }
@@ -376,7 +368,7 @@ const RTCProvider = ({
       try {
          if (localStream.videoTrack) {
             if (localStream.isVideoPublished) {
-               let localStreamTracks = [localStream.videoTrack]
+               const localStreamTracks = [localStream.videoTrack]
                await rtcClient.unpublish(localStreamTracks)
 
                disableDualStream(rtcClient).catch(console.error)
@@ -416,7 +408,7 @@ const RTCProvider = ({
       try {
          if (localStream.audioTrack) {
             if (localStream.isAudioPublished) {
-               let localStreamTracks = [localStream.audioTrack]
+               const localStreamTracks = [localStream.audioTrack]
                try {
                   await rtcClient.unpublish(localStreamTracks)
                } catch (e) {
@@ -449,7 +441,7 @@ const RTCProvider = ({
 
    const getScreenShareStream = useCallback(
       async (screenSharingMode: string, onScreenShareStopped: () => void) => {
-         let screenShareVideoResolution: ScreenVideoTrackInitConfig["encoderConfig"] =
+         const screenShareVideoResolution: ScreenVideoTrackInitConfig["encoderConfig"] =
             screenSharingMode === "motion" ? "720p_2" : "1080p_1"
          try {
             const tracksObject = await AgoraRTC.createScreenVideoTrack(
@@ -526,8 +518,8 @@ const RTCProvider = ({
 
    const unPublishScreenShareStream = useCallback(async () => {
       try {
-         let screenShareRtcClient = screenShareRtcClientRef.current
-         let screenShareStream = screenShareStreamRef.current
+         const screenShareRtcClient = screenShareRtcClientRef.current
+         const screenShareStream = screenShareStreamRef.current
 
          await screenShareRtcClient.unpublish(screenShareStream)
          if (Array.isArray(screenShareStream)) {
@@ -547,7 +539,7 @@ const RTCProvider = ({
 
    const setDesktopMode = useCallback(
       async (mode: LivestreamEvent["mode"], initiatorId: string) => {
-         let sharerId = mode === "desktop" ? initiatorId : screenSharerId
+         const sharerId = mode === "desktop" ? initiatorId : screenSharerId
          await setDesktopModeInstanceMethod(
             streamRef,
             mode,

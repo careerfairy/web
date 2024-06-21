@@ -1,8 +1,11 @@
-import { UserData } from "../users"
-import { CustomJob, CustomJobApplicant, PublicCustomJob } from "./customJobs"
-import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import firebase from "firebase/compat"
+import BaseFirebaseRepository, {
+   mapFirestoreDocuments,
+} from "../BaseFirebaseRepository"
 import { Timestamp } from "../firebaseTypes"
+import { UserData } from "../users"
+import { chunkArray } from "../utils"
+import { CustomJob, CustomJobApplicant, PublicCustomJob } from "./customJobs"
 
 export interface ICustomJobRepository {
    /**
@@ -78,6 +81,18 @@ export interface ICustomJobRepository {
       jobIdsToUpdate: string[],
       toRemove?: boolean
    ): Promise<void>
+
+   /**
+    * Retrieves a list of customJobs where the given ids by @param ids is included in the
+    * relationship designed by @param linkField, meaning its value must be an array field of customJobs document
+    * where valid ids are to be present.
+    * @param linkField customJobs field for matching ids
+    * @param ids list of identifiers for which the field @param linkField will be filtered by.
+    */
+   getCustomJobsByLinkedContentIds(
+      linkField: string,
+      ids: string[]
+   ): Promise<CustomJob[]>
 }
 
 export class FirebaseCustomJobRepository
@@ -105,7 +120,9 @@ export class FirebaseCustomJobRepository
          createdAt: this.fieldValue.serverTimestamp() as Timestamp,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
          livestreams: linkedLivestreamId ? [linkedLivestreamId] : [],
+         sparks: [],
          id: ref.id,
+         published: Boolean(linkedLivestreamId),
       }
 
       await ref.set(newJob, { merge: true })
@@ -243,5 +260,41 @@ export class FirebaseCustomJobRepository
       })
 
       return batch.commit()
+   }
+
+   async getCustomJobsByLinkedContentIds(
+      linkField: keyof Pick<CustomJob, "sparks" | "livestreams">,
+      ids: string[]
+   ): Promise<CustomJob[]> {
+      if (!ids.length) return []
+
+      const chunks = chunkArray(ids, 10)
+      const promises = []
+      for (const chunk of chunks) {
+         promises.push(
+            this.firestore
+               .collection(this.COLLECTION_NAME)
+               .where(linkField, "array-contains-any", chunk)
+               .get()
+               .then(mapFirestoreDocuments)
+         )
+      }
+
+      const responses = await Promise.allSettled(promises)
+
+      return responses
+         .filter((r) => {
+            if (r.status === "fulfilled") {
+               return true
+            } else {
+               // only log for debugging purposes
+               console.error("Promise failed", r)
+            }
+
+            return false
+         })
+         .map((r) => (r as PromiseFulfilledResult<CustomJob[]>).value)
+         .flat()
+         .filter(Boolean)
    }
 }

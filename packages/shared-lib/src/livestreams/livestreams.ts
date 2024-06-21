@@ -15,7 +15,7 @@ import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
-   1000 * 60 * 60 * 4
+   1000 * 60 * 60 * 4 // 4 hours
 
 export interface LivestreamEvent extends Identifiable {
    author?: AuthorInfo
@@ -40,6 +40,14 @@ export interface LivestreamEvent extends Identifiable {
    universityIds?: string[]
    levelOfStudyIds?: string[]
    fieldOfStudyIds?: string[]
+   /**
+    * Content Tag IDs
+    * e.g: ["BusinessDevelopment", "Consulting"]
+    */
+   businessFunctionsTagIds?: string[]
+   contentTopicsTagIds?: string[]
+   linkedCustomJobsTagIds?: string[]
+
    isRecording?: boolean
    language?: LivestreamLanguage
    hidden: boolean
@@ -713,6 +721,7 @@ export enum ImpressionLocation {
    embeddedPastLivestreams = "embeddedPastLivestreams",
    landingPageCarousel = "landingPageCarousel",
    viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
+   endOfStreamLivestreams = "endOfStreamLivestreams",
    unknown = "unknown",
 }
 
@@ -748,4 +757,64 @@ export type FilterLivestreamsOptions = {
 export type CategoryDataOption = {
    livestream: LivestreamEvent
    userData: UserData
+}
+
+/**
+ * A PDF presentation for a live stream
+ * Document Path: livestreams/{livestreamId}/presentations/presentation
+ */
+export interface LivestreamPresentation extends Identifiable {
+   downloadUrl: string
+   page: number
+   fileName?: string
+   /** The path to the PDF in the storage */
+   storagePath?: string
+   /** The size of the PDF in bytes */
+   fileSize?: number
+}
+
+/**
+ * A YouTube video for a live stream
+ * Document Path: livestreams/{livestreamId}/videos/video
+ */
+export interface LivestreamVideo extends Identifiable {
+   url: string
+   second: number
+   state: "playing" | "paused"
+   lastPlayed: firebase.firestore.Timestamp
+   /** The ID of the user that can update the video */
+   updater: string
+}
+
+/**
+ * The type of the emote reactions viewers can send to the stream
+ */
+export enum EmoteType {
+   /**
+    * The user pressed the clapping button
+    */
+   CLAPPING = "clapping",
+   /**
+    * The user pressed the like button
+    */
+   LIKE = "like",
+   /**
+    * The user pressed the heart button
+    */
+   HEART = "heart",
+   /**
+    * The user pressed the confused button
+    */
+   CONFUSED = "confused",
+}
+
+export interface LivestreamEmote extends Identifiable {
+   name: EmoteType
+   timestamp: firebase.firestore.Timestamp
+   userUid: string | null
+   agoraUserId: string
+   /** @deprecated */
+   authorEmail?: string
+   /** @deprecated */
+   streamerId?: string
 }

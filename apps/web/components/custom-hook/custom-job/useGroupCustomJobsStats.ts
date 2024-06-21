@@ -1,7 +1,7 @@
+import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
-import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 type Options = {
    deletedJobs?: boolean
@@ -20,7 +20,7 @@ const useGroupCustomJobsStats = (groupId: string, options: Options = {}) => {
       collection(useFirestore(), "customJobStats"),
       where("groupId", "==", groupId),
       where("deleted", "==", deletedJobs),
-      orderBy("job.createdAt", "desc")
+      orderBy("job.deadline", "asc")
    )
 
    const { data } = useFirestoreCollection<CustomJobStats>(collectionRef, {

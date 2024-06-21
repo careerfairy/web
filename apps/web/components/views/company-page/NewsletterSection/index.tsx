@@ -1,14 +1,14 @@
-import { Box, Button, Typography } from "@mui/material"
-import React, { useCallback } from "react"
-import { sxStyles } from "../../../../types/commonTypes"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import Link from "../../common/Link"
-import { useRouter } from "next/router"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { userRepo } from "../../../../data/RepositoryInstances"
 import { IUserReminder, UserReminderType } from "@careerfairy/shared-lib/users"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import { Box, Button, Typography } from "@mui/material"
+import { useRouter } from "next/router"
+import { useCallback } from "react"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { userRepo } from "../../../../data/RepositoryInstances"
 import { PillsBackground } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
+import { sxStyles } from "../../../../types/commonTypes"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import Link from "../../common/Link"
 import { useCompanyPage } from "../index"
 
 const styles = sxStyles({
@@ -81,21 +81,23 @@ const NewsletterSection = () => {
             </Typography>
             <Box mt={4}>
                {isLoggedOut ? (
-                  <Button
-                     component={Link}
-                     // @ts-ignore
+                  <Link
+                     noLinkStyle
                      href={{
                         pathname: "/signup",
                         query: {
                            absolutePath: asPath,
                         },
                      }}
-                     variant={"contained"}
-                     color={"secondary"}
-                     size={"large"}
                   >
-                     Join CareerFairy
-                  </Button>
+                     <Button
+                        variant={"contained"}
+                        color={"secondary"}
+                        size={"large"}
+                     >
+                        Join CareerFairy
+                     </Button>
+                  </Link>
                ) : (
                   <Button
                      onClick={handleAcceptNewsletter}

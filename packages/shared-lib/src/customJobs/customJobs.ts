@@ -17,14 +17,20 @@ export interface CustomJob extends Identifiable {
    deadline: firebase.firestore.Timestamp
    createdAt: firebase.firestore.Timestamp
    updatedAt: firebase.firestore.Timestamp
-   clicks?: number // TODO: this field is deprecated, it should be removed after the release
-   applicants?: string[] // TODO: this field is deprecated, it should be removed after the release
+   // live streams ids where this job opening is shown
+   livestreams: string[]
+   // sparks ids where this job opening is shown
+   sparks: string[]
+   published: boolean
 
    // optional fields
    salary?: string
-   // livestreams ids where this job opening is shown
-   livestreams: string[]
    deleted?: boolean
+   /**
+    * Content Tag IDs
+    * e.g: ["BusinessDevelopment", "Consulting"]
+    */
+   businessFunctionsTagIds?: string[]
 }
 
 export type PublicCustomJob = Pick<
@@ -38,6 +44,7 @@ export type PublicCustomJob = Pick<
    | "deadline"
    | "salary"
    | "deleted"
+   | "deadline"
 >
 
 export type PublicCustomJobApplicant = Pick<

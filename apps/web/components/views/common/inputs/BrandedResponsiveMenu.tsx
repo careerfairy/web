@@ -8,11 +8,11 @@ import {
    SxProps,
    Typography,
 } from "@mui/material"
-import { FC, Fragment, ReactElement } from "react"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { ComponentType, FC, Fragment, ReactElement } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import BrandedMenu from "./BrandedMenu"
 import BrandedSwipeableDrawer from "./BrandedSwipeableDrawer"
-import useIsMobile from "components/custom-hook/useIsMobile"
 
 const LOADER_SIZE = 15
 
@@ -60,6 +60,10 @@ const styles = sxStyles({
       transform: "translate(-50%, -50%)",
       color: (theme) => theme.brand.black[600],
    },
+   mobileDrawer: {
+      //Assures mobile drawer can be opened inside of modals
+      zIndex: (theme) => theme.zIndex.modal + 1,
+   },
 })
 
 export type MenuOption = {
@@ -70,6 +74,10 @@ export type MenuOption = {
    disabled?: boolean
    loading?: boolean
    color?: string
+   /** An optional component to wrap around the menu item e.g. a file uploader. */
+   wrapperComponent?: ComponentType<{ children?: ReactElement }>
+   /** If true, keeps the menu open after clicking the option. Defaults to false. */
+   keepOpen?: boolean
 }
 
 type MobileDrawerProps = {
@@ -90,37 +98,23 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
          onClose={handleClose}
          onOpen={() => null}
          open={open}
+         sx={styles.mobileDrawer}
       >
          <List>
-            {options.map((option, index) => (
-               <Fragment key={index}>
-                  {index !== 0 && <Divider sx={styles.listItemDivider} />}
-                  <ListItemButton
-                     key={index}
-                     onClick={async (args) => {
-                        try {
-                           await option.handleClick(args)
-                        } catch (error) {
-                           console.error(error)
-                        }
-                        handleClose()
-                     }}
-                     sx={combineStyles(
-                        [
-                           styles.drawerMenuItem,
-                           option.loading && styles.listItemLoading,
-                           option.color && { color: option.color },
-                        ],
-                        option.menuItemSxProps
-                     )}
-                     disabled={option.disabled || option.loading}
-                  >
-                     <Box sx={styles.icon}>{option.icon}</Box>
-                     <Typography variant="medium">{option.label}</Typography>
-                     {Boolean(option.loading) && <Loader />}
-                  </ListItemButton>
-               </Fragment>
-            ))}
+            {options.map((option, index) => {
+               const WrapperComponent = option.wrapperComponent || Fragment
+               return (
+                  <Fragment key={index}>
+                     {index !== 0 && <Divider sx={styles.listItemDivider} />}
+                     <WrapperComponent>
+                        <MobileMenuItem
+                           option={option}
+                           handleClose={handleClose}
+                        />
+                     </WrapperComponent>
+                  </Fragment>
+               )
+            })}
             {Boolean(enableDrawerCancelButton) && (
                <Fragment>
                   <Divider sx={styles.listItemDivider} />
@@ -142,61 +136,50 @@ type PopoverMenuProps = {
    handleClose: () => void
    anchorEl: HTMLElement | null
    open: boolean
+   placement?: MenuPlacement
 }
+
+type MenuPlacement = "top" | "bottom"
+
 const DesktopMenu: FC<PopoverMenuProps> = ({
    options,
    handleClose,
    anchorEl,
    open,
+   placement = "bottom",
 }) => {
-   const singleOption = options.length == 1
    return (
       <BrandedMenu
          onClose={handleClose}
          anchorEl={anchorEl}
          open={open}
          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
+            vertical: placement == "bottom" ? "bottom" : "top",
+            horizontal: placement == "bottom" ? "right" : "left",
          }}
          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
+            vertical: placement == "bottom" ? "top" : "bottom",
+            horizontal: placement == "bottom" ? "right" : "left",
          }}
          TransitionProps={{
             unmountOnExit: true,
          }}
       >
-         {options.map((option, index) => (
-            <Box key={index}>
-               <MenuItem
-                  onClick={async (args) => {
-                     try {
-                        await option.handleClick(args)
-                     } catch (error) {
-                        console.error(error)
-                     }
-                     handleClose()
-                  }}
-                  disabled={option.disabled || option.loading}
-                  sx={combineStyles(
-                     [
-                        styles.menuItem,
-                        option.loading && styles.listItemLoading,
-                        singleOption && styles.singleMenuItem,
-                        index !== options.length - 1 && styles.borderBottom,
-                        option.color && { color: option.color },
-                     ],
-                     option.menuItemSxProps
-                  )}
-               >
-                  <Box sx={styles.icon}>{option.icon}</Box>
-                  <Typography variant="xsmall">{option.label}</Typography>
-                  {Boolean(options.length - 1 !== index) && <Divider />}
-                  {Boolean(option.loading) && <Loader />}
-               </MenuItem>
-            </Box>
-         ))}
+         {options.map((option, index) => {
+            const WrapperComponent = option.wrapperComponent || Fragment
+            return (
+               <Box key={index}>
+                  <WrapperComponent>
+                     <DesktopMenuItem
+                        option={option}
+                        handleClose={handleClose}
+                        singleOption={options.length == 1}
+                        hasDivider={index !== options.length - 1}
+                     />
+                  </WrapperComponent>
+               </Box>
+            )
+         })}
       </BrandedMenu>
    )
 }
@@ -208,6 +191,7 @@ export type MoreMenuProps = {
    anchorEl: HTMLElement | null
    handleClose: () => void
    enableDrawerCancelButton?: boolean
+   placement?: MenuPlacement
 }
 
 const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
@@ -217,6 +201,7 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
    anchorEl,
    handleClose,
    enableDrawerCancelButton,
+   placement,
 }) => {
    const defaultIsMobile = useIsMobile()
    const isMobile = isMobileOverride ?? defaultIsMobile
@@ -236,6 +221,7 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
                handleClose={handleClose}
                anchorEl={anchorEl}
                open={open}
+               placement={placement}
             />
          )}
       </Fragment>
@@ -244,6 +230,82 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
 
 const Loader = () => {
    return <CircularProgress sx={styles.loader} size={LOADER_SIZE} />
+}
+
+type MobileMenuItemProps = {
+   option: MenuOption
+   handleClose: () => void
+}
+
+const MobileMenuItem: FC<MobileMenuItemProps> = ({ option, handleClose }) => {
+   return (
+      <ListItemButton
+         onClick={async (args) => {
+            try {
+               await option.handleClick(args)
+            } catch (error) {
+               console.error(error)
+            }
+            !option.keepOpen && handleClose()
+         }}
+         sx={combineStyles(
+            [
+               styles.drawerMenuItem,
+               option.loading && styles.listItemLoading,
+               option.color && { color: option.color },
+            ],
+            option.menuItemSxProps
+         )}
+         disabled={option.disabled || option.loading}
+      >
+         <Box sx={styles.icon}>{option.icon}</Box>
+         <Typography variant="medium">{option.label}</Typography>
+         {Boolean(option.loading) && <Loader />}
+      </ListItemButton>
+   )
+}
+
+type DesktopMenuItemProps = {
+   option: MenuOption
+   handleClose: () => void
+   singleOption: boolean
+   hasDivider: boolean
+}
+
+const DesktopMenuItem: FC<DesktopMenuItemProps> = ({
+   option,
+   handleClose,
+   singleOption,
+   hasDivider,
+}) => {
+   return (
+      <MenuItem
+         onClick={async (args) => {
+            try {
+               await option.handleClick(args)
+            } catch (error) {
+               console.error(error)
+            }
+            !option.keepOpen && handleClose()
+         }}
+         disabled={option.disabled || option.loading}
+         sx={combineStyles(
+            [
+               styles.menuItem,
+               option.loading && styles.listItemLoading,
+               singleOption && styles.singleMenuItem,
+               hasDivider && styles.borderBottom,
+               option.color && { color: option.color },
+            ],
+            option.menuItemSxProps
+         )}
+      >
+         <Box sx={styles.icon}>{option.icon}</Box>
+         <Typography variant="xsmall">{option.label}</Typography>
+         {hasDivider ? <Divider /> : null}
+         {Boolean(option.loading) && <Loader />}
+      </MenuItem>
+   )
 }
 
 export default BrandedResponsiveMenu

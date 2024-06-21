@@ -8,7 +8,9 @@ import {
 import { sxStyles } from "types/commonTypes"
 import { UserStream } from "../../../types"
 import { SpotlightProvider } from "./SpotlightProvider"
-import { SpotlightStream } from "./SpotlightStream"
+import { SpotlightPDF } from "./pdf/SpotlightPDF"
+import { SpotlightStream } from "./stream/SpotlightStream"
+import { SpotlightVideo } from "./video/SpotlightVideo"
 
 const styles = sxStyles({
    root: {
@@ -23,10 +25,8 @@ const styles = sxStyles({
 
 const Content = {
    [LivestreamModes.DESKTOP]: <SpotlightStream />,
-   [LivestreamModes.PRESENTATION]: <Box>Rendering PDF Spotlight Content</Box>,
-   [LivestreamModes.VIDEO]: (
-      <Box>Rendering YouTube Video Spotlight Content</Box>
-   ),
+   [LivestreamModes.PRESENTATION]: <SpotlightPDF />,
+   [LivestreamModes.VIDEO]: <SpotlightVideo />,
 } as const
 
 type Props = {

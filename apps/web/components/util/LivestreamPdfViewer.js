@@ -1,8 +1,8 @@
 import { memo, useEffect, useState } from "react"
-import { pdfjs } from "react-pdf"
-import { Document, Page } from "react-pdf"
+import { Document, Page, pdfjs } from "react-pdf"
 
-import { useWindowSize } from "components/custom-hook/useWindowSize"
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft"
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight"
 import {
    Button,
    CircularProgress,
@@ -11,15 +11,15 @@ import {
    IconButton,
    LinearProgress,
 } from "@mui/material"
-import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft"
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight"
+import { useWindowSize } from "components/custom-hook/useWindowSize"
 
-import FilePickerContainer from "components/ssr/FilePickerContainer"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { STORAGE_PATHS } from "@careerfairy/shared-lib/constants/storagePaths"
 import Box from "@mui/material/Box"
-import AutoSizer from "react-virtualized-auto-sizer"
 import makeStyles from "@mui/styles/makeStyles"
+import FilePickerContainer from "components/ssr/FilePickerContainer"
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import AutoSizer from "react-virtualized-auto-sizer"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -68,15 +68,18 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
             }
          )
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [livestreamId])
 
-   function uploadLogo(logoFile) {
+   function uploadPresentation(logoFile) {
+      const getStoragePath = () => {
+         return `${STORAGE_PATHS.presentations}/${livestreamId}.pdf`
+      }
+
       setLoading(true)
       setUploadingPresentation(true)
       var storageRef = firebase.getStorageRef()
-      let presentationRef = storageRef.child(
-         "company_documents/" + livestreamId + ".pdf"
-      )
+      let presentationRef = storageRef.child(getStoragePath())
 
       var uploadTask = presentationRef.put(logoFile)
 
@@ -115,7 +118,12 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
             uploadTask.snapshot.ref
                .getDownloadURL()
                .then(function (downloadURL) {
-                  firebase.setLivestreamPresentation(livestreamId, downloadURL)
+                  firebase.setLivestreamPresentation(
+                     livestreamId,
+                     downloadURL,
+                     logoFile,
+                     getStoragePath()
+                  )
                   console.log("File available at", downloadURL)
                   setUploadingPresentation(false)
                })
@@ -123,7 +131,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
       )
    }
 
-   function getPageHeight(height, width) {
+   function getPageHeight(height) {
       if (showMenu) {
          if (windowSize.height > windowSize.width - 480) {
             return windowSize.width * 0.4
@@ -200,7 +208,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
       <FilePickerContainer
          extensions={["pdf"]}
          onChange={(fileObject) => {
-            uploadLogo(fileObject)
+            uploadPresentation(fileObject)
          }}
          maxSize={20}
          onError={(errMsg) => console.log(errMsg)}
@@ -235,7 +243,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
             <FilePickerContainer
                extensions={["pdf"]}
                onChange={(fileObject) => {
-                  uploadLogo(fileObject)
+                  uploadPresentation(fileObject)
                }}
                maxSize={20}
                onError={(errMsg) => console.log(errMsg)}

@@ -11,7 +11,31 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
-import { WaitingRoom } from "./components/viewer/WaitingRoom"
+import { WaitingRoom } from "./components/waiting-room/WaitingRoom"
+
+const EndOfStream = dynamic(
+   () =>
+      import("./components/end-of-stream/EndOfStream").then(
+         (mod) => mod.EndOfStream
+      ),
+   { ssr: false }
+)
+
+const ShareVideoDialog = dynamic(
+   () =>
+      import(
+         "./components/StreamingGrid/Spotlight/video/ShareVideoDialog"
+      ).then((mod) => mod.ShareVideoDialog),
+   { ssr: false }
+)
+
+const UploadPDFPresentationDialog = dynamic(
+   () =>
+      import(
+         "./components/StreamingGrid/Spotlight/pdf/UploadPDFPresentationDialog"
+      ).then((mod) => mod.UploadPDFPresentationDialog),
+   { ssr: false }
+)
 
 const ThanksForJoiningHandRaiseDialog = dynamic(
    () =>
@@ -152,6 +176,14 @@ const OngoingPollTracker = dynamic(
    { ssr: false }
 )
 
+const EmotesRenderer = dynamic(
+   () =>
+      import("./components/emotes/EmotesRenderer").then(
+         (mod) => mod.EmotesRenderer
+      ),
+   { ssr: false }
+)
+
 type Props = {
    isHost: boolean
 }
@@ -208,15 +240,17 @@ const Component = ({ isHost }: Props) => {
                         <AgoraDevicesProvider>
                            <LocalTracksProvider>
                               <ScreenShareProvider>
-                                 <Layout>
-                                    <Fragment>
-                                       <TopBar />
-                                       <MiddleContent />
-                                       <BottomBar />
-                                       <StreamSetupWidget />
-                                       <SettingsMenu />
-                                    </Fragment>
-                                 </Layout>
+                                 <EndOfStream isHost={isHost}>
+                                    <Layout>
+                                       <Fragment>
+                                          <TopBar />
+                                          <MiddleContent />
+                                          <BottomBar />
+                                          <StreamSetupWidget />
+                                          <SettingsMenu />
+                                       </Fragment>
+                                    </Layout>
+                                 </EndOfStream>
                                  <ToggleStreamModeButton />
                               </ScreenShareProvider>
                            </LocalTracksProvider>
@@ -225,6 +259,9 @@ const Component = ({ isHost }: Props) => {
                         {isHost ? <HostTrackers /> : <ViewerTrackers />}
                         {isHost ? null : <OngoingPollTracker />}
                         {isHost ? null : <ThanksForJoiningHandRaiseDialog />}
+                        {isHost ? <UploadPDFPresentationDialog /> : null}
+                        {isHost ? <ShareVideoDialog /> : null}
+                        <EmotesRenderer />
                         <SessionConflictModal />
                         <SessionDisconnectedModal />
                      </RTMSignalingProvider>

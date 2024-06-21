@@ -1,3 +1,4 @@
+import AgoraRTM, { RtmMessage } from "agora-rtm-sdk"
 import {
    useCallback,
    useContext,
@@ -6,22 +7,20 @@ import {
    useRef,
    useState,
 } from "react"
-import AgoraRTM, { RtmMessage } from "agora-rtm-sdk"
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 
+import { EmoteType } from "@careerfairy/shared-lib/livestreams"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { useDispatch } from "react-redux"
+import * as actions from "store/actions"
+import { setSessionRTMFailedToJoin } from "store/actions/streamActions"
+import { agoraCredentials } from "../../data/agora/AgoraInstance"
+import { RTMStatus } from "../../types/streaming"
+import { errorLogAndNotify } from "../../util/CommonUtil"
 import RTMContext, {
    AgoraRTMContextInterface,
    EmoteMessage,
-   EmoteType,
 } from "./RTMContext"
-import * as actions from "store/actions"
-import { agoraCredentials } from "../../data/agora/AgoraInstance"
-import { errorLogAndNotify } from "../../util/CommonUtil"
-import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
-import { RTMStatus } from "../../types/streaming"
-import { setSessionRTMFailedToJoin } from "store/actions/streamActions"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 interface Props {
    children: JSX.Element

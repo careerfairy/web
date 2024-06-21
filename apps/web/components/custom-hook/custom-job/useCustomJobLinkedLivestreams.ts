@@ -1,11 +1,13 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { useFirestoreCollection } from "../utils/useFirestoreCollection"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { collection, documentId, query, where } from "firebase/firestore"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
 const useCustomJobLinkedLivestreams = (job: CustomJob) => {
-   const linkedLivestreams = job?.livestreams || []
+   const linkedLivestreams = job?.livestreams?.length
+      ? job.livestreams
+      : ["no-livestream-id"]
 
    const livestreamsCollectionRef = query(
       collection(FirestoreInstance, "livestreams"),

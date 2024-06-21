@@ -315,7 +315,10 @@ export class RankedSparkRepository {
     * @returns Array of ranked sparks filtered by the specified field ID
     */
    private getSparksFilteredByField(
-      field: keyof Spark,
+      field: keyof Omit<
+         Spark,
+         "contentTopicsTagIds" | "languageTagIds" | "linkedCustomJobsTagIds"
+      >,
       values: unknown[],
       limit: number
    ): RankedSpark[] {
@@ -323,8 +326,11 @@ export class RankedSparkRepository {
          .filter((rankedSpark) => {
             const sparkFieldValue = rankedSpark.model.spark[field]
 
+            // When adding other fields to Spark it should be omitted
             if (sparkFieldValue && Array.isArray(sparkFieldValue)) {
-               return sparkFieldValue.some((value) => values.includes(value.id))
+               return sparkFieldValue.some((value) =>
+                  values.includes(value?.id)
+               )
             }
 
             if (sparkFieldValue && typeof sparkFieldValue === "string") {

@@ -1,10 +1,10 @@
 import {
-   ILocalVideoTrack,
    type IAgoraRTCRemoteUser,
    type ICameraVideoTrack,
+   type ILocalAudioTrack,
+   type ILocalVideoTrack,
    type IMicrophoneAudioTrack,
    type UID,
-   ILocalAudioTrack,
 } from "agora-rtc-react"
 
 export type LocalUser = {
@@ -65,3 +65,9 @@ export type RemoteUser = {
 }
 
 export type UserStream = LocalUser | LocalUserScreen | RemoteUser
+
+export enum VirtualBackgroundMode {
+   IMAGE = "virtual background",
+   BLUR = "blur",
+   OFF = "off",
+}

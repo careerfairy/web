@@ -1,14 +1,12 @@
 import { Box, Dialog, SwipeableDrawer } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import React from "react"
+import { Fragment } from "react"
 import { toggleSettingsMenu } from "store/reducers/streamingAppReducer"
 import { useSettingsMenuOpen } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
-import { SettingsMenuProvider } from "./SettingsMenuContext"
-import { Title } from "./Title"
-import { Actions } from "./Actions"
 import { Body } from "./Body"
+import { Title } from "./Title"
 
 const styles = sxStyles({
    dialog: {
@@ -73,10 +71,9 @@ type ContentProps = {
 
 const Content = ({ onClose, isMobile }: ContentProps) => {
    return (
-      <SettingsMenuProvider isMobile={isMobile} onClose={onClose}>
-         <Title />
+      <Fragment>
+         <Title handleClose={onClose} isMobile={isMobile} />
          <Body />
-         <Actions />
-      </SettingsMenuProvider>
+      </Fragment>
    )
 }

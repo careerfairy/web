@@ -1,0 +1,202 @@
+import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
+import { Stack, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import Link from "components/views/common/Link"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import { useRouter } from "next/router"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { useSelector } from "react-redux"
+import {
+   activeSparkSelector,
+   anonymousUserCountryCodeSelector,
+   shouldShowLinkedInPopUpNotificationSelector,
+} from "store/selectors/sparksFeedSelectors"
+import CreatorAvatar from "../../CreatorAvatar"
+import { LinkedInIcon } from "./LinkedInIcon"
+import { SparksPopUpBase } from "./SparksPopUpBase"
+
+const LINKEDIN_COLOR = "#3A70E2"
+
+const getSparksUtmParamsIfExist = (pathname: string) => {
+   const isOnSparksFeed = pathname.includes("/sparks/[sparkId]")
+
+   if (isOnSparksFeed) {
+      return `&utm_source=careerfairy&utm_medium=sparks`
+   }
+
+   return ""
+}
+
+type NotificationMessageProps = {
+   name: string
+}
+
+const LoggedInNotificationMessage = ({ name }: NotificationMessageProps) => {
+   const isMobile = useIsMobile()
+   return (
+      <Typography
+         color={"text.primary"}
+         variant={isMobile ? "body1" : "body2"}
+         component={"span"}
+      >
+         Reach out to
+         <Typography
+            fontSize={"inherit"}
+            color={LINKEDIN_COLOR}
+            display={"inline"}
+            fontWeight={600}
+         >
+            {" "}
+            {name}{" "}
+         </Typography>
+         on LinkedIn and ask your own questions!
+      </Typography>
+   )
+}
+
+const LoggedOutNotificationMessage = ({ name }: NotificationMessageProps) => {
+   const isMobile = useIsMobile()
+   return (
+      <Typography
+         color={"text.primary"}
+         variant={isMobile ? "body1" : "body2"}
+         component={"span"}
+      >
+         Want to ask
+         <Typography
+            fontSize={"inherit"}
+            color={"primary"}
+            display={"inline"}
+            fontWeight={600}
+         >
+            {" "}
+            {name}{" "}
+         </Typography>
+         your own questions? Create an account to access her details.
+      </Typography>
+   )
+}
+
+const LinkedInCta = (
+   <Stack direction="row" alignItems="center" gap="12px">
+      <LinkedInIcon width={14} height={14} sx={{ marginTop: "-2px" }} />
+      Reach out
+   </Stack>
+)
+
+const SignUpButton = () => {
+   const { asPath, pathname } = useRouter()
+
+   return (
+      <Link
+         color="inherit"
+         href={`/signup?absolutePath=${encodeURIComponent(
+            asPath
+         )}${getSparksUtmParamsIfExist(pathname)}`}
+         sx={{
+            width: "100%",
+            textDecoration: "none",
+         }}
+      >
+         Sign Up
+      </Link>
+   )
+}
+
+type Props = {
+   spark: SparkPresenter
+}
+
+export const SparksCreatorNotification = ({ spark }: Props) => {
+   const { userData, isLoggedIn } = useAuth()
+
+   const { trackEvent } = useSparksFeedTracker()
+   const activeSpark = useSelector(activeSparkSelector)
+   const anonymousUserCountryCode = useSelector(
+      anonymousUserCountryCodeSelector
+   )
+   const shouldShowLinkedInCTA = useSelector(
+      shouldShowLinkedInPopUpNotificationSelector
+   )
+
+   const [hasUserClickedAnyButton, setHasUserClickedAnyButton] = useState(false)
+   const [playingCriteriaHasBeenMet, setPlayingCriteriaHasBeenMet] =
+      useState(false)
+
+   const linkedInHandleClick = useCallback(() => {
+      window.open(spark.creator.linkedInUrl, "_blank")
+      trackEvent(SparkEventActions.Click_ReachOut_LinkedIn)
+      setHasUserClickedAnyButton(true)
+   }, [spark.creator.linkedInUrl, trackEvent])
+
+   const cancelHandleClick = useCallback((ev) => {
+      setHasUserClickedAnyButton(true)
+      ev.preventDefault()
+      ev.stopPropagation()
+   }, [])
+
+   const userMeetsTargetCriteria = useMemo(() => {
+      const userCountryCode =
+         anonymousUserCountryCode || userData?.universityCountryCode
+
+      const isTargetedUser =
+         spark.group.targetedCountries?.filter(
+            (country) => country.id === userCountryCode
+         ).length > 0
+
+      return isTargetedUser
+   }, [
+      anonymousUserCountryCode,
+      spark.group.targetedCountries,
+      userData?.universityCountryCode,
+   ])
+
+   useEffect(() => {
+      if (
+         !hasUserClickedAnyButton &&
+         activeSpark &&
+         activeSpark.id === spark?.id &&
+         shouldShowLinkedInCTA
+      ) {
+         setPlayingCriteriaHasBeenMet(true)
+      }
+
+      return () => setPlayingCriteriaHasBeenMet(false)
+   }, [activeSpark, hasUserClickedAnyButton, shouldShowLinkedInCTA, spark?.id])
+
+   if (
+      !shouldShowLinkedInCTA ||
+      !spark.creator.linkedInUrl ||
+      !userMeetsTargetCriteria ||
+      activeSpark.isCardNotification
+   ) {
+      return null
+   }
+
+   return (
+      <SparksPopUpBase
+         showNotification={Boolean(
+            userMeetsTargetCriteria && playingCriteriaHasBeenMet
+         )}
+         pictureUrl={spark.creator.avatarUrl}
+         message={
+            isLoggedIn ? (
+               <LoggedInNotificationMessage name={spark.creator.firstName} />
+            ) : (
+               <LoggedOutNotificationMessage name={spark.creator.firstName} />
+            )
+         }
+         cancelHandleClick={cancelHandleClick}
+         ctaHandleClick={isLoggedIn ? linkedInHandleClick : undefined}
+         cta={isLoggedIn ? LinkedInCta : <SignUpButton />}
+         ctaSx={
+            Boolean(isLoggedIn) && {
+               backgroundColor: `${LINKEDIN_COLOR} !important`,
+            }
+         }
+         pictureSlot={<CreatorAvatar creator={spark.creator} size={50} />}
+      />
+   )
+}

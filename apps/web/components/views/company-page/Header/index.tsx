@@ -1,4 +1,3 @@
-import { getTabLabel, TabValue, TabValueType, useCompanyPage } from "../"
 import {
    AppBar,
    Avatar,
@@ -9,21 +8,22 @@ import {
    TabsOwnProps,
    Typography,
 } from "@mui/material"
-import { sxStyles } from "../../../../types/commonTypes"
+import Stack from "@mui/material/Stack"
+import { styled, useTheme } from "@mui/material/styles"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useCallback, useMemo } from "react"
+import { TabValue, TabValueType, getTabLabel, useCompanyPage } from "../"
 import { companyLogoPlaceholder } from "../../../../constants/images"
 import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
-import React, { useCallback, useMemo } from "react"
-import { styled, useTheme } from "@mui/material/styles"
-import Stack from "@mui/material/Stack"
-import FollowButton from "../../common/company/FollowButton"
-import ShareButton from "./ShareButton"
+import { sxStyles } from "../../../../types/commonTypes"
+import useControlledTabNavigationOnScroll from "../../../custom-hook/useControlledTabNavigationOnScroll"
 import useElementIsAtTopOfPage from "../../../custom-hook/useElementIsAtTopOfPage"
 import useIsMobile from "../../../custom-hook/useIsMobile"
-import useControlledTabNavigationOnScroll from "../../../custom-hook/useControlledTabNavigationOnScroll"
 import Link from "../../common/Link"
-import BannerIllustration from "./BannerIllustration"
+import FollowButton from "../../common/company/FollowButton"
 import PublicSparksBadge from "../../common/icons/PublicSparksBadge"
-import CircularLogo from "components/views/common/logos/CircularLogo"
+import BannerIllustration from "./BannerIllustration"
+import ShareButton from "./ShareButton"
 
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60

@@ -122,7 +122,7 @@ export class SparksService {
          }
       >(
          this.functions,
-         "getSparksFeed_v4"
+         "getSparksFeed_v5"
       )(data)
 
       return {

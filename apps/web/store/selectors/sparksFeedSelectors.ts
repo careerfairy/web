@@ -92,3 +92,9 @@ export const autoAction = (state: RootState) => state.sparksFeed.autoAction
 
 export const interactionSourceSelector = (state: RootState) =>
    state.sparksFeed.interactionSource
+
+export const anonymousUserCountryCodeSelector = (state: RootState) =>
+   state.sparksFeed.anonymousUserCountryCode
+
+export const shouldShowLinkedInPopUpNotificationSelector = (state: RootState) =>
+   state.sparksFeed.shouldShowLinkedInPopUpNotification

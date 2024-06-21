@@ -7,7 +7,7 @@ import { LoadingButton } from "@mui/lab"
 import { Stack, Typography } from "@mui/material"
 import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
-import { useEffect, useState } from "react"
+import { forwardRef, useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { useStreamingContext } from "../../context"
@@ -42,106 +42,111 @@ type Props = {
    handRaise: HandRaise
 }
 
-export const HandRaiseCard = ({ handRaise }: Props) => {
-   const { livestreamId } = useStreamingContext()
+export const HandRaiseCard = forwardRef<HTMLDivElement, Props>(
+   ({ handRaise }, ref) => {
+      const { livestreamId } = useStreamingContext()
 
-   const {
-      trigger: updateUserHandRaiseState,
-      isMutating: isUpdatingUserHandRaiseState,
-   } = useUpdateUserHandRaiseState(livestreamId)
+      const {
+         trigger: updateUserHandRaiseState,
+         isMutating: isUpdatingUserHandRaiseState,
+      } = useUpdateUserHandRaiseState(livestreamId)
 
-   const timeSinceHandRaise = useTimeSinceHandRaise(handRaise)
+      const timeSinceHandRaise = useTimeSinceHandRaise(handRaise)
 
-   const isGreenBackground =
-      handRaise.state === HandRaiseState.connecting ||
-      handRaise.state === HandRaiseState.connected
+      const isGreenBackground =
+         handRaise.state === HandRaiseState.connecting ||
+         handRaise.state === HandRaiseState.connected
 
-   return (
-      <Stack
-         sx={[styles.root, isGreenBackground && styles.greenBackground]}
-         spacing={3}
-         p={1}
-         key={handRaise.id}
-      >
-         <Stack spacing={1.5}>
-            {handRaise.state === HandRaiseState.requested && (
-               <Typography color="primary" variant="small">
-                  Raised hands {timeSinceHandRaise}
-               </Typography>
-            )}
-            {handRaise.state === HandRaiseState.invited && (
-               <Typography color="primary" variant="small">
-                  Invited to the live stream
-               </Typography>
-            )}
-            {handRaise.state === HandRaiseState.connecting && (
-               <Typography variant="small">
-                  Connecting to the live stream
-               </Typography>
-            )}
-            {handRaise.state === HandRaiseState.connected && (
-               <Typography variant="small">Currently participating</Typography>
-            )}
-            <HandRaiserDetails
-               handRaise={handRaise}
-               color={isGreenBackground ? "white" : undefined}
-            />
-         </Stack>
-         {isUserCanJoinPanel(handRaise) ? (
-            <LoadingButton
-               color="error"
-               variant="text"
-               onClick={() =>
-                  updateUserHandRaiseState({
-                     state: HandRaiseState.denied,
-                     handRaiseId: handRaise.id,
-                  })
-               }
-               loading={isUpdatingUserHandRaiseState}
-               sx={styles.removeButton}
-            >
-               {handRaise.state === HandRaiseState.invited
-                  ? "Cancel invite"
-                  : "Remove participant"}
-            </LoadingButton>
-         ) : (
-            <Stack direction="row" spacing={1.5}>
+      return (
+         <Stack
+            sx={[styles.root, isGreenBackground && styles.greenBackground]}
+            spacing={3}
+            p={1}
+            key={handRaise.id}
+            ref={ref}
+         >
+            <Stack spacing={1.5}>
+               {handRaise.state === HandRaiseState.requested && (
+                  <Typography color="primary" variant="small">
+                     Raised hands {timeSinceHandRaise}
+                  </Typography>
+               )}
+               {handRaise.state === HandRaiseState.invited && (
+                  <Typography color="primary" variant="small">
+                     Invited to the live stream
+                  </Typography>
+               )}
+               {handRaise.state === HandRaiseState.connecting && (
+                  <Typography variant="small">
+                     Connecting to the live stream
+                  </Typography>
+               )}
+               {handRaise.state === HandRaiseState.connected && (
+                  <Typography variant="small">
+                     Currently participating
+                  </Typography>
+               )}
+               <HandRaiserDetails
+                  handRaise={handRaise}
+                  color={isGreenBackground ? "white" : undefined}
+               />
+            </Stack>
+            {isUserCanJoinPanel(handRaise) ? (
                <LoadingButton
-                  fullWidth
+                  color="error"
+                  variant="text"
                   onClick={() =>
                      updateUserHandRaiseState({
-                        state: HandRaiseState.unrequested,
+                        state: HandRaiseState.denied,
                         handRaiseId: handRaise.id,
                      })
                   }
                   loading={isUpdatingUserHandRaiseState}
-                  color="grey"
-                  variant="outlined"
-               >
-                  Deny
-               </LoadingButton>
-               <LoadingButton
-                  fullWidth
-                  onClick={() =>
-                     updateUserHandRaiseState({
-                        state: HandRaiseState.invited,
-                        handRaiseId: handRaise.id,
-                     })
-                  }
-                  disabled={handRaise.state === HandRaiseState.invited}
-                  loading={isUpdatingUserHandRaiseState}
-                  color="primary"
-                  variant="contained"
+                  sx={styles.removeButton}
                >
                   {handRaise.state === HandRaiseState.invited
-                     ? "Invited"
-                     : "Approve"}
+                     ? "Cancel invite"
+                     : "Remove participant"}
                </LoadingButton>
-            </Stack>
-         )}
-      </Stack>
-   )
-}
+            ) : (
+               <Stack direction="row" spacing={1.5}>
+                  <LoadingButton
+                     fullWidth
+                     onClick={() =>
+                        updateUserHandRaiseState({
+                           state: HandRaiseState.unrequested,
+                           handRaiseId: handRaise.id,
+                        })
+                     }
+                     loading={isUpdatingUserHandRaiseState}
+                     color="grey"
+                     variant="outlined"
+                  >
+                     Deny
+                  </LoadingButton>
+                  <LoadingButton
+                     fullWidth
+                     onClick={() =>
+                        updateUserHandRaiseState({
+                           state: HandRaiseState.invited,
+                           handRaiseId: handRaise.id,
+                        })
+                     }
+                     disabled={handRaise.state === HandRaiseState.invited}
+                     loading={isUpdatingUserHandRaiseState}
+                     color="primary"
+                     variant="contained"
+                  >
+                     {handRaise.state === HandRaiseState.invited
+                        ? "Invited"
+                        : "Approve"}
+                  </LoadingButton>
+               </Stack>
+            )}
+         </Stack>
+      )
+   }
+)
 
 type HandRaiserDetailsProps = {
    handRaise: HandRaise
@@ -172,6 +177,8 @@ const HandRaiserDetails = ({ handRaise, color }: HandRaiserDetailsProps) => {
       />
    )
 }
+
+HandRaiseCard.displayName = "HandRaiseCard"
 
 const useTimeSinceHandRaise = (entry: HandRaise) => {
    const [timeSince, setTimeSince] = useState(() =>
