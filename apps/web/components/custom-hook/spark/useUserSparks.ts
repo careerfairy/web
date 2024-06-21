@@ -14,7 +14,6 @@ const fetcher = async (userId?: string) => {
       numberOfSparks: 10,
       userId: userId || null,
    })
-
    return sparks.map(SparkPresenter.toFirebaseObject)
 }
 
