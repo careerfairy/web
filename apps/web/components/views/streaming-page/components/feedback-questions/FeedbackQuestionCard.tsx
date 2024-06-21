@@ -13,6 +13,7 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "../../context"
 import RatingQuestion from "./RatingQuestion"
 import SentimentQuestion from "./SentimentQuestion"
+import { TextQuestion } from "./TextQuestion"
 
 const styles = sxStyles({
    content: {
@@ -38,7 +39,7 @@ export const QuestionsComponents: Record<
 > = {
    [FeedbackQuestionType.STAR_RATING]: RatingQuestion,
    [FeedbackQuestionType.SENTIMENT_RATING]: SentimentQuestion,
-   [FeedbackQuestionType.TEXT]: RatingQuestion,
+   [FeedbackQuestionType.TEXT]: TextQuestion,
 }
 
 type FeedbackQuestionCardProps = {

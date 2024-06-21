@@ -1,10 +1,11 @@
 import { FeedbackQuestionUserAnswer } from "@careerfairy/shared-lib/livestreams"
 import { LoadingButton } from "@mui/lab"
-import { OutlinedInput, Stack } from "@mui/material"
+import { Stack } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { Controller } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import * as Yup from "yup"
+import { StreamInput } from "../StreamInput"
 
 const styles = sxStyles({
    answerWrapper: {
@@ -33,14 +34,7 @@ const styles = sxStyles({
       width: "100%",
       fontSize: "16px",
       p: "6px 10px",
-      "& textarea::placeholder": {
-         color: "#B1B1B1",
-         opacity: 1,
-      },
-      "& .MuiOutlinedInput-notchedOutline ": {
-         borderRadius: "6px",
-         border: "1.3px solid #D7D7D7",
-      },
+      borderRadius: "6px !important",
    },
 })
 
@@ -80,7 +74,7 @@ export const TextQuestion = ({ onAnswerSubmit }: Props) => {
             name="message"
             control={control}
             render={({ field }) => (
-               <OutlinedInput
+               <StreamInput
                   {...field}
                   onChange={(e) => {
                      field.onChange(e.target.value.slice(0, MAX_MESSAGE_LENGTH))
