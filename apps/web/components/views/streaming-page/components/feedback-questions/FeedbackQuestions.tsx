@@ -67,13 +67,18 @@ export const FeedbackQuestionsComponent = ({
    const [minutesPassed, setMinutesPassed] = useState(
       hasStarted ? DateUtil.getMinutesPassed(new Date(startedAt)) : 0
    )
-   /** The queue of questions that will show up to the user */
-   const [activeQuestions, setActiveQuestions] = useState<FeedbackQuestion[]>(
-      []
-   )
+   /** The queue of questions that will show up to the user
+    * Using a Map disregards duplicates, and the object indirection
+    * avoids recreating a new Map at every set state */
+   const [activeQuestions, setActiveQuestions] = useState<{
+      questions: Map<FeedbackQuestion["id"], FeedbackQuestion>
+   }>({ questions: new Map() })
+
    /** The local answers data to avoid too many fetch requests */
    const [feedbackQuestionsData, setFeedbackQuestionsData] =
       useState<FeedbackQuestion[]>(feedbackQuestions)
+
+   const [firstActiveQuestion] = activeQuestions.questions.values()
 
    const getQuestionIndex = useCallback(
       (question: FeedbackQuestion) => {
@@ -96,10 +101,11 @@ export const FeedbackQuestionsComponent = ({
 
    const handleAnswer = useCallback(
       (question: FeedbackQuestion) => {
-         if (activeQuestions.length == 1) setOpen(false)
-         const removeActiveQuestion = [...activeQuestions]
-         removeActiveQuestion.shift()
-         setActiveQuestions(removeActiveQuestion)
+         if (activeQuestions.questions.size == 1) setOpen(false)
+         setActiveQuestions((prev) => {
+            prev.questions.delete(question.id)
+            return { questions: prev.questions }
+         })
          markAsAnswered(question)
       },
       [activeQuestions, markAsAnswered]
@@ -141,9 +147,7 @@ export const FeedbackQuestionsComponent = ({
 
    const isAlreadyActive = useCallback(
       (question: FeedbackQuestion) => {
-         return activeQuestions.some(
-            (activeQuestion) => activeQuestion.id == question.id
-         )
+         return activeQuestions.questions.has(question.id)
       },
       [activeQuestions]
    )
@@ -152,7 +156,10 @@ export const FeedbackQuestionsComponent = ({
       feedbackQuestionsData.forEach(async (question: FeedbackQuestion) => {
          const shouldActivate = await questionShouldBeActive(question)
          if (shouldActivate && !isAlreadyActive(question)) {
-            setActiveQuestions((prev) => [...prev, { ...question }])
+            setActiveQuestions((prev) => {
+               prev.questions.set(question.id, question)
+               return { questions: prev.questions }
+            })
             setOpen(true)
          }
       })
@@ -161,7 +168,7 @@ export const FeedbackQuestionsComponent = ({
    useEffect(() => {
       // listen for changes in questions mid live stream
       setFeedbackQuestionsData(feedbackQuestions)
-      setActiveQuestions([])
+      setActiveQuestions({ questions: new Map() })
    }, [feedbackQuestions])
 
    useEffect(() => {
@@ -187,10 +194,10 @@ export const FeedbackQuestionsComponent = ({
          <SnackbarContent
             sx={styles.dialog}
             message={
-               activeQuestions[0] ? (
+               firstActiveQuestion ? (
                   <FeedbackQuestionCard
-                     question={activeQuestions[0]}
-                     questionNumber={getQuestionIndex(activeQuestions[0]) + 1}
+                     question={firstActiveQuestion}
+                     questionNumber={getQuestionIndex(firstActiveQuestion) + 1}
                      onAnswer={handleAnswer}
                   />
                ) : null
