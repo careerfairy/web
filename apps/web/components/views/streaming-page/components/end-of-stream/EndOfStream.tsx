@@ -1,4 +1,5 @@
 import { Box, BoxProps, Stack } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { ReactNode, forwardRef } from "react"
 import {
    useShowEndScreen,
@@ -8,7 +9,7 @@ import { sxStyles } from "types/commonTypes"
 import { EndOfStreamHeader } from "./EndOfStreamHeader"
 import { Hero } from "./Hero"
 import { Jobs } from "./Jobs"
-import { Streams } from "./Streams"
+import { NextStreams, RecommendedStreams } from "./Streams"
 
 const styles = sxStyles({
    root: {
@@ -48,6 +49,7 @@ export const EndOfStream = ({ children, isHost }: Props) => {
 
 const EndOfStreamView = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
    const hasJobs = useStreamHasJobs()
+   const { isLoggedIn } = useAuth()
 
    return (
       <Box ref={ref} {...props} sx={styles.root}>
@@ -55,7 +57,7 @@ const EndOfStreamView = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
          <Hero />
          <Stack sx={styles.contentContainer} spacing={3}>
             {Boolean(hasJobs) && <Jobs />}
-            <Streams />
+            {isLoggedIn ? <RecommendedStreams /> : <NextStreams />}
          </Stack>
       </Box>
    )

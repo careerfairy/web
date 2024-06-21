@@ -12,7 +12,6 @@ import useFunctionsSWR, {
 type Config = {
    limit?: FirebaseInArrayLimit
    suspense?: boolean
-   disabled?: boolean
 }
 
 const functionName = "getRecommendedEvents_v4"
@@ -23,10 +22,9 @@ const useRecommendedEvents = (config?: Config) => {
 
    const limit = config?.limit || 10
    const suspense = config?.suspense || false
-   const disabled = config?.disabled || false
 
    const { data: eventIds } = useSWR<string[]>(
-      authenticatedUser.email && !disabled
+      authenticatedUser.email
          ? [
               functionName,
               {

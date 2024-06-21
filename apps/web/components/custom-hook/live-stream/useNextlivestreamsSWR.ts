@@ -18,7 +18,6 @@ import { errorLogAndNotify } from "util/CommonUtil"
 type Options = {
    suspense?: boolean
    limit?: number
-   disabled?: boolean
    includeHidden?: boolean
 }
 
@@ -26,12 +25,11 @@ export const useNextLivestreamsSWR = (options?: Options) => {
    const limit = options?.limit ?? 10
    const suspense = options?.suspense ?? false
    const includeHidden = options?.includeHidden ?? false
-   const disabled = options?.disabled ?? false
 
    const firestore = useFirestore()
 
    return useSWR<LivestreamEvent[]>(
-      disabled ? null : "next-livestreams",
+      "next-livestreams",
       async () => {
          const livestreamsQuery = query(
             collection(firestore, "livestreams"),
