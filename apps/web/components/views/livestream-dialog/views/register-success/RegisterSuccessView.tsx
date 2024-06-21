@@ -1,7 +1,6 @@
-import React, { FC, useCallback, useEffect, useState } from "react"
-import BaseDialogView, { MainContent } from "../../BaseDialogView"
-import { useLiveStreamDialog } from "../../LivestreamDialog"
-import { sxStyles } from "../../../../../types/commonTypes"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
+import CalendarIcon from "@mui/icons-material/CalendarTodayOutlined"
 import {
    Box,
    Button,
@@ -11,25 +10,28 @@ import {
    Slide,
    Typography,
 } from "@mui/material"
-import { confetti } from "../../../../../constants/images"
-import Image from "next/legacy/image"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
 import Stack from "@mui/material/Stack"
-import CalendarIcon from "@mui/icons-material/CalendarTodayOutlined"
-import { AddToCalendar } from "../../../common/AddToCalendar"
-import { responsiveConfetti } from "../../../../util/confetti"
-import { useSelector } from "react-redux"
-import { eventDetailsDialogVisibilitySelector } from "../../../../../store/selectors/sparksFeedSelectors"
-import { useRouter } from "next/router"
-import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
-import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import SparksCarouselWithSuspenseComponent, {
+import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
+import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
+import {
+   GroupSparksCarousel,
    MobileSparksArrows,
-} from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
-import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
+} from "components/views/portal/sparks/SparksCarouselWithArrows"
+import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
+import Image from "next/legacy/image"
+import { useRouter } from "next/router"
+import { FC, useCallback, useEffect, useState } from "react"
+import { useSelector } from "react-redux"
+import { confetti } from "../../../../../constants/images"
+import { eventDetailsDialogVisibilitySelector } from "../../../../../store/selectors/sparksFeedSelectors"
+import { sxStyles } from "../../../../../types/commonTypes"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { responsiveConfetti } from "../../../../util/confetti"
+import { AddToCalendar } from "../../../common/AddToCalendar"
+import BaseDialogView, { MainContent } from "../../BaseDialogView"
+import { useLiveStreamDialog } from "../../LivestreamDialog"
 
 const styles = sxStyles({
    fullHeight: {
@@ -401,25 +403,30 @@ const SparksGrid = ({ livestream, handleSparkClick }) => {
    )
 }
 
+const CarouselHeader = () => {
+   return (
+      <Typography variant={"brandedBody"} sx={styles.sparkCarouselTitle}>
+         More content from this company
+      </Typography>
+   )
+}
+
 const SparksMobileCarousel = ({ livestream, handleSparkClick }) => {
    return (
       <Box sx={styles.mobileSparksWrapper}>
-         <SparksCarouselWithSuspenseComponent
-            handleSparksClicked={handleSparkClick}
-            header={
-               <Typography
-                  variant={"brandedBody"}
-                  sx={styles.sparkCarouselTitle}
-               >
-                  More content from this company
-               </Typography>
-            }
-            headerSx={styles.mobileSparksCarouselHeader}
-            groupId={livestream.groupIds[0]}
-            sx={styles.mobileSparksCarousel}
-            showArrows
-            arrows={MobileSparksArrows}
-         />
+         <SuspenseWithBoundary
+            fallback={<FallbackComponent header={<CarouselHeader />} />}
+         >
+            <GroupSparksCarousel
+               handleSparksClicked={handleSparkClick}
+               header={<CarouselHeader />}
+               headerSx={styles.mobileSparksCarouselHeader}
+               groupId={livestream.groupIds[0]}
+               sx={styles.mobileSparksCarousel}
+               showArrows
+               arrows={MobileSparksArrows}
+            />
+         </SuspenseWithBoundary>
       </Box>
    )
 }
