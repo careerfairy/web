@@ -60,6 +60,7 @@ import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
 import stripe = require("./stripe")
+import tags = require("./lib/tagging/tags")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -133,6 +134,9 @@ exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
 exports.fetchLivestreams_v2 = livestreams.fetchLivestreams
+
+// Tags
+exports.fetchTagsContentHits = tags.fetchContentHits
 
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook
