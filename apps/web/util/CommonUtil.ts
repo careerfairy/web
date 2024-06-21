@@ -354,3 +354,18 @@ export const numberToString = (num: number): string => {
    }
    return num.toString()
 }
+
+export const sanitizeFileName = (fileName: string): string => {
+   return (
+      fileName
+         // Replace special characters with underscore
+         .replace(/[^a-zA-Z0-9.]/g, "_")
+         // Replace multiple underscores with a single one
+         .replace(/__+/g, "_")
+         // Remove leading and trailing underscores
+         .replace(/^_|_$/g, "") || "file"
+   )
+}
+
+export const convertBytesToMB = (bytes: number) =>
+   Number.isFinite(bytes) ? bytes / 1024 / 1024 : 0

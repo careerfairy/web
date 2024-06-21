@@ -1,9 +1,9 @@
 import { Box, Stack, Typography } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { sxStyles } from "types/commonTypes"
-import { useSettingsMenu } from "./SettingsMenuContext"
 import { useAudioTrackVolumeLevel } from "components/custom-hook/streaming/useAudioTrackVolumeLevel"
 import { useMemo } from "react"
+import { sxStyles } from "types/commonTypes"
+import { useLocalTracks } from "../../context"
 
 const styles = sxStyles({
    volumeLabel: {
@@ -22,14 +22,14 @@ const styles = sxStyles({
 })
 
 export const MicVolume = () => {
-   const { tempMicrophoneTrack } = useSettingsMenu()
+   const { localMicrophoneTrack } = useLocalTracks()
 
    const decreaseNumberOfIndicators = useStreamIsMobile(450)
 
    const numberOfIndicators = decreaseNumberOfIndicators ? 18 : 23
 
    const volumeLevel = useAudioTrackVolumeLevel(
-      tempMicrophoneTrack.localMicrophoneTrack,
+      localMicrophoneTrack.localMicrophoneTrack,
       250
    )
 

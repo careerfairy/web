@@ -45,6 +45,13 @@ export interface UserData extends Identifiable {
    validationPin: number
    interestsIds?: string[]
 
+   /**
+    * Content Tag IDs
+    * e.g: ["BusinessDevelopment", "Consulting"]
+    */
+   businessFunctionsTagIds?: string[]
+   contentTopicsTagIds?: string[]
+
    // from the rewards/credit system
    // negative or positive
    credits?: number

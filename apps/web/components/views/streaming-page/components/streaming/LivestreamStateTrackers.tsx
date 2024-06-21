@@ -4,14 +4,18 @@ import { useLivestreamData } from "components/custom-hook/streaming"
 import { useEffect } from "react"
 import {
    resetLivestreamState,
+   setCompanyName,
    setHandRaiseEnabled,
    setHasEnded,
+   setHasJobs,
    setLivestreamMode,
    setNumberOfParticipants,
    setOpenStream,
    setScreenSharerId,
    setStarted,
    setStartsAt,
+   setTest,
+   setTitle,
 } from "store/reducers/streamingAppReducer"
 import { setCompanyLogoUrl } from "../../../../../store/reducers/streamingAppReducer"
 
@@ -75,8 +79,24 @@ export const LivestreamStateTrackers = (): null => {
    }, [dispatch, livestream.companyLogoUrl])
 
    useEffect(() => {
+      dispatch(setCompanyName(livestream.company ?? ""))
+   }, [dispatch, livestream.company])
+
+   useEffect(() => {
+      dispatch(setTitle(livestream.title ?? ""))
+   }, [dispatch, livestream.title])
+
+   useEffect(() => {
+      dispatch(setTest(Boolean(livestream.test)))
+   }, [dispatch, livestream.test])
+
+   useEffect(() => {
       dispatch(setHandRaiseEnabled(Boolean(livestream.handRaiseActive)))
    }, [dispatch, livestream.handRaiseActive])
+
+   useEffect(() => {
+      dispatch(setHasJobs(Boolean(livestream.hasJobs)))
+   }, [dispatch, livestream.hasJobs])
 
    // Clean up the state on unmount
    useEffect(() => {

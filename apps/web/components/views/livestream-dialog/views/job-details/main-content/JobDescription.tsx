@@ -37,7 +37,6 @@ const styles = sxStyles({
    wrapper: {
       display: "flex",
       flexDirection: "column",
-      gap: "16px",
    },
    confirmationWrapper: {
       display: "flex",
@@ -78,7 +77,7 @@ const JobDescription: FC<Props> = ({ job }) => {
          </Box>
 
          {jobSalary ? (
-            <Box sx={styles.wrapper}>
+            <Box sx={styles.wrapper} gap={2}>
                <Typography variant={"h6"} sx={styles.subTitle}>
                   Salary
                </Typography>
@@ -89,7 +88,7 @@ const JobDescription: FC<Props> = ({ job }) => {
          ) : null}
 
          {jobDeadline ? (
-            <Box sx={styles.wrapper}>
+            <Box sx={styles.wrapper} gap={2}>
                <Typography variant={"h6"} sx={styles.subTitle}>
                   Application deadline
                </Typography>

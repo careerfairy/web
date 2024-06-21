@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from "react"
 import { useAsync } from "react-use"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { useForcedProxyMode } from "./useForcedProxyMode"
 
 type Options = {
    hostCondition: boolean
@@ -15,6 +16,13 @@ export const useClientConfig = (client: IAgoraRTCClient, options: Options) => {
    // Default role is always audience according to SDK
    const [currentRole, setCurrentRole] = useState<ClientRole>("audience")
    const isConnected = useIsConnected(client)
+   const forcedProxyMode = useForcedProxyMode()
+
+   useEffect(() => {
+      if (forcedProxyMode) {
+         client.startProxyServer(forcedProxyMode)
+      }
+   }, [client, forcedProxyMode])
 
    useAsync(async () => {
       if (isConnected) {

@@ -170,6 +170,8 @@ export interface IUserRepository {
    getStats(userDataId: string): Promise<UserStats>
 
    updateResume(userEmail: string, resumeUrl: string): Promise<void>
+   
+   deleteResume(userEmail: string): Promise<void>
 
    welcomeDialogComplete(userEmail: string): Promise<void>
 
@@ -823,6 +825,16 @@ export class FirebaseUserRepository
 
       const toUpdate: Pick<UserData, "userResume"> = {
          userResume: resumeUrl,
+      }
+
+      return docRef.update(toUpdate)
+   }
+
+   deleteResume(userEmail: string): Promise<void> {
+      const docRef = this.firestore.collection("userData").doc(userEmail)
+
+      const toUpdate = {
+         userResume: firebase.firestore.FieldValue.delete()
       }
 
       return docRef.update(toUpdate)

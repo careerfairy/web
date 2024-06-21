@@ -1,21 +1,24 @@
-import { Box, Tabs, Tooltip, Typography } from "@mui/material"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import React, { FC, useCallback, useMemo, useState } from "react"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import Stack from "@mui/material/Stack"
 import ChevronLeft from "@mui/icons-material/ChevronLeft"
-import Link from "../../../../common/Link"
-import Tab from "@mui/material/Tab"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
-import { SwipeablePanel } from "../../../../../../materialUI/GlobalPanels/GlobalPanels"
-import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
-import { SkeletonStackMultiple } from "../../../../../util/Skeletons"
+import { Box, Tab, Tabs, Tooltip, Typography } from "@mui/material"
+import Stack from "@mui/material/Stack"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { useRouter } from "next/router"
+import React, { FC, useCallback, useMemo, useState } from "react"
+import { AlertCircle } from "react-feather"
 import SwipeableViews from "react-swipeable-views"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
-import JobPosting from "./jobPosting"
+import { SwipeablePanel } from "../../../../../../materialUI/GlobalPanels/GlobalPanels"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import { SkeletonStackMultiple } from "../../../../../util/Skeletons"
+import Link from "../../../../common/Link"
 import JobApplicants from "./jobApplicants"
 import NoApplicantsData from "./jobApplicants/NoApplicantsData"
-import { useRouter } from "next/router"
+import JobPosting from "./jobPosting"
+import LinkedContent from "./linkedContent"
+import PendingContent from "./linkedContent/PendingContent"
 
 const styles = sxStyles({
    wrapper: {
@@ -31,7 +34,10 @@ const styles = sxStyles({
       color: "black !important",
    },
    indicator: {
-      backgroundColor: "#6749EA !important",
+      backgroundColor: (theme) => `${theme.palette.secondary.main} !important`,
+   },
+   jobWarningIndicator: {
+      backgroundColor: (theme) => `${theme.palette.warning["600"]} !important`,
    },
    tabsLabel: {
       fontSize: "16px",
@@ -45,13 +51,35 @@ const styles = sxStyles({
    applicantsTab: {
       display: "flex",
       alignItems: "center",
+
+      "& svg": {
+         width: 20,
+         height: 20,
+      },
    },
    tooltip: {
       ml: 1,
-      color: "#8E8E8E",
+      color: (theme) => theme.brand.black[700],
    },
    tabs: {
-      borderBottom: "1px solid #D6D6E0",
+      borderBottom: (theme) => `1px solid ${theme.palette.neutral[100]}`,
+
+      "& .MuiTabs-scrollButtons": {
+         width: "auto !important",
+      },
+   },
+   warningTab: {
+      fontWeight: "600",
+      color: (theme) => theme.palette.warning["600"],
+   },
+   warningAlert: {
+      ml: 1,
+      color: (theme) => theme.palette.warning["600"],
+   },
+   centered: {
+      display: "flex",
+      justifyContent: "center",
+      mt: 4,
    },
 })
 
@@ -63,6 +91,16 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
    const { push } = useRouter()
+   const { jobHubV1 } = useFeatureFlags()
+
+   const TabsEnum = useMemo(
+      () => ({
+         APPLICATION: 0,
+         LINKED_CONTENT: jobHubV1 ? 1 : -1,
+         JOB_POSTING: jobHubV1 ? 2 : 1,
+      }),
+      [jobHubV1]
+   )
 
    const allowToDisplayApplicantsData = group.privacyPolicyActive
 
@@ -74,8 +112,12 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       []
    )
 
-   const tabs = useMemo(
-      () => [
+   const jobHasNoContent = jobHubV1
+      ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
+      : false
+
+   const tabs = useMemo(() => {
+      const tabs = [
          {
             label: "Applicants",
             component: () =>
@@ -85,15 +127,28 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   <NoApplicantsData />
                ),
          },
+         ...(jobHubV1
+            ? [
+                 {
+                    label: "Linked content",
+                    component: () =>
+                       jobHasNoContent ? (
+                          <PendingContent job={job} group={group} />
+                       ) : (
+                          <LinkedContent job={job} />
+                       ),
+                 },
+              ]
+            : []),
          {
             label: "Job Opening",
             component: () => <JobPosting job={job} group={group} />,
          },
-      ],
-      [allowToDisplayApplicantsData, group, job]
-   )
+      ]
+      return tabs
+   }, [allowToDisplayApplicantsData, group, job, jobHasNoContent, jobHubV1])
 
-   if (!Boolean(job)) {
+   if (!job) {
       return void push(`/group/${group.id}/admin/jobs`)
    }
 
@@ -113,8 +168,17 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             value={activeTabIndex}
             onChange={switchTabHandler}
             textColor="secondary"
+            variant="scrollable"
+            allowScrollButtonsMobile
             aria-label="job details tabs"
-            TabIndicatorProps={{ sx: styles.indicator }}
+            TabIndicatorProps={{
+               sx: [
+                  styles.indicator,
+                  activeTabIndex === TabsEnum.LINKED_CONTENT &&
+                     jobHasNoContent &&
+                     styles.jobWarningIndicator,
+               ],
+            }}
             sx={styles.tabs}
          >
             <Tab
@@ -124,7 +188,8 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                      <Typography
                         sx={{
                            ...styles.tabsLabel,
-                           ...(activeTabIndex === 0 && styles.activeTab),
+                           ...(activeTabIndex === TabsEnum.APPLICATION &&
+                              styles.activeTab),
                         }}
                      >
                         Applicants
@@ -140,13 +205,39 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   </Box>
                }
             />
+            {jobHubV1 ? (
+               <Tab
+                  key={"Linked content"}
+                  label={
+                     <Box sx={styles.applicantsTab}>
+                        <Typography
+                           sx={{
+                              ...styles.tabsLabel,
+                              ...(activeTabIndex === TabsEnum.LINKED_CONTENT &&
+                                 styles.activeTab),
+                              ...(jobHasNoContent && styles.warningTab),
+                           }}
+                        >
+                           Linked content
+                        </Typography>
+                        {jobHasNoContent ? (
+                           <Box
+                              component={AlertCircle}
+                              sx={styles.warningAlert}
+                           />
+                        ) : null}
+                     </Box>
+                  }
+               />
+            ) : null}
             <Tab
                key={"Job posting"}
                label={
                   <Typography
                      sx={{
                         ...styles.tabsLabel,
-                        ...(activeTabIndex === 1 && styles.activeTab),
+                        ...(activeTabIndex === TabsEnum.JOB_POSTING &&
+                           styles.activeTab),
                      }}
                   >
                      Job posting

@@ -134,6 +134,7 @@ export const SparkEventActions = {
    Click_CareerPageCTA: "Click_CareerPageCTA",
    Click_CompanyPageCTA: "Click_CompanyPageCTA",
    Click_DiscoverLivestreamCTA: "Click_DiscoverLivestreamCTA",
+   Click_ReachOut_LinkedIn: "Click_ReachOut_LinkedIn",
    Watched_CompleteSpark: "Watched_CompleteSpark",
    Played_Spark: "Played_Spark",
    Register_Event: "Register_Event",
@@ -147,4 +148,5 @@ export const SparkInteractionSources = {
    Livestream_Registration_Flow: "livestream_registration_flow",
    Company_Page: "company_page",
    New_Spark_Notification: "new_spark_notification",
+   Livestream_End_Screen: "livestream_end_screen",
 } as const

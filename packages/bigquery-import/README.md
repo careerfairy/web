@@ -19,7 +19,7 @@ We've made an initial bulk import to backfill the existing data using the script
 
 Documentation: https://github.com/firebase/extensions/blob/master/firestore-bigquery-export/guides/GENERATE_SCHEMA_VIEWS.md
 
-The `schema-views` folder contain schema files that are applied via a CLI command. These schemas are basically Views on BigQuery that map the json document from firestore into BigQuery datatypes.
+The `schema-views` folder contain schema files that are applied via a CLI command. These schemas are basically Views on BigQuery that map the json document from firestore into BigQuery data types.
 
 To update a schema file (adding/changing/removing fields):
 

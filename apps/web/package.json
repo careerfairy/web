@@ -58,6 +58,7 @@
       "firebase": "^9.23.0",
       "formik": "^2.1.2",
       "geoip-lite": "^1.4.10",
+      "framer-motion": "^11.2.6",
       "global": "^4.4.0",
       "graphql": "^16.6.0",
       "graphql-request": "^5.0.0",

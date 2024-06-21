@@ -1,10 +1,10 @@
 import { Box, DialogContent, Stack, Typography } from "@mui/material"
 import React from "react"
+import { sxStyles } from "types/commonTypes"
 import { MicVolume } from "./MicVolume"
 import { TempCameraSetup } from "./TempCameraSetup"
-import { TempCameraSelect, TempMicrophoneSelect } from "./temp-device-select"
 import { VideoEffects } from "./VideoEffects"
-import { sxStyles } from "types/commonTypes"
+import { TempCameraSelect, TempMicrophoneSelect } from "./temp-device-select"
 
 const styles = sxStyles({
    dialogContent: {
@@ -31,9 +31,9 @@ export const Body = () => {
             <Box>
                <MenuHeading>Video settings</MenuHeading>
                <Box pb={2} />
-               <TempCameraSetup />
-               <Box pb={1.5} />
                <TempCameraSelect />
+               <Box pb={1.5} />
+               <TempCameraSetup />
                <Box pb={1.5} />
                <VideoEffects />
             </Box>

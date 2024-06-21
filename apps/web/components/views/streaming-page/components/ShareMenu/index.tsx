@@ -9,11 +9,19 @@ import {
    VideoIcon,
 } from "components/views/common/icons"
 
+import { useAppDispatch } from "components/custom-hook/store"
+import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
+import { useDeleteLivestreamVideo } from "components/custom-hook/streaming/video/useDeleteLivestreamVideo"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
-import { sxStyles } from "types/commonTypes"
-import { useScreenShare } from "../../context/ScreenShare"
+import {
+   setShareVideoDialogOpen,
+   setUploadPDFPresentationDialogOpen,
+} from "store/reducers/streamingAppReducer"
 import { useLivestreamMode } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
+import { useStreamingContext } from "../../context"
+import { useScreenShare } from "../../context/ScreenShare"
 
 const styles = sxStyles({
    root: {
@@ -62,9 +70,14 @@ type Props = MenuProps & {
 }
 
 export const ShareMenu = forwardRef<HTMLDivElement, Props>(
-   ({ handleClose, ...props }, ref) => {
+   ({ handleClose, open, ...props }, ref) => {
+      const dispatch = useAppDispatch()
       const { handleStopScreenShare, handleStartScreenShareProcess } =
          useScreenShare()
+      const { livestreamId } = useStreamingContext()
+      const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
+      const { trigger: deleteLivestreamVideo } =
+         useDeleteLivestreamVideo(livestreamId)
 
       const mode = useLivestreamMode()
 
@@ -82,33 +95,29 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                }
                break
             case LivestreamModes.PRESENTATION:
-               /**
-                * TODO:
-                * 1. Open PDF file picker
-                * 2. Upload the PDF to storage
-                * 3. **Save the storage URL  at /livestreams/{id}/presentations/presentation. Look at old implementation for reference
-                * 4. Set the mode to presentation
-                *
-                * Maybe we want to unify all video/PDFs into one collection of different types of "content" at /livestreams/{id}/content
-                */
-               alert("Share PDF not implemented yet")
+               if (active) {
+                  setLivestreamMode({ mode: LivestreamModes.DEFAULT })
+               } else {
+                  dispatch(setUploadPDFPresentationDialogOpen(true))
+               }
                break
             case LivestreamModes.VIDEO:
-               /**
-                * TODO:
-                * 1. Open the youtube video URL dialog form
-                * 2. Save the youtube video URL at /livestreams/{id}/videos/video. Look at old implementation for reference
-                * 3. Set the mode to video
-                *
-                * Maybe we want to unify all video/PDFs into one collection of different types of "content" at /livestreams/{id}/content
-                */
-               alert("Share Youtube video not implemented yet")
+               if (active) {
+                  setLivestreamMode({ mode: LivestreamModes.DEFAULT })
+                  deleteLivestreamVideo()
+               } else {
+                  dispatch(setShareVideoDialogOpen(true))
+               }
                break
             default:
                break
          }
 
          handleClose()
+      }
+
+      if (!open) {
+         return null
       }
 
       return (
@@ -119,6 +128,7 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
             transformOrigin={TransformOrigin}
             onClose={handleClose}
             ref={ref}
+            open={open}
          >
             <MenuItem
                onClick={() =>

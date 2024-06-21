@@ -1,4 +1,5 @@
 import {
+   EmoteType,
    LivestreamMode,
    LivestreamModes,
 } from "@careerfairy/shared-lib/livestreams"
@@ -9,7 +10,12 @@ import {
    type UID,
 } from "agora-rtc-react"
 import { RtmStatusCode } from "agora-rtm-sdk"
+import { VirtualBackgroundMode } from "components/views/streaming-page/types"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { v4 as uuidv4 } from "uuid"
+
+/** Max number of emote nodes that can be rendered at once */
+const MAX_EMOTES_TO_RENDER = 30
 
 export const ActiveViews = {
    CHAT: "chat",
@@ -48,6 +54,8 @@ export interface StreamingAppState {
    settingsMenu: {
       isOpen: boolean
    }
+   uploadPDFPresentationDialogOpen: boolean
+   shareVideoDialogOpen: boolean
    /**
     * A mapping from user IDs to objects containing their current audio levels and the timestamp when their audio level was last above 60.
     * Audio levels are represented as integers ranging from 0 to 100.
@@ -76,7 +84,11 @@ export interface StreamingAppState {
       hasEnded: boolean
       openStream: boolean
       companyLogoUrl: string
+      companyName: string
+      title: string
       handRaiseEnabled: boolean
+      hasJobs: boolean
+      test: boolean
    } | null
    rtmSignalingState: {
       failedToConnect: boolean
@@ -93,6 +105,11 @@ export interface StreamingAppState {
          reason: ConnectionDisconnectedReason
       } | null
    }
+   emotes: {
+      type: EmoteType
+      id: string
+   }[]
+   virtualBackgroundMode: VirtualBackgroundMode
    isLoggedInOnDifferentBrowser: boolean
 }
 
@@ -106,6 +123,8 @@ const initialState: StreamingAppState = {
    settingsMenu: {
       isOpen: false,
    },
+   uploadPDFPresentationDialogOpen: false,
+   shareVideoDialogOpen: false,
    audioLevels: {},
    livestreamState: {
       mode: LivestreamModes.DEFAULT,
@@ -117,8 +136,12 @@ const initialState: StreamingAppState = {
       hasEnded: false,
       openStream: false,
       companyLogoUrl: "",
+      companyName: "",
+      title: "",
       handRaiseEnabled: false,
       numberOfHandRaiseNotifications: 0,
+      hasJobs: false,
+      test: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -128,6 +151,8 @@ const initialState: StreamingAppState = {
    rtcState: {
       connectionState: null,
    },
+   emotes: [],
+   virtualBackgroundMode: VirtualBackgroundMode.OFF,
    isLoggedInOnDifferentBrowser: false,
 }
 
@@ -234,6 +259,15 @@ const streamingAppSlice = createSlice({
       setCompanyLogoUrl(state, action: PayloadAction<string>) {
          state.livestreamState.companyLogoUrl = action.payload
       },
+      setTest(state, action: PayloadAction<boolean>) {
+         state.livestreamState.test = action.payload
+      },
+      setCompanyName(state, action: PayloadAction<string>) {
+         state.livestreamState.companyName = action.payload
+      },
+      setTitle(state, action: PayloadAction<string>) {
+         state.livestreamState.title = action.payload
+      },
       setHandRaiseEnabled(state, action: PayloadAction<boolean>) {
          if (state.livestreamState.handRaiseEnabled !== action.payload) {
             // Reset the number of new hand raises to zero when the hand raise is toggled
@@ -260,6 +294,9 @@ const streamingAppSlice = createSlice({
       },
       toggleSettingsMenu(state) {
          state.settingsMenu.isOpen = !state.settingsMenu.isOpen
+      },
+      setHasJobs(state, action: PayloadAction<boolean>) {
+         state.livestreamState.hasJobs = action.payload
       },
 
       /* ==========================
@@ -312,6 +349,40 @@ const streamingAppSlice = createSlice({
             }
          }
       },
+
+      setUploadPDFPresentationDialogOpen(
+         state,
+         action: PayloadAction<boolean>
+      ) {
+         state.uploadPDFPresentationDialogOpen = action.payload
+      },
+      setShareVideoDialogOpen(state, action: PayloadAction<boolean>) {
+         state.shareVideoDialogOpen = action.payload
+      },
+      addEmote(state, action: PayloadAction<EmoteType>) {
+         if (state.emotes.length >= MAX_EMOTES_TO_RENDER) {
+            state.emotes.shift()
+         }
+         state.emotes.push({ type: action.payload, id: uuidv4() })
+      },
+      removeEmote(state, action: PayloadAction<string>) {
+         state.emotes = state.emotes.filter(
+            (emote) => emote.id !== action.payload
+         )
+      },
+      clearEmotes(state) {
+         state.emotes = []
+      },
+
+      /* ==========================
+         ||   Virtual Background   ||
+         ========================== */
+      setVirtualBackgroundMode(
+         state,
+         action: PayloadAction<VirtualBackgroundMode>
+      ) {
+         state.virtualBackgroundMode = action.payload
+      },
    },
 })
 
@@ -325,6 +396,9 @@ export const {
       setHasEnded,
       setOpenStream,
       setCompanyLogoUrl,
+      setTest,
+      setCompanyName,
+      setTitle,
       resetLivestreamState,
       toggleSidePanel,
       closeSidePanel,
@@ -338,8 +412,15 @@ export const {
       setRTCConnectionState,
       openPolls,
       setHandRaiseEnabled,
+      setHasJobs,
       incrementNumberOfHandRaiseNotifications,
       resetNumberOfHandRaiseNotifications,
+      setUploadPDFPresentationDialogOpen,
+      setShareVideoDialogOpen,
+      addEmote,
+      removeEmote,
+      clearEmotes,
+      setVirtualBackgroundMode,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice

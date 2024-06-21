@@ -1,7 +1,4 @@
-import { Box, Button, Stack, tooltipClasses } from "@mui/material"
-import useIsMobile from "../../../../../custom-hook/useIsMobile"
-import DividerWithText from "../../../../common/misc/DividerWithText"
-import BrandedTooltip from "../../../../common/tooltips/BrandedTooltip"
+import { Box, Button, Stack, Typography, tooltipClasses } from "@mui/material"
 import { useCallback } from "react"
 import {
    EyeOff as HiddenIcon,
@@ -9,13 +6,16 @@ import {
    Eye as VisibleIcon,
 } from "react-feather"
 import { useDispatch, useSelector } from "react-redux"
+import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import { toggleShowHiddenSparks } from "../../../../../../store/reducers/adminSparksReducer"
 import { sparksShowHiddenSparks } from "../../../../../../store/selectors/adminSparksSelectors"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import DividerWithText from "../../../../common/misc/DividerWithText"
+import BrandedTooltip from "../../../../common/tooltips/BrandedTooltip"
 import CreateSparkButton from "../../components/CreateSparkButton"
 import GetInspiredButton from "../../components/GetInspiredButton"
-import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
-import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import SparksCounter from "./SparksCounter"
 import TrialModeNotice from "./TrialModeNotice/TrialModeNotice"
 
@@ -92,7 +92,11 @@ const HeaderActions = () => {
             >
                <Stack sx={styles.mobileRoot} spacing={1}>
                   <CreateSparkButton>Upload a new Spark</CreateSparkButton>
-                  <DividerWithText maxWidth={"50%"}>Or</DividerWithText>
+                  <DividerWithText maxWidth={"50%"}>
+                     <Typography variant="xsmall" color="neutral.200">
+                        Or
+                     </Typography>
+                  </DividerWithText>
                   <Stack
                      sx={styles.getInspiredBtnWrapper}
                      spacing={1.25}

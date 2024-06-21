@@ -9,10 +9,13 @@ export const tooltipStyles = sxStyles({
       fontWeight: 400,
       py: 1,
    },
+   wrapper: {
+      lineHeight: 0,
+   },
 })
 
 export const BrandedTooltip = styled(
-   ({ className, placement = "top", ...props }: TooltipProps) => (
+   ({ className, placement = "top", children, ...props }: TooltipProps) => (
       <Tooltip
          {...props}
          componentsProps={{
@@ -22,7 +25,9 @@ export const BrandedTooltip = styled(
          }}
          placement={placement}
          classes={{ popper: className }}
-      />
+      >
+         <span style={tooltipStyles.wrapper}>{children}</span>
+      </Tooltip>
    )
 )({
    [`& .${tooltipClasses.tooltip}`]: {

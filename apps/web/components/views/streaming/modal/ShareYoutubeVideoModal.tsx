@@ -1,4 +1,4 @@
-import React from "react"
+import LoadingButton from "@mui/lab/LoadingButton"
 import {
    Dialog,
    DialogActions,
@@ -9,11 +9,13 @@ import {
 } from "@mui/material"
 import { useFormik } from "formik"
 import * as yup from "yup"
+import {
+   VIMEO_URL_REGEX,
+   YOUTUBE_URL_REGEX,
+} from "../../../../components/util/constants"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
-import useStreamRef from "../../../custom-hook/useStreamRef"
-import { YOUTUBE_URL_REGEX } from "../../../../components/util/constants"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
-import LoadingButton from "@mui/lab/LoadingButton"
+import useStreamRef from "../../../custom-hook/useStreamRef"
 
 interface Props {
    open: boolean
@@ -23,7 +25,11 @@ interface Props {
 const schema = yup.object().shape({
    youtubeUrl: yup
       .string()
-      .matches(YOUTUBE_URL_REGEX, { message: "Must be a valid url" })
+      .test(
+         "is-valid-video-url",
+         "Must be a valid YouTube or Vimeo video URL",
+         (value) => YOUTUBE_URL_REGEX.test(value) || VIMEO_URL_REGEX.test(value)
+      )
       .required("Must be a valid url"),
 })
 
@@ -38,7 +44,13 @@ const ShareYoutubeVideoModal = ({ open, onClose }: Props) => {
       validationSchema: schema,
       onSubmit: async (values) => {
          try {
-            await setCurrentVideo(streamRef, values.youtubeUrl, streamerId)
+            // Ensure the URL is properly formatted
+            const url = new URL(
+               values.youtubeUrl.startsWith("http")
+                  ? values.youtubeUrl
+                  : `https://${values.youtubeUrl}`
+            )
+            await setCurrentVideo(streamRef, url.href, streamerId)
             await setLivestreamMode(streamRef, "video")
          } catch (e) {
             console.log("-> error in setting video", e)
@@ -68,10 +80,12 @@ const ShareYoutubeVideoModal = ({ open, onClose }: Props) => {
                value={formik.values.youtubeUrl}
                variant="outlined"
                error={
-                  formik.touched.youtubeUrl && Boolean(formik.errors.youtubeUrl)
+                  formik.touched.youtubeUrl
+                     ? Boolean(formik.errors.youtubeUrl)
+                     : null
                }
                helperText={
-                  formik.touched.youtubeUrl && formik.errors.youtubeUrl
+                  formik.touched.youtubeUrl ? formik.errors.youtubeUrl : null
                }
                label="Full YouTube video URL"
                placeholder="https://www.youtube.com/watch?v=cNZNR-wmBxI"

@@ -1,3 +1,9 @@
+import { CUSTOM_JOB_CONSTANTS } from "@careerfairy/shared-lib/customJobs/constants"
+import {
+   JobType,
+   PublicCustomJob,
+   jobTypeOptions,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    Autocomplete,
    Box,
@@ -8,24 +14,18 @@ import {
    Grid,
    TextField,
 } from "@mui/material"
+import CustomRichTextEditor from "components/util/CustomRichTextEditor"
+import GBLocale from "date-fns/locale/en-GB"
 import { Formik } from "formik"
+import { useMemo, useRef } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import {
-   JobType,
-   jobTypeOptions,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
+import { v4 as uuidv4 } from "uuid"
 import * as yup from "yup"
+import { Timestamp } from "../../../../../data/firebase/FirebaseInstance"
+import { sxStyles } from "../../../../../types/commonTypes"
 import { URL_REGEX } from "../../../../util/constants"
 import { datePickerDefaultStyles } from "../../../calendar/utils"
-import GBLocale from "date-fns/locale/en-GB"
-import { sxStyles } from "../../../../../types/commonTypes"
-import { v4 as uuidv4 } from "uuid"
-import { useMemo, useRef } from "react"
-import { Timestamp } from "../../../../../data/firebase/FirebaseInstance"
-import CustomRichTextEditor from "components/util/CustomRichTextEditor"
-import { CUSTOM_JOB_CONSTANTS } from "@careerfairy/shared-lib/customJobs/constants"
 
 const schema = (quillRef) =>
    yup.object().shape({
@@ -137,9 +137,7 @@ const CustomJobCreateOrEditFrom = ({
                const formatValues: PublicCustomJob = {
                   ...values,
                   jobType: values.jobType as JobType,
-                  deadline: values.deadline
-                     ? Timestamp.fromDate(values.deadline)
-                     : null,
+                  deadline: Timestamp.fromDate(values.deadline),
                   postingUrl:
                      values.postingUrl.indexOf("http") === 0
                         ? values.postingUrl
@@ -389,10 +387,10 @@ const CustomJobCreateOrEditFrom = ({
                         onClick={() => handleSubmit()}
                      >
                         {isSubmitting
-                           ? Boolean(job)
+                           ? job
                               ? "Updating"
                               : "Creating"
-                           : Boolean(job)
+                           : job
                            ? "Update"
                            : "Create"}
                      </Button>

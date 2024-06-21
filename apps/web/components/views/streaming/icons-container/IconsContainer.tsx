@@ -1,4 +1,11 @@
-import React, {
+import { EmoteType } from "@careerfairy/shared-lib/livestreams"
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined"
+import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined"
+import Box from "@mui/material/Box"
+import RubberBand from "@stahl.luke/react-reveal/RubberBand"
+import clsx from "clsx"
+import { EmoteEntity, EmoteMessage } from "context/agora/RTMContext"
+import {
    memo,
    useCallback,
    useContext,
@@ -6,21 +13,15 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import * as actions from "../../../../store/actions"
-import RubberBand from "@stahl.luke/react-reveal/RubberBand"
-import { v4 as uuidv4 } from "uuid"
-import TutorialContext from "../../../../context/tutorials/TutorialContext"
-import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined"
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined"
-import ClappingSVG from "../../../util/CustomSVGs"
 import { useDispatch, useSelector } from "react-redux"
 import { TransitionGroup } from "react-transition-group"
-import { EMOTE_MESSAGE_TEXT_TYPE } from "../../../util/constants"
-import clsx from "clsx"
-import { sxStyles } from "types/commonTypes"
-import Box from "@mui/material/Box"
 import { emotesSelector } from "store/selectors/streamSelectors"
-import { EmoteEntity, EmoteMessage } from "context/agora/RTMContext"
+import { sxStyles } from "types/commonTypes"
+import { v4 as uuidv4 } from "uuid"
+import TutorialContext from "../../../../context/tutorials/TutorialContext"
+import * as actions from "../../../../store/actions"
+import ClappingSVG from "../../../util/CustomSVGs"
+import { EMOTE_MESSAGE_TEXT_TYPE } from "../../../util/constants"
 import { useFallbackEmotes } from "./useFallbackEmotes"
 
 const styles = ({ right, color, durationTransform, opacity, distance }) =>
@@ -100,7 +101,12 @@ const ActionButton = ({ iconName, color }) => {
 
 const ActionButtonMemoized = memo(ActionButton)
 
-const emotes = ["clapping", "like", "heart"] as const
+const emotes = [
+   EmoteType.CLAPPING,
+   EmoteType.LIKE,
+   EmoteType.HEART,
+   EmoteType.CONFUSED,
+] as const
 
 function IconsContainer({ className, livestreamId }) {
    const emotesData = useSelector(emotesSelector)

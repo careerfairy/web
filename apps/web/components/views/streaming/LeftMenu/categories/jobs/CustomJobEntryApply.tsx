@@ -1,10 +1,10 @@
-import { Button, CircularProgress } from "@mui/material"
-import { ExternalLink } from "react-feather"
-import React, { FC, useCallback } from "react"
-import { sxStyles } from "../../../../../../types/commonTypes"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
+import { Button, CircularProgress } from "@mui/material"
+import { FC, useCallback } from "react"
+import { ExternalLink } from "react-feather"
 import DateUtil from "util/DateUtil"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
 
 const styles = sxStyles({
    btn: {
@@ -23,22 +23,20 @@ const CustomJobEntryApply = ({
    job,
    livestreamId,
    handleApplyClick,
-   isSecondary
+   isSecondary,
 }: Props) => {
    const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
       livestreamId
    )
 
-
    const handleClick = useCallback(async () => {
       await handleClickApplyBtn()
       handleApplyClick()
    }, [handleClickApplyBtn, handleApplyClick])
 
-
    if (job.deadline && DateUtil.isDeadlineExpired(job.deadline.toDate())) {
-         return <ApplicationExpiredButton />
+      return <ApplicationExpiredButton />
    }
 
    return (
@@ -49,8 +47,9 @@ const CustomJobEntryApply = ({
             href={job.postingUrl}
             target="_blank"
             rel="noopener noreferrer"
-            variant={isSecondary ? "text" : "contained"}
-            color={isSecondary ? "grey" : "primary"}
+            variant={isSecondary ? "outlined" : "contained"}
+            color={"primary"}
+            fullWidth
             endIcon={
                isClickingOnApplyBtn ? (
                   <CircularProgress size={20} color="inherit" />
@@ -68,7 +67,13 @@ const CustomJobEntryApply = ({
 
 const ApplicationExpiredButton: FC = () => {
    return (
-      <Button disabled variant="contained" color="primary" sx={styles.btn} >
+      <Button
+         fullWidth
+         disabled
+         variant="contained"
+         color="primary"
+         sx={styles.btn}
+      >
          Application deadline expired
       </Button>
    )

@@ -1,10 +1,9 @@
-import React, { createContext } from "react"
+import { EmoteType } from "@careerfairy/shared-lib/livestreams"
 import { RtmChannel, RtmClient } from "agora-rtm-sdk"
+import { createContext } from "react"
 import { RTMStatus } from "../../types/streaming"
 
 export type RTMTextMessageType = "CONTROL" | "NORMAL" | "EMOTE" | "TRANSCRIBE"
-
-export type EmoteType = "clapping" | "like" | "heart"
 
 export type ControlMessageType =
    | "muteAudio"

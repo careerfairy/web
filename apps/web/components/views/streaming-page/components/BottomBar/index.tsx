@@ -1,5 +1,8 @@
 import { Box, Stack } from "@mui/material"
-import { useStreamIsMobile } from "components/custom-hook/streaming"
+import {
+   useStreamIsLandscape,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
@@ -11,7 +14,6 @@ import { AllActions } from "./AllActionComponents"
 const styles = sxStyles({
    root: {
       mx: "auto",
-      pb: 5,
    },
    actionsBar: {
       bgcolor: "background.paper",
@@ -25,8 +27,13 @@ const styles = sxStyles({
 
 export const BottomBar = () => {
    const { isHost } = useStreamingContext()
+   const streamIsLandscape = useStreamIsLandscape()
 
-   return <Box sx={styles.root}>{isHost ? <HostView /> : <ViewerView />}</Box>
+   return (
+      <Box sx={styles.root} pb={streamIsLandscape ? 1.375 : 5}>
+         {isHost ? <HostView /> : <ViewerView />}
+      </Box>
+   )
 }
 
 export const BottomBarActions = {
@@ -78,31 +85,33 @@ const getViewerActionNames = (
    if (isStreaming) {
       if (isMobile) {
          return [
-            "Mic",
-            "Video",
+            ...(userCanJoinPanel ? (["Mic", "Video"] as const) : []),
             "Divider",
             "Q&A",
             ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
             "Polls",
-            "SpeedDial",
+            ...(userCanJoinPanel
+               ? (["SpeedDial"] as const)
+               : (["Chat"] as const)),
             ...(userCanJoinPanel
                ? (["Divider", "Stop hand raise"] as const)
-               : []),
+               : (["Reactions"] as const)),
          ]
       }
 
       return [
-         "Mic",
-         "Video",
+         ...(userCanJoinPanel ? (["Mic", "Video"] as const) : []),
          "Divider",
          "Q&A",
          ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
          "Polls",
          "Chat",
-         "Reactions",
+         ...(userCanJoinPanel ? [] : (["Reactions"] as const)),
          "Divider",
-         "Settings",
-         ...(userCanJoinPanel ? (["Stop hand raise"] as const) : []),
+
+         ...(userCanJoinPanel
+            ? (["Settings", "Stop hand raise"] as const)
+            : []),
       ]
    }
    return [

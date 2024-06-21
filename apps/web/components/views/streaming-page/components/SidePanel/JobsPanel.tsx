@@ -1,7 +1,6 @@
-import React from "react"
-import { SidePanelView } from "./SidePanelView"
 import { Briefcase } from "react-feather"
-import { Typography } from "@mui/material"
+import { JobList } from "../jobs/JobList"
+import { SidePanelView } from "./SidePanelView"
 
 export const JobsPanel = () => {
    return (
@@ -10,35 +9,7 @@ export const JobsPanel = () => {
          title="Available jobs"
          icon={<Briefcase />}
       >
-         <Typography variant="body1">
-            Simply dummy text of the printing and typesetting industry. Lorem
-            Ipsum has been the industry&apos;s standard dummy text ever since
-            the 1500s, when an unknown printer took a galley of type and
-            scrambled it to make a type specimen book. It has survived not only
-            five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsun printer took a galley of
-            type and scrambled it to make a type specimen book. It has survived
-            not only five centuries, but also the leap into electronic
-            typesetting, remaining essentially unchanged. It was popularised in
-            the 1960s with the release of Letraset sheets containing Lorem Ipsum
-            passages, and more recently with desktop publishing software like
-            Aldus PageMaker including versions of Lorem Ipsun printer took a
-            galley of type and scrambled it to make a type specimen book. It has
-            survived not only five centuries, but also the leap into electronic
-            typesetting, remaining essentially unchanged. It was popularised in
-            the 1960s with the release of Letraset sheets containing Lorem Ipsum
-            passages, and more recently with desktop publishing software like
-            Aldus PageMaker including versions of Lorem Ipsun printer took a
-            galley of type and scrambled it to make a type specimen book. It has
-            survived not only five centuries, but also the leap into electronic
-            typesetting, remaining essentially unchanged. It was popularised in
-            the 1960s with the release of Letraset sheets containing Lorem Ipsum
-            passages, and more recently with desktop publishing software like
-            Aldus PageMaker including versions of Lorem Ipsu
-         </Typography>
+         <JobList />
       </SidePanelView>
    )
 }
