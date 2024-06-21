@@ -3,7 +3,7 @@ import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
-import { useHasLivestreamStarted } from "./useLivestreamHasStarted"
+import { useHasLivestreamStarted } from "./useHasLivestreamStarted"
 
 export const StatusTitle = () => {
    const streamIsMobile = useStreamIsMobile()
