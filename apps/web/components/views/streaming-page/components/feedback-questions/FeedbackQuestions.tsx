@@ -37,11 +37,29 @@ const styles = sxStyles({
 type FeedbackQuestion = EventRatingWithType & { answered: boolean }
 
 export const FeedbackQuestions = () => {
-   const { livestreamId, agoraUserId } = useStreamingContext()
+   const { livestreamId } = useStreamingContext()
+
    const { feedbackQuestions } = useFeedbackQuestions(
       livestreamId,
       "livestreams"
    )
+
+   const sortQuestions = (questions) =>
+      questions.sort((q1, q2) => (q1.appearAfter > q2.appearAfter ? 1 : -1))
+
+   return (
+      <FeedbackQuestionsComponent
+         feedbackQuestions={sortQuestions(feedbackQuestions)}
+      />
+   )
+}
+
+export const FeedbackQuestionsComponent = ({
+   feedbackQuestions,
+}: {
+   feedbackQuestions: FeedbackQuestion[]
+}) => {
+   const { livestreamId, agoraUserId } = useStreamingContext()
    const startedAt = useStartedAt()
    const hasStarted = useHasStarted()
    const hasEnded = useHasEnded()
@@ -54,14 +72,8 @@ export const FeedbackQuestions = () => {
       []
    )
    /** The local answers data to avoid too many fetch requests */
-   const [feedbackQuestionsData, setFeedbackQuestionsData] = useState<
-      FeedbackQuestion[]
-   >(
-      // sort to get question number
-      feedbackQuestions.sort((q1, q2) =>
-         q1.appearAfter > q2.appearAfter ? 1 : -1
-      ) as FeedbackQuestion[]
-   )
+   const [feedbackQuestionsData, setFeedbackQuestionsData] =
+      useState<FeedbackQuestion[]>(feedbackQuestions)
 
    const getQuestionIndex = useCallback(
       (question: FeedbackQuestion) => {
@@ -145,6 +157,12 @@ export const FeedbackQuestions = () => {
          }
       })
    }, [feedbackQuestionsData, isAlreadyActive, questionShouldBeActive])
+
+   useEffect(() => {
+      // listen for changes in questions mid live stream
+      setFeedbackQuestionsData(feedbackQuestions)
+      setActiveQuestions([])
+   }, [feedbackQuestions])
 
    useEffect(() => {
       if (hasStarted && startedAt) {
