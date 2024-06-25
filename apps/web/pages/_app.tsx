@@ -1,44 +1,44 @@
-import * as React from "react"
-import "styles.css"
-import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
-import config from "@stahl.luke/react-reveal/globals"
-import { store, wrapper } from "../store"
-import NextNProgress from "nextjs-progressbar"
-import { brandedLightTheme } from "../materialUI"
-import Head from "next/head"
+import { CacheProvider } from "@emotion/react"
 import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { AuthProvider } from "../HOCs/AuthProvider"
+import config from "@stahl.luke/react-reveal/globals"
+import Head from "next/head"
+import NextNProgress from "nextjs-progressbar"
+import { Provider } from "react-redux"
 import { ReactReduxFirebaseProvider } from "react-redux-firebase"
 import { actionTypes, createFirestoreInstance } from "redux-firestore"
-import { Provider } from "react-redux"
-import { CacheProvider } from "@emotion/react"
-import createEmotionCache from "../materialUI/createEmotionCache"
+import "styles.css"
+import { AuthProvider } from "../HOCs/AuthProvider"
 import Notifier from "../components/views/notifier"
-import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
+import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
 import firebaseApp, {
    AuthInstance,
-   firebaseConfig,
    FirestoreInstance,
    FunctionsInstance,
+   firebaseConfig,
 } from "../data/firebase/FirebaseInstance"
+import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
+import { brandedLightTheme } from "../materialUI"
+import createEmotionCache from "../materialUI/createEmotionCache"
+import { store, wrapper } from "../store"
 
-import "../util/FirebaseUtils"
-import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
-import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
-import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
-import TutorialProvider from "../HOCs/TutorialProvider"
-import ErrorProvider from "../HOCs/ErrorProvider"
+import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
+import { useEffect } from "react"
 import {
-   AuthProvider as ReactFireAuthProvider,
    FirebaseAppProvider,
    FirestoreProvider,
    FunctionsProvider,
+   AuthProvider as ReactFireAuthProvider,
 } from "reactfire"
+import ErrorProvider from "../HOCs/ErrorProvider"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
+import TutorialProvider from "../HOCs/TutorialProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
-import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
+import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
+import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
+import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
+import "../util/FirebaseUtils"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -74,6 +74,24 @@ function MyApp(props) {
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
 
+   useEffect(() => {
+      if ("serviceWorker" in navigator) {
+         window.addEventListener("load", () => {
+            navigator.serviceWorker.register("/service-worker.js").then(
+               (registration) => {
+                  console.log(
+                     "Service Worker registration successful with scope: ",
+                     registration.scope
+                  )
+               },
+               (error) => {
+                  console.log("Service Worker registration failed: ", error)
+               }
+            )
+         })
+      }
+   }, [])
+
    return (
       <CacheProvider value={emotionCache}>
          <Head>
@@ -82,6 +100,8 @@ function MyApp(props) {
                content="initial-scale=1, width=device-width, maximum-scale=1.0, user-scalable=0" //https://github.com/vercel/next.js/issues/7176
             />
             <title>CareerFairy | Watch live streams. Get hired.</title>
+            <link rel="manifest" href="/manifest.json" />
+            <link rel="icon" href="/favicon-196x196.png" />
          </Head>
          <NextNProgress
             color={brandedLightTheme.palette.primary.main}
