@@ -1,44 +1,44 @@
-import { CacheProvider } from "@emotion/react"
+import * as React from "react"
+import "styles.css"
+import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
+import config from "@stahl.luke/react-reveal/globals"
+import { store, wrapper } from "../store"
+import NextNProgress from "nextjs-progressbar"
+import { brandedLightTheme } from "../materialUI"
+import Head from "next/head"
 import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import config from "@stahl.luke/react-reveal/globals"
-import Head from "next/head"
-import NextNProgress from "nextjs-progressbar"
-import { Provider } from "react-redux"
+import { AuthProvider } from "../HOCs/AuthProvider"
 import { ReactReduxFirebaseProvider } from "react-redux-firebase"
 import { actionTypes, createFirestoreInstance } from "redux-firestore"
-import "styles.css"
-import { AuthProvider } from "../HOCs/AuthProvider"
+import { Provider } from "react-redux"
+import { CacheProvider } from "@emotion/react"
+import createEmotionCache from "../materialUI/createEmotionCache"
 import Notifier from "../components/views/notifier"
-import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
+import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
 import firebaseApp, {
    AuthInstance,
+   firebaseConfig,
    FirestoreInstance,
    FunctionsInstance,
-   firebaseConfig,
 } from "../data/firebase/FirebaseInstance"
-import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
-import { brandedLightTheme } from "../materialUI"
-import createEmotionCache from "../materialUI/createEmotionCache"
-import { store, wrapper } from "../store"
 
-import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
-import { useEffect } from "react"
+import "../util/FirebaseUtils"
+import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
+import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
+import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
+import TutorialProvider from "../HOCs/TutorialProvider"
+import ErrorProvider from "../HOCs/ErrorProvider"
 import {
+   AuthProvider as ReactFireAuthProvider,
    FirebaseAppProvider,
    FirestoreProvider,
    FunctionsProvider,
-   AuthProvider as ReactFireAuthProvider,
 } from "reactfire"
-import ErrorProvider from "../HOCs/ErrorProvider"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
-import TutorialProvider from "../HOCs/TutorialProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
-import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
-import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
-import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
-import "../util/FirebaseUtils"
+import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -74,7 +74,7 @@ function MyApp(props) {
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
 
-   useEffect(() => {
+   React.useEffect(() => {
       if ("serviceWorker" in navigator) {
          window.addEventListener("load", () => {
             navigator.serviceWorker.register("/service-worker.js").then(
