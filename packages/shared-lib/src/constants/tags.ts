@@ -1,16 +1,14 @@
 import { OptionGroup } from "../commonTypes"
 import { languageOptionCodes } from "./forms"
 
+export type GroupedOptionGroup = {
+   [id: string]: OptionGroup
+}
+
 export type GroupedTags = {
-   businessFunctions: {
-      [id: string]: OptionGroup
-   }
-   contentTopics: {
-      [id: string]: OptionGroup
-   }
-   language: {
-      [id: string]: OptionGroup
-   }
+   businessFunctions: GroupedOptionGroup
+   contentTopics: GroupedOptionGroup
+   language: GroupedOptionGroup
 }
 
 export const BusinessFunctionsTagValues: OptionGroup[] = [
@@ -105,6 +103,29 @@ export const TagsLookup = Object.fromEntries(
    TagValues.map((tag) => [tag.id, tag])
 )
 
+export type ContentHitsCount = {
+   sparks: number
+   livestreams: number
+}
+export type ContentHits = {
+   [tagId: string]: {
+      contentHits: number
+      count: ContentHitsCount
+   }
+}
+
+export type TagsContentHits = {
+   businessFunctions: {
+      hits: ContentHits
+   }
+   contentTopics: {
+      hits: ContentHits
+   }
+   languages: {
+      hits: ContentHits
+   }
+}
+
 export const groupTags = (tagIds: string[]): GroupedTags => {
    const businessFunctions = BusinessFunctionsTagValues.filter((bf) =>
       tagIds.includes(bf.id)
@@ -144,27 +165,5 @@ export const groupTags = (tagIds: string[]): GroupedTags => {
                return [l.id, l]
             })
       ),
-   }
-}
-
-export type ContentHits = {
-   [tagId: string]: {
-      contentHits: number
-      count: {
-         sparks: number
-         livestreams: number
-      }
-   }
-}
-
-export type TagsContentHits = {
-   businessFunctions: {
-      hits: ContentHits
-   }
-   contentTopics: {
-      hits: ContentHits
-   }
-   languages: {
-      hits: ContentHits
    }
 }

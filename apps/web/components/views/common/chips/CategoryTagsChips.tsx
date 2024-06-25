@@ -1,7 +1,5 @@
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { Chip, Stack } from "@mui/material"
-import { ChipProps } from "@mui/material/Chip/Chip"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
 
 // const styles = sxStyles({
 //    chipNormal: {
@@ -16,35 +14,19 @@ import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailable
 //    },
 // })
 
-interface CategoryTagsChipsProps extends ChipProps {
+type CategoryTagsChipsProps = {
    selectedCategories: string[]
+   availableCategories: OptionGroup[]
    handleCategoryClick: (categoryId: string) => void
    handleAllClick: () => void
 }
 
-const CategoryTagsChips = (props: CategoryTagsChipsProps) => {
-   return (
-      <SuspenseWithBoundary fallback={<Loader />}>
-         <Content {...props} />
-      </SuspenseWithBoundary>
-   )
-}
-
-const Content = ({
+const CategoryTagsChips = ({
    selectedCategories,
+   availableCategories,
    handleCategoryClick,
    handleAllClick,
 }: CategoryTagsChipsProps) => {
-   // Hook to set selected chips
-   // const tagsContentHits: TagsContentHits = useTagsContentHits()
-   // console.log("🚀 ~ CategoryTagsChips ~ tagsContentHits:", tagsContentHits)
-   // Hook to get used tags by content
-   const availableCategories = useAvailableTagsByHits()
-   console.log(
-      "🚀 ~ CategoryTagsChips ~ availableCategories:",
-      availableCategories
-   )
-
    // Could be more precise when checking but since no duplicates should be ok
    const isAllSelected =
       selectedCategories.length === availableCategories.length
@@ -73,11 +55,4 @@ const Content = ({
    )
 }
 
-const Loader = () => {
-   return (
-      <>
-         <h1>TODO SKELETON</h1>
-      </>
-   )
-}
 export default CategoryTagsChips

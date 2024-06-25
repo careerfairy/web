@@ -1,49 +1,72 @@
-import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useLivestreamsByTags } from "components/custom-hook/tags/useLivestreamsByTags"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Button, Stack } from "@mui/material"
 
 type Props = {
-   tags: GroupedTags
+   events: LivestreamEvent[]
+   onSeeMore: () => void
 }
 // TODO: Use for coming up and past
-export const UpcomingLivestreamTagsContent = ({ tags }: Props) => {
+export const UpcomingLivestreamTagsContent = (props: Props) => {
+   //  const { data: upcomingEvents } = useLivestreamsByTags({
+   //     type: "upcomingEvents",
+   //     tags: tags,
+   //     limit: 6,
+   //  })
    // TODO: move to category tags content
-   return (
-      <SuspenseWithBoundary fallback={<Loader />}>
-         <LivestreamTagsContent type="upcomingEvents" tags={tags} />
-      </SuspenseWithBoundary>
-   )
+   return <LivestreamTagsContent {...props} title="Upcoming Events" />
+}
+
+export const PastLivestreamTagsContent = (props: Props) => {
+   // const { data: pastEvents } = useLivestreamsByTags({
+   //     type: "pastEvents",
+   //     tags: tags,
+   //     limit: 6,
+   //  })
+   // TODO: move to category tags content
+   return <LivestreamTagsContent {...props} title="Past Events" />
 }
 
 type LivestreamTagsContentProps = {
-   type: "upcomingEvents" | "pastEvents"
-   tags: GroupedTags
+   title: string
+   events: LivestreamEvent[]
+   onSeeMore: () => void
 }
 
 // TODO: pass limit
-const LivestreamTagsContent = ({ type, tags }: LivestreamTagsContentProps) => {
-   const { data } = useLivestreamsByTags({
-      type: "pastEvents",
-      tags: tags,
-      limit: 996,
-   })
+const LivestreamTagsContent = ({
+   events,
+   title,
+   onSeeMore,
+}: LivestreamTagsContentProps) => {
    console.log(
-      "🚀 ~ LivestreamTagsContent ~ events:",
-      type,
-      data.map((e) => e.id)
+      "🚀 ~ LivestreamTagsContent ~" + title + "events:",
+      events?.map((e) => e.id)
    )
 
    return (
       <>
-         <h5>HI THERE</h5>
+         <h4>
+            HI THERE: {title} - with {events?.length} events
+         </h4>
+         {events?.map((e, i) => {
+            return (
+               <Stack direction={"row"} key={i}>
+                  <h5>{e.id}</h5>
+                  <h6>BF: {e?.businessFunctionsTagIds}</h6>
+                  <h6>CT: {e?.contentTopicsTagIds}</h6>
+                  <h6>LG: {e.language?.code}</h6>
+               </Stack>
+            )
+         })}
+         <Button onClick={onSeeMore}> See more 2</Button>
       </>
    )
 }
 
-const Loader = () => {
-   return (
-      <>
-         <h1>TODO SKELETON</h1>
-      </>
-   )
-}
+// const Loader = () => {
+//    return (
+//       <>
+//          <h1>TODO SKELETON</h1>
+//       </>
+//    )
+// }
