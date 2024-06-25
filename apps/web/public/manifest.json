@@ -2,7 +2,7 @@
    "name": "CareerFairy",
    "short_name": "CareerFairy",
    "description": "CareerFairy - Watch live streams. Get hired.",
-   "start_url": "/",
+   "start_url": "/portal",
    "display": "standalone",
    "background_color": "#ffffff",
    "theme_color": "#000000",
