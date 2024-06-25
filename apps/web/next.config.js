@@ -3,6 +3,14 @@ const { withSentryConfig } = require("@sentry/nextjs")
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require("path")
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withPWA = require("next-pwa")({
+   dest: "public",
+   register: true,
+   skipWaiting: true,
+   disable: process.env.NODE_ENV === "development",
+})
+
 // const withBundleAnalyzer = require("@next/bundle-analyzer")({
 //    enabled: process.env.ANALYZE === "true",
 // });
@@ -223,7 +231,7 @@ const securityHeaders = [
 ]
 
 /** @type {import('next').NextConfig} */
-const moduleExports = {
+const moduleExports = withPWA({
    env: {
       REACT_APP_FIREBASE_API_KEY: "AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0",
       REACT_APP_FIREBASE_AUTH_DOMAIN: "careerfairy-e1fd9.firebaseapp.com",
@@ -362,7 +370,7 @@ const moduleExports = {
    },
    // this is an open issue on MUI's GitHub: https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
    transpilePackages: ["@mui/x-charts"],
-}
+})
 
 // test or development environment
 if (notProduction) {
