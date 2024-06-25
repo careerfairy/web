@@ -1,4 +1,5 @@
 import BaseFirebaseRepository from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import {
@@ -306,6 +307,8 @@ export interface ISparkFunctionsRepository {
    ): Promise<void>
 
    fetchSparksWithTags(): Promise<Spark[]>
+
+   fetchSparksByTags(tags: GroupedTags, limit: number): Promise<Spark[]>
 }
 
 export class SparkFunctionsRepository
@@ -1077,7 +1080,44 @@ export class SparkFunctionsRepository
    }
 
    async fetchSparksWithTags(): Promise<Spark[]> {
-      return []
+      // Any spark
+      const ref = this.firestore
+         .collection("sparks")
+         .withConverter(createGenericConverter<Spark>())
+
+      const snap = await ref.get()
+
+      const sparks = snap.docs
+         ?.map((s) => s.data())
+         .filter(
+            (s) => s.languageTagIds?.length || s.contentTopicsTagIds?.length
+         )
+      return sparks
+   }
+
+   async fetchSparksByTags(tags: GroupedTags, limit: number): Promise<Spark[]> {
+      // Any spark
+      const query = this.firestore.collection("sparks").limit(limit)
+
+      const snap = await query
+         .withConverter(createGenericConverter<Spark>())
+         .get()
+
+      const sparks =
+         snap.docs
+            ?.map((doc) => doc.data())
+            ?.filter((spark) => {
+               const hasContentTopics = Object.keys(tags.contentTopics).find(
+                  (ct) => spark.contentTopicsTagIds?.includes(ct)
+               )
+               const hasLanguages = Object.keys(tags.language).find((l) =>
+                  spark.languageTagIds?.includes(l)
+               )
+
+               return hasContentTopics || hasLanguages
+            }) || []
+
+      return sparks.slice(0, limit)
    }
 }
 
