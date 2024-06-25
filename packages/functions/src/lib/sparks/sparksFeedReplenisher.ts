@@ -3,10 +3,10 @@ import {
    UserSparksFeedMetrics,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { Firestore, Timestamp } from "../../api/firestoreAdmin"
+import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
 import { addAddedToFeedAt } from "../../util/sparks"
 import SparkRecommendationService from "../recommendation/SparkRecommendationService"
 import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
-import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
 
 /**
  * The SparksFeedReplenisher class is responsible for replenishing the user's feed
@@ -75,7 +75,7 @@ export class SparksFeedReplenisher {
       feed: UserSparksFeedMetrics
    ): Promise<void> {
       // Check if a replenish process is already underway
-      if (feed.replenishStatus === "started") {
+      if (feed?.replenishStatus === "started") {
          return
       }
       const currentSparkCount = feed.numberOfSparks
