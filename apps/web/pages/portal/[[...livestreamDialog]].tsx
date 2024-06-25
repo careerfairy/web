@@ -4,7 +4,7 @@ import { Box } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import SEO from "../../components/util/SEO"
 import CarouselContentService, {
    type CarouselContent,
@@ -28,21 +28,25 @@ import {
 
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
+import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import CategoryTagsChips from "components/views/common/chips/CategoryTagsChips"
+import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
 import Heading from "components/views/portal/common/Heading"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
+import { UserSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
 import { sxStyles } from "types/commonTypes"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
 } from "../../components/views/livestream-dialog"
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
-import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
-import { UserSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
 
 const styles = sxStyles({
    sparksCarouselHeader: {
@@ -118,7 +122,7 @@ const PortalPage = ({
                         />
                      </Box>
                      <Container disableGutters>
-                        <WidgetsWrapper>
+                        <PortalTagsContent>
                            {isMounted ? (
                               <UserSparksCarousel
                                  header={<Heading>SPARKS</Heading>}
@@ -150,13 +154,98 @@ const PortalPage = ({
                                  seeMoreLink={"/past-livestreams"}
                               />
                            </ConditionalWrapper>
-                        </WidgetsWrapper>
+                        </PortalTagsContent>
                      </Container>
                   </>
                </LivestreamDialogLayout>
                <WelcomeDialogContainer />
             </>
          </GenericDashboardLayout>
+      </>
+   )
+}
+
+type PortalTagsContentProps = {
+   children: React.ReactNode
+}
+const PortalTagsContent = ({ children }: PortalTagsContentProps) => {
+   const isMounted = useIsMounted()
+   return (
+      <SuspenseWithBoundary fallback={<PortalTagsLoader />}>
+         {isMounted ? <PortalTags>{children}</PortalTags> : null}
+      </SuspenseWithBoundary>
+   )
+}
+// TODO: Check animations
+const PortalTags = ({ children }: PortalTagsContentProps) => {
+   const availableCategories = useAvailableTagsByHits()
+
+   const [categoriesData, setCategoriesData] = useState(() => {
+      return Object.fromEntries(
+         availableCategories.map((tag) => {
+            return [
+               tag.id,
+               {
+                  selected: false,
+               },
+            ]
+         })
+      )
+   })
+
+   const selectedCategories = useMemo(() => {
+      return Object.keys(categoriesData).filter(
+         (cat) => categoriesData[cat].selected
+      )
+   }, [categoriesData])
+
+   const handleCategoryChipClicked = (categoryId: string) => {
+      const newCategories = { ...categoriesData }
+      newCategories[categoryId].selected = !newCategories[categoryId].selected
+
+      setCategoriesData(newCategories)
+   }
+
+   const handleAllCategoryChipClicked = () => {
+      // TODO: Could be better
+      const anyUnselected = Object.keys(categoriesData)
+         .map((cat) => !categoriesData[cat].selected)
+         .filter(Boolean).length
+
+      Object.keys(categoriesData).forEach((cat) => {
+         const newCategories = { ...categoriesData }
+         if (anyUnselected!) {
+            newCategories[cat].selected = true
+         } else {
+            newCategories[cat].selected = false
+         }
+
+         setCategoriesData(newCategories)
+      })
+   }
+
+   return (
+      <WidgetsWrapper>
+         <CategoryTagsChips
+            handleCategoryClick={handleCategoryChipClicked}
+            selectedCategories={selectedCategories}
+            availableCategories={availableCategories}
+            handleAllClick={handleAllCategoryChipClicked}
+         />
+         <ConditionalWrapper
+            condition={!selectedCategories.length}
+            fallback={<CategoryTagsContent categories={categoriesData} />}
+         >
+            {children}
+         </ConditionalWrapper>
+      </WidgetsWrapper>
+   )
+}
+
+const PortalTagsLoader = () => {
+   return (
+      <>
+         <h1>PortalTagsLoader</h1>
       </>
    )
 }
