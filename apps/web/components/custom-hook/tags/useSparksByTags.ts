@@ -1,5 +1,5 @@
 import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import useSWR, { SWRConfiguration } from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWR, {
@@ -12,22 +12,15 @@ const swrOptions: SWRConfiguration = {
    suspense: true,
    onError: (error, key) =>
       errorLogAndNotify(error, {
-         message: `Error fetching content by tags : ${key}`,
+         message: `Error fetching sparks content by tags : ${key}`,
       }),
 }
 
-export const useLivestreamsByTags = (
-   type: "upcomingEvents" | "pastEvents",
-   tags: GroupedTags,
-   limit: number
-) => {
-   const fetcher = useFunctionsSWR<LivestreamEvent[]>()
+export const useSparksByTags = (tags: GroupedTags) => {
+   const fetcher = useFunctionsSWR<Spark[]>()
 
-   return useSWR<LivestreamEvent[]>(
-      [
-         "getLivestreamsByTags",
-         { tags: tags, limit: limit, past: type === "pastEvents" },
-      ],
+   return useSWR<Spark[]>(
+      ["getSparksByTags", { tags: tags, limit: 10 }],
       fetcher,
       swrOptions
    )

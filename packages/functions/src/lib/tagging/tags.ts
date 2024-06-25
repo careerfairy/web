@@ -1,3 +1,4 @@
+import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
@@ -7,9 +8,12 @@ import {
 } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import _ from "lodash"
+import { DateTime } from "luxon"
+import { SchemaOf, boolean, number, object } from "yup"
 import { livestreamsRepo, sparkRepo } from "../../api/repositories"
 import config from "../../config"
 import { middlewares } from "../../middlewares/middlewares"
+import { dataValidation } from "../../middlewares/validations"
 import { getChangeTypes } from "../../util"
 import { TagsHitsDataParser } from "./TagsHitsDataParser"
 // TODO: Update documentation
@@ -239,15 +243,80 @@ const contentCustomJobsExcludingMap = (
 
 export const fetchContentHits = functions.region(config.region).https.onCall(
    middlewares(async () => {
-      console.log("🚀 ~ fRUNNING etchContentHits:", fetchContentHits)
-      const eventsWithTags = await livestreamsRepo.fetchLivestreamsWithTags()
-      console.log("🚀 ~ eventsWithTags len:", eventsWithTags?.length)
+      // TODO: Use single promise
+      const pastEventsWithTags = await livestreamsRepo.fetchLivestreamsWithTags(
+         "pastEvents"
+      )
+      const upcomingventsWithTags =
+         await livestreamsRepo.fetchLivestreamsWithTags("upcomingEvents")
       const sparksWithTags = await sparkRepo.fetchSparksWithTags()
 
-      const parser = new TagsHitsDataParser(eventsWithTags, sparksWithTags)
+      const allEvents = pastEventsWithTags.concat(upcomingventsWithTags)
+      const parser = new TagsHitsDataParser(allEvents, sparksWithTags)
 
       const res = parser.build()
+      console.log("🚀 ~ middlewares ~ res:", res)
 
       return res
    })
+)
+type LivestreamsByTags = {
+   // type: string,
+   past: boolean
+   tags: GroupedTags
+   limit: number
+}
+const getLivestreamsByTagsSchema: SchemaOf<LivestreamsByTags> = object().shape({
+   // type: string().oneOf(["upcomingEvents", "pastEvents"]),
+   past: boolean().required(),
+   tags: object(),
+   limit: number().default(6).required(),
+})
+
+export const getLivestreamsByTags = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares(
+         dataValidation(getLivestreamsByTagsSchema),
+
+         async (data: LivestreamsByTags) => {
+            console.log("🚀 ~ getLivestreamsByTags:", data)
+
+            // TODO: Confirm date from when past
+            const date = DateTime.now().minus({ years: 5 }).toJSDate()
+            const type = data.past ? "pastEvents" : "upcomingEvents"
+            const events = await livestreamsRepo.fetchLivestreamsByTags(
+               type,
+               data.tags,
+               date,
+               data.limit
+            )
+
+            console.log("🚀 ~ events:", events.length)
+            return events?.length ? events : []
+         }
+      )
+   )
+
+type SparksByTags = {
+   tags: GroupedTags
+   limit: number
+}
+const getSparksByTagsSchema: SchemaOf<SparksByTags> = object().shape({
+   tags: object(),
+   limit: number().default(6).required(),
+})
+
+export const getSparksByTags = functions.region(config.region).https.onCall(
+   middlewares(
+      dataValidation(getSparksByTagsSchema),
+
+      async (data: LivestreamsByTags) => {
+         console.log("🚀 ~ getSparksByTags:", data)
+         const sparks = await sparkRepo.fetchSparksByTags(data.tags, data.limit)
+
+         console.log("🚀 ~ sparks:", sparks.length)
+         return sparks?.length ? sparks : []
+      }
+   )
 )

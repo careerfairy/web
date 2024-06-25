@@ -1,6 +1,13 @@
 import { groupTags } from "@careerfairy/shared-lib/constants/tags"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { UpcomingLivestreamTagsContent } from "./content/LivestreamTagsContent"
+import { useLivestreamsByTags } from "components/custom-hook/tags/useLivestreamsByTags"
+import { useSparksByTags } from "components/custom-hook/tags/useSparksByTags"
+import { useMemo, useState } from "react"
+import {
+   PastLivestreamTagsContent,
+   UpcomingLivestreamTagsContent,
+} from "./content/LivestreamTagsContent"
+import SparksTagsContent from "./content/SparksTagsContent"
 
 type Props = {
    categories: {
@@ -17,14 +24,47 @@ const CategoryTagsContent = (props: Props) => {
    )
 }
 const CategoryTagsContentComponent = ({ categories }: Props) => {
-   const tags = groupTags(
-      Object.keys(categories).filter((cat) => categories[cat].selected)
+   const [pastEventsLimit, setPastEventsLimit] = useState(6)
+   console.log(
+      "🚀 ~ CategoryTagsContentComponent ~ pastEventsLimit:",
+      pastEventsLimit
    )
+   const [upcomingEventsLimit, setUpcomingEventsLimit] = useState(6)
+
+   const tags = useMemo(() => {
+      return groupTags(
+         Object.keys(categories).filter((cat) => categories[cat].selected)
+      )
+   }, [categories])
+
+   const { data: pastEvents } = useLivestreamsByTags(
+      "pastEvents",
+      tags,
+      pastEventsLimit
+   )
+   const { data: upcomingEvents } = useLivestreamsByTags(
+      "upcomingEvents",
+      tags,
+      upcomingEventsLimit
+   )
+   const { data: sparks } = useSparksByTags(tags)
 
    // TODO: pass limits independantly and use see more to increment
    return (
       <>
-         <UpcomingLivestreamTagsContent tags={tags} />
+         <SparksTagsContent sparks={sparks} />
+         <UpcomingLivestreamTagsContent
+            events={upcomingEvents}
+            onSeeMore={() => {
+               setPastEventsLimit(pastEventsLimit + 6)
+            }}
+         />
+         <PastLivestreamTagsContent
+            events={pastEvents}
+            onSeeMore={() => {
+               setUpcomingEventsLimit(upcomingEventsLimit + 6)
+            }}
+         />
       </>
    )
 }
