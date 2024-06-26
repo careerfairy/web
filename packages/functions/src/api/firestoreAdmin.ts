@@ -1,14 +1,15 @@
 import { initializeApp } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
-import { getStorage, Storage } from "firebase-admin/storage"
 import {
+   DocumentSnapshot,
+   FieldPath,
    FieldValue,
+   Firestore,
    getFirestore,
    Timestamp,
-   Firestore,
-   FieldPath,
-   DocumentSnapshot,
 } from "firebase-admin/firestore"
+import { getMessaging } from "firebase-admin/messaging"
+import { getStorage, Storage } from "firebase-admin/storage"
 import { isLocalEnvironment } from "../util"
 
 /**
@@ -30,12 +31,13 @@ initializeApp()
 export const firestore = getFirestore()
 export const auth = getAuth()
 export const storage = getStorage()
+export const messaging = getMessaging()
 
 export {
-   FieldValue,
-   Timestamp,
-   Storage,
-   Firestore,
-   FieldPath,
    DocumentSnapshot,
+   FieldPath,
+   FieldValue,
+   Firestore,
+   Storage,
+   Timestamp,
 }

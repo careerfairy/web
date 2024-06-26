@@ -102,6 +102,8 @@ export default function MyDocument(props: DocumentProps) {
                   ></script>
                </>
             ) : null}
+            <link rel="manifest" href="/manifest.json" />
+            <link rel="apple-touch-icon" href="/icon.png"></link>
             <link
                rel="preload"
                href="/fonts/subset-Poppins-Regular.woff2"

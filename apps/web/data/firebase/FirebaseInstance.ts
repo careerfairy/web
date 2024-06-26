@@ -1,11 +1,13 @@
-import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
-import "firebase/compat/auth"
-import "firebase/compat/storage"
-import "firebase/compat/functions"
-import SessionStorageUtil from "../../util/SessionStorageUtil"
-import { shouldUseEmulators } from "../../util/CommonUtil"
 import { fromDateFirestoreFn } from "@careerfairy/shared-lib/dist/firebaseTypes"
+import { isServer } from "components/helperFunctions/HelperFunctions"
+import firebase from "firebase/compat/app"
+import "firebase/compat/auth"
+import "firebase/compat/firestore"
+import "firebase/compat/functions"
+import "firebase/compat/messaging"
+import "firebase/compat/storage"
+import { shouldUseEmulators } from "../../util/CommonUtil"
+import SessionStorageUtil from "../../util/SessionStorageUtil"
 
 export const firebaseConfig = {
    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -14,6 +16,7 @@ export const firebaseConfig = {
    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+   appId: "1:993933306494:web:8c51e7a31d29ea9143862f",
 }
 
 export const region = "europe-west1"
@@ -74,7 +77,8 @@ const firebaseApp: firebase.app.App = createFirebaseInstance("[DEFAULT]")
 export const FirestoreInstance = firebaseApp.firestore()
 export const AuthInstance = firebaseApp.auth()
 export const FunctionsInstance = firebaseApp.functions(region)
-
+export const MessagingInstance = isServer() ? null : firebase.messaging()
+export const getToken = MessagingInstance?.getToken
 export const FieldValue = firebase.firestore.FieldValue
 export const Timestamp = firebase.firestore.Timestamp
 export const fromDate: fromDateFirestoreFn = Timestamp?.fromDate
