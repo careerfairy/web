@@ -16,7 +16,7 @@
    ],
    "theme_color": "#2ABAA5",
    "background_color": "#FFFFFF",
-   "start_url": "/",
+   "start_url": "/portal",
    "display": "standalone",
    "orientation": "portrait"
 }
