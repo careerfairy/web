@@ -23,7 +23,6 @@ import { brandedLightTheme } from "../materialUI"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import { store, wrapper } from "../store"
 
-import { useMessagingToken } from "components/custom-hook/useMessagingToken"
 import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
 import {
    FirebaseAppProvider,
@@ -73,7 +72,6 @@ function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
-   useMessagingToken()
 
    return (
       <CacheProvider value={emotionCache}>
