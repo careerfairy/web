@@ -2,6 +2,12 @@
 const { withSentryConfig } = require("@sentry/nextjs")
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require("path")
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withPWA = require("@ducanh2912/next-pwa").default({
+   dest: "public",
+   register: true,
+   skipWaiting: true,
+})
 
 // const withBundleAnalyzer = require("@next/bundle-analyzer")({
 //    enabled: process.env.ANALYZE === "true",
@@ -37,6 +43,8 @@ const csp = {
       "blob:",
       "careerfairy-e1fd9.firebaseapp.com",
       "https://ik.imagekit.io",
+      "*.cloudfront.net", // PWA
+      "https://cdn.prod.website-files.com", // PWA
    ],
    "script-src": [
       "'self'",
@@ -73,6 +81,8 @@ const csp = {
       "https://scripts.simpleanalyticscdn.com", // Google Ads services
       "https://www.googleadservices.com", // Google Ads services
       "https://cdn.prod.website-files.com", // Webflow
+      "*.cloudfront.net", // Added URL
+      "https://www.gstatic.com", // Added URL
    ],
    "style-src": [
       "'self'",
@@ -123,6 +133,9 @@ const csp = {
       "https://capig.stape.tech", // Pixel Conversion API Gateway
       "https://www.googletagmanager.com",
       "https://pagead2.googlesyndication.com", // Google Ads
+      "https://clientstream.launchdarkly.com:*", // PWA
+      "https://cdn.prod.website-files.com:*", // Webflow
+      "*.cloudfront.net:*", // Added URL
    ],
    "img-src": [
       "'self'",
@@ -132,6 +145,7 @@ const csp = {
       "blob:",
       "data:",
       "https:",
+      "https://cdn.prod.website-files.com", // Webflow
    ],
    "frame-src": [
       "blob:",
@@ -223,7 +237,7 @@ const securityHeaders = [
 ]
 
 /** @type {import('next').NextConfig} */
-const moduleExports = {
+const moduleExports = withPWA({
    env: {
       REACT_APP_FIREBASE_API_KEY: "AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0",
       REACT_APP_FIREBASE_AUTH_DOMAIN: "careerfairy-e1fd9.firebaseapp.com",
@@ -362,7 +376,7 @@ const moduleExports = {
    },
    // this is an open issue on MUI's GitHub: https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
    transpilePackages: ["@mui/x-charts"],
-}
+})
 
 // test or development environment
 if (notProduction) {
