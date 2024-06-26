@@ -23,11 +23,9 @@ import React, {
 import { checkIfPast } from "util/streamUtil"
 import WhiteTagChip from "../chips/TagChip"
 
-import {
-   ImpressionLocation,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
 import { CardActionArea } from "@mui/material"
 import Link, { LinkProps } from "next/link"
@@ -406,7 +404,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          router,
       ])
 
-      const isLink = event && !onCardClick
+      const isLink = event && !onCardClick && !isPlaceholderEvent
 
       const Wrapper = isLink ? Link : Fragment
 
