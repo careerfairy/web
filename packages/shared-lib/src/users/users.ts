@@ -113,7 +113,7 @@ export interface UserData extends Identifiable {
    hasCompletedSparksB2BOnboarding?: boolean
 
    /** An array of all the tokens (per device) that we will send notifications to*/
-   messagingTokens: string[]
+   messagingTokens?: string[]
 }
 
 /*
