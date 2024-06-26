@@ -18,7 +18,7 @@ export const useMessagingToken = () => {
    const { userData } = useAuth()
    const firestore = useFirestore()
    return useSWRImmutable(
-      MessagingInstance && userData?.email
+      MessagingInstance && userData?.userEmail
          ? ["getMessagingToken", MessagingInstance]
          : null,
       async () => {
@@ -33,7 +33,7 @@ export const useMessagingToken = () => {
             const userDoc = doc(
                firestore,
                "userData",
-               userData?.email
+               userData?.userEmail
             ).withConverter(createGenericConverter<UserData>())
 
             await updateDoc(userDoc, {
