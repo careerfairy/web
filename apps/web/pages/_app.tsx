@@ -1,44 +1,45 @@
+import config from "@stahl.luke/react-reveal/globals"
 import * as React from "react"
 import "styles.css"
-import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
-import config from "@stahl.luke/react-reveal/globals"
-import { store, wrapper } from "../store"
-import NextNProgress from "nextjs-progressbar"
-import { brandedLightTheme } from "../materialUI"
-import Head from "next/head"
+
+import { CacheProvider } from "@emotion/react"
 import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { AuthProvider } from "../HOCs/AuthProvider"
-import { ReactReduxFirebaseProvider } from "react-redux-firebase"
-import { actionTypes, createFirestoreInstance } from "redux-firestore"
-import { Provider } from "react-redux"
-import { CacheProvider } from "@emotion/react"
-import createEmotionCache from "../materialUI/createEmotionCache"
-import Notifier from "../components/views/notifier"
-import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
-import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
-import firebaseApp, {
-   AuthInstance,
-   firebaseConfig,
-   FirestoreInstance,
-   FunctionsInstance,
-} from "../data/firebase/FirebaseInstance"
 
-import "../util/FirebaseUtils"
-import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
-import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
-import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
-import TutorialProvider from "../HOCs/TutorialProvider"
-import ErrorProvider from "../HOCs/ErrorProvider"
+import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
+import Head from "next/head"
+import NextNProgress from "nextjs-progressbar"
+import { Provider } from "react-redux"
+import { ReactReduxFirebaseProvider } from "react-redux-firebase"
 import {
-   AuthProvider as ReactFireAuthProvider,
    FirebaseAppProvider,
    FirestoreProvider,
    FunctionsProvider,
+   AuthProvider as ReactFireAuthProvider,
 } from "reactfire"
+import { actionTypes, createFirestoreInstance } from "redux-firestore"
+import { AuthProvider } from "../HOCs/AuthProvider"
+import ErrorProvider from "../HOCs/ErrorProvider"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
+import TutorialProvider from "../HOCs/TutorialProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
-import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
+import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
+import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
+import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
+import Notifier from "../components/views/notifier"
+import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
+import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
+import firebaseApp, {
+   AuthInstance,
+   FirestoreInstance,
+   FunctionsInstance,
+   firebaseConfig,
+} from "../data/firebase/FirebaseInstance"
+import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
+import { brandedLightTheme } from "../materialUI"
+import createEmotionCache from "../materialUI/createEmotionCache"
+import { store, wrapper } from "../store"
+import "../util/FirebaseUtils"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
