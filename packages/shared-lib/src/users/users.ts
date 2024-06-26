@@ -111,6 +111,9 @@ export interface UserData extends Identifiable {
     * Indicates if the user has completed the Sparks onboarding process
     */
    hasCompletedSparksB2BOnboarding?: boolean
+
+   /** An array of all the tokens (per device) that we will send notifications to*/
+   messagingTokens: string[]
 }
 
 /*
