@@ -1,4 +1,9 @@
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { useAuth } from "HOCs/AuthProvider"
 import { MessagingInstance } from "data/firebase/FirebaseInstance"
+import { arrayUnion, doc, updateDoc } from "firebase/firestore"
+import { useFirestore } from "reactfire"
 import useSWRImmutable from "swr/immutable"
 
 /**
@@ -10,8 +15,12 @@ import useSWRImmutable from "swr/immutable"
  * @returns The messaging token response from Firebase
  */
 export const useMessagingToken = () => {
+   const { userData } = useAuth()
+   const firestore = useFirestore()
    return useSWRImmutable(
-      MessagingInstance ? ["getMessagingToken", MessagingInstance] : null,
+      MessagingInstance && userData
+         ? ["getMessagingToken", MessagingInstance]
+         : null,
       async () => {
          const permission = await Notification.requestPermission()
 
@@ -20,9 +29,18 @@ export const useMessagingToken = () => {
                vapidKey:
                   "BBR82x2GvYK1kMOhbO-naONUGxueaLQ-DFMsXbecuLk_SLZMcXK6W50fMd6DDhljLYNKZFjvq8CK8cI9e7lRHvM",
             })
-            console.log("🚀 ~ file: useMessagingToken.ts:23 ~ token:", token)
 
-            return token
+            const userDoc = doc(
+               firestore,
+               "userData",
+               userData.email
+            ).withConverter(createGenericConverter<UserData>())
+
+            await updateDoc(userDoc, {
+               messagingTokens: arrayUnion(token),
+            })
+
+            console.log("🚀 Token saved!")
          } else {
             alert("Permission denied")
          }
