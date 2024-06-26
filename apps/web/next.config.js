@@ -3,7 +3,7 @@ const { withSentryConfig } = require("@sentry/nextjs")
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require("path")
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const withPWA = require("@ducanh2912/next-pwa").default({
+const withPWA = require("next-pwa")({
    dest: "public",
    register: true,
    skipWaiting: true,
