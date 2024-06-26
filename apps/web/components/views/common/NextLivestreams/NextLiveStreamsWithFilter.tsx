@@ -175,6 +175,10 @@ const NextLiveStreamsWithFilter = ({
 
    const numberOfResults = data?.[0]?.nbHits || 0
 
+   const hasAppliedFilters = Boolean(
+      Object.values(filterOptions.arrayFilters).flat().length
+   )
+
    const infiniteLivestreams = useMemo(() => {
       return data?.flatMap((page) => page.deserializedHits) || []
    }, [data])
@@ -282,7 +286,7 @@ const NextLiveStreamsWithFilter = ({
             upcomingLivestreams={infiniteLivestreams}
             listenToUpcoming
             pastLivestreams={infiniteLivestreams}
-            minimumUpcomingStreams={0}
+            minimumUpcomingStreams={hasAppliedFilters || inputValue ? 0 : 4}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
          {Boolean(isValidating) && (
