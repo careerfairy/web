@@ -28,6 +28,8 @@ export interface IUserFunctionsRepository extends IUserRepository {
       earlierThanDays?: number
    ): Promise<UserData[]>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
+
+   getAllUsers(): Promise<UserData[]>
 }
 
 export class UserFunctionsRepository
@@ -107,5 +109,11 @@ export class UserFunctionsRepository
          .get()
 
       return querySnapshot.docs?.map((doc) => doc.data() as CompanyFollowed)
+   }
+
+   async getAllUsers(): Promise<UserData[]> {
+      const querySnapshot = await this.firestore.collection("userData").get()
+
+      return querySnapshot.docs?.map((doc) => doc.data() as UserData)
    }
 }
