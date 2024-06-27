@@ -60,6 +60,7 @@ import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
 import stripe = require("./stripe")
+import pushNotifications = require("./pushNotifications")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -294,3 +295,6 @@ exports.resetQuestion = streaming.resetQuestion
 exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent
 exports.markQuestionAsDone = streaming.markQuestionAsDone
 exports.toggleHandRaise = streaming.toggleHandRaise
+
+exports.sendPushNotificationsToEveryone =
+   pushNotifications.sendPushNotificationsToEveryone
