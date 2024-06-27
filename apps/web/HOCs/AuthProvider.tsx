@@ -5,7 +5,6 @@ import {
 } from "@careerfairy/shared-lib/dist/users"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import * as Sentry from "@sentry/nextjs"
-import { useMessagingToken } from "components/custom-hook/useMessagingToken"
 import { clearFirestoreCache } from "data/util/authUtil"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
@@ -68,7 +67,6 @@ const AuthContext = createContext<DefaultContext>({
 
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
-   useMessagingToken()
 
    const { pathname, replace, asPath } = useRouter()
    const firebaseService = useFirebaseService()

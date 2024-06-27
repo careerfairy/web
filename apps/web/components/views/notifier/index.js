@@ -1,11 +1,13 @@
+import { useSyncMessagingToken } from "components/custom-hook/useSyncMessagingToken"
+import { useSnackbar } from "notistack"
 import React from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useSnackbar } from "notistack"
 import * as actions from "../../../store/actions"
 
 let displayed = []
 
 const Notifier = () => {
+   useSyncMessagingToken()
    const dispatch = useDispatch()
    const notifications = useSelector(
       (store) => store.snackbars.notifications || []

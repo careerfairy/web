@@ -14,11 +14,11 @@ import useSWRImmutable from "swr/immutable"
  *
  * @returns The messaging token response from Firebase
  */
-export const useMessagingToken = () => {
+export const useSyncMessagingToken = () => {
    const { userData } = useAuth()
    const firestore = useFirestore()
    return useSWRImmutable(
-      MessagingInstance && userData?.userEmail
+      MessagingInstance && userData?.id
          ? ["getMessagingToken", MessagingInstance]
          : null,
       async () => {
@@ -33,14 +33,14 @@ export const useMessagingToken = () => {
             const userDoc = doc(
                firestore,
                "userData",
-               userData?.userEmail
+               userData?.id
             ).withConverter(createGenericConverter<UserData>())
 
             await updateDoc(userDoc, {
                messagingTokens: arrayUnion(token),
             })
 
-            console.log("🚀 Token saved!")
+            console.log("🚀 Token synced!")
          } else {
             alert("Permission denied")
          }
