@@ -457,7 +457,13 @@ export interface EventRatingAnswer extends Identifiable {
    message?: string
    rating?: number
    timestamp?: firebase.firestore.Timestamp
+   user?: StreamerDetails
 }
+
+export type FeedbackQuestionUserAnswer = Pick<
+   EventRatingAnswer,
+   "message" | "rating"
+>
 
 export type LivestreamEventPublicData = Partial<
    Pick<
@@ -817,4 +823,12 @@ export interface LivestreamEmote extends Identifiable {
    authorEmail?: string
    /** @deprecated */
    streamerId?: string
+}
+
+export type StreamerDetails = {
+   firstName: string
+   lastName: string
+   role: string
+   avatarUrl: string
+   linkedInUrl: string
 }
