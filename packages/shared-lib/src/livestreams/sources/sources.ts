@@ -79,6 +79,7 @@ export const VALID_SOURCES: RegistrationSource[] = [
             /[a-z]{2}[-_]newsletter$/i,
             // e.g unicc_de, student_assoc_ch, unicc-ch
             /student[_-]assoc[_-][a-z]{2}|unicc[_-][a-z]{2}|student[_-]council[_-][a-z]{2}/i,
+            /^professors$/i,
          ]
          const matchSource = validSources.some((r) => r.test(utms?.utm_source))
          const matchMedium = /email/i.test(utms?.utm_medium)
@@ -114,7 +115,7 @@ function matchAnyUtmParam(regex: RegExp) {
  * Returns true if any entry matches
  */
 const matchAnyMapValue = (map: object, regex: RegExp) => {
-   for (let key in map) {
+   for (const key in map) {
       if (regex.test(map[key])) {
          return true
       }
