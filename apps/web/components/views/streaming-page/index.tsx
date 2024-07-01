@@ -117,6 +117,15 @@ const SettingsMenu = dynamic(
       ssr: false,
    }
 )
+const FeedbackQuestions = dynamic(
+   () =>
+      import("./components/feedback-questions/FeedbackQuestions").then(
+         (mod) => mod.FeedbackQuestions
+      ),
+   {
+      ssr: false,
+   }
+)
 const TopBar = dynamic(
    () => import("./components/TopBar").then((mod) => mod.TopBar),
    {
@@ -251,6 +260,9 @@ const Component = ({ isHost }: Props) => {
                                        </Fragment>
                                     </Layout>
                                  </EndOfStream>
+                                 {!isHost && authenticatedUser ? (
+                                    <FeedbackQuestions />
+                                 ) : null}
                                  <ToggleStreamModeButton />
                               </ScreenShareProvider>
                            </LocalTracksProvider>
@@ -271,6 +283,6 @@ const Component = ({ isHost }: Props) => {
             <LivestreamStateTrackers />
          </>
       ),
-      [agoraUserId, isHost, livestream.id]
+      [agoraUserId, isHost, livestream.id, authenticatedUser]
    )
 }

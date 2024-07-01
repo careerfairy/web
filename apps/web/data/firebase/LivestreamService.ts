@@ -11,6 +11,8 @@ import {
    DeleteLivestreamChatEntryRequest,
    DeleteLivestreamPollRequest,
    EmoteType,
+   EventRatingAnswer,
+   FeedbackQuestionUserAnswer,
    FilterLivestreamsOptions,
    CategoryDataOption as LivestreamCategoryDataOption,
    LivestreamChatEntry,
@@ -28,6 +30,7 @@ import {
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
    ResetLivestreamQuestionRequest,
+   StreamerDetails,
    ToggleHandRaiseRequest,
    UpdateLivestreamPollRequest,
    UserLivestreamData,
@@ -72,14 +75,6 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
-
-type StreamerDetails = {
-   firstName: string
-   lastName: string
-   role: string
-   avatarUrl: string
-   linkedInUrl: string
-}
 
 /**
  * Defines the options for setting a live stream's mode.
@@ -241,11 +236,11 @@ export class LivestreamService {
          const data = snapshot.docs[0].data()
 
          return {
-            firstName: data.firstName,
-            lastName: data.lastName,
+            firstName: data.firstName || "",
+            lastName: data.lastName || "",
             role: data.position || data.fieldOfStudy.name || "",
-            avatarUrl: data.avatar,
-            linkedInUrl: data.linkedinUrl,
+            avatarUrl: data.avatar || "",
+            linkedInUrl: data.linkedinUrl || "",
          }
       }
 
@@ -1117,6 +1112,90 @@ export class LivestreamService {
          timestamp: Timestamp.now(),
          agoraUserId,
          userUid: userUid || null,
+      })
+   }
+
+   getUserFeedbackQuestionAnswer = async (
+      livestreamId: string,
+      questionId: string,
+      userId: string
+   ) => {
+      const voterInVotersRef = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "rating",
+         questionId,
+         "voters",
+         userId
+      ).withConverter(createGenericConverter<EventRatingAnswer>())
+
+      const voterInNonVotersRef = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "rating",
+         questionId,
+         "nonVoters",
+         userId
+      ).withConverter(createGenericConverter<EventRatingAnswer>())
+
+      const voterInVotersSnap = await getDoc(voterInVotersRef)
+      const voterInNonVotersSnap = await getDoc(voterInNonVotersRef)
+
+      return {
+         hasAnswered:
+            voterInVotersSnap.exists() || voterInNonVotersSnap.exists(),
+         optedOut: voterInNonVotersSnap.exists(),
+         answer: voterInVotersSnap.data() || voterInNonVotersSnap.data(),
+      }
+   }
+
+   optOutFeedbackQuestion = async (
+      livestreamId: string,
+      questionId: string,
+      voterId: string,
+      userData: StreamerDetails
+   ) => {
+      const ref = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "rating",
+         questionId,
+         "nonVoters",
+         voterId
+      ).withConverter(createGenericConverter<EventRatingAnswer>())
+
+      return setDoc(ref, {
+         id: ref.id,
+         timestamp: Timestamp.now(),
+         user: { ...userData },
+      })
+   }
+
+   answerFeedbackQuestion = async (
+      livestreamId: string,
+      questionId: string,
+      voterId: string,
+      userData: StreamerDetails,
+      answer: FeedbackQuestionUserAnswer
+   ) => {
+      const ref = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "rating",
+         questionId,
+         "voters",
+         voterId
+      ).withConverter(createGenericConverter<EventRatingAnswer>())
+
+      return setDoc(ref, {
+         ...answer,
+         id: ref.id,
+         timestamp: Timestamp.now(),
+         user: { ...userData },
       })
    }
 }
