@@ -130,3 +130,8 @@ export const useShowEndScreen = (isHost: boolean) =>
 
 export const useIsTestLivestream = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.test)
+
+export const useIsRecordingWindow = () =>
+   useAppSelector(
+      (state) => state.streamingApp.livestreamState.isRecordingWindow
+   )

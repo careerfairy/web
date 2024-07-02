@@ -89,6 +89,7 @@ export interface StreamingAppState {
       handRaiseEnabled: boolean
       hasJobs: boolean
       test: boolean
+      isRecordingWindow: boolean
    } | null
    rtmSignalingState: {
       failedToConnect: boolean
@@ -142,6 +143,7 @@ const initialState: StreamingAppState = {
       numberOfHandRaiseNotifications: 0,
       hasJobs: false,
       test: false,
+      isRecordingWindow: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -383,6 +385,10 @@ const streamingAppSlice = createSlice({
       ) {
          state.virtualBackgroundMode = action.payload
       },
+
+      setIsRecordingWindow(state, action: PayloadAction<boolean>) {
+         state.livestreamState.isRecordingWindow = action.payload
+      },
    },
 })
 
@@ -421,6 +427,7 @@ export const {
       removeEmote,
       clearEmotes,
       setVirtualBackgroundMode,
+      setIsRecordingWindow,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
