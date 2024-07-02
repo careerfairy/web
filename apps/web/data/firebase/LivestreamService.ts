@@ -273,12 +273,44 @@ export class LivestreamService {
       return null
    }
 
-   private getTagAndIdentifierFromUid(uid: string): [StreamIdentifier, string] {
-      return uid.split("-") as [StreamIdentifier, string]
+   private async getLivestreamSpeakerDetails(
+      speakerId: string,
+      livestreamId: string
+   ): Promise<StreamerDetails | null> {
+      const livestream = await getDoc(this.getLivestreamRef(livestreamId))
+
+      if (livestream.exists) {
+         const speaker = livestream
+            .data()
+            ?.speakers?.find((speaker) => speaker.id === speakerId)
+
+         if (speaker) {
+            return {
+               firstName: speaker.firstName,
+               lastName: speaker.lastName,
+               role: speaker.position,
+               avatarUrl: speaker.avatar,
+               linkedInUrl: speaker.linkedInUrl,
+            }
+         }
+      }
+
+      return null
+   }
+
+   private getTagAndIdentifierFromUid(
+      uid: string
+   ): [StreamIdentifier, string, string] {
+      return uid.split("-") as [
+         StreamIdentifier,
+         string, // Identifier is the speaker/user id
+         string // Live stream id
+      ]
    }
 
    async getStreamerDetails(uid: string): Promise<StreamerDetails> {
-      const [tag, identifier] = this.getTagAndIdentifierFromUid(uid)
+      const [tag, identifier, livestreamId] =
+         this.getTagAndIdentifierFromUid(uid)
       let details: StreamerDetails | null = null
 
       switch (tag) {
@@ -291,8 +323,17 @@ export class LivestreamService {
                linkedInUrl: "",
             }
             break
-         case STREAM_IDENTIFIERS.CREATOR:
+         case STREAM_IDENTIFIERS.SPEAKER:
             details = await this.getCreatorDetails(identifier)
+
+            if (!details) {
+               // Fallback to the live stream speaker details if no creator details are found
+               details = await this.getLivestreamSpeakerDetails(
+                  identifier,
+                  livestreamId
+               )
+            }
+
             break
          case STREAM_IDENTIFIERS.USER:
             details = await this.getUserDetails(identifier)
@@ -307,11 +348,18 @@ export class LivestreamService {
                ""
             )
 
-            const [userTag, userIdentifier] =
+            const [userTag, userIdentifier, userLivestreamId] =
                this.getTagAndIdentifierFromUid(userUid)
 
-            if (userTag === STREAM_IDENTIFIERS.CREATOR) {
+            if (userTag === STREAM_IDENTIFIERS.SPEAKER) {
                details = await this.getCreatorDetails(userIdentifier)
+               if (!details) {
+                  // Fallback to the live stream speaker details if no creator details are found
+                  details = await this.getLivestreamSpeakerDetails(
+                     userIdentifier,
+                     userLivestreamId
+                  )
+               }
             }
             if (userTag === STREAM_IDENTIFIERS.USER) {
                details = await this.getUserDetails(userIdentifier)
