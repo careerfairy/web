@@ -1,6 +1,7 @@
 import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useLivestreamData } from "components/custom-hook/streaming"
+import { useRouter } from "next/router"
 import { useEffect } from "react"
 import {
    resetLivestreamState,
@@ -8,6 +9,7 @@ import {
    setHandRaiseEnabled,
    setHasEnded,
    setHasJobs,
+   setIsRecordingWindow,
    setLivestreamMode,
    setNumberOfParticipants,
    setOpenStream,
@@ -31,6 +33,7 @@ import { setCompanyLogoUrl } from "../../../../../store/reducers/streamingAppRed
 export const LivestreamStateTrackers = (): null => {
    const dispatch = useAppDispatch()
    const livestream = useLivestreamData()
+   const { query } = useRouter()
 
    useEffect(() => {
       dispatch(setLivestreamMode(livestream.mode ?? LivestreamModes.DEFAULT))
@@ -97,6 +100,10 @@ export const LivestreamStateTrackers = (): null => {
    useEffect(() => {
       dispatch(setHasJobs(Boolean(livestream.hasJobs)))
    }, [dispatch, livestream.hasJobs])
+
+   useEffect(() => {
+      dispatch(setIsRecordingWindow(Boolean(query.isRecordingWindow)))
+   }, [dispatch, query.isRecordingWindow])
 
    // Clean up the state on unmount
    useEffect(() => {
