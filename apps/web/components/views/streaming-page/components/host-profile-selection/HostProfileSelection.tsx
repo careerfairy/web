@@ -1,4 +1,4 @@
-import { Box, Container } from "@mui/material"
+import { Box } from "@mui/material"
 import { ReactNode } from "react"
 import { useSpeakerId } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
@@ -19,11 +19,30 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       position: "relative",
-      pb: 4.5,
       bgcolor: "#F7F8FC",
+   },
+   mainContainer: {
+      display: "grid",
+      placeItems: "center",
+      flex: 1,
+      px: {
+         xs: 0,
+         sm: 2,
+      },
    },
    contentContainer: {
       alignItems: "center",
+      backgroundColor: "#FDFDFD",
+      borderRadius: "16px",
+      maxWidth: 770,
+      height: {
+         xs: "100%",
+         sm: "auto",
+      },
+      mt: {
+         xs: 4,
+         sm: 0,
+      },
    },
 })
 
@@ -48,20 +67,22 @@ const Content = () => {
          {(activeView) => (
             <Box sx={styles.root}>
                <SpeakerSelectHeader />
-               <Container>
-                  {activeView === ProfileSelectEnum.SELECT_SPEAKER && (
-                     <SelectSpeakerView />
-                  )}
-                  {activeView === ProfileSelectEnum.CREATE_SPEAKER && (
-                     <CreateSpeakerView />
-                  )}
-                  {activeView === ProfileSelectEnum.EDIT_SPEAKER && (
-                     <EditSpeakerView />
-                  )}
-                  {activeView === ProfileSelectEnum.JOIN_WITH_SPEAKER && (
-                     <JoinWithSpeakerView />
-                  )}
-               </Container>
+               <Box sx={styles.mainContainer}>
+                  <Box sx={styles.contentContainer}>
+                     {activeView === ProfileSelectEnum.SELECT_SPEAKER && (
+                        <SelectSpeakerView />
+                     )}
+                     {activeView === ProfileSelectEnum.CREATE_SPEAKER && (
+                        <CreateSpeakerView />
+                     )}
+                     {activeView === ProfileSelectEnum.EDIT_SPEAKER && (
+                        <EditSpeakerView />
+                     )}
+                     {activeView === ProfileSelectEnum.JOIN_WITH_SPEAKER && (
+                        <JoinWithSpeakerView />
+                     )}
+                  </Box>
+               </Box>
             </Box>
          )}
       </ProfileSelectProvider>
