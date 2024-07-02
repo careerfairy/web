@@ -5,7 +5,6 @@ import {
    AgoraRTMTokenRequest,
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
    CreateLivestreamPollRequest,
    DeleteLivestreamChatEntryRequest,
@@ -54,10 +53,8 @@ import {
    arrayRemove,
    arrayUnion,
    collection,
-   collectionGroup,
    deleteDoc,
    doc,
-   documentId,
    getDoc,
    getDocs,
    increment,
@@ -247,32 +244,6 @@ export class LivestreamService {
       return null
    }
 
-   private async getCreatorDetails(
-      identifier: string
-   ): Promise<StreamerDetails | null> {
-      const creatorQuery = query(
-         collectionGroup(FirestoreInstance, "creators"),
-         where(documentId(), "==", identifier),
-         limit(1)
-      ).withConverter(createGenericConverter<Creator>())
-
-      const snapshot = await getDocs(creatorQuery)
-
-      if (!snapshot.empty) {
-         const data = snapshot.docs[0].data()
-
-         return {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            role: data.position,
-            avatarUrl: data.avatarUrl,
-            linkedInUrl: data.linkedInUrl,
-         }
-      }
-
-      return null
-   }
-
    private async getLivestreamSpeakerDetails(
       speakerId: string,
       livestreamId: string
@@ -324,15 +295,10 @@ export class LivestreamService {
             }
             break
          case STREAM_IDENTIFIERS.SPEAKER:
-            details = await this.getCreatorDetails(identifier)
-
-            if (!details) {
-               // Fallback to the live stream speaker details if no creator details are found
-               details = await this.getLivestreamSpeakerDetails(
-                  identifier,
-                  livestreamId
-               )
-            }
+            details = await this.getLivestreamSpeakerDetails(
+               identifier,
+               livestreamId
+            )
 
             break
          case STREAM_IDENTIFIERS.USER:
@@ -352,14 +318,10 @@ export class LivestreamService {
                this.getTagAndIdentifierFromUid(userUid)
 
             if (userTag === STREAM_IDENTIFIERS.SPEAKER) {
-               details = await this.getCreatorDetails(userIdentifier)
-               if (!details) {
-                  // Fallback to the live stream speaker details if no creator details are found
-                  details = await this.getLivestreamSpeakerDetails(
-                     userIdentifier,
-                     userLivestreamId
-                  )
-               }
+               details = await this.getLivestreamSpeakerDetails(
+                  userIdentifier,
+                  userLivestreamId
+               )
             }
             if (userTag === STREAM_IDENTIFIERS.USER) {
                details = await this.getUserDetails(userIdentifier)
