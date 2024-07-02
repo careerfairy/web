@@ -19,8 +19,10 @@ const styles = sxStyles({
       width: "100%",
    },
 })
-export const EndOfStreamHeader = () => {
+
+export const SpeakerSelectHeader = () => {
    const streamIsMobile = useStreamIsMobile()
+
    return (
       <Header>
          <Stack sx={styles.root}>

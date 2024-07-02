@@ -50,6 +50,7 @@ export interface StreamingAppState {
       activeView: ActiveView
    }
    isHost: boolean
+   speakerId: string | null
    streamLayout: StreamLayout
    settingsMenu: {
       isOpen: boolean
@@ -121,6 +122,7 @@ const initialState: StreamingAppState = {
       activeView: ActiveViews.CHAT, // 'chat', 'polls', 'questions', etc.
    },
    isHost: false,
+   speakerId: null,
    streamLayout: StreamLayouts.GALLERY,
    settingsMenu: {
       isOpen: false,
@@ -394,6 +396,9 @@ const streamingAppSlice = createSlice({
       setIsRecordingBotInRoom(state, action: PayloadAction<boolean>) {
          state.livestreamState.isRecordingBotInRoom = action.payload
       },
+      setSpeakerId(state, action: PayloadAction<string | null>) {
+         state.speakerId = action.payload
+      },
    },
 })
 
@@ -434,6 +439,7 @@ export const {
       setVirtualBackgroundMode,
       setIsRecordingWindow,
       setIsRecordingBotInRoom,
+      setSpeakerId,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
