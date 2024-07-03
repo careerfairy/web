@@ -132,6 +132,8 @@ export const convertToClientModel = (
       topUniversities,
       topFieldsOfStudy,
       levelsOfStudy,
+      topSparksByIndustry,
+      topSparksByAudience,
    } = data
 
    const timeFramesFilters: FilterableTimeFrame[] = [
@@ -211,11 +213,19 @@ export const convertToClientModel = (
                   levelsOfStudy[timeFrame],
                   levelsOfStudyLookup
                ),
+               topSparksByIndustry: mapMostSomethingData(
+                  topSparksByIndustry[timeFrame]
+               ),
+               topSparksByAudience: mapMostSomethingData(
+                  topSparksByAudience[timeFrame]
+               ),
             }
             return acc
          },
          {}
       )
+
+   console.log("🚀 ~ analytics:", analytics)
 
    return analytics
 }
