@@ -10,7 +10,7 @@ import SteppedDialog, {
 import { useEffect, useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
-import { JobDialogStepEnum } from ".."
+import { JobDialogStep } from ".."
 import { basicInfoSchema } from "./schemas"
 
 const styles = sxStyles({
@@ -83,7 +83,7 @@ const JobBasicInfo = () => {
    // Dynamically sets the top position of the dialog element based on mobile view and current step
    if (dialogElement) {
       dialogElement.style.top =
-         isMobile && currentStep === JobDialogStepEnum.FORM_BASIC_INFO
+         isMobile && currentStep === JobDialogStep.FORM_BASIC_INFO.position
             ? styles.mobileDialog.top
             : "revert-layer"
    }
