@@ -9,6 +9,7 @@ This script is designed to migrate the IDs of creators in the Firestore database
    -  Creates a new document in the Firestore database with the new ID and the creator's data.
    -  Deletes the old document that used the creator's email as the ID.
    -  Updates the embedded creator data in all sparks that reference this creator with the new ID and the public data of the creator.
+   -  Updates and replaces the email creator's id in all livestream.creatorIds[] and livestream.speakers[index].id with the new Firestore ID.
 3. Commits all the changes made in the Firestore database as a batch operation.
 
 ## Run
