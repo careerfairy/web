@@ -18,36 +18,9 @@ const styles = sxStyles({
       minHeight: "100vh",
       display: "flex",
       flexDirection: "column",
+      alignItems: "center",
       position: "relative",
       bgcolor: "#F7F8FC",
-   },
-   mainContainer: {
-      display: "grid",
-      placeItems: "center",
-      flex: 1,
-      px: {
-         xs: 0,
-         sm: 2,
-      },
-   },
-   contentContainer: {
-      alignItems: "center",
-      backgroundColor: "#FDFDFD",
-      borderRadius: "16px",
-      maxWidth: 770,
-      maxHeight: {
-         xs: "auto",
-         sm: 637,
-      },
-      overflowY: "auto",
-      height: {
-         xs: "100%",
-         sm: "auto",
-      },
-      mt: {
-         xs: 4,
-         sm: 0,
-      },
    },
 })
 
@@ -73,22 +46,18 @@ const Content = () => {
          {(activeView) => (
             <Box sx={styles.root}>
                <SpeakerSelectHeader />
-               <Box sx={styles.mainContainer}>
-                  <Box sx={styles.contentContainer}>
-                     {activeView === ProfileSelectEnum.SELECT_SPEAKER && (
-                        <SelectSpeakerView />
-                     )}
-                     {activeView === ProfileSelectEnum.CREATE_SPEAKER && (
-                        <CreateSpeakerView />
-                     )}
-                     {activeView === ProfileSelectEnum.EDIT_SPEAKER && (
-                        <EditSpeakerView />
-                     )}
-                     {activeView === ProfileSelectEnum.JOIN_WITH_SPEAKER && (
-                        <JoinWithSpeakerView />
-                     )}
-                  </Box>
-               </Box>
+               {activeView === ProfileSelectEnum.SELECT_SPEAKER && (
+                  <SelectSpeakerView />
+               )}
+               {activeView === ProfileSelectEnum.CREATE_SPEAKER && (
+                  <CreateSpeakerView />
+               )}
+               {activeView === ProfileSelectEnum.EDIT_SPEAKER && (
+                  <EditSpeakerView />
+               )}
+               {activeView === ProfileSelectEnum.JOIN_WITH_SPEAKER && (
+                  <JoinWithSpeakerView />
+               )}
             </Box>
          )}
       </ProfileSelectProvider>
