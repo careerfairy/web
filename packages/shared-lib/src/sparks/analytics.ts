@@ -2,7 +2,7 @@
 
 export type TimeseriesDataPoint = {
    x: string | number
-   y: any
+   y: unknown
 }
 
 export type TimePeriodParams = "7days" | "30days" | "6months" | "1year"
@@ -57,13 +57,15 @@ export type SparksAnalyticsDTO = {
    topUniversities: LinearBarWithPastData
    topFieldsOfStudy: PieChartWithPastData
    levelsOfStudy: PieChartWithPastData
+   topSparksByIndustry: MostSomethingWithPastData
+   topSparksByAudience: MostSomethingWithPastData
 }
 
 // Frontend data types
 
 export type TimeSeriesForCharts = {
    totalCount: number
-   xAxis?: any[]
+   xAxis?: unknown[]
    series?: (number | null)[]
 }
 export type TimeSeriesForChartsWithPastData = WithPastData<TimeSeriesForCharts>
@@ -91,8 +93,14 @@ export type SparkAnalyticsClientAudience = {
    levelsOfStudy: PieChartDataPoint[]
 }
 
+export type SparksAnalyticsClientCompetitor = {
+   topSparksByIndustry: MostSomethingBase
+   topSparksByAudience: MostSomethingBase
+}
+
 export type SparkAnalyticsClient = SparkAnalyticsClientOverview &
-   SparkAnalyticsClientAudience
+   SparkAnalyticsClientAudience &
+   SparksAnalyticsClientCompetitor
 
 export type SparkAnalyticsClientWithPastData =
    WithPastData<SparkAnalyticsClient>
