@@ -9,8 +9,8 @@ import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { AnimatePresence, Variants } from "framer-motion"
 import { Fragment, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
+import { HostProfileButton } from "./HostProfileButton"
 import { useHostProfileSelection } from "./HostProfileSelectionProvider"
-import { SpeakerButton } from "./SpeakerButton"
 
 const styles = sxStyles({
    root: {
@@ -86,7 +86,7 @@ export const SpeakersList = () => {
             <AnimatePresence>
                {Boolean(userData?.isAdmin) && (
                   <FramerBox sx={styles.item}>
-                     <SpeakerButton
+                     <HostProfileButton
                         onClick={() => joinLiveStreamWithUser(userData.authId)}
                         speaker={{
                            avatar: cfLogo,
@@ -106,10 +106,10 @@ export const SpeakersList = () => {
                      animate={itemVariants.visible}
                      exit={itemVariants.exit}
                   >
-                     <SpeakerButton
+                     <HostProfileButton
                         onClick={() => selectSpeaker(speaker)}
                         speaker={speaker}
-                        greyedOut={isSpeakerInUse(speaker, remoteUsers)}
+                        profileInUse={isSpeakerInUse(speaker, remoteUsers)}
                      />
                   </FramerBox>
                ))}
