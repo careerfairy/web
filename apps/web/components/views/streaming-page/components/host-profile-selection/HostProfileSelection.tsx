@@ -1,6 +1,6 @@
 import { Box } from "@mui/material"
 import { ReactNode } from "react"
-import { useSpeakerId } from "store/selectors/streamingAppSelectors"
+import { useSpeakerId, useUserUid } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import {
    ProfileSelectEnum,
@@ -58,8 +58,9 @@ type Props = {
 
 export const HostProfileSelection = ({ children, isHost }: Props) => {
    const speakerId = useSpeakerId()
+   const userUid = useUserUid()
 
-   if (!speakerId && isHost) {
+   if (!speakerId && !userUid && isHost) {
       return <Content />
    }
 

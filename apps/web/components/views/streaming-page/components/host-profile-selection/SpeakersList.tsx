@@ -1,8 +1,10 @@
 import { Speaker } from "@careerfairy/shared-lib/livestreams"
 import { Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { IAgoraRTCRemoteUser, useRemoteUsers } from "agora-rtc-react"
 import { useLivestreamData } from "components/custom-hook/streaming"
 import FramerBox from "components/views/common/FramerBox"
+import { cfLogo } from "constants/images"
 import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { AnimatePresence, Variants } from "framer-motion"
 import { Fragment, useMemo } from "react"
@@ -54,7 +56,8 @@ export const buildAgoraSpeakerId = (speakerId: string, streamId: string) => {
 }
 
 export const SpeakersList = () => {
-   const { selectSpeaker } = useHostProfileSelection()
+   const { userData } = useAuth()
+   const { selectSpeaker, joinLiveStreamWithUser } = useHostProfileSelection()
    const livestream = useLivestreamData()
    const remoteUsers = useRemoteUsers()
 
@@ -81,7 +84,20 @@ export const SpeakersList = () => {
          </Typography>
          <FramerBox variants={containerVariants} sx={styles.root}>
             <AnimatePresence>
-               {speakers.map((speaker) => (
+               {Boolean(userData?.isAdmin) && (
+                  <FramerBox sx={styles.item}>
+                     <SpeakerButton
+                        onClick={() => joinLiveStreamWithUser(userData.authId)}
+                        speaker={{
+                           avatar: cfLogo,
+                           firstName: userData.firstName,
+                           lastName: userData.lastName,
+                           id: userData.id,
+                        }}
+                     />
+                  </FramerBox>
+               )}
+               {speakers.slice(0, 7).map((speaker) => (
                   <FramerBox
                      key={speaker.id}
                      sx={styles.item}

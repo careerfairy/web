@@ -46,7 +46,7 @@ const styles = sxStyles({
 
 type Props = {
    onClick: ButtonBaseProps["onClick"]
-   speaker: Speaker
+   speaker: Pick<Speaker, "id" | "firstName" | "lastName" | "avatar">
    greyedOut?: boolean
 }
 

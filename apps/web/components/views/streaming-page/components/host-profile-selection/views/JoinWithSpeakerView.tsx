@@ -5,7 +5,7 @@ import { useHostProfileSelection } from "../HostProfileSelectionProvider"
 const styles = sxStyles({ root: {} })
 
 export const JoinWithSpeakerView = () => {
-   const { goBackToSelectSpeaker, selectedSpeaker, joinLiveStream } =
+   const { goBackToSelectSpeaker, selectedSpeaker, joinLiveStreamWithSpeaker } =
       useHostProfileSelection()
 
    return (
@@ -13,7 +13,7 @@ export const JoinWithSpeakerView = () => {
          <Button onClick={goBackToSelectSpeaker}>Back</Button>
          <Button
             onClick={() => {
-               joinLiveStream(selectedSpeaker?.id)
+               joinLiveStreamWithSpeaker(selectedSpeaker?.id)
             }}
          >
             Join live stream
