@@ -221,7 +221,7 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
             isInitial: false,
             section: "videos",
          },
-         ...(this.featureFlags.mentorsV1
+         ...(this.featureFlags?.mentorsV1
             ? [
                  {
                     label: "Add a mentor",

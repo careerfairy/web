@@ -31,16 +31,16 @@ const styles = sxStyles({
 })
 const CompanyGroupInfo = ({ companyGroupData }: Props) => {
    const featureFlags = useFeatureFlags()
-   const { data: mentorsData } = useGroupCreators(companyGroupData.id)
+   const { data: creators } = useGroupCreators(companyGroupData?.id)
    const showCompanyPageCta = useMemo(() => {
       const presenter = GroupPresenter.createFromDocument(companyGroupData)
-      presenter.setHasMentor(mentorsData?.length > 0)
+      presenter.setHasMentor(creators?.length > 0)
       presenter.setFeatureFlags(featureFlags)
 
       return Boolean(
          companyGroupData.publicProfile && presenter.companyPageIsReady()
       )
-   }, [companyGroupData, featureFlags, mentorsData])
+   }, [companyGroupData, featureFlags, creators])
 
    return (
       <Box>

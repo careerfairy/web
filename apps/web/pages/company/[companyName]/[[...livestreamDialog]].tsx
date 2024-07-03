@@ -103,7 +103,7 @@ export const getStaticProps: GetStaticProps<{
             } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx)
 
             const creators = await groupRepo.getCreators(
-               serverSideGroup.groupId
+               serverSideGroup?.groupId
             )
 
             return {
@@ -119,7 +119,7 @@ export const getStaticProps: GetStaticProps<{
                         LivestreamPresenter.serializeDocument
                      ) || [],
                   livestreamDialogData,
-                  groupCreators: creators.map(pickPublicDataFromCreator) || [],
+                  groupCreators: creators?.map(pickPublicDataFromCreator) || [],
                },
                revalidate: 60,
             }

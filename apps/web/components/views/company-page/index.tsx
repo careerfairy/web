@@ -4,7 +4,6 @@ import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Container, Grid, Stack } from "@mui/material"
-import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { doc } from "firebase/firestore"
@@ -135,8 +134,6 @@ const CompanyPageOverview = ({
       listenToPastEvents: true,
    })
 
-   const { data: contextMentors } = useGroupCreators(group.id)
-
    const aboutSectionRef = useRef<HTMLElement>(null)
    const testimonialSectionRef = useRef<HTMLElement>(null)
    const eventSectionRef = useRef<HTMLElement>(null)
@@ -147,14 +144,14 @@ const CompanyPageOverview = ({
       presenter.setHasLivestream(
          Boolean((contextUpcomingLivestream || upcomingLivestreams)?.length > 0)
       )
-      presenter.setHasMentor(Boolean(contextMentors?.length > 0))
+      presenter.setHasMentor(Boolean(groupCreators?.length > 0))
       presenter.setFeatureFlags(featureFlags)
       return presenter
    }, [
       contextGroup,
-      contextMentors?.length,
       contextUpcomingLivestream,
       featureFlags,
+      groupCreators?.length,
       upcomingLivestreams,
    ])
 

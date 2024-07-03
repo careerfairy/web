@@ -31,18 +31,18 @@ const useGroupCompanyPageProgress = (group: Group): Progress | null => {
       }
    )
 
-   const { data: mentorsData } = useGroupCreators(group.id)
+   const { data: creators } = useGroupCreators(group?.id)
 
    return useMemo(() => {
       if (!livestreamsData) return null // still loading
 
       const presenter = GroupPresenter.createFromDocument(group)
       presenter.setHasLivestream(livestreamsData.length > 0) // set the hasLivestream flag
-      presenter.setHasMentor(mentorsData.length > 0) // set the hasMentor flag
+      presenter.setHasMentor(creators.length > 0) // set the hasMentor flag
       presenter.setFeatureFlags(featureFlags)
 
       return presenter.getCompanyPageProgress()
-   }, [livestreamsData, mentorsData, featureFlags, group])
+   }, [livestreamsData, creators, featureFlags, group])
 }
 
 type Progress = ReturnType<GroupPresenter["getCompanyPageProgress"]>
