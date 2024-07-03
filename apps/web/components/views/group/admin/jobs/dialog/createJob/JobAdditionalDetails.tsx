@@ -1,3 +1,6 @@
+import {
+   CustomJob
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid, Typography } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
@@ -77,6 +80,7 @@ const styles = sxStyles({
 
 type Props = {
    quillInputRef: MutableRefObject<any>
+   job: CustomJob
 }
 
 const JobAdditionalDetails = ({ quillInputRef }: Props) => {
