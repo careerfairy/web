@@ -1,3 +1,6 @@
+import {
+   CustomJob
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid, Typography } from "@mui/material"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
@@ -69,9 +72,10 @@ const styles = sxStyles({
 
 type Props = {
    quillInputRef: MutableRefObject<any>
+   job: CustomJob
 }
 
-const JobAdditionalDetails = ({ quillInputRef }: Props) => {
+const JobAdditionalDetails = ({ quillInputRef, job }: Props) => {
    const [stepIsValid, setStepIsValid] = useState(false)
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
