@@ -89,7 +89,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const featureFlags = useFeatureFlags()
 
    const { group, stats } = useAdminGroup(groupId)
-   const { data: mentorsData } = useGroupCreators(groupId)
+
+   const { data: creators } = useGroupCreators(group?.id)
 
    const { errorNotification } = useSnackbarNotifications()
 
@@ -189,11 +190,11 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       if (!group) return null
 
       const presenter = GroupPresenter.createFromDocument(group)
-      presenter.setHasMentor(mentorsData?.length > 0)
       presenter.setFeatureFlags(featureFlags)
+      presenter.setHasMentor(creators?.length > 0)
 
       return presenter
-   }, [featureFlags, group, mentorsData])
+   }, [creators?.length, featureFlags, group])
 
    const livestreamDialog = useLivestreamDialog(group)
 

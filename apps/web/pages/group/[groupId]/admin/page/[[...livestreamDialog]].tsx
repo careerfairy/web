@@ -76,7 +76,7 @@ export const getServerSideProps: GetServerSideProps<{
          livestreamDialogData,
       } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, context)
 
-      const creators = await groupRepo.getCreators(serverSideGroup.groupId)
+      const creators = await groupRepo.getCreators(serverSideGroup?.groupId)
 
       return {
          props: {
@@ -90,7 +90,7 @@ export const getServerSideProps: GetServerSideProps<{
                   LivestreamPresenter.serializeDocument
                ) || [],
             livestreamDialogData,
-            groupCreators: creators.map(pickPublicDataFromCreator) || [],
+            groupCreators: creators?.map(pickPublicDataFromCreator) || [],
          },
       }
    } catch (e) {
