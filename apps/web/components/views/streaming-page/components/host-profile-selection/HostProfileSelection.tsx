@@ -35,7 +35,10 @@ const styles = sxStyles({
       backgroundColor: "#FDFDFD",
       borderRadius: "16px",
       maxWidth: 770,
-      maxHeight: 637,
+      maxHeight: {
+         xs: "auto",
+         sm: 637,
+      },
       overflowY: "auto",
       height: {
          xs: "100%",
