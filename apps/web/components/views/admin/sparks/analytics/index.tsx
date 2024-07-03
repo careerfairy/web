@@ -7,6 +7,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
+import { SparksCompetitorTab } from "./competitor-tab/SparksCompetitorTab"
 import { LockedSparksAnalytics } from "./components/LockedSparksAnalytics"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
 import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
@@ -111,6 +112,7 @@ const GroupSparkAnalytics = () => {
             >
                <Tab label="Overview" value="overview" />
                <Tab label="Audience" value="audience" />
+               <Tab label="Competitor" value="competitor" />
             </Tabs>
             <Box component="span" sx={styles.mobileLimiter} />
             <ResponsiveSelectWithDrawer
@@ -128,6 +130,9 @@ const GroupSparkAnalytics = () => {
             )}
             {tabValue === "audience" && (
                <SparksAudienceTab timeFilter={selectTimeFilter} />
+            )}
+            {tabValue === "competitor" && (
+               <SparksCompetitorTab timeFilter={selectTimeFilter} />
             )}
          </Box>
       </Box>
