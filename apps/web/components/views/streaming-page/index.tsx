@@ -11,9 +11,16 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import { useSpeakerId } from "store/selectors/streamingAppSelectors"
-import { HostProfileSelection } from "./components/host-profile-selection/HostProfileSelection"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/waiting-room/WaitingRoom"
+
+const HostProfileSelection = dynamic(
+   () =>
+      import("./components/host-profile-selection/HostProfileSelection").then(
+         (mod) => mod.HostProfileSelection
+      ),
+   { ssr: false }
+)
 
 const EndOfStream = dynamic(
    () =>
