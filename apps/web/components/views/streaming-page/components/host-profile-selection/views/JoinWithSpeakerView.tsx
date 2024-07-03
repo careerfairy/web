@@ -1,23 +1,46 @@
 import { Box, Button } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
+import { getStreamerDisplayName } from "components/views/streaming-page/util"
 import { useHostProfileSelection } from "../HostProfileSelectionProvider"
-
-const styles = sxStyles({ root: {} })
+import { View } from "../View"
 
 export const JoinWithSpeakerView = () => {
    const { goBackToSelectSpeaker, selectedSpeaker, joinLiveStreamWithSpeaker } =
       useHostProfileSelection()
 
    return (
-      <Box sx={styles.root}>
-         <Button onClick={goBackToSelectSpeaker}>Back</Button>
-         <Button
-            onClick={() => {
-               joinLiveStreamWithSpeaker(selectedSpeaker?.id)
-            }}
-         >
-            Join live stream
-         </Button>
-      </Box>
+      <View>
+         <View.Content>
+            <View.Title>
+               Hello{" "}
+               <Box color="primary.main" component="span">
+                  {getStreamerDisplayName(
+                     selectedSpeaker?.firstName,
+                     selectedSpeaker?.lastName
+                  )}
+               </Box>
+            </View.Title>
+            <View.Subtitle>
+               Whenever you’re ready to join, click on the button below
+            </View.Subtitle>
+         </View.Content>
+         <View.Actions>
+            <Button
+               color="grey"
+               variant="outlined"
+               onClick={goBackToSelectSpeaker}
+            >
+               Back
+            </Button>
+            <Button
+               variant="contained"
+               color="primary"
+               onClick={() => {
+                  joinLiveStreamWithSpeaker(selectedSpeaker?.id)
+               }}
+            >
+               Join live stream
+            </Button>
+         </View.Actions>
+      </View>
    )
 }
