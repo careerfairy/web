@@ -1,4 +1,5 @@
-import { Box } from "@mui/material"
+import FramerBox from "components/views/common/FramerBox"
+import { AnimatePresence } from "framer-motion"
 import { ReactNode } from "react"
 import { useSpeakerId, useUserUid } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
@@ -22,6 +23,18 @@ const styles = sxStyles({
       position: "relative",
       bgcolor: "#F7F8FC",
    },
+   view: {
+      my: "auto",
+      mt: {
+         xs: 2,
+         sm: "auto",
+      },
+
+      mx: {
+         xs: 0,
+         sm: 2,
+      },
+   },
 })
 
 type Props = {
@@ -44,22 +57,58 @@ const Content = () => {
    return (
       <ProfileSelectProvider>
          {(activeView) => (
-            <Box sx={styles.root}>
+            <FramerBox sx={styles.root}>
                <SpeakerSelectHeader />
-               {activeView === ProfileSelectEnum.SELECT_SPEAKER && (
-                  <SelectSpeakerView />
-               )}
-               {activeView === ProfileSelectEnum.CREATE_SPEAKER && (
-                  <CreateSpeakerView />
-               )}
-               {activeView === ProfileSelectEnum.EDIT_SPEAKER && (
-                  <EditSpeakerView />
-               )}
-               {activeView === ProfileSelectEnum.JOIN_WITH_SPEAKER && (
-                  <JoinWithSpeakerView />
-               )}
-            </Box>
+               <AnimatePresence mode="wait">
+                  <ViewFramerBox
+                     activeView={activeView}
+                     viewEnum={ProfileSelectEnum.SELECT_SPEAKER}
+                     viewComponent={<SelectSpeakerView />}
+                  />
+                  <ViewFramerBox
+                     activeView={activeView}
+                     viewEnum={ProfileSelectEnum.CREATE_SPEAKER}
+                     viewComponent={<CreateSpeakerView />}
+                  />
+                  <ViewFramerBox
+                     activeView={activeView}
+                     viewEnum={ProfileSelectEnum.EDIT_SPEAKER}
+                     viewComponent={<EditSpeakerView />}
+                  />
+                  <ViewFramerBox
+                     activeView={activeView}
+                     viewEnum={ProfileSelectEnum.JOIN_WITH_SPEAKER}
+                     viewComponent={<JoinWithSpeakerView />}
+                  />
+               </AnimatePresence>
+            </FramerBox>
          )}
       </ProfileSelectProvider>
+   )
+}
+
+type ViewFramerBoxProps = {
+   activeView: ProfileSelectEnum
+   viewEnum: ProfileSelectEnum
+   viewComponent: ReactNode
+}
+
+const ViewFramerBox = ({
+   activeView,
+   viewEnum,
+   viewComponent,
+}: ViewFramerBoxProps) => {
+   return (
+      activeView === viewEnum && (
+         <FramerBox
+            key={viewEnum}
+            sx={styles.view}
+            initial={{ opacity: 0, x: -100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+         >
+            {viewComponent}
+         </FramerBox>
+      )
    )
 }
