@@ -1,6 +1,13 @@
-import { Box, Typography, TypographyProps } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import FramerBox from "components/views/common/FramerBox"
+import {
+   useStartsAt,
+   useStreamTitle,
+} from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
+import DateUtil from "util/DateUtil"
 import { HostDetails } from "../../HostDetails"
 import { SpeakersList } from "../SpeakersList"
 
@@ -12,48 +19,79 @@ const styles = sxStyles({
    },
    rootMobile: {
       px: 2,
+      py: 3,
    },
    rootDesktop: {
       p: 4,
    },
-   title: {
+   heading: {
       fontWeight: 700,
       textAlign: "center",
+      mt: {
+         xs: 2,
+         md: 3,
+      },
+   },
+   subHeading: {
+      color: "neutral.800",
+      textAlign: "center",
+      ...getMaxLineStyles(2),
+      mb: {
+         xs: 3.5,
+         md: 4,
+      },
    },
 })
 
 export const SelectSpeakerView = () => {
    const streamIsMobile = useStreamIsMobile()
    return (
-      <Box
+      <FramerBox
          sx={[
             styles.root,
             streamIsMobile ? styles.rootMobile : styles.rootDesktop,
          ]}
       >
          <HostDetails />
-         <Title>
-            Welcome to your{" "}
-            <Box component="span" color="primary.main">
-               stream
-            </Box>
-            :
-         </Title>
+         <StartDate />
+         <Heading />
+         <SubHeading />
          <SpeakersList />
-      </Box>
+      </FramerBox>
    )
 }
 
-const Title = ({ children, ...props }: TypographyProps) => {
+const Heading = () => {
    const streamIsMobile = useStreamIsMobile()
 
    return (
       <Typography
-         sx={styles.title}
+         sx={styles.heading}
          variant={streamIsMobile ? "desktopBrandedH3" : "mobileBrandedH2"}
-         {...props}
       >
-         {children}
+         Welcome to your{" "}
+         <Box component="span" color="primary.main">
+            stream
+         </Box>
+         :
+      </Typography>
+   )
+}
+
+const SubHeading = () => {
+   const streamTitle = useStreamTitle()
+   return (
+      <Typography sx={styles.subHeading} variant="brandedH5">
+         {streamTitle}
+      </Typography>
+   )
+}
+
+const StartDate = () => {
+   const startsAt = useStartsAt()
+   return (
+      <Typography variant="small" color="neutral.700">
+         Starting on: {DateUtil.formatDateTime(startsAt)}
       </Typography>
    )
 }
