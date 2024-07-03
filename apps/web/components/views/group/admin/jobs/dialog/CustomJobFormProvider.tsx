@@ -1,31 +1,25 @@
 import { getBusinessTagsByIds } from "@careerfairy/shared-lib/constants/tags"
-import { CUSTOM_JOB_CONSTANTS } from "@careerfairy/shared-lib/customJobs/constants"
 import {
    CustomJob,
    JobType,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { yupResolver } from "@hookform/resolvers/yup"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { customJobRepo } from "data/RepositoryInstances"
-import { Timestamp } from "data/firebase/FirebaseInstance"
-import { Formik } from "formik"
+import { Timestamp } from "firebase/firestore"
 import { MutableRefObject, ReactNode, useCallback } from "react"
+import { FormProvider, useForm } from "react-hook-form"
 import { useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "store/selectors/adminJobsSelectors"
 import { v4 as uuidv4 } from "uuid"
-import * as Yup from "yup"
 import {
    AdditionalInfoValues,
    BasicInfoValues,
    JobFormValues,
-} from "./createJob/types"
-
-const jobFormValidationSchema = (quillRef) =>
-   Yup.object().shape({
-      basicInfo: basicInfoSchema,
-      additionalInfo: additionalInfoSchema(quillRef),
-   })
+   schema,
+} from "./createJob/schemas"
 
 type Props = {
    job: CustomJob
@@ -59,7 +53,7 @@ const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
       groupId: groupId,
       basicInfo: {
          title: "",
-         jobType: "",
+         jobType: null,
          businessTags: [],
       },
       additionalInfo: {
@@ -72,7 +66,7 @@ const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
    }
 }
 
-const JobFormikProvider = ({
+const CustomJobFormProvider = ({
    job,
    children,
    quillInputRef,
@@ -101,7 +95,7 @@ const JobFormikProvider = ({
                id,
                groupId,
                businessFunctionsTagIds,
-               jobType: jobType as JobType,
+               jobType: jobType.value as JobType,
                deadline: Timestamp.fromDate(deadline),
                postingUrl:
                   postingUrl.indexOf("http") === 0
@@ -141,65 +135,25 @@ const JobFormikProvider = ({
       ]
    )
 
+   const formMethods = useForm<JobFormValues>({
+      resolver: yupResolver(schema(quillInputRef)),
+      defaultValues: getInitialValues(job, group.groupId),
+      mode: "onChange",
+   })
+
    return (
-      <Formik<JobFormValues>
-         initialValues={getInitialValues(job, group.groupId)}
-         onSubmit={handleSubmit}
-         validationSchema={() => jobFormValidationSchema(quillInputRef)}
-      >
-         {children}
-      </Formik>
+      <FormProvider {...formMethods}>
+         <form
+            id="custom-job-form"
+            onSubmit={formMethods.handleSubmit(handleSubmit)}
+         >
+            {children}
+         </form>
+      </FormProvider>
    )
 }
 
-export default JobFormikProvider
-
-const groupOptionShape = Yup.object().shape({
-   id: Yup.string().required(),
-   name: Yup.string().required(),
-})
-
-export const basicInfoSchema = Yup.object().shape({
-   title: Yup.string().required("Job title is required"),
-   jobType: Yup.string(),
-   businessTags: Yup.array()
-      .of(groupOptionShape)
-      .min(
-         CUSTOM_JOB_CONSTANTS.MIN_BUSINESS_TAGS,
-         `Must select at least ${CUSTOM_JOB_CONSTANTS.MIN_BUSINESS_TAGS} business option`
-      )
-      .required("Business option is required"),
-})
-
-const additionalInfoSchema = (quillRef) =>
-   Yup.object().shape({
-      salary: Yup.string(),
-      description: Yup.string()
-         .transform(() =>
-            quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")
-         ) //ReactQuill appends a new line to text
-         .required("Description is required")
-         .min(
-            CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH,
-            `Must be at least ${CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH} characters`
-         )
-         .max(
-            CUSTOM_JOB_CONSTANTS.MAX_DESCRIPTION_LENGTH,
-            `Must be less than ${CUSTOM_JOB_CONSTANTS.MAX_DESCRIPTION_LENGTH} characters`
-         ),
-      postingUrl: Yup.string()
-         .url("Invalid URL")
-         .required("Job posting URL is required"),
-      noDateValidation: Yup.boolean(),
-      deadline: Yup.date()
-         .when("noDateValidation", {
-            is: false,
-            then: Yup.date()
-               .nullable()
-               .min(new Date(), "The date must be in the future"),
-         })
-         .required("Application deadline is required"),
-   })
+export default CustomJobFormProvider
 
 const mapBasicInfo = ({
    title,
@@ -207,7 +161,7 @@ const mapBasicInfo = ({
    businessFunctionsTagIds,
 }: CustomJob): BasicInfoValues => ({
    title,
-   jobType,
+   jobType: { value: jobType, label: jobType, id: jobType },
    businessTags: getBusinessTagsByIds(businessFunctionsTagIds),
 })
 
