@@ -220,8 +220,7 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
 
    const handleCloseDialog = useCallback(() => {
       dispatch(closeJobsDialog())
-      resetForm()
-   }, [dispatch, resetForm])
+   }, [dispatch])
 
    const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
