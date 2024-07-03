@@ -27,19 +27,11 @@ const styles = sxStyles({
       maxHeight: {
          sm: 694,
       },
-      my: "auto",
       flex: {
          xs: 1,
          sm: 0,
       },
-      mt: {
-         xs: 2,
-         sm: "auto",
-      },
-      mx: {
-         xs: 0,
-         sm: 2,
-      },
+
       p: "0px !important",
       background: "#FCFCFC",
    },
