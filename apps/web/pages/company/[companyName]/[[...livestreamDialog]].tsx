@@ -64,8 +64,8 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                ref={viewRef}
             >
                <CompanyPageOverview
-                  groupCreators={groupCreators}
                   group={serverSideGroup}
+                  groupCreators={groupCreators}
                   upcomingLivestreams={mapFromServerSide(
                      serverSideUpcomingLivestreams
                   )}
