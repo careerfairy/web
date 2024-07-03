@@ -2,17 +2,16 @@ import { BusinessFunctionsTagValues } from "@careerfairy/shared-lib/constants/ta
 import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { getTextFieldProps } from "components/helperFunctions/streamFormFunctions"
-import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
-import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
+import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
+import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
-import { useFormikContext } from "formik"
+import { useEffect, useState } from "react"
+import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { JobDialogStepEnum } from ".."
-import { basicInfoSchema } from "../CustomJobFormikProvider"
-import { JobFormValues } from "./types"
+import { basicInfoSchema } from "./schemas"
 
 const styles = sxStyles({
    container: {
@@ -52,17 +51,36 @@ const styles = sxStyles({
 })
 
 const JobBasicInfo = () => {
+   const [stepIsValid, setStepIsValid] = useState(false)
+
    const { moveToNext, currentStep } = useStepper()
    const isMobile = useIsMobile()
    const {
-      values: { basicInfo: basicInfoValues },
-      setFieldValue,
-      errors: { basicInfo: basicInfoErrors = {} },
-      touched: { basicInfo: basicInfoTouched = {} },
-   } = useFormikContext<JobFormValues>()
+      formState: { isSubmitting },
+      watch,
+   } = useFormContext()
+   const watchFields = watch([
+      "basicInfo.title",
+      "basicInfo.jobType",
+      "basicInfo.businessTags",
+   ])
+
+   // This effect validates the basic info fields and updates the step validity state
+   useEffect(() => {
+      const [title, jobType, businessTags] = watchFields
+
+      const fieldsToValidate = {
+         title,
+         jobType,
+         businessTags,
+      }
+
+      setStepIsValid(basicInfoSchema.isValidSync(fieldsToValidate))
+   }, [watchFields])
 
    const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
 
+   // Dynamically sets the top position of the dialog element based on mobile view and current step
    if (dialogElement) {
       dialogElement.style.top =
          isMobile && currentStep === JobDialogStepEnum.FORM_BASIC_INFO
@@ -92,62 +110,47 @@ const JobBasicInfo = () => {
 
                   <Grid container spacing={2} sx={styles.form}>
                      <Grid xs={12} item>
-                        <FormBrandedTextField
+                        <ControlledBrandedTextField
                            name="basicInfo.title"
-                           label="Job Title (required)"
-                           placeholder="E.g., Mechanical Engineer"
+                           label="Job Title"
                            fullWidth
+                           requiredText="(required)"
+                           disabled={isSubmitting}
                         />
                      </Grid>
 
                      <Grid xs={12} item>
-                        <BrandedAutocomplete
-                           id={"jobType"}
+                        <ControlledBrandedAutoComplete
+                           label="Job Type"
+                           name="basicInfo.jobType"
                            options={jobTypeOptions}
-                           defaultValue={basicInfoValues.jobType}
-                           getOptionLabel={(option) => option.label || ""}
-                           isOptionEqualToValue={(option, value) =>
-                              option.value === value.value
-                           }
-                           value={getValue(basicInfoValues.jobType)}
-                           disableClearable
-                           textFieldProps={getTextFieldProps(
-                              "Job Type",
-                              "jobType",
-                              basicInfoTouched,
-                              basicInfoErrors
-                           )}
-                           onChange={(_, selected) =>
-                              setFieldValue(
-                                 "basicInfo.jobType",
-                                 selected?.value
-                              )
-                           }
+                           autocompleteProps={{
+                              id: "jobType",
+                              disabled: isSubmitting,
+                              autoHighlight: true,
+                              disableClearable: true,
+                           }}
                         />
                      </Grid>
 
                      <Grid xs={12} item>
-                        <BrandedAutocomplete
-                           id={"businessTags"}
+                        <ControlledBrandedAutoComplete
+                           label="Business function"
+                           name={"basicInfo.businessTags"}
                            options={BusinessFunctionsTagValues}
-                           defaultValue={basicInfoValues.businessTags}
-                           getOptionLabel={(option) => option.name || ""}
-                           isOptionEqualToValue={(option, value) =>
-                              option.id === value.id
-                           }
-                           value={basicInfoValues.businessTags}
-                           disableCloseOnSelect
                            multiple
                            limit={5}
-                           textFieldProps={getTextFieldProps(
-                              "Business function (required)",
-                              "businessTags",
-                              basicInfoTouched,
-                              basicInfoErrors
-                           )}
-                           onChange={(_, selected) =>
-                              setFieldValue("basicInfo.businessTags", selected)
-                           }
+                           autocompleteProps={{
+                              id: "businessTags",
+                              disabled: isSubmitting,
+                              autoHighlight: true,
+                              disableCloseOnSelect: true,
+                              getOptionLabel: (option: any) =>
+                                 option.name || "",
+                           }}
+                           textFieldProps={{
+                              requiredText: "(required)",
+                           }}
                         />
                      </Grid>
                   </Grid>
@@ -159,7 +162,7 @@ const JobBasicInfo = () => {
                   variant="contained"
                   color="secondary"
                   onClick={moveToNext}
-                  disabled={!basicInfoSchema.isValidSync(basicInfoValues)}
+                  disabled={!stepIsValid}
                >
                   Next
                </SteppedDialog.Button>
@@ -168,8 +171,5 @@ const JobBasicInfo = () => {
       </SteppedDialog.Container>
    )
 }
-
-const getValue = (value: string) =>
-   value ? { value: value, label: value } : null
 
 export default JobBasicInfo

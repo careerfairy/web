@@ -6,7 +6,6 @@ import { CircularProgress } from "@mui/material"
 import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import { useFormikContext } from "formik"
 import dynamic from "next/dynamic"
 import { MutableRefObject, useCallback, useMemo, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -21,12 +20,11 @@ import { sxStyles } from "../../../../../../types/commonTypes"
 import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
 import SteppedDialog from "../../../../stepped-dialog/SteppedDialog"
-import JobFormikProvider from "./CustomJobFormikProvider"
+import CustomJobFormProvider from "./CustomJobFormProvider"
 import NoLinkedContentDialog from "./additionalSteps/NoLinkedContentDialog"
 import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
 import JobBasicInfo from "./createJob/JobBasicInfo"
 import JobFormDialog from "./createJob/JobFormDialog"
-import { JobFormValues } from "./createJob/types"
 import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
 export type JobDialogStep = ReturnType<typeof getViews>[number]["key"]
@@ -116,7 +114,7 @@ const JobDialog = ({ afterCreateCustomJob, afterUpdateCustomJob }: Props) => {
       <SuspenseWithBoundary fallback={<CircularProgress />}>
          <JobFetchWrapper jobId={selectedJobId}>
             {(job) => (
-               <JobFormikProvider
+               <CustomJobFormProvider
                   job={job}
                   quillInputRef={quillInputRef}
                   afterCreateCustomJob={
@@ -127,7 +125,7 @@ const JobDialog = ({ afterCreateCustomJob, afterUpdateCustomJob }: Props) => {
                   }
                >
                   <Content job={job} quillInputRef={quillInputRef} />
-               </JobFormikProvider>
+               </CustomJobFormProvider>
             )}
          </JobFetchWrapper>
       </SuspenseWithBoundary>
@@ -149,12 +147,10 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
       deleteJobWithLinkedLivestreamsDialogOpenSelector
    )
    const { jobHubV1 } = useFeatureFlags()
-   const { resetForm } = useFormikContext<JobFormValues>()
 
    const handleCloseDialog = useCallback(() => {
       dispatch(closeJobsDialog())
-      resetForm()
-   }, [dispatch, resetForm])
+   }, [dispatch])
 
    const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
