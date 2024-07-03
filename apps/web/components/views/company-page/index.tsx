@@ -1,7 +1,7 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Container, Grid, Stack } from "@mui/material"
 import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
@@ -39,12 +39,14 @@ type Props = {
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
    pastLivestreams: LivestreamEvent[]
+   groupCreators: PublicCreator[]
 }
 
 export const TabValue = {
    profile: "profile-section",
    media: "media-section",
    testimonials: "testimonials-section",
+   mentors: "mentors-section",
    livesStreams: "livesStreams-section",
    banner: "banner-section",
    video: "video-section",
@@ -60,6 +62,8 @@ export const getTabLabel = (tabId: TabValueType) => {
          return "Media"
       case TabValue.testimonials:
          return "Testimonials"
+      case TabValue.mentors:
+         return "Mentors"
       case TabValue.livesStreams:
          return "Live Streams"
       default:
@@ -77,7 +81,7 @@ export type SectionRefs = {
 type ICompanyPageContext = {
    group: Group
    groupPresenter: GroupPresenter
-   groupCreators: Creator[]
+   groupCreators: PublicCreator[]
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
    pastLivestreams: LivestreamEvent[]
@@ -104,8 +108,10 @@ const CompanyPageOverview = ({
    editMode,
    upcomingLivestreams,
    pastLivestreams,
+   groupCreators,
 }: Props) => {
-   const { mentorsV1 } = useFeatureFlags()
+   const featureFlags = useFeatureFlags()
+   const { mentorsV1 } = featureFlags
    const { isLoggedIn, isLoggedOut } = useAuth()
    const isMobile = useIsMobile()
    const groupRef = useMemo(
@@ -120,8 +126,6 @@ const CompanyPageOverview = ({
       initialData: group,
    })
 
-   const { data: groupCreators } = useGroupCreators(group.id)
-
    const contextUpcomingLivestream = useListenToStreams({
       filterByGroupId: group.groupId,
    })
@@ -130,6 +134,8 @@ const CompanyPageOverview = ({
       filterByGroupId: group.groupId,
       listenToPastEvents: true,
    })
+
+   const { data: contextMentors } = useGroupCreators(group.id)
 
    const aboutSectionRef = useRef<HTMLElement>(null)
    const testimonialSectionRef = useRef<HTMLElement>(null)
@@ -141,8 +147,16 @@ const CompanyPageOverview = ({
       presenter.setHasLivestream(
          Boolean((contextUpcomingLivestream || upcomingLivestreams)?.length > 0)
       )
+      presenter.setHasMentor(Boolean(contextMentors?.length > 0))
+      presenter.setFeatureFlags(featureFlags)
       return presenter
-   }, [contextGroup, contextUpcomingLivestream, upcomingLivestreams])
+   }, [
+      contextGroup,
+      contextMentors?.length,
+      contextUpcomingLivestream,
+      featureFlags,
+      upcomingLivestreams,
+   ])
 
    useEffect(() => {
       const isPublicProfile = presenter.companyPageIsReady()
