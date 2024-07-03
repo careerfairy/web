@@ -1,7 +1,10 @@
+import { Speaker } from "@careerfairy/shared-lib/livestreams"
 import { Typography } from "@mui/material"
+import { IAgoraRTCRemoteUser, useRemoteUsers } from "agora-rtc-react"
 import { useLivestreamData } from "components/custom-hook/streaming"
 import FramerBox from "components/views/common/FramerBox"
-import { Variants } from "framer-motion"
+import { STREAM_IDENTIFIERS } from "constants/streaming"
+import { AnimatePresence, Variants } from "framer-motion"
 import { Fragment, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useHostProfileSelection } from "./HostProfileSelectionProvider"
@@ -26,6 +29,7 @@ const styles = sxStyles({
    heading: {
       color: "neutral.700",
       mb: 2.5,
+      textAlign: "center",
    },
 })
 
@@ -39,14 +43,20 @@ const containerVariants: Variants = {
    },
 }
 
-const itemVariants: Variants = {
+const itemVariants = {
    hidden: { opacity: 0, scale: 0.9 },
    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+   exit: { opacity: 0, scale: 0.9, transition: { duration: 0.5 } },
+} satisfies Variants
+
+export const buildAgoraSpeakerId = (speakerId: string, streamId: string) => {
+   return `${STREAM_IDENTIFIERS.SPEAKER}-${speakerId}-${streamId}` as const
 }
 
 export const SpeakersList = () => {
    const { selectSpeaker } = useHostProfileSelection()
    const livestream = useLivestreamData()
+   const remoteUsers = useRemoteUsers()
 
    const speakers = useMemo(() => {
       return [
@@ -55,29 +65,39 @@ export const SpeakersList = () => {
       ]
    }, [livestream.speakers, livestream.adHocSpeakers])
 
+   const isSpeakerInUse = (
+      speaker: Speaker,
+      remoteUsers: IAgoraRTCRemoteUser[]
+   ) => {
+      return remoteUsers.some(
+         (user) => user.uid === buildAgoraSpeakerId(speaker.id, livestream.id)
+      )
+   }
+
    return (
       <Fragment>
-         <Typography sx={styles.heading} variant="medium">
+         <Typography component="p" sx={styles.heading} variant="medium">
             Please select your profile:
          </Typography>
-         <FramerBox
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            sx={styles.root}
-         >
-            {speakers.map((speaker) => (
-               <FramerBox
-                  key={speaker.id}
-                  sx={styles.item}
-                  variants={itemVariants}
-               >
-                  <SpeakerButton
-                     onClick={() => selectSpeaker(speaker)}
-                     speaker={speaker}
-                  />
-               </FramerBox>
-            ))}
+         <FramerBox variants={containerVariants} sx={styles.root}>
+            <AnimatePresence>
+               {speakers.map((speaker) => (
+                  <FramerBox
+                     key={speaker.id}
+                     sx={styles.item}
+                     variants={itemVariants}
+                     initial={itemVariants.hidden}
+                     animate={itemVariants.visible}
+                     exit={itemVariants.exit}
+                  >
+                     <SpeakerButton
+                        onClick={() => selectSpeaker(speaker)}
+                        speaker={speaker}
+                        greyedOut={isSpeakerInUse(speaker, remoteUsers)}
+                     />
+                  </FramerBox>
+               ))}
+            </AnimatePresence>
          </FramerBox>
       </Fragment>
    )
