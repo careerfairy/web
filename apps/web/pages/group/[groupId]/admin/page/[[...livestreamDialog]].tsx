@@ -1,9 +1,14 @@
 import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
+import {
+   PublicCreator,
+   pickPublicDataFromCreator,
+} from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
 } from "components/views/livestream-dialog"
+import { groupRepo } from "data/RepositoryInstances"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import CompanyPageOverview from "../../../../../components/views/company-page"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
@@ -22,6 +27,7 @@ const CompanyPage: NextPage<
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
    livestreamDialogData,
+   groupCreators,
 }) => {
    const { groupId, universityName } = serverSideGroup
 
@@ -34,6 +40,7 @@ const CompanyPage: NextPage<
             <DashboardHead title={`CareerFairy | ${universityName}`} />
             <CompanyPageOverview
                group={deserializeGroupClient(serverSideGroup)}
+               groupCreators={groupCreators}
                upcomingLivestreams={mapFromServerSide(
                   serverSideUpcomingLivestreams
                )}
@@ -50,6 +57,7 @@ export const getServerSideProps: GetServerSideProps<{
    serverSideUpcomingLivestreams: any[]
    serverSidePastLivestreams: any[]
    livestreamDialogData: LiveStreamDialogData
+   groupCreators: PublicCreator[]
 }> = async (context) => {
    try {
       const { groupId } = context.params
@@ -68,6 +76,8 @@ export const getServerSideProps: GetServerSideProps<{
          livestreamDialogData,
       } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, context)
 
+      const creators = await groupRepo.getCreators(serverSideGroup.groupId)
+
       return {
          props: {
             serverSideGroup: serializeGroup(serverSideGroup),
@@ -80,6 +90,7 @@ export const getServerSideProps: GetServerSideProps<{
                   LivestreamPresenter.serializeDocument
                ) || [],
             livestreamDialogData,
+            groupCreators: creators.map(pickPublicDataFromCreator) || [],
          },
       }
    } catch (e) {
