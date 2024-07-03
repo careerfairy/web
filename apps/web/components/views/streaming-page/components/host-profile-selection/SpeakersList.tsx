@@ -97,7 +97,7 @@ export const SpeakersList = () => {
                      />
                   </FramerBox>
                )}
-               {speakers.slice(0, 7).map((speaker) => (
+               {speakers.map((speaker) => (
                   <FramerBox
                      key={speaker.id}
                      sx={styles.item}
