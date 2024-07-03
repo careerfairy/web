@@ -1,23 +1,22 @@
 import { Box, Grid, Typography } from "@mui/material"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
 import { datePickerDefaultStyles } from "components/views/calendar/utils"
-import BrandedTextField, {
-   FormBrandedTextField,
-} from "components/views/common/inputs/BrandedTextField"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
 import GBLocale from "date-fns/locale/en-GB"
-import { useFormikContext } from "formik"
-import { MutableRefObject } from "react"
+import { MutableRefObject, useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { Briefcase } from "react-feather"
+import { useFormContext } from "react-hook-form"
 import { useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "store/selectors/adminJobsSelectors"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
-import { JobFormValues } from "./types"
+import { additionalInfoSchema } from "./schemas"
 
 const styles = sxStyles({
    container: {
@@ -72,17 +71,52 @@ type Props = {
 }
 
 const JobAdditionalDetails = ({ quillInputRef }: Props) => {
+   const [stepIsValid, setStepIsValid] = useState(false)
    const { moveToPrev } = useStepper()
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+
    const {
-      values: { additionalInfo: additionalInfoValues, basicInfo },
-      setFieldValue,
-      errors: { additionalInfo: additionalInfoErrors = {} },
-      touched: { additionalInfo: additionalInfoTouched = {} },
-      submitForm,
-      isSubmitting,
-      dirty,
-   } = useFormikContext<JobFormValues>()
+      formState: { isSubmitting, isDirty },
+      watch,
+      setValue,
+   } = useFormContext()
+   const watchedFields = watch([
+      "basicInfo.title",
+      "additionalInfo.salary",
+      "additionalInfo.description",
+      "additionalInfo.deadline",
+      "additionalInfo.postingUrl",
+   ])
+   const fieldNames = [
+      "title",
+      "salary",
+      "description",
+      "deadline",
+      "postingUrl",
+   ]
+
+   // Convert watchedFields array to an object
+   const watchedFieldsObject = fieldNames.reduce((acc, fieldName, index) => {
+      acc[fieldName] = watchedFields[index]
+      return acc
+   }, {} as any)
+
+   const { title, deadline } = watchedFieldsObject
+
+   // This effect validates the additional info fields and updates the step validity state
+   useEffect(() => {
+      const { description, deadline, postingUrl } = watchedFieldsObject
+
+      const fieldsToValidate = {
+         description,
+         deadline,
+         postingUrl,
+      }
+
+      setStepIsValid(
+         additionalInfoSchema(quillInputRef).isValidSync(fieldsToValidate)
+      )
+   }, [quillInputRef, watchedFieldsObject])
 
    return (
       <SteppedDialog.Container
@@ -109,25 +143,28 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                      <Box sx={styles.subtitle2}>
                         <Briefcase color="grey" size={20} />
                         <Typography variant={"h6"} sx={styles.subText}>
-                           {basicInfo.title}
+                           {title}
                         </Typography>
                      </Box>
                      <Grid xs={12} item>
-                        <FormBrandedTextField
+                        <ControlledBrandedTextField
                            name="additionalInfo.salary"
                            label="Salary Range"
-                           placeholder="E.g., 85’000-95’000 CHF"
                            fullWidth
+                           disabled={isSubmitting}
+                           placeholder="E.g., 85’000-95’000 CHF"
                         />
                      </Grid>
 
                      <Grid xs={12} item>
-                        <FormBrandedTextField
+                        <ControlledBrandedTextField
                            name="additionalInfo.description"
-                           label="Job Description (Required)"
-                           placeholder="Tell your viewers more on what to expect about this job"
+                           label="Job Description"
                            fullWidth
                            multiline
+                           disabled={isSubmitting}
+                           placeholder="Tell your viewers more on what to expect about this job"
+                           requiredText="(required)"
                            inputRef={quillInputRef}
                            InputProps={{
                               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -147,7 +184,8 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                            ]}
                         >
                            <DatePicker
-                              selected={additionalInfoValues.deadline}
+                              name="additionalInfo.deadline"
+                              selected={deadline}
                               minDate={DateUtil.getTomorrowDate()}
                               dateFormat={"dd/MM/yyyy"}
                               locale={GBLocale}
@@ -158,36 +196,26 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                               shouldCloseOnSelect={true}
                               customInput={
                                  <BrandedTextField
-                                    name="additionalInfo.deadline"
                                     label="Application Deadline (Required)"
                                     placeholder="Insert date"
                                     fullWidth
-                                    error={Boolean(
-                                       additionalInfoTouched.deadline &&
-                                          additionalInfoErrors.deadline
-                                    )}
-                                    // @ts-ignore
-                                    helperText={
-                                       additionalInfoTouched.deadline &&
-                                       additionalInfoErrors.deadline
-                                          ? additionalInfoErrors.deadline
-                                          : null
-                                    }
                                  />
                               }
                               onChange={(value) =>
-                                 setFieldValue("additionalInfo.deadline", value)
+                                 setValue("additionalInfo.deadline", value)
                               }
                            />
                         </Box>
                      </Grid>
 
                      <Grid xs={12} md={6} item>
-                        <FormBrandedTextField
+                        <ControlledBrandedTextField
                            name="additionalInfo.postingUrl"
-                           label="Job posting URL (required)"
-                           placeholder="E.g., www.careerpage.com/role"
+                           label="Job posting URL"
                            fullWidth
+                           requiredText="(required)"
+                           disabled={isSubmitting}
+                           placeholder="E.g., www.careerpage.com/role"
                         />
                      </Grid>
                   </Grid>
@@ -205,11 +233,12 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
+                  type="submit"
+                  form="custom-job-form"
                   variant="contained"
                   color="secondary"
-                  onClick={submitForm}
                   loading={isSubmitting}
-                  disabled={isSubmitting || !dirty}
+                  disabled={isSubmitting || !isDirty || !stepIsValid}
                >
                   {selectedJobId ? "Update" : "Create"}
                </SteppedDialog.Button>

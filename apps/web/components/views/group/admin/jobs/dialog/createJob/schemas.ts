@@ -1,0 +1,83 @@
+import { CUSTOM_JOB_CONSTANTS } from "@careerfairy/shared-lib/customJobs/constants"
+import * as Yup from "yup"
+
+export const jobFormValidationSchema = (quillRef) =>
+   Yup.object({
+      id: Yup.string().required(),
+      groupId: Yup.string().required(),
+      basicInfo: basicInfoSchema,
+      additionalInfo: additionalInfoSchema(quillRef),
+   })
+
+const groupOptionShape = Yup.object({
+   id: Yup.string().required(),
+   name: Yup.string().required(),
+})
+
+export const basicInfoSchema = Yup.object({
+   title: Yup.string().required("Job title is required"),
+   jobType: Yup.object({
+      value: Yup.string().required(),
+      label: Yup.string().required(),
+      id: Yup.string().required(),
+   }).optional(),
+   businessTags: Yup.array()
+      .of(groupOptionShape)
+      .min(
+         CUSTOM_JOB_CONSTANTS.MIN_BUSINESS_TAGS,
+         `Must select at least ${CUSTOM_JOB_CONSTANTS.MIN_BUSINESS_TAGS} business option`
+      )
+      .required("Business option is required"),
+})
+
+export const additionalInfoSchema = (quillRef) =>
+   Yup.object({
+      salary: Yup.string().optional().nullable(),
+      description: Yup.string()
+         .transform(() =>
+            quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")
+         ) //ReactQuill appends a new line to text
+         .required("Description is required")
+         .min(
+            CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH,
+            `Must be at least ${CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH} characters`
+         )
+         .max(
+            CUSTOM_JOB_CONSTANTS.MAX_DESCRIPTION_LENGTH,
+            `Must be less than ${CUSTOM_JOB_CONSTANTS.MAX_DESCRIPTION_LENGTH} characters`
+         ),
+      postingUrl: Yup.string()
+         .url("Invalid URL")
+         .required("Job posting URL is required"),
+      noDateValidation: Yup.boolean(),
+      deadline: Yup.date()
+         .when("noDateValidation", {
+            is: false,
+            then: Yup.date()
+               .nullable()
+               .min(new Date(), "The date must be in the future"),
+         })
+         .required("Application deadline is required"),
+   })
+
+export interface BasicInfoValues
+   extends Yup.InferType<typeof basicInfoSchema> {}
+
+export interface AdditionalInfoValues
+   extends Yup.InferType<ReturnType<typeof additionalInfoSchema>> {}
+
+export const schema = (cenas) =>
+   Yup.object({
+      id: Yup.string().required(),
+      groupId: Yup.string().required(),
+      basicInfo: basicInfoSchema,
+      additionalInfo: additionalInfoSchema(cenas),
+   })
+
+//  export interface JobFormValues extends Yup.InferType<typeof schema>{
+export interface JobFormValues {
+   id: string
+   groupId: string
+   basicInfo: BasicInfoValues
+   additionalInfo: AdditionalInfoValues
+}
