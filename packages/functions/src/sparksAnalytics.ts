@@ -1,21 +1,21 @@
+import {
+   SparksAnalyticsDTO,
+   TimePeriodParams,
+} from "@careerfairy/shared-lib/sparks/analytics"
 import * as functions from "firebase-functions"
+import { string } from "yup"
+import { getSparksAnalyticsRepoInstance } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
+import {
+   CacheKeyOnCallFn,
+   cacheOnCallValues,
+} from "./middlewares/cacheMiddleware"
 import { middlewares } from "./middlewares/middlewares"
 import {
    dataValidation,
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
-import { string } from "yup"
-import {
-   CacheKeyOnCallFn,
-   cacheOnCallValues,
-} from "./middlewares/cacheMiddleware"
-import { getSparksAnalyticsRepoInstance } from "./api/repositories"
-import {
-   TimePeriodParams,
-   SparksAnalyticsDTO,
-} from "@careerfairy/shared-lib/sparks/analytics"
 
 // Define cache settings
 const cache = (cacheKeyFn: CacheKeyOnCallFn) =>
@@ -102,6 +102,18 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                   levelsOfStudy6months,
                   levelsOfStudy1year,
                ],
+               [
+                  topSparksByIndustry7days,
+                  topSparksByIndustry30days,
+                  topSparksByIndustry6months,
+                  topSparksByIndustry1year,
+               ],
+               [
+                  topSparksByAudience7days,
+                  topSparksByAudience30days,
+                  topSparksByAudience6months,
+                  topSparksByAudience1year,
+               ],
             ] = await Promise.all([
                sparksAnalyticsRepo.getTotalViewsPastYear(),
                sparksAnalyticsRepo.getUniqueViewersPastYear(),
@@ -141,6 +153,16 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                ),
                fetchTimePeriodData(
                   sparksAnalyticsRepo.getLevelsOfStudy.bind(sparksAnalyticsRepo)
+               ),
+               fetchTimePeriodData(
+                  sparksAnalyticsRepo.getTopSparksByIndustry.bind(
+                     sparksAnalyticsRepo
+                  )
+               ),
+               fetchTimePeriodData(
+                  sparksAnalyticsRepo.getTopSparksByAudience.bind(
+                     sparksAnalyticsRepo
+                  )
                ),
             ])
 
@@ -199,6 +221,18 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                   "30days": levelsOfStudy30days,
                   "6months": levelsOfStudy6months,
                   "1year": levelsOfStudy1year,
+               },
+               topSparksByIndustry: {
+                  "7days": topSparksByIndustry7days,
+                  "30days": topSparksByIndustry30days,
+                  "6months": topSparksByIndustry6months,
+                  "1year": topSparksByIndustry1year,
+               },
+               topSparksByAudience: {
+                  "7days": topSparksByAudience7days,
+                  "30days": topSparksByAudience30days,
+                  "6months": topSparksByAudience6months,
+                  "1year": topSparksByAudience1year,
                },
             }
 
