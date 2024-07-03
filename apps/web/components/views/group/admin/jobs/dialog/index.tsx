@@ -29,12 +29,35 @@ import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
 export type JobDialogStep = ReturnType<typeof getViews>[number]["key"]
 
-export enum JobDialogStepEnum {
-   PRIVACY_POLICY = 0,
-   FORM_BASIC_INFO = 1,
-   FORM_ADDITIONAL_DETAILS = 2,
-   NO_LINKED_CONTENT = 3,
-   DELETE_JOB = 4,
+export const JobDialogStep = {
+   PRIVACY_POLICY: {
+      position: 0,
+      key: "privacy-policy",
+   },
+   FORM_BASIC_INFO: {
+      position: 1,
+      key: "form-basic-info",
+   },
+   FORM_ADDITIONAL_DETAILS: {
+      position: 2,
+      key: "form-additional-details",
+   },
+   NO_LINKED_CONTENT: {
+      position: 3,
+      key: "no-linked-content",
+   },
+   FORM_LINKED_LIVE_STREAMS: {
+      position: 4,
+      key: "form-linked-live-streams",
+   },
+   FORM_LINKED_SPARKS: {
+      position: 5,
+      key: "form-linked-content",
+   },
+   DELETE_JOB: {
+      position: 7,
+      key: "delete-job",
+   },
 }
 
 const styles = sxStyles({
@@ -69,13 +92,16 @@ const getViews = (jobHubV1: boolean, quillInputRef, job?: CustomJob) =>
       ...(jobHubV1
          ? [
               {
-                 key: "create-job-basic-info",
+                 key: "form-basic-info",
                  Component: () => <JobBasicInfo />,
               },
               {
-                 key: "create-job-additional-details",
+                 key: "form-additional-details",
                  Component: () => (
-                    <JobAdditionalDetails quillInputRef={quillInputRef} />
+                    <JobAdditionalDetails
+                       quillInputRef={quillInputRef}
+                       job={job}
+                    />
                  ),
               },
            ]
@@ -154,11 +180,12 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
 
    const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
-         return JobDialogStepEnum.DELETE_JOB
+         return JobDialogStep.DELETE_JOB.position
       }
+
       return group.privacyPolicyActive || selectedJobId
-         ? JobDialogStepEnum.FORM_BASIC_INFO
-         : JobDialogStepEnum.PRIVACY_POLICY
+         ? JobDialogStep.FORM_BASIC_INFO.position
+         : JobDialogStep.PRIVACY_POLICY.position
    }, [group.privacyPolicyActive, isDeleteJobDialogOpen, selectedJobId])
 
    const views = useMemo(

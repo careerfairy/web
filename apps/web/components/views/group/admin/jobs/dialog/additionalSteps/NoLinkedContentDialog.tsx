@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { AlertCircle } from "react-feather"
-import { JobDialogStepEnum } from ".."
+import { JobDialogStep } from ".."
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import SteppedDialog, {
    useStepper,
@@ -49,7 +49,7 @@ const NoLinkedContentDialog = () => {
 
    if (dialogElement) {
       dialogElement.style.top =
-         isMobile && currentStep === JobDialogStepEnum.NO_LINKED_CONTENT
+         isMobile && currentStep === JobDialogStep.NO_LINKED_CONTENT.position
             ? styles.mobileDialog.top
             : "revert-layer"
    }

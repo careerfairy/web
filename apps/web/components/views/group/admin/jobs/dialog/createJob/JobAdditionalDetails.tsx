@@ -1,4 +1,12 @@
+import {
+   CustomJob,
+   JobType,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid, Typography } from "@mui/material"
+import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
+import useGroupFromState from "components/custom-hook/useGroupFromState"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
 import { datePickerDefaultStyles } from "components/views/calendar/utils"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
@@ -6,8 +14,10 @@ import { ControlledBrandedTextField } from "components/views/common/inputs/Contr
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
+import { customJobRepo } from "data/RepositoryInstances"
 import GBLocale from "date-fns/locale/en-GB"
-import { MutableRefObject, useEffect, useState } from "react"
+import { Timestamp } from "firebase/firestore"
+import { MutableRefObject, useCallback, useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { Briefcase } from "react-feather"
@@ -16,6 +26,7 @@ import { useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "store/selectors/adminJobsSelectors"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
+import { JobDialogStep } from ".."
 import { additionalInfoSchema } from "./schemas"
 
 const styles = sxStyles({
@@ -68,18 +79,24 @@ const styles = sxStyles({
 
 type Props = {
    quillInputRef: MutableRefObject<any>
+   job: CustomJob
 }
 
-const JobAdditionalDetails = ({ quillInputRef }: Props) => {
+const JobAdditionalDetails = ({ quillInputRef, job }: Props) => {
    const [stepIsValid, setStepIsValid] = useState(false)
-   const { moveToPrev } = useStepper()
+   const { moveToPrev, goToStep } = useStepper()
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const { successNotification, errorNotification } = useSnackbarNotifications()
+   const { group } = useGroupFromState()
+   const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(group.id)
 
    const {
       formState: { isSubmitting, isDirty },
       watch,
       setValue,
+      getValues,
    } = useFormContext()
+
    const watchedFields = watch([
       "basicInfo.title",
       "additionalInfo.salary",
@@ -117,6 +134,64 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
          additionalInfoSchema(quillInputRef).isValidSync(fieldsToValidate)
       )
    }, [quillInputRef, watchedFieldsObject])
+
+   const handleSubmit = useCallback(async () => {
+      try {
+         const {
+            basicInfo: { jobType, businessTags, ...basicInfoRest },
+            additionalInfo: { deadline, postingUrl, ...additionalInfoRest },
+            id,
+            groupId,
+         } = getValues()
+
+         const businessFunctionsTagIds = businessTags.map((el) => el.id)
+
+         const formattedJob: PublicCustomJob = {
+            ...basicInfoRest,
+            ...additionalInfoRest,
+            id,
+            groupId,
+            businessFunctionsTagIds,
+            jobType: jobType.value as JobType,
+            deadline: Timestamp.fromDate(deadline),
+            postingUrl:
+               postingUrl.indexOf("http") === 0
+                  ? postingUrl
+                  : `https://${postingUrl}`,
+         }
+
+         if (selectedJobId) {
+            const updatedJob: CustomJob = {
+               ...job,
+               ...formattedJob,
+            }
+
+            await customJobRepo.updateCustomJob(updatedJob)
+            successNotification("Job successfully updated")
+
+            if (groupHasUpcomingLivestreams) {
+               goToStep(JobDialogStep.FORM_LINKED_LIVE_STREAMS.key)
+            } else if (!groupHasUpcomingLivestreams && group.publicSparks) {
+               goToStep(JobDialogStep.FORM_LINKED_SPARKS.key)
+            } else {
+               goToStep(JobDialogStep.NO_LINKED_CONTENT.key)
+            }
+         } else {
+            successNotification("Job successfully created")
+         }
+      } catch (error) {
+         errorNotification(error, "An error has occurred")
+      }
+   }, [
+      getValues,
+      selectedJobId,
+      job,
+      successNotification,
+      groupHasUpcomingLivestreams,
+      group.publicSparks,
+      goToStep,
+      errorNotification,
+   ])
 
    return (
       <SteppedDialog.Container
@@ -233,8 +308,9 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
-                  type="submit"
-                  form="custom-job-form"
+                  // type="submit"
+                  // form="custom-job-form"
+                  onClick={handleSubmit}
                   variant="contained"
                   color="secondary"
                   loading={isSubmitting}
