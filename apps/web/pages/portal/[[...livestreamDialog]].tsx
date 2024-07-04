@@ -170,8 +170,8 @@ type PortalTagsContentProps = {
 const PortalTagsContent = ({ children }: PortalTagsContentProps) => {
    const isMounted = useIsMounted()
    return (
-      <SuspenseWithBoundary fallback={<PortalTagsLoader />}>
-         {isMounted ? <PortalTags>{children}</PortalTags> : null}
+      <SuspenseWithBoundary fallback={children}>
+         {isMounted ? <PortalTags>{children}</PortalTags> : children}
       </SuspenseWithBoundary>
    )
 }
@@ -254,13 +254,13 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
    )
 }
 
-const PortalTagsLoader = () => {
-   return (
-      <>
-         <h1>PortalTagsLoader</h1>
-      </>
-   )
-}
+// const PortalTagsLoader = () => {
+//    return (
+//       <>
+//          <h1>PortalTagsLoader</h1>
+//       </>
+//    )
+// }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const token = getUserTokenFromCookie(ctx)
