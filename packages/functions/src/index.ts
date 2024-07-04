@@ -137,8 +137,6 @@ exports.fetchLivestreams_v2 = livestreams.fetchLivestreams
 
 // Tags
 exports.fetchTagsContentHits = tags.fetchContentHits
-exports.getLivestreamsByTags = tags.getLivestreamsByTags
-exports.getSparksByTags = tags.getSparksByTags
 
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook
