@@ -1,9 +1,9 @@
-import useSWR from "swr"
 import { RtmChannel } from "agora-rtm-sdk"
-import { useRTMChannelEvent } from "./useRTMChannelEvent"
-import { errorLogAndNotify } from "util/CommonUtil"
-import { STREAM_IDENTIFIERS } from "constants/streaming"
+import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
 import { useMemo } from "react"
+import useSWR from "swr"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { useRTMChannelEvent } from "./useRTMChannelEvent"
 
 // fetcher function that calls the `getMembers` method on the channel
 const fetchChannelMembers = async (channel: RtmChannel) => {
@@ -45,14 +45,27 @@ const sortMembers = (a: string, b: string) => {
    return a.localeCompare(b)
 }
 
+const filterMembers = (members: string[], roles: StreamIdentifier[]) => {
+   if (roles) {
+      return members.filter(
+         (member) => !roles.some((role) => member.startsWith(role))
+      )
+   }
+   return members
+}
+
 /**
  * Custom hook to manage channel members in real-time.
  * It utilizes SWR for data fetching and caching, and listens to RTM channel events
  * to update the members list upon member join or leave events.
  *
  * @param {RtmChannel} channel - The RTM channel instance.
+ * @param {StreamIdentifier[]} filterRoles - The roles to filter out of the members list.
  */
-export const useChannelMembers = (channel: RtmChannel) => {
+export const useChannelMembers = (
+   channel: RtmChannel,
+   filterRoles?: StreamIdentifier[]
+) => {
    const channelId = channel?.channelId
 
    const { data, error, mutate, isLoading } = useSWR<string[]>(
@@ -107,8 +120,13 @@ export const useChannelMembers = (channel: RtmChannel) => {
 
    const sortedMembers = useMemo(() => data?.sort(sortMembers), [data])
 
+   const filteredMembers = useMemo(
+      () => filterMembers(sortedMembers, filterRoles),
+      [sortedMembers, filterRoles]
+   )
+
    return {
-      members: sortedMembers,
+      members: filteredMembers,
       isLoading,
       error,
    }
