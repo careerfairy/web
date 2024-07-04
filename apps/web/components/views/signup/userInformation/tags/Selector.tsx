@@ -6,16 +6,14 @@ import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../types/commonTypes"
 
 const styles = sxStyles({
-   chip: {
+   chip: (theme) => ({
       mr: "8px",
       mt: "8px",
       p: "14px 6px",
       borderRadius: "60px",
-
-      border: (theme) => `1px solid ${theme.palette.secondary.light}`,
-      background: (theme) => theme.brand.white[300],
-      color: (theme) => theme.palette.neutral[700],
-      fontFamily: "Poppins",
+      border: `1px solid ${theme.palette.secondary.light}`,
+      background: theme.brand.white[300],
+      color: theme.palette.neutral[700],
       fontSize: "14px",
       fontStyle: "normal",
       fontWeight: "400",
@@ -23,18 +21,17 @@ const styles = sxStyles({
       "&:last-child": {
          mr: "0px",
       },
-   },
-   selectedChip: {
+   }),
+   selectedChip: (theme) => ({
       borderRadius: "60px",
-      border: (theme) => `1px solid ${theme.palette.secondary.light}`,
-      background: (theme) => theme.palette.primary.main,
-      color: (theme) => theme.brand.white[50],
-      fontFamily: "Poppins",
+      border: `1px solid ${theme.palette.secondary.light}`,
+      background: theme.palette.primary.main,
+      color: theme.brand.white[50],
       fontSize: "14px",
       fontStyle: "normal",
       fontWeight: 400,
       lineHeight: "20px",
-   },
+   }),
 })
 
 type TagsMap = {
@@ -88,13 +85,11 @@ export const Selector = ({
    )
 
    return (
-      <>
-         <TagValuesSelector
-            tagsMap={tagsMap}
-            setUserTags={handleTagChange}
-            field={field}
-         />
-      </>
+      <TagValuesSelector
+         tagsMap={tagsMap}
+         setUserTags={handleTagChange}
+         field={field}
+      />
    )
 }
 
@@ -111,35 +106,33 @@ const TagValuesSelector = ({
 }: TagValuesSelectorProps) => {
    return (
       <Grid container spacing={2} justifyContent="center">
-         <Grid container>
-            {Object.keys(tagsMap).map((tagId) => {
-               return (
-                  <Chip
-                     data-testid={`${field}_${tagId}_option`}
-                     onClick={() => {
-                        const selected = tagsMap[tagId]
+         {Object.keys(tagsMap).map((tagId) => {
+            return (
+               <Chip
+                  data-testid={`${field}_${tagId}_option`}
+                  onClick={() => {
+                     const selected = tagsMap[tagId]
 
-                        const tags = {
-                           ...tagsMap,
-                        }
+                     const tags = {
+                        ...tagsMap,
+                     }
 
-                        tags[tagId].state = !selected.state
-                        const upToDateTags = Object.keys(tags)
-                           .filter((tagId) => tags[tagId].state)
-                           .map((tagId) => tags[tagId].option)
-                        setUserTags(upToDateTags)
-                     }}
-                     clickable
-                     sx={[
-                        styles.chip,
-                        tagsMap[tagId].state ? styles.selectedChip : null,
-                     ]}
-                     key={tagId}
-                     label={tagsMap[tagId].option.name}
-                  />
-               )
-            })}
-         </Grid>
+                     tags[tagId].state = !selected.state
+                     const upToDateTags = Object.keys(tags)
+                        .filter((tagId) => tags[tagId].state)
+                        .map((tagId) => tags[tagId].option)
+                     setUserTags(upToDateTags)
+                  }}
+                  clickable
+                  sx={[
+                     styles.chip,
+                     tagsMap[tagId].state ? styles.selectedChip : null,
+                  ]}
+                  key={tagId}
+                  label={tagsMap[tagId].option.name}
+               />
+            )
+         })}
       </Grid>
    )
 }
