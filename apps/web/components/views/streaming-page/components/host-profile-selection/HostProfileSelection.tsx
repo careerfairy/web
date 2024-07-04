@@ -25,14 +25,11 @@ const styles = sxStyles({
    },
    view: {
       my: "auto",
-      mt: {
-         xs: 2,
-         sm: "auto",
-      },
-
-      mx: {
-         xs: 0,
-         sm: 2,
+      flex: 1,
+      display: "grid",
+      placeItems: {
+         xs: "start",
+         sm: "center",
       },
    },
 })

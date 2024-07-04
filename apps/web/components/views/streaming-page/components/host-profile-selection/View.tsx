@@ -31,6 +31,13 @@ const styles = sxStyles({
          xs: 1,
          sm: 0,
       },
+      mt: {
+         xs: 2,
+      },
+      mx: {
+         xs: 0,
+         sm: 2,
+      },
 
       p: "0px !important",
       background: "#FCFCFC",
