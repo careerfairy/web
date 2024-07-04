@@ -62,6 +62,7 @@ const CategoryTagsContentComponent = ({ categories }: Props) => {
       <Stack sx={styles.wrapper} spacing={3}>
          <SparksTagsContent
             sparks={sparks}
+            selectTagIds={selectedCategories}
             selectedTagLabel={selectedTagLabel}
          />
          <LivestreamTagsContent

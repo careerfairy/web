@@ -15,9 +15,14 @@ const styles = sxStyles({
 type Props = {
    sparks: Spark[]
    selectedTagLabel: string
+   selectTagIds: string[]
 }
 
-const SparksTagsContent = ({ sparks, selectedTagLabel }: Props) => {
+const SparksTagsContent = ({
+   sparks,
+   selectedTagLabel,
+   selectTagIds,
+}: Props) => {
    const router = useRouter()
 
    const handleSparksClicked = (spark: Spark) => {
@@ -28,6 +33,7 @@ const SparksTagsContent = ({ sparks, selectedTagLabel }: Props) => {
          query: {
             ...router.query, // spread current query params
             interactionSource: SparkInteractionSources.PortalTag,
+            tags: selectTagIds,
          },
       })
    }

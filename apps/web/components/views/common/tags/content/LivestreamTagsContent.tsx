@@ -42,6 +42,7 @@ type Props = {
 }
 
 const LivestreamTagsContent = (props: Props) => {
+   if (!props.events.length) return null
    return (
       <Stack>
          <Typography sx={styles.heading} color="neutral.800">
