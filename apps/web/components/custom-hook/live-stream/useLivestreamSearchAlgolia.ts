@@ -131,7 +131,7 @@ export function useLivestreamSearchAlgolia(
          replica,
          pageLimit
       )
-      console.log("🚀 ~ fetcher ~ result:", result)
+
       return {
          ...result,
          deserializedHits: result.hits.map(deserializeAlgoliaSearchResponse),
