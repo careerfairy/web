@@ -7,7 +7,6 @@ import BaseFirebaseRepository, {
 } from "../BaseFirebaseRepository"
 import { Job, JobIdentifier } from "../ats/Job"
 import { Create, ImageType } from "../commonTypes"
-import { GroupedTags } from "../constants/tags"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
 import { Group } from "../groups"
@@ -113,11 +112,6 @@ export interface ILivestreamRepository {
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
    upcomingEventsQuery(
-      showHidden?: boolean,
-      limit?: number
-   ): firebase.firestore.Query<firebase.firestore.DocumentData>
-
-   pastEventsQuery(
       showHidden?: boolean,
       limit?: number
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
@@ -381,17 +375,6 @@ export interface ILivestreamRepository {
       userId: string,
       limit?: number
    ): Promise<LivestreamEvent[]>
-
-   fetchLivestreamsWithTags(
-      type?: "pastEvents" | "upcomingEvents"
-   ): Promise<LivestreamEvent[]>
-
-   fetchLivestreamsByTags(
-      type: "pastEvents" | "upcomingEvents",
-      tags: GroupedTags,
-      fromDate: Date,
-      limit: number
-   ): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -644,24 +627,6 @@ export class FirebaseLivestreamRepository
          .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
          .orderBy("start", "asc")
-
-      if (showHidden === false) {
-         query = query.where("hidden", "==", false)
-      }
-
-      if (limit) {
-         query = query.limit(limit)
-      }
-
-      return query
-   }
-
-   pastEventsQuery(showHidden = false, limit?: number) {
-      let query = this.firestore
-         .collection("livestreams")
-         .where("hasEnded", "==", true)
-         .where("test", "==", false)
-      // .orderBy("start", "asc")
 
       if (showHidden === false) {
          query = query.where("hidden", "==", false)
@@ -1670,67 +1635,6 @@ export class FirebaseLivestreamRepository
          sortedLivestreamsIds.indexOf(event.id)
       )
       return sortedLivestreams
-   }
-
-   async fetchLivestreamsWithTags(
-      type?: "pastEvents" | "upcomingEvents"
-   ): Promise<LivestreamEvent[]> {
-      // Any past or future livestreams
-      // TODO: confirm past sort, set own function for retrieving tag query, and reuse in fetchLivestreamsByTags
-      const query =
-         type === "pastEvents"
-            ? this.pastEventsQuery()
-            : this.upcomingEventsQuery()
-
-      const snap = await query.get()
-      const events =
-         mapFirestoreDocuments<LivestreamEvent>(snap)?.filter(
-            (e) =>
-               e.businessFunctionsTagIds?.length ||
-               e.contentTopicsTagIds?.length ||
-               Boolean(e.language?.code)
-         ) || []
-      return events
-   }
-
-   async fetchLivestreamsByTags(
-      type: "pastEvents" | "upcomingEvents",
-      tags: GroupedTags,
-      fromDate: Date,
-      limit: number
-   ): Promise<LivestreamEvent[]> {
-      const query =
-         type === "pastEvents"
-            ? this.pastEventsQuery()
-            : this.upcomingEventsQuery()
-
-      const snaps = await query.get()
-
-      const events = mapFirestoreDocuments<LivestreamEvent>(snaps) || []
-      console.log(
-         "🚀 ~ fetchLivestreamsByTags ~ events:",
-         events.map((e) => e.id)
-      )
-
-      const filteredEvents = events.filter((e) => {
-         const hasBusinessFunctions = Object.keys(tags.businessFunctions).find(
-            (bf) => e.businessFunctionsTagIds?.includes(bf)
-         )
-         const hasContentTopics = Object.keys(tags.contentTopics).find((ct) =>
-            e.contentTopicsTagIds?.includes(ct)
-         )
-         const hasLanguages = Object.keys(tags.language).find(
-            (l) => e.language?.code === l
-         )
-
-         const result = Boolean(
-            hasBusinessFunctions || hasContentTopics || hasLanguages
-         )
-         // console.log("🚀 ~ filteredEvents ~ eventId, hasBusinessFunctions, hasContentTopics, hasLanguages:", e.id, hasBusinessFunctions, hasContentTopics, hasLanguages, result)
-
-         return result
-      })
-      return filteredEvents.slice(0, limit)
    }
 }
 

@@ -26,7 +26,14 @@ type Data = SearchResponse<AlgoliaLivestreamResponse> & {
    deserializedHits: LivestreamSearchResult[]
 }
 
-type Key = ["searchLivestreams", string, string, number, LivestreamReplicaType]
+type Key = [
+   "searchLivestreams",
+   string,
+   string,
+   number,
+   LivestreamReplicaType,
+   number
+]
 
 export type FilterOptions = {
    arrayFilters?: Partial<Record<ArrayFilterFieldType, string[]>>
@@ -96,7 +103,8 @@ export function useLivestreamSearchAlgolia(
    inputValue: string,
    options: FilterOptions,
    targetReplica?: LivestreamReplicaType,
-   disable?: boolean
+   disable?: boolean,
+   itemsPerPage?: number
 ) {
    const getKey = useCallback(
       (pageIndex: number, previousPageData: Data | null): Key => {
@@ -108,19 +116,22 @@ export function useLivestreamSearchAlgolia(
             buildAlgoliaFilterString(options),
             pageIndex,
             targetReplica,
+            itemsPerPage,
          ]
       },
-      [inputValue, options, targetReplica]
+      [inputValue, options, targetReplica, itemsPerPage]
    )
 
    const fetcher = async (key: Key): Promise<Data> => {
-      const [, inputValue, filters, page, replica] = key
+      const [, inputValue, filters, page, replica, pageLimit] = key
       const result = await algoliaRepo.searchLivestreams(
          inputValue,
          filters,
          page,
-         replica
+         replica,
+         pageLimit
       )
+      console.log("🚀 ~ fetcher ~ result:", result)
       return {
          ...result,
          deserializedHits: result.hits.map(deserializeAlgoliaSearchResponse),
