@@ -13,7 +13,6 @@ import ContentCarousel from "../../components/views/portal/content-carousel/Cont
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
 import MyNextEvents from "../../components/views/portal/events-preview/MyNextEvents"
 import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
-import WidgetsWrapper from "../../components/views/portal/WidgetsWrapper"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../../data/constants/streamContants"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { useAuth } from "../../HOCs/AuthProvider"
@@ -33,7 +32,6 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import CategoryTagsChips from "components/views/common/chips/CategoryTagsChips"
 import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
 import Heading from "components/views/portal/common/Heading"
 import EventsPreviewCarousel, {
@@ -41,6 +39,7 @@ import EventsPreviewCarousel, {
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
 import { UserSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
+import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
 import { sxStyles } from "types/commonTypes"
 import {
    getLivestreamDialogData,
@@ -200,8 +199,21 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
    }, [categoriesData])
 
    const handleCategoryChipClicked = (categoryId: string) => {
-      const newCategories = { ...categoriesData }
-      newCategories[categoryId].selected = !newCategories[categoryId].selected
+      const newCategories = Object.fromEntries(
+         Object.keys(categoriesData).map((id) => {
+            return [
+               id,
+               {
+                  selected:
+                     id === categoryId
+                        ? !categoriesData[categoryId].selected
+                        : false,
+               },
+            ]
+         })
+      )
+
+      // newCategories[categoryId].selected = !newCategories[categoryId].selected
 
       setCategoriesData(newCategories)
    }
@@ -225,12 +237,12 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
    }
 
    return (
-      <WidgetsWrapper>
-         <CategoryTagsChips
-            handleCategoryClick={handleCategoryChipClicked}
+      <Box m={0}>
+         <TagsCarouselWithArrow
             selectedCategories={selectedCategories}
-            availableCategories={availableCategories}
-            handleAllClick={handleAllCategoryChipClicked}
+            tags={availableCategories}
+            handleTagClicked={handleCategoryChipClicked}
+            handleAllClicked={handleAllCategoryChipClicked}
          />
          <ConditionalWrapper
             condition={!selectedCategories.length}
@@ -238,7 +250,7 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
          >
             {children}
          </ConditionalWrapper>
-      </WidgetsWrapper>
+      </Box>
    )
 }
 

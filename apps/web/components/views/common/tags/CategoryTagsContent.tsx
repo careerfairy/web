@@ -1,14 +1,24 @@
-import { groupTags } from "@careerfairy/shared-lib/constants/tags"
+import {
+   TagValuesLookup,
+   groupTags,
+} from "@careerfairy/shared-lib/constants/tags"
+import { sxStyles } from "@careerfairy/shared-ui"
+import { Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamsByTags } from "components/custom-hook/tags/useLivestreamsByTags"
 import { useSparksByTags } from "components/custom-hook/tags/useSparksByTags"
-import { useMemo, useState } from "react"
-import {
-   PastLivestreamTagsContent,
-   UpcomingLivestreamTagsContent,
-} from "./content/LivestreamTagsContent"
+
+import LivestreamTagsContent from "./content/LivestreamTagsContent"
 import SparksTagsContent from "./content/SparksTagsContent"
 
+const EVENTS_PER_BATCH = 3
+const SPARKS_PER_BATCH = 10
+
+const styles = sxStyles({
+   wrapper: {
+      transition: (theme) => theme.transitions.create(["opacity"]),
+   },
+})
 type Props = {
    categories: {
       [id: string]: {
@@ -24,48 +34,53 @@ const CategoryTagsContent = (props: Props) => {
    )
 }
 const CategoryTagsContentComponent = ({ categories }: Props) => {
-   const [pastEventsLimit, setPastEventsLimit] = useState(6)
-   console.log(
-      "🚀 ~ CategoryTagsContentComponent ~ pastEventsLimit:",
-      pastEventsLimit
+   const selectedCategories = Object.keys(categories).filter(
+      (cat) => categories[cat].selected
    )
-   const [upcomingEventsLimit, setUpcomingEventsLimit] = useState(6)
+   const tags = groupTags(selectedCategories)
 
-   const tags = useMemo(() => {
-      return groupTags(
-         Object.keys(categories).filter((cat) => categories[cat].selected)
-      )
-   }, [categories])
+   const {
+      data: pastEvents,
+      setSize: setNextPagePast,
+      hasMorePages: hasMorePagesPast,
+   } = useLivestreamsByTags("past", tags, EVENTS_PER_BATCH)
 
-   const { data: pastEvents } = useLivestreamsByTags(
-      "pastEvents",
-      tags,
-      pastEventsLimit
-   )
-   const { data: upcomingEvents } = useLivestreamsByTags(
-      "upcomingEvents",
-      tags,
-      upcomingEventsLimit
-   )
-   const { data: sparks } = useSparksByTags(tags)
+   const {
+      data: upcomingEvents,
+      setSize: setNextPageFuture,
+      hasMorePages: hasMorePagesFuture,
+   } = useLivestreamsByTags("future", tags, EVENTS_PER_BATCH)
 
-   // TODO: pass limits independantly and use see more to increment
+   const sparks = useSparksByTags(tags, SPARKS_PER_BATCH)
+
+   const selectedTagLabel = selectedCategories
+      .map((cat) => TagValuesLookup[cat])
+      .join(", ")
+
+   // TODO: pass limits independently and use see more to increment
    return (
-      <>
-         <SparksTagsContent sparks={sparks} />
-         <UpcomingLivestreamTagsContent
+      <Stack sx={styles.wrapper} spacing={3}>
+         <SparksTagsContent
+            sparks={sparks}
+            selectedTagLabel={selectedTagLabel}
+         />
+         <LivestreamTagsContent
+            title={"Upcoming live streams related to " + selectedTagLabel}
             events={upcomingEvents}
-            onSeeMore={() => {
-               setPastEventsLimit(pastEventsLimit + 6)
-            }}
+            seeMoreDisabled={!hasMorePagesFuture}
+            onSeeMore={() =>
+               setNextPageFuture((previousSize) => previousSize + 1)
+            }
          />
-         <PastLivestreamTagsContent
+         <LivestreamTagsContent
+            title={"Top " + selectedTagLabel + " recordings"}
             events={pastEvents}
-            onSeeMore={() => {
-               setUpcomingEventsLimit(upcomingEventsLimit + 6)
-            }}
+            seeMoreDisabled={!hasMorePagesPast}
+            onSeeMore={() =>
+               setNextPagePast((previousSize) => previousSize + 1)
+            }
          />
-      </>
+      </Stack>
    )
 }
 
