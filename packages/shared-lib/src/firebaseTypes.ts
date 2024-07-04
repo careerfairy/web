@@ -5,7 +5,7 @@
  * our codebase. We should remove the compat path after migrating all
  * the code instances to the firebase v9 types
  */
-import type firebase from "firebase/compat"
+import type firebase from "firebase/compat/app"
 
 /**
  * Utility function for each package to convert JS Dates
