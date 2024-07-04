@@ -1,5 +1,5 @@
+import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
-import firebase from "firebase/compat"
 
 export interface UserNotification extends Identifiable {
    documentType: "userNotification" // simplify groupCollection Queries
