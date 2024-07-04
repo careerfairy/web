@@ -1,27 +1,22 @@
 import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import useSWR, { SWRConfiguration } from "swr"
-import { errorLogAndNotify } from "util/CommonUtil"
-import useFunctionsSWR, {
-   reducedRemoteCallsOptions,
-} from "../utils/useFunctionsSWRFetcher"
+import { useSparkSearchAlgolia } from "../spark/useSparkSearchAlgolia"
 
-const swrOptions: SWRConfiguration = {
-   ...reducedRemoteCallsOptions,
-   keepPreviousData: true,
-   suspense: true,
-   onError: (error, key) =>
-      errorLogAndNotify(error, {
-         message: `Error fetching sparks content by tags : ${key}`,
-      }),
-}
+/**
+ * TODO: allow limit like useLivestreamsByTags
+ * @param tags
+ * @returns
+ */
+export const useSparksByTags = (
+   tags: GroupedTags,
+   totalItems?: number
+): Spark[] => {
+   const { data } = useSparkSearchAlgolia("", {
+      arrayFilters: {
+         contentTopicsTagIds: Object.keys(tags.contentTopics),
+         languageTagIds: Object.keys(tags.language),
+      },
+   })
 
-export const useSparksByTags = (tags: GroupedTags) => {
-   const fetcher = useFunctionsSWR<Spark[]>()
-
-   return useSWR<Spark[]>(
-      ["getSparksByTags", { tags: tags, limit: 10 }],
-      fetcher,
-      swrOptions
-   )
+   return (data?.deserializedHits || []).slice(0, totalItems)
 }

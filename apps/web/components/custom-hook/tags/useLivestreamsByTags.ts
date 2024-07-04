@@ -1,34 +1,34 @@
 import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import useSWR, { SWRConfiguration } from "swr"
-import { errorLogAndNotify } from "util/CommonUtil"
-import useFunctionsSWR, {
-   reducedRemoteCallsOptions,
-} from "../utils/useFunctionsSWRFetcher"
-
-const swrOptions: SWRConfiguration = {
-   ...reducedRemoteCallsOptions,
-   keepPreviousData: true,
-   suspense: true,
-   onError: (error, key) =>
-      errorLogAndNotify(error, {
-         message: `Error fetching content by tags : ${key}`,
-      }),
-}
+import { useLivestreamSearchAlgolia } from "../live-stream/useLivestreamSearchAlgolia"
 
 export const useLivestreamsByTags = (
-   type: "upcomingEvents" | "pastEvents",
+   type: "future" | "past",
    tags: GroupedTags,
    limit: number
 ) => {
-   const fetcher = useFunctionsSWR<LivestreamEvent[]>()
-
-   return useSWR<LivestreamEvent[]>(
-      [
-         "getLivestreamsByTags",
-         { tags: tags, limit: limit, past: type === "pastEvents" },
-      ],
-      fetcher,
-      swrOptions
+   const { data, setSize } = useLivestreamSearchAlgolia(
+      "",
+      {
+         arrayFilters: {
+            contentTopicsTagIds: Object.keys(tags.contentTopics),
+            businessFunctionsTagIds: Object.keys(tags.businessFunctions),
+            languageCode: Object.keys(tags.language),
+         },
+         dateFilter: type,
+      },
+      undefined,
+      undefined,
+      limit
    )
+
+   const hasMorePages = data?.length && data.at(0)?.nbPages > data.length
+
+   return {
+      hasMorePages: hasMorePages,
+      data: (data?.flatMap((page) => page.deserializedHits) || []).map(
+         (hit) => hit as unknown as LivestreamEvent
+      ),
+      setSize: setSize,
+   }
 }
