@@ -22,15 +22,13 @@ const styles = sxStyles({
       alignItems: "center",
       position: "relative",
       bgcolor: "#F7F8FC",
+      overflowX: "hidden",
    },
    view: {
-      my: "auto",
+      width: "100%",
       flex: 1,
       display: "grid",
-      placeItems: {
-         xs: "start",
-         sm: "center",
-      },
+      placeItems: "center",
    },
 })
 
@@ -56,23 +54,27 @@ const Content = () => {
          {(activeView) => (
             <FramerBox sx={styles.root}>
                <SpeakerSelectHeader />
-               <AnimatePresence mode="wait">
+               <AnimatePresence mode="popLayout">
                   <ViewFramerBox
+                     key={ProfileSelectEnum.SELECT_SPEAKER}
                      activeView={activeView}
                      viewEnum={ProfileSelectEnum.SELECT_SPEAKER}
                      viewComponent={<SelectSpeakerView />}
                   />
                   <ViewFramerBox
+                     key={ProfileSelectEnum.CREATE_SPEAKER}
                      activeView={activeView}
                      viewEnum={ProfileSelectEnum.CREATE_SPEAKER}
                      viewComponent={<CreateSpeakerView />}
                   />
                   <ViewFramerBox
+                     key={ProfileSelectEnum.EDIT_SPEAKER}
                      activeView={activeView}
                      viewEnum={ProfileSelectEnum.EDIT_SPEAKER}
                      viewComponent={<EditSpeakerView />}
                   />
                   <ViewFramerBox
+                     key={ProfileSelectEnum.JOIN_WITH_SPEAKER}
                      activeView={activeView}
                      viewEnum={ProfileSelectEnum.JOIN_WITH_SPEAKER}
                      viewComponent={<JoinWithSpeakerView />}

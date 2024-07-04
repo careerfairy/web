@@ -21,15 +21,15 @@ const styles = sxStyles({
       maxWidth: 770,
       maxHeight: {
          xs: "auto",
-         sm: 637,
+         tablet: 637,
       },
       mx: {
          xs: 0,
-         sm: 2,
+         tablet: 2,
       },
       mt: {
          xs: 2,
-         sm: "auto",
+         tablet: "auto",
       },
       overflowY: "auto",
       my: "auto",
