@@ -47,7 +47,7 @@ const sortMembers = (a: string, b: string) => {
 
 const filterMembers = (members: string[], roles: StreamIdentifier[]) => {
    if (roles) {
-      return members.filter(
+      return members?.filter(
          (member) => !roles.some((role) => member.startsWith(role))
       )
    }
