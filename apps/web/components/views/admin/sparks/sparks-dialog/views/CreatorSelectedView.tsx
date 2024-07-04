@@ -18,6 +18,10 @@ const styles = sxStyles({
    creatorDetailsWrapper: {
       maxHeight: 488,
       backgroundColor: "#FEFEFE",
+      width: {
+         xs: "100%",
+         md: 494,
+      },
    },
    editButton: {
       top: 0,

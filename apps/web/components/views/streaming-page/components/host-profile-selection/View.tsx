@@ -13,13 +13,12 @@ import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    containerDesktop: {
-      backgroundColor: "#FDFDFD",
       borderRadius: "16px",
       p: "0px !important",
       background: "#FCFCFC",
       overflow: "auto",
-      height: 694,
-      maxHeight: 694,
+      height: 720,
+      maxHeight: 720,
       maxWidth: 770,
       display: "flex",
       flexDirection: "column",
@@ -35,7 +34,7 @@ const styles = sxStyles({
       flexDirection: "column",
    },
    content: {
-      backgroundColor: "inherit",
+      background: "inherit",
       px: {
          xs: 2,
          tablet: 4,
