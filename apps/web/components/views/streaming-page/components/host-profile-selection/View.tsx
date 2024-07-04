@@ -2,8 +2,8 @@ import {
    Box,
    BoxProps,
    Container,
-   ContainerProps,
    Stack,
+   SxProps,
    Typography,
    TypographyProps,
 } from "@mui/material"
@@ -12,46 +12,44 @@ import { ReactNode } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   root: {
-      display: "flex",
-      flexDirection: "column",
+   containerDesktop: {
       backgroundColor: "#FDFDFD",
       borderRadius: "16px",
-      maxWidth: 770,
-      overflowY: {
-         sm: "auto",
-      },
-      minHeight: {
-         sm: 694,
-      },
-      maxHeight: {
-         sm: 694,
-      },
-      flex: {
-         xs: 1,
-         sm: 0,
-      },
-      mt: {
-         xs: 2,
-      },
-      mx: {
-         xs: 0,
-         sm: 2,
-      },
-
       p: "0px !important",
       background: "#FCFCFC",
+      overflow: "auto",
+      height: 694,
+      maxHeight: 694,
+      maxWidth: 770,
+      display: "flex",
+      flexDirection: "column",
+   },
+   drawerMobile: {
+      background: "#FCFCFC",
+      maxHeight: "calc(100vh - 100px)",
+      borderTopLeftRadius: "16px",
+      borderTopRightRadius: "16px",
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
    },
    content: {
+      backgroundColor: "inherit",
       px: {
          xs: 2,
-         sm: 4,
+         tablet: 4,
       },
       pt: {
          xs: 3,
-         sm: 4,
+         tablet: 4,
       },
       pb: 3,
+      borderTopLeftRadius: "16px",
+      borderTopRightRadius: "16px",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
    },
    title: (theme) => ({
       color: theme.palette.common.black,
@@ -70,28 +68,37 @@ const styles = sxStyles({
       justifyContent: "flex-end",
       p: {
          xs: 2,
-         sm: 0,
+         tablet: 0,
       },
       px: {
-         sm: 4,
+         tablet: 4,
       },
       pt: {
-         sm: 3,
+         tablet: 3,
       },
       pb: {
-         sm: 4,
+         tablet: 4,
       },
       background: "inherit",
    },
 })
 
-export const View = ({ children, sx, ...props }: ContainerProps) => {
+type ViewProps = {
+   children: ReactNode
+   sx?: SxProps
+}
+
+export const View = ({ children, sx }: ViewProps) => {
+   const streamIsMobile = useStreamIsMobile()
+
    return (
       <Container
          id="host-profile-selection-root"
          maxWidth={false}
-         sx={combineStyles(styles.root, sx)}
-         {...props}
+         sx={combineStyles(
+            [streamIsMobile ? styles.drawerMobile : styles.containerDesktop],
+            sx
+         )}
       >
          {children}
       </Container>
