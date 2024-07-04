@@ -3,10 +3,10 @@ import { languageOptionCodes } from "@careerfairy/shared-lib/constants/forms"
 import {
    BusinessFunctionsTagValues,
    ContentHits,
+   ContentHitsCount,
    ContentTopicsTagValues,
    TagsContentHits,
 } from "@careerfairy/shared-lib/constants/tags"
-import { createContentHit } from "@careerfairy/shared-lib/tags/TagsHitsDataParser"
 import { SearchIndex } from "algoliasearch"
 
 type CategoryHits = {
@@ -189,4 +189,20 @@ export const generateArrayFilterString = (
 
    // Link different filter types with "AND" (all conditions must be met).
    return filters.join(" AND ")
+}
+
+const createContentHit = (
+   eventsCount: number,
+   sparksCount: number
+): {
+   contentHits: number
+   count: ContentHitsCount
+} => {
+   return {
+      contentHits: eventsCount + sparksCount,
+      count: {
+         livestreams: eventsCount,
+         sparks: sparksCount,
+      },
+   }
 }
