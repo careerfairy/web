@@ -43,7 +43,6 @@ const styles = sxStyles({
    },
    tagsLabel: {
       color: (theme) => theme.palette.neutral[900],
-      fontFamily: "Poppins",
       fontSize: "11.2px",
       fontStyle: "normal",
       fontWeight: "700",
