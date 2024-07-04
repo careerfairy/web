@@ -1,47 +1,45 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { Box, useMediaQuery } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
+import AgoraRTC from "agora-rtc-sdk-ng"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
+import RTMProvider from "context/agora/RTMProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
-import ViewerTopBar from "./ViewerTopBar"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { isLoaded } from "react-redux-firebase"
-import { useAuth } from "../../HOCs/AuthProvider"
-import Loader from "../../components/views/loader/Loader"
-import { Box, useMediaQuery } from "@mui/material"
-import LeftMenu from "../../components/views/viewer/LeftMenu/LeftMenu"
+import * as actions from "store/actions"
 import { v4 as uuidv4 } from "uuid"
+import { useAuth } from "../../HOCs/AuthProvider"
+import useCountLivestreamAttendanceMinutes from "../../components/custom-hook/useCountLivestreamAttendanceMinutes"
+import useRewardLivestreamAttendance from "../../components/custom-hook/useRewardLivestreamAttendance"
+import useStreamConnect from "../../components/custom-hook/useStreamConnect"
+import useStreamRef from "../../components/custom-hook/useStreamRef"
+import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect"
+import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
+import Loader from "../../components/views/loader/Loader"
+import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
+import LeftMenu from "../../components/views/viewer/LeftMenu/LeftMenu"
+import { LEFT_MENU_WIDTH } from "../../constants/streams"
+import RTCProvider from "../../context/agora/RTCProvider"
 import {
    CurrentStreamContext,
    CurrentStreamContextInterface,
 } from "../../context/stream/StreamContext"
-import useStreamConnect from "../../components/custom-hook/useStreamConnect"
-import useStreamRef from "../../components/custom-hook/useStreamRef"
-import { useDispatch, useSelector } from "react-redux"
-import * as actions from "store/actions"
-import RTMProvider from "context/agora/RTMProvider"
-import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect"
-import AgoraRTC from "agora-rtc-sdk-ng"
-import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
-import useRewardLivestreamAttendance from "../../components/custom-hook/useRewardLivestreamAttendance"
-import useCountLivestreamAttendanceMinutes from "../../components/custom-hook/useCountLivestreamAttendanceMinutes"
+import { groupRepo } from "../../data/RepositoryInstances"
+import { agoraCredentials } from "../../data/agora/AgoraInstance"
+import GroupsUtil from "../../data/util/GroupsUtil"
+import { RootState } from "../../store"
 import {
    focusModeEnabledSelector,
    leftMenuOpenSelector,
 } from "../../store/selectors/streamSelectors"
-import { groupRepo } from "../../data/RepositoryInstances"
-import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
-import { agoraCredentials } from "../../data/agora/AgoraInstance"
-import RTCProvider from "../../context/agora/RTCProvider"
-import { LEFT_MENU_WIDTH } from "../../constants/streams"
-import { dataLayerEvent } from "../../util/analyticsUtils"
-import { errorLogAndNotify } from "../../util/CommonUtil"
-import GroupsUtil from "../../data/util/GroupsUtil"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { sxStyles } from "../../types/commonTypes"
-import { RootState } from "../../store"
-import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
-import { appendCurrentQueryParams } from "components/util/url"
+import { errorLogAndNotify } from "../../util/CommonUtil"
+import { dataLayerEvent } from "../../util/analyticsUtils"
+import ViewerTopBar from "./ViewerTopBar"
 
 const styles = sxStyles({
    root: {
@@ -321,12 +319,6 @@ const ViewerLayout = (props) => {
 
    useRewardLivestreamAttendance(currentLivestream)
    useCountLivestreamAttendanceMinutes(currentLivestream)
-
-   useConditionalRedirect(
-      // Do not redirect to new UI if the current stream is a breakout room, as we don't support the new UI for breakout rooms
-      isBreakout ? false : currentLivestream?.useNewUI,
-      appendCurrentQueryParams(`/streaming/viewer/${livestreamId}`)
-   )
 
    if (notAuthorized) {
       void replace({

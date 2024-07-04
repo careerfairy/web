@@ -36,11 +36,9 @@ export const Content = () => {
       // When a poll is started, we want all viewers to be redirected to the polls view
       if (ongoingPollId) {
          dispatch(openPolls())
-      } else {
          // When a poll is not active, we want the recording window to go back to the Q&A view
-         if (isRecordingWindow) {
-            dispatch(setActiveView(ActiveViews.QUESTIONS))
-         }
+      } else if (isRecordingWindow) {
+         dispatch(setActiveView(ActiveViews.QUESTIONS))
       }
    }, [dispatch, ongoingPollId, isRecordingWindow])
 

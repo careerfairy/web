@@ -4,6 +4,7 @@ import { SidePanelView } from "./SidePanelView"
 import { Box, CircularProgress } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useParticipatingUsers } from "components/custom-hook/streaming/useParticipatingUsers"
+import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { Eye } from "react-feather"
 import {
    useCurrentViewCount,
@@ -80,7 +81,9 @@ const AllAttendees = () => {
 
 const CurrentRTMChannelMembers = () => {
    const rtmChannel = useRTMChannel()
-   const { members } = useChannelMembers(rtmChannel)
+   const { members } = useChannelMembers(rtmChannel, [
+      STREAM_IDENTIFIERS.RECORDING,
+   ])
 
    return <GenericListRenderer items={members || []} itemKey={(item) => item} />
 }

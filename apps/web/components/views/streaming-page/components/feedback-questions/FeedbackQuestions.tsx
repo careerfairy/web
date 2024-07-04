@@ -46,7 +46,7 @@ export const FeedbackQuestions = () => {
       "livestreams"
    )
 
-   if (isRecordingWindow) return
+   if (isRecordingWindow) return null
 
    const sortQuestions = (questions) =>
       questions.sort((q1, q2) => (q1.appearAfter > q2.appearAfter ? 1 : -1))

@@ -1,34 +1,32 @@
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import makeStyles from "@mui/styles/makeStyles"
+import AgoraRTC from "agora-rtc-sdk-ng"
+import RTMProvider from "context/agora/RTMProvider"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useRouter } from "next/router"
 import PropTypes from "prop-types"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import StreamerTopBar from "./StreamerTopBar"
-import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay"
-import LeftMenu from "../../components/views/streaming/LeftMenu/LeftMenu"
-import Loader from "../../components/views/loader/Loader"
-import { useRouter } from "next/router"
-import NotificationsContext from "../../context/notifications/NotificationsContext"
-import { CurrentStreamContext } from "../../context/stream/StreamContext"
-import { v4 as uuidv4 } from "uuid"
+import isEqual from "react-fast-compare"
+import { useDispatch, useSelector } from "react-redux"
 import { isEmpty, isLoaded } from "react-redux-firebase"
-import useMediaQuery from "@mui/material/useMediaQuery"
+import * as actions from "store/actions"
+import { v4 as uuidv4 } from "uuid"
 import useStreamConnect from "../../components/custom-hook/useStreamConnect"
 import useStreamRef from "../../components/custom-hook/useStreamRef"
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect"
-import { useDispatch, useSelector } from "react-redux"
-import * as actions from "store/actions"
-import RTMProvider from "context/agora/RTMProvider"
-import AgoraRTC from "agora-rtc-sdk-ng"
+import Loader from "../../components/views/loader/Loader"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
-import { leftMenuOpenSelector } from "../../store/selectors/streamSelectors"
-import { agoraCredentials } from "../../data/agora/AgoraInstance"
-import RTCProvider from "../../context/agora/RTCProvider"
-import isEqual from "react-fast-compare"
+import LeftMenu from "../../components/views/streaming/LeftMenu/LeftMenu"
+import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay"
 import { LEFT_MENU_WIDTH } from "../../constants/streams"
+import RTCProvider from "../../context/agora/RTCProvider"
+import NotificationsContext from "../../context/notifications/NotificationsContext"
+import { CurrentStreamContext } from "../../context/stream/StreamContext"
+import { agoraCredentials } from "../../data/agora/AgoraInstance"
+import { leftMenuOpenSelector } from "../../store/selectors/streamSelectors"
 import { dataLayerEvent } from "../../util/analyticsUtils"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { useConditionalRedirect } from "../../components/custom-hook/useConditionalRedirect"
-import { appendCurrentQueryParams } from "components/util/url"
+import StreamerTopBar from "./StreamerTopBar"
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -249,18 +247,6 @@ const StreamerLayout = (props) => {
             : null,
       }),
       [currentLivestream, isBreakout, isMainStreamer, selectedState, streamerId]
-   )
-
-   useConditionalRedirect(
-      /**
-       * Redirect to the new UI ONLY under the following conditions:
-       * - The stream is not a breakout room (new UI does not support breakout rooms)
-       * - The token has been verified OR it's a test stream
-       */
-      !isBreakout && (tokenChecked || currentLivestream?.test)
-         ? currentLivestream?.useNewUI
-         : false,
-      appendCurrentQueryParams(`/streaming/host/${livestreamId}`)
    )
 
    const tokenIsValidated = () => {
