@@ -333,13 +333,6 @@ const moduleExports = {
          "127.0.0.1",
       ],
    },
-   webpackDevMiddleware: (config) => {
-      config.watchOptions = {
-         poll: 1000,
-         aggregateTimeout: 300,
-      }
-      return config
-   },
    webpack: (config) => {
       config.module.rules.push({
          test: /\.wav$/,
