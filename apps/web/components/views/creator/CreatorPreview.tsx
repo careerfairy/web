@@ -16,10 +16,7 @@ const styles = sxStyles({
    root: {
       display: "flex",
       position: "relative",
-      width: {
-         xs: "100%",
-         md: 494,
-      },
+
       borderRadius: 2,
       border: "1px solid #F8F8F8",
       p: 3.5,
