@@ -20,20 +20,14 @@ export const missingDataFields = [
    {
       description: "Business Functions",
       isMissing: (userData) => {
-         return (
-            !userData.businessFunctionsTagIds ||
-            userData.businessFunctionsTagIds.length === 0
-         )
+         return !userData.businessFunctionsTagIds?.length
       },
       component: () => BusinessFunctionsTagSelector,
    },
    {
       description: "Content Topics",
       isMissing: (userData) => {
-         return (
-            !userData.contentTopicsTagIds ||
-            userData.contentTopicsTagIds.length === 0
-         )
+         return !userData.contentTopicsTagIds?.length
       },
       component: () => ContentTopicsTagSelector,
    },
