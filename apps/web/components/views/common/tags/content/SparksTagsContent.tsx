@@ -1,31 +1,51 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { Stack } from "@mui/material"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
+import { Typography } from "@mui/material"
+import { SparksCarouselWithArrows } from "components/views/portal/sparks/SparksCarouselWithArrows"
+import { useRouter } from "next/router"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   heading: {
+      fontSize: "18px",
+      fontWeight: 600,
+   },
+})
 
 type Props = {
    sparks: Spark[]
+   selectedTagLabel: string
 }
 
-// TODO: pass limit
-const SparksTagsContent = ({ sparks }: Props) => {
-   console.log(
-      "🚀 ~ SparksTagsContent Sparks:",
-      sparks?.map((s) => s.id)
-   )
+const SparksTagsContent = ({ sparks, selectedTagLabel }: Props) => {
+   const router = useRouter()
+
+   const handleSparksClicked = (spark: Spark) => {
+      if (!spark) return
+
+      return router.push({
+         pathname: `/sparks/${spark.id}`,
+         query: {
+            ...router.query, // spread current query params
+            interactionSource: SparkInteractionSources.PortalTag,
+         },
+      })
+   }
+
+   if (!sparks.length) return null
 
    return (
-      <>
-         <h4>HI SPARKY: with {sparks?.length} SPARKS!!</h4>
-
-         {sparks?.map((e, i) => {
-            return (
-               <Stack key={i}>
-                  <h5>{e.id}</h5>
-                  <h6>CT: {e?.contentTopicsTagIds}</h6>
-                  <h6>LG: {e.languageTagIds}</h6>
-               </Stack>
-            )
-         })}
-      </>
+      <SparksCarouselWithArrows
+         header={
+            <Typography
+               sx={styles.heading}
+               color="neutral.800"
+            >{`Sparks talking about ${selectedTagLabel}`}</Typography>
+         }
+         showArrows
+         sparks={sparks}
+         handleSparksClicked={handleSparksClicked}
+      />
    )
 }
 

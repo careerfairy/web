@@ -1,3 +1,4 @@
+import { CompanyIndustryValuesLookup } from "@careerfairy/shared-lib/constants/forms"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    LIVESTREAM_FIELDS_TO_INDEX,
@@ -6,9 +7,17 @@ import {
    LIVESTREAM_SEARCHABLE_ATTRIBUTES,
    TransformedLivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams/search"
-import { Index } from "./searchIndexGenerator"
+
+import {
+   SPARK_FIELDS_TO_INDEX,
+   SPARK_FILTERING_FIELDS,
+   SPARK_REPLICAS,
+   SPARK_SEARCHABLE_ATTRIBUTES,
+   TransformedSpark,
+} from "@careerfairy/shared-lib/sparks/search"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { removeDuplicates } from "@careerfairy/shared-lib/utils"
-import { CompanyIndustryValuesLookup } from "@careerfairy/shared-lib/constants/forms"
+import { Index } from "./searchIndexGenerator"
 
 const livestreamIndex = {
    collectionPath: "livestreams",
@@ -41,8 +50,24 @@ const livestreamIndex = {
    },
 } satisfies Index<LivestreamEvent, TransformedLivestreamEvent>
 
+const sparkIndex = {
+   collectionPath: "sparks",
+   indexName: "sparks" as const, // To allow inferring the type of the index name
+   fields: removeDuplicates(SPARK_FIELDS_TO_INDEX),
+   transformData: (data) => ({
+      ...data,
+      createdAtMs: data.createdAt?.toDate?.().getTime() ?? null,
+   }),
+   settings: {
+      attributesForFaceting: SPARK_FILTERING_FIELDS,
+      searchableAttributes: SPARK_SEARCHABLE_ATTRIBUTES,
+      replicas: [SPARK_REPLICAS.START_DESC, SPARK_REPLICAS.START_ASC],
+   },
+} satisfies Index<Spark, TransformedSpark>
+
 export const knownIndexes = {
    [livestreamIndex.indexName]: livestreamIndex,
+   [sparkIndex.indexName]: sparkIndex,
 } as const satisfies Record<string, Index>
 
 export type IndexName = keyof typeof knownIndexes

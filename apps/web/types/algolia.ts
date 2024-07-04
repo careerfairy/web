@@ -3,6 +3,11 @@ import {
    FieldToIndexType,
    TransformedLivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams/search"
+
+import {
+   FieldToIndexType as SparkFieldToIndexType,
+   TransformedSpark,
+} from "@careerfairy/shared-lib/sparks/search"
 import firebase from "firebase/compat/app"
 
 /**
@@ -40,6 +45,16 @@ export type LivestreamAlgoliaHit = Hit<AlgoliaLivestreamResponse>
 
 // The search result type with deserialized timestamps.
 export type LivestreamSearchResult = DeserializeTimestamps<LivestreamAlgoliaHit>
+
+// The spark data type stored in the Algolia index.
+export type AlgoliaSparkResponse = SerializeTimestamps<
+   Pick<TransformedSpark, SparkFieldToIndexType>
+>
+
+export type SparkAlgoliaHit = Hit<AlgoliaSparkResponse>
+
+// The search result type with deserialized timestamps.
+export type SparkSearchResult = DeserializeTimestamps<SparkAlgoliaHit>
 
 // Filters
 export type DateFilterFieldType<T> = {

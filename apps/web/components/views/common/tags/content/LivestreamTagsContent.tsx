@@ -1,72 +1,99 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Button, Stack } from "@mui/material"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
+import { Box, Button, Grid, Stack, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { ChevronDown } from "react-feather"
+import { sxStyles } from "types/commonTypes"
+import EventPreviewCard from "../../stream-cards/EventPreviewCard"
+
+const styles = sxStyles({
+   seeMore: {
+      color: (theme) => theme.palette.neutral[600],
+      borderRadius: "20px",
+      border: (theme) => `1px solid ${theme.palette.neutral[200]}`,
+      "&:hover": {
+         backgroundColor: (theme) => theme.palette.neutral[200],
+      },
+      mx: "15px !important",
+   },
+   heading: {
+      fontSize: "18px",
+      pl: 2,
+      fontWeight: 600,
+   },
+   eventsRowWrapper: {
+      px: 2,
+      flexWrap: "wrap",
+   },
+   slide: {
+      position: "relative",
+      maxWidth: "368px",
+      ml: 2,
+   },
+})
 
 type Props = {
    events: LivestreamEvent[]
    onSeeMore: () => void
-}
-// TODO: Use for coming up and past
-export const UpcomingLivestreamTagsContent = (props: Props) => {
-   //  const { data: upcomingEvents } = useLivestreamsByTags({
-   //     type: "upcomingEvents",
-   //     tags: tags,
-   //     limit: 6,
-   //  })
-   // TODO: move to category tags content
-   return <LivestreamTagsContent {...props} title="Upcoming Events" />
-}
-
-export const PastLivestreamTagsContent = (props: Props) => {
-   // const { data: pastEvents } = useLivestreamsByTags({
-   //     type: "pastEvents",
-   //     tags: tags,
-   //     limit: 6,
-   //  })
-   // TODO: move to category tags content
-   return <LivestreamTagsContent {...props} title="Past Events" />
-}
-
-type LivestreamTagsContentProps = {
    title: string
-   events: LivestreamEvent[]
-   onSeeMore: () => void
+   seeMoreDisabled?: boolean
 }
 
-// TODO: pass limit
-const LivestreamTagsContent = ({
-   events,
-   title,
-   onSeeMore,
-}: LivestreamTagsContentProps) => {
-   console.log(
-      "🚀 ~ LivestreamTagsContent ~" + title + "events:",
-      events?.map((e) => e.id)
+const LivestreamTagsContent = (props: Props) => {
+   return (
+      <Stack>
+         <Typography sx={styles.heading} color="neutral.800">
+            {props.title}
+         </Typography>
+         <EventsPreview {...props} />
+      </Stack>
    )
+}
+
+const EventsPreview = ({ events, seeMoreDisabled, onSeeMore }: Props) => {
+   const isMobile = useIsMobile()
 
    return (
-      <>
-         <h4>
-            HI THERE: {title} - with {events?.length} events
-         </h4>
-         {events?.map((e, i) => {
-            return (
-               <Stack direction={"row"} key={i}>
-                  <h5>{e.id}</h5>
-                  <h6>BF: {e?.businessFunctionsTagIds}</h6>
-                  <h6>CT: {e?.contentTopicsTagIds}</h6>
-                  <h6>LG: {e.language?.code}</h6>
-               </Stack>
-            )
-         })}
-         <Button onClick={onSeeMore}> See more 2</Button>
-      </>
+      <Stack direction={"column"} sx={{ width: "100%" }} spacing={1}>
+         <Box sx={{ p: { xs: 2, md: 2 }, width: "100%" }}>
+            <Grid container spacing={isMobile ? 2 : 3}>
+               {events.map((livestream, idx, arr) => {
+                  return (
+                     <Grid
+                        key={livestream.id}
+                        xs={12}
+                        sm={6}
+                        lg={4}
+                        xl={3}
+                        item
+                     >
+                        <EventPreviewCard
+                           key={livestream.id}
+                           index={idx}
+                           totalElements={arr.length}
+                           // TODO: Check location
+                           location={
+                              ImpressionLocation.recommendedEventsCarousel
+                           }
+                           event={livestream}
+                           isRecommended
+                        />
+                     </Grid>
+                  )
+               })}
+            </Grid>
+         </Box>
+         <Button
+            disabled={seeMoreDisabled}
+            onClick={onSeeMore}
+            sx={[styles.seeMore]}
+         >
+            See more <ChevronDown />
+         </Button>
+      </Stack>
    )
 }
 
-// const Loader = () => {
-//    return (
-//       <>
-//          <h1>TODO SKELETON</h1>
-//       </>
-//    )
-// }
+export default LivestreamTagsContent
