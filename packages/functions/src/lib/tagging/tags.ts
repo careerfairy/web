@@ -8,7 +8,7 @@ import {
 } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import _ from "lodash"
-import { livestreamIndex, sparksIndex } from "../../api/algolia"
+
 import config from "../../config"
 import {
    CacheKeyOnCallFn,
@@ -16,6 +16,8 @@ import {
 } from "../../middlewares/cacheMiddleware"
 import { middlewares } from "../../middlewares/middlewares"
 import { getChangeTypes } from "../../util"
+import { knownIndexes } from "../search/searchIndexes"
+import { initAlgoliaIndex } from "../search/util"
 import { TagsService } from "./services/TagsService"
 // TODO: Update documentation
 
@@ -252,6 +254,13 @@ export const fetchContentHits = functions.region(config.region).https.onCall(
    middlewares(
       cacheTagHits((data) => registrationSourcesCacheKey({ ...data })),
       async () => {
+         const livestreamIndex = initAlgoliaIndex(
+            knownIndexes.livestreams.indexName
+         )
+
+         const sparksIndex = initAlgoliaIndex(
+            knownIndexes.livestreams.indexName
+         )
          const tagsService = new TagsService(livestreamIndex, sparksIndex)
 
          return tagsService.countHits()

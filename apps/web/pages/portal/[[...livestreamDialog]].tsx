@@ -39,6 +39,7 @@ import EventsPreviewCarousel, {
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
 import { UserSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
+import WidgetsWrapper from "components/views/portal/WidgetsWrapper"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
 import { sxStyles } from "types/commonTypes"
 import {
@@ -237,7 +238,7 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
    }
 
    return (
-      <Box m={0}>
+      <WidgetsWrapper>
          <TagsCarouselWithArrow
             selectedCategories={selectedCategories}
             tags={availableCategories}
@@ -250,7 +251,7 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
          >
             {children}
          </ConditionalWrapper>
-      </Box>
+      </WidgetsWrapper>
    )
 }
 
