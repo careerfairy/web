@@ -15,11 +15,15 @@ import TestimonialSection from "./TestimonialSection"
 export const TestimonialsOrMentorsSection = () => {
    const { mentorsV1 } = useFeatureFlags()
    const {
+      group,
+      groupCreators,
       sectionRefs: { testimonialOrMentorsSectionRef },
    } = useCompanyPage()
    const isMounted = useMountedState()
 
    if (!isMounted()) return null
+
+   if (!group.testimonials.length && !groupCreators.length) return null
 
    return (
       <Box sx={{ position: "relative" }}>
