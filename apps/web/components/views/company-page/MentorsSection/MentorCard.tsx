@@ -53,7 +53,7 @@ type MentorCardProps = {
    isEditMode?: boolean
 }
 
-const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
+export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
 
@@ -81,5 +81,3 @@ const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
       </Box>
    )
 }
-
-export default MentorCard
