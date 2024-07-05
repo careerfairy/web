@@ -118,7 +118,7 @@ export const useChannelMembers = (channel: RtmChannel) => {
    const filteredMembers = useMemo(
       () =>
          data?.filter((member) => {
-            const isRecordBot = member.startsWith(STREAM_IDENTIFIERS.USER)
+            const isRecordBot = member.startsWith(STREAM_IDENTIFIERS.RECORDING)
             if (isRecordBot) {
                dispatch(setIsRecordingBotInRoom(true))
             }
