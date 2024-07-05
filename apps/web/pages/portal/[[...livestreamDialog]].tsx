@@ -178,7 +178,12 @@ const PortalTagsContent = ({ children }: PortalTagsContentProps) => {
 }
 // TODO: Check animations
 const PortalTags = ({ children }: PortalTagsContentProps) => {
+   const { query } = useRouter()
+   const fromSparksFeedTags = Boolean(query.interactionSource)
+   console.log("🚀 ~ PortalTags ~ fromSparksFeedTags:", fromSparksFeedTags)
    const availableCategories = useAvailableTagsByHits()
+
+   const [allSelected, setAllSelected] = useState(false)
 
    const [categoriesData, setCategoriesData] = useState(() => {
       return Object.fromEntries(
@@ -214,24 +219,19 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
          })
       )
 
-      // newCategories[categoryId].selected = !newCategories[categoryId].selected
-
       setCategoriesData(newCategories)
    }
 
    const handleAllCategoryChipClicked = () => {
-      // TODO: Could be better
-      const anyUnselected = Object.keys(categoriesData)
-         .map((cat) => !categoriesData[cat].selected)
-         .filter(Boolean).length
+      setAllSelected(!allSelected)
+
+      // const anyUnselected = Object.keys(categoriesData)
+      //    .map((cat) => !categoriesData[cat].selected)
+      //    .filter(Boolean).length
 
       Object.keys(categoriesData).forEach((cat) => {
          const newCategories = { ...categoriesData }
-         if (anyUnselected!) {
-            newCategories[cat].selected = true
-         } else {
-            newCategories[cat].selected = false
-         }
+         newCategories[cat].selected = false
 
          setCategoriesData(newCategories)
       })
@@ -244,6 +244,7 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
             tags={availableCategories}
             handleTagClicked={handleCategoryChipClicked}
             handleAllClicked={handleAllCategoryChipClicked}
+            allSelected={allSelected}
          />
          <ConditionalWrapper
             condition={!selectedCategories.length}

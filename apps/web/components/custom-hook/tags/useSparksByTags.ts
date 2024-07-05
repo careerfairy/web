@@ -12,12 +12,17 @@ export const useSparksByTags = (
    totalItems?: number
 ): Spark[] => {
    // TODO: pass total items per page
-   const { data } = useSparkSearchAlgolia("", {
-      arrayFilters: {
-         contentTopicsTagIds: Object.keys(tags.contentTopics),
-         languageTagIds: Object.keys(tags.language),
+   console.log("🚀 ~ useSparksByTags -> tags:", tags)
+   const { data } = useSparkSearchAlgolia(
+      "",
+      {
+         arrayFilters: {
+            contentTopicsTagIds: Object.keys(tags.contentTopics),
+            languageTagIds: Object.keys(tags.language),
+         },
       },
-   })
+      totalItems
+   )
 
    return (data?.deserializedHits || []).slice(0, totalItems)
 }
