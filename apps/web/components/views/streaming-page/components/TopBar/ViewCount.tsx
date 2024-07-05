@@ -30,7 +30,7 @@ export const ViewCount = () => {
          variant="outlined"
          startIcon={<Eye />}
       >
-         {members?.length}
+         {members?.length || 0}
       </ResponsiveStreamButton>
    )
 }
