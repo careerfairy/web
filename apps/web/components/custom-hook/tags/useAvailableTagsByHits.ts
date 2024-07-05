@@ -10,7 +10,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import { useTagsContentHits } from "./useTagsContentHits"
 
 /**
- * TODO: Add additional docs, and could be moved to to CF
+ * Retrieves all tags (see TagValues @packages/shared-lib/src/constants/tags.ts)
  * @returns
  */
 export const useAvailableTagsByHits = () => {
