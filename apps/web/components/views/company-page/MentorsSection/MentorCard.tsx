@@ -48,12 +48,12 @@ const styles = sxStyles({
 })
 
 type MentorCardProps = {
+   key: string
    creator: PublicCreator
-   key?: string
    isEditMode?: boolean
 }
 
-const MentorCard = ({ creator, key, isEditMode }: MentorCardProps) => {
+const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
 

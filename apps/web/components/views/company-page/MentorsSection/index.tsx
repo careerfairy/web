@@ -1,10 +1,10 @@
-// @ts-ignore
 import { Box, IconButton, Typography } from "@mui/material"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import { useMemo } from "react"
 import { ArrowLeft, ArrowRight } from "react-feather"
+import { useMountedState } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { useCompanyPage } from ".."
 import MentorCard from "./MentorCard"
@@ -34,10 +34,12 @@ const styles = sxStyles({
    },
 })
 
-const MentorsSection = () => {
+export const MentorsSection = () => {
    const { editMode, groupCreators } = useCompanyPage()
 
    const isDesktop = useIsDesktop()
+
+   const isMounted = useMountedState()
 
    const emblaOptions = useMemo<EmblaOptionsType>(
       () => ({
@@ -50,7 +52,9 @@ const MentorsSection = () => {
       WheelGesturesPlugin(),
    ])
 
-   if (!groupCreators.length) return null
+   if (!groupCreators?.length) return null
+
+   if (!isMounted()) return null
 
    return (
       <Box>
@@ -95,5 +99,3 @@ const MentorsSection = () => {
       </Box>
    )
 }
-
-export default MentorsSection

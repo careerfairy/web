@@ -1,22 +1,21 @@
-import { Box, IconButton, Typography } from "@mui/material"
-import { sxStyles } from "../../../../types/commonTypes"
-import { SectionAnchor, TabValue, useCompanyPage } from "../index"
-import { useCallback, useMemo, useState } from "react"
-import Add from "@mui/icons-material/Add"
-import TestimonialCard from "./TestimonialCard"
-import EditDialog from "../EditDialog"
-import TestimonialDialog from "./TestimonialDialog"
 import { Testimonial } from "@careerfairy/shared-lib/groups"
-import { ArrowLeft, ArrowRight } from "react-feather"
-import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import { useMountedState } from "react-use"
+import Add from "@mui/icons-material/Add"
+import { Box, IconButton, Typography } from "@mui/material"
+import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
+import AutoHeight from "embla-carousel-auto-height"
 import useEmblaCarousel, {
    EmblaOptionsType,
    EmblaPluginType,
 } from "embla-carousel-react"
-import React from "react"
-import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
-import AutoHeight from "embla-carousel-auto-height"
+import React, { useCallback, useMemo, useState } from "react"
+import { ArrowLeft, ArrowRight } from "react-feather"
+import { useMountedState } from "react-use"
+import { sxStyles } from "../../../../types/commonTypes"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import EditDialog from "../EditDialog"
+import { useCompanyPage } from "../index"
+import TestimonialCard from "./TestimonialCard"
+import TestimonialDialog from "./TestimonialDialog"
 
 const styles = sxStyles({
    titleSection: {
@@ -49,11 +48,7 @@ const styles = sxStyles({
 })
 
 const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
-   const {
-      group,
-      editMode,
-      sectionRefs: { testimonialSectionRef },
-   } = useCompanyPage()
+   const { group, editMode } = useCompanyPage()
    const [testimonialToEdit, setTestimonialToEdit] = useState(null)
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
@@ -105,87 +100,77 @@ const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
 
    return isMounted() ? (
       <>
-         <Box position="relative">
-            <SectionAnchor
-               ref={testimonialSectionRef}
-               tabValue={TabValue.testimonials}
-            />
-            <Box sx={styles.titleSection}>
-               <Typography variant="h4" fontWeight={"600"} color="black" mb={1}>
-                  Testimonials
-               </Typography>
-               <>
-                  {editMode ? (
-                     <IconButton
-                        data-testid={"testimonial-section-edit-button"}
-                        color="secondary"
-                        onClick={handleOpenDialog}
-                     >
-                        <Add fontSize={"large"} />
-                     </IconButton>
-                  ) : (
-                     <> </>
-                  )}
-                  {group?.testimonials?.length > 1 ? (
-                     <Box>
-                        <IconButton
-                           color="inherit"
-                           sx={styles.arrowIcon}
-                           onClick={() => {
-                              if (emblaApi.canScrollPrev())
-                                 emblaApi.scrollPrev()
-                           }}
-                        >
-                           <ArrowLeft fontSize={"large"} />
-                        </IconButton>
-                        <IconButton
-                           color="inherit"
-                           sx={styles.arrowIcon}
-                           onClick={() => {
-                              if (emblaApi.canScrollNext())
-                                 emblaApi.scrollNext()
-                           }}
-                        >
-                           <ArrowRight fontSize={"large"} />
-                        </IconButton>
-                     </Box>
-                  ) : null}
-               </>
-            </Box>
-
-            <Box mt={1}>
-               {group?.testimonials?.length > 0 ? (
-                  <Box sx={styles.viewport} ref={emblaRef}>
-                     <Box sx={styles.container}>
-                        <>
-                           {group?.testimonials?.map((testimonial) => (
-                              <Box
-                                 sx={styles.slide}
-                                 key={"testimonial-slide-box-" + testimonial.id}
-                              >
-                                 <TestimonialCard
-                                    key={testimonial.id}
-                                    testimonial={testimonial}
-                                    handleEditTestimonial={
-                                       handleEditTestimonial
-                                    }
-                                 />
-                              </Box>
-                           ))}
-                        </>
-                     </Box>
-                  </Box>
-               ) : (
-                  <Typography
-                     variant="h6"
-                     fontWeight={"400"}
-                     color="textSecondary"
+         <Box sx={styles.titleSection}>
+            <Typography variant="h4" fontWeight={"600"} color="black" mb={1}>
+               Testimonials
+            </Typography>
+            <>
+               {editMode ? (
+                  <IconButton
+                     data-testid={"testimonial-section-edit-button"}
+                     color="secondary"
+                     onClick={handleOpenDialog}
                   >
-                     This section will not be shown to users until at least one
-                     employee personal story has been added.
-                  </Typography>
+                     <Add fontSize={"large"} />
+                  </IconButton>
+               ) : (
+                  <> </>
                )}
-            </Box>
+               {group?.testimonials?.length > 1 ? (
+                  <Box>
+                     <IconButton
+                        color="inherit"
+                        sx={styles.arrowIcon}
+                        onClick={() => {
+                           if (emblaApi.canScrollPrev()) emblaApi.scrollPrev()
+                        }}
+                     >
+                        <ArrowLeft fontSize={"large"} />
+                     </IconButton>
+                     <IconButton
+                        color="inherit"
+                        sx={styles.arrowIcon}
+                        onClick={() => {
+                           if (emblaApi.canScrollNext()) emblaApi.scrollNext()
+                        }}
+                     >
+                        <ArrowRight fontSize={"large"} />
+                     </IconButton>
+                  </Box>
+               ) : null}
+            </>
+         </Box>
+
+         <Box mt={1}>
+            {group?.testimonials?.length > 0 ? (
+               <Box sx={styles.viewport} ref={emblaRef}>
+                  <Box sx={styles.container}>
+                     <>
+                        {group?.testimonials?.map((testimonial) => (
+                           <Box
+                              sx={styles.slide}
+                              key={"testimonial-slide-box-" + testimonial.id}
+                           >
+                              <TestimonialCard
+                                 key={testimonial.id}
+                                 testimonial={testimonial}
+                                 handleEditTestimonial={handleEditTestimonial}
+                              />
+                           </Box>
+                        ))}
+                     </>
+                  </Box>
+               </Box>
+            ) : (
+               <Typography
+                  variant="h6"
+                  fontWeight={"400"}
+                  color="textSecondary"
+               >
+                  This section will not be shown to users until at least one
+                  employee personal story has been added.
+               </Typography>
+            )}
          </Box>
 
          {isDialogOpen ? (
