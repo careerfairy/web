@@ -45,7 +45,7 @@ const styles = sxStyles({
    },
 })
 
-const containerVariants: Variants = {
+const containerAnimationVariants: Variants = {
    hidden: { opacity: 0 },
    visible: {
       opacity: 1,
@@ -55,7 +55,7 @@ const containerVariants: Variants = {
    },
 }
 
-const itemVariants: Variants = {
+const itemAnimationVariants: Variants = {
    hidden: { opacity: 0, y: 20 },
    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 }
@@ -64,7 +64,7 @@ export const SelectSpeakerView = () => {
    const streamIsMobile = useStreamIsMobile()
    return (
       <FramerBox
-         variants={containerVariants}
+         variants={containerAnimationVariants}
          initial="hidden"
          animate="visible"
          sx={[
@@ -72,19 +72,19 @@ export const SelectSpeakerView = () => {
             streamIsMobile ? styles.rootMobile : styles.rootDesktop,
          ]}
       >
-         <FramerBox variants={itemVariants}>
+         <FramerBox variants={itemAnimationVariants}>
             <HostDetails />
          </FramerBox>
-         <FramerBox variants={itemVariants}>
+         <FramerBox variants={itemAnimationVariants}>
             <StartDate />
          </FramerBox>
-         <FramerBox variants={itemVariants}>
+         <FramerBox variants={itemAnimationVariants}>
             <Heading />
          </FramerBox>
-         <FramerBox variants={itemVariants}>
+         <FramerBox variants={itemAnimationVariants}>
             <SubHeading />
          </FramerBox>
-         <FramerBox variants={itemVariants}>
+         <FramerBox variants={itemAnimationVariants}>
             <SpeakersList />
          </FramerBox>
       </FramerBox>
