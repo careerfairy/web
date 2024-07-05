@@ -36,7 +36,6 @@ const SparkCarouselCard: FC<Props> = ({
    onGoNext,
 }) => {
    const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
-   console.log("🚀 ~ sparkPresenter:", sparkPresenter)
    const [autoPlaying, setAutoPlaying] = useState(false)
    const containerRef = useRef<HTMLDivElement>(null)
    const isMobile = useIsMobile()
