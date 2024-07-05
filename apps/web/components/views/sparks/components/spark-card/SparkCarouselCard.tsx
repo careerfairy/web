@@ -1,16 +1,16 @@
-import { FC, useEffect, useRef, useState } from "react"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import Box from "@mui/material/Box"
-import { sxStyles } from "types/commonTypes"
-import SparkHeader from "./SparkHeader"
-import SparkCategoryChip from "./SparkCategoryChip"
-import SparkQuestion from "./SparkQuestion"
-import { Stack } from "@mui/material"
-import SparkCarouselCardContainer from "./SparkCarouselCardContainer"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { Stack } from "@mui/material"
+import Box from "@mui/material/Box"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { debounce } from "lodash"
+import { FC, useEffect, useRef, useState } from "react"
+import { sxStyles } from "types/commonTypes"
+import SparkCarouselCardContainer from "./SparkCarouselCardContainer"
+import SparkCategoryChip from "./SparkCategoryChip"
+import SparkHeader from "./SparkHeader"
+import SparkQuestion from "./SparkQuestion"
 
 const cardPadding = 2
 
@@ -36,6 +36,7 @@ const SparkCarouselCard: FC<Props> = ({
    onGoNext,
 }) => {
    const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
+   console.log("🚀 ~ sparkPresenter:", sparkPresenter)
    const [autoPlaying, setAutoPlaying] = useState(false)
    const containerRef = useRef<HTMLDivElement>(null)
    const isMobile = useIsMobile()

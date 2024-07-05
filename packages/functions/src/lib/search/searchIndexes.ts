@@ -59,11 +59,17 @@ const sparkIndex = {
    transformData: (data) => ({
       ...data,
       createdAtMs: data.createdAt?.toDate?.().getTime() ?? null,
+      groupPublicSparks: data.group?.publicSparks,
+      publishedAtMs: data.publishedAt?.toDate?.().getTime() ?? null,
    }),
    settings: {
       attributesForFaceting: SPARK_FILTERING_FIELDS,
       searchableAttributes: SPARK_SEARCHABLE_ATTRIBUTES,
-      replicas: [SPARK_REPLICAS.START_DESC, SPARK_REPLICAS.START_ASC],
+      replicas: [
+         SPARK_REPLICAS.START_DESC,
+         SPARK_REPLICAS.START_ASC,
+         SPARK_REPLICAS.PUBLISHED_AT_DESC,
+      ],
    },
 } satisfies Index<Spark, TransformedSpark>
 
