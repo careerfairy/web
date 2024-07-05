@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight } from "react-feather"
 import { useMountedState } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { useCompanyPage } from ".."
-import MentorCard from "./MentorCard"
+import { MentorCard } from "./MentorCard"
 
 const styles = sxStyles({
    titleSection: {
@@ -21,16 +21,20 @@ const styles = sxStyles({
       minWidth: { xs: "25px", md: "30px" },
       ml: 2,
    },
+   viewport: {
+      overflow: "hidden",
+      // hack to ensure shadows are not cut off
+      padding: 2,
+      marginLeft: -2,
+   },
    container: {
+      position: "relative",
       display: "flex",
       flexDirection: "row",
       alignItems: "flex-start",
       gap: 2,
       touchAction: "pan-y",
       backfaceVisibility: "hidden",
-   },
-   viewport: {
-      overflow: "hidden",
    },
 })
 
