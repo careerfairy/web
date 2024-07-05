@@ -12,10 +12,12 @@ import { ReactNode } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   containerDesktop: {
-      borderRadius: "16px",
+   container: {
       p: "0px !important",
       background: "#FCFCFC",
+   },
+   containerDesktop: {
+      borderRadius: "16px",
       overflow: "auto",
       height: 720,
       maxHeight: 720,
@@ -23,9 +25,9 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
    },
-   drawerMobile: {
-      background: "#FCFCFC",
-      maxHeight: "calc(100vh - 100px)",
+   containerMobile: {
+      marginTop: "auto",
+      maxHeight: "calc(100vh - 70px)",
       borderTopLeftRadius: "16px",
       borderTopRightRadius: "16px",
       width: "100%",
@@ -95,7 +97,12 @@ export const View = ({ children, sx }: ViewProps) => {
          id="host-profile-selection-root"
          maxWidth={false}
          sx={combineStyles(
-            [streamIsMobile ? styles.drawerMobile : styles.containerDesktop],
+            [
+               styles.container,
+               streamIsMobile
+                  ? styles.containerMobile
+                  : styles.containerDesktop,
+            ],
             sx
          )}
       >

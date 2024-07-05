@@ -59,7 +59,7 @@ const styles = sxStyles({
 const AVATAR_SIZE = 136
 
 type Props = {
-   creator: Creator
+   creator?: Creator
    children?: ReactNode
 } & BoxProps
 
