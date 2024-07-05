@@ -50,7 +50,10 @@ export const useCurrentViewCount = () =>
       if (state.streamingApp.rtmSignalingState.failedToConnect) {
          return state.streamingApp.livestreamState.numberOfParticipants
       }
-      return state.streamingApp.rtmSignalingState.viewCount
+      const viewCount = state.streamingApp.rtmSignalingState.viewCount
+      return state.streamingApp.livestreamState.isRecordingBotInRoom
+         ? viewCount - 1
+         : viewCount
    })
 
 export const useIsConnectedOnDifferentBrowser = () =>
@@ -134,4 +137,9 @@ export const useIsTestLivestream = () =>
 export const useIsRecordingWindow = () =>
    useAppSelector(
       (state) => state.streamingApp.livestreamState.isRecordingWindow
+   )
+
+export const useIsRecordingBotInRoom = () =>
+   useAppSelector(
+      (state) => state.streamingApp.livestreamState.isRecordingBotInRoom
    )
