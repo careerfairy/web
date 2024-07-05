@@ -6,9 +6,9 @@ import {
 } from "@careerfairy/shared-lib/sparks/search"
 import algoliaRepo from "data/algolia/AlgoliaRepository"
 import { useCallback } from "react"
-import useSWR from "swr"
+import useSWRInfinite from "swr/infinite"
 import { AlgoliaSparkResponse, SparkSearchResult } from "types/algolia"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { errorLogAndNotify, isTestEnvironment } from "util/CommonUtil"
 import {
    deserializeAlgoliaSearchResponse,
    generateArrayFilterString,
@@ -89,12 +89,13 @@ export function useSparkSearchAlgolia(
       }
    }
 
-   return useSWR<Data>(disable ? null : getKey, fetcher, {
+   return useSWRInfinite<Data>(disable ? null : getKey, fetcher, {
       onError: (error, key) =>
          errorLogAndNotify(error, {
-            message: "Error fetching sparks",
+            message: "Error fetching sparks via Algolia",
             key,
          }),
       keepPreviousData: true,
+      refreshInterval: isTestEnvironment() ? 1000 : undefined,
    })
 }

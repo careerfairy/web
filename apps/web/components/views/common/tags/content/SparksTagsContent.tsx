@@ -1,3 +1,4 @@
+import { ContentTopicsTagValues } from "@careerfairy/shared-lib/constants/tags"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Typography } from "@mui/material"
@@ -28,12 +29,25 @@ const SparksTagsContent = ({
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
 
+      console.log(
+         "🚀 ~ handleSparksClicked ~ CLICKED ON -> :",
+         spark.id + " | " + spark.question
+      )
+      console.log(
+         "🚀 ~ handleSparksClicked ~ PATHNAME -> :",
+         `/sparks/${spark.id}`
+      )
+
       return router.push({
          pathname: `/sparks/${spark.id}`,
          query: {
             ...router.query, // spread current query params
             interactionSource: SparkInteractionSources.PortalTag,
-            tags: selectTagIds,
+            contentTopic: selectTagIds.filter((id) => {
+               return Boolean(
+                  ContentTopicsTagValues.find((tag) => tag.id == id)
+               )
+            }),
          },
       })
    }

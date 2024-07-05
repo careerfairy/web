@@ -59,32 +59,23 @@ type PropType = {
    emblaRef
    tags?: OptionGroup[]
    onTagClick?: (tagId: string) => void
-   onAllClick?: () => void
-   allSelected?: boolean
+   onAllClick?: () => void // Not needed for now, as all is merely a UI indication
 }
 
 const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
-   const {
-      selectedCategories,
-      emblaRef,
-      tags,
-      onTagClick,
-      onAllClick,
-      allSelected,
-   } = props
+   const { selectedCategories, emblaRef, tags, onTagClick } = props
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>
-         <Stack sx={styles.container} direction={"row"} spacing={"12px"}>
+         <Stack direction={"row"} spacing={"12px"}>
             {/* Chip for All  */}
             <Chip
                sx={[
                   styles.chip,
                   styles.allChip,
-                  allSelected ? styles.selectedChip : null,
+                  selectedCategories.length ? styles.selectedChip : null,
                ]}
                label="All"
-               onClick={onAllClick}
             />
             {tags?.length
                ? tags.map((category) => {
