@@ -75,12 +75,12 @@ const sortByUserInterests = (
    }
    const businessFunctions = sortTagsByUserData(
       () => businessFunctionTagIds,
-      () => user.businessFunctionsTagIds || [],
+      () => user?.businessFunctionsTagIds || [],
       createGroupedOptionGroupGetter(groupedTags.businessFunctions)
    )
    const contentTopics = sortTagsByUserData(
       () => contentTopicTagIDs,
-      () => user.contentTopicsTagIds || [],
+      () => user?.contentTopicsTagIds || [],
       createGroupedOptionGroupGetter(groupedTags.contentTopics)
    )
    const languages = sortedLanguages
