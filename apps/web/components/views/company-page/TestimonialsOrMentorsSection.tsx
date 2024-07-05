@@ -21,9 +21,12 @@ export const TestimonialsOrMentorsSection = () => {
    } = useCompanyPage()
    const isMounted = useMountedState()
 
-   if (!isMounted()) return null
-
-   if (!group.testimonials.length && !groupCreators.length) return null
+   if (
+      !isMounted() ||
+      (!group.testimonials?.length && !mentorsV1) ||
+      (!groupCreators?.length && mentorsV1)
+   )
+      return null
 
    return (
       <Box sx={{ position: "relative" }}>
