@@ -1,0 +1,217 @@
+import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
+import {
+   PublicCreator,
+   pickPublicDataFromCreator,
+} from "@careerfairy/shared-lib/groups/creators"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import {
+   SerializedSpark,
+   SparkPresenter,
+} from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
+import { Box, Button } from "@mui/material"
+import * as Sentry from "@sentry/nextjs"
+import SEO from "components/util/SEO"
+import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import {
+   LiveStreamDialogData,
+   LivestreamDialogLayout,
+} from "components/views/livestream-dialog"
+import EventsPreviewCarousel, {
+   EventsTypes,
+} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { groupRepo } from "data/RepositoryInstances"
+import { sparkService } from "data/firebase/SparksService"
+import GenericDashboardLayout from "layouts/GenericDashboardLayout"
+import {
+   GetStaticPaths,
+   GetStaticProps,
+   InferGetStaticPropsType,
+   NextPage,
+} from "next"
+import { useRouter } from "next/router"
+import { getLivestreamsAndDialogData, mapFromServerSide } from "util/serverUtil"
+
+const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   serverSideGroup,
+   serverSideLivestreams,
+   livestreamDialogData,
+   sparks,
+   creator,
+}) => {
+   const {
+      query: { companyName, mentorName },
+   } = useRouter()
+
+   // TODO: track page view (example below), move slug creation out of Mentor Card, make this pretty and fix carousels
+   /* 
+   const viewRef = useTrackPageView({
+      trackDocumentId: id,
+      handleTrack: ({ id, visitorId }: TrackProps) =>
+         trackCompanyPageView(id, visitorId),
+   }) as unknown as React.RefObject<HTMLDivElement>
+   */
+
+   const deseralizedSparks = sparks
+      ?.map(SparkPresenter.deserialize)
+      .map(SparkPresenter.toFirebaseObject)
+
+   return (
+      <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
+         <SEO
+            id={`CareerFairy | ${companyName} | ${mentorName}`}
+            title={`CareerFairy | ${companyName} | ${mentorName}`}
+         />
+
+         <GenericDashboardLayout>
+            <Box
+               sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
+               //ref={viewRef}
+            >
+               <BackButton />
+               <MentorDetail mentor={creator} />
+               <SparksCarousel sparks={deseralizedSparks} />
+               <EventsPreviewCarousel
+                  title="My livestreams"
+                  events={mapFromServerSide(serverSideLivestreams)}
+                  type={EventsTypes.RECOMMENDED}
+               />
+            </Box>
+         </GenericDashboardLayout>
+      </LivestreamDialogLayout>
+   )
+}
+
+type MentorDetailProps = {
+   mentor: PublicCreator
+}
+
+const BackButton = () => {
+   const router = useRouter()
+
+   return <Button onClick={() => router.back()}>Back</Button>
+}
+
+const MentorDetail = ({ mentor }: MentorDetailProps) => {
+   const creatorName = `${mentor?.firstName} ${mentor?.lastName}`
+
+   if (!mentor) return null
+
+   return (
+      <Box>
+         <CircularLogo
+            size={80}
+            src={mentor?.avatarUrl}
+            alt={`Avatar of ${creatorName}`}
+            objectFit="cover"
+         />
+         <h1>{creatorName}</h1>
+         <p>{mentor?.position}</p>
+         <p>{mentor?.linkedInUrl}</p>
+         <p>{mentor?.story}</p>
+      </Box>
+   )
+}
+
+export const getStaticProps: GetStaticProps<{
+   serverSideGroup: SerializedGroup
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   serverSideLivestreams: { [p: string]: any }[]
+   livestreamDialogData: LiveStreamDialogData
+   sparks: SerializedSpark[]
+   creator: PublicCreator
+}> = async (ctx) => {
+   const { params } = ctx
+   const { companyName: companyNameSlug, mentorName, mentorId } = params
+   const companyName = companyNameUnSlugify(companyNameSlug as string)
+
+   if (companyName) {
+      const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
+
+      if (serverSideGroup) {
+         if (serverSideGroup.publicProfile) {
+            const {
+               serverSideUpcomingLivestreams,
+               serverSidePastLivestreams,
+               livestreamDialogData,
+            } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx)
+
+            const sparks = await sparkService.getCreatorSparks(
+               mentorId[0],
+               serverSideGroup?.groupId
+            )
+
+            const creator = await groupRepo.getCreatorById(
+               serverSideGroup?.groupId,
+               mentorId[0]
+            )
+
+            return {
+               props: {
+                  serverSideGroup: serializeGroup(serverSideGroup),
+                  serverSideLivestreams: [
+                     serverSideUpcomingLivestreams?.map(
+                        LivestreamPresenter.serializeDocument
+                     ) || [],
+                     serverSidePastLivestreams?.map(
+                        LivestreamPresenter.serializeDocument
+                     ) || [],
+                  ].flat(),
+                  livestreamDialogData,
+                  sparks: sparks.map((spark) =>
+                     SparkPresenter.serialize(spark)
+                  ),
+                  creator: pickPublicDataFromCreator(creator),
+               },
+               revalidate: 60,
+            }
+         }
+
+         Sentry.captureException(
+            new Error(
+               `Mentor page ${mentorName} with id ${mentorId[0]} of group ${serverSideGroup.id} is not ready yet`
+            ),
+            {
+               extra: {
+                  serverSideGroup,
+                  companyNameSlug,
+               },
+            }
+         )
+
+         // The page is not ready, return notFound to trigger a 404
+         return {
+            notFound: true,
+            revalidate: 60, // <- ISR, interval in seconds between revalidations
+         }
+      }
+   }
+
+   Sentry.captureException(
+      new Error(
+         `Mentor ${mentorName} with id ${mentorId} of group ${companyNameSlug} not found`
+      ),
+      {
+         extra: {
+            mentorName,
+            mentorId,
+            companyNameSlug,
+         },
+      }
+   )
+
+   // The mentor is not found, return notFound to trigger a 404
+   return {
+      notFound: true,
+      revalidate: 60, // <- ISR, interval in seconds between revalidations
+   }
+}
+
+export const getStaticPaths: GetStaticPaths = () => ({
+   paths: [],
+   fallback: "blocking",
+})
+
+export default MentorPage
