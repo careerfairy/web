@@ -178,12 +178,7 @@ const PortalTagsContent = ({ children }: PortalTagsContentProps) => {
 }
 // TODO: Check animations
 const PortalTags = ({ children }: PortalTagsContentProps) => {
-   const { query } = useRouter()
-   const fromSparksFeedTags = Boolean(query.interactionSource)
-   console.log("🚀 ~ PortalTags ~ fromSparksFeedTags:", fromSparksFeedTags)
    const availableCategories = useAvailableTagsByHits()
-
-   const [allSelected, setAllSelected] = useState(false)
 
    const [categoriesData, setCategoriesData] = useState(() => {
       return Object.fromEntries(
@@ -222,47 +217,27 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
       setCategoriesData(newCategories)
    }
 
-   const handleAllCategoryChipClicked = () => {
-      setAllSelected(!allSelected)
-
-      // const anyUnselected = Object.keys(categoriesData)
-      //    .map((cat) => !categoriesData[cat].selected)
-      //    .filter(Boolean).length
-
-      Object.keys(categoriesData).forEach((cat) => {
-         const newCategories = { ...categoriesData }
-         newCategories[cat].selected = false
-
-         setCategoriesData(newCategories)
-      })
-   }
-
    return (
       <WidgetsWrapper>
          <TagsCarouselWithArrow
             selectedCategories={selectedCategories}
             tags={availableCategories}
             handleTagClicked={handleCategoryChipClicked}
-            handleAllClicked={handleAllCategoryChipClicked}
-            allSelected={allSelected}
          />
-         <ConditionalWrapper
+         {selectedCategories.length ? (
+            <CategoryTagsContent categories={categoriesData} />
+         ) : (
+            children
+         )}
+         {/* <ConditionalWrapper
             condition={!selectedCategories.length}
             fallback={<CategoryTagsContent categories={categoriesData} />}
          >
             {children}
-         </ConditionalWrapper>
+         </ConditionalWrapper> */}
       </WidgetsWrapper>
    )
 }
-
-// const PortalTagsLoader = () => {
-//    return (
-//       <>
-//          <h1>PortalTagsLoader</h1>
-//       </>
-//    )
-// }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const token = getUserTokenFromCookie(ctx)

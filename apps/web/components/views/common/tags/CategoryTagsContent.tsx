@@ -51,13 +51,15 @@ const CategoryTagsContentComponent = ({ categories }: Props) => {
       hasMorePages: hasMorePagesFuture,
    } = useLivestreamsByTags("future", tags, EVENTS_PER_BATCH)
 
-   const sparks = useSparksByTags(tags, SPARKS_PER_BATCH)
+   // No need to use setSize for next page, since the sparks to be fetched is
+   // capped to 10 items.
+   const { data: sparks } = useSparksByTags(tags, SPARKS_PER_BATCH)
 
+   // Allows usage even if multiple selection is allowed
    const selectedTagLabel = selectedCategories
       .map((cat) => TagValuesLookup[cat])
       .join(", ")
 
-   // TODO: pass limits independently and use see more to increment
    return (
       <Stack sx={styles.wrapper} spacing={3}>
          <SparksTagsContent
