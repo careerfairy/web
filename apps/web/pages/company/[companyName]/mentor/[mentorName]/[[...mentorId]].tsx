@@ -9,18 +9,14 @@ import {
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
-import { Box, Button } from "@mui/material"
+import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
 import SEO from "components/util/SEO"
-import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
-import CircularLogo from "components/views/common/logos/CircularLogo"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
 } from "components/views/livestream-dialog"
-import EventsPreviewCarousel, {
-   EventsTypes,
-} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { MentorDetailPage } from "components/views/mentor-page"
 import { groupRepo } from "data/RepositoryInstances"
 import { sparkService } from "data/firebase/SparksService"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
@@ -30,7 +26,6 @@ import {
    InferGetStaticPropsType,
    NextPage,
 } from "next"
-import { useRouter } from "next/router"
 import { getLivestreamsAndDialogData, mapFromServerSide } from "util/serverUtil"
 
 const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
@@ -41,10 +36,6 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    sparks,
    creator,
 }) => {
-   const {
-      query: { companyName, mentorName },
-   } = useRouter()
-
    // TODO: track page view (example below), move slug creation out of Mentor Card, make this pretty and fix carousels
    /* 
    const viewRef = useTrackPageView({
@@ -61,8 +52,8 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
          <SEO
-            id={`CareerFairy | ${companyName} | ${mentorName}`}
-            title={`CareerFairy | ${companyName} | ${mentorName}`}
+            id={`CareerFairy | ${serverSideGroup.universityName} | ${creator.firstName} ${creator.lastName}`}
+            title={`CareerFairy | ${serverSideGroup.universityName} | ${creator.firstName} ${creator.lastName}`}
          />
 
          <GenericDashboardLayout>
@@ -70,48 +61,15 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
                //ref={viewRef}
             >
-               <BackButton />
-               <MentorDetail mentor={creator} />
-               <SparksCarousel sparks={deseralizedSparks} />
-               <EventsPreviewCarousel
-                  title="My livestreams"
-                  events={mapFromServerSide(serverSideLivestreams)}
-                  type={EventsTypes.RECOMMENDED}
+               <MentorDetailPage
+                  companyName={serverSideGroup.universityName}
+                  mentor={creator}
+                  livestreams={mapFromServerSide(serverSideLivestreams)}
+                  sparks={deseralizedSparks}
                />
             </Box>
          </GenericDashboardLayout>
       </LivestreamDialogLayout>
-   )
-}
-
-type MentorDetailProps = {
-   mentor: PublicCreator
-}
-
-const BackButton = () => {
-   const router = useRouter()
-
-   return <Button onClick={() => router.back()}>Back</Button>
-}
-
-const MentorDetail = ({ mentor }: MentorDetailProps) => {
-   const creatorName = `${mentor?.firstName} ${mentor?.lastName}`
-
-   if (!mentor) return null
-
-   return (
-      <Box>
-         <CircularLogo
-            size={80}
-            src={mentor?.avatarUrl}
-            alt={`Avatar of ${creatorName}`}
-            objectFit="cover"
-         />
-         <h1>{creatorName}</h1>
-         <p>{mentor?.position}</p>
-         <p>{mentor?.linkedInUrl}</p>
-         <p>{mentor?.story}</p>
-      </Box>
    )
 }
 
