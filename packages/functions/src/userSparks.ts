@@ -48,10 +48,6 @@ export const getSparksFeed = functions
 
                if ("userId" in data) {
                   if (data.userId) {
-                     console.log(
-                        "🚀 ~getSparksFeed ->  data.userId:",
-                        data.userId
-                     )
                      return {
                         sparks: await sparkRepo.getUserSparksFeed(
                            data.userId,
@@ -61,7 +57,6 @@ export const getSparksFeed = functions
                      }
                   }
 
-                  console.log("🚀 ~ getSparksFeed -> no user:", "no user")
                   return {
                      sparks: await sparkRepo.getPublicSparksFeed(
                         data.contentTopicIds,
@@ -73,7 +68,6 @@ export const getSparksFeed = functions
                }
 
                if ("groupId" in data) {
-                  console.log("🚀 ~ getSparksFeed -> groupId:", "groupId")
                   return {
                      sparks: await sparkRepo.getGroupSparksFeed(
                         data.groupId,

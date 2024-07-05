@@ -29,15 +29,6 @@ const SparksTagsContent = ({
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
 
-      console.log(
-         "🚀 ~ handleSparksClicked ~ CLICKED ON -> :",
-         spark.id + " | " + spark.question
-      )
-      console.log(
-         "🚀 ~ handleSparksClicked ~ PATHNAME -> :",
-         `/sparks/${spark.id}`
-      )
-
       return router.push({
          pathname: `/sparks/${spark.id}`,
          query: {

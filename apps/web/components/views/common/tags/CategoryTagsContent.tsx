@@ -88,11 +88,7 @@ const CategoryTagsContentComponent = ({ categories }: Props) => {
 }
 
 const CategoryTagsContentSkeleton = () => {
-   return (
-      <>
-         <h1>TODO SKELETON</h1>
-      </>
-   )
+   return <></>
 }
 
 export default CategoryTagsContent
