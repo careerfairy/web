@@ -4,12 +4,12 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { useSparkSearchAlgolia } from "../spark/useSparkSearchAlgolia"
 
 /**
- * TODO: allow limit like useLivestreamsByTags
+ * TODO: documentation
  * @param tags
+ * @param totalItems
  * @returns
  */
 export const useSparksByTags = (tags: GroupedTags, totalItems?: number) => {
-   // TODO: pass total items per page
    const filters = {
       contentTopicsTagIds: Object.keys(tags.contentTopics),
       languageTagIds: Object.keys(tags.language),

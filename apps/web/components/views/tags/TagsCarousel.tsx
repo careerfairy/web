@@ -12,12 +12,6 @@ const styles = sxStyles({
    viewport: {
       overflow: "hidden",
    },
-   container: {
-      // backfaceVisibility: "hidden",
-      // display: "flex",
-      // touchAction: "pan-y",
-      // marginLeft: `calc(${slideSpacing}px * -1)`,
-   },
    slide: {
       flex: {
          xs: `0 0 ${mobileSlideWidth}px`,
@@ -44,9 +38,6 @@ const styles = sxStyles({
       backgroundColor: (t) => t.palette.primary.main,
       color: "white",
    },
-   allChip: {
-      // px: "12px"
-   },
 })
 
 export type ChildRefType = {
@@ -72,7 +63,6 @@ const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
             <Chip
                sx={[
                   styles.chip,
-                  styles.allChip,
                   selectedCategories.length ? styles.selectedChip : null,
                ]}
                label="All"

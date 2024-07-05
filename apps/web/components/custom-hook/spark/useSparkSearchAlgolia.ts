@@ -46,7 +46,7 @@ const buildAlgoliaFilterString = (options: FilterOptions): string => {
 }
 
 /**
- * A custom React hook used for performing searches of livestream events in Algolia.
+ * A custom React hook used for performing searches of sparks in Algolia.
  * @param  inputValue - The search string input by the user
  * @param  options - The filter options to apply to the search
  */

@@ -248,7 +248,8 @@ const contentCustomJobsExcludingMap = (
 }
 
 /**
- * TODO: Refactor to factory TagsRepo
+ * Counts all tags (business functions, content topics and languages) based on linked content, namely
+ * Sparks and livestreams, calculating how many hits each tag has in terms of content.
  */
 export const fetchContentHits = functions.region(config.region).https.onCall(
    middlewares(
