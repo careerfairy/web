@@ -1,5 +1,6 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -38,6 +39,10 @@ const styles = sxStyles({
          lineHeight: "20px",
          textAlign: "center",
          color: "neutral.400",
+         ...getMaxLineStyles(2),
+         // css hack to ensure text is not cut off
+         paddingBottom: 1,
+         marginBottom: -1,
       },
    },
    edit: {
@@ -76,7 +81,7 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
          />
          <Typography sx={styles.creator.name}>{creatorName}</Typography>
          <Typography sx={styles.creator.position}>
-            {creator.position}
+            {creator.position} aaaaaaa aaaaaaaa aaaa
          </Typography>
       </Box>
    )
