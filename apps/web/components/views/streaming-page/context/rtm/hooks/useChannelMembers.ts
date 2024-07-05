@@ -1,6 +1,8 @@
 import { RtmChannel } from "agora-rtm-sdk"
-import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
+import { useAppDispatch } from "components/custom-hook/store"
+import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { useMemo } from "react"
+import { setIsRecordingBotInRoom } from "store/reducers/streamingAppReducer"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useRTMChannelEvent } from "./useRTMChannelEvent"
@@ -45,27 +47,15 @@ const sortMembers = (a: string, b: string) => {
    return a.localeCompare(b)
 }
 
-const filterMembers = (members: string[], roles: StreamIdentifier[]) => {
-   if (roles) {
-      return members?.filter(
-         (member) => !roles.some((role) => member.startsWith(role))
-      )
-   }
-   return members
-}
-
 /**
  * Custom hook to manage channel members in real-time.
  * It utilizes SWR for data fetching and caching, and listens to RTM channel events
  * to update the members list upon member join or leave events.
  *
  * @param {RtmChannel} channel - The RTM channel instance.
- * @param {StreamIdentifier[]} filterRoles - The roles to filter out of the members list.
  */
-export const useChannelMembers = (
-   channel: RtmChannel,
-   filterRoles?: StreamIdentifier[]
-) => {
+export const useChannelMembers = (channel: RtmChannel) => {
+   const dispatch = useAppDispatch()
    const channelId = channel?.channelId
 
    const { data, error, mutate, isLoading } = useSWR<string[]>(
@@ -90,6 +80,11 @@ export const useChannelMembers = (
     * and triggers a mutation in the SWR cache to include the new member.
     */
    useRTMChannelEvent(channel, "MemberJoined", (newMemberId: string) => {
+      if (newMemberId.startsWith(STREAM_IDENTIFIERS.RECORDING)) {
+         // We don't want to add the Recording Bot to our member's list, but still want to know
+         // it's there so that we remove it from the viewer count
+         return dispatch(setIsRecordingBotInRoom(true))
+      }
       return mutate(
          async (currentMembers) => {
             const newSet = new Set(currentMembers || [])
@@ -108,6 +103,9 @@ export const useChannelMembers = (
     * It does not trigger a revalidation of the data, ensuring the cache is populated with the latest state.
     */
    useRTMChannelEvent(channel, "MemberLeft", (memberId: string) => {
+      if (memberId.startsWith(STREAM_IDENTIFIERS.RECORDING)) {
+         return dispatch(setIsRecordingBotInRoom(false))
+      }
       return mutate(
          (currentMembers) =>
             currentMembers?.filter((member) => member !== memberId),
@@ -120,13 +118,8 @@ export const useChannelMembers = (
 
    const sortedMembers = useMemo(() => data?.sort(sortMembers), [data])
 
-   const filteredMembers = useMemo(
-      () => filterMembers(sortedMembers, filterRoles),
-      [sortedMembers, filterRoles]
-   )
-
    return {
-      members: filteredMembers,
+      members: sortedMembers,
       isLoading,
       error,
    }
