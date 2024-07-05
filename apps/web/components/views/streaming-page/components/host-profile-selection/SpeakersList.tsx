@@ -35,7 +35,7 @@ const styles = sxStyles({
    },
 })
 
-const containerVariants: Variants = {
+const containerAnimationVariants: Variants = {
    hidden: { opacity: 0 },
    visible: {
       opacity: 1,
@@ -45,7 +45,7 @@ const containerVariants: Variants = {
    },
 }
 
-const itemVariants = {
+const itemAnimationVariants = {
    hidden: { opacity: 0, scale: 0.9 },
    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
    exit: { opacity: 0, scale: 0.9, transition: { duration: 0.5 } },
@@ -82,7 +82,7 @@ export const SpeakersList = () => {
          <Typography component="p" sx={styles.heading} variant="medium">
             Please select your profile:
          </Typography>
-         <FramerBox variants={containerVariants} sx={styles.root}>
+         <FramerBox variants={containerAnimationVariants} sx={styles.root}>
             <AnimatePresence>
                {Boolean(userData?.isAdmin) && (
                   <FramerBox sx={styles.item}>
@@ -101,10 +101,10 @@ export const SpeakersList = () => {
                   <FramerBox
                      key={speaker.id}
                      sx={styles.item}
-                     variants={itemVariants}
-                     initial={itemVariants.hidden}
-                     animate={itemVariants.visible}
-                     exit={itemVariants.exit}
+                     variants={itemAnimationVariants}
+                     initial={itemAnimationVariants.hidden}
+                     animate={itemAnimationVariants.visible}
+                     exit={itemAnimationVariants.exit}
                   >
                      <HostProfileButton
                         onClick={() => selectSpeaker(speaker)}
