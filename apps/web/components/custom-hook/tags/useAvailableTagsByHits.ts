@@ -131,13 +131,18 @@ const sortTagsByUserData = (
 const alphabeticalSort = (tagA: OptionGroup, tagB: OptionGroup) =>
    tagA.name.localeCompare(tagB.name)
 
+// eslint-disable-next-line  @typescript-eslint/no-unused-vars
 const shouldShowTagByCount = (
    hitsCount: ContentHitsCount,
    minEvents: number,
    minSparks?: number
 ): boolean => {
-   return (
-      hitsCount.livestreams >= minEvents &&
-      (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
-   )
+   console.log("🚀 ~ hitsCount:", hitsCount, minEvents, minSparks)
+
+   // TODO: Remove testing
+   return true
+   // return (
+   //    hitsCount.livestreams >= minEvents &&
+   //    (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
+   // )
 }
