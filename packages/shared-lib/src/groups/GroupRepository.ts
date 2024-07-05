@@ -255,6 +255,13 @@ export interface IGroupRepository {
    getCreators(groupId: string): Promise<Creator[]>
 
    /**
+    * Gets all group creators with public sparks
+    * @param groupId the group to get creators from
+    * @returns A Promise that resolves with an array of creators.
+    */
+   getCreatorsWithPublicSparks(groupId: string): Promise<Creator[]>
+
+   /**
     * Updates the publicSparks flag in a group.
     *
     * @param  groupId - The ID of the group.
@@ -1033,6 +1040,32 @@ export class FirebaseGroupRepository
          .get()
 
       return mapFirestoreDocuments<Creator>(snaps)
+   }
+
+   async getCreatorsWithPublicSparks(groupId: string): Promise<Creator[]> {
+      const snaps = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .get()
+
+      const creators = mapFirestoreDocuments<Creator>(snaps)
+
+      const creatorsWithSparks = await Promise.all(
+         creators.map(async (creator) => {
+            const hasSparks = await this.firestore
+               .collection("sparks")
+               .where("published", "==", true)
+               .where("creator.id", "==", creator.id)
+               .limit(1)
+               .get()
+               .then((querySnapshot) => !querySnapshot.empty)
+
+            return hasSparks ? creator : null
+         })
+      )
+
+      return creatorsWithSparks.filter((creator) => creator !== null)
    }
 
    async updatePublicSparks(groupId: string, isPublic: boolean): Promise<void> {
