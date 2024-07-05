@@ -63,7 +63,7 @@ const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
             <Chip
                sx={[
                   styles.chip,
-                  selectedCategories.length ? styles.selectedChip : null,
+                  !selectedCategories.length ? styles.selectedChip : null,
                ]}
                label="All"
             />
