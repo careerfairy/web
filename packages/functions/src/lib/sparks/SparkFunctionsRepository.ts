@@ -127,13 +127,18 @@ export interface ISparkFunctionsRepository {
     *
     * - If the user doesn't have a feed, it will lazily generate one and store it in the database, then return it
     */
-   getUserSparksFeed(userId: string, limit?: number): Promise<SerializedSpark[]>
+   getUserSparksFeed(
+      userId: string,
+      contentTopics?: string[],
+      limit?: number
+   ): Promise<SerializedSpark[]>
 
    /**
     * Get the public feed of Sparks
     * @param limit ${limit} The number of sparks to fetch (default: 10)
     */
    getPublicSparksFeed(
+      contentTopics?: string[],
       limit?: number,
       countryCode?: OptionGroup
    ): Promise<SerializedSpark[]>
@@ -145,6 +150,7 @@ export interface ISparkFunctionsRepository {
     */
    getGroupSparksFeed(
       groupId: string,
+      contentTopics?: string[],
       limit?: number
    ): Promise<SerializedSpark[]>
 
@@ -550,13 +556,23 @@ export class SparkFunctionsRepository
 
    async getUserSparksFeed(
       userId: string,
+      contentTopics: string[],
       limit = 10
    ): Promise<SerializedSpark[]> {
-      const userFeedRef = this.firestore
+      let query = this.firestore
          .collection("userData")
          .doc(userId)
          .collection("sparksFeed")
          .where("group.publicSparks", "==", true)
+
+      if (contentTopics?.length) {
+         query = query.where(
+            "contentTopicsTagIds",
+            "array-contains-any",
+            contentTopics
+         )
+      }
+      const userFeedRef = query
          .orderBy("publishedAt", "desc")
          .limit(limit)
          .withConverter(createGenericConverter<Spark>())
@@ -574,6 +590,7 @@ export class SparkFunctionsRepository
    }
 
    async getPublicSparksFeed(
+      contentTopics: string[],
       limit = 10,
       countryCode: OptionGroup
    ): Promise<SerializedSpark[]> {
@@ -581,6 +598,13 @@ export class SparkFunctionsRepository
          .collection("sparks")
          .where("group.publicSparks", "==", true)
 
+      if (contentTopics?.length) {
+         query = query.where(
+            "contentTopicsTagIds",
+            "array-contains-any",
+            contentTopics
+         )
+      }
       // If there is no logged out country code, we want to get all the public sparks without any additional logic
       if (!countryCode) {
          const publicFeedRef = query
@@ -650,12 +674,23 @@ export class SparkFunctionsRepository
 
    async getGroupSparksFeed(
       groupId: string,
+      contentTopics: string[],
       limit = 10
    ): Promise<SerializedSpark[]> {
-      const groupFeedRef = this.firestore
+      let query = this.firestore
          .collection("sparks")
          .where("group.id", "==", groupId)
          .where("group.publicSparks", "==", true)
+
+      if (contentTopics?.length) {
+         query = query.where(
+            "contentTopicsTagIds",
+            "array-contains-any",
+            contentTopics
+         )
+      }
+
+      const groupFeedRef = query
          .orderBy("publishedAt", "desc")
          .limit(limit)
          .withConverter(createGenericConverter<Spark>())

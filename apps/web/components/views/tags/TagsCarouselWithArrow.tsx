@@ -39,8 +39,7 @@ type CarouselProps = {
    selectedCategories: string[]
    tags: OptionGroup[]
    handleTagClicked: (tagId: string) => void
-   handleAllClicked: () => void
-   allSelected: boolean
+   handleAllClicked?: () => void
 }
 
 const TagsCarouselWithArrow: FC<CarouselProps> = ({
@@ -48,7 +47,6 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
    handleTagClicked,
    selectedCategories,
    handleAllClicked,
-   allSelected,
 }) => {
    const childRef = useRef<ChildRefType | null>(null)
 
@@ -105,7 +103,6 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
                selectedCategories={selectedCategories}
                onTagClick={handleTagClicked}
                onAllClick={handleAllClicked}
-               allSelected={allSelected}
                emblaRef={emblaRef}
             />
             <ConditionalWrapper condition={showNextButton}>

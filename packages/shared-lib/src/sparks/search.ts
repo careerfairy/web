@@ -6,6 +6,8 @@ import { Spark } from "./sparks"
  */
 export type TransformedSpark = Spark & {
    createdAtMs: number
+   publishedAtMs: number
+   groupPublicSparks: boolean
 }
 
 export const SPARK_FIELDS_TO_INDEX = [
@@ -24,6 +26,7 @@ export const SPARK_FIELDS_TO_INDEX = [
    "createdAtMs",
    "contentTopicsTagIds",
    "linkedCustomJobsTagIds",
+   "groupPublicSparks",
 ] satisfies (keyof TransformedSpark)[]
 
 export type FieldToIndexType = (typeof SPARK_FIELDS_TO_INDEX)[number]
@@ -34,8 +37,6 @@ export type FieldToIndexType = (typeof SPARK_FIELDS_TO_INDEX)[number]
  * They must be a subset of the fields defined in SPARK_FIELDS_TO_INDEX.
  */
 export const SPARK_SEARCHABLE_ATTRIBUTES = [
-   "published",
-   "createdAtMs",
    "contentTopicsTagIds",
    "languageTagIds",
    "linkedCustomJobsTagIds",
@@ -46,11 +47,13 @@ export const SPARK_SEARCHABLE_ATTRIBUTES = [
  * They must be a subset of the fields defined in SPARK_FIELDS_TO_INDEX.
  */
 export const SPARK_FILTERING_FIELDS = [
+   "groupPublicSparks",
    "published",
    "createdAtMs",
    "contentTopicsTagIds",
    "linkedCustomJobsTagIds",
    "languageTagIds",
+   "group",
 ] satisfies FieldToIndexType[]
 
 type FilterFieldType = (typeof SPARK_FILTERING_FIELDS)[number]
@@ -60,9 +63,13 @@ export type ArrayFilterFieldType = Extract<
    "contentTopicsTagIds" | "languageTagIds"
 >
 
-export type BooleanFilterFieldType = Extract<FilterFieldType, "published">
+export type BooleanFilterFieldType = Extract<
+   FilterFieldType,
+   "published" | "groupPublicSparks"
+>
 
 export const SPARK_REPLICAS = {
+   PUBLISHED_AT_DESC: "sparks_publishedAtMs_desc",
    START_ASC: "sparks_createdAtMs_asc",
    START_DESC: "sparks_createdAtMs_desc",
 } as const

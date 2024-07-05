@@ -125,6 +125,11 @@ export class SparksService {
          "getSparksFeed_v5"
       )(data)
 
+      console.log(
+         "🚀 ~ SparksService ~ fetchFeed ~ serializedSparks:",
+         serializedSparks
+      )
+
       return {
          sparks: serializedSparks.map(SparkPresenter.deserialize),
          anonymousUserCountryCode,
@@ -228,6 +233,18 @@ export class SparksService {
          )
       }
 
+      // Filter the sparks by content topics
+      if (options.contentTopicIds?.length) {
+         console.log(
+            "🚀 ~ SparksService ~ FETCH NEXT SPARKScontentTopicIds:",
+            options.contentTopicIds
+         )
+         baseQuery = query(
+            baseQuery,
+            where("contentTopicsTagIds", "in", options.contentTopicIds)
+         )
+      }
+
       // Order the results by their publication date in descending order.
       baseQuery = query(
          baseQuery,
@@ -258,6 +275,7 @@ export class SparksService {
     * @param sparkId - The id of the spark to fetch
     * */
    async getSparkById(sparkId: string): Promise<SparkPresenter | null> {
+      console.log("🚀 ~ SparksService ~ getSparkById ~ sparkId:", sparkId)
       const docRef = doc(FirestoreInstance, "sparks", sparkId)
       const docSnap = await getDoc(
          docRef.withConverter(sparkPresenterConverter)

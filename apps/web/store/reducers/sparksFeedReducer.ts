@@ -45,6 +45,7 @@ interface SparksState {
    autoAction: AutomaticActions
    conversionCardInterval: number
    interactionSource: string
+   contentTopicIds: string[]
    anonymousUserCountryCode?: string
    countrySpecificFeed?: boolean
    shouldShowLinkedInPopUpNotification: boolean
@@ -75,6 +76,7 @@ const initialState: SparksState = {
    autoAction: null,
    conversionCardInterval: 0,
    interactionSource: null,
+   contentTopicIds: [],
    anonymousUserCountryCode: null,
    countrySpecificFeed: null,
    shouldShowLinkedInPopUpNotification: false,
@@ -85,6 +87,7 @@ export const fetchNextSparks = createAsyncThunk(
    "sparks/fetchNext",
    async (_, { getState, dispatch }) => {
       const state = getState() as RootState
+      console.log("🚀 ~ fetchNextSparks -> state:", state)
       const {
          sparks,
          hasMoreSparks,
@@ -112,6 +115,7 @@ export const fetchInitialSparksFeed = createAsyncThunk(
    "sparks/fetchInitial",
    async (_, { getState }) => {
       const state = getState() as RootState
+      console.log("🚀 ~ fetchInitialSparksFeed -> state:", state)
 
       const sparkOptions = getSparkOptions(state)
 
@@ -231,6 +235,9 @@ const sparksFeedSlice = createSlice({
       },
       setInteractionSource: (state, action: PayloadAction<string>) => {
          state.interactionSource = action.payload
+      },
+      setContentTopicIds: (state, action: PayloadAction<string[]>) => {
+         state.contentTopicIds = action.payload
       },
       setEventToRegisterTo: (state, action: PayloadAction<string>) => {
          state.eventToRegisterTo = action.payload
@@ -392,12 +399,14 @@ const getSparkOptions = (state: RootState) => {
       groupId,
       userEmail,
       sparkCategoryIds,
+      contentTopicIds,
       anonymousUserCountryCode,
    } = state.sparksFeed
 
    return {
       numberOfSparks: numberOfSparksToFetch,
       sparkCategoryIds,
+      contentTopicIds,
       anonymousUserCountryCode,
       ...(groupId ? { groupId } : { userId: userEmail || null }),
    }
@@ -473,6 +482,7 @@ export const {
    setCardEventNotification,
    setCameFromCompanyPageLink,
    setInteractionSource,
+   setContentTopicIds,
    setEventToRegisterTo,
    setJobToOpen,
    setAutoAction,
