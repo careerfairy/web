@@ -1,4 +1,3 @@
-import { getTabLabel, TabValue, TabValueType, useCompanyPage } from "../"
 import {
    AppBar,
    Avatar,
@@ -9,21 +8,24 @@ import {
    TabsOwnProps,
    Typography,
 } from "@mui/material"
-import { sxStyles } from "../../../../types/commonTypes"
+import Stack from "@mui/material/Stack"
+import { styled, useTheme } from "@mui/material/styles"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useCallback, useMemo } from "react"
+import { useMountedState } from "react-use"
+import { TabValue, TabValueType, getTabLabel, useCompanyPage } from "../"
 import { companyLogoPlaceholder } from "../../../../constants/images"
 import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
-import React, { useCallback, useMemo } from "react"
-import { styled, useTheme } from "@mui/material/styles"
-import Stack from "@mui/material/Stack"
-import FollowButton from "../../common/company/FollowButton"
-import ShareButton from "./ShareButton"
+import { sxStyles } from "../../../../types/commonTypes"
+import useControlledTabNavigationOnScroll from "../../../custom-hook/useControlledTabNavigationOnScroll"
 import useElementIsAtTopOfPage from "../../../custom-hook/useElementIsAtTopOfPage"
 import useIsMobile from "../../../custom-hook/useIsMobile"
-import useControlledTabNavigationOnScroll from "../../../custom-hook/useControlledTabNavigationOnScroll"
 import Link from "../../common/Link"
-import BannerIllustration from "./BannerIllustration"
+import FollowButton from "../../common/company/FollowButton"
 import PublicSparksBadge from "../../common/icons/PublicSparksBadge"
-import CircularLogo from "components/views/common/logos/CircularLogo"
+import BannerIllustration from "./BannerIllustration"
+import ShareButton from "./ShareButton"
 
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60
@@ -166,6 +168,8 @@ const ToolbarOffset = styled("div")(({ theme }) => theme.mixins.toolbar)
 
 const Header = () => {
    const isMobile = useIsMobile()
+   const featureFlags = useFeatureFlags()
+   const isMounted = useMountedState()
 
    const [ref, elementIsTop] = useElementIsAtTopOfPage({
       offset: isMobile ? -60 : 70,
@@ -198,9 +202,11 @@ const Header = () => {
 
    const renderTabs = useCallback(() => {
       return sectionRefsArray
-         .filter((ref) =>
-            Object.values(TabValue).includes(ref.current?.id as TabValueType)
-         )
+         .filter((ref) => {
+            return Object.values(TabValue).includes(
+               ref.current?.id as TabValueType
+            )
+         })
          .map((ref, index) => {
             const sectionId = ref.current.id as TabValueType
 
@@ -214,7 +220,7 @@ const Header = () => {
                            theme.palette.secondary.main,
                      },
                   ]}
-                  label={getTabLabel(sectionId)}
+                  label={getTabLabel(sectionId, featureFlags)}
                   value={sectionId}
                   key={sectionId}
                   component={Link}
@@ -224,7 +230,9 @@ const Header = () => {
                />
             )
          })
-   }, [sectionRefsArray, theme.palette.secondary.main, value])
+   }, [featureFlags, sectionRefsArray, theme.palette.secondary.main, value])
+
+   if (!isMounted()) return null
 
    return (
       <>

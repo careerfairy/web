@@ -1,4 +1,5 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { FeatureFlagsState } from "@careerfairy/shared-lib/feature-flags/types"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
@@ -26,11 +27,10 @@ import AboutSection from "./AboutSection"
 import EventSection from "./EventSection"
 import Header from "./Header"
 import MediaSection from "./MediaSection"
-import MentorsSection from "./MentorsSection"
 import NewsletterSection from "./NewsletterSection"
 import ProgressBanner from "./ProgressBanner"
 import SparksSection from "./SparksSection"
-import TestimonialSection from "./TestimonialSection"
+import { TestimonialsOrMentorsSection } from "./TestimonialsOrMentorsSection"
 import { FollowCompany, SignUp } from "./ctas"
 
 type Props = {
@@ -44,8 +44,7 @@ type Props = {
 export const TabValue = {
    profile: "profile-section",
    media: "media-section",
-   testimonials: "testimonials-section",
-   mentors: "mentors-section",
+   testimonialsOrMentors: "testimonials-or-mentors-section",
    livesStreams: "livesStreams-section",
    banner: "banner-section",
    video: "video-section",
@@ -53,16 +52,17 @@ export const TabValue = {
 
 export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
 
-export const getTabLabel = (tabId: TabValueType) => {
+export const getTabLabel = (
+   tabId: TabValueType,
+   featureFlags: FeatureFlagsState
+) => {
    switch (tabId) {
       case TabValue.profile:
          return "About"
       case TabValue.media:
          return "Media"
-      case TabValue.testimonials:
-         return "Testimonials"
-      case TabValue.mentors:
-         return "Mentors"
+      case TabValue.testimonialsOrMentors:
+         return featureFlags.mentorsV1 ? "Mentors" : "Testimonials"
       case TabValue.livesStreams:
          return "Live Streams"
       default:
@@ -72,7 +72,7 @@ export const getTabLabel = (tabId: TabValueType) => {
 
 export type SectionRefs = {
    aboutSectionRef: MutableRefObject<HTMLElement>
-   testimonialSectionRef: MutableRefObject<HTMLElement>
+   testimonialOrMentorsSectionRef: MutableRefObject<HTMLElement>
    eventSectionRef: MutableRefObject<HTMLElement>
    mediaSectionRef: MutableRefObject<HTMLElement>
 }
@@ -98,7 +98,7 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
       aboutSectionRef: null,
       eventSectionRef: null,
       mediaSectionRef: null,
-      testimonialSectionRef: null,
+      testimonialOrMentorsSectionRef: null,
    },
 })
 
@@ -110,7 +110,6 @@ const CompanyPageOverview = ({
    groupCreators,
 }: Props) => {
    const featureFlags = useFeatureFlags()
-   const { mentorsV1 } = featureFlags
    const { isLoggedIn, isLoggedOut } = useAuth()
    const isMobile = useIsMobile()
    const groupRef = useMemo(
@@ -135,7 +134,7 @@ const CompanyPageOverview = ({
    })
 
    const aboutSectionRef = useRef<HTMLElement>(null)
-   const testimonialSectionRef = useRef<HTMLElement>(null)
+   const testimonialOrMentorsSectionRef = useRef<HTMLElement>(null)
    const eventSectionRef = useRef<HTMLElement>(null)
    const mediaSectionRef = useRef<HTMLElement>(null)
 
@@ -185,7 +184,7 @@ const CompanyPageOverview = ({
          pastLivestreams: contextPastLivestreams || pastLivestreams,
          sectionRefs: {
             aboutSectionRef,
-            testimonialSectionRef,
+            testimonialOrMentorsSectionRef,
             eventSectionRef,
             mediaSectionRef,
          },
@@ -225,19 +224,11 @@ const CompanyPageOverview = ({
                         {isMobile && !editMode ? (
                            <>
                               <EventSection />
-                              {mentorsV1 ? (
-                                 <MentorsSection />
-                              ) : (
-                                 <TestimonialSection />
-                              )}
+                              <TestimonialsOrMentorsSection />
                            </>
                         ) : (
                            <>
-                              {mentorsV1 ? (
-                                 <MentorsSection />
-                              ) : (
-                                 <TestimonialSection />
-                              )}
+                              <TestimonialsOrMentorsSection />
                               <EventSection />
                            </>
                         )}
