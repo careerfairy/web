@@ -1045,6 +1045,8 @@ export class FirebaseGroupRepository
    }
 
    async getCreatorsWithPublicContent(groupId: string): Promise<Creator[]> {
+      if (!groupId) return []
+
       const [creatorsSnaps, livestreamsSnaps] = await Promise.all([
          this.firestore
             .collection("careerCenterData")
@@ -1060,24 +1062,14 @@ export class FirebaseGroupRepository
             .get(),
       ])
 
+      if (creatorsSnaps.empty) return []
+
       const creators = mapFirestoreDocuments<Creator>(creatorsSnaps)
       const creatorsMap = new Map<string, Creator>()
       creators.forEach((creator) => {
          if (creator.id) {
             creatorsMap.set(creator.id, creator)
          }
-      })
-
-      const livestreams =
-         mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps)
-      // covers co-hosted live stream edge case
-      const groupLivestreams = livestreams.filter(
-         (livestream) => livestream.groupIds[0] === groupId
-      )
-      const creatorsWithLivestreams = groupLivestreams.flatMap((livestream) => {
-         return livestream.creatorsIds
-            .map((creatorId) => creatorsMap.get(creatorId))
-            .filter(Boolean)
       })
 
       const creatorsWithSparksSnaps = await Promise.all(
@@ -1096,6 +1088,22 @@ export class FirebaseGroupRepository
          .map((snap) => mapFirestoreDocuments<Spark>(snap)[0])
          .map((sparks) => creatorsMap.get(sparks.creator.id))
          .filter(Boolean)
+
+      if (livestreamsSnaps.empty) return creatorsWithSparks
+
+      const livestreams =
+         mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps)
+      // covers co-hosted live stream edge case
+      const groupLivestreams = livestreams.filter(
+         (livestream) => livestream.groupIds[0] === groupId
+      )
+      const creatorsWithLivestreams = groupLivestreams.flatMap((livestream) => {
+         return livestream.creatorsIds
+            .map((creatorId) => creatorsMap.get(creatorId))
+            .filter(Boolean)
+      })
+
+      if (creatorsWithLivestreams.length === 0) return creatorsWithSparks
 
       const creatorsWithPublicContent = [
          ...creatorsWithLivestreams,
