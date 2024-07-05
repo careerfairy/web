@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app"
+import { uniqBy } from "lodash"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
    mapFirestoreDocuments,
@@ -7,6 +8,7 @@ import BaseFirebaseRepository, {
 } from "../BaseFirebaseRepository"
 import { Create, ImageType } from "../commonTypes"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
+import { Spark } from "../sparks/sparks"
 import {
    CompanyFollowed,
    pickPublicDataFromUser,
@@ -255,11 +257,11 @@ export interface IGroupRepository {
    getCreators(groupId: string): Promise<Creator[]>
 
    /**
-    * Gets all group creators with public sparks
+    * Gets all group creators with public content
     * @param groupId the group to get creators from
     * @returns A Promise that resolves with an array of creators.
     */
-   getCreatorsWithPublicSparks(groupId: string): Promise<Creator[]>
+   getCreatorsWithPublicContent(groupId: string): Promise<Creator[]>
 
    /**
     * Updates the publicSparks flag in a group.
@@ -1042,30 +1044,69 @@ export class FirebaseGroupRepository
       return mapFirestoreDocuments<Creator>(snaps)
    }
 
-   async getCreatorsWithPublicSparks(groupId: string): Promise<Creator[]> {
-      const snaps = await this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("creators")
-         .get()
+   async getCreatorsWithPublicContent(groupId: string): Promise<Creator[]> {
+      const [creatorsSnaps, livestreamsSnaps] = await Promise.all([
+         this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("creators")
+            .get(),
+         this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
+            .where("hidden", "==", false)
+            .where("denyRecordingAccess", "==", false)
+            .get(),
+      ])
 
-      const creators = mapFirestoreDocuments<Creator>(snaps)
+      const creators = mapFirestoreDocuments<Creator>(creatorsSnaps)
+      const creatorsMap = new Map<string, Creator>()
+      creators.forEach((creator) => {
+         if (creator.id) {
+            creatorsMap.set(creator.id, creator)
+         }
+      })
 
-      const creatorsWithSparks = await Promise.all(
-         creators.map(async (creator) => {
-            const hasSparks = await this.firestore
+      const livestreams =
+         mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps)
+      // covers co-hosted live stream edge case
+      const groupLivestreams = livestreams.filter(
+         (livestream) => livestream.groupIds[0] === groupId
+      )
+      const creatorsWithLivestreams = groupLivestreams.flatMap((livestream) => {
+         return livestream.creatorsIds
+            .map((creatorId) => creatorsMap.get(creatorId))
+            .filter(Boolean)
+      })
+
+      const creatorsWithSparksSnaps = await Promise.all(
+         creators.map((creator) => {
+            return this.firestore
                .collection("sparks")
                .where("published", "==", true)
                .where("creator.id", "==", creator.id)
                .limit(1)
                .get()
-               .then((querySnapshot) => !querySnapshot.empty)
-
-            return hasSparks ? creator : null
          })
       )
 
-      return creatorsWithSparks.filter((creator) => creator !== null)
+      const creatorsWithSparks = creatorsWithSparksSnaps
+         .filter((snap) => !snap.empty)
+         .map((snap) => mapFirestoreDocuments<Spark>(snap)[0])
+         .map((sparks) => creatorsMap.get(sparks.creator.id))
+         .filter(Boolean)
+
+      const creatorsWithPublicContent = [
+         ...creatorsWithLivestreams,
+         ...creatorsWithSparks,
+      ]
+      const resultWithNoDuplicates = uniqBy(
+         creatorsWithPublicContent,
+         (creator) => creator.id
+      )
+
+      return resultWithNoDuplicates
    }
 
    async updatePublicSparks(groupId: string, isPublic: boolean): Promise<void> {
