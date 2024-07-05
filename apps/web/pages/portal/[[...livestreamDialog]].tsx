@@ -176,7 +176,7 @@ const PortalTagsContent = ({ children }: PortalTagsContentProps) => {
       </SuspenseWithBoundary>
    )
 }
-// TODO: Check animations
+
 const PortalTags = ({ children }: PortalTagsContentProps) => {
    const availableCategories = useAvailableTagsByHits()
 
@@ -229,12 +229,6 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
          ) : (
             children
          )}
-         {/* <ConditionalWrapper
-            condition={!selectedCategories.length}
-            fallback={<CategoryTagsContent categories={categoriesData} />}
-         >
-            {children}
-         </ConditionalWrapper> */}
       </WidgetsWrapper>
    )
 }

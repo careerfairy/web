@@ -122,13 +122,8 @@ export class SparksService {
          }
       >(
          this.functions,
-         "getSparksFeed_v5"
+         "getSparksFeed_v6"
       )(data)
-
-      console.log(
-         "🚀 ~ SparksService ~ fetchFeed ~ serializedSparks:",
-         serializedSparks
-      )
 
       return {
          sparks: serializedSparks.map(SparkPresenter.deserialize),
@@ -235,10 +230,6 @@ export class SparksService {
 
       // Filter the sparks by content topics
       if (options.contentTopicIds?.length) {
-         console.log(
-            "🚀 ~ SparksService ~ FETCH NEXT SPARKScontentTopicIds:",
-            options.contentTopicIds
-         )
          baseQuery = query(
             baseQuery,
             where("contentTopicsTagIds", "in", options.contentTopicIds)
@@ -275,7 +266,6 @@ export class SparksService {
     * @param sparkId - The id of the spark to fetch
     * */
    async getSparkById(sparkId: string): Promise<SparkPresenter | null> {
-      console.log("🚀 ~ SparksService ~ getSparkById ~ sparkId:", sparkId)
       const docRef = doc(FirestoreInstance, "sparks", sparkId)
       const docSnap = await getDoc(
          docRef.withConverter(sparkPresenterConverter)
