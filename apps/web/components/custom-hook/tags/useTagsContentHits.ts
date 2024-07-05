@@ -16,7 +16,6 @@ const swrOptions: SWRConfiguration = {
 }
 
 export const useTagsContentHits = () => {
-   // TODO: Use CF for hits and build better metadata for hits considering multiple categories and different criteria
    const fetcher = useFunctionsSWR<TagsContentHits>()
    return useSWR<TagsContentHits>(
       ["fetchTagsContentHits", {}],

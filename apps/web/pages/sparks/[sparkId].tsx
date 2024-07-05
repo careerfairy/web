@@ -80,10 +80,8 @@ const SparksPage: NextPage<
 
    useEffect(() => {
       if (!contentTopic) {
-         console.log("🚀 ~ useEffect ~ cNOT ontentTopic:", contentTopic)
          dispatch(setContentTopicIds([]))
       } else {
-         console.log("🚀 ~ useEffect ~  contentTopic:", contentTopic)
          dispatch(setContentTopicIds([contentTopic]))
       }
 
@@ -286,7 +284,6 @@ export const getServerSideProps: GetServerSideProps<
    const token = getUserTokenFromCookie(context)
 
    const sparkId = context.params.sparkId
-   console.log("🚀 ~ >= ~ sparkId:", sparkId)
 
    const sparkFromService = await sparkService.getSparkById(sparkId)
 

@@ -87,7 +87,7 @@ export const fetchNextSparks = createAsyncThunk(
    "sparks/fetchNext",
    async (_, { getState, dispatch }) => {
       const state = getState() as RootState
-      console.log("🚀 ~ fetchNextSparks -> state:", state)
+
       const {
          sparks,
          hasMoreSparks,
@@ -115,7 +115,6 @@ export const fetchInitialSparksFeed = createAsyncThunk(
    "sparks/fetchInitial",
    async (_, { getState }) => {
       const state = getState() as RootState
-      console.log("🚀 ~ fetchInitialSparksFeed -> state:", state)
 
       const sparkOptions = getSparkOptions(state)
 
