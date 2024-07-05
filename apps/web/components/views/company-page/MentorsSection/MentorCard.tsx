@@ -81,7 +81,7 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
          />
          <Typography sx={styles.creator.name}>{creatorName}</Typography>
          <Typography sx={styles.creator.position}>
-            {creator.position} aaaaaaa aaaaaaaa aaaa
+            {creator.position}
          </Typography>
       </Box>
    )
