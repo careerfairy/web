@@ -1097,11 +1097,13 @@ export class FirebaseGroupRepository
       const groupLivestreams = livestreams.filter(
          (livestream) => livestream.groupIds[0] === groupId
       )
-      const creatorsWithLivestreams = groupLivestreams.flatMap((livestream) => {
-         return livestream.creatorsIds
-            .map((creatorId) => creatorsMap.get(creatorId))
-            .filter(Boolean)
-      })
+      const creatorsWithLivestreams = groupLivestreams
+         .flatMap((livestream) => {
+            return livestream.creatorsIds
+               ?.map((creatorId) => creatorsMap.get(creatorId))
+               .filter(Boolean)
+         })
+         .filter(Boolean)
 
       if (creatorsWithLivestreams.length === 0) return creatorsWithSparks
 
