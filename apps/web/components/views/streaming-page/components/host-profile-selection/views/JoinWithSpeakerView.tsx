@@ -68,7 +68,11 @@ export const JoinWithSpeakerView = () => {
             </View.Subtitle>
             <CreatorPreview
                sx={styles.creatorPreview}
-               creator={mapSpeakerToCreator(selectedSpeaker)}
+               creator={
+                  selectedSpeaker
+                     ? mapSpeakerToCreator(selectedSpeaker)
+                     : undefined
+               }
             />
          </View.Content>
          <View.Actions>
