@@ -19,7 +19,7 @@ type Data = SearchResponse<AlgoliaSparkResponse> & {
    deserializedHits: SparkSearchResult[]
 }
 
-type Key = ["searchSparks", string, string, number, SparkReplicaType]
+type Key = ["searchSparks", string, string, number, number, SparkReplicaType]
 
 export type FilterOptions = {
    arrayFilters?: Partial<Record<ArrayFilterFieldType, string[]>>
@@ -53,10 +53,10 @@ const buildAlgoliaFilterString = (options: FilterOptions): string => {
 export function useSparkSearchAlgolia(
    inputValue: string,
    options: FilterOptions,
+   limit: number,
    targetReplica?: SparkReplicaType,
    disable?: boolean
 ) {
-   console.log("🚀 ~ options:", options)
    const getKey = useCallback(
       (pageIndex: number, previousPageData: Data | null): Key => {
          // If reached the end of the list, return null to stop fetching
@@ -66,19 +66,21 @@ export function useSparkSearchAlgolia(
             inputValue,
             buildAlgoliaFilterString(options),
             pageIndex,
+            limit,
             targetReplica,
          ]
       },
-      [inputValue, options, targetReplica]
+      [inputValue, options, targetReplica, limit]
    )
 
    const fetcher = async (key: Key): Promise<Data> => {
-      const [, inputValue, filters, page, replica] = key
+      const [, inputValue, filters, page, itemsPerPage, replica] = key
       const result = await algoliaRepo.searchSparks(
          inputValue,
          filters,
          page,
-         replica
+         replica,
+         itemsPerPage
       )
 
       return {

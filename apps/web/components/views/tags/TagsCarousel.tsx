@@ -60,14 +60,18 @@ type PropType = {
    tags?: OptionGroup[]
    onTagClick?: (tagId: string) => void
    onAllClick?: () => void
+   allSelected?: boolean
 }
 
 const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
-   const { selectedCategories, emblaRef, tags, onTagClick, onAllClick } = props
-
-   // Could be more precise when checking but since no duplicates should be ok
-   // TODO: change to UI cue only
-   const isAllSelected = selectedCategories.length === tags.length
+   const {
+      selectedCategories,
+      emblaRef,
+      tags,
+      onTagClick,
+      onAllClick,
+      allSelected,
+   } = props
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>
@@ -77,7 +81,7 @@ const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
                sx={[
                   styles.chip,
                   styles.allChip,
-                  isAllSelected ? styles.selectedChip : null,
+                  allSelected ? styles.selectedChip : null,
                ]}
                label="All"
                onClick={onAllClick}
