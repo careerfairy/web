@@ -1,11 +1,11 @@
-import { ResponsiveStreamButton } from "../Buttons"
 import { sxStyles } from "types/commonTypes"
+import { ResponsiveStreamButton } from "../Buttons"
 
-import { Eye } from "react-feather"
-import React from "react"
-import { useCurrentViewCount } from "store/selectors/streamingAppSelectors"
-import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
 import { useAppDispatch } from "components/custom-hook/store"
+import { Eye } from "react-feather"
+import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
+import { useRTMChannel } from "../../context/rtm"
+import { useChannelMembers } from "../../context/rtm/hooks/useChannelMembers"
 
 const styles = sxStyles({
    root: {
@@ -14,7 +14,8 @@ const styles = sxStyles({
 })
 
 export const ViewCount = () => {
-   const viewCount = useCurrentViewCount()
+   const rtmChannel = useRTMChannel()
+   const { members } = useChannelMembers(rtmChannel)
 
    const dispatch = useAppDispatch()
 
@@ -29,7 +30,7 @@ export const ViewCount = () => {
          variant="outlined"
          startIcon={<Eye />}
       >
-         {viewCount}
+         {members?.length}
       </ResponsiveStreamButton>
    )
 }

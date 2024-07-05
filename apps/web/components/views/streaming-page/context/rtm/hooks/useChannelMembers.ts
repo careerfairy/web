@@ -81,8 +81,6 @@ export const useChannelMembers = (channel: RtmChannel) => {
     */
    useRTMChannelEvent(channel, "MemberJoined", (newMemberId: string) => {
       if (newMemberId.startsWith(STREAM_IDENTIFIERS.RECORDING)) {
-         // We don't want to add the Recording Bot to our member's list, but still want to know
-         // it's there so that we remove it from the viewer count
          return dispatch(setIsRecordingBotInRoom(true))
       }
       return mutate(
@@ -116,7 +114,23 @@ export const useChannelMembers = (channel: RtmChannel) => {
       )
    })
 
-   const sortedMembers = useMemo(() => data?.sort(sortMembers), [data])
+   // filter Recording Bot out of the list of members
+   const filteredMembers = useMemo(
+      () =>
+         data?.filter((member) => {
+            const isRecordBot = member.startsWith(STREAM_IDENTIFIERS.USER)
+            if (isRecordBot) {
+               dispatch(setIsRecordingBotInRoom(true))
+            }
+            return !isRecordBot
+         }),
+      [data, dispatch]
+   )
+
+   const sortedMembers = useMemo(
+      () => filteredMembers?.sort(sortMembers),
+      [filteredMembers]
+   )
 
    return {
       members: sortedMembers,
