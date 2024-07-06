@@ -8,6 +8,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import dynamic from "next/dynamic"
 import { MutableRefObject, useCallback, useMemo, useRef } from "react"
+import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
 import {
@@ -21,9 +22,7 @@ import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
 import SteppedDialog from "../../../../stepped-dialog/SteppedDialog"
 import CustomJobFormProvider from "./CustomJobFormProvider"
-import NoLinkedContentDialog from "./additionalSteps/NoLinkedContentDialog"
 import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
-import JobBasicInfo from "./createJob/JobBasicInfo"
 import JobFormDialog from "./createJob/JobFormDialog"
 import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
@@ -34,6 +33,10 @@ export const JobDialogStep = {
       position: 0,
       key: "privacy-policy",
    },
+   OLD_FORM: {
+      position: 1,
+      key: "oldJobForm",
+   },
    FORM_BASIC_INFO: {
       position: 1,
       key: "form-basic-info",
@@ -42,17 +45,21 @@ export const JobDialogStep = {
       position: 2,
       key: "form-additional-details",
    },
-   NO_LINKED_CONTENT: {
-      position: 3,
-      key: "no-linked-content",
-   },
    FORM_LINKED_LIVE_STREAMS: {
-      position: 4,
+      position: 3,
       key: "form-linked-live-streams",
    },
    FORM_LINKED_SPARKS: {
-      position: 5,
+      position: 4,
       key: "form-linked-content",
+   },
+   FORM_PREVIEW: {
+      position: 5,
+      key: "form-preview",
+   },
+   NO_LINKED_CONTENT: {
+      position: 6,
+      key: "no-linked-content",
    },
    DELETE_JOB: {
       position: 7,
@@ -82,8 +89,14 @@ const JobAdditionalDetails = dynamic(
    }
 )
 
+type ViewsProps = {
+   jobHubV1: boolean
+   quillInputRef: any
+   job?: CustomJob
+}
+
 // This function dynamically generates an array of views based on the jobHubV1 flag and the presence of a job.
-const getViews = (jobHubV1: boolean, quillInputRef, job?: CustomJob) =>
+const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
    [
       {
          key: "privacy-policy",
@@ -93,16 +106,27 @@ const getViews = (jobHubV1: boolean, quillInputRef, job?: CustomJob) =>
          ? [
               {
                  key: "form-basic-info",
-                 Component: () => <JobBasicInfo />,
+                 Component: dynamic(() => import("./createJob/JobBasicInfo")),
               },
               {
                  key: "form-additional-details",
                  Component: () => (
-                    <JobAdditionalDetails
-                       quillInputRef={quillInputRef}
-                       job={job}
-                    />
+                    <JobAdditionalDetails quillInputRef={quillInputRef} />
                  ),
+              },
+              {
+                 key: "form-linked-live-streams",
+                 Component: dynamic(
+                    () => import("./createJob/JobLinkLiveStreams")
+                 ),
+              },
+              {
+                 key: "form-linked-content",
+                 Component: dynamic(() => import("./createJob/JobLinkSparks")),
+              },
+              {
+                 key: "form-preview",
+                 Component: dynamic(() => import("./createJob/JobFormPreview")),
               },
            ]
          : [
@@ -113,7 +137,9 @@ const getViews = (jobHubV1: boolean, quillInputRef, job?: CustomJob) =>
            ]),
       {
          key: "no-linked-content",
-         Component: () => <NoLinkedContentDialog />,
+         Component: dynamic(
+            () => import("./additionalSteps/NoLinkedContentDialog")
+         ),
       },
       {
          key: "delete-job",
@@ -173,10 +199,12 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
       deleteJobWithLinkedLivestreamsDialogOpenSelector
    )
    const { jobHubV1 } = useFeatureFlags()
+   const { reset } = useFormContext()
 
    const handleCloseDialog = useCallback(() => {
       dispatch(closeJobsDialog())
-   }, [dispatch])
+      reset()
+   }, [dispatch, reset])
 
    const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
@@ -189,7 +217,7 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
    }, [group.privacyPolicyActive, isDeleteJobDialogOpen, selectedJobId])
 
    const views = useMemo(
-      () => getViews(jobHubV1, quillInputRef, job),
+      () => getViews({ jobHubV1, quillInputRef, job }),
       [job, jobHubV1, quillInputRef]
    )
 
