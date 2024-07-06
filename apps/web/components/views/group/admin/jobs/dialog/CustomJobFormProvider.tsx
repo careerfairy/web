@@ -82,8 +82,6 @@ const CustomJobFormProvider = ({
    const { group } = useGroupFromState()
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
-   // TODO-GS currently is not being used, we want to use this function after the preview
-   // job will be already created with everything
    const handleSubmit = useCallback(
       async (values: JobFormValues) => {
          try {
