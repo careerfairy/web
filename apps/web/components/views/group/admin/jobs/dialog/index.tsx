@@ -104,6 +104,12 @@ const JobAdditionalDetails = dynamic(
 )
 
 type ViewsProps = {
+   jobHubV1: boolean
+   quillInputRef: any
+   job?: CustomJob
+}
+
+type ViewsProps = {
    quillInputRef: any
    job?: CustomJob
 }
@@ -220,7 +226,8 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
 
    const handleCloseDialog = useCallback(() => {
       dispatch(closeJobsDialog())
-   }, [dispatch])
+      reset()
+   }, [dispatch, reset])
 
    const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
