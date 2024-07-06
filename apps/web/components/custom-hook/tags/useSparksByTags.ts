@@ -4,10 +4,11 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { useSparkSearchAlgolia } from "../spark/useSparkSearchAlgolia"
 
 /**
- * TODO: documentation
- * @param tags
- * @param totalItems
- * @returns
+ * Fetches Sparks with the specified @field tags. The retrieval of the data is done solely via Algolia.
+ * @param tags Tags information grouped in the different categories allowed for a tag, with each category being a map of
+ * tag id resolving to the tag OptionGroup. All ids in the map for each category will be used for matching sparks data.
+ * @param totalItems Total items to fetch, use in Algolia for item per page.
+ * @returns Sparks data and additional page information for navigating to next pages.
  */
 export const useSparksByTags = (tags: GroupedTags, totalItems?: number) => {
    const filters = {
@@ -27,8 +28,6 @@ export const useSparksByTags = (tags: GroupedTags, totalItems?: number) => {
       totalItems,
       SPARK_REPLICAS.PUBLISHED_AT_DESC
    )
-
-   // return (data?.deserializedHits || [])
    const hasMorePages = data?.length && data.at(0)?.nbPages > data.length
 
    return {
