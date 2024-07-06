@@ -1,6 +1,7 @@
 import { Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { AlertCircle } from "react-feather"
+import { useFormContext } from "react-hook-form"
 import { JobDialogStep } from ".."
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import SteppedDialog, {
@@ -42,8 +43,11 @@ const styles = sxStyles({
 })
 
 const NoLinkedContentDialog = () => {
-   const { handleClose, currentStep } = useStepper()
+   const { currentStep } = useStepper()
    const isMobile = useIsMobile()
+   const {
+      formState: { isSubmitting },
+   } = useFormContext()
 
    const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
 
@@ -86,10 +90,12 @@ const NoLinkedContentDialog = () => {
                   </SteppedDialog.Subtitle>
 
                   <SteppedDialog.Button
+                     type="submit"
+                     form="custom-job-form"
                      variant="contained"
                      color={"warning"}
-                     type="submit"
-                     onClick={() => handleClose()}
+                     loading={isSubmitting}
+                     disabled={isSubmitting}
                      sx={styles.btn}
                   >
                      Understood

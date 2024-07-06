@@ -45,6 +45,8 @@ const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
          groupId: job.groupId,
          basicInfo: mapBasicInfo(job),
          additionalInfo: mapAdditionalInfo(job, pastJob),
+         livestreamIds: job.livestreams,
+         sparkIds: job.sparks,
       }
    }
 
@@ -63,6 +65,8 @@ const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
          postingUrl: "",
          noDateValidation: false,
       },
+      livestreamIds: [],
+      sparkIds: [],
    }
 }
 
@@ -77,8 +81,6 @@ const CustomJobFormProvider = ({
    const { group } = useGroupFromState()
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
-   // TODO-GS currently is not being used, we want to use this function after the preview
-   // job will be already created with everything
    const handleSubmit = useCallback(
       async (values: JobFormValues) => {
          try {
@@ -87,6 +89,8 @@ const CustomJobFormProvider = ({
                additionalInfo: { deadline, postingUrl, ...additionalInfoRest },
                id,
                groupId,
+               livestreamIds,
+               sparkIds,
             } = values
 
             const businessFunctionsTagIds = businessTags.map((el) => el.id)
@@ -103,6 +107,8 @@ const CustomJobFormProvider = ({
                   postingUrl.indexOf("http") === 0
                      ? postingUrl
                      : `https://${postingUrl}`,
+               livestreams: livestreamIds,
+               sparks: sparkIds,
             }
 
             if (selectedJobId) {
