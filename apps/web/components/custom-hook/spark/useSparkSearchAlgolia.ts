@@ -47,8 +47,12 @@ const buildAlgoliaFilterString = (options: FilterOptions): string => {
 
 /**
  * A custom React hook used for performing searches of sparks in Algolia.
- * @param  inputValue - The search string input by the user
- * @param  options - The filter options to apply to the search
+ * @param  inputValue - A custom search input, checked against the Algolia index filterable fields.
+ * @param  options - The filter options to apply to the search (array and boolean filters) with other type of filters also able to be defined.
+ * @param limit Limit of items to fetch, defines the Algolia item per page.
+ * @param targetReplica Replica to target, for Sparks the most applicable replica is sorted by publishedAt descending, matching in this way the sparks feed
+ * ordering of sparks as well.
+ * @param disable Optional parameter for disabling the data fetch,
  */
 export function useSparkSearchAlgolia(
    inputValue: string,

@@ -15,6 +15,9 @@ type CategoryHits = {
 
 /**
  * TODO: Add type safety to field being checked
+ * Allows fetching of all tags and their respective content usage count, all through Algolia indexes.
+ * With additional values added to the tags there is no need to update this class, unless new categories get added to the
+ * overall values for the tags.
  */
 export class TagsService {
    constructor(
@@ -22,6 +25,15 @@ export class TagsService {
       private sparksIndex: SearchIndex
    ) {}
 
+   /**
+    * Main method for counting a tag hit by searching the received index if the @field field contains
+    * the @tag id. The response is then mapped to only the number of hits, since the actual data is not needed.
+    * @param index Index for searching tag usage (livestreams, sparks or other future index).
+    * @param tag Tag to look for of @type OptionGroup even though only the 'id' field is needed.
+    * @param field For for checking the tag usage ('businessFunctionsTagIds', 'contentTopicsTagIds', ...).
+    * @returns Promise resolving with a single dictionary for the @field tag.id, where the key is the id of the
+    * OptionGroup and value the number of hits obtained for the passed index.
+    */
    private async countHit(index: SearchIndex, tag: OptionGroup, field: string) {
       return index
          .search("", {

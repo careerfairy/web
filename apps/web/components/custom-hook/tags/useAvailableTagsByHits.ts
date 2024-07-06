@@ -10,8 +10,11 @@ import { useAuth } from "HOCs/AuthProvider"
 import { useTagsContentHits } from "./useTagsContentHits"
 
 /**
- * Retrieves all tags (see TagValues @packages/shared-lib/src/constants/tags.ts)
- * @returns
+ * Retrieves all tags (see TagValues @packages/shared-lib/src/constants/tags.ts), according to the amount of times a specific
+ * tag has been used. To determine how many hits each tag has, a custom cloud function (fetchTagsContentHits), which does this calculation via Algolia and
+ * returns a map with all the counts and also grouping of the counts by content. Allowing this hook to apply the custom rule for defining if a tag should be selectable
+ * or displayable.
+ * @returns @type OptionGroup with all available tags for usage, based on rules according to content usage.
  */
 export const useAvailableTagsByHits = () => {
    const { isLoggedIn, userData } = useAuth()
