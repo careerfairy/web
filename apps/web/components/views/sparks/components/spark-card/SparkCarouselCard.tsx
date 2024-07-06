@@ -4,6 +4,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Stack } from "@mui/material"
 import Box from "@mui/material/Box"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import CardTopCheckBox from "components/views/common/CardTopCheckBox"
 import { debounce } from "lodash"
 import { FC, useEffect, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -27,6 +28,9 @@ type Props = {
    preview?: boolean
    onClick?: () => void
    onGoNext?: () => void
+   isSelectable?: boolean
+   selected?: boolean
+   disableAutoPlay?: boolean
 }
 
 const SparkCarouselCard: FC<Props> = ({
@@ -34,6 +38,9 @@ const SparkCarouselCard: FC<Props> = ({
    onClick,
    preview = false,
    onGoNext,
+   isSelectable,
+   selected,
+   disableAutoPlay,
 }) => {
    const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
    const [autoPlaying, setAutoPlaying] = useState(false)
@@ -98,11 +105,24 @@ const SparkCarouselCard: FC<Props> = ({
             url: sparkPresenter.getTransformedVideoUrl(),
             preview,
          }}
-         onMouseEnter={isMobile ? null : () => setAutoPlaying(true)}
-         onMouseLeave={isMobile ? null : () => setAutoPlaying(false)}
-         autoPlaying={autoPlaying}
+         onMouseEnter={
+            disableAutoPlay || isMobile ? null : () => setAutoPlaying(true)
+         }
+         onMouseLeave={
+            disableAutoPlay || isMobile ? null : () => setAutoPlaying(false)
+         }
+         autoPlaying={!disableAutoPlay && autoPlaying}
          containerRef={containerRef}
+         selected={selected}
       >
+         {isSelectable ? (
+            <CardTopCheckBox
+               id={spark.id}
+               selected={selected}
+               handleClick={onClick}
+            />
+         ) : null}
+
          <Box px={cardPadding} pt={cardPadding}>
             <SparkHeader showAdminOptions={false} spark={spark} />
          </Box>

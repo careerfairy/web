@@ -42,6 +42,7 @@ import {
    buildDialogLink,
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
+import CardTopCheckBox from "../CardTopCheckBox"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import WhiteTagChip from "../chips/TagChip"
 import CircularLogo from "../logos/CircularLogo"
@@ -110,6 +111,14 @@ const styles = sxStyles({
       borderRadius: (theme) => theme.spacing(2),
       boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
+   },
+   selectedWrapper: {
+      opacity: 0.5,
+      backgroundImage: (theme) =>
+         `linear-gradient(0deg, ${alpha(
+            theme.palette.common.black,
+            0.2
+         )}, ${alpha(theme.palette.common.black, 0.1)})`,
    },
    mainContentWrapper: {
       position: "relative",
@@ -222,7 +231,10 @@ type EventPreviewCardProps = {
    disableClick?: boolean
    /* Overrides the default Link click behavior of the card */
    onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
+   isSelectable?: boolean
+   selected?: boolean
 }
+
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (
       {
@@ -237,6 +249,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          hideChipLabels,
          disableClick,
          onCardClick,
+         isSelectable,
+         selected,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -399,8 +413,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       return (
          <>
             <Wrapper
-               {...(event ? linkProps : {})}
-               {...(event && {
+               {...(isLink ? linkProps : {})}
+               {...(isLink && {
                   // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
                   shallow: true,
                   passHref: true,
@@ -423,10 +437,14 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      ref={ref}
                      sx={[
                         styles.mainAndLowerContentWrapper,
+                        selected && styles.selectedWrapper,
                         isLive && styles.cardIsLive,
                      ]}
                   >
                      <Box sx={styles.mainContentWrapper}>
+                        {isSelectable ? (
+                           <CardTopCheckBox id={event.id} selected={selected} />
+                        ) : null}
                         <Box
                            className="backgroundImageWrapper"
                            sx={[
