@@ -30,7 +30,7 @@ export class ManualTemplatedEmailService {
       this.subscribedUsers = convertDocArrayToDict(users)
 
       this.logger.info(
-         "Total Users subscribed to the release email for AAB Talent Pool communication",
+         "Total Users subscribed to the release email for B2C content tagging launch announcement",
          Object.keys(this.subscribedUsers).length
       )
 
@@ -38,10 +38,10 @@ export class ManualTemplatedEmailService {
    }
 
    /**
-    * Sends the Spark Release Email to the subscribed users
+    * Sends the Email to the subscribed users
     *
     * Possibility of overriding the users to send the release email to
-    * for testing purposes
+    * for testing purposes.
     */
    send() {
       const emails = Object.keys(this.subscribedUsers)
