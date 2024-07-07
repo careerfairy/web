@@ -57,7 +57,7 @@ export const TagsSelector = (props: TagsSelectorProps) => {
 
    return (
       <>
-         <Stack spacing={1}>
+         <Stack spacing={"7px"}>
             <Stack spacing={0.5}>
                <ConditionalWrapper condition={Boolean(props.label)}>
                   <Typography sx={props.labelSx ? props.labelSx : styles.label}>
