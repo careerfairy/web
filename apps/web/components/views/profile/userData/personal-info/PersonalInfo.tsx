@@ -39,7 +39,6 @@ const styles = sxStyles({
       textTransform: "uppercase",
       fontSize: "0.8rem !important",
       fontWeight: "bold",
-      marginBottom: 1,
    },
    tagsLabel: {
       color: (theme) => theme.palette.neutral[900],
