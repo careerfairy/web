@@ -90,7 +90,6 @@ export const buildLivestreamObject = (
       companyLogoUrl: values.companyLogoUrl,
       start: firebase.getFirebaseTimestamp(values.start),
       duration: values.duration,
-      interestsIds: [...new Set(values.interestsIds)],
       groupQuestionsMap: values.groupQuestionsMap,
       type: "upcoming",
       test: false,
@@ -258,10 +257,6 @@ export const validateStreamForm = (
    })
    if (!Object.keys(errors.speakers).length) {
       delete errors.speakers
-   }
-
-   if (values.interestsIds?.length === 0) {
-      errors.interestsIds = "Please select at least one category."
    }
 
    return noValidation ? {} : errors

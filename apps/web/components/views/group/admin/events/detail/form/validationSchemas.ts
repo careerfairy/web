@@ -108,13 +108,6 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .test("length-requirement", null, (value) => {
             return value.filter(Boolean).length > 0
          }),
-      categories: yup.object().shape({
-         values: yup
-            .array()
-            .of(groupOptionShape)
-            .min(1, getSelectAtLeastOneMessage("category")),
-         options: yup.array().of(groupOptionShape),
-      }),
       targetCountries: yup.array().of(groupOptionShape),
       targetUniversities: yup.array().of(groupOptionShape),
       targetFieldsOfStudy: yup
