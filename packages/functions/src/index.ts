@@ -113,7 +113,7 @@ exports.manualOnboardingNewsletter =
 exports.manualEndOfSparksTrialEmails =
    endOfSparksTrials.manualEndOfSparksTrialEmails
 exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
-exports.manualAABTalentPoolCommunication = newsletter.manualTemplatedEmail
+exports.manualTemplatedEmail = newsletter.manualTemplatedEmail
 
 // Stripe
 exports.stripeWebHook = stripe.stripeWebHook
