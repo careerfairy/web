@@ -1,9 +1,10 @@
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import { mapCreatorToSpeaker } from "@careerfairy/shared-lib/groups/creators"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
    LivestreamEvent,
    LivestreamGroupQuestions,
    LivestreamGroupQuestionsMap,
+   Speaker,
 } from "@careerfairy/shared-lib/livestreams"
 import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import FirebaseService from "data/firebase/FirebaseService"
@@ -94,6 +95,20 @@ export const getFieldsOfStudyWithoutOtherOption = (
    return removeFieldOfStudyFromOptions(allFieldsOfStudy, OTHER_OPTION_ID)
 }
 
+const mapCreatorToSpeaker = (creator: Creator): Speaker => {
+   return {
+      id: creator.id,
+      avatar: creator.avatarUrl,
+      background: creator.story,
+      firstName: creator.firstName,
+      lastName: creator.lastName,
+      position: creator.position,
+      email: creator.email,
+      linkedInUrl: creator.linkedInUrl,
+      roles: creator.roles,
+   }
+}
+
 const mapRegistrationQuestionsToGroupQuestionsMap = (
    registrationQuestions: LivestreamFormQuestionsTabValues["registrationQuestions"]["values"]
 ): Partial<LivestreamGroupQuestionsMap> => {
@@ -177,11 +192,6 @@ export const mapFormValuesToLivestreamObject = (
          set(result, toProperty, sanitizedValue)
       }
    })
-
-   const mappedBusinessFunctionsTagIds =
-      formValues.general.businessFunctionsTagIds?.map((tag) => tag.id) || []
-   const mappedContentTopicsTagIds =
-      formValues.general.contentTopicsTagIds?.map((tag) => tag.id) || []
 
    const mappedBusinessFunctionsTagIds =
       formValues.general.businessFunctionsTagIds?.map((tag) => tag.id) || []

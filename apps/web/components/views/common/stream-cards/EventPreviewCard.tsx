@@ -642,8 +642,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                           />
                                        ) : null}
                                        {event?.businessFunctionsTagIds
-                                          ?.slice(0, 1)
-                                          ?.map((tagId) => (
+                                          .slice(0, 1)
+                                          .map((tagId) => (
                                              <WhiteTagChip
                                                 key={tagId}
                                                 variant="filled"
@@ -659,14 +659,44 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                                 label={TagValuesLookup[tagId]}
                                              />
                                           ))}
-                                       {event?.businessFunctionsTagIds?.length >
+                                       {event?.businessFunctionsTagIds.length >
                                        2 ? (
                                           <WhiteTagChip
                                              variant="filled"
                                              sx={{ border: "1px solid black" }}
                                              label={`+ ${
-                                                event.businessFunctionsTagIds
-                                                   .length - 1
+                                                event?.businessFunctionsTagIds
+                                                   .length - 2
+                                             }`}
+                                          />
+                                       ) : null}
+
+                                       {event?.contentTopicsTagIds
+                                          .slice(0, 1)
+                                          .map((tagId) => (
+                                             <WhiteTagChip
+                                                key={tagId}
+                                                variant="filled"
+                                                sx={{
+                                                   maxWidth:
+                                                      event
+                                                         ?.businessFunctionsTagIds
+                                                         .length > 2
+                                                         ? "50%"
+                                                         : "80%",
+                                                   border: "1px solid black",
+                                                }}
+                                                label={TagValuesLookup[tagId]}
+                                             />
+                                          ))}
+                                       {event?.contentTopicsTagIds.length >
+                                       2 ? (
+                                          <WhiteTagChip
+                                             variant="filled"
+                                             sx={{ border: "1px solid black" }}
+                                             label={`+ ${
+                                                event?.businessFunctionsTagIds
+                                                   .length - 2
                                              }`}
                                           />
                                        ) : null}
