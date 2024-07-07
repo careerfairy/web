@@ -666,7 +666,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                              sx={{ border: "1px solid black" }}
                                              label={`+ ${
                                                 event.businessFunctionsTagIds
-                                                   .length - 2
+                                                   .length - 1
                                              }`}
                                           />
                                        ) : null}
