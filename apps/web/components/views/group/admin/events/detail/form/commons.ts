@@ -159,7 +159,8 @@ const formValuesLivestreamEventPropertyMap = [
    ["general.duration", "duration"],
    ["general.language", "language"],
    ["general.reasonsToJoin", "reasonsToJoinLivestream_v2"],
-   ["general.categories.values", "interestsIds"],
+   ["general.businessFunctionsTagIds", "businessFunctionsTagIds"],
+   ["general.contentTopicsTagIds", "contentTopicsTagIds"],
    ["general.targetCountries", "targetCountries"],
    ["general.targetUniversities", "targetUniversities"],
    ["general.targetFieldsOfStudy", "targetFieldsOfStudy"],
@@ -192,10 +193,6 @@ export const mapFormValuesToLivestreamObject = (
       }
    })
 
-   const mappedInterestsIds =
-      formValues.general.categories?.values?.map((category) => category.id) ||
-      []
-
    const mappedBusinessFunctionsTagIds =
       formValues.general.businessFunctionsTagIds?.map((tag) => tag.id) || []
    const mappedContentTopicsTagIds =
@@ -216,10 +213,6 @@ export const mapFormValuesToLivestreamObject = (
       mapRegistrationQuestionsToGroupQuestionsMap(
          formValues.questions.registrationQuestions.values
       )
-
-   if (mappedInterestsIds.length > 0) {
-      result.interestsIds = mappedInterestsIds
-   }
 
    if (creatorsIds.length > 0) {
       result.creatorsIds = creatorsIds
