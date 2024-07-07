@@ -1,20 +1,19 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { Box, Grid, LinearProgress, Typography } from "@mui/material"
-import useInfiniteScrollClientWithHandlers from "../../../../custom-hook/useInfiniteScrollClientWithHandlers"
-import ShareLivestreamModal from "../../ShareLivestreamModal"
-import EventPreviewCard from "../../stream-cards/EventPreviewCard"
-import RegistrationModal from "../../registration-modal"
-import { useRouter } from "next/router"
-import useRegistrationModal from "../../../../custom-hook/useRegistrationModal"
-import { useInterests } from "../../../../custom-hook/useCollection"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { sxStyles } from "../../../../../types/commonTypes"
+import { Group } from "@careerfairy/shared-lib/groups"
 import {
    ImpressionLocation,
    LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { isEmptyObject } from "../../../../helperFunctions/HelperFunctions"
+} from "@careerfairy/shared-lib/livestreams"
+import { Box, Grid, LinearProgress, Typography } from "@mui/material"
+import { useRouter } from "next/router"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { InView } from "react-intersection-observer"
+import { sxStyles } from "../../../../../types/commonTypes"
+import useInfiniteScrollClientWithHandlers from "../../../../custom-hook/useInfiniteScrollClientWithHandlers"
+import useRegistrationModal from "../../../../custom-hook/useRegistrationModal"
+import { isEmptyObject } from "../../../../helperFunctions/HelperFunctions"
+import ShareLivestreamModal from "../../ShareLivestreamModal"
+import RegistrationModal from "../../registration-modal"
+import EventPreviewCard from "../../stream-cards/EventPreviewCard"
 
 const styles = sxStyles({
    emptyMessage: {
@@ -52,7 +51,6 @@ const GroupStreams = ({
       query: { groupId },
    } = useRouter()
    const { joinGroupModalData, handleCloseJoinModal } = useRegistrationModal()
-   const { data: existingInterests } = useInterests()
    const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
    const searchedButNoResults = useMemo(
       () => !searching && !livestreams?.length,
@@ -68,7 +66,7 @@ const GroupStreams = ({
       if (globalCardHighlighted) {
          setGlobalCardHighlighted(false)
       }
-   }, [groupData])
+   }, [groupData, globalCardHighlighted])
 
    const [shareEventDialog, setShareEventDialog] = useState(null)
 
@@ -100,7 +98,6 @@ const GroupStreams = ({
                                  ref={ref}
                                  index={index}
                                  totalElements={arr.length}
-                                 interests={existingInterests}
                                  location={location}
                                  event={livestream}
                               />
@@ -113,7 +110,7 @@ const GroupStreams = ({
                )
             }
          }),
-      [existingInterests, location, slicedLivestreams]
+      [location, slicedLivestreams]
    )
 
    return (
