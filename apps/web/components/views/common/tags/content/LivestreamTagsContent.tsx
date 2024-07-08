@@ -1,12 +1,16 @@
+import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
 import {
    ImpressionLocation,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Grid, Stack, Typography } from "@mui/material"
+import { useLivestreamsByTags } from "components/custom-hook/tags/useLivestreamsByTags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import EventPreviewCard from "../../stream-cards/EventPreviewCard"
+
+const EVENTS_PER_BATCH = 3
 
 const styles = sxStyles({
    seeMore: {
@@ -35,25 +39,45 @@ const styles = sxStyles({
 })
 
 type Props = {
-   events: LivestreamEvent[]
-   onSeeMore: () => void
+   type: "future" | "past"
+   tags: GroupedTags
    title: string
-   seeMoreDisabled?: boolean
 }
 
 const LivestreamTagsContent = (props: Props) => {
-   if (!props.events.length) return null
+   const {
+      data: events,
+      setSize: setNextPage,
+      hasMorePages: hasMorePages,
+   } = useLivestreamsByTags(props.type, props.tags, EVENTS_PER_BATCH)
+
+   if (!events.length) return null
+
    return (
       <Stack>
          <Typography sx={styles.heading} color="neutral.800">
             {props.title}
          </Typography>
-         <EventsPreview {...props} />
+         <EventsPreview
+            events={events}
+            seeMoreDisabled={!hasMorePages}
+            onSeeMore={() => setNextPage((previousSize) => previousSize + 1)}
+         />
       </Stack>
    )
 }
 
-const EventsPreview = ({ events, seeMoreDisabled, onSeeMore }: Props) => {
+type EventsPreviewProps = {
+   events: LivestreamEvent[]
+   onSeeMore: () => void
+   seeMoreDisabled?: boolean
+}
+
+const EventsPreview = ({
+   events,
+   seeMoreDisabled,
+   onSeeMore,
+}: EventsPreviewProps) => {
    const isMobile = useIsMobile()
 
    return (
