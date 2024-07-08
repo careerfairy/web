@@ -264,7 +264,10 @@ export const fetchContentHits = functions.region(config.region).https.onCall(
          )
          const tagsService = new TagsService(livestreamIndex, sparksIndex)
 
-         return tagsService.countHits()
+         const hits = tagsService.countHits()
+
+         functions.logger.info("Fetched tags content hits - ", hits)
+         return hits
       }
    )
 )
