@@ -1,11 +1,12 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { Box, IconButton, Stack } from "@mui/material"
 import { ArrowLeftIcon, ArrowRightIcon } from "@mui/x-date-pickers"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { ChildRefType } from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
-import React, { FC, useRef, useState } from "react"
+import React, { FC, useMemo, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import TagsCarousel from "./TagsCarousel"
 
@@ -48,6 +49,7 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
    selectedCategories,
    handleAllClicked,
 }) => {
+   const isMobile = useIsMobile()
    const childRef = useRef<ChildRefType | null>(null)
 
    const [emblaRef, emblaApi] = useEmblaCarousel(tagsCarouselEmblaOptions, [
@@ -63,6 +65,14 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
 
    const [showPreviousButton, setShowPreviousButton] = useState(false)
    const [showNextButton, setShowNextButton] = useState(true)
+
+   const showNext = useMemo(() => {
+      return !isMobile && showNextButton
+   }, [isMobile, showNextButton])
+
+   const showPrevious = useMemo(() => {
+      return !isMobile && showPreviousButton
+   }, [isMobile, showPreviousButton])
 
    emblaApi?.on("scroll", () => {
       setShowNextButton(emblaApi.canScrollNext())
@@ -83,7 +93,7 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
    return (
       <Stack spacing={1.25} direction={"row"} ml={2} mb={3}>
          <Box sx={styles.contentWrapper}>
-            <ConditionalWrapper condition={showPreviousButton}>
+            <ConditionalWrapper condition={showPrevious}>
                <Box sx={[styles.arrowWrapper]}>
                   <IconButton
                      sx={[
@@ -105,7 +115,7 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
                onAllClick={handleAllClicked}
                emblaRef={emblaRef}
             />
-            <ConditionalWrapper condition={showNextButton}>
+            <ConditionalWrapper condition={showNext}>
                <Box sx={[styles.arrowWrapper]}>
                   <IconButton
                      sx={[

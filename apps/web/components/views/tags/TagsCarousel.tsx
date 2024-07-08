@@ -37,6 +37,10 @@ const styles = sxStyles({
    selectedChip: {
       backgroundColor: (t) => t.palette.primary.main,
       color: "white",
+      "&:hover": {
+         backgroundColor: (t) => t.palette.primary.main,
+         color: "white",
+      },
    },
 })
 
@@ -93,6 +97,6 @@ const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
    )
 })
 
-TagsCarousel.displayName = "SparksCarousel"
+TagsCarousel.displayName = "TagsCarousel"
 
 export default TagsCarousel
