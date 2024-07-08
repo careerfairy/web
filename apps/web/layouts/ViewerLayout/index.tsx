@@ -2,7 +2,9 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/Li
 import { Box, useMediaQuery } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import AgoraRTC from "agora-rtc-sdk-ng"
+import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { appendCurrentQueryParams } from "components/util/url"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import RTMProvider from "context/agora/RTMProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -319,6 +321,12 @@ const ViewerLayout = (props) => {
 
    useRewardLivestreamAttendance(currentLivestream)
    useCountLivestreamAttendanceMinutes(currentLivestream)
+
+   useConditionalRedirect(
+      // Do not redirect to new UI if the current stream is a breakout room, as we don't support the new UI for breakout rooms
+      isBreakout ? false : currentLivestream?.useNewUI,
+      appendCurrentQueryParams(`/streaming/viewer/${livestreamId}`)
+   )
 
    if (notAuthorized) {
       void replace({
