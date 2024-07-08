@@ -1,3 +1,7 @@
+import {
+   BusinessFunctionsTagValues,
+   ContentTopicsTagValues,
+} from "@careerfairy/shared-lib/constants/tags"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { LoadingButton } from "@mui/lab"
@@ -7,6 +11,7 @@ import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifica
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { ControlledBrandedCheckBox } from "components/views/common/inputs/ControlledBrandedCheckbox"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
+import { TagsSelector } from "components/views/signup/userInformation/tags/TagsSelector"
 import { userRepo } from "data/RepositoryInstances"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
@@ -34,7 +39,14 @@ const styles = sxStyles({
       textTransform: "uppercase",
       fontSize: "0.8rem !important",
       fontWeight: "bold",
-      marginBottom: 1,
+   },
+   tagsLabel: {
+      color: (theme) => theme.palette.neutral[900],
+      fontSize: "11.2px",
+      fontStyle: "normal",
+      fontWeight: "700",
+      lineHeight: "14.94px",
+      textTransform: "uppercase",
    },
 })
 
@@ -152,6 +164,24 @@ const PersonalInfo = ({ userData }: Props) => {
                <StudyDomainSelector
                   collection="levelsOfStudy"
                   name="levelOfStudy"
+               />
+            </Grid>
+            <Grid item>
+               <Typography sx={styles.subtitle} variant="h5">
+                  Areas of interest
+               </Typography>
+               <TagsSelector
+                  tags={BusinessFunctionsTagValues}
+                  field="businessFunctionsTagIds"
+               />
+            </Grid>
+            <Grid item>
+               <Typography sx={styles.subtitle} variant="h5">
+                  Topics of interest
+               </Typography>
+               <TagsSelector
+                  tags={ContentTopicsTagValues}
+                  field="contentTopicsTagIds"
                />
             </Grid>
             <Grid item xs={12}>
