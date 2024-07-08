@@ -7,14 +7,16 @@ export const useLivestreamsByTags = (
    tags: GroupedTags,
    limit: number
 ) => {
+   const filters = {
+      contentTopicsTagIds: Object.keys(tags.contentTopics),
+      businessFunctionsTagIds: Object.keys(tags.businessFunctions),
+      languageCode: Object.keys(tags.language),
+   }
+
    const { data, setSize } = useLivestreamSearchAlgolia(
       "",
       {
-         arrayFilters: {
-            contentTopicsTagIds: Object.keys(tags.contentTopics),
-            businessFunctionsTagIds: Object.keys(tags.businessFunctions),
-            languageCode: Object.keys(tags.language),
-         },
+         arrayFilters: filters,
          dateFilter: type,
       },
       undefined,
