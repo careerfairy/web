@@ -54,9 +54,14 @@ const ChipsLine = ({ livestream }: { livestream: LivestreamEvent }) => {
 
          {livestream?.businessFunctionsTagIds ? (
             <EventTags
-               tagIds={[]
-                  .concat(livestream.businessFunctionsTagIds)
-                  .concat(livestream.contentTopicsTagIds)}
+               tagIds={livestream.businessFunctionsTagIds}
+               chipsToDisplay={chipsToDisplay}
+            />
+         ) : undefined}
+         {!livestream?.businessFunctionsTagIds &&
+         livestream?.contentTopicsTagIds ? (
+            <EventTags
+               tagIds={livestream.contentTopicsTagIds}
                chipsToDisplay={chipsToDisplay}
             />
          ) : undefined}

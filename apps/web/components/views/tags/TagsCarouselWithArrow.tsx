@@ -6,7 +6,7 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { ChildRefType } from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
-import React, { FC, useMemo, useRef, useState } from "react"
+import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import TagsCarousel from "./TagsCarousel"
 
@@ -32,8 +32,8 @@ const styles = sxStyles({
 
 const tagsCarouselEmblaOptions: EmblaOptionsType = {
    loop: false,
-   dragFree: true,
-   skipSnaps: true,
+   dragFree: false,
+   skipSnaps: false,
 }
 
 type CarouselProps = {
@@ -74,10 +74,17 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
       return !isMobile && showPreviousButton
    }, [isMobile, showPreviousButton])
 
-   emblaApi?.on("scroll", () => {
-      setShowNextButton(emblaApi.canScrollNext())
-      setShowPreviousButton(emblaApi.canScrollPrev())
-   })
+   useEffect(() => {
+      const handleScroll = () => {
+         setShowNextButton(emblaApi.canScrollNext())
+         setShowPreviousButton(emblaApi.canScrollPrev())
+      }
+      emblaApi?.on("scroll", handleScroll)
+      // Cleanup the event listener on component unmount
+      return () => {
+         emblaApi?.off("scroll", handleScroll)
+      }
+   }, [emblaApi])
 
    React.useImperativeHandle(childRef, () => ({
       goNext() {

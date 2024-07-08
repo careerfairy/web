@@ -19,29 +19,16 @@ import { useTagsContentHits } from "./useTagsContentHits"
 export const useAvailableTagsByHits = () => {
    const { isLoggedIn, userData } = useAuth()
    const { data: hits } = useTagsContentHits()
-   console.log("🚀 ~ useAvailableTagsByHits ~ hits:", hits)
 
    const availableCategories = TagValues.filter((tag) => {
-      if (hits.businessFunctions.hits[tag.id]) {
-         return shouldShowTagByCount(
-            hits.businessFunctions.hits[tag.id].count,
-            6
-         )
-      }
-      if (hits.contentTopics.hits[tag.id]) {
-         return shouldShowTagByCount(
-            hits.contentTopics.hits[tag.id].count,
-            6,
-            6
-         )
-      }
-      if (hits.languages.hits[tag.id]) {
-         return shouldShowTagByCount(hits.languages.hits[tag.id].count, 6, 6)
-      }
+      const tagHits =
+         hits.businessFunctions.hits[tag.id] ||
+         hits.contentTopics.hits[tag.id] ||
+         hits.languages.hits[tag.id]
+      return tagHits ? shouldShowTagByCount(tagHits.count, 6, 6) : false
    })
 
-   const tags = sortByUserInterests(availableCategories, userData, isLoggedIn)
-   return tags
+   return sortByUserInterests(availableCategories, userData, isLoggedIn)
 }
 
 const sortByUserInterests = (
@@ -67,12 +54,33 @@ const sortByUserInterests = (
    const contentTopicTagIDs = Object.keys(groupedTags.contentTopics || [])
    const languageTagIds = Object.keys(groupedTags.language || [])
 
+   const sortedUserTags = sortTags(
+      (user?.businessFunctionsTagIds || []).concat(
+         user?.contentTopicsTagIds || []
+      ),
+      (tagId) => {
+         if (businessFunctionTagIds.includes(tagId)) {
+            return businessFunctionsGetter(tagId)
+         } else {
+            return contentTopicsGetter(tagId)
+         }
+      }
+   )
+
    const sortedBusinessFunctions = sortTags(
-      businessFunctionTagIds,
+      businessFunctionTagIds.filter(
+         (tagId) => !sortedUserTags.find((userTag) => userTag.id == tagId)
+      ),
       businessFunctionsGetter
    )
 
-   const sortedContentTopics = sortTags(contentTopicTagIDs, contentTopicsGetter)
+   const sortedContentTopics = sortTags(
+      contentTopicTagIDs.filter(
+         (tagId) => !sortedUserTags.find((userTag) => userTag.id == tagId)
+      ),
+      contentTopicsGetter
+   )
+
    const sortedLanguages = sortTags(languageTagIds, languagesGetter)
 
    if (!isLoggedIn) {
@@ -81,21 +89,10 @@ const sortByUserInterests = (
          .concat(sortedLanguages)
    }
 
-   const businessFunctions = sortTagsByUserData(
-      businessFunctionTagIds,
-      user?.businessFunctionsTagIds || [],
-      createGroupedOptionGroupGetter(groupedTags.businessFunctions)
-   )
-
-   const contentTopics = sortTagsByUserData(
-      contentTopicTagIDs,
-      user?.contentTopicsTagIds || [],
-      createGroupedOptionGroupGetter(groupedTags.contentTopics)
-   )
-
-   const languages = sortedLanguages
-
-   return contentTopics.concat(businessFunctions).concat(languages)
+   return sortedUserTags
+      .concat(sortedContentTopics)
+      .concat(sortedBusinessFunctions)
+      .concat(sortedLanguages)
 }
 
 const createGroupedOptionGroupGetter = (
@@ -106,38 +103,9 @@ const createGroupedOptionGroupGetter = (
 
 const sortTags = (
    tagIds: string[],
-   optionGroupGetter: (tagId) => OptionGroup
+   optionGroupGetter: (tagId: string) => OptionGroup
 ): OptionGroup[] => {
    return tagIds.map(optionGroupGetter).sort(alphabeticalSort)
-}
-
-/**
- * Sorts a given set of tag ids, taken into consideration the tags which user has preference in his profile, meaning
- * these tags will take precedence when sorting and still will be sorted alphabetically.
- * - Example: User has tags [E,M,O] in his profile so the sorted list of all tags would be [E,M,O,A,B,C...].
- *
- * This function returns OptionGroup[] allowing for quick display with the labels, and for such it uses @param optionGroupGetter to
- * map the tag id to its OptionGroup value.
- * @param tagIds Ids of the tags to sort.
- * @param userTagIds Ids of user preferred tags.
- * @param optionGroupGetter Getter for mapping a tag id to its OptionGroup value.
- * @returns OptionGroup[]
- */
-const sortTagsByUserData = (
-   tagIds: string[],
-   userTagIds: string[],
-   optionGroupGetter: (tagId) => OptionGroup
-): OptionGroup[] => {
-   const matchingTagIds = tagIds.filter((tagId) => userTagIds.includes(tagId))
-
-   const matches = matchingTagIds.map(optionGroupGetter).sort(alphabeticalSort)
-
-   const tagsWithoutUserMatch = tagIds
-      .filter((tag) => !matchingTagIds.includes(tag))
-      .map(optionGroupGetter)
-      .sort(alphabeticalSort)
-
-   return matches.concat(tagsWithoutUserMatch)
 }
 
 const alphabeticalSort = (tagA: OptionGroup, tagB: OptionGroup) =>
@@ -148,8 +116,10 @@ const shouldShowTagByCount = (
    minEvents: number,
    minSparks?: number
 ): boolean => {
+   // TODO: remove when enough content, keeping the long to prevent linting,
+   // should work when fetchTagsContentHits is fixed (CF)
    console.log("🚀 ~ minSparks:", minSparks, minEvents, hitsCount)
+
    return true
-   // TODO: remove when enough content
    // && (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
 }

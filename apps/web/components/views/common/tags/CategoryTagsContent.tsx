@@ -15,6 +15,7 @@ const styles = sxStyles({
       transition: (theme) => theme.transitions.create(["opacity"]),
    },
 })
+
 type Props = {
    categories: {
       [id: string]: {
@@ -22,6 +23,7 @@ type Props = {
       }
    }
 }
+
 const CategoryTagsContent = (props: Props) => {
    return (
       <SuspenseWithBoundary fallback={<CategoryTagsContentSkeleton />}>
@@ -29,6 +31,7 @@ const CategoryTagsContent = (props: Props) => {
       </SuspenseWithBoundary>
    )
 }
+
 const CategoryTagsContentComponent = ({ categories }: Props) => {
    const selectedCategories = Object.keys(categories).filter(
       (cat) => categories[cat].selected

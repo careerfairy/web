@@ -13,15 +13,15 @@ import EventPreviewCard from "../../stream-cards/EventPreviewCard"
 const EVENTS_PER_BATCH = 3
 
 const styles = sxStyles({
-   seeMore: {
-      color: (theme) => theme.palette.neutral[600],
+   seeMore: (theme) => ({
+      color: theme.palette.neutral[600],
       borderRadius: "20px",
-      border: (theme) => `1px solid ${theme.palette.neutral[200]}`,
+      border: `1px solid ${theme.palette.neutral[200]}`,
       "&:hover": {
-         backgroundColor: (theme) => theme.palette.neutral[200],
+         backgroundColor: theme.palette.neutral[200],
       },
       mx: "15px !important",
-   },
+   }),
    heading: {
       fontSize: "18px",
       pl: 2,
@@ -98,7 +98,6 @@ const EventsPreview = ({
                            key={livestream.id}
                            index={idx}
                            totalElements={arr.length}
-                           // TODO: Check location
                            location={
                               ImpressionLocation.recommendedEventsCarousel
                            }
@@ -110,13 +109,15 @@ const EventsPreview = ({
                })}
             </Grid>
          </Box>
-         <Button
-            disabled={seeMoreDisabled}
-            onClick={onSeeMore}
-            sx={[styles.seeMore]}
-         >
-            See more <ChevronDown />
-         </Button>
+         {seeMoreDisabled ? undefined : (
+            <Button
+               disabled={seeMoreDisabled}
+               onClick={onSeeMore}
+               sx={[styles.seeMore]}
+            >
+               See more <ChevronDown />
+            </Button>
+         )}
       </Stack>
    )
 }

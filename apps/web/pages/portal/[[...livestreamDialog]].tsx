@@ -39,7 +39,6 @@ import EventsPreviewCarousel, {
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
 import { UserSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
-import WidgetsWrapper from "components/views/portal/WidgetsWrapper"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
 import { sxStyles } from "types/commonTypes"
 import {
@@ -179,18 +178,17 @@ const PortalTagsContent = ({ children }: PortalTagsContentProps) => {
 
 const PortalTags = ({ children }: PortalTagsContentProps) => {
    const availableCategories = useAvailableTagsByHits()
+   const defaultCategories = availableCategories.map((tag) => {
+      return [
+         tag.id,
+         {
+            selected: false,
+         },
+      ]
+   })
 
    const [categoriesData, setCategoriesData] = useState(() => {
-      return Object.fromEntries(
-         availableCategories.map((tag) => {
-            return [
-               tag.id,
-               {
-                  selected: false,
-               },
-            ]
-         })
-      )
+      return Object.fromEntries(defaultCategories)
    })
 
    const selectedCategories = useMemo(() => {
@@ -218,18 +216,19 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
    }
 
    return (
-      <WidgetsWrapper>
+      <Box>
          <TagsCarouselWithArrow
             selectedCategories={selectedCategories}
             tags={availableCategories}
             handleTagClicked={handleCategoryChipClicked}
+            handleAllClicked={() => handleCategoryChipClicked(undefined)}
          />
          {selectedCategories.length ? (
             <CategoryTagsContent categories={categoriesData} />
          ) : (
             children
          )}
-      </WidgetsWrapper>
+      </Box>
    )
 }
 
