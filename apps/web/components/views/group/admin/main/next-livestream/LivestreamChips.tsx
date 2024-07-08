@@ -52,13 +52,14 @@ const ChipsLine = ({ livestream }: { livestream: LivestreamEvent }) => {
             />
          ) : undefined}
 
-         <EventTags
-            tagIds={[]
-               .concat(livestream.businessFunctionsTagIds)
-               .concat(livestream.contentTopicsTagIds)}
-            chipsToDisplay={chipsToDisplay}
-         />
-         {/* <EventTags tagIds={livestream.contentTopicsTagIds} chipsToDisplay={chipsToDisplay} /> */}
+         {livestream?.businessFunctionsTagIds ? (
+            <EventTags
+               tagIds={[]
+                  .concat(livestream.businessFunctionsTagIds)
+                  .concat(livestream.contentTopicsTagIds)}
+               chipsToDisplay={chipsToDisplay}
+            />
+         ) : undefined}
       </Box>
    )
 }
