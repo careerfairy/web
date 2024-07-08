@@ -1,10 +1,16 @@
-import { ContentTopicsTagValues } from "@careerfairy/shared-lib/constants/tags"
+import {
+   ContentTopicsTagValues,
+   GroupedTags,
+} from "@careerfairy/shared-lib/constants/tags"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Typography } from "@mui/material"
+import { useSparksByTags } from "components/custom-hook/tags/useSparksByTags"
 import { SparksCarouselWithArrows } from "components/views/portal/sparks/SparksCarouselWithArrows"
 import { useRouter } from "next/router"
 import { sxStyles } from "types/commonTypes"
+
+const SPARKS_PER_BATCH = 10
 
 const styles = sxStyles({
    heading: {
@@ -14,17 +20,17 @@ const styles = sxStyles({
 })
 
 type Props = {
-   sparks: Spark[]
+   tags: GroupedTags
    selectedTagLabel: string
    selectTagIds: string[]
 }
 
-const SparksTagsContent = ({
-   sparks,
-   selectedTagLabel,
-   selectTagIds,
-}: Props) => {
+const SparksTagsContent = ({ tags, selectedTagLabel, selectTagIds }: Props) => {
    const router = useRouter()
+
+   // No need to use setSize for next page, since the sparks to be fetched is
+   // capped to 10 items.
+   const { data: sparks } = useSparksByTags(tags, SPARKS_PER_BATCH)
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
