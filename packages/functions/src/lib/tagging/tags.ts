@@ -1,5 +1,4 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { registrationSourcesCacheKey } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import {
@@ -9,6 +8,7 @@ import {
 import * as functions from "firebase-functions"
 import _ from "lodash"
 
+import { registrationSourcesCacheKey } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import config from "../../config"
 import {
    CacheKeyOnCallFn,
@@ -265,7 +265,7 @@ export const fetchContentHits = functions.region(config.region).https.onCall(
          )
          const tagsService = new TagsService(livestreamIndex, sparksIndex)
 
-         const hits = tagsService.countHits()
+         const hits = await tagsService.countHits()
 
          functions.logger.info("Fetched tags content hits - ", hits)
          return hits
