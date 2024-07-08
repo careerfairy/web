@@ -93,12 +93,18 @@ const handleSearch = <AlgoliaResponseType>(
    filters: string,
    page: number
 ) => {
+   const isTest = isTestEnvironment()
+   const workflowId = getWorkflowId()
+
+   if (isTest) {
+      // This console log is required to ensure the compiler outputs the workflow ID for the CI
+      console.log(`🚀 - Workflow ID: ${workflowId}`)
+   }
+
    return index.search<AlgoliaResponseType>(query, {
-      filters:
-         (isTestEnvironment() ? `workflowId:${getWorkflowId()} AND ` : "") +
-         filters,
+      filters: (isTest ? `workflowId:${workflowId} AND ` : "") + filters,
       page,
-      cacheable: !isTestEnvironment(), // Disable caching for test environments as time is limited
+      cacheable: !isTest, // Disable caching for test environments as time is limited
    })
 }
 

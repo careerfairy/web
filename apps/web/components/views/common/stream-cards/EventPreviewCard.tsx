@@ -1,51 +1,50 @@
+import LanguageIcon from "@mui/icons-material/Language"
+import Box from "@mui/material/Box"
+import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
+import { Theme, alpha } from "@mui/material/styles"
+import { useAuth } from "HOCs/AuthProvider"
+import {
+   getMaxLineStyles,
+   getResizedUrl,
+   isInIframe,
+} from "components/helperFunctions/HelperFunctions"
+import Image from "next/legacy/image"
+import { useRouter } from "next/router"
 import React, {
+   Fragment,
    forwardRef,
    useCallback,
    useEffect,
    useMemo,
    useState,
 } from "react"
-import Box from "@mui/material/Box"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import { alpha, Theme } from "@mui/material/styles"
-import LanguageIcon from "@mui/icons-material/Language"
-import {
-   getMaxLineStyles,
-   getResizedUrl,
-   isInIframe,
-} from "components/helperFunctions/HelperFunctions"
-import WhiteTagChip from "../chips/TagChip"
-import Image from "next/legacy/image"
-import { useRouter } from "next/router"
 import { checkIfPast } from "util/streamUtil"
-import { useAuth } from "HOCs/AuthProvider"
-import Skeleton from "@mui/material/Skeleton"
+import WhiteTagChip from "../chips/TagChip"
 
-import { Interest } from "../../../../types/interests"
-import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
-import {
-   ImpressionLocation,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { marketingSignUpFormId } from "../../../cms/constants"
+import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import CalendarIcon from "@mui/icons-material/CalendarToday"
+import { CardActionArea } from "@mui/material"
+import Link, { LinkProps } from "next/link"
+import { placeholderBanner } from "../../../../constants/images"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
+import { gradientAnimation } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
+import { sxStyles } from "../../../../types/commonTypes"
+import { Interest } from "../../../../types/interests"
+import DateUtil from "../../../../util/DateUtil"
+import { marketingSignUpFormId } from "../../../cms/constants"
 import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
 import useTrackLivestreamImpressions from "../../../custom-hook/useTrackLivestreamImpressions"
-import { placeholderBanner } from "../../../../constants/images"
-import DateUtil from "../../../../util/DateUtil"
-import CalendarIcon from "@mui/icons-material/CalendarToday"
-import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
-import { sxStyles } from "../../../../types/commonTypes"
-import { gradientAnimation } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import Link, { LinkProps } from "next/link"
-import { CardActionArea } from "@mui/material"
 import {
    buildDialogLink,
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
+import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import CircularLogo from "../logos/CircularLogo"
+import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
 
 const bottomContentHeight = 50
 const cardAvatarSize = 65
@@ -221,6 +220,8 @@ type EventPreviewCardProps = {
    // If true, the chip labels will be hidden
    hideChipLabels?: boolean
    disableClick?: boolean
+   /* Overrides the default Link click behavior of the card */
+   onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
 }
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (
@@ -236,6 +237,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          bottomElement,
          hideChipLabels,
          disableClick,
+         onCardClick,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -338,11 +340,16 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          [startDate]
       )
 
-      const handleDetailsClick = useCallback(() => {
-         if (isOnMarketingLandingPage) {
-            setSelectedEventId(event?.id)
-         }
-      }, [event?.id, isOnMarketingLandingPage, setSelectedEventId])
+      const handleDetailsClick = useCallback(
+         (e: React.MouseEvent<HTMLElement>) => {
+            if (isOnMarketingLandingPage) {
+               setSelectedEventId(event?.id)
+            }
+
+            onCardClick?.(e)
+         },
+         [event?.id, isOnMarketingLandingPage, onCardClick, setSelectedEventId]
+      )
 
       const isLive = useMemo(
          () => event?.hasStarted && !isPast,
@@ -397,25 +404,32 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          router,
       ])
 
+      const isLink = event && !onCardClick && !isPlaceholderEvent
+
+      const Wrapper = isLink ? Link : Fragment
+
       return (
          <>
-            <Link
-               {...linkProps}
-               // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
-               shallow
-               passHref
-               // Prevents the page from scrolling to the top when the link is clicked
-               scroll={false}
-               legacyBehavior
+            <Wrapper
+               {...(event ? linkProps : {})}
+               {...(event && {
+                  // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+                  shallow: true,
+                  passHref: true,
+                  // Prevents the page from scrolling to the top when the link is clicked
+                  scroll: false,
+                  legacyBehavior: true,
+               })}
             >
                <CardActionArea
-                  component={event ? "a" : "div"}
+                  component={isLink ? "a" : "div"}
                   sx={[event && styles.cursorPointer, styles.cardWrapper]}
                   ref={trackImpressionsRef}
                   target={isInIframe() ? "_blank" : undefined}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
                   disabled={disableClick}
+                  disableRipple={!event}
                >
                   <Box
                      ref={ref}
@@ -683,7 +697,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                   </Box>
                   {event ? <EventSEOSchemaScriptTag event={event} /> : null}
                </CardActionArea>
-            </Link>
+            </Wrapper>
          </>
       )
    }

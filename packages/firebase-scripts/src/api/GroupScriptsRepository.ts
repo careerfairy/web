@@ -1,25 +1,25 @@
-import firebase from "firebase/compat"
 import {
    DocRef,
    mapFirestoreDocuments,
 } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { CustomJob } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
 import {
-   Group,
    GROUP_DASHBOARD_ROLE,
+   Group,
    GroupAdmin,
    LegacyGroupAdmin,
 } from "@careerfairy/shared-lib/dist/groups"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
 import {
    FirebaseGroupRepository,
    IGroupRepository,
 } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
-import { DataWithRef } from "../util/types"
-import { GroupStats } from "@careerfairy/shared-lib/dist/groups/stats"
 import { Creator } from "@careerfairy/shared-lib/dist/groups/creators"
+import { GroupStats } from "@careerfairy/shared-lib/dist/groups/stats"
 import { Spark, SparkStats } from "@careerfairy/shared-lib/dist/sparks/sparks"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 import * as admin from "firebase-admin"
-import { CustomJob } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
+import firebase from "firebase/compat/app"
+import { DataWithRef } from "../util/types"
 
 export interface IGroupScriptsRepository extends IGroupRepository {
    getAllLegacyAdmins<T extends boolean>(

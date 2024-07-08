@@ -1,4 +1,5 @@
 import BaseFirebaseRepository from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import {
    Creator,
@@ -34,19 +35,26 @@ import { DocumentSnapshot } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
-import { FunctionsLogger } from "src/util"
+import { FunctionsLogger, getChangeTypes } from "src/util"
 import {
    FieldValue,
    Firestore,
    Storage,
    Timestamp,
 } from "../../api/firestoreAdmin"
-import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
+import {
+   customJobRepo,
+   livestreamsRepo,
+   sparkRepo,
+   userRepo,
+} from "../../api/repositories"
 import { createGenericConverter } from "../../util/firestore-admin"
 import { addAddedToFeedAt } from "../../util/sparks"
 import BigQueryCreateInsertService from "../bigQuery/BigQueryCreateInsertService"
 import SparkRecommendationService from "../recommendation/SparkRecommendationService"
 import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
+import { syncCustomJobLinkedContentTags } from "../tagging/tags"
+import { logAndThrow } from "../validations"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 
 export interface ISparkFunctionsRepository {
@@ -282,6 +290,20 @@ export interface ISparkFunctionsRepository {
     * @returns Promise of an array of Spark
     */
    getSparksByIds(sparkIds: string[]): Promise<Spark[]>
+
+   /**
+    * Synchronizes the the business function tags from a customJob, to all the associated
+    * sparks, also updates the tags on sparks which were removed from the jobs.
+    * This means fetching all other jobs for the unlinked sparks, and keep for that spark only
+    * the other jobs tags.
+    * @param afterJob customJob after update
+    * @param beforeJob customJob before data update
+    */
+   syncCustomJobBusinessFunctionTagsToSparks(
+      afterJob: CustomJob,
+      beforeJob: CustomJob,
+      changeType: ReturnType<typeof getChangeTypes>
+   ): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -993,6 +1015,63 @@ export class SparkFunctionsRepository
             ...snapshot.data(),
             id: snapshot.id,
          }))
+   }
+
+   async syncCustomJobBusinessFunctionTagsToSparks(
+      afterJob: CustomJob,
+      beforeJob: CustomJob,
+      changeType: ReturnType<typeof getChangeTypes>
+   ): Promise<void> {
+      functions.logger.log(
+         `Sync tags with sparks from customJob: ${afterJob.id}`
+      )
+
+      // When creating data manually on firefoo an empty object is created first
+      // this prevents doing any processing if no id is present, the remaining checks
+      // for linked content is null safe and will also result in an early return for empty objects
+      if (!afterJob?.id) return
+
+      const updatePromises = []
+      const updatedSparks = await syncCustomJobLinkedContentTags(
+         afterJob,
+         beforeJob,
+         changeType,
+         (job) => job.sparks,
+         (sparkIds) => this.getSparksByIds(sparkIds),
+         (sparkIds) =>
+            customJobRepo.getCustomJobsByLinkedContentIds("sparks", sparkIds)
+      )
+
+      updatedSparks
+         .map((spark) => {
+            const ref = this.firestore
+               .collection("sparks")
+               .withConverter(createGenericConverter<Spark>())
+               .doc(spark.id)
+
+            functions.logger.log(
+               `live stream ${spark.id} tags after sync: ${spark.linkedCustomJobsTagIds}`
+            )
+
+            return ref.update({
+               linkedCustomJobsTagIds: spark.linkedCustomJobsTagIds,
+            })
+         })
+         .forEach((updatePromise) => updatePromises.push(updatePromise))
+
+      const results = await Promise.allSettled(updatePromises)
+
+      const errors = results.filter((res) => res.status == "rejected")
+
+      if (errors.length) {
+         logAndThrow("Error synching tags with sparks", {
+            sparkIds: afterJob.sparks,
+            customJobId: afterJob.id,
+            errors: errors,
+         })
+      }
+
+      functions.logger.log(`Updated sparks linked to customJob ${afterJob.id}`)
    }
 }
 
