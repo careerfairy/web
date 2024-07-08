@@ -54,6 +54,9 @@ const sparkIndex = {
    collectionPath: "sparks",
    indexName: "sparks" as const, // To allow inferring the type of the index name
    fields: removeDuplicates(SPARK_FIELDS_TO_INDEX),
+   // Leaving these as undefined as the CI does not build
+   shouldIndex: undefined,
+   fullIndexSyncQueryConstraints: undefined,
    transformData: (data) => ({
       ...data,
       createdAtMs: data.createdAt?.toDate?.().getTime() ?? null,
