@@ -2,6 +2,8 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/Li
 import useMediaQuery from "@mui/material/useMediaQuery"
 import makeStyles from "@mui/styles/makeStyles"
 import AgoraRTC from "agora-rtc-sdk-ng"
+import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
+import { appendCurrentQueryParams } from "components/util/url"
 import RTMProvider from "context/agora/RTMProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
@@ -247,6 +249,18 @@ const StreamerLayout = (props) => {
             : null,
       }),
       [currentLivestream, isBreakout, isMainStreamer, selectedState, streamerId]
+   )
+
+   useConditionalRedirect(
+      /**
+       * Redirect to the new UI ONLY under the following conditions:
+       * - The stream is not a breakout room (new UI does not support breakout rooms)
+       * - The token has been verified OR it's a test stream
+       */
+      !isBreakout && (tokenChecked || currentLivestream?.test)
+         ? currentLivestream?.useNewUI
+         : false,
+      appendCurrentQueryParams(`/streaming/host/${livestreamId}`)
    )
 
    const tokenIsValidated = () => {
