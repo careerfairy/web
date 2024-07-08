@@ -1,6 +1,6 @@
 import * as yup from "yup"
 
-const CreateCreatorSchema = yup.object().shape({
+const CreateCreatorSchema = yup.object({
    firstName: yup
       .string()
       .max(50, "First Name must be less than 50 characters")
@@ -29,6 +29,9 @@ const CreateCreatorSchema = yup.object().shape({
             return Boolean(value)
          }),
    }),
+   id: yup.string(),
 })
+
+export type CreateCreatorSchemaType = yup.InferType<typeof CreateCreatorSchema>
 
 export default CreateCreatorSchema
