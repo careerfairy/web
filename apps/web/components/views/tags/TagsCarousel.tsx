@@ -69,6 +69,8 @@ const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
                   styles.chip,
                   !selectedCategories.length ? styles.selectedChip : null,
                ]}
+               clickable
+               onClick={props.onAllClick}
                label="All"
             />
             {tags?.length

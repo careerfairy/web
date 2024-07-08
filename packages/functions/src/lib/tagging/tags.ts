@@ -8,7 +8,6 @@ import {
 import * as functions from "firebase-functions"
 import _ from "lodash"
 
-import { registrationSourcesCacheKey } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import config from "../../config"
 import {
    CacheKeyOnCallFn,
@@ -20,7 +19,12 @@ import { knownIndexes } from "../search/searchIndexes"
 import { initAlgoliaIndex } from "../search/util"
 import { TagsService } from "./services/TagsService"
 // TODO: Update documentation
-
+/**
+ * Generate cache key for the fn call
+ */
+export const cacheKey = () => {
+   return ["fetchContentHits"]
+}
 // cache settings for tag hits
 const cacheTagHits = (cacheKeyFn: CacheKeyOnCallFn) =>
    cacheOnCallValues("tag", cacheKeyFn, 21600) // 6 hours
@@ -253,7 +257,7 @@ const contentCustomJobsExcludingMap = (
  */
 export const fetchContentHits = functions.region(config.region).https.onCall(
    middlewares(
-      cacheTagHits((data) => registrationSourcesCacheKey({ ...data })),
+      cacheTagHits(() => cacheKey()),
       async () => {
          functions.logger.info("Fetching tags content hits ")
          const livestreamIndex = initAlgoliaIndex(
