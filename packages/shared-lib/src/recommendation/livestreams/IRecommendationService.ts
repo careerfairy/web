@@ -158,6 +158,8 @@ export default class RecommendationServiceCore {
          .userCountriesOfInterest()
          .userCompanyTargetUniversity()
          .userCompanyTargetFieldsOfStudy()
+         .userContentTopicTags()
+         .userBusinessFunctionsTags()
          .userImplicitFollowedCompanies()
          .userImplicitInteractedEventsCompanyCountry()
          .userImplicitInteractedEventsCompanyIndustries()

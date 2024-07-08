@@ -11,7 +11,15 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
-import { WaitingRoom } from "./components/viewer/WaitingRoom"
+import { WaitingRoom } from "./components/waiting-room/WaitingRoom"
+
+const EndOfStream = dynamic(
+   () =>
+      import("./components/end-of-stream/EndOfStream").then(
+         (mod) => mod.EndOfStream
+      ),
+   { ssr: false }
+)
 
 const ShareVideoDialog = dynamic(
    () =>
@@ -105,6 +113,15 @@ const StreamSetupWidget = dynamic(
 )
 const SettingsMenu = dynamic(
    () => import("./components/SettingsMenu").then((mod) => mod.SettingsMenu),
+   {
+      ssr: false,
+   }
+)
+const FeedbackQuestions = dynamic(
+   () =>
+      import("./components/feedback-questions/FeedbackQuestions").then(
+         (mod) => mod.FeedbackQuestions
+      ),
    {
       ssr: false,
    }
@@ -232,15 +249,20 @@ const Component = ({ isHost }: Props) => {
                         <AgoraDevicesProvider>
                            <LocalTracksProvider>
                               <ScreenShareProvider>
-                                 <Layout>
-                                    <Fragment>
-                                       <TopBar />
-                                       <MiddleContent />
-                                       <BottomBar />
-                                       <StreamSetupWidget />
-                                       <SettingsMenu />
-                                    </Fragment>
-                                 </Layout>
+                                 <EndOfStream isHost={isHost}>
+                                    <Layout>
+                                       <Fragment>
+                                          <TopBar />
+                                          <MiddleContent />
+                                          <BottomBar />
+                                          <StreamSetupWidget />
+                                          <SettingsMenu />
+                                       </Fragment>
+                                    </Layout>
+                                 </EndOfStream>
+                                 {!isHost && authenticatedUser ? (
+                                    <FeedbackQuestions />
+                                 ) : null}
                                  <ToggleStreamModeButton />
                               </ScreenShareProvider>
                            </LocalTracksProvider>
@@ -261,6 +283,6 @@ const Component = ({ isHost }: Props) => {
             <LivestreamStateTrackers />
          </>
       ),
-      [agoraUserId, isHost, livestream.id]
+      [agoraUserId, isHost, livestream.id, authenticatedUser]
    )
 }
