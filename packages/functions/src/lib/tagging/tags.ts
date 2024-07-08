@@ -255,6 +255,7 @@ export const fetchContentHits = functions.region(config.region).https.onCall(
    middlewares(
       cacheTagHits((data) => registrationSourcesCacheKey({ ...data })),
       async () => {
+         functions.logger.info("Fetching tags content hits ")
          const livestreamIndex = initAlgoliaIndex(
             knownIndexes.livestreams.indexName
          )
