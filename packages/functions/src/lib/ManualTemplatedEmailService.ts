@@ -31,7 +31,7 @@ export class ManualTemplatedEmailService {
 
       this.logger.info(
          "Total Users subscribed to the release email for B2C content tagging launch announcement",
-         Object.keys(this.subscribedUsers).length
+         Object.keys(this.subscribedUsers || {}).length
       )
 
       return this
@@ -44,7 +44,7 @@ export class ManualTemplatedEmailService {
     * for testing purposes.
     */
    send() {
-      const emails = Object.keys(this.subscribedUsers)
+      const emails = Object.keys(this.subscribedUsers || {})
 
       for (const userEmail of emails) {
          this.emailBuilder.addRecipient(userEmail)

@@ -24,7 +24,7 @@ export class ManualTemplatedEmailBuilder {
          TemplateId: Number(process.env.POSTMARK_TEMPLATE_MANUAL_EMAIL),
          TemplateModel: {},
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "content-tagging-launch_v2",
+         Tag: "content-tagging-launch",
       })
    }
 
