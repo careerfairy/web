@@ -147,8 +147,10 @@ const shouldShowTagByCount = (
    minEvents: number,
    minSparks?: number
 ): boolean => {
+   console.log("🚀 ~ minSparks:", minSparks)
    return (
-      hitsCount.livestreams >= minEvents &&
-      (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
+      hitsCount.livestreams >= minEvents
+      // TODO: remove when enough content
+      // && (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
    )
 }
