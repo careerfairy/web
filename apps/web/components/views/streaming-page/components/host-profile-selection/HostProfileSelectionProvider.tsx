@@ -24,7 +24,8 @@ type State = {
 }
 
 type Action =
-   | { type: ProfileSelectEnum.SELECT_SPEAKER; payload: Speaker }
+   | { type: ProfileSelectEnum.SELECT_SPEAKER }
+   | { type: ProfileSelectEnum.JOIN_WITH_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.EDIT_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.CREATE_SPEAKER }
    | { type: "SELECT_USER"; payload: UserData }
@@ -33,6 +34,11 @@ type Action =
 const reducer = (state: State, action: Action): State => {
    switch (action.type) {
       case ProfileSelectEnum.SELECT_SPEAKER:
+         return {
+            ...state,
+            activeView: ProfileSelectEnum.SELECT_SPEAKER,
+         }
+      case ProfileSelectEnum.JOIN_WITH_SPEAKER:
          return {
             ...state,
             selectedSpeaker: action.payload,
@@ -102,12 +108,12 @@ export const ProfileSelectProvider = ({ children }: Props) => {
          },
          selectSpeaker: (speaker: Speaker) => {
             return dispatch({
-               type: ProfileSelectEnum.SELECT_SPEAKER,
+               type: ProfileSelectEnum.JOIN_WITH_SPEAKER,
                payload: speaker,
             })
          },
          goBackToSelectSpeaker: () => {
-            return dispatch({ type: "RESET" })
+            return dispatch({ type: ProfileSelectEnum.SELECT_SPEAKER })
          },
          joinLiveStreamWithSpeaker: (speakerId: string) => {
             dispatch({ type: "RESET" })

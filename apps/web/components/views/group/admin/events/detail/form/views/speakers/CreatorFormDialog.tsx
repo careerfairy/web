@@ -155,7 +155,6 @@ const CreatorFormDialog = ({
                               <Grid sx={styles.avatarGrid} item xs={12}>
                                  <AvatarUpload
                                     name="avatarFile"
-                                    groupId={group.id}
                                     remoteUrl={creator?.avatarUrl}
                                  />
                               </Grid>

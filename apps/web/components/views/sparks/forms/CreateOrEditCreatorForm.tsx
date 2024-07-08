@@ -64,7 +64,6 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                   <Grid sx={styles.avaGrid} item xs={12}>
                      <AvatarUpload
                         name="avatarFile"
-                        groupId={groupId}
                         remoteUrl={creator?.avatarUrl}
                      />
                   </Grid>
@@ -148,7 +147,7 @@ const getInitialRolesValues = (creator: Creator): CreatorRole[] => {
    return hasSparkRole ? creator.roles : [...creator.roles, CreatorRoles.Spark]
 }
 
-const getInitialValues = (creator?: Creator): CreatorFormValues => ({
+export const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    avatarUrl: creator?.avatarUrl || "",
    avatarFile: null,
    firstName: creator?.firstName || "",

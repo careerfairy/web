@@ -1,11 +1,15 @@
 import { Speaker } from "@careerfairy/shared-lib/livestreams"
 import {
+   Box,
    ButtonBase,
    ButtonBaseProps,
+   Grow,
    TooltipProps,
    Typography,
+   alpha,
 } from "@mui/material"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { getFormattedName } from "../../util"
 import { BrandedTooltip } from "../BrandedTooltip"
@@ -29,6 +33,7 @@ const styles = sxStyles({
          transition: theme.transitions.create(["filter", "opacity"]),
          opacity: 1,
       },
+      position: "relative",
    }),
    greyedOut: {
       "& img": {
@@ -47,19 +52,39 @@ const styles = sxStyles({
    }),
    avatar: {
       border: "1px solid #EDE7FD",
+      position: "relative",
    },
+   editOverlay: (theme) => ({
+      position: "absolute",
+      top: 0,
+      right: 0,
+      left: 0,
+      bottom: 0,
+      background: alpha(theme.palette.common.black, 0.5),
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      "& svg": {
+         color: theme.palette.common.white,
+         width: 24,
+         height: 24,
+      },
+      zIndex: 0,
+   }),
 })
 
 type Props = {
    onClick: ButtonBaseProps["onClick"]
    speaker: Pick<Speaker, "id" | "firstName" | "lastName" | "avatar">
    profileInUse?: boolean
+   isEditMode?: boolean
 }
 
 export const HostProfileButton = ({
    onClick,
    speaker,
    profileInUse,
+   isEditMode,
 }: Props) => {
    return (
       <BrandedTooltip
@@ -76,7 +101,13 @@ export const HostProfileButton = ({
                alt={speaker.firstName}
                objectFit="cover"
                sx={styles.avatar}
-            />
+            >
+               <Grow in={isEditMode}>
+                  <Box sx={styles.editOverlay}>
+                     <Edit2 />
+                  </Box>
+               </Grow>
+            </CircularLogo>
             <Typography sx={styles.name} variant="medium">
                {getFormattedName(speaker.firstName, speaker.lastName)}
             </Typography>

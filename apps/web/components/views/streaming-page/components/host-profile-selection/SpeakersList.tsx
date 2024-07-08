@@ -1,12 +1,13 @@
 import { Speaker } from "@careerfairy/shared-lib/livestreams"
-import { Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { IAgoraRTCRemoteUser, useRemoteUsers } from "agora-rtc-react"
 import { useLivestreamData } from "components/custom-hook/streaming"
 import FramerBox from "components/views/common/FramerBox"
 import { cfLogo } from "constants/images"
 import { AnimatePresence, Variants } from "framer-motion"
-import { Fragment, useMemo } from "react"
+import { ReactNode, useMemo, useState } from "react"
+import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { buildAgoraSpeakerId } from "../../util"
 import { HostProfileButton } from "./HostProfileButton"
@@ -14,6 +15,11 @@ import { useHostProfileSelection } from "./HostProfileSelectionProvider"
 
 const styles = sxStyles({
    root: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+   },
+   list: {
       maxWidth: 706,
       display: "flex",
       gap: "24px",
@@ -33,6 +39,9 @@ const styles = sxStyles({
       mb: 2.5,
       textAlign: "center",
    },
+   editButton: {
+      mt: 3,
+   },
 })
 
 const containerAnimationVariants: Variants = {
@@ -45,17 +54,14 @@ const containerAnimationVariants: Variants = {
    },
 }
 
-const itemAnimationVariants = {
-   hidden: { opacity: 0, scale: 0.9 },
-   visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
-   exit: { opacity: 0, scale: 0.9, transition: { duration: 0.5 } },
-} satisfies Variants
-
 export const SpeakersList = () => {
-   const { userData } = useAuth()
-   const { selectSpeaker, joinLiveStreamWithUser } = useHostProfileSelection()
+   const { userData, isLoggedIn } = useAuth()
+   const { selectSpeaker, joinLiveStreamWithUser, editSpeaker } =
+      useHostProfileSelection()
    const livestream = useLivestreamData()
    const remoteUsers = useRemoteUsers()
+
+   const [isEditMode, setIsEditMode] = useState(false)
 
    const speakers = useMemo(() => {
       return [
@@ -74,14 +80,14 @@ export const SpeakersList = () => {
    }
 
    return (
-      <Fragment>
+      <Box sx={styles.root}>
          <Typography component="p" sx={styles.heading} variant="medium">
             Please select your profile:
          </Typography>
-         <FramerBox variants={containerAnimationVariants} sx={styles.root}>
-            <AnimatePresence>
+         <FramerBox variants={containerAnimationVariants} sx={styles.list}>
+            <AnimatePresence mode="sync">
                {Boolean(userData?.isAdmin) && (
-                  <FramerBox sx={styles.item}>
+                  <ItemAnimation key={userData.authId}>
                      <HostProfileButton
                         onClick={() => joinLiveStreamWithUser(userData.authId)}
                         speaker={{
@@ -91,26 +97,55 @@ export const SpeakersList = () => {
                            id: userData.id,
                         }}
                      />
-                  </FramerBox>
+                  </ItemAnimation>
                )}
                {speakers.map((speaker) => (
-                  <FramerBox
-                     key={speaker.id}
-                     sx={styles.item}
-                     variants={itemAnimationVariants}
-                     initial={itemAnimationVariants.hidden}
-                     animate={itemAnimationVariants.visible}
-                     exit={itemAnimationVariants.exit}
-                  >
+                  <ItemAnimation key={speaker.id}>
                      <HostProfileButton
-                        onClick={() => selectSpeaker(speaker)}
+                        onClick={() =>
+                           isEditMode
+                              ? editSpeaker(speaker)
+                              : selectSpeaker(speaker)
+                        }
                         speaker={speaker}
                         profileInUse={isSpeakerInUse(speaker, remoteUsers)}
+                        isEditMode={isEditMode}
                      />
-                  </FramerBox>
+                  </ItemAnimation>
                ))}
             </AnimatePresence>
          </FramerBox>
-      </Fragment>
+         {Boolean(isLoggedIn) && (
+            <Button
+               sx={styles.editButton}
+               onClick={() => setIsEditMode((prev) => !prev)}
+               color={isEditMode ? "primary" : "grey"}
+               variant={isEditMode ? "contained" : "outlined"}
+               endIcon={isEditMode ? null : <Edit2 />}
+            >
+               {isEditMode ? "Done" : "Edit"}
+            </Button>
+         )}
+      </Box>
+   )
+}
+
+const itemAnimationVariants = {
+   hidden: { opacity: 0, scale: 0.9 },
+   visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+   exit: { opacity: 0, scale: 0.9, transition: { duration: 0.5 } },
+} satisfies Variants
+
+const ItemAnimation = ({ children }: { children: ReactNode }) => {
+   return (
+      <FramerBox
+         sx={styles.item}
+         variants={itemAnimationVariants}
+         initial={itemAnimationVariants.hidden}
+         animate={itemAnimationVariants.visible}
+         exit={itemAnimationVariants.exit}
+      >
+         {children}
+      </FramerBox>
    )
 }
