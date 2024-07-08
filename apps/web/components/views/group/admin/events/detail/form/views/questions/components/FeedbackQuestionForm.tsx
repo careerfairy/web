@@ -33,10 +33,6 @@ const QUESTION_TYPES = [
       id: FeedbackQuestionType.TEXT,
       name: FeedbackQuestionsLabels[FeedbackQuestionType.TEXT],
    },
-   {
-      id: FeedbackQuestionType.TEXT_WITH_RATING,
-      name: FeedbackQuestionsLabels[FeedbackQuestionType.TEXT_WITH_RATING],
-   },
 ] as const
 
 type FeedbackQuestionFormProps = {

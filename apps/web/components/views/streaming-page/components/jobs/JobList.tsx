@@ -2,10 +2,9 @@ import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
-import useLivestreamJobs from "components/custom-hook/useLivestreamJobs"
-import { useCallback, useMemo, useState } from "react"
+import { useCombinedJobs } from "components/custom-hook/streaming/useCombinedJobs"
+import { useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import JobCard from "../jobs/JobCard"
@@ -43,16 +42,9 @@ const ContentWrapper = () => {
 }
 
 const Content = ({ livestreamId, isHost, hostCompanyId }) => {
-   const { jobs: atsJobs } = useLivestreamJobs(livestreamId)
-   const livestreamCustomJobs = useGroupCustomJobs(hostCompanyId, {
-      livestreamId: livestreamId,
-   })
    const [selectedJob, setSelectedJob] = useState(null)
 
-   const jobsToShow: Job[] | CustomJob[] = useMemo(
-      () => (atsJobs.length ? atsJobs : livestreamCustomJobs || []),
-      [atsJobs, livestreamCustomJobs]
-   )
+   const jobsToShow = useCombinedJobs(livestreamId, hostCompanyId)
 
    const onCloseDialog = useCallback(() => {
       setSelectedJob(null)

@@ -931,23 +931,23 @@ export class FirebaseGroupRepository
       groupId: string,
       creator: AddCreatorData
    ): Promise<Creator> {
+      const creatorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .doc()
+
       const creatorData: Creator = {
          ...creator,
          // eslint-disable-next-line @typescript-eslint/no-explicit-any
          createdAt: this.fieldValue.serverTimestamp() as any,
          // eslint-disable-next-line @typescript-eslint/no-explicit-any
          updatedAt: this.fieldValue.serverTimestamp() as any,
-         id: creator.email, // We use the email as the id and not firestore's auto generated id
+         id: creatorRef.id, // We use the firestore auto generated id
          documentType: "groupCreator",
          groupId,
          roles: creator.roles,
       }
-
-      const creatorRef = this.firestore
-         .collection("careerCenterData")
-         .doc(creatorData.groupId)
-         .collection("creators")
-         .doc(creatorData.id)
 
       creatorRef.set(creatorData, { merge: true }).then(() => {
          return creatorData.id

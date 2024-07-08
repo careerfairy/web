@@ -1,4 +1,4 @@
-import type firebase from "firebase/compat"
+import type firebase from "firebase/compat/app"
 import { MergeATSRepository } from "./MergeATSRepository"
 import { MockedMergeATSRepository } from "./MockedMergeATSRepository"
 

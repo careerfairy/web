@@ -1,12 +1,12 @@
-import Stack from "@mui/material/Stack"
-import React, { FC } from "react"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import useLivestreamRatingVoters from "./useLivestreamRatingVoters"
-import useLivestreamRating from "./useLivestreamRating"
-import { Divider, Skeleton, Typography } from "@mui/material"
-import { StyledRating } from "../../../common/inputs"
 import { normalizeRating } from "@careerfairy/shared-lib/livestreams/ratings"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { Divider, Skeleton, Typography } from "@mui/material"
+import Stack from "@mui/material/Stack"
+import { FC } from "react"
 import censorEmail from "../../../../../../util/censorEmail"
+import { StyledRating } from "../../../common/inputs"
+import useLivestreamRating from "./useLivestreamRating"
+import useLivestreamRatingVoters from "./useLivestreamRatingVoters"
 
 type FeedbackAnswersContentProps = {
    livestreamStats: LiveStreamStats
@@ -38,7 +38,7 @@ export const RatingAnswers: FC<FeedbackAnswersContentProps> = ({
                      spacing={1}
                   >
                      <Typography fontWeight={600} variant="body1">
-                        {censorEmail(voter.id)}
+                        {voter.user?.firstName || censorEmail(voter.id)}
                      </Typography>
                      <StyledRating
                         value={normalizeRating(feedbackQuestion, voter)}

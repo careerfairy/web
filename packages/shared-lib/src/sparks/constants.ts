@@ -40,6 +40,11 @@ export const SPARK_CONSTANTS = {
    SECONDS_TO_SHOW_EVENT_NOTIFICATION: 6000,
 
    /**
+    * The percentage of the spark video that needs to be played before showing creator's LinkedIn notification
+    */
+   PLAYED_PERCENTAGE_TO_SHOW_LINKEDIN_NOTIFICATION: 0.6,
+
+   /**
     * The year we started tracking likes
     */
    LIKES_TRACKING_START_YEAR: 2023,

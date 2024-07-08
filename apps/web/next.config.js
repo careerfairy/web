@@ -72,6 +72,7 @@ const csp = {
       "https://js.stripe.com",
       "https://scripts.simpleanalyticscdn.com", // Google Ads services
       "https://www.googleadservices.com", // Google Ads services
+      "https://cdn.prod.website-files.com", // Webflow
    ],
    "style-src": [
       "'self'",
@@ -83,6 +84,7 @@ const csp = {
       "'unsafe-inline'",
       "client.crisp.chat",
       "https://assets-global.website-files.com",
+      "https://cdn.prod.website-files.com", // Webflow
    ],
    "connect-src": [
       "'self'",
@@ -120,6 +122,7 @@ const csp = {
       "https://www.google.com", // Google Ads services
       "https://capig.stape.tech", // Pixel Conversion API Gateway
       "https://www.googletagmanager.com",
+      "https://pagead2.googlesyndication.com", // Google Ads
    ],
    "img-src": [
       "'self'",
@@ -162,6 +165,14 @@ const csp = {
       "careerfairy-e1fd9.firebaseapp.com",
       "*.youtube.com",
       "*.googleapis.com",
+   ],
+   "worker-src": [
+      "'self'", // For Sentry Replay
+      "blob:", // For Sentry Replay
+   ],
+   "child-src": [
+      "'self'", // For Sentry Replay
+      "blob:", // For Sentry Replay
    ],
 }
 
@@ -321,13 +332,6 @@ const moduleExports = {
          "localhost",
          "127.0.0.1",
       ],
-   },
-   webpackDevMiddleware: (config) => {
-      config.watchOptions = {
-         poll: 1000,
-         aggregateTimeout: 300,
-      }
-      return config
    },
    webpack: (config) => {
       config.module.rules.push({

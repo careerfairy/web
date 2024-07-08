@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
+import { useEffect, useRef, useState } from "react"
+import { useAuth } from "../../../HOCs/AuthProvider"
 
 /**
  * Custom React Hook to handle redirection to a Livestream Event room.
@@ -20,22 +20,37 @@ const useRedirectToEventRoom = (
    const { authenticatedUser, isLoadingAuth } = useAuth()
    const { replace } = useRouter()
    const [isRedirecting, setIsRedirecting] = useState(false)
+   const hasRedirected = useRef(false)
 
    useEffect(() => {
-      if (isRedirecting || !livestreamPresenter || !shouldRedirect) return
       if (
-         !isLoadingAuth &&
-         livestreamPresenter.isLive() &&
-         livestreamPresenter.isUserRegistered(authenticatedUser.email)
-      ) {
-         setIsRedirecting(true)
-         void replace(livestreamPresenter.getViewerEventRoomLink()).finally(
-            () => {
-               setIsRedirecting(false)
-            }
-         )
-      }
+         isRedirecting ||
+         !livestreamPresenter ||
+         !shouldRedirect ||
+         hasRedirected.current
+      )
+         return
+
+      const intervalId = setInterval(() => {
+         if (
+            !isLoadingAuth &&
+            livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
+            (livestreamPresenter.isLive() ||
+               livestreamPresenter.waitingRoomIsOpen())
+         ) {
+            setIsRedirecting(true)
+            void replace(livestreamPresenter.getViewerEventRoomLink())
+               .then(() => {
+                  hasRedirected.current = true
+               })
+               .finally(() => {
+                  setIsRedirecting(false)
+               })
+         }
+      }, 1000)
+
       return () => {
+         clearInterval(intervalId)
          setIsRedirecting(false)
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
