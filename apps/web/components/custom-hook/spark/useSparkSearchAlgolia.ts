@@ -19,7 +19,14 @@ type Data = SearchResponse<AlgoliaSparkResponse> & {
    deserializedHits: SparkSearchResult[]
 }
 
-type Key = ["searchSparks", string, string, number, number, SparkReplicaType]
+type Key = [
+   "searchSparks",
+   string, // The search input value
+   string, // The constructed filter string
+   number, // The current page index
+   number, // The limit of items per page
+   SparkReplicaType
+]
 
 export type FilterOptions = {
    arrayFilters?: Partial<Record<ArrayFilterFieldType, string[]>>
