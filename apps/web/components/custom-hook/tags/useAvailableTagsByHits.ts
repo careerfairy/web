@@ -19,6 +19,7 @@ import { useTagsContentHits } from "./useTagsContentHits"
 export const useAvailableTagsByHits = () => {
    const { isLoggedIn, userData } = useAuth()
    const { data: hits } = useTagsContentHits()
+   console.log("🚀 ~ useAvailableTagsByHits ~ hits:", hits)
 
    const availableCategories = TagValues.filter((tag) => {
       if (hits.businessFunctions.hits[tag.id]) {
@@ -147,10 +148,8 @@ const shouldShowTagByCount = (
    minEvents: number,
    minSparks?: number
 ): boolean => {
-   console.log("🚀 ~ minSparks:", minSparks)
-   return (
-      hitsCount.livestreams >= minEvents
-      // TODO: remove when enough content
-      // && (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
-   )
+   console.log("🚀 ~ minSparks:", minSparks, minEvents, hitsCount)
+   return true
+   // TODO: remove when enough content
+   // && (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
 }
