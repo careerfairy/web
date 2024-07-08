@@ -1,11 +1,10 @@
-import { Interest } from "@careerfairy/shared-lib/interests"
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Skeleton, useMediaQuery, useTheme } from "@mui/material"
-import { useInterests } from "components/custom-hook/useCollection"
+import LanguageIcon from "@mui/icons-material/Language"
+import { Box, useMediaQuery, useTheme } from "@mui/material"
 import WhiteTagChip from "components/views/common/chips/TagChip"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
-import LanguageIcon from "@mui/icons-material/Language"
 
 const styles = sxStyles({
    chip: {
@@ -25,31 +24,10 @@ export const LivestreamChips = ({
 }: {
    livestream: LivestreamEvent
 }) => {
-   const { data: existingInterests, isLoading } = useInterests()
-
-   // match the event interests with the existing ones
-   const eventInterests = useMemo(() => {
-      if (isLoading) return []
-
-      return existingInterests.filter((i) =>
-         livestream.interestsIds?.includes(i.id)
-      )
-   }, [livestream.interestsIds, existingInterests, isLoading])
-
-   if (isLoading) {
-      return <Skeleton variant="text" />
-   }
-
-   return <ChipsLine livestream={livestream} eventInterests={eventInterests} />
+   return <ChipsLine livestream={livestream} />
 }
 
-const ChipsLine = ({
-   livestream,
-   eventInterests,
-}: {
-   livestream: LivestreamEvent
-   eventInterests: Interest[]
-}) => {
+const ChipsLine = ({ livestream }: { livestream: LivestreamEvent }) => {
    const theme = useTheme()
    const xl = useMediaQuery(theme.breakpoints.up("xl"))
    const xs = useMediaQuery(theme.breakpoints.down("sm"))
@@ -74,21 +52,40 @@ const ChipsLine = ({
             />
          ) : undefined}
 
-         {eventInterests.slice(0, chipsToDisplay - 1).map((interest) => (
+         {livestream?.businessFunctionsTagIds ? (
+            <EventTags
+               tagIds={[]
+                  .concat(livestream.businessFunctionsTagIds)
+                  .concat(livestream.contentTopicsTagIds)}
+               chipsToDisplay={chipsToDisplay}
+            />
+         ) : undefined}
+      </Box>
+   )
+}
+
+type EventTagsProps = {
+   tagIds: string[]
+   chipsToDisplay: 1 | 2 | 3
+}
+const EventTags = ({ tagIds, chipsToDisplay }: EventTagsProps) => {
+   return (
+      <>
+         {tagIds.slice(0, chipsToDisplay - 1).map((tagId) => (
             <WhiteTagChip
-               key={interest.id}
+               key={tagId}
                variant="filled"
                sx={styles.chip}
-               label={interest.name}
+               label={TagValuesLookup[tagId]}
             />
          ))}
-         {eventInterests.length > chipsToDisplay && (
+         {tagIds.length > chipsToDisplay && (
             <WhiteTagChip
                sx={styles.chip}
                variant="outlined"
-               label={`+ ${eventInterests.length - 3}`}
+               label={`+ ${++tagIds.length - chipsToDisplay}`}
             />
          )}
-      </Box>
+      </>
    )
 }
