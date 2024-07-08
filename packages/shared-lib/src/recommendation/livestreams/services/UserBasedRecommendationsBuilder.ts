@@ -158,6 +158,34 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
       return this
    }
 
+   public userContentTopicTags() {
+      if (this.user.contentTopicsTagIds?.length) {
+         // Fetch recommended events based on the user's content topics tag ids against events content topic tags
+         this.addResults(
+            this.rankedLivestreamRepo.getEventsBasedOnContentTopicTags(
+               this.user.contentTopicsTagIds,
+               this.limit
+            )
+         )
+      }
+
+      return this
+   }
+
+   public userBusinessFunctionsTags() {
+      if (this.user.businessFunctionsTagIds?.length) {
+         // Fetch recommended events based on the user's business functions tag ids against events business functions tags
+         this.addResults(
+            this.rankedLivestreamRepo.getEventsBasedOnBusinessFunctionTags(
+               this.user.businessFunctionsTagIds,
+               this.limit
+            )
+         )
+      }
+
+      return this
+   }
+
    // Implicit Data
 
    public userImplicitFollowedCompanies() {

@@ -15,7 +15,7 @@ import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
-   1000 * 60 * 60 * 4
+   1000 * 60 * 60 * 4 // 4 hours
 
 export interface LivestreamEvent extends Identifiable {
    author?: AuthorInfo
@@ -457,7 +457,13 @@ export interface EventRatingAnswer extends Identifiable {
    message?: string
    rating?: number
    timestamp?: firebase.firestore.Timestamp
+   user?: StreamerDetails
 }
+
+export type FeedbackQuestionUserAnswer = Pick<
+   EventRatingAnswer,
+   "message" | "rating"
+>
 
 export type LivestreamEventPublicData = Partial<
    Pick<
@@ -721,6 +727,7 @@ export enum ImpressionLocation {
    embeddedPastLivestreams = "embeddedPastLivestreams",
    landingPageCarousel = "landingPageCarousel",
    viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
+   endOfStreamLivestreams = "endOfStreamLivestreams",
    unknown = "unknown",
 }
 
@@ -816,4 +823,12 @@ export interface LivestreamEmote extends Identifiable {
    authorEmail?: string
    /** @deprecated */
    streamerId?: string
+}
+
+export type StreamerDetails = {
+   firstName: string
+   lastName: string
+   role: string
+   avatarUrl: string
+   linkedInUrl: string
 }

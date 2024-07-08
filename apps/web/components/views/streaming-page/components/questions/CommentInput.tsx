@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Fab, OutlinedInput } from "@mui/material"
+import { Box, CircularProgress, Fab } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
@@ -11,6 +11,7 @@ import { sxStyles } from "types/commonTypes"
 import * as Yup from "yup"
 import { useStreamingContext } from "../../context"
 import { getStreamerDisplayName } from "../../util"
+import { StreamInput } from "../StreamInput"
 
 const styles = sxStyles({
    root: {
@@ -35,8 +36,6 @@ const styles = sxStyles({
    input: {
       width: "100%",
       height: 38,
-      borderRadius: "24px",
-      border: (theme) => `1px solid ${theme.palette.neutral[100]}`,
       "& .MuiInputBase-input": {
          pr: 3,
       },
@@ -119,7 +118,7 @@ export const CommentInput = ({ questionId, onCommentPosted }: Props) => {
             name="message"
             control={control}
             render={({ field }) => (
-               <OutlinedInput
+               <StreamInput
                   {...field}
                   onChange={(e) => {
                      field.onChange(e.target.value.slice(0, MAX_MESSAGE_LENGTH))

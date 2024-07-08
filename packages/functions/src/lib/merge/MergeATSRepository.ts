@@ -1,5 +1,15 @@
 /* eslint-disable camelcase */
-import axios, { AxiosError } from "axios"
+import { Application } from "@careerfairy/shared-lib/ats/Application"
+import { Candidate } from "@careerfairy/shared-lib/ats/Candidate"
+import {
+   ATSPaginatedResults,
+   ATSPaginationOptions,
+   RecruitersFilterOptions,
+} from "@careerfairy/shared-lib/ats/Functions"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { Office } from "@careerfairy/shared-lib/ats/Office"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
+import { SyncStatus } from "@careerfairy/shared-lib/ats/SyncStatus"
 import {
    MergeAccountTokenResponse,
    MergeApplication,
@@ -20,25 +30,15 @@ import {
    MergeRemoveAccountResponse,
    MergeSyncStatus,
 } from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
-import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { Office } from "@careerfairy/shared-lib/ats/Office"
-import { SyncStatus } from "@careerfairy/shared-lib/ats/SyncStatus"
-import { Application } from "@careerfairy/shared-lib/ats/Application"
 import { UserData } from "@careerfairy/shared-lib/users"
-import { Candidate } from "@careerfairy/shared-lib/ats/Candidate"
-import firebase from "firebase/compat"
+import axios, { AxiosError } from "axios"
+import firebase from "firebase/compat/app"
 import {
    ApplicationCreationOptions,
    AttachmentCreationOptions,
    CandidateCreationOptions,
    IATSRepository,
 } from "../IATSRepository"
-import {
-   ATSPaginatedResults,
-   ATSPaginationOptions,
-   RecruitersFilterOptions,
-} from "@careerfairy/shared-lib/ats/Functions"
-import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
 
 export const MERGE_DEFAULT_PAGE_SIZE = "100"
 export const SOURCE = "CareerFairy"

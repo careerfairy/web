@@ -5,8 +5,9 @@ import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { alpha } from "@mui/material/styles"
+import { useCountdownToDate } from "components/custom-hook/utils/useCountDownToDate"
 import { isEmpty } from "lodash/fp"
-import { memo, useCallback, useEffect, useState } from "react"
+import { memo } from "react"
 import DateUtil from "util/DateUtil"
 
 const styles = sxStyles({
@@ -98,20 +99,7 @@ const TimerTextSkeleton = () => {
 }
 
 const TimerText = memo(function TimerText({ time }: { time: Date }) {
-   const calculateTimeLeft = useCallback(
-      () => DateUtil.calculateTimeLeft(time),
-      [time]
-   )
-
-   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
-
-   useEffect(() => {
-      const interval = setInterval(() => {
-         const newTimeLeft = calculateTimeLeft()
-         setTimeLeft(newTimeLeft)
-      }, 1000)
-      return () => clearInterval(interval)
-   }, [calculateTimeLeft])
+   const timeLeft = useCountdownToDate(time)
 
    if (isEmpty(timeLeft)) return null
 

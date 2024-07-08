@@ -11,7 +11,7 @@
       "pretty": true,
       "forceConsistentCasingInFileNames": true,
       "module": "esnext",
-      "moduleResolution": "node",
+      "moduleResolution": "Bundler",
       "resolveJsonModule": true,
       "isolatedModules": true,
       "skipLibCheck": true,

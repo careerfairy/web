@@ -84,8 +84,11 @@ export interface StreamingAppState {
       hasEnded: boolean
       openStream: boolean
       companyLogoUrl: string
+      companyName: string
+      title: string
       handRaiseEnabled: boolean
       hasJobs: boolean
+      test: boolean
    } | null
    rtmSignalingState: {
       failedToConnect: boolean
@@ -133,9 +136,12 @@ const initialState: StreamingAppState = {
       hasEnded: false,
       openStream: false,
       companyLogoUrl: "",
+      companyName: "",
+      title: "",
       handRaiseEnabled: false,
       numberOfHandRaiseNotifications: 0,
       hasJobs: false,
+      test: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -252,6 +258,15 @@ const streamingAppSlice = createSlice({
       },
       setCompanyLogoUrl(state, action: PayloadAction<string>) {
          state.livestreamState.companyLogoUrl = action.payload
+      },
+      setTest(state, action: PayloadAction<boolean>) {
+         state.livestreamState.test = action.payload
+      },
+      setCompanyName(state, action: PayloadAction<string>) {
+         state.livestreamState.companyName = action.payload
+      },
+      setTitle(state, action: PayloadAction<string>) {
+         state.livestreamState.title = action.payload
       },
       setHandRaiseEnabled(state, action: PayloadAction<boolean>) {
          if (state.livestreamState.handRaiseEnabled !== action.payload) {
@@ -381,6 +396,9 @@ export const {
       setHasEnded,
       setOpenStream,
       setCompanyLogoUrl,
+      setTest,
+      setCompanyName,
+      setTitle,
       resetLivestreamState,
       toggleSidePanel,
       closeSidePanel,

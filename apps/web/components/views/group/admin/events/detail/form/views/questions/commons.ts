@@ -12,14 +12,13 @@ export enum FeedbackQuestionType {
    STAR_RATING = "star-rating",
    SENTIMENT_RATING = "sentiment-rating",
    TEXT = "free-text",
-   TEXT_WITH_RATING = "free-text-with-rating",
+   TEXT_WITH_RATING = "free-text-with-rating", //deprecated, kept here for backwards compatibility
 }
 
 export const FeedbackQuestionsLabels = {
-   [FeedbackQuestionType.STAR_RATING]: "Star rating",
+   [FeedbackQuestionType.STAR_RATING]: "Rating",
    [FeedbackQuestionType.SENTIMENT_RATING]: "Sentiment rating",
    [FeedbackQuestionType.TEXT]: "Written review",
-   [FeedbackQuestionType.TEXT_WITH_RATING]: "Written review + Rating",
 }
 
 export type FeedbackQuestionFormValues = {
@@ -62,7 +61,7 @@ export const feedbackQuestionFormInitialValues: FeedbackQuestionFormValues[] = [
    },
 ]
 
-type EventRatingWithType = EventRating & { type?: FeedbackQuestionType }
+export type EventRatingWithType = EventRating & { type?: FeedbackQuestionType }
 
 export const mapRatingToFeedbackQuestions = (
    rating: EventRatingWithType

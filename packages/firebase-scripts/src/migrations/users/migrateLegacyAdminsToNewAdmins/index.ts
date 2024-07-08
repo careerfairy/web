@@ -1,15 +1,16 @@
-import Counter from "../../../lib/Counter"
-import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
-import { groupRepo } from "../../../repositories"
-import {
-   Group,
-   GROUP_DASHBOARD_ROLE,
-} from "@careerfairy/shared-lib/dist/groups"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import firebase from "firebase/compat"
+import {
+   GROUP_DASHBOARD_ROLE,
+   Group,
+} from "@careerfairy/shared-lib/dist/groups"
+import firebase from "firebase/compat/app"
 import * as fs from "fs"
 import config from "../../../config"
 import { getArgValue } from "../../../index"
+import Counter from "../../../lib/Counter"
+import { groupRepo } from "../../../repositories"
+import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const cliProgress = require("cli-progress")
 
 const customCountKeys = {
