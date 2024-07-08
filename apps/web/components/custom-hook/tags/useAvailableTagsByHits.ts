@@ -56,11 +56,13 @@ const sortByUserInterests = (
    const contentTopicsGetter = createGroupedOptionGroupGetter(
       groupedTags.contentTopics
    )
+
    const languagesGetter = createGroupedOptionGroupGetter(groupedTags.language)
 
    const businessFunctionTagIds = Object.keys(
       groupedTags.businessFunctions || []
    )
+
    const contentTopicTagIDs = Object.keys(groupedTags.contentTopics || [])
    const languageTagIds = Object.keys(groupedTags.language || [])
 
@@ -68,6 +70,7 @@ const sortByUserInterests = (
       businessFunctionTagIds,
       businessFunctionsGetter
    )
+
    const sortedContentTopics = sortTags(contentTopicTagIDs, contentTopicsGetter)
    const sortedLanguages = sortTags(languageTagIds, languagesGetter)
 
@@ -76,16 +79,19 @@ const sortByUserInterests = (
          .concat(sortedBusinessFunctions)
          .concat(sortedLanguages)
    }
+
    const businessFunctions = sortTagsByUserData(
-      () => businessFunctionTagIds,
-      () => user?.businessFunctionsTagIds || [],
+      businessFunctionTagIds,
+      user?.businessFunctionsTagIds || [],
       createGroupedOptionGroupGetter(groupedTags.businessFunctions)
    )
+
    const contentTopics = sortTagsByUserData(
-      () => contentTopicTagIDs,
-      () => user?.contentTopicsTagIds || [],
+      contentTopicTagIDs,
+      user?.contentTopicsTagIds || [],
       createGroupedOptionGroupGetter(groupedTags.contentTopics)
    )
+
    const languages = sortedLanguages
 
    return contentTopics.concat(businessFunctions).concat(languages)
@@ -105,19 +111,24 @@ const sortTags = (
 }
 
 /**
- * TODO: Update docs, using getters to not call maps again since the data already should exist by calling function
- * @param tagsGetter
- * @param userTagIdsGetter
- * @param optionGroupGetter
- * @returns
+ * Sorts a given set of tag ids, taken into consideration the tags which user has preference in his profile, meaning
+ * these tags will take precedence when sorting and still will be sorted alphabetically.
+ * - Example: User has tags [E,M,O] in his profile so the sorted list of all tags would be [E,M,O,A,B,C...].
+ *
+ * This function returns OptionGroup[] allowing for quick display with the labels, and for such it uses @param optionGroupGetter to
+ * map the tag id to its OptionGroup value.
+ * @param tagIds Ids of the tags to sort.
+ * @param userTagIds Ids of user preferred tags.
+ * @param optionGroupGetter Getter for mapping a tag id to its OptionGroup value.
+ * @returns OptionGroup[]
  */
 const sortTagsByUserData = (
-   tagsIdsGetter: () => string[],
-   userTagIdsGetter: () => string[],
+   tagIds: string[],
+   userTagIds: string[],
    optionGroupGetter: (tagId) => OptionGroup
 ): OptionGroup[] => {
-   const tagIds = tagsIdsGetter()
-   const userTagIds = userTagIdsGetter()
+   // const tagIds = tagsIdsGetter()
+   // const userTagIds = userTagIdsGetter()
 
    const matchingTagIds = tagIds.filter((tagId) => userTagIds.includes(tagId))
 
