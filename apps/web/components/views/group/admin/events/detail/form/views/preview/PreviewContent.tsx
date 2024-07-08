@@ -1,6 +1,7 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { mapOptions } from "components/views/signup/utils"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { forwardRef, useMemo } from "react"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
@@ -104,7 +105,10 @@ const PreviewContent = forwardRef<HTMLDivElement, PreviewContentProps>(
                      <LivestreamTitle text={general.title} />
                      <LivestreamTagsContainer
                         language={general.language}
-                        interests={general.categories.values}
+                        businessFunctions={mapOptions(
+                           general.businessFunctionsTagIds
+                        )}
+                        contentTopics={mapOptions(general.contentTopicsTagIds)}
                      />
                      <CountDownTimer
                         isPast={false}

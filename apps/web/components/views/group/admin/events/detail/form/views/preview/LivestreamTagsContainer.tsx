@@ -1,3 +1,4 @@
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { LivestreamLanguage } from "@careerfairy/shared-lib/livestreams"
 import { sxStyles } from "@careerfairy/shared-ui"
 import Box from "@mui/material/Box"
@@ -38,11 +39,13 @@ const styles = sxStyles({
 
 type LivestreamTagsContainerProps = {
    language: LivestreamLanguage
-   interests: any[]
+   businessFunctions: string[]
+   contentTopics: string[]
 }
 const LivestreamTagsContainer = ({
    language,
-   interests,
+   businessFunctions,
+   contentTopics,
 }: LivestreamTagsContainerProps) => {
    return (
       <Box sx={styles.tagsWrapper}>
@@ -56,8 +59,14 @@ const LivestreamTagsContainer = ({
          ) : (
             <LanguageSkeleton />
          )}
-         {interests?.length > 0 ? (
-            <InterestChips interests={interests} />
+         {businessFunctions?.length > 0 ? (
+            <TagChips tagIds={businessFunctions} />
+         ) : (
+            <TagsSkeleton />
+         )}
+
+         {contentTopics?.length > 0 ? (
+            <TagChips tagIds={contentTopics} />
          ) : (
             <TagsSkeleton />
          )}
@@ -68,43 +77,43 @@ const LivestreamTagsContainer = ({
 const TagsSkeleton = () => {
    return (
       <Box sx={styles.tagsWrapper}>
-         <InterestSkeletons />
+         <TagSkeletons />
       </Box>
    )
 }
 
-type InterestChipsProps = {
-   interests: any[]
+type TagChipsProps = {
+   tagIds: string[]
 }
 
-const maxInterestsToShow = 2
+const maxTagsToShow = 2
 
-const InterestChips = ({ interests }: InterestChipsProps) => {
-   // Calculate the number of remaining interests
-   const remainingInterests = interests.length - maxInterestsToShow
+const TagChips = ({ tagIds }: TagChipsProps) => {
+   // Calculate the number of remaining tags
+   const remainingTags = tagIds.length - maxTagsToShow
 
-   // Slice the interests array to only contain the first two interests
-   const shownInterests = interests.slice(0, maxInterestsToShow)
+   // Slice the tag ids array to only contain the first two tags
+   const shownTags = tagIds.slice(0, maxTagsToShow)
 
-   const notShownInterests = interests.slice(maxInterestsToShow)
+   const notShownTags = tagIds.slice(maxTagsToShow)
 
    return (
       <>
-         {shownInterests.map((interest) => (
+         {shownTags.map((tagId) => (
             <WhiteTagChip
-               key={interest.id}
+               key={tagId}
                sx={styles.chip}
                variant={"outlined"}
-               label={interest.name}
+               label={TagValuesLookup[tagId]}
             />
          ))}
-         {remainingInterests > 0 && (
+         {remainingTags > 0 && (
             <WhiteTagChip
                sx={styles.chip}
                variant={"outlined"}
-               label={`+${remainingInterests}`}
-               tooltipText={notShownInterests
-                  .map((interest) => interest.name)
+               label={`+${remainingTags}`}
+               tooltipText={notShownTags
+                  .map((tagId) => TagValuesLookup[tagId])
                   .join(", ")}
             />
          )}
@@ -123,7 +132,7 @@ const LanguageSkeleton = () => {
    )
 }
 
-const InterestSkeletons = () => {
+const TagSkeletons = () => {
    return (
       <>
          <StaticSkeleton
