@@ -127,9 +127,6 @@ const sortTagsByUserData = (
    userTagIds: string[],
    optionGroupGetter: (tagId) => OptionGroup
 ): OptionGroup[] => {
-   // const tagIds = tagsIdsGetter()
-   // const userTagIds = userTagIdsGetter()
-
    const matchingTagIds = tagIds.filter((tagId) => userTagIds.includes(tagId))
 
    const matches = matchingTagIds.map(optionGroupGetter).sort(alphabeticalSort)
@@ -145,18 +142,13 @@ const sortTagsByUserData = (
 const alphabeticalSort = (tagA: OptionGroup, tagB: OptionGroup) =>
    tagA.name.localeCompare(tagB.name)
 
-// eslint-disable-next-line  @typescript-eslint/no-unused-vars
 const shouldShowTagByCount = (
    hitsCount: ContentHitsCount,
    minEvents: number,
    minSparks?: number
 ): boolean => {
-   console.log("🚀 ~ hitsCount:", hitsCount, minEvents, minSparks)
-
-   // TODO: Remove testing
-   return true
-   // return (
-   //    hitsCount.livestreams >= minEvents &&
-   //    (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
-   // )
+   return (
+      hitsCount.livestreams >= minEvents &&
+      (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
+   )
 }
