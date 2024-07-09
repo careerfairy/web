@@ -27,7 +27,7 @@ const styles = sxStyles({
    },
    containerMobile: {
       marginTop: "auto",
-      maxHeight: "calc(100vh - 70px)",
+      maxHeight: "calc(100dvh - 70px)",
       borderTopLeftRadius: "16px",
       borderTopRightRadius: "16px",
       width: "100%",

@@ -19,8 +19,9 @@ const styles = sxStyles({
       backgroundColor: "#FDFDFD",
       borderRadius: "16px",
       maxWidth: 770,
+      width: "100%",
       maxHeight: {
-         xs: "auto",
+         xs: "100%",
          tablet: 637,
       },
       mx: {
