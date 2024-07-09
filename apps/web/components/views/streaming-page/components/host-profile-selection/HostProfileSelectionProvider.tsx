@@ -12,6 +12,7 @@ import { setSpeakerId, setUserUid } from "store/reducers/streamingAppReducer"
 
 export enum ProfileSelectEnum {
    SELECT_SPEAKER,
+   ADD_NEW_SPEAKER,
    EDIT_SPEAKER,
    CREATE_SPEAKER,
    JOIN_WITH_SPEAKER,
@@ -28,6 +29,7 @@ type Action =
    | { type: ProfileSelectEnum.JOIN_WITH_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.EDIT_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.CREATE_SPEAKER }
+   | { type: ProfileSelectEnum.ADD_NEW_SPEAKER }
 
 const reducer = (state: State, action: Action): State => {
    state.direction = state.activeView > action.type ? -1 : 1
@@ -54,6 +56,11 @@ const reducer = (state: State, action: Action): State => {
             ...state,
             selectedSpeaker: null,
             activeView: ProfileSelectEnum.CREATE_SPEAKER,
+         }
+      case ProfileSelectEnum.ADD_NEW_SPEAKER:
+         return {
+            ...state,
+            activeView: ProfileSelectEnum.ADD_NEW_SPEAKER,
          }
       default:
          return state

@@ -10,6 +10,7 @@ import { ReactNode, useMemo, useState } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { buildAgoraSpeakerId } from "../../util"
+import { AddNewSpeakerButton } from "./AddNewSpeakerButton"
 import { HostProfileButton } from "./HostProfileButton"
 import { useHostProfileSelection } from "./HostProfileSelectionProvider"
 
@@ -113,6 +114,9 @@ export const SpeakersList = () => {
                      />
                   </ItemAnimation>
                ))}
+               <ItemAnimation key="add-speaker">
+                  <AddNewSpeakerButton />
+               </ItemAnimation>
             </AnimatePresence>
          </FramerBox>
          {Boolean(isLoggedIn) && (

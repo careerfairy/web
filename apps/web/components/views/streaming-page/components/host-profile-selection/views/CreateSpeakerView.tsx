@@ -1,32 +1,100 @@
+import { mapSpeakerToCreator } from "@careerfairy/shared-lib/groups/creators"
+import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
+import { LoadingButton } from "@mui/lab"
 import { Box, Button } from "@mui/material"
+import { useSpeakerFormSubmit } from "components/custom-hook/live-stream/useSpeakerFormSubmit"
+import {
+   CreatorFormFields,
+   CreatorFormProvider,
+} from "components/views/creator/CreatorForm"
+import { useStreamingContext } from "components/views/streaming-page/context"
+import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { useHostProfileSelection } from "../HostProfileSelectionProvider"
+import { View } from "../View"
 
-const styles = sxStyles({ root: {} })
+const styles = sxStyles({
+   formFields: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      px: {
+         xs: 2,
+         tablet: 4,
+      },
+      pb: 1,
+   },
+})
 
 export const CreateSpeakerView = () => {
-   const {
-      goBackToSelectSpeaker,
-      // joinLiveStream,
-   } = useHostProfileSelection()
+   const { goBackToSelectSpeaker, selectedSpeaker } = useHostProfileSelection()
 
    return (
-      <Box sx={styles.root}>
-         CreateSpeakerView
-         <Button onClick={goBackToSelectSpeaker}>Back</Button>
-         <Button
-            disabled
-            onClick={() => {
-               /**
-                * TODO:
-                * 1. Create Creator
-                * 2. Save Creator as Speaker on Live Stream
-                * 3. joinLiveStream(createdSpeaker.id)
-                */
-            }}
-         >
-            Join live stream (not implemented yet)
-         </Button>
-      </Box>
+      <CreatorFormProvider
+         creator={
+            selectedSpeaker ? mapSpeakerToCreator(selectedSpeaker) : undefined
+         }
+      >
+         <View component="form">
+            <View.Content>
+               <View.Title>
+                  Edit{" "}
+                  <Box component="span" color="primary.main">
+                     Speaker
+                  </Box>
+               </View.Title>
+               <View.Subtitle>
+                  Check and change your speaker details
+               </View.Subtitle>
+            </View.Content>
+            <Box sx={styles.formFields}>
+               <CreatorFormFields />
+            </Box>
+            <View.Actions>
+               <Button
+                  color="grey"
+                  variant="outlined"
+                  onClick={goBackToSelectSpeaker}
+               >
+                  Back
+               </Button>
+               <SaveChangesButton />
+            </View.Actions>
+         </View>
+      </CreatorFormProvider>
+   )
+}
+
+const SaveChangesButton = () => {
+   const { livestreamId, streamerAuthToken } = useStreamingContext()
+   const {
+      //  selectSpeaker,
+      joinLiveStreamWithSpeaker,
+   } = useHostProfileSelection()
+
+   const { handleSubmit: handleSubmitSpeakerForm } = useSpeakerFormSubmit(
+      livestreamId,
+      streamerAuthToken
+   )
+
+   const {
+      handleSubmit,
+      formState: { isSubmitting, isValid, isDirty },
+   } = useFormContext<CreateCreatorSchemaType>()
+
+   const onSubmit = async (values: CreateCreatorSchemaType) => {
+      await handleSubmitSpeakerForm(values)
+      joinLiveStreamWithSpeaker(values.id)
+   }
+
+   return (
+      <LoadingButton
+         loading={isSubmitting}
+         disabled={!isValid || !isDirty}
+         variant="contained"
+         onClick={handleSubmit(onSubmit)}
+      >
+         Join live stream
+      </LoadingButton>
    )
 }
