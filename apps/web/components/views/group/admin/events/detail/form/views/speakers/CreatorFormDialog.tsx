@@ -3,6 +3,7 @@ import {
    CreatorRole,
    CreatorRoles,
 } from "@careerfairy/shared-lib/groups/creators"
+import { CreateCreatorSchema } from "@careerfairy/shared-lib/groups/schemas"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Grid } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -11,7 +12,6 @@ import useCreatorFormSubmit, {
    CreatorFormValues,
 } from "components/views/sparks/forms/hooks/useCreatorFormSubmit"
 import AvatarUpload from "components/views/sparks/forms/inputs/AvatarUpload"
-import CreateCreatorSchema from "components/views/sparks/forms/schemas/CreateCreatorSchema"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { EMAIL_TOOLTIP_INFO } from "constants/pages"
 import { Form, Formik } from "formik"
