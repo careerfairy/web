@@ -1,6 +1,7 @@
 import { mapSpeakerToCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Button } from "@mui/material"
 import { useRemoteUsers } from "agora-rtc-react"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { CreatorPreview } from "components/views/creator/CreatorPreview"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import {
@@ -40,6 +41,7 @@ export const JoinWithSpeakerView = () => {
    } = useHostProfileSelection()
    const { livestreamId } = useStreamingContext()
    const remoteUsers = useRemoteUsers()
+   const isMobile = useStreamIsMobile()
 
    const displayName = getStreamerDisplayName(
       selectedSpeaker?.firstName,
@@ -91,7 +93,11 @@ export const JoinWithSpeakerView = () => {
                variant="outlined"
                onClick={goBackToSelectSpeaker}
             >
-               {userJustEditedSpeaker ? "Select another profile" : "Back"}
+               {userJustEditedSpeaker
+                  ? isMobile
+                     ? "Change"
+                     : "Select another profile"
+                  : "Back"}
             </Button>
             <Button
                variant="contained"
@@ -103,7 +109,7 @@ export const JoinWithSpeakerView = () => {
                {isSpeakerInUse
                   ? "Join here"
                   : userJustEditedSpeaker
-                  ? `Join as ${displayName}`
+                  ? `Join as ${selectedSpeaker?.firstName}`
                   : "Join live stream"}
             </Button>
          </View.Actions>

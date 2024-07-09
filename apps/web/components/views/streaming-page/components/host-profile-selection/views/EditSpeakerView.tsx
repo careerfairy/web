@@ -17,7 +17,6 @@ import { useHostProfileSelection } from "../HostProfileSelectionProvider"
 import { View } from "../View"
 
 const styles = sxStyles({
-   root: {},
    formFields: {
       display: "flex",
       flexDirection: "column",
@@ -26,6 +25,7 @@ const styles = sxStyles({
          xs: 2,
          tablet: 4,
       },
+      pb: 1,
    },
 })
 

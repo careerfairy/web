@@ -56,7 +56,7 @@ const Content = () => {
          {(activeView) => (
             <Box sx={styles.root}>
                <SpeakerSelectHeader />
-               <AnimatePresence mode="wait">
+               <AnimatePresence mode="popLayout">
                   {activeView === ProfileSelectEnum.SELECT_SPEAKER && (
                      <ViewFramerBox key={ProfileSelectEnum.SELECT_SPEAKER}>
                         <SelectSpeakerView />
