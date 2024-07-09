@@ -29,6 +29,7 @@ import {
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
    ResetLivestreamQuestionRequest,
+   Speaker,
    StreamerDetails,
    ToggleHandRaiseRequest,
    UpdateLivestreamPollRequest,
@@ -1227,7 +1228,7 @@ export class LivestreamService {
     * Updates or adds a live stream speaker, including related creator updates and last-minute profiles for hosts.
     */
    async upsertLivestreamSpeaker(data: UpsertSpeakerRequest) {
-      await httpsCallable<UpsertSpeakerRequest>(
+      return httpsCallable<UpsertSpeakerRequest, Speaker>(
          this.functions,
          "upsertLivestreamSpeaker"
       )(data)

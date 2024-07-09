@@ -1,12 +1,13 @@
 import { mapCreatorToSpeaker } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
+import { Speaker } from "@careerfairy/shared-lib/livestreams"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useCallback, useMemo } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useUploadLivestreamSpeakerAvatar } from "./useUploadLivestreamSpeakerAvatar"
 
 type UseCreatorFormSubmit = {
-   handleSubmit: (values: CreateCreatorSchemaType) => Promise<void>
+   handleSubmit: (values: CreateCreatorSchemaType) => Promise<Speaker>
    progress: number
    uploading: boolean
    isLoading: boolean
@@ -34,11 +35,14 @@ export const useSpeakerFormSubmit = (
 
             const speaker = mapCreatorToSpeaker(values)
 
-            return livestreamService.upsertLivestreamSpeaker({
-               livestreamId,
-               livestreamToken,
-               speaker,
-            })
+            const { data: updatedSpeaker } =
+               await livestreamService.upsertLivestreamSpeaker({
+                  livestreamId,
+                  livestreamToken,
+                  speaker,
+               })
+
+            return updatedSpeaker
          } catch (error) {
             errorLogAndNotify(error, {
                message: "Failed to add speaker to livestream",
