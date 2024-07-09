@@ -215,11 +215,12 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * Updates the speaker or adhoc speaker on a live stream
     * @param livestreamId - Live stream id
     * @param speaker - Speaker to update
+    * @returns The updated speaker
     */
    updateLivestreamSpeaker(
       livestreamId: string,
       speaker: Speaker
-   ): Promise<void>
+   ): Promise<Speaker>
 
    /**
     * Adds an ad hoc speaker to a live stream, this
@@ -227,11 +228,12 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * only as a selectable speaker in the live stream page
     * @param livestreamId - Live stream id
     * @param speaker - Speaker to add
+    * @returns The created speaker
     */
    addAdHocSpeaker(
       livestreamId: string,
       speaker: Create<Speaker>
-   ): Promise<void>
+   ): Promise<Speaker>
 }
 
 export class LivestreamFunctionsRepository
@@ -846,7 +848,7 @@ export class LivestreamFunctionsRepository
    async updateLivestreamSpeaker(
       livestreamId: string,
       speaker: Speaker
-   ): Promise<void> {
+   ): Promise<Speaker> {
       const stream = await this.getById(livestreamId)
 
       const updatedSpeakers =
@@ -870,16 +872,18 @@ export class LivestreamFunctionsRepository
          adHocSpeakers: updatedAdhocSpeakers,
       }
 
-      return this.firestore
+      await this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .update(toUpdate)
+
+      return speaker
    }
 
    async addAdHocSpeaker(
       livestreamId: string,
       speaker: Create<Speaker>
-   ): Promise<void> {
+   ): Promise<Speaker> {
       const speakerWithId: Speaker = { ...speaker, id: uuid() }
 
       const toUpdate: Pick<LivestreamEvent, "adHocSpeakers"> = {
@@ -888,9 +892,11 @@ export class LivestreamFunctionsRepository
          ) as unknown as Speaker[],
       }
 
-      return this.firestore
+      await this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .update(toUpdate)
+
+      return speakerWithId
    }
 }
