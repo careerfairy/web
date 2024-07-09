@@ -1,6 +1,7 @@
 import { Box, Fab, Typography } from "@mui/material"
 import { Plus } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { useHostProfileSelection } from "./HostProfileSelectionProvider"
 
 const styles = sxStyles({
    root: {
@@ -32,9 +33,11 @@ const styles = sxStyles({
 })
 
 export const AddNewSpeakerButton = () => {
+   const { goToCreateNewSpeaker } = useHostProfileSelection()
+
    return (
       <Box sx={styles.root}>
-         <Fab sx={styles.addButton}>
+         <Fab sx={styles.addButton} onClick={goToCreateNewSpeaker}>
             <Plus />
          </Fab>
          <Typography sx={styles.text} variant="medium">

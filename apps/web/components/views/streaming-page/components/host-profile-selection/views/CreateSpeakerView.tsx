@@ -1,8 +1,9 @@
-import { mapSpeakerToCreator } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
 import { LoadingButton } from "@mui/lab"
 import { Box, Button } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { useSpeakerFormSubmit } from "components/custom-hook/live-stream/useSpeakerFormSubmit"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import {
    CreatorFormFields,
    CreatorFormProvider,
@@ -27,14 +28,8 @@ const styles = sxStyles({
 })
 
 export const CreateSpeakerView = () => {
-   const { goBackToSelectSpeaker, selectedSpeaker } = useHostProfileSelection()
-
    return (
-      <CreatorFormProvider
-         creator={
-            selectedSpeaker ? mapSpeakerToCreator(selectedSpeaker) : undefined
-         }
-      >
+      <CreatorFormProvider>
          <View component="form">
             <View.Content>
                <View.Title>
@@ -50,26 +45,20 @@ export const CreateSpeakerView = () => {
             <Box sx={styles.formFields}>
                <CreatorFormFields />
             </Box>
-            <View.Actions>
-               <Button
-                  color="grey"
-                  variant="outlined"
-                  onClick={goBackToSelectSpeaker}
-               >
-                  Back
-               </Button>
-               <SaveChangesButton />
-            </View.Actions>
+            <Actions />
          </View>
       </CreatorFormProvider>
    )
 }
 
-const SaveChangesButton = () => {
+const Actions = () => {
+   const { isLoggedIn } = useAuth()
    const { livestreamId, streamerAuthToken } = useStreamingContext()
+   const isMobile = useStreamIsMobile()
    const {
       //  selectSpeaker,
       joinLiveStreamWithSpeaker,
+      goBackToSelectSpeaker,
    } = useHostProfileSelection()
 
    const { handleSubmit: handleSubmitSpeakerForm } = useSpeakerFormSubmit(
@@ -82,19 +71,33 @@ const SaveChangesButton = () => {
       formState: { isSubmitting, isValid, isDirty },
    } = useFormContext<CreateCreatorSchemaType>()
 
-   const onSubmit = async (values: CreateCreatorSchemaType) => {
+   const handleJoin = async (values: CreateCreatorSchemaType) => {
+      const newSpeaker = await handleSubmitSpeakerForm(values)
+      joinLiveStreamWithSpeaker(newSpeaker.id)
+   }
+
+   const handleBack = async (values: CreateCreatorSchemaType) => {
       await handleSubmitSpeakerForm(values)
-      joinLiveStreamWithSpeaker(values.id)
+      goBackToSelectSpeaker()
    }
 
    return (
-      <LoadingButton
-         loading={isSubmitting}
-         disabled={!isValid || !isDirty}
-         variant="contained"
-         onClick={handleSubmit(onSubmit)}
-      >
-         Join live stream
-      </LoadingButton>
+      <View.Actions>
+         <Button
+            color="grey"
+            variant="outlined"
+            onClick={handleSubmit(handleBack)}
+         >
+            {isLoggedIn ? (isMobile ? "Back" : "Save and go back") : "Back"}
+         </Button>
+         <LoadingButton
+            loading={isSubmitting}
+            disabled={!isValid || !isDirty}
+            variant="contained"
+            onClick={handleSubmit(handleJoin)}
+         >
+            Join live stream
+         </LoadingButton>
+      </View.Actions>
    )
 }
