@@ -62,6 +62,7 @@ const styles = sxStyles({
       textAlign: "center",
    },
    actions: {
+      zIndex: 1,
       position: "sticky",
       bottom: 0,
       borderTop: "1px solid #F0F0F0",
