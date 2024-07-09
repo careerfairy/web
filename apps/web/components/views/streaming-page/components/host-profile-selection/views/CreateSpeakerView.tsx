@@ -1,9 +1,7 @@
 import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
 import { LoadingButton } from "@mui/lab"
 import { Box, Button } from "@mui/material"
-import { useAuth } from "HOCs/AuthProvider"
 import { useSpeakerFormSubmit } from "components/custom-hook/live-stream/useSpeakerFormSubmit"
-import { useStreamIsMobile } from "components/custom-hook/streaming"
 import {
    CreatorFormFields,
    CreatorFormProvider,
@@ -52,14 +50,11 @@ export const CreateSpeakerView = () => {
 }
 
 const Actions = () => {
-   const { isLoggedIn } = useAuth()
+   // const { isLoggedIn } = useAuth()
    const { livestreamId, streamerAuthToken } = useStreamingContext()
-   const isMobile = useStreamIsMobile()
-   const {
-      //  selectSpeaker,
-      joinLiveStreamWithSpeaker,
-      goBackToSelectSpeaker,
-   } = useHostProfileSelection()
+   // const isMobile = useStreamIsMobile()
+   const { joinLiveStreamWithSpeaker, goBackToSelectSpeaker } =
+      useHostProfileSelection()
 
    const { handleSubmit: handleSubmitSpeakerForm } = useSpeakerFormSubmit(
       livestreamId,
@@ -76,19 +71,20 @@ const Actions = () => {
       joinLiveStreamWithSpeaker(newSpeaker.id)
    }
 
-   const handleBack = async (values: CreateCreatorSchemaType) => {
-      await handleSubmitSpeakerForm(values)
-      goBackToSelectSpeaker()
-   }
+   // const handleBack = async (values: CreateCreatorSchemaType) => {
+   //    await handleSubmitSpeakerForm(values)
+   //    goBackToSelectSpeaker()
+   // }
 
    return (
       <View.Actions>
          <Button
             color="grey"
             variant="outlined"
-            onClick={handleSubmit(handleBack)}
+            onClick={goBackToSelectSpeaker}
          >
-            {isLoggedIn ? (isMobile ? "Back" : "Save and go back") : "Back"}
+            {/* {isLoggedIn ? (isMobile ? "Back" : "Save and go back") : "Back"} */}
+            Back
          </Button>
          <LoadingButton
             loading={isSubmitting}
