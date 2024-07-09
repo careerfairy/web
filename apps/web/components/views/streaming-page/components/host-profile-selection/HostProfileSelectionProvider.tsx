@@ -1,5 +1,4 @@
 import { Speaker } from "@careerfairy/shared-lib/livestreams"
-import { UserData } from "@careerfairy/shared-lib/users"
 import { useAppDispatch } from "components/custom-hook/store"
 import {
    ReactNode,
@@ -29,47 +28,32 @@ type Action =
    | { type: ProfileSelectEnum.JOIN_WITH_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.EDIT_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.CREATE_SPEAKER }
-   | { type: "SELECT_USER"; payload: UserData }
-   | { type: "RESET" }
 
 const reducer = (state: State, action: Action): State => {
+   state.direction = state.activeView > action.type ? -1 : 1
    switch (action.type) {
       case ProfileSelectEnum.SELECT_SPEAKER:
          return {
             ...state,
             activeView: ProfileSelectEnum.SELECT_SPEAKER,
-            direction:
-               state.activeView > ProfileSelectEnum.SELECT_SPEAKER ? -1 : 1,
          }
       case ProfileSelectEnum.JOIN_WITH_SPEAKER:
          return {
             ...state,
             selectedSpeaker: action.payload,
             activeView: ProfileSelectEnum.JOIN_WITH_SPEAKER,
-            direction:
-               state.activeView > ProfileSelectEnum.JOIN_WITH_SPEAKER ? -1 : 1,
          }
       case ProfileSelectEnum.EDIT_SPEAKER:
          return {
             ...state,
             selectedSpeaker: action.payload,
             activeView: ProfileSelectEnum.EDIT_SPEAKER,
-            direction:
-               state.activeView > ProfileSelectEnum.EDIT_SPEAKER ? -1 : 1,
          }
       case ProfileSelectEnum.CREATE_SPEAKER:
          return {
             ...state,
             selectedSpeaker: null,
             activeView: ProfileSelectEnum.CREATE_SPEAKER,
-            direction:
-               state.activeView > ProfileSelectEnum.CREATE_SPEAKER ? -1 : 1,
-         }
-      case "RESET":
-         return {
-            selectedSpeaker: null,
-            activeView: ProfileSelectEnum.SELECT_SPEAKER,
-            direction: 1,
          }
       default:
          return state
@@ -129,11 +113,9 @@ export const ProfileSelectProvider = ({ children }: Props) => {
             return dispatch({ type: ProfileSelectEnum.SELECT_SPEAKER })
          },
          joinLiveStreamWithSpeaker: (speakerId: string) => {
-            dispatch({ type: "RESET" })
             return appDispatch(setSpeakerId(speakerId))
          },
          joinLiveStreamWithUser: (userId: string) => {
-            dispatch({ type: "RESET" })
             return appDispatch(setUserUid(userId))
          },
       }),
