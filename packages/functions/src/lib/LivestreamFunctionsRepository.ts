@@ -884,7 +884,10 @@ export class LivestreamFunctionsRepository
       livestreamId: string,
       speaker: Create<Speaker>
    ): Promise<Speaker> {
-      const speakerWithId: Speaker = { ...speaker, id: uuid() }
+      const speakerWithId: Speaker = {
+         ...speaker,
+         id: uuid().replace(/-/g, ""), // Remove the "-" from the uuid
+      }
 
       const toUpdate: Pick<LivestreamEvent, "adHocSpeakers"> = {
          adHocSpeakers: FieldValue.arrayUnion(
