@@ -18,7 +18,7 @@ import { SelectSpeakerView } from "./views/SelectSpeakerView"
 const styles = sxStyles({
    root: {
       width: "100%",
-      minHeight: "100vh",
+      minHeight: "100dvh",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
