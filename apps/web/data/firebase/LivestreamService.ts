@@ -32,6 +32,7 @@ import {
    StreamerDetails,
    ToggleHandRaiseRequest,
    UpdateLivestreamPollRequest,
+   UpsertSpeakerRequest,
    UserLivestreamData,
    hasUpvotedLivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
@@ -1220,6 +1221,16 @@ export class LivestreamService {
             useNewUI: !livestreamDoc.data().useNewUI,
          })
       }
+   }
+
+   /**
+    * Updates or adds a live stream speaker, including related creator updates and last-minute profiles for hosts.
+    */
+   async upsertLivestreamSpeaker(data: UpsertSpeakerRequest) {
+      await httpsCallable<UpsertSpeakerRequest>(
+         this.functions,
+         "upsertLivestreamSpeaker"
+      )(data)
    }
 }
 

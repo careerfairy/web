@@ -1,11 +1,16 @@
-import { mapSpeakerToCreator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   mapCreatorToSpeaker,
+   mapSpeakerToCreator,
+} from "@careerfairy/shared-lib/groups/creators"
+import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
+import { LoadingButton } from "@mui/lab"
 import { Box, Button } from "@mui/material"
+import { useSpeakerFormSubmit } from "components/custom-hook/live-stream/useSpeakerFormSubmit"
 import {
    CreatorFormFields,
    CreatorFormProvider,
 } from "components/views/creator/CreatorForm"
-import { CreateCreatorSchemaType } from "components/views/sparks/forms/schemas/CreateCreatorSchema"
-import { groupRepo } from "data/RepositoryInstances"
+import { useStreamingContext } from "components/views/streaming-page/context"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { useHostProfileSelection } from "../HostProfileSelectionProvider"
@@ -14,6 +19,9 @@ import { View } from "../View"
 const styles = sxStyles({
    root: {},
    formFields: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
       px: {
          xs: 2,
          tablet: 4,
@@ -30,75 +38,63 @@ export const EditSpeakerView = () => {
             selectedSpeaker ? mapSpeakerToCreator(selectedSpeaker) : undefined
          }
       >
-         {() => (
-            <View component="form">
-               <View.Content>
-                  <View.Title>
-                     Edit{" "}
-                     <Box component="span" color="primary.main">
-                        Speaker
-                     </Box>
-                  </View.Title>
-                  <View.Subtitle>
-                     Check and change your speaker details
-                  </View.Subtitle>
-               </View.Content>
-               <Box sx={styles.formFields}>
-                  <CreatorFormFields />
-               </Box>
-               <View.Actions>
-                  <Button
-                     color="grey"
-                     variant="outlined"
-                     onClick={goBackToSelectSpeaker}
-                  >
-                     Back
-                  </Button>
-                  <SaveChangesButton />
-               </View.Actions>
-            </View>
-         )}
+         <View component="form">
+            <View.Content>
+               <View.Title>
+                  Edit{" "}
+                  <Box component="span" color="primary.main">
+                     Speaker
+                  </Box>
+               </View.Title>
+               <View.Subtitle>
+                  Check and change your speaker details
+               </View.Subtitle>
+            </View.Content>
+            <Box sx={styles.formFields}>
+               <CreatorFormFields />
+            </Box>
+            <View.Actions>
+               <Button
+                  color="grey"
+                  variant="outlined"
+                  onClick={goBackToSelectSpeaker}
+               >
+                  Back
+               </Button>
+               <SaveChangesButton />
+            </View.Actions>
+         </View>
       </CreatorFormProvider>
    )
 }
 
 const SaveChangesButton = () => {
-   const { goBackToSelectSpeaker } = useHostProfileSelection()
-   const { handleSubmit } = useFormContext<CreateCreatorSchemaType>()
+   const { livestreamId, streamerAuthToken } = useStreamingContext()
+   const { selectSpeaker } = useHostProfileSelection()
+
+   const { handleSubmit: handleSubmitSpeakerForm } = useSpeakerFormSubmit(
+      livestreamId,
+      streamerAuthToken
+   )
+
+   const {
+      handleSubmit,
+      formState: { isSubmitting, isValid, isDirty },
+   } = useFormContext<CreateCreatorSchemaType>()
 
    const onSubmit = async (values: CreateCreatorSchemaType) => {
-      /**
-       * TODO:
-       * 1. Update Creator if exists
-       * 2. Update related Speaker on live stream
-       */
-
-      const existingCreator = await groupRepo.getCreatorById(values.id)
-
-      if (existingCreator) {
-         await groupRepo.updateCreatorInGroup(
-            existingCreator.groupId,
-            existingCreator.id,
-            values
-         )
-      }
-
-      console.log(
-         "🚀 ~ file: EditSpeakerView.tsx:27 ~ onSubmit ~ values:",
-         values
-      )
+      await handleSubmitSpeakerForm(values)
+      selectSpeaker(mapCreatorToSpeaker(values))
    }
 
    return (
-      <Button
-         disabled
-         onClick={() => {
-            handleSubmit((values) => onSubmit(values))().then(
-               goBackToSelectSpeaker
-            )
-         }}
+      <LoadingButton
+         loading={isSubmitting}
+         disabled={!isValid || !isDirty}
+         variant="contained"
+         onClick={handleSubmit(onSubmit)}
       >
          Save changes
-      </Button>
+      </LoadingButton>
    )
 }

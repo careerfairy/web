@@ -204,6 +204,12 @@ export const onWriteCreator = functions
       // Run side effects for all creator changes
       sideEffectPromises.push(sparkRepo.syncCreatorDataToSpark(change))
 
+      if (changeTypes.isUpdate) {
+         sideEffectPromises.push(
+            livestreamsRepo.syncCreatorDataToLivestream(change)
+         )
+      }
+
       return handleSideEffects(sideEffectPromises)
    })
 
