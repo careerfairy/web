@@ -204,16 +204,16 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    ): Promise<void>
 
    /**
-    * Syncs the creator data to the live stream
-    * Fetches all live streams where the livestream.creatorsIds contains the creator.id
-    * and updates the livestream.speakers array with the creator data where the speaker.id is the creator.id
+    * Syncs creator data to live streams by updating speakers with matching creator IDs.
     * @param creator
     */
-   syncCreatorDataToLivestream(creator: Change<DocumentSnapshot>): Promise<void>
+   syncCreatorDataToLivestreamSpeaker(
+      creator: Change<DocumentSnapshot>
+   ): Promise<void>
 
    /**
     * Updates the speaker or adhoc speaker on a live stream
-    * @param livestreamId - Livestream id
+    * @param livestreamId - Live stream id
     * @param speaker - Speaker to update
     */
    updateLivestreamSpeaker(
@@ -224,8 +224,8 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
     * Adds an ad hoc speaker to a live stream, this
     * speaker will not appear in live stream details dialog
-    * only as a selectable speaker in the livestream page
-    * @param livestreamId - Livestream id
+    * only as a selectable speaker in the live stream page
+    * @param livestreamId - Live stream id
     * @param speaker - Speaker to add
     */
    addAdHocSpeaker(
@@ -782,7 +782,7 @@ export class LivestreamFunctionsRepository
       return livestreams.docs.map((doc) => doc.data())
    }
 
-   async syncCreatorDataToLivestream(
+   async syncCreatorDataToLivestreamSpeaker(
       change: Change<DocumentSnapshot<Creator>>
    ): Promise<void> {
       const creator = change.after.data()
