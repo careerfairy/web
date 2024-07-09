@@ -1,4 +1,8 @@
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   CreateCreatorSchema,
+   CreateCreatorSchemaType,
+} from "@careerfairy/shared-lib/groups/schemas"
 import { Grid } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { EMAIL_TOOLTIP_INFO } from "constants/pages"
@@ -8,9 +12,6 @@ import { sxStyles } from "types/commonTypes"
 import { ControlledAvatarUpload } from "../common/inputs/ControlledAvatarUpload"
 import { ControlledBrandedTextField } from "../common/inputs/ControlledBrandedTextField"
 import { getInitialValues } from "../sparks/forms/CreateOrEditCreatorForm"
-import CreateCreatorSchema, {
-   CreateCreatorSchemaType,
-} from "../sparks/forms/schemas/CreateCreatorSchema"
 
 const styles = sxStyles({
    avatarGrid: {
@@ -22,9 +23,9 @@ const styles = sxStyles({
 
 type FormProviderProps = {
    creator?: Creator
-   children: (
-      methods: UseFormReturn<CreateCreatorSchemaType>
-   ) => ReactNode | ReactNode
+   children:
+      | ((methods: UseFormReturn<CreateCreatorSchemaType>) => ReactNode)
+      | ReactNode
 }
 
 export const CreatorFormProvider = ({
@@ -38,7 +39,11 @@ export const CreatorFormProvider = ({
       reValidateMode: "onChange",
    })
 
-   return <FormProvider {...methods}>{children(methods)}</FormProvider>
+   return (
+      <FormProvider {...methods}>
+         {typeof children === "function" ? children(methods) : children}
+      </FormProvider>
+   )
 }
 
 export const CreatorFormFields = () => {

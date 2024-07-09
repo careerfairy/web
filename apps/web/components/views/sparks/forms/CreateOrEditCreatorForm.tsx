@@ -3,6 +3,7 @@ import {
    CreatorRole,
    CreatorRoles,
 } from "@careerfairy/shared-lib/groups/creators"
+import { CreateCreatorSchema } from "@careerfairy/shared-lib/groups/schemas"
 import { Grid } from "@mui/material"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { EMAIL_TOOLTIP_INFO } from "constants/pages"
@@ -13,7 +14,6 @@ import useCreatorFormSubmit, {
    CreatorFormValues,
 } from "./hooks/useCreatorFormSubmit"
 import AvatarUpload from "./inputs/AvatarUpload"
-import CreateCreatorSchema from "./schemas/CreateCreatorSchema"
 
 const styles = sxStyles({
    avaGrid: {

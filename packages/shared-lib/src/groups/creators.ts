@@ -96,3 +96,30 @@ export const mapSpeakerToCreator = (speaker: Speaker): Creator => {
       roles: speaker.roles || [CreatorRoles.Speaker],
    }
 }
+
+export const mapCreatorToSpeaker = (
+   creator: Pick<
+      Creator,
+      | "id"
+      | "avatarUrl"
+      | "story"
+      | "firstName"
+      | "lastName"
+      | "position"
+      | "email"
+      | "linkedInUrl"
+      | "roles"
+   >
+): Speaker => {
+   return {
+      id: creator.id,
+      avatar: creator.avatarUrl,
+      background: creator.story,
+      firstName: creator.firstName,
+      lastName: creator.lastName,
+      position: creator.position,
+      email: creator.email,
+      linkedInUrl: creator.linkedInUrl,
+      roles: creator.roles,
+   }
+}

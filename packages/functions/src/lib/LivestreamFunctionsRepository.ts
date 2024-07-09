@@ -1,15 +1,21 @@
 import { createCompatGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    GroupAdmin,
    GroupAdminNewEventEmailInfo,
 } from "@careerfairy/shared-lib/groups"
 import {
+   Creator,
+   mapCreatorToSpeaker,
+} from "@careerfairy/shared-lib/groups/creators"
+import {
    EventRating,
    EventRatingAnswer,
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamQueryOptions,
+   Speaker,
    UserLivestreamData,
    getEarliestEventBufferTime,
    pickPublicDataFromLivestream,
@@ -40,6 +46,7 @@ import type { Change } from "firebase-functions"
 import * as functions from "firebase-functions"
 import { isEmpty } from "lodash"
 import { DateTime } from "luxon"
+import uuid from "uuid-random"
 import {
    DocumentSnapshot,
    FieldValue,
@@ -194,6 +201,36 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       afterJob: CustomJob,
       beforeJob: CustomJob,
       changeType: ReturnType<typeof getChangeTypes>
+   ): Promise<void>
+
+   /**
+    * Syncs the creator data to the live stream
+    * Fetches all live streams where the livestream.creatorsIds contains the creator.id
+    * and updates the livestream.speakers array with the creator data where the speaker.id is the creator.id
+    * @param creator
+    */
+   syncCreatorDataToLivestream(creator: Change<DocumentSnapshot>): Promise<void>
+
+   /**
+    * Updates the speaker or adhoc speaker on a live stream
+    * @param livestreamId - Livestream id
+    * @param speaker - Speaker to update
+    */
+   updateLivestreamSpeaker(
+      livestreamId: string,
+      speaker: Speaker
+   ): Promise<void>
+
+   /**
+    * Adds an ad hoc speaker to a live stream, this
+    * speaker will not appear in live stream details dialog
+    * only as a selectable speaker in the livestream page
+    * @param livestreamId - Livestream id
+    * @param speaker - Speaker to add
+    */
+   addAdHocSpeaker(
+      livestreamId: string,
+      speaker: Create<Speaker>
    ): Promise<void>
 }
 
@@ -731,5 +768,129 @@ export class LivestreamFunctionsRepository
       functions.logger.log(
          `Updated live streams linked to customJob ${afterJob.id}`
       )
+   }
+
+   async getLivestreamsByCreatorId(
+      creatorId: string
+   ): Promise<LivestreamEvent[]> {
+      const livestreams = await this.firestore
+         .collection("livestreams")
+         .where("creatorsIds", "array-contains", creatorId)
+         .withConverter(createCompatGenericConverter<LivestreamEvent>())
+         .get()
+
+      return livestreams.docs.map((doc) => doc.data())
+   }
+
+   async syncCreatorDataToLivestream(
+      change: Change<DocumentSnapshot<Creator>>
+   ): Promise<void> {
+      const creator = change.after.data()
+
+      if (!creator) {
+         functions.logger.log("No creator data found in the change document.")
+         return
+      }
+
+      functions.logger.log(`Syncing creator data for creator ID: ${creator.id}`)
+
+      const livestreams = await this.getLivestreamsByCreatorId(creator.id)
+
+      if (livestreams.length === 0) {
+         functions.logger.log(
+            `No livestreams found for creator ID: ${creator.id}`
+         )
+         return
+      }
+
+      functions.logger.log(
+         `Found ${livestreams.length} livestream(s) for creator ID: ${creator.id}`
+      )
+
+      const bulkWriter = firestoreAdmin.bulkWriter()
+
+      for (const livestream of livestreams) {
+         const livestreamRef = this.firestore
+            .collection("livestreams")
+            .withConverter(createCompatGenericConverter<LivestreamEvent>())
+            .doc(livestream.id)
+
+         if (!livestream.speakers) {
+            functions.logger.log(
+               `No speakers found for livestream ID: ${livestream.id}`
+            )
+            continue
+         }
+
+         const updatedSpeakers = livestream.speakers.map((speaker) => {
+            if (speaker.id === creator.id) {
+               functions.logger.log(
+                  `Updating speaker data for livestream ID: ${livestream.id}, speaker ID: ${speaker.id}`
+               )
+               return mapCreatorToSpeaker(creator)
+            }
+            return speaker
+         })
+
+         void bulkWriter.update(livestreamRef as any, {
+            speakers: updatedSpeakers,
+         })
+      }
+
+      await bulkWriter.close()
+      functions.logger.log(
+         `Completed syncing creator data for creator ID: ${creator.id}`
+      )
+   }
+
+   async updateLivestreamSpeaker(
+      livestreamId: string,
+      speaker: Speaker
+   ): Promise<void> {
+      const stream = await this.getById(livestreamId)
+
+      const updatedSpeakers =
+         stream.speakers?.map((s) => {
+            if (s.id === speaker.id) {
+               return { ...s, ...speaker }
+            }
+            return s
+         }) || []
+
+      const updatedAdhocSpeakers =
+         stream.adHocSpeakers?.map((s) => {
+            if (s.id === speaker.id) {
+               return { ...s, ...speaker }
+            }
+            return s
+         }) || []
+
+      const toUpdate: Pick<LivestreamEvent, "speakers" | "adHocSpeakers"> = {
+         speakers: updatedSpeakers,
+         adHocSpeakers: updatedAdhocSpeakers,
+      }
+
+      return this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .update(toUpdate)
+   }
+
+   async addAdHocSpeaker(
+      livestreamId: string,
+      speaker: Create<Speaker>
+   ): Promise<void> {
+      const speakerWithId: Speaker = { ...speaker, id: uuid() }
+
+      const toUpdate: Pick<LivestreamEvent, "adHocSpeakers"> = {
+         adHocSpeakers: FieldValue.arrayUnion(
+            speakerWithId
+         ) as unknown as Speaker[],
+      }
+
+      return this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .update(toUpdate)
    }
 }

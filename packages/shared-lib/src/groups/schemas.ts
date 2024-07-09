@@ -1,6 +1,7 @@
 import * as yup from "yup"
+import { CreatorRole, CreatorRoles } from "./creators"
 
-const CreateCreatorSchema = yup.object({
+export const baseCreatorShape = {
    firstName: yup
       .string()
       .max(50, "First Name must be less than 50 characters")
@@ -25,13 +26,20 @@ const CreateCreatorSchema = yup.object({
       is: (avatarUrl: string) => !avatarUrl, // if avatarUrl is empty
       then: yup // then avatarFile is required
          .mixed<File>()
-         .test("avatarFile", "Avatar is required", function (value) {
+         .test("avatarFile", "Avatar file is required", function (value) {
             return Boolean(value)
          }),
    }),
+   roles: yup
+      .array()
+      .of(
+         yup
+            .mixed<CreatorRole>()
+            .oneOf(Object.values(CreatorRoles) as CreatorRole[])
+      ),
    id: yup.string(),
-})
+}
+
+export const CreateCreatorSchema = yup.object(baseCreatorShape)
 
 export type CreateCreatorSchemaType = yup.InferType<typeof CreateCreatorSchema>
-
-export default CreateCreatorSchema

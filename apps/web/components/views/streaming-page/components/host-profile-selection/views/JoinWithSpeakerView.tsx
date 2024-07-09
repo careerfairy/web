@@ -9,7 +9,10 @@ import {
 } from "components/views/streaming-page/util"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { useHostProfileSelection } from "../HostProfileSelectionProvider"
+import {
+   ProfileSelectEnum,
+   useHostProfileSelection,
+} from "../HostProfileSelectionProvider"
 import { View } from "../View"
 
 const styles = sxStyles({
@@ -29,8 +32,12 @@ const styles = sxStyles({
 })
 
 export const JoinWithSpeakerView = () => {
-   const { goBackToSelectSpeaker, selectedSpeaker, joinLiveStreamWithSpeaker } =
-      useHostProfileSelection()
+   const {
+      goBackToSelectSpeaker,
+      selectedSpeaker,
+      joinLiveStreamWithSpeaker,
+      prevActiveView,
+   } = useHostProfileSelection()
    const { livestreamId } = useStreamingContext()
    const remoteUsers = useRemoteUsers()
 
@@ -46,6 +53,9 @@ export const JoinWithSpeakerView = () => {
       )
       return remoteUsers.some((user) => user.uid === agoraSpeakerId)
    }, [remoteUsers, selectedSpeaker?.id, livestreamId])
+
+   const userJustEditedSpeaker =
+      prevActiveView === ProfileSelectEnum.EDIT_SPEAKER
 
    const name = (
       <Box color="primary.main" component="span">
@@ -81,7 +91,7 @@ export const JoinWithSpeakerView = () => {
                variant="outlined"
                onClick={goBackToSelectSpeaker}
             >
-               Back
+               {userJustEditedSpeaker ? "Select another profile" : "Back"}
             </Button>
             <Button
                variant="contained"
@@ -90,7 +100,11 @@ export const JoinWithSpeakerView = () => {
                   joinLiveStreamWithSpeaker(selectedSpeaker?.id)
                }}
             >
-               {isSpeakerInUse ? "Join here" : "Join live stream"}
+               {isSpeakerInUse
+                  ? "Join here"
+                  : userJustEditedSpeaker
+                  ? `Join as ${displayName}`
+                  : "Join live stream"}
             </Button>
          </View.Actions>
       </View>

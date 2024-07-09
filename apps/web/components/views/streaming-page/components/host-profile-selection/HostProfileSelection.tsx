@@ -1,6 +1,6 @@
 import { Box } from "@mui/material"
 import FramerBox from "components/views/common/FramerBox"
-import { AnimatePresence } from "framer-motion"
+import { AnimatePresence, Variants } from "framer-motion"
 import { ReactNode, forwardRef } from "react"
 import { useSpeakerId, useUserUid } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
@@ -58,32 +58,24 @@ const Content = () => {
                <SpeakerSelectHeader />
                <AnimatePresence mode="wait">
                   {activeView === ProfileSelectEnum.SELECT_SPEAKER && (
-                     <ViewFramerBox
-                        key={ProfileSelectEnum.SELECT_SPEAKER}
-                        activeView={activeView}
-                        viewComponent={<SelectSpeakerView />}
-                     />
+                     <ViewFramerBox key={ProfileSelectEnum.SELECT_SPEAKER}>
+                        <SelectSpeakerView />
+                     </ViewFramerBox>
                   )}
                   {activeView === ProfileSelectEnum.CREATE_SPEAKER && (
-                     <ViewFramerBox
-                        key={ProfileSelectEnum.CREATE_SPEAKER}
-                        activeView={activeView}
-                        viewComponent={<CreateSpeakerView />}
-                     />
+                     <ViewFramerBox key={ProfileSelectEnum.CREATE_SPEAKER}>
+                        <CreateSpeakerView />
+                     </ViewFramerBox>
                   )}
                   {activeView === ProfileSelectEnum.EDIT_SPEAKER && (
-                     <ViewFramerBox
-                        key={ProfileSelectEnum.EDIT_SPEAKER}
-                        activeView={activeView}
-                        viewComponent={<EditSpeakerView />}
-                     />
+                     <ViewFramerBox key={ProfileSelectEnum.EDIT_SPEAKER}>
+                        <EditSpeakerView />
+                     </ViewFramerBox>
                   )}
                   {activeView === ProfileSelectEnum.JOIN_WITH_SPEAKER && (
-                     <ViewFramerBox
-                        key={ProfileSelectEnum.JOIN_WITH_SPEAKER}
-                        activeView={activeView}
-                        viewComponent={<JoinWithSpeakerView />}
-                     />
+                     <ViewFramerBox key={ProfileSelectEnum.JOIN_WITH_SPEAKER}>
+                        <JoinWithSpeakerView />
+                     </ViewFramerBox>
                   )}
                </AnimatePresence>
             </Box>
@@ -92,32 +84,39 @@ const Content = () => {
    )
 }
 
-type ViewFramerBoxProps = {
-   activeView: ProfileSelectEnum
-   viewComponent: ReactNode
+const DISTANCE = 100
+
+const sliderVariants: Variants = {
+   incoming: (direction: number) => ({
+      x: direction * DISTANCE,
+      opacity: 0,
+   }),
+   active: { x: 0, opacity: 1 },
+   exit: (direction: number) => ({
+      x: -direction * DISTANCE,
+      opacity: 0,
+   }),
 }
 
-const getDirection = (
-   prevActiveView: ProfileSelectEnum,
-   activeView: ProfileSelectEnum
-) => {
-   return activeView > prevActiveView ? 1 : -1
+type ViewFramerBoxProps = {
+   children: ReactNode
 }
 
 const ViewFramerBox = forwardRef<HTMLDivElement, ViewFramerBoxProps>(
-   ({ activeView, viewComponent }, ref) => {
-      const { prevActiveView } = useHostProfileSelection()
-      const direction = getDirection(prevActiveView, activeView)
+   ({ children }, ref) => {
+      const { direction } = useHostProfileSelection()
 
       return (
          <FramerBox
             ref={ref}
             sx={styles.view}
-            initial={{ opacity: 0, x: direction * 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -100 }}
+            custom={direction}
+            variants={sliderVariants}
+            initial="incoming"
+            animate="active"
+            exit="exit"
          >
-            {viewComponent}
+            {children}
          </FramerBox>
       )
    }

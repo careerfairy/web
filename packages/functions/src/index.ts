@@ -294,3 +294,4 @@ exports.resetQuestion = streaming.resetQuestion
 exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent
 exports.markQuestionAsDone = streaming.markQuestionAsDone
 exports.toggleHandRaise = streaming.toggleHandRaise
+exports.upsertLivestreamSpeaker = streaming.upsertLivestreamSpeaker

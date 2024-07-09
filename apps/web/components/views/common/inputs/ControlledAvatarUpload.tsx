@@ -7,7 +7,7 @@ import {
    Typography,
 } from "@mui/material"
 import useFileUploader from "components/custom-hook/useFileUploader"
-import { Fragment, forwardRef, useCallback, useMemo } from "react"
+import { Fragment, forwardRef, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import FileUploader from "../FileUploader"
@@ -66,16 +66,10 @@ export const ControlledAvatarUpload = forwardRef<HTMLDivElement, Props>(
    ({ fileFieldName, urlFieldName, size }, ref) => {
       const {
          setValue,
-         setError,
-         setFocus,
          watch,
          formState: { errors, touchedFields },
       } = useFormContext()
       const [fileValue, urlValue] = watch([fileFieldName, urlFieldName])
-
-      const handleTouched = useCallback(() => {
-         setFocus(fileFieldName)
-      }, [fileFieldName, setFocus])
 
       const { fileUploaderProps, dragActive } = useFileUploader({
          acceptedFileTypes: ["png", "jpeg", "jpg", "PNG", "JPEG", "JPG"],
@@ -83,9 +77,11 @@ export const ControlledAvatarUpload = forwardRef<HTMLDivElement, Props>(
          multiple: false,
          onValidated: async (file) => {
             const newFile = Array.isArray(file) ? file[0] : file
-            setValue(fileFieldName, newFile)
-            handleTouched()
-            setError(fileFieldName, undefined)
+            setValue(fileFieldName, newFile, {
+               shouldDirty: true,
+               shouldTouch: true,
+               shouldValidate: true,
+            })
          },
       })
 
@@ -96,6 +92,7 @@ export const ControlledAvatarUpload = forwardRef<HTMLDivElement, Props>(
       }, [fileValue])
 
       const isTouched = touchedFields[fileFieldName]
+
       const error = errors[fileFieldName]
 
       return (
@@ -107,7 +104,7 @@ export const ControlledAvatarUpload = forwardRef<HTMLDivElement, Props>(
             ref={ref}
          >
             <FileUploader {...fileUploaderProps}>
-               <CardActionArea onClick={handleTouched} sx={styles.avaRoot}>
+               <CardActionArea sx={styles.avaRoot}>
                   <Avatar
                      src={blobUrl || urlValue}
                      sx={[
