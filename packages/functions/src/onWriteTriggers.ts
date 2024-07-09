@@ -206,7 +206,7 @@ export const onWriteCreator = functions
 
       if (changeTypes.isUpdate) {
          sideEffectPromises.push(
-            livestreamsRepo.syncCreatorDataToLivestream(change)
+            livestreamsRepo.syncCreatorDataToLivestreamSpeaker(change)
          )
       }
 
