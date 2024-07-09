@@ -32,11 +32,7 @@ export const baseCreatorShape = {
    }),
    roles: yup
       .array()
-      .of(
-         yup
-            .mixed<CreatorRole>()
-            .oneOf(Object.values(CreatorRoles) as CreatorRole[])
-      ),
+      .of(yup.mixed<CreatorRole>().oneOf(Object.values(CreatorRoles))),
    id: yup.string(),
 }
 
