@@ -15,7 +15,10 @@ import {
    SPARK_SEARCHABLE_ATTRIBUTES,
    TransformedSpark,
 } from "@careerfairy/shared-lib/sparks/search"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   Spark,
+   SparkCategoriesToTagValuesMapper,
+} from "@careerfairy/shared-lib/sparks/sparks"
 import { removeDuplicates } from "@careerfairy/shared-lib/utils"
 import { Index } from "./searchIndexGenerator"
 
@@ -62,6 +65,8 @@ const sparkIndex = {
       createdAtMs: data.createdAt?.toDate?.().getTime() ?? null,
       groupPublicSparks: data.group?.publicSparks,
       publishedAtMs: data.publishedAt?.toDate?.().getTime() ?? null,
+      contentTopicsTagIds:
+         [SparkCategoriesToTagValuesMapper[data.category?.id]] ?? [],
    }),
    settings: {
       attributesForFaceting: SPARK_FILTERING_FIELDS,
