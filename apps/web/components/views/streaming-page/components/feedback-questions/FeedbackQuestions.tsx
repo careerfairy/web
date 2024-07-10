@@ -7,6 +7,7 @@ import { livestreamService } from "data/firebase/LivestreamService"
 import {
    useHasEnded,
    useHasStarted,
+   useIsRecordingWindow,
    useStartedAt,
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
@@ -38,11 +39,14 @@ type FeedbackQuestion = EventRatingWithType & { answered: boolean }
 
 export const FeedbackQuestions = () => {
    const { livestreamId } = useStreamingContext()
+   const isRecordingWindow = useIsRecordingWindow()
 
    const { feedbackQuestions } = useFeedbackQuestions(
       livestreamId,
       "livestreams"
    )
+
+   if (isRecordingWindow) return null
 
    const sortQuestions = (questions) =>
       questions.sort((q1, q2) => (q1.appearAfter > q2.appearAfter ? 1 : -1))
