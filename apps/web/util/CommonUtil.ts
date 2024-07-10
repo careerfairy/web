@@ -372,5 +372,5 @@ export const convertBytesToMB = (bytes: number) =>
    Number.isFinite(bytes) ? bytes / 1024 / 1024 : 0
 
 export const generateUniqueId = () => {
-   return uuid().replace(/-/g, "")
+   return uuid().replace(/-/g, "") // remove dashes
 }
