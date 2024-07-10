@@ -23,8 +23,11 @@ import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamImpression,
+   LivestreamPoll,
    LivestreamPresentation,
    LivestreamPromotions,
+   LivestreamQuestion,
+   Speaker,
    UserLivestreamData,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
@@ -804,33 +807,43 @@ class FirebaseService {
    createTestLivestream = async () => {
       const livestreamDocRef = this.firestore.collection("livestreams").doc()
 
-      await livestreamDocRef.set({
+      const testStream: LivestreamEvent = {
          companyId: "CareerFairy",
          test: true,
          id: livestreamDocRef.id,
          universities: [],
-         createdAt: this.getServerTimestamp(),
+         created: this.getServerTimestamp() as Timestamp,
          start: firebase.firestore.Timestamp.fromDate(
             new Date("March 17, 2020 03:24:00")
          ),
-      })
+         hidden: true,
+         triGrams: {},
+         useNewUI: true,
+      }
+
+      await livestreamDocRef.set(testStream)
 
       return livestreamDocRef
    }
 
    setupTestLivestream = (
-      livestreamId,
-      testChats,
-      testQuestions,
-      testPolls
+      livestreamId: string,
+      testChats: LivestreamChatEntry[],
+      testQuestions: LivestreamQuestion[],
+      testPolls: LivestreamPoll[],
+      testSpeakers: Speaker[]
    ) => {
       const batch = this.firestore.batch()
       const livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
-      batch.update(livestreamRef, {
+      const livestreamUpdateData: Partial<LivestreamEvent> = {
          currentSpeakerId: livestreamId,
-      })
+         speakers: testSpeakers,
+      }
+
+      batch.update(livestreamRef, livestreamUpdateData)
+
       const chatsRef = livestreamRef.collection("chatEntries")
       testChats.forEach((chat) => {
          const docRef = chatsRef.doc()

@@ -9,6 +9,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
+      transition: (theme) => theme.transitions.create("transform"),
       "&:hover, &:focus": {
          transform: "scale(1.05)",
       },
@@ -16,7 +17,7 @@ const styles = sxStyles({
    addButton: {
       width: 80,
       height: 80,
-      boxShadow: "none",
+      boxShadow: "none !important",
       filter: "none",
       border: `1px solid #EDE7FD`,
       bgcolor: "#F7F8FC",
