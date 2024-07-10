@@ -1,8 +1,9 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import {
+   BusinessFunctionsTagValues,
    ContentHitsCount,
+   ContentTopicsTagValues,
    GroupedOptionGroup,
-   TagValues,
    groupTags,
 } from "@careerfairy/shared-lib/constants/tags"
 import { UserData } from "@careerfairy/shared-lib/users"
@@ -20,15 +21,27 @@ export const useAvailableTagsByHits = () => {
    const { isLoggedIn, userData } = useAuth()
    const { data: hits } = useTagsContentHits()
 
-   const availableCategories = TagValues.filter((tag) => {
-      const tagHits =
-         hits.businessFunctions.hits[tag.id] ||
-         hits.contentTopics.hits[tag.id] ||
-         hits.languages.hits[tag.id]
-      return tagHits ? shouldShowTagByCount(tagHits.count, 6, 6) : false
+   const availableBusinessFunctions = BusinessFunctionsTagValues.filter(
+      (tag) => {
+         const tagHits = hits.businessFunctions.hits[tag.id]
+         return tagHits
+            ? shouldShowBusinessFunctionTagByCount(tagHits.count, 6)
+            : false
+      }
+   )
+
+   const availableContentTopics = ContentTopicsTagValues.filter((tag) => {
+      const tagHits = hits.contentTopics.hits[tag.id]
+      return tagHits
+         ? shouldShowContentTopicTagByCount(tagHits.count, 6, 6)
+         : false
    })
 
-   return sortByUserInterests(availableCategories, userData, isLoggedIn)
+   return sortByUserInterests(
+      [...availableBusinessFunctions, ...availableContentTopics],
+      userData,
+      isLoggedIn
+   )
 }
 
 const sortByUserInterests = (
@@ -111,15 +124,17 @@ const sortTags = (
 const alphabeticalSort = (tagA: OptionGroup, tagB: OptionGroup) =>
    tagA.name.localeCompare(tagB.name)
 
-const shouldShowTagByCount = (
+const shouldShowBusinessFunctionTagByCount = (
+   hitsCount: ContentHitsCount,
+   minEvents: number
+): boolean => {
+   return hitsCount.livestreams > minEvents
+}
+
+const shouldShowContentTopicTagByCount = (
    hitsCount: ContentHitsCount,
    minEvents: number,
-   minSparks?: number
+   minSparks: number
 ): boolean => {
-   // TODO: remove when enough content, keeping the long to prevent linting,
-   // should work when fetchTagsContentHits is fixed (CF)
-   console.log("🚀 ~ minSparks:", minSparks, minEvents, hitsCount)
-
-   return true
-   // && (minSparks !== undefined ? hitsCount.sparks >= minSparks : true)
+   return hitsCount.livestreams > minEvents && hitsCount.sparks > minSparks
 }
