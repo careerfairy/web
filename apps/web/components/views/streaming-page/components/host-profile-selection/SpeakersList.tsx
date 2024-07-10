@@ -47,21 +47,17 @@ const styles = sxStyles({
 
 const containerAnimationVariants: Variants = {
    hidden: { opacity: 0 },
-   visible: (hasSeenAnimation) => ({
+   visible: (hasSeenStaggerAnimation) => ({
       opacity: 1,
       transition: {
-         staggerChildren: hasSeenAnimation ? 0 : 0.2,
+         staggerChildren: hasSeenStaggerAnimation ? 0 : 0.2,
       },
    }),
-}
+} satisfies Variants
 
-type SpeakersListProps = {
-   hasSeenStaggerAnimation: boolean
-}
+let hasSeenStaggerAnimation = false
 
-export const SpeakersList = ({
-   hasSeenStaggerAnimation,
-}: SpeakersListProps) => {
+export const SpeakersList = () => {
    const { userData, isLoggedIn } = useAuth()
    const { selectSpeaker, joinLiveStreamWithUser, editSpeaker } =
       useHostProfileSelection()
@@ -94,6 +90,7 @@ export const SpeakersList = ({
          <FramerBox
             custom={hasSeenStaggerAnimation}
             variants={containerAnimationVariants}
+            onAnimationComplete={() => (hasSeenStaggerAnimation = true)}
             sx={styles.list}
          >
             <AnimatePresence mode="sync">
@@ -146,7 +143,11 @@ export const SpeakersList = ({
 
 const itemAnimationVariants = {
    hidden: { opacity: 0, scale: 0.9 },
-   visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+   visible: (hasSeenStaggerAnimation) => ({
+      opacity: 1,
+      scale: 1,
+      transition: { duration: hasSeenStaggerAnimation ? 0 : 0.5 },
+   }),
    exit: { opacity: 0, scale: 0.9, transition: { duration: 0.5 } },
 } satisfies Variants
 
@@ -155,9 +156,7 @@ const ItemAnimation = ({ children }: { children: ReactNode }) => {
       <FramerBox
          sx={styles.item}
          variants={itemAnimationVariants}
-         initial={itemAnimationVariants.hidden}
-         animate={itemAnimationVariants.visible}
-         exit={itemAnimationVariants.exit}
+         custom={hasSeenStaggerAnimation}
       >
          {children}
       </FramerBox>
