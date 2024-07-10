@@ -14,8 +14,10 @@ import TestimonialSection from "./TestimonialSection"
  */
 export const TestimonialsOrMentorsSection = () => {
    const { mentorsV1 } = useFeatureFlags()
+
    const {
       group,
+      editMode,
       groupCreators,
       sectionRefs: { testimonialOrMentorsSectionRef },
    } = useCompanyPage()
@@ -23,8 +25,8 @@ export const TestimonialsOrMentorsSection = () => {
 
    if (
       !isMounted() ||
-      (!group.testimonials?.length && !mentorsV1) ||
-      (!groupCreators?.length && mentorsV1)
+      (!group.testimonials?.length && !mentorsV1 && !editMode) ||
+      (!groupCreators?.length && mentorsV1 && !editMode)
    )
       return null
 
