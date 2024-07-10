@@ -6,6 +6,7 @@ import {
 import { Box, Button, Grid, Stack, Typography } from "@mui/material"
 import { useLivestreamsByTags } from "components/custom-hook/tags/useLivestreamsByTags"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useMemo } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import EventPreviewCard from "../../stream-cards/EventPreviewCard"
@@ -62,6 +63,7 @@ const LivestreamTagsContent = (props: Props) => {
             events={events}
             seeMoreDisabled={!hasMorePages}
             onSeeMore={() => setNextPage((previousSize) => previousSize + 1)}
+            tags={props.tags}
          />
       </Stack>
    )
@@ -71,14 +73,26 @@ type EventsPreviewProps = {
    events: LivestreamEvent[]
    onSeeMore: () => void
    seeMoreDisabled?: boolean
+   tags: GroupedTags
 }
 
 const EventsPreview = ({
    events,
    seeMoreDisabled,
    onSeeMore,
+   tags,
 }: EventsPreviewProps) => {
    const isMobile = useIsMobile()
+
+   const impression = useMemo(() => {
+      if (tags.businessFunctions[0]) {
+         return `${ImpressionLocation.businessFunctionsTagsCarousel}-${tags.businessFunctions[0].id}`
+      } else if (tags.contentTopics[0]) {
+         return `${ImpressionLocation.contentTopicsTagsCarousel}-${tags.contentTopics[0].id}`
+      } else {
+         return `${ImpressionLocation.otherTagsCarousel}`
+      }
+   }, [tags.businessFunctions, tags.contentTopics])
 
    return (
       <Stack direction={"column"} sx={{ width: "100%" }} spacing={1}>
@@ -98,9 +112,7 @@ const EventsPreview = ({
                            key={livestream.id}
                            index={idx}
                            totalElements={arr.length}
-                           location={
-                              ImpressionLocation.recommendedEventsCarousel
-                           }
+                           location={impression}
                            event={livestream}
                            isRecommended
                         />
