@@ -109,7 +109,7 @@ export const SelectSpeakerView = () => {
             <SubHeading />
          </AnimatedItem>
          <AnimatedItem>
-            <SpeakersList hasSeenStaggerAnimation={hasSeenStaggerAnimation} />
+            <SpeakersList />
          </AnimatedItem>
       </FramerBox>
    )

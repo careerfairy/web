@@ -30,14 +30,14 @@ const TestStreamingPage = () => {
             roles: [],
             id: generateUniqueId(),
             avatar:
-               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fmaria.png?alt=media&token=66ccb241-009a-4aa4-918a-c4014a9fd360",
+               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/demo-speakers%2Fmaria.png?alt=media&token=5958bdc4-f90f-4007-939a-5be12dfcacca",
             firstName: "Maria",
             lastName: "Lopez",
             position: "HR Campus Lead",
             background:
                "Hello! I am Maria Lopez, an HR Campus Lead with a passion for nurturing talent and fostering growth. With years of experience in human resources, I excel in creating inclusive environments where everyone can thrive.\nI am dedicated to implementing innovative HR strategies that align with organizational goals and drive employee engagement.",
             email: "maria@acme.com",
-            linkedInUrl: "https://www.linkedin.com/in/maria-lopez-23b1a0123/",
+            linkedInUrl: "https://www.linkedin.com/in/maria-lopez/",
          },
          {
             roles: ["Speaker"],
@@ -50,6 +50,7 @@ const TestStreamingPage = () => {
             background:
                "Greetings! I am John Doe, a seasoned Supply Chain Manager with a knack for optimizing logistics and streamlining operations. My expertise lies in ensuring that supply chains run smoothly and efficiently.\nI am passionate about leveraging technology to enhance supply chain processes and deliver exceptional results.",
             email: "john.doe@acme.com",
+            linkedInUrl: "https://www.linkedin.com/in/john-doe/",
          },
          {
             roles: ["Speaker"],
@@ -62,6 +63,7 @@ const TestStreamingPage = () => {
             background:
                "Hi! I am Jane Smith, a dynamic Business Development Manager with a passion for driving growth and building strategic partnerships. My focus is on identifying new business opportunities and fostering long-term relationships.\nI thrive in fast-paced environments and am dedicated to achieving ambitious business goals.",
             email: "jane.smith@acme.com",
+            linkedInUrl: "https://www.linkedin.com/in/jane-smith/",
          },
          {
             roles: ["Speaker"],
@@ -74,6 +76,7 @@ const TestStreamingPage = () => {
             email: "alice.johnson@acme.com",
             background:
                "Hello! I am Alice Johnson, a dedicated Tax Manager with extensive experience in tax planning and compliance. My goal is to help organizations navigate complex tax regulations and optimize their tax strategies.\nI am committed to providing accurate and timely tax advice to support business success.",
+            linkedInUrl: "https://www.linkedin.com/in/alice-johnson/",
          },
          {
             roles: ["Speaker"],
@@ -83,9 +86,10 @@ const TestStreamingPage = () => {
             firstName: "Bob",
             lastName: "Brown",
             position: "Talent Acquisition Manager - Tax",
-            email: "bob.brown@mazars.de",
+            email: "bob@acme.com",
             background:
                "Greetings! I am Bob Brown, a Talent Acquisition Manager specializing in the tax sector. My expertise lies in identifying and recruiting top talent to meet organizational needs.\nI am passionate about building strong teams and fostering a culture of excellence within the workplace.",
+            linkedInUrl: "https://www.linkedin.com/in/bob-brown/",
          },
       ]
       const testChatEntries: LivestreamChatEntry[] = [
