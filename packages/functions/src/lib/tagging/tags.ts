@@ -259,14 +259,13 @@ export const fetchContentHits = functions.region(config.region).https.onCall(
    middlewares(
       cacheTagHits(() => cacheKey()),
       async () => {
-         functions.logger.info("Fetching tags content hits ")
+         functions.logger.info("Fetching tags content hits")
+
          const livestreamIndex = initAlgoliaIndex(
             knownIndexes.livestreams.indexName
          )
 
-         const sparksIndex = initAlgoliaIndex(
-            knownIndexes.livestreams.indexName
-         )
+         const sparksIndex = initAlgoliaIndex(knownIndexes.sparks.indexName)
          const tagsService = new TagsService(livestreamIndex, sparksIndex)
 
          const hits = await tagsService.countHits()
