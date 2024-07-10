@@ -715,6 +715,8 @@ export interface UserParticipatingStats extends DocumentData, Identifiable {
 
 export enum ImpressionLocation {
    recommendedEventsCarousel = "recommendedEventsCarousel",
+   businessFunctionsCarousel = "businessFunctionsTagsCarousel",
+   contentTopicsCarousel = "contentTopicsTagsCarousel",
    comingUpCarousel = "comingUpCarousel",
    myNextEventsCarousel = "myNextEventsCarousel",
    pastEventsCarousel = "pastEventsCarousel",
