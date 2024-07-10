@@ -50,9 +50,7 @@ export const CreateSpeakerView = () => {
 }
 
 const Actions = () => {
-   // const { isLoggedIn } = useAuth()
    const { livestreamId, streamerAuthToken } = useStreamingContext()
-   // const isMobile = useStreamIsMobile()
    const { joinLiveStreamWithSpeaker, goBackToSelectSpeaker } =
       useHostProfileSelection()
 
@@ -71,11 +69,6 @@ const Actions = () => {
       joinLiveStreamWithSpeaker(newSpeaker.id)
    }
 
-   // const handleBack = async (values: CreateCreatorSchemaType) => {
-   //    await handleSubmitSpeakerForm(values)
-   //    goBackToSelectSpeaker()
-   // }
-
    return (
       <View.Actions>
          <Button
@@ -83,7 +76,6 @@ const Actions = () => {
             variant="outlined"
             onClick={goBackToSelectSpeaker}
          >
-            {/* {isLoggedIn ? (isMobile ? "Back" : "Save and go back") : "Back"} */}
             Back
          </Button>
          <LoadingButton

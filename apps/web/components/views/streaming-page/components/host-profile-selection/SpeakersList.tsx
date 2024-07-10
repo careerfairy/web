@@ -47,15 +47,21 @@ const styles = sxStyles({
 
 const containerAnimationVariants: Variants = {
    hidden: { opacity: 0 },
-   visible: {
+   visible: (hasSeenAnimation) => ({
       opacity: 1,
       transition: {
-         staggerChildren: 0.2,
+         staggerChildren: hasSeenAnimation ? 0 : 0.2,
       },
-   },
+   }),
 }
 
-export const SpeakersList = () => {
+type SpeakersListProps = {
+   hasSeenStaggerAnimation: boolean
+}
+
+export const SpeakersList = ({
+   hasSeenStaggerAnimation,
+}: SpeakersListProps) => {
    const { userData, isLoggedIn } = useAuth()
    const { selectSpeaker, joinLiveStreamWithUser, editSpeaker } =
       useHostProfileSelection()
@@ -85,7 +91,11 @@ export const SpeakersList = () => {
          <Typography component="p" sx={styles.heading} variant="medium">
             Please select your profile:
          </Typography>
-         <FramerBox variants={containerAnimationVariants} sx={styles.list}>
+         <FramerBox
+            custom={hasSeenStaggerAnimation}
+            variants={containerAnimationVariants}
+            sx={styles.list}
+         >
             <AnimatePresence mode="sync">
                {Boolean(userData?.isAdmin) && (
                   <ItemAnimation key={userData.authId}>

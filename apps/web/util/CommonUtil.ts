@@ -1,6 +1,7 @@
 /* eslint-disable no-var */
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import * as Sentry from "@sentry/nextjs"
+import { v4 as uuid } from "uuid"
 import LocalStorageUtil from "./LocalStorageUtil"
 
 export function getRandom(arr, n) {
@@ -369,3 +370,7 @@ export const sanitizeFileName = (fileName: string): string => {
 
 export const convertBytesToMB = (bytes: number) =>
    Number.isFinite(bytes) ? bytes / 1024 / 1024 : 0
+
+export const generateUniqueId = () => {
+   return uuid().replace(/-/g, "")
+}
