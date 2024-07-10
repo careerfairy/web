@@ -40,7 +40,7 @@ const LivestreamValidationsComponent = ({
 }: LivestreamValidationWrapperProps) => {
    const { userData, isLoggedOut, authenticatedUser } = useAuth()
    const {
-      query: { token },
+      query: { token, isRecordingWindow },
       asPath,
       replace,
    } = useRouter()
@@ -59,15 +59,18 @@ const LivestreamValidationsComponent = ({
 
    // Custom validations
 
-   const needsTokenValidation = isHost && !livestream.test
+   const needsTokenValidation =
+      (isHost && !livestream.test) || (!isHost && isRecordingWindow)
 
    const isInvalidToken =
       needsTokenValidation && token !== livestreamToken?.data?.value
 
-   const needsToRegister = !isHost && !isUserRegistered
+   const needsToRegister = !isHost && !isUserRegistered && !isRecordingWindow
 
    const needsToBeLoggedIn =
-      !isHost && isLoggedOut && !(livestream.test || livestream.openStream)
+      !isHost &&
+      isLoggedOut &&
+      !(livestream.test || livestream.openStream || isRecordingWindow)
 
    useConditionalRedirect(isInvalidToken, "/streaming/error")
 

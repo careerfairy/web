@@ -1,16 +1,16 @@
-import { StartStreamIcon, StopStreamIcon } from "components/views/common/icons"
-import { ResponsiveStreamButton } from "../Buttons"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { useUpdateLivestreamStartEndState } from "components/custom-hook/streaming/useUpdateLivestreamStartEndState"
+import { StartStreamIcon, StopStreamIcon } from "components/views/common/icons"
 import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
 import { useCallback, useState } from "react"
 import {
    useHasStarted,
    useStartsAt,
 } from "store/selectors/streamingAppSelectors"
-import { useUpdateLivestreamStartEndState } from "components/custom-hook/streaming/useUpdateLivestreamStartEndState"
 import { useStreamingContext } from "../../context"
+import { BrandedTooltip } from "../BrandedTooltip"
+import { ResponsiveStreamButton } from "../Buttons"
 import useIsStreamStartingSoon from "./useIsStreamStartingSoon"
-import { Tooltip } from "@mui/material"
 
 type ConfirmDialogState = {
    isDialogOpen: boolean
@@ -43,8 +43,9 @@ export const ToggleStartLiveStreamButton = () => {
 
    return (
       <>
-         <Tooltip
+         <BrandedTooltip
             placement="top"
+            sx={{ maxWidth: "250px" }}
             title={
                isStreamStartingSoon || streamHasNoStartTime
                   ? ""
@@ -74,7 +75,7 @@ export const ToggleStartLiveStreamButton = () => {
                      : "Start live stream"}
                </ResponsiveStreamButton>
             </span>
-         </Tooltip>
+         </BrandedTooltip>
          <ConfirmationDialog
             open={Boolean(dialogState.isDialogOpen)}
             title={shouldStop ? "End live stream" : "Start live stream"}

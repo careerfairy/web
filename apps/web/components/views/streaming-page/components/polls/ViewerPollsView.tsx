@@ -2,6 +2,7 @@ import { Slide, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamMostRecentClosedPoll } from "components/custom-hook/streaming/useLivestreamMostRecentClosedPoll"
 import { useLivestreamOngoingPoll } from "components/custom-hook/streaming/useLivestreamOngoingPoll"
+import { useIsRecordingWindow } from "store/selectors/streamingAppSelectors"
 import { useStreamingContext } from "../../context"
 import { EmptyPollsView } from "./EmptyPollsView"
 import { PollCard } from "./PollCard"
@@ -22,6 +23,7 @@ const Content = () => {
 
    const ongoingPoll = useLivestreamOngoingPoll(livestreamId)
    const mostRecentClosedPoll = useLivestreamMostRecentClosedPoll(livestreamId)
+   const isRecordingWindow = useIsRecordingWindow()
 
    const pollToShow = ongoingPoll || mostRecentClosedPoll
 
@@ -35,7 +37,9 @@ const Content = () => {
             {pollToShow ? (
                <PollCard
                   poll={pollToShow}
-                  showResults={pollToShow.state === "closed"}
+                  showResults={
+                     pollToShow.state === "closed" || isRecordingWindow
+                  }
                />
             ) : (
                <PollCardSkeleton noBorder showResultsSkeleton={false} />
