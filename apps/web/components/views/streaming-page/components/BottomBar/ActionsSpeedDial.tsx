@@ -8,7 +8,10 @@ import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode, useMemo, useRef, useState } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
-import { useNumberOfHandRaiseNotifications } from "store/selectors/streamingAppSelectors"
+import {
+   useIsSpyMode,
+   useNumberOfHandRaiseNotifications,
+} from "store/selectors/streamingAppSelectors"
 import { ActionName, ActionTooltips, AllActions } from "./AllActionComponents"
 
 export type Action = {
@@ -16,9 +19,18 @@ export type Action = {
    label: string
 }
 
-const getStreamerActions = (isMobile: boolean): ActionName[] => {
+const getStreamerActions = (
+   isMobile: boolean,
+   isSpyMode: boolean
+): ActionName[] => {
    if (isMobile) {
-      return ["Hand raise", "Polls", "Jobs", "CTA", "Settings"]
+      return [
+         "Hand raise",
+         "Polls",
+         "Jobs",
+         "CTA",
+         ...(isSpyMode ? [] : (["Settings"] as const)),
+      ]
    }
 
    return []
@@ -43,6 +55,7 @@ export const ActionsSpeedDial = () => {
    const { isHost, shouldStream } = useStreamingContext()
 
    const isMobile = useStreamIsMobile()
+   const isSpyMode = useIsSpyMode()
 
    const handleToggle = () => setOpen((prevOpen) => !prevOpen)
 
@@ -53,7 +66,7 @@ export const ActionsSpeedDial = () => {
    })
 
    const actions = isHost
-      ? getStreamerActions(isMobile)
+      ? getStreamerActions(isMobile, isSpyMode)
       : getViewerActions(isMobile, shouldStream)
 
    const hasHandRaiseButton = actions.includes("Hand raise")
