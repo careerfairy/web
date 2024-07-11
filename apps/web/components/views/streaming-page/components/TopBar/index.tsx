@@ -2,6 +2,8 @@ import { Box, Stack, StackProps } from "@mui/material"
 
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ReactNode } from "react"
+import { useIsSpyMode } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context/Streaming"
 import { CallToActionsButton } from "./CallToActionsButton"
 import { CheckJobsButton } from "./CheckJobsButton"
@@ -9,36 +11,56 @@ import { CompanyButton } from "./CompanyButton"
 import { ConnectionStatus } from "./ConnectionStatus"
 import { Header } from "./Header"
 import { LogoBackButton } from "./LogoBackButton"
+import { SpyModeBanner } from "./SpyModeBanner"
 import { Timer } from "./Timer"
 import { ToggleStartLiveStreamButton } from "./ToggleStartLiveStreamButton"
 import { ViewCount } from "./ViewCount"
+
+const styles = sxStyles({
+   root: {
+      width: "100%",
+      alignItems: "center",
+      justifyContent: "space-between",
+   },
+   leftSide: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+   },
+})
 
 const TOOLBAR_WRAP_BREAKPOINT = 660
 
 export const TopBar = () => {
    const { isHost } = useStreamingContext()
+   const isStreamMobile = useIsMobile()
+   const isSpyMode = useIsSpyMode()
 
    const isNarrow = useIsMobile(TOOLBAR_WRAP_BREAKPOINT)
 
    return (
-      <Header>
-         <Stack
-            width="100%"
-            direction={isNarrow ? "column" : "row"}
-            spacing={isNarrow ? 2.625 : 0}
-            alignItems="center"
-            justifyContent="space-between"
-         >
-            <StackComponent
-               justifyContent={isNarrow ? "space-between" : "flex-start"}
-               width={isNarrow ? "100%" : "auto"}
+      <>
+         <Header>
+            <Stack
+               direction={isNarrow ? "column" : "row"}
+               spacing={isNarrow ? 2.625 : 0}
+               sx={styles.root}
             >
-               <LogoBackButton />
-               <Timer />
-            </StackComponent>
-            {isHost ? <HostView /> : <ViewerView />}
-         </Stack>
-      </Header>
+               <StackComponent
+                  justifyContent={isNarrow ? "space-between" : "flex-start"}
+                  width={isNarrow ? "100%" : "auto"}
+               >
+                  <LogoBackButton />
+                  <Stack direction="row" sx={styles.leftSide}>
+                     {isSpyMode && isStreamMobile ? <SpyModeBanner /> : null}
+                     <Timer />
+                  </Stack>
+               </StackComponent>
+               {isHost ? <HostView /> : <ViewerView />}
+            </Stack>
+         </Header>
+         {isSpyMode && !isStreamMobile ? <SpyModeBanner /> : null}
+      </>
    )
 }
 
