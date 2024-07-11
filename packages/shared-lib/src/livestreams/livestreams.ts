@@ -728,6 +728,7 @@ export enum ImpressionLocation {
    landingPageCarousel = "landingPageCarousel",
    viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
    endOfStreamLivestreams = "endOfStreamLivestreams",
+   mentorPageCarousel = "mentorPageCarousel",
    unknown = "unknown",
 }
 
