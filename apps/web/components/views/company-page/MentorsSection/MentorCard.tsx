@@ -7,6 +7,8 @@ import { SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
+const CARD_WIDTH = 214
+
 const styles = sxStyles({
    container: (theme) => ({
       position: "relative",
@@ -17,7 +19,7 @@ const styles = sxStyles({
       borderRadius: "10px",
       border: `1px solid ${theme.palette.secondary.light}`,
       boxShadow: "0px 0px 8px 0px #1414140F",
-      minWidth: "214px",
+      minWidth: `${CARD_WIDTH}px`,
       height: "194px",
       padding: "16px",
       gap: 1,
@@ -106,3 +108,5 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
       </Box>
    )
 }
+
+MentorCard.width = CARD_WIDTH
