@@ -56,6 +56,7 @@ export type GenericCarouselProps = {
    emblaApi: UseEmblaCarouselType[1]
    /** Prevents the last slide from touching the edge of the viewport */
    preventEdgeTouch?: boolean
+   containerRef?: React.RefObject<HTMLDivElement>
 }
 
 export const GenericCarousel = ({
@@ -66,6 +67,7 @@ export const GenericCarousel = ({
    emblaRef,
    emblaApi,
    preventEdgeTouch,
+   containerRef,
 }: GenericCarouselProps) => {
    const value = useMemo<GenericCarouselContextType>(
       () => ({ gap, emblaApi }),
@@ -83,6 +85,7 @@ export const GenericCarousel = ({
                id="generic-embla-carousel-container"
                marginLeft={`calc(${gap} * -1)`}
                sx={combineStyles(styles.container, containerSx)}
+               ref={containerRef}
             >
                {children}
                {Boolean(preventEdgeTouch) && <GenericCarousel.Slide />}
