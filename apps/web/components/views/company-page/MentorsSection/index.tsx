@@ -22,6 +22,12 @@ export const MentorsSection = () => {
                   Mentors
                </Typography>
             }
+            viewportSx={{
+               // hack to ensure shadows are not cut off
+               padding: "16px",
+               margin: "-16px",
+               width: "calc(100% + 16px)",
+            }}
          >
             {groupCreators.map((creator) => (
                <MentorCard
