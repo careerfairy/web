@@ -9,7 +9,10 @@ import {
 } from "agora-rtc-react"
 import { useHandleHandRaise } from "components/custom-hook/streaming/hand-raise/useHandleHandRaise"
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
+import { useOptimisedLocalStream } from "components/custom-hook/streaming/useOptimisedLocalStream"
 import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
+import { getVideoEncoderPreset } from "context/agora/RTCProvider"
+import { useRouter } from "next/router"
 import {
    FC,
    ReactNode,
@@ -58,6 +61,9 @@ const LocalTracksContext = createContext<LocalTracksContextProps | undefined>(
 export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    children,
 }) => {
+   const {
+      query: { withHighQuality },
+   } = useRouter()
    const isConnectedOnDifferentBrowser = useIsConnectedOnDifferentBrowser()
    const streamingContextProps = useStreamingContext()
    const { isReady, shouldStream, currentRole } = streamingContextProps
@@ -89,12 +95,14 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       shouldStream ? Boolean(cameraOn && firstCameraId) : false,
       {
          cameraId: firstCameraId,
+         encoderConfig: getVideoEncoderPreset(withHighQuality),
       }
    )
 
    const micReady = Boolean(shouldStream && firstMicId)
    const microphoneTrack = useLocalMicrophoneTrack(micReady, {
       microphoneId: firstMicId,
+      encoderConfig: withHighQuality ? "high_quality_stereo" : undefined,
    })
 
    const {
@@ -230,14 +238,20 @@ const PublishComponent = ({
 
       const interval = setInterval(() => {
          if (cameraTrack.localCameraTrack?.enabled && !isCameraPublished) {
-            rtcClient.publish(cameraTrack.localCameraTrack).then(() => {
-               isCameraPublished = true
-            }).catch(console.error)
+            rtcClient
+               .publish(cameraTrack.localCameraTrack)
+               .then(() => {
+                  isCameraPublished = true
+               })
+               .catch(console.error)
          }
          if (microphoneTrack.localMicrophoneTrack?.enabled && !isMicPublished) {
-            rtcClient.publish(microphoneTrack.localMicrophoneTrack).then(() => {
-               isMicPublished = true
-            }).catch(console.error)
+            rtcClient
+               .publish(microphoneTrack.localMicrophoneTrack)
+               .then(() => {
+                  isMicPublished = true
+               })
+               .catch(console.error)
          }
       }, 1000)
 
@@ -255,6 +269,8 @@ const PublishComponent = ({
       rtcClient,
       microphoneTrack.localMicrophoneTrack,
    ])
+
+   useOptimisedLocalStream(cameraTrack.localCameraTrack, true)
 
    useHandleHandRaise({
       livestreamId,
