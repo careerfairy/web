@@ -1,5 +1,5 @@
 import { Identifiable } from "../commonTypes"
-import { ContentTopicsTagValues } from "../constants/tags"
+import { ContentTopicsTags } from "../constants/tags"
 import { Timestamp } from "../firebaseTypes"
 import { PublicGroup } from "../groups"
 import { PublicCreator } from "../groups/creators"
@@ -375,12 +375,12 @@ export const SparksCategories = {
 } as const
 
 export const SparkCategoriesToTagValuesMapper = {
-   [SparksCategories.Application.id]: ContentTopicsTagValues[0].id,
-   [SparksCategories.CompanyCulture.id]: ContentTopicsTagValues[1].id,
-   [SparksCategories.DayInTheLife.id]: ContentTopicsTagValues[2].id,
-   [SparksCategories.Jobs.id]: ContentTopicsTagValues[4].id,
-   [SparksCategories.Role.id]: ContentTopicsTagValues[5].id,
-   [SparksCategories.Events.id]: ContentTopicsTagValues[3].id,
+   [SparksCategories.Application.id]: ContentTopicsTags.ApplicationProcess,
+   [SparksCategories.CompanyCulture.id]: ContentTopicsTags.CompanyCulture,
+   [SparksCategories.DayInTheLife.id]: ContentTopicsTags.DayInTheLife,
+   [SparksCategories.Jobs.id]: ContentTopicsTags.Jobs,
+   [SparksCategories.Role.id]: ContentTopicsTags.Role,
+   [SparksCategories.Events.id]: ContentTopicsTags.Events,
 }
 
 export const sparksCategoriesArray = Object.values(SparksCategories)
