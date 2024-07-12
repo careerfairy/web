@@ -7,6 +7,9 @@ import { Box } from "@mui/material"
 import EventPreviewCard from "../common/stream-cards/EventPreviewCard"
 import { ContentCarousel } from "./ContentCarousel"
 
+const CARD_WIDTH = 328
+const CARD_HEIGHT = 268
+
 const styles = sxStyles({
    carouselContainer: {
       width: "100%",
@@ -14,25 +17,8 @@ const styles = sxStyles({
       overflow: "visible !important",
    },
    cardWrapper: {
-      flex: {
-         xs: `0 0 90%`,
-         sm: `0 0 45%`,
-         md: `0 0 40%`,
-         lg: `0 0 30%`,
-      },
-
-      minWidth: 0,
-      position: "relative",
-      height: {
-         xs: 363,
-         md: 363,
-      },
-      "&:not(:first-of-type)": {
-         paddingLeft: `calc(21px - 5px)`,
-      },
-      "&:first-of-type": {
-         ml: 0.3,
-      },
+      width: CARD_WIDTH,
+      minHeight: CARD_HEIGHT,
    },
    lastCard: {
       paddingRight: "16px",
@@ -47,7 +33,16 @@ export const LivestreamsCarousel = ({
    livestreams,
 }: LivestreamsCarouselProps) => {
    return (
-      <ContentCarousel headerTitle="Live streams" slideWidth={363}>
+      <ContentCarousel
+         headerTitle="Live streams"
+         slideWidth={CARD_WIDTH}
+         viewportSx={{
+            // hack to ensure shadows are not cut off
+            padding: "16px",
+            margin: "-16px",
+            width: "calc(100% + 16px)",
+         }}
+      >
          {livestreams.map((livestream, index) => (
             <Box
                key={livestream.id}
