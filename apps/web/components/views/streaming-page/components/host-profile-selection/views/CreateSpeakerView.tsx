@@ -31,13 +31,13 @@ export const CreateSpeakerView = () => {
          <View component="form">
             <View.Content>
                <View.Title>
-                  Edit{" "}
+                  New{" "}
                   <Box component="span" color="primary.main">
                      Speaker
                   </Box>
                </View.Title>
                <View.Subtitle>
-                  Check and change your speaker details
+                  You can now insert your details and join the live stream!
                </View.Subtitle>
             </View.Content>
             <Box sx={styles.formFields}>
