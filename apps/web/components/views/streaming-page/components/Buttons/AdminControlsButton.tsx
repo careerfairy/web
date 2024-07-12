@@ -39,7 +39,7 @@ export const AdminControlsButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >(({ enableTooltip, ...props }, ref) => {
-   const { push, query, pathname } = useRouter()
+   const { push, query, pathname, reload } = useRouter()
    const { livestreamId, isHost } = useStreamingContext()
    const token = useLivestreamSecureTokenSWR(livestreamId)
    const hasStarted = useHasStarted()
@@ -85,6 +85,7 @@ export const AdminControlsButton = forwardRef<
                pathname,
                query: newQuery,
             })
+            isHost && isSpyMode && reload()
          },
          menuItemSxProps: [styles.menuOption],
       },

@@ -32,20 +32,26 @@ export const ToggleStartLiveStreamButton = () => {
       setDialogState((prev) => ({ ...prev, isDialogOpen: false }))
    }, [])
 
+   const disabled = !(
+      isStreamStartingSoon ||
+      streamHasNoStartTime ||
+      hasStarted
+   )
+
    return (
       <>
          <BrandedTooltip
             placement="top"
             sx={{ maxWidth: "250px" }}
             title={
-               isStreamStartingSoon || streamHasNoStartTime
+               disabled
                   ? ""
                   : "The Start Streaming button will become active 2 minutes before the stream's official start time."
             }
          >
             <span>
                <ResponsiveStreamButton
-                  disabled={!(isStreamStartingSoon || streamHasNoStartTime)}
+                  disabled={disabled}
                   onClick={() =>
                      setDialogState({
                         isDialogOpen: true,
