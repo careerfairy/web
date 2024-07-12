@@ -1,4 +1,4 @@
-import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/livestreams"
 import { FormikErrors } from "formik"
 
 export const checkIfUserHasAnsweredAllLivestreamGroupQuestions = (

@@ -1,21 +1,21 @@
-import { Grid, Switch, Typography } from "@mui/material"
-import React, { useCallback, useEffect, useState } from "react"
-import { sxStyles } from "../../../../types/commonTypes"
-import MultiListSelect from "../../common/MultiListSelect"
-import { useAuth } from "../../../../HOCs/AuthProvider"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import {
    countriesAndRegionsOptionCodes,
    countryGroupId,
    languageOptionCodes,
    regionGroupId,
 } from "@careerfairy/shared-lib/constants/forms"
+import { Grid, Switch, Typography } from "@mui/material"
+import { useCallback, useEffect, useState } from "react"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { userRepo } from "../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../types/commonTypes"
+import MultiListSelect from "../../common/MultiListSelect"
 import {
    formatToOptionArray,
    mapOptions,
    multiListSelectMapValueFn,
 } from "../utils"
-import { userRepo } from "../../../../data/RepositoryInstances"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 const styles = sxStyles({
    inputLabel: {

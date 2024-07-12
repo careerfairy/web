@@ -1,16 +1,16 @@
-import React, { useCallback } from "react"
-import { FormikErrors, FormikValues } from "formik"
-import { FormikTouched } from "formik/dist/types"
-import GenericDropdown from "../../common/GenericDropdown"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import {
    CompanyCountryValues,
    CompanyIndustryValues,
    CompanySizesCodes,
 } from "@careerfairy/shared-lib/constants/forms"
 import { Autocomplete, Box, Collapse, TextField } from "@mui/material"
+import { FormikErrors, FormikValues } from "formik"
+import { FormikTouched } from "formik/dist/types"
+import { useCallback } from "react"
+import GenericDropdown from "../../common/GenericDropdown"
 import MultiListSelect from "../../common/MultiListSelect"
 import { multiListSelectMapValueFn } from "../../signup/utils"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 type Props = {
    handleChange: (event) => void

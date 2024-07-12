@@ -1,13 +1,13 @@
-import React, { useMemo } from "react"
+import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import MaterialTable from "@material-table/core"
-import useGroupATSApplications from "../../../../custom-hook/useGroupATSApplications"
-import { TableTitle } from "./AccountJobs"
-import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
-import Box from "@mui/material/Box"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
-import { LINKEDIN_COLOR } from "../../../../util/colors"
+import Box from "@mui/material/Box"
+import { useMemo } from "react"
+import useGroupATSApplications from "../../../../custom-hook/useGroupATSApplications"
 import { makeExternalLink } from "../../../../helperFunctions/HelperFunctions"
+import { LINKEDIN_COLOR } from "../../../../util/colors"
 import { useATSAccount } from "./ATSAccountContextProvider"
+import { TableTitle } from "./AccountJobs"
 
 const columns = [
    {
@@ -92,10 +92,10 @@ type RowData = {
 function mapApplicationsToTableRows(data: UserLivestreamData[]): RowData[] {
    return data
       .map((doc) => {
-         let applications = []
+         const applications = []
 
-         for (let jobApplicationsKey in doc.jobApplications) {
-            let job = doc.jobApplications[jobApplicationsKey].job
+         for (const jobApplicationsKey in doc.jobApplications) {
+            const job = doc.jobApplications[jobApplicationsKey].job
             applications.push({
                jobName: job?.name,
                candidateName: `${doc?.user?.firstName} ${doc?.user?.lastName}`,

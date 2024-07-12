@@ -1,7 +1,7 @@
-import React, { useCallback } from "react"
+import { Interest } from "@careerfairy/shared-lib/interests"
 import { Chip, FormHelperText } from "@mui/material"
-import { Interest } from "@careerfairy/shared-lib/dist/interests"
 import Box from "@mui/material/Box"
+import { useCallback } from "react"
 import { StylesProps } from "../../../types/commonTypes"
 
 interface InterestSelectProps {
@@ -37,6 +37,7 @@ const InterestSelect = ({
    const checkDisable = useCallback(
       (interest: Interest) =>
          (limitReached && !isInterestSelected(interest)) || disabled,
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [limitReached, selectedInterests]
    )
 
@@ -59,6 +60,7 @@ const InterestSelect = ({
             setFieldValue("interests", [...selectedInterests, interest])
          }
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [selectedInterests, limitReached]
    )
 
@@ -87,8 +89,8 @@ const InterestSelect = ({
                key={interest.id}
             />
          ))}
-         {hasError && (
-            <FormHelperText error>{error && touched && error}</FormHelperText>
+         {Boolean(hasError && touched) && (
+            <FormHelperText error>{error}</FormHelperText>
          )}
       </Box>
    )

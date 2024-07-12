@@ -1,6 +1,6 @@
-import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
-import RemoteUserList from "./RemoteUserList"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
 import { ReactNode } from "react"
+import RemoteUserList from "./RemoteUserList"
 
 // required field => component
 export type RequiredComponentsMap = {

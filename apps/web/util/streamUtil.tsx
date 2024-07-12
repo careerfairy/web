@@ -1,10 +1,10 @@
-import { DeviceOption } from "../types/streaming"
+import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LivestreamEvent,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import { getBaseUrl } from "../components/helperFunctions/HelperFunctions"
-import { Group } from "@careerfairy/shared-lib/groups"
+import { DeviceOption } from "../types/streaming"
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone"
@@ -43,9 +43,9 @@ export const getDeviceList = (
    }, []) as DeviceOption[]
 }
 export const mapDevices = (deviceInfos: MediaDeviceInfo[]) => {
-   let audioInputList = getDeviceList(deviceInfos, "audioinput")
-   let audioOutputList = getDeviceList(deviceInfos, "audiooutput")
-   let videoDeviceList = getDeviceList(deviceInfos, "videoinput")
+   const audioInputList = getDeviceList(deviceInfos, "audioinput")
+   const audioOutputList = getDeviceList(deviceInfos, "audiooutput")
+   const videoDeviceList = getDeviceList(deviceInfos, "videoinput")
 
    return {
       audioInputList: audioInputList,

@@ -1,8 +1,8 @@
-import React, { Dispatch, SetStateAction, useCallback, useMemo } from "react"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
 import { TextField } from "@mui/material"
-import VirtualizedAutocomplete from "../../common/VirtualizedAutocomplete"
-import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { Dispatch, SetStateAction, useCallback, useMemo } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
+import VirtualizedAutocomplete from "../../common/VirtualizedAutocomplete"
 
 type Entry = {
    name: string

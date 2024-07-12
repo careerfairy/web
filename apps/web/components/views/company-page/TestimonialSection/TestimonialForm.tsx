@@ -1,4 +1,4 @@
-import { sxStyles } from "../../../../types/commonTypes"
+import { Testimonial } from "@careerfairy/shared-lib/groups"
 import {
    Button,
    Collapse,
@@ -7,13 +7,13 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import ImageSelect from "../../draftStreamForm/ImageSelect/ImageSelect"
-import { UserPlus } from "react-feather"
-import { Testimonial } from "@careerfairy/shared-lib/dist/groups"
-import { FormikValues } from "formik"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
+import { FormikValues } from "formik"
 import { MutableRefObject, useRef } from "react"
+import { UserPlus } from "react-feather"
 import ReactQuill from "react-quill"
+import { sxStyles } from "../../../../types/commonTypes"
+import ImageSelect from "../../draftStreamForm/ImageSelect/ImageSelect"
 
 const styles = sxStyles({
    multiline: {

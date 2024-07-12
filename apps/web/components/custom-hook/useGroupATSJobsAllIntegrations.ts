@@ -1,6 +1,6 @@
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
 import { useEffect, useState } from "react"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import { atsServiceInstance } from "../../data/firebase/ATSService"
 
 /**
@@ -41,7 +41,7 @@ const useGroupATSJobsAllIntegrations = (accounts: GroupATSAccount[]) => {
 function fetchAllJobs(accounts: GroupATSAccount[]) {
    const promises = []
 
-   for (let account of accounts) {
+   for (const account of accounts) {
       promises.push(atsServiceInstance.getAllJobs(account.groupId, account.id))
    }
 

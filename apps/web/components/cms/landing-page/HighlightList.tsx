@@ -1,11 +1,11 @@
-import { HygraphResponseHighlightList } from "../../../types/cmsTypes"
+import { HighLight } from "@careerfairy/shared-lib/highlights/Highlight"
+import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
+import Container from "@mui/material/Container"
+import { useMemo } from "react"
+import { HygraphResponseHighlightList } from "../../../types/cmsTypes"
 import { sxStyles } from "../../../types/commonTypes"
 import HighlightsCarousel from "../../views/portal/HighlightsCarousel"
-import React, { useMemo } from "react"
-import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
-import Container from "@mui/material/Container"
-import { Typography } from "@mui/material"
 
 const styles = sxStyles({
    wrapper: {

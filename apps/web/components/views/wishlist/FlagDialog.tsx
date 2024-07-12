@@ -1,4 +1,4 @@
-import React from "react"
+import { FlagReason } from "@careerfairy/shared-lib/wishes"
 import {
    Button,
    Chip,
@@ -10,15 +10,14 @@ import {
    FormHelperText,
    TextField,
 } from "@mui/material"
-import { FlagReason } from "@careerfairy/shared-lib/dist/wishes"
-import * as yup from "yup"
-import { Formik } from "formik"
-import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
-import { StylesProps } from "../../../types/commonTypes"
-import { useDispatch } from "react-redux"
-import * as actions from "../../../store/actions"
+import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
+import { Formik } from "formik"
+import { useDispatch } from "react-redux"
+import * as yup from "yup"
+import * as actions from "../../../store/actions"
+import { StylesProps } from "../../../types/commonTypes"
 
 interface Props {
    handleFlag: (reasons: FlagReason[], message: string) => Promise<void>
@@ -159,15 +158,11 @@ const FlagDialog = ({ onClose, handleFlag, open }: Props) => {
                                  key={reason}
                               />
                            ))}
-                           {errors.reasons &&
-                              touched.reasons &&
-                              errors.reasons && (
-                                 <FormHelperText error>
-                                    {errors.reasons &&
-                                       touched.reasons &&
-                                       errors.reasons}
-                                 </FormHelperText>
-                              )}
+                           {Boolean(errors.reasons && touched.reasons) && (
+                              <FormHelperText error>
+                                 {errors.reasons}
+                              </FormHelperText>
+                           )}
                         </Box>
                         <TextField
                            autoFocus
@@ -178,9 +173,9 @@ const FlagDialog = ({ onClose, handleFlag, open }: Props) => {
                            onBlur={handleBlur}
                            value={values.flagMessage}
                            helperText={
-                              errors.flagMessage &&
-                              touched.flagMessage &&
-                              errors.flagMessage
+                              Boolean(
+                                 errors.flagMessage && touched.flagMessage
+                              ) && errors.flagMessage
                            }
                            maxRows={6}
                            minRows={4}

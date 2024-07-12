@@ -1,21 +1,21 @@
-import React, { Fragment, useCallback, useMemo } from "react"
-import { FormControl, FormHelperText, MenuItem } from "@mui/material"
+import { convertDictToDocArray } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    LivestreamGroupQuestion,
    LivestreamGroupQuestions,
    LivestreamGroupQuestionsMap,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
-import { convertDictToDocArray } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+} from "@careerfairy/shared-lib/livestreams"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
+import { FormControl, FormHelperText, MenuItem } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import {
    FormikErrors,
    FormikHandlers,
    FormikHelpers,
    FormikTouched,
 } from "formik"
+import { Fragment, useCallback, useMemo } from "react"
 import { sxStyles } from "../../../../../types/commonTypes"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
-import useIsMobile from "components/custom-hook/useIsMobile"
 
 interface Props {
    groupQuestions: LivestreamGroupQuestions

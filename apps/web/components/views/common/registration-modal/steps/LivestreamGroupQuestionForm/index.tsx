@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from "react"
+/* eslint-disable no-extra-semi */
+import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    Button,
@@ -9,21 +10,21 @@ import {
    DialogTitle,
    Typography,
 } from "@mui/material"
+import Stack from "@mui/material/Stack"
 import makeStyles from "@mui/styles/makeStyles"
 import { RegistrationContext } from "context/registration/RegistrationContext"
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import GroupLogo from "../../common/GroupLogo"
-import Stack from "@mui/material/Stack"
-import { groupRepo } from "../../../../../../data/RepositoryInstances"
-import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
 import { Form, Formik } from "formik"
+import { useContext, useEffect, useState } from "react"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import { groupRepo } from "../../../../../../data/RepositoryInstances"
+import LivestreamGroupQuestionsSelector from "../../../../profile/LivestreamGroupQuestionsSelector"
+import GroupLogo from "../../common/GroupLogo"
 import {
    checkIfUserHasAnsweredAllLivestreamGroupQuestions,
    validate,
 } from "./util"
-import LivestreamGroupQuestionsSelector from "../../../../profile/LivestreamGroupQuestionsSelector"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
    actions: {
       display: "flex",
       flexFlow: "column",
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "center",
       alignItems: "center",
    },
-}))
+})
 
 const LivestreamGroupQuestionForm = () => {
    const {
@@ -90,6 +91,7 @@ const LivestreamGroupQuestionForm = () => {
          }
          setCheckingQuestions(false)
       })()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       livestream?.groupQuestionsMap,
       userData?.userEmail,
@@ -189,7 +191,7 @@ const LivestreamGroupQuestionForm = () => {
                      </Stack>
                   </DialogContent>
                   <DialogActions>
-                     {!livestream?.hasStarted && cancelable && (
+                     {Boolean(!livestream?.hasStarted && cancelable) && (
                         <Button size="large" color="grey" onClick={handleClose}>
                            Cancel
                         </Button>
@@ -200,7 +202,7 @@ const LivestreamGroupQuestionForm = () => {
                         variant="contained"
                         size="large"
                         endIcon={
-                           isSubmitting && (
+                           Boolean(isSubmitting) && (
                               <CircularProgress size={20} color="inherit" />
                            )
                         }

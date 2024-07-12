@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from "react"
-import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { SavedRecruiter } from "@careerfairy/shared-lib/users"
 import { GENERAL_ERROR } from "components/util/constants"
 import { useSnackbar } from "notistack"
+import { useCallback, useEffect, useState } from "react"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { userRepo } from "../../../../../data/RepositoryInstances"
 
 const useRecruiterData = (speakerId) => {
    const [recruiterData, setRecruiterData] = useState<SavedRecruiter>(null)
-   const [recruiterSaved, setRecruiterSaved] = useState<Boolean>(false)
+   const [recruiterSaved, setRecruiterSaved] = useState<boolean>(false)
    const [isLoading, setIsLoading] = useState(true)
    const { userData } = useAuth()
    const { enqueueSnackbar } = useSnackbar()
@@ -57,6 +57,7 @@ const useRecruiterData = (speakerId) => {
                setIsLoading(false)
             })
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [userData?.userEmail]
    )
 

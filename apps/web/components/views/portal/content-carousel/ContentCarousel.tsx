@@ -1,5 +1,5 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import { Box } from "@mui/material"
 import { useTheme } from "@mui/material/styles"

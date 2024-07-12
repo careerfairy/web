@@ -2,17 +2,14 @@ import {
    Group,
    GroupQuestion,
    GroupQuestionOption,
-} from "@careerfairy/shared-lib/dist/groups"
-import {
-   CSVDownloadUserData,
-   UserData,
-} from "@careerfairy/shared-lib/dist/users"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+} from "@careerfairy/shared-lib/groups"
 import {
    LivestreamEvent,
    LivestreamGroupQuestion,
    UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
+import { CSVDownloadUserData, UserData } from "@careerfairy/shared-lib/users"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
 
 export default class StatsUtil {
    static getUserAnswerNameFromLivestreamGroupQuestion(

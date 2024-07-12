@@ -1,16 +1,16 @@
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
 import {
    ListItem,
    ListItemButton,
    ListItemIcon,
    ListItemText,
 } from "@mui/material"
-import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
 import Typography from "@mui/material/Typography"
-import React, { memo, useCallback } from "react"
+import { memo, useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 
 const styles = sxStyles({
@@ -68,11 +68,11 @@ const JobItem = ({ job, handleSelectJob }: Props) => {
                   {jobName}
                </Typography>
 
-               {Boolean(hiringManager) ? (
+               {Boolean(hiringManager) && (
                   <Typography variant="body2" mt={1} fontStyle="italic">
                      {`Posted by ${hiringManager}`}
                   </Typography>
-               ) : null}
+               )}
             </ListItemText>
          </ListItemButton>
       </ListItem>

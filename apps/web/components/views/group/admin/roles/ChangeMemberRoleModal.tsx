@@ -1,10 +1,10 @@
-import React, { useState } from "react"
-import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
-import { GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/dist/groups"
-import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
-import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
-import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
+import { GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
 import { Typography } from "@mui/material"
+import { useState } from "react"
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
+import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
+import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 
 type Props = {
    modalData: {

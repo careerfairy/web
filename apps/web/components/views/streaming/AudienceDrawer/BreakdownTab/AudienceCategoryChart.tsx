@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
-import { useTheme } from "@mui/material/styles"
+import { UserData } from "@careerfairy/shared-lib/users"
 import {
    Box,
    Card,
@@ -8,15 +7,16 @@ import {
    MenuItem,
    Select,
 } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
 import Chart from "chart.js"
 import "chartjs-plugin-labels"
-import { percentageDonutConfig } from "../../../../util/chartUtils"
+import { useEffect, useRef, useState } from "react"
 import { Doughnut } from "react-chartjs-2"
 import CustomLegend from "../../../../../materialUI/Legends"
-import EmptyDisplay from "../displays/EmptyDisplay"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useUserBreakdownStats from "../../../../custom-hook/useUserBreakdownStats"
+import { percentageDonutConfig } from "../../../../util/chartUtils"
+import EmptyDisplay from "../displays/EmptyDisplay"
 
 Chart.defaults.global.plugins.labels = false
 
@@ -71,6 +71,7 @@ const AudienceCategoryChart = ({ audience }: Props) => {
 
    useEffect(() => {
       setChartOptions(getChartOptions(theme))
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [theme.palette.mode])
 
    return (

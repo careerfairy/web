@@ -1,5 +1,5 @@
-import React, { createContext, ReactNode, useContext, useMemo } from "react"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
+import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
+import { createContext, ReactNode, useContext, useMemo } from "react"
 
 type IATSAccountContext = {
    atsAccount: GroupATSAccount

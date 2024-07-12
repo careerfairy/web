@@ -1,4 +1,4 @@
-import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { doc } from "firebase/firestore"
 import { useFirestore, useFirestoreDocDataOnce } from "reactfire"
 

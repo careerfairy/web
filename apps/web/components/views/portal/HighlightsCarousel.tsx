@@ -1,18 +1,18 @@
-import React, { useEffect, useMemo, useState } from "react"
-import HighlightItem from "./HighlightItem"
-import HighlightVideoDialog from "./HighlightVideoDialog"
+import { HighLight } from "@careerfairy/shared-lib/highlights/Highlight"
 import Box from "@mui/material/Box"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
-import useCanWatchHighlights from "../../custom-hook/useCanWatchHighlights"
-import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
-import HighlightsRestrictedDialog from "./HighlightsRestrictedDialog"
-import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
-import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
+import { useEffect, useMemo, useState } from "react"
+import { useAuth } from "../../../HOCs/AuthProvider"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../constants/routes"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
+import useCanWatchHighlights from "../../custom-hook/useCanWatchHighlights"
+import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
+import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
+import HighlightItem from "./HighlightItem"
+import HighlightVideoDialog from "./HighlightVideoDialog"
+import HighlightsRestrictedDialog from "./HighlightsRestrictedDialog"
 
 const styles = {
    root: {
@@ -27,6 +27,7 @@ const HighlightsCarousel = ({
    const {
       breakpoints: { up },
    } = useTheme()
+   // eslint-disable-next-line react/hook-use-state
    const [highlights] = useState<HighLight[]>(serverSideHighlights)
    const { push, query, pathname } = useRouter()
    const [
@@ -126,13 +127,13 @@ const HighlightsCarousel = ({
                </Box>
             ))}
          </CustomButtonCarousel>
-         {videoUrl && (
+         {Boolean(videoUrl) && (
             <HighlightVideoDialog
                videoUrl={videoUrl}
                handleClose={handleCloseVideoDialog}
             />
          )}
-         {highlightsRestrictedDialogOpen && (
+         {Boolean(highlightsRestrictedDialogOpen) && (
             <HighlightsRestrictedDialog
                open={highlightsRestrictedDialogOpen}
                handleClose={handleCloseHighlightsRestrictedDialog}
@@ -146,7 +147,7 @@ const HighlightsCarousel = ({
 
 interface Props {
    serverSideHighlights: HighLight[]
-   showHighlights: Boolean
+   showHighlights: boolean
 }
 
 export default HighlightsCarousel

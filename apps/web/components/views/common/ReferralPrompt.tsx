@@ -1,11 +1,10 @@
-import React from "react"
-import { StylesProps } from "types/commonTypes"
-import Stack from "@mui/material/Stack"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Typography } from "@mui/material"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import ReferralWidget from "./ReferralWidget"
-import useIsMobile from "../../custom-hook/useIsMobile"
+import Stack from "@mui/material/Stack"
+import { StylesProps } from "types/commonTypes"
 import useEventSocials from "../../custom-hook/useEventSocials"
+import useIsMobile from "../../custom-hook/useIsMobile"
+import ReferralWidget from "./ReferralWidget"
 
 const styles: StylesProps = {
    root: {
@@ -24,10 +23,12 @@ const ReferralPrompt = ({ event, title, subtitle }: Props) => {
 
    return (
       <Stack spacing={2} sx={styles.root}>
-         {(title || subtitle) && (
+         {Boolean(title || subtitle) && (
             <span>
-               {title && <Typography variant="h6">{title}</Typography>}
-               {subtitle && <Typography variant="body1">{subtitle}</Typography>}
+               {Boolean(title) && <Typography variant="h6">{title}</Typography>}
+               {Boolean(subtitle) && (
+                  <Typography variant="body1">{subtitle}</Typography>
+               )}
             </span>
          )}
          <ReferralWidget

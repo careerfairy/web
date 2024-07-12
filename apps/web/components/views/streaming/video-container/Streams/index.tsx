@@ -1,15 +1,15 @@
-import React, { memo, useEffect, useState } from "react"
-import StreamsLayout from "./StreamsLayout"
-import Banners from "./Banners"
+import { LiveSpeaker } from "@careerfairy/shared-lib/livestreams"
+import Box from "@mui/material/Box"
+import { memo, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import SuperAdminControls from "../SuperAdminControls"
 import { focusModeEnabledSelector } from "../../../../../store/selectors/streamSelectors"
-import { IRemoteStream, LocalStream } from "../../../../../types/streaming"
-import { LiveSpeaker } from "@careerfairy/shared-lib/dist/livestreams"
-import FloatingHelpButton from "../../sharedComponents/FloatingHelpButton"
-import Box from "@mui/material/Box"
 import { sxStyles } from "../../../../../types/commonTypes"
+import { IRemoteStream, LocalStream } from "../../../../../types/streaming"
+import FloatingHelpButton from "../../sharedComponents/FloatingHelpButton"
+import SuperAdminControls from "../SuperAdminControls"
+import Banners from "./Banners"
+import StreamsLayout from "./StreamsLayout"
 
 const styles = sxStyles({
    root: {
@@ -93,13 +93,14 @@ const Streams = ({
          setStreamData(allStreams)
          return
       }
-      let newLargeStream = handleGetLargeStream(allStreams, currentSpeakerId)
+      const newLargeStream = handleGetLargeStream(allStreams, currentSpeakerId)
       if (!newLargeStream) {
          setStreamData([])
          return
       }
-      let newSmallStreams = handleGetSmallStream(allStreams, newLargeStream)
+      const newSmallStreams = handleGetSmallStream(allStreams, newLargeStream)
       setStreamData([...newSmallStreams, newLargeStream])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       externalMediaStreams,
       localMediaStream,
@@ -153,7 +154,7 @@ const Streams = ({
             />
          )}
          <Box sx={styles.videoElementsWrapper}>
-            {presenter && (
+            {Boolean(presenter) && (
                <Box sx={styles.floatingButtonWrapper}>
                   <FloatingHelpButton
                      openSupportInLeftMenu={openSupportInLeftMenu}
@@ -176,9 +177,9 @@ const Streams = ({
                streamerId={streamerId}
                handRaiseActive={handRaiseActive}
             />
-            {userData?.isAdmin && <SuperAdminControls />}
+            {Boolean(userData?.isAdmin) && <SuperAdminControls />}
          </Box>
-         {bannersBottom && (
+         {Boolean(bannersBottom) && (
             <Banners
                isBottom
                presenter={presenter}

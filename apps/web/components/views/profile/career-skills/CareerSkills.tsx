@@ -1,3 +1,10 @@
+import { EngageBadge } from "@careerfairy/shared-lib/badges/EngageBadges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/badges/NetworkBadges"
+import { ResearchBadge } from "@careerfairy/shared-lib/badges/ResearchBadges"
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import {
    Accordion,
    AccordionDetails,
@@ -10,30 +17,23 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
-import React, { useCallback, useState } from "react"
-import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import Box from "@mui/material/Box"
-import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
-import { styles as profileStyles } from "../profileStyles"
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import { BadgeStepper, LevelInformationPopupListItem } from "./BadgeStepper"
-import { sxStyles } from "types/commonTypes"
-import { ResearchBadge } from "@careerfairy/shared-lib/dist/badges/ResearchBadges"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
-import { EngageBadge } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
 import Button from "@mui/material/Button"
-import Link from "../../common/Link"
 import Card from "@mui/material/Card"
 import { DefaultTheme } from "@mui/styles"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import { useRouter } from "next/router"
+import { useCallback, useState } from "react"
+import { sxStyles } from "types/commonTypes"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 import {
    ContextInfoDetail,
    ContextInfoMap,
 } from "../../../../constants/contextInfoCareerSkills"
+import ContentCard from "../../../../layouts/UserLayout/ContentCard"
+import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
+import Link from "../../common/Link"
+import { styles as profileStyles } from "../profileStyles"
+import { BadgeStepper, LevelInformationPopupListItem } from "./BadgeStepper"
 
 const styles = sxStyles({
    laneTitle: {

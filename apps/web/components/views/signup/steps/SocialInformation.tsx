@@ -1,13 +1,13 @@
+import { UserData } from "@careerfairy/shared-lib/users"
 import { Grid, Typography } from "@mui/material"
-import { sxStyles } from "../../../../types/commonTypes"
+import { useCallback, useEffect, useState } from "react"
 import { useLocalStorage } from "react-use"
-import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
-import React, { useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
+import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
 import { userRepo } from "../../../../data/RepositoryInstances"
-import ReferralCodeInput from "../../common/inputs/ReferralCodeInput"
+import { sxStyles } from "../../../../types/commonTypes"
 import LinkedInInput from "../../common/inputs/LinkedInInput"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import ReferralCodeInput from "../../common/inputs/ReferralCodeInput"
 
 const styles = sxStyles({
    inputLabel: {
@@ -67,6 +67,7 @@ const SocialInformation = () => {
             }))
          }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [userData])
 
    const handleInputChange = useCallback(({ target: { value, name } }) => {

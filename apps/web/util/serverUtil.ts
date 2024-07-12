@@ -1,23 +1,23 @@
-import { store } from "store"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { fromDate } from "data/firebase/FirebaseInstance"
 import {
    Group,
    SerializedGroup,
    deserializeGroup,
 } from "@careerfairy/shared-lib/groups"
-import nookies from "nookies"
-import CookiesUtil from "./CookiesUtil"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { ParsedUrlQuery } from "querystring"
-import { GetServerSidePropsContext, GetStaticPathsContext } from "next"
 import {
    MAX_PAST_STREAMS,
    MAX_UPCOMING_STREAMS,
 } from "components/views/company-page/EventSection"
-import { livestreamRepo } from "data/RepositoryInstances"
 import { getLivestreamDialogData } from "components/views/livestream-dialog"
+import { livestreamRepo } from "data/RepositoryInstances"
+import { fromDate } from "data/firebase/FirebaseInstance"
+import { GetServerSidePropsContext, GetStaticPathsContext } from "next"
+import nookies from "nookies"
+import { ParsedUrlQuery } from "querystring"
+import { store } from "store"
+import CookiesUtil from "./CookiesUtil"
 
 export const getServerSideStream = async (
    livestreamId: string

@@ -1,5 +1,5 @@
+import { UserReminderType } from "@careerfairy/shared-lib/users"
 import { createContext } from "react"
-import { UserReminderType } from "@careerfairy/shared-lib/dist/users"
 
 export type IUserReminderContext = {
    forceShowReminder: (reminderType: UserReminderType) => void

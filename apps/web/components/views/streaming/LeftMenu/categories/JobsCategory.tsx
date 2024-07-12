@@ -1,14 +1,14 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import WorkIcon from "@mui/icons-material/Work"
+import Box from "@mui/material/Box"
 import {
    CategoryContainerTopAligned,
    QuestionContainerHeader,
    QuestionContainerTitle,
 } from "materialUI/GlobalContainers"
-import WorkIcon from "@mui/icons-material/Work"
 import { memo } from "react"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import JobList from "./jobs/JobList"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
-import Box from "@mui/material/Box"
+import JobList from "./jobs/JobList"
 
 type Props = {
    selectedState: string // current tab open, this one is "jobs"

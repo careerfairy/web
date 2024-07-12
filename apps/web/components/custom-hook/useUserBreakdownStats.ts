@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { GroupQuestion } from "@careerfairy/shared-lib/dist/groups"
-import { colorsArray } from "../util/colors"
-import { useTheme } from "@mui/material/styles"
+import { GroupQuestion } from "@careerfairy/shared-lib/groups"
 import {
+   UserBreakdownStats,
    getGeneralUserBreakdownStats,
    getUserBreakdownStatsBasedOnGroupQuestions,
-   UserBreakdownStats,
-} from "@careerfairy/shared-lib/dist/groups/analytics"
+} from "@careerfairy/shared-lib/groups/analytics"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { useTheme } from "@mui/material/styles"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { colorsArray } from "../util/colors"
 
 interface ChartData {
    datasets: {
@@ -52,6 +52,7 @@ const useUserBreakdownStats = (
             ...currentStats.dataArray.map(() => randomColor()),
          ])
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [currentStats?.dataArray.length])
 
    useEffect(() => {
@@ -86,6 +87,7 @@ const useUserBreakdownStats = (
             dataId: currentStats.id,
          })
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [currentStats, theme.palette.mode, colors])
 
    const totalStats = useMemo<UserBreakdownStats[]>(() => {
@@ -103,6 +105,7 @@ const useUserBreakdownStats = (
 
    useEffect(() => {
       handleStatChange(currentStats?.id)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [Boolean(totalStats.length), Boolean(groupQuestions), users])
 
    const handleStatChange = useCallback(
@@ -126,6 +129,7 @@ const useUserBreakdownStats = (
          chartData,
          colors,
       }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [currentStats, totalStats, handleStatChange, chartData, colors]
    )
 }

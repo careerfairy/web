@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react"
-import { Identifiable } from "../../types/commonTypes"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import { Interest } from "types/interests"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { UniversityCountry } from "@careerfairy/shared-lib/universities"
 import firebase from "firebase/compat/app"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
-import { UniversityCountry } from "@careerfairy/shared-lib/dist/universities"
+import { useEffect, useState } from "react"
+import { Interest } from "types/interests"
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import { Identifiable } from "../../types/commonTypes"
 
 /**
  * Fetch a Firestore collection
@@ -58,6 +58,7 @@ function useCollection<T extends Identifiable>(
          setDocuments(list)
          setIsLoading(false)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [collection, realtime])
 
    return { isLoading: isLoading, data: documents, error: error }

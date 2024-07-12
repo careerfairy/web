@@ -1,5 +1,8 @@
-import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
-import Card from "@mui/material/Card"
+import { SavedRecruiter } from "@careerfairy/shared-lib/users"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined"
+import MoreVertIcon from "@mui/icons-material/MoreVert"
+import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import {
    CardActions,
    CardHeader,
@@ -9,19 +12,16 @@ import {
    MenuItem,
    Typography,
 } from "@mui/material"
-import ColorizedAvatar from "../../common/ColorizedAvatar"
 import Box from "@mui/material/Box"
+import Card from "@mui/material/Card"
 import IconButton from "@mui/material/IconButton"
-import MoreVertIcon from "@mui/icons-material/MoreVert"
-import React, { useCallback, useState } from "react"
-import Link from "../../common/Link"
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined"
-import { useAuth } from "../../../../HOCs/AuthProvider"
 import Image from "next/legacy/image"
-import OpenInNewIcon from "@mui/icons-material/OpenInNew"
-import { sxStyles } from "../../../../types/commonTypes"
+import { useCallback, useState } from "react"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 import { userRepo } from "../../../../data/RepositoryInstances"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { sxStyles } from "../../../../types/commonTypes"
+import ColorizedAvatar from "../../common/ColorizedAvatar"
+import Link from "../../common/Link"
 
 const styles = sxStyles({
    name: {
@@ -76,6 +76,7 @@ export const RecruiterCard = ({
       } catch (e) {
          console.error(e)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [recruiter, userEmail])
 
    return (
@@ -102,7 +103,7 @@ export const RecruiterCard = ({
                      {recruiter.streamerDetails.lastName}
                   </Typography>
 
-                  {recruiter.streamerDetails.linkedIn && (
+                  {Boolean(recruiter.streamerDetails.linkedIn) && (
                      <IconButton
                         component={Link}
                         noLinkStyle

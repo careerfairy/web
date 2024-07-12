@@ -1,12 +1,12 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { useSelector } from "react-redux"
-import { groupSelector } from "../../../../../store/selectors/groupSelectors"
-import { useCallback, useEffect, useReducer } from "react"
-import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
-import * as Sentry from "@sentry/nextjs"
-import LoadingButton from "@mui/lab/LoadingButton"
+import { Group } from "@careerfairy/shared-lib/groups"
 import { useMergeLink } from "@mergeapi/react-merge-link"
+import LoadingButton from "@mui/lab/LoadingButton"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import * as Sentry from "@sentry/nextjs"
+import { useCallback, useEffect, useReducer } from "react"
+import { useSelector } from "react-redux"
+import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
+import { groupSelector } from "../../../../../store/selectors/groupSelectors"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 
 const initialState = {
@@ -100,6 +100,7 @@ const MergeDialogConnector = ({
          try {
             atsServiceInstance
                .exchangeAccountToken(groupId, integrationId, public_token)
+               // eslint-disable-next-line @typescript-eslint/no-unused-vars
                .then((_) => {
                   dispatch(complete())
                })

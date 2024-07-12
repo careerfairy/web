@@ -1,20 +1,20 @@
-import Header from "../Header"
-import useGroupATSAccounts from "../../../../custom-hook/useGroupATSAccounts"
-import LinkAccountButton from "./LinkAccountButton"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { Button, Grid, Tab, Tabs, Tooltip } from "@mui/material"
+import { useCallback, useState } from "react"
+import SwipeableViews from "react-swipeable-views"
 import {
    SwipeablePanel,
    swipeableTabA11yProps,
 } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
-import SwipeableViews from "react-swipeable-views"
-import { useCallback, useState } from "react"
 import { sxStyles } from "../../../../../types/commonTypes"
-import AccountInformation from "./AccountInformation"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
-import { SkeletonStackMultiple } from "../../../../util/Skeletons"
+import useGroupATSAccounts from "../../../../custom-hook/useGroupATSAccounts"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
-import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import { SkeletonStackMultiple } from "../../../../util/Skeletons"
+import Header from "../Header"
 import ATSAccountContextProvider from "./ATSAccountContextProvider"
+import AccountInformation from "./AccountInformation"
+import LinkAccountButton from "./LinkAccountButton"
 
 const styles = sxStyles({
    indicator: {

@@ -1,17 +1,17 @@
-import { useCallback } from "react"
-import { useAuth } from "../../HOCs/AuthProvider"
 import {
    LivestreamEvent,
    LivestreamEventPublicData,
    pickPublicDataFromLivestream,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import usePersistentInterval from "./usePersistentInterval"
-import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
+} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import { useRouter } from "next/router"
+import { useCallback } from "react"
 import { useSelector } from "react-redux"
-import { rtcConnectionStateSelector } from "../../store/selectors/streamSelectors"
+import { useAuth } from "../../HOCs/AuthProvider"
 import { livestreamRepo } from "../../data/RepositoryInstances"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { rtcConnectionStateSelector } from "../../store/selectors/streamSelectors"
+import usePersistentInterval from "./usePersistentInterval"
 
 // Send a heartbeat event to the server every minute
 const HEARTBEAT_INTERVAL_SECONDS = 60
@@ -84,6 +84,7 @@ const useCountLivestreamAttendanceMinutes = (
       } catch (e) {
          console.error(e)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       livestreamData?.hasStarted,
       livestreamData?.hasEnded,

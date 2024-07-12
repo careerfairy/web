@@ -1,6 +1,6 @@
-import React, { useCallback } from "react"
+import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import AddIcon from "@mui/icons-material/Add"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import BarChart from "@mui/icons-material/BarChart"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import {
    Box,
@@ -15,15 +15,15 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import BarChart from "@mui/icons-material/BarChart"
-import { GlassDialog } from "../../../../../../../materialUI/GlobalModals"
-import { v4 as uuidv4 } from "uuid"
-import useStreamRef from "../../../../../../custom-hook/useStreamRef"
-import { useFormik, getIn } from "formik"
-import * as yup from "yup"
 import Stack from "@mui/material/Stack"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { getIn, useFormik } from "formik"
+import { useCallback } from "react"
+import { v4 as uuidv4 } from "uuid"
+import * as yup from "yup"
+import { GlassDialog } from "../../../../../../../materialUI/GlobalModals"
 import { errorLogAndNotify } from "../../../../../../../util/CommonUtil"
-import { LivestreamPoll } from "@careerfairy/shared-lib/dist/livestreams"
+import useStreamRef from "../../../../../../custom-hook/useStreamRef"
 
 const validationSchema = yup.object({
    question: yup
@@ -173,12 +173,12 @@ const PollCreationModal = ({
                      variant="outlined"
                      disabled={isSubmitting}
                      onChange={handleChange}
-                     error={touched.question && Boolean(errors.question)}
-                     helperText={touched.question && errors.question}
+                     error={Boolean(touched.question && errors.question)}
+                     helperText={Boolean(touched.question) && errors.question}
                      onBlur={handleBlur}
                      placeholder="Write down your question or poll to your audience"
                   />
-                  {values.options.map(({ id, text }, index) => {
+                  {values.options.map(({ id }, index) => {
                      const error = getIn(errors.options, `${index}.text`),
                         isTouched = getIn(touched.options, `${index}.text`)
 
@@ -192,8 +192,8 @@ const PollCreationModal = ({
                               onChange={handleChange}
                               onBlur={handleBlur}
                               disabled={isSubmitting}
-                              error={isTouched && Boolean(error)}
-                              helperText={isTouched && error}
+                              error={Boolean(isTouched && error)}
+                              helperText={Boolean(isTouched) && error}
                               variant="outlined"
                               margin="dense"
                               size={"small"}
@@ -245,7 +245,7 @@ const PollCreationModal = ({
                </Button>
                <Button
                   startIcon={
-                     isSubmitting && (
+                     Boolean(isSubmitting) && (
                         <CircularProgress size={20} color="inherit" />
                      )
                   }

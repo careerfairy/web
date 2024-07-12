@@ -1,12 +1,14 @@
-import { useState, useCallback, useEffect, useMemo } from "react"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import {
+   UserData,
+   userAlreadyAppliedForJob,
+} from "@careerfairy/shared-lib/users"
 import * as Sentry from "@sentry/nextjs"
-import { userAlreadyAppliedForJob } from "@careerfairy/shared-lib/dist/users"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { atsServiceInstance } from "../../../data/firebase/ATSService"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
-import useUserATSRelations from "../useUserATSRelations"
 import useSnackbarNotifications from "../useSnackbarNotifications"
+import useUserATSRelations from "../useUserATSRelations"
 
 type UseJobApply = {
    /**

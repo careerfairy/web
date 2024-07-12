@@ -1,32 +1,31 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Button, Card, Slide, Tab, Tabs } from "@mui/material"
+import { useSnackbar } from "notistack"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
    copyStringToClipboard,
    prettyDate,
    prettyLocalizedDate,
 } from "../../../../../../helperFunctions/HelperFunctions"
-import { useSnackbar } from "notistack"
 
-import { tableIcons } from "../../common/TableUtils"
-import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil"
-import { useDispatch, useSelector } from "react-redux"
-import { universityCountriesMap } from "../../../../../../util/constants/universityCountries"
-import PDFIcon from "@mui/icons-material/PictureAsPdf"
-import Link from "../../../../../common/Link"
-import JSZip from "jszip"
-import * as actions from "store/actions"
-import ExportTable from "../../../../../common/Tables/ExportTable"
-import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
-import { exportSelectionAction } from "../../../../../../util/tableUtils"
-import { useGroupAnalytics } from "../../../../../../../HOCs/GroupAnalyticsProvider"
-import { RootState } from "../../../../../../../store"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { UserDataSet, UserType } from "../../index"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import LinkifyText from "../../../../../../util/LinkifyText"
-import { Identifiable } from "../../../../../../../types/commonTypes"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { createLookup } from "@careerfairy/shared-lib/utils"
+import PDFIcon from "@mui/icons-material/PictureAsPdf"
+import JSZip from "jszip"
+import { useDispatch, useSelector } from "react-redux"
+import * as actions from "store/actions"
+import { useGroupAnalytics } from "../../../../../../../HOCs/GroupAnalyticsProvider"
+import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { RootState } from "../../../../../../../store"
+import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
+import LinkifyText from "../../../../../../util/LinkifyText"
+import { universityCountriesMap } from "../../../../../../util/constants/universityCountries"
+import { exportSelectionAction } from "../../../../../../util/tableUtils"
+import Link from "../../../../../common/Link"
+import ExportTable from "../../../../../common/Tables/ExportTable"
+import { tableIcons } from "../../common/TableUtils"
+import { UserDataSet, UserType } from "../../index"
 
 interface Props {
    currentUserDataSet: UserDataSet
@@ -86,16 +85,17 @@ const UsersTable = ({
             },
          ]
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [showUniversityBreakdown, groupQuestions])
 
    useEffect(() => {
-      let newUsers
-      newUsers =
+      const newUsers =
          totalUniqueUsers?.map((user) =>
             AnalyticsUtil.mapUserEngagement(user, streamsFromTimeFrameAndFuture)
          ) || []
       setUsers(newUsers)
       setSelection([])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [totalUniqueUsers])
 
    useEffect(() => {
@@ -159,6 +159,7 @@ const UsersTable = ({
    }
 
    const makefileNameWindowsFriendly = (string) => {
+      // eslint-disable-next-line no-useless-escape
       return string.replace(/[\/\*\|\:\<\>\?\"\\]/gi, "_")
    }
    //
@@ -376,11 +377,11 @@ const UsersTable = ({
                         onClick: handleDownloadCVs,
                      }),
                      {
-                        disabled: !Boolean(currentStream),
+                        disabled: !currentStream,
                         tooltip: currentStream && "Set back to overall",
                         isFreeAction: true,
                         icon: tableIcons.RotateLeftIcon,
-                        hidden: !Boolean(currentStream),
+                        hidden: !currentStream,
                         onClick: handleReset,
                      },
                   ]}

@@ -1,13 +1,13 @@
-import useSWR from "swr"
-import { useMemo } from "react"
 import {
    ATSPaginatedResults,
    RecruitersFunctionCallOptions,
-} from "@careerfairy/shared-lib/dist/ats/Functions"
+} from "@careerfairy/shared-lib/ats/Functions"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
+import { useMemo } from "react"
+import useSWR from "swr"
 import useFunctionsSWRFetcher, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
-import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 
 const useGroupATSRecruiters = (
    groupId: string,

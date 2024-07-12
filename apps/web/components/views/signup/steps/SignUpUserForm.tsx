@@ -1,6 +1,9 @@
-import { useRouter } from "next/router"
-import React, { Fragment, useContext, useEffect, useState } from "react"
-import { Formik } from "formik"
+import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
+import {
+   IUserReminder,
+   UserData,
+   UserReminderType,
+} from "@careerfairy/shared-lib/users"
 import {
    Box,
    Button,
@@ -11,35 +14,32 @@ import {
    Grid,
    Typography,
 } from "@mui/material"
-import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector"
-import UniversitySelector from "../../universitySelect/UniversitySelector"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { Formik } from "formik"
+import { useRouter } from "next/router"
+import React, { Fragment, useContext, useEffect, useState } from "react"
 import * as yup from "yup"
+import { userRepo } from "../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../types/commonTypes"
+import CookiesUtil from "../../../../util/CookiesUtil"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import GenericDropdown from "../../common/GenericDropdown"
 import {
    IMultiStepContext,
    MultiStepContext,
 } from "../../common/MultiStepWrapper"
-import { sxStyles } from "../../../../types/commonTypes"
-import GenericDropdown from "../../common/GenericDropdown"
-import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
-import {
-   UserReminderType,
-   UserData,
-   IUserReminder,
-} from "@careerfairy/shared-lib/dist/users"
-import { FieldOfStudySelector } from "../userInformation/FieldOfStudySelector"
-import { LevelOfStudySelector } from "../userInformation/LevelOfStudySelector"
+import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector"
+import UniversitySelector from "../../universitySelect/UniversitySelector"
+import HelperHint from "../common/HelperHint"
 import { signupSchema } from "../schemas"
+import Email from "../userInformation/Email"
+import { FieldOfStudySelector } from "../userInformation/FieldOfStudySelector"
 import FirstName from "../userInformation/FirstName"
 import LastName from "../userInformation/LastName"
-import Email from "../userInformation/Email"
+import { LevelOfStudySelector } from "../userInformation/LevelOfStudySelector"
 import Password from "../userInformation/Password"
-import TermsAgreement from "../userInformation/TermsAgreement"
 import PasswordRepeat from "../userInformation/PasswordRepeat"
-import HelperHint from "../common/HelperHint"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { userRepo } from "../../../../data/RepositoryInstances"
-import CookiesUtil from "../../../../util/CookiesUtil"
+import TermsAgreement from "../userInformation/TermsAgreement"
 
 const styles = sxStyles({
    submit: {

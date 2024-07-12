@@ -1,13 +1,13 @@
-import React, { FC, useMemo } from "react"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
-import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
-import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Stack, Typography } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
-import Heading from "../common/Heading"
+import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { FC, useMemo } from "react"
+import { sxStyles } from "types/commonTypes"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import Heading from "../common/Heading"
+import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
 
 const config = {
    suspense: false,

@@ -1,9 +1,9 @@
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
 import { Button, Tooltip } from "@mui/material"
-import React, { memo } from "react"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
-import BadgeIcon from "../common/BadgeIcon"
-import isEqual from "react-fast-compare"
 import IconButton from "@mui/material/IconButton"
+import { memo } from "react"
+import isEqual from "react-fast-compare"
+import BadgeIcon from "../common/BadgeIcon"
 
 const styles = {
    disabled: {
@@ -28,7 +28,9 @@ const BadgeButton = ({
    onlyIcon = false,
    activeTooltip = defaultActiveTooltip,
    inactiveTooltip = defaultInactiveTooltip,
+   // eslint-disable-next-line react/no-object-type-as-default-prop
    badgeIconProps = {},
+   // eslint-disable-next-line react/no-object-type-as-default-prop
    buttonProps = {},
    iconButton = false,
 }: Props) => {
@@ -58,7 +60,9 @@ const BadgeButton = ({
    ) : (
       <Button
          startIcon={
-            showIcon && <BadgeIcon badgeKey={badge?.key} {...badgeIconProps} />
+            Boolean(showIcon) && (
+               <BadgeIcon badgeKey={badge?.key} {...badgeIconProps} />
+            )
          }
          sx={buttonStyles}
          disableRipple={!onClick}
@@ -66,7 +70,7 @@ const BadgeButton = ({
          {...buttonProps}
       >
          {badge?.name}
-         {showBadgeSuffix && " Badge"}
+         {Boolean(showBadgeSuffix) && " Badge"}
       </Button>
    )
 

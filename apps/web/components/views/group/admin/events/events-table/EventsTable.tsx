@@ -1,5 +1,5 @@
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { Group } from "@careerfairy/shared-lib//groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import MaterialTable, {
    Action,
    Column,

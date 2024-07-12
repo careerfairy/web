@@ -1,10 +1,10 @@
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import { useMemo } from "react"
 import useSWR from "swr"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "./utils/useFunctionsSWRFetcher"
-import { useMemo } from "react"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 
 type Result = {
    jobs: Job[]

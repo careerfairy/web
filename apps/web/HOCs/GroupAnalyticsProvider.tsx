@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useMemo } from "react"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { createContext, useContext, useMemo } from "react"
 import {
    useFieldsOfStudy,
    useLevelsOfStudy,

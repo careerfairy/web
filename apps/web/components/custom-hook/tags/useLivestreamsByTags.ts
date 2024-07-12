@@ -1,5 +1,6 @@
 import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
 import { useLivestreamSearchAlgolia } from "../live-stream/useLivestreamSearchAlgolia"
 
 export const useLivestreamsByTags = (
@@ -18,8 +19,13 @@ export const useLivestreamsByTags = (
       {
          arrayFilters: filters,
          dateFilter: type,
+         booleanFilters: {
+            hidden: false,
+         },
       },
-      undefined,
+      type === "future"
+         ? LIVESTREAM_REPLICAS.START_ASC
+         : LIVESTREAM_REPLICAS.START_DESC,
       undefined,
       limit
    )

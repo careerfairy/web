@@ -1,6 +1,6 @@
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
-import { UserStats } from "@careerfairy/shared-lib/dist/users"
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
+import { UserStats } from "@careerfairy/shared-lib/users"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
 import { useMemo } from "react"
 
 type Result = {

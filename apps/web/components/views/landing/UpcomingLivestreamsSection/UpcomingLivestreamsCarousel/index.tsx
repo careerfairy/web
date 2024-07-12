@@ -1,14 +1,13 @@
-import React from "react"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-import Slider from "react-slick"
-import { Box } from "@mui/material"
-import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard"
-import { getMaxSlides } from "util/CommonUtil"
 import {
    ImpressionLocation,
    LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
+import { Box } from "@mui/material"
+import Slider from "react-slick"
+import "slick-carousel/slick/slick-theme.css"
+import "slick-carousel/slick/slick.css"
+import { getMaxSlides } from "util/CommonUtil"
+import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard"
 
 const styles = {
    root: (theme) => ({

@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from "react"
-import {
-   Button,
-   Typography,
-   DialogActions,
-   DialogTitle,
-   FormHelperText,
-   Box,
-   Dialog,
-   DialogContent,
-   TextField,
-} from "@mui/material"
-import { v4 as uuidv4 } from "uuid"
-import Warning from "@mui/icons-material/Warning"
-import { UpdateMode } from "../GroupQuestionEdit"
 import {
    GroupQuestion,
    GroupQuestionOption,
-} from "@careerfairy/shared-lib/dist/groups"
+} from "@careerfairy/shared-lib/groups"
+import Warning from "@mui/icons-material/Warning"
+import {
+   Box,
+   Button,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogTitle,
+   FormHelperText,
+   TextField,
+   Typography,
+} from "@mui/material"
+import { useEffect, useState } from "react"
+import { v4 as uuidv4 } from "uuid"
+import { UpdateMode } from "../GroupQuestionEdit"
 
 const requiredTxt = "Please fill this field"
 const duplicateTxt = "Cannot be a duplicate"
@@ -58,6 +58,7 @@ export const AddGroupQuestion = ({
       } else {
          setError(false)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [newOptionName])
 
    const handleAddModal = (e) => {
@@ -88,7 +89,7 @@ export const AddGroupQuestion = ({
                   onChange={(e) => setNewOptionName(e.target.value)}
                   error={Boolean(touched && error.length > 0)}
                   onBlur={() => setTouched(true)}
-                  helperText={touched && error}
+                  helperText={Boolean(touched && error)}
                   name="option-name"
                />
             </DialogContent>
@@ -180,6 +181,7 @@ export const RenameOption = ({
          (name) => name !== updateMode.option.name
       )
       setNames(otherNames)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [updateMode.options])
 
    useEffect(() => {
@@ -195,6 +197,7 @@ export const RenameOption = ({
       } else {
          setError(false)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [newOptionName])
 
    const handleRenameModal = (e) => {
@@ -221,9 +224,9 @@ export const RenameOption = ({
                   }}
                   value={newOptionName}
                   onChange={(e) => setNewOptionName(e.target.value)}
-                  error={touched && error.length > 0}
+                  error={Boolean(touched && error.length > 0)}
                   onBlur={() => setTouched(true)}
-                  helperText={touched && error}
+                  helperText={Boolean(touched) && error}
                   name="option-name"
                />
                <Typography>

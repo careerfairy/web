@@ -1,20 +1,20 @@
+import { getIntegrationSpecifics } from "@careerfairy/shared-lib/ats/IntegrationSpecifics"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    MergeExtraRequiredData,
    MergeMetaEntities,
    MergeMetaResponse,
 } from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { useATSAccount } from "components/views/group/admin/ats-integration/ATSAccountContextProvider"
 import {
    RequiredComponentsMap,
    requiredComponents,
 } from "components/views/group/admin/ats-integration/application-test/RequiredFields"
 import { atsServiceInstance } from "data/firebase/ATSService"
-import { useReducer, useCallback, useMemo } from "react"
+import { useCallback, useMemo, useReducer } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import useMergeMetaEndpoint from "./useMergeMetaEndpoint"
-import { getIntegrationSpecifics } from "@careerfairy/shared-lib/dist/ats/IntegrationSpecifics"
 
 export type State = {
    job: Job | null // selected job

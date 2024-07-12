@@ -1,5 +1,5 @@
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
 
 /**
  * Push an event to the GTM DataLayer

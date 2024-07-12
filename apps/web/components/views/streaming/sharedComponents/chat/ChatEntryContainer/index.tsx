@@ -1,19 +1,21 @@
-import React, { memo, useCallback, useEffect, useState } from "react"
-import { Box, Card, IconButton, Popover, Typography } from "@mui/material"
-import { getTimeFromNow } from "../../../../../helperFunctions/HelperFunctions"
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined"
+import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
-import EmotesPreview from "./EmotesPreview"
-import EmotesPopUp from "./EmotesPopUp"
+import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined"
+import { Box, Card, IconButton, Popover, Typography } from "@mui/material"
 import Fade from "@stahl.luke/react-reveal/Fade"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import React, { memo, useCallback, useEffect, useState } from "react"
 import isEqual from "react-fast-compare"
-import LinkifyText from "../../../../../util/LinkifyText"
-import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import { getTimeFromNow } from "../../../../../helperFunctions/HelperFunctions"
+import LinkifyText from "../../../../../util/LinkifyText"
+import EmotesPopUp from "./EmotesPopUp"
+import EmotesPreview from "./EmotesPreview"
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const dayjs = require("dayjs")
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const relativeTime = require("dayjs/plugin/relativeTime")
 dayjs.extend(relativeTime)
 
@@ -149,7 +151,7 @@ const ChatEntryContainer = ({
 
    const open = Boolean(anchorEl)
    return (
-      <Fade left={!isMe && isNew} right={isMe && isNew} duration={250}>
+      <Fade left={!isMe && isNew} right={Boolean(isMe && isNew)} duration={250}>
          <Box sx={[styles.root, isMe && styles.rootMe]}>
             <Box
                component={"span"}
@@ -220,7 +222,7 @@ const ChatEntryContainer = ({
                <IconButton size="small" onClick={handleOpenEmotesMenu}>
                   <EmojiEmotionsOutlinedIcon fontSize={"small"} />
                </IconButton>
-               {canDelete && (
+               {Boolean(canDelete) && (
                   <IconButton onClick={handleClickDeleteChatEntry} size="small">
                      <DeleteForeverIcon fontSize={"small"} />
                   </IconButton>

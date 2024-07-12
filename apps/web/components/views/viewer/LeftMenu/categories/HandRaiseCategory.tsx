@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"

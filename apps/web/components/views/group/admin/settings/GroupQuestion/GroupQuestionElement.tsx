@@ -1,6 +1,10 @@
-import React, { Fragment, useMemo, useState } from "react"
+import {
+   Group,
+   GroupQuestion,
+   GroupQuestionOption,
+   convertGroupQuestionOptionsToSortedArray,
+} from "@careerfairy/shared-lib/groups"
 import EditIcon from "@mui/icons-material/Edit"
-import GroupQuestionEdit from "./GroupQuestionEdit"
 import {
    Card,
    CardContent,
@@ -9,21 +13,9 @@ import {
    Divider,
    Fade,
    IconButton,
-   Tooltip,
 } from "@mui/material"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import {
-   convertGroupQuestionOptionsToSortedArray,
-   GroupQuestion,
-   GroupQuestionOption,
-   Group,
-} from "@careerfairy/shared-lib/dist/groups"
-
-const styles = sxStyles({
-   hiddenChip: {
-      marginLeft: 1,
-   },
-})
+import { Fragment, useMemo, useState } from "react"
+import GroupQuestionEdit from "./GroupQuestionEdit"
 
 interface Props {
    handleUpdateGroupQuestion?: (category: GroupQuestion) => void
@@ -66,22 +58,7 @@ const GroupQuestionElement = ({
                      gutterBottom: true,
                      color: hidden ? "textSecondary" : "textPrimary",
                   }}
-                  title={
-                     <>
-                        {GroupQuestion.name}
-                        {/*TODO we might not need this anymore as questions are opt in per event*/}
-                        {/*{hidden && (*/}
-                        {/*   <Tooltip title="This information will not be collected from viewers who register to your events.">*/}
-                        {/*      <Chip*/}
-                        {/*         sx={styles.hiddenChip}*/}
-                        {/*         variant="outlined"*/}
-                        {/*         color="secondary"*/}
-                        {/*         label="Hidden From Registration"*/}
-                        {/*      />*/}
-                        {/*   </Tooltip>*/}
-                        {/*)}*/}
-                     </>
-                  }
+                  title={<>{GroupQuestion.name}</>}
                   action={
                      <IconButton
                         onClick={() => setEditMode(true)}

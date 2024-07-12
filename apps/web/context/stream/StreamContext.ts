@@ -1,6 +1,6 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import React, { useContext } from "react"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const CurrentStreamContext = React.createContext<CurrentStreamContextInterface>(
    {

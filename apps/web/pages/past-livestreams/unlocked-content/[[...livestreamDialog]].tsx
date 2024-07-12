@@ -1,27 +1,27 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { Grid, Typography } from "@mui/material"
+import { StreamsSection } from "components/views/common/NextLivestreams/StreamsSection"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
+import { useMemo } from "react"
+import useIsMobile from "../../../components/custom-hook/useIsMobile"
+import SEO from "../../../components/util/SEO"
+import Link from "../../../components/views/common/Link"
+import NoResultsMessage from "../../../components/views/common/NextLivestreams/NoResultsMessage"
+import ScrollToTop from "../../../components/views/common/ScrollToTop"
+import {
+   LivestreamDialogLayout,
+   getLivestreamDialogData,
+} from "../../../components/views/livestream-dialog"
+import { livestreamRepo } from "../../../data/RepositoryInstances"
+import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
+import { sxStyles } from "../../../types/commonTypes"
+import DateUtil from "../../../util/DateUtil"
 import {
    getServerSideUserStats,
    getUserTokenFromCookie,
    mapFromServerSide,
 } from "../../../util/serverUtil"
-import { livestreamRepo } from "../../../data/RepositoryInstances"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import SEO from "../../../components/util/SEO"
-import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
-import NoResultsMessage from "../../../components/views/common/NextLivestreams/NoResultsMessage"
-import ScrollToTop from "../../../components/views/common/ScrollToTop"
-import React, { useMemo } from "react"
-import { StreamsSection } from "components/views/common/NextLivestreams/StreamsSection"
-import { Grid, Typography } from "@mui/material"
-import { sxStyles } from "../../../types/commonTypes"
-import DateUtil from "../../../util/DateUtil"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import Link from "../../../components/views/common/Link"
-import useIsMobile from "../../../components/custom-hook/useIsMobile"
-import {
-   getLivestreamDialogData,
-   LivestreamDialogLayout,
-} from "../../../components/views/livestream-dialog"
 
 const styles = sxStyles({
    noResultsMessage: {

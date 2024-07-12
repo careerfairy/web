@@ -1,14 +1,13 @@
+import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { fixLivestreamRegistrationDates } from "@careerfairy/shared-lib/livestreams/sources/transformations"
+import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
+import { createContext, ReactElement, useContext, useMemo } from "react"
+import useSWR from "swr"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../../../../../custom-hook/utils/useFunctionsSWRFetcher"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import useSWR from "swr"
-import { createContext, ReactElement, useContext, useMemo } from "react"
-import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { sortLivestreamsDesc } from "@careerfairy/shared-lib/dist/utils"
-import { fixLivestreamRegistrationDates } from "@careerfairy/shared-lib/livestreams/sources/transformations"
 
 type IRegistrationSourcesContext = {
    utmData?: RegistrationSourcesResponseItem[]
