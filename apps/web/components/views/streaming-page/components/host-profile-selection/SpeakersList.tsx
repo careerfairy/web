@@ -5,10 +5,10 @@ import { IAgoraRTCRemoteUser, useRemoteUsers } from "agora-rtc-react"
 import { useLivestreamData } from "components/custom-hook/streaming"
 import FramerBox from "components/views/common/FramerBox"
 import { cfLogo } from "constants/images"
-import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { AnimatePresence, Variants } from "framer-motion"
 import { Fragment, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
+import { buildAgoraSpeakerId } from "../../util"
 import { HostProfileButton } from "./HostProfileButton"
 import { useHostProfileSelection } from "./HostProfileSelectionProvider"
 
@@ -50,10 +50,6 @@ const itemAnimationVariants = {
    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
    exit: { opacity: 0, scale: 0.9, transition: { duration: 0.5 } },
 } satisfies Variants
-
-export const buildAgoraSpeakerId = (speakerId: string, streamId: string) => {
-   return `${STREAM_IDENTIFIERS.SPEAKER}-${speakerId}-${streamId}` as const
-}
 
 export const SpeakersList = () => {
    const { userData } = useAuth()

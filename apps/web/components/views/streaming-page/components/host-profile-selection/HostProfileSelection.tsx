@@ -1,10 +1,13 @@
 import { Box } from "@mui/material"
-import { ReactNode } from "react"
+import FramerBox from "components/views/common/FramerBox"
+import { AnimatePresence } from "framer-motion"
+import { ReactNode, forwardRef } from "react"
 import { useSpeakerId, useUserUid } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import {
    ProfileSelectEnum,
    ProfileSelectProvider,
+   useHostProfileSelection,
 } from "./HostProfileSelectionProvider"
 import { SpeakerSelectHeader } from "./SpeakerSelectHeader"
 import { CreateSpeakerView } from "./views/CreateSpeakerView"
@@ -15,39 +18,19 @@ import { SelectSpeakerView } from "./views/SelectSpeakerView"
 const styles = sxStyles({
    root: {
       width: "100%",
-      minHeight: "100vh",
+      minHeight: "100dvh",
       display: "flex",
       flexDirection: "column",
+      alignItems: "center",
       position: "relative",
       bgcolor: "#F7F8FC",
+      overflowX: "hidden",
    },
-   mainContainer: {
+   view: {
+      width: "100%",
+      flex: 1,
       display: "grid",
       placeItems: "center",
-      flex: 1,
-      px: {
-         xs: 0,
-         sm: 2,
-      },
-   },
-   contentContainer: {
-      alignItems: "center",
-      backgroundColor: "#FDFDFD",
-      borderRadius: "16px",
-      maxWidth: 770,
-      maxHeight: {
-         xs: "auto",
-         sm: 637,
-      },
-      overflowY: "auto",
-      height: {
-         xs: "100%",
-         sm: "auto",
-      },
-      mt: {
-         xs: 4,
-         sm: 0,
-      },
    },
 })
 
@@ -73,24 +56,71 @@ const Content = () => {
          {(activeView) => (
             <Box sx={styles.root}>
                <SpeakerSelectHeader />
-               <Box sx={styles.mainContainer}>
-                  <Box sx={styles.contentContainer}>
-                     {activeView === ProfileSelectEnum.SELECT_SPEAKER && (
-                        <SelectSpeakerView />
-                     )}
-                     {activeView === ProfileSelectEnum.CREATE_SPEAKER && (
-                        <CreateSpeakerView />
-                     )}
-                     {activeView === ProfileSelectEnum.EDIT_SPEAKER && (
-                        <EditSpeakerView />
-                     )}
-                     {activeView === ProfileSelectEnum.JOIN_WITH_SPEAKER && (
-                        <JoinWithSpeakerView />
-                     )}
-                  </Box>
-               </Box>
+               <AnimatePresence mode="wait">
+                  {activeView === ProfileSelectEnum.SELECT_SPEAKER && (
+                     <ViewFramerBox
+                        key={ProfileSelectEnum.SELECT_SPEAKER}
+                        activeView={activeView}
+                        viewComponent={<SelectSpeakerView />}
+                     />
+                  )}
+                  {activeView === ProfileSelectEnum.CREATE_SPEAKER && (
+                     <ViewFramerBox
+                        key={ProfileSelectEnum.CREATE_SPEAKER}
+                        activeView={activeView}
+                        viewComponent={<CreateSpeakerView />}
+                     />
+                  )}
+                  {activeView === ProfileSelectEnum.EDIT_SPEAKER && (
+                     <ViewFramerBox
+                        key={ProfileSelectEnum.EDIT_SPEAKER}
+                        activeView={activeView}
+                        viewComponent={<EditSpeakerView />}
+                     />
+                  )}
+                  {activeView === ProfileSelectEnum.JOIN_WITH_SPEAKER && (
+                     <ViewFramerBox
+                        key={ProfileSelectEnum.JOIN_WITH_SPEAKER}
+                        activeView={activeView}
+                        viewComponent={<JoinWithSpeakerView />}
+                     />
+                  )}
+               </AnimatePresence>
             </Box>
          )}
       </ProfileSelectProvider>
    )
 }
+
+type ViewFramerBoxProps = {
+   activeView: ProfileSelectEnum
+   viewComponent: ReactNode
+}
+
+const getDirection = (
+   prevActiveView: ProfileSelectEnum,
+   activeView: ProfileSelectEnum
+) => {
+   return activeView > prevActiveView ? 1 : -1
+}
+
+const ViewFramerBox = forwardRef<HTMLDivElement, ViewFramerBoxProps>(
+   ({ activeView, viewComponent }, ref) => {
+      const { prevActiveView } = useHostProfileSelection()
+      const direction = getDirection(prevActiveView, activeView)
+
+      return (
+         <FramerBox
+            ref={ref}
+            sx={styles.view}
+            initial={{ opacity: 0, x: direction * 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction * -100 }}
+         >
+            {viewComponent}
+         </FramerBox>
+      )
+   }
+)
+
+ViewFramerBox.displayName = "ViewFramerBox"

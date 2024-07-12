@@ -19,6 +19,10 @@ const styles = sxStyles({
       borderRadius: 2,
       backgroundColor: "transparent",
       transition: (theme) => theme.transitions.create("background-color"),
+      "& > *": {
+         width: "inherit",
+      },
+
       width: "100%",
    },
    fileUploaderActive: {

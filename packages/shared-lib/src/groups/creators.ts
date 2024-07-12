@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase/firestore"
 import { Identifiable } from "../commonTypes"
+import { Speaker } from "../livestreams"
 
 export const CreatorRoles = {
    Spark: "Spark",
@@ -75,5 +76,23 @@ export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
       story: creator.story ?? null,
       id: creator.id ?? null,
       linkedInUrl: creator.linkedInUrl ?? null,
+   }
+}
+
+export const mapSpeakerToCreator = (speaker: Speaker): Creator => {
+   return {
+      id: speaker.id,
+      groupId: null,
+      documentType: "groupCreator",
+      firstName: speaker.firstName || null,
+      lastName: speaker.lastName || null,
+      position: speaker.position || null,
+      email: speaker.email || null,
+      avatarUrl: speaker.avatar || null,
+      createdAt: null,
+      updatedAt: null,
+      linkedInUrl: speaker.linkedInUrl || "",
+      story: speaker.background || null,
+      roles: speaker.roles || [CreatorRoles.Speaker],
    }
 }
