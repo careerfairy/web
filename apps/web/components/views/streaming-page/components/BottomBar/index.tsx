@@ -58,7 +58,7 @@ const getHostActionNames = (
          ...(isSpyMode ? [] : (["Video"] as const)),
          "Share",
          "Divider",
-         "Q&A",
+         ...(isAdmin ? [] : (["Q&A"] as const)),
          "Chat",
          "SpeedDial",
          ...(isAdmin ? (["Divider", "Admin"] as const) : []),
