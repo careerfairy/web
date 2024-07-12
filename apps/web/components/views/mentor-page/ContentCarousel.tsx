@@ -66,7 +66,7 @@ export const ContentCarousel = ({
    }, [isDesktop, carouselContainerRef])
 
    return (
-      <Stack gap="16px">
+      <Stack display="grid" gap="16px">
          <Stack
             direction="row"
             justifyContent="space-between"
