@@ -251,9 +251,12 @@ export class LivestreamService {
       const livestream = await getDoc(this.getLivestreamRef(livestreamId))
 
       if (livestream.exists) {
-         const speaker = livestream
-            .data()
-            ?.speakers?.find((speaker) => speaker.id === speakerId)
+         const data = livestream.data()
+
+         const allSpeakers = (data?.speakers || []).concat(
+            data?.adHocSpeakers || []
+         )
+         const speaker = allSpeakers.find((speaker) => speaker.id === speakerId)
 
          if (speaker) {
             return {

@@ -145,6 +145,11 @@ export interface LivestreamEvent extends Identifiable {
    speakers?: Speaker[]
 
    /**
+    * Speakers who joined during the live stream but are not displayed in the live stream details dialog
+    */
+   adHocSpeakers?: Speaker[]
+
+   /**
     * The creators' identifiers of the speakers.
     * This is used for data relationship and syncing purposes.
     * Relates with creators in careerCenterData/creator sub collection.
