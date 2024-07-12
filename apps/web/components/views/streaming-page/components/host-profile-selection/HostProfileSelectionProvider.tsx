@@ -1,4 +1,5 @@
 import { Speaker } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { useAppDispatch } from "components/custom-hook/store"
 import {
    ReactNode,
@@ -7,7 +8,7 @@ import {
    useMemo,
    useReducer,
 } from "react"
-import { setSpeakerId } from "store/reducers/streamingAppReducer"
+import { setSpeakerId, setUserUid } from "store/reducers/streamingAppReducer"
 
 export enum ProfileSelectEnum {
    SELECT_SPEAKER,
@@ -25,6 +26,7 @@ type Action =
    | { type: ProfileSelectEnum.SELECT_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.EDIT_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.CREATE_SPEAKER }
+   | { type: "SELECT_USER"; payload: UserData }
    | { type: "RESET" }
 
 const reducer = (state: State, action: Action): State => {
@@ -58,7 +60,8 @@ const reducer = (state: State, action: Action): State => {
 }
 
 type ProfileSelectContextType = {
-   joinLiveStream: (speakerId: string) => void
+   joinLiveStreamWithSpeaker: (speakerId: string) => void
+   joinLiveStreamWithUser: (userId: string) => void
    goBackToSelectSpeaker: () => void
    editSpeaker: (speaker: Speaker) => void
    selectSpeaker: (speaker: Speaker) => void
@@ -101,9 +104,13 @@ export const ProfileSelectProvider = ({ children }: Props) => {
          goBackToSelectSpeaker: () => {
             return dispatch({ type: "RESET" })
          },
-         joinLiveStream: (speakerId: string) => {
+         joinLiveStreamWithSpeaker: (speakerId: string) => {
             dispatch({ type: "RESET" })
             return appDispatch(setSpeakerId(speakerId))
+         },
+         joinLiveStreamWithUser: (userId: string) => {
+            dispatch({ type: "RESET" })
+            return appDispatch(setUserUid(userId))
          },
       }),
       [state, dispatch, appDispatch]

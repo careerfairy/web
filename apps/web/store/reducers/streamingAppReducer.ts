@@ -51,6 +51,7 @@ export interface StreamingAppState {
    }
    isHost: boolean
    speakerId: string | null
+   userUid: string | null
    streamLayout: StreamLayout
    settingsMenu: {
       isOpen: boolean
@@ -123,6 +124,7 @@ const initialState: StreamingAppState = {
    },
    isHost: false,
    speakerId: null,
+   userUid: null,
    streamLayout: StreamLayouts.GALLERY,
    settingsMenu: {
       isOpen: false,
@@ -398,6 +400,11 @@ const streamingAppSlice = createSlice({
       },
       setSpeakerId(state, action: PayloadAction<string | null>) {
          state.speakerId = action.payload
+         state.userUid = null
+      },
+      setUserUid(state, action: PayloadAction<string | null>) {
+         state.userUid = action.payload
+         state.speakerId = null
       },
    },
 })
@@ -440,6 +447,7 @@ export const {
       setIsRecordingWindow,
       setIsRecordingBotInRoom,
       setSpeakerId,
+      setUserUid,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
