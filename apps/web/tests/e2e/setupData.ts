@@ -1,11 +1,11 @@
-import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
-import GroupSeed from "@careerfairy/seed-data/dist/groups"
+import FieldsOfStudySeed from "@careerfairy/seed-data/fieldsOfStudy"
+import GroupSeed from "@careerfairy/seed-data/groups"
 import LivestreamSeed, {
    createLivestreamGroupQuestions,
-} from "@careerfairy/seed-data/dist/livestreams"
-import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/seed-data/livestreams"
+import UniversitiesSeed from "@careerfairy/seed-data/universities"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 /**
  * Creates a livestream document with a group and group questions

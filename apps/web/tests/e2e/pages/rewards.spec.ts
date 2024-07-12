@@ -1,19 +1,19 @@
-import { BrowserContext, expect } from "@playwright/test"
-import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
-import InterestSeed from "@careerfairy/seed-data/dist/interests"
-import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
-import UserSeed from "@careerfairy/seed-data/dist/users"
-import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
-import { signedInFixture as test } from "../fixtures"
-import { setupLivestreamData } from "../setupData"
-import { credentials, pdfSamplePath } from "../../constants"
-import { CreditsDialogModel } from "../page-object-models/CreditsDialogModel"
-import { sleep } from "../utils"
+import FieldsOfStudySeed from "@careerfairy/seed-data/fieldsOfStudy"
+import InterestSeed from "@careerfairy/seed-data/interests"
+import LivestreamSeed from "@careerfairy/seed-data/livestreams"
+import UniversitiesSeed from "@careerfairy/seed-data/universities"
+import UserSeed from "@careerfairy/seed-data/users"
+import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/rewards"
 import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
-import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/dist/rewards"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { BrowserContext, expect } from "@playwright/test"
+import { credentials, pdfSamplePath } from "../../constants"
+import { signedInFixture as test } from "../fixtures"
+import { CreditsDialogModel } from "../page-object-models/CreditsDialogModel"
+import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
 import { SignupPage } from "../page-object-models/SignupPage"
+import { setupLivestreamData } from "../setupData"
+import { sleep } from "../utils"
 
 test.describe("Win credits by completing actions", () => {
    test("Upload CV and win a credit", async ({ page, user }) => {
@@ -105,7 +105,7 @@ test.describe("Win credits by completing actions", () => {
          "Refer to 3 friends+ 3"
       )
 
-      let usersCount = 3
+      const usersCount = 3
 
       const promises = []
 

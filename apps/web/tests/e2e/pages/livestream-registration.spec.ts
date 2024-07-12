@@ -1,7 +1,7 @@
-import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
-import UserSeed from "@careerfairy/seed-data/dist/users"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import LivestreamSeed from "@careerfairy/seed-data/livestreams"
+import UserSeed from "@careerfairy/seed-data/users"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { expect } from "@playwright/test"
 import { signedInFixture as test } from "../fixtures"
 import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
@@ -46,7 +46,6 @@ test.describe("Livestream Registration Signed In", () => {
 
    test("successful registration on a livestream event with no group questions", async ({
       page,
-      user,
    }) => {
       const { livestream } = await setupLivestreamData(undefined, {
          overrideLivestreamDetails: {
@@ -62,7 +61,6 @@ test.describe("Livestream Registration Signed In", () => {
 
    test("successful registration on a livestream event without group questions and required consent", async ({
       page,
-      user,
    }) => {
       const { livestream } = await setupLivestreamData(undefined, {
          overrideGroupDetails: {
@@ -84,7 +82,6 @@ test.describe("Livestream Registration Signed In", () => {
 
    test("successful registration on a livestream event with both group questions and required consent", async ({
       page,
-      user,
    }) => {
       const { livestream } = await setupLivestreamData(undefined, {
          overrideGroupDetails: {
@@ -134,7 +131,6 @@ test.describe("Livestream Registration Signed In", () => {
 
    test("livestream has already started, confirm the redirection without any registration", async ({
       page,
-      user,
       browserName,
    }) => {
       test.skip(
