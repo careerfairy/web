@@ -1,20 +1,20 @@
-import { expect, test as base } from "@playwright/test"
-import LivestreamSeed, {
-   createLivestreamGroupQuestions,
-} from "@careerfairy/seed-data/dist/livestreams"
-import { LoginPage } from "../page-object-models/LoginPage"
-import UserSeed from "@careerfairy/seed-data/dist/users"
 import {
    clearAuthData,
    clearFirestoreData,
-} from "@careerfairy/seed-data/dist/emulators"
-import { StreamerPage, ViewerPage } from "../page-object-models/StreamingPage"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { sleep } from "../utils"
-import GroupSeed from "@careerfairy/seed-data/dist/groups"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/seed-data/emulators"
+import GroupSeed from "@careerfairy/seed-data/groups"
+import LivestreamSeed, {
+   createLivestreamGroupQuestions,
+} from "@careerfairy/seed-data/livestreams"
+import UserSeed from "@careerfairy/seed-data/users"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { test as base, expect } from "@playwright/test"
 import { credentials } from "../../constants"
+import { LoginPage } from "../page-object-models/LoginPage"
+import { StreamerPage, ViewerPage } from "../page-object-models/StreamingPage"
+import { sleep } from "../utils"
 
 /**
  * Test Fixture
@@ -35,12 +35,12 @@ const test = base.extend<{
 
       await use(userData)
    },
-   streamerPage: async ({ page, user, context }, use) => {
+   streamerPage: async ({ page }, use) => {
       const streamerPage = new StreamerPage(page)
 
       await use(streamerPage)
    },
-   viewerPage: async ({ context, page, user }, use) => {
+   viewerPage: async ({ context }, use) => {
       const viewerTabPage = await context.newPage()
 
       const viewerPage = new ViewerPage(viewerTabPage)

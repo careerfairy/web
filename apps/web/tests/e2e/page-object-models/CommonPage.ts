@@ -1,6 +1,7 @@
+/* eslint-disable no-extra-semi */
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { expect, Locator, Page } from "@playwright/test"
 import { sleep } from "../utils"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 export class CommonPage {
    constructor(public readonly page: Page) {}
@@ -86,6 +87,7 @@ export class CommonPage {
             await this.page.goto(url)
             await sleep(finalWait)
             return
+            // eslint-disable-next-line no-empty
          } catch (e) {}
       }
    }
@@ -111,9 +113,11 @@ export class CommonPage {
       // wait for the questions tab to appear
       await this.assertTextIsVisible("Would Like To Know More About You", false)
 
-      for (let groupQuestions of Object.values(livestream.groupQuestionsMap)) {
-         for (let question of Object.values(groupQuestions.questions)) {
-            let inputId = `#${groupQuestions.groupId}\\.questions\\.${question.id}\\.selectedOptionId`
+      for (const groupQuestions of Object.values(
+         livestream.groupQuestionsMap
+      )) {
+         for (const question of Object.values(groupQuestions.questions)) {
+            const inputId = `#${groupQuestions.groupId}\\.questions\\.${question.id}\\.selectedOptionId`
 
             const options = Object.values(question.options)
             const randomOption =
@@ -202,11 +206,11 @@ export const materialSelectOption = async (
 ) => {
    return page.evaluate(
       ({ newSelectedValue, cssSelector }) => {
-         let clickEvent = new MouseEvent("mousedown", {
+         const clickEvent = new MouseEvent("mousedown", {
             bubbles: true,
             cancelable: true,
          })
-         let selectNode = document.querySelector(cssSelector)
+         const selectNode = document.querySelector(cssSelector)
          selectNode.dispatchEvent(clickEvent)
 
          // Wait for a short period of time to allow the dropdown to render

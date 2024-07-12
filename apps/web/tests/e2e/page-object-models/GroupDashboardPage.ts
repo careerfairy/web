@@ -1,20 +1,19 @@
-import { Locator, Page } from "@playwright/test"
-import { expect } from "@playwright/test"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { CommonPage } from "./CommonPage"
 import {
    LivestreamEvent,
    LivestreamJobAssociation,
+   Speaker,
 } from "@careerfairy/shared-lib/livestreams"
+import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { Locator, Page, expect } from "@playwright/test"
 import DateUtil from "../../../util/DateUtil"
-import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
 import { correctCompany, imageLogoPath } from "../../constants"
-import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 import { sleep } from "../utils"
+import { CommonPage } from "./CommonPage"
 import { ATSAdminPage } from "./admin/ATSAdminPage"
 import { FeedbackPage } from "./admin/FeedbackPage"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator

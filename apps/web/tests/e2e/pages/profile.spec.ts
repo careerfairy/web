@@ -1,16 +1,16 @@
-import { test as base, expect } from "@playwright/test"
 import {
    clearAuthData,
    clearFirestoreData,
-} from "@careerfairy/seed-data/dist/emulators"
+} from "@careerfairy/seed-data/emulators"
+import UserSeed from "@careerfairy/seed-data/users"
+import { EngageBadgeLevel3 } from "@careerfairy/shared-lib/badges/EngageBadges"
+import { UserData } from "@careerfairy/shared-lib/users"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
+import { test as base, expect } from "@playwright/test"
+import { credentials } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"
 import ProfilePage from "../page-object-models/ProfilePage"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import UserSeed from "@careerfairy/seed-data/dist/users"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { sleep } from "../utils"
-import { EngageBadgeLevel3 } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
-import { credentials } from "../../constants"
 
 const test = base.extend<{
    user: UserData
@@ -26,7 +26,7 @@ const test = base.extend<{
 
       await use(userData)
    },
-   profilePage: async ({ page, user }, use) => {
+   profilePage: async ({ page }, use) => {
       // user is a dependency, its required here even if not used
       const profilePage = new ProfilePage(page)
 
