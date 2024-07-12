@@ -1,5 +1,5 @@
-import { RefObject, useEffect, useState } from "react"
 import debounce from "lodash.debounce"
+import { RefObject, useEffect, useState } from "react"
 
 /**
  * Uses IntersectionObserver API to detect which element is in view during scrolling.
@@ -66,7 +66,11 @@ const useControlledTabNavigationOnScroll = (
                }
             )
 
-            refs.forEach((ref) => observer.observe(ref.current))
+            refs.forEach((ref) => {
+               if (ref?.current) {
+                  observer.observe(ref.current)
+               }
+            })
          }
          return () => observer?.disconnect()
       },
