@@ -152,3 +152,6 @@ export const useIsSpyMode = () =>
 
 export const useSpeakerId = () =>
    useAppSelector((state) => state.streamingApp.speakerId)
+
+export const useUserUid = () =>
+   useAppSelector((state) => state.streamingApp.userUid)

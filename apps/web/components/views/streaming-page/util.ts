@@ -128,6 +128,15 @@ export const getStreamerDisplayName = (firstName: string, lastName: string) => {
    return [firstName, lastName].filter(Boolean).join(" ")
 }
 
+export const getFormattedName = (firstName: string, lastName: string) => {
+   const lastNameInitial = lastName ? `${lastName.charAt(0)}.` : ""
+   return `${firstName} ${lastNameInitial}`
+}
+
+export const buildAgoraSpeakerId = (speakerId: string, streamId: string) => {
+   return `${STREAM_IDENTIFIERS.SPEAKER}-${speakerId}-${streamId}` as const
+}
+
 export enum UserType {
    Viewer = "Viewer",
    Streamer = "Streamer",
