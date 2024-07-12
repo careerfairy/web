@@ -1,7 +1,6 @@
 import {
    CreatorRole,
    CreatorRoles,
-   mapSpeakerToCreator,
 } from "@careerfairy/shared-lib/groups/creators"
 import { baseCreatorShape } from "@careerfairy/shared-lib/groups/schemas"
 import {
@@ -80,7 +79,15 @@ export const upsertLivestreamSpeaker = functions
                   await groupRepo.updateCreatorInGroup(
                      existingCreator.groupId,
                      existingCreator.id,
-                     mapSpeakerToCreator(speaker)
+                     {
+                        avatarUrl: speaker.avatar,
+                        firstName: speaker.firstName,
+                        lastName: speaker.lastName,
+                        id: speaker.id,
+                        story: speaker.background,
+                        linkedInUrl: speaker.linkedInUrl,
+                        position: speaker.position,
+                     }
                   )
                }
 
