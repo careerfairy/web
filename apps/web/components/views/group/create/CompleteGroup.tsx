@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { GroupQuestion } from "@careerfairy/shared-lib/groups"
 import {
    Box,
    Button,
@@ -9,11 +9,11 @@ import {
    Container,
    Typography,
 } from "@mui/material"
-import DisplayCategoryElement from "./DisplayCategoryElement"
-import { sxStyles } from "../../../../types/commonTypes"
-import { BaseGroupInfo } from "../../../../pages/group/create"
-import { GroupQuestion } from "@careerfairy/shared-lib/dist/groups"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useState } from "react"
+import { BaseGroupInfo } from "../../../../pages/group/create"
+import { sxStyles } from "../../../../types/commonTypes"
+import DisplayCategoryElement from "./DisplayCategoryElement"
 
 const styles = sxStyles({
    root: {
@@ -151,7 +151,7 @@ const CompleteGroup = ({
                      style={{ marginLeft: 5 }}
                      disabled={submitting}
                      endIcon={
-                        submitting && (
+                        Boolean(submitting) && (
                            <CircularProgress size={20} color="inherit" />
                         )
                      }

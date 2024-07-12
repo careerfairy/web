@@ -1,11 +1,12 @@
+/* eslint-disable no-extra-semi */
 import {
    University,
    UniversityCountry,
-} from "@careerfairy/shared-lib/dist/universities"
+} from "@careerfairy/shared-lib/universities"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import { useEffect, useState } from "react"
-import { errorLogAndNotify } from "../../util/CommonUtil"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import { errorLogAndNotify } from "../../util/CommonUtil"
 
 const useUniversitiesByCountryCodes = (
    selectedCountriesIds: string[]

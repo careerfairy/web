@@ -1,12 +1,12 @@
-import React from "react"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    IAgoraRTCClient,
    ILocalAudioTrack,
    ILocalVideoTrack,
    NetworkQuality,
 } from "agora-rtc-sdk-ng"
+import React from "react"
 import { IRemoteStream, LocalStream } from "../../types/streaming"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 export interface RtcContextInterface {
    remoteStreams: IRemoteStream[]

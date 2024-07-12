@@ -1,14 +1,14 @@
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { FormControl } from "@mui/material"
 import Typography from "@mui/material/Typography"
-import MultiCheckboxSelect from "../MultiCheckboxSelect"
+import { useRouter } from "next/router"
+import { useCallback } from "react"
+import { useInterests } from "../../../../custom-hook/useCollection"
 import {
    formatToOptionArray,
    multiListSelectMapValueFn,
 } from "../../../signup/utils"
-import React, { useCallback } from "react"
-import { useInterests } from "../../../../custom-hook/useCollection"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
-import { useRouter } from "next/router"
+import MultiCheckboxSelect from "../MultiCheckboxSelect"
 
 type Props = {
    handleChange: (name: string, selectedOptions: OptionGroup[]) => void

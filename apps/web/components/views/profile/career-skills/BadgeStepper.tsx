@@ -1,4 +1,4 @@
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
 import CelebrationIcon from "@mui/icons-material/Celebration"
 import CheckIcon from "@mui/icons-material/Check"
 import CircleIcon from "@mui/icons-material/Circle"

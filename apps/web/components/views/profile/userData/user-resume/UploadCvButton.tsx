@@ -1,3 +1,8 @@
+import { UserData } from "@careerfairy/shared-lib/users"
+import Add from "@mui/icons-material/Add"
+import ArrowDropDown from "@mui/icons-material/ArrowDropDown"
+import DeleteForever from "@mui/icons-material/DeleteForever"
+import GetApp from "@mui/icons-material/GetApp"
 import {
    Button,
    ButtonGroup,
@@ -8,13 +13,8 @@ import {
    Paper,
    Popper,
 } from "@mui/material"
-import GetApp from "@mui/icons-material/GetApp"
-import Add from "@mui/icons-material/Add"
-import DeleteForever from "@mui/icons-material/DeleteForever"
-import ArrowDropDown from "@mui/icons-material/ArrowDropDown"
-import FilePickerContainer from "../../../../ssr/FilePickerContainer"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { useCallback } from "react"
+import FilePickerContainer from "../../../../ssr/FilePickerContainer"
 
 const UploadCvButton = ({
    userData,

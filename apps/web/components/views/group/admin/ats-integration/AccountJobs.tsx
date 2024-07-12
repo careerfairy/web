@@ -1,4 +1,5 @@
-import React, { RefObject, useCallback, useRef } from "react"
+import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/ats/Functions"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
 import MaterialTable, {
    Column,
    MaterialTableProps,
@@ -6,13 +7,12 @@ import MaterialTable, {
    Query,
    QueryResult,
 } from "@material-table/core"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import Box from "@mui/material/Box"
-import SanitizedHTML from "../../../../util/SanitizedHTML"
 import { Typography } from "@mui/material"
-import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/dist/ats/Functions"
+import Box from "@mui/material/Box"
+import { RefObject, useCallback, useRef } from "react"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
 import { sxStyles } from "../../../../../types/commonTypes"
+import SanitizedHTML from "../../../../util/SanitizedHTML"
 import { useATSAccount } from "./ATSAccountContextProvider"
 
 const perPage = 7
@@ -43,7 +43,7 @@ const AccountJobs = () => {
    const { atsAccount } = useATSAccount()
 
    // keep track of previous page
-   let pageHistory = useRef<PageData[]>([
+   const pageHistory = useRef<PageData[]>([
       {
          pageNumber: 0,
          next: null,
@@ -80,10 +80,10 @@ const fetchPage = (
 ): Promise<QueryResult<TRowData>> =>
    new Promise((resolve, reject) => {
       const { page, pageSize } = query
-      let pageData: PageData = pageHistory.current.pop()
+      const pageData: PageData = pageHistory.current.pop()
       const isBackwards = pageData.pageNumber > query.page
 
-      let pagination: ATSDataPaginationOptions = {
+      const pagination: ATSDataPaginationOptions = {
          cursor: isBackwards ? pageData.prev : pageData.next,
          pageSize: query.pageSize,
       }
@@ -195,7 +195,7 @@ export const TableTitle = ({ title, subtitle }: TableTitleProps) => {
          <Box display="flex">
             <Typography variant="h6">{title}</Typography>
          </Box>
-         {subtitle && (
+         {Boolean(subtitle) && (
             <Box>
                <Typography variant="subtitle1" fontSize="0.8rem" color="gray">
                   {subtitle}

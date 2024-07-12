@@ -1,8 +1,8 @@
+import { NetworkerBadge } from "@careerfairy/shared-lib/badges/NetworkBadges"
 import {
    BusinessFunctionsTagValues,
    ContentTopicsTagValues,
 } from "@careerfairy/shared-lib/constants/tags"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { LoadingButton } from "@mui/lab"
 import { Grid, Typography } from "@mui/material"

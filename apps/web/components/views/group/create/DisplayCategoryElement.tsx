@@ -1,10 +1,10 @@
-import React, { useMemo } from "react"
-import { Box, Card, Chip } from "@mui/material"
-import { sxStyles } from "../../../../types/commonTypes"
 import {
-   convertGroupQuestionOptionsToSortedArray,
    GroupQuestion,
-} from "@careerfairy/shared-lib/dist/groups"
+   convertGroupQuestionOptionsToSortedArray,
+} from "@careerfairy/shared-lib/groups"
+import { Box, Card, Chip } from "@mui/material"
+import { useMemo } from "react"
+import { sxStyles } from "../../../../types/commonTypes"
 
 const styles = sxStyles({
    whiteBox: {

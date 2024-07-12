@@ -1,3 +1,5 @@
+import { IUserReminder, UserReminderType } from "@careerfairy/shared-lib/users"
+import CloseIcon from "@mui/icons-material/Close"
 import {
    Button,
    Grid,
@@ -6,21 +8,16 @@ import {
    SnackbarContent,
    Typography,
 } from "@mui/material"
-import React, { useCallback, useState } from "react"
-import CloseIcon from "@mui/icons-material/Close"
-import IconButton from "@mui/material/IconButton"
-import useIsMobile from "../../custom-hook/useIsMobile"
-import { sxStyles } from "../../../types/commonTypes"
-import { userRepo } from "../../../data/RepositoryInstances"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import {
-   IUserReminder,
-   UserReminderType,
-} from "@careerfairy/shared-lib/dist/users"
 import CircularProgress from "@mui/material/CircularProgress"
-import { sendGeneralError } from "../../../store/actions"
+import IconButton from "@mui/material/IconButton"
+import { useCallback, useState } from "react"
 import { useDispatch } from "react-redux"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import { userRepo } from "../../../data/RepositoryInstances"
+import { sendGeneralError } from "../../../store/actions"
+import { sxStyles } from "../../../types/commonTypes"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    closeBtnWrapper: {
@@ -139,7 +136,7 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
          open={open}
          TransitionComponent={TransitionDown}
          key={"newsletter"}
-         sx={isMobile && { left: 26, right: 26, bottom: 36 }}
+         sx={Boolean(isMobile) && { left: 26, right: 26, bottom: 36 }}
       >
          <SnackbarContent
             style={{ backgroundColor: "white" }}
@@ -203,7 +200,7 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
                               size="large"
                               sx={{ py: 1 }}
                               startIcon={
-                                 isSubmitting && (
+                                 Boolean(isSubmitting) && (
                                     <CircularProgress
                                        color={"inherit"}
                                        size={15}

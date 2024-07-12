@@ -1,13 +1,13 @@
-import MultiCheckboxSelect from "../MultiCheckboxSelect"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { useRouter } from "next/router"
+import { useCallback, useMemo } from "react"
+import { useFieldsOfStudy } from "../../../../custom-hook/useCollection"
 import {
    formatToOptionArray,
    multiListSelectMapValueFn,
 } from "../../../signup/utils"
-import React, { useCallback, useMemo } from "react"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
-import { useRouter } from "next/router"
 import MultiListSelect from "../../MultiListSelect"
-import { useFieldsOfStudy } from "../../../../custom-hook/useCollection"
+import MultiCheckboxSelect from "../MultiCheckboxSelect"
 
 type Props = {
    handleChange: (name: string, selectedOptions: OptionGroup[]) => void

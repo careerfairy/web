@@ -1,4 +1,8 @@
-import React, { useCallback, useMemo, useState } from "react"
+import {
+   GROUP_DASHBOARD_ROLE,
+   GroupAdmin,
+} from "@careerfairy/shared-lib/groups"
+import MaterialTable, { Column, MaterialTableProps } from "@material-table/core"
 import {
    Avatar,
    Badge,
@@ -8,18 +12,14 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
-import { defaultTableOptions, tableIcons } from "../../../../util/tableUtils"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { convertCamelToSentence } from "../../../../helperFunctions/HelperFunctions"
-import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
-import {
-   GROUP_DASHBOARD_ROLE,
-   GroupAdmin,
-} from "@careerfairy/shared-lib/dist/groups"
-import useGroupAdmins from "../../../../custom-hook/useGroupAdmins"
-import MaterialTable, { Column, MaterialTableProps } from "@material-table/core"
-import { sxStyles } from "../../../../../types/commonTypes"
 import TextField from "@mui/material/TextField"
+import { useCallback, useMemo, useState } from "react"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
+import { sxStyles } from "../../../../../types/commonTypes"
+import useGroupAdmins from "../../../../custom-hook/useGroupAdmins"
+import { convertCamelToSentence } from "../../../../helperFunctions/HelperFunctions"
+import { defaultTableOptions, tableIcons } from "../../../../util/tableUtils"
 import AddMemberModal from "./AddMemberModal"
 import ChangeMemberRoleModal from "./ChangeMemberRoleModal"
 import KickMemberModal from "./KickMemberModal"
@@ -277,14 +277,14 @@ const MembersTable = () => {
                actions={actions}
                title={getTitle()}
             />
-            {kickAdminDialogData && (
+            {Boolean(kickAdminDialogData) && (
                <KickMemberModal
                   modalData={kickAdminDialogData}
                   handleClose={closeKickMemberDialog}
                   open={!!kickAdminDialogData}
                />
             )}
-            {changeRoleDialogData && (
+            {Boolean(changeRoleDialogData) && (
                <ChangeMemberRoleModal
                   open={!!changeRoleDialogData}
                   handleClose={closeChangeRoleDialog}
@@ -292,7 +292,7 @@ const MembersTable = () => {
                />
             )}
          </Card>
-         {showAddMemberModal && (
+         {Boolean(showAddMemberModal) && (
             <AddMemberModal
                group={group}
                open={showAddMemberModal}

@@ -1,22 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import PollCategory from "./categories/PollCategory"
-import HandRaiseCategory from "./categories/HandRaiseCategory"
-import QuestionCategory from "../sharedComponents/QuestionCategory"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
+import { Drawer, Fab } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
-import SwipeableViews from "react-swipeable-views"
 import clsx from "clsx"
-import { Drawer, Fab } from "@mui/material"
-import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import SwipeableViews from "react-swipeable-views"
 import * as actions from "store/actions"
-import { leftMenuOpenSelector } from "../../../../store/selectors/streamSelectors"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import JobsCategory from "./categories/JobsCategory"
-import GenericCategoryInactive from "../sharedComponents/GenericCategoryInactive"
-import SupportCategory from "./categories/SupportCategory"
 import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
 import { CurrentStreamContextInterface } from "../../../../context/stream/StreamContext"
+import { leftMenuOpenSelector } from "../../../../store/selectors/streamSelectors"
+import GenericCategoryInactive from "../sharedComponents/GenericCategoryInactive"
+import QuestionCategory from "../sharedComponents/QuestionCategory"
+import HandRaiseCategory from "./categories/HandRaiseCategory"
+import JobsCategory from "./categories/JobsCategory"
+import PollCategory from "./categories/PollCategory"
+import SupportCategory from "./categories/SupportCategory"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -96,6 +96,7 @@ const LeftMenu = ({
       if (value !== newSelectedIndex) {
          setValue(newSelectedIndex)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [selectedState, value])
 
    const handleChange = useCallback(
@@ -104,6 +105,7 @@ const LeftMenu = ({
          setValue(event)
          setSelectedState?.(states[event])
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [setSelectedState, setSliding]
    )
 
@@ -204,7 +206,7 @@ const LeftMenu = ({
          open={showMenu}
          variant={smallScreen ? "temporary" : "persistent"}
       >
-         {showMenu && smallScreen && (
+         {Boolean(showMenu && smallScreen) && (
             <Fab
                className={classes.closeBtn}
                size="small"

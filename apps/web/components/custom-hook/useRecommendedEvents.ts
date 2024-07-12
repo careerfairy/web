@@ -1,5 +1,5 @@
-import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { collection, query, where } from "firebase/firestore"
 import { useEffect, useMemo } from "react"
 import { useFirestore, useFirestoreCollectionData } from "reactfire"

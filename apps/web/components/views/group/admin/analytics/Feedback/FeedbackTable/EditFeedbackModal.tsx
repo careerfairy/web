@@ -1,4 +1,7 @@
-import React, { useCallback, useMemo } from "react"
+import {
+   EventRating,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import {
    Button,
    Checkbox,
@@ -19,21 +22,18 @@ import {
    Slide,
    TextField,
 } from "@mui/material"
-import { Formik } from "formik"
-import { useFirebaseService } from "../../../../../../../context/firebase/FirebaseServiceContext"
-import { LONG_NUMBER } from "../../../../../../util/constants"
-import { getMinutes } from "../../../../../../helperFunctions/HelperFunctions"
-import Stack from "@mui/material/Stack"
 import Collapse from "@mui/material/Collapse"
-import {
-   EventRating,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import useIsMobile from "../../../../../../custom-hook/useIsMobile"
-import SentimentRating from "../../../../../viewer/rating-container/SentimentRating"
-import NormalRating from "../../../../../viewer/rating-container/NormalRating"
+import Stack from "@mui/material/Stack"
+import { Formik } from "formik"
+import React, { useCallback, useMemo } from "react"
 import * as yup from "yup"
+import { useFirebaseService } from "../../../../../../../context/firebase/FirebaseServiceContext"
+import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import useSnackbarNotifications from "../../../../../../custom-hook/useSnackbarNotifications"
+import { getMinutes } from "../../../../../../helperFunctions/HelperFunctions"
+import { LONG_NUMBER } from "../../../../../../util/constants"
+import NormalRating from "../../../../../viewer/rating-container/NormalRating"
+import SentimentRating from "../../../../../viewer/rating-container/SentimentRating"
 
 const marks = [
    5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95,
@@ -311,7 +311,7 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                   <Button
                      variant="contained"
                      endIcon={
-                        isSubmitting && (
+                        Boolean(isSubmitting) && (
                            <CircularProgress size={20} color="inherit" />
                         )
                      }

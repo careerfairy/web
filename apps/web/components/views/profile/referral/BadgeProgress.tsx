@@ -1,11 +1,11 @@
-import Box from "@mui/material/Box"
+import { NetworkerBadge } from "@careerfairy/shared-lib/badges/NetworkBadges"
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
+import { getUserBadges } from "@careerfairy/shared-lib/users/UserBadges"
 import { LinearProgress, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
-import BadgeIcon from "../../common/BadgeIcon"
-import { getUserBadges } from "@careerfairy/shared-lib/dist/users/UserBadges"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import { useAuth } from "../../../../HOCs/AuthProvider"
+import BadgeIcon from "../../common/BadgeIcon"
 
 const BadgeProgress = () => {
    const { userData, userStats } = useAuth()
@@ -17,7 +17,7 @@ const BadgeProgress = () => {
    }
 
    // we only have the networker badge for now, we need to change this in the future
-   let networkerBadge = userBadges.networkerBadge()
+   const networkerBadge = userBadges.networkerBadge()
    let nextBadge: Badge
 
    if (!networkerBadge) {

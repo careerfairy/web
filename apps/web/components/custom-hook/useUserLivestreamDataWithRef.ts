@@ -1,7 +1,7 @@
-import { useFirestore, useFirestoreDocDataOnce } from "reactfire"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { doc } from "firebase/firestore"
-import { createGenericConverter } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import { useFirestore, useFirestoreDocDataOnce } from "reactfire"
 import useStreamRef from "./useStreamRef"
 
 const useUserLivestreamDataWithRef = (

@@ -1,21 +1,21 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
+import { Typography } from "@mui/material"
+import Button from "@mui/material/Button"
+import CircularProgress from "@mui/material/CircularProgress"
+import Container from "@mui/material/Container"
+import Stack from "@mui/material/Stack"
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
+import { useRouter } from "next/router"
+import { useEffect, useMemo } from "react"
+import useSWR from "swr"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import useSnackbarNotifications from "../../../components/custom-hook/useSnackbarNotifications"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../../../components/custom-hook/utils/useFunctionsSWRFetcher"
-import useSWR from "swr"
-import CircularProgress from "@mui/material/CircularProgress"
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
-import useSnackbarNotifications from "../../../components/custom-hook/useSnackbarNotifications"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import GeneralLayout from "../../../layouts/GeneralLayout"
-import { useEffect, useMemo } from "react"
-import Container from "@mui/material/Container"
-import { Typography } from "@mui/material"
-import Stack from "@mui/material/Stack"
 import { MainLogo } from "../../../components/logos"
-import { useRouter } from "next/router"
-import { WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
-import Button from "@mui/material/Button"
+import GeneralLayout from "../../../layouts/GeneralLayout"
 
 type GroupInvitePageProps = InferGetServerSidePropsType<
    typeof getServerSideProps
@@ -86,7 +86,7 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
          return (
             <Stack spacing={2} direction="column" alignItems="center">
                <MainLogo />
-               {isWrongEmailError && (
+               {Boolean(isWrongEmailError) && (
                   <Typography align={"center"} variant={"h5"}>
                      This invite is not for your currently logged in account:{" "}
                      <b>{authenticatedUser?.email}</b>
@@ -95,7 +95,7 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
                <Typography align={"center"} variant={"h6"}>
                   {error.message?.replace("Error: ", "")}
                </Typography>
-               {isWrongEmailError && (
+               {Boolean(isWrongEmailError) && (
                   <Button variant={"contained"} onClick={signOut}>
                      Click here to logout and {flow || "login"} with the correct
                      email

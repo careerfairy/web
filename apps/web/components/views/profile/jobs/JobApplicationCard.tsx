@@ -1,13 +1,13 @@
-import { UserJobApplicationDocument } from "@careerfairy/shared-lib/dist/users"
-import Card from "@mui/material/Card"
-import { CardContent, CardHeader, Divider, Typography } from "@mui/material"
-import React, { useMemo } from "react"
-import { sxStyles } from "../../../../types/commonTypes"
-import Stack from "@mui/material/Stack"
+import { UserJobApplicationDocument } from "@careerfairy/shared-lib/users"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import TaskAltRoundedIcon from "@mui/icons-material/TaskAltRounded"
-import DateUtil from "../../../../util/DateUtil"
+import { CardContent, CardHeader, Divider, Typography } from "@mui/material"
+import Card from "@mui/material/Card"
 import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
+import React, { useMemo } from "react"
+import { sxStyles } from "../../../../types/commonTypes"
+import DateUtil from "../../../../util/DateUtil"
 
 const styles = sxStyles({
    title: {

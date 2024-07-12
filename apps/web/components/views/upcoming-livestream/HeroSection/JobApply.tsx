@@ -1,6 +1,7 @@
-import React, { useCallback, useState } from "react"
-import { SuspenseWithBoundary } from "../../../ErrorBoundary"
-import JobDialog from "../../streaming/LeftMenu/categories/jobs/JobDialog"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
 import {
    Box,
    Button,
@@ -10,17 +11,16 @@ import {
    ListItemText,
    Typography,
 } from "@mui/material"
-import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import Skeleton from "@mui/material/Skeleton"
+import { useCallback, useState } from "react"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../types/commonTypes"
-import useUserLivestreamData from "../../../custom-hook/useUserLivestreamData"
+import { SuspenseWithBoundary } from "../../../ErrorBoundary"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import useLivestreamJobs from "../../../custom-hook/useLivestreamJobs"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import Skeleton from "@mui/material/Skeleton"
-import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import useUserLivestreamData from "../../../custom-hook/useUserLivestreamData"
+import JobDialog from "../../streaming/LeftMenu/categories/jobs/JobDialog"
 
 const styles = sxStyles({
    itemWrapper: {
@@ -82,7 +82,7 @@ const LoadingJobsSpinner = () => {
 }
 
 const JobList = ({ livestream }: Props) => {
-   let { jobs } = useLivestreamJobs(livestream.id, livestream.jobs)
+   const { jobs } = useLivestreamJobs(livestream.id, livestream.jobs)
    const [selectedJob, setSelectedJob] = useState(null)
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()

@@ -1,19 +1,20 @@
-import React, { useCallback, useEffect, useState } from "react"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { Button, FormControl, Grid, TextField } from "@mui/material"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import makeStyles from "@mui/styles/makeStyles"
-import { Formik } from "formik"
-import clsx from "clsx"
-import * as actions from "../../../../store/actions"
-import { getMinutesPassed } from "../../../helperFunctions/HelperFunctions"
-import { useDispatch } from "react-redux"
-import useStreamRef from "../../../custom-hook/useStreamRef"
+/* eslint-disable no-extra-semi */
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { EventRating } from "@careerfairy/shared-lib/src/livestreams"
+import { Button, FormControl, Grid, TextField } from "@mui/material"
+import makeStyles from "@mui/styles/makeStyles"
+import clsx from "clsx"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { Formik } from "formik"
+import { useCallback, useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import * as actions from "../../../../store/actions"
+import useStreamRef from "../../../custom-hook/useStreamRef"
+import { getMinutesPassed } from "../../../helperFunctions/HelperFunctions"
 import NormalRating from "./NormalRating"
 import SentimentRating from "./SentimentRating"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { errorLogAndNotify } from "util/CommonUtil"
 
 const useStyles = makeStyles((theme) => ({
    snackbar: {
@@ -94,6 +95,7 @@ const ActionComponent = ({
          setSubmitting(false)
          closeSnackbar(rating.id)
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [closeSnackbar, email, firebase, livestreamId, rating.id]
    )
 
@@ -101,6 +103,7 @@ const ActionComponent = ({
       setSubmitting(true)
       try {
          await firebase.optOutOfRating(livestreamId, email, rating.id)
+         // eslint-disable-next-line no-empty
       } catch (e) {}
       setSubmitting(false)
       closeSnackbar(rating.id)
@@ -159,7 +162,7 @@ const ActionComponent = ({
          }}
          enableReinitialize
          validate={(values) => {
-            let errors: any = {}
+            const errors: any = {}
             if (!values[rating.id] && !values.message) {
                errors.message = "Please fill one"
                errors[rating.id] = "Please fill one"
@@ -289,6 +292,7 @@ const RatingContainer = ({ livestream, livestreamId }: Props) => {
          setMinutesPassed(getMinutesPassed(livestream))
       }, 10 * 1000) // check for minutes passed every 10 seconds
       return () => clearInterval(interval)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [livestream.start])
 
    useEffect(() => {
@@ -297,6 +301,7 @@ const RatingContainer = ({ livestream, livestreamId }: Props) => {
             await handleCheckRatings()
          })()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [minutesPassed, livestream.hasEnded])
 
    const hasNotRatedAndTimeHasPassed = (rating) => {

@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react"
+/* eslint-disable no-extra-semi */
+import { Group } from "@careerfairy/shared-lib/groups"
+import { UserAdminGroup } from "@careerfairy/shared-lib/users"
 import {
    Box,
    Button,
@@ -11,22 +13,21 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import { useRouter } from "next/router"
-import CurrentGroup from "components/views/profile/CurrentGroup"
-import makeStyles from "@mui/styles/makeStyles"
-import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
-import ContentCard from "../../../../layouts/UserLayout/ContentCard"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import Link from "../../common/Link"
-import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
-import { groupRepo } from "../../../../data/RepositoryInstances"
 import Autocomplete from "@mui/material/Autocomplete"
+import makeStyles from "@mui/styles/makeStyles"
 import match from "autosuggest-highlight/match"
 import parse from "autosuggest-highlight/parse"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
-import { UserAdminGroup } from "@careerfairy/shared-lib/dist/users"
+import CurrentGroup from "components/views/profile/CurrentGroup"
+import { useRouter } from "next/router"
+import React, { useEffect, useMemo, useState } from "react"
 import { Search as FindIcon } from "react-feather"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { groupRepo } from "../../../../data/RepositoryInstances"
+import ContentCard from "../../../../layouts/UserLayout/ContentCard"
+import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
+import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import Link from "../../common/Link"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -153,6 +154,7 @@ const Groups = ({ isOnDialog = false, containerRef }: Props) => {
 
    useEffect(() => {
       resetInput()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [value])
 
    useEffect(() => {

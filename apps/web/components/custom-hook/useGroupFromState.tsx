@@ -1,8 +1,8 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { useMemo } from "react"
 import { useSelector } from "react-redux"
 import { groupSelector } from "../../store/selectors/groupSelectors"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
-import { useMemo } from "react"
 
 type Result = {
    group?: Group

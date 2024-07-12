@@ -1,5 +1,10 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react"
-import { useTheme } from "@mui/material/styles"
+import { convertDictToDocArray } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import {
+   LivestreamGroupQuestion,
+   LivestreamGroupQuestions,
+   LivestreamGroupQuestionsMap,
+} from "@careerfairy/shared-lib/livestreams"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import {
    Chip,
    MenuItem,
@@ -7,19 +12,14 @@ import {
    Typography,
    useMediaQuery,
 } from "@mui/material"
-import {
-   LivestreamGroupQuestion,
-   LivestreamGroupQuestions,
-   LivestreamGroupQuestionsMap,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
-import { convertDictToDocArray } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { useTheme } from "@mui/material/styles"
 import {
    FormikErrors,
    FormikHandlers,
    FormikHelpers,
    FormikTouched,
 } from "formik"
+import React, { Fragment, useCallback, useEffect, useState } from "react"
 
 interface Props {
    groupQuestions: LivestreamGroupQuestions
@@ -55,7 +55,7 @@ const LivestreamGroupQuestionsSelector = ({
                <QuestionSelect
                   key={question.id}
                   handleBlur={handleBlur}
-                  errorText={errorText && touchedEl && errorText}
+                  errorText={Boolean(errorText && touchedEl) && errorText}
                   inputName={`${groupQuestions.groupId}.questions.${question.id}.selectedOptionId`}
                   question={question}
                   setFieldValue={setFieldValue}
@@ -82,6 +82,7 @@ const QuestionSelect = ({
 }: QuestionSelectProps) => {
    const theme = useTheme()
    const native = useMediaQuery(theme.breakpoints.down("sm"))
+   // eslint-disable-next-line react/hook-use-state
    const [options] = useState(
       convertDictToDocArray(question.options).sort(dynamicSort("name"))
    )
@@ -100,7 +101,7 @@ const QuestionSelect = ({
          name={inputName}
          label={
             <Typography variant={"inherit"}>
-               {isNew && (
+               {Boolean(isNew) && (
                   <Chip
                      sx={{ mr: 0.5 }}
                      size={"small"}
@@ -120,7 +121,7 @@ const QuestionSelect = ({
             native: native,
          }}
       >
-         {native && <option value="" disabled></option>}
+         {Boolean(native) && <option value="" disabled></option>}
          {options.map((option) => {
             if (native) {
                return (

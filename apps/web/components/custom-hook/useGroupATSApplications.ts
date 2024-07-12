@@ -1,10 +1,10 @@
 import {
    LivestreamEvent,
    UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { livestreamRepo } from "../../data/RepositoryInstances"
-import useSWR from "swr"
+} from "@careerfairy/shared-lib/livestreams"
 import { useCallback } from "react"
+import useSWR from "swr"
+import { livestreamRepo } from "../../data/RepositoryInstances"
 
 /**
  * Grabs the ATS applications for a given group & integration
@@ -75,7 +75,7 @@ function filterJobApplications(
    integrationId: string
 ) {
    // job ids for the given integration id
-   let validJobIds = livestreams
+   const validJobIds = livestreams
       .map((stream) =>
          stream.jobs
             .filter((j) => j.integrationId === integrationId)
@@ -83,7 +83,7 @@ function filterJobApplications(
       )
       .flat()
 
-   for (let jobId in data.jobApplications) {
+   for (const jobId in data.jobApplications) {
       if (!validJobIds.includes(jobId)) {
          delete data.jobApplications[jobId]
       }

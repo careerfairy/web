@@ -1,9 +1,9 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
+import keywordExtractor from "keyword-extractor"
 import { getResizedUrl } from "../components/helperFunctions/HelperFunctions"
 import { SeoProps } from "../components/util/SEO"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import keywordExtractor from "keyword-extractor"
 import DateUtil from "./DateUtil"
-import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 
 export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
    const streamDate = stream.startDate

@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import AgoraRTC, {
    IAgoraRTCClient,
    ILocalAudioTrack,

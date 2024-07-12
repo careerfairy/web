@@ -1,5 +1,5 @@
-import Box from "@mui/material/Box"
-import { sxStyles } from "../../../types/commonTypes"
+import { FieldOfStudy } from "@careerfairy/shared-lib/marketing/MarketingUser"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import {
    Button,
    CircularProgress,
@@ -9,22 +9,22 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import React, { useCallback, useMemo, useState } from "react"
-import { marketingServiceInstance } from "../../../data/firebase/MarketingService"
+import Box from "@mui/material/Box"
 import { Formik } from "formik"
+import { useRouter } from "next/router"
+import { useCallback, useMemo, useState } from "react"
 import * as yup from "yup"
-import { marketingSignUpFormId } from "../constants"
+import { marketingServiceInstance } from "../../../data/firebase/MarketingService"
 import {
    HygraphResponseButton,
    HygraphResponseMarketingSignup,
 } from "../../../types/cmsTypes"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
-import { useRouter } from "next/router"
+import { sxStyles } from "../../../types/commonTypes"
+import CookiesUtil from "../../../util/CookiesUtil"
 import useIsMobile from "../../custom-hook/useIsMobile"
+import { marketingSignUpFormId } from "../constants"
 import CmsImage from "../image"
 import { useMarketingLandingPage } from "./MarketingLandingPageProvider"
-import CookiesUtil from "../../../util/CookiesUtil"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const styles = sxStyles({
    largeContainer: {
@@ -59,6 +59,7 @@ const MarketingSignUp = ({
    icon,
 }: MarketingSignUpProps) => {
    const isMobile = useIsMobile()
+   // eslint-disable-next-line react/hook-use-state
    const [isComplete, setComplete] = useState(false)
    return (
       <Box my={6}>
@@ -73,9 +74,9 @@ const MarketingSignUp = ({
          >
             <Grid container spacing={2} p={{ xs: 6, md: 8, lg: 10 }}>
                <Grid item xs={12} lg={6}>
-                  {shortText && (
+                  {Boolean(shortText) && (
                      <Box sx={styles.leftBlock}>
-                        {icon && (
+                        {Boolean(icon) && (
                            <Box pb={4} maxWidth={70} margin="auto">
                               <CmsImage cmsImage={icon} />
                            </Box>
@@ -88,7 +89,7 @@ const MarketingSignUp = ({
                </Grid>
                <Grid item xs={12} lg={6} mt={{ xs: 4, lg: 0 }}>
                   <Box maxWidth={{ lg: "100%", xl: "80%" }}>
-                     {title && (
+                     {Boolean(title) && (
                         <Typography variant="h6" color="white">
                            {title}
                         </Typography>
@@ -101,7 +102,7 @@ const MarketingSignUp = ({
                               fieldsOfStudy={fieldsOfStudy}
                            />
                         )}
-                        {isComplete && <Complete />}
+                        {Boolean(isComplete) && <Complete />}
                      </Box>
                   </Box>
                </Grid>
@@ -162,6 +163,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                fieldOfStudyId: values.fieldOfStudyId,
                utmParams: CookiesUtil.getUTMParams() ?? {},
             })
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .then((_) => {
                setFormCompleted(true)
                resetForm()
@@ -226,8 +228,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                            )}
                            // @ts-ignore
                            helperText={
-                              errors.firstName &&
-                              touched.firstName &&
+                              Boolean(errors.firstName && touched.firstName) &&
                               errors.firstName
                            }
                         />
@@ -253,8 +254,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                            )}
                            // @ts-ignore
                            helperText={
-                              errors.lastName &&
-                              touched.lastName &&
+                              Boolean(errors.lastName && touched.lastName) &&
                               errors.lastName
                            }
                         />
@@ -279,7 +279,8 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                            )}
                            // @ts-ignore
                            helperText={
-                              errors.email && touched.email && errors.email
+                              Boolean(errors.email && touched.email) &&
+                              errors.email
                            }
                         />
                      </Grid>
@@ -299,9 +300,9 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                            )}
                            // @ts-ignore
                            helperText={
-                              errors.fieldOfStudyId &&
-                              touched.fieldOfStudyId &&
-                              errors.fieldOfStudyId
+                              Boolean(
+                                 errors.fieldOfStudyId && touched.fieldOfStudyId
+                              ) && errors.fieldOfStudyId
                            }
                         />
                      </Box>
@@ -317,7 +318,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                         variant="contained"
                         disabled={isSubmitting}
                         endIcon={
-                           isSubmitting && (
+                           Boolean(isSubmitting) && (
                               <CircularProgress size={20} color="inherit" />
                            )
                         }
@@ -328,7 +329,9 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                         {buttonProps?.children || "Send"}
                      </Button>
                   </Box>
-                  {backendError && <BackendError error={backendError} />}
+                  {Boolean(backendError) && (
+                     <BackendError error={backendError} />
+                  )}
                </>
             </form>
          )}
@@ -343,6 +346,7 @@ const FieldOfStudySelector = ({
    disabled,
    error,
    helperText,
+   // eslint-disable-next-line react/no-object-type-as-default-prop
    fieldsOfStudy = [],
 }) => {
    return (

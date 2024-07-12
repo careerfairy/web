@@ -1,16 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import { useRouter } from "next/router"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
-import { formatLivestreamsEvents } from "./utils"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+import { useRouter } from "next/router"
+import { useEffect, useMemo, useState } from "react"
+import { sxStyles } from "types/commonTypes"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
    EventsTypes,
 } from "./EventsPreviewCarousel"
-import { sxStyles } from "types/commonTypes"
+import { formatLivestreamsEvents } from "./utils"
 
 const config = {
    suspense: false,

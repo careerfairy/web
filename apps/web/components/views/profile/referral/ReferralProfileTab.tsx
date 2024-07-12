@@ -1,3 +1,6 @@
+import { NetworkerBadge } from "@careerfairy/shared-lib/badges/NetworkBadges"
+import { getHumanStringDescriptionForAction } from "@careerfairy/shared-lib/rewards"
+import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import {
    Box,
    Button,
@@ -12,26 +15,22 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import React from "react"
-import ContentPasteIcon from "@mui/icons-material/ContentPaste"
-import { makeReferralUrl } from "../../../../util/makeUrls"
+import * as Sentry from "@sentry/nextjs"
 import { useSnackbar } from "notistack"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import ContentCard from "../../../../layouts/UserLayout/ContentCard"
+import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { makeReferralUrl } from "../../../../util/makeUrls"
+import { SuspenseWithBoundary } from "../../../ErrorBoundary"
+import useUserRewards from "../../../custom-hook/useUserRewards"
 import {
    copyStringToClipboard,
    getTimeFromNow,
 } from "../../../helperFunctions/HelperFunctions"
-import * as Sentry from "@sentry/nextjs"
-import { getHumanStringDescriptionForAction } from "@careerfairy/shared-lib/dist/rewards"
 import BadgeSimpleButton from "../BadgeSimpleButton"
-import BadgeProgress from "./BadgeProgress"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
-import ContentCard from "../../../../layouts/UserLayout/ContentCard"
-import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
-import { useAuth } from "../../../../HOCs/AuthProvider"
 import { styles } from "../profileStyles"
-import useUserRewards from "../../../custom-hook/useUserRewards"
-import { SuspenseWithBoundary } from "../../../ErrorBoundary"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import BadgeProgress from "./BadgeProgress"
 
 const ReferralProfileTab = () => {
    const { userData, userPresenter } = useAuth()

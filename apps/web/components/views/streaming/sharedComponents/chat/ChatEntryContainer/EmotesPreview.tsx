@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react"
+import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
+import { Paper, Typography, Zoom } from "@mui/material"
+import Image from "next/legacy/image"
+import { useEffect, useState } from "react"
+import { sxStyles } from "../../../../../../types/commonTypes"
 import {
    heartPng,
    laughingPng,
    thumbsUpPng,
    wowPng,
 } from "../EmotesModal/utils"
-import { Paper, Typography, Zoom } from "@mui/material"
-import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
-import Image from "next/legacy/image"
-import { sxStyles } from "../../../../../../types/commonTypes"
 
 const styles = sxStyles({
    emotesPreviewPaperWrapper: {
@@ -24,9 +24,9 @@ const styles = sxStyles({
       right: 0,
       overflow: "hidden",
       borderRadius: 2,
-      "&  > *": (theme) => ({
+      "&  > *": {
          margin: (theme) => `0 ${theme.spacing(0.3)} !important`,
-      }),
+      },
    },
    totalText: {
       fontSize: 10,

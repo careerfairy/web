@@ -1,27 +1,27 @@
-import React, { useMemo, useState } from "react"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Container, Grid, Tooltip } from "@mui/material"
-import TotalRegistrations from "./TotalRegistrations"
-import TotalUniqueRegistrations from "./TotalUniqueRegistrations"
-import CategoryBreakdown from "./CategoryBreakdown"
-import AverageRegistrations from "./AverageRegistrations"
-import { mustBeNumber } from "../../../../../helperFunctions/HelperFunctions"
 import { useTheme } from "@mui/material/styles"
-import LatestEvents from "../common/LatestEvents"
-import UserCount from "./UserCount"
-import TotalUniqueParticipatingStudents from "./TotalUniqueParticipatingStudents"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import React, { useMemo, useState } from "react"
+import { useSelector } from "react-redux"
 import {
    getTotalEmailsFromStreamsByProperty,
    getUniqueIds,
 } from "../../../../../../data/util/AnalyticsUtil"
-import useUserDataSet from "../../../../../custom-hook/useUserDataSet"
-import { useSelector } from "react-redux"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { GlobalTimeFrame } from "../../../../../custom-hook/useTimeFrames"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserDataSet, UserType } from "../index"
 import { RootState } from "../../../../../../store"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import { GlobalTimeFrame } from "../../../../../custom-hook/useTimeFrames"
+import useUserDataSet from "../../../../../custom-hook/useUserDataSet"
+import { mustBeNumber } from "../../../../../helperFunctions/HelperFunctions"
+import LatestEvents from "../common/LatestEvents"
+import { UserDataSet, UserType } from "../index"
+import AverageRegistrations from "./AverageRegistrations"
+import CategoryBreakdown from "./CategoryBreakdown"
+import TotalRegistrations from "./TotalRegistrations"
+import TotalUniqueParticipatingStudents from "./TotalUniqueParticipatingStudents"
+import TotalUniqueRegistrations from "./TotalUniqueRegistrations"
+import UserCount from "./UserCount"
 
 const styles = sxStyles({
    root: {
@@ -210,19 +210,23 @@ const General = ({
 
    const averageRegistrations = useMemo(
       () => getAverageRegistrationsPerEvent(),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [streamsFromTimeFrameAndFuture]
    )
 
    const registrationsStatus = useMemo(
       () => compareRegistrations(),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
    )
    const uniqueRegistrationsStatus = useMemo(
       () => compareUniqueRegistrations("registeredUsers"),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
    )
    const uniqueParticipationStatus = useMemo(
       () => compareUniqueRegistrations("participatingStudents"),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
    )
 
@@ -299,7 +303,7 @@ const General = ({
                         />
                      </Grid>
                   </Tooltip>
-                  {mediumScreen && !group.universityCode && (
+                  {Boolean(mediumScreen && !group.universityCode) && (
                      <Tooltip
                         arrow
                         title={`This block displays the total number of individual users who watched your events over the past ${globalTimeFrame.name}.`}

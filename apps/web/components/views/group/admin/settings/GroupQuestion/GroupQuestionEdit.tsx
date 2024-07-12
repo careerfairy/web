@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react"
-import AddIcon from "@mui/icons-material/Add"
 import {
-   AddGroupQuestion,
-   DeleteGroupQuestion,
-   DeleteOption,
-   RenameOption,
-} from "./Option/GroupQuestionEditDialogs"
+   Group,
+   GroupQuestion,
+   GroupQuestionOption,
+} from "@careerfairy/shared-lib/groups"
+import AddIcon from "@mui/icons-material/Add"
+import EditIcon from "@mui/icons-material/Edit"
 import {
    Box,
    Button,
@@ -23,15 +22,16 @@ import {
    Tooltip,
    Zoom,
 } from "@mui/material"
-import EditIcon from "@mui/icons-material/Edit"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import {
-   Group,
-   GroupQuestion,
-   GroupQuestionOption,
-} from "@careerfairy/shared-lib/dist/groups"
+import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 import { groupRepo } from "../../../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import {
+   AddGroupQuestion,
+   DeleteGroupQuestion,
+   DeleteOption,
+   RenameOption,
+} from "./Option/GroupQuestionEditDialogs"
 
 const styles = sxStyles({
    errorButton: {
@@ -110,6 +110,7 @@ const GroupQuestionEdit = ({
       ) {
          setErrorObj({ ...errorObj, optionError: false })
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [Object.keys(localGroupQuestion.options).length])
 
    useEffect(() => {
@@ -212,13 +213,6 @@ const GroupQuestionEdit = ({
       setAnchorEl(null)
    }
 
-   const toggleGroupQuestionHidden = async (event) => {
-      const isHidden = event.currentTarget.checked
-      setLocalGroupQuestion((prevGroupQuestion) => {
-         return { ...prevGroupQuestion, hidden: isHidden }
-      })
-   }
-
    const resetUpdateMode = () => setUpdateMode({})
 
    const optionElements = Object.keys(localGroupQuestion?.options).map(
@@ -266,33 +260,10 @@ const GroupQuestionEdit = ({
                onChange={handleChange}
             />
             <FormHelperText sx={styles.nameError} error>
-               {touched && !localGroupQuestion.name?.length && "Required"}
+               {Boolean(touched && !localGroupQuestion.name?.length) &&
+                  "Required"}
             </FormHelperText>
             <Card>
-               {/*TODO we might not need this anymore as questions are opt in per event*/}
-               {/*   <Tooltip*/}
-               {/*      title={*/}
-               {/*         localGroupQuestion.hidden*/}
-               {/*            ? "Re-enable this question so that users will be prompted to fill it in when registering for your events."*/}
-               {/*            : "Don’t ask this question when users register to your events."*/}
-               {/*      }*/}
-               {/*   >*/}
-               {/*      <FormControlLabel*/}
-               {/*         control={*/}
-               {/*            <Switch*/}
-               {/*               checked={Boolean(localGroupQuestion.hidden)}*/}
-               {/*               onChange={toggleGroupQuestionHidden}*/}
-               {/*               name="question-visibility-toggle"*/}
-               {/*               color="primary"*/}
-               {/*            />*/}
-               {/*         }*/}
-               {/*         label={*/}
-               {/*            localGroupQuestion.hidden*/}
-               {/*               ? "Hidden"*/}
-               {/*               : "Hide Question"*/}
-               {/*         }*/}
-               {/*      />*/}
-               {/*   </Tooltip>*/}
                <CardHeader subheader="Question Options" />
                <Divider />
                <CardActions>
@@ -311,7 +282,8 @@ const GroupQuestionEdit = ({
                      </IconButton>
                   </div>
                   <FormHelperText error>
-                     {errorObj.optionError && "You must add at least 2 options"}
+                     {Boolean(errorObj.optionError) &&
+                        "You must add at least 2 options"}
                   </FormHelperText>
                </CardActions>
             </Card>

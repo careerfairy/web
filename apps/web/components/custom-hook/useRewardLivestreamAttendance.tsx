@@ -1,14 +1,14 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/rewards"
+import * as Sentry from "@sentry/nextjs"
+import { rewardService } from "data/firebase/RewardService"
 import { useEffect } from "react"
 import { useLocalStorage, useSessionStorage } from "react-use"
+import { useAuth } from "../../HOCs/AuthProvider"
 import {
    localStorageInvite,
    localStorageReferralCode,
 } from "../../constants/localStorageKeys"
-import * as Sentry from "@sentry/nextjs"
-import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/dist/rewards"
-import { useAuth } from "../../HOCs/AuthProvider"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { rewardService } from "data/firebase/RewardService"
 
 const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
    const { isLoggedIn } = useAuth()
@@ -72,6 +72,7 @@ const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
          Sentry.captureException(e)
          console.error(e)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       isLoggedIn,
       livestreamData?.hasStarted,

@@ -1,12 +1,12 @@
-import useSWR from "swr"
 import {
    MergeMetaEntities,
    MergeMetaResponse,
-} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+} from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
+import { useMemo } from "react"
+import useSWR from "swr"
 import useFunctionsSWRFetcher, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
-import { useMemo } from "react"
 
 /**
  * Fetch a single or multiple entities meta information from Merge

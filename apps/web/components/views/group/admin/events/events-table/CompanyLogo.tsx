@@ -1,11 +1,11 @@
-import React from "react"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import EditIcon from "@mui/icons-material/Edit"
+import ImageIcon from "@mui/icons-material/Image"
 import { Avatar, Box, Button } from "@mui/material"
 import { alpha } from "@mui/material/styles"
-import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
-import ImageIcon from "@mui/icons-material/Image"
-import EditIcon from "@mui/icons-material/Edit"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import React from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {

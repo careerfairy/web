@@ -1,3 +1,11 @@
+import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/groups"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestionsMap,
+   LivestreamQuestion,
+} from "@careerfairy/shared-lib/livestreams"
+import { livestreamRepo, userRepo } from "data/RepositoryInstances"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import React, {
    createContext,
    useCallback,
@@ -6,22 +14,14 @@ import React, {
    useReducer,
    useState,
 } from "react"
-import GroupsUtil from "../../data/util/GroupsUtil"
-import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 import { useAuth } from "../../HOCs/AuthProvider"
-import StatsUtil from "../../data/util/StatsUtil"
 import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer"
-import {
-   LivestreamEvent,
-   LivestreamGroupQuestionsMap,
-   LivestreamQuestion,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
-import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import { errorLogAndNotify } from "../../util/CommonUtil"
-import { livestreamRepo, userRepo } from "data/RepositoryInstances"
-import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import { sparkService } from "../../data/firebase/SparksService"
+import GroupsUtil from "../../data/util/GroupsUtil"
+import StatsUtil from "../../data/util/StatsUtil"
+import { errorLogAndNotify } from "../../util/CommonUtil"
+import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 
 type Variants = "standard"
 type Margins = "normal"

@@ -1,4 +1,4 @@
-import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
+import { BaseModel } from "@careerfairy/shared-lib/BaseModel"
 import {
    HygraphResponseHero,
    HygraphResponsePage,

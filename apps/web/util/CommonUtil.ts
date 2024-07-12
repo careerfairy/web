@@ -1,5 +1,5 @@
 /* eslint-disable no-var */
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import * as Sentry from "@sentry/nextjs"
 import LocalStorageUtil from "./LocalStorageUtil"
 

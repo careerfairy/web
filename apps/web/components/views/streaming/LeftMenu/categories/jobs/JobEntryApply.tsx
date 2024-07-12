@@ -1,12 +1,11 @@
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import Box from "@mui/material/Box"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import ContentCard from "../../../../../../layouts/UserLayout/ContentCard"
-import React from "react"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { UserData } from "@careerfairy/shared-lib/users"
 import LoadingButton from "@mui/lab/LoadingButton"
-import dynamic from "next/dynamic"
 import { Typography } from "@mui/material"
+import Box from "@mui/material/Box"
+import dynamic from "next/dynamic"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import ContentCard from "../../../../../../layouts/UserLayout/ContentCard"
 import useJobApply from "../../../../../custom-hook/ats/useJobApply"
 
 type Props = {
@@ -60,7 +59,7 @@ const JobEntryApply = ({
 
    const missingDataComponents = []
 
-   for (let requiredDataToApplyElement of requiredDataToApply) {
+   for (const requiredDataToApplyElement of requiredDataToApply) {
       if (!userData[requiredDataToApplyElement.field]) {
          missingDataComponents.push(requiredDataToApplyElement.component)
       }

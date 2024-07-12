@@ -1,5 +1,8 @@
-import React, { useMemo, useRef, useState } from "react"
-import { Doughnut } from "react-chartjs-2"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import RotateLeftIcon from "@mui/icons-material/RotateLeft"
 import {
    Accordion,
    AccordionDetails,
@@ -18,23 +21,20 @@ import {
    Tabs,
    Typography,
 } from "@mui/material"
-import RotateLeftIcon from "@mui/icons-material/RotateLeft"
-import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
-import CustomLegend from "../../../../../../materialUI/Legends"
+import { useTheme } from "@mui/material/styles"
 import Chart from "chart.js"
 import "chartjs-plugin-labels"
-import { customDonutConfig } from "../common/TableUtils"
-import { useTheme } from "@mui/material/styles"
+import React, { useMemo, useRef, useState } from "react"
+import { Doughnut } from "react-chartjs-2"
 import { useSelector } from "react-redux"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import { RootState } from "../../../../../../store"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserDataSet, UserType } from "../index"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
+import CustomLegend from "../../../../../../materialUI/Legends"
+import { RootState } from "../../../../../../store"
+import { sxStyles } from "../../../../../../types/commonTypes"
 import useUserBreakdownStats from "../../../../../custom-hook/useUserBreakdownStats"
+import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
+import { customDonutConfig } from "../common/TableUtils"
+import { UserDataSet, UserType } from "../index"
 
 Chart.defaults.global.plugins.labels = false
 

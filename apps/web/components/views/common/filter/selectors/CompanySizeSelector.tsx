@@ -1,12 +1,12 @@
-import MultiCheckboxSelect from "../MultiCheckboxSelect"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CompanySizesCodes } from "@careerfairy/shared-lib/constants/forms"
+import { useRouter } from "next/router"
+import { useCallback, useMemo } from "react"
 import {
    formatToOptionArray,
    multiListSelectMapValueFn,
 } from "../../../signup/utils"
-import React, { useCallback, useMemo } from "react"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
-import { useRouter } from "next/router"
+import MultiCheckboxSelect from "../MultiCheckboxSelect"
 
 type Props = {
    handleChange: (name: string, selectedOptions: OptionGroup[]) => void

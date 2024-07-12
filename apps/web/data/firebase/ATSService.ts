@@ -1,19 +1,19 @@
+import {
+   ATSDataPaginationOptions,
+   ATSPaginatedResults,
+} from "@careerfairy/shared-lib/ats/Functions"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import {
+   MergeExtraRequiredData,
+   MergeLinkTokenResponse,
+} from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
+import { GroupATSAccountDocument } from "@careerfairy/shared-lib/groups"
+import firebase from "firebase/compat/app"
+import { v4 as uuidv4 } from "uuid"
 import firebaseInstance, {
    FieldValue,
    FunctionsInstance,
 } from "./FirebaseInstance"
-import firebase from "firebase/compat/app"
-import { v4 as uuidv4 } from "uuid"
-import {
-   MergeExtraRequiredData,
-   MergeLinkTokenResponse,
-} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
-import {
-   ATSDataPaginationOptions,
-   ATSPaginatedResults,
-} from "@careerfairy/shared-lib/dist/ats/Functions"
 
 export class ATSService {
    constructor(
@@ -80,7 +80,7 @@ export class ATSService {
          "fetchATSJobs_eu"
       )(params)
 
-      let mappedData = data.data.results
+      const mappedData = data.data.results
          .map(Job.createFromPlainObject)
          .map((job: Job) => {
             job.setIntegrationId(integrationId)

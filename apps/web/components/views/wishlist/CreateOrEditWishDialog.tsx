@@ -1,4 +1,7 @@
-import React, { useMemo } from "react"
+import { Interest } from "@careerfairy/shared-lib/interests"
+import { Wish } from "@careerfairy/shared-lib/wishes"
+import { CreateWishFormValues } from "@careerfairy/shared-lib/wishes/wishes"
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh"
 import {
    Button,
    CircularProgress,
@@ -8,24 +11,21 @@ import {
    DialogTitle,
    TextField,
 } from "@mui/material"
-import { Formik } from "formik"
-import * as yup from "yup"
-import { useInterests } from "../../custom-hook/useCollection"
-import InterestSelect from "./InterestSelect"
-import { Interest } from "@careerfairy/shared-lib/dist/interests"
-import { Wish } from "@careerfairy/shared-lib/dist/wishes"
-import Stack from "@mui/material/Stack"
-import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh"
-import { StylesProps } from "../../../types/commonTypes"
-import Typography from "@mui/material/Typography"
-import { useAuth } from "../../../HOCs/AuthProvider"
 import Box from "@mui/material/Box"
+import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
+import { Formik } from "formik"
+import { useMemo } from "react"
 import { useDispatch } from "react-redux"
-import * as actions from "../../../store/actions"
-import { HandleAddNewWishToHits } from "../../../pages/wishlist"
-import UserAvatar from "../common/UserAvatar"
-import { CreateWishFormValues } from "@careerfairy/shared-lib/dist/wishes/wishes"
+import * as yup from "yup"
+import { useAuth } from "../../../HOCs/AuthProvider"
 import { wishlistRepo } from "../../../data/RepositoryInstances"
+import { HandleAddNewWishToHits } from "../../../pages/wishlist"
+import * as actions from "../../../store/actions"
+import { StylesProps } from "../../../types/commonTypes"
+import { useInterests } from "../../custom-hook/useCollection"
+import UserAvatar from "../common/UserAvatar"
+import InterestSelect from "./InterestSelect"
 
 interface CreateWishDialogProps {
    open: boolean
@@ -228,8 +228,7 @@ const CreateOrEditWishDialog = ({
                               onBlur={handleBlur}
                               value={values.description}
                               helperText={
-                                 errors.description &&
-                                 touched.description &&
+                                 Boolean(touched.description) &&
                                  errors.description
                               }
                               maxRows={6}

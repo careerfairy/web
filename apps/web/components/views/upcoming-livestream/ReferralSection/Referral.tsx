@@ -1,14 +1,13 @@
-import React from "react"
-import { StylesProps } from "types/commonTypes"
-import Stack from "@mui/material/Stack"
-import { Alert, Typography } from "@mui/material"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { alpha } from "@mui/material/styles"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
+import { Alert, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
-import ReferralWidget from "../../common/ReferralWidget"
-import useIsMobile from "../../../custom-hook/useIsMobile"
+import Stack from "@mui/material/Stack"
+import { alpha } from "@mui/material/styles"
+import { StylesProps } from "types/commonTypes"
 import useEventSocials from "../../../custom-hook/useEventSocials"
+import useIsMobile from "../../../custom-hook/useIsMobile"
+import ReferralWidget from "../../common/ReferralWidget"
 
 const styles: StylesProps = {
    root: {

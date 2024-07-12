@@ -1,12 +1,12 @@
-import useGroupATSJobsAllIntegrations from "../../../../../custom-hook/useGroupATSJobsAllIntegrations"
-import { useATSAccount } from "../ATSAccountContextProvider"
-import { useCallback, useMemo, useState } from "react"
-import Typography from "@mui/material/Typography"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
 import Autocomplete from "@mui/material/Autocomplete"
 import TextField from "@mui/material/TextField"
-import { OnChangeHandler } from "./RequiredFields"
+import Typography from "@mui/material/Typography"
 import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
+import { useCallback, useMemo, useState } from "react"
+import useGroupATSJobsAllIntegrations from "../../../../../custom-hook/useGroupATSJobsAllIntegrations"
+import { useATSAccount } from "../ATSAccountContextProvider"
+import { OnChangeHandler } from "./RequiredFields"
 
 type Props = {
    disabled?: boolean

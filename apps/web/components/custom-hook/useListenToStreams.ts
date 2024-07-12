@@ -1,11 +1,11 @@
-import { useMemo } from "react"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { livestreamRepo } from "../../data/RepositoryInstances"
-import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import { useFirestoreCollection } from "./utils/useFirestoreCollection"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import firebase from "firebase/compat/app"
+import { useMemo } from "react"
+import { livestreamRepo } from "../../data/RepositoryInstances"
 import { TimeFrames } from "../views/group/admin/analytics-new/general/GeneralPageProvider"
+import { useFirestoreCollection } from "./utils/useFirestoreCollection"
 
 type Props = {
    filterByGroupId?: string
@@ -127,9 +127,12 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
       fieldsOfStudy,
    ])
 
-   let { data, status } = useFirestoreCollection<LivestreamEvent>(eventsQuery, {
-      suspense: false,
-   })
+   const { data, status } = useFirestoreCollection<LivestreamEvent>(
+      eventsQuery,
+      {
+         suspense: false,
+      }
+   )
 
    if (status === "loading") return undefined
 

@@ -1,5 +1,7 @@
-import React, { FC, useCallback, useEffect, useState } from "react"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { PdfReportData } from "@careerfairy/shared-lib/groups/pdf-report"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import PDFIcon from "@mui/icons-material/PictureAsPdf"
 import {
    Button,
    CircularProgress,
@@ -9,15 +11,13 @@ import {
    DialogContentText,
    DialogTitle,
 } from "@mui/material"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import { CSVLink } from "react-csv"
-import PDFIcon from "@mui/icons-material/PictureAsPdf"
-import { useAuth } from "../../HOCs/AuthProvider"
-import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
+import * as actions from "store/actions"
+import { useAuth } from "../../HOCs/AuthProvider"
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import { getCSVDelimiterBasedOnOS } from "../../util/CommonUtil"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { PdfReportData } from "@careerfairy/shared-lib/dist/groups/pdf-report"
 import { useLivestreamCsvData } from "../useLivestreamCsvData"
 
 interface MetaDataActionsProps {
@@ -113,6 +113,7 @@ export function useMetaDataActions({
             [rowData.id]: false,
          }))
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [dispatch, group?.id, userData?.userEmail, reportDataDictionary]
    )
 
@@ -142,6 +143,7 @@ export function useMetaDataActions({
             disabled: actionLoading,
          }
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [isDraft, isPast, loadingReportData, reportDataDictionary, group]
    )
 
@@ -211,7 +213,7 @@ export const CSVDialogDownload: FC<
          {!!children &&
             // @ts-ignore
             React.cloneElement(children, { onClick: handleOpen })}
-         {open && (
+         {Boolean(open) && (
             <Dialog open={open} onBackdropClick={handleClose}>
                <DialogTitle onClickCapture={stopClickPropagation}>
                   {title}

@@ -1,11 +1,13 @@
-import React, { useMemo } from "react"
-import { EventsCarouselStyling, EventsTypes } from "./EventsPreviewCarousel"
+import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { useMemo } from "react"
+import { sxStyles } from "types/commonTypes"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
-import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import EventsPreviewCarousel from "./EventsPreviewCarousel"
-import { sxStyles } from "types/commonTypes"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
+import EventsPreviewCarousel, {
+   EventsCarouselStyling,
+   EventsTypes,
+} from "./EventsPreviewCarousel"
 
 const slideSpacing = 21
 

@@ -1,6 +1,5 @@
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
 import { Button, Tooltip, useMediaQuery } from "@mui/material"
-import React from "react"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import BadgeIcon from "../common/BadgeIcon"
 
 const styles = {
@@ -55,7 +54,7 @@ const BadgeSimpleButton = ({ badge, isActive, onClick }: Props) => {
 type Props = {
    badge: Badge
    isActive: boolean
-   onClick?: () => {}
+   onClick?: () => object
 }
 
 export default BadgeSimpleButton

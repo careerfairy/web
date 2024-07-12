@@ -1,14 +1,14 @@
-import { useAuth } from "./AuthProvider"
-import { useEffect } from "react"
-import { useSnackbar } from "notistack"
-import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import {
-   getHumanStringDescriptionForAction,
-   getCustomRewardMessageForAction,
    RewardAction,
    RewardDoc,
-} from "@careerfairy/shared-lib/dist/rewards"
+   getCustomRewardMessageForAction,
+   getHumanStringDescriptionForAction,
+} from "@careerfairy/shared-lib/rewards"
+import { useSnackbar } from "notistack"
+import { useEffect } from "react"
 import RewardNotification from "../components/views/notifications/RewardNotification"
+import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
+import { useAuth } from "./AuthProvider"
 
 const UserRewardsNotifications = ({ children }) => {
    const { userData } = useAuth()
@@ -28,7 +28,7 @@ const UserRewardsNotifications = ({ children }) => {
              */
             const groups: Partial<Record<RewardAction, RewardDoc[]>> = {}
             querySnapshot.forEach((doc) => {
-               let reward = doc.data() as RewardDoc
+               const reward = doc.data() as RewardDoc
                if (groups[reward.action]) {
                   groups[reward.action].push(reward)
                } else {
@@ -37,7 +37,7 @@ const UserRewardsNotifications = ({ children }) => {
             })
 
             // Show a notification
-            for (let action in groups) {
+            for (const action in groups) {
                const actionHumanString = getHumanStringDescriptionForAction(
                   action as RewardAction
                )
@@ -72,6 +72,7 @@ const UserRewardsNotifications = ({ children }) => {
                setTimeout(() => {
                   firebaseService
                      .rewardMarkManyAsSeen(refs)
+                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                      .then((_) =>
                         console.log(`${refs.length} rewards marked as seen`)
                      )

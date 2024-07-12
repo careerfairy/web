@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
-import { NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL } from "constants/routes"
-import HeadWithMeta from "components/page/HeadWithMeta"
+/* eslint-disable no-extra-semi */
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEventSerialized } from "@careerfairy/shared-lib/livestreams"
 import { useTheme } from "@mui/material/styles"
-import ScrollToTop from "../../../../components/views/common/ScrollToTop"
+import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
+import HeadWithMeta from "components/page/HeadWithMeta"
+import { NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL } from "constants/routes"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import EmbedBannerSection from "../../../../components/views/common/NextLivestreams/emebed/EmbedBannerSection"
 import StreamsSwipeableView from "../../../../components/views/common/NextLivestreams/emebed/StreamsSwipeableView"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEventSerialized } from "@careerfairy/shared-lib/dist/livestreams"
+import ScrollToTop from "../../../../components/views/common/ScrollToTop"
 import { groupRepo, livestreamRepo } from "../../../../data/RepositoryInstances"
 
 {
@@ -38,9 +39,11 @@ const EmbeddedGroupStreamsPage = ({
       palette: { primary },
    } = useTheme()
    const [value, setValue] = useState("upcomingEvents")
+   // eslint-disable-next-line react/hook-use-state
    const [upcomingEvents] = useState(
       serverSideUpcomingEvents.map(livestreamRepo.parseSerializedEvent)
    )
+   // eslint-disable-next-line react/hook-use-state
    const [pastEvents] = useState(
       serverSidePastEvents.map(livestreamRepo.parseSerializedEvent)
    )
@@ -59,6 +62,7 @@ const EmbeddedGroupStreamsPage = ({
             showUpcomingEvents()
          }
       })()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [Boolean(upcomingEvents), Boolean(pastEvents), serverSideGroup.groupId])
 
    const showPastEvents = () => setValue("pastEvents")

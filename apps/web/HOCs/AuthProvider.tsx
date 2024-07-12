@@ -2,8 +2,8 @@ import {
    AuthUserCustomClaims,
    UserData,
    UserStats,
-} from "@careerfairy/shared-lib/dist/users"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+} from "@careerfairy/shared-lib/users"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
 import * as Sentry from "@sentry/nextjs"
 import { clearFirestoreCache } from "data/util/authUtil"
 import dynamic from "next/dynamic"

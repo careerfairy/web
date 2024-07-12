@@ -1,5 +1,6 @@
 import base from "../../jest.config"
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
    ...base,
    name: "careerfairy-web-app",

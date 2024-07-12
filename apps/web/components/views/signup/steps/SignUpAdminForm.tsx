@@ -1,6 +1,5 @@
-import { useRouter } from "next/router"
-import React, { Fragment } from "react"
-import { Formik } from "formik"
+import { NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
+import { UserData } from "@careerfairy/shared-lib/users"
 import {
    Box,
    Button,
@@ -10,21 +9,22 @@ import {
    Typography,
 } from "@mui/material"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { Formik } from "formik"
+import { FormikHelpers } from "formik/dist/types"
+import { useRouter } from "next/router"
+import { Fragment } from "react"
 import * as yup from "yup"
 import { sxStyles } from "../../../../types/commonTypes"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { FormikHelpers } from "formik/dist/types"
-import { NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import InvalidInviteDisplay from "../../common/auth/InvalidInviteDisplay"
+import HelperHint from "../common/HelperHint"
 import { signupSchema } from "../schemas"
+import Email from "../userInformation/Email"
 import FirstName from "../userInformation/FirstName"
 import LastName from "../userInformation/LastName"
-import Email from "../userInformation/Email"
 import Password from "../userInformation/Password"
-import TermsAgreement from "../userInformation/TermsAgreement"
 import PasswordRepeat from "../userInformation/PasswordRepeat"
-import HelperHint from "../common/HelperHint"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import TermsAgreement from "../userInformation/TermsAgreement"
 
 const styles = sxStyles({
    submit: {
@@ -210,7 +210,7 @@ function SignUpAdminForm() {
                      color="primary"
                      disabled={isSubmitting}
                      endIcon={
-                        isSubmitting && (
+                        Boolean(isSubmitting) && (
                            <CircularProgress size={20} color="inherit" />
                         )
                      }

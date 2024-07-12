@@ -1,12 +1,12 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Grid, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
-import RegistrationSourcesProvider from "./RegistrationSourcesContext"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import CircularLoader from "../../../../loader/CircularLoader"
-import LivestreamsTable from "./LivestreamsTable"
-import { Grid, Typography } from "@mui/material"
 import AggregatedSourcesChart from "./AggregatedSourcesChart"
+import LivestreamsTable from "./LivestreamsTable"
+import RegistrationSourcesProvider from "./RegistrationSourcesContext"
 
 type Props = {
    group: Group
