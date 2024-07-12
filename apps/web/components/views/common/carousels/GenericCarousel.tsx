@@ -131,7 +131,7 @@ const Arrows = ({ emblaApi }: ArrowsProps) => {
             color="inherit"
             sx={styles.arrowIcon}
             onClick={() => {
-               if (emblaApi.canScrollPrev()) emblaApi.scrollPrev()
+               if (emblaApi && emblaApi.canScrollPrev()) emblaApi.scrollPrev()
             }}
          >
             <ArrowLeft fontSize={"large"} />
@@ -140,7 +140,7 @@ const Arrows = ({ emblaApi }: ArrowsProps) => {
             color="inherit"
             sx={styles.arrowIcon}
             onClick={() => {
-               if (emblaApi.canScrollNext()) emblaApi.scrollNext()
+               if (emblaApi && emblaApi.canScrollNext()) emblaApi.scrollNext()
             }}
          >
             <ArrowRight fontSize={"large"} />
