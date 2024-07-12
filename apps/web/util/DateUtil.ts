@@ -389,4 +389,14 @@ export default class DateUtil {
       const diff = now.getTime() - date.getTime()
       return Math.floor(diff / 1000 / 60)
    }
+
+   /**
+    * Formats a given date to a string in the format "DD MMM YYYY at HH:mm".
+    *
+    * @param {Date} JSDate - The JavaScript Date object to be formatted.
+    * @return {string} - The formatted date string.
+    */
+   static formatDateTime(JSDate: Date | number): string {
+      return dayjs(JSDate).format("DD MMM YYYY [at] HH:mm")
+   }
 }
