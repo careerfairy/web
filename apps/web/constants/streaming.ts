@@ -3,8 +3,8 @@ import { ConnectionState } from "agora-rtc-react"
 export const STREAM_IDENTIFIERS = {
    /** If an agora UID starts with this, it is a recording */
    RECORDING: "recording",
-   /** If an agora UID starts with this, it is a creator */
-   CREATOR: "creator",
+   /** If an agora UID starts with this, it is a speaker */
+   SPEAKER: "speaker",
    /** If an agora UID starts with this, it is a user */
    USER: "user",
    /** If an agora UID starts with this, it is an anonymous user */

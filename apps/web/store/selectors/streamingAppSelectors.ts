@@ -143,3 +143,6 @@ export const useIsRecordingBotInRoom = () =>
    useAppSelector(
       (state) => state.streamingApp.livestreamState.isRecordingBotInRoom
    )
+
+export const useSpeakerId = () =>
+   useAppSelector((state) => state.streamingApp.speakerId)
