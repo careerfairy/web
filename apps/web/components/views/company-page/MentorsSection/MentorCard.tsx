@@ -29,9 +29,7 @@ const styles = sxStyles({
    creator: {
       name: {
          width: "100%",
-         fontSize: "20px",
          fontWeight: 600,
-         lineHeight: "30px",
          textAlign: "center",
          textOverflow: "ellipsis",
          overflow: "hidden",
@@ -101,7 +99,9 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
             alt={`Picture of creator ${creatorName}`}
             objectFit="cover"
          />
-         <Typography sx={styles.creator.name}>{creatorName}</Typography>
+         <Typography variant="brandedH4" sx={styles.creator.name}>
+            {creatorName}
+         </Typography>
          <Typography sx={styles.creator.position}>
             {creator.position}
          </Typography>
