@@ -1,5 +1,7 @@
-import { ICameraVideoTrack } from "agora-rtc-react"
-import { VideoEncoderConfigurationPreset } from "agora-rtc-sdk-ng"
+import {
+   ICameraVideoTrack,
+   VideoEncoderConfigurationPreset,
+} from "agora-rtc-react"
 import { getVideoEncoderPreset } from "context/agora/RTCProvider"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useRef } from "react"
@@ -26,10 +28,12 @@ export const useOptimisedLocalStream = (
    const currentVideoPresetRef = useRef<VideoEncoderConfigurationPreset>(
       getVideoEncoderPreset(withHighQuality)
    )
-
    const setVideoQuality = useCallback(
-      async (quality: string) => {
-         if (!localCameraTrack || !tracksPublished) return
+      async (quality: VideoEncoderConfigurationPreset) => {
+         if (!localCameraTrack || !tracksPublished) {
+            return
+         }
+
          try {
             if (currentVideoPresetRef.current !== quality) {
                await localCameraTrack.setEncoderConfiguration(quality)
