@@ -8,6 +8,7 @@ import {
    useMemo,
    useReducer,
 } from "react"
+import { usePrevious } from "react-use"
 import { setSpeakerId, setUserUid } from "store/reducers/streamingAppReducer"
 
 export enum ProfileSelectEnum {
@@ -67,6 +68,7 @@ type ProfileSelectContextType = {
    selectSpeaker: (speaker: Speaker) => void
    selectedSpeaker: Speaker | null
    activeView: ProfileSelectEnum
+   prevActiveView: ProfileSelectEnum | null
 }
 
 const ProfileSelectContext = createContext<
@@ -85,9 +87,12 @@ export const ProfileSelectProvider = ({ children }: Props) => {
       activeView: ProfileSelectEnum.SELECT_SPEAKER,
    })
 
+   const prevActiveView = usePrevious(state.activeView)
+
    const value = useMemo<ProfileSelectContextType>(
       () => ({
          activeView: state.activeView,
+         prevActiveView: prevActiveView,
          selectedSpeaker: state.selectedSpeaker,
          editSpeaker: (speaker: Speaker) => {
             return dispatch({
@@ -113,7 +118,7 @@ export const ProfileSelectProvider = ({ children }: Props) => {
             return appDispatch(setUserUid(userId))
          },
       }),
-      [state, dispatch, appDispatch]
+      [state, dispatch, appDispatch, prevActiveView]
    )
 
    return (

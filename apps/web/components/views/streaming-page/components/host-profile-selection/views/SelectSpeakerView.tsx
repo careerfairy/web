@@ -14,10 +14,26 @@ import { SpeakersList } from "../SpeakersList"
 
 const styles = sxStyles({
    root: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
+      display: "grid",
+      placeItems: "center",
+      backgroundColor: "#FDFDFD",
+      borderRadius: "16px",
+      maxWidth: 770,
+      width: "100%",
+      maxHeight: {
+         xs: "100%",
+         tablet: 637,
+      },
+      mx: {
+         xs: 0,
+         tablet: 2,
+      },
+      mt: {
+         xs: 2,
+         tablet: "auto",
+      },
+      overflowY: "auto",
+      my: "auto",
    },
    rootMobile: {
       px: 2,
