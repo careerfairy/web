@@ -49,6 +49,7 @@ import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/url
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
+import { DateTime } from "luxon"
 import DateUtil from "util/DateUtil"
 import { v4 as uuidv4 } from "uuid"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
@@ -814,11 +815,12 @@ class FirebaseService {
          universities: [],
          created: this.getServerTimestamp() as Timestamp,
          start: firebase.firestore.Timestamp.fromDate(
-            new Date("March 17, 2020 03:24:00")
+            DateTime.now().plus({ months: 1 }).toJSDate()
          ),
          hidden: true,
          triGrams: {},
          useNewUI: true,
+         title: "Test live stream",
       }
 
       await livestreamDocRef.set(testStream)
