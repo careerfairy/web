@@ -1,5 +1,4 @@
 import useLivestreamSecureTokenSWR from "components/custom-hook/live-stream/useLivestreamSecureToken"
-import { useAppDispatch } from "components/custom-hook/store"
 import useMenuState from "components/custom-hook/useMenuState"
 import { appendCurrentQueryParams } from "components/util/url"
 import BrandedResponsiveMenu, {
@@ -9,7 +8,6 @@ import { SpyIcon } from "components/views/streaming-page/components/TopBar/SpyIc
 import { useRouter } from "next/router"
 import { forwardRef, useCallback, useState } from "react"
 import { PlayCircle, Tool, UserPlus } from "react-feather"
-import { setIsSpyMode } from "store/reducers/streamingAppReducer"
 import {
    useHasStarted,
    useIsSpyMode,
@@ -41,8 +39,7 @@ export const AdminControlsButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >(({ enableTooltip, ...props }, ref) => {
-   const dispatch = useAppDispatch()
-   const { push } = useRouter()
+   const { push, query, pathname } = useRouter()
    const { livestreamId, isHost } = useStreamingContext()
    const token = useLivestreamSecureTokenSWR(livestreamId)
    const hasStarted = useHasStarted()
@@ -82,7 +79,12 @@ export const AdminControlsButton = forwardRef<
          label: `${isSpyMode ? "Disable" : "Enable"} spy mode`,
          icon: <SpyIcon enabled={!isSpyMode} />,
          handleClick: () => {
-            dispatch(setIsSpyMode(!isSpyMode))
+            const newQuery = { ...query }
+            isSpyMode ? delete newQuery.spy : (newQuery.spy = "true")
+            push({
+               pathname,
+               query: newQuery,
+            })
          },
          menuItemSxProps: [styles.menuOption],
       },
