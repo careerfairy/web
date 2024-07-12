@@ -12,16 +12,12 @@ const SLIDE_WIDTH = 368
 
 const styles = sxStyles({
    root: {
-      position: "relative",
-      display: "flex",
       flexDirection: "row",
-      width: "100%",
       gap: "16px",
       paddingLeft: "32px",
    },
    mentorDetailsContainer: {
       position: "relative",
-      display: "flex",
       width: `${SLIDE_WIDTH}px`,
       padding: "54px 26px 28px 26px",
       flexDirection: "column",
@@ -38,7 +34,6 @@ const styles = sxStyles({
       flexDirection: "column",
       gap: "24px",
       width: "100%",
-      overflow: "hidden",
    },
 })
 
