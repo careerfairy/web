@@ -216,7 +216,7 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
    }
 
    return (
-      <Box>
+      <Box sx={{ mb: 3 }}>
          <TagsCarouselWithArrow
             selectedCategories={selectedCategories}
             tags={availableCategories}
