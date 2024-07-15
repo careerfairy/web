@@ -43,6 +43,7 @@ const styles = sxStyles({
       color: "neutral.500",
    },
    wrapperContainer: {
+      width: { md: "700px" },
       height: { xs: "unset", md: "auto !important" },
    },
    mobileDialog: {

@@ -75,12 +75,15 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
    const [stepIsValid, setStepIsValid] = useState(false)
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
-   const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(group.id)
+   const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
+      group.id ?? group.groupId
+   )
 
    const {
       formState: { isSubmitting },
       watch,
       setValue,
+      getValues,
    } = useFormContext()
 
    const watchedFields = watch([
@@ -122,14 +125,16 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
    }, [quillInputRef, watchedFieldsObject])
 
    const handleNext = useCallback(() => {
-      if (groupHasUpcomingLivestreams) {
+      const selectedLivestreams = getValues("livestreamIds")
+
+      if (groupHasUpcomingLivestreams || selectedLivestreams.length > 0) {
          goToStep(JobDialogStep.FORM_LINKED_LIVE_STREAMS.key)
       } else if (group.publicSparks) {
          goToStep(JobDialogStep.FORM_LINKED_SPARKS.key)
       } else {
-         goToStep(JobDialogStep.NO_LINKED_CONTENT.key)
+         goToStep(JobDialogStep.NO_CONTENT_AVAILABLE.key)
       }
-   }, [goToStep, group.publicSparks, groupHasUpcomingLivestreams])
+   }, [getValues, goToStep, group.publicSparks, groupHasUpcomingLivestreams])
 
    return (
       <SteppedDialog.Container

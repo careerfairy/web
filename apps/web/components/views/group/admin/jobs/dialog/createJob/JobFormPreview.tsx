@@ -1,9 +1,13 @@
 import { Box } from "@mui/material"
+import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
+import useGroupFromState from "components/custom-hook/useGroupFromState"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
+import { useCallback } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
+import { JobDialogStep } from ".."
 
 const styles = sxStyles({
    container: {
@@ -34,11 +38,25 @@ const styles = sxStyles({
 })
 
 const JobFormPreview = () => {
-   const { moveToPrev } = useStepper()
+   const { group } = useGroupFromState()
+   const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
+      group.id ?? group.groupId
+   )
+   const { goToStep } = useStepper()
 
    const {
       formState: { isSubmitting },
    } = useFormContext()
+
+   const handlePrevClick = useCallback(() => {
+      if (group.publicSparks) {
+         goToStep(JobDialogStep.FORM_LINKED_SPARKS.key)
+      } else if (groupHasUpcomingLivestreams) {
+         goToStep(JobDialogStep.FORM_LINKED_LIVE_STREAMS.key)
+      } else {
+         goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
+      }
+   }, [goToStep, group.publicSparks, groupHasUpcomingLivestreams])
 
    return (
       <SteppedDialog.Container
@@ -66,7 +84,7 @@ const JobFormPreview = () => {
                <SteppedDialog.Button
                   variant="outlined"
                   color="grey"
-                  onClick={moveToPrev}
+                  onClick={handlePrevClick}
                   sx={styles.cancelBtn}
                >
                   Back

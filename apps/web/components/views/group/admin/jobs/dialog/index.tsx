@@ -33,37 +33,41 @@ export const JobDialogStep = {
       position: 0,
       key: "privacy-policy",
    },
-   OLD_FORM: {
+   DELETE_JOB: {
       position: 1,
+      key: "delete-job",
+   },
+   OLD_FORM: {
+      position: 2,
       key: "oldJobForm",
    },
    FORM_BASIC_INFO: {
-      position: 1,
+      position: 2,
       key: "form-basic-info",
    },
    FORM_ADDITIONAL_DETAILS: {
-      position: 2,
+      position: 3,
       key: "form-additional-details",
    },
+   NO_CONTENT_AVAILABLE: {
+      position: 4,
+      key: "no-content-available",
+   },
    FORM_LINKED_LIVE_STREAMS: {
-      position: 3,
+      position: 5,
       key: "form-linked-live-streams",
    },
    FORM_LINKED_SPARKS: {
-      position: 4,
+      position: 6,
       key: "form-linked-content",
    },
-   FORM_PREVIEW: {
-      position: 5,
-      key: "form-preview",
-   },
    NO_LINKED_CONTENT: {
-      position: 6,
+      position: 7,
       key: "no-linked-content",
    },
-   DELETE_JOB: {
-      position: 7,
-      key: "delete-job",
+   FORM_PREVIEW: {
+      position: 8,
+      key: "form-preview",
    },
 }
 
@@ -81,12 +85,15 @@ const styles = sxStyles({
    },
 })
 
-// Due to the quillInputRef field
 const JobAdditionalDetails = dynamic(
    () => import("./createJob/JobAdditionalDetails"),
    {
       ssr: false,
    }
+)
+
+const JobLinkLiveStreams = dynamic(
+   () => import("./createJob/JobLinkLiveStreams")
 )
 
 type ViewsProps = {
@@ -102,6 +109,10 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
          key: "privacy-policy",
          Component: () => <PrivacyPolicyDialog />,
       },
+      {
+         key: "delete-job",
+         Component: () => <DeleteJobDialog job={job} />,
+      },
       ...(jobHubV1
          ? [
               {
@@ -115,14 +126,24 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
                  ),
               },
               {
-                 key: "form-linked-live-streams",
+                 key: "no-content-available",
                  Component: dynamic(
-                    () => import("./createJob/JobLinkLiveStreams")
+                    () => import("./additionalSteps/NoContentAvailableDialog")
                  ),
+              },
+              {
+                 key: "form-linked-live-streams",
+                 Component: () => <JobLinkLiveStreams job={job} />,
               },
               {
                  key: "form-linked-content",
                  Component: dynamic(() => import("./createJob/JobLinkSparks")),
+              },
+              {
+                 key: "no-linked-content",
+                 Component: dynamic(
+                    () => import("./additionalSteps/NoLinkedContentDialog")
+                 ),
               },
               {
                  key: "form-preview",
@@ -135,16 +156,6 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
                  Component: () => <JobFormDialog />,
               },
            ]),
-      {
-         key: "no-linked-content",
-         Component: dynamic(
-            () => import("./additionalSteps/NoLinkedContentDialog")
-         ),
-      },
-      {
-         key: "delete-job",
-         Component: () => <DeleteJobDialog job={job} />,
-      },
    ] as const
 
 type Props = {
@@ -237,6 +248,7 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
                ? styles.jobWithList
                : null,
          ]}
+         fullWidth={false}
       />
    )
 }
