@@ -375,12 +375,12 @@ export const SparksCategories = {
 } as const
 
 export const SparkCategoriesToTagValuesMapper = {
-   [SparksCategories.Application.id]: ContentTopicsTags.ApplicationProcess,
-   [SparksCategories.CompanyCulture.id]: ContentTopicsTags.CompanyCulture,
-   [SparksCategories.DayInTheLife.id]: ContentTopicsTags.DayInTheLife,
-   [SparksCategories.Jobs.id]: ContentTopicsTags.Jobs,
-   [SparksCategories.Role.id]: ContentTopicsTags.Role,
-   [SparksCategories.Events.id]: ContentTopicsTags.Events,
+   [SparksCategories.Application.id]: ContentTopicsTags.ApplicationProcess.id,
+   [SparksCategories.CompanyCulture.id]: ContentTopicsTags.CompanyCulture.id,
+   [SparksCategories.DayInTheLife.id]: ContentTopicsTags.DayInTheLife.id,
+   [SparksCategories.Jobs.id]: ContentTopicsTags.Jobs.id,
+   [SparksCategories.Role.id]: ContentTopicsTags.Role.id,
+   [SparksCategories.Events.id]: ContentTopicsTags.Events.id,
 }
 
 export const sparksCategoriesArray = Object.values(SparksCategories)

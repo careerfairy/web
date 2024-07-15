@@ -12,41 +12,89 @@ export type GroupedTags = {
 }
 
 export const BusinessFunctionsTags = {
-   BusinessDevelopment: "Business development",
-   Consulting: "Consulting",
-   DataAnalytics: "Data & analytics",
-   Finance: "Finance",
-   InformationTechnology: "Information technology",
-   Legal: "Legal",
-   Marketing: "Marketing",
-   Operations: "Operations",
-   Other: "Other",
-   ResearchDevelopment: "Research & development",
-   ProductManagement: "Product management",
-   SupplyChainLogistics: "Supply chain & logistics",
+   BusinessDevelopment: {
+      id: "BusinessDevelopment",
+      name: "Business development",
+   },
+   Consulting: {
+      id: "Consulting",
+      name: "Consulting",
+   },
+   DataAnalytics: {
+      id: "DataAnalytics",
+      name: "Data & analytics",
+   },
+   Finance: {
+      id: "Finance",
+      name: "Finance",
+   },
+   InformationTechnology: {
+      id: "InformationTechnology",
+      name: "Information technology",
+   },
+   Legal: {
+      id: "Legal",
+      name: "Legal",
+   },
+   Marketing: {
+      id: "Marketing",
+      name: "Marketing",
+   },
+   Operations: {
+      id: "Operations",
+      name: "Operations",
+   },
+   Other: {
+      id: "Other",
+      name: "Other",
+   },
+   ResearchDevelopment: {
+      id: "ResearchDevelopment",
+      name: "Research & development",
+   },
+   ProductManagement: {
+      id: "ProductManagement",
+      name: "Product management",
+   },
+   SupplyChainLogistics: {
+      id: "SupplyChainLogistics",
+      name: "Supply chain & logistics",
+   },
 }
 
 export const BusinessFunctionsTagValues = Object.entries(
    BusinessFunctionsTags
-).map(([id, name]) => ({
-   id,
-   name,
-})) satisfies OptionGroup[]
+).map(([, entry]) => entry) satisfies OptionGroup[]
 
 export const ContentTopicsTags = {
-   ApplicationProcess: "Application process",
-   CompanyCulture: "Company culture",
-   DayInTheLife: "Day in the life",
-   Events: "Events",
-   Jobs: "Jobs",
-   Role: "Role",
+   ApplicationProcess: {
+      id: "ApplicationProcess",
+      name: "Application process",
+   },
+   CompanyCulture: {
+      id: "CompanyCulture",
+      name: "Company culture",
+   },
+   DayInTheLife: {
+      id: "DayInTheLife",
+      name: "Day in the life",
+   },
+   Events: {
+      id: "Events",
+      name: "Events",
+   },
+   Jobs: {
+      id: "Jobs",
+      name: "Jobs",
+   },
+   Role: {
+      id: "Role",
+      name: "Role",
+   },
 }
 
 export const ContentTopicsTagValues = Object.entries(ContentTopicsTags).map(
-   ([id, name]) => ({
-      id,
-      name,
-   })
+   ([, entry]) => entry
 ) satisfies OptionGroup[]
 
 export const TagValues: OptionGroup[] = [
