@@ -35,10 +35,13 @@ export const additionalInfoSchema = (quillRef) =>
    Yup.object({
       salary: Yup.string().optional().nullable(),
       description: Yup.string()
-         // TODO:GS - this is causing the description to fail always !!
-         // .transform(() =>
-         //    quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")
-         // ) //ReactQuill appends a new line to text
+         .transform((value) =>
+            quillRef?.current
+               ? quillRef.current.unprivilegedEditor
+                    .getText()
+                    .replace(/\n$/, "")
+               : value
+         )
          .required("Description is required")
          .min(
             CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH,
