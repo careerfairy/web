@@ -101,14 +101,14 @@ const CustomJobFormProvider = ({
                id,
                groupId,
                businessFunctionsTagIds,
-               jobType: jobType.value as JobType,
+               jobType: jobType ? (jobType.value as JobType) : null,
                deadline: Timestamp.fromDate(deadline),
                postingUrl:
                   postingUrl.indexOf("http") === 0
                      ? postingUrl
                      : `https://${postingUrl}`,
-               livestreams: livestreamIds,
-               sparks: sparkIds,
+               livestreams: livestreamIds ?? [],
+               sparks: sparkIds ?? [],
             }
 
             if (selectedJobId) {
@@ -169,7 +169,7 @@ const mapBasicInfo = ({
    businessFunctionsTagIds,
 }: CustomJob): BasicInfoValues => ({
    title,
-   jobType: { value: jobType, label: jobType, id: jobType },
+   jobType: jobType ? { value: jobType, label: jobType, id: jobType } : null,
    businessTags: getBusinessTagsByIds(businessFunctionsTagIds),
 })
 

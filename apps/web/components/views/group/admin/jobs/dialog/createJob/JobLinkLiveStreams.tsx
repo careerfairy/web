@@ -1,4 +1,6 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
+import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
@@ -44,26 +46,35 @@ const styles = sxStyles({
 
 const FIELD_NAME = "livestreamIds"
 
-const JobLinkLiveStreams = () => {
+type Props = {
+   job: CustomJob
+}
+
+const JobLinkLiveStreams = ({ job }: Props) => {
    const { moveToPrev, moveToNext, goToStep } = useStepper()
    const { group } = useGroupFromState()
-   const upcomingLiveStreams = useListenToStreams({ filterByGroupId: group.id })
+   const upcomingLiveStreams =
+      useListenToStreams({ filterByGroupId: group.id }) || []
+   const selectedLiveStreams = useCustomJobLinkedLivestreams(job) || []
 
-   const {
-      formState: { isSubmitting },
-      watch,
-      setValue,
-   } = useFormContext()
+   const { watch, setValue } = useFormContext()
 
    const livestreamIds = watch(FIELD_NAME)
 
    const handleNext = useCallback(() => {
+      // If the group has public sparks, move to the next step
       if (group.publicSparks) {
          moveToNext()
-      } else {
+      }
+      // If there are no livestream IDs selected and has no public sparks, go to the NO_LINKED_CONTENT step
+      else if (livestreamIds.length > 0) {
+         goToStep(JobDialogStep.NO_LINKED_CONTENT.key)
+      }
+      // Otherwise, go to the FORM_PREVIEW step
+      else {
          goToStep(JobDialogStep.FORM_PREVIEW.key)
       }
-   }, [goToStep, group.publicSparks, moveToNext])
+   }, [goToStep, group.publicSparks, livestreamIds.length, moveToNext])
 
    const handleCardClick = useCallback(
       (eventId: string) => {
@@ -79,7 +90,17 @@ const JobLinkLiveStreams = () => {
       [livestreamIds, setValue]
    )
 
-   const adaptGrid = upcomingLiveStreams?.length > 2
+   // Combines upcomingLiveStreams and selectedLiveStreams into a single array of unique live streams
+   const allLivesStreams = [
+      ...new Map(
+         [...upcomingLiveStreams, ...selectedLiveStreams].map((stream) => [
+            stream.id,
+            stream,
+         ])
+      ).values(),
+   ]
+
+   const adaptGrid = allLivesStreams?.length > 2
 
    return (
       <SteppedDialog.Container
@@ -108,7 +129,7 @@ const JobLinkLiveStreams = () => {
                   mt={2}
                   sx={adaptGrid ? null : styles.centerGrid}
                >
-                  {upcomingLiveStreams?.map((event) => (
+                  {allLivesStreams?.map((event) => (
                      <Grid item key={event.id} xs={adaptGrid ? 4 : 6}>
                         <EventPreviewCard
                            key={event.id}
@@ -137,8 +158,6 @@ const JobLinkLiveStreams = () => {
                   onClick={handleNext}
                   variant="contained"
                   color="secondary"
-                  loading={isSubmitting}
-                  disabled={isSubmitting}
                >
                   Next
                </SteppedDialog.Button>

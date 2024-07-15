@@ -170,6 +170,7 @@ type StepperDialogProps = {
    sx?: SxProps<Theme>
    disableFullScreen?: boolean
    maxWidth?: number
+   fullWidth?: boolean
 }
 
 /**
@@ -241,6 +242,7 @@ const SteppedDialog = <K extends string>({
    sx,
    disableFullScreen,
    maxWidth,
+   fullWidth = true,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -307,7 +309,7 @@ const SteppedDialog = <K extends string>({
                : SlideUpTransition
          }
          maxWidth="md"
-         fullWidth
+         fullWidth={fullWidth}
          fullScreen={isMobile ? !disableFullScreen : null}
          closeAfterTransition={true}
          PaperProps={{

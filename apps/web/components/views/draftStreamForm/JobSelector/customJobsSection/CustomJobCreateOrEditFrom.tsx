@@ -125,6 +125,8 @@ const CustomJobCreateOrEditFrom = ({
          deadline: null,
          postingUrl: "",
          jobType: "",
+         livestreams: [],
+         sparks: [],
       }
    }, [groupId, job])
 
