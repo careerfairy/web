@@ -1,15 +1,8 @@
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { useStreamingContext } from "../../context"
 import { useDeleteLivestreamChatEntry } from "components/custom-hook/streaming/useDeleteLivestreamChatEntry"
-import { Trash2 as DeleteIcon } from "react-feather"
-import { sxStyles } from "types/commonTypes"
 import BrandedResponsiveMenu from "components/views/common/inputs/BrandedResponsiveMenu"
-
-const styles = sxStyles({
-   delete: {
-      color: "error.main",
-   },
-})
+import { Trash2 as DeleteIcon } from "react-feather"
+import { useStreamingContext } from "../../context"
 
 type Props = {
    handleClose: () => void
@@ -40,7 +33,7 @@ export const OptionsMenu = ({
                agoraUserId,
                livestreamToken: streamerAuthToken,
             }),
-         menuItemSxProps: [styles.delete],
+         color: "error.main",
          loading: isMutating,
       },
    ]
