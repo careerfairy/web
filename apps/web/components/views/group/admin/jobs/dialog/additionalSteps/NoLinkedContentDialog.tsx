@@ -122,4 +122,4 @@ const NoLinkedContentDialog = () => {
    )
 }
 
-export default NoLinkedContentDialog
+export default NoLinkContentDialog
