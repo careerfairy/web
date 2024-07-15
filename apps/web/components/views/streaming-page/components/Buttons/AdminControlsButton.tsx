@@ -7,12 +7,11 @@ import BrandedResponsiveMenu, {
 import { SpyIcon } from "components/views/streaming-page/components/TopBar/SpyIcon"
 import { useRouter } from "next/router"
 import { forwardRef, useCallback, useState } from "react"
-import { PlayCircle, Tool, UserPlus } from "react-feather"
+import { PlayCircle, StopCircle, Tool, UserPlus } from "react-feather"
 import {
    useHasStarted,
    useIsSpyMode,
 } from "store/selectors/streamingAppSelectors"
-import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { ActionTooltips } from "../BottomBar/AllActionComponents"
 import { BrandedTooltip } from "../BrandedTooltip"
@@ -21,19 +20,6 @@ import {
    ToggleStartLiveStreamDialog,
 } from "../TopBar/ToggleStartLiveStreamDialog"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
-
-const styles = sxStyles({
-   menuOption: {
-      color: (theme) => theme.palette.neutral[700],
-      textDecoration: "none",
-      "& svg": {
-         m: "0 !important",
-      },
-   },
-   cautionOption: {
-      color: "error.main",
-   },
-})
 
 export const AdminControlsButton = forwardRef<
    HTMLButtonElement,
@@ -73,7 +59,6 @@ export const AdminControlsButton = forwardRef<
                )
             )
          },
-         menuItemSxProps: [styles.menuOption],
       },
       {
          label: `${isSpyMode ? "Disable" : "Enable"} spy mode`,
@@ -87,21 +72,17 @@ export const AdminControlsButton = forwardRef<
             })
             isHost && isSpyMode && reload()
          },
-         menuItemSxProps: [styles.menuOption],
       },
       {
          label: `${hasStarted ? "Stop" : "Start"} stream`,
-         icon: <PlayCircle />,
+         icon: hasStarted ? <StopCircle /> : <PlayCircle />,
          handleClick: () => {
             setDialogState({
                isDialogOpen: true,
                intent: hasStarted ? "stop-streaming" : "start-streaming",
             })
          },
-         menuItemSxProps: [
-            styles.menuOption,
-            hasStarted && styles.cautionOption,
-         ],
+         color: hasStarted ? "error.main" : "",
       },
    ]
 

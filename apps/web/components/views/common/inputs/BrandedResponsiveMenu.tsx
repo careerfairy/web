@@ -21,15 +21,23 @@ const styles = sxStyles({
       display: "flex",
       alignSelf: "center",
       my: "auto",
-      mr: 1,
+      mr: 1.5,
+      svg: {
+         width: "16px",
+         height: "16px",
+         m: "0 !important",
+      },
+   },
+   iconMobile: {
       svg: {
          width: "18px",
          height: "18px",
-         fontSize: "18px",
       },
    },
    menuItem: {
       position: "relative",
+      color: (theme) => theme.palette.neutral[700],
+      p: "10px 16px !important",
    },
    listItemLoading: {
       "& .MuiTypography-root": {
@@ -49,6 +57,7 @@ const styles = sxStyles({
    drawerMenuItem: {
       p: "17px 20px !important",
       position: "relative",
+      color: (theme) => theme.palette.neutral[700],
    },
    listItemDivider: {
       borderColor: (theme) => theme.brand.black[300],
@@ -173,7 +182,6 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
                      <DesktopMenuItem
                         option={option}
                         handleClose={handleClose}
-                        singleOption={options.length == 1}
                         hasDivider={index !== options.length - 1}
                      />
                   </WrapperComponent>
@@ -258,8 +266,8 @@ const MobileMenuItem: FC<MobileMenuItemProps> = ({ option, handleClose }) => {
          )}
          disabled={option.disabled || option.loading}
       >
-         <Box sx={styles.icon}>{option.icon}</Box>
-         <Typography variant="medium">{option.label}</Typography>
+         <Box sx={[styles.icon, styles.iconMobile]}>{option.icon}</Box>
+         <Typography variant="brandedBody">{option.label}</Typography>
          {Boolean(option.loading) && <Loader />}
       </ListItemButton>
    )
@@ -268,14 +276,12 @@ const MobileMenuItem: FC<MobileMenuItemProps> = ({ option, handleClose }) => {
 type DesktopMenuItemProps = {
    option: MenuOption
    handleClose: () => void
-   singleOption: boolean
    hasDivider: boolean
 }
 
 const DesktopMenuItem: FC<DesktopMenuItemProps> = ({
    option,
    handleClose,
-   singleOption,
    hasDivider,
 }) => {
    return (
@@ -293,7 +299,6 @@ const DesktopMenuItem: FC<DesktopMenuItemProps> = ({
             [
                styles.menuItem,
                option.loading && styles.listItemLoading,
-               singleOption && styles.singleMenuItem,
                hasDivider && styles.borderBottom,
                option.color && { color: option.color },
             ],
@@ -301,7 +306,7 @@ const DesktopMenuItem: FC<DesktopMenuItemProps> = ({
          )}
       >
          <Box sx={styles.icon}>{option.icon}</Box>
-         <Typography variant="xsmall">{option.label}</Typography>
+         <Typography variant="small">{option.label}</Typography>
          {hasDivider ? <Divider /> : null}
          {Boolean(option.loading) && <Loader />}
       </MenuItem>
