@@ -11,7 +11,6 @@ import { useDeleteLivestreamVideo } from "components/custom-hook/streaming/video
 import BrandedResponsiveMenu, {
    MenuOption,
 } from "components/views/common/inputs/BrandedResponsiveMenu"
-import { forwardRef } from "react"
 import { Youtube } from "react-feather"
 import {
    setShareVideoDialogOpen,
@@ -25,88 +24,86 @@ type Props = MenuProps & {
    handleClose: () => void
 }
 
-export const ShareMenu = forwardRef<HTMLDivElement, Props>(
-   ({ handleClose, open, anchorEl }) => {
-      const dispatch = useAppDispatch()
-      const { handleStopScreenShare, handleStartScreenShareProcess } =
-         useScreenShare()
-      const { livestreamId } = useStreamingContext()
-      const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
-      const { trigger: deleteLivestreamVideo } =
-         useDeleteLivestreamVideo(livestreamId)
+export const ShareMenu = ({ handleClose, open, anchorEl }: Props) => {
+   const dispatch = useAppDispatch()
+   const { handleStopScreenShare, handleStartScreenShareProcess } =
+      useScreenShare()
+   const { livestreamId } = useStreamingContext()
+   const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
+   const { trigger: deleteLivestreamVideo } =
+      useDeleteLivestreamVideo(livestreamId)
 
-      const mode = useLivestreamMode()
+   const mode = useLivestreamMode()
 
-      const screenShareActive = mode === LivestreamModes.DESKTOP
-      const PDFActive = mode === LivestreamModes.PRESENTATION
-      const videoActive = mode === LivestreamModes.VIDEO
+   const screenShareActive = mode === LivestreamModes.DESKTOP
+   const PDFActive = mode === LivestreamModes.PRESENTATION
+   const videoActive = mode === LivestreamModes.VIDEO
 
-      const handleToggleMode = (newMode: LivestreamMode, active: boolean) => {
-         switch (newMode) {
-            case LivestreamModes.DESKTOP:
-               if (active) {
-                  handleStopScreenShare()
-               } else {
-                  handleStartScreenShareProcess()
-               }
-               break
-            case LivestreamModes.PRESENTATION:
-               if (active) {
-                  setLivestreamMode({ mode: LivestreamModes.DEFAULT })
-               } else {
-                  dispatch(setUploadPDFPresentationDialogOpen(true))
-               }
-               break
-            case LivestreamModes.VIDEO:
-               if (active) {
-                  setLivestreamMode({ mode: LivestreamModes.DEFAULT })
-                  deleteLivestreamVideo()
-               } else {
-                  dispatch(setShareVideoDialogOpen(true))
-               }
-               break
-            default:
-               break
-         }
-
-         handleClose()
+   const handleToggleMode = (newMode: LivestreamMode, active: boolean) => {
+      switch (newMode) {
+         case LivestreamModes.DESKTOP:
+            if (active) {
+               handleStopScreenShare()
+            } else {
+               handleStartScreenShareProcess()
+            }
+            break
+         case LivestreamModes.PRESENTATION:
+            if (active) {
+               setLivestreamMode({ mode: LivestreamModes.DEFAULT })
+            } else {
+               dispatch(setUploadPDFPresentationDialogOpen(true))
+            }
+            break
+         case LivestreamModes.VIDEO:
+            if (active) {
+               setLivestreamMode({ mode: LivestreamModes.DEFAULT })
+               deleteLivestreamVideo()
+            } else {
+               dispatch(setShareVideoDialogOpen(true))
+            }
+            break
+         default:
+            break
       }
 
-      const options: MenuOption[] = [
-         {
-            label: PDFActive ? "Stop sharing PDF" : "Share PDF presentation",
-            icon: <PDFIcon />,
-            handleClick: () =>
-               handleToggleMode(LivestreamModes.PRESENTATION, PDFActive),
-         },
-         {
-            label: videoActive ? "Stop sharing video" : "Share video",
-            icon: <Youtube />,
-            handleClick: () =>
-               handleToggleMode(LivestreamModes.VIDEO, videoActive),
-         },
-         {
-            label: screenShareActive ? "Stop sharing screen" : "Share screen",
-            icon: <ShareScreenIcon />,
-            handleClick: () =>
-               handleToggleMode(LivestreamModes.DESKTOP, screenShareActive),
-         },
-      ]
-
-      if (!open) {
-         return null
-      }
-
-      return (
-         <BrandedResponsiveMenu
-            placement="top"
-            handleClose={handleClose}
-            open={open}
-            anchorEl={anchorEl as HTMLElement}
-            options={options}
-         />
-      )
+      handleClose()
    }
-)
+
+   const options: MenuOption[] = [
+      {
+         label: PDFActive ? "Stop sharing PDF" : "Share PDF presentation",
+         icon: <PDFIcon />,
+         handleClick: () =>
+            handleToggleMode(LivestreamModes.PRESENTATION, PDFActive),
+      },
+      {
+         label: videoActive ? "Stop sharing video" : "Share video",
+         icon: <Youtube />,
+         handleClick: () =>
+            handleToggleMode(LivestreamModes.VIDEO, videoActive),
+      },
+      {
+         label: screenShareActive ? "Stop sharing screen" : "Share screen",
+         icon: <ShareScreenIcon />,
+         handleClick: () =>
+            handleToggleMode(LivestreamModes.DESKTOP, screenShareActive),
+      },
+   ]
+
+   if (!open) {
+      return null
+   }
+
+   return (
+      <BrandedResponsiveMenu
+         placement="top"
+         handleClose={handleClose}
+         open={open}
+         anchorEl={anchorEl as HTMLElement}
+         options={options}
+      />
+   )
+}
 
 ShareMenu.displayName = "ShareMenu"
