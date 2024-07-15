@@ -18,7 +18,6 @@ import { getChangeTypes } from "../../util"
 import { knownIndexes } from "../search/searchIndexes"
 import { initAlgoliaIndex } from "../search/util"
 import { TagsService } from "./services/TagsService"
-// TODO: Update documentation
 /**
  * Generate cache key for the fn call
  */
