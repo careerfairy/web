@@ -45,8 +45,8 @@ export const ToggleStartLiveStreamButton = () => {
             sx={{ maxWidth: "250px" }}
             title={
                disabled
-                  ? ""
-                  : "The Start Streaming button will become active 2 minutes before the stream's official start time."
+                  ? "The Start Streaming button will become active 2 minutes before the stream's official start time."
+                  : ""
             }
          >
             <span>
