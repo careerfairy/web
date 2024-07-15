@@ -83,6 +83,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
       formState: { isSubmitting },
       watch,
       setValue,
+      getValues,
    } = useFormContext()
 
    const watchedFields = watch([
