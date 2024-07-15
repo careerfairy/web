@@ -69,6 +69,10 @@ export const JobDialogStep = {
       position: 4,
       key: "form-additional-details",
    },
+   NO_CONTENT_AVAILABLE: {
+      position: 4,
+      key: "no-content-available",
+   },
    FORM_LINKED_LIVE_STREAMS: {
       position: 5,
       key: "form-linked-live-streams",
@@ -101,6 +105,10 @@ const JobAdditionalDetails = dynamic(
    {
       ssr: false,
    }
+)
+
+const JobLinkLiveStreams = dynamic(
+   () => import("./createJob/JobLinkLiveStreams")
 )
 
 type ViewsProps = {
