@@ -1,4 +1,5 @@
 import { Box, Grid } from "@mui/material"
+import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
@@ -8,6 +9,7 @@ import SteppedDialog, {
 import { useCallback } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
+import { JobDialogStep } from ".."
 
 const styles = sxStyles({
    container: {
@@ -43,16 +45,20 @@ const styles = sxStyles({
 const FIELD_NAME = "sparkIds"
 
 const JobLinkSparks = () => {
-   const { moveToPrev, moveToNext } = useStepper()
+   const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const { data: publishedSparks } = useGroupSparks(group.id, {
       isPublished: true,
    })
+   const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
+      group.id ?? group.groupId
+   )
 
    const {
       formState: { isSubmitting },
       watch,
       setValue,
+      getValues,
    } = useFormContext()
 
    const sparkIds = watch(FIELD_NAME)
@@ -70,6 +76,35 @@ const JobLinkSparks = () => {
       },
       [sparkIds, setValue]
    )
+
+   const handlePrevClick = useCallback(() => {
+      const selectedLivestreams = getValues("livestreamIds")
+
+      // If there are no upcoming livestreams and no livestreams are selected, navigate to the FORM_ADDITIONAL_DETAILS step
+      if (!groupHasUpcomingLivestreams && selectedLivestreams.length === 0) {
+         goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
+      }
+      // Otherwise, move to the previous step
+      else {
+         moveToPrev()
+      }
+   }, [getValues, goToStep, groupHasUpcomingLivestreams, moveToPrev])
+
+   const handleNextClick = useCallback(() => {
+      const [selectedLivestreams, selectedSparks] = getValues([
+         "livestreamIds",
+         FIELD_NAME,
+      ])
+
+      // If at least one livestream or spark is selected, move to the preview step.
+      if (selectedLivestreams.length > 0 || selectedSparks.length > 0) {
+         goToStep(JobDialogStep.FORM_PREVIEW.key)
+      }
+      // If no content is selected, navigate to the "No Linked Content" step.
+      else {
+         goToStep(JobDialogStep.NO_LINKED_CONTENT.key)
+      }
+   }, [getValues, goToStep])
 
    const adaptGrid = publishedSparks?.length > 2
 
@@ -123,14 +158,14 @@ const JobLinkSparks = () => {
                <SteppedDialog.Button
                   variant="outlined"
                   color="grey"
-                  onClick={moveToPrev}
+                  onClick={handlePrevClick}
                   sx={styles.cancelBtn}
                >
                   Back
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
-                  onClick={moveToNext}
+                  onClick={handleNextClick}
                   variant="contained"
                   color="secondary"
                   loading={isSubmitting}

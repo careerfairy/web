@@ -234,6 +234,8 @@ const getInitialValues = (
       postingUrl: "",
       jobType: "",
       noDateValidation: false,
+      livestreams: [],
+      sparks: [],
    }
 }
 

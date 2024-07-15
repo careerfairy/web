@@ -1,16 +1,17 @@
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { AlertCircle } from "react-feather"
-import { useFormContext } from "react-hook-form"
-import { JobDialogStep } from ".."
-import { sxStyles } from "../../../../../../../types/commonTypes"
 import SteppedDialog, {
    useStepper,
-} from "../../../../../stepped-dialog/SteppedDialog"
+} from "components/views/stepped-dialog/SteppedDialog"
+import { AlertTriangle } from "react-feather"
+import { useFormContext } from "react-hook-form"
 
 const styles = sxStyles({
    wrapContainer: {
+      width: "450px",
       height: {
+         xs: "310px",
          md: "100%",
       },
    },
@@ -18,12 +19,11 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      height: "100%",
       width: "100%",
       px: 2,
    },
    content: {
-      my: { xs: 1, md: "40px" },
+      my: 1,
    },
    info: {
       display: "flex",
@@ -31,80 +31,89 @@ const styles = sxStyles({
       alignItems: "center",
    },
    title: {
-      fontSize: { xs: "20px", md: "24px" },
+      fontSize: "20px !important",
+   },
+   subtitle: {
+      fontSize: "16px ",
    },
    btn: {
-      mt: 4,
-      width: "350px",
+      width: "100%",
    },
    mobileDialog: {
-      top: "calc(100dvh - 500px)",
+      top: "calc(100dvh - 310px)",
+   },
+   actions: {
+      border: "none !important",
    },
 })
 
-const NoLinkedContentDialog = () => {
-   const { currentStep } = useStepper()
+const NoLinkContentDialog = () => {
    const isMobile = useIsMobile()
    const {
       formState: { isSubmitting },
    } = useFormContext()
+   const { moveToPrev } = useStepper()
 
    const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
 
    if (dialogElement) {
-      dialogElement.style.top =
-         isMobile && currentStep === JobDialogStep.NO_LINKED_CONTENT.position
-            ? styles.mobileDialog.top
-            : "revert-layer"
+      dialogElement.style.top = isMobile
+         ? styles.mobileDialog.top
+         : "revert-layer"
    }
 
    return (
       <SteppedDialog.Container
          containerSx={styles.content}
          sx={styles.wrapContainer}
+         hideCloseButton
+         withActions
       >
          <>
             <SteppedDialog.Content sx={styles.container}>
-               <Stack spacing={3} sx={styles.info}>
-                  <AlertCircle color={"#FE9B0E"} size={68} />
+               <Stack spacing={2} sx={styles.info}>
+                  <AlertTriangle color={"#856DEE"} size={48} />
 
                   <SteppedDialog.Title sx={styles.title}>
-                     No content to link available
+                     Make your job visible!
                   </SteppedDialog.Title>
 
                   <SteppedDialog.Subtitle
                      maxWidth={"unset"}
                      textAlign={"center"}
+                     sx={styles.subtitle}
                   >
-                     Without an upcoming live stream or published Sparks to link
-                     to, your job opening won&apos;t be visible to talent.
-                     Create new content and link it to this job to make it
-                     visible.
+                     Linking your job opening to Sparks or upcoming live streams
+                     is necessary for qualified candidates to see it.
                   </SteppedDialog.Subtitle>
-
-                  <SteppedDialog.Subtitle
-                     maxWidth={"unset"}
-                     textAlign={"center"}
-                  >
-                     No worries, this job opening has been saved.
-                  </SteppedDialog.Subtitle>
-
-                  <SteppedDialog.Button
-                     type="submit"
-                     form="custom-job-form"
-                     variant="contained"
-                     color={"warning"}
-                     loading={isSubmitting}
-                     disabled={isSubmitting}
-                     sx={styles.btn}
-                  >
-                     Understood
-                  </SteppedDialog.Button>
                </Stack>
             </SteppedDialog.Content>
+
+            <SteppedDialog.Actions sx={styles.actions}>
+               <SteppedDialog.Button
+                  type="submit"
+                  form="custom-job-form"
+                  variant="outlined"
+                  color={"grey"}
+                  sx={styles.btn}
+                  loading={isSubmitting}
+                  disabled={isSubmitting}
+               >
+                  I&apos;ll do it later
+               </SteppedDialog.Button>
+
+               <SteppedDialog.Button
+                  variant="contained"
+                  color={"secondary"}
+                  sx={styles.btn}
+                  onClick={moveToPrev}
+               >
+                  Link content
+               </SteppedDialog.Button>
+            </SteppedDialog.Actions>
          </>
       </SteppedDialog.Container>
    )
 }
 
-export default NoLinkedContentDialog
+export default NoLinkContentDialog
