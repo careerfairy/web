@@ -61,7 +61,7 @@ const schema = (quillRef) =>
  * Additionally, use the 'Date' data type instead of 'Timestamp' within the form.
  */
 type CustomJobObj = {
-   jobType: string
+   jobType?: string
    deadline: Date
 } & Omit<PublicCustomJob, "jobType" | "deadline">
 
