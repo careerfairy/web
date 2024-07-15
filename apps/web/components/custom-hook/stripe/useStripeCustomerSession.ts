@@ -1,12 +1,12 @@
 import useSWR, { SWRConfiguration } from "swr"
 
-import { useMemo } from "react"
 import { Group, GroupPlanType } from "@careerfairy/shared-lib/groups"
+import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
+import { useMemo } from "react"
+import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
-import { errorLogAndNotify } from "util/CommonUtil"
-import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -51,11 +51,11 @@ const useStripeCustomerSession = (
          customerEmail: userEmail,
          groupId: group.groupId,
          customerName: group.universityName,
-         priceId: PLAN_CONSTANTS[plan].stripe.priceId(group.companyCountry.id),
+         priceId: PLAN_CONSTANTS[plan].stripe.priceId(group.companyCountry?.id),
          successUrl: `/group/${group.groupId}/admin/sparks?stripe_session_id={CHECKOUT_SESSION_ID}&planName=${PLAN_CONSTANTS[plan].name}`,
       }
    }, [
-      group.companyCountry.id,
+      group.companyCountry?.id,
       group.groupId,
       group.universityName,
       plan,
