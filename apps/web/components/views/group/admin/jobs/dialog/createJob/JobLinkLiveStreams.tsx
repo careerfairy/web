@@ -1,3 +1,4 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -48,7 +49,11 @@ const styles = sxStyles({
 
 const FIELD_NAME = "livestreamIds"
 
-const JobLinkLiveStreams = () => {
+type Props = {
+   job: CustomJob
+}
+
+const JobLinkLiveStreams = ({ job }: Props) => {
    const { moveToPrev, moveToNext, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const isMobile = useIsMobile()
