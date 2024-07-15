@@ -78,10 +78,10 @@ export const AdminControlsButton = forwardRef<
       {
          label: `${isSpyMode ? "Disable" : "Enable"} spy mode`,
          icon: <SpyIcon enabled={!isSpyMode} />,
-         handleClick: () => {
+         handleClick: async () => {
             const newQuery = { ...query }
             isSpyMode ? delete newQuery.spy : (newQuery.spy = "true")
-            push({
+            await push({
                pathname,
                query: newQuery,
             })
