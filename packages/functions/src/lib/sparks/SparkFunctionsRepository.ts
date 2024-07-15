@@ -395,6 +395,8 @@ export class SparkFunctionsRepository
          question: data.question,
          video: data.video,
          category: getCategoryById(data.categoryId),
+         contentTopicsTagIds:
+            [SparkCategoriesToTagValuesMapper[data.categoryId]] ?? [],
          createdAt: Timestamp.now(),
          publishedAt: data.published ? Timestamp.now() : null,
          updatedAt: null,
