@@ -3,7 +3,6 @@ import { Box, Stack, StackProps } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ReactNode } from "react"
 import { useStreamingContext } from "../../context/Streaming"
-import { CallToActionsButton } from "./CallToActionsButton"
 import { CheckJobsButton } from "./CheckJobsButton"
 import { CompanyButton } from "./CompanyButton"
 import { ConnectionStatus } from "./ConnectionStatus"
@@ -61,7 +60,7 @@ const ViewerView = () => {
          <MarginBox>
             <ViewCount />
          </MarginBox>
-         <CallToActionsButton />
+         {/* <CallToActionsButton /> */}
          {shouldStream ? <ConnectionStatus /> : null}
          <CompanyButton />
          <CheckJobsButton />
