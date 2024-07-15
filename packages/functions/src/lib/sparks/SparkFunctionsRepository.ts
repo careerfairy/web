@@ -14,6 +14,7 @@ import {
    DeletedSpark,
    SeenSparks,
    Spark,
+   SparkCategoriesToTagValuesMapper,
    SparkStats,
    UpdateSparkData,
    UserSparksFeedMetrics,
@@ -411,6 +412,7 @@ export class SparkFunctionsRepository
       const doc: Pick<
          Spark,
          | "category"
+         | "contentTopicsTagIds"
          | "creator"
          | "question"
          | "published"
@@ -420,6 +422,8 @@ export class SparkFunctionsRepository
       > = {
          question: data.question,
          category: getCategoryById(data.categoryId),
+         contentTopicsTagIds:
+            [SparkCategoriesToTagValuesMapper[data.categoryId]] ?? [],
          updatedAt: Timestamp.now(),
          published: data.published,
          creator: pickPublicDataFromCreator(creator),
