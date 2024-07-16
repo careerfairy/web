@@ -91,10 +91,6 @@ export const ShareMenu = ({ handleClose, open, anchorEl }: Props) => {
       },
    ]
 
-   if (!open) {
-      return null
-   }
-
    return (
       <BrandedResponsiveMenu
          placement="top"
