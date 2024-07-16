@@ -1,13 +1,12 @@
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
-import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { JobDialogStep } from ".."
@@ -42,20 +41,36 @@ const styles = sxStyles({
    centerGrid: {
       justifyContent: "center",
    },
+   actions: {
+      zIndex: 99,
+   },
 })
 
 const FIELD_NAME = "livestreamIds"
 
-type Props = {
-   job: CustomJob
-}
-
-const JobLinkLiveStreams = ({ job }: Props) => {
+const JobLinkLiveStreams = () => {
    const { moveToPrev, moveToNext, goToStep } = useStepper()
    const { group } = useGroupFromState()
-   const upcomingLiveStreams =
-      useListenToStreams({ filterByGroupId: group.id }) || []
-   const selectedLiveStreams = useCustomJobLinkedLivestreams(job) || []
+   const isMobile = useIsMobile()
+   const upcomingLiveStreams = useListenToStreams({
+      filterByGroupId: group.id ?? group.groupId,
+   })
+   const pastLiveStreams = useListenToStreams({
+      filterByGroupId: group.id ?? group.groupId,
+      listenToPastEvents: true,
+   })
+
+   const allLivesStreams = useMemo(
+      () => [
+         ...new Map(
+            [
+               ...(upcomingLiveStreams ? upcomingLiveStreams : []),
+               ...(pastLiveStreams ? pastLiveStreams : []),
+            ].map((stream) => [stream.id, stream])
+         ).values(),
+      ],
+      [pastLiveStreams, upcomingLiveStreams]
+   )
 
    const { watch, setValue } = useFormContext()
 
@@ -67,7 +82,7 @@ const JobLinkLiveStreams = ({ job }: Props) => {
          moveToNext()
       }
       // If there are no livestream IDs selected and has no public sparks, go to the NO_LINKED_CONTENT step
-      else if (livestreamIds.length > 0) {
+      else if (livestreamIds.length === 0) {
          goToStep(JobDialogStep.NO_LINKED_CONTENT.key)
       }
       // Otherwise, go to the FORM_PREVIEW step
@@ -90,17 +105,7 @@ const JobLinkLiveStreams = ({ job }: Props) => {
       [livestreamIds, setValue]
    )
 
-   // Combines upcomingLiveStreams and selectedLiveStreams into a single array of unique live streams
-   const allLivesStreams = [
-      ...new Map(
-         [...upcomingLiveStreams, ...selectedLiveStreams].map((stream) => [
-            stream.id,
-            stream,
-         ])
-      ).values(),
-   ]
-
-   const adaptGrid = allLivesStreams?.length > 2
+   const adaptGrid = allLivesStreams?.length > 2 && !isMobile
 
    return (
       <SteppedDialog.Container
@@ -130,7 +135,11 @@ const JobLinkLiveStreams = ({ job }: Props) => {
                   sx={adaptGrid ? null : styles.centerGrid}
                >
                   {allLivesStreams?.map((event) => (
-                     <Grid item key={event.id} xs={adaptGrid ? 4 : 6}>
+                     <Grid
+                        item
+                        key={event.id}
+                        xs={isMobile ? 12 : adaptGrid ? 4 : 6}
+                     >
                         <EventPreviewCard
                            key={event.id}
                            event={event}
@@ -144,7 +153,7 @@ const JobLinkLiveStreams = ({ job }: Props) => {
                </Grid>
             </SteppedDialog.Content>
 
-            <SteppedDialog.Actions>
+            <SteppedDialog.Actions sx={styles.actions}>
                <SteppedDialog.Button
                   variant="outlined"
                   color="grey"
