@@ -1,11 +1,15 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
+import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
+import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
+import { useCallback } from "react"
 import { AlertTriangle } from "react-feather"
 import { useFormContext } from "react-hook-form"
+import { JobDialogStep } from ".."
 
 const styles = sxStyles({
    wrapContainer: {
@@ -52,8 +56,11 @@ const NoLinkContentDialog = () => {
    const {
       formState: { isSubmitting },
    } = useFormContext()
-   const { moveToPrev } = useStepper()
-
+   const { moveToPrev, goToStep } = useStepper()
+   const { group } = useGroupFromState()
+   const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
+      group.id ?? group.groupId
+   )
    const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
 
    if (dialogElement) {
@@ -61,6 +68,16 @@ const NoLinkContentDialog = () => {
          ? styles.mobileDialog.top
          : "revert-layer"
    }
+
+   const handlePrevClick = useCallback(() => {
+      if (group.publicSparks) {
+         moveToPrev()
+      } else if (groupHasUpcomingLivestreams) {
+         goToStep(JobDialogStep.FORM_LINKED_LIVE_STREAMS.key)
+      } else {
+         goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
+      }
+   }, [goToStep, group.publicSparks, groupHasUpcomingLivestreams, moveToPrev])
 
    return (
       <SteppedDialog.Container
@@ -106,7 +123,7 @@ const NoLinkContentDialog = () => {
                   variant="contained"
                   color={"secondary"}
                   sx={styles.btn}
-                  onClick={moveToPrev}
+                  onClick={handlePrevClick}
                >
                   Link content
                </SteppedDialog.Button>
