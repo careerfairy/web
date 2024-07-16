@@ -124,10 +124,7 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
               {
                  key: JobDialogStep.FORM_ADDITIONAL_DETAILS.key,
                  Component: () => (
-                    <JobAdditionalDetails
-                       quillInputRef={quillInputRef}
-                       job={job}
-                    />
+                    <JobAdditionalDetails quillInputRef={quillInputRef} />
                  ),
               },
               {
