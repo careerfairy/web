@@ -2,6 +2,7 @@ import { Box, Grid } from "@mui/material"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import SteppedDialog, {
    useStepper,
@@ -40,6 +41,13 @@ const styles = sxStyles({
    centerGrid: {
       justifyContent: "center",
    },
+   card: {
+      height: { xs: "600px", md: "360px" },
+      mx: { xs: 4, md: "unset" },
+   },
+   actions: {
+      zIndex: 99,
+   },
 })
 
 const FIELD_NAME = "sparkIds"
@@ -53,6 +61,7 @@ const JobLinkSparks = () => {
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
       group.id ?? group.groupId
    )
+   const isMobile = useIsMobile()
 
    const {
       formState: { isSubmitting },
@@ -106,7 +115,7 @@ const JobLinkSparks = () => {
       }
    }, [getValues, goToStep])
 
-   const adaptGrid = publishedSparks?.length > 2
+   const adaptGrid = publishedSparks?.length > 2 && !isMobile
 
    return (
       <SteppedDialog.Container
@@ -139,8 +148,8 @@ const JobLinkSparks = () => {
                      <Grid
                         item
                         key={spark.id}
-                        xs={adaptGrid ? 4 : 6}
-                        sx={{ height: "360px" }}
+                        xs={isMobile ? 12 : adaptGrid ? 4 : 6}
+                        sx={styles.card}
                      >
                         <SparkCarouselCard
                            spark={spark}
@@ -154,7 +163,7 @@ const JobLinkSparks = () => {
                </Grid>
             </SteppedDialog.Content>
 
-            <SteppedDialog.Actions>
+            <SteppedDialog.Actions sx={styles.actions}>
                <SteppedDialog.Button
                   variant="outlined"
                   color="grey"
