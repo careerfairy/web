@@ -188,3 +188,7 @@ export const getGroupedTags = (tagIds: string[]): GroupedTags => {
       language: Object.fromEntries(languages),
    }
 }
+
+export const TagsLookup = Object.fromEntries(
+   TagValues.map((tag) => [tag.id, tag])
+)
