@@ -1,26 +1,26 @@
 import {
-   LocalVideoTrack,
-   LocalAudioTrack,
-   ILocalVideoTrack,
    ILocalAudioTrack,
+   ILocalVideoTrack,
+   LocalAudioTrack,
+   LocalVideoTrack,
 } from "agora-rtc-react"
-import { type ReactNode } from "react"
+import { useEffect, type ReactNode } from "react"
 
 import { Box, BoxProps } from "@mui/material"
-import { useLocalTracks } from "../../context"
-import { FloatingContent, VideoTrackWrapper } from "./VideoTrackWrapper"
-import { UserCover } from "./UserCover"
-import { Loader } from "./Loader"
-import { styles } from "./styles"
-import { userIsSpeakingSelector } from "store/selectors/streamingAppSelectors"
 import { useAppSelector } from "components/custom-hook/store"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
-import { DetailsOverlay } from "./DetailsOverlay"
-import { SpeakingIndicator } from "./SpeakingIndicator"
+import { userIsSpeakingSelector } from "store/selectors/streamingAppSelectors"
+import { useLocalTracks } from "../../context"
 import { useScreenShare } from "../../context/ScreenShare"
-import { LocalUser, LocalUserScreen } from "../../types"
 import { useUserStream } from "../../context/UserStream"
+import { LocalUser, LocalUserScreen } from "../../types"
+import { DetailsOverlay } from "./DetailsOverlay"
 import { LinearGradient } from "./LinearGradient"
+import { Loader } from "./Loader"
+import { SpeakingIndicator } from "./SpeakingIndicator"
+import { UserCover } from "./UserCover"
+import { FloatingContent, VideoTrackWrapper } from "./VideoTrackWrapper"
+import { styles } from "./styles"
 
 export type LocalMicrophoneAndCameraUserProps = {
    /**
@@ -153,6 +153,15 @@ export const LocalStream = ({
    playAudio = playAudio ?? Boolean(micOn)
 
    const micActive = micOn && !micMuted
+
+   const videoPlayer = document.querySelector(".agora_video_player")
+
+   useEffect(() => {
+      if (videoPlayer) {
+         videoPlayer.setAttribute("playsinline", "true")
+         videoPlayer.setAttribute("webkit-playsinline", "true")
+      }
+   }, [localCameraTrack, videoPlayer])
 
    return (
       <VideoTrackWrapper {...props}>
