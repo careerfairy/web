@@ -51,9 +51,6 @@ const styles = sxStyles({
       borderBottom: "1px solid",
       borderColor: (theme) => theme.brand.black[300],
    },
-   singleMenuItem: {
-      p: "16px !important",
-   },
    drawerMenuItem: {
       p: "17px 20px !important",
       position: "relative",
