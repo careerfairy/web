@@ -107,6 +107,10 @@ export const TagValuesLookup = Object.fromEntries(
    TagValues.map((tag) => [tag.id, tag.name])
 )
 
+export const TagsLookup = Object.fromEntries(
+   TagValues.map((tag) => [tag.id, tag])
+)
+
 export const getBusinessTagsByIds = (tagIds: string[]): OptionGroup[] => {
    const tagIdSet = new Set(tagIds)
 
