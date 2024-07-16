@@ -158,8 +158,8 @@ export const LocalStream = ({
 
    useEffect(() => {
       if (videoPlayer) {
-         videoPlayer.setAttribute("playsinline", "true")
-         videoPlayer.setAttribute("webkit-playsinline", "true")
+         videoPlayer.setAttribute("playsinline", "")
+         videoPlayer.setAttribute("webkit-playsinline", "")
       }
    }, [localCameraTrack, videoPlayer])
 
