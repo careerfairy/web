@@ -8,7 +8,7 @@ import { useStreamingContext } from "../../context"
 import { CollapseButton } from "../Buttons/CollapseButton"
 import { CommentCard } from "./CommentCard"
 import { CommentCardSkeleton } from "./CommentCardSkeleton"
-import { useQuestionsListContext } from "./QuestionsLisProvider"
+import { useQuestionsListContext } from "./QuestionsListProvider"
 
 type Props = {
    question: LivestreamQuestion
