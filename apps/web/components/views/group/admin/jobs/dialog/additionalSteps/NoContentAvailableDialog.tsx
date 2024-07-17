@@ -3,9 +3,7 @@ import { useCallback } from "react"
 import { AlertCircle } from "react-feather"
 import { JobDialogStep } from ".."
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import SteppedDialog, {
-   useStepper,
-} from "../../../../../stepped-dialog/SteppedDialog"
+import SteppedDialog from "../../../../../stepped-dialog/SteppedDialog"
 
 const styles = sxStyles({
    wrapContainer: {
