@@ -49,7 +49,6 @@ export const getSparksFeed = functions
 
                if ("userId" in data) {
                   if (data.userId) {
-                     functions.logger.info(`data.userId ${data.userId}`)
                      return {
                         sparks: await sparkRepo.getUserSparksFeed(
                            data.userId,
