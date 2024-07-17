@@ -103,6 +103,10 @@ const JobAdditionalDetails = dynamic(
    }
 )
 
+const JobLinkLiveStreams = dynamic(
+   () => import("./createJob/JobLinkLiveStreams")
+)
+
 type ViewsProps = {
    jobHubV1: boolean
    quillInputRef: any
