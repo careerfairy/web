@@ -135,8 +135,7 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
                  key: JobDialogStep.FORM_LINKED_LIVE_STREAMS.key,
                  Component: () => (
                     <SuspenseWithBoundary fallback={<></>}>
-                       {" "}
-                       <JobLinkLiveStreams job={job} />{" "}
+                       <JobLinkLiveStreams job={job} />
                     </SuspenseWithBoundary>
                  ),
               },
