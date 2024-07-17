@@ -60,6 +60,7 @@ const JobBasicInfo = () => {
       formState: { isSubmitting },
       watch,
    } = useFormContext()
+
    const watchFields = watch([
       "basicInfo.title",
       "basicInfo.jobType",
