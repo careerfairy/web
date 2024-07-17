@@ -141,15 +141,20 @@ export class FirebaseCustomJobRepository
    ): Promise<CustomJob> {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc()
 
+      const isPublished = Boolean(
+         job.livestreams.length || job.sparks.length || linkedLivestreamId
+      )
+
       const newJob: CustomJob = {
          documentType: this.COLLECTION_NAME,
          ...job,
          createdAt: this.fieldValue.serverTimestamp() as Timestamp,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
-         livestreams: linkedLivestreamId ? [linkedLivestreamId] : [],
-         sparks: [],
+         livestreams: linkedLivestreamId
+            ? [linkedLivestreamId]
+            : job.livestreams,
          id: ref.id,
-         published: Boolean(linkedLivestreamId),
+         published: isPublished,
       }
 
       await ref.set(newJob, { merge: true })

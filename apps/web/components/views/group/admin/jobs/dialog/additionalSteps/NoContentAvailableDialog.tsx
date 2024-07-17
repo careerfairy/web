@@ -1,12 +1,9 @@
 import { Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { useCallback } from "react"
 import { AlertCircle } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import SteppedDialog, {
-   useStepper,
-} from "../../../../../stepped-dialog/SteppedDialog"
+import SteppedDialog from "../../../../../stepped-dialog/SteppedDialog"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -49,9 +46,8 @@ const styles = sxStyles({
 const NoLinkedContentDialog = () => {
    const isMobile = useIsMobile()
    const {
-      formState: { isSubmitting, isDirty },
+      formState: { isSubmitting },
    } = useFormContext()
-   const { handleClose } = useStepper()
 
    const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
 
@@ -60,12 +56,6 @@ const NoLinkedContentDialog = () => {
          ? styles.mobileDialog.top
          : "revert-layer"
    }
-
-   const handleClick = useCallback(() => {
-      if (!isDirty) {
-         handleClose()
-      }
-   }, [handleClose, isDirty])
 
    return (
       <SteppedDialog.Container
@@ -101,13 +91,12 @@ const NoLinkedContentDialog = () => {
                   </SteppedDialog.Subtitle>
 
                   <SteppedDialog.Button
-                     type={isDirty ? "submit" : "button"}
+                     type={"submit"}
                      form="custom-job-form"
                      variant="contained"
                      color={"warning"}
                      loading={isSubmitting}
                      disabled={isSubmitting}
-                     onClick={handleClick}
                      sx={styles.btn}
                   >
                      Understood
