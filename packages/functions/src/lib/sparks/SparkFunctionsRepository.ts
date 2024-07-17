@@ -588,20 +588,39 @@ export class SparkFunctionsRepository
       limit = 10,
       countryCode: OptionGroup
    ): Promise<SerializedSpark[]> {
-      let query = this.firestore
-         .collection("sparks")
-         .where("group.publicSparks", "==", true)
+      try {
+         let query = this.firestore
+            .collection("sparks")
+            .where("group.publicSparks", "==", true)
 
-      if (contentTopics?.length) {
-         query = query.where(
-            "contentTopicsTagIds",
-            "array-contains-any",
-            contentTopics
-         )
-      }
+         if (contentTopics?.length) {
+            query = query.where("contentTopicsTagIds", "in", contentTopics[0])
+         }
 
-      // If no country code is provided, fetch all public sparks
-      if (!countryCode) {
+         // If no country code is provided, fetch all public sparks
+         if (!countryCode) {
+            const publicFeedRef = query
+               .orderBy("publishedAt", "desc")
+               .limit(limit)
+               .withConverter(createGenericConverter<Spark>())
+
+            const publicFeedSnap = await publicFeedRef.get()
+
+            return publicFeedSnap.docs.map((doc) =>
+               SparkPresenter.serialize(doc.data())
+            )
+         }
+
+         // Apply country code filter only if content topics are not provided
+         if (!contentTopics?.length) {
+            // If a country code is provided, prioritize sparks targeted to that country first
+            query = query.where(
+               "group.targetedCountries",
+               "array-contains",
+               countryCode
+            )
+         }
+
          const publicFeedRef = query
             .orderBy("publishedAt", "desc")
             .limit(limit)
@@ -609,65 +628,47 @@ export class SparkFunctionsRepository
 
          const publicFeedSnap = await publicFeedRef.get()
 
-         return publicFeedSnap.docs.map((doc) =>
-            SparkPresenter.serialize(doc.data())
-         )
-      }
-
-      // Apply country code filter only if content topics are not provided
-      if (!contentTopics?.length) {
-         // If a country code is provided, prioritize sparks targeted to that country first
-         query = query.where(
-            "group.targetedCountries",
-            "array-contains",
-            countryCode
-         )
-      }
-
-      const publicFeedRef = query
-         .orderBy("publishedAt", "desc")
-         .limit(limit)
-         .withConverter(createGenericConverter<Spark>())
-
-      const publicFeedSnap = await publicFeedRef.get()
-
-      const sparksFeedCandidates = publicFeedSnap.docs.map((doc) =>
-         SparkPresenter.serialize(doc.data())
-      )
-
-      if (sparksFeedCandidates.length < limit) {
-         const publicFeedRef = this.firestore
-            .collection("sparks")
-            .where("group.publicSparks", "==", true)
-            .orderBy("publishedAt", "desc")
-            .limit(limit)
-            .withConverter(createGenericConverter<Spark>())
-
-         const publicFeedSnap = await publicFeedRef.get()
-
-         const publicSparks = publicFeedSnap.docs.map((doc) =>
+         const sparksFeedCandidates = publicFeedSnap.docs.map((doc) =>
             SparkPresenter.serialize(doc.data())
          )
 
-         if (sparksFeedCandidates.length === 0) {
-            return publicSparks
+         if (sparksFeedCandidates.length < limit) {
+            const publicFeedRef = this.firestore
+               .collection("sparks")
+               .where("group.publicSparks", "==", true)
+               .orderBy("publishedAt", "desc")
+               .limit(limit)
+               .withConverter(createGenericConverter<Spark>())
+
+            const publicFeedSnap = await publicFeedRef.get()
+
+            const publicSparks = publicFeedSnap.docs.map((doc) =>
+               SparkPresenter.serialize(doc.data())
+            )
+
+            if (sparksFeedCandidates.length === 0) {
+               return publicSparks
+            }
+
+            const publicSparksWithoutDuplicates = publicSparks.filter((spark) =>
+               sparksFeedCandidates.some(
+                  (targetedSpark) => targetedSpark.id !== spark.id
+               )
+            )
+
+            const result = [
+               ...sparksFeedCandidates,
+               ...publicSparksWithoutDuplicates,
+            ].slice(0, limit)
+
+            return result
          }
 
-         const publicSparksWithoutDuplicates = publicSparks.filter((spark) =>
-            sparksFeedCandidates.some(
-               (targetedSpark) => targetedSpark.id !== spark.id
-            )
-         )
-
-         const result = [
-            ...sparksFeedCandidates,
-            ...publicSparksWithoutDuplicates,
-         ].slice(0, limit)
-
-         return result
+         return sparksFeedCandidates
+      } catch (error) {
+         functions.logger.error(error)
+         return []
       }
-
-      return sparksFeedCandidates
    }
 
    async getGroupSparksFeed(
