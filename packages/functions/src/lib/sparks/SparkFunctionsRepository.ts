@@ -594,6 +594,7 @@ export class SparkFunctionsRepository
             .where("group.publicSparks", "==", true)
 
          if (contentTopics?.length) {
+            // The mapping between content topics and spark categories is 1:1
             query = query.where("contentTopicsTagIds", "in", contentTopics[0])
          }
 
