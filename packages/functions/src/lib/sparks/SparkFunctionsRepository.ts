@@ -16,6 +16,7 @@ import {
    Spark,
    SparkCategoriesToTagValuesMapper,
    SparkStats,
+   TagValuesToSparkCategoriesMapper,
    UpdateSparkData,
    UserSparksFeedMetrics,
    createSeenSparksDocument,
@@ -128,11 +129,7 @@ export interface ISparkFunctionsRepository {
     *
     * - If the user doesn't have a feed, it will lazily generate one and store it in the database, then return it
     */
-   getUserSparksFeed(
-      userId: string,
-      contentTopics?: string[],
-      limit?: number
-   ): Promise<SerializedSpark[]>
+   getUserSparksFeed(userId: string, limit?: number): Promise<SerializedSpark[]>
 
    /**
     * Get the public feed of Sparks
@@ -562,22 +559,14 @@ export class SparkFunctionsRepository
 
    async getUserSparksFeed(
       userId: string,
-      contentTopics: string[],
       limit = 10
    ): Promise<SerializedSpark[]> {
-      let query = this.firestore
+      const query = this.firestore
          .collection("userData")
          .doc(userId)
          .collection("sparksFeed")
          .where("group.publicSparks", "==", true)
 
-      if (contentTopics?.length) {
-         query = query.where(
-            "contentTopicsTagIds",
-            "array-contains-any",
-            contentTopics
-         )
-      }
       const userFeedRef = query
          .orderBy("publishedAt", "desc")
          .limit(limit)
@@ -605,10 +594,15 @@ export class SparkFunctionsRepository
          .where("group.publicSparks", "==", true)
 
       if (contentTopics?.length) {
+         /*
+          * At the moment there is an 1:1 mapping between Sparks categories and content topics
+          * This might change in the future so we might need to refactor:
+          * https://linear.app/careerfairy/issue/CF-989/refactor-public-sparks-feed-generation-to-use-algolia
+          */
          query = query.where(
-            "contentTopicsTagIds",
-            "array-contains-any",
-            contentTopics
+            "category.id",
+            "==",
+            TagValuesToSparkCategoriesMapper[contentTopics[0]]
          )
       }
       // If there is no logged out country code, we want to get all the public sparks without any additional logic
