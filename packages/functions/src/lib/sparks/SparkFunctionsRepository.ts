@@ -16,7 +16,6 @@ import {
    Spark,
    SparkCategoriesToTagValuesMapper,
    SparkStats,
-   TagValuesToSparkCategoriesMapper,
    UpdateSparkData,
    UserSparksFeedMetrics,
    createSeenSparksDocument,
@@ -594,18 +593,14 @@ export class SparkFunctionsRepository
          .where("group.publicSparks", "==", true)
 
       if (contentTopics?.length) {
-         /*
-          * At the moment there is an 1:1 mapping between Sparks categories and content topics
-          * This might change in the future so we might need to refactor:
-          * https://linear.app/careerfairy/issue/CF-989/refactor-public-sparks-feed-generation-to-use-algolia
-          */
          query = query.where(
-            "category.id",
-            "==",
-            TagValuesToSparkCategoriesMapper[contentTopics[0]]
+            "contentTopicsTagIds",
+            "array-contains-any",
+            contentTopics
          )
       }
-      // If there is no logged out country code, we want to get all the public sparks without any additional logic
+
+      // If no country code is provided, fetch all public sparks
       if (!countryCode) {
          const publicFeedRef = query
             .orderBy("publishedAt", "desc")
@@ -619,12 +614,15 @@ export class SparkFunctionsRepository
          )
       }
 
-      // In case of logged out country code, we want to get 1st all the targetedCountries sparks
-      query = query.where(
-         "group.targetedCountries",
-         "array-contains",
-         countryCode
-      )
+      // Apply country code filter only if content topics are not provided
+      if (!contentTopics?.length) {
+         // If a country code is provided, prioritize sparks targeted to that country first
+         query = query.where(
+            "group.targetedCountries",
+            "array-contains",
+            countryCode
+         )
+      }
 
       const publicFeedRef = query
          .orderBy("publishedAt", "desc")
@@ -633,11 +631,11 @@ export class SparkFunctionsRepository
 
       const publicFeedSnap = await publicFeedRef.get()
 
-      const targetedSparks = publicFeedSnap.docs.map((doc) =>
+      const sparksFeedCandidates = publicFeedSnap.docs.map((doc) =>
          SparkPresenter.serialize(doc.data())
       )
 
-      if (targetedSparks.length < limit) {
+      if (sparksFeedCandidates.length < limit) {
          const publicFeedRef = this.firestore
             .collection("sparks")
             .where("group.publicSparks", "==", true)
@@ -651,25 +649,25 @@ export class SparkFunctionsRepository
             SparkPresenter.serialize(doc.data())
          )
 
-         if (targetedSparks.length === 0) {
+         if (sparksFeedCandidates.length === 0) {
             return publicSparks
          }
 
          const publicSparksWithoutDuplicates = publicSparks.filter((spark) =>
-            targetedSparks.some(
+            sparksFeedCandidates.some(
                (targetedSpark) => targetedSpark.id !== spark.id
             )
          )
 
          const result = [
-            ...targetedSparks,
+            ...sparksFeedCandidates,
             ...publicSparksWithoutDuplicates,
          ].slice(0, limit)
 
          return result
       }
 
-      return targetedSparks
+      return sparksFeedCandidates
    }
 
    async getGroupSparksFeed(
