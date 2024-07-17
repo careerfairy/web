@@ -37,6 +37,7 @@ export const getSparksFeed = functions
             userId: string().trim().min(1).optional().nullable(),
             groupId: string().trim().min(1).optional(),
             numberOfSparks: number().min(1).optional(),
+            contentTopicIds: array().of(string()).optional(),
          }),
          async (data: GetFeedData, context) => {
             try {
@@ -48,10 +49,10 @@ export const getSparksFeed = functions
 
                if ("userId" in data) {
                   if (data.userId) {
+                     functions.logger.info(`data.userId ${data.userId}`)
                      return {
                         sparks: await sparkRepo.getUserSparksFeed(
                            data.userId,
-                           data.contentTopicIds,
                            data.numberOfSparks
                         ),
                      }
