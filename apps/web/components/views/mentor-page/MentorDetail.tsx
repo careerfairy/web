@@ -60,7 +60,10 @@ const LinkedInButton = () => {
    )
 }
 
-const SpeakerAvatar = ({ mentor, companyName }: MentorDetailProps) => {
+const SpeakerAvatar = ({
+   mentor,
+   companyName,
+}: Pick<MentorDetailProps, "mentor" | "companyName">) => {
    const mentorName = `${mentor.firstName ?? ""} ${mentor.lastName ?? ""}`
 
    return (
@@ -83,13 +86,61 @@ const SpeakerAvatar = ({ mentor, companyName }: MentorDetailProps) => {
    )
 }
 
+const getMentorPlaceholderStory = ({
+   mentor,
+   companyName,
+   numSparks,
+   numLivestreams,
+}: MentorDetailProps) => {
+   const hasCreatedSparks = numSparks > 0
+   const hasParticipatedInLivestreams = numLivestreams > 0
+
+   const mentorName = `${mentor.firstName ?? ""} ${mentor.lastName ?? ""}`
+
+   if (!hasCreatedSparks && !hasParticipatedInLivestreams) {
+      return `Reach out to ${mentorName} on LinkedIn and ask your own questions!`
+   }
+
+   const sparksMessage = hasCreatedSparks
+      ? `has created ${numSparks} Sparks`
+      : ""
+   const livestreamsMessage = hasParticipatedInLivestreams
+      ? `has participated in ${numLivestreams} live streams`
+      : ""
+
+   const introMessage = `${mentorName} ${sparksMessage}${
+      hasCreatedSparks && hasParticipatedInLivestreams ? " and " : ""
+   }${livestreamsMessage}.`
+
+   const pronoun = numSparks + numLivestreams > 1 ? "them" : "it"
+   const watchMessage = `Watch ${pronoun} to know ${mentor.firstName} and ${companyName} better!`
+
+   const reachOutMessage = `After that reach out to ${mentor.firstName} on LinkedIn and ask your own questions!`
+
+   return `${introMessage} ${watchMessage} ${reachOutMessage}`
+}
+
 type MentorDetailProps = {
    mentor: PublicCreator
    companyName: string
+   numSparks: number
+   numLivestreams: number
 }
 
-export const MentorDetail = ({ mentor, companyName }: MentorDetailProps) => {
+export const MentorDetail = ({
+   mentor,
+   companyName,
+   numSparks,
+   numLivestreams,
+}: MentorDetailProps) => {
    if (!mentor) return null
+
+   const placeholderStory = getMentorPlaceholderStory({
+      mentor,
+      companyName,
+      numSparks,
+      numLivestreams,
+   })
 
    return (
       <Stack sx={styles.root}>
@@ -101,7 +152,9 @@ export const MentorDetail = ({ mentor, companyName }: MentorDetailProps) => {
          >
             <LinkedInButton />
          </Button>
-         <Typography sx={styles.story}>{mentor?.story}</Typography>
+         <Typography sx={styles.story}>
+            {mentor.story ? mentor.story : placeholderStory}
+         </Typography>
       </Stack>
    )
 }
