@@ -1,4 +1,5 @@
 import { Box, Grid } from "@mui/material"
+import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
@@ -48,7 +49,7 @@ const styles = sxStyles({
 
 const FIELD_NAME = "livestreamIds"
 
-const JobLinkLiveStreams = () => {
+const JobLinkLiveStreams = ({ job }) => {
    const { moveToPrev, moveToNext, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const isMobile = useIsMobile()
