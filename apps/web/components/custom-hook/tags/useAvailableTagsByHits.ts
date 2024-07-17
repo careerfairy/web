@@ -20,7 +20,6 @@ import { useTagsContentHits } from "./useTagsContentHits"
 export const useAvailableTagsByHits = () => {
    const { isLoggedIn, userData } = useAuth()
    const { data: hits } = useTagsContentHits()
-   console.log("🚀 ~ useAvailableTagsByHits ~ hits:", hits)
 
    const availableBusinessFunctions = BusinessFunctionsTagValues.filter(
       (tag) => {
@@ -37,10 +36,6 @@ export const useAvailableTagsByHits = () => {
          ? shouldShowContentTopicTagByCount(tagHits.count, 6, 6)
          : false
    })
-   console.log(
-      "🚀 ~ availableContentTopics ~ availableContentTopics:",
-      availableContentTopics
-   )
 
    return sortByUserInterests(
       [...availableBusinessFunctions, ...availableContentTopics],
