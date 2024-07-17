@@ -1,6 +1,7 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Button, Stack, Typography } from "@mui/material"
+import { Button, Stack, Typography, useTheme } from "@mui/material"
+import { LinkedInIcon } from "../common/icons/LinkedInIcon"
 import CircularLogo from "../common/logos/CircularLogo"
 
 const styles = sxStyles({
@@ -26,17 +27,38 @@ const styles = sxStyles({
       fontWeight: 400,
       lineHeight: "24px",
    },
+   linkedInButtonInnerContainer: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "baseline",
+      height: "20px",
+      gap: "6px",
+   },
    linkedInButton: (theme) => ({
       color: `${theme.brand.info[700]}`,
       border: `1px solid ${theme.brand.info[400]}`,
-      fontSize: "14px",
-      lineHeight: "20px",
       "&:hover": {
          border: `1px solid ${theme.brand.info[400]}`,
          backgroundColor: `${theme.brand.info[50]}`,
       },
+      "& svg": {
+         width: "14px",
+         height: "14px",
+         marginTop: "-2px",
+      },
    }),
 })
+
+const LinkedInButton = () => {
+   const theme = useTheme()
+
+   return (
+      <Stack sx={styles.linkedInButtonInnerContainer}>
+         <LinkedInIcon fill={theme.brand.info[700]} />
+         <Typography variant="small">Reach out on LinkedIn</Typography>
+      </Stack>
+   )
+}
 
 const SpeakerAvatar = ({ mentor, companyName }: MentorDetailProps) => {
    const mentorName = `${mentor.firstName ?? ""} ${mentor.lastName ?? ""}`
@@ -77,7 +99,7 @@ export const MentorDetail = ({ mentor, companyName }: MentorDetailProps) => {
             variant="outlined"
             onClick={() => window.open(mentor?.linkedInUrl, "_blank")}
          >
-            Reach out on LinkedIn
+            <LinkedInButton />
          </Button>
          <Typography sx={styles.story}>{mentor?.story}</Typography>
       </Stack>
