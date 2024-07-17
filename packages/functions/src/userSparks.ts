@@ -48,7 +48,7 @@ export const getSparksFeed = functions
                )
 
                if ("userId" in data) {
-                  if (data.userId) {
+                  if (data.userId && !data.contentTopicIds?.length) {
                      return {
                         sparks: await sparkRepo.getUserSparksFeed(
                            data.userId,
