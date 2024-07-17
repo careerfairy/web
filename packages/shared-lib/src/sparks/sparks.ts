@@ -383,6 +383,13 @@ export const SparkCategoriesToTagValuesMapper = {
    [SparksCategories.Events.id]: ContentTopicsTags.Events.id,
 }
 
+export const TagValuesToSparkCategoriesMapper = Object.fromEntries(
+   Object.entries(SparkCategoriesToTagValuesMapper).map(([key, value]) => [
+      value,
+      key,
+   ])
+)
+
 export const sparksCategoriesArray = Object.values(SparksCategories)
 
 export const getCategoryEmoji = (categoryId: SparkCategory["id"]) => {
