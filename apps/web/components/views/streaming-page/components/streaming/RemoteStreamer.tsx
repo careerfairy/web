@@ -7,7 +7,6 @@ import {
    useRemoteUserTrack,
 } from "agora-rtc-react"
 import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
-import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { setAutoplayState } from "store/reducers/streamingAppReducer"
 import {
@@ -66,7 +65,6 @@ export const RemoteStreamer = ({
    )
 
    const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
-   const streamIsMobile = useStreamIsMobile()
 
    const { data: streamerDetails } = useStreamerDetails(user.uid)
 
@@ -117,7 +115,7 @@ export const RemoteStreamer = ({
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
          <SpeakingIndicator isSpeaking={isSpeaking} />
          <FloatingContent>{children}</FloatingContent>
-         {streamIsMobile ? null : (
+         {isScreenShare ? null : (
             <DetailsOverlay
                micActive={user.hasAudio}
                streamerDetails={streamerDetails}
