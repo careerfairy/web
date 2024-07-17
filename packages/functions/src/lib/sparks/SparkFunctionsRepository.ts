@@ -16,6 +16,7 @@ import {
    Spark,
    SparkCategoriesToTagValuesMapper,
    SparkStats,
+   TagValuesToSparkCategoriesMapper,
    UpdateSparkData,
    UserSparksFeedMetrics,
    createSeenSparksDocument,
@@ -595,7 +596,11 @@ export class SparkFunctionsRepository
 
          if (contentTopics?.length) {
             // The mapping between content topics and spark categories is 1:1
-            query = query.where("contentTopicsTagIds", "in", contentTopics[0])
+            query = query.where(
+               "category.id",
+               "==",
+               TagValuesToSparkCategoriesMapper[contentTopics[0]]
+            )
          }
 
          // If no country code is provided, fetch all public sparks
