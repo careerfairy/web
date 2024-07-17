@@ -54,7 +54,12 @@ export const MentorDetailPage = ({
       <Stack sx={styles.root}>
          <Box sx={styles.mentorDetailsContainer}>
             <BackButton />
-            <MentorDetail mentor={mentor} companyName={companyName} />
+            <MentorDetail
+               mentor={mentor}
+               companyName={companyName}
+               numSparks={sparks.length}
+               numLivestreams={livestreams.length}
+            />
          </Box>
          <Stack sx={styles.mentorContentContainer}>
             <SparksCarousel sparks={sparks} />
