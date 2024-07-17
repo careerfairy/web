@@ -92,6 +92,10 @@ const JobAdditionalDetails = dynamic(
    }
 )
 
+const JobLinkLiveStreams = dynamic(
+   () => import("./createJob/JobLinkLiveStreams")
+)
+
 type ViewsProps = {
    jobHubV1: boolean
    quillInputRef: any
@@ -129,8 +133,11 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
               },
               {
                  key: JobDialogStep.FORM_LINKED_LIVE_STREAMS.key,
-                 Component: dynamic(
-                    () => import("./createJob/JobLinkLiveStreams")
+                 Component: () => (
+                    <SuspenseWithBoundary fallback={<></>}>
+                       {" "}
+                       <JobLinkLiveStreams job={job} />{" "}
+                    </SuspenseWithBoundary>
                  ),
               },
               {
