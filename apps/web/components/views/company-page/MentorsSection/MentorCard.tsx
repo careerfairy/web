@@ -2,6 +2,7 @@ import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import { SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
@@ -25,6 +26,8 @@ const styles = sxStyles({
       gap: 1,
       userSelect: "none",
       cursor: "pointer",
+      textDecoration: "none",
+      color: "inherit",
    }),
    creator: {
       name: {
@@ -69,17 +72,6 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
    const theme = useTheme()
    const router = useRouter()
 
-   const handleClick = (ev: SyntheticEvent) => {
-      ev.preventDefault()
-      ev.stopPropagation()
-      const { companyName } = router.query
-      return router.push(
-         `/company/${companyName}/mentor/${transformCreatorNameIntoSlug(
-            creator
-         )}/${creator.id}`
-      )
-   }
-
    const handleEdit = (ev: SyntheticEvent) => {
       ev.preventDefault()
       ev.stopPropagation()
@@ -87,7 +79,14 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
    }
 
    return (
-      <Box key={key} sx={styles.container} onClick={handleClick}>
+      <Box
+         key={key}
+         sx={styles.container}
+         component={Link}
+         href={`/company/${
+            router.query.companyName
+         }/mentor/${transformCreatorNameIntoSlug(creator)}/${creator.id}`}
+      >
          {Boolean(isEditMode) && (
             <IconButton sx={styles.edit} onClick={handleEdit}>
                <Edit2 size={20} color={theme.palette.neutral[700]} />
