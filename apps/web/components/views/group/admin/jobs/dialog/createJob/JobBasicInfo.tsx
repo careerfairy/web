@@ -150,6 +150,7 @@ const JobBasicInfo = () => {
                               disableCloseOnSelect: true,
                               getOptionLabel: (option: any) =>
                                  option.name || "",
+                              ChipProps: { color: "secondary" },
                            }}
                            textFieldProps={{
                               requiredText: "(required)",
