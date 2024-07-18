@@ -205,7 +205,7 @@ export class SparksService {
          // Query the public sparks feed
          baseQuery = query(collection(db, "sparks"))
 
-         if (anonymousUserCountryCode) {
+         if (anonymousUserCountryCode && !options.contentTopicIds?.length) {
             const loggedOutCountry = getCountryOptionByCountryCode(
                anonymousUserCountryCode
             )
