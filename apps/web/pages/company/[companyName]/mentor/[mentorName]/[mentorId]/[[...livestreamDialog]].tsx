@@ -83,6 +83,7 @@ export const getStaticProps: GetStaticProps<{
 }> = async (ctx) => {
    const { params } = ctx
    const { companyName: companyNameSlug, mentorName, mentorId } = params
+   console.log("🚀 ~ params:", params)
    const companyName = companyNameUnSlugify(companyNameSlug as string)
 
    if (companyName) {
@@ -97,13 +98,13 @@ export const getStaticProps: GetStaticProps<{
             } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx)
 
             const sparks = await sparkService.getCreatorSparks(
-               mentorId[0],
+               mentorId as string,
                serverSideGroup?.groupId
             )
 
             const creator = await groupRepo.getCreatorById(
                serverSideGroup?.groupId,
-               mentorId[0]
+               mentorId as string
             )
 
             return {
