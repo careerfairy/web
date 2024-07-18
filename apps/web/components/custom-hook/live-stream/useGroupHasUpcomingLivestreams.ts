@@ -18,6 +18,7 @@ const useGroupHasUpcomingLivestreams = (groupId: string) => {
          where("groupIds", "array-contains", groupId),
          where("start", ">", now),
          where("test", "==", false),
+         where("hidden", "==", false),
          limit(1)
       )
    }, [groupId])
