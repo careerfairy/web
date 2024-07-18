@@ -2,6 +2,7 @@ import { BusinessFunctionsTagValues } from "@careerfairy/shared-lib/constants/ta
 import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import BaseStyles from "components/views/admin/company-information/BaseStyles"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import SteppedDialog, {
@@ -154,6 +155,7 @@ const JobBasicInfo = () => {
                            }}
                            textFieldProps={{
                               requiredText: "(required)",
+                              sx: BaseStyles.chipInput,
                            }}
                         />
                      </Grid>
