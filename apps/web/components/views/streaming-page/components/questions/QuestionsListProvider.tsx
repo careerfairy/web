@@ -4,6 +4,7 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { ReactNode, createContext, useContext, useMemo, useState } from "react"
 import { CommentOptionsMenu } from "./CommentOptionsMenu"
+import { ConfirmDeleteQuestionDialog } from "./ConfirmDeleteQuestionDialog"
 import { QuestionOptionsMenu } from "./QuestionOptionsMenu"
 
 export type QuestionMenuProps = {
@@ -29,6 +30,7 @@ type QuestionsListContextType = {
       event: React.MouseEvent<HTMLElement>,
       question: LivestreamQuestion
    ) => void
+   onQuestionDeleteClick: (questionId: string) => void
    questionIdWithOpenedCommentList: string | null
    setQuestionIdWithOpenedCommentList: (questionId: string | null) => void
 }
@@ -49,6 +51,10 @@ const QuestionsListContextProvider = ({ children }: Props) => {
 
    const [questionIdWithOpenedCommentList, setQuestionIdWithOpenedCommentList] =
       useState<string | null>(null)
+
+   const [questionIdToDelete, setQuestionIdToDelete] = useState<string | null>(
+      null
+   )
 
    const value = useMemo<QuestionsListContextType>(
       () => ({
@@ -74,6 +80,9 @@ const QuestionsListContextProvider = ({ children }: Props) => {
                anchorEl: event.currentTarget,
             })
          },
+         onQuestionDeleteClick: (questionId: string) => {
+            setQuestionIdToDelete(questionId)
+         },
          questionIdWithOpenedCommentList,
          setQuestionIdWithOpenedCommentList,
       }),
@@ -93,6 +102,11 @@ const QuestionsListContextProvider = ({ children }: Props) => {
             comment={commentMenuProps?.comment}
             questionId={commentMenuProps?.questionId}
             anchorEl={commentMenuProps?.anchorEl}
+         />
+         <ConfirmDeleteQuestionDialog
+            onClose={() => setQuestionIdToDelete(null)}
+            open={Boolean(questionIdToDelete)}
+            questionId={questionIdToDelete}
          />
       </QuestionsListContext.Provider>
    )
