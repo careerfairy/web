@@ -18,7 +18,13 @@ export type Action = {
 
 const getStreamerActions = (isMobile: boolean): ActionName[] => {
    if (isMobile) {
-      return ["Hand raise", "Polls", "Jobs", "CTA", "Settings"]
+      return [
+         "Hand raise",
+         "Polls",
+         "Jobs",
+         //"CTA",
+         "Settings",
+      ]
    }
 
    return []
