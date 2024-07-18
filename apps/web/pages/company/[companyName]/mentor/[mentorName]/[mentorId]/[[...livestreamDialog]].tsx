@@ -96,27 +96,40 @@ export const getStaticProps: GetStaticProps<{
                livestreamDialogData,
             } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx)
 
-            const sparks = await sparkService.getCreatorSparks(
-               mentorId as string,
-               serverSideGroup?.groupId
-            )
-
             const creator = await groupRepo.getCreatorById(
                serverSideGroup?.groupId,
                mentorId as string
             )
 
+            const sparks = await sparkService.getCreatorSparks(
+               mentorId as string,
+               serverSideGroup?.groupId
+            )
+
+            const creatorLivestreams = {
+               upcoming: serverSideUpcomingLivestreams?.filter((livestream) => {
+                  return livestream.speakers.some(
+                     (speaker) => speaker.email === creator.email
+                  )
+               }),
+               past: serverSidePastLivestreams?.filter((livestream) => {
+                  return livestream.speakers.some(
+                     (speaker) => speaker.email === creator.email
+                  )
+               }),
+            }
+
             return {
                props: {
                   serverSideGroup: serializeGroup(serverSideGroup),
                   serverSideLivestreams: [
-                     serverSideUpcomingLivestreams?.map(
+                     ...(creatorLivestreams.upcoming?.map(
                         LivestreamPresenter.serializeDocument
-                     ) || [],
-                     serverSidePastLivestreams?.map(
+                     ) || []),
+                     ...(creatorLivestreams.past?.map(
                         LivestreamPresenter.serializeDocument
-                     ) || [],
-                  ].flat(),
+                     ) || []),
+                  ],
                   livestreamDialogData,
                   sparks: sparks.map((spark) =>
                      SparkPresenter.serialize(spark)
