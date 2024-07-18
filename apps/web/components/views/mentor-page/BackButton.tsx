@@ -1,5 +1,6 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button } from "@mui/material"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import { ChevronLeft } from "react-feather"
 
@@ -20,7 +21,12 @@ export const BackButton = () => {
          variant="text"
          color="grey"
          startIcon={<ChevronLeft />}
-         onClick={() => router.back()}
+         LinkComponent={Link}
+         href={
+            router.query.companyName
+               ? `/company/${router.query.companyName}`
+               : "/"
+         }
          sx={styles.backButton}
       >
          Back
