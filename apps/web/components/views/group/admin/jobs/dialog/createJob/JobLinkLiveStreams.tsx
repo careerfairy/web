@@ -31,6 +31,7 @@ const styles = sxStyles({
       px: { md: "24px !important" },
    },
    title: {
+      maxWidth: { xs: "90%", md: "unset" },
       fontSize: { xs: "28px", md: "32px" },
    },
    subtitle: {
