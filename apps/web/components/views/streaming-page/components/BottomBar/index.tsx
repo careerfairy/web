@@ -52,7 +52,7 @@ const getHostActionNames = (isMobile: boolean): BottomBarActionName[] => {
       "Mic",
       "Video",
       "Share",
-      "CTA",
+      // "CTA",
       "Divider",
       "Q&A",
       "Hand raise",
