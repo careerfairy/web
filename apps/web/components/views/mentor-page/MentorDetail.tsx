@@ -1,6 +1,6 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Button, Stack, Typography, useTheme } from "@mui/material"
+import { Button, Link, Stack, Typography, useTheme } from "@mui/material"
 import { LinkedInIcon } from "../common/icons/LinkedInIcon"
 import CircularLogo from "../common/logos/CircularLogo"
 
@@ -95,10 +95,10 @@ const getMentorPlaceholderStory = ({
    const hasCreatedSparks = numSparks > 0
    const hasParticipatedInLivestreams = numLivestreams > 0
 
-   const mentorName = `${mentor.firstName ?? ""} ${mentor.lastName ?? ""}`
-
    if (!hasCreatedSparks && !hasParticipatedInLivestreams) {
-      return `Reach out to ${mentorName} on LinkedIn and ask your own questions!`
+      return mentor.linkedInUrl
+         ? `Reach out to ${mentor.firstName} on LinkedIn and ask your own questions!`
+         : `Continue exploring and go back to ${companyName}'s company page to see more of what they have to offer!`
    }
 
    const sparksMessage = hasCreatedSparks
@@ -108,14 +108,16 @@ const getMentorPlaceholderStory = ({
       ? `has participated in ${numLivestreams} live streams`
       : ""
 
-   const introMessage = `${mentorName} ${sparksMessage}${
+   const introMessage = `${mentor.firstName} ${sparksMessage}${
       hasCreatedSparks && hasParticipatedInLivestreams ? " and " : ""
    }${livestreamsMessage}.`
 
    const pronoun = numSparks + numLivestreams > 1 ? "them" : "it"
    const watchMessage = `Watch ${pronoun} to know ${mentor.firstName} and ${companyName} better!`
 
-   const reachOutMessage = `After that reach out to ${mentor.firstName} on LinkedIn and ask your own questions!`
+   const reachOutMessage = mentor.linkedInUrl
+      ? `After that reach out to ${mentor.firstName} on LinkedIn and ask your own questions!`
+      : `After that continue exploring and go back to ${companyName}'s company page to see more of what they have to offer!`
 
    return `${introMessage} ${watchMessage} ${reachOutMessage}`
 }
@@ -145,13 +147,17 @@ export const MentorDetail = ({
    return (
       <Stack sx={styles.root}>
          <SpeakerAvatar mentor={mentor} companyName={companyName} />
-         <Button
-            sx={styles.linkedInButton}
-            variant="outlined"
-            onClick={() => window.open(mentor?.linkedInUrl, "_blank")}
-         >
-            <LinkedInButton />
-         </Button>
+         {Boolean(mentor?.linkedInUrl) && (
+            <Button
+               sx={styles.linkedInButton}
+               variant="outlined"
+               LinkComponent={Link}
+               href={mentor.linkedInUrl}
+               target="_blank"
+            >
+               <LinkedInButton />
+            </Button>
+         )}
          <Typography sx={styles.story}>
             {mentor.story ? mentor.story : placeholderStory}
          </Typography>
