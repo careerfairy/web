@@ -65,11 +65,11 @@ export const additionalInfoSchema = (quillRef) =>
          .required("Application deadline is required"),
    })
 
-export interface BasicInfoValues
-   extends Yup.InferType<typeof basicInfoSchema> {}
+export type BasicInfoValues = Yup.InferType<typeof basicInfoSchema>
 
-export interface AdditionalInfoValues
-   extends Yup.InferType<ReturnType<typeof additionalInfoSchema>> {}
+export type AdditionalInfoValues = Yup.InferType<
+   ReturnType<typeof additionalInfoSchema>
+>
 
 export const schema = (quillRef) =>
    Yup.object({
@@ -82,7 +82,7 @@ export const schema = (quillRef) =>
    })
 
 //  export interface JobFormValues extends Yup.InferType<typeof schema>{
-export interface JobFormValues {
+export type JobFormValues = {
    id: string
    groupId: string
    basicInfo: BasicInfoValues

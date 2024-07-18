@@ -26,6 +26,7 @@ const styles = sxStyles({
       maxHeight: "800px",
    },
    title: {
+      maxWidth: { xs: "90%", md: "unset" },
       fontSize: { xs: "28px", md: "32px" },
    },
    subtitle: {
