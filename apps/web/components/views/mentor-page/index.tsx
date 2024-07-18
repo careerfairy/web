@@ -12,13 +12,25 @@ const SLIDE_WIDTH = 368
 
 const styles = sxStyles({
    root: {
-      flexDirection: "row",
-      gap: "16px",
-      paddingLeft: "32px",
+      flexDirection: {
+         xs: "column",
+         md: "row",
+      },
+      gap: { xs: "20px", md: "16px" },
+      paddingLeft: {
+         xs: "0px",
+         md: "32px",
+      },
+      paddingBottom: {
+         xs: "72px",
+      },
    },
    mentorDetailsContainer: {
       position: "relative",
-      width: `${SLIDE_WIDTH}px`,
+      width: {
+         xs: "100%",
+         md: `${SLIDE_WIDTH}px`,
+      },
       padding: "54px 26px 28px 26px",
       flexDirection: "column",
       alignItems: "center",
@@ -34,6 +46,9 @@ const styles = sxStyles({
       flexDirection: "column",
       gap: "24px",
       width: "100%",
+      padding: {
+         xs: "16px",
+      },
    },
    rule: {
       background: "#E4E4E4",
