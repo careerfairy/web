@@ -1,4 +1,5 @@
 import { Box, Grid, Typography } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
@@ -12,7 +13,7 @@ import GBLocale from "date-fns/locale/en-GB"
 import { MutableRefObject, useCallback, useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { Briefcase } from "react-feather"
+import { Briefcase, Calendar as CalendarIcon } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
@@ -40,6 +41,7 @@ const styles = sxStyles({
       my: "24px",
    },
    title: {
+      maxWidth: { xs: "90%", md: "unset" },
       fontSize: { xs: "28px", md: "32px" },
    },
    subtitle: {
@@ -65,6 +67,15 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[600],
       ml: 1,
    },
+   calendarIcon: {
+      "& svg": {
+         mt: "10px",
+      },
+   },
+   dateWrapper: {
+      zIndex: 99,
+      mt: "unset",
+   },
 })
 
 type Props = {
@@ -72,6 +83,7 @@ type Props = {
 }
 
 const JobAdditionalDetails = ({ quillInputRef }: Props) => {
+   const theme = useTheme()
    const [stepIsValid, setStepIsValid] = useState(false)
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
@@ -195,10 +207,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                         <Box
                            sx={[
                               datePickerDefaultStyles.datePicker,
-                              {
-                                 zIndex: 99,
-                                 mt: "unset",
-                              },
+                              styles.dateWrapper,
                            ]}
                         >
                            <DatePicker
@@ -214,9 +223,21 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                               shouldCloseOnSelect={true}
                               customInput={
                                  <BrandedTextField
-                                    label="Application Deadline (Required)"
-                                    placeholder="Insert date"
                                     fullWidth
+                                    label="Application Deadline (required)"
+                                    placeholder="Insert date"
+                                    sx={styles.calendarIcon}
+                                    InputProps={{
+                                       endAdornment: (
+                                          <CalendarIcon
+                                             color={
+                                                theme.palette.secondary.main
+                                             }
+                                          />
+                                       ),
+                                       disableUnderline: true,
+                                       readOnly: true,
+                                    }}
                                  />
                               }
                               onChange={(value) =>

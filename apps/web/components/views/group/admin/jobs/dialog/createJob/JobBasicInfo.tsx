@@ -33,6 +33,7 @@ const styles = sxStyles({
       my: "24px",
    },
    title: {
+      maxWidth: { xs: "90%", md: "unset" },
       fontSize: { xs: "28px", md: "32px" },
    },
    subtitle: {
@@ -44,7 +45,7 @@ const styles = sxStyles({
    },
    wrapperContainer: {
       width: { md: "700px" },
-      height: { xs: "unset", md: "auto !important" },
+      height: { xs: "74dvh", md: "auto !important" },
    },
    mobileDialog: {
       top: "calc(100dvh - 480px)",
