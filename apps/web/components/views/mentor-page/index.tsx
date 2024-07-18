@@ -35,6 +35,11 @@ const styles = sxStyles({
       gap: "24px",
       width: "100%",
    },
+   rule: {
+      background: "#E4E4E4",
+      height: "1px",
+      width: "100%",
+   },
 })
 
 type MentorDetailPageProps = {
@@ -64,7 +69,10 @@ export const MentorDetailPage = ({
          <Stack sx={styles.mentorContentContainer}>
             {Boolean(sparks.length) && <SparksCarousel sparks={sparks} />}
             {Boolean(livestreams.length) && (
-               <LivestreamsCarousel livestreams={livestreams} />
+               <>
+                  <Box sx={styles.rule} />
+                  <LivestreamsCarousel livestreams={livestreams} />
+               </>
             )}
          </Stack>
       </Stack>
