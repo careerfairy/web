@@ -16,6 +16,7 @@ import {
    SharedSparks,
    Spark,
    SparkStats,
+   TagValuesToSparkCategoriesMapper,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
@@ -232,7 +233,11 @@ export class SparksService {
       if (options.contentTopicIds?.length) {
          baseQuery = query(
             baseQuery,
-            where("contentTopicsTagIds", "in", options.contentTopicIds)
+            where(
+               "category.id",
+               "==",
+               TagValuesToSparkCategoriesMapper[options.contentTopicIds[0]]
+            )
          )
       }
 
