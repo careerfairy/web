@@ -83,7 +83,6 @@ export const getStaticProps: GetStaticProps<{
 }> = async (ctx) => {
    const { params } = ctx
    const { companyName: companyNameSlug, mentorName, mentorId } = params
-   console.log("🚀 ~ params:", params)
    const companyName = companyNameUnSlugify(companyNameSlug as string)
 
    if (companyName) {
