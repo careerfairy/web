@@ -17,9 +17,9 @@ const styles = sxStyles({
       paddingRight: "30px",
    },
    title: {
-      fontSize: 24,
+      fontSize: "24px",
       fontWeight: 600,
-      lineHeight: 36,
+      lineHeight: "36px",
       color: "neutral.900",
    },
 })
