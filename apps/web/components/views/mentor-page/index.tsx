@@ -62,8 +62,10 @@ export const MentorDetailPage = ({
             />
          </Box>
          <Stack sx={styles.mentorContentContainer}>
-            <SparksCarousel sparks={sparks} />
-            <LivestreamsCarousel livestreams={livestreams} />
+            {Boolean(sparks.length) && <SparksCarousel sparks={sparks} />}
+            {Boolean(livestreams.length) && (
+               <LivestreamsCarousel livestreams={livestreams} />
+            )}
          </Stack>
       </Stack>
    )
