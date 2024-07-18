@@ -12,7 +12,7 @@ import { useStreamingContext } from "../../context"
 import { QuestionTab } from "./PanelTabs"
 import { QuestionCard } from "./QuestionCard"
 import { QuestionCardSkeleton } from "./QuestionCardSkeleton"
-import QuestionsListContextProvider from "./QuestionsLisProvider"
+import QuestionsListContextProvider from "./QuestionsListProvider"
 import { MIN_QUESTIONS_TO_SHOW } from "./util"
 
 type Props = {
