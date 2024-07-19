@@ -109,6 +109,27 @@ const JobLinkLiveStreams = ({ job }: Props) => {
 
    const adaptGrid = allLivesStreams?.length > 2 && !isMobile
 
+   const title = useMemo(
+      () =>
+         group.publicSparks ? (
+            <SteppedDialog.Title sx={styles.title}>
+               Link your{" "}
+               <Box component="span" color="secondary.main">
+                  job
+               </Box>{" "}
+               to a live stream
+            </SteppedDialog.Title>
+         ) : (
+            <SteppedDialog.Title sx={styles.title}>
+               Where to{" "}
+               <Box component="span" color="secondary.main">
+                  promote
+               </Box>
+            </SteppedDialog.Title>
+         ),
+      [group.publicSparks]
+   )
+
    return (
       <SteppedDialog.Container
          containerSx={styles.content}
@@ -117,18 +138,7 @@ const JobLinkLiveStreams = ({ job }: Props) => {
       >
          <>
             <SteppedDialog.Content sx={styles.container}>
-               <SteppedDialog.Title sx={styles.title}>
-                  Link your{" "}
-                  <Box component="span" color="secondary.main">
-                     job
-                  </Box>{" "}
-                  to a live stream
-               </SteppedDialog.Title>
-
-               <SteppedDialog.Subtitle sx={styles.subtitle}>
-                  Select at least one upcoming live stream to link to this job
-                  so it can be visible to talent.
-               </SteppedDialog.Subtitle>
+               {title}
 
                <Grid
                   container
