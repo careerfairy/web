@@ -56,7 +56,7 @@ const JobLinkSparks = () => {
       isPublished: true,
    })
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
-      group.id ?? group.groupId
+      group.groupId
    )
    const isMobile = useIsMobile()
 
