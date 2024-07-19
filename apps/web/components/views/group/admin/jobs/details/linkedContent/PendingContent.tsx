@@ -44,7 +44,7 @@ const styles = sxStyles({
 const PendingContent = ({ job }: Props) => {
    const { group } = useGroup()
    const groupHasSparks = useGroupHasSparks(group.id, { isPublished: true })
-   const groupHasLivestreams = useGroupHasUpcomingLivestreams(group.id)
+   const groupHasLivestreams = useGroupHasUpcomingLivestreams(group.groupId)
 
    const handleClick = () => {
       // open job dialog on content section
