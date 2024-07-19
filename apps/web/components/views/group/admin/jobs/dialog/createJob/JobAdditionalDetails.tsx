@@ -25,7 +25,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      height: "100%",
+      height: { xs: "auto !important", md: "100%" },
       width: "100%",
       px: 2,
    },
@@ -50,10 +50,6 @@ const styles = sxStyles({
    },
    cancelBtn: {
       color: "neutral.500",
-   },
-   wrapperContainer: {
-      height: { xs: "80dvh", md: "auto !important" },
-      maxHeight: "800px",
    },
    subtitle2: {
       display: "flex",
@@ -149,11 +145,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
    }, [getValues, goToStep, group.publicSparks, groupHasUpcomingLivestreams])
 
    return (
-      <SteppedDialog.Container
-         containerSx={styles.content}
-         sx={styles.wrapperContainer}
-         withActions
-      >
+      <SteppedDialog.Container containerSx={styles.content} withActions>
          <>
             <SteppedDialog.Content sx={styles.container}>
                <>
