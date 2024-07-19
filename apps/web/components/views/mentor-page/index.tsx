@@ -83,11 +83,11 @@ export const MentorDetailPage = ({
          </Box>
          <Stack sx={styles.mentorContentContainer}>
             {Boolean(sparks.length) && <SparksCarousel sparks={sparks} />}
+            {livestreams.length > 0 && sparks.length > 0 ? (
+               <Box sx={styles.rule} />
+            ) : null}
             {Boolean(livestreams.length) && (
-               <>
-                  <Box sx={styles.rule} />
-                  <LivestreamsCarousel livestreams={livestreams} />
-               </>
+               <LivestreamsCarousel livestreams={livestreams} />
             )}
          </Stack>
       </Stack>
