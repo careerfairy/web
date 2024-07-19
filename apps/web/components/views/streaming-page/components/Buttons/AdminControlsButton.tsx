@@ -25,7 +25,7 @@ export const AdminControlsButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >(({ enableTooltip, ...props }, ref) => {
-   const { push, query, pathname, reload } = useRouter()
+   const { push, query, pathname } = useRouter()
    const { livestreamId, isHost } = useStreamingContext()
    const token = useLivestreamSecureTokenSWR(livestreamId)
    const hasStarted = useHasStarted()
@@ -66,11 +66,10 @@ export const AdminControlsButton = forwardRef<
          handleClick: async () => {
             const newQuery = { ...query }
             isSpyMode ? delete newQuery.spy : (newQuery.spy = "true")
-            await push({
+            push({
                pathname,
                query: newQuery,
             })
-            isHost && isSpyMode && reload()
          },
       },
       {

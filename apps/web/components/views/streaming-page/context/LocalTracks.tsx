@@ -5,6 +5,7 @@ import {
    useLocalCameraTrack,
    useLocalMicrophoneTrack,
    usePublish,
+   useRTCClient,
 } from "agora-rtc-react"
 import { useHandleHandRaise } from "components/custom-hook/streaming/hand-raise/useHandleHandRaise"
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
@@ -214,10 +215,45 @@ const PublishComponent = ({
    cameraTrack,
 }: PublishComponentProps) => {
    const { livestreamId, agoraUserId, isHost } = useStreamingContext()
+   const rtcClient = useRTCClient()
 
    const { error, isLoading } = usePublish([
       microphoneTrack.localMicrophoneTrack,
       cameraTrack.localCameraTrack,
+   ])
+
+   /* agora-rtc-react has some issues with publishing enabled tracks that start as disabled,
+    * so this effect assures everything goes smoothly when turning mic and camera on/off */
+   useEffect(() => {
+      let isCameraPublished = false
+      let isMicPublished = false
+
+      const interval = setInterval(() => {
+         if (cameraTrack.localCameraTrack?.enabled && !isCameraPublished) {
+            rtcClient.publish(cameraTrack.localCameraTrack).then(() => {
+               isCameraPublished = true
+            }).catch(console.error)
+         }
+         if (microphoneTrack.localMicrophoneTrack?.enabled && !isMicPublished) {
+            rtcClient.publish(microphoneTrack.localMicrophoneTrack).then(() => {
+               isMicPublished = true
+            }).catch(console.error)
+         }
+      }, 1000)
+
+      return () => {
+         clearInterval(interval)
+         rtcClient.unpublish(cameraTrack.localCameraTrack).then(() => {
+            isCameraPublished = false
+         })
+         rtcClient.unpublish(microphoneTrack.localMicrophoneTrack).then(() => {
+            isMicPublished = false
+         })
+      }
+   }, [
+      cameraTrack.localCameraTrack,
+      rtcClient,
+      microphoneTrack.localMicrophoneTrack,
    ])
 
    useHandleHandRaise({
