@@ -134,44 +134,28 @@ export type TagsContentHits = {
    }
 }
 
-export const groupTags = (tagIds: string[]): GroupedTags => {
+export const getGroupedTags = (tagIds: string[]): GroupedTags => {
    const businessFunctions = BusinessFunctionsTagValues.filter((bf) =>
       tagIds.includes(bf.id)
-   )
+   ).map((bf) => {
+      return [bf.id, bf]
+   })
+
    const contentTopics = ContentTopicsTagValues.filter((ct) =>
       tagIds.includes(ct.id)
-   )
-   const languages = languageOptionCodes.filter((lang) =>
-      tagIds.includes(lang.id)
-   )
+   ).map((ct) => {
+      return [ct.id, ct]
+   })
+
+   const languages = languageOptionCodes
+      .filter((lang) => tagIds.includes(lang.id))
+      .map((l) => {
+         return [l.id, l]
+      })
 
    return {
-      businessFunctions: Object.fromEntries(
-         businessFunctions
-            .filter((option) => {
-               return tagIds.includes(option.id)
-            })
-            .map((bf) => {
-               return [bf.id, bf]
-            })
-      ),
-      contentTopics: Object.fromEntries(
-         contentTopics
-            .filter((option) => {
-               return tagIds.includes(option.id)
-            })
-            .map((ct) => {
-               return [ct.id, ct]
-            })
-      ),
-      language: Object.fromEntries(
-         languages
-            .filter((option) => {
-               return tagIds.includes(option.id)
-            })
-            .map((l) => {
-               return [l.id, l]
-            })
-      ),
+      businessFunctions: Object.fromEntries(businessFunctions),
+      contentTopics: Object.fromEntries(contentTopics),
+      language: Object.fromEntries(languages),
    }
 }
