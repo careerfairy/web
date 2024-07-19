@@ -54,7 +54,7 @@ const NoLinkContentDialog = () => {
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
-      group.id ?? group.groupId
+      group.groupId
    )
 
    const handlePrevClick = useCallback(() => {
