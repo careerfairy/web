@@ -4,7 +4,7 @@ import {
    ContentHitsCount,
    ContentTopicsTagValues,
    GroupedOptionGroup,
-   groupTags,
+   getGroupedTags,
 } from "@careerfairy/shared-lib/constants/tags"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { useAuth } from "HOCs/AuthProvider"
@@ -49,7 +49,9 @@ const sortByUserInterests = (
    user: UserData,
    isLoggedIn: boolean
 ): OptionGroup[] => {
-   const groupedTags = groupTags(tags.map((t) => t.id))
+   if (tags?.length === 0) return []
+
+   const groupedTags = getGroupedTags(tags.map((t) => t.id))
 
    const businessFunctionsGetter = createGroupedOptionGroupGetter(
       groupedTags.businessFunctions
@@ -65,6 +67,7 @@ const sortByUserInterests = (
    )
 
    const contentTopicTagIDs = Object.keys(groupedTags.contentTopics || [])
+
    const languageTagIds = Object.keys(groupedTags.language || [])
 
    const sortedUserTags = sortTags(
@@ -78,7 +81,7 @@ const sortByUserInterests = (
             return contentTopicsGetter(tagId)
          }
       }
-   )
+   ).filter(Boolean)
 
    const sortedBusinessFunctions = sortTags(
       businessFunctionTagIds.filter(
