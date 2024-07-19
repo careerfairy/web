@@ -7,7 +7,7 @@ import SparkCarouselCard from "components/views/sparks/components/spark-card/Spa
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { JobDialogStep } from ".."
@@ -114,17 +114,33 @@ const JobLinkSparks = () => {
 
    const adaptGrid = publishedSparks?.length > 2 && !isMobile
 
+   const title = useMemo(() => {
+      const selectedLivestreams = getValues("livestreamIds")
+
+      return selectedLivestreams.length > 0 ? (
+         <SteppedDialog.Title sx={styles.title}>
+            Link your{" "}
+            <Box component="span" color="secondary.main">
+               job
+            </Box>{" "}
+            also to Sparks
+         </SteppedDialog.Title>
+      ) : (
+         <SteppedDialog.Title sx={styles.title}>
+            Link your{" "}
+            <Box component="span" color="secondary.main">
+               job
+            </Box>{" "}
+            to Sparks
+         </SteppedDialog.Title>
+      )
+   }, [getValues])
+
    return (
       <SteppedDialog.Container containerSx={styles.content} withActions>
          <>
             <SteppedDialog.Content sx={styles.container}>
-               <SteppedDialog.Title sx={styles.title}>
-                  Link your{" "}
-                  <Box component="span" color="secondary.main">
-                     job
-                  </Box>{" "}
-                  to Sparks
-               </SteppedDialog.Title>
+               {title}
 
                <SteppedDialog.Subtitle sx={styles.subtitle}>
                   Select at least one Spark to link to this job so it&apos;s
