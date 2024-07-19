@@ -3,6 +3,7 @@ import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import FramerBox from "components/views/common/FramerBox"
 import { Variants } from "framer-motion"
+import { ReactNode } from "react"
 import {
    useStartsAt,
    useStreamTitle,
@@ -63,18 +64,23 @@ const styles = sxStyles({
 
 const containerAnimationVariants: Variants = {
    hidden: { opacity: 0 },
-   visible: {
+   visible: (hasSeenStaggerAnimation: boolean) => ({
       opacity: 1,
       transition: {
-         staggerChildren: 0.2,
+         staggerChildren: hasSeenStaggerAnimation ? 0 : 0.2,
       },
-   },
+   }),
 }
 
 const itemAnimationVariants: Variants = {
-   hidden: { opacity: 0, y: 20 },
+   hidden: (hasSeenStaggerAnimation: boolean) => ({
+      opacity: 0,
+      y: hasSeenStaggerAnimation ? 0 : 20,
+   }),
    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 }
+
+let hasSeenStaggerAnimation = false
 
 export const SelectSpeakerView = () => {
    const streamIsMobile = useStreamIsMobile()
@@ -83,26 +89,43 @@ export const SelectSpeakerView = () => {
          variants={containerAnimationVariants}
          initial="hidden"
          animate="visible"
+         custom={hasSeenStaggerAnimation}
+         onAnimationComplete={() => (hasSeenStaggerAnimation = true)}
          sx={[
             styles.root,
             streamIsMobile ? styles.rootMobile : styles.rootDesktop,
          ]}
       >
-         <FramerBox variants={itemAnimationVariants}>
+         <AnimatedItem>
             <HostDetails />
-         </FramerBox>
-         <FramerBox variants={itemAnimationVariants}>
+         </AnimatedItem>
+         <AnimatedItem>
             <StartDate />
-         </FramerBox>
-         <FramerBox variants={itemAnimationVariants}>
+         </AnimatedItem>
+         <AnimatedItem>
             <Heading />
-         </FramerBox>
-         <FramerBox variants={itemAnimationVariants}>
+         </AnimatedItem>
+         <AnimatedItem>
             <SubHeading />
-         </FramerBox>
-         <FramerBox variants={itemAnimationVariants}>
+         </AnimatedItem>
+         <AnimatedItem>
             <SpeakersList />
-         </FramerBox>
+         </AnimatedItem>
+      </FramerBox>
+   )
+}
+
+type AnimatedItemProps = {
+   children: ReactNode
+}
+
+const AnimatedItem = ({ children }: AnimatedItemProps) => {
+   return (
+      <FramerBox
+         custom={hasSeenStaggerAnimation}
+         variants={itemAnimationVariants}
+      >
+         {children}
       </FramerBox>
    )
 }

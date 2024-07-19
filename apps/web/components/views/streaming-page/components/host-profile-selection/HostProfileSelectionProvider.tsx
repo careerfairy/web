@@ -66,6 +66,7 @@ type ProfileSelectContextType = {
    goBackToSelectSpeaker: () => void
    editSpeaker: (speaker: Speaker) => void
    selectSpeaker: (speaker: Speaker) => void
+   goToCreateNewSpeaker: () => void
    selectedSpeaker: Speaker | null
    activeView: ProfileSelectEnum
    prevActiveView: ProfileSelectEnum | null
@@ -95,7 +96,7 @@ export const ProfileSelectProvider = ({ children }: Props) => {
       () => ({
          direction: state.direction,
          activeView: state.activeView,
-         prevActiveView: prevActiveView,
+         prevActiveView,
          selectedSpeaker: state.selectedSpeaker,
          editSpeaker: (speaker: Speaker) => {
             return dispatch({
@@ -108,6 +109,9 @@ export const ProfileSelectProvider = ({ children }: Props) => {
                type: ProfileSelectEnum.JOIN_WITH_SPEAKER,
                payload: speaker,
             })
+         },
+         goToCreateNewSpeaker: () => {
+            return dispatch({ type: ProfileSelectEnum.CREATE_SPEAKER })
          },
          goBackToSelectSpeaker: () => {
             return dispatch({ type: ProfileSelectEnum.SELECT_SPEAKER })
