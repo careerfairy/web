@@ -1,5 +1,4 @@
 import { Speaker } from "@careerfairy/shared-lib/livestreams"
-import { UserData } from "@careerfairy/shared-lib/users"
 import { useAppDispatch } from "components/custom-hook/store"
 import {
    ReactNode,
@@ -21,18 +20,24 @@ export enum ProfileSelectEnum {
 type State = {
    selectedSpeaker: Speaker | null
    activeView: ProfileSelectEnum
+   direction: 1 | -1
 }
 
 type Action =
-   | { type: ProfileSelectEnum.SELECT_SPEAKER; payload: Speaker }
+   | { type: ProfileSelectEnum.SELECT_SPEAKER }
+   | { type: ProfileSelectEnum.JOIN_WITH_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.EDIT_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.CREATE_SPEAKER }
-   | { type: "SELECT_USER"; payload: UserData }
-   | { type: "RESET" }
 
 const reducer = (state: State, action: Action): State => {
+   state.direction = state.activeView > action.type ? -1 : 1
    switch (action.type) {
       case ProfileSelectEnum.SELECT_SPEAKER:
+         return {
+            ...state,
+            activeView: ProfileSelectEnum.SELECT_SPEAKER,
+         }
+      case ProfileSelectEnum.JOIN_WITH_SPEAKER:
          return {
             ...state,
             selectedSpeaker: action.payload,
@@ -50,11 +55,6 @@ const reducer = (state: State, action: Action): State => {
             selectedSpeaker: null,
             activeView: ProfileSelectEnum.CREATE_SPEAKER,
          }
-      case "RESET":
-         return {
-            selectedSpeaker: null,
-            activeView: ProfileSelectEnum.SELECT_SPEAKER,
-         }
       default:
          return state
    }
@@ -69,6 +69,7 @@ type ProfileSelectContextType = {
    selectedSpeaker: Speaker | null
    activeView: ProfileSelectEnum
    prevActiveView: ProfileSelectEnum | null
+   direction: 1 | -1
 }
 
 const ProfileSelectContext = createContext<
@@ -85,12 +86,14 @@ export const ProfileSelectProvider = ({ children }: Props) => {
    const [state, dispatch] = useReducer(reducer, {
       selectedSpeaker: null,
       activeView: ProfileSelectEnum.SELECT_SPEAKER,
+      direction: 1,
    })
 
    const prevActiveView = usePrevious(state.activeView)
 
    const value = useMemo<ProfileSelectContextType>(
       () => ({
+         direction: state.direction,
          activeView: state.activeView,
          prevActiveView: prevActiveView,
          selectedSpeaker: state.selectedSpeaker,
@@ -102,19 +105,17 @@ export const ProfileSelectProvider = ({ children }: Props) => {
          },
          selectSpeaker: (speaker: Speaker) => {
             return dispatch({
-               type: ProfileSelectEnum.SELECT_SPEAKER,
+               type: ProfileSelectEnum.JOIN_WITH_SPEAKER,
                payload: speaker,
             })
          },
          goBackToSelectSpeaker: () => {
-            return dispatch({ type: "RESET" })
+            return dispatch({ type: ProfileSelectEnum.SELECT_SPEAKER })
          },
          joinLiveStreamWithSpeaker: (speakerId: string) => {
-            dispatch({ type: "RESET" })
             return appDispatch(setSpeakerId(speakerId))
          },
          joinLiveStreamWithUser: (userId: string) => {
-            dispatch({ type: "RESET" })
             return appDispatch(setUserUid(userId))
          },
       }),
