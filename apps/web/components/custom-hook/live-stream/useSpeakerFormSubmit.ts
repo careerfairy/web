@@ -45,7 +45,7 @@ export const useSpeakerFormSubmit = (
             return updatedSpeaker
          } catch (error) {
             errorLogAndNotify(error, {
-               message: "Failed to add speaker to livestream",
+               message: "Failed to add speaker to live stream",
                values,
                livestreamId,
                livestreamToken,

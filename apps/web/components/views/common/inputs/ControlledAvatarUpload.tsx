@@ -13,6 +13,12 @@ import { sxStyles } from "types/commonTypes"
 import FileUploader from "../FileUploader"
 
 const styles = sxStyles({
+   root: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+   },
    avaRoot: {
       mx: "auto",
       width: 136,
@@ -96,13 +102,7 @@ export const ControlledAvatarUpload = forwardRef<HTMLDivElement, Props>(
       const error = errors[fileFieldName]
 
       return (
-         <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            ref={ref}
-         >
+         <Box sx={styles.root} ref={ref}>
             <FileUploader {...fileUploaderProps}>
                <CardActionArea sx={styles.avaRoot}>
                   <Avatar
