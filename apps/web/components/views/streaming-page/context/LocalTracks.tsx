@@ -232,12 +232,12 @@ const PublishComponent = ({
          if (cameraTrack.localCameraTrack?.enabled && !isCameraPublished) {
             rtcClient.publish(cameraTrack.localCameraTrack).then(() => {
                isCameraPublished = true
-            })
+            }).catch(console.error)
          }
          if (microphoneTrack.localMicrophoneTrack?.enabled && !isMicPublished) {
             rtcClient.publish(microphoneTrack.localMicrophoneTrack).then(() => {
                isMicPublished = true
-            })
+            }).catch(console.error)
          }
       }, 1000)
 
