@@ -59,7 +59,7 @@ export class SparksService {
    async createSpark(data: AddSparkSparkData) {
       return httpsCallable<AddSparkSparkData, void>(
          this.functions,
-         "createSpark_v3"
+         "createSpark_v4"
       )(data)
    }
 
@@ -70,7 +70,7 @@ export class SparksService {
    async updateSpark(data: UpdateSparkData) {
       return httpsCallable<UpdateSparkData, void>(
          this.functions,
-         "updateSpark_v3"
+         "updateSpark_v4"
       )(data)
    }
 
