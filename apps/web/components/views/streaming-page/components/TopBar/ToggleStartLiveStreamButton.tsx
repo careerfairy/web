@@ -30,9 +30,6 @@ export const ToggleStartLiveStreamButton = () => {
 
    const shouldStop = dialogState.intent === "stop-streaming"
 
-   const disabled =
-      !isStreamStartingSoon && !isTestStream && !streamHasNoStartTime
-
    const handleCloseDialog = useCallback(() => {
       setDialogState((prev) => ({ ...prev, isDialogOpen: false }))
    }, [])
@@ -40,7 +37,8 @@ export const ToggleStartLiveStreamButton = () => {
    const disabled = !(
       isStreamStartingSoon ||
       streamHasNoStartTime ||
-      hasStarted
+      hasStarted ||
+      isTestStream
    )
 
    return (
