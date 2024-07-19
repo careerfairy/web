@@ -1,6 +1,7 @@
 import { mapSpeakerToCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Button } from "@mui/material"
 import { useRemoteUsers } from "agora-rtc-react"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { CreatorPreview } from "components/views/creator/CreatorPreview"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import {
@@ -9,7 +10,10 @@ import {
 } from "components/views/streaming-page/util"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { useHostProfileSelection } from "../HostProfileSelectionProvider"
+import {
+   ProfileSelectEnum,
+   useHostProfileSelection,
+} from "../HostProfileSelectionProvider"
 import { View } from "../View"
 
 const styles = sxStyles({
@@ -29,10 +33,15 @@ const styles = sxStyles({
 })
 
 export const JoinWithSpeakerView = () => {
-   const { goBackToSelectSpeaker, selectedSpeaker, joinLiveStreamWithSpeaker } =
-      useHostProfileSelection()
+   const {
+      goBackToSelectSpeaker,
+      selectedSpeaker,
+      joinLiveStreamWithSpeaker,
+      prevActiveView,
+   } = useHostProfileSelection()
    const { livestreamId } = useStreamingContext()
    const remoteUsers = useRemoteUsers()
+   const isMobile = useStreamIsMobile()
 
    const displayName = getStreamerDisplayName(
       selectedSpeaker?.firstName,
@@ -46,6 +55,9 @@ export const JoinWithSpeakerView = () => {
       )
       return remoteUsers.some((user) => user.uid === agoraSpeakerId)
    }, [remoteUsers, selectedSpeaker?.id, livestreamId])
+
+   const userJustEditedSpeaker =
+      prevActiveView === ProfileSelectEnum.EDIT_SPEAKER
 
    const name = (
       <Box color="primary.main" component="span">
@@ -81,7 +93,11 @@ export const JoinWithSpeakerView = () => {
                variant="outlined"
                onClick={goBackToSelectSpeaker}
             >
-               Back
+               {userJustEditedSpeaker
+                  ? isMobile
+                     ? "Change"
+                     : "Select another profile"
+                  : "Back"}
             </Button>
             <Button
                variant="contained"
@@ -90,7 +106,11 @@ export const JoinWithSpeakerView = () => {
                   joinLiveStreamWithSpeaker(selectedSpeaker?.id)
                }}
             >
-               {isSpeakerInUse ? "Join here" : "Join live stream"}
+               {isSpeakerInUse
+                  ? "Join here"
+                  : userJustEditedSpeaker
+                  ? `Join as ${selectedSpeaker?.firstName}`
+                  : "Join live stream"}
             </Button>
          </View.Actions>
       </View>

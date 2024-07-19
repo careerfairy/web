@@ -2,8 +2,8 @@ import {
    Box,
    BoxProps,
    Container,
+   ContainerProps,
    Stack,
-   SxProps,
    Typography,
    TypographyProps,
 } from "@mui/material"
@@ -62,6 +62,7 @@ const styles = sxStyles({
       textAlign: "center",
    },
    actions: {
+      zIndex: 1,
       position: "sticky",
       bottom: 0,
       borderTop: "1px solid #F0F0F0",
@@ -84,12 +85,7 @@ const styles = sxStyles({
    },
 })
 
-type ViewProps = {
-   children: ReactNode
-   sx?: SxProps
-}
-
-export const View = ({ children, sx }: ViewProps) => {
+export const View = ({ children, sx, ...props }: ContainerProps) => {
    const streamIsMobile = useStreamIsMobile()
 
    return (
@@ -105,6 +101,7 @@ export const View = ({ children, sx }: ViewProps) => {
             ],
             sx
          )}
+         {...props}
       >
          {children}
       </Container>
