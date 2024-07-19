@@ -26,8 +26,6 @@ const styles = sxStyles({
       mt: 1,
    },
    wrapperContainer: {
-      height: { xs: "80dvh", md: "auto !important" },
-      maxHeight: "800px",
       px: { md: "24px !important" },
    },
    title: {
