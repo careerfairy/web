@@ -102,7 +102,7 @@ const Layout = dynamic(
    }
 )
 
-const ToggleStreamModeButton = dynamic(
+/* const ToggleStreamModeButton = dynamic(
    () =>
       import("./components/ToggleStreamModeButton").then(
          (mod) => mod.ToggleStreamModeButton
@@ -110,7 +110,7 @@ const ToggleStreamModeButton = dynamic(
    {
       ssr: false,
    }
-)
+) */
 const StreamSetupWidget = dynamic(
    () =>
       import("./components/StreamSetupWidget").then(
@@ -274,7 +274,7 @@ const Component = ({ isHost }: Props) => {
                                     {!isHost && authenticatedUser ? (
                                        <FeedbackQuestions />
                                     ) : null}
-                                    <ToggleStreamModeButton />
+                                    {/* <ToggleStreamModeButton /> */}
                                  </ScreenShareProvider>
                               </LocalTracksProvider>
                            </AgoraDevicesProvider>

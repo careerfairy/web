@@ -31,7 +31,7 @@ const getStreamerActions = (
          "Hand raise",
          "Polls",
          "Jobs",
-         "CTA",
+         //"CTA",
          ...(isSpyMode ? [] : (["Settings"] as const)),
       ]
    }

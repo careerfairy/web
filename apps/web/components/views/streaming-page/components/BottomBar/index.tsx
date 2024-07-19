@@ -69,7 +69,7 @@ const getHostActionNames = (
       ...(isSpyMode ? [] : (["Mic"] as const)),
       ...(isSpyMode ? [] : (["Video"] as const)),
       "Share",
-      "CTA",
+      // "CTA",
       "Divider",
       "Q&A",
       "Hand raise",
