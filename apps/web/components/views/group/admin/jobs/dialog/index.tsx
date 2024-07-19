@@ -12,7 +12,6 @@ import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
 import {
-   deleteJobWithLinkedLivestreamsDialogOpenSelector,
    deleteJobsDialogOpenSelector,
    jobsDialogOpenSelector,
    jobsFormSelectedJobIdSelector,
@@ -73,15 +72,13 @@ export const JobDialogStep = {
 
 const styles = sxStyles({
    dialog: {
-      top: { xs: "20dvh", md: 0 },
+      height: { xs: "auto", md: "auto" },
+      maxHeight: { xs: "calc(90dvh)", md: "800px" },
+      alignSelf: { xs: "self-end", md: "unset" },
       borderRadius: 5,
    },
    smallDeleteDialog: {
       maxWidth: { md: 450 },
-      top: { xs: "calc(100dvh - 320px)", md: 0 },
-   },
-   jobWithList: {
-      top: { xs: "calc(100dvh - 500px)", md: 0 },
    },
 })
 
@@ -210,9 +207,6 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
    const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
    const isDeleteJobDialogOpen = useSelector(deleteJobsDialogOpenSelector)
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
-   const isDeleteJobDialogWithLinkedLivestreamsOpen = useSelector(
-      deleteJobWithLinkedLivestreamsDialogOpenSelector
-   )
    const { jobHubV1 } = useFeatureFlags()
    const { reset } = useFormContext()
 
@@ -255,9 +249,6 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
          sx={[
             styles.dialog,
             isDeleteJobDialogOpen ? styles.smallDeleteDialog : null,
-            isDeleteJobDialogWithLinkedLivestreamsOpen
-               ? styles.jobWithList
-               : null,
          ]}
          fullWidth={false}
       />

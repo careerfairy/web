@@ -89,10 +89,8 @@ const styles = sxStyles({
       py: `${mobileTopPadding}px`,
       px: { xs: 3, md: 6 },
       position: "relative",
-      height: {
-         xs: "90dvh",
-         [mobileBreakpoint]: "clamp(0px, calc(100dvh - 50px), 778px)",
-      },
+      height: "auto",
+      maxHeight: { xs: "90dvh", md: "800px" },
    },
    container: {
       px: "unset !important",

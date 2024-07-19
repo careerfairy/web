@@ -2,7 +2,6 @@ import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
@@ -13,7 +12,7 @@ import { JobDialogStep } from ".."
 
 const styles = sxStyles({
    wrapContainer: {
-      width: "450px",
+      width: { xs: "100%", md: "450px" },
       height: {
          xs: "310px",
          md: "100%",
@@ -43,16 +42,12 @@ const styles = sxStyles({
    btn: {
       width: "100%",
    },
-   mobileDialog: {
-      top: "calc(100dvh - 310px)",
-   },
    actions: {
       border: "none !important",
    },
 })
 
 const NoLinkContentDialog = () => {
-   const isMobile = useIsMobile()
    const {
       formState: { isSubmitting },
    } = useFormContext()
@@ -61,13 +56,6 @@ const NoLinkContentDialog = () => {
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
       group.id ?? group.groupId
    )
-   const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
-
-   if (dialogElement) {
-      dialogElement.style.top = isMobile
-         ? styles.mobileDialog.top
-         : "revert-layer"
-   }
 
    const handlePrevClick = useCallback(() => {
       if (group.publicSparks) {

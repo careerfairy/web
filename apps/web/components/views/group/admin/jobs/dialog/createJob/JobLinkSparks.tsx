@@ -24,10 +24,6 @@ const styles = sxStyles({
    content: {
       mt: 1,
    },
-   wrapperContainer: {
-      height: { xs: "80dvh", md: "auto !important" },
-      maxHeight: "800px",
-   },
    title: {
       maxWidth: { xs: "90%", md: "unset" },
       fontSize: { xs: "28px", md: "32px" },
@@ -119,11 +115,7 @@ const JobLinkSparks = () => {
    const adaptGrid = publishedSparks?.length > 2 && !isMobile
 
    return (
-      <SteppedDialog.Container
-         containerSx={styles.content}
-         sx={styles.wrapperContainer}
-         withActions
-      >
+      <SteppedDialog.Container containerSx={styles.content} withActions>
          <>
             <SteppedDialog.Content sx={styles.container}>
                <SteppedDialog.Title sx={styles.title}>
