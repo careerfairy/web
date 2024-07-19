@@ -38,6 +38,9 @@ const styles = sxStyles({
       transition: (theme) =>
          theme.transitions.create(["border", "background-color"]),
    },
+   avatarError: {
+      border: (theme) => `1px solid ${theme.palette.error.main}`,
+   },
    icon: {
       width: 36,
       height: 36,
@@ -110,6 +113,7 @@ export const ControlledAvatarUpload = forwardRef<HTMLDivElement, Props>(
                      sx={[
                         styles.avatar,
                         dragActive && styles.dragActive,
+                        error && styles.avatarError,
                         { width: size, height: size },
                      ]}
                   >

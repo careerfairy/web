@@ -10,6 +10,7 @@ import { ReactNode, useMemo, useState } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { buildAgoraSpeakerId } from "../../util"
+import { AddNewSpeakerButton } from "./AddNewSpeakerButton"
 import { HostProfileButton } from "./HostProfileButton"
 import { useHostProfileSelection } from "./HostProfileSelectionProvider"
 
@@ -46,13 +47,15 @@ const styles = sxStyles({
 
 const containerAnimationVariants: Variants = {
    hidden: { opacity: 0 },
-   visible: {
+   visible: (hasSeenStaggerAnimation) => ({
       opacity: 1,
       transition: {
-         staggerChildren: 0.2,
+         staggerChildren: hasSeenStaggerAnimation ? 0 : 0.2,
       },
-   },
-}
+   }),
+} satisfies Variants
+
+let hasSeenStaggerAnimation = false
 
 export const SpeakersList = () => {
    const { userData, isLoggedIn } = useAuth()
@@ -84,7 +87,12 @@ export const SpeakersList = () => {
          <Typography component="p" sx={styles.heading} variant="medium">
             Please select your profile:
          </Typography>
-         <FramerBox variants={containerAnimationVariants} sx={styles.list}>
+         <FramerBox
+            custom={hasSeenStaggerAnimation}
+            variants={containerAnimationVariants}
+            onAnimationComplete={() => (hasSeenStaggerAnimation = true)}
+            sx={styles.list}
+         >
             <AnimatePresence mode="sync">
                {Boolean(userData?.isAdmin) && (
                   <ItemAnimation key={userData.authId}>
@@ -113,6 +121,9 @@ export const SpeakersList = () => {
                      />
                   </ItemAnimation>
                ))}
+               <ItemAnimation key="add-speaker">
+                  <AddNewSpeakerButton />
+               </ItemAnimation>
             </AnimatePresence>
          </FramerBox>
          {Boolean(isLoggedIn) && (
@@ -132,7 +143,11 @@ export const SpeakersList = () => {
 
 const itemAnimationVariants = {
    hidden: { opacity: 0, scale: 0.9 },
-   visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+   visible: (hasSeenStaggerAnimation) => ({
+      opacity: 1,
+      scale: 1,
+      transition: { duration: hasSeenStaggerAnimation ? 0 : 0.5 },
+   }),
    exit: { opacity: 0, scale: 0.9, transition: { duration: 0.5 } },
 } satisfies Variants
 
@@ -141,9 +156,7 @@ const ItemAnimation = ({ children }: { children: ReactNode }) => {
       <FramerBox
          sx={styles.item}
          variants={itemAnimationVariants}
-         initial={itemAnimationVariants.hidden}
-         animate={itemAnimationVariants.visible}
-         exit={itemAnimationVariants.exit}
+         custom={hasSeenStaggerAnimation}
       >
          {children}
       </FramerBox>
