@@ -60,7 +60,7 @@ const sparkIndex = {
    transformData: (data) => ({
       ...data,
       createdAtMs: data.createdAt?.toDate?.().getTime() ?? null,
-      groupPublicSparks: data.group?.publicSparks,
+      groupPublicSparks: Boolean(data.group?.publicSparks),
       publishedAtMs: data.publishedAt?.toDate?.().getTime() ?? null,
    }),
    settings: {
