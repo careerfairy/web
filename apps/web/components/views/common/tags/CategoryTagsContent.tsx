@@ -1,6 +1,6 @@
 import {
    TagValuesLookup,
-   groupTags,
+   getGroupedTags,
 } from "@careerfairy/shared-lib/constants/tags"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
@@ -36,7 +36,7 @@ const CategoryTagsContentComponent = ({ categories }: Props) => {
    const selectedCategories = Object.keys(categories).filter(
       (cat) => categories[cat].selected
    )
-   const tags = groupTags(selectedCategories)
+   const tags = getGroupedTags(selectedCategories)
 
    const hasBusinessFunctions = Boolean(
       Object.keys(tags.businessFunctions).length
