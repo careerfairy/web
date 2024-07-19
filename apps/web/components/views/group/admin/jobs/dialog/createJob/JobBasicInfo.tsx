@@ -1,7 +1,6 @@
 import { BusinessFunctionsTagValues } from "@careerfairy/shared-lib/constants/tags"
 import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
@@ -11,7 +10,6 @@ import SteppedDialog, {
 import { useEffect, useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
-import { JobDialogStep } from ".."
 import { basicInfoSchema } from "./schemas"
 
 const styles = sxStyles({
@@ -46,18 +44,14 @@ const styles = sxStyles({
    },
    wrapperContainer: {
       width: { md: "700px" },
-      height: { xs: "74dvh", md: "auto !important" },
-   },
-   mobileDialog: {
-      top: "calc(100dvh - 480px)",
+      height: { xs: "auto", md: "auto !important" },
    },
 })
 
 const JobBasicInfo = () => {
    const [stepIsValid, setStepIsValid] = useState(false)
 
-   const { moveToNext, currentStep } = useStepper()
-   const isMobile = useIsMobile()
+   const { moveToNext } = useStepper()
    const {
       formState: { isSubmitting },
       watch,
@@ -81,16 +75,6 @@ const JobBasicInfo = () => {
 
       setStepIsValid(basicInfoSchema.isValidSync(fieldsToValidate))
    }, [watchFields])
-
-   const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
-
-   // Dynamically sets the top position of the dialog element based on mobile view and current step
-   if (dialogElement) {
-      dialogElement.style.top =
-         isMobile && currentStep === JobDialogStep.FORM_BASIC_INFO.position
-            ? styles.mobileDialog.top
-            : "revert-layer"
-   }
 
    return (
       <SteppedDialog.Container

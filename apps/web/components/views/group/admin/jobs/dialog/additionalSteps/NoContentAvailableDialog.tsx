@@ -1,5 +1,4 @@
 import { Stack } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { AlertCircle } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "../../../../../../../types/commonTypes"
@@ -7,7 +6,7 @@ import SteppedDialog from "../../../../../stepped-dialog/SteppedDialog"
 
 const styles = sxStyles({
    wrapContainer: {
-      width: "450px",
+      width: { xs: "100%", md: "450px" },
       height: {
          md: "100%",
       },
@@ -38,24 +37,12 @@ const styles = sxStyles({
       width: "100%",
       color: "white",
    },
-   mobileDialog: {
-      top: "calc(100dvh - 400px)",
-   },
 })
 
 const NoLinkedContentDialog = () => {
-   const isMobile = useIsMobile()
    const {
       formState: { isSubmitting },
    } = useFormContext()
-
-   const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
-
-   if (dialogElement) {
-      dialogElement.style.top = isMobile
-         ? styles.mobileDialog.top
-         : "revert-layer"
-   }
 
    return (
       <SteppedDialog.Container
