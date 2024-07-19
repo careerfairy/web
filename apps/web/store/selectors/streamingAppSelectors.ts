@@ -122,13 +122,17 @@ export const useVirtualBackgroundMode = () =>
 export const useShowWaitingRoom = (isHost: boolean) =>
    useAppSelector((state) => {
       const { hasStarted, hasEnded } = state.streamingApp.livestreamState
-      return !isHost && !hasEnded && hasStarted === undefined
+      const isSpyMode = state.streamingApp.isSpyMode
+
+      return !isHost && !isSpyMode && !hasEnded && hasStarted === undefined
    })
 
 export const useShowEndScreen = (isHost: boolean) =>
    useAppSelector((state) => {
       const { hasStarted, hasEnded } = state.streamingApp.livestreamState
-      return !isHost && hasEnded && hasStarted === false
+      const isSpyMode = state.streamingApp.isSpyMode
+
+      return !isHost && !isSpyMode && hasEnded && hasStarted === false
    })
 
 export const useIsTestLivestream = () =>
@@ -143,6 +147,8 @@ export const useIsRecordingBotInRoom = () =>
    useAppSelector(
       (state) => state.streamingApp.livestreamState.isRecordingBotInRoom
    )
+export const useIsSpyMode = () =>
+   useAppSelector((state) => state.streamingApp.isSpyMode)
 
 export const useSpeakerId = () =>
    useAppSelector((state) => state.streamingApp.speakerId)

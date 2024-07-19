@@ -1211,6 +1211,16 @@ export class LivestreamService {
          user: { ...userData },
       })
    }
+
+   toggleNewUI = async (livestreamId: string) => {
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+      const livestreamDoc = await getDoc(livestreamRef)
+      if (livestreamDoc.exists) {
+         return updateDoc(livestreamRef, {
+            useNewUI: !livestreamDoc.data().useNewUI,
+         })
+      }
+   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

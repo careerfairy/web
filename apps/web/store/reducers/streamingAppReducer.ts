@@ -115,6 +115,7 @@ export interface StreamingAppState {
    }[]
    virtualBackgroundMode: VirtualBackgroundMode
    isLoggedInOnDifferentBrowser: boolean
+   isSpyMode: boolean
 }
 
 const initialState: StreamingAppState = {
@@ -162,6 +163,7 @@ const initialState: StreamingAppState = {
    emotes: [],
    virtualBackgroundMode: VirtualBackgroundMode.OFF,
    isLoggedInOnDifferentBrowser: false,
+   isSpyMode: false,
 }
 
 const streamingAppSlice = createSlice({
@@ -398,6 +400,9 @@ const streamingAppSlice = createSlice({
       setIsRecordingBotInRoom(state, action: PayloadAction<boolean>) {
          state.livestreamState.isRecordingBotInRoom = action.payload
       },
+      setIsSpyMode(state, action: PayloadAction<boolean>) {
+         state.isSpyMode = action.payload
+      },
       setSpeakerId(state, action: PayloadAction<string | null>) {
          state.speakerId = action.payload
          state.userUid = null
@@ -446,6 +451,7 @@ export const {
       setVirtualBackgroundMode,
       setIsRecordingWindow,
       setIsRecordingBotInRoom,
+      setIsSpyMode,
       setSpeakerId,
       setUserUid,
    },
