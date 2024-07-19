@@ -1,19 +1,12 @@
+import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import useMenuState from "components/custom-hook/useMenuState"
+import BrandedOptions from "components/views/common/inputs/BrandedOptions"
 import BrandedResponsiveMenu, {
    MenuOption,
 } from "components/views/common/inputs/BrandedResponsiveMenu"
 import { Fragment } from "react"
 import { Trash2 as DeleteIcon, Edit, RefreshCw } from "react-feather"
-import { sxStyles } from "types/commonTypes"
-import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
-import BrandedOptions from "components/views/common/inputs/BrandedOptions"
-
-const styles = sxStyles({
-   delete: {
-      color: "error.main",
-   },
-})
 
 type Props = {
    poll: LivestreamPoll
@@ -57,7 +50,7 @@ export const PollOptionsMenu = ({
             label: "Delete poll",
             icon: <DeleteIcon />,
             handleClick: () => onClickDelete(poll.id),
-            menuItemSxProps: [styles.delete],
+            color: "error.main",
          })
       }
 
