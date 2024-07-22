@@ -1,17 +1,17 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import React, { FC } from "react"
 import { Avatar, Box, Button, Stack } from "@mui/material"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import Typography from "@mui/material/Typography"
+import { FC } from "react"
+import { Briefcase, Edit, Zap } from "react-feather"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
-import { Briefcase, Edit } from "react-feather"
-import SanitizedHTML from "../../../../util/SanitizedHTML"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
+import SanitizedHTML from "../../../../util/SanitizedHTML"
 
 const styles = sxStyles({
    wrapper: {
-      p: 3,
+      p: 2,
    },
    header: {
       display: "flex",
@@ -29,16 +29,11 @@ const styles = sxStyles({
       ml: 3,
    },
    jobName: {
-      fontWeight: "bold",
-   },
-   jobType: {
-      color: "#8B8B8B",
-      fontSize: "14px",
-      ml: 0.5,
+      fontWeight: 600,
    },
    subTitle: {
-      fontSize: "20px",
-      fontWeight: "bold",
+      fontSize: "18px",
+      fontWeight: 600,
    },
    jobValues: {
       fontSize: "16px",
@@ -57,7 +52,7 @@ const styles = sxStyles({
    description: {
       fontSize: "16px",
       fontWeight: 400,
-      lineHeight: "27px",
+      color: (theme) => theme.palette.text.secondary,
    },
    editButton: {
       textTransform: "none",
@@ -69,11 +64,27 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
    },
+   detailsWrapper: {
+      display: "inline",
+   },
+   details: {
+      color: "#8B8B8B",
+      fontSize: "12px",
+   },
+   detailsValue: {
+      display: "inline",
+
+      "& svg": {
+         verticalAlign: "bottom",
+         mr: "6px !important",
+      },
+   },
 })
 
 type Props = {
-   job: CustomJob
-   handleEdit: () => void
+   job: Partial<CustomJob>
+   handleEdit?: () => void
+   previewMode?: boolean
    companyName: string
    companyLogoUrl: string
 }
@@ -82,6 +93,7 @@ const CustomJobAdminDetails: FC<Props> = ({
    handleEdit,
    companyName,
    companyLogoUrl,
+   previewMode,
 }) => {
    const isMobile = useIsMobile()
    const jobDeadline = job.deadline
@@ -90,7 +102,7 @@ const CustomJobAdminDetails: FC<Props> = ({
 
    return (
       <Box sx={styles.wrapper}>
-         {isMobile ? (
+         {isMobile && !previewMode ? (
             <Box sx={styles.mobileEditBtnSection}>
                <Button
                   variant={"outlined"}
@@ -117,17 +129,33 @@ const CustomJobAdminDetails: FC<Props> = ({
                   <Typography variant={"h4"} sx={styles.jobName}>
                      {job.title}
                   </Typography>
-                  {Boolean(job.jobType) ? (
-                     <Box sx={{ display: "flex" }}>
-                        <Briefcase width={11} color={"#7A7A8E"} />
-                        <Typography variant={"subtitle1"} sx={styles.jobType}>
-                           {job.jobType}
-                        </Typography>
-                     </Box>
-                  ) : null}
+
+                  <Box sx={styles.detailsWrapper}>
+                     <Typography variant={"subtitle1"} sx={styles.details}>
+                        <Stack
+                           direction={"row"}
+                           spacing={2}
+                           sx={styles.detailsValue}
+                        >
+                           {job.jobType ? (
+                              <>
+                                 <Briefcase width={14} />
+                                 {job.jobType}
+                              </>
+                           ) : null}
+                           {job.businessFunctionsTagIds ? (
+                              <>
+                                 <Zap width={14} />
+                                 {job.businessFunctionsTagIds.join(", ")}
+                              </>
+                           ) : null}
+                        </Stack>
+                     </Typography>
+                  </Box>
                </Box>
             </Box>
-            {isMobile ? null : (
+
+            {isMobile || previewMode ? null : (
                <Box>
                   <Button
                      variant={"outlined"}
@@ -144,7 +172,7 @@ const CustomJobAdminDetails: FC<Props> = ({
          </Box>
 
          <Box sx={styles.content}>
-            <Stack spacing={2} sx={{ height: "100%" }}>
+            <Stack spacing={2}>
                <Box>
                   <Typography variant={"subtitle1"} sx={styles.subTitle}>
                      Job description
@@ -155,7 +183,7 @@ const CustomJobAdminDetails: FC<Props> = ({
                   />
                </Box>
 
-               {Boolean(job.salary) ? (
+               {job.salary ? (
                   <Box>
                      <Typography variant={"subtitle1"} sx={styles.subTitle}>
                         Salary
@@ -166,7 +194,7 @@ const CustomJobAdminDetails: FC<Props> = ({
                   </Box>
                ) : null}
 
-               {Boolean(jobDeadline) ? (
+               {jobDeadline ? (
                   <Box>
                      <Typography variant={"subtitle1"} sx={styles.subTitle}>
                         Application deadline
