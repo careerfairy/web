@@ -90,7 +90,14 @@ const styles = sxStyles({
       px: { xs: 3, md: 6 },
       position: "relative",
       height: "auto",
-      maxHeight: { xs: "90dvh", md: "800px" },
+
+      "@media (max-height: 850px)": {
+         maxHeight: "90dvh",
+      },
+
+      "@media (min-height: 850px)": {
+         maxHeight: { xs: "90dvh", md: "800px" },
+      },
    },
    container: {
       px: "unset !important",
