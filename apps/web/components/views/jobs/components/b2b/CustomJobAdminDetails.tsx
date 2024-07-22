@@ -1,7 +1,6 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Avatar, Box, Button, Stack } from "@mui/material"
 import Typography from "@mui/material/Typography"
-import { FC } from "react"
 import { Briefcase, Edit, Zap } from "react-feather"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
@@ -65,7 +64,8 @@ const styles = sxStyles({
       justifyContent: "center",
    },
    detailsWrapper: {
-      display: "inline",
+      display: { xs: "flex", md: "inline" },
+      flexDirection: "column",
    },
    details: {
       color: "#8B8B8B",
@@ -88,13 +88,13 @@ type Props = {
    companyName: string
    companyLogoUrl: string
 }
-const CustomJobAdminDetails: FC<Props> = ({
+const CustomJobAdminDetails = ({
    job,
    handleEdit,
    companyName,
    companyLogoUrl,
    previewMode,
-}) => {
+}: Props) => {
    const isMobile = useIsMobile()
    const jobDeadline = job.deadline
       ? DateUtil.formatDateToString(job.deadline.toDate())
@@ -130,28 +130,52 @@ const CustomJobAdminDetails: FC<Props> = ({
                      {job.title}
                   </Typography>
 
-                  <Box sx={styles.detailsWrapper}>
-                     <Typography variant={"subtitle1"} sx={styles.details}>
-                        <Stack
-                           direction={"row"}
-                           spacing={2}
-                           sx={styles.detailsValue}
-                        >
-                           {job.jobType ? (
-                              <>
-                                 <Briefcase width={14} />
-                                 {job.jobType}
-                              </>
-                           ) : null}
-                           {job.businessFunctionsTagIds ? (
-                              <>
-                                 <Zap width={14} />
-                                 {job.businessFunctionsTagIds.join(", ")}
-                              </>
-                           ) : null}
-                        </Stack>
-                     </Typography>
-                  </Box>
+                  {isMobile ? (
+                     <Box sx={[styles.detailsWrapper, styles.detailsValue]}>
+                        {job.jobType ? (
+                           <Typography
+                              variant={"subtitle1"}
+                              sx={styles.details}
+                           >
+                              <Briefcase width={14} />
+                              {job.jobType}
+                           </Typography>
+                        ) : null}
+
+                        {job.businessFunctionsTagIds ? (
+                           <Typography
+                              variant={"subtitle1"}
+                              sx={styles.details}
+                           >
+                              <Zap width={14} />
+                              {job.businessFunctionsTagIds.join(", ")}
+                           </Typography>
+                        ) : null}
+                     </Box>
+                  ) : (
+                     <Box sx={styles.detailsWrapper}>
+                        <Typography variant={"subtitle1"} sx={styles.details}>
+                           <Stack
+                              direction={"row"}
+                              spacing={2}
+                              sx={styles.detailsValue}
+                           >
+                              {job.jobType ? (
+                                 <>
+                                    <Briefcase width={14} />
+                                    {job.jobType}
+                                 </>
+                              ) : null}
+                              {job.businessFunctionsTagIds ? (
+                                 <>
+                                    <Zap width={14} />
+                                    {job.businessFunctionsTagIds.join(", ")}
+                                 </>
+                              ) : null}
+                           </Stack>
+                        </Typography>
+                     </Box>
+                  )}
                </Box>
             </Box>
 
