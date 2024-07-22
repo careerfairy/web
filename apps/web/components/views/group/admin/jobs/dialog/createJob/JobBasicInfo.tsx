@@ -128,6 +128,7 @@ const JobBasicInfo = () => {
                            options={BusinessFunctionsTagValues}
                            multiple
                            limit={5}
+                           showCheckbox
                            autocompleteProps={{
                               id: "businessTags",
                               disabled: isSubmitting,
