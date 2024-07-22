@@ -1,7 +1,10 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Link, Stack, Typography, useTheme } from "@mui/material"
+import useIsDesktop from "components/custom-hook/useIsDesktop"
+import { ChevronDown, ChevronUp } from "react-feather"
 import { LinkedInIcon } from "../common/icons/LinkedInIcon"
+import CollapsibleText from "../common/inputs/CollapsibleText"
 import CircularLogo from "../common/logos/CircularLogo"
 
 const styles = sxStyles({
@@ -47,6 +50,14 @@ const styles = sxStyles({
          marginTop: "-2px",
       },
    }),
+   mobileCollapsibleContainer: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      "& button": {
+         width: "100%",
+      },
+   },
 })
 
 const LinkedInButton = () => {
@@ -85,6 +96,18 @@ const SpeakerAvatar = ({
       </Stack>
    )
 }
+
+const ShowMoreButton = (
+   <Button variant="text" color="grey" endIcon={<ChevronDown />}>
+      Show more
+   </Button>
+)
+
+const ShowLessButton = (
+   <Button variant="text" color="grey" endIcon={<ChevronUp />}>
+      Show less
+   </Button>
+)
 
 const getMentorPlaceholderStory = ({
    mentor,
@@ -135,6 +158,8 @@ export const MentorDetail = ({
    numSparks,
    numLivestreams,
 }: MentorDetailProps) => {
+   const isDesktop = useIsDesktop()
+
    if (!mentor) return null
 
    const placeholderStory = getMentorPlaceholderStory({
@@ -158,9 +183,21 @@ export const MentorDetail = ({
                <LinkedInButton />
             </Button>
          )}
-         <Typography sx={styles.story}>
-            {mentor.story ? mentor.story : placeholderStory}
-         </Typography>
+         {isDesktop ? (
+            <Typography sx={styles.story}>
+               {mentor.story ? mentor.story : placeholderStory}
+            </Typography>
+         ) : (
+            <CollapsibleText
+               text={mentor.story ? mentor.story : placeholderStory}
+               textStyle={styles.story}
+               slots={{
+                  expand: ShowMoreButton,
+                  collapse: ShowLessButton,
+               }}
+               containerSx={styles.mobileCollapsibleContainer}
+            />
+         )}
       </Stack>
    )
 }
