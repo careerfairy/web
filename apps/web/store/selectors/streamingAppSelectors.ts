@@ -155,3 +155,6 @@ export const useSpeakerId = () =>
 
 export const useUserUid = () =>
    useAppSelector((state) => state.streamingApp.userUid)
+
+export const useAutoplayState = () =>
+   useAppSelector((state) => state.streamingApp.autoplayState)
