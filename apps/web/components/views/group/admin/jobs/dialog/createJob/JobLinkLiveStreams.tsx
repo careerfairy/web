@@ -27,6 +27,7 @@ const styles = sxStyles({
    },
    wrapperContainer: {
       px: { md: "24px !important" },
+      minWidth: { md: "750px" },
    },
    title: {
       maxWidth: { xs: "90%", md: "unset" },
