@@ -54,7 +54,7 @@ type PropType = {
    emblaRef
    tags?: OptionGroup[]
    onTagClick?: (tagId: string) => void
-   onAllClick?: () => void // Not needed for now, as all is merely a UI indication
+   onAllClick?: () => void
 }
 
 const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
@@ -62,7 +62,7 @@ const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>
-         <Stack direction={"row"} spacing={"12px"}>
+         <Stack direction={"row"} spacing={"12px"} pl={2}>
             {/* Chip for All  */}
             <Chip
                sx={[

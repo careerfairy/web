@@ -24,17 +24,15 @@ export const useAvailableTagsByHits = () => {
    const availableBusinessFunctions = BusinessFunctionsTagValues.filter(
       (tag) => {
          const tagHits = hits.businessFunctions.hits[tag.id]
-         return tagHits
-            ? shouldShowBusinessFunctionTagByCount(tagHits.count, 6)
-            : false
+         return (
+            tagHits && shouldShowBusinessFunctionTagByCount(tagHits.count, 6)
+         )
       }
    )
 
    const availableContentTopics = ContentTopicsTagValues.filter((tag) => {
       const tagHits = hits.contentTopics.hits[tag.id]
-      return tagHits
-         ? shouldShowContentTopicTagByCount(tagHits.count, 6, 6)
-         : false
+      return tagHits && shouldShowContentTopicTagByCount(tagHits.count, 6, 6)
    })
 
    return sortByUserInterests(

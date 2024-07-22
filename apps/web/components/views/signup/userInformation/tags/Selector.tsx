@@ -31,6 +31,9 @@ const styles = sxStyles({
       fontStyle: "normal",
       fontWeight: 400,
       lineHeight: "20px",
+      "&:hover": {
+         backgroundColor: theme.palette.primary[700],
+      },
    }),
 })
 

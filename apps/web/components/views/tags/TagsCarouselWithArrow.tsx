@@ -32,8 +32,9 @@ const styles = sxStyles({
 
 const tagsCarouselEmblaOptions: EmblaOptionsType = {
    loop: false,
-   dragFree: false,
-   skipSnaps: false,
+   dragFree: true,
+   skipSnaps: true,
+   slidesToScroll: 2,
 }
 
 type CarouselProps = {
@@ -89,8 +90,10 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
    React.useImperativeHandle(childRef, () => ({
       goNext() {
          emblaApi.scrollNext()
+         emblaApi.scrollNext()
       },
       goPrev() {
+         emblaApi.scrollPrev()
          emblaApi.scrollPrev()
       },
    }))
@@ -98,7 +101,7 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
    if (!tags?.length) return null
 
    return (
-      <Stack spacing={1.25} direction={"row"} ml={2} mb={3}>
+      <Stack spacing={1.25} direction={"row"} mb={3}>
          <Box sx={styles.contentWrapper}>
             <ConditionalWrapper condition={showPrevious}>
                <Box sx={[styles.arrowWrapper]}>
