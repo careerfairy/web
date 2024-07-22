@@ -2,6 +2,7 @@ import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useCallback, useState } from "react"
 import {
    useHasStarted,
+   useIsTestLivestream,
    useStartsAt,
 } from "store/selectors/streamingAppSelectors"
 import { BrandedTooltip } from "../BrandedTooltip"
@@ -19,6 +20,7 @@ export const ToggleStartLiveStreamButton = () => {
    const isMobile = useStreamIsMobile(390)
 
    const isStreamStartingSoon = useIsStreamStartingSoon(startsAt)
+   const isTestStream = useIsTestLivestream()
    const streamHasNoStartTime = !startsAt // Test streams currently have no start time
 
    const [dialogState, setDialogState] = useState<ConfirmDialogState>({
@@ -35,7 +37,8 @@ export const ToggleStartLiveStreamButton = () => {
    const disabled = !(
       isStreamStartingSoon ||
       streamHasNoStartTime ||
-      hasStarted
+      hasStarted ||
+      isTestStream
    )
 
    return (
