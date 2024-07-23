@@ -1,3 +1,4 @@
+import { Group } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
@@ -58,14 +59,14 @@ const styles = sxStyles({
 })
 
 type MentorDetailPageProps = {
-   companyName: string
+   group: Group
    mentor: PublicCreator
    livestreams: LivestreamEvent[]
    sparks: Spark[]
 }
 
 export const MentorDetailPage = ({
-   companyName,
+   group,
    mentor,
    livestreams,
    sparks,
@@ -76,7 +77,7 @@ export const MentorDetailPage = ({
             <BackButton />
             <MentorDetail
                mentor={mentor}
-               companyName={companyName}
+               group={group}
                numSparks={sparks.length}
                numLivestreams={livestreams.length}
             />
