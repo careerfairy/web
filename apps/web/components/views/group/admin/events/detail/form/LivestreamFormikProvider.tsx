@@ -4,10 +4,7 @@ import {
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group, GroupQuestion } from "@careerfairy/shared-lib/groups"
-import {
-   Creator,
-   mapSpeakerToCreator,
-} from "@careerfairy/shared-lib/groups/creators"
+import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { useAuth } from "HOCs/AuthProvider"
@@ -74,6 +71,24 @@ const formInitialValues: LivestreamFormValues = {
    speakers: { ...formSpeakersTabInitialValues },
    questions: { ...formQuestionsTabInitialValues },
    jobs: { ...formJobsTabInitialValues },
+}
+
+const mapSpeakerToCreator = (speaker: Speaker): Creator => {
+   return {
+      id: speaker.id,
+      groupId: null,
+      documentType: "groupCreator",
+      firstName: speaker.firstName || null,
+      lastName: speaker.lastName || null,
+      position: speaker.position || null,
+      email: speaker.email || null,
+      avatarUrl: speaker.avatar || null,
+      createdAt: null,
+      updatedAt: null,
+      linkedInUrl: speaker.linkedInUrl || "",
+      story: speaker.background || null,
+      roles: speaker.roles || [CreatorRoles.Speaker],
+   }
 }
 
 const unionCreatorsAndSpeakers = (

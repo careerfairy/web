@@ -60,6 +60,7 @@ import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
 import stripe = require("./stripe")
+import tags = require("./lib/tagging/tags")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -133,6 +134,9 @@ exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
 exports.fetchLivestreams_v2 = livestreams.fetchLivestreams
+
+// Tags
+exports.fetchTagsContentHits = tags.fetchContentHits
 
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook
@@ -239,8 +243,8 @@ exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 
 // Group Spark Functions
-exports.createSpark_v3 = groupSparks.createSpark
-exports.updateSpark_v3 = groupSparks.updateSpark
+exports.createSpark_v4 = groupSparks.createSpark
+exports.updateSpark_v4 = groupSparks.updateSpark
 exports.deleteSpark_v3 = groupSparks.deleteSpark
 
 // User Spark Notification Functions
@@ -252,7 +256,7 @@ exports.removeAndSyncUserSparkNotification_v2 =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
-exports.getSparksFeed_v5 = userSparks.getSparksFeed
+exports.getSparksFeed_v6 = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser_v3 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions

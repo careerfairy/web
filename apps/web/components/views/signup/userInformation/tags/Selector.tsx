@@ -31,6 +31,9 @@ const styles = sxStyles({
       fontStyle: "normal",
       fontWeight: 400,
       lineHeight: "20px",
+      "&:hover": {
+         backgroundColor: theme.palette.primary[700],
+      },
    }),
 })
 
@@ -85,27 +88,7 @@ export const Selector = ({
    )
 
    return (
-      <TagValuesSelector
-         tagsMap={tagsMap}
-         setUserTags={handleTagChange}
-         field={field}
-      />
-   )
-}
-
-type TagValuesSelectorProps = {
-   tagsMap: TagsMap
-   field: string
-   setUserTags: (selectedTags: OptionGroup[]) => Promise<void>
-}
-
-const TagValuesSelector = ({
-   tagsMap: tagsMap,
-   setUserTags: setUserTags,
-   field,
-}: TagValuesSelectorProps) => {
-   return (
-      <Grid container spacing={2} justifyContent="center">
+      <Grid container spacing={2}>
          {Object.keys(tagsMap).map((tagId) => {
             return (
                <Chip
@@ -121,7 +104,7 @@ const TagValuesSelector = ({
                      const upToDateTags = Object.keys(tags)
                         .filter((tagId) => tags[tagId].state)
                         .map((tagId) => tags[tagId].option)
-                     setUserTags(upToDateTags)
+                     handleTagChange(upToDateTags)
                   }}
                   clickable
                   sx={[
@@ -136,4 +119,3 @@ const TagValuesSelector = ({
       </Grid>
    )
 }
-export default Selector
