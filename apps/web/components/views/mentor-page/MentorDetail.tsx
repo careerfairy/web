@@ -1,7 +1,11 @@
+import { Group } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Link, Stack, Typography, useTheme } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import useAnonymousUserCountryCode from "components/custom-hook/useAnonymousUserCountryCode"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
+import { useMemo } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
 import { LinkedInIcon } from "../common/icons/LinkedInIcon"
 import CollapsibleText from "../common/inputs/CollapsibleText"
@@ -71,10 +75,11 @@ const LinkedInButton = () => {
    )
 }
 
-const SpeakerAvatar = ({
-   mentor,
-   companyName,
-}: Pick<MentorDetailProps, "mentor" | "companyName">) => {
+type SpeakerAvatarProps = {
+   companyName: string
+} & Pick<MentorDetailProps, "mentor">
+
+const SpeakerAvatar = ({ mentor, companyName }: SpeakerAvatarProps) => {
    const mentorName = `${mentor.firstName ?? ""} ${mentor.lastName ?? ""}`
 
    return (
@@ -109,12 +114,16 @@ const ShowLessButton = (
    </Button>
 )
 
+type PlaceholderStory = {
+   companyName: string
+} & Pick<MentorDetailProps, "mentor" | "numSparks" | "numLivestreams">
+
 const getMentorPlaceholderStory = ({
    mentor,
    companyName,
    numSparks,
    numLivestreams,
-}: MentorDetailProps) => {
+}: PlaceholderStory) => {
    const hasCreatedSparks = numSparks > 0
    const hasParticipatedInLivestreams = numLivestreams > 0
 
@@ -147,32 +156,56 @@ const getMentorPlaceholderStory = ({
 
 type MentorDetailProps = {
    mentor: PublicCreator
-   companyName: string
+   group: Group
    numSparks: number
    numLivestreams: number
 }
 
 export const MentorDetail = ({
    mentor,
-   companyName,
+   group,
    numSparks,
    numLivestreams,
 }: MentorDetailProps) => {
    const isDesktop = useIsDesktop()
+   const { userData, isLoggedIn } = useAuth()
+
+   const { anonymousUserCountryCode, isLoading } = useAnonymousUserCountryCode()
+
+   const showLinkedInButton = useMemo(() => {
+      const isTargetedUser =
+         group.targetedCountries.filter((country) => {
+            const userCode = isLoggedIn
+               ? userData?.universityCountryCode
+               : anonymousUserCountryCode
+
+            console.log("🚀 ~ isTargetedUser ~ userCode:", userCode)
+            return country.id === userCode
+         }).length > 0
+
+      return !isLoading && mentor?.linkedInUrl && isTargetedUser
+   }, [
+      group.targetedCountries,
+      isLoading,
+      mentor?.linkedInUrl,
+      isLoggedIn,
+      userData?.universityCountryCode,
+      anonymousUserCountryCode,
+   ])
 
    if (!mentor) return null
 
    const placeholderStory = getMentorPlaceholderStory({
       mentor,
-      companyName,
+      companyName: group.universityName,
       numSparks,
       numLivestreams,
    })
 
    return (
       <Stack sx={styles.root}>
-         <SpeakerAvatar mentor={mentor} companyName={companyName} />
-         {Boolean(mentor?.linkedInUrl) && (
+         <SpeakerAvatar mentor={mentor} companyName={group.universityName} />
+         {Boolean(showLinkedInButton) && (
             <Button
                sx={styles.linkedInButton}
                variant="outlined"
@@ -183,7 +216,7 @@ export const MentorDetail = ({
                <LinkedInButton />
             </Button>
          )}
-         {isDesktop ? (
+         {isDesktop || !mentor.story ? (
             <Typography sx={styles.story}>
                {mentor.story ? mentor.story : placeholderStory}
             </Typography>
