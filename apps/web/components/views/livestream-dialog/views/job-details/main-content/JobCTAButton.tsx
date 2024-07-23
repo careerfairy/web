@@ -40,13 +40,6 @@ const styles = sxStyles({
       backgroundColor: (theme) => alpha(theme.palette.secondary.main, 0.2),
       border: "none",
    },
-   menuOption: {
-      color: (theme) => theme.palette.neutral[700],
-      textDecoration: "none",
-   },
-   deleteOption: {
-      color: "error.main",
-   },
    uploaderInput: {
       "& > input": {
          display: "none",
@@ -145,14 +138,8 @@ const ManageCVButton = () => {
          label: "View current CV",
          icon: <Eye />,
          handleClick: () => {},
-         menuItemSxProps: [styles.menuOption],
          wrapperComponent: ({ children, ...props }) => (
-            <Link
-               href={userData.userResume}
-               target="_blank"
-               sx={styles.menuOption}
-               {...props}
-            >
+            <Link href={userData.userResume} target="_blank" {...props}>
                {children}
             </Link>
          ),
@@ -161,7 +148,6 @@ const ManageCVButton = () => {
          label: "Upload new CV",
          icon: <UploadCloud />,
 
-         menuItemSxProps: [styles.menuOption],
          loading: isLoading,
          handleClick: () => {},
          keepOpen: true,
@@ -182,7 +168,7 @@ const ManageCVButton = () => {
             handleDeleteCV()
          },
          keepOpen: true,
-         menuItemSxProps: [styles.deleteOption],
+         color: "error.main",
          loading: isLoadingDelete,
       },
    ]

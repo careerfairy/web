@@ -1,15 +1,15 @@
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { FC } from "react"
 import Box from "@mui/material/Box"
+import Skeleton from "@mui/material/Skeleton"
+import { FC } from "react"
+import { sxStyles } from "../../../../../types/commonTypes"
+import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import {
    InPersonEventBadge,
    LimitedRegistrationsBadge,
 } from "../../../common/NextLivestreams/GroupStreams/groupStreamCard/badges"
 import WhiteTagChip from "../../../common/chips/TagChip"
-import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
-import { sxStyles } from "../../../../../types/commonTypes"
-import Skeleton from "@mui/material/Skeleton"
-import useInterestsByIds from "../../../../custom-hook/useInterestsByIds"
 
 const styles = sxStyles({
    tagsWrapper: {
@@ -69,9 +69,15 @@ const LivestreamTagsContainer: FC<LivestreamTagsContainerProps> = ({
                label={presenter.language.name}
             />
          ) : null}
-         {presenter.interestsIds.length > 0 ? (
-            <SuspenseWithBoundary fallback={<InterestSkeletons />}>
-               <InterestChips interestIds={presenter.interestsIds} />
+
+         {presenter.businessFunctionsTagIds.length > 0 ? (
+            <SuspenseWithBoundary fallback={<TagSkeletons />}>
+               <TagChips ids={presenter.businessFunctionsTagIds} />
+            </SuspenseWithBoundary>
+         ) : null}
+         {presenter.contentTopicsTagIds.length > 0 ? (
+            <SuspenseWithBoundary fallback={<TagSkeletons />}>
+               <TagChips ids={presenter.contentTopicsTagIds} />
             </SuspenseWithBoundary>
          ) : null}
       </Box>
@@ -81,45 +87,43 @@ const LivestreamTagsContainer: FC<LivestreamTagsContainerProps> = ({
 export const LivestreamTagsContainerSkeleton = () => {
    return (
       <Box sx={styles.tagsWrapper}>
-         <InterestSkeletons />
+         <TagSkeletons />
       </Box>
    )
 }
 
-type InterestChipsProps = {
-   interestIds: string[]
+type TagChipsProps = {
+   ids: string[]
 }
 
-const maxInterestsToShow = 2
+const maxTagsToShow = 2
 
-const InterestChips: FC<InterestChipsProps> = ({ interestIds }) => {
-   const { data: interests } = useInterestsByIds(interestIds)
+const TagChips: FC<TagChipsProps> = ({ ids: tagIds }) => {
+   // Calculate the number of remaining tags to show
+   const remainingTags = tagIds.length - maxTagsToShow
 
-   // Calculate the number of remaining interests
-   const remainingInterests = interests.length - maxInterestsToShow
+   // Slice the tag ids array to only contain the first two tags
+   const shownTags = tagIds.slice(0, maxTagsToShow)
 
-   // Slice the interests array to only contain the first two interests
-   const shownInterests = interests.slice(0, maxInterestsToShow)
-
-   const notShownInterests = interests.slice(maxInterestsToShow)
+   const notShownTags = tagIds.slice(maxTagsToShow)
 
    return (
       <>
-         {shownInterests.map((interest) => (
+         {shownTags.map((tagId) => (
             <WhiteTagChip
-               key={interest.id}
+               key={tagId}
                sx={styles.chip}
                variant={"outlined"}
-               label={interest.name}
+               label={TagValuesLookup[tagId]}
             />
          ))}
-         {remainingInterests > 0 && (
+         {remainingTags > 0 && (
             <WhiteTagChip
                sx={styles.chip}
                variant={"outlined"}
-               label={`+${remainingInterests}`}
-               tooltipText={notShownInterests
-                  .map((interest) => interest.name)
+               label={`+${remainingTags}`}
+               tooltipText={notShownTags
+                  .map((tagId) => TagValuesLookup[tagId])
                   .join(", ")}
             />
          )}
@@ -127,7 +131,7 @@ const InterestChips: FC<InterestChipsProps> = ({ interestIds }) => {
    )
 }
 
-const InterestSkeletons: FC = () => {
+const TagSkeletons: FC = () => {
    return (
       <>
          <Skeleton

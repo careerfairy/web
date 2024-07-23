@@ -145,6 +145,11 @@ export interface LivestreamEvent extends Identifiable {
    speakers?: Speaker[]
 
    /**
+    * Speakers who joined during the live stream but are not displayed in the live stream details dialog
+    */
+   adHocSpeakers?: Speaker[]
+
+   /**
     * The creators' identifiers of the speakers.
     * This is used for data relationship and syncing purposes.
     * Relates with creators in careerCenterData/creator sub collection.
@@ -457,7 +462,13 @@ export interface EventRatingAnswer extends Identifiable {
    message?: string
    rating?: number
    timestamp?: firebase.firestore.Timestamp
+   user?: StreamerDetails
 }
+
+export type FeedbackQuestionUserAnswer = Pick<
+   EventRatingAnswer,
+   "message" | "rating"
+>
 
 export type LivestreamEventPublicData = Partial<
    Pick<
@@ -709,6 +720,9 @@ export interface UserParticipatingStats extends DocumentData, Identifiable {
 
 export enum ImpressionLocation {
    recommendedEventsCarousel = "recommendedEventsCarousel",
+   businessFunctionsTagsCarousel = "businessFunctionsTagsCarousel",
+   contentTopicsTagsCarousel = "contentTopicsTagsCarousel",
+   otherTagsCarousel = "otherTagsCarousel",
    comingUpCarousel = "comingUpCarousel",
    myNextEventsCarousel = "myNextEventsCarousel",
    pastEventsCarousel = "pastEventsCarousel",
@@ -817,4 +831,12 @@ export interface LivestreamEmote extends Identifiable {
    authorEmail?: string
    /** @deprecated */
    streamerId?: string
+}
+
+export type StreamerDetails = {
+   firstName: string
+   lastName: string
+   role: string
+   avatarUrl: string
+   linkedInUrl: string
 }

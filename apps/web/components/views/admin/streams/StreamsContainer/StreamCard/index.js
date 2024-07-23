@@ -1,4 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react"
+import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import {
+   dynamicSort,
+   removeDuplicates,
+} from "@careerfairy/shared-lib/dist/utils"
+import MoreVertIcon from "@mui/icons-material/MoreVert"
+import RegistrationsIcon from "@mui/icons-material/People"
+import PercentIcon from "@mui/icons-material/Percent"
+import JoinIcon from "@mui/icons-material/RecordVoiceOver"
+import ParticipationIcon from "@mui/icons-material/Visibility"
 import {
    Avatar,
    Box,
@@ -21,34 +30,26 @@ import {
    MenuItem,
    Typography,
 } from "@mui/material"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { format } from "date-fns"
+import Image from "next/legacy/image"
+import PropTypes from "prop-types"
+import React, { useCallback, useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { useFirestore } from "react-redux-firebase"
+import * as actions from "store/actions/index"
+import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
+import { useToggleLivestreamNewUI } from "../../../../../custom-hook/live-stream/useToggleLivestreamNewUI"
+import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
 import {
    getBaseUrl,
    getResizedUrl,
    prettyDate,
 } from "../../../../../helperFunctions/HelperFunctions"
-import RegistrationsIcon from "@mui/icons-material/People"
-import ParticipationIcon from "@mui/icons-material/Visibility"
-import JoinIcon from "@mui/icons-material/RecordVoiceOver"
-import { useFirestore } from "react-redux-firebase"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { useDispatch, useSelector } from "react-redux"
-import * as actions from "store/actions/index"
-import MoreVertIcon from "@mui/icons-material/MoreVert"
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog"
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog"
-import PropTypes from "prop-types"
-import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
-import PercentIcon from "@mui/icons-material/Percent"
-import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
-import { format } from "date-fns"
-import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
-import {
-   dynamicSort,
-   removeDuplicates,
-} from "@careerfairy/shared-lib/dist/utils"
-import Image from "next/legacy/image"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -106,6 +107,8 @@ const StreamCard = ({ isUpcoming, stream }) => {
       (state) => state.streamAdmin.recording.recordingRequestOngoing
    )
    const [csvDownloadData, setCsvDownloadData] = useState(null)
+   const { trigger: toggleLivestreamNewUI, isMutating } =
+      useToggleLivestreamNewUI(stream.id)
 
    const handleCloseCsvDialog = useCallback(() => {
       setCsvDownloadData(null)
@@ -243,6 +246,14 @@ const StreamCard = ({ isUpcoming, stream }) => {
                         </MenuItem>
                         <MenuItem onClick={handleRegisteredUsersDownload}>
                            Download Registered Users CSV
+                        </MenuItem>
+                        <MenuItem
+                           disabled={isMutating}
+                           onClick={toggleLivestreamNewUI}
+                        >
+                           {stream.useNewUI
+                              ? "Disable new stream room"
+                              : "Enable new stream room"}
                         </MenuItem>
                         {isUpcoming ? (
                            <>

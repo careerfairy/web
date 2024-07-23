@@ -1,6 +1,6 @@
+import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { TemplatedMessage } from "postmark"
 import { PostmarkEmailSender } from "../api/postmark"
-import { Logger } from "@careerfairy/shared-lib/utils/types"
 
 /**
  * Builds a Spark release email (templated) and sends it to the recipients
@@ -17,16 +17,14 @@ export class ManualTemplatedEmailBuilder {
    /**
     * Adds a recipient to the list of recipients and constructs the template data
     */
-   addRecipient(email: string, name: string) {
+   addRecipient(email: string) {
       this.recipients.push({
          From: this.from,
          To: email,
          TemplateId: Number(process.env.POSTMARK_TEMPLATE_MANUAL_EMAIL),
-         TemplateModel: {
-            firstName: name,
-         },
+         TemplateModel: {},
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "aab-talent-pool",
+         Tag: "content-tagging-launch",
       })
    }
 

@@ -16,6 +16,7 @@ import {
    SharedSparks,
    Spark,
    SparkStats,
+   TagValuesToSparkCategoriesMapper,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
@@ -58,7 +59,7 @@ export class SparksService {
    async createSpark(data: AddSparkSparkData) {
       return httpsCallable<AddSparkSparkData, void>(
          this.functions,
-         "createSpark_v3"
+         "createSpark_v4"
       )(data)
    }
 
@@ -69,7 +70,7 @@ export class SparksService {
    async updateSpark(data: UpdateSparkData) {
       return httpsCallable<UpdateSparkData, void>(
          this.functions,
-         "updateSpark_v3"
+         "updateSpark_v4"
       )(data)
    }
 
@@ -122,7 +123,7 @@ export class SparksService {
          }
       >(
          this.functions,
-         "getSparksFeed_v5"
+         "getSparksFeed_v6"
       )(data)
 
       return {
@@ -204,7 +205,7 @@ export class SparksService {
          // Query the public sparks feed
          baseQuery = query(collection(db, "sparks"))
 
-         if (anonymousUserCountryCode) {
+         if (anonymousUserCountryCode && !options.contentTopicIds?.length) {
             const loggedOutCountry = getCountryOptionByCountryCode(
                anonymousUserCountryCode
             )
@@ -225,6 +226,18 @@ export class SparksService {
          baseQuery = query(
             baseQuery,
             where("category.id", "in", options.sparkCategoryIds)
+         )
+      }
+
+      // Filter the sparks by content topics
+      if (options.contentTopicIds?.length) {
+         baseQuery = query(
+            baseQuery,
+            where(
+               "category.id",
+               "==",
+               TagValuesToSparkCategoriesMapper[options.contentTopicIds[0]]
+            )
          )
       }
 

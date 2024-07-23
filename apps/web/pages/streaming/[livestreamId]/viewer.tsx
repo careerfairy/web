@@ -1,8 +1,10 @@
-import React from "react"
-import Head from "next/head"
+import { livestreamRepo } from "data/RepositoryInstances"
+import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import dynamic from "next/dynamic"
+import Head from "next/head"
+import { encode } from "querystring"
+import React from "react"
 import StreamingLoader from "../../../components/views/loader/StreamingLoader"
-import { GetServerSideProps } from "next"
 
 const ViewerLayout = dynamic(() => import("../../../layouts/ViewerLayout"), {
    ssr: false,
@@ -38,7 +40,25 @@ const ViewerPage = () => {
  * context data (query string params) and disable Usercentrics for certain scenarios
  * like the recording session
  */
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (
+   context: GetServerSidePropsContext
+) => {
+   const { livestreamId, ...params } = context.query
+   const queryParamString = encode(params)
+
+   const livestreamData = await livestreamRepo.getById(livestreamId as string)
+
+   if (livestreamData?.useNewUI) {
+      return {
+         redirect: {
+            permanent: false,
+            destination: `/streaming/viewer/${livestreamId}${
+               queryParamString && `?${queryParamString}`
+            }`,
+         },
+      }
+   }
+
    return { props: {} }
 }
 
