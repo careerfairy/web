@@ -71,6 +71,20 @@
       {
          "name": "universityCode",
          "type": "string"
+      },
+      {
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            }
+         ],
+         "name": "targetedCountries",
+         "type": "array"
       }
    ]
 }
