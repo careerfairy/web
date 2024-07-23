@@ -1,4 +1,3 @@
-import { livestreamRepo } from "data/RepositoryInstances"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import dynamic from "next/dynamic"
 import Head from "next/head"
@@ -46,20 +45,14 @@ export const getServerSideProps: GetServerSideProps = async (
    const { livestreamId, ...params } = context.query
    const queryParamString = encode(params)
 
-   const livestreamData = await livestreamRepo.getById(livestreamId as string)
-
-   if (livestreamData?.useNewUI) {
-      return {
-         redirect: {
-            permanent: false,
-            destination: `/streaming/viewer/${livestreamId}${
-               queryParamString && `?${queryParamString}`
-            }`,
-         },
-      }
+   return {
+      redirect: {
+         permanent: false,
+         destination: `/streaming/viewer/${livestreamId}${
+            queryParamString && `?${queryParamString}`
+         }`,
+      },
    }
-
-   return { props: {} }
 }
 
 export default ViewerPage
