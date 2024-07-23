@@ -6,6 +6,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Typography } from "@mui/material"
 import { useSparksByTags } from "components/custom-hook/tags/useSparksByTags"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { SparksCarouselWithArrows } from "components/views/portal/sparks/SparksCarouselWithArrows"
 import { useRouter } from "next/router"
 import { sxStyles } from "types/commonTypes"
@@ -27,6 +28,7 @@ type Props = {
 
 const SparksTagsContent = ({ tags, selectedTagLabel, selectTagIds }: Props) => {
    const router = useRouter()
+   const isMobile = useIsMobile()
 
    // No need to use setSize for next page, since the sparks to be fetched is
    // capped to 10 items.
@@ -59,7 +61,7 @@ const SparksTagsContent = ({ tags, selectedTagLabel, selectTagIds }: Props) => {
                color="neutral.800"
             >{`Sparks talking about ${selectedTagLabel}`}</Typography>
          }
-         showArrows
+         showArrows={!isMobile}
          sparks={sparks}
          handleSparksClicked={handleSparksClicked}
       />

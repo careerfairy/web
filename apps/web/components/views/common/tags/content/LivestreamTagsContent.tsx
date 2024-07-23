@@ -19,8 +19,8 @@ const styles = sxStyles({
       borderRadius: "20px",
       border: `1px solid ${theme.palette.neutral[200]}`,
       "&:hover": {
-         backgroundColor: theme.palette.black[400],
-         color: theme.palette.black[700],
+         background: theme.brand.black[400],
+         color: theme.brand.black[700],
          border: `1px solid ${theme.palette.neutral[50]}`,
       },
       mx: "15px !important",
