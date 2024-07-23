@@ -30,13 +30,6 @@ import React, {
    useState,
 } from "react"
 import { checkIfPast } from "util/streamUtil"
-import WhiteTagChip from "../chips/TagChip"
-import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import CalendarIcon from "@mui/icons-material/CalendarToday"
-import { CardActionArea } from "@mui/material"
-import Link, { LinkProps } from "next/link"
 import { placeholderBanner } from "../../../../constants/images"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import { gradientAnimation } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
