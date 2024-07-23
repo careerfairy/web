@@ -25,8 +25,7 @@ const styles = sxStyles({
       mt: 1,
    },
    wrapperContainer: {
-      width: { md: "700px" },
-      height: { xs: "auto", md: "auto !important" },
+      minWidth: { md: "750px" },
    },
    title: {
       maxWidth: { xs: "90%", md: "unset" },
@@ -65,6 +64,8 @@ const JobFormPreview = () => {
       "additionalInfo.description",
       "additionalInfo.salary",
       "additionalInfo.deadline",
+      "livestreamIds",
+      "sparkIds",
    ])
 
    const fieldNames = [
@@ -74,6 +75,8 @@ const JobFormPreview = () => {
       "description",
       "salary",
       "deadline",
+      "livestreamIds",
+      "sparkIds",
    ]
 
    // Convert fieldsValues array to an object
@@ -92,8 +95,9 @@ const JobFormPreview = () => {
       }
    }, [goToStep, group.publicSparks, groupHasUpcomingLivestreams])
 
-   const previewJob = useMemo<Partial<CustomJob>>(() => {
-      const { deadline, jobType, businessTags } = fieldValuesObject
+   const previewJob = useMemo<CustomJob>(() => {
+      const { deadline, jobType, businessTags, livestreamIds, sparkIds } =
+         fieldValuesObject
 
       const businessTagsValues: string[] = businessTags?.map(
          (el: OptionGroup) => el.id
@@ -104,8 +108,11 @@ const JobFormPreview = () => {
          jobType: jobType ? jobType.value : null,
          deadline: Timestamp.fromDate(deadline),
          businessFunctionsTagIds: businessTagsValues,
+         livestreams: livestreamIds,
+         sparks: sparkIds,
+         groupId: group.groupId,
       }
-   }, [fieldValuesObject])
+   }, [fieldValuesObject, group])
 
    return (
       <SteppedDialog.Container

@@ -160,6 +160,7 @@ export enum EventsTypes {
     * coming up marketing events
     * */
    COMING_UP_MARKETING = "comingUpMarketing",
+   JOB_EVENTS = "jobLinkedEvents",
 }
 
 export type EventsCarouselStyling = {
@@ -200,6 +201,7 @@ export type EventsProps = {
    showManageButton?: boolean
    hideChipLabels?: boolean
    handleOpenEvent?: (event: LivestreamEvent) => void
+   disableClick?: boolean
 }
 
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
@@ -222,6 +224,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          hideChipLabels,
          showManageButton = false,
          handleOpenEvent,
+         disableClick,
       } = props
       const emblaPlugins = []
       if (events?.length)
@@ -436,6 +439,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                           event={event}
                                           isRecommended={isRecommended}
                                           hideChipLabels={hideChipLabels}
+                                          disableClick={disableClick}
                                           bottomElement={
                                              showManageButton ? (
                                                 <Box
