@@ -77,9 +77,6 @@ const styles = sxStyles({
       alignSelf: { xs: "self-end", md: "unset" },
       borderRadius: 5,
    },
-   smallDeleteDialog: {
-      maxWidth: { md: 450 },
-   },
 })
 
 const JobAdditionalDetails = dynamic(
@@ -246,10 +243,7 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
          views={views}
          initialStep={initialStep}
          transition={SlideUpTransition}
-         sx={[
-            styles.dialog,
-            isDeleteJobDialogOpen ? styles.smallDeleteDialog : null,
-         ]}
+         sx={styles.dialog}
          fullWidth={false}
       />
    )
