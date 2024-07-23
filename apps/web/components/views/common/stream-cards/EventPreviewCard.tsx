@@ -214,7 +214,7 @@ type EventPreviewCardProps = {
    index?: number
    // The total number of events in the list
    totalElements?: number
-   location?: ImpressionLocation
+   location?: ImpressionLocation | string
    ref?: React.Ref<HTMLDivElement>
    bottomElement?: React.ReactNode
    // If true, the chip labels will be hidden
