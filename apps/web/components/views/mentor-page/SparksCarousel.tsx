@@ -74,6 +74,7 @@ export const SparksCarousel = ({ sparks }: SparksCarousel) => {
                   spark={spark}
                   onClick={() => handleSparksClicked(spark)}
                   onGoNext={() => emblaApi?.scrollNext()}
+                  questionLimitLines={true}
                />
             </Box>
          ))}
