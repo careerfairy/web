@@ -31,7 +31,6 @@ const styles = sxStyles({
 })
 
 const tagsCarouselEmblaOptions: EmblaOptionsType = {
-   loop: false,
    dragFree: true,
    skipSnaps: true,
    slidesToScroll: 2,
@@ -76,24 +75,30 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
    }, [isMobile, showPreviousButton])
 
    useEffect(() => {
-      const handleScroll = () => {
+      const handleButtons = () => {
          setShowNextButton(emblaApi.canScrollNext())
          setShowPreviousButton(emblaApi.canScrollPrev())
       }
-      emblaApi?.on("scroll", handleScroll)
+
+      emblaApi?.on("settle", handleButtons)
+      emblaApi?.on("init", handleButtons)
+      emblaApi?.on("slidesChanged", handleButtons)
       // Cleanup the event listener on component unmount
       return () => {
-         emblaApi?.off("scroll", handleScroll)
+         emblaApi?.off("settle", handleButtons)
+         emblaApi?.off("slidesChanged", handleButtons)
+         emblaApi?.off("init", handleButtons)
       }
    }, [emblaApi])
 
    React.useImperativeHandle(childRef, () => ({
       goNext() {
-         emblaApi.scrollNext()
+         if (!showPreviousButton) {
+            emblaApi.scrollNext()
+         }
          emblaApi.scrollNext()
       },
       goPrev() {
-         emblaApi.scrollPrev()
          emblaApi.scrollPrev()
       },
    }))
