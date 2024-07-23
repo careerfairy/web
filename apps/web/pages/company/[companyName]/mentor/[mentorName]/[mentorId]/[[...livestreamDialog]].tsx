@@ -62,7 +62,7 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                //ref={viewRef}
             >
                <MentorDetailPage
-                  companyName={serverSideGroup.universityName}
+                  group={serverSideGroup}
                   mentor={creator}
                   livestreams={mapFromServerSide(serverSideLivestreams)}
                   sparks={deseralizedSparks}
