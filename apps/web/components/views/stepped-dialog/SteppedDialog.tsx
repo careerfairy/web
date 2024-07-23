@@ -377,6 +377,7 @@ type SteppedDialogContainerProps = BoxProps & {
    hideCloseButton?: boolean
    withActions?: boolean
    containerSx?: SxProps<Theme>
+   actionsContainerSx?: SxProps<Theme>
    handleCloseIconClick?: () => void
 }
 
@@ -388,6 +389,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
    containerSx,
    withActions,
    handleCloseIconClick,
+   actionsContainerSx,
 }) => {
    const stepper = useStepper()
 
@@ -418,7 +420,11 @@ const Container: FC<SteppedDialogContainerProps> = ({
                </Box>
             )}
          </MuiContainer>
-         {withActions ? <Box sx={styles.actionsContainer} /> : null}
+         {withActions ? (
+            <Box
+               sx={combineStyles(styles.actionsContainer, actionsContainerSx)}
+            />
+         ) : null}
       </Box>
    )
 }
