@@ -730,7 +730,7 @@ export class LivestreamFunctionsRepository
          afterJob,
          beforeJob,
          changeType,
-         (job) => job.livestreams,
+         (job) => job?.livestreams ?? [],
          (livestreamIds) => this.getLivestreamsByIds(livestreamIds),
          (livestreamIds) =>
             customJobRepo.getCustomJobsByLinkedContentIds(

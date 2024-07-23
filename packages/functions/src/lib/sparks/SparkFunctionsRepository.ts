@@ -1076,7 +1076,7 @@ export class SparkFunctionsRepository
          afterJob,
          beforeJob,
          changeType,
-         (job) => job.sparks,
+         (job) => job?.sparks ?? [],
          (sparkIds) => this.getSparksByIds(sparkIds),
          (sparkIds) =>
             customJobRepo.getCustomJobsByLinkedContentIds("sparks", sparkIds)
