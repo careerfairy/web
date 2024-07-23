@@ -1,6 +1,15 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Avatar, Box, Button, Stack } from "@mui/material"
 import Typography from "@mui/material/Typography"
+import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
+import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import useListenToStreams from "components/custom-hook/useListenToStreams"
+import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
+import EventsPreviewCarousel, {
+   EventsCarouselStyling,
+   EventsTypes,
+} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { useMemo, useRef } from "react"
 import { Briefcase, Edit, Zap } from "react-feather"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
@@ -79,10 +88,38 @@ const styles = sxStyles({
          mr: "6px !important",
       },
    },
+   linkedContentWrapper: {
+      mt: 2,
+   },
+   viewport: {
+      overflow: "hidden",
+   },
+   slide: {
+      flex: {
+         xs: `0 0 90%`,
+         sm: `0 0 60%`,
+      },
+      height: {
+         xs: 355,
+         md: 355,
+      },
+      "&:not(:first-of-type)": {
+         paddingLeft: `15px`,
+      },
+      "&:first-of-type": {
+         ml: 0.3,
+      },
+   },
 })
 
+const defaultStyling: EventsCarouselStyling = {
+   compact: true,
+   viewportSx: styles.viewport,
+   slide: styles.slide,
+}
+
 type Props = {
-   job: Partial<CustomJob>
+   job: CustomJob
    handleEdit?: () => void
    previewMode?: boolean
    companyName: string
@@ -96,9 +133,48 @@ const CustomJobAdminDetails = ({
    previewMode,
 }: Props) => {
    const isMobile = useIsMobile()
-   const jobDeadline = job.deadline
-      ? DateUtil.formatDateToString(job.deadline.toDate())
+   const childRef = useRef(null)
+   const {
+      title,
+      jobType,
+      businessFunctionsTagIds,
+      description,
+      salary,
+      deadline,
+      livestreams,
+      sparks,
+      groupId,
+   } = job
+
+   const upcomingLiveStreams = useListenToStreams({ filterByGroupId: groupId })
+   const linkedLiveStreams = useCustomJobLinkedLivestreams(job)
+   const { data: publishedSparks } = useGroupSparks(groupId, {
+      isPublished: true,
+   })
+
+   const allLivesStreams = useMemo(
+      () => [
+         ...new Map(
+            [
+               ...(linkedLiveStreams ? linkedLiveStreams : []),
+               ...(upcomingLiveStreams ? upcomingLiveStreams : []),
+            ].map((stream) => [stream.id, stream])
+         ).values(),
+      ],
+      [linkedLiveStreams, upcomingLiveStreams]
+   )
+   const jobDeadline = deadline
+      ? DateUtil.formatDateToString(deadline.toDate())
       : ""
+
+   const jobLivestreams = useMemo(
+      () => allLivesStreams.filter((event) => livestreams.includes(event.id)),
+      [allLivesStreams, livestreams]
+   )
+   const jobSparks = useMemo(
+      () => publishedSparks.filter((spark) => sparks.includes(spark.id)),
+      [publishedSparks, sparks]
+   )
 
    return (
       <Box sx={styles.wrapper}>
@@ -127,28 +203,28 @@ const CustomJobAdminDetails = ({
 
                <Box sx={styles.headerContent}>
                   <Typography variant={"h4"} sx={styles.jobName}>
-                     {job.title}
+                     {title}
                   </Typography>
 
                   {isMobile ? (
                      <Box sx={[styles.detailsWrapper, styles.detailsValue]}>
-                        {job.jobType ? (
+                        {jobType ? (
                            <Typography
                               variant={"subtitle1"}
                               sx={styles.details}
                            >
                               <Briefcase width={14} />
-                              {job.jobType}
+                              {jobType}
                            </Typography>
                         ) : null}
 
-                        {job.businessFunctionsTagIds ? (
+                        {businessFunctionsTagIds ? (
                            <Typography
                               variant={"subtitle1"}
                               sx={styles.details}
                            >
                               <Zap width={14} />
-                              {job.businessFunctionsTagIds.join(", ")}
+                              {businessFunctionsTagIds.join(", ")}
                            </Typography>
                         ) : null}
                      </Box>
@@ -160,16 +236,16 @@ const CustomJobAdminDetails = ({
                               spacing={2}
                               sx={styles.detailsValue}
                            >
-                              {job.jobType ? (
+                              {jobType ? (
                                  <>
                                     <Briefcase width={14} />
-                                    {job.jobType}
+                                    {jobType}
                                  </>
                               ) : null}
-                              {job.businessFunctionsTagIds ? (
+                              {businessFunctionsTagIds ? (
                                  <>
                                     <Zap width={14} />
-                                    {job.businessFunctionsTagIds.join(", ")}
+                                    {businessFunctionsTagIds.join(", ")}
                                  </>
                               ) : null}
                            </Stack>
@@ -203,17 +279,17 @@ const CustomJobAdminDetails = ({
                   </Typography>
                   <SanitizedHTML
                      sx={styles.description}
-                     htmlString={job.description}
+                     htmlString={description}
                   />
                </Box>
 
-               {job.salary ? (
+               {salary ? (
                   <Box>
                      <Typography variant={"subtitle1"} sx={styles.subTitle}>
                         Salary
                      </Typography>
                      <Typography variant={"body1"} sx={styles.jobValues}>
-                        {job.salary}
+                        {salary}
                      </Typography>
                   </Box>
                ) : null}
@@ -226,6 +302,41 @@ const CustomJobAdminDetails = ({
                      <Typography variant={"body1"} sx={styles.jobValues}>
                         {jobDeadline}
                      </Typography>
+                  </Box>
+               ) : null}
+
+               {jobLivestreams.length > 0 ? (
+                  <Box>
+                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
+                        Live streams related to this job
+                     </Typography>
+                     <Box sx={styles.linkedContentWrapper}>
+                        <EventsPreviewCarousel
+                           id={"job-events"}
+                           type={EventsTypes.JOB_EVENTS}
+                           events={jobLivestreams}
+                           isEmbedded
+                           disableClick
+                           styling={defaultStyling}
+                        />
+                     </Box>
+                  </Box>
+               ) : null}
+
+               {jobSparks.length > 0 ? (
+                  <Box>
+                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
+                        Sparks related to this job
+                     </Typography>
+                     <Box sx={styles.linkedContentWrapper}>
+                        <SparksCarousel
+                           ref={childRef}
+                           sparks={jobSparks}
+                           options={{
+                              align: "start",
+                           }}
+                        />
+                     </Box>
                   </Box>
                ) : null}
             </Stack>

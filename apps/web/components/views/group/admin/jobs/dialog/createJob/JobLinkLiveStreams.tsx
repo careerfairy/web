@@ -59,7 +59,7 @@ const JobLinkLiveStreams = ({ job }: Props) => {
    const { group } = useGroupFromState()
    const isMobile = useIsMobile()
    const upcomingLiveStreams = useListenToStreams({
-      filterByGroupId: group.id ?? group.groupId,
+      filterByGroupId: group.groupId,
    })
    const linkedLiveStreams = useCustomJobLinkedLivestreams(job)
 
