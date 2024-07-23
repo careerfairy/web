@@ -179,7 +179,6 @@ export const MentorDetail = ({
                ? userData?.universityCountryCode
                : anonymousUserCountryCode
 
-            console.log("🚀 ~ isTargetedUser ~ userCode:", userCode)
             return country.id === userCode
          }).length > 0
 
