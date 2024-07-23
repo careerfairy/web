@@ -50,7 +50,10 @@ export const useCurrentViewCount = () =>
       if (state.streamingApp.rtmSignalingState.failedToConnect) {
          return state.streamingApp.livestreamState.numberOfParticipants
       }
-      return state.streamingApp.rtmSignalingState.viewCount
+      const viewCount = state.streamingApp.rtmSignalingState.viewCount
+      return state.streamingApp.livestreamState.isRecordingBotInRoom
+         ? viewCount - 1
+         : viewCount
    })
 
 export const useIsConnectedOnDifferentBrowser = () =>
@@ -119,14 +122,39 @@ export const useVirtualBackgroundMode = () =>
 export const useShowWaitingRoom = (isHost: boolean) =>
    useAppSelector((state) => {
       const { hasStarted, hasEnded } = state.streamingApp.livestreamState
-      return !isHost && !hasEnded && hasStarted === undefined
+      const isSpyMode = state.streamingApp.isSpyMode
+
+      return !isHost && !isSpyMode && !hasEnded && hasStarted === undefined
    })
 
 export const useShowEndScreen = (isHost: boolean) =>
    useAppSelector((state) => {
       const { hasStarted, hasEnded } = state.streamingApp.livestreamState
-      return !isHost && hasEnded && hasStarted === false
+      const isSpyMode = state.streamingApp.isSpyMode
+
+      return !isHost && !isSpyMode && hasEnded && hasStarted === false
    })
 
 export const useIsTestLivestream = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.test)
+
+export const useIsRecordingWindow = () =>
+   useAppSelector(
+      (state) => state.streamingApp.livestreamState.isRecordingWindow
+   )
+
+export const useIsRecordingBotInRoom = () =>
+   useAppSelector(
+      (state) => state.streamingApp.livestreamState.isRecordingBotInRoom
+   )
+export const useIsSpyMode = () =>
+   useAppSelector((state) => state.streamingApp.isSpyMode)
+
+export const useSpeakerId = () =>
+   useAppSelector((state) => state.streamingApp.speakerId)
+
+export const useUserUid = () =>
+   useAppSelector((state) => state.streamingApp.userUid)
+
+export const useAutoplayState = () =>
+   useAppSelector((state) => state.streamingApp.autoplayState)

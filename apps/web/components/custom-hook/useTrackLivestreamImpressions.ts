@@ -1,25 +1,25 @@
-import { useInView } from "react-intersection-observer"
 import "intersection-observer" // polyfill for unsupported browsers
+import { useInView } from "react-intersection-observer"
 
-import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import {
    ImpressionLocation,
    LivestreamEvent,
    LivestreamImpression,
    pickPublicDataFromLivestream,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
+import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
-import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 
 type Props = {
    positionInResults?: number
    numberOfResults?: number
    isRecommended?: boolean
    event?: LivestreamEvent
-   location: ImpressionLocation
+   location: ImpressionLocation | string
    disableTracking?: boolean
 }
 const useTrackLivestreamImpressions = ({

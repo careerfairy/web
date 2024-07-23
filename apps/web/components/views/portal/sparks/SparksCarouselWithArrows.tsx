@@ -82,7 +82,7 @@ type CarouselProps = Props & {
    sparks: Spark[]
 }
 
-const SparksCarouselWithArrows: FC<CarouselProps> = ({
+export const SparksCarouselWithArrows: FC<CarouselProps> = ({
    header,
    handleSparksClicked,
    showArrows,

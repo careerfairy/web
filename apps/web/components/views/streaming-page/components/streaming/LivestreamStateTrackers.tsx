@@ -1,6 +1,8 @@
 import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
+import { useAuth } from "HOCs/AuthProvider"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useLivestreamData } from "components/custom-hook/streaming"
+import { useRouter } from "next/router"
 import { useEffect } from "react"
 import {
    resetLivestreamState,
@@ -8,6 +10,8 @@ import {
    setHandRaiseEnabled,
    setHasEnded,
    setHasJobs,
+   setIsRecordingWindow,
+   setIsSpyMode,
    setLivestreamMode,
    setNumberOfParticipants,
    setOpenStream,
@@ -31,6 +35,8 @@ import { setCompanyLogoUrl } from "../../../../../store/reducers/streamingAppRed
 export const LivestreamStateTrackers = (): null => {
    const dispatch = useAppDispatch()
    const livestream = useLivestreamData()
+   const { query } = useRouter()
+   const { userData } = useAuth()
 
    useEffect(() => {
       dispatch(setLivestreamMode(livestream.mode ?? LivestreamModes.DEFAULT))
@@ -97,6 +103,16 @@ export const LivestreamStateTrackers = (): null => {
    useEffect(() => {
       dispatch(setHasJobs(Boolean(livestream.hasJobs)))
    }, [dispatch, livestream.hasJobs])
+
+   useEffect(() => {
+      dispatch(setIsRecordingWindow(Boolean(query.isRecordingWindow)))
+   }, [dispatch, query.isRecordingWindow])
+
+   useEffect(() => {
+      if (userData?.isAdmin) {
+         dispatch(setIsSpyMode(Boolean(query.spy)))
+      }
+   }, [dispatch, query.spy, userData?.isAdmin])
 
    // Clean up the state on unmount
    useEffect(() => {

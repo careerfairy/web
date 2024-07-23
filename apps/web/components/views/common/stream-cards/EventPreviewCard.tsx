@@ -1,4 +1,12 @@
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import CalendarIcon from "@mui/icons-material/CalendarToday"
 import LanguageIcon from "@mui/icons-material/Language"
+import { CardActionArea } from "@mui/material"
 import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
@@ -11,6 +19,7 @@ import {
    isInIframe,
 } from "components/helperFunctions/HelperFunctions"
 import Image from "next/legacy/image"
+import Link, { LinkProps } from "next/link"
 import { useRouter } from "next/router"
 import React, {
    Fragment,
@@ -21,19 +30,10 @@ import React, {
    useState,
 } from "react"
 import { checkIfPast } from "util/streamUtil"
-import WhiteTagChip from "../chips/TagChip"
-
-import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import CalendarIcon from "@mui/icons-material/CalendarToday"
-import { CardActionArea } from "@mui/material"
-import Link, { LinkProps } from "next/link"
 import { placeholderBanner } from "../../../../constants/images"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import { gradientAnimation } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
 import { sxStyles } from "../../../../types/commonTypes"
-import { Interest } from "../../../../types/interests"
 import DateUtil from "../../../../util/DateUtil"
 import { marketingSignUpFormId } from "../../../cms/constants"
 import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
@@ -43,6 +43,7 @@ import {
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
+import WhiteTagChip from "../chips/TagChip"
 import CircularLogo from "../logos/CircularLogo"
 import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
 
@@ -206,7 +207,6 @@ const styles = sxStyles({
 type EventPreviewCardProps = {
    event?: LivestreamEvent
    loading?: boolean
-   interests?: Interest[]
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
    isRecommended?: boolean
@@ -214,7 +214,7 @@ type EventPreviewCardProps = {
    index?: number
    // The total number of events in the list
    totalElements?: number
-   location?: ImpressionLocation
+   location?: ImpressionLocation | string
    ref?: React.Ref<HTMLDivElement>
    bottomElement?: React.ReactNode
    // If true, the chip labels will be hidden
@@ -228,7 +228,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       {
          event,
          loading,
-         interests,
          animation,
          isRecommended,
          totalElements,
@@ -253,7 +252,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       })
       const router = useRouter()
       const { pathname } = router
-      const [eventInterests, setEventInterests] = useState([])
       const { authenticatedUser, isLoggedIn } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
 
@@ -305,16 +303,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
          return null
       }, [isPast, isLoggedIn, authenticatedUser?.email, presenterEvent])
-
-      useEffect(() => {
-         if (!loading && interests) {
-            setEventInterests(
-               interests.filter((interest) =>
-                  event?.interestsIds?.includes(interest.id)
-               )
-            )
-         }
-      }, [event?.interestsIds, loading, interests])
 
       useEffect(() => {
          if (!loading) {
@@ -653,28 +641,32 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                              sx={{ border: "1px solid black" }}
                                           />
                                        ) : null}
-                                       {eventInterests
-                                          .slice(0, 1)
-                                          .map((interest) => (
+                                       {event?.businessFunctionsTagIds
+                                          ?.slice(0, 1)
+                                          ?.map((tagId) => (
                                              <WhiteTagChip
-                                                key={interest.id}
+                                                key={tagId}
                                                 variant="filled"
                                                 sx={{
                                                    maxWidth:
-                                                      eventInterests.length > 2
+                                                      event
+                                                         ?.businessFunctionsTagIds
+                                                         .length > 2
                                                          ? "50%"
                                                          : "80%",
                                                    border: "1px solid black",
                                                 }}
-                                                label={interest.name}
+                                                label={TagValuesLookup[tagId]}
                                              />
                                           ))}
-                                       {eventInterests.length > 2 ? (
+                                       {event?.businessFunctionsTagIds?.length >
+                                       2 ? (
                                           <WhiteTagChip
                                              variant="filled"
                                              sx={{ border: "1px solid black" }}
                                              label={`+ ${
-                                                eventInterests.length - 2
+                                                event.businessFunctionsTagIds
+                                                   .length - 1
                                              }`}
                                           />
                                        ) : null}

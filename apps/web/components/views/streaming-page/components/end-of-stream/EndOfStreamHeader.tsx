@@ -28,7 +28,7 @@ export const EndOfStreamHeader = () => {
             <IconButton
                component={Link}
                noLinkStyle
-               href={"/"}
+               href={"/portal"}
                sx={styles.closeButton}
             >
                <X />

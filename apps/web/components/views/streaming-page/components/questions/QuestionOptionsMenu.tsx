@@ -4,15 +4,14 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { useDeleteLivestreamQuestion } from "components/custom-hook/streaming/question/useDeleteLivestreamQuestion"
 import { useResetLivestreamQuestion } from "components/custom-hook/streaming/question/useResetLivestreamQuestion"
 import BrandedResponsiveMenu, {
    MenuOption,
 } from "components/views/common/inputs/BrandedResponsiveMenu"
-import { livestreamService } from "data/firebase/LivestreamService"
 import { useMemo } from "react"
 import { Trash2 as DeleteIcon, RefreshCw } from "react-feather"
 import { useStreamingContext } from "../../context"
+import { useQuestionsListContext } from "./QuestionsListProvider"
 
 type Props = {
    handleClose: () => void
@@ -68,18 +67,14 @@ export const QuestionOptionsMenu = ({
    const streamIsMobile = useStreamIsMobile()
    const { livestreamId, streamerAuthToken } = useStreamingContext()
 
-   const { trigger: triggerDeleteQuestion, isMutating: isDeletingQuestion } =
-      useDeleteLivestreamQuestion(
-         livestreamService.getLivestreamRef(livestreamId),
-         question?.id
-      )
+   const { onQuestionDeleteClick } = useQuestionsListContext()
 
    const { trigger: triggerResetQuestion, isMutating: isResettingQuestion } =
       useResetLivestreamQuestion(livestreamId, question?.id, streamerAuthToken)
 
    const { showReset, showDelete } = useQuestionsVisibilityControls(question)
 
-   const isMutating = isDeletingQuestion || isResettingQuestion
+   const isMutating = isResettingQuestion
 
    const getOptions = () => {
       const options: MenuOption[] = []
@@ -101,7 +96,7 @@ export const QuestionOptionsMenu = ({
          options.push({
             label: "Delete question",
             icon: <DeleteIcon />,
-            handleClick: () => triggerDeleteQuestion(),
+            handleClick: () => onQuestionDeleteClick(question.id),
             loading: isMutating,
             color: "error.main",
          })

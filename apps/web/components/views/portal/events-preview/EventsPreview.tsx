@@ -1,24 +1,23 @@
-import React, { useCallback, useMemo, useState } from "react"
-import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography"
-import EventPreviewCard from "../../common/stream-cards/EventPreviewCard"
-import Link from "next/link"
-import RegistrationModal from "components/views/common/registration-modal"
-import { useRouter } from "next/router"
-import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
-import { useTheme } from "@mui/material/styles"
-import Stack from "@mui/material/Stack"
-import useMediaQuery from "@mui/material/useMediaQuery"
-import Heading from "../common/Heading"
-import { useInterests } from "../../../custom-hook/useCollection"
-import EmptyMessageOverlay from "./EmptyMessageOverlay"
-import ShareLivestreamModal from "../../common/ShareLivestreamModal"
-import CustomButtonCarousel from "../../common/carousels/CustomButtonCarousel"
 import {
    ImpressionLocation,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
+import Box from "@mui/material/Box"
+import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
+import { useTheme } from "@mui/material/styles"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import RegistrationModal from "components/views/common/registration-modal"
+import Link from "next/link"
+import { useRouter } from "next/router"
+import { useCallback, useMemo, useState } from "react"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
+import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
+import ShareLivestreamModal from "../../common/ShareLivestreamModal"
+import CustomButtonCarousel from "../../common/carousels/CustomButtonCarousel"
+import EventPreviewCard from "../../common/stream-cards/EventPreviewCard"
+import Heading from "../common/Heading"
+import EmptyMessageOverlay from "./EmptyMessageOverlay"
 
 const styles = {
    carousel: {
@@ -100,7 +99,6 @@ const EventsPreview = ({
       pathname,
    } = useRouter()
    const { joinGroupModalData, handleCloseJoinModal } = useRegistrationModal()
-   const { data: existingInterests } = useInterests()
 
    const {
       breakpoints: { up },
@@ -219,7 +217,6 @@ const EventsPreview = ({
                                    }
                                    index={index}
                                    totalElements={arr.length}
-                                   interests={existingInterests}
                                    location={getLocation(type)}
                                    key={event.id}
                                    event={event}

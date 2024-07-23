@@ -1,9 +1,11 @@
-import useSWR from "swr"
 import { RtmChannel } from "agora-rtm-sdk"
-import { useRTMChannelEvent } from "./useRTMChannelEvent"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { useAppDispatch } from "components/custom-hook/store"
 import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { useMemo } from "react"
+import { setIsRecordingBotInRoom } from "store/reducers/streamingAppReducer"
+import useSWR from "swr"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { useRTMChannelEvent } from "./useRTMChannelEvent"
 
 // fetcher function that calls the `getMembers` method on the channel
 const fetchChannelMembers = async (channel: RtmChannel) => {
@@ -23,7 +25,7 @@ const fetchChannelMembers = async (channel: RtmChannel) => {
  */
 const sortMembers = (a: string, b: string) => {
    const precedence = [
-      STREAM_IDENTIFIERS.CREATOR,
+      STREAM_IDENTIFIERS.SPEAKER,
       STREAM_IDENTIFIERS.SCREEN_SHARE,
       STREAM_IDENTIFIERS.USER,
       STREAM_IDENTIFIERS.ANONYMOUS,
@@ -53,6 +55,7 @@ const sortMembers = (a: string, b: string) => {
  * @param {RtmChannel} channel - The RTM channel instance.
  */
 export const useChannelMembers = (channel: RtmChannel) => {
+   const dispatch = useAppDispatch()
    const channelId = channel?.channelId
 
    const { data, error, mutate, isLoading } = useSWR<string[]>(
@@ -77,6 +80,9 @@ export const useChannelMembers = (channel: RtmChannel) => {
     * and triggers a mutation in the SWR cache to include the new member.
     */
    useRTMChannelEvent(channel, "MemberJoined", (newMemberId: string) => {
+      if (newMemberId.startsWith(STREAM_IDENTIFIERS.RECORDING)) {
+         return dispatch(setIsRecordingBotInRoom(true))
+      }
       return mutate(
          async (currentMembers) => {
             const newSet = new Set(currentMembers || [])
@@ -95,6 +101,9 @@ export const useChannelMembers = (channel: RtmChannel) => {
     * It does not trigger a revalidation of the data, ensuring the cache is populated with the latest state.
     */
    useRTMChannelEvent(channel, "MemberLeft", (memberId: string) => {
+      if (memberId.startsWith(STREAM_IDENTIFIERS.RECORDING)) {
+         return dispatch(setIsRecordingBotInRoom(false))
+      }
       return mutate(
          (currentMembers) =>
             currentMembers?.filter((member) => member !== memberId),
@@ -105,7 +114,23 @@ export const useChannelMembers = (channel: RtmChannel) => {
       )
    })
 
-   const sortedMembers = useMemo(() => data?.sort(sortMembers), [data])
+   // filter Recording Bot out of the list of members
+   const filteredMembers = useMemo(
+      () =>
+         data?.filter((member) => {
+            const isRecordBot = member.startsWith(STREAM_IDENTIFIERS.RECORDING)
+            if (isRecordBot) {
+               dispatch(setIsRecordingBotInRoom(true))
+            }
+            return !isRecordBot
+         }),
+      [data, dispatch]
+   )
+
+   const sortedMembers = useMemo(
+      () => filteredMembers?.sort(sortMembers),
+      [filteredMembers]
+   )
 
    return {
       members: sortedMembers,
