@@ -9,24 +9,12 @@ import { useMemo } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
 import { LinkedInIcon } from "../common/icons/LinkedInIcon"
 import CollapsibleText from "../common/inputs/CollapsibleText"
-import CircularLogo from "../common/logos/CircularLogo"
+import { SpeakerAvatar } from "./SpeakersAvatar"
 
 const styles = sxStyles({
    root: {
       flexDirection: "column",
       gap: "16px",
-   },
-   displayName: {
-      color: "neutral.900",
-      fontSize: "24px",
-      fontWeight: 600,
-      lineHeight: "36px",
-   },
-   position: {
-      color: "neutral.500",
-      fontSize: "14px",
-      fontWeight: 400,
-      lineHeight: "20px",
    },
    story: {
       color: "neutral.800",
@@ -71,33 +59,6 @@ const LinkedInButton = () => {
       <Stack sx={styles.linkedInButtonInnerContainer}>
          <LinkedInIcon fill={theme.brand.info[700]} />
          <Typography variant="small">Reach out on LinkedIn</Typography>
-      </Stack>
-   )
-}
-
-type SpeakerAvatarProps = {
-   companyName: string
-} & Pick<MentorDetailProps, "mentor">
-
-const SpeakerAvatar = ({ mentor, companyName }: SpeakerAvatarProps) => {
-   const mentorName = `${mentor.firstName ?? ""} ${mentor.lastName ?? ""}`
-
-   return (
-      <Stack spacing={0.75} direction="row" width="100%">
-         <CircularLogo
-            size={80}
-            src={mentor?.avatarUrl}
-            alt={`Avatar of ${mentorName}`}
-            objectFit="cover"
-         />
-         <Stack>
-            <Typography sx={styles.displayName} variant="h6">
-               {mentorName}
-            </Typography>
-            <Typography sx={styles.position} variant="body2">
-               {mentor.position} at <b>{companyName}</b>
-            </Typography>
-         </Stack>
       </Stack>
    )
 }
