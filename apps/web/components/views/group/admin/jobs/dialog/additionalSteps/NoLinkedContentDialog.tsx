@@ -7,7 +7,6 @@ import SteppedDialog, {
 } from "components/views/stepped-dialog/SteppedDialog"
 import { useCallback } from "react"
 import { AlertTriangle } from "react-feather"
-import { useFormContext } from "react-hook-form"
 import { JobDialogStep } from ".."
 
 const styles = sxStyles({
@@ -48,9 +47,6 @@ const styles = sxStyles({
 })
 
 const NoLinkContentDialog = () => {
-   const {
-      formState: { isSubmitting },
-   } = useFormContext()
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
@@ -66,6 +62,10 @@ const NoLinkContentDialog = () => {
          goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
       }
    }, [goToStep, group.publicSparks, groupHasUpcomingLivestreams, moveToPrev])
+
+   const handleNextClick = useCallback(() => {
+      goToStep(JobDialogStep.FORM_PREVIEW.key)
+   }, [goToStep])
 
    return (
       <SteppedDialog.Container
@@ -96,13 +96,10 @@ const NoLinkContentDialog = () => {
 
             <SteppedDialog.Actions sx={styles.actions}>
                <SteppedDialog.Button
-                  type="submit"
-                  form="custom-job-form"
                   variant="outlined"
                   color={"grey"}
                   sx={styles.btn}
-                  loading={isSubmitting}
-                  disabled={isSubmitting}
+                  onClick={handleNextClick}
                >
                   I&apos;ll do it later
                </SteppedDialog.Button>
