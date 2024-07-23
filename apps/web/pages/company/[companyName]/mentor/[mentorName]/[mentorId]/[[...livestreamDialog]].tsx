@@ -29,22 +29,12 @@ import {
 import { getLivestreamsAndDialogData, mapFromServerSide } from "util/serverUtil"
 
 const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    serverSideGroup,
    serverSideLivestreams,
    livestreamDialogData,
    sparks,
    creator,
 }) => {
-   // TODO: track page view (example below), move slug creation out of Mentor Card, make this pretty and fix carousels
-   /* 
-   const viewRef = useTrackPageView({
-      trackDocumentId: id,
-      handleTrack: ({ id, visitorId }: TrackProps) =>
-         trackCompanyPageView(id, visitorId),
-   }) as unknown as React.RefObject<HTMLDivElement>
-   */
-
    const deseralizedSparks = sparks
       ?.map(SparkPresenter.deserialize)
       .map(SparkPresenter.toFirebaseObject)
