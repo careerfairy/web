@@ -3,6 +3,7 @@ import { useAppDispatch } from "components/custom-hook/store"
 import { useEffect } from "react"
 import {
    setAudioLevels,
+   setAutoplayState,
    setRTCConnectionState,
    setRTMConnectionState,
    setViewCount,
@@ -49,10 +50,9 @@ export const AgoraTrackers = () => {
 
    useEffect(() => {
       AgoraRTC.onAutoplayFailed = () => {
-         // TODO: Handle autoplay failure
-         // ticket: https://linear.app/careerfairy/issue/CF-816/handle-videoaudio-track-autoplay-faliure
+         dispatch(setAutoplayState("failed"))
       }
-   }, [rtcClient])
+   }, [dispatch, rtcClient])
 
    useRTMChannelEvent(rtmChannel, "MemberCountUpdated", (newCount) => {
       dispatch(setViewCount(newCount))

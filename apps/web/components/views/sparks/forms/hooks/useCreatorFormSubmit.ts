@@ -1,7 +1,6 @@
 import { Creator, CreatorRole } from "@careerfairy/shared-lib/groups/creators"
 import useUploadCreatorAvatar from "components/custom-hook/creator/useUploadCreatorAvatar"
 import { groupRepo } from "data/RepositoryInstances"
-import { FormikHelpers } from "formik"
 import { useCallback, useMemo } from "react"
 
 export type CreatorFormValues = {
@@ -20,7 +19,12 @@ export type CreatorFormValues = {
 type UseCreatorFormSubmit = {
    handleSubmit: (
       values: CreatorFormValues,
-      formikHelpers: FormikHelpers<CreatorFormValues>
+      formMethods: {
+         setFieldError: (
+            field: keyof CreatorFormValues,
+            message: string
+         ) => void
+      }
    ) => Promise<void>
    progress: number
    uploading: boolean
@@ -40,13 +44,13 @@ type UseCreatorFormSubmit = {
  */
 const useCreatorFormSubmit = (
    groupId: string,
-   onSubmited: (creator: Creator) => void
+   onSubmited?: (creator: Creator) => void
 ): UseCreatorFormSubmit => {
    const { handleUploadFile, isLoading, uploading, progress } =
       useUploadCreatorAvatar(groupId)
 
    const handleSubmit = useCallback<UseCreatorFormSubmit["handleSubmit"]>(
-      async (values, { setSubmitting, setFieldError }) => {
+      async (values, { setFieldError }) => {
          let avatarUrl = values.avatarUrl
          const isEditing = Boolean(values?.id)
 
@@ -64,7 +68,6 @@ const useCreatorFormSubmit = (
             // If the email is not unique and we are trying to create a new creator
             // we set an error to the email field and prevent the form from being submitted
             setFieldError("email", "Email has already been taken")
-            setSubmitting(false)
             return
          }
 
@@ -91,8 +94,6 @@ const useCreatorFormSubmit = (
                roles: values.roles,
             })
          }
-
-         setSubmitting(false)
 
          if (onSubmited) {
             onSubmited(creator)

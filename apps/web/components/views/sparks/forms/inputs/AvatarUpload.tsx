@@ -57,7 +57,6 @@ const styles = sxStyles({
 })
 
 type Props = {
-   groupId: string
    name: string
    remoteUrl?: string
 }

@@ -81,6 +81,9 @@ export const LIVESTREAM_FIELDS_TO_INDEX = [
    "levelOfStudyNameTags",
    "startTimeMs",
    "companyIndustryNameTags",
+   "businessFunctionsTagIds",
+   "contentTopicsTagIds",
+   "linkedCustomJobsTagIds",
 ] satisfies (keyof TransformedLivestreamEvent)[]
 
 export type FieldToIndexType = (typeof LIVESTREAM_FIELDS_TO_INDEX)[number]
@@ -94,6 +97,9 @@ export const LIVESTREAM_SEARCHABLE_ATTRIBUTES = [
    "title",
    "company",
    "companyIndustryNameTags",
+   "businessFunctionsTagIds",
+   "contentTopicsTagIds",
+   "linkedCustomJobsTagIds",
 ] satisfies FieldToIndexType[]
 
 /**
@@ -114,12 +120,18 @@ export const LIVESTREAM_FILTERING_FIELDS = [
    "companyIndustries",
    "hasJobs",
    "startTimeMs",
+   "businessFunctionsTagIds",
+   "contentTopicsTagIds",
+   "linkedCustomJobsTagIds",
 ] satisfies FieldToIndexType[]
 
 type FilterFieldType = (typeof LIVESTREAM_FILTERING_FIELDS)[number]
 
 export type ArrayFilterFieldType = Extract<
    FilterFieldType,
+   | "businessFunctionsTagIds"
+   | "contentTopicsTagIds"
+   | "linkedCustomJobsTagIds"
    | "fieldOfStudyIdTags"
    | "levelOfStudyIdTags"
    | "groupIds"

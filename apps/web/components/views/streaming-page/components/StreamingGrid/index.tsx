@@ -1,20 +1,25 @@
-import { sxStyles } from "types/commonTypes"
-import { Stack } from "@mui/material"
-import React from "react"
-import { Gallery } from "./gallery/Gallery"
+import { Box, Stack } from "@mui/material"
+import { TrackBoundary } from "agora-rtc-react"
 import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
-import { useStreams } from "./useStreams"
-import { useSpotlightStream } from "./useSpotlightStream"
+import { sxStyles } from "types/commonTypes"
+import { ClickToHearOverlay } from "./ClickToHearOverlay"
 import { Spotlight } from "./Spotlight/Spotlight"
-import { TrackBoundary } from "agora-rtc-react"
+import { Gallery } from "./gallery/Gallery"
+import { useSpotlightStream } from "./useSpotlightStream"
+import { useStreams } from "./useStreams"
 
 const styles = sxStyles({
    root: {
       flex: 1,
       display: "flex",
+      position: "relative",
+   },
+   content: {
+      width: "100%",
+      height: "100%",
    },
 })
 
@@ -28,15 +33,18 @@ export const StreamingGrid = () => {
    const spacing = isLandscape ? 0.75 : isMobile ? 1.125 : 1.25
 
    return (
-      <TrackBoundary>
-         <Stack
-            direction={isLandscape ? "row-reverse" : "column"}
-            sx={styles.root}
-            spacing={spacing}
-         >
-            <Gallery spacing={spacing} streams={otherStreams} />
-            <Spotlight stream={spotlightStream} />
-         </Stack>
-      </TrackBoundary>
+      <Box sx={styles.root}>
+         <TrackBoundary>
+            <Stack
+               direction={isLandscape ? "row-reverse" : "column"}
+               sx={styles.content}
+               spacing={spacing}
+            >
+               <Gallery spacing={spacing} streams={otherStreams} />
+               <Spotlight stream={spotlightStream} />
+            </Stack>
+         </TrackBoundary>
+         <ClickToHearOverlay />
+      </Box>
    )
 }

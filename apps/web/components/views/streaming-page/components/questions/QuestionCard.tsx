@@ -11,7 +11,7 @@ import { useStreamingContext } from "../../context"
 import { CommentInput } from "./CommentInput"
 import { CommentsList } from "./CommentsList"
 import { useQuestionsVisibilityControls } from "./QuestionOptionsMenu"
-import { useQuestionsListContext } from "./QuestionsLisProvider"
+import { useQuestionsListContext } from "./QuestionsListProvider"
 import { ToggleUpvoteButton } from "./ToggleUpvoteButton"
 
 export const questionCardStyles = sxStyles({

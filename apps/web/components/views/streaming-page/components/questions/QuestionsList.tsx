@@ -2,7 +2,6 @@ import { Collapse, Stack, useTheme } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useStreamIsLandscape } from "components/custom-hook/streaming"
 import { useLivestreamQuestions } from "components/custom-hook/streaming/question/useLivestreamQuestions"
-import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import { SwipeablePanel } from "materialUI/GlobalPanels/GlobalPanels"
 import { memo, useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
@@ -13,7 +12,7 @@ import { useStreamingContext } from "../../context"
 import { QuestionTab } from "./PanelTabs"
 import { QuestionCard } from "./QuestionCard"
 import { QuestionCardSkeleton } from "./QuestionCardSkeleton"
-import QuestionsListContextProvider from "./QuestionsLisProvider"
+import QuestionsListContextProvider from "./QuestionsListProvider"
 import { MIN_QUESTIONS_TO_SHOW } from "./util"
 
 type Props = {
@@ -24,7 +23,6 @@ type Props = {
 }
 
 export const QuestionsList = memo((props: Props) => {
-   useTraceUpdate(props)
    const {
       tabValue,
       setTabValue,

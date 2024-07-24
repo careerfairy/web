@@ -50,6 +50,8 @@ export interface StreamingAppState {
       activeView: ActiveView
    }
    isHost: boolean
+   speakerId: string | null
+   userUid: string | null
    streamLayout: StreamLayout
    settingsMenu: {
       isOpen: boolean
@@ -89,6 +91,8 @@ export interface StreamingAppState {
       handRaiseEnabled: boolean
       hasJobs: boolean
       test: boolean
+      isRecordingWindow: boolean
+      isRecordingBotInRoom: boolean
    } | null
    rtmSignalingState: {
       failedToConnect: boolean
@@ -111,6 +115,8 @@ export interface StreamingAppState {
    }[]
    virtualBackgroundMode: VirtualBackgroundMode
    isLoggedInOnDifferentBrowser: boolean
+   isSpyMode: boolean
+   autoplayState: "failed" | "should-play-again" | "playing"
 }
 
 const initialState: StreamingAppState = {
@@ -119,6 +125,8 @@ const initialState: StreamingAppState = {
       activeView: ActiveViews.CHAT, // 'chat', 'polls', 'questions', etc.
    },
    isHost: false,
+   speakerId: null,
+   userUid: null,
    streamLayout: StreamLayouts.GALLERY,
    settingsMenu: {
       isOpen: false,
@@ -142,6 +150,8 @@ const initialState: StreamingAppState = {
       numberOfHandRaiseNotifications: 0,
       hasJobs: false,
       test: false,
+      isRecordingWindow: false,
+      isRecordingBotInRoom: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -154,6 +164,8 @@ const initialState: StreamingAppState = {
    emotes: [],
    virtualBackgroundMode: VirtualBackgroundMode.OFF,
    isLoggedInOnDifferentBrowser: false,
+   isSpyMode: false,
+   autoplayState: "playing",
 }
 
 const streamingAppSlice = createSlice({
@@ -383,6 +395,30 @@ const streamingAppSlice = createSlice({
       ) {
          state.virtualBackgroundMode = action.payload
       },
+
+      setIsRecordingWindow(state, action: PayloadAction<boolean>) {
+         state.livestreamState.isRecordingWindow = action.payload
+      },
+      setIsRecordingBotInRoom(state, action: PayloadAction<boolean>) {
+         state.livestreamState.isRecordingBotInRoom = action.payload
+      },
+      setIsSpyMode(state, action: PayloadAction<boolean>) {
+         state.isSpyMode = action.payload
+      },
+      setSpeakerId(state, action: PayloadAction<string | null>) {
+         state.speakerId = action.payload
+         state.userUid = null
+      },
+      setUserUid(state, action: PayloadAction<string | null>) {
+         state.userUid = action.payload
+         state.speakerId = null
+      },
+      setAutoplayState(
+         state,
+         action: PayloadAction<StreamingAppState["autoplayState"]>
+      ) {
+         state.autoplayState = action.payload
+      },
    },
 })
 
@@ -421,6 +457,12 @@ export const {
       removeEmote,
       clearEmotes,
       setVirtualBackgroundMode,
+      setIsRecordingWindow,
+      setIsRecordingBotInRoom,
+      setIsSpyMode,
+      setSpeakerId,
+      setUserUid,
+      setAutoplayState,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice

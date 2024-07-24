@@ -53,7 +53,7 @@ export const createSpark = functions.region(config.region).https.onCall(
          try {
             const group = context.middlewares.group as Group
 
-            const creator = await groupRepo.getCreatorById(
+            const creator = await groupRepo.getCreatorByGroupAndId(
                group.id,
                data.creatorId
             )
@@ -93,7 +93,7 @@ export const updateSpark = functions.region(config.region).https.onCall(
          try {
             const group = context.middlewares.group as Group
 
-            const creator = await groupRepo.getCreatorById(
+            const creator = await groupRepo.getCreatorByGroupAndId(
                group.id,
                data.creatorId
             )

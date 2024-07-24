@@ -1,11 +1,10 @@
-import React from "react"
-import { FloatingContent } from "./VideoTrackWrapper"
-import { sxStyles } from "types/commonTypes"
 import { Box, Grow, Stack, Typography } from "@mui/material"
-import { MicOff, Info } from "react-feather"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import { MicOff } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 import { getStreamerDisplayName } from "../../util"
+import { FloatingContent } from "./VideoTrackWrapper"
 
 const styles = sxStyles({
    root: {
@@ -71,7 +70,7 @@ export const DetailsOverlay = ({
                   <Grow in={!micActive} unmountOnExit>
                      <Box sx={styles.micOff} component={MicOff} />
                   </Grow>
-                  <Info />
+                  {/* <Info /> */}
                </Stack>
             )}
          </Stack>

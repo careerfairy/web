@@ -3,6 +3,7 @@ import {
    CreatorRole,
    CreatorRoles,
 } from "@careerfairy/shared-lib/groups/creators"
+import { CreateCreatorSchema } from "@careerfairy/shared-lib/groups/schemas"
 import { Grid } from "@mui/material"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { EMAIL_TOOLTIP_INFO } from "constants/pages"
@@ -13,7 +14,6 @@ import useCreatorFormSubmit, {
    CreatorFormValues,
 } from "./hooks/useCreatorFormSubmit"
 import AvatarUpload from "./inputs/AvatarUpload"
-import CreateCreatorSchema from "./schemas/CreateCreatorSchema"
 
 const styles = sxStyles({
    avaGrid: {
@@ -64,7 +64,6 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                   <Grid sx={styles.avaGrid} item xs={12}>
                      <AvatarUpload
                         name="avatarFile"
-                        groupId={groupId}
                         remoteUrl={creator?.avatarUrl}
                      />
                   </Grid>
@@ -148,7 +147,7 @@ const getInitialRolesValues = (creator: Creator): CreatorRole[] => {
    return hasSparkRole ? creator.roles : [...creator.roles, CreatorRoles.Spark]
 }
 
-const getInitialValues = (creator?: Creator): CreatorFormValues => ({
+export const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    avatarUrl: creator?.avatarUrl || "",
    avatarFile: null,
    firstName: creator?.firstName || "",

@@ -1,9 +1,9 @@
-import { useCallback, useState, useMemo } from "react"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import {
    MAX_TAB_VALUE,
    TAB_VALUES,
 } from "components/views/group/admin/events/detail/form/commons"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { useCallback, useMemo, useState } from "react"
 import {
    livestreamFormGeneralTabSchema,
    livestreamFormSpeakersTabSchema,

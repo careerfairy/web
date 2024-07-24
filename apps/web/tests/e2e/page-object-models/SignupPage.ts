@@ -1,8 +1,8 @@
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import { expect, Locator, Page } from "@playwright/test"
+import { credentials } from "../../constants"
 import { sleep } from "../utils"
 import { CommonPage } from "./CommonPage"
-import { credentials } from "../../constants"
-import UserSeed from "@careerfairy/seed-data/dist/users"
 
 export class SignupPage extends CommonPage {
    readonly page: Page
@@ -49,7 +49,6 @@ export class SignupPage extends CommonPage {
    readonly interestsInformationStep: Locator
    readonly spokenLanguagesInput: Locator
    readonly countriesOfInterestInput: Locator
-   readonly interestsInput: Locator
    readonly isLookingForJobToggle: Locator
 
    constructor(page: Page) {
@@ -148,7 +147,6 @@ export class SignupPage extends CommonPage {
       )
       this.spokenLanguagesInput = page.locator("id=spokenLanguages")
       this.countriesOfInterestInput = page.locator("id=countriesOfInterest")
-      this.interestsInput = page.locator("id=interestsIds")
       this.isLookingForJobToggle = page.locator("id=isLookingForJob")
    }
 
@@ -228,12 +226,16 @@ export class SignupPage extends CommonPage {
          ?.click()
       await this.countriesOfInterestInput.click()
    }
-   async selectInterestsInputOption(optionId: string) {
-      await this.interestsInput.click()
+   async selectBusinessFunctionTagInputOption(optionId: string) {
       await this.page
-         .locator(`data-testid=interestsIds_${optionId}_option`)
+         .locator(`data-testid=businessFunctionsTagIds_${optionId}_option`)
          ?.click()
-      await this.interestsInput.click()
+   }
+
+   async selectContentTopicTagInputOption(optionId: string) {
+      await this.page
+         .locator(`data-testid=contentTopicsTagIds_${optionId}_option`)
+         ?.click()
    }
    async selectIsLookingForJobToggleOption() {
       return this.isLookingForJobToggle.click()

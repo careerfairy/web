@@ -196,6 +196,7 @@ const NewStreamModal = ({
 
       try {
          setSubmitting(true)
+
          livestream = buildLivestreamObject(
             values,
             updateMode,
