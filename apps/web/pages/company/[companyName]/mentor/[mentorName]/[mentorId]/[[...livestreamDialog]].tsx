@@ -47,10 +47,7 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
          />
 
          <GenericDashboardLayout>
-            <Box
-               sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
-               //ref={viewRef}
-            >
+            <Box sx={{ backgroundColor: "inherit", minHeight: "100vh" }}>
                <MentorDetailPage
                   group={serverSideGroup}
                   mentor={creator}
