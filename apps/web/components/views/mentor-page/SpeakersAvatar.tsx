@@ -33,6 +33,7 @@ export const SpeakerAvatar = ({ mentor, companyName }: SpeakerAvatarProps) => {
             src={mentor?.avatarUrl}
             alt={`Avatar of ${mentorName}`}
             objectFit="cover"
+            key={mentor.avatarUrl}
          />
          <Stack>
             <Typography sx={styles.displayName} variant="h6">
