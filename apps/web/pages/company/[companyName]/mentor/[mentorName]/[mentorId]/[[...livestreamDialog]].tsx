@@ -84,7 +84,11 @@ export const getStaticProps: GetStaticProps<{
                serverSideUpcomingLivestreams,
                serverSidePastLivestreams,
                livestreamDialogData,
-            } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx)
+            } = await getLivestreamsAndDialogData(
+               serverSideGroup?.groupId,
+               ctx,
+               true
+            )
 
             const hasJobs =
                (await customJobRepo.getGroupJobs(serverSideGroup.groupId))

@@ -100,7 +100,11 @@ export const getStaticProps: GetStaticProps<{
                serverSideUpcomingLivestreams,
                serverSidePastLivestreams,
                livestreamDialogData,
-            } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx)
+            } = await getLivestreamsAndDialogData(
+               serverSideGroup?.groupId,
+               ctx,
+               true
+            )
 
             const creators = await groupRepo.getCreatorsWithPublicContent(
                serverSideGroup?.groupId
