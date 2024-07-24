@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { VideoEncoderConfigurationPreset } from "agora-rtc-react"
 import AgoraRTC, {
    IAgoraRTCClient,
    ILocalAudioTrack,
@@ -723,7 +724,7 @@ function disableDualStream(client: IAgoraRTCClient) {
  */
 export function getVideoEncoderPreset(
    withHighQuality: string | string[]
-): string {
+): VideoEncoderConfigurationPreset {
    if (!withHighQuality) return "480p_9"
 
    if (/^\d{3,4}p(_\d)?$/.test(withHighQuality + "")) {

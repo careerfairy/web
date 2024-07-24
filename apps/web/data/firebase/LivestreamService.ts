@@ -5,7 +5,6 @@ import {
    AgoraRTMTokenRequest,
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
    CreateLivestreamPollRequest,
    DeleteLivestreamChatEntryRequest,
@@ -30,9 +29,11 @@ import {
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
    ResetLivestreamQuestionRequest,
+   Speaker,
    StreamerDetails,
    ToggleHandRaiseRequest,
    UpdateLivestreamPollRequest,
+   UpsertSpeakerRequest,
    UserLivestreamData,
    hasUpvotedLivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
@@ -54,10 +55,8 @@ import {
    arrayRemove,
    arrayUnion,
    collection,
-   collectionGroup,
    deleteDoc,
    doc,
-   documentId,
    getDoc,
    getDocs,
    increment,
@@ -247,38 +246,47 @@ export class LivestreamService {
       return null
    }
 
-   private async getCreatorDetails(
-      identifier: string
+   private async getLivestreamSpeakerDetails(
+      speakerId: string,
+      livestreamId: string
    ): Promise<StreamerDetails | null> {
-      const creatorQuery = query(
-         collectionGroup(FirestoreInstance, "creators"),
-         where(documentId(), "==", identifier),
-         limit(1)
-      ).withConverter(createGenericConverter<Creator>())
+      const livestream = await getDoc(this.getLivestreamRef(livestreamId))
 
-      const snapshot = await getDocs(creatorQuery)
+      if (livestream.exists) {
+         const data = livestream.data()
 
-      if (!snapshot.empty) {
-         const data = snapshot.docs[0].data()
+         const allSpeakers = (data?.speakers || []).concat(
+            data?.adHocSpeakers || []
+         )
+         const speaker = allSpeakers.find((speaker) => speaker.id === speakerId)
 
-         return {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            role: data.position,
-            avatarUrl: data.avatarUrl,
-            linkedInUrl: data.linkedInUrl,
+         if (speaker) {
+            return {
+               firstName: speaker.firstName,
+               lastName: speaker.lastName,
+               role: speaker.position,
+               avatarUrl: speaker.avatar,
+               linkedInUrl: speaker.linkedInUrl,
+            }
          }
       }
 
       return null
    }
 
-   private getTagAndIdentifierFromUid(uid: string): [StreamIdentifier, string] {
-      return uid.split("-") as [StreamIdentifier, string]
+   private getTagAndIdentifierFromUid(
+      uid: string
+   ): [StreamIdentifier, string, string] {
+      return uid.split("-") as [
+         StreamIdentifier,
+         string, // Identifier is the speaker/user id
+         string // Live stream id
+      ]
    }
 
    async getStreamerDetails(uid: string): Promise<StreamerDetails> {
-      const [tag, identifier] = this.getTagAndIdentifierFromUid(uid)
+      const [tag, identifier, livestreamId] =
+         this.getTagAndIdentifierFromUid(uid)
       let details: StreamerDetails | null = null
 
       switch (tag) {
@@ -291,8 +299,12 @@ export class LivestreamService {
                linkedInUrl: "",
             }
             break
-         case STREAM_IDENTIFIERS.CREATOR:
-            details = await this.getCreatorDetails(identifier)
+         case STREAM_IDENTIFIERS.SPEAKER:
+            details = await this.getLivestreamSpeakerDetails(
+               identifier,
+               livestreamId
+            )
+
             break
          case STREAM_IDENTIFIERS.USER:
             details = await this.getUserDetails(identifier)
@@ -307,11 +319,14 @@ export class LivestreamService {
                ""
             )
 
-            const [userTag, userIdentifier] =
+            const [userTag, userIdentifier, userLivestreamId] =
                this.getTagAndIdentifierFromUid(userUid)
 
-            if (userTag === STREAM_IDENTIFIERS.CREATOR) {
-               details = await this.getCreatorDetails(userIdentifier)
+            if (userTag === STREAM_IDENTIFIERS.SPEAKER) {
+               details = await this.getLivestreamSpeakerDetails(
+                  userIdentifier,
+                  userLivestreamId
+               )
             }
             if (userTag === STREAM_IDENTIFIERS.USER) {
                details = await this.getUserDetails(userIdentifier)
@@ -1197,6 +1212,26 @@ export class LivestreamService {
          timestamp: Timestamp.now(),
          user: { ...userData },
       })
+   }
+
+   toggleNewUI = async (livestreamId: string) => {
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+      const livestreamDoc = await getDoc(livestreamRef)
+      if (livestreamDoc.exists) {
+         return updateDoc(livestreamRef, {
+            useNewUI: !livestreamDoc.data().useNewUI,
+         })
+      }
+   }
+
+   /**
+    * Updates or adds a live stream speaker, including related creator updates and last-minute profiles for hosts.
+    */
+   async upsertLivestreamSpeaker(data: UpsertSpeakerRequest) {
+      return httpsCallable<UpsertSpeakerRequest, Speaker>(
+         this.functions,
+         "upsertLivestreamSpeaker"
+      )(data)
    }
 }
 

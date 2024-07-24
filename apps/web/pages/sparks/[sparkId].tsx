@@ -4,29 +4,32 @@ import {
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Button } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import SparksFeedCarousel from "components/views/sparks-feed/SparksFeedCarousel"
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import SparkSeo from "components/views/sparks/components/SparkSeo"
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
-import SparksFeedCarousel from "components/views/sparks-feed/SparksFeedCarousel"
-import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { useMountedState } from "react-use"
 import {
+   AddCardNotificationPayload,
+   addCardNotificationToSparksList,
    fetchInitialSparksFeed,
    fetchNextSparks,
    removeGroupId,
+   removeNotificationsByType,
    resetSparksFeed,
+   setContentTopicIds,
+   setConversionCardInterval,
    setGroupId,
+   setInteractionSource,
    setOriginalSparkId,
    setSparks,
    setUserEmail,
-   setConversionCardInterval,
-   AddCardNotificationPayload,
-   addCardNotificationToSparksList,
-   removeNotificationsByType,
-   setInteractionSource,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
@@ -39,8 +42,6 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
-import { useMountedState } from "react-use"
-import { useAuth } from "HOCs/AuthProvider"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -50,6 +51,7 @@ const SparksPage: NextPage<
    userEmail,
    conversionInterval,
    interactionSource,
+   contentTopic,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const mounted = useMountedState()
@@ -75,6 +77,18 @@ const SparksPage: NextPage<
       dispatch(setSparks([originalSpark]))
       dispatch(setOriginalSparkId(originalSpark.id))
    }, [dispatch, groupId, serializedSpark, userEmail])
+
+   useEffect(() => {
+      if (!contentTopic) {
+         dispatch(setContentTopicIds([]))
+      } else {
+         dispatch(setContentTopicIds([contentTopic]))
+      }
+
+      return () => {
+         dispatch(setContentTopicIds([]))
+      }
+   }, [dispatch, contentTopic])
 
    useEffect(() => {
       const validConversionInterval =
@@ -241,6 +255,7 @@ type SparksPageProps = {
    userEmail: string | null
    conversionInterval: number
    interactionSource: string | null
+   contentTopic: string
 }
 
 export const getServerSideProps: GetServerSideProps<
@@ -260,6 +275,10 @@ export const getServerSideProps: GetServerSideProps<
 
    const interactionSource = context.query.interactionSource
       ? context.query.interactionSource.toString()
+      : null
+
+   const contentTopic = context.query.contentTopic
+      ? context.query.contentTopic.toString()
       : null
 
    const token = getUserTokenFromCookie(context)
@@ -284,6 +303,7 @@ export const getServerSideProps: GetServerSideProps<
          userEmail: token?.email ?? null,
          conversionInterval: +conversionInterval,
          interactionSource,
+         contentTopic: contentTopic,
       },
    }
 }

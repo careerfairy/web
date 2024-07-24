@@ -1,6 +1,6 @@
 import {
-   dummyLevelsOfStudy,
    dummyFieldsOfStudy,
+   dummyLevelsOfStudy,
 } from "@careerfairy/seed-data/dist/fieldsOfStudy"
 
 export const credentials = {
@@ -20,7 +20,8 @@ export const credentials = {
    spokenLanguagesIds: ["en", "pt", "de"],
    countriesOfInterestIds: ["GB", "PT", "DE"],
    regionsOfInterestIds: ["asia", "africa"],
-   interestsIds: ["Le9yVcgRtkReAdwyh6tq"],
+   businessFunctionsTagIds: ["SupplyChainLogistics"],
+   contentTopicsTagIds: ["DayInTheLife"],
    correctFieldOfStudyName: dummyFieldsOfStudy[0].name,
    correctLevelOfStudyName: dummyLevelsOfStudy[0].name,
 }

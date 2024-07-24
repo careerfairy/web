@@ -1,4 +1,5 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { TagsLookup } from "@careerfairy/shared-lib/constants/tags"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { Group } from "@careerfairy/shared-lib/groups"
@@ -38,7 +39,6 @@ import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
-import { useInterests } from "../../custom-hook/useCollection"
 import { copyStringToClipboard } from "../../helperFunctions/HelperFunctions"
 import {
    getStreamSubCollectionSpeakers,
@@ -51,7 +51,6 @@ import {
    SUBMIT_FOR_APPROVAL,
 } from "../../util/constants"
 import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
-import EventCategoriesInfo from "./StreamForm/EventCategoriesInfo"
 import HostAndQuestionsInfo from "./StreamForm/HostAndQuestionsInfo"
 import SpeakersInfo from "./StreamForm/SpeakersInfo"
 import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
@@ -150,7 +149,6 @@ export const getLivestreamInitialValues = (group: Group) => ({
    company: group?.universityCode ? "" : group?.universityName || "",
    companyId: "",
    title: "",
-   interestsIds: [],
    groupIds: [],
    start: new Date(),
    groupQuestionsMap: {},
@@ -161,6 +159,8 @@ export const getLivestreamInitialValues = (group: Group) => ({
    reasonsToJoinLivestream_v2: [],
    speakers: { [uuidv4()]: speakerObj },
    creatorsIds: [],
+   contentTopicsTagIds: [],
+   businessFunctionsTagIds: [],
    status: {},
    language: languageCodes[0],
    targetFieldsOfStudy: [],
@@ -215,7 +215,6 @@ export interface DraftFormValues {
    company: string
    companyId: string
    title: string
-   interestsIds: string[]
    groupIds: string[]
    start: Date
    groupQuestionsMap: LivestreamGroupQuestionsMap
@@ -234,6 +233,8 @@ export interface DraftFormValues {
    }
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: FieldOfStudy[]
+   contentTopicsTagIds: OptionGroup[]
+   businessFunctionsTagIds: OptionGroup[]
    promotionChannelsCodes: OptionGroup[]
    promotionCountriesCodes: OptionGroup[]
    promotionUniversitiesCodes: OptionGroup[]
@@ -267,7 +268,6 @@ const DraftStreamForm = ({
    const targetStudentsRef = useRef(null)
    // const promotionInfoRef = useRef(null)
    const questionsInfoRef = useRef(null)
-   const eventCategoriesInfoRef = useRef(null)
    const jobInfoRef = useRef(null)
    const navRef = useRef(null)
 
@@ -277,9 +277,7 @@ const DraftStreamForm = ({
             { label: "Stream Info", ref: streamInfoRef },
             { label: "Speakers", ref: speakersInfoRef },
             { label: "Target Students", ref: targetStudentsRef },
-            // { label: "Promotion", ref: promotionInfoRef },
             { label: "Jobs", ref: jobInfoRef },
-            { label: "Event Categories", ref: eventCategoriesInfoRef },
          ] as IStreamFormNavigatorSteps[],
       []
    )
@@ -300,7 +298,6 @@ const DraftStreamForm = ({
    } as StyleProps)
 
    const [selectedGroups, setSelectedGroups] = useState<Group[]>([])
-   const [selectedInterests, setSelectedInterests] = useState([])
    const [selectedJobs, setSelectedJobs] = useState<LivestreamJobAssociation[]>(
       []
    )
@@ -309,8 +306,6 @@ const DraftStreamForm = ({
    const [updateMode, setUpdateMode] = useState(false)
    const { formHasChanged, setFormHasChanged, showPromotionInputs } =
       useStreamCreationProvider()
-
-   const { data: existingInterests } = useInterests()
 
    const [draftId, setDraftId] = useState("")
 
@@ -423,7 +418,12 @@ const DraftStreamForm = ({
                   companyId: livestream.companyId || "",
                   title: livestream.title || "",
                   groupIds: livestream.groupIds || [],
-                  interestsIds: livestream.interestsIds || [],
+                  contentTopicsTagIds: (
+                     livestream.contentTopicsTagIds || []
+                  ).map((tagId) => TagsLookup[tagId]),
+                  businessFunctionsTagIds: (
+                     livestream.businessFunctionsTagIds || []
+                  ).map((tagId) => TagsLookup[tagId]),
                   start: livestream.start.toDate() || new Date(),
                   groupQuestionsMap: livestream.groupQuestionsMap || {},
                   duration:
@@ -465,11 +465,6 @@ const DraftStreamForm = ({
                   await handleSetGroupIds([], livestream.groupIds, newFormData)
                }
                setSelectedJobs(livestream.jobs || [])
-               setSelectedInterests(
-                  existingInterests.filter((i) =>
-                     newFormData.interestsIds.includes(i.id)
-                  )
-               )
                setUpdateMode(true)
             } else {
                setUpdateMode(false)
@@ -486,7 +481,7 @@ const DraftStreamForm = ({
          })()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [draftStreamId, router, submitted, existingInterests])
+   }, [draftStreamId, router, submitted])
 
    // to handle the visibility of the Host and Questions Steps
    useEffect(() => {
@@ -902,19 +897,6 @@ const DraftStreamForm = ({
                                     groupId={group?.id}
                                     classes={classes}
                                     sectionRef={questionsInfoRef}
-                                 />
-
-                                 <EventCategoriesInfo
-                                    setSelectedInterests={setSelectedInterests}
-                                    selectedInterests={selectedInterests}
-                                    existingInterests={existingInterests}
-                                    isSubmitting={isSubmitting}
-                                    setFieldValue={setFieldValue}
-                                    classes={classes}
-                                    sectionRef={eventCategoriesInfoRef}
-                                    errors={errors}
-                                    touched={touched}
-                                    handleBlur={handleBlur}
                                  />
 
                                  <Box

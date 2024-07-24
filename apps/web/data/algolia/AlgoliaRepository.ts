@@ -1,8 +1,9 @@
 import { SearchResponse } from "@algolia/client-search"
 import { LivestreamReplicaType } from "@careerfairy/shared-lib/livestreams/search"
+import { SparkReplicaType } from "@careerfairy/shared-lib/sparks/search"
 import { Wish } from "@careerfairy/shared-lib/wishes"
 import { SearchClient, SearchIndex } from "algoliasearch"
-import { AlgoliaLivestreamResponse } from "types/algolia"
+import { AlgoliaLivestreamResponse, AlgoliaSparkResponse } from "types/algolia"
 import { getWorkflowId, isTestEnvironment } from "util/CommonUtil"
 import { SortType } from "../../components/views/common/filter/FilterMenu"
 import algoliaSearchClient from "./AlgoliaInstance"
@@ -17,8 +18,17 @@ export interface IAlgoliaRepository {
       query: string,
       filters: string,
       page: number,
-      targetReplica?: LivestreamReplicaType
+      targetReplica?: LivestreamReplicaType,
+      itemsPerPage?: number
    ): Promise<SearchResponse<AlgoliaLivestreamResponse>>
+
+   searchSparks(
+      query: string,
+      filters: string,
+      page: number,
+      targetReplica?: SparkReplicaType,
+      itemsPerPage?: number
+   ): Promise<SearchResponse<AlgoliaSparkResponse>>
 }
 interface SearchWishesOptions {
    sortType?: SortType
@@ -69,7 +79,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
       query: string,
       filters: string,
       page: number,
-      targetReplica?: LivestreamReplicaType
+      targetReplica?: LivestreamReplicaType,
+      itemsPerPage?: number
    ) {
       const index = initAlgoliaIndex(
          targetReplica ? targetReplica : "livestreams"
@@ -79,7 +90,26 @@ class AlgoliaRepository implements IAlgoliaRepository {
          index,
          query,
          filters,
-         page
+         page,
+         itemsPerPage
+      )
+   }
+
+   async searchSparks(
+      query: string,
+      filters: string,
+      page: number,
+      targetReplica?: SparkReplicaType,
+      itemsPerPage?: number
+   ) {
+      const index = initAlgoliaIndex(targetReplica ? targetReplica : "sparks")
+
+      return handleSearch<AlgoliaSparkResponse>(
+         index,
+         query,
+         filters,
+         page,
+         itemsPerPage
       )
    }
 }
@@ -91,7 +121,8 @@ const handleSearch = <AlgoliaResponseType>(
    index: SearchIndex,
    query: string,
    filters: string,
-   page: number
+   page: number,
+   itemsPerPage?: number
 ) => {
    const isTest = isTestEnvironment()
    const workflowId = getWorkflowId()
@@ -102,6 +133,7 @@ const handleSearch = <AlgoliaResponseType>(
    }
 
    return index.search<AlgoliaResponseType>(query, {
+      hitsPerPage: itemsPerPage,
       filters: (isTest ? `workflowId:${workflowId} AND ` : "") + filters,
       page,
       cacheable: !isTest, // Disable caching for test environments as time is limited

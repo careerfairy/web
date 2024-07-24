@@ -9,10 +9,6 @@ businessFunctionsTagIds?: string[]
 contentTopicsTagIds?: string[]
 ```
 
-## Rules
-
-Based on old interests the user data shall be updated with new tag category values.
-
 ## Run
 
 ```sh

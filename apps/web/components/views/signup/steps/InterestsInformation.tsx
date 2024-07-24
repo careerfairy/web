@@ -1,100 +1,56 @@
-import { sxStyles } from "../../../../types/commonTypes"
-import { Grid, Typography } from "@mui/material"
-import React, { useCallback, useEffect, useState } from "react"
-import MultiListSelect from "../../common/MultiListSelect"
-import { useInterests } from "../../../custom-hook/useCollection"
-import { useAuth } from "../../../../HOCs/AuthProvider"
 import {
-   formatToOptionArray,
-   mapOptions,
-   multiListSelectMapValueFn,
-} from "../utils"
-import { userRepo } from "../../../../data/RepositoryInstances"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+   BusinessFunctionsTagValues,
+   ContentTopicsTagValues,
+} from "@careerfairy/shared-lib/constants/tags"
+import { sxStyles } from "@careerfairy/shared-ui"
+import { Stack } from "@mui/material"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { TagsSelector } from "../userInformation/tags/TagsSelector"
+
+const BUSINESS_FUNCTIONS_INTERESTS_LABEL =
+   "What kind of work are you excited about?"
+
+const CONTENT_TOPIC_INTERESTS_LABEL =
+   "Choose the topics that spark your curiosity!"
 
 const styles = sxStyles({
-   inputLabel: {
+   label: {
+      color: (theme) => theme.palette.neutral[900],
+      fontFamily: "Poppins",
+      fontSize: "11.2px",
+      fontStyle: "normal",
+      fontWeight: "700",
+      lineHeight: "14.94px",
       textTransform: "uppercase",
-      fontSize: "0.8rem !important",
-      fontWeight: "bold",
    },
 })
-
-const SELECTED_INTERESTS_FIELD_NAME = "interestsIds"
-
 const InterestsInformation = () => {
-   const { data: allInterests } = useInterests()
-   const { authenticatedUser: user, userData } = useAuth()
-
-   const [inputValues, setInputValues] = useState({
-      [SELECTED_INTERESTS_FIELD_NAME]: [] as OptionGroup[],
-   })
-
-   useEffect(() => {
-      if (userData) {
-         const { interestsIds } = userData
-
-         setInputValues({
-            [SELECTED_INTERESTS_FIELD_NAME]: formatToOptionArray(
-               interestsIds,
-               allInterests
-            ),
-         })
-      }
-   }, [userData, allInterests])
-
-   const handleSelectedInterestsChange = useCallback(
-      async (name: string, selectedInterests: OptionGroup[]) => {
-         try {
-            await userRepo.updateAdditionalInformation(user.email, {
-               [name]: mapOptions(selectedInterests),
-            })
-         } catch (error) {
-            console.log(error)
-         }
-      },
-      [user.email]
-   )
+   const { userData } = useAuth()
 
    return (
-      <>
-         <Grid
-            container
+      <ConditionalWrapper condition={Boolean(userData)}>
+         <Stack
+            gap={"16px"}
+            direction={"column"}
             spacing={2}
-            justifyContent="center"
-            data-testid="registration-interests-information-step"
+            data-testid={"registration-interests-information-step"}
          >
-            <Grid item xs={12} sm={8}>
-               <Typography sx={styles.inputLabel} variant="h5">
-                  Select your interests
-               </Typography>
-            </Grid>
-            <Grid item xs={12} sm={8}>
-               <MultiListSelect
-                  inputName={SELECTED_INTERESTS_FIELD_NAME}
-                  isCheckbox
-                  limit={5}
-                  selectedItems={inputValues[SELECTED_INTERESTS_FIELD_NAME]}
-                  allValues={allInterests}
-                  setFieldValue={handleSelectedInterestsChange}
-                  inputProps={multiSelectInputProps}
-                  getValueFn={multiListSelectMapValueFn}
-                  chipProps={multiSelectChipProps}
-               />
-            </Grid>
-         </Grid>
-      </>
+            <TagsSelector
+               tags={ContentTopicsTagValues}
+               field="contentTopicsTagIds"
+               label={CONTENT_TOPIC_INTERESTS_LABEL}
+               labelSx={styles.label}
+            />
+            <TagsSelector
+               tags={BusinessFunctionsTagValues}
+               field="businessFunctionsTagIds"
+               label={BUSINESS_FUNCTIONS_INTERESTS_LABEL}
+               labelSx={styles.label}
+            />
+         </Stack>
+      </ConditionalWrapper>
    )
-}
-
-const multiSelectInputProps = {
-   label: "Select 5 to improve your site experience",
-   placeholder: "Select from the following list",
-   className: "registrationInput",
-}
-
-const multiSelectChipProps = {
-   color: "primary",
 }
 
 export default InterestsInformation

@@ -14,7 +14,9 @@ import {
    DeletedSpark,
    SeenSparks,
    Spark,
+   SparkCategoriesToTagValuesMapper,
    SparkStats,
+   TagValuesToSparkCategoriesMapper,
    UpdateSparkData,
    UserSparksFeedMetrics,
    createSeenSparksDocument,
@@ -134,6 +136,7 @@ export interface ISparkFunctionsRepository {
     * @param limit ${limit} The number of sparks to fetch (default: 10)
     */
    getPublicSparksFeed(
+      contentTopics?: string[],
       limit?: number,
       countryCode?: OptionGroup
    ): Promise<SerializedSpark[]>
@@ -145,6 +148,7 @@ export interface ISparkFunctionsRepository {
     */
    getGroupSparksFeed(
       groupId: string,
+      contentTopics?: string[],
       limit?: number
    ): Promise<SerializedSpark[]>
 
@@ -388,6 +392,8 @@ export class SparkFunctionsRepository
          question: data.question,
          video: data.video,
          category: getCategoryById(data.categoryId),
+         contentTopicsTagIds:
+            [SparkCategoriesToTagValuesMapper[data.categoryId]] ?? [],
          createdAt: Timestamp.now(),
          publishedAt: data.published ? Timestamp.now() : null,
          updatedAt: null,
@@ -405,6 +411,7 @@ export class SparkFunctionsRepository
       const doc: Pick<
          Spark,
          | "category"
+         | "contentTopicsTagIds"
          | "creator"
          | "question"
          | "published"
@@ -414,6 +421,8 @@ export class SparkFunctionsRepository
       > = {
          question: data.question,
          category: getCategoryById(data.categoryId),
+         contentTopicsTagIds:
+            [SparkCategoriesToTagValuesMapper[data.categoryId]] ?? [],
          updatedAt: Timestamp.now(),
          published: data.published,
          creator: pickPublicDataFromCreator(creator),
@@ -552,11 +561,13 @@ export class SparkFunctionsRepository
       userId: string,
       limit = 10
    ): Promise<SerializedSpark[]> {
-      const userFeedRef = this.firestore
+      const query = this.firestore
          .collection("userData")
          .doc(userId)
          .collection("sparksFeed")
          .where("group.publicSparks", "==", true)
+
+      const userFeedRef = query
          .orderBy("publishedAt", "desc")
          .limit(limit)
          .withConverter(createGenericConverter<Spark>())
@@ -574,15 +585,48 @@ export class SparkFunctionsRepository
    }
 
    async getPublicSparksFeed(
+      contentTopics: string[],
       limit = 10,
       countryCode: OptionGroup
    ): Promise<SerializedSpark[]> {
-      let query = this.firestore
-         .collection("sparks")
-         .where("group.publicSparks", "==", true)
+      try {
+         let query = this.firestore
+            .collection("sparks")
+            .where("group.publicSparks", "==", true)
 
-      // If there is no logged out country code, we want to get all the public sparks without any additional logic
-      if (!countryCode) {
+         if (contentTopics?.length) {
+            // The mapping between content topics and spark categories is 1:1
+            query = query.where(
+               "category.id",
+               "==",
+               TagValuesToSparkCategoriesMapper[contentTopics[0]]
+            )
+         }
+
+         // If no country code is provided, fetch all public sparks
+         if (!countryCode) {
+            const publicFeedRef = query
+               .orderBy("publishedAt", "desc")
+               .limit(limit)
+               .withConverter(createGenericConverter<Spark>())
+
+            const publicFeedSnap = await publicFeedRef.get()
+
+            return publicFeedSnap.docs.map((doc) =>
+               SparkPresenter.serialize(doc.data())
+            )
+         }
+
+         // Apply country code filter only if content topics are not provided
+         if (!contentTopics?.length) {
+            // If a country code is provided, prioritize sparks targeted to that country first
+            query = query.where(
+               "group.targetedCountries",
+               "array-contains",
+               countryCode
+            )
+         }
+
          const publicFeedRef = query
             .orderBy("publishedAt", "desc")
             .limit(limit)
@@ -590,72 +634,68 @@ export class SparkFunctionsRepository
 
          const publicFeedSnap = await publicFeedRef.get()
 
-         return publicFeedSnap.docs.map((doc) =>
-            SparkPresenter.serialize(doc.data())
-         )
-      }
-
-      // In case of logged out country code, we want to get 1st all the targetedCountries sparks
-      query = query.where(
-         "group.targetedCountries",
-         "array-contains",
-         countryCode
-      )
-
-      const publicFeedRef = query
-         .orderBy("publishedAt", "desc")
-         .limit(limit)
-         .withConverter(createGenericConverter<Spark>())
-
-      const publicFeedSnap = await publicFeedRef.get()
-
-      const targetedSparks = publicFeedSnap.docs.map((doc) =>
-         SparkPresenter.serialize(doc.data())
-      )
-
-      if (targetedSparks.length < limit) {
-         const publicFeedRef = this.firestore
-            .collection("sparks")
-            .where("group.publicSparks", "==", true)
-            .orderBy("publishedAt", "desc")
-            .limit(limit)
-            .withConverter(createGenericConverter<Spark>())
-
-         const publicFeedSnap = await publicFeedRef.get()
-
-         const publicSparks = publicFeedSnap.docs.map((doc) =>
+         const sparksFeedCandidates = publicFeedSnap.docs.map((doc) =>
             SparkPresenter.serialize(doc.data())
          )
 
-         if (targetedSparks.length === 0) {
-            return publicSparks
+         if (sparksFeedCandidates.length < limit) {
+            const publicFeedRef = this.firestore
+               .collection("sparks")
+               .where("group.publicSparks", "==", true)
+               .orderBy("publishedAt", "desc")
+               .limit(limit)
+               .withConverter(createGenericConverter<Spark>())
+
+            const publicFeedSnap = await publicFeedRef.get()
+
+            const publicSparks = publicFeedSnap.docs.map((doc) =>
+               SparkPresenter.serialize(doc.data())
+            )
+
+            if (sparksFeedCandidates.length === 0) {
+               return publicSparks
+            }
+
+            const publicSparksWithoutDuplicates = publicSparks.filter((spark) =>
+               sparksFeedCandidates.some(
+                  (targetedSpark) => targetedSpark.id !== spark.id
+               )
+            )
+
+            const result = [
+               ...sparksFeedCandidates,
+               ...publicSparksWithoutDuplicates,
+            ].slice(0, limit)
+
+            return result
          }
 
-         const publicSparksWithoutDuplicates = publicSparks.filter((spark) =>
-            targetedSparks.some(
-               (targetedSpark) => targetedSpark.id !== spark.id
-            )
-         )
-
-         const result = [
-            ...targetedSparks,
-            ...publicSparksWithoutDuplicates,
-         ].slice(0, limit)
-
-         return result
+         return sparksFeedCandidates
+      } catch (error) {
+         functions.logger.error(error)
+         return []
       }
-
-      return targetedSparks
    }
 
    async getGroupSparksFeed(
       groupId: string,
+      contentTopics: string[],
       limit = 10
    ): Promise<SerializedSpark[]> {
-      const groupFeedRef = this.firestore
+      let query = this.firestore
          .collection("sparks")
          .where("group.id", "==", groupId)
          .where("group.publicSparks", "==", true)
+
+      if (contentTopics?.length) {
+         query = query.where(
+            "contentTopicsTagIds",
+            "array-contains-any",
+            contentTopics
+         )
+      }
+
+      const groupFeedRef = query
          .orderBy("publishedAt", "desc")
          .limit(limit)
          .withConverter(createGenericConverter<Spark>())
@@ -1036,7 +1076,7 @@ export class SparkFunctionsRepository
          afterJob,
          beforeJob,
          changeType,
-         (job) => job.sparks,
+         (job) => job?.sparks ?? [],
          (sparkIds) => this.getSparksByIds(sparkIds),
          (sparkIds) =>
             customJobRepo.getCustomJobsByLinkedContentIds("sparks", sparkIds)

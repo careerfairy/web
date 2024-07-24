@@ -247,7 +247,14 @@ export interface IGroupRepository {
     * @param creatorId the creator to get
     * @returns A Promise that resolves with the creator.
     */
-   getCreatorById(groupId: string, creatorId: string): Promise<Creator>
+   getCreatorByGroupAndId(groupId: string, creatorId: string): Promise<Creator>
+
+   /**
+    * Gets a creator by their ID
+    * @param creatorId the creator to get
+    * @returns A Promise that resolves with the creator.
+    */
+   getCreatorById(creatorId: string): Promise<Creator>
 
    /**
     * Gets all group creators
@@ -1019,7 +1026,10 @@ export class FirebaseGroupRepository
       return creatorRef.get().then((snap) => snap.empty)
    }
 
-   async getCreatorById(groupId: string, creatorId: string): Promise<Creator> {
+   async getCreatorByGroupAndId(
+      groupId: string,
+      creatorId: string
+   ): Promise<Creator> {
       const creatorRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
@@ -1032,6 +1042,22 @@ export class FirebaseGroupRepository
          return this.addIdToDoc<Creator>(snapshot)
       }
       return null
+   }
+
+   async getCreatorById(creatorId: string): Promise<Creator | null> {
+      const creatorRef = this.firestore
+         .collectionGroup("creators")
+         .where("id", "==", creatorId)
+         .limit(1)
+         .withConverter(createCompatGenericConverter<Creator>())
+
+      const snapshot = await creatorRef.get()
+
+      if (snapshot.empty) {
+         return null
+      }
+
+      return snapshot.docs[0].data()
    }
 
    async getCreators(groupId: string): Promise<Creator[]> {

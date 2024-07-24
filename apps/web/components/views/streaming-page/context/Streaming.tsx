@@ -22,6 +22,7 @@ import {
    useHasEnded,
    useHasStarted,
    useIsConnectedOnDifferentBrowser,
+   useIsSpyMode,
    useSidePanel,
 } from "store/selectors/streamingAppSelectors"
 
@@ -63,6 +64,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
    const [isReady, setIsReady] = useState(false)
    const hasStarted = useHasStarted()
    const hasEnded = useHasEnded()
+   const isSpyMode = useIsSpyMode()
 
    const hostAuthToken = query.token?.toString() || null
 
@@ -86,7 +88,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       }
    }, [isHost, isHandRaiseActive, dispatch])
 
-   const shouldStream = Boolean(isHost || isUserHandRaiseActive)
+   const shouldStream = Boolean((isHost && !isSpyMode) || isUserHandRaiseActive)
 
    const response = useAgoraRtcToken({
       channelName: livestreamId,
@@ -96,7 +98,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       uid: agoraUserId,
    })
 
-   const viewerCanJoin = !isHost && !hasEnded && hasStarted
+   const viewerCanJoin = (!isHost && !hasEnded && hasStarted) || isSpyMode
 
    const client = useRTCClient()
 
@@ -115,7 +117,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       () => ({
          livestreamId,
          isHost,
-         shouldStream: isHost ? true : shouldStream,
+         shouldStream: shouldStream,
          streamerAuthToken: hostAuthToken,
          agoraUserId,
          agoraUserToken: response.token,

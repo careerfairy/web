@@ -5,10 +5,28 @@ import {
    getArrayDifference,
    removeDuplicates,
 } from "@careerfairy/shared-lib/utils"
+import * as functions from "firebase-functions"
 import _ from "lodash"
-import { getChangeTypes } from "src/util"
-// TODO: Update documentation
 
+import config from "../../config"
+import {
+   CacheKeyOnCallFn,
+   cacheOnCallValues,
+} from "../../middlewares/cacheMiddleware"
+import { middlewares } from "../../middlewares/middlewares"
+import { getChangeTypes } from "../../util"
+import { knownIndexes } from "../search/searchIndexes"
+import { initAlgoliaIndex } from "../search/util"
+import { TagsService } from "./services/TagsService"
+/**
+ * Generate cache key for the fn call
+ */
+export const cacheKey = () => {
+   return ["fetchContentHits"]
+}
+// cache settings for tag hits
+const cacheTagHits = (cacheKeyFn: CacheKeyOnCallFn) =>
+   cacheOnCallValues("tag", cacheKeyFn, 21600) // 6 hours
 /**
  * Synchronizes all of linked content tags (@field linkedCustomJobsTagIds of @type LivestreamEvent | Spark) related to a customJob (livestream, sparks, or future content).
  * Based on an operation on a customJob (create, update or delete), determines which linked content needs updating of @field linkedCustomJobsTagIds, taking into consideration
@@ -231,3 +249,28 @@ const contentCustomJobsExcludingMap = (
       })
    )
 }
+
+/**
+ * Counts all tags (business functions, content topics and languages) based on linked content, namely
+ * Sparks and livestreams, calculating how many hits each tag has in terms of content.
+ */
+export const fetchContentHits = functions.region(config.region).https.onCall(
+   middlewares(
+      cacheTagHits(() => cacheKey()),
+      async () => {
+         functions.logger.info("Fetching tags content hits")
+
+         const livestreamIndex = initAlgoliaIndex(
+            knownIndexes.livestreams.indexName
+         )
+
+         const sparksIndex = initAlgoliaIndex(knownIndexes.sparks.indexName)
+         const tagsService = new TagsService(livestreamIndex, sparksIndex)
+
+         const hits = await tagsService.countHits()
+
+         functions.logger.info("Fetched tags content hits - ", hits)
+         return hits
+      }
+   )
+)

@@ -13,6 +13,7 @@ import {
    ShareActionButton,
    VideoActionButton,
 } from "../Buttons"
+import { AdminControlsButton } from "../Buttons/AdminControlsButton"
 import { StopHandRaisingButton } from "../Buttons/StopHandRaisingButton"
 
 export const AllActions = {
@@ -44,6 +45,9 @@ export const AllActions = {
    "Stop hand raise": (props: ActionButtonProps) => (
       <StopHandRaisingButton {...props} key="Stop hand raise" />
    ),
+   Admin: (props: ActionButtonProps) => (
+      <AdminControlsButton {...props} key="Admin" />
+   ),
    Divider: () => <Divider orientation="vertical" flexItem />,
 } as const
 
@@ -65,4 +69,5 @@ export const ActionTooltips = {
    MicUnmute: "Unmute",
    VideoTurnOff: "Switch camera off",
    VideoTurnOn: "Switch camera on",
+   Admin: "Admin controls",
 } as const

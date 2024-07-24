@@ -37,16 +37,18 @@ export const getSparksFeed = functions
             userId: string().trim().min(1).optional().nullable(),
             groupId: string().trim().min(1).optional(),
             numberOfSparks: number().min(1).optional(),
+            contentTopicIds: array().of(string()).optional(),
          }),
          async (data: GetFeedData, context) => {
             try {
                const anonymousUserCountryCode = getCountryCode(context)
+
                const anonymousUserCountry = getCountryOptionByCountryCode(
                   anonymousUserCountryCode
                )
 
                if ("userId" in data) {
-                  if (data.userId) {
+                  if (data.userId && !data.contentTopicIds?.length) {
                      return {
                         sparks: await sparkRepo.getUserSparksFeed(
                            data.userId,
@@ -57,6 +59,7 @@ export const getSparksFeed = functions
 
                   return {
                      sparks: await sparkRepo.getPublicSparksFeed(
+                        data.contentTopicIds,
                         data.numberOfSparks,
                         anonymousUserCountry
                      ),
@@ -68,6 +71,7 @@ export const getSparksFeed = functions
                   return {
                      sparks: await sparkRepo.getGroupSparksFeed(
                         data.groupId,
+                        data.contentTopicIds,
                         data.numberOfSparks
                      ),
                      anonymousUserCountryCode,
