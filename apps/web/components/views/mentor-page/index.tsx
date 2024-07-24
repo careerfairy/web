@@ -63,6 +63,7 @@ type MentorDetailPageProps = {
    mentor: PublicCreator
    livestreams: LivestreamEvent[]
    sparks: Spark[]
+   hasJobs: boolean
 }
 
 export const MentorDetailPage = ({
@@ -70,6 +71,7 @@ export const MentorDetailPage = ({
    mentor,
    livestreams,
    sparks,
+   hasJobs,
 }: MentorDetailPageProps) => {
    return (
       <Stack sx={styles.root}>
@@ -80,6 +82,7 @@ export const MentorDetailPage = ({
                group={group}
                numSparks={sparks.length}
                numLivestreams={livestreams.length}
+               hasJobs={hasJobs}
             />
          </Box>
          <Stack sx={styles.mentorContentContainer}>
