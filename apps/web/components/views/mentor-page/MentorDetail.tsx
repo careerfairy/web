@@ -21,6 +21,8 @@ const styles = sxStyles({
       fontSize: "16px",
       fontWeight: 400,
       lineHeight: "24px",
+      textOverflow: "ellipsis",
+      overflow: "hidden",
    },
    linkedInButtonInnerContainer: {
       display: "flex",
@@ -77,42 +79,49 @@ const ShowLessButton = (
 
 type PlaceholderStory = {
    companyName: string
-} & Pick<MentorDetailProps, "mentor" | "numSparks" | "numLivestreams">
+   isUserFromTargetedCountry: boolean
+} & Pick<
+   MentorDetailProps,
+   "mentor" | "numSparks" | "numLivestreams" | "hasJobs"
+>
 
 const getMentorPlaceholderStory = ({
    mentor,
    companyName,
    numSparks,
    numLivestreams,
+   isUserFromTargetedCountry,
+   hasJobs,
 }: PlaceholderStory) => {
    const hasCreatedSparks = numSparks > 0
    const hasParticipatedInLivestreams = numLivestreams > 0
 
-   if (!hasCreatedSparks && !hasParticipatedInLivestreams) {
-      return mentor.linkedInUrl
-         ? `Reach out to ${mentor.firstName} on LinkedIn and ask your own questions!`
-         : `Continue exploring and go back to ${companyName}'s company page to see more of what they have to offer!`
-   }
+   const availableContentMessage =
+      hasCreatedSparks && hasParticipatedInLivestreams
+         ? "Sparks (and live streams)"
+         : hasCreatedSparks
+         ? "Sparks"
+         : hasParticipatedInLivestreams
+         ? "Live streams"
+         : "" // this never happens because we only show a mentor if there is at least one spark or live stream
 
-   const sparksMessage = hasCreatedSparks
-      ? `has created ${numSparks} Sparks`
-      : ""
-   const livestreamsMessage = hasParticipatedInLivestreams
-      ? `has participated in ${numLivestreams} live streams`
-      : ""
+   const watchMessage = `Hi! Watch my ${availableContentMessage} to get to know me better and understand how it is to work at ${companyName}.`
 
-   const introMessage = `${mentor.firstName} ${sparksMessage}${
-      hasCreatedSparks && hasParticipatedInLivestreams ? " and " : ""
-   }${livestreamsMessage}.`
+   const noLinkedInNoJobs = `${watchMessage}`
+   const noLinkedInWithJobs = `${watchMessage} After that, visit ${companyName}’s company page to discover more career opportunities!`
 
-   const pronoun = numSparks + numLivestreams > 1 ? "them" : "it"
-   const watchMessage = `Watch ${pronoun} to know ${mentor.firstName} and ${companyName} better!`
+   const notTargetedUserCountry = hasJobs
+      ? noLinkedInWithJobs
+      : noLinkedInNoJobs
 
-   const reachOutMessage = mentor.linkedInUrl
-      ? `After that reach out to ${mentor.firstName} on LinkedIn and ask your own questions!`
-      : `After that continue exploring and go back to ${companyName}'s company page to see more of what they have to offer!`
+   const targetCountryWithLinkedIn = `${watchMessage}. Reach out to me on LinkedIn anytime to ask your career questions and grow your professional network!`
 
-   return `${introMessage} ${watchMessage} ${reachOutMessage}`
+   const placeholder =
+      mentor?.linkedInUrl && isUserFromTargetedCountry
+         ? targetCountryWithLinkedIn
+         : notTargetedUserCountry
+
+   return placeholder
 }
 
 type MentorDetailProps = {
@@ -120,6 +129,7 @@ type MentorDetailProps = {
    group: Group
    numSparks: number
    numLivestreams: number
+   hasJobs: boolean
 }
 
 export const MentorDetail = ({
@@ -127,13 +137,16 @@ export const MentorDetail = ({
    group,
    numSparks,
    numLivestreams,
+   hasJobs,
 }: MentorDetailProps) => {
    const isDesktop = useIsDesktop()
    const { userData, isLoggedIn } = useAuth()
 
    const { anonymousUserCountryCode, isLoading } = useAnonymousUserCountryCode()
 
-   const showLinkedInButton = useMemo(() => {
+   const isUserFromTargetedCountry = useMemo(() => {
+      if (isLoading) return false
+
       const isTargetedUser =
          group.targetedCountries.filter((country) => {
             const userCode = isLoggedIn
@@ -143,11 +156,10 @@ export const MentorDetail = ({
             return country.id === userCode
          }).length > 0
 
-      return !isLoading && mentor?.linkedInUrl && isTargetedUser
+      return isTargetedUser
    }, [
       group.targetedCountries,
       isLoading,
-      mentor?.linkedInUrl,
       isLoggedIn,
       userData?.universityCountryCode,
       anonymousUserCountryCode,
@@ -160,12 +172,14 @@ export const MentorDetail = ({
       companyName: group.universityName,
       numSparks,
       numLivestreams,
+      isUserFromTargetedCountry,
+      hasJobs,
    })
 
    return (
       <Stack sx={styles.root}>
          <SpeakerAvatar mentor={mentor} companyName={group.universityName} />
-         {Boolean(showLinkedInButton) && (
+         {Boolean(isUserFromTargetedCountry && mentor?.linkedInUrl) && (
             <Button
                sx={styles.linkedInButton}
                variant="outlined"
