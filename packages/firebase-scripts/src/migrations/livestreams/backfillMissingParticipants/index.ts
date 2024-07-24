@@ -18,7 +18,7 @@ const progressBar = new cliProgress.SingleBar(
    cliProgress.Presets.shades_grey
 )
 
-const TARGET_LIVESTREAM_ID = "QVUGAmPHypoznuT5O8jr"
+const TARGET_LIVESTREAM_ID = "QVUGAmPHypoznuT5O8jr" // World bank event
 
 export async function run() {
    const counter = new Counter()
@@ -43,9 +43,9 @@ export async function run() {
          (doc) => doc.id
       )
 
-      updateLivestreamWithParticipants(participatingEmails, bulkWriter)
+      updateLivestreamWithParticipants(participatingEmails, bulkWriter, counter)
 
-      markUsersAsParticipated(participatingEmails, bulkWriter)
+      await markUsersAsParticipated(participatingEmails, bulkWriter, counter)
 
       await bulkWriter.close()
 
@@ -60,7 +60,8 @@ export async function run() {
 
 const updateLivestreamWithParticipants = async (
    participantEmails: string[],
-   bulkWriter: BulkWriter
+   bulkWriter: BulkWriter,
+   counter: Counter
 ) => {
    const livestreamUpdate: Pick<LivestreamEvent, "participatingStudents"> = {
       participatingStudents: FieldValue.arrayUnion(
@@ -76,20 +77,30 @@ const updateLivestreamWithParticipants = async (
       .doc(TARGET_LIVESTREAM_ID)
 
    bulkWriter.update(livestreamRef, livestreamUpdate)
+   counter.writeIncrement()
 }
 
 const markUsersAsParticipated = async (
    participantEmails: string[],
-   bulkWriter: BulkWriter
+   bulkWriter: BulkWriter,
+   counter: Counter
 ) => {
    progressBar.start(participantEmails.length, 0)
 
-   participantEmails.forEach((email) => {
+   for (const email of participantEmails) {
       const userLivestreamDataRef = firestore
          .collection("livestreams")
          .doc(TARGET_LIVESTREAM_ID)
          .collection("userLivestreamData")
          .doc(email)
+
+      const userExists = await userLivestreamDataRef.get()
+
+      progressBar.increment()
+
+      if (!userExists.exists) {
+         continue
+      }
 
       const userParticipationUpdate: Pick<UserLivestreamData, "participated"> =
          {
@@ -98,12 +109,9 @@ const markUsersAsParticipated = async (
             },
          }
 
-      bulkWriter
-         .update(userLivestreamDataRef, userParticipationUpdate)
-         .catch(console.error)
-
-      progressBar.increment()
-   })
+      bulkWriter.update(userLivestreamDataRef, userParticipationUpdate).catch() // allow update to fail, maybe not all users have userLivestreamData document
+      counter.writeIncrement()
+   }
 
    progressBar.stop()
 }
