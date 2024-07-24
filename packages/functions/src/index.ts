@@ -317,6 +317,11 @@ exports.resetQuestion = streaming.resetQuestion
 exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent
 exports.markQuestionAsDone = streaming.markQuestionAsDone
 exports.toggleHandRaise = streaming.toggleHandRaise
+exports.upsertLivestreamSpeaker = streaming.upsertLivestreamSpeaker
+exports.createCTA = streaming.createCTA
+exports.deleteCTA = streaming.deleteCTA
+exports.updateCTA = streaming.updateCTA
+exports.toggleActiveCTA = streaming.toggleActiveCTA
 
 // Utils
 exports.fetchUserCountryCode = fetchUserCountryCode

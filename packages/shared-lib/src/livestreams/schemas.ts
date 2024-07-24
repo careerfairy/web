@@ -50,3 +50,13 @@ export const basePollShape = {
       .mixed<LivestreamPoll["state"]>()
       .oneOf(["closed", "current", "upcoming"]),
 }
+
+export const baseCTAShape = {
+   message: yup.string().trim().min(3, "Message must be at least 3 characters"),
+   buttonText: yup.string().trim().min(3, "Text must be at least 3 characters"),
+   buttonURL: yup
+      .string()
+      .url("Please enter a valid URL")
+      .trim()
+      .min(3, "URL must be at least 3 characters"),
+}
