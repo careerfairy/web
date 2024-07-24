@@ -118,7 +118,7 @@ const SparkCarouselCard: FC<Props> = ({
             <SparkQuestion
                question={spark.question}
                limitLines={questionLimitLines}
-            ></SparkQuestion>
+            />
          </Stack>
       </SparkCarouselCardContainer>
    )
