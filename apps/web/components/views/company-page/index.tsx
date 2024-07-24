@@ -1,46 +1,50 @@
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { FeatureFlagsState } from "@careerfairy/shared-lib/feature-flags/types"
 import { Group } from "@careerfairy/shared-lib/groups"
-import Header from "./Header"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Box, Container, Grid, Stack } from "@mui/material"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { doc } from "firebase/firestore"
 import {
+   MutableRefObject,
    createContext,
    forwardRef,
-   MutableRefObject,
    useContext,
    useEffect,
    useMemo,
    useRef,
 } from "react"
-import { Box, Container, Grid, Stack } from "@mui/material"
-import AboutSection from "./AboutSection"
-import MediaSection from "./MediaSection"
-import TestimonialSection from "./TestimonialSection"
-import EventSection from "./EventSection"
 import { useFirestoreDocData } from "reactfire"
-import { doc } from "firebase/firestore"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import useListenToStreams from "../../custom-hook/useListenToStreams"
-import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { groupRepo } from "../../../data/RepositoryInstances"
-import { errorLogAndNotify } from "../../../util/CommonUtil"
-import { FollowCompany, SignUp } from "./ctas"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import { groupRepo } from "../../../data/RepositoryInstances"
+import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
+import { errorLogAndNotify } from "../../../util/CommonUtil"
+import useListenToStreams from "../../custom-hook/useListenToStreams"
+import AboutSection from "./AboutSection"
+import EventSection from "./EventSection"
+import Header from "./Header"
+import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
 import ProgressBanner from "./ProgressBanner"
 import SparksSection from "./SparksSection"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import { TestimonialsOrMentorsSection } from "./TestimonialsOrMentorsSection"
+import { FollowCompany, SignUp } from "./ctas"
 
 type Props = {
    group: Group
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
    pastLivestreams: LivestreamEvent[]
+   groupCreators: PublicCreator[]
 }
 
 export const TabValue = {
    profile: "profile-section",
    media: "media-section",
-   testimonials: "testimonials-section",
+   testimonialsOrMentors: "testimonials-or-mentors-section",
    livesStreams: "livesStreams-section",
    banner: "banner-section",
    video: "video-section",
@@ -48,14 +52,17 @@ export const TabValue = {
 
 export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
 
-export const getTabLabel = (tabId: TabValueType) => {
+export const getTabLabel = (
+   tabId: TabValueType,
+   featureFlags: FeatureFlagsState
+) => {
    switch (tabId) {
       case TabValue.profile:
          return "About"
       case TabValue.media:
          return "Media"
-      case TabValue.testimonials:
-         return "Testimonials"
+      case TabValue.testimonialsOrMentors:
+         return featureFlags.mentorsV1 ? "Mentors" : "Testimonials"
       case TabValue.livesStreams:
          return "Live Streams"
       default:
@@ -65,7 +72,7 @@ export const getTabLabel = (tabId: TabValueType) => {
 
 export type SectionRefs = {
    aboutSectionRef: MutableRefObject<HTMLElement>
-   testimonialSectionRef: MutableRefObject<HTMLElement>
+   testimonialOrMentorsSectionRef: MutableRefObject<HTMLElement>
    eventSectionRef: MutableRefObject<HTMLElement>
    mediaSectionRef: MutableRefObject<HTMLElement>
 }
@@ -73,6 +80,7 @@ export type SectionRefs = {
 type ICompanyPageContext = {
    group: Group
    groupPresenter: GroupPresenter
+   groupCreators: PublicCreator[]
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
    pastLivestreams: LivestreamEvent[]
@@ -82,6 +90,7 @@ type ICompanyPageContext = {
 const CompanyPageContext = createContext<ICompanyPageContext>({
    group: null,
    groupPresenter: null,
+   groupCreators: [],
    editMode: false,
    upcomingLivestreams: [],
    pastLivestreams: [],
@@ -89,7 +98,7 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
       aboutSectionRef: null,
       eventSectionRef: null,
       mediaSectionRef: null,
-      testimonialSectionRef: null,
+      testimonialOrMentorsSectionRef: null,
    },
 })
 
@@ -98,7 +107,9 @@ const CompanyPageOverview = ({
    editMode,
    upcomingLivestreams,
    pastLivestreams,
+   groupCreators,
 }: Props) => {
+   const featureFlags = useFeatureFlags()
    const { isLoggedIn, isLoggedOut } = useAuth()
    const isMobile = useIsMobile()
    const groupRef = useMemo(
@@ -123,7 +134,7 @@ const CompanyPageOverview = ({
    })
 
    const aboutSectionRef = useRef<HTMLElement>(null)
-   const testimonialSectionRef = useRef<HTMLElement>(null)
+   const testimonialOrMentorsSectionRef = useRef<HTMLElement>(null)
    const eventSectionRef = useRef<HTMLElement>(null)
    const mediaSectionRef = useRef<HTMLElement>(null)
 
@@ -132,8 +143,16 @@ const CompanyPageOverview = ({
       presenter.setHasLivestream(
          Boolean((contextUpcomingLivestream || upcomingLivestreams)?.length > 0)
       )
+      presenter.setHasMentor(Boolean(groupCreators?.length > 0))
+      presenter.setFeatureFlags(featureFlags)
       return presenter
-   }, [contextGroup, contextUpcomingLivestream, upcomingLivestreams])
+   }, [
+      contextGroup,
+      contextUpcomingLivestream,
+      featureFlags,
+      groupCreators?.length,
+      upcomingLivestreams,
+   ])
 
    useEffect(() => {
       const isPublicProfile = presenter.companyPageIsReady()
@@ -159,12 +178,13 @@ const CompanyPageOverview = ({
       () => ({
          group: contextGroup,
          groupPresenter: presenter,
+         groupCreators: groupCreators,
          editMode,
          upcomingLivestreams: contextUpcomingLivestream || upcomingLivestreams,
          pastLivestreams: contextPastLivestreams || pastLivestreams,
          sectionRefs: {
             aboutSectionRef,
-            testimonialSectionRef,
+            testimonialOrMentorsSectionRef,
             eventSectionRef,
             mediaSectionRef,
          },
@@ -172,6 +192,7 @@ const CompanyPageOverview = ({
       [
          contextGroup,
          presenter,
+         groupCreators,
          editMode,
          contextUpcomingLivestream,
          upcomingLivestreams,
@@ -203,11 +224,11 @@ const CompanyPageOverview = ({
                         {isMobile && !editMode ? (
                            <>
                               <EventSection />
-                              <TestimonialSection />
+                              <TestimonialsOrMentorsSection />
                            </>
                         ) : (
                            <>
-                              <TestimonialSection />
+                              <TestimonialsOrMentorsSection />
                               <EventSection />
                            </>
                         )}

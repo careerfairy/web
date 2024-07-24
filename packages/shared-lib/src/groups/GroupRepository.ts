@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app"
+import { uniqBy } from "lodash"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
    mapFirestoreDocuments,
@@ -7,6 +8,7 @@ import BaseFirebaseRepository, {
 } from "../BaseFirebaseRepository"
 import { Create, ImageType } from "../commonTypes"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
+import { Spark } from "../sparks/sparks"
 import {
    CompanyFollowed,
    pickPublicDataFromUser,
@@ -260,6 +262,13 @@ export interface IGroupRepository {
     * @returns A Promise that resolves with an array of creators.
     */
    getCreators(groupId: string): Promise<Creator[]>
+
+   /**
+    * Gets all group creators with public content
+    * @param groupId the group to get creators from
+    * @returns A Promise that resolves with an array of creators.
+    */
+   getCreatorsWithPublicContent(groupId: string): Promise<Creator[]>
 
    /**
     * Updates the publicSparks flag in a group.
@@ -1059,6 +1068,81 @@ export class FirebaseGroupRepository
          .get()
 
       return mapFirestoreDocuments<Creator>(snaps)
+   }
+
+   async getCreatorsWithPublicContent(groupId: string): Promise<Creator[]> {
+      if (!groupId) return []
+
+      const [creatorsSnaps, livestreamsSnaps] = await Promise.all([
+         this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("creators")
+            .get(),
+         this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
+            .where("hidden", "==", false)
+            .where("denyRecordingAccess", "==", false)
+            .get(),
+      ])
+
+      if (creatorsSnaps.empty) return []
+
+      const creators = mapFirestoreDocuments<Creator>(creatorsSnaps)
+      const creatorsMap = new Map<string, Creator>()
+      creators.forEach((creator) => {
+         if (creator.id) {
+            creatorsMap.set(creator.id, creator)
+         }
+      })
+
+      const creatorsWithSparksSnaps = await Promise.all(
+         creators.map((creator) => {
+            return this.firestore
+               .collection("sparks")
+               .where("published", "==", true)
+               .where("creator.id", "==", creator.id)
+               .limit(1)
+               .get()
+         })
+      )
+
+      const creatorsWithSparks = creatorsWithSparksSnaps
+         .filter((snap) => !snap.empty)
+         .map((snap) => mapFirestoreDocuments<Spark>(snap)[0])
+         .map((sparks) => creatorsMap.get(sparks.creator.id))
+         .filter(Boolean)
+
+      if (livestreamsSnaps.empty) return creatorsWithSparks
+
+      const livestreams =
+         mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps)
+      // covers co-hosted live stream edge case
+      const groupLivestreams = livestreams.filter(
+         (livestream) => livestream.groupIds[0] === groupId
+      )
+      const creatorsWithLivestreams = groupLivestreams
+         .flatMap((livestream) => {
+            return livestream.creatorsIds
+               ?.map((creatorId) => creatorsMap.get(creatorId))
+               .filter(Boolean)
+         })
+         .filter(Boolean)
+
+      if (creatorsWithLivestreams.length === 0) return creatorsWithSparks
+
+      const creatorsWithPublicContent = [
+         ...creatorsWithLivestreams,
+         ...creatorsWithSparks,
+      ]
+      const resultWithNoDuplicates = uniqBy(
+         creatorsWithPublicContent,
+         (creator) => creator.id
+      )
+
+      return resultWithNoDuplicates
    }
 
    async updatePublicSparks(groupId: string, isPublic: boolean): Promise<void> {
