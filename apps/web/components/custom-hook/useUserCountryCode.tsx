@@ -2,12 +2,12 @@ import { FunctionsInstance } from "data/firebase/FirebaseInstance"
 import useSWRImmutable from "swr/immutable"
 import { errorLogAndNotify } from "util/CommonUtil"
 
-const useAnonymousUserCountryCode = () => {
-   const { data: anonymousUserCountryCode, isLoading } = useSWRImmutable(
-      "fetchAnonymousUserCountryCode",
+const useUserCountryCode = () => {
+   const { data: userCountryCode, isLoading } = useSWRImmutable(
+      "fetchUserCountryCode",
       async () => {
          const result = await FunctionsInstance.httpsCallable(
-            "fetchAnonymousUserCountryCode"
+            "fetchUserCountryCode"
          )()
 
          return result.data
@@ -22,7 +22,7 @@ const useAnonymousUserCountryCode = () => {
       }
    )
 
-   return { anonymousUserCountryCode, isLoading }
+   return { userCountryCode, isLoading }
 }
 
-export default useAnonymousUserCountryCode
+export default useUserCountryCode
