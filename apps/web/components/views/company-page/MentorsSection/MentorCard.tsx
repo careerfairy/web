@@ -97,6 +97,7 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
             src={creator.avatarUrl}
             alt={`Picture of creator ${creatorName}`}
             objectFit="cover"
+            key={creator.avatarUrl}
          />
          <Typography variant="brandedH4" sx={styles.creator.name}>
             {creatorName}
