@@ -310,8 +310,8 @@ export class FirebaseCustomJobRepository
          .where("groupId", "==", groupId)
          .where("deleted", "==", false)
          .where("published", "==", true)
-         .where("job.deadline", ">=", new Date())
-         .orderBy("job.deadline", "asc")
+         .where("deadline", ">=", new Date())
+         .orderBy("deadline", "asc")
          .get()
 
       return this.addIdToDocs<CustomJob>(docs.docs)
