@@ -209,7 +209,7 @@ export const getLivestreamsAndDialogData = async (
          groupId,
          "upcoming",
          noLimits
-            ? {}
+            ? undefined
             : {
                  limit: MAX_UPCOMING_STREAMS + 1, // fetch 10 + 1 to know if there are more
               }
@@ -218,7 +218,7 @@ export const getLivestreamsAndDialogData = async (
          groupId,
          "past",
          noLimits
-            ? {}
+            ? undefined
             : {
                  limit: MAX_PAST_STREAMS + 1, // fetch 5 + 1 to know if there are more
               }
