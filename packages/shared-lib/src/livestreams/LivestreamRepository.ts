@@ -13,6 +13,7 @@ import { Group } from "../groups"
 import { UserPublicData } from "../users"
 import { arraySortByIndex, chunkArray, containsAny } from "../utils"
 import {
+   LivestreamCTA,
    LivestreamEvent,
    LivestreamEventParsed,
    LivestreamEventPublicData,
@@ -370,6 +371,55 @@ export interface ILivestreamRepository {
     * @returns A promise that resolves to a boolean indicating if the user is registered
     */
    isUserRegistered(livestreamId: string, userId: string): Promise<boolean>
+
+   /**
+    * Fetches a CTA from a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param ctaId - The ID of the CTA
+    */
+   getCTA(livestreamId: string, ctaId: string): Promise<LivestreamCTA>
+
+   /**
+    * Creates a CTA for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param message - The message of the CTA
+    * @param buttonText - The text in the button of the CTA
+    * @param buttonURL - The URL of the button of the CTA
+    */
+   createCTA(
+      livestreamId: string,
+      message: LivestreamCTA["message"],
+      buttonText: LivestreamCTA["buttonText"],
+      buttonURL: LivestreamCTA["buttonURL"]
+   ): Promise<void>
+
+   /**
+    * Updates a CTA for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param ctaId - The ID of the CTA
+    * @param cta - The cta data to update
+    */
+   updateCTA(
+      livestreamId: string,
+      ctaId: string,
+      cta: Partial<Pick<LivestreamCTA, "message" | "buttonText" | "buttonURL">>
+   ): Promise<void>
+
+   /**
+    * Marks a specific CTA as active/inactive
+    *
+    * @param livestreamId - The ID of the livestream
+    * @param ctaId - The ID of the CTA to activate
+    * @returns A Promise that resolves when the transaction is complete.
+    */
+   toggleActiveCTA(livestreamId: string, ctaId: string): Promise<void>
+
+   /**
+    * Deletes a CTA from a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param ctaId - The ID of the CTA
+    */
+   deleteCTA(livestreamId: string, ctaId: string): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -1579,6 +1629,96 @@ export class FirebaseLivestreamRepository
       const snap = await query.get()
 
       return Boolean(snap.data()?.registered?.date)
+   }
+
+   async getCTA(livestreamId: string, ctaId: string): Promise<LivestreamCTA> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .doc(ctaId)
+         .withConverter(createCompatGenericConverter<LivestreamCTA>())
+
+      const doc = await docRef.get()
+
+      if (!doc.exists) {
+         return null
+      }
+
+      return doc.data()
+   }
+
+   async createCTA(
+      livestreamId: string,
+      message: LivestreamCTA["message"],
+      buttonText: LivestreamCTA["buttonText"],
+      buttonURL: LivestreamCTA["buttonURL"]
+   ): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .withConverter(createCompatGenericConverter<LivestreamCTA>())
+         .doc()
+
+      const details: LivestreamCTA = {
+         message,
+         buttonText,
+         buttonURL,
+         timestamp: this.fieldValue.serverTimestamp() as unknown as Timestamp,
+         id: docRef.id,
+         numberOfUsersWhoClickedLink: 0,
+         numberOfUsersWhoDismissed: 0,
+         active: false,
+      }
+
+      return docRef.set(details)
+   }
+
+   async updateCTA(
+      livestreamId: string,
+      ctaId: string,
+      cta: Partial<Pick<LivestreamCTA, "message" | "buttonText" | "buttonURL">>
+   ): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .withConverter(createCompatGenericConverter<LivestreamCTA>())
+         .doc(ctaId)
+
+      const updateData: Partial<LivestreamCTA> = {
+         ...cta,
+      }
+
+      return docRef.update(updateData)
+   }
+
+   async toggleActiveCTA(livestreamId: string, ctaId: string): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .withConverter(createCompatGenericConverter<LivestreamCTA>())
+         .doc(ctaId)
+
+      const ctaSnap = await docRef.get()
+
+      const updateData: Pick<LivestreamCTA, "active"> = {
+         active: !ctaSnap.data().active,
+      }
+
+      return docRef.update(updateData)
+   }
+
+   async deleteCTA(livestreamId: string, ctaId: string): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .doc(ctaId)
+
+      return docRef.delete()
    }
 }
 
