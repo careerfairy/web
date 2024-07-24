@@ -17,7 +17,7 @@ import {
    LivestreamDialogLayout,
 } from "components/views/livestream-dialog"
 import { MentorDetailPage } from "components/views/mentor-page"
-import { groupRepo } from "data/RepositoryInstances"
+import { customJobRepo, groupRepo } from "data/RepositoryInstances"
 import { sparkService } from "data/firebase/SparksService"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import {
@@ -34,6 +34,7 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    livestreamDialogData,
    sparks,
    creator,
+   hasJobs,
 }) => {
    const deseralizedSparks = sparks
       ?.map(SparkPresenter.deserialize)
@@ -53,6 +54,7 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                   mentor={creator}
                   livestreams={mapFromServerSide(serverSideLivestreams)}
                   sparks={deseralizedSparks}
+                  hasJobs={hasJobs}
                />
             </Box>
          </GenericDashboardLayout>
@@ -67,6 +69,7 @@ export const getStaticProps: GetStaticProps<{
    livestreamDialogData: LiveStreamDialogData
    sparks: SerializedSpark[]
    creator: PublicCreator
+   hasJobs: boolean
 }> = async (ctx) => {
    const { params } = ctx
    const { companyName: companyNameSlug, mentorName, mentorId } = params
@@ -82,6 +85,10 @@ export const getStaticProps: GetStaticProps<{
                serverSidePastLivestreams,
                livestreamDialogData,
             } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx)
+
+            const hasJobs =
+               (await customJobRepo.getGroupJobs(serverSideGroup.groupId))
+                  .length > 0
 
             const creator = await groupRepo.getCreatorById(
                serverSideGroup?.groupId,
@@ -122,6 +129,7 @@ export const getStaticProps: GetStaticProps<{
                      SparkPresenter.serialize(spark)
                   ),
                   creator: pickPublicDataFromCreator(creator),
+                  hasJobs,
                },
                revalidate: 60,
             }
