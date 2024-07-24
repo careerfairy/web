@@ -3,8 +3,8 @@ import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Link, Stack, Typography, useTheme } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import useAnonymousUserCountryCode from "components/custom-hook/useAnonymousUserCountryCode"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { useMemo } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
 import { LinkedInIcon } from "../common/icons/LinkedInIcon"
@@ -142,7 +142,7 @@ export const MentorDetail = ({
    const isDesktop = useIsDesktop()
    const { userData, isLoggedIn } = useAuth()
 
-   const { anonymousUserCountryCode, isLoading } = useAnonymousUserCountryCode()
+   const { userCountryCode, isLoading } = useUserCountryCode()
 
    const isUserFromTargetedCountry = useMemo(() => {
       if (isLoading) return false
@@ -151,7 +151,7 @@ export const MentorDetail = ({
          group.targetedCountries.filter((country) => {
             const userCode = isLoggedIn
                ? userData?.universityCountryCode
-               : anonymousUserCountryCode
+               : userCountryCode
 
             return country.id === userCode
          }).length > 0
@@ -162,7 +162,7 @@ export const MentorDetail = ({
       isLoading,
       isLoggedIn,
       userData?.universityCountryCode,
-      anonymousUserCountryCode,
+      userCountryCode,
    ])
 
    if (!mentor) return null

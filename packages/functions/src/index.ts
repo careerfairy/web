@@ -17,7 +17,7 @@ dotenv.config()
 
 // to prevent import issue
 import { bundles } from "./bundles"
-import { fetchAnonymousUserCountryCode } from "./fetchAnonymousCountryCode"
+import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
@@ -297,4 +297,4 @@ exports.markQuestionAsDone = streaming.markQuestionAsDone
 exports.toggleHandRaise = streaming.toggleHandRaise
 
 // Utils
-exports.fetchAnonymousUserCountryCode = fetchAnonymousUserCountryCode
+exports.fetchUserCountryCode = fetchUserCountryCode
