@@ -94,10 +94,7 @@ export const getStaticProps: GetStaticProps<{
                (await customJobRepo.getGroupJobs(serverSideGroup.groupId))
                   .length > 0
 
-            const creator = await groupRepo.getCreatorById(
-               serverSideGroup?.groupId,
-               mentorId as string
-            )
+            const creator = await groupRepo.getCreatorById(mentorId as string)
 
             const sparks = await sparkService.getCreatorSparks(
                mentorId as string,
