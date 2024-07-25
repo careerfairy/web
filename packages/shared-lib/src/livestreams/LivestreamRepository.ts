@@ -97,12 +97,6 @@ export interface ILivestreamRepository {
       callback: (snapshot: firebase.firestore.QuerySnapshot) => void
    )
 
-   listenToRegisteredEvents(
-      userEmail: string,
-      limit: number,
-      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
-   )
-
    getPastEventsFrom(options: PastEventsOptions): Promise<LivestreamEvent[]>
 
    getPastEventsFromQuery(options: PastEventsOptions): firebase.firestore.Query
@@ -817,24 +811,6 @@ export class FirebaseLivestreamRepository
       const snapshots = await livestreamRef.get()
 
       return this.mapLivestreamCollections(snapshots).get()
-   }
-
-   listenToRegisteredEvents(
-      userEmail: string,
-      limit: number,
-      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
-   ) {
-      if (!userEmail) return null
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("registeredUsers", "array-contains", userEmail)
-         .orderBy("start", "asc")
-      if (limit) {
-         livestreamRef = livestreamRef.limit(limit)
-      }
-      return livestreamRef.onSnapshot(callback)
    }
 
    recommendEventsQuery(userInterestsIds?: string[]) {
