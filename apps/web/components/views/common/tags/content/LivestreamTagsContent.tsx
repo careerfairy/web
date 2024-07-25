@@ -56,13 +56,19 @@ type Props = {
 const LivestreamTagsContent = (props: Props) => {
    const theme = useTheme()
 
-   const largeToXl = useMediaQuery(theme.breakpoints.up("lg"))
-   const betweenMidToLarge = useMediaQuery(
+   const biggerThanLarge = useMediaQuery(theme.breakpoints.up("lg"))
+   const betweenSmallToLarge = useMediaQuery(
       theme.breakpoints.between("sm", "lg")
    )
-   const small = useMediaQuery(theme.breakpoints.only("xs"))
+   const extraSmall = useMediaQuery(theme.breakpoints.only("xs"))
 
-   const eventsPerBatch = small ? 1 : betweenMidToLarge ? 2 : largeToXl ? 3 : 4
+   const eventsPerBatch = extraSmall
+      ? 1
+      : betweenSmallToLarge
+      ? 2
+      : biggerThanLarge
+      ? 3
+      : 4
 
    const {
       data: events,
