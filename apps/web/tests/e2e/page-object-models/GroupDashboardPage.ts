@@ -1,20 +1,20 @@
-import { Locator, Page } from "@playwright/test"
-import { expect } from "@playwright/test"
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { CommonPage } from "./CommonPage"
 import {
    LivestreamEvent,
    LivestreamJobAssociation,
+   Speaker,
 } from "@careerfairy/shared-lib/livestreams"
-import DateUtil from "../../../util/DateUtil"
-import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
+import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { Locator, Page, expect } from "@playwright/test"
+import DateUtil from "util/DateUtil"
 import { correctCompany, imageLogoPath } from "../../constants"
-import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 import { sleep } from "../utils"
+import { CommonPage } from "./CommonPage"
 import { ATSAdminPage } from "./admin/ATSAdminPage"
 import { FeedbackPage } from "./admin/FeedbackPage"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
@@ -175,16 +175,30 @@ export class GroupDashboardPage extends CommonPage {
          .click()
    }
 
-   public async fillLivestreamForm(data: Partial<LivestreamEvent>) {
+   public async fillLivestreamForm(
+      data: Partial<LivestreamEvent>,
+      publish?: boolean
+   ) {
       const matchById = {
-         "#title": () => data.title,
-         "#start": () =>
+         "input[id='general.title']": () => data.title,
+         "input[id='general.startDate']": () =>
             data.start
                ? DateUtil.eventStartDate(data.start?.toDate?.())
                : undefined,
-         "input[name=duration]": () => data.duration?.toString(),
-         "#summary": () => data.summary,
-         "#reasonsToJoinLivestream": () => data.reasonsToJoinLivestream,
+         "input[id='general.duration']": () => data.duration?.toString(),
+         "textarea[id='general.summary']": () => data.summary,
+         "input[id='general.reasonsToJoin.0']": () =>
+            (data.reasonsToJoinLivestream_v2?.length &&
+               data.reasonsToJoinLivestream_v2.at(0)) ||
+            "",
+         "input[id='general.reasonsToJoin.1']": () =>
+            (data.reasonsToJoinLivestream_v2?.length > 1 &&
+               data.reasonsToJoinLivestream_v2.at(1)) ||
+            "",
+         "input[id='general.reasonsToJoin.2']": () =>
+            (data.reasonsToJoinLivestream_v2?.length > 2 &&
+               data.reasonsToJoinLivestream_v2.at(2)) ||
+            "",
       }
 
       // fill inputs fields by id
@@ -196,16 +210,59 @@ export class GroupDashboardPage extends CommonPage {
          }
       }
 
+      await this.fillMultiSelectTagCategories(
+         "general.contentTopicsTagIds",
+         data.contentTopicsTagIds
+      )
+      await this.fillMultiSelectTagCategories(
+         "general.businessFunctionsTagIds",
+         data.businessFunctionsTagIds
+      )
+      await this.fillMultiSelectTargetAudience(
+         "general.targetFieldsOfStudy",
+         data.fieldOfStudyIds
+      )
+      await this.fillMultiSelectTargetAudience(
+         "general.targetLevelsOfStudy",
+         data.levelOfStudyIds
+      )
+
       if (data.speakers) {
-         await this.fillSpeakerDetails(data.speakers)
+         await this.clickNextButton()
+         const isGeneralTabInvalid = await this.page
+            .getByRole("heading", { name: "Required fields missing" })
+            .isVisible()
+         if (isGeneralTabInvalid) {
+            await this.page
+               .getByRole("button", { name: "Skip for now" })
+               .click()
+         }
+         await this.createSpeakers(data.speakers)
       }
 
-      if (data.interestsIds?.length > 0) {
-         await this.selectInterests(data.interestsIds)
-      }
+      await expect(
+         this.page.getByText(`${data.isDraft ? "Draft" : "Changes"} saved`)
+      ).toBeVisible()
 
-      if (data.jobs?.length > 0) {
-         await this.selectJobs(data.jobs)
+      if (publish) {
+         const isPublishDisabled = await this.page
+            .getByRole("button", { name: "Publish" })
+            .isDisabled()
+
+         await expect(isPublishDisabled).toBe(false)
+
+         if (!isPublishDisabled) {
+            await this.page.getByRole("button", { name: "Publish" }).click()
+
+            const isConfirmPublishVisible = await this.page.getByRole(
+               "heading",
+               { name: "Ready to publish?" }
+            )
+
+            if (isConfirmPublishVisible) {
+               await this.page.getByRole("button", { name: "Publish" }).click()
+            }
+         }
       }
    }
 
@@ -230,41 +287,101 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
-   public async fillSpeakerDetails(speakers: Speaker[]) {
-      if (speakers.length > 1) {
-         // add extra speakers slots
-         let idx = speakers.length - 1
-         while (idx-- > 0) {
-            await this.page
-               .getByRole("button", { name: "Add a Speaker" })
-               .click()
-         }
-      }
+   public async fillMultiSelectTagCategories(
+      dropdownId: string,
+      tagIds: string[]
+   ) {
+      if (tagIds?.length) {
+         await this.page.locator(`input[id='${dropdownId}']`).click()
 
-      for (let i = 0; i < speakers.length; i++) {
-         const speaker = speakers[i]
-
-         const placeholders = {
-            "Enter the speaker’s first name": () => speaker.firstName,
-            "Enter the speaker’s last name": () => speaker.lastName,
-            "Enter the speaker’s position": () => speaker.position,
-            "Enter the speaker’s academic background": () => speaker.background,
-            "Enter the speaker’s email address": () => speaker.email,
-         }
-
-         // fill speaker fields
-         for (const [placeholder, value] of Object.entries(placeholders)) {
-            const val = value() // calculate the value
-            if (val) {
-               await this.page.getByPlaceholder(placeholder).nth(i).fill(val)
-            }
-         }
-
-         // upload avatar
-         await this.clickAndUploadFiles(
-            this.page.getByRole("button", { name: "Upload Avatar" }).nth(0),
-            imageLogoPath
+         await Promise.all(
+            tagIds.map((tagId) => {
+               return this.page
+                  .getByRole("option", { name: TagValuesLookup[tagId] })
+                  .click()
+            })
          )
+
+         await this.page.locator(`input[id='${dropdownId}']`).click()
+      }
+   }
+
+   public async fillMultiSelectTargetAudience(
+      dropdownId: string,
+      options: string[]
+   ) {
+      if (options?.length) {
+         await this.page.locator(`input[id='${dropdownId}']`).click()
+
+         await Promise.all(
+            options.map((option) => {
+               return this.page.getByRole("option", { name: option }).click()
+            })
+         )
+
+         await this.page.locator(`input[id='${dropdownId}']`).click()
+      }
+   }
+
+   public async clickNextButton() {
+      return await this.page.locator("button[id='general.next']").click()
+   }
+
+   public async createSpeakers(speakers: Speaker[]) {
+      if (speakers?.length) {
+         for (const speaker of speakers) {
+            await this.page.locator("input[id='speakers.values']").click()
+
+            const existingSpeaker = await this.page
+               .getByLabel("Speakers of this event")
+               .getByText(speaker.email)
+            const speakerExists = await existingSpeaker.isVisible()
+
+            if (speakerExists) {
+               await this.page.locator("input[id='speakers.values']").click()
+               // await existingSpeaker.click()
+               continue
+            }
+
+            await this.page
+               .getByRole("menuitem", { name: "Create a new contributor" })
+               .click()
+
+            await this.clickAndUploadFiles(
+               this.page.getByRole("button", {
+                  name: "Upload speaker picture",
+               }),
+               "tests/e2e/assets/creatorAvatar.png"
+            )
+
+            await this.page
+               .locator("input[id='creator.firstName']")
+               .fill(speaker.firstName)
+            await this.page
+               .locator("input[id='creator.lastName']")
+               .fill(speaker.lastName)
+            await this.page
+               .locator("input[id='creator.position']")
+               .fill(speaker.position)
+            await this.page
+               .locator("input[id='creator.email']")
+               .fill(speaker.email)
+            await this.page
+               .locator("input[id='creator.email']")
+               .fill(speaker.email)
+
+            if (speaker.linkedInUrl)
+               await this.page
+                  .locator("input[id='creator.linkedInUrl']")
+                  .fill(speaker.linkedInUrl)
+
+            if (speaker.background)
+               await this.page
+                  .getByLabel("Personal story")
+                  .fill(speaker.background)
+
+            await this.page.getByRole("button", { name: "Create" }).click()
+         }
       }
    }
 
@@ -273,7 +390,7 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    public async clickPublish() {
-      await this.page.locator("text=publish as stream").click()
+      await this.page.getByRole("button", { name: "Publish" }).click()
    }
 
    public async clickManageLivestream() {

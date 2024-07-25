@@ -1,9 +1,9 @@
+import { renderMultiSectionDigitalClockTimeView } from "@mui/x-date-pickers"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { useField } from "formik"
 import { sxStyles } from "types/commonTypes"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-import { renderMultiSectionDigitalClockTimeView } from "@mui/x-date-pickers"
-import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 
 const styles = sxStyles({
    datePickerDesktop: (theme) => ({
@@ -92,6 +92,7 @@ const CustomInputField = (params) => {
          onBlur={async () => {
             await onBlur({ target: { name: fieldName } })
          }}
+         inputProps={{ id: fieldName }}
       />
    )
 }

@@ -160,6 +160,7 @@ const CreatorFormDialog = ({
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                  <FormBrandedTextField
+                                    id="creator.firstName"
                                     name="firstName"
                                     type="text"
                                     label="First name"
@@ -170,6 +171,7 @@ const CreatorFormDialog = ({
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                  <FormBrandedTextField
+                                    id="creator.lastName"
                                     name="lastName"
                                     type="text"
                                     label="Last name"
@@ -180,6 +182,7 @@ const CreatorFormDialog = ({
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                  <FormBrandedTextField
+                                    id="creator.position"
                                     name="position"
                                     type="text"
                                     label="Position"
@@ -191,6 +194,7 @@ const CreatorFormDialog = ({
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                  <FormBrandedTextField
+                                    id="creator.linkedInUrl"
                                     name="linkedInUrl"
                                     type="text"
                                     label="LinkedIn link"
@@ -201,6 +205,7 @@ const CreatorFormDialog = ({
                               </Grid>
                               <Grid item xs={12}>
                                  <FormBrandedTextField
+                                    id="creator.email"
                                     name="email"
                                     type="text"
                                     label="Email address"

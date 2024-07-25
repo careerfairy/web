@@ -15,6 +15,7 @@ const ReasonsToJoin = () => {
             fullWidth
             requiredText="(required)"
             placeholder="E.g., Find out, which job benefits await you as a [title of open position/program]"
+            inputProps={{ id: "general.reasonsToJoin.0" }}
          />
          <FormBrandedTextField
             name="general.reasonsToJoin.1"
@@ -22,6 +23,7 @@ const ReasonsToJoin = () => {
             fullWidth
             requiredText="(required)"
             placeholder="E.g., Learn what skills from your studies you can apply in this working environment."
+            inputProps={{ id: "general.reasonsToJoin.1" }}
          />
          <FormBrandedTextField
             name="general.reasonsToJoin.2"
@@ -29,6 +31,7 @@ const ReasonsToJoin = () => {
             fullWidth
             requiredText="(required)"
             placeholder="E.g., Start job application process in-stream and skip first round of interviews."
+            inputProps={{ id: "general.reasonsToJoin.2" }}
          />
       </>
    )
