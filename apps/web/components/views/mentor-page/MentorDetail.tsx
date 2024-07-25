@@ -1,7 +1,7 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Button, Link, Stack, Typography, useTheme } from "@mui/material"
+import { Button, Stack, Typography, useTheme } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
 import useUserCountryCode from "components/custom-hook/useUserCountryCode"
@@ -183,7 +183,7 @@ export const MentorDetail = ({
             <Button
                sx={styles.linkedInButton}
                variant="outlined"
-               LinkComponent={Link}
+               LinkComponent="a"
                href={mentor.linkedInUrl}
                target="_blank"
             >
