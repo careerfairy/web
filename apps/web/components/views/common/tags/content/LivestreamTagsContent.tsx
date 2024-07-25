@@ -3,15 +3,21 @@ import {
    ImpressionLocation,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
-import { Box, Button, Grid, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   Grid,
+   Stack,
+   Typography,
+   useMediaQuery,
+   useTheme,
+} from "@mui/material"
 import { useLivestreamsByTags } from "components/custom-hook/tags/useLivestreamsByTags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useMemo } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import EventPreviewCard from "../../stream-cards/EventPreviewCard"
-
-const EVENTS_PER_BATCH = 3
 
 const styles = sxStyles({
    seeMore: (theme) => ({
@@ -48,11 +54,21 @@ type Props = {
 }
 
 const LivestreamTagsContent = (props: Props) => {
+   const theme = useTheme()
+
+   const largeToXl = useMediaQuery(theme.breakpoints.up("lg"))
+   const betweenMidToLarge = useMediaQuery(
+      theme.breakpoints.between("sm", "lg")
+   )
+   const small = useMediaQuery(theme.breakpoints.only("xs"))
+
+   const eventsPerBatch = small ? 1 : betweenMidToLarge ? 2 : largeToXl ? 3 : 4
+
    const {
       data: events,
       setSize: setNextPage,
       hasMorePages: hasMorePages,
-   } = useLivestreamsByTags(props.type, props.tags, EVENTS_PER_BATCH)
+   } = useLivestreamsByTags(props.type, props.tags, eventsPerBatch)
 
    if (!events.length) return null
 
