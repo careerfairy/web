@@ -52,9 +52,17 @@ const FIELD_NAME = "livestreamIds"
 
 type Props = {
    job: CustomJob
+   handleSecondaryButton?: () => void
+   handlePrimaryButton?: () => void
+   pendingContentView?: boolean
 }
 
-const JobLinkLiveStreams = ({ job }: Props) => {
+const JobLinkLiveStreams = ({
+   job,
+   handleSecondaryButton,
+   handlePrimaryButton,
+   pendingContentView,
+}: Props) => {
    const { moveToPrev, moveToNext, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const isMobile = useIsMobile()
@@ -79,11 +87,14 @@ const JobLinkLiveStreams = ({ job }: Props) => {
 
    const livestreamIds = watch(FIELD_NAME)
 
-   const handleNext = useCallback(() => {
+   const handlePrimaryClick = useCallback(() => {
       // If the group has public sparks, move to the next step
       if (group.publicSparks) {
          moveToNext()
+      } else if (handlePrimaryButton) {
+         handlePrimaryButton()
       }
+
       // If there are no livestream IDs selected and has no public sparks, go to the NO_LINKED_CONTENT step
       else if (livestreamIds.length === 0) {
          goToStep(JobDialogStep.NO_LINKED_CONTENT.key)
@@ -92,7 +103,21 @@ const JobLinkLiveStreams = ({ job }: Props) => {
       else {
          goToStep(JobDialogStep.FORM_PREVIEW.key)
       }
-   }, [goToStep, group.publicSparks, livestreamIds.length, moveToNext])
+   }, [
+      goToStep,
+      group.publicSparks,
+      handlePrimaryButton,
+      livestreamIds.length,
+      moveToNext,
+   ])
+
+   const handleSecondaryClick = useCallback(() => {
+      if (handleSecondaryButton) {
+         handleSecondaryButton()
+      } else {
+         moveToPrev()
+      }
+   }, [handleSecondaryButton, moveToPrev])
 
    const handleCardClick = useCallback(
       (eventId: string) => {
@@ -170,18 +195,22 @@ const JobLinkLiveStreams = ({ job }: Props) => {
                <SteppedDialog.Button
                   variant="outlined"
                   color="grey"
-                  onClick={moveToPrev}
+                  onClick={handleSecondaryClick}
                   sx={styles.cancelBtn}
                >
-                  Back
+                  {pendingContentView ? "Cancel" : "Back"}
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
-                  onClick={handleNext}
+                  onClick={handlePrimaryClick}
                   variant="contained"
                   color="secondary"
                >
-                  Next
+                  {pendingContentView
+                     ? group.publicSparks
+                        ? "Next"
+                        : "Save"
+                     : "Next"}
                </SteppedDialog.Button>
             </SteppedDialog.Actions>
          </>

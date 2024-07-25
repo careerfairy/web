@@ -49,7 +49,19 @@ const styles = sxStyles({
 
 const FIELD_NAME = "sparkIds"
 
-const JobLinkSparks = () => {
+type Props = {
+   handlePrimaryButton?: () => void
+   handleSecondaryButton?: () => void
+   pendingContentView?: boolean
+   isSingleStepView?: boolean
+}
+
+const JobLinkSparks = ({
+   handlePrimaryButton,
+   handleSecondaryButton,
+   pendingContentView,
+   isSingleStepView,
+}: Props) => {
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const { data: publishedSparks } = useGroupSparks(group.groupId, {
@@ -83,20 +95,38 @@ const JobLinkSparks = () => {
       [sparkIds, setValue]
    )
 
-   const handlePrevClick = useCallback(() => {
+   const handleSecondaryClick = useCallback(() => {
       const selectedLivestreams = getValues("livestreamIds")
 
       // If there are no upcoming livestreams and no livestreams are selected, navigate to the FORM_ADDITIONAL_DETAILS step
       if (!groupHasUpcomingLivestreams && selectedLivestreams.length === 0) {
-         goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
+         if (handleSecondaryButton) {
+            handleSecondaryButton()
+         } else {
+            goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
+         }
+      } else if (isSingleStepView && handleSecondaryButton) {
+         handleSecondaryButton()
       }
       // Otherwise, move to the previous step
       else {
          moveToPrev()
       }
-   }, [getValues, goToStep, groupHasUpcomingLivestreams, moveToPrev])
+   }, [
+      getValues,
+      goToStep,
+      groupHasUpcomingLivestreams,
+      handleSecondaryButton,
+      moveToPrev,
+      isSingleStepView,
+   ])
 
-   const handleNextClick = useCallback(() => {
+   const handlePrimaryClick = useCallback(() => {
+      if (handlePrimaryButton) {
+         handlePrimaryButton()
+         return
+      }
+
       const [selectedLivestreams, selectedSparks] = getValues([
          "livestreamIds",
          FIELD_NAME,
@@ -110,7 +140,7 @@ const JobLinkSparks = () => {
       else {
          goToStep(JobDialogStep.NO_LINKED_CONTENT.key)
       }
-   }, [getValues, goToStep])
+   }, [getValues, goToStep, handlePrimaryButton])
 
    const adaptGrid = publishedSparks?.length > 2 && !isMobile
 
@@ -176,20 +206,20 @@ const JobLinkSparks = () => {
                <SteppedDialog.Button
                   variant="outlined"
                   color="grey"
-                  onClick={handlePrevClick}
+                  onClick={handleSecondaryClick}
                   sx={styles.cancelBtn}
                >
-                  Back
+                  {pendingContentView ? "Cancel" : "Back"}
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
-                  onClick={handleNextClick}
+                  onClick={handlePrimaryClick}
                   variant="contained"
                   color="secondary"
                   loading={isSubmitting}
                   disabled={isSubmitting}
                >
-                  Next
+                  {pendingContentView ? "Save" : "Next"}
                </SteppedDialog.Button>
             </SteppedDialog.Actions>
          </>
