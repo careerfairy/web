@@ -11,6 +11,12 @@ const CARD_WIDTH = 328
 const CARD_HEIGHT = 268
 
 const styles = sxStyles({
+   viewport: {
+      // hack to ensure shadows are not cut off
+      padding: "16px",
+      margin: "-16px",
+      width: "calc(100% + 16px)",
+   },
    carouselContainer: {
       width: "100%",
       gap: "12px",
@@ -36,12 +42,7 @@ export const LivestreamsCarousel = ({
       <ContentCarousel
          headerTitle="Live streams"
          slideWidth={CARD_WIDTH}
-         viewportSx={{
-            // hack to ensure shadows are not cut off
-            padding: "16px",
-            margin: "-16px",
-            width: "calc(100% + 16px)",
-         }}
+         viewportSx={styles.viewport}
       >
          {livestreams.map((livestream, index) => (
             <Box
