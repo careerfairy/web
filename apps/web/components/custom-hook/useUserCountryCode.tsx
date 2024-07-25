@@ -15,7 +15,7 @@ const useUserCountryCode = () => {
       {
          onError: (error, key) => {
             return errorLogAndNotify(error, {
-               message: "Failed to fetch anonymous user country code",
+               message: "Failed to fetch user's country code",
                args: key,
             })
          },
