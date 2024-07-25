@@ -9,6 +9,7 @@ import EventsPreviewCarousel, {
    EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { EmblaOptionsType } from "embla-carousel-react"
 import { useMemo, useRef } from "react"
 import { Briefcase, Edit, Zap } from "react-feather"
 import { sxStyles } from "../../../../../types/commonTypes"
@@ -98,13 +99,16 @@ const styles = sxStyles({
       flex: {
          xs: `0 0 90%`,
          sm: `0 0 60%`,
+         md: "0 0 60%",
+         xl: "0 0 20%",
       },
+      maxWidth: { md: 360 },
       height: {
          xs: 355,
          md: 355,
       },
       "&:not(:first-of-type)": {
-         paddingLeft: `15px`,
+         ml: `15px`,
       },
       "&:first-of-type": {
          ml: 0.3,
@@ -116,6 +120,10 @@ const defaultStyling: EventsCarouselStyling = {
    compact: true,
    viewportSx: styles.viewport,
    slide: styles.slide,
+}
+
+const sparksCarouselEmblaOptions: EmblaOptionsType = {
+   align: "start",
 }
 
 type Props = {
@@ -332,9 +340,7 @@ const CustomJobAdminDetails = ({
                         <SparksCarousel
                            ref={childRef}
                            sparks={jobSparks}
-                           options={{
-                              align: "start",
-                           }}
+                           options={sparksCarouselEmblaOptions}
                         />
                      </Box>
                   </Box>

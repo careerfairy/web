@@ -78,7 +78,7 @@ export const schema = (quillRef) =>
       basicInfo: basicInfoSchema,
       additionalInfo: additionalInfoSchema(quillRef),
       livestreamIds: Yup.array(Yup.string()),
-      sparkIds: Yup.array().of(Yup.string()),
+      sparkIds: Yup.array(Yup.string()),
    })
 
 //  export interface JobFormValues extends Yup.InferType<typeof schema>{
@@ -90,3 +90,13 @@ export type JobFormValues = {
    livestreamIds: string[]
    sparkIds: string[]
 }
+
+export type JobLinkedContentValues = {
+   livestreamIds: string[]
+   sparkIds: string[]
+}
+
+export const jobLinkedContentSchema = Yup.object({
+   livestreamIds: Yup.array(Yup.string()),
+   sparkIds: Yup.array(Yup.string()),
+})

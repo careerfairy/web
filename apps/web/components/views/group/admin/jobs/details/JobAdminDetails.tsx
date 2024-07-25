@@ -18,7 +18,6 @@ import JobApplicants from "./jobApplicants"
 import NoApplicantsData from "./jobApplicants/NoApplicantsData"
 import JobPosting from "./jobPosting"
 import LinkedContent from "./linkedContent"
-import PendingContent from "./linkedContent/PendingContent"
 
 const styles = sxStyles({
    wrapper: {
@@ -130,12 +129,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             ? [
                  {
                     label: "Linked content",
-                    component: () =>
-                       jobHasNoContent ? (
-                          <PendingContent job={job} />
-                       ) : (
-                          <LinkedContent job={job} />
-                       ),
+                    component: () => <LinkedContent job={job} />,
                  },
               ]
             : []),
@@ -144,7 +138,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             component: () => <JobPosting job={job} group={group} />,
          },
       ],
-      [allowToDisplayApplicantsData, group, job, jobHasNoContent, jobHubV1]
+      [allowToDisplayApplicantsData, group, job, jobHubV1]
    )
 
    if (!job) {

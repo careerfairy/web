@@ -41,7 +41,7 @@ const styles = sxStyles({
    previewWrapper: {
       mt: 3,
       background: "#F7F8FC",
-      borderRadius: "12px",
+      borderRadius: "15px",
    },
 })
 
