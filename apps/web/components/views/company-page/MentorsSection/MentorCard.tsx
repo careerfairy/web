@@ -1,4 +1,7 @@
-import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   PublicCreator,
+   transformCreatorNameIntoSlug,
+} from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
@@ -61,10 +64,6 @@ type MentorCardProps = {
    key: string
    creator: PublicCreator
    isEditMode?: boolean
-}
-
-function transformCreatorNameIntoSlug(creator: PublicCreator) {
-   return `${creator.firstName}-${creator.lastName}`.toLowerCase()
 }
 
 export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
