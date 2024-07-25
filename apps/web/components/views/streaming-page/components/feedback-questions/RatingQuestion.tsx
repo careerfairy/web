@@ -56,6 +56,9 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[700],
       fontWeight: 400,
    },
+   fullWidth: {
+      width: "100%",
+   },
 })
 
 type RatingQuestionProps = RatingProps & {
@@ -80,6 +83,7 @@ const RatingQuestion = ({
             onChange={(_event, value: number) => {
                onAnswerSubmit({ rating: value })
             }}
+            sx={styles.fullWidth}
             IconContainerComponent={ButtonContainer}
             {...props}
          />
