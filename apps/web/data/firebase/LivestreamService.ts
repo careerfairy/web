@@ -36,12 +36,14 @@ import {
    UpsertSpeakerRequest,
    UserLivestreamData,
    hasUpvotedLivestreamQuestion,
+   sortByDateAscending,
 } from "@careerfairy/shared-lib/livestreams"
 import {
    HandRaise,
    HandRaiseState,
 } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { chunkArray } from "@careerfairy/shared-lib/utils"
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
@@ -55,6 +57,7 @@ import {
    arrayRemove,
    arrayUnion,
    collection,
+   collectionGroup,
    deleteDoc,
    doc,
    getDoc,
@@ -1232,6 +1235,48 @@ export class LivestreamService {
          this.functions,
          "upsertLivestreamSpeaker"
       )(data)
+   }
+
+   /**
+    * Retrieves a list of livestreams that the user has registered for.
+    * @param registeredUserEmail - The email of the registered user.
+    * @returns A promise resolved with the list of livestreams.
+    */
+   async getRegisteredStreams(
+      registeredUserAuthId: string,
+      maxResults: number = 20
+   ) {
+      const userLivestreamDataRef = query(
+         collectionGroup(FirestoreInstance, "userLivestreamData"),
+         where("userId", "==", registeredUserAuthId),
+         orderBy("registered.date", "desc"), // ordering by a field automatically filters out nulls
+         limit(maxResults)
+      ).withConverter(createGenericConverter<UserLivestreamData>())
+
+      const userLivestreamDataSnaps = await getDocs(userLivestreamDataRef)
+
+      const registeredLivestreamIds = userLivestreamDataSnaps.docs
+         .map((snap) => snap.data().livestreamId)
+         .filter(Boolean)
+
+      const chunks = chunkArray(registeredLivestreamIds, 30) // 30 is the max number of where clauses
+
+      const livestreamsPromises = chunks.map((ids) =>
+         getDocs(
+            query(
+               collection(FirestoreInstance, "livestreams"),
+               where("id", "in", ids),
+               where("start", ">=", Timestamp.now())
+            ).withConverter(createGenericConverter<LivestreamEvent>())
+         )
+      )
+
+      const livestreamsSnapshots = await Promise.all(livestreamsPromises)
+      const livestreams = livestreamsSnapshots.flatMap((snapshot) =>
+         snapshot.docs.map((doc) => doc.data())
+      )
+
+      return livestreams.sort(sortByDateAscending)
    }
 }
 

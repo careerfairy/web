@@ -58,10 +58,7 @@ const useRecommendedEvents = (config?: Config) => {
       }
    )
 
-   const filteredEvents = filterRegisteredOrPastEvents(
-      authenticatedUser?.email,
-      events || []
-   )
+   const filteredEvents = filterRegisteredOrPastEvents(events || [])
 
    // Sort the fetched livestreams based on index returned by recommendation engine, as collectionRef query
    // does not take into account the sorting position
@@ -89,12 +86,8 @@ const useRecommendedEvents = (config?: Config) => {
  * Filter events that the user has registered for or that have already occurred
  */
 const filterRegisteredOrPastEvents = (
-   userId: string,
    events: LivestreamEvent[]
-): LivestreamEvent[] =>
-   events.filter(
-      (event) => !(event.hasEnded || event.registeredUsers?.includes(userId))
-   )
+): LivestreamEvent[] => events.filter((event) => !event.hasEnded)
 
 type PreFetchConfig = {
    limit?: FirebaseInArrayLimit
