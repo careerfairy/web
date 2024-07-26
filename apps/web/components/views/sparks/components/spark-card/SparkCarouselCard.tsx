@@ -4,7 +4,6 @@ import { imageKitLoader } from "@careerfairy/shared-lib/utils/video"
 import { Stack } from "@mui/material"
 import Box from "@mui/material/Box"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import CardTopCheckBox from "components/views/common/CardTopCheckBox"
 import { debounce } from "lodash"
 import { FC, useEffect, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -28,7 +27,7 @@ type Props = {
    preview?: boolean
    onClick?: () => void
    onGoNext?: () => void
-   isSelectable?: boolean
+   selectInput?: React.ReactNode
    selected?: boolean
    disableAutoPlay?: boolean
    questionLimitLines?: boolean
@@ -39,7 +38,7 @@ const SparkCarouselCard: FC<Props> = ({
    onClick,
    preview = false,
    onGoNext,
-   isSelectable,
+   selectInput,
    selected,
    disableAutoPlay,
    questionLimitLines,
@@ -122,13 +121,7 @@ const SparkCarouselCard: FC<Props> = ({
          containerRef={containerRef}
          selected={selected}
       >
-         {isSelectable ? (
-            <CardTopCheckBox
-               id={spark.id}
-               selected={selected}
-               handleClick={onClick}
-            />
-         ) : null}
+         {selectInput || null}
 
          <Box px={cardPadding} pt={cardPadding}>
             <SparkHeader showAdminOptions={false} spark={spark} />
