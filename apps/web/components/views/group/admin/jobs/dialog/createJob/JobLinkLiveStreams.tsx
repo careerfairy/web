@@ -4,6 +4,7 @@ import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/use
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
+import CardTopCheckBox from "components/views/common/CardTopCheckBox"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import SteppedDialog, {
    useStepper,
@@ -156,6 +157,16 @@ const JobLinkLiveStreams = ({
       [group.publicSparks]
    )
 
+   const selectInput = useCallback(
+      (eventId: string) => (
+         <CardTopCheckBox
+            id={eventId}
+            selected={livestreamIds.includes(eventId)}
+         />
+      ),
+      [livestreamIds]
+   )
+
    return (
       <SteppedDialog.Container
          containerSx={styles.content}
@@ -183,7 +194,7 @@ const JobLinkLiveStreams = ({
                            event={event}
                            hideChipLabels
                            onCardClick={() => handleCardClick(event.id)}
-                           isSelectable
+                           selectInput={selectInput(event.id)}
                            selected={livestreamIds.includes(event.id)}
                         />
                      </Grid>

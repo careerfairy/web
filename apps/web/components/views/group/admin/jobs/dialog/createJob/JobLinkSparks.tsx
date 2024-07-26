@@ -3,6 +3,7 @@ import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/u
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import CardTopCheckBox from "components/views/common/CardTopCheckBox"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import SteppedDialog, {
    useStepper,
@@ -166,6 +167,13 @@ const JobLinkSparks = ({
       )
    }, [getValues])
 
+   const selectInput = useCallback(
+      (sparkId: string) => (
+         <CardTopCheckBox id={sparkId} selected={sparkIds.includes(sparkId)} />
+      ),
+      [sparkIds]
+   )
+
    return (
       <SteppedDialog.Container containerSx={styles.content} withActions>
          <>
@@ -193,7 +201,7 @@ const JobLinkSparks = ({
                         <SparkCarouselCard
                            spark={spark}
                            onClick={() => handleCardClick(spark.id)}
-                           isSelectable
+                           selectInput={selectInput(spark.id)}
                            selected={sparkIds.includes(spark.id)}
                            disableAutoPlay
                         />

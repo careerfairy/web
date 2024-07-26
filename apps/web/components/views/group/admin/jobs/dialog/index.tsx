@@ -21,8 +21,16 @@ import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
 import SteppedDialog from "../../../../stepped-dialog/SteppedDialog"
 import CustomJobFormProvider from "./CustomJobFormProvider"
+import {
+   default as NoContentAvailableDialog,
+   default as NoLinkedContentDialog,
+} from "./additionalSteps/NoContentAvailableDialog"
 import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
+import JobBasicInfo from "./createJob/JobBasicInfo"
 import JobFormDialog from "./createJob/JobFormDialog"
+import JobFormPreview from "./createJob/JobFormPreview"
+import JobLinkLiveStreams from "./createJob/JobLinkLiveStreams"
+import JobLinkSparks from "./createJob/JobLinkSparks"
 import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
 export type JobDialogStep = ReturnType<typeof getViews>[number]["key"]
@@ -86,10 +94,6 @@ const JobAdditionalDetails = dynamic(
    }
 )
 
-const JobLinkLiveStreams = dynamic(
-   () => import("./createJob/JobLinkLiveStreams")
-)
-
 type ViewsProps = {
    jobHubV1: boolean
    quillInputRef: any
@@ -111,13 +115,11 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
          ? [
               {
                  key: JobDialogStep.NO_CONTENT_AVAILABLE.key,
-                 Component: dynamic(
-                    () => import("./additionalSteps/NoContentAvailableDialog")
-                 ),
+                 Component: () => <NoContentAvailableDialog />,
               },
               {
                  key: JobDialogStep.FORM_BASIC_INFO.key,
-                 Component: dynamic(() => import("./createJob/JobBasicInfo")),
+                 Component: () => <JobBasicInfo />,
               },
               {
                  key: JobDialogStep.FORM_ADDITIONAL_DETAILS.key,
@@ -135,17 +137,19 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
               },
               {
                  key: JobDialogStep.FORM_LINKED_SPARKS.key,
-                 Component: dynamic(() => import("./createJob/JobLinkSparks")),
-              },
-              {
-                 key: JobDialogStep.NO_LINKED_CONTENT.key,
-                 Component: dynamic(
-                    () => import("./additionalSteps/NoLinkedContentDialog")
+                 Component: () => (
+                    <SuspenseWithBoundary fallback={<></>}>
+                       <JobLinkSparks />
+                    </SuspenseWithBoundary>
                  ),
               },
               {
+                 key: JobDialogStep.NO_LINKED_CONTENT.key,
+                 Component: () => <NoLinkedContentDialog />,
+              },
+              {
                  key: JobDialogStep.FORM_PREVIEW.key,
-                 Component: dynamic(() => import("./createJob/JobFormPreview")),
+                 Component: () => <JobFormPreview />,
               },
            ]
          : [

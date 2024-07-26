@@ -44,7 +44,6 @@ import {
    buildDialogLink,
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
-import CardTopCheckBox from "../CardTopCheckBox"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import WhiteTagChip from "../chips/TagChip"
 import CircularLogo from "../logos/CircularLogo"
@@ -233,7 +232,7 @@ type EventPreviewCardProps = {
    disableClick?: boolean
    /* Overrides the default Link click behavior of the card */
    onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
-   isSelectable?: boolean
+   selectInput?: React.ReactNode
    selected?: boolean
 }
 
@@ -251,7 +250,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          hideChipLabels,
          disableClick,
          onCardClick,
-         isSelectable,
+         selectInput,
          selected,
       }: EventPreviewCardProps,
       ref
@@ -443,9 +442,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      ]}
                   >
                      <Box sx={styles.mainContentWrapper}>
-                        {isSelectable ? (
-                           <CardTopCheckBox id={event.id} selected={selected} />
-                        ) : null}
+                        {selectInput || null}
+
                         <Box
                            className="backgroundImageWrapper"
                            sx={[

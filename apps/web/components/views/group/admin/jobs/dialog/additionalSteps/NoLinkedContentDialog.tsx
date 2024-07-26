@@ -77,7 +77,7 @@ const NoLinkContentDialog = () => {
          <>
             <SteppedDialog.Content sx={styles.container}>
                <Stack spacing={2} sx={styles.info}>
-                  <AlertTriangle color={"#856DEE"} size={48} />
+                  <AlertTriangle color={"secondary.500"} size={48} />
 
                   <SteppedDialog.Title sx={styles.title}>
                      Make your job visible!
