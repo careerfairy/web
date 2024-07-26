@@ -1,6 +1,6 @@
 import { Skeleton, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
-import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegisteredRealtime"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import React, { FC } from "react"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import Link from "../../../../common/Link"

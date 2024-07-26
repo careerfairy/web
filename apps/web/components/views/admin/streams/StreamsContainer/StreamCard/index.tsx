@@ -145,6 +145,7 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
 
             const [recordingToken, recordingStats] = results
                .filter((result) => result.status === "fulfilled")
+               // @ts-ignore
                .map((result) => result.value)
             // @ts-ignore
             const recordingSid = recordingToken?.sid

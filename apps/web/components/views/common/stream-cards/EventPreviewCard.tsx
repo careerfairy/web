@@ -13,7 +13,7 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
-import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegisteredRealtime"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
    getMaxLineStyles,
    getResizedUrl,
