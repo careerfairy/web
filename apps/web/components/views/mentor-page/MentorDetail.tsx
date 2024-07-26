@@ -148,7 +148,7 @@ export const MentorDetail = ({
       if (isLoading) return false
 
       const isTargetedUser =
-         group.targetedCountries.filter((country) => {
+         group.targetedCountries?.filter((country) => {
             const userCode = isLoggedIn
                ? userData?.universityCountryCode
                : userCountryCode
