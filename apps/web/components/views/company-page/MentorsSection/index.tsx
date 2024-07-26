@@ -1,15 +1,18 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import BrandedDialog from "components/views/group/admin/events/detail/form/views/questions/components/BrandedDialog"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { ContentCarousel } from "components/views/mentor-page/ContentCarousel"
 import { useState } from "react"
 import { useMountedState } from "react-use"
 import { useCompanyPage } from ".."
+import { CreatorFormLayout } from "./CreatorFormLayout"
 import { MentorCard } from "./MentorCard"
 import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
+   const isMobile = useIsMobile()
+
    const [selectedMentor, setSelectedMentor] = useState<PublicCreator | null>(
       null
    )
@@ -52,15 +55,16 @@ export const MentorsSection = () => {
                />
             ))}
          </ContentCarousel>
-         <BrandedDialog
+         <CreatorFormLayout.Dialog
             isDialogOpen={isDialogOpen}
             handleCloseDialog={handleCloseDialog}
+            isMobile={isMobile}
          >
             <MentorForm
                mentor={selectedMentor}
                handleClose={handleCloseDialog}
             />
-         </BrandedDialog>
+         </CreatorFormLayout.Dialog>
       </Box>
    )
 }
