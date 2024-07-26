@@ -3,7 +3,6 @@ import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box } from "@mui/material"
 import useGroupCreator from "components/custom-hook/creator/useGroupCreator"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import {
    CreatorFormFields,
    CreatorFormProvider,
@@ -67,7 +66,6 @@ type MentorFormProps = {
 }
 
 export const MentorForm = ({ mentor, handleClose }: MentorFormProps) => {
-   const isMobile = useIsMobile()
    const { data: creator } = useGroupCreator(
       mentor?.groupId || "",
       mentor?.id || "",
@@ -84,25 +82,14 @@ export const MentorForm = ({ mentor, handleClose }: MentorFormProps) => {
             handleCloseIconClick={handleClose}
          >
             <SteppedDialog.Content sx={styles.container}>
-               {creator?.id ? (
-                  <SteppedDialog.Title sx={styles.title}>
-                     Edit your{" "}
-                     <Box component="span" color="secondary.main">
-                        contributor
-                     </Box>
-                  </SteppedDialog.Title>
-               ) : (
-                  <SteppedDialog.Title sx={styles.title}>
-                     Create {isMobile ? "" : "a"} new{" "}
-                     <Box component="span" color="secondary.main">
-                        contributor
-                     </Box>
-                  </SteppedDialog.Title>
-               )}
+               <SteppedDialog.Title sx={styles.title}>
+                  Edit your{" "}
+                  <Box component="span" color="secondary.main">
+                     contributor
+                  </Box>
+               </SteppedDialog.Title>
                <SteppedDialog.Subtitle sx={styles.subtitle}>
-                  {creator
-                     ? "Check and change your contributor details"
-                     : "Insert your new contributor details!"}
+                  Check and change your contributor details
                </SteppedDialog.Subtitle>
                <Box sx={styles.form} component="form">
                   <CreatorFormFields />
@@ -153,7 +140,7 @@ const Actions = ({ creator, handleClose }: ActionsProps) => {
             onClick={handleSubmit?.(onSubmit)}
             loading={isSubmitting}
          >
-            {creator?.id ? "Save" : "Create"}
+            Save
          </SteppedDialog.Button>
       </>
    )
