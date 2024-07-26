@@ -1,12 +1,16 @@
-import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   PublicCreator,
+   transformCreatorNameIntoSlug,
+} from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { SyntheticEvent } from "react"
+import { ReactNode, SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { useCompanyPage } from ".."
 
 const CARD_WIDTH = 214
 
@@ -57,6 +61,32 @@ const styles = sxStyles({
    },
 })
 
+type ContainerProps = Pick<MentorCardProps, "key" | "creator"> & {
+   children: ReactNode
+}
+
+const Container = ({ key, creator, children }: ContainerProps) => {
+   const router = useRouter()
+   const { editMode } = useCompanyPage()
+
+   return editMode ? (
+      <Box key={key} sx={[styles.container, { cursor: "auto" }]}>
+         {children}
+      </Box>
+   ) : (
+      <Box
+         key={key}
+         sx={styles.container}
+         component={Link}
+         href={`/company/${
+            router.query.companyName
+         }/mentor/${transformCreatorNameIntoSlug(creator)}/${creator.id}`}
+      >
+         {children}
+      </Box>
+   )
+}
+
 type MentorCardProps = {
    key: string
    creator: PublicCreator
@@ -72,8 +102,6 @@ export const MentorCard = ({
 }: MentorCardProps) => {
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
-   const router = useRouter()
-   console.log("🚀 ~ router:", router)
 
    const _handleEdit = (ev: SyntheticEvent) => {
       ev.preventDefault()
@@ -82,20 +110,7 @@ export const MentorCard = ({
    }
 
    return (
-      <Box
-         key={key}
-         sx={styles.container}
-         component={isEditMode ? "div" : Link}
-         // href={
-         //    isEditMode
-         //       ? "#"
-         //       : `/company/${
-         //            router.query.companyName
-         //         }/mentor/${transformCreatorNameIntoSlug(creator)}/${
-         //            creator.id
-         //         }`
-         // }
-      >
+      <Container key={key} creator={creator}>
          {Boolean(isEditMode) && (
             <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.palette.neutral[700]} />
@@ -114,7 +129,7 @@ export const MentorCard = ({
          <Typography sx={styles.creator.position}>
             {creator.position}
          </Typography>
-      </Box>
+      </Container>
    )
 }
 
