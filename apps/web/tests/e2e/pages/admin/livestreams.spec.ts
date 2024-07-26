@@ -26,6 +26,17 @@ test.describe("Group Admin Livestreams", () => {
       await livestreamsPage.assertTextIsVisible(livestream.title)
    })
 
+   /**
+    * This test runs various edits on a single live stream event, creating a draft first with missing fields,
+    * then updating the draft filling the missing fields and lastly doing another update after its published
+    * changing only the title.
+    *
+    * Beware as the new live stream form auto saves and the data is already filled for existing streams, and for the selectable chips,
+    * namely (contentTopicsTagIds, businessFunctionsTagIds, fieldOfStudyIds and levelOfStudyIds) to prevent them from being cleared
+    * when filling the form for the 2nd time (editing a previously created form) they can be set as null in the override fields, thus impeding the form
+    * from updating those values. If the form would update those values it would result in clicking them again, deselecting the values which might not
+    * be intended.
+    */
    test("Publish a draft livestream and edit its title", async ({
       groupPage,
       fieldOfStudyIds,
@@ -36,16 +47,16 @@ test.describe("Group Admin Livestreams", () => {
 
       const livestream = LivestreamSeed.randomDraft({})
 
-      // create draft
+      // create draft - with missing required fields
       await groupPage.clickCreateNewLivestreamTop()
       await groupPage.fillLivestreamForm(livestream)
 
-      // publish draft
+      // 1. - publish draft
       const livestreamsPage = await groupPage.goToLivestreams()
       await livestreamsPage.clickDraftsTab()
       await livestreamsPage.launchEditModal()
 
-      // fill in missing required fields
+      // 1.1 - fill in missing required fields
 
       const overrideFields = {
          ...livestream,
@@ -54,12 +65,14 @@ test.describe("Group Admin Livestreams", () => {
          fieldOfStudyIds: fieldOfStudyIds.slice(0, 3).map((l) => l.id),
       }
 
+      // Deleting before calling random to force recalculation, if not these values would be transported from the base stream
       delete overrideFields["contentTopicsTagIds"]
       delete overrideFields["summary"]
 
       const livestreamToPublish: LivestreamEvent =
          LivestreamSeed.random(overrideFields)
 
+      // 1.2 - fill form and publish after auto save
       await groupPage.fillLivestreamForm(livestreamToPublish, true)
 
       // Should be in upcoming after filling missing fields

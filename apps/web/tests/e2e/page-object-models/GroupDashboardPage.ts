@@ -266,16 +266,6 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
-   public async selectInterests(interests: string[]) {
-      await this.page
-         .getByPlaceholder("Choose 5 categories that best describe this event")
-         .click()
-
-      for (const interest of interests) {
-         await this.page.getByTestId(`interestsIds_${interest}_option`).click()
-      }
-   }
-
    /**
     * Selects the jobs from the dropdown, currently you can only select one job
     * */
@@ -287,6 +277,10 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
+   /**
+    * Fills a multi select, beware if called for the new live stream creation form, if already filled it will deselect the items.
+    * The manipulation is done via deleting fields of the provided data but an improvement can be made for checking if the item is already selected.
+    */
    public async fillMultiSelectTagCategories(
       dropdownId: string,
       tagIds: string[]
@@ -306,6 +300,10 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
+   /**
+    * Fills a multi select, beware if called for the new live stream creation form, if already filled it will deselect the items.
+    * The manipulation is done via deleting fields of the provided data but an improvement can be made for checking if the item is already selected.
+    */
    public async fillMultiSelectTargetAudience(
       dropdownId: string,
       options: string[]
@@ -385,10 +383,6 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
-   public async clickCreateDraft() {
-      await this.page.getByRole("button", { name: "Create draft" }).click()
-   }
-
    public async clickPublish() {
       await this.page.getByRole("button", { name: "Publish" }).click()
    }
@@ -397,10 +391,6 @@ export class GroupDashboardPage extends CommonPage {
       await this.page
          .getByRole("button", { name: "Manage your live stream" })
          .click()
-   }
-
-   public async clickUpdate() {
-      await this.page.getByRole("button", { name: "update and close" }).click()
    }
 
    private async goToPage(
