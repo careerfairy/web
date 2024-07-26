@@ -1,11 +1,22 @@
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Typography } from "@mui/material"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import BrandedDialog from "components/views/group/admin/events/detail/form/views/questions/components/BrandedDialog"
 import { ContentCarousel } from "components/views/mentor-page/ContentCarousel"
+import { useState } from "react"
 import { useMountedState } from "react-use"
 import { useCompanyPage } from ".."
 import { MentorCard } from "./MentorCard"
+import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
+   const [selectedMentor, setSelectedMentor] = useState<PublicCreator | null>(
+      null
+   )
+
    const { editMode, groupCreators } = useCompanyPage()
+   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
+      useDialogStateHandler()
 
    const isMounted = useMountedState()
 
@@ -34,9 +45,22 @@ export const MentorsSection = () => {
                   key={`mentor-slide-box-${creator.id}`}
                   creator={creator}
                   isEditMode={editMode}
+                  handleEdit={() => {
+                     setSelectedMentor(creator)
+                     handleOpenDialog()
+                  }}
                />
             ))}
          </ContentCarousel>
+         <BrandedDialog
+            isDialogOpen={isDialogOpen}
+            handleCloseDialog={handleCloseDialog}
+         >
+            <MentorForm
+               mentor={selectedMentor}
+               handleClose={handleCloseDialog}
+            />
+         </BrandedDialog>
       </Box>
    )
 }
