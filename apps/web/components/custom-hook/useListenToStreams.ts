@@ -128,7 +128,7 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
    let res = new LivestreamsDataParser(data)
 
    /**
-    * If a `filterByGroupId` is provided, conduct client-side filters for `interestsIds`, `registeredUsers`, and `targetFieldsOfStudy`.
+    * If a `filterByGroupId` is provided, conduct client-side filters for `interestsIds`, and `targetFieldsOfStudy`.
     * These filters are performed on the client-side due to Firestore's limitation of one `array-contains` operation per query.
     */
    if (filterByGroupId) {

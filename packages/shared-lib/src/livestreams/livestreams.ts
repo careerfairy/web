@@ -25,7 +25,10 @@ export interface LivestreamEvent extends Identifiable {
    backgroundImageUrl?: string
    company?: string
    companyId?: string
-   participants?: string[]
+   /**
+    * @deprecated Use userLivestreamData sub-collection instead.
+    * This field will be removed in a future version.
+    */
    participatingStudents?: string[]
    maxRegistrants?: number
    companyLogoUrl?: string
@@ -656,7 +659,6 @@ export interface LivestreamEventSerialized
       | "registeredUsers"
       | "talentPool"
       | "participatingStudents"
-      | "participants"
       | "created"
       | "start"
       | "startDate"

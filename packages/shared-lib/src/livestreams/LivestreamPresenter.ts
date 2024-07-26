@@ -39,7 +39,6 @@ export class LivestreamPresenter extends BaseModel {
       public readonly backgroundImageUrl: string,
       public readonly company: string,
       public readonly companyId: string,
-      public readonly participants: string[],
       public readonly participatingStudents: string[],
       public readonly companyLogoUrl: string,
       public readonly created: Date,
@@ -190,10 +189,10 @@ export class LivestreamPresenter extends BaseModel {
             )
       )
    }
-   isRegistrationDisabled(userEmail: string): boolean {
+   isRegistrationDisabled(isUserRegistered: boolean): boolean {
       if (this.isPast()) return true
       //User should always be able to cancel registration
-      if (this.isUserRegistered(userEmail)) return false
+      if (isUserRegistered) return false
       //Disable registration if max number of registrants is reached
       if (this.maxRegistrants && this.maxRegistrants > 0) {
          return this.registeredUsers
@@ -298,7 +297,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.backgroundImageUrl ?? "",
          livestream.company ?? "",
          livestream.companyId ?? "",
-         livestream.participants ?? [],
          livestream.participatingStudents ?? [],
 
          livestream.companyLogoUrl || "",
@@ -369,7 +367,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.backgroundImageUrl,
          livestream.company,
          livestream.companyId,
-         livestream.participants,
          livestream.participatingStudents,
          livestream.companyLogoUrl,
          fromSerializedDate(livestream.created),
@@ -458,7 +455,6 @@ export class LivestreamPresenter extends BaseModel {
          backgroundImageUrl: this.backgroundImageUrl,
          company: this.company,
          companyId: this.companyId,
-         participants: this.participants,
          participatingStudents: this.participatingStudents,
          companyLogoUrl: this.companyLogoUrl,
          created: fromDateConverter(this.created, fromDate),

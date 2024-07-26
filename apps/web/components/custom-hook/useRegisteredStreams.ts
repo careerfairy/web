@@ -7,7 +7,7 @@ type Options = {
 }
 
 const useRegisteredStreams = (props: Options = {}) => {
-   const { limit = 20 } = props
+   const { limit = 30 } = props
    const { authenticatedUser } = useAuth()
 
    return useSWR(
