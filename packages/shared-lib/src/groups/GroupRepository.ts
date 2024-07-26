@@ -268,7 +268,7 @@ export interface IGroupRepository {
     * @param groupId the group to get creators from
     * @returns A Promise that resolves with an array of creators.
     */
-   getCreatorsWithPublicContent(groupId: string): Promise<Creator[]>
+   getCreatorsWithPublicContent(group: Group): Promise<Creator[]>
 
    /**
     * Updates the publicSparks flag in a group.
@@ -1070,18 +1070,18 @@ export class FirebaseGroupRepository
       return mapFirestoreDocuments<Creator>(snaps)
    }
 
-   async getCreatorsWithPublicContent(groupId: string): Promise<Creator[]> {
-      if (!groupId) return []
+   async getCreatorsWithPublicContent(group: Group): Promise<Creator[]> {
+      if (!group?.groupId) return []
 
       const [creatorsSnaps, livestreamsSnaps] = await Promise.all([
          this.firestore
             .collection("careerCenterData")
-            .doc(groupId)
+            .doc(group.id)
             .collection("creators")
             .get(),
          this.firestore
             .collection("livestreams")
-            .where("groupIds", "array-contains", groupId)
+            .where("groupIds", "array-contains", group.id)
             .where("test", "==", false)
             .where("hidden", "==", false)
             .where("denyRecordingAccess", "==", false)
@@ -1091,42 +1091,53 @@ export class FirebaseGroupRepository
       if (creatorsSnaps.empty) return []
 
       const creators = mapFirestoreDocuments<Creator>(creatorsSnaps)
-      const creatorsMap = new Map<string, Creator>()
+
+      const creatorsMapById = new Map<string, Creator>()
       creators.forEach((creator) => {
          if (creator.id) {
-            creatorsMap.set(creator.id, creator)
+            creatorsMapById.set(creator.id, creator)
          }
       })
 
-      const creatorsWithSparksSnaps = await Promise.all(
-         creators.map((creator) => {
-            return this.firestore
-               .collection("sparks")
-               .where("published", "==", true)
-               .where("creator.id", "==", creator.id)
-               .limit(1)
-               .get()
-         })
-      )
+      const creatorsMapByEmail = new Map<string, Creator>()
+      creators.forEach((creator) => {
+         if (creator.id) {
+            creatorsMapByEmail.set(creator.email, creator)
+         }
+      })
+
+      const creatorsWithSparksSnaps = group.publicSparks
+         ? await Promise.all(
+              creators.map((creator) => {
+                 return this.firestore
+                    .collection("sparks")
+                    .where("published", "==", true)
+                    .where("creator.id", "==", creator.id)
+                    .limit(1)
+                    .get()
+              })
+           )
+         : []
 
       const creatorsWithSparks = creatorsWithSparksSnaps
          .filter((snap) => !snap.empty)
          .map((snap) => mapFirestoreDocuments<Spark>(snap)[0])
-         .map((sparks) => creatorsMap.get(sparks.creator.id))
+         .map((sparks) => creatorsMapById.get(sparks.creator.id))
          .filter(Boolean)
 
       if (livestreamsSnaps.empty) return creatorsWithSparks
 
       const livestreams =
          mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps)
+
       // covers co-hosted live stream edge case
       const groupLivestreams = livestreams.filter(
-         (livestream) => livestream.groupIds[0] === groupId
+         (livestream) => livestream.groupIds[0] === group.id
       )
       const creatorsWithLivestreams = groupLivestreams
          .flatMap((livestream) => {
-            return livestream.creatorsIds
-               ?.map((creatorId) => creatorsMap.get(creatorId))
+            return livestream.speakers
+               ?.map((speaker) => creatorsMapByEmail.get(speaker.email))
                .filter(Boolean)
          })
          .filter(Boolean)
@@ -1137,6 +1148,7 @@ export class FirebaseGroupRepository
          ...creatorsWithLivestreams,
          ...creatorsWithSparks,
       ]
+
       const resultWithNoDuplicates = uniqBy(
          creatorsWithPublicContent,
          (creator) => creator.id

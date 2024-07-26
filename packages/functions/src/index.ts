@@ -17,6 +17,7 @@ dotenv.config()
 
 // to prevent import issue
 import { bundles } from "./bundles"
+import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
@@ -134,6 +135,7 @@ exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
 exports.fetchLivestreams_v2 = livestreams.fetchLivestreams
+exports.upsertLivestreamSpeaker = streaming.upsertLivestreamSpeaker
 
 // Tags
 exports.fetchTagsContentHits = tags.fetchContentHits
@@ -298,4 +300,6 @@ exports.resetQuestion = streaming.resetQuestion
 exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent
 exports.markQuestionAsDone = streaming.markQuestionAsDone
 exports.toggleHandRaise = streaming.toggleHandRaise
-exports.upsertLivestreamSpeaker = streaming.upsertLivestreamSpeaker
+
+// Utils
+exports.fetchUserCountryCode = fetchUserCountryCode

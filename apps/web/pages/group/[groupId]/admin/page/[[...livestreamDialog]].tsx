@@ -77,7 +77,7 @@ export const getServerSideProps: GetServerSideProps<{
       } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, context)
 
       const creators = await groupRepo.getCreatorsWithPublicContent(
-         serverSideGroup?.groupId
+         serverSideGroup
       )
 
       return {

@@ -13,8 +13,8 @@ import {
    anonymousUserCountryCodeSelector,
    shouldShowLinkedInPopUpNotificationSelector,
 } from "store/selectors/sparksFeedSelectors"
+import { LinkedInIcon } from "../../../../common/icons/LinkedInIcon"
 import CreatorAvatar from "../../CreatorAvatar"
-import { LinkedInIcon } from "./LinkedInIcon"
 import { SparksPopUpBase } from "./SparksPopUpBase"
 
 const LINKEDIN_COLOR = "#3A70E2"
@@ -81,7 +81,12 @@ const LoggedOutNotificationMessage = ({ name }: NotificationMessageProps) => {
 
 const LinkedInCta = (
    <Stack direction="row" alignItems="center" gap="12px">
-      <LinkedInIcon width={14} height={14} sx={{ marginTop: "-2px" }} />
+      <LinkedInIcon
+         width={14}
+         height={14}
+         sx={{ marginTop: "-2px" }}
+         fill="white"
+      />
       Reach out
    </Stack>
 )

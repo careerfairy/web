@@ -93,6 +93,12 @@ export interface ICustomJobRepository {
       linkField: string,
       ids: string[]
    ): Promise<CustomJob[]>
+
+   /**
+    * Get all the custom jobs linked by a specific group
+    * @param groupId
+    */
+   getGroupJobs(groupId: string): Promise<CustomJob[]>
 }
 
 export class FirebaseCustomJobRepository
@@ -296,5 +302,18 @@ export class FirebaseCustomJobRepository
          .map((r) => (r as PromiseFulfilledResult<CustomJob[]>).value)
          .flat()
          .filter(Boolean)
+   }
+
+   async getGroupJobs(groupId: string): Promise<CustomJob[]> {
+      const docs = await this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("groupId", "==", groupId)
+         .where("deleted", "==", false)
+         .where("published", "==", true)
+         .where("deadline", ">=", new Date())
+         .orderBy("deadline", "asc")
+         .get()
+
+      return this.addIdToDocs<CustomJob>(docs.docs)
    }
 }
