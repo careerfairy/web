@@ -1,9 +1,17 @@
-import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   PublicCreator,
+   transformCreatorNameIntoSlug,
+} from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import Link from "next/link"
+import { useRouter } from "next/router"
+import { SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+
+const CARD_WIDTH = 214
 
 const styles = sxStyles({
    container: (theme) => ({
@@ -15,12 +23,14 @@ const styles = sxStyles({
       borderRadius: "10px",
       border: `1px solid ${theme.palette.secondary.light}`,
       boxShadow: "0px 0px 8px 0px #1414140F",
-      minWidth: "214px",
+      minWidth: `${CARD_WIDTH}px`,
       height: "194px",
       padding: "16px",
       gap: 1,
       userSelect: "none",
       cursor: "pointer",
+      textDecoration: "none",
+      color: "inherit",
    }),
    creator: {
       name: {
@@ -59,13 +69,23 @@ type MentorCardProps = {
 export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
+   const router = useRouter()
 
-   const handleEdit = () => {
+   const handleEdit = (ev: SyntheticEvent) => {
+      ev.preventDefault()
+      ev.stopPropagation()
       alert("Will open edit dialog")
    }
 
    return (
-      <Box key={key} sx={styles.container}>
+      <Box
+         key={key}
+         sx={styles.container}
+         component={Link}
+         href={`/company/${
+            router.query.companyName
+         }/mentor/${transformCreatorNameIntoSlug(creator)}/${creator.id}`}
+      >
          {Boolean(isEditMode) && (
             <IconButton sx={styles.edit} onClick={handleEdit}>
                <Edit2 size={20} color={theme.palette.neutral[700]} />
@@ -76,6 +96,7 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
             src={creator.avatarUrl}
             alt={`Picture of creator ${creatorName}`}
             objectFit="cover"
+            key={creator.avatarUrl}
          />
          <Typography variant="brandedH4" sx={styles.creator.name}>
             {creatorName}
@@ -86,3 +107,5 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
       </Box>
    )
 }
+
+MentorCard.width = CARD_WIDTH

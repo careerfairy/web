@@ -27,6 +27,7 @@ type Props = {
    preview?: boolean
    onClick?: () => void
    onGoNext?: () => void
+   questionLimitLines?: boolean
 }
 
 const SparkCarouselCard: FC<Props> = ({
@@ -34,6 +35,7 @@ const SparkCarouselCard: FC<Props> = ({
    onClick,
    preview = false,
    onGoNext,
+   questionLimitLines,
 }) => {
    const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
    const [autoPlaying, setAutoPlaying] = useState(false)
@@ -113,7 +115,10 @@ const SparkCarouselCard: FC<Props> = ({
             flexGrow={1}
          >
             <SparkCategoryChip categoryId={spark.category.id} />
-            <SparkQuestion question={spark.question}></SparkQuestion>
+            <SparkQuestion
+               question={spark.question}
+               limitLines={questionLimitLines}
+            />
          </Stack>
       </SparkCarouselCardContainer>
    )
