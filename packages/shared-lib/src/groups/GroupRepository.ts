@@ -1071,7 +1071,7 @@ export class FirebaseGroupRepository
    }
 
    async getCreatorsWithPublicContent(group: Group): Promise<Creator[]> {
-      if (!group?.id) return []
+      if (!group?.groupId) return []
 
       const [creatorsSnaps, livestreamsSnaps] = await Promise.all([
          this.firestore
