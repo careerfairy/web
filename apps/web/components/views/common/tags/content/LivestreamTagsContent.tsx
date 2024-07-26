@@ -3,16 +3,9 @@ import {
    ImpressionLocation,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
-import {
-   Box,
-   Button,
-   Grid,
-   Stack,
-   Typography,
-   useMediaQuery,
-   useTheme,
-} from "@mui/material"
+import { Box, Button, Grid, Stack, Typography } from "@mui/material"
 import { useLivestreamsByTags } from "components/custom-hook/tags/useLivestreamsByTags"
+import useLivestreamsPerBatch from "components/custom-hook/tags/useLivestreamsPerBatch"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useMemo } from "react"
 import { ChevronDown } from "react-feather"
@@ -54,21 +47,8 @@ type Props = {
 }
 
 const LivestreamTagsContent = (props: Props) => {
-   const theme = useTheme()
-
-   const biggerThanLarge = useMediaQuery(theme.breakpoints.up("lg"))
-   const betweenSmallToLarge = useMediaQuery(
-      theme.breakpoints.between("sm", "lg")
-   )
-   const extraSmall = useMediaQuery(theme.breakpoints.only("xs"))
-
-   const eventsPerBatch = extraSmall
-      ? 1
-      : betweenSmallToLarge
-      ? 2
-      : biggerThanLarge
-      ? 3
-      : 4
+   const eventsPerBatch = useLivestreamsPerBatch()
+   console.log("🚀 ~ LivestreamTagsContent ~ eventsPerBatch:", eventsPerBatch)
 
    const {
       data: events,
