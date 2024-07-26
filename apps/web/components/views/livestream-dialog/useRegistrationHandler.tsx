@@ -4,6 +4,7 @@ import {
    LivestreamGroupQuestionsMap,
 } from "@careerfairy/shared-lib/src/livestreams"
 import { UserReminderType } from "@careerfairy/shared-lib/src/users"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegisteredRealtime"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -21,15 +22,8 @@ import { useLiveStreamDialog } from "./LivestreamDialog"
  * Logic for handling the register button click
  */
 export default function useRegistrationHandler() {
-   const {
-      livestream,
-      isRecommended,
-      livestreamPresenter,
-      serverUserEmail,
-      goToView,
-      currentSparkId,
-      mode,
-   } = useLiveStreamDialog()
+   const { livestream, isRecommended, goToView, currentSparkId, mode } =
+      useLiveStreamDialog()
    const { push, asPath, pathname } = useRouter()
    const { forceShowReminder } = useUserReminders()
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
@@ -39,6 +33,8 @@ export default function useRegistrationHandler() {
       deregisterFromLivestream,
       sendRegistrationConfirmationEmail,
    } = useFirebaseService()
+
+   const isAlreadyRegistered = useUserIsRegistered(livestream.id)
 
    /**
     * Initiate the registration process
@@ -96,6 +92,7 @@ export default function useRegistrationHandler() {
          livestream.id,
          userData.authId
       )
+
       dataLayerLivestreamEvent("event_registration_removed", livestream)
 
       // after de-register from a livestream we want to update the user sparks notifications for this user
@@ -112,22 +109,12 @@ export default function useRegistrationHandler() {
          return "login_required"
       }
 
-      const isAlreadyRegistered = livestreamPresenter.isUserRegistered(
-         authenticatedUser?.email || serverUserEmail
-      )
-
       if (isAlreadyRegistered) {
          return "registered"
       }
 
       return "can_register"
-   }, [
-      authenticatedUser?.email,
-      authenticatedUser?.emailVerified,
-      isLoggedOut,
-      livestreamPresenter,
-      serverUserEmail,
-   ])
+   }, [authenticatedUser?.emailVerified, isLoggedOut, isAlreadyRegistered])
 
    const redirectToLogin = useCallback(() => {
       const url = new URL(asPath, window.location.origin)

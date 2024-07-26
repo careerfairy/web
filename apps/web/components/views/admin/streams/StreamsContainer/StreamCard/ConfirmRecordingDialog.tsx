@@ -1,4 +1,3 @@
-import React, { Fragment } from "react"
 import {
    Button,
    Dialog,
@@ -6,6 +5,15 @@ import {
    DialogContent,
    DialogTitle,
 } from "@mui/material"
+import { Fragment } from "react"
+
+type Props = {
+   action?: string
+   confirmText: string
+   onConfirm: () => void
+   onclose: () => void
+   open: boolean
+}
 
 const ConfirmRecordingDialog = ({
    action,
@@ -13,7 +21,7 @@ const ConfirmRecordingDialog = ({
    onConfirm,
    onclose,
    open,
-}) => {
+}: Props) => {
    const handleConfirm = () => {
       onConfirm()
       onclose()

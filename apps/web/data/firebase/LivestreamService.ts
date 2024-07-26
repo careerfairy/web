@@ -1238,9 +1238,18 @@ export class LivestreamService {
    }
 
    /**
-    * Retrieves a list of livestreams that the user has registered for.
-    * @param registeredUserEmail - The email of the registered user.
-    * @returns A promise resolved with the list of livestreams.
+    * Retrieves the registered live streams for a user.
+    *
+    * This method uses a two-step query process due to Firestore's limitations:
+    * 1. First, it queries the userLivestreamData to get the IDs of registered streams.
+    * 2. Then, it fetches the actual live stream events using these IDs.
+    *
+    * This approach ensures we get the most up-to-date live stream information
+    * while still respecting the user's registration status.
+    *
+    * @param registeredUserAuthId - The auth ID of the user whose registrations we're fetching.
+    * @param maxResults - The maximum number of results to return (default: 20).
+    * @returns A Promise that resolves to an array of LivestreamEvent objects.
     */
    async getRegisteredStreams(
       registeredUserAuthId: string,
@@ -1266,17 +1275,73 @@ export class LivestreamService {
             query(
                collection(FirestoreInstance, "livestreams"),
                where("id", "in", ids),
-               where("start", ">=", Timestamp.now())
+               where("start", ">=", Timestamp.now()),
+               orderBy("start", "asc")
             ).withConverter(createGenericConverter<LivestreamEvent>())
          )
       )
 
       const livestreamsSnapshots = await Promise.all(livestreamsPromises)
-      const livestreams = livestreamsSnapshots.flatMap((snapshot) =>
-         snapshot.docs.map((doc) => doc.data())
-      )
 
-      return livestreams.sort(sortByDateAscending)
+      const livestreams = livestreamsSnapshots
+         .flatMap((snapshot) => snapshot.docs.map((doc) => doc.data()))
+         .sort(sortByDateAscending)
+
+      return livestreams
+   }
+
+   /**
+    * Fetches recommended live stream events for a user.
+    * @param {number} limit - Maximum number of events to fetch.
+    * @param {string} userId - ID of the user to get recommendations for.
+    * @returns Array of recommended live stream events.
+    *
+    * Filters out:
+    * 1. Events the user is already registered for.
+    * 2. Events that have already ended.
+    */
+   async getRecommendedEvents(limit: number, userId: string) {
+      const { data: eventIds } = await httpsCallable<
+         { limit: number },
+         string[]
+      >(
+         this.functions,
+         "getRecommendedEvents_v4"
+      )({ limit })
+
+      const recommendedLivestreams: LivestreamEvent[] = []
+
+      for (const eventId of eventIds) {
+         const isUserRegistered = await this.hasUserRegistered(eventId, userId)
+         // If the user is registered, we don't want to show them the event
+         if (isUserRegistered) continue
+
+         const eventSnap = await getDoc(this.getLivestreamRef(eventId))
+         const livestream = eventSnap.data()
+
+         // If the event has ended, we don't want to show it
+         if (livestream.hasEnded) continue
+
+         recommendedLivestreams.push(livestream)
+      }
+
+      return recommendedLivestreams
+   }
+
+   async hasUserRegistered(livestreamId: string, userId: string) {
+      if (!userId || !livestreamId) return false
+
+      const registeredRef = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "userLivestreamData",
+         userId
+      ).withConverter(createGenericConverter<UserLivestreamData>())
+
+      const registeredSnap = await getDoc(registeredRef)
+
+      return Boolean(registeredSnap.data()?.registered?.date)
    }
 }
 

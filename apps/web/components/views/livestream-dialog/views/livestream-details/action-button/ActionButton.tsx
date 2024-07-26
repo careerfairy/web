@@ -1,18 +1,19 @@
-import React, { FC } from "react"
 import { Skeleton, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegisteredRealtime"
+import React, { FC } from "react"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import Link from "../../../../common/Link"
-import Box from "@mui/material/Box"
 import ActionButtonProvider, {
    ActionButtonContextType,
    useActionButtonContext,
 } from "./ActionButtonProvider"
-import styles from "./Styles"
-import SignUpToWatchButton from "./SignUpToWatchButton"
-import WatchNowButton from "./WatchNowButton"
 import BuyRecordingButton from "./BuyRecordingButton"
 import NotEnoughCreditsButton from "./NotEnoughCreditsButton"
 import RegisterButton from "./RegisterButton"
+import SignUpToWatchButton from "./SignUpToWatchButton"
+import styles from "./Styles"
+import WatchNowButton from "./WatchNowButton"
 
 const ActionButton: FC<ActionButtonContextType> = (props) => {
    return (
@@ -26,11 +27,9 @@ const ButtonElement: FC = () => {
    const { livestreamPresenter, userEmailFromServer, canWatchRecording } =
       useActionButtonContext()
 
-   const { authenticatedUser, isLoggedIn, userData, isLoggedOut } = useAuth()
+   const { isLoggedIn, userData, isLoggedOut } = useAuth()
 
-   const registered = livestreamPresenter.isUserRegistered(
-      authenticatedUser.email || userEmailFromServer
-   )
+   const registered = useUserIsRegistered(livestreamPresenter.id)
 
    if (livestreamPresenter.isPast()) {
       if (livestreamPresenter.denyRecordingAccess) {
