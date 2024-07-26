@@ -5,23 +5,24 @@ const useLivestreamsPerBatch = (): number => {
 
    const extraSmall = useMediaQuery(theme.breakpoints.only("xs"))
    const small = useMediaQuery(theme.breakpoints.only("sm"))
-   const smallUpperLimit = useMediaQuery(theme.breakpoints.down(989))
-   const smallLowerLimit = useMediaQuery(theme.breakpoints.up(900))
+
+   // Taking into consideration side drawer
+   const smallUpperLimit = useMediaQuery(theme.breakpoints.down(1280))
+   const smallLowerLimit = useMediaQuery(theme.breakpoints.up(600))
 
    const smallIsh = smallLowerLimit && smallUpperLimit
 
-   const medium = useMediaQuery(theme.breakpoints.only("md"))
-   const large = useMediaQuery(theme.breakpoints.only("lg"))
-   const wide = useMediaQuery(theme.breakpoints.up("lg"))
+   const large = useMediaQuery(theme.breakpoints.up("lg"))
 
+   // One of them must be true
    const sizes = [
       { active: extraSmall, itemsPerBatch: 1 },
-      { active: small, itemsPerBatch: 2 },
-      { active: smallIsh, itemsPerBatch: 2 },
-      { active: medium || large, itemsPerBatch: 3 },
-      { active: wide, itemsPerBatch: 4 },
+      { active: small || smallIsh, itemsPerBatch: 2 },
+      { active: large, itemsPerBatch: 3 },
    ]
-   return sizes.find((sizeData) => sizeData.active)?.itemsPerBatch || 4
+
+   // Setting default in case of no match
+   return sizes.find((sizeData) => sizeData.active)?.itemsPerBatch || 2
 }
 
 export default useLivestreamsPerBatch
