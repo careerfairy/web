@@ -4,7 +4,7 @@ import {
    LivestreamGroupQuestionsMap,
 } from "@careerfairy/shared-lib/src/livestreams"
 import { UserReminderType } from "@careerfairy/shared-lib/src/users"
-import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegisteredRealtime"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
