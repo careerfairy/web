@@ -107,7 +107,7 @@ export const getStaticProps: GetStaticProps<{
             )
 
             const creators = await groupRepo.getCreatorsWithPublicContent(
-               serverSideGroup?.groupId
+               serverSideGroup
             )
 
             return {
