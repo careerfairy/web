@@ -1,7 +1,4 @@
-import {
-   PublicCreator,
-   transformCreatorNameIntoSlug,
-} from "@careerfairy/shared-lib/groups/creators"
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
@@ -64,30 +61,43 @@ type MentorCardProps = {
    key: string
    creator: PublicCreator
    isEditMode?: boolean
+   handleEdit?: () => void
 }
 
-export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
+export const MentorCard = ({
+   key,
+   creator,
+   isEditMode,
+   handleEdit,
+}: MentorCardProps) => {
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
    const router = useRouter()
+   console.log("🚀 ~ router:", router)
 
-   const handleEdit = (ev: SyntheticEvent) => {
+   const _handleEdit = (ev: SyntheticEvent) => {
       ev.preventDefault()
       ev.stopPropagation()
-      alert("Will open edit dialog")
+      handleEdit?.()
    }
 
    return (
       <Box
          key={key}
          sx={styles.container}
-         component={Link}
-         href={`/company/${
-            router.query.companyName
-         }/mentor/${transformCreatorNameIntoSlug(creator)}/${creator.id}`}
+         component={isEditMode ? "div" : Link}
+         // href={
+         //    isEditMode
+         //       ? "#"
+         //       : `/company/${
+         //            router.query.companyName
+         //         }/mentor/${transformCreatorNameIntoSlug(creator)}/${
+         //            creator.id
+         //         }`
+         // }
       >
          {Boolean(isEditMode) && (
-            <IconButton sx={styles.edit} onClick={handleEdit}>
+            <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.palette.neutral[700]} />
             </IconButton>
          )}
