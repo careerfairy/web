@@ -1091,10 +1091,18 @@ export class FirebaseGroupRepository
       if (creatorsSnaps.empty) return []
 
       const creators = mapFirestoreDocuments<Creator>(creatorsSnaps)
-      const creatorsMap = new Map<string, Creator>()
+
+      const creatorsMapById = new Map<string, Creator>()
       creators.forEach((creator) => {
          if (creator.id) {
-            creatorsMap.set(creator.email, creator)
+            creatorsMapById.set(creator.id, creator)
+         }
+      })
+
+      const creatorsMapByEmail = new Map<string, Creator>()
+      creators.forEach((creator) => {
+         if (creator.id) {
+            creatorsMapByEmail.set(creator.email, creator)
          }
       })
 
@@ -1114,13 +1122,14 @@ export class FirebaseGroupRepository
       const creatorsWithSparks = creatorsWithSparksSnaps
          .filter((snap) => !snap.empty)
          .map((snap) => mapFirestoreDocuments<Spark>(snap)[0])
-         .map((sparks) => creatorsMap.get(sparks.creator.id))
+         .map((sparks) => creatorsMapById.get(sparks.creator.id))
          .filter(Boolean)
 
       if (livestreamsSnaps.empty) return creatorsWithSparks
 
       const livestreams =
          mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps)
+
       // covers co-hosted live stream edge case
       const groupLivestreams = livestreams.filter(
          (livestream) => livestream.groupIds[0] === group.id
@@ -1128,7 +1137,7 @@ export class FirebaseGroupRepository
       const creatorsWithLivestreams = groupLivestreams
          .flatMap((livestream) => {
             return livestream.speakers
-               ?.map((speaker) => creatorsMap.get(speaker.email))
+               ?.map((speaker) => creatorsMapByEmail.get(speaker.email))
                .filter(Boolean)
          })
          .filter(Boolean)
@@ -1139,6 +1148,7 @@ export class FirebaseGroupRepository
          ...creatorsWithLivestreams,
          ...creatorsWithSparks,
       ]
+
       const resultWithNoDuplicates = uniqBy(
          creatorsWithPublicContent,
          (creator) => creator.id
