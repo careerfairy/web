@@ -5,10 +5,18 @@ import { useAgoraRtmToken } from "components/custom-hook/streaming/useAgoraRtmTo
 import { useForcedProxyMode } from "components/custom-hook/streaming/useForcedProxyMode"
 import { agoraCredentials } from "data/agora/AgoraInstance"
 import { ReactNode, useCallback, useEffect, useState } from "react"
-import { setRTMFailedToConnect } from "store/reducers/streamingAppReducer"
+import {
+   setIsRecordingBotInRoom,
+   setRTMFailedToConnect,
+   setViewCount,
+} from "store/reducers/streamingAppReducer"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "./Streaming"
 import { AgoraRTMChannelProvider, AgoraRTMClientProvider } from "./rtm"
+import {
+   fetchChannelMembers,
+   filterMembers,
+} from "./rtm/hooks/useChannelMembers"
 
 type RTMSignalingProviderProps = {
    children: ReactNode
@@ -50,6 +58,12 @@ export const RTMSignalingProvider = ({
          await newChannel.join()
          setRtmState({ channel: newChannel, client: newClient })
          dispatch(setRTMFailedToConnect(false))
+         /* dispatch current view count for users that join mid-stream */
+         const channelMemberCount = await newClient.getChannelMemberCount([
+            newChannel.channelId,
+         ])
+         channelMemberCount[livestreamId] &&
+            dispatch(setViewCount(channelMemberCount[livestreamId]))
       } catch (e) {
          dispatch(setRTMFailedToConnect(true))
          errorLogAndNotify(e, {
@@ -81,12 +95,25 @@ export const RTMSignalingProvider = ({
    useEffect(() => {
       if (token) {
          login()
-
          return () => {
             logout()
          }
       }
    }, [login, logout, token])
+
+   useEffect(() => {
+      /* filter members after joining to adjust view count */
+      const filter = async () => {
+         if (rtmState.channel) {
+            const members = await fetchChannelMembers(rtmState.channel)
+            const { hasRecordBot } = filterMembers(members)
+            if (hasRecordBot) {
+               dispatch(setIsRecordingBotInRoom(true))
+            }
+         }
+      }
+      filter()
+   }, [rtmState.channel, dispatch])
 
    return (
       <AgoraRTMClientProvider client={rtmState.client}>
