@@ -17,7 +17,7 @@ const useLivestreamsPerBatch = (type: "future" | "past"): number => {
    // One of them must be true
    const sizes = [
       { active: extraSmall, itemsPerBatch: type === "future" ? 6 : 3 },
-      { active: small || smallIsh, itemsPerBatch: 2 },
+      { active: small || smallIsh, itemsPerBatch: type === "future" ? 6 : 4 },
       { active: large, itemsPerBatch: 3 },
    ]
 
