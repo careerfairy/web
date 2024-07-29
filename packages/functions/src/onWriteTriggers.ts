@@ -266,7 +266,7 @@ export const onWriteGroup = functions
    })
 
 export const onWriteSpark = functions
-   .runWith(defaultTriggerRunTimeConfig)
+   .runWith({ ...defaultTriggerRunTimeConfig, memory: "512MB" })
    .region(config.region)
    .firestore.document("sparks/{sparkId}")
    .onWrite(async (change, context) => {
