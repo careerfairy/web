@@ -15,6 +15,8 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       overflow: "hidden",
+      height: "100%",
+      justifyContent: "space-between",
    },
    container: {
       overflowX: "auto",
