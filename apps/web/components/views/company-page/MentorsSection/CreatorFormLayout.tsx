@@ -16,24 +16,6 @@ const styles = sxStyles({
       flexDirection: "column",
       overflow: "hidden",
    },
-   closeBtn: {
-      zIndex: 1,
-      position: "absolute",
-      top: {
-         xs: "12px",
-         md: "20px",
-      },
-      right: {
-         xs: "16px",
-         md: "20px",
-      },
-      color: "text.primary",
-      "& svg": {
-         width: 32,
-         height: 32,
-         color: "text.primary",
-      },
-   },
    container: {
       overflowX: "auto",
    },
@@ -102,6 +84,24 @@ const styles = sxStyles({
       padding: {
          xs: "21px",
          md: "24px",
+      },
+   },
+   closeBtn: {
+      zIndex: 1,
+      position: "absolute",
+      top: {
+         xs: "12px",
+         md: "20px",
+      },
+      right: {
+         xs: "16px",
+         md: "20px",
+      },
+      color: "text.primary",
+      "& svg": {
+         width: 32,
+         height: 32,
+         color: "text.primary",
       },
    },
    button: {
@@ -173,6 +173,7 @@ const Actions = ({ children }) => {
 }
 
 type BrandedDialogProps = {
+   key: string
    isDialogOpen: boolean
    handleCloseDialog: () => void
    isMobile: boolean
@@ -180,6 +181,7 @@ type BrandedDialogProps = {
 }
 
 const BrandedDialog = ({
+   key,
    isDialogOpen,
    handleCloseDialog,
    isMobile,
@@ -187,6 +189,7 @@ const BrandedDialog = ({
 }: BrandedDialogProps) => {
    return isMobile ? (
       <SwipeableDrawer
+         key={key}
          anchor="bottom"
          open={isDialogOpen}
          onOpen={() => null}
@@ -199,6 +202,7 @@ const BrandedDialog = ({
       </SwipeableDrawer>
    ) : (
       <Dialog
+         key={key}
          open={isDialogOpen}
          onClose={handleCloseDialog}
          PaperProps={{
