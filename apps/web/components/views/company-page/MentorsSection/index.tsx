@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ContentCarousel } from "components/views/mentor-page/ContentCarousel"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { useMountedState } from "react-use"
 import { useCompanyPage } from ".."
 import { CreatorFormLayout } from "./CreatorFormLayout"
@@ -22,6 +22,19 @@ export const MentorsSection = () => {
       useDialogStateHandler()
 
    const isMounted = useMountedState()
+
+   const handleOpen = useCallback(
+      (creator: PublicCreator) => {
+         setSelectedMentor(creator)
+         handleOpenDialog()
+      },
+      [handleOpenDialog]
+   )
+
+   const handleClose = useCallback(() => {
+      setSelectedMentor(null)
+      handleCloseDialog()
+   }, [handleCloseDialog])
 
    if (!groupCreators?.length) return null
 
@@ -48,22 +61,16 @@ export const MentorsSection = () => {
                   key={`mentor-slide-box-${creator.id}`}
                   creator={creator}
                   isEditMode={editMode}
-                  handleEdit={() => {
-                     setSelectedMentor(creator)
-                     handleOpenDialog()
-                  }}
+                  handleEdit={() => handleOpen(creator)}
                />
             ))}
          </ContentCarousel>
          <CreatorFormLayout.Dialog
             isDialogOpen={isDialogOpen}
-            handleCloseDialog={handleCloseDialog}
+            handleCloseDialog={handleClose}
             isMobile={isMobile}
          >
-            <MentorForm
-               mentor={selectedMentor}
-               handleClose={handleCloseDialog}
-            />
+            <MentorForm mentor={selectedMentor} handleClose={handleClose} />
          </CreatorFormLayout.Dialog>
       </Box>
    )
