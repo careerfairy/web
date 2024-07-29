@@ -78,10 +78,7 @@ export const MentorForm = ({ mentor, handleClose }: MentorFormProps) => {
    return (
       <Box key={creator?.id}>
          <CreatorFormProvider creator={creator}>
-            <CreatorFormLayout
-               handleClose={handleClose}
-               key={new Date().getTime()}
-            >
+            <CreatorFormLayout handleClose={handleClose}>
                <CreatorFormLayout.Container>
                   <CreatorFormLayout.Header>
                      <CreatorFormLayout.Title>
