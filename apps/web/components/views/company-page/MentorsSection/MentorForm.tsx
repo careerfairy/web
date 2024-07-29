@@ -1,5 +1,6 @@
 import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
+import { Box } from "@mui/material"
 import useGroupCreator from "components/custom-hook/creator/useGroupCreator"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
 import {
@@ -9,50 +10,6 @@ import {
 import useCreatorFormSubmit from "components/views/sparks/forms/hooks/useCreatorFormSubmit"
 import { useFormContext } from "react-hook-form"
 import { CreatorFormLayout } from "./CreatorFormLayout"
-
-type MentorFormProps = {
-   mentor: PublicCreator
-   handleClose: () => void
-}
-
-export const MentorForm = ({ mentor, handleClose }: MentorFormProps) => {
-   const isDesktop = useIsDesktop()
-
-   const { data: creator } = useGroupCreator(
-      mentor?.groupId || "",
-      mentor?.id || "",
-      {
-         suspense: true,
-         initialData: mentor,
-      }
-   )
-
-   return (
-      <CreatorFormProvider creator={creator}>
-         <CreatorFormLayout handleClose={handleClose}>
-            <CreatorFormLayout.Container>
-               <CreatorFormLayout.Header>
-                  <CreatorFormLayout.Title>
-                     Edit {Boolean(isDesktop) && "your"}{" "}
-                     <CreatorFormLayout.HighlightedTitleText>
-                        contributor
-                     </CreatorFormLayout.HighlightedTitleText>
-                  </CreatorFormLayout.Title>
-                  <CreatorFormLayout.Subtitle>
-                     Check and change your contributor details
-                  </CreatorFormLayout.Subtitle>
-               </CreatorFormLayout.Header>
-               <CreatorFormLayout.Fields>
-                  <CreatorFormFields />
-               </CreatorFormLayout.Fields>
-            </CreatorFormLayout.Container>
-            <CreatorFormLayout.Actions>
-               <Actions creator={creator} handleClose={handleClose} />
-            </CreatorFormLayout.Actions>
-         </CreatorFormLayout>
-      </CreatorFormProvider>
-   )
-}
 
 type ActionsProps = {
    creator: Creator
@@ -96,5 +53,56 @@ const Actions = ({ creator, handleClose }: ActionsProps) => {
             Save
          </CreatorFormLayout.Button>
       </>
+   )
+}
+
+type MentorFormProps = {
+   mentor: PublicCreator
+   handleClose: () => void
+}
+
+export const MentorForm = ({ mentor, handleClose }: MentorFormProps) => {
+   const isDesktop = useIsDesktop()
+
+   const { data: creator, status } = useGroupCreator(
+      mentor?.groupId || "",
+      mentor?.id || "",
+      {
+         suspense: true,
+         initialData: mentor,
+      }
+   )
+
+   if (status !== "success") return null
+
+   return (
+      <Box key={creator?.id}>
+         <CreatorFormProvider creator={creator}>
+            <CreatorFormLayout
+               handleClose={handleClose}
+               key={new Date().getTime()}
+            >
+               <CreatorFormLayout.Container>
+                  <CreatorFormLayout.Header>
+                     <CreatorFormLayout.Title>
+                        Edit {Boolean(isDesktop) && "your"}{" "}
+                        <CreatorFormLayout.HighlightedTitleText>
+                           contributor
+                        </CreatorFormLayout.HighlightedTitleText>
+                     </CreatorFormLayout.Title>
+                     <CreatorFormLayout.Subtitle>
+                        Check and change your contributor details
+                     </CreatorFormLayout.Subtitle>
+                  </CreatorFormLayout.Header>
+                  <CreatorFormLayout.Fields>
+                     <CreatorFormFields />
+                  </CreatorFormLayout.Fields>
+               </CreatorFormLayout.Container>
+               <CreatorFormLayout.Actions>
+                  <Actions creator={creator} handleClose={handleClose} />
+               </CreatorFormLayout.Actions>
+            </CreatorFormLayout>
+         </CreatorFormProvider>
+      </Box>
    )
 }
