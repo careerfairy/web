@@ -1253,7 +1253,7 @@ export class LivestreamService {
     */
    async getRegisteredStreams(
       registeredUserAuthId: string,
-      maxResults: number = 20
+      maxResults: number = 30
    ) {
       const userLivestreamDataRef = query(
          collectionGroup(FirestoreInstance, "userLivestreamData"),

@@ -29,9 +29,7 @@ const MyRegistrations: NextPage<
 > = (props) => {
    const isMobile = useIsMobile()
 
-   const { data: registeredStreams } = useRegisteredStreams({
-      limit: 30,
-   })
+   const { data: registeredStreams } = useRegisteredStreams()
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (

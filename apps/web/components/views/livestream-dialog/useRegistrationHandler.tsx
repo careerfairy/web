@@ -5,6 +5,7 @@ import {
 } from "@careerfairy/shared-lib/src/livestreams"
 import { UserReminderType } from "@careerfairy/shared-lib/src/users"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
+import { useRefetchRegisteredStreams } from "components/custom-hook/useRegisteredStreams"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -34,6 +35,7 @@ export default function useRegistrationHandler() {
       sendRegistrationConfirmationEmail,
    } = useFirebaseService()
 
+   const refetchRegisteredStreams = useRefetchRegisteredStreams()
    const isAlreadyRegistered = useUserIsRegistered(livestream.id)
 
    /**
@@ -88,6 +90,7 @@ export default function useRegistrationHandler() {
     */
    const deRegisterLivestream = useCallback(async () => {
       await deregisterFromLivestream(livestream.id, userData)
+      refetchRegisteredStreams()
       recommendationServiceInstance.unRegisterEvent(
          livestream.id,
          userData.authId
@@ -99,7 +102,12 @@ export default function useRegistrationHandler() {
       await sparkService.createUserSparksFeedEventNotifications(
          userData.userEmail
       )
-   }, [deregisterFromLivestream, livestream, userData])
+   }, [
+      deregisterFromLivestream,
+      livestream,
+      refetchRegisteredStreams,
+      userData,
+   ])
 
    /**
     * Should be called when the auth object is loaded
@@ -225,6 +233,7 @@ export default function useRegistrationHandler() {
 
                // Increase livestream popularity
                recommendationServiceInstance.registerEvent(livestream, userData)
+               refetchRegisteredStreams()
 
                dataLayerLivestreamEvent(
                   "event_registration_complete",
@@ -243,6 +252,7 @@ export default function useRegistrationHandler() {
          currentSparkId,
          isRecommended,
          registerToLivestream,
+         refetchRegisteredStreams,
          sendRegistrationConfirmationEmail,
       ]
    )
