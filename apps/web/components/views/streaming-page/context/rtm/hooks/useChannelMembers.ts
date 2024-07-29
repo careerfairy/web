@@ -50,7 +50,7 @@ const sortMembers = (a: string, b: string) => {
 export const filterMembers = (members: string[]) => {
    const filteredData = { hasRecordBot: false }
    const filteredMembers = members?.filter((member) => {
-      if (member.startsWith(STREAM_IDENTIFIERS.USER)) {
+      if (member.startsWith(STREAM_IDENTIFIERS.RECORDING)) {
          filteredData.hasRecordBot = true
          return false
       }
