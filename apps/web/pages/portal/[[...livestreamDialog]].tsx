@@ -141,7 +141,7 @@ const PortalPage = ({
                               serverSideEvents={comingUpNext}
                               limit={20}
                            />
-                           <MyNextEvents limit={20} />
+                           <MyNextEvents />
                            <ConditionalWrapper
                               condition={Boolean(events?.length)}
                            >
