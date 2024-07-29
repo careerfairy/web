@@ -47,7 +47,7 @@ type Props = {
 }
 
 const LivestreamTagsContent = (props: Props) => {
-   const eventsPerBatch = useLivestreamsPerBatch()
+   const eventsPerBatch = useLivestreamsPerBatch(props.type)
 
    const {
       data: events,

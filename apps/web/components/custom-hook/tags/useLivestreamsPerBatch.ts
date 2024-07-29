@@ -1,6 +1,6 @@
 import { useMediaQuery, useTheme } from "@mui/material"
 
-const useLivestreamsPerBatch = (): number => {
+const useLivestreamsPerBatch = (type: "future" | "past"): number => {
    const theme = useTheme()
 
    const extraSmall = useMediaQuery(theme.breakpoints.only("xs"))
@@ -16,7 +16,7 @@ const useLivestreamsPerBatch = (): number => {
 
    // One of them must be true
    const sizes = [
-      { active: extraSmall, itemsPerBatch: 1 },
+      { active: extraSmall, itemsPerBatch: type === "future" ? 6 : 3 },
       { active: small || smallIsh, itemsPerBatch: 2 },
       { active: large, itemsPerBatch: 3 },
    ]
