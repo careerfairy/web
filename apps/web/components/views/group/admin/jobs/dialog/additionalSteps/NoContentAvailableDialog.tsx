@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material"
+import { Stack, useTheme } from "@mui/material"
 import { AlertCircle } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "../../../../../../../types/commonTypes"
@@ -39,7 +39,8 @@ const styles = sxStyles({
    },
 })
 
-const NoLinkedContentDialog = () => {
+const NoContentAvailableDialog = () => {
+   const theme = useTheme()
    const {
       formState: { isSubmitting },
    } = useFormContext()
@@ -53,7 +54,7 @@ const NoLinkedContentDialog = () => {
          <>
             <SteppedDialog.Content sx={styles.container}>
                <Stack spacing={3} sx={styles.info}>
-                  <AlertCircle color={"#FE9B0E"} size={48} />
+                  <AlertCircle color={theme.palette.warning.main} size={48} />
 
                   <SteppedDialog.Title sx={styles.title}>
                      No content to link available
@@ -95,4 +96,4 @@ const NoLinkedContentDialog = () => {
    )
 }
 
-export default NoLinkedContentDialog
+export default NoContentAvailableDialog

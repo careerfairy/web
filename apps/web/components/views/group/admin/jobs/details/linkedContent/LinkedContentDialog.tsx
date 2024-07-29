@@ -16,7 +16,7 @@ const styles = sxStyles({
       height: { xs: "auto", md: "auto" },
       maxHeight: { xs: "calc(90dvh)", md: "800px" },
       alignSelf: { xs: "self-end", md: "unset" },
-      borderRadius: 5,
+      borderRadius: { xs: "20px 20px 0 0", md: 5 },
    },
 })
 

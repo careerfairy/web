@@ -23,7 +23,7 @@ import SelectorCustomJobsDropDown from "./components/SelectorCustomJobsDropDown"
 const styles = sxStyles({
    dialog: {
       top: { xs: "70px", md: 0 },
-      borderRadius: 5,
+      borderRadius: { xs: "20px 20px 0 0", md: 5 },
    },
 })
 
