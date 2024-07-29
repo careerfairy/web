@@ -103,14 +103,7 @@ const EventsPreview = ({
             <Grid container spacing={isMobile ? 2 : 3}>
                {events.map((livestream, idx, arr) => {
                   return (
-                     <Grid
-                        key={livestream.id}
-                        xs={12}
-                        sm={6}
-                        lg={4}
-                        xl={3}
-                        item
-                     >
+                     <Grid key={livestream.id} xs={12} sm={6} lg={4} item>
                         <EventPreviewCard
                            key={livestream.id}
                            index={idx}
