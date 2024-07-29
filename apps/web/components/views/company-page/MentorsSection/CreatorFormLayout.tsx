@@ -173,7 +173,6 @@ const Actions = ({ children }) => {
 }
 
 type BrandedDialogProps = {
-   key: string
    isDialogOpen: boolean
    handleCloseDialog: () => void
    isMobile: boolean
@@ -181,7 +180,6 @@ type BrandedDialogProps = {
 }
 
 const BrandedDialog = ({
-   key,
    isDialogOpen,
    handleCloseDialog,
    isMobile,
@@ -189,7 +187,6 @@ const BrandedDialog = ({
 }: BrandedDialogProps) => {
    return isMobile ? (
       <SwipeableDrawer
-         key={key}
          anchor="bottom"
          open={isDialogOpen}
          onOpen={() => null}
@@ -202,7 +199,6 @@ const BrandedDialog = ({
       </SwipeableDrawer>
    ) : (
       <Dialog
-         key={key}
          open={isDialogOpen}
          onClose={handleCloseDialog}
          PaperProps={{
