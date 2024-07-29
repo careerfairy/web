@@ -240,15 +240,14 @@ export class GroupDashboardPage extends CommonPage {
 
       if (data.speakers) {
          await this.clickNextButton()
-         const isGeneralTabInvalid = await this.page
-            .getByRole("heading", { name: "Required fields missing" })
-            .isVisible()
-         if (isGeneralTabInvalid) {
-            await this.page
-               .getByRole("button", { name: "Skip for now" })
-               .click()
-         }
+         await this.skipRequiredFields()
          await this.createSpeakers(data.speakers)
+      }
+
+      if (data.jobs) {
+         await this.clickJobOpenings()
+         await this.skipRequiredFields()
+         await this.selectJobs(data.jobs)
       }
 
       await expect(
@@ -277,6 +276,15 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
+   public async skipRequiredFields() {
+      const isGeneralTabInvalid = await this.page
+         .getByRole("heading", { name: "Required fields missing" })
+         .isVisible()
+
+      if (isGeneralTabInvalid) {
+         await this.page.getByRole("button", { name: "Skip for now" }).click()
+      }
+   }
    /**
     * Selects the jobs from the dropdown, currently you can only select one job
     * */
@@ -392,6 +400,9 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
+   public async clickJobOpenings() {
+      await this.page.getByRole("button", { name: "Job openings" }).click()
+   }
    public async clickPublish() {
       await this.page.getByRole("button", { name: "Publish" }).click()
    }

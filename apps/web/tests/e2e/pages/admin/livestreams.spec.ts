@@ -94,4 +94,22 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.goToLivestreams()
       await groupPage.assertTextIsVisible(title)
    })
+
+   test("Create a draft live stream with job openings", async ({
+      groupPage,
+   }) => {
+      // TODO-WG: Confirm cannot use in beforeAll
+      await setupLivestreamData()
+
+      const livestream = LivestreamSeed.randomDraft({})
+      console.log(
+         "🚀 ~ test.describe ~ livestreams:",
+         livestream.hasJobs,
+         livestream.jobs
+      )
+
+      // create draft - with missing required fields
+      await groupPage.clickCreateNewLivestreamTop()
+      await groupPage.fillLivestreamForm(livestream)
+   })
 })
