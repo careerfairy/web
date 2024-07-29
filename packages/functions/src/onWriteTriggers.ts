@@ -266,6 +266,7 @@ export const onWriteGroup = functions
    })
 
 export const onWriteSpark = functions
+   // Keep settings with higher memory
    .runWith({ ...defaultTriggerRunTimeConfig, memory: "512MB" })
    .region(config.region)
    .firestore.document("sparks/{sparkId}")
