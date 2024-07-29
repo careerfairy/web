@@ -21,10 +21,8 @@ import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
 import SteppedDialog from "../../../../stepped-dialog/SteppedDialog"
 import CustomJobFormProvider from "./CustomJobFormProvider"
-import {
-   default as NoContentAvailableDialog,
-   default as NoLinkedContentDialog,
-} from "./additionalSteps/NoContentAvailableDialog"
+import NoContentAvailableDialog from "./additionalSteps/NoContentAvailableDialog"
+import NoLinkedContentDialog from "./additionalSteps/NoLinkedContentDialog"
 import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
 import JobBasicInfo from "./createJob/JobBasicInfo"
 import JobFormDialog from "./createJob/JobFormDialog"
@@ -83,7 +81,7 @@ const styles = sxStyles({
       height: { xs: "auto", md: "auto" },
       maxHeight: { xs: "calc(90dvh)", md: "800px" },
       alignSelf: { xs: "self-end", md: "unset" },
-      borderRadius: 5,
+      borderRadius: { xs: "20px 20px 0 0", md: 5 },
    },
 })
 
@@ -149,7 +147,11 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
               },
               {
                  key: JobDialogStep.FORM_PREVIEW.key,
-                 Component: () => <JobFormPreview />,
+                 Component: () => (
+                    <SuspenseWithBoundary fallback={<></>}>
+                       <JobFormPreview />
+                    </SuspenseWithBoundary>
+                 ),
               },
            ]
          : [

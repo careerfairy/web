@@ -2,6 +2,7 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useCustomJobLinkedSparks from "components/custom-hook/custom-job/useCustomJobLinkedSparks"
+import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
@@ -10,6 +11,7 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useRef, useState } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -58,7 +60,6 @@ const styles = sxStyles({
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "baseline",
-      mb: "16px !important",
    },
    editBtn: {
       width: "8px",
@@ -88,9 +89,13 @@ export type DialogState = {
 
 const LinkedContent = ({ job }: Props) => {
    const childRef = useRef(null)
+   const { group } = useGroup()
    const [dialogState, setDialogState] = useState<DialogState>({ open: false })
    const linkedLivestreams = useCustomJobLinkedLivestreams(job)
    const linkedSparks = useCustomJobLinkedSparks(job)
+   const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
+      group.groupId
+   )
    const { jobHubV1 } = useFeatureFlags()
    const isMobile = useIsMobile()
 
@@ -101,9 +106,9 @@ const LinkedContent = ({ job }: Props) => {
    const linkJobToContentClick = useCallback(() => {
       setDialogState({
          open: true,
-         step: linkedLivestreams.length > 0 ? 0 : 1,
+         step: groupHasUpcomingLivestreams ? 0 : 1,
       })
-   }, [linkedLivestreams.length])
+   }, [groupHasUpcomingLivestreams])
 
    const handleEditLiveStreams = () => {
       setDialogState({ open: true, step: 0 })
