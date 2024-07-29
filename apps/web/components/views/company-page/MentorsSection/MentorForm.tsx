@@ -1,6 +1,5 @@
 import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
-import { Box } from "@mui/material"
 import useGroupCreator from "components/custom-hook/creator/useGroupCreator"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
 import {
@@ -13,22 +12,28 @@ import { CreatorFormLayout } from "./CreatorFormLayout"
 
 type ActionsProps = {
    creator: Creator
+   handleSubmitCallback?: (values: CreateCreatorSchemaType) => void
    handleClose: () => void
 }
 
-const Actions = ({ creator, handleClose }: ActionsProps) => {
+const Actions = ({
+   creator,
+   handleSubmitCallback,
+   handleClose,
+}: ActionsProps) => {
    const { handleSubmit: handleCreatorSubmit } = useCreatorFormSubmit(
       creator?.groupId
    )
 
    const {
-      handleSubmit,
+      handleSubmit: handleFormSubmit,
       formState: { isSubmitting, isValid, isDirty },
       setError,
    } = useFormContext<CreateCreatorSchemaType>()
 
    const onSubmit = async (values: CreateCreatorSchemaType) => {
       await handleCreatorSubmit(values, setError as any)
+      handleSubmitCallback?.(values)
       handleClose()
    }
 
@@ -47,7 +52,7 @@ const Actions = ({ creator, handleClose }: ActionsProps) => {
             color={"secondary"}
             disabled={isSubmitting || !isValid || !isDirty}
             type="submit"
-            onClick={handleSubmit?.(onSubmit)}
+            onClick={handleFormSubmit?.(onSubmit)}
             loading={isSubmitting}
          >
             Save
@@ -58,10 +63,15 @@ const Actions = ({ creator, handleClose }: ActionsProps) => {
 
 type MentorFormProps = {
    mentor: PublicCreator
+   handleSubmitCallback?: (values: CreateCreatorSchemaType) => void
    handleClose: () => void
 }
 
-export const MentorForm = ({ mentor, handleClose }: MentorFormProps) => {
+export const MentorForm = ({
+   mentor,
+   handleSubmitCallback,
+   handleClose,
+}: MentorFormProps) => {
    const isDesktop = useIsDesktop()
 
    const { data: creator, status } = useGroupCreator(
@@ -76,30 +86,32 @@ export const MentorForm = ({ mentor, handleClose }: MentorFormProps) => {
    if (status !== "success") return null
 
    return (
-      <Box key={creator?.id}>
-         <CreatorFormProvider creator={creator}>
-            <CreatorFormLayout handleClose={handleClose}>
-               <CreatorFormLayout.Container>
-                  <CreatorFormLayout.Header>
-                     <CreatorFormLayout.Title>
-                        Edit {Boolean(isDesktop) && "your"}{" "}
-                        <CreatorFormLayout.HighlightedTitleText>
-                           contributor
-                        </CreatorFormLayout.HighlightedTitleText>
-                     </CreatorFormLayout.Title>
-                     <CreatorFormLayout.Subtitle>
-                        Check and change your contributor details
-                     </CreatorFormLayout.Subtitle>
-                  </CreatorFormLayout.Header>
-                  <CreatorFormLayout.Fields>
-                     <CreatorFormFields />
-                  </CreatorFormLayout.Fields>
-               </CreatorFormLayout.Container>
-               <CreatorFormLayout.Actions>
-                  <Actions creator={creator} handleClose={handleClose} />
-               </CreatorFormLayout.Actions>
-            </CreatorFormLayout>
-         </CreatorFormProvider>
-      </Box>
+      <CreatorFormProvider creator={creator}>
+         <CreatorFormLayout handleClose={handleClose}>
+            <CreatorFormLayout.Container>
+               <CreatorFormLayout.Header>
+                  <CreatorFormLayout.Title>
+                     Edit {Boolean(isDesktop) && "your"}{" "}
+                     <CreatorFormLayout.HighlightedTitleText>
+                        contributor
+                     </CreatorFormLayout.HighlightedTitleText>
+                  </CreatorFormLayout.Title>
+                  <CreatorFormLayout.Subtitle>
+                     Check and change your contributor details
+                  </CreatorFormLayout.Subtitle>
+               </CreatorFormLayout.Header>
+               <CreatorFormLayout.Fields>
+                  <CreatorFormFields />
+               </CreatorFormLayout.Fields>
+            </CreatorFormLayout.Container>
+            <CreatorFormLayout.Actions>
+               <Actions
+                  creator={creator}
+                  handleSubmitCallback={handleSubmitCallback}
+                  handleClose={handleClose}
+               />
+            </CreatorFormLayout.Actions>
+         </CreatorFormLayout>
+      </CreatorFormProvider>
    )
 }
