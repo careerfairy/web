@@ -10,14 +10,17 @@ const useLivestreamsPerBatch = (type: "future" | "past"): number => {
    const smallUpperLimit = useMediaQuery(theme.breakpoints.down(1280))
    const smallLowerLimit = useMediaQuery(theme.breakpoints.up(600))
 
-   const smallIsh = smallLowerLimit && smallUpperLimit
+   const isWithinSmallLimits = smallLowerLimit && smallUpperLimit
 
    const large = useMediaQuery(theme.breakpoints.up("lg"))
 
    // One of them must be true
    const sizes = [
       { active: extraSmall, itemsPerBatch: type === "future" ? 6 : 3 },
-      { active: small || smallIsh, itemsPerBatch: type === "future" ? 6 : 4 },
+      {
+         active: small || isWithinSmallLimits,
+         itemsPerBatch: type === "future" ? 6 : 4,
+      },
       { active: large, itemsPerBatch: 3 },
    ]
 
