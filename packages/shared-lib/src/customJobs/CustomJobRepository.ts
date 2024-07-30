@@ -95,7 +95,7 @@ export interface ICustomJobRepository {
    ): Promise<CustomJob[]>
 
    /**
-    * Get all group custom jobs by group IDs
+    * Get all group custom jobs by group ID
     * @param groupId
     */
    getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]>
