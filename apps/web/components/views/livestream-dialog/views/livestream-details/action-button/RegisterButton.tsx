@@ -2,6 +2,7 @@ import CheckIcon from "@mui/icons-material/Check"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { Button } from "@mui/material"
 import Box from "@mui/material/Box"
+import { useLivestreamUsersCount } from "components/custom-hook/live-stream/useLivestreamUsersCount"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import { FC, useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
@@ -28,8 +29,15 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
    const [open, setOpen] = useState(false)
 
    const registered = useUserIsRegistered(livestreamPresenter.id)
+   const { count } = useLivestreamUsersCount(
+      livestreamPresenter.id,
+      "registered"
+   )
 
-   const disabled = livestreamPresenter.isRegistrationDisabled(registered)
+   const disabled = livestreamPresenter.isRegistrationDisabled(
+      registered,
+      count || 0
+   )
 
    const isPast = livestreamPresenter.isPast()
 

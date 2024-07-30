@@ -1,5 +1,6 @@
 import { Skeleton, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
+import { useLivestreamUsersCount } from "components/custom-hook/live-stream/useLivestreamUsersCount"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import React, { FC } from "react"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
@@ -30,6 +31,12 @@ const ButtonElement: FC = () => {
    const { isLoggedIn, userData, isLoggedOut } = useAuth()
 
    const registered = useUserIsRegistered(livestreamPresenter.id)
+   const { count } = useLivestreamUsersCount(
+      livestreamPresenter.id,
+      "registered"
+   )
+
+   const registeredUsersCount = count || 0
 
    if (livestreamPresenter.isPast()) {
       if (livestreamPresenter.denyRecordingAccess) {
@@ -76,7 +83,7 @@ const ButtonElement: FC = () => {
       return <RegisterButton label="You're registered" />
    }
 
-   if (livestreamPresenter.hasNoSpotsLeft()) {
+   if (livestreamPresenter.hasNoSpotsLeft(registeredUsersCount)) {
       return <RegisterButton label="No spots left" />
    }
 

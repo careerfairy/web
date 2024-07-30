@@ -2,6 +2,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/Li
 import { Box, useMediaQuery } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import AgoraRTC from "agora-rtc-sdk-ng"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { appendCurrentQueryParams } from "components/util/url"
@@ -118,6 +119,7 @@ const ViewerLayout = (props) => {
    const [handRaiseActive, setHandRaiseActive] = useState(false)
    const [streamerId, setStreamerId] = useState("")
    const showMenu = useSelector(leftMenuOpenSelector)
+   const hasRegisteredToEvent = useUserIsRegistered(livestreamId as string)
 
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const spyModeEnabled = useSelector(
@@ -285,13 +287,6 @@ const ViewerLayout = (props) => {
                const hasAnsweredAllQuestions =
                   checkIfUserHasAnsweredAllLivestreamGroupQuestions(
                      answeredLivestreamGroupQuestions
-                  )
-
-               // The user might have answered all the questions but not registered to the event,
-               // so we check if the user has registered to the event
-               const hasRegisteredToEvent =
-                  currentLivestream?.registeredUsers?.includes?.(
-                     userData.userEmail
                   )
 
                if (

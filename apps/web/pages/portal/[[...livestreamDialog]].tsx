@@ -7,6 +7,7 @@ import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
 import SEO from "../../components/util/SEO"
 import CarouselContentService, {
+   filterNonRegisteredStreams,
    type CarouselContent,
 } from "../../components/views/portal/content-carousel/CarouselContentService"
 import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
@@ -273,11 +274,16 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
 
+   const [upcomingLivestreams, pastLivestreams] = await Promise.all([
+      filterNonRegisteredStreams(comingUpNextEvents || [], token?.email),
+      filterNonRegisteredStreams(pastEvents || [], token?.email),
+   ])
+
    const carouselContentService = new CarouselContentService({
       userData: userData,
       userStats: userStats,
-      pastLivestreams: pastEvents || [],
-      upcomingLivestreams: comingUpNextEvents || [],
+      pastLivestreams,
+      upcomingLivestreams,
       registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
    })
 
