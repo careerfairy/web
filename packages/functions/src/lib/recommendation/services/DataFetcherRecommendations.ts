@@ -121,8 +121,6 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
    getPastLivestreams(): Promise<LivestreamEvent[]> {
       // fetch the last 10 registered livestreams for this user only
       return this.livestreamRepo.getRegisteredEvents(this.userId, {
-         to: new Date(),
-         orderByDirection: "desc",
          limit: 10,
       })
    }

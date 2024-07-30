@@ -1,11 +1,11 @@
-import { BulkWriter, Firestore } from "firebase-admin/firestore"
+import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/livestreams"
-import { addDaysDate } from "../../../util"
-import { mapEventsToNotifications } from "../util"
+import { BulkWriter, Firestore } from "firebase-admin/firestore"
 import { sparkRepo } from "../../../api/repositories"
+import { addDaysDate } from "../../../util"
 import { getStreamsByDateWithRegisteredStudents } from "../../livestream"
+import { mapEventsToNotifications } from "../util"
 
 type createSparkNotificationForSingleUser = {
    userId: string
@@ -22,10 +22,13 @@ const createSparkNotificationForSingleUser = ({
    bulkWriter,
    logger,
 }: createSparkNotificationForSingleUser) => {
-   // filter all the upcoming events where the user already registered
-   const filteredUpcomingEvents = upcomingEvents.filter(
-      (event) => !event.registeredUsers?.includes(userId)
-   )
+   // filter all the upcoming events where the user is not registered
+   const filteredUpcomingEvents = upcomingEvents.filter((event) => {
+      const userLivestreamData = event.usersLivestreamData.find(
+         (user) => user.id === userId
+      )
+      return !userLivestreamData?.registered.date
+   })
 
    const notifications: UserSparksNotification[] = mapEventsToNotifications(
       filteredUpcomingEvents

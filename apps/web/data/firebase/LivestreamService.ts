@@ -12,7 +12,6 @@ import {
    EmoteType,
    EventRatingAnswer,
    FeedbackQuestionUserAnswer,
-   FilterLivestreamsOptions,
    CategoryDataOption as LivestreamCategoryDataOption,
    LivestreamChatEntry,
    LivestreamEmote,
@@ -21,7 +20,6 @@ import {
    LivestreamModes,
    LivestreamPollVoter,
    LivestreamPresentation,
-   LivestreamQueryOptions,
    LivestreamQuestion,
    LivestreamQuestionComment,
    LivestreamVideo,
@@ -36,14 +34,12 @@ import {
    UpsertSpeakerRequest,
    UserLivestreamData,
    hasUpvotedLivestreamQuestion,
-   sortByDateAscending,
 } from "@careerfairy/shared-lib/livestreams"
 import {
    HandRaise,
    HandRaiseState,
 } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { chunkArray } from "@careerfairy/shared-lib/utils"
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
@@ -57,7 +53,6 @@ import {
    arrayRemove,
    arrayUnion,
    collection,
-   collectionGroup,
    deleteDoc,
    doc,
    getDoc,
@@ -74,7 +69,6 @@ import {
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
 
@@ -99,27 +93,6 @@ export type SetModeOptionsType<Mode extends LivestreamMode> =
 
 export class LivestreamService {
    constructor(private readonly functions: Functions) {}
-
-   /**
-    * Fetches livestreams with the given query options
-    * @param data  The query options
-    * */
-   async fetchLivestreams(
-      data: LivestreamQueryOptions & FilterLivestreamsOptions
-   ) {
-      const { data: serializedLivestreams } = await httpsCallable<
-         typeof data,
-         {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            [field: string]: any
-         }[]
-      >(
-         this.functions,
-         "fetchLivestreams_v2"
-      )(data)
-
-      return mapFromServerSide(serializedLivestreams)
-   }
 
    /**
     * Validates category data for a live stream, determining if a certain user as answered and performed all steps
@@ -1235,59 +1208,6 @@ export class LivestreamService {
          this.functions,
          "upsertLivestreamSpeaker"
       )(data)
-   }
-
-   /**
-    * Retrieves the registered live streams for a user.
-    *
-    * This method uses a two-step query process due to Firestore's limitations:
-    * 1. First, it queries the userLivestreamData to get the IDs of registered streams.
-    * 2. Then, it fetches the actual live stream events using these IDs.
-    *
-    * This approach ensures we get the most up-to-date live stream information
-    * while still respecting the user's registration status.
-    *
-    * @param registeredUserAuthId - The auth ID of the user whose registrations we're fetching.
-    * @param maxResults - The maximum number of results to return (default: 20).
-    * @returns A Promise that resolves to an array of LivestreamEvent objects.
-    */
-   async getRegisteredStreams(
-      registeredUserAuthId: string,
-      maxResults: number = 30
-   ) {
-      const userLivestreamDataRef = query(
-         collectionGroup(FirestoreInstance, "userLivestreamData"),
-         where("userId", "==", registeredUserAuthId),
-         orderBy("registered.date", "desc"), // ordering by a field automatically filters out nulls
-         limit(maxResults)
-      ).withConverter(createGenericConverter<UserLivestreamData>())
-
-      const userLivestreamDataSnaps = await getDocs(userLivestreamDataRef)
-
-      const registeredLivestreamIds = userLivestreamDataSnaps.docs
-         .map((snap) => snap.data().livestreamId)
-         .filter(Boolean)
-
-      const chunks = chunkArray(registeredLivestreamIds, 30) // 30 is the max number of where clauses
-
-      const livestreamsPromises = chunks.map((ids) =>
-         getDocs(
-            query(
-               collection(FirestoreInstance, "livestreams"),
-               where("id", "in", ids),
-               where("start", ">=", Timestamp.now()),
-               orderBy("start", "asc")
-            ).withConverter(createGenericConverter<LivestreamEvent>())
-         )
-      )
-
-      const livestreamsSnapshots = await Promise.all(livestreamsPromises)
-
-      const livestreams = livestreamsSnapshots
-         .flatMap((snapshot) => snapshot.docs.map((doc) => doc.data()))
-         .sort(sortByDateAscending)
-
-      return livestreams
    }
 
    /**

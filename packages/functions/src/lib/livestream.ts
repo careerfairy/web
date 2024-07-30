@@ -3,10 +3,11 @@ import {
    LiveStreamEventWithUsersLivestreamData,
    LivestreamSecureToken,
 } from "@careerfairy/shared-lib/livestreams"
-import { addMinutesDate, removeMinutesDate } from "../util"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
-import { firestore } from "../api/firestoreAdmin"
 import { WriteBatch } from "firebase-admin/firestore"
+import { firestore } from "../api/firestoreAdmin"
+import { livestreamsRepo } from "../api/repositories"
+import { addMinutesDate, removeMinutesDate } from "../util"
 
 export const livestreamGetSecureToken = async (
    id: string,
@@ -214,4 +215,27 @@ export const updateUnfinishedLivestreams = async () => {
    })
 
    return batch.commit()
+}
+
+const getRegistrationStatus = async (
+   streams: LivestreamEvent[],
+   userId: string
+): Promise<boolean[]> => {
+   if (!userId) {
+      return streams.map(() => false)
+   }
+
+   return Promise.all(
+      streams.map((stream) =>
+         livestreamsRepo.isUserRegistered(stream.id, userId)
+      )
+   )
+}
+
+export const filterRegisteredLiveStreams = async (
+   streams: LivestreamEvent[],
+   userId: string
+): Promise<LivestreamEvent[]> => {
+   const registrationStatus = await getRegistrationStatus(streams, userId)
+   return streams.filter((_, index) => registrationStatus[index])
 }
