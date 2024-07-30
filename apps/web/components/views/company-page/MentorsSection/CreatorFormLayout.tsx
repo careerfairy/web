@@ -133,7 +133,7 @@ const styles = sxStyles({
 
 export const CreatorFormLayout = ({ children, handleClose }) => {
    return (
-      <Box sx={styles.root}>
+      <Box sx={styles.root} component="form">
          <Box sx={styles.closeBtn}>
             <IconButton onClick={handleClose}>
                <CloseRounded />
