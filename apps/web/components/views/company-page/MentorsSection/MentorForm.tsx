@@ -78,12 +78,11 @@ export const MentorForm = ({
       mentor?.groupId || "",
       mentor?.id || "",
       {
-         suspense: true,
          initialData: mentor,
       }
    )
 
-   if (!creator?.id) return null
+   if (!creator?.id || !creator?.email) return null
 
    return (
       <CreatorFormProvider creator={creator}>
