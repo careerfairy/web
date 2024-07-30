@@ -55,14 +55,16 @@ type Props = {
    job: CustomJob
    handleSecondaryButton?: () => void
    handlePrimaryButton?: () => void
-   pendingContentView?: boolean
+   primaryButtonMessage?: string
+   secondaryButtonMessage?: string
 }
 
 const JobLinkLiveStreams = ({
    job,
    handleSecondaryButton,
    handlePrimaryButton,
-   pendingContentView,
+   primaryButtonMessage,
+   secondaryButtonMessage,
 }: Props) => {
    const { moveToPrev, moveToNext, goToStep } = useStepper()
    const { group } = useGroupFromState()
@@ -89,11 +91,14 @@ const JobLinkLiveStreams = ({
    const livestreamIds = watch(FIELD_NAME)
 
    const handlePrimaryClick = useCallback(() => {
+      if (handlePrimaryButton) {
+         handlePrimaryButton()
+         return
+      }
+
       // If the group has public sparks, move to the next step
       if (group.publicSparks) {
          moveToNext()
-      } else if (handlePrimaryButton) {
-         handlePrimaryButton()
       }
 
       // If there are no livestream IDs selected and has no public sparks, go to the NO_LINKED_CONTENT step
@@ -209,7 +214,7 @@ const JobLinkLiveStreams = ({
                   onClick={handleSecondaryClick}
                   sx={styles.cancelBtn}
                >
-                  {pendingContentView ? "Cancel" : "Back"}
+                  {secondaryButtonMessage || "Back"}
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
@@ -217,11 +222,7 @@ const JobLinkLiveStreams = ({
                   variant="contained"
                   color="secondary"
                >
-                  {pendingContentView
-                     ? group.publicSparks
-                        ? "Next"
-                        : "Save"
-                     : "Next"}
+                  {primaryButtonMessage || "Next"}
                </SteppedDialog.Button>
             </SteppedDialog.Actions>
          </>

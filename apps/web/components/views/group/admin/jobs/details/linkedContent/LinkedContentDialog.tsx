@@ -4,6 +4,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { SlideUpTransition } from "components/views/common/transitions"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { customJobRepo } from "data/RepositoryInstances"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
@@ -27,6 +28,7 @@ type Props = {
 }
 
 const LinkedContentDialog = ({ job, dialogState, handleClose }: Props) => {
+   const { group } = useGroup()
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { getValues } = useFormContext()
 
@@ -55,9 +57,9 @@ const LinkedContentDialog = ({ job, dialogState, handleClose }: Props) => {
             job,
             handleSubmit,
             handleClose,
-            isSingleStepView: !!dialogState?.step,
+            hasNextStep: !dialogState.editMode && group.publicSparks,
          }),
-      [job, handleSubmit, handleClose, dialogState?.step]
+      [job, handleSubmit, handleClose, dialogState.editMode, group.publicSparks]
    )
 
    return (
@@ -79,14 +81,14 @@ type ViewsProps = {
    job: CustomJob
    handleSubmit: () => void
    handleClose: () => void
-   isSingleStepView: boolean
+   hasNextStep: boolean
 }
 
 const getViews = ({
    job,
    handleSubmit,
    handleClose,
-   isSingleStepView,
+   hasNextStep,
 }: ViewsProps) => [
    {
       key: "live-streams",
@@ -94,9 +96,10 @@ const getViews = ({
          <SuspenseWithBoundary fallback={<></>}>
             <JobLinkLiveStreams
                job={job}
-               handlePrimaryButton={handleSubmit}
-               handleSecondaryButton={handleClose}
-               pendingContentView={true}
+               handlePrimaryButton={hasNextStep ? null : handleSubmit}
+               handleSecondaryButton={hasNextStep ? null : handleClose}
+               primaryButtonMessage={hasNextStep ? "Next" : "Save"}
+               secondaryButtonMessage={"Cancel"}
             />
          </SuspenseWithBoundary>
       ),
@@ -107,9 +110,9 @@ const getViews = ({
          <SuspenseWithBoundary fallback={<></>}>
             <JobLinkSparks
                handlePrimaryButton={handleSubmit}
-               handleSecondaryButton={handleClose}
-               pendingContentView={true}
-               isSingleStepView={isSingleStepView}
+               handleSecondaryButton={hasNextStep ? null : handleClose}
+               primaryButtonMessage={"Save"}
+               secondaryButtonMessage={"Cancel"}
             />
          </SuspenseWithBoundary>
       ),
