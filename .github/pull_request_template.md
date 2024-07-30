@@ -8,12 +8,15 @@
 
 <!-- You can remove anything that doesn't make sense for this change. -->
 
+### Demo
+
+<!-- Consider including a short demo video. -->
+
 ### Browser Testing
 
 -  [ ] Chrome
 -  [ ] Firefox
 -  [ ] Safari
--  [ ] Edge
 
 ### Different Resolutions Testing
 
