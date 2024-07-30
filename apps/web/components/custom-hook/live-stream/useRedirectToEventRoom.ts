@@ -22,7 +22,7 @@ const useRedirectToEventRoom = (
    const { replace } = useRouter()
    const [isRedirecting, setIsRedirecting] = useState(false)
    const hasRedirected = useRef(false)
-   const isRegistered = useUserIsRegistered(livestreamPresenter.id)
+   const isRegistered = useUserIsRegistered(livestreamPresenter?.id)
 
    useEffect(() => {
       if (
