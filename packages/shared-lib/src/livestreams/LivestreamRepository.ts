@@ -1567,6 +1567,8 @@ export class FirebaseLivestreamRepository
       livestreamId: string,
       userId: string
    ): Promise<boolean> {
+      if (!livestreamId || !userId) return false
+
       const query = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
