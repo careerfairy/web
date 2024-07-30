@@ -375,6 +375,9 @@ export const onWriteCustomJobs = functions
             customJobRepo.syncDeletedCustomJobDataToJobApplications(
                deletedCustomJob
             ),
+            customJobRepo.syncDeletedCustomJobToLinkedLivestreams(
+               deletedCustomJob
+            ),
             sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
                deletedCustomJob,
                deletedCustomJob,
