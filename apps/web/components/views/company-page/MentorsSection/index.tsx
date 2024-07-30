@@ -86,12 +86,13 @@ export const MentorsSection = () => {
             }}
          >
             {mentors.map((creator) => (
-               <MentorCard
-                  key={`mentor-slide-box-${JSON.stringify(creator)}`}
-                  creator={creator}
-                  isEditMode={editMode}
-                  handleEdit={() => handleOpen(creator)}
-               />
+               <Box key={`mentor-slide-box-${JSON.stringify(creator)}`}>
+                  <MentorCard
+                     creator={creator}
+                     isEditMode={editMode}
+                     handleEdit={() => handleOpen(creator)}
+                  />
+               </Box>
             ))}
          </ContentCarousel>
          <CreatorFormLayout.Dialog

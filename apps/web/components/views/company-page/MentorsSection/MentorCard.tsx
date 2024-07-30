@@ -61,21 +61,18 @@ const styles = sxStyles({
    },
 })
 
-type ContainerProps = Pick<MentorCardProps, "key" | "creator"> & {
+type ContainerProps = Pick<MentorCardProps, "creator"> & {
    children: ReactNode
 }
 
-const Container = ({ key, creator, children }: ContainerProps) => {
+const Container = ({ creator, children }: ContainerProps) => {
    const router = useRouter()
    const { editMode } = useCompanyPage()
 
    return editMode ? (
-      <Box key={key} sx={[styles.container, { cursor: "auto" }]}>
-         {children}
-      </Box>
+      <Box sx={[styles.container, { cursor: "auto" }]}>{children}</Box>
    ) : (
       <Box
-         key={key}
          sx={styles.container}
          component={Link}
          href={`/company/${
@@ -88,14 +85,12 @@ const Container = ({ key, creator, children }: ContainerProps) => {
 }
 
 type MentorCardProps = {
-   key: string
    creator: PublicCreator
    isEditMode?: boolean
    handleEdit?: () => void
 }
 
 export const MentorCard = ({
-   key,
    creator,
    isEditMode,
    handleEdit,
@@ -110,7 +105,7 @@ export const MentorCard = ({
    }
 
    return (
-      <Container key={key} creator={creator}>
+      <Container creator={creator}>
          {Boolean(isEditMode) && (
             <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.palette.neutral[700]} />
