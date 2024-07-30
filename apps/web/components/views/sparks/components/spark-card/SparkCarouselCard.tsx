@@ -1,6 +1,6 @@
-import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { imageKitLoader } from "@careerfairy/shared-lib/utils/video"
 import { Stack } from "@mui/material"
 import Box from "@mui/material/Box"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -35,7 +35,6 @@ const SparkCarouselCard: FC<Props> = ({
    preview = false,
    onGoNext,
 }) => {
-   const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
    const [autoPlaying, setAutoPlaying] = useState(false)
    const containerRef = useRef<HTMLDivElement>(null)
    const isMobile = useIsMobile()
@@ -95,7 +94,13 @@ const SparkCarouselCard: FC<Props> = ({
       <SparkCarouselCardContainer
          video={{
             thumbnailUrl: spark.video.thumbnailUrl,
-            url: sparkPresenter.getTransformedVideoUrl(),
+            url: imageKitLoader({
+               src: spark.video.url,
+               height: 640 * 1,
+               width: 360 * 1,
+               quality: 40,
+               maxSizeCrop: true,
+            }),
             preview,
          }}
          onMouseEnter={isMobile ? null : () => setAutoPlaying(true)}
