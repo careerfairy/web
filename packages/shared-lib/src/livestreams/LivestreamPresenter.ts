@@ -57,7 +57,6 @@ export class LivestreamPresenter extends BaseModel {
       public readonly hasNoTalentPool: boolean,
       public readonly test: boolean,
       public readonly openStream: boolean,
-      public readonly registeredUsers: string[],
       public readonly hasStarted: boolean,
       public readonly hasEnded: boolean,
       public readonly hidden: boolean,
@@ -189,25 +188,25 @@ export class LivestreamPresenter extends BaseModel {
             )
       )
    }
-   isRegistrationDisabled(isUserRegistered: boolean): boolean {
+   isRegistrationDisabled(
+      isUserRegistered: boolean,
+      numRegistered: number
+   ): boolean {
       if (this.isPast()) return true
       //User should always be able to cancel registration
       if (isUserRegistered) return false
       //Disable registration if max number of registrants is reached
       if (this.maxRegistrants && this.maxRegistrants > 0) {
-         return this.registeredUsers
-            ? this.maxRegistrants <= this.registeredUsers.length
-            : false
+         return this.maxRegistrants <= numRegistered
       }
       return false
    }
 
-   hasNoSpotsLeft(): boolean {
+   hasNoSpotsLeft(numRegistered: number): boolean {
       return Boolean(
          this.maxRegistrants &&
             this.maxRegistrants > 0 &&
-            this.registeredUsers &&
-            this.maxRegistrants <= this.registeredUsers.length
+            this.maxRegistrants <= numRegistered
       )
    }
 
@@ -221,18 +220,12 @@ export class LivestreamPresenter extends BaseModel {
 
       return maxDateToShowRecording
    }
-   isUserRegistered(userEmail: string): boolean {
-      if (!userEmail) {
-         return false
-      }
-      return this.registeredUsers.includes(userEmail)
-   }
 
-   isAbleToShowRecording(userEmail: string): boolean {
+   isAbleToShowRecording(isRegistered: boolean): boolean {
       return (
          this.isPast() &&
          this.isAbleToAccessRecording() &&
-         this.isUserRegistered(userEmail) &&
+         isRegistered &&
          new Date() <= this.recordingAccessTimeLeft()
       )
    }
@@ -268,11 +261,11 @@ export class LivestreamPresenter extends BaseModel {
     *
     * @returns {number} The number of spots remaining.
     */
-   getNumberOfSpotsRemaining(): number {
+   getNumberOfSpotsRemaining(numRegistered: number): number {
       if (!this.maxRegistrants) return 0
-      else if (!this.registeredUsers) return this.maxRegistrants
+      else if (!numRegistered) return this.maxRegistrants
       else {
-         return this.maxRegistrants - this.registeredUsers.length
+         return this.maxRegistrants - numRegistered
       }
    }
 
@@ -316,7 +309,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.hasNoTalentPool ?? false,
          livestream.test ?? false,
          livestream.openStream ?? false,
-         livestream.registeredUsers ?? [],
          livestream.hasStarted ?? false,
          livestream.hasEnded ?? false,
          livestream.hidden ?? false,
@@ -385,7 +377,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.hasNoTalentPool,
          livestream.test,
          livestream.openStream,
-         livestream.registeredUsers,
          livestream.hasStarted,
          livestream.hasEnded,
          livestream.hidden,
@@ -473,7 +464,6 @@ export class LivestreamPresenter extends BaseModel {
          hasNoTalentPool: this.hasNoTalentPool,
          test: this.test,
          openStream: this.openStream,
-         registeredUsers: this.registeredUsers,
          hasStarted: this.hasStarted,
          startDate: this.start,
          address: this.address,

@@ -11,6 +11,7 @@ import {
    UserStats,
 } from "@careerfairy/shared-lib/users"
 import { firebaseServiceInstance } from "data/firebase/FirebaseService"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { sparkService } from "data/firebase/SparksService"
 import DateUtil from "util/DateUtil"
 import { mapFromServerSide } from "util/serverUtil"
@@ -96,20 +97,14 @@ export class CarouselContentService {
       this.pastEventsService = ExistingDataRecommendationService.create(
          console,
          options.userData,
-         filterStreamsForUnregisteredUsersAndNonBuyers(
-            options.pastLivestreams,
-            options.userStats
-         ),
+         filterStreamsForNonBuyers(options.pastLivestreams, options.userStats),
          false,
          implicitRecommendationData
       )
       this.upcomingEventsService = ExistingDataRecommendationService.create(
          console,
          options.userData,
-         filterNonRegisteredStreams(
-            options.upcomingLivestreams,
-            options.userStats
-         ),
+         options.upcomingLivestreams,
          false,
          implicitRecommendationData
       )
@@ -342,7 +337,7 @@ export class CarouselContentService {
    }
 }
 
-const filterStreamsForUnregisteredUsersAndNonBuyers = (
+const filterStreamsForNonBuyers = (
    streams: LivestreamEvent[],
    userStats: UserStats
 ) => {
@@ -357,24 +352,29 @@ const filterStreamsForUnregisteredUsersAndNonBuyers = (
       )
       const allowedToWatchRecording = Boolean(s.denyRecordingAccess) === false
 
-      const hasRegistered = s.registeredUsers?.includes(userStats?.userId ?? "")
       // We only want to show past streams that are recorded and the user has not bought the recording
-      // and the user has not registered for the live stream
-      return allowedToWatchRecording && !hasRegistered && !hasBoughtRecording
+      return allowedToWatchRecording && !hasBoughtRecording
    })
 }
 
-export const filterNonRegisteredStreams = (
+/**
+ * Filters out live streams that the user has already registered for.
+ *
+ * @param {LivestreamEvent[]} streams - An array of LivestreamEvent objects to filter.
+ * @param {string} userId - The ID of the user to check registrations against.
+ * @returns {Promise<LivestreamEvent[]>} A promise that resolves to an array of LivestreamEvent objects,
+ *                                       excluding those the user has already registered for.
+ */
+export const filterNonRegisteredStreams = async (
    streams: LivestreamEvent[],
-   userStats: UserStats
-) => {
-   if (!streams.length) {
-      return []
-   }
-   return streams.filter((s) => {
-      const hasRegistered = s.registeredUsers?.includes(userStats?.userId ?? "")
-      return !hasRegistered
-   })
+   userId: string
+): Promise<LivestreamEvent[]> => {
+   const registrationStatus = await Promise.all(
+      streams.map((stream) =>
+         livestreamService.hasUserRegistered(stream.id, userId)
+      )
+   )
+   return streams.filter((_, index) => !registrationStatus[index])
 }
 
 /**

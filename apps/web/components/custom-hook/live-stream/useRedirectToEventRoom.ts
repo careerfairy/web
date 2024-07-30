@@ -2,6 +2,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { useRouter } from "next/router"
 import { useEffect, useRef, useState } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import { useUserIsRegistered } from "./useUserIsRegistered"
 
 /**
  * Custom React Hook to handle redirection to a Livestream Event room.
@@ -21,6 +22,7 @@ const useRedirectToEventRoom = (
    const { replace } = useRouter()
    const [isRedirecting, setIsRedirecting] = useState(false)
    const hasRedirected = useRef(false)
+   const isRegistered = useUserIsRegistered(livestreamPresenter.id)
 
    useEffect(() => {
       if (
@@ -34,7 +36,7 @@ const useRedirectToEventRoom = (
       const intervalId = setInterval(() => {
          if (
             !isLoadingAuth &&
-            livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
+            isRegistered &&
             (livestreamPresenter.isLive() ||
                livestreamPresenter.waitingRoomIsOpen())
          ) {
@@ -60,6 +62,7 @@ const useRedirectToEventRoom = (
       authenticatedUser.email,
       isLoadingAuth,
       shouldRedirect,
+      isRegistered,
    ])
 
    return isRedirecting
