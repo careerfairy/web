@@ -101,8 +101,6 @@ const JobLinkLiveStreams = ({
       // If the group has public sparks, move to the next step
       if (group.publicSparks) {
          moveToNext()
-      } else if (handlePrimaryButton) {
-         handlePrimaryButton()
       }
 
       // If there are no livestream IDs selected and has no public sparks, go to the NO_LINKED_CONTENT step
