@@ -74,7 +74,7 @@ export const MentorForm = ({
 }: MentorFormProps) => {
    const isDesktop = useIsDesktop()
 
-   const { data: creator, status } = useGroupCreator(
+   const { data: creator } = useGroupCreator(
       mentor?.groupId || "",
       mentor?.id || "",
       {
@@ -83,7 +83,7 @@ export const MentorForm = ({
       }
    )
 
-   if (status !== "success") return null
+   if (!creator?.id) return null
 
    return (
       <CreatorFormProvider creator={creator}>
