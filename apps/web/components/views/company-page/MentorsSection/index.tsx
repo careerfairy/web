@@ -99,16 +99,11 @@ export const MentorsSection = () => {
             isMobile={isMobile}
             handleCloseDialog={handleClose}
          >
-            <Box
-               key={`mentor-form-${selectedMentor?.id}`}
-               sx={{ display: "contents" }}
-            >
-               <MentorForm
-                  mentor={selectedMentor}
-                  handleSubmitCallback={handleSubmitCallback}
-                  handleClose={handleClose}
-               />
-            </Box>
+            <MentorForm
+               mentor={selectedMentor}
+               handleSubmitCallback={handleSubmitCallback}
+               handleClose={handleClose}
+            />
          </CreatorFormLayout.Dialog>
       </Box>
    )

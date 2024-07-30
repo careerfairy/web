@@ -108,9 +108,12 @@ const styles = sxStyles({
    },
    button: {
       textTransform: "none",
-      "&:disabled": {
+      "&.Mui-disabled": {
          bgcolor: "#EDEDED",
          color: "#BBBBBB",
+      },
+      "&.MuiLoadingButton-loading": {
+         color: "transparent",
       },
    },
    dialog: {
@@ -122,6 +125,9 @@ const styles = sxStyles({
       height: "calc(100% - 22px)",
       borderTopLeftRadius: 12,
       borderTopRightRadius: 12,
+   },
+   drawerContentWrapper: {
+      display: "contents",
    },
 })
 
@@ -197,7 +203,7 @@ const BrandedDialog = ({
             sx: styles.drawer,
          }}
       >
-         {children}
+         <Box sx={styles.drawerContentWrapper}>{children}</Box>
       </SwipeableDrawer>
    ) : (
       <Dialog
