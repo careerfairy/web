@@ -53,15 +53,15 @@ const FIELD_NAME = "sparkIds"
 type Props = {
    handlePrimaryButton?: () => void
    handleSecondaryButton?: () => void
-   pendingContentView?: boolean
-   isSingleStepView?: boolean
+   primaryButtonMessage?: string
+   secondaryButtonMessage?: string
 }
 
 const JobLinkSparks = ({
    handlePrimaryButton,
    handleSecondaryButton,
-   pendingContentView,
-   isSingleStepView,
+   primaryButtonMessage,
+   secondaryButtonMessage,
 }: Props) => {
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
@@ -106,7 +106,7 @@ const JobLinkSparks = ({
          } else {
             goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
          }
-      } else if (isSingleStepView && handleSecondaryButton) {
+      } else if (handleSecondaryButton) {
          handleSecondaryButton()
       }
       // Otherwise, move to the previous step
@@ -119,7 +119,6 @@ const JobLinkSparks = ({
       groupHasUpcomingLivestreams,
       handleSecondaryButton,
       moveToPrev,
-      isSingleStepView,
    ])
 
    const handlePrimaryClick = useCallback(() => {
@@ -217,7 +216,7 @@ const JobLinkSparks = ({
                   onClick={handleSecondaryClick}
                   sx={styles.cancelBtn}
                >
-                  {pendingContentView ? "Cancel" : "Back"}
+                  {secondaryButtonMessage || "Back"}
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
@@ -227,7 +226,7 @@ const JobLinkSparks = ({
                   loading={isSubmitting}
                   disabled={isSubmitting}
                >
-                  {pendingContentView ? "Save" : "Next"}
+                  {primaryButtonMessage || "Next"}
                </SteppedDialog.Button>
             </SteppedDialog.Actions>
          </>

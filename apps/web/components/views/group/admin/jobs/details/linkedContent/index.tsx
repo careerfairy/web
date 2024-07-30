@@ -85,6 +85,7 @@ type Props = {
 export type DialogState = {
    open: boolean
    step?: number
+   editMode?: boolean
 }
 
 const LinkedContent = ({ job }: Props) => {
@@ -111,11 +112,11 @@ const LinkedContent = ({ job }: Props) => {
    }, [groupHasUpcomingLivestreams])
 
    const handleEditLiveStreams = () => {
-      setDialogState({ open: true, step: 0 })
+      setDialogState({ open: true, step: 0, editMode: true })
    }
 
    const handleEditSparks = () => {
-      setDialogState({ open: true, step: 1 })
+      setDialogState({ open: true, step: 1, editMode: true })
    }
 
    return (

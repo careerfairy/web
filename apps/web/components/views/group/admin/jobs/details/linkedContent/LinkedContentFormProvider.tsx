@@ -20,7 +20,7 @@ const LinkedContentFormProvider = ({ job, children }: Props) => {
 
    return (
       <FormProvider {...formMethods}>
-         <form>{children}</form>
+         <form id="linked-content-form-id">{children}</form>
       </FormProvider>
    )
 }
