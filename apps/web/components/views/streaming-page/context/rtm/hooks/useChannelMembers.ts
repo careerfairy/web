@@ -54,6 +54,7 @@ export const filterMembers = (members: string[]) => {
          filteredData.hasRecordBot = true
          return false
       }
+      return true
    })
    return { members: filteredMembers, ...filteredData }
 }

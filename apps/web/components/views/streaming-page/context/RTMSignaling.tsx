@@ -58,12 +58,6 @@ export const RTMSignalingProvider = ({
          await newChannel.join()
          setRtmState({ channel: newChannel, client: newClient })
          dispatch(setRTMFailedToConnect(false))
-         /* dispatch current view count for users that join mid-stream */
-         const channelMemberCount = await newClient.getChannelMemberCount([
-            newChannel.channelId,
-         ])
-         channelMemberCount[livestreamId] &&
-            dispatch(setViewCount(channelMemberCount[livestreamId]))
       } catch (e) {
          dispatch(setRTMFailedToConnect(true))
          errorLogAndNotify(e, {
@@ -102,18 +96,38 @@ export const RTMSignalingProvider = ({
    }, [login, logout, token])
 
    useEffect(() => {
-      /* filter members after joining to adjust view count */
-      const filter = async () => {
-         if (rtmState.channel) {
-            const members = await fetchChannelMembers(rtmState.channel)
-            const { hasRecordBot } = filterMembers(members)
-            if (hasRecordBot) {
-               dispatch(setIsRecordingBotInRoom(true))
-            }
+      const initMemberInfo = async () => {
+         if (rtmState.channel && rtmState.client) {
+            /* filter members after joining to adjust view count */
+            fetchChannelMembers(rtmState.channel)
+               .then((members) => {
+                  const { hasRecordBot } = filterMembers(members)
+                  if (hasRecordBot) {
+                     dispatch(setIsRecordingBotInRoom(true))
+                  }
+               })
+               .catch((e) => {
+                  errorLogAndNotify(e, {
+                     message: "Failed to fetch channel members",
+                  })
+               })
+
+            /* dispatch current view count for users that join mid-stream */
+            rtmState.client
+               .getChannelMemberCount([rtmState.channel.channelId])
+               .then((channelMemberCount) => {
+                  channelMemberCount[livestreamId] &&
+                     dispatch(setViewCount(channelMemberCount[livestreamId]))
+               })
+               .catch((e) => {
+                  errorLogAndNotify(e, {
+                     message: "Failed to get channel member count",
+                  })
+               })
          }
       }
-      filter()
-   }, [rtmState.channel, dispatch])
+      initMemberInfo()
+   }, [rtmState, dispatch, livestreamId])
 
    return (
       <AgoraRTMClientProvider client={rtmState.client}>
