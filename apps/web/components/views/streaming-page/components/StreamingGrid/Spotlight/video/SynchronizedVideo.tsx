@@ -91,20 +91,6 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
       }
    }, [reactPlayerInstance])
 
-   const videoPaused = video.state === "paused"
-
-   /**
-    * Effect to handle syncing everybody else's video
-    * player to the video sharer's video player
-    */
-   useEffect(() => {
-      if (videoPaused || isVideoSharer) return
-
-      if (reactPlayerInstance) {
-         reactPlayerInstance.seekTo(video.second, "seconds")
-      }
-   }, [video.second, isVideoSharer, reactPlayerInstance, videoPaused])
-
    const handlePlay = () => {
       if (!isVideoSharer || !playerReady) {
          return
