@@ -8,7 +8,7 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { useRTMChannelEvent } from "./useRTMChannelEvent"
 
 // fetcher function that calls the `getMembers` method on the channel
-const fetchChannelMembers = async (channel: RtmChannel) => {
+export const fetchChannelMembers = async (channel: RtmChannel) => {
    if (!channel) return []
 
    return channel.getMembers()
@@ -45,6 +45,18 @@ const sortMembers = (a: string, b: string) => {
    }
 
    return a.localeCompare(b)
+}
+
+export const filterMembers = (members: string[]) => {
+   const filteredData = { hasRecordBot: false }
+   const filteredMembers = members?.filter((member) => {
+      if (member.startsWith(STREAM_IDENTIFIERS.RECORDING)) {
+         filteredData.hasRecordBot = true
+         return false
+      }
+      return true
+   })
+   return { members: filteredMembers, ...filteredData }
 }
 
 /**
@@ -115,17 +127,13 @@ export const useChannelMembers = (channel: RtmChannel) => {
    })
 
    // filter Recording Bot out of the list of members
-   const filteredMembers = useMemo(
-      () =>
-         data?.filter((member) => {
-            const isRecordBot = member.startsWith(STREAM_IDENTIFIERS.RECORDING)
-            if (isRecordBot) {
-               dispatch(setIsRecordingBotInRoom(true))
-            }
-            return !isRecordBot
-         }),
-      [data, dispatch]
-   )
+   const filteredMembers = useMemo(() => {
+      const { members, hasRecordBot } = filterMembers(data)
+      if (hasRecordBot) {
+         dispatch(setIsRecordingBotInRoom(true))
+      }
+      return members
+   }, [data, dispatch])
 
    const sortedMembers = useMemo(
       () => filteredMembers?.sort(sortMembers),
