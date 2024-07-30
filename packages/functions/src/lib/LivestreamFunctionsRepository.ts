@@ -586,10 +586,12 @@ export class LivestreamFunctionsRepository
 
       const bulkWriter = firestoreAdmin.bulkWriter()
 
-      livestream.registeredUsers?.forEach((user) => {
+      const users = await this.getLivestreamUsers(livestream.id, "registered")
+
+      users.forEach((user) => {
          const ref = firestoreAdmin
             .collection("userData")
-            .doc(user)
+            .doc(user.id)
             .collection("userNotifications")
             .doc()
 
@@ -610,9 +612,7 @@ export class LivestreamFunctionsRepository
          })
       })
 
-      functions.logger.log(
-         `Notified ${livestream.registeredUsers?.length} users of livestream start`
-      )
+      functions.logger.log(`Notified ${users.length} users of livestream start`)
 
       return void bulkWriter.close()
    }

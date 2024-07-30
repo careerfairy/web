@@ -1,6 +1,23 @@
 import functions = require("firebase-functions")
-import config from "./config"
+import {
+   LiveStreamEventWithUsersLivestreamData,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { WriteBatch } from "firebase-admin/firestore"
+import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
+import { TemplatedMessage } from "postmark"
+import { firestore } from "./api/firestoreAdmin"
+import { sendMessage } from "./api/mailgun"
 import { client } from "./api/postmark"
+import { livestreamsRepo } from "./api/repositories"
+import config from "./config"
+import {
+   getStreamsByDateWithRegisteredStudents,
+   updateLiveStreamsWithEmailSent,
+} from "./lib/livestream"
+import { logAndThrow } from "./lib/validations"
 import {
    addMinutesDate,
    generateNonAttendeesReminder,
@@ -8,72 +25,54 @@ import {
    IGenerateEmailDataProps,
    setCORSHeaders,
 } from "./util"
-import { sendMessage } from "./api/mailgun"
-import { TemplatedMessage } from "postmark"
-import {
-   LiveStreamEventWithUsersLivestreamData,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/livestreams"
-import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
-import {
-   getStreamsByDateWithRegisteredStudents,
-   updateLiveStreamsWithEmailSent,
-} from "./lib/livestream"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { livestreamsRepo } from "./api/repositories"
-import { firestore } from "./api/firestoreAdmin"
-import { WriteBatch } from "firebase-admin/firestore"
 
 export const sendReminderEmailToRegistrants = functions
    .region(config.region)
    .https.onRequest(async (req, res) => {
       setCORSHeaders(req, res)
 
-      let registeredUsers = []
-      firestore
-         .collection("livestreams")
-         .doc(req.body.livestreamId)
-         .get()
-         .then((doc) => {
-            registeredUsers = doc.data().registeredUsers
-            const templates = []
-            registeredUsers.forEach((recipient) => {
-               const email = {
-                  TemplateId: req.body.templateId,
-                  From: "CareerFairy <noreply@careerfairy.io>",
-                  To: recipient,
-                  TemplateModel: {},
-               }
-               templates.push(email)
-            })
-            const arraysOfTemplates = []
-            let myChunk
-            for (let index = 0; index < templates.length; index += 500) {
-               myChunk = templates.slice(index, index + 500)
-               // Do something if you want with the group
-               arraysOfTemplates.push(myChunk)
+      try {
+         const users = await livestreamsRepo.getLivestreamUsers(
+            req.body.livestreamId,
+            "registered"
+         )
+
+         const templates = []
+         users.forEach((recipient) => {
+            const email = {
+               TemplateId: req.body.templateId,
+               From: "CareerFairy <noreply@careerfairy.io>",
+               To: recipient.id,
+               TemplateModel: {},
             }
-            console.log(arraysOfTemplates.length)
-            arraysOfTemplates.forEach((arrayOfTemplates) => {
-               client.sendEmailBatchWithTemplates(arrayOfTemplates).then(
-                  () => {
-                     console.log(
-                        `Successfully sent email to ${arrayOfTemplates.length}`
-                     )
-                  },
-                  (error) => {
-                     console.error(
-                        `Error sending email to ${arrayOfTemplates.length}`,
-                        error
-                     )
-                  }
-               )
-            })
+            templates.push(email)
          })
-         .catch(() => {
-            return res.status(400).send()
+         const arraysOfTemplates = []
+         let myChunk
+         for (let index = 0; index < templates.length; index += 500) {
+            myChunk = templates.slice(index, index + 500)
+            // Do something if you want with the group
+            arraysOfTemplates.push(myChunk)
+         }
+         console.log(arraysOfTemplates.length)
+         arraysOfTemplates.forEach((arrayOfTemplates) => {
+            client.sendEmailBatchWithTemplates(arrayOfTemplates).then(
+               () => {
+                  console.log(
+                     `Successfully sent email to ${arrayOfTemplates.length}`
+                  )
+               },
+               (error) => {
+                  console.error(
+                     `Error sending email to ${arrayOfTemplates.length}`,
+                     error
+                  )
+               }
+            )
          })
+      } catch (error) {
+         logAndThrow(error, "Error sending reminder email to registrants")
+      }
    })
 
 export const sendReminderEmailAboutApplicationLink = functions

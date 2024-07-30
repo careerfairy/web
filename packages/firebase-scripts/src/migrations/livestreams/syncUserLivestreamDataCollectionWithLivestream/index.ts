@@ -1,6 +1,7 @@
-import { firestore } from "../../../lib/firebase"
+import { FieldValue } from "firebase-admin/firestore"
 import Counter from "../../../lib/Counter"
-import { throwMigrationError } from "../../../util/misc"
+import counterConstants from "../../../lib/Counter/constants"
+import { firestore } from "../../../lib/firebase"
 import { livestreamRepo } from "../../../repositories"
 import {
    handleBulkWriterError,
@@ -8,8 +9,7 @@ import {
    loopProgressBar,
    writeProgressBar,
 } from "../../../util/bulkWriter"
-import counterConstants from "../../../lib/Counter/constants"
-import { FieldValue } from "firebase-admin/firestore"
+import { throwMigrationError } from "../../../util/misc"
 
 export async function run() {
    const counter = new Counter()
@@ -35,7 +35,6 @@ export async function run() {
          loopProgressBar.update(index + 1)
          const livestreamId = data.livestreamId
          const userEmail = data.user?.userEmail
-         const hasRegistered = Boolean(data.registered?.date)
          const hasParticipated = Boolean(data.participated?.date)
          const hasJoinedTalentPool = Boolean(data.talentPool?.date)
          const updateData = {
@@ -45,10 +44,6 @@ export async function run() {
                : FieldValue.arrayRemove(userEmail),
             // @ts-ignore
             participatedUsers: hasParticipated
-               ? FieldValue.arrayUnion(userEmail)
-               : FieldValue.arrayRemove(userEmail),
-            // @ts-ignore
-            registeredUsers: hasRegistered
                ? FieldValue.arrayUnion(userEmail)
                : FieldValue.arrayRemove(userEmail),
          }
