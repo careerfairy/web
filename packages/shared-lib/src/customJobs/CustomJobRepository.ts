@@ -99,6 +99,12 @@ export interface ICustomJobRepository {
     * @param groupId
     */
    getGroupJobs(groupId: string): Promise<CustomJob[]>
+
+   /**
+    * Get all group custom jobs by group ID
+    * @param groupId
+    */
+   getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]>
 }
 
 export class FirebaseCustomJobRepository
@@ -266,6 +272,19 @@ export class FirebaseCustomJobRepository
       })
 
       return batch.commit()
+   }
+
+   async getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]> {
+      const docs = await this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("groupId", "==", groupId)
+         .get()
+
+      if (docs.empty) {
+         return []
+      }
+
+      return this.addIdToDocs<CustomJob>(docs.docs)
    }
 
    async getCustomJobsByLinkedContentIds(
