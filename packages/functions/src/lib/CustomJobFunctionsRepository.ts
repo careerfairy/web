@@ -8,9 +8,11 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { CustomJobMetaData } from "@careerfairy/shared-lib/groups/metadata"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import { Timestamp } from "../api/firestoreAdmin"
+import { livestreamsRepo } from "../api/repositories"
 
 export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    /**
@@ -61,6 +63,14 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
     * @param group Group object
     */
    syncCustomJobDataGroupMetaData(groupId: string, group: Group): Promise<void>
+
+   /**
+    * This method syncs the deleted job on all the linked live streams
+    * @param deletedCustomJob
+    */
+   syncDeletedCustomJobToLinkedLivestreams(
+      deletedCustomJob: CustomJob
+   ): Promise<void>
 }
 
 export class CustomJobFunctionsRepository
@@ -235,5 +245,58 @@ export class CustomJobFunctionsRepository
       })
 
       await Promise.allSettled(promises)
+   }
+
+   async syncDeletedCustomJobToLinkedLivestreams(
+      deletedCustomJob: CustomJob
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const { livestreams, groupId } = deletedCustomJob
+      const groupCustomJobs = await this.getCustomJobsByGroupId(groupId)
+      const linkedLivestreams = await livestreamsRepo.getLivestreamsByIds(
+         livestreams
+      )
+
+      // Filter out the deleted custom job from the group's custom jobs
+      const filteredGroupJobs = groupCustomJobs.filter(
+         (job) => job.id !== deletedCustomJob.id
+      )
+
+      const livestreamsToUpdate = linkedLivestreams.filter(
+         (livestream: LivestreamEvent) => {
+            // If the livestream has associated ATS jobs, do nothing
+            if (livestream.jobs.length > 0) {
+               return false
+            }
+
+            // Check if any other custom job in the group links to this livestream
+            const hasMoreCustomJobsThanTheDeletedOne = filteredGroupJobs.some(
+               (customJob) =>
+                  customJob.livestreams.some(
+                     (linkedLivestream) => linkedLivestream === livestream.id
+                  )
+            )
+
+            // If another custom job links to this livestream, do nothing
+            if (hasMoreCustomJobsThanTheDeletedOne) {
+               return false
+            }
+
+            // Otherwise, mark this livestream for update
+            return true
+         }
+      )
+
+      // update live streams hasJobs flag
+      livestreamsToUpdate.map((livestream) => {
+         const ref = this.firestore.collection("livestreams").doc(livestream.id)
+
+         batch.update(ref, {
+            hasJobs: false,
+         })
+      })
+
+      return batch.commit()
    }
 }
