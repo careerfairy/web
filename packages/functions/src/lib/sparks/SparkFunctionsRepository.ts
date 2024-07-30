@@ -153,6 +153,17 @@ export interface ISparkFunctionsRepository {
    ): Promise<SerializedSpark[]>
 
    /**
+    * Get the creator's feed of Sparks
+    * @param creatorId ${creatorId} The id of the creator
+    * @param limit ${limit} The number of sparks to fetch (default: 10)
+    */
+   getCreatorSparksFeed(
+      creatorId: string,
+      contentTopics?: string[],
+      limit?: number
+   ): Promise<SerializedSpark[]>
+
+   /**
     * Method to replenish a user's feed, when the number of sparks in the feed is less than x
     * @param userId The id of the user
     */
@@ -703,6 +714,36 @@ export class SparkFunctionsRepository
       const groupFeedSnap = await groupFeedRef.get()
 
       return groupFeedSnap.docs.map((doc) =>
+         SparkPresenter.serialize(doc.data())
+      )
+   }
+
+   async getCreatorSparksFeed(
+      creatorId: string,
+      contentTopics?: string[],
+      limit = 10
+   ): Promise<SerializedSpark[]> {
+      let query = this.firestore
+         .collection("sparks")
+         .where("creator.id", "==", creatorId)
+         .where("group.publicSparks", "==", true)
+
+      if (contentTopics?.length) {
+         query = query.where(
+            "contentTopicsTagIds",
+            "array-contains-any",
+            contentTopics
+         )
+      }
+
+      const creatorFeedRef = query
+         .orderBy("publishedAt", "desc")
+         .limit(limit)
+         .withConverter(createGenericConverter<Spark>())
+
+      const creatorFeedSnap = await creatorFeedRef.get()
+
+      return creatorFeedSnap.docs.map((doc) =>
          SparkPresenter.serialize(doc.data())
       )
    }
