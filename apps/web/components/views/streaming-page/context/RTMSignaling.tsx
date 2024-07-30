@@ -96,7 +96,7 @@ export const RTMSignalingProvider = ({
    }, [login, logout, token])
 
    useEffect(() => {
-      const initMemberInfo = async () => {
+      const initMemberInfo = () => {
          if (rtmState.channel && rtmState.client) {
             /* filter members after joining to adjust view count */
             fetchChannelMembers(rtmState.channel)
