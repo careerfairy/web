@@ -19,15 +19,10 @@ interface JobsSeed {
    /**
     * Creates the collection
     */
-   createLivestreamCustomJobs(
+   createCustomJobs(
       groupId: string,
       livestreamIds: string[]
    ): Promise<LivestreamJobAssociation[]>
-   addLivestreamToCustomJobs(
-      groupId: string,
-      livestreamIds: string[],
-      jobs: LivestreamJobAssociation[]
-   )
 
    /**
     * TODO-WG: Add docs specifying does not create to database
@@ -71,44 +66,17 @@ class JobsFirebaseSeed implements JobsSeed {
    /**
     * Creates the field or level of study collection
     */
-   async createLivestreamCustomJobs(groupId: string, livestreamIds: string[]) {
-      const batch = firestore.batch()
+   async createCustomJobs(groupId: string, livestreamIds: string[]) {
+      const promise = (await this.randomJobs(groupId, livestreamIds)).map(
+         (randomJob) => {
+            return this.customJobRepo.createCustomJob(randomJob)
+         }
+      )
 
-      const dummyData = await this.randomJobs(groupId, livestreamIds)
-      dummyData.forEach((data) => {
-         const ref = firestore.collection("customJobs").doc(data.id)
-         batch.set(ref, data)
-      })
-
-      await batch.commit()
+      const dummyData = await Promise.all(promise)
       return dummyData.map((customJob) => {
          return generateJobAssociation(groupId, customJob.id, customJob.title)
       })
-   }
-
-   async addLivestreamToCustomJobs(
-      groupId: string,
-      livestreamIds: string[],
-      jobs: LivestreamJobAssociation[]
-   ) {
-      if (!jobs?.length) return
-      const batch = firestore.batch()
-
-      const dummyData = await Promise.all(
-         jobs.map((jobAssociation) => {
-            return this.randomJob(groupId, livestreamIds, {
-               id: jobAssociation.jobId,
-               title: jobAssociation.name,
-               description: jobAssociation.description,
-            })
-         })
-      )
-      dummyData.forEach((data) => {
-         const ref = firestore.collection("customJobs").doc(data.id)
-         batch.set(ref, dummyData)
-      })
-
-      await batch.commit()
    }
 
    async randomJob(
@@ -158,7 +126,13 @@ class JobsFirebaseSeed implements JobsSeed {
    }
 
    async getCustomJobs(groupId: string): Promise<CustomJob[]> {
-      return this.customJobRepo.getGroupJobs(groupId)
+      const query = firestore
+         .collection("customJobs")
+         .where("groupId", "==", groupId)
+
+      const snap = await query.get()
+
+      return snap?.docs.map((doc) => doc.data() as CustomJob)
    }
 
    getJobAssociations(jobs: CustomJob[]) {

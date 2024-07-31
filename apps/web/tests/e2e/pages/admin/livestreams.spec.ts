@@ -96,33 +96,59 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.assertTextIsVisible(title)
    })
 
-   test.extend({
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      options: async ({ options }, use) => {
-         await use({
-            atsGroupType: "COMPLETE",
-            createUser: true,
-            completedGroup: true,
-         })
-      },
-   })(
-      "Create a draft live stream with job openings",
-      async ({ groupPage, group, customJobs }) => {
-         console.log("🚀 ~ customJobs:", customJobs)
-         // TODO-WG: Confirm cannot use in beforeAll
+   // TODO: different tests for ats and not ats
+   test("Create a draft live stream with job openings - No ATS", async ({
+      groupPage,
+      group,
+      customJobs,
+   }) => {
+      // TODO-WG: Confirm cannot use in beforeAll
+      await setupLivestreamData(group)
 
-         await setupLivestreamData(group)
+      const jobs = customJobs.slice(0, 2) // only select some
+      const livestreamJobAssociations = JobsSeed.getJobAssociations(jobs)
 
-         const livestreamJobAssociations = JobsSeed.getJobAssociations(
-            customJobs.slice(0, 1)
-         )
+      const livestream = LivestreamSeed.randomDraft({
+         jobs: livestreamJobAssociations,
+         speakers: [],
+      })
 
-         const livestream = LivestreamSeed.randomDraft({
-            jobs: livestreamJobAssociations,
-         })
+      await groupPage.clickCreateNewLivestreamTop()
+      await groupPage.fillLivestreamForm(livestream)
 
-         await groupPage.clickCreateNewLivestreamTop()
-         await groupPage.fillLivestreamForm(livestream)
-      }
-   )
+      // Finish editing the draft
+      const livestreamsPage = await groupPage.goToLivestreams()
+
+      // Re edit to check custom jobs
+      await livestreamsPage.clickDraftsTab()
+      await livestreamsPage.launchEditModal()
+
+      const addedJobIds = livestreamJobAssociations.map(
+         (association) => association.jobId
+      )
+      await groupPage.assertJobIsAttachedToStream(addedJobIds)
+   })
+
+   // test.extend({
+   //    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   //    options: async ({ options }, use) => {
+   //       await use({
+   //          atsGroupType: "COMPLETE",
+   //          completedGroup: true,
+   //       })
+   //    },
+   // })(
+   //    "Create a draft live stream with job openings - With ATS",
+   //    async ({ groupPage, group }) => {
+
+   //       await setupLivestreamData(group)
+
+   //       const livestream = LivestreamSeed.randomDraft({
+   //          // jobs: livestreamJobAssociations,
+   //       })
+
+   //       await groupPage.clickCreateNewLivestreamTop()
+   //       await groupPage.fillLivestreamForm(livestream)
+   //    }
+   // )
 })

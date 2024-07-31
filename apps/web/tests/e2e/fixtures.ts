@@ -94,6 +94,8 @@ export const groupAdminFixture = base.extend<{
             break
       }
 
+      await JobsSeed.createCustomJobs(group.groupId, [])
+
       await use(group)
    },
    user: async ({ group, options }, use) => {

@@ -289,10 +289,25 @@ export class GroupDashboardPage extends CommonPage {
     * Selects the jobs from the dropdown, currently you can only select one job
     * */
    public async selectJobs(jobs: LivestreamJobAssociation[]) {
-      await this.page.getByPlaceholder("Select one job").click()
+      await this.page.getByPlaceholder("Select jobs you want to attach").click()
 
       for (const job of jobs) {
-         await this.page.getByTestId(`jobIds_${job.jobId}_option`).click()
+         // TODO: Check if job is visible, if not create via UI
+         // How to test a draft stream with saved job ?
+         await this.page
+            .getByTestId(`custom-job-${job.jobId}-data-test-id`)
+            .click()
+      }
+   }
+
+   public async assertJobIsAttachedToStream(jobIds: string[]) {
+      await this.clickJobOpenings()
+      await this.skipRequiredFields()
+
+      for (const jobId of jobIds) {
+         await expect(
+            this.page.getByTestId(`job-card-preview-custom-job-${jobId}`)
+         ).toBeVisible()
       }
    }
 
@@ -401,7 +416,7 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    public async clickJobOpenings() {
-      await this.page.getByRole("button", { name: "Job openings" }).click()
+      await this.page.getByRole("tab", { name: "Job openings" }).click()
    }
    public async clickPublish() {
       await this.page.getByRole("button", { name: "Publish" }).click()

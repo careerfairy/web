@@ -2,7 +2,7 @@ import {
    JobType,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import React, { useCallback, useMemo } from "react"
+import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import {
    Avatar,
    Box,
@@ -13,15 +13,15 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import AddRoundedIcon from "@mui/icons-material/AddRounded"
-import { sxStyles } from "types/commonTypes"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
 import { FormBrandedAutocomplete } from "components/views/common/inputs/BrandedAutocomplete"
 import { props } from "lodash/fp"
-import { useLivestreamFormValues } from "../../../../useLivestreamFormValues"
+import { useCallback, useMemo } from "react"
 import { useDispatch } from "react-redux"
 import { openJobsDialog } from "store/reducers/adminJobsReducer"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import { sxStyles } from "types/commonTypes"
+import { useLivestreamFormValues } from "../../../../useLivestreamFormValues"
 
 const styles = sxStyles({
    menuItem: {
@@ -114,7 +114,10 @@ const SelectorCustomJobsDropDown = ({
 
    const getOptionElement = useCallback(
       (job: PublicCustomJob) => (
-         <Box sx={styles.optionElementContainer}>
+         <Box
+            sx={styles.optionElementContainer}
+            data-testid={`custom-job-${job.id}-data-test-id`}
+         >
             <Typography sx={styles.optionTitle}>{job.title}</Typography>
 
             <Stack spacing={2} direction={"row"}>
