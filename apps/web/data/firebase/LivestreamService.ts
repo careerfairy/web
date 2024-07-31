@@ -237,7 +237,7 @@ export class LivestreamService {
          return {
             firstName: data.firstName || "",
             lastName: data.lastName || "",
-            role: data.position || data.fieldOfStudy.name || "",
+            role: data.position || (data.fieldOfStudy?.name ?? "") || "Other",
             avatarUrl: data.avatar || "",
             linkedInUrl: data.linkedinUrl || "",
          }
