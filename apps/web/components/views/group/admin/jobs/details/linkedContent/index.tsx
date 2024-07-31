@@ -1,19 +1,33 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useCustomJobLinkedSparks from "components/custom-hook/custom-job/useCustomJobLinkedSparks"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
+import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useCallback, useRef, useState } from "react"
+import {
+   Dispatch,
+   SetStateAction,
+   useCallback,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import { Edit2 } from "react-feather"
+import { useDispatch } from "react-redux"
+import { setSparkToPreview } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
 import LinkedContentDialog from "./LinkedContentDialog"
 import LinkedContentFormProvider from "./LinkedContentFormProvider"
@@ -82,42 +96,47 @@ type Props = {
    job: CustomJob
 }
 
-export type DialogState = {
+export type EditDialogState = {
    open: boolean
    step?: number
    editMode?: boolean
 }
 
+export type LiveStreamDialogState = {
+   open: boolean
+   livestreamId?: string
+}
+
 const LinkedContent = ({ job }: Props) => {
-   const childRef = useRef(null)
    const { group } = useGroup()
-   const [dialogState, setDialogState] = useState<DialogState>({ open: false })
-   const linkedLivestreams = useCustomJobLinkedLivestreams(job)
-   const linkedSparks = useCustomJobLinkedSparks(job)
+   const [editDialogState, setEditDialogState] = useState<EditDialogState>({
+      open: false,
+   })
+   const [livestreamDialog, setLivestreamDialog] =
+      useState<LiveStreamDialogState>({ open: false })
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
       group.groupId
    )
    const { jobHubV1 } = useFeatureFlags()
-   const isMobile = useIsMobile()
 
-   const jobHasNoContent = jobHubV1
-      ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
-      : false
+   const jobHasNoContent = useMemo(
+      () =>
+         jobHubV1
+            ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
+            : false,
+      [job.livestreams.length, job.sparks.length, jobHubV1]
+   )
 
    const linkJobToContentClick = useCallback(() => {
-      setDialogState({
+      setEditDialogState({
          open: true,
          step: groupHasUpcomingLivestreams ? 0 : 1,
       })
    }, [groupHasUpcomingLivestreams])
 
-   const handleEditLiveStreams = () => {
-      setDialogState({ open: true, step: 0, editMode: true })
-   }
-
-   const handleEditSparks = () => {
-      setDialogState({ open: true, step: 1, editMode: true })
-   }
+   const handleClose = useCallback(() => {
+      setEditDialogState({ open: false })
+   }, [])
 
    return (
       <>
@@ -126,84 +145,20 @@ const LinkedContent = ({ job }: Props) => {
          ) : (
             <Box sx={styles.wrapper}>
                <Stack spacing={2}>
-                  {linkedLivestreams.length > 0 ? (
-                     <>
-                        <Box sx={styles.header}>
-                           <Typography
-                              variant={"subtitle1"}
-                              sx={styles.subTitle}
-                           >
-                              Live streams related to this job
-                           </Typography>
+                  <SuspenseWithBoundary fallback={<></>}>
+                     <LiveStreamsContent
+                        job={job}
+                        setEditDialogState={setEditDialogState}
+                        setLiveStreamDialog={setLivestreamDialog}
+                     />
+                  </SuspenseWithBoundary>
 
-                           {isMobile ? (
-                              <Edit2
-                                 color="grey"
-                                 size={18}
-                                 onClick={handleEditLiveStreams}
-                              />
-                           ) : (
-                              <Button
-                                 variant="outlined"
-                                 color="grey"
-                                 startIcon={<Edit2 color="grey" />}
-                                 onClick={handleEditLiveStreams}
-                              >
-                                 Edit
-                              </Button>
-                           )}
-                        </Box>
-
-                        <Box sx={styles.linkedContentWrapper}>
-                           <EventsPreviewCarousel
-                              id={"job-events"}
-                              type={EventsTypes.JOB_EVENTS}
-                              events={linkedLivestreams}
-                              isEmbedded
-                              disableClick
-                              styling={defaultStyling}
-                           />
-                        </Box>
-                     </>
-                  ) : null}
-
-                  {linkedSparks.length > 0 ? (
-                     <>
-                        <Box sx={styles.header}>
-                           <Typography
-                              variant={"subtitle1"}
-                              sx={styles.subTitle}
-                           >
-                              Sparks related to this job
-                           </Typography>
-
-                           {isMobile ? (
-                              <Edit2
-                                 color="grey"
-                                 size={18}
-                                 onClick={handleEditSparks}
-                              />
-                           ) : (
-                              <Button
-                                 variant="outlined"
-                                 color="grey"
-                                 startIcon={<Edit2 color="grey" />}
-                                 onClick={handleEditSparks}
-                              >
-                                 Edit
-                              </Button>
-                           )}
-                        </Box>
-
-                        <Box sx={styles.linkedContentWrapper}>
-                           <SparksCarousel
-                              ref={childRef}
-                              sparks={linkedSparks}
-                              options={sparksCarouselEmblaOptions}
-                           />
-                        </Box>
-                     </>
-                  ) : null}
+                  <SuspenseWithBoundary fallback={<></>}>
+                     <SparksContent
+                        job={job}
+                        setEditDialogState={setEditDialogState}
+                     />
+                  </SuspenseWithBoundary>
                </Stack>
             </Box>
          )}
@@ -211,12 +166,132 @@ const LinkedContent = ({ job }: Props) => {
          <LinkedContentFormProvider job={job}>
             <LinkedContentDialog
                job={job}
-               dialogState={dialogState}
-               handleClose={() => setDialogState({ open: false })}
+               dialogState={editDialogState}
+               handleClose={handleClose}
             />
          </LinkedContentFormProvider>
+
+         <LivestreamDialog
+            open={livestreamDialog.open}
+            livestreamId={livestreamDialog.livestreamId || ""}
+            handleClose={() => setLivestreamDialog({ open: false })}
+            page={"details"}
+            serverUserEmail={group.adminEmail}
+         />
       </>
    )
+}
+
+type ContentProps = {
+   job: CustomJob
+   setEditDialogState: Dispatch<SetStateAction<EditDialogState>>
+   setLiveStreamDialog?: Dispatch<SetStateAction<LiveStreamDialogState>>
+}
+const LiveStreamsContent = ({
+   job,
+   setEditDialogState,
+   setLiveStreamDialog,
+}: ContentProps) => {
+   const linkedLivestreams = useCustomJobLinkedLivestreams(job)
+   const isMobile = useIsMobile()
+
+   const handleEditLiveStreams = () => {
+      setEditDialogState({ open: true, step: 0, editMode: true })
+   }
+
+   const handleCardClick = useCallback(
+      (event: LivestreamEvent) => {
+         setLiveStreamDialog({ open: true, livestreamId: event.id })
+      },
+      [setLiveStreamDialog]
+   )
+
+   return linkedLivestreams.length > 0 ? (
+      <>
+         <Box sx={styles.header}>
+            <Typography variant={"subtitle1"} sx={styles.subTitle}>
+               Live streams related to this job
+            </Typography>
+
+            {isMobile ? (
+               <Edit2 color="grey" size={18} onClick={handleEditLiveStreams} />
+            ) : (
+               <Button
+                  variant="outlined"
+                  color="grey"
+                  startIcon={<Edit2 color="grey" />}
+                  onClick={handleEditLiveStreams}
+               >
+                  Edit
+               </Button>
+            )}
+         </Box>
+
+         <Box sx={styles.linkedContentWrapper}>
+            <EventsPreviewCarousel
+               id={"job-events"}
+               type={EventsTypes.JOB_EVENTS}
+               events={linkedLivestreams}
+               isEmbedded
+               styling={defaultStyling}
+               onCardClick={handleCardClick}
+            />
+         </Box>
+      </>
+   ) : null
+}
+
+const SparksContent = ({ job, setEditDialogState }: ContentProps) => {
+   const childRef = useRef(null)
+   const isMobile = useIsMobile()
+   const dispatch = useDispatch()
+
+   const linkedSparks = useCustomJobLinkedSparks(job)
+
+   const handleSparkClick = useCallback(
+      (spark: Spark) => {
+         dispatch(setSparkToPreview(spark.id))
+      },
+      [dispatch]
+   )
+
+   const handleEditSparks = () => {
+      setEditDialogState({ open: true, step: 1, editMode: true })
+   }
+
+   return linkedSparks.length > 0 ? (
+      <>
+         <Box sx={styles.header}>
+            <Typography variant={"subtitle1"} sx={styles.subTitle}>
+               Sparks related to this job
+            </Typography>
+
+            {isMobile ? (
+               <Edit2 color="grey" size={18} onClick={handleEditSparks} />
+            ) : (
+               <Button
+                  variant="outlined"
+                  color="grey"
+                  startIcon={<Edit2 color="grey" />}
+                  onClick={handleEditSparks}
+               >
+                  Edit
+               </Button>
+            )}
+         </Box>
+
+         <Box sx={styles.linkedContentWrapper}>
+            <SparksCarousel
+               ref={childRef}
+               sparks={linkedSparks}
+               options={sparksCarouselEmblaOptions}
+               onSparkClick={handleSparkClick}
+            />
+         </Box>
+
+         <SparkPreviewDialog />
+      </>
+   ) : null
 }
 
 export default LinkedContent

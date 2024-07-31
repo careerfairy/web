@@ -7,7 +7,13 @@ import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import dynamic from "next/dynamic"
-import { MutableRefObject, useCallback, useMemo, useRef } from "react"
+import {
+   MutableRefObject,
+   useCallback,
+   useEffect,
+   useMemo,
+   useRef,
+} from "react"
 import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
@@ -213,10 +219,14 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
    const { jobHubV1 } = useFeatureFlags()
    const { reset } = useFormContext()
 
+   useEffect(() => {
+      reset()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [isJobFormDialogOpen])
+
    const handleCloseDialog = useCallback(() => {
       dispatch(closeJobsDialog())
-      reset()
-   }, [dispatch, reset])
+   }, [dispatch])
 
    const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
