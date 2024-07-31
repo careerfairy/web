@@ -73,11 +73,6 @@ export const syncLivestreams = functions
                   )
                )
             })
-
-            // Notify every registered user of the live stream start
-            sideEffectPromises.push(
-               livestreamsRepo.createLivestreamStartUserNotifications(newValue)
-            )
          }
 
          if (newValue.startDate !== previousValue.startDate) {
@@ -103,6 +98,34 @@ export const syncLivestreams = functions
       }
 
       return handleSideEffects(sideEffectPromises)
+   })
+
+export const syncLivestreamStartNotifications = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("livestreams/{livestreamId}")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      logStart({
+         changeTypes,
+         context,
+         message: "handleLivestreamStartNotificationsOnWrite",
+      })
+
+      if (changeTypes.isUpdate) {
+         const newValue = change.after?.data() as LivestreamEvent
+         const previousValue = change.before?.data() as LivestreamEvent
+
+         if (newValue.hasStarted && !previousValue.hasStarted) {
+            // Notify every registered user of the live stream start
+            return livestreamsRepo.createLivestreamStartUserNotifications(
+               newValue
+            )
+         }
+      }
+
+      return null
    })
 
 export const syncUserLivestreamData = functions

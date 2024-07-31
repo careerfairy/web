@@ -1,12 +1,8 @@
-import { firestore } from "../../../lib/firebase"
-import Counter from "../../../lib/Counter"
-import { livestreamRepo } from "../../../repositories"
-import {
-   LivestreamEvent,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import { BigBatch } from "@qualdesk/firestore-big-batch"
-import { removeDuplicates } from "@careerfairy/shared-lib/dist/utils"
+import Counter from "../../../lib/Counter"
+import { firestore } from "../../../lib/firebase"
+import { livestreamRepo } from "../../../repositories"
 
 const targetLivestreamId = "4Y7N5oAPpooemptigtE9"
 
@@ -46,32 +42,13 @@ export async function run() {
                utm: null,
             },
          }
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          batch.update(data._ref as any, userLivestreamData)
          counter.writeIncrement()
       }
 
-      const streamRef = await firestore
-         .collection("livestreams")
-         .doc(livestream.id)
-
       const registeredIds = missingRegDataUsers?.map((user) => user.id)
       counter.addToCustomCount("Num Missing Reg Data", registeredIds.length)
-
-      if (registeredIds?.length) {
-         // If there are new registered users
-         const newRegisteredUsers = removeDuplicates([
-            ...(livestream?.registeredUsers || []),
-            ...registeredIds,
-         ]).sort()
-
-         // Update the livestream registered users array with the new registrants
-         const toUpdate: Pick<LivestreamEvent, "registeredUsers"> = {
-            registeredUsers: newRegisteredUsers,
-         }
-
-         batch.update(streamRef, toUpdate)
-         counter.writeIncrement()
-      }
 
       // Commit all changes at once
       await batch.commit()
