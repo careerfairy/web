@@ -1,8 +1,10 @@
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import {
-   dynamicSort,
-   removeDuplicates,
-} from "@careerfairy/shared-lib/dist/utils"
+   LivestreamEvent,
+   LivestreamRecordingDetails,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/livestreams"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import RegistrationsIcon from "@mui/icons-material/People"
 import PercentIcon from "@mui/icons-material/Percent"
@@ -33,7 +35,6 @@ import {
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { format } from "date-fns"
 import Image from "next/legacy/image"
-import PropTypes from "prop-types"
 import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useFirestore } from "react-redux-firebase"
@@ -41,6 +42,7 @@ import * as actions from "store/actions/index"
 import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
+import { useLivestreamUsersCount } from "../../../../../custom-hook/live-stream/useLivestreamUsersCount"
 import { useToggleLivestreamNewUI } from "../../../../../custom-hook/live-stream/useToggleLivestreamNewUI"
 import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
 import {
@@ -92,7 +94,25 @@ const styles = sxStyles({
    },
 })
 
-const StreamCard = ({ isUpcoming, stream }) => {
+type Props = {
+   isUpcoming: boolean
+   stream: LivestreamEvent
+}
+
+const StreamCard = ({ isUpcoming, stream }: Props) => {
+   const { count: registeredUsersCount } = useLivestreamUsersCount(
+      stream.id,
+      "registered"
+   )
+
+   const { count: participatingUsersCount } = useLivestreamUsersCount(
+      stream.id,
+      "participated"
+   )
+
+   const registeredCount = registeredUsersCount ?? 0
+   const participatingCount = participatingUsersCount ?? 0
+
    const firestore = useFirestore()
    const firebase = useFirebaseService()
    const dispatch = useDispatch()
@@ -104,6 +124,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
    const [openStreamerLinksDialog, setOpenStreamerLinksDialog] =
       React.useState(false)
    const recordingRequestOngoing = useSelector(
+      // @ts-ignore
       (state) => state.streamAdmin.recording.recordingRequestOngoing
    )
    const [csvDownloadData, setCsvDownloadData] = useState(null)
@@ -124,8 +145,9 @@ const StreamCard = ({ isUpcoming, stream }) => {
 
             const [recordingToken, recordingStats] = results
                .filter((result) => result.status === "fulfilled")
+               // @ts-ignore
                .map((result) => result.value)
-
+            // @ts-ignore
             const recordingSid = recordingToken?.sid
             if (recordingSid) {
                setRecordingSid(recordingSid)
@@ -171,6 +193,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
             ],
          })
          if (tokenDoc.exists) {
+            // @ts-ignore
             const secureToken = tokenDoc.data().value
             const baseUrl = getBaseUrl()
             const url = `${baseUrl}/streaming/${stream.id}/joining-streamer?token=${secureToken}`
@@ -185,10 +208,12 @@ const StreamCard = ({ isUpcoming, stream }) => {
    }, [dispatch, firestore, stream.id])
 
    const handleStartRecording = useCallback(async () => {
+      // @ts-ignore
       dispatch(actions.handleStartRecording({ firebase, streamId: stream.id }))
    }, [dispatch, firebase, stream.id])
 
    const handleStopRecording = useCallback(async () => {
+      // @ts-ignore
       dispatch(actions.handleStopRecording({ firebase, streamId: stream.id }))
    }, [dispatch, firebase, stream.id])
 
@@ -249,7 +274,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                         </MenuItem>
                         <MenuItem
                            disabled={isMutating}
-                           onClick={toggleLivestreamNewUI}
+                           onClick={() => toggleLivestreamNewUI()}
                         >
                            {stream.useNewUI
                               ? "Disable new stream room"
@@ -303,7 +328,6 @@ const StreamCard = ({ isUpcoming, stream }) => {
                               confirmText="Are you sure that you want to stop recording this live stream?"
                               onConfirm={handleStopRecording}
                               open={confirmRecordingDialogOpen}
-                              disabled={recordingRequestOngoing}
                               onclose={handleCloseConfirmRecordingDialog}
                            />
                         ) : (
@@ -311,7 +335,6 @@ const StreamCard = ({ isUpcoming, stream }) => {
                               confirmText="Are you sure that you want to start recording this live stream?"
                               onConfirm={handleStartRecording}
                               open={confirmRecordingDialogOpen}
-                              disabled={recordingRequestOngoing}
                               onclose={handleCloseConfirmRecordingDialog}
                            />
                         )}
@@ -337,7 +360,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                         </ListItemAvatar>
                         <ListItemText
                            primary="Registrations"
-                           secondary={stream.registeredUsers?.length || 0}
+                           secondary={registeredUsersCount || 0}
                         />
                      </ListItem>
                      <ListItem>
@@ -348,7 +371,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                         </ListItemAvatar>
                         <ListItemText
                            primary="Participating"
-                           secondary={stream.participatingStudents?.length || 0}
+                           secondary={participatingUsersCount || 0}
                         />
                      </ListItem>
                      {stream.hasEnded ? (
@@ -361,7 +384,10 @@ const StreamCard = ({ isUpcoming, stream }) => {
                            <ListItemText
                               primary="No Show"
                               secondary={
-                                 calculateNoShowPercentage(stream) + "%"
+                                 calculateNoShowPercentage(
+                                    registeredCount,
+                                    participatingCount
+                                 ) + "%"
                               }
                            />
                         </ListItem>
@@ -402,8 +428,11 @@ const StreamCard = ({ isUpcoming, stream }) => {
                            <ListItemText
                               primary="Users Reached"
                               secondary={
-                                 calculateReachedUsers(stream, recordingStats) +
-                                 "%"
+                                 calculateReachedUsers(
+                                    registeredCount,
+                                    participatingCount,
+                                    recordingStats
+                                 ) + "%"
                               }
                            />
                         </ListItem>
@@ -467,7 +496,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
    )
 }
 
-function formatRegisteredUsersToCSV(userLivestreamDatas) {
+function formatRegisteredUsersToCSV(userLivestreamDatas: UserLivestreamData[]) {
    const DATE_FIELD = "Registered Date (Swiss Time)"
    return userLivestreamDatas
       .map((data) => ({
@@ -486,7 +515,7 @@ function formatRegisteredUsersToCSV(userLivestreamDatas) {
       }))
 }
 
-function convertFromUTCToSwissTime(date) {
+function convertFromUTCToSwissTime(date: Date) {
    const zonedDate = new Date(
       date?.toLocaleString("en-US", {
          timeZone: "Europe/Zurich",
@@ -496,11 +525,13 @@ function convertFromUTCToSwissTime(date) {
    return format(zonedDate, "yyyy-MM-dd HH:mm")
 }
 
-function calculateNoShowPercentage(stream) {
+function calculateNoShowPercentage(
+   registeredCount: number,
+   participatingCount: number
+) {
    try {
-      const noShowUsers =
-         stream.registeredUsers?.length - stream.participatingStudents?.length
-      const number = (noShowUsers / stream.registeredUsers?.length) * 100 || 0
+      const noShowUsers = registeredCount - participatingCount
+      const number = (noShowUsers / registeredCount) * 100 || 0
 
       return Math.round(number)
    } catch (e) {
@@ -508,22 +539,18 @@ function calculateNoShowPercentage(stream) {
    }
 }
 
-function calculateReachedUsers(stream, recordingStats) {
-   const numOfRegisteredUsers = stream.registeredUsers?.length
+function calculateReachedUsers(
+   numOfRegisteredUsers: number,
+   numOfParticipatingUsers: number,
+   recordingStats: LivestreamRecordingDetails
+) {
+   const reachedUsers =
+      numOfParticipatingUsers + (recordingStats.viewers?.length ?? 0)
 
-   const reachedUsers = removeDuplicates([
-      ...(stream?.participatingStudents || []),
-      ...(recordingStats?.viewers || []),
-   ])
    const reachedUsersPercentage =
-      (reachedUsers.length / numOfRegisteredUsers) * 100 || 0
+      (reachedUsers / numOfRegisteredUsers) * 100 || 0
 
    return Math.round(reachedUsersPercentage)
-}
-
-StreamCard.propTypes = {
-   stream: PropTypes.object,
-   isUpcoming: PropTypes.bool,
 }
 
 export default StreamCard

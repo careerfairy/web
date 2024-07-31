@@ -1,11 +1,11 @@
-import { useMemo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import { useFirestoreCollection } from "./utils/useFirestoreCollection"
 import firebase from "firebase/compat/app"
+import { useMemo } from "react"
+import { livestreamRepo } from "../../data/RepositoryInstances"
 import { TimeFrames } from "../views/group/admin/analytics-new/general/GeneralPageProvider"
+import { useFirestoreCollection } from "./utils/useFirestoreCollection"
 
 type Props = {
    filterByGroupId?: string
@@ -16,7 +16,6 @@ type Props = {
    companySizes?: string[]
    companyIndustriesIds?: string[]
    getHiddenEvents?: boolean
-   registeredUserEmail?: string
    from?: Date
    fieldsOfStudy?: FieldOfStudy[]
    recordedOnly?: boolean
@@ -48,7 +47,6 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
       companySizes,
       companyIndustriesIds,
       getHiddenEvents,
-      registeredUserEmail,
       from,
       fieldsOfStudy,
       recordedOnly,
@@ -71,14 +69,6 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
                "interestsIds",
                "array-contains-any",
                interestsIds
-            )
-         }
-
-         if (registeredUserEmail) {
-            query = query.where(
-               "registeredUsers",
-               "array-contains",
-               registeredUserEmail
             )
          }
 
@@ -123,29 +113,27 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
       from,
       recordedOnly,
       limit,
-      registeredUserEmail,
       fieldsOfStudy,
    ])
 
-   let { data, status } = useFirestoreCollection<LivestreamEvent>(eventsQuery, {
-      suspense: false,
-   })
+   const { data, status } = useFirestoreCollection<LivestreamEvent>(
+      eventsQuery,
+      {
+         suspense: false,
+      }
+   )
 
    if (status === "loading") return undefined
 
    let res = new LivestreamsDataParser(data)
 
    /**
-    * If a `filterByGroupId` is provided, conduct client-side filters for `interestsIds`, `registeredUsers`, and `targetFieldsOfStudy`.
+    * If a `filterByGroupId` is provided, conduct client-side filters for `interestsIds`, and `targetFieldsOfStudy`.
     * These filters are performed on the client-side due to Firestore's limitation of one `array-contains` operation per query.
     */
    if (filterByGroupId) {
       if (interestsIds) {
          res = res.filterByInterests(interestsIds) // Ensure this method exists in LivestreamsDataParser
-      }
-
-      if (registeredUserEmail) {
-         res = res.filterByRegisteredUser(registeredUserEmail) // Ensure this method exists in LivestreamsDataParser
       }
 
       if (fieldsOfStudy?.length) {
