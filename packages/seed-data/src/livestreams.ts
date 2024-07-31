@@ -91,14 +91,6 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          .collection("livestreams")
          .doc(options.livestream.id)
 
-      if (options.registered) {
-         await livestreamRef.update({
-            registeredUsers: admin.firestore.FieldValue.arrayUnion(
-               options.user.userEmail
-            ),
-         })
-      }
-
       const userLivestreamDataRef = livestreamRef
          .collection("userLivestreamData")
          .doc(options.user.userEmail)
@@ -241,12 +233,6 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       overrideFields?: Partial<LivestreamEvent>
    ): Promise<LivestreamEvent> {
       const batch = firestore.batch()
-      const registeredUsers = Array.from(
-         {
-            length: faker.datatype.number({ min: 0, max: 100 }),
-         },
-         () => faker.internet.email()
-      )
 
       const groupId = uuidv4()
 
@@ -259,7 +245,6 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
             email: faker.internet.email(),
             groupId: groupId,
          },
-         registeredUsers,
          groupIds: [groupId],
          hasEnded: false,
          ...overrideFields,

@@ -62,11 +62,6 @@ export interface LivestreamEvent extends Identifiable {
    start: firebase.firestore.Timestamp
    startDate?: Date
    status?: LivestreamStatus
-   /**
-    * @deprecated Use userLivestreamData sub-collection instead.
-    * This field will be removed in a future version.
-    */
-   registeredUsers?: string[]
    groupQuestionsMap?: LivestreamGroupQuestionsMap
    hasStarted?: boolean
    startedAt?: firebase.firestore.Timestamp
@@ -656,7 +651,6 @@ export const pickPublicDataFromLivestream = (
 export interface LivestreamEventSerialized
    extends Omit<
       LivestreamEvent,
-      | "registeredUsers"
       | "talentPool"
       | "participatingStudents"
       | "created"

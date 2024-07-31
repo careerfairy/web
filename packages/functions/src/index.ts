@@ -133,7 +133,6 @@ exports.notifySlackWhenALivestreamStarts =
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
-exports.fetchLivestreams_v2 = livestreams.fetchLivestreams
 
 // Tags
 exports.fetchTagsContentHits = tags.fetchContentHits
@@ -171,7 +170,7 @@ exports.slackHandleInteractions = slack.slackHandleInteractions
 // Rewards
 exports.rewardLivestreamInvitationComplete_eu =
    rewards.rewardLivestreamInvitationComplete
-exports.rewardUserAction_eu = rewards.rewardUserAction
+exports.rewardUserAction_v2 = rewards.rewardUserAction
 exports.applyReferralCode_eu = rewards.applyReferralCode
 
 // Ratings
@@ -217,6 +216,8 @@ exports.getRecommendedEvents_v4 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
+exports.syncLivestreamStartNotifications =
+   onWriteTriggers.syncLivestreamStartNotifications
 exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
 exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 exports.syncUserStats = onWriteTriggers.syncUserStats
