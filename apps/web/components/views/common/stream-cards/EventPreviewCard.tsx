@@ -13,6 +13,7 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
    getMaxLineStyles,
    getResizedUrl,
@@ -29,6 +30,7 @@ import React, {
    useMemo,
    useState,
 } from "react"
+import { useInView } from "react-intersection-observer"
 import { checkIfPast } from "util/streamUtil"
 import { placeholderBanner } from "../../../../constants/images"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
@@ -240,6 +242,14 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       }: EventPreviewCardProps,
       ref
    ) => {
+      const { inView: cardInView, ref: cardInViewRef } = useInView({
+         fallbackInView: true,
+      })
+
+      const hasRegistered = useUserIsRegistered(event?.id, {
+         disabled: !cardInView, // Helps Reduce the number of listeners
+      })
+
       const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
       const trackImpressionsRef = useTrackLivestreamImpressions({
@@ -265,14 +275,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          () => (event ? LivestreamPresenter.createFromDocument(event) : null),
          [event]
       )
-
-      const hasRegistered = useMemo<boolean>(() => {
-         if (loading) return false
-
-         return Boolean(
-            event?.registeredUsers?.includes(authenticatedUser?.email)
-         )
-      }, [loading, event?.registeredUsers, authenticatedUser?.email])
 
       const hasParticipated = useMemo<boolean>(() => {
          if (loading) return false
@@ -351,10 +353,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             }
          }
 
-         if (
-            presenterEvent.isLive() &&
-            presenterEvent.isUserRegistered(authenticatedUser.email)
-         ) {
+         if (presenterEvent.isLive() && hasRegistered) {
             return {
                href: presenterEvent.getViewerEventRoomLink(),
             }
@@ -390,6 +389,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          marketingFormCompleted,
          pathname,
          router,
+         hasRegistered,
       ])
 
       const isLink = event && !onCardClick && !isPlaceholderEvent
@@ -412,7 +412,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                <CardActionArea
                   component={isLink ? "a" : "div"}
                   sx={[event && styles.cursorPointer, styles.cardWrapper]}
-                  ref={trackImpressionsRef}
+                  ref={(e: HTMLDivElement | null) => {
+                     trackImpressionsRef(e)
+                     cardInViewRef(e)
+                  }}
                   target={isInIframe() ? "_blank" : undefined}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}

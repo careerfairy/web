@@ -44,6 +44,8 @@ export type CountQuery = {
    refetch: KeyedMutator<number>
 }
 
+type Options = SWRConfiguration<number>
+
 /**
  * Retrieves the count of documents matching a query.
  *
@@ -51,13 +53,16 @@ export type CountQuery = {
  * Executes an aggregation query, potentially reducing costs to 1/1000th of a standard read operation.
  * For further details on aggregation queries and their cost benefits, visit https://firebase.google.com/docs/firestore/pricing#aggregation_queries
  */
-const useSWRCountQuery = (
-   q: Query,
-   options?: SWRConfiguration<number>
-): CountQuery => {
-   const mergedOptions: SWRConfiguration<number> = {
+const useSWRCountQuery = (q: Query, options?: Options): CountQuery => {
+   const mergedOptions: Options = {
       revalidateOnFocus: false,
       ...options,
+      onError: (err) => {
+         errorLogAndNotify(err, {
+            message: "Error fetching count query",
+            query: JSON.stringify(q),
+         })
+      },
    }
 
    const { data, error, isLoading, mutate } = useSWR(
