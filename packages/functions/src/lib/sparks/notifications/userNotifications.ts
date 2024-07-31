@@ -24,10 +24,10 @@ const createSparkNotificationForSingleUser = ({
 }: createSparkNotificationForSingleUser) => {
    // filter all the upcoming events where the user is not registered
    const filteredUpcomingEvents = upcomingEvents.filter((event) => {
-      const userLivestreamData = event.usersLivestreamData.find(
+      const userLivestreamData = event?.usersLivestreamData?.find(
          (user) => user.id === userId
       )
-      return !userLivestreamData?.registered.date
+      return !userLivestreamData?.registered?.date
    })
 
    const notifications: UserSparksNotification[] = mapEventsToNotifications(
