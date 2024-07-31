@@ -588,7 +588,7 @@ export class LivestreamFunctionsRepository
 
       const users = await this.getLivestreamUsers(livestream.id, "registered")
 
-      users.forEach((user) => {
+      users?.forEach((user) => {
          const ref = firestoreAdmin
             .collection("userData")
             .doc(user.id)
