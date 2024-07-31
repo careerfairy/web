@@ -5,7 +5,6 @@ import {
 import { CircularProgress } from "@mui/material"
 import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import dynamic from "next/dynamic"
 import {
    MutableRefObject,
@@ -216,7 +215,8 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
    const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
    const isDeleteJobDialogOpen = useSelector(deleteJobsDialogOpenSelector)
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
-   const { jobHubV1 } = useFeatureFlags()
+   // const { jobHubV1 } = useFeatureFlags()
+   const { jobHubV1 } = { jobHubV1: true }
    const { reset } = useFormContext()
 
    useEffect(() => {

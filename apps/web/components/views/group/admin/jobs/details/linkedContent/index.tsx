@@ -5,10 +5,8 @@ import { Box, Button, Stack, Typography } from "@mui/material"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useCustomJobLinkedSparks from "components/custom-hook/custom-job/useCustomJobLinkedSparks"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import EventsPreviewCarousel, {
@@ -117,7 +115,8 @@ const LinkedContent = ({ job }: Props) => {
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
       group.groupId
    )
-   const { jobHubV1 } = useFeatureFlags()
+   //    // const { jobHubV1 } = useFeatureFlags()
+   const { jobHubV1 } = { jobHubV1: true }
 
    const jobHasNoContent = useMemo(
       () =>
@@ -195,9 +194,9 @@ const LiveStreamsContent = ({
    const linkedLivestreams = useCustomJobLinkedLivestreams(job)
    const isMobile = useIsMobile()
 
-   const handleEditLiveStreams = () => {
+   const handleEditLiveStreams = useCallback(() => {
       setEditDialogState({ open: true, step: 0, editMode: true })
-   }
+   }, [setEditDialogState])
 
    const handleCardClick = useCallback(
       (event: LivestreamEvent) => {
@@ -255,9 +254,9 @@ const SparksContent = ({ job, setEditDialogState }: ContentProps) => {
       [dispatch]
    )
 
-   const handleEditSparks = () => {
+   const handleEditSparks = useCallback(() => {
       setEditDialogState({ open: true, step: 1, editMode: true })
-   }
+   }, [setEditDialogState])
 
    return linkedSparks.length > 0 ? (
       <>
@@ -288,8 +287,6 @@ const SparksContent = ({ job, setEditDialogState }: ContentProps) => {
                onSparkClick={handleSparkClick}
             />
          </Box>
-
-         <SparkPreviewDialog />
       </>
    ) : null
 }
