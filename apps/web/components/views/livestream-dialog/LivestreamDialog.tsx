@@ -1,3 +1,12 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { UserStats } from "@careerfairy/shared-lib/users"
+import { Dialog, DialogContent } from "@mui/material"
+import CircularProgress from "@mui/material/CircularProgress"
+import { useTheme } from "@mui/material/styles"
+import { LoadableOptions } from "next/dist/shared/lib/dynamic"
+import dynamic from "next/dynamic"
+import { useRouter } from "next/router"
 import {
    ComponentType,
    createContext,
@@ -10,38 +19,29 @@ import {
    useReducer,
    useState,
 } from "react"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import useLivestream from "../../custom-hook/live-stream/useLivestream"
-import { Dialog, DialogContent } from "@mui/material"
-import useIsMobile from "../../custom-hook/useIsMobile"
-import { sxStyles } from "../../../types/commonTypes"
 import SwipeableViews from "react-swipeable-views"
-import { useTheme } from "@mui/material/styles"
+import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
-import dynamic from "next/dynamic"
-import CircularProgress from "@mui/material/CircularProgress"
-import { LoadableOptions } from "next/dist/shared/lib/dynamic"
+import { sxStyles } from "../../../types/commonTypes"
+import { isFromNewsletter } from "../../../util/PathUtils"
+import useLivestream from "../../custom-hook/live-stream/useLivestream"
+import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
+import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { UserStats } from "@careerfairy/shared-lib/users"
-import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
-import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
-import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQuestionsViewSkeleton"
-import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
-import { useRouter } from "next/router"
-import { buildDialogLink } from "./util"
 import {
    RegistrationAction,
    registrationInitialState,
    registrationReducer,
    RegistrationState,
 } from "./registrationReducer"
-import { isFromNewsletter } from "../../../util/PathUtils"
-import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
-import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
-import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
-import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
+import { buildDialogLink } from "./util"
+import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQuestionsViewSkeleton"
 import RedirectingView from "./views/common/RedirectingView"
+import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
+import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
+import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
+import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
+import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 
 const styles = sxStyles({
    content: {
@@ -261,6 +261,7 @@ const Content: FC<ContentProps> = ({
                      routerOptions
                   )
                }
+            // eslint-disable-next-line no-fallthrough
             case "register-data-consent":
                if (isPageMode) {
                   return void push(
@@ -276,11 +277,13 @@ const Content: FC<ContentProps> = ({
                   )
                }
 
+            // eslint-disable-next-line no-fallthrough
             case "register-ask-questions":
                if (livestream?.questionsDisabled) {
                   view = "register-join-talent-pool"
                }
 
+            // eslint-disable-next-line no-fallthrough
             default:
                setValue(views.findIndex((v) => v.key === view))
          }

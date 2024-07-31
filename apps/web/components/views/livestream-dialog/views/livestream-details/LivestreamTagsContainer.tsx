@@ -2,6 +2,7 @@ import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
+import { useLivestreamUsersCount } from "components/custom-hook/live-stream/useLivestreamUsersCount"
 import { FC } from "react"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
@@ -49,6 +50,8 @@ type LivestreamTagsContainerProps = {
 const LivestreamTagsContainer: FC<LivestreamTagsContainerProps> = ({
    presenter,
 }) => {
+   const { count } = useLivestreamUsersCount(presenter.id, "registered")
+
    return (
       <Box sx={styles.tagsWrapper}>
          {presenter.isFaceToFace ? (
@@ -58,7 +61,9 @@ const LivestreamTagsContainer: FC<LivestreamTagsContainerProps> = ({
             <LimitedRegistrationsBadge
                sx={styles.chip}
                white
-               numberOfSpotsRemaining={presenter.getNumberOfSpotsRemaining()}
+               numberOfSpotsRemaining={presenter.getNumberOfSpotsRemaining(
+                  count || 0
+               )}
             />
          ) : null}
          {presenter.language ? (

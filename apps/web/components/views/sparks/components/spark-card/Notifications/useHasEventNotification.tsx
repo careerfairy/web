@@ -1,6 +1,6 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { useAuth } from "HOCs/AuthProvider"
 import useLivestream from "components/custom-hook/live-stream/useLivestream"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import { useMemo } from "react"
 import { useSelector } from "react-redux"
 import {
@@ -10,14 +10,11 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 
 export const useHasEventNotification = (spark: SparkPresenter) => {
-   const { authenticatedUser } = useAuth()
    const eventNotification = useSelector(currentSparkEventNotificationSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const groupPageId = useSelector(groupIdSelector)
    const event = useLivestream(eventNotification?.eventId || "none")
-   const isUserRegisteredToEvent = event?.data?.registeredUsers?.includes(
-      authenticatedUser?.email
-   )
+   const isUserRegisteredToEvent = useUserIsRegistered(event?.data?.id)
 
    const hasNotification: boolean = useMemo(
       () =>
