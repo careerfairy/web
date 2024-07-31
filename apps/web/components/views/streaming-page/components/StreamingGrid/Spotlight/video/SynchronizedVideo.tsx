@@ -101,7 +101,11 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
       if (videoPaused || isVideoSharer) return
 
       if (reactPlayerInstance) {
-         reactPlayerInstance.seekTo(video.second, "seconds")
+         const secondsDiff = DateUtil.getSecondsBetweenDates(
+            videoRef.current.lastPlayed.toDate(),
+            new Date()
+         )
+         reactPlayerInstance.seekTo(video.second + secondsDiff, "seconds")
       }
    }, [video.second, isVideoSharer, reactPlayerInstance, videoPaused])
 
@@ -157,7 +161,7 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
                width="100%"
                height="100%"
                style={{
-                  pointerEvents: isVideoSharer ? "visibleFill" : "visibleFill",
+                  pointerEvents: isVideoSharer ? "visibleFill" : "none",
                }}
             />
             {Boolean(autoPlayFailed) && (
