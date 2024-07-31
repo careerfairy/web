@@ -202,6 +202,7 @@ export type EventsProps = {
    hideChipLabels?: boolean
    handleOpenEvent?: (event: LivestreamEvent) => void
    disableClick?: boolean
+   onCardClick?: (event) => void
 }
 
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
@@ -225,6 +226,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          showManageButton = false,
          handleOpenEvent,
          disableClick,
+         onCardClick,
       } = props
       const emblaPlugins = []
       if (events?.length)
@@ -440,6 +442,11 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                           isRecommended={isRecommended}
                                           hideChipLabels={hideChipLabels}
                                           disableClick={disableClick}
+                                          onCardClick={
+                                             onCardClick
+                                                ? () => onCardClick(event)
+                                                : null
+                                          }
                                           bottomElement={
                                              showManageButton ? (
                                                 <Box

@@ -5,10 +5,10 @@ import { SlideUpTransition } from "components/views/common/transitions"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { customJobRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
-import { DialogState } from "."
+import { EditDialogState } from "."
 import JobLinkLiveStreams from "../../dialog/createJob/JobLinkLiveStreams"
 import JobLinkSparks from "../../dialog/createJob/JobLinkSparks"
 
@@ -23,14 +23,19 @@ const styles = sxStyles({
 
 type Props = {
    job: CustomJob
-   dialogState: DialogState
+   dialogState: EditDialogState
    handleClose: () => void
 }
 
 const LinkedContentDialog = ({ job, dialogState, handleClose }: Props) => {
    const { group } = useGroup()
    const { successNotification, errorNotification } = useSnackbarNotifications()
-   const { getValues } = useFormContext()
+   const { getValues, reset } = useFormContext()
+
+   useEffect(() => {
+      reset()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [dialogState.open])
 
    const handleSubmit = useCallback(async () => {
       try {
