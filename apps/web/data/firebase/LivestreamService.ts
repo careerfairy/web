@@ -169,10 +169,10 @@ export class LivestreamService {
 
             // The user might have answered all the questions but not registered to the event,
             // so we check if the user has registered to the event
-            const hasRegisteredToEvent =
-               currentLivestream?.registeredUsers?.includes?.(
-                  userData.userEmail
-               )
+            const hasRegisteredToEvent = await this.hasUserRegistered(
+               currentLivestream.id,
+               userData.userEmail
+            )
 
             if (
                !hasAnsweredAllQuestions || // if the user has not answered all the event questions

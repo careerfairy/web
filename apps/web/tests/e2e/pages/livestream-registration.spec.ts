@@ -46,6 +46,7 @@ test.describe("Livestream Registration Signed In", () => {
 
    test("successful registration on a livestream event with no group questions", async ({
       page,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
    }) => {
       const { livestream } = await setupLivestreamData(undefined, {
@@ -62,6 +63,7 @@ test.describe("Livestream Registration Signed In", () => {
 
    test("successful registration on a livestream event without group questions and required consent", async ({
       page,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
    }) => {
       const { livestream } = await setupLivestreamData(undefined, {
@@ -84,6 +86,7 @@ test.describe("Livestream Registration Signed In", () => {
 
    test("successful registration on a livestream event with both group questions and required consent", async ({
       page,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
    }) => {
       const { livestream } = await setupLivestreamData(undefined, {
@@ -134,6 +137,7 @@ test.describe("Livestream Registration Signed In", () => {
 
    test("livestream has already started, confirm the redirection without any registration", async ({
       page,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
       browserName,
    }) => {
@@ -262,7 +266,4 @@ async function expectUserLivestreamDataCreated(
    expect(
       finalLivestreamData.userLivestreamData[0].registered.date
    ).toBeTruthy()
-   expect(finalLivestreamData.livestream.registeredUsers).toContain(
-      user.userEmail
-   )
 }
