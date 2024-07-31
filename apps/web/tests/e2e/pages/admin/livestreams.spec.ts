@@ -1,3 +1,4 @@
+import JobsSeed from "@careerfairy/seed-data/jobs"
 import LivestreamSeed from "@careerfairy/seed-data/livestreams"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { setupLivestreamData } from "tests/e2e/setupData"
@@ -95,21 +96,33 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.assertTextIsVisible(title)
    })
 
-   test("Create a draft live stream with job openings", async ({
-      groupPage,
-   }) => {
-      // TODO-WG: Confirm cannot use in beforeAll
-      await setupLivestreamData()
+   test.extend({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      options: async ({ options }, use) => {
+         await use({
+            atsGroupType: "COMPLETE",
+            createUser: true,
+            completedGroup: true,
+         })
+      },
+   })(
+      "Create a draft live stream with job openings",
+      async ({ groupPage, group, customJobs }) => {
+         console.log("🚀 ~ customJobs:", customJobs)
+         // TODO-WG: Confirm cannot use in beforeAll
 
-      const livestream = LivestreamSeed.randomDraft({})
-      console.log(
-         "🚀 ~ test.describe ~ livestreams:",
-         livestream.hasJobs,
-         livestream.jobs
-      )
+         await setupLivestreamData(group)
 
-      // create draft - with missing required fields
-      await groupPage.clickCreateNewLivestreamTop()
-      await groupPage.fillLivestreamForm(livestream)
-   })
+         const livestreamJobAssociations = JobsSeed.getJobAssociations(
+            customJobs.slice(0, 1)
+         )
+
+         const livestream = LivestreamSeed.randomDraft({
+            jobs: livestreamJobAssociations,
+         })
+
+         await groupPage.clickCreateNewLivestreamTop()
+         await groupPage.fillLivestreamForm(livestream)
+      }
+   )
 })

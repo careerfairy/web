@@ -177,7 +177,7 @@ async function setupData(group: Group) {
    return { livestream, secureToken }
 }
 
-export const generateJobAssociation = (
+const generateJobAssociation = (
    groupId: string,
    jobId: string,
    name: string
