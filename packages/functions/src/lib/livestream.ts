@@ -217,6 +217,12 @@ export const updateUnfinishedLivestreams = async () => {
    return batch.commit()
 }
 
+/**
+ * Retrieves registration status for multiple live streams for a given user.
+ * @param streams - Array of LivestreamEvent objects.
+ * @param userId - User ID to check registration status for.
+ * @returns Promise resolving to an array of boolean values indicating registration status.
+ */
 const getRegistrationStatus = async (
    streams: LivestreamEvent[],
    userId: string
@@ -232,6 +238,12 @@ const getRegistrationStatus = async (
    )
 }
 
+/**
+ * Filters an array of live streams to include only those the user is registered for.
+ * @param streams - Array of LivestreamEvent objects to filter.
+ * @param userId - User ID to check registration status for.
+ * @returns Promise resolving to an array of LivestreamEvent objects the user is registered for.
+ */
 export const filterRegisteredLiveStreams = async (
    streams: LivestreamEvent[],
    userId: string
