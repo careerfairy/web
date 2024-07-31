@@ -37,7 +37,7 @@ interface SparksState {
    sparkCategoryIds: SparkCategory["id"][]
    showEventDetailsDialog: boolean
    cardNotification: UserSparksNotification | null
-   cameFromCompanyPageLink: string | null
+   cameFromPageLink: string | null
    videosMuted: boolean
    playing: boolean
    eventToRegisterTo: string | null
@@ -68,7 +68,7 @@ const initialState: SparksState = {
    eventNotification: null,
    showEventDetailsDialog: false,
    cardNotification: null,
-   cameFromCompanyPageLink: null,
+   cameFromPageLink: null,
    videosMuted: true,
    playing: true,
    eventToRegisterTo: null,
@@ -229,8 +229,8 @@ const sparksFeedSlice = createSlice({
          state.groupId = null
          state.hasMoreSparks = true
       },
-      setCameFromCompanyPageLink: (state, action: PayloadAction<string>) => {
-         state.cameFromCompanyPageLink = action.payload
+      setCameFromPageLink: (state, action: PayloadAction<string>) => {
+         state.cameFromPageLink = action.payload
       },
       setInteractionSource: (state, action: PayloadAction<string>) => {
          state.interactionSource = action.payload
@@ -283,7 +283,7 @@ const sparksFeedSlice = createSlice({
          state.sparkCategoryIds = []
          state.showEventDetailsDialog = false
          state.originalSparkId = null
-         state.cameFromCompanyPageLink = null
+         state.cameFromPageLink = null
          state.cardNotification = null
          state.videosMuted = false
          state.playing = true
@@ -479,7 +479,7 @@ export const {
    addCardNotificationToSparksList,
    removeGroupId,
    setCardEventNotification,
-   setCameFromCompanyPageLink,
+   setCameFromPageLink,
    setInteractionSource,
    setContentTopicIds,
    setEventToRegisterTo,
