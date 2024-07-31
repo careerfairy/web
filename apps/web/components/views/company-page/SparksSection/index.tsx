@@ -9,7 +9,7 @@ import { GroupSparksCarousel } from "components/views/portal/sparks/SparksCarous
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
-import { setCameFromCompanyPageLink } from "store/reducers/sparksFeedReducer"
+import { setCameFromPageLink } from "store/reducers/sparksFeedReducer"
 import { SectionAnchor, TabValue, useCompanyPage } from ".."
 
 type Props = {
@@ -42,7 +42,7 @@ const SparksSection: FC<Props> = ({ groupId }) => {
    const handleSparksClicked = useCallback(
       (spark: Spark) => {
          if (spark) {
-            dispatch(setCameFromCompanyPageLink(router.asPath))
+            dispatch(setCameFromPageLink(router.asPath))
             router.push({
                pathname: `/sparks/${spark.id}`,
                query: {
