@@ -26,6 +26,7 @@ interface SparksState {
    currentPlayingIndex: number
    hasMoreSparks: boolean
    groupId: string | null
+   creatorId: string | null
    userEmail: string | null
    numberOfSparksToFetch: number
    fetchNextSparksStatus: Status
@@ -57,6 +58,7 @@ const initialState: SparksState = {
    currentPlayingIndex: 0,
    hasMoreSparks: true,
    groupId: null,
+   creatorId: null,
    userEmail: null,
    numberOfSparksToFetch: 10,
    initialFetchStatus: "loading",
@@ -144,6 +146,12 @@ const sparksFeedSlice = createSlice({
       },
       setGroupId: (state, action: PayloadAction<SparksState["groupId"]>) => {
          state.groupId = action.payload
+      },
+      setCreatorId: (
+         state,
+         action: PayloadAction<SparksState["creatorId"]>
+      ) => {
+         state.creatorId = action.payload
       },
       setUserEmail: (state, action: PayloadAction<string>) => {
          state.userEmail = action.payload
@@ -396,18 +404,25 @@ const getSparkOptions = (state: RootState) => {
    const {
       numberOfSparksToFetch,
       groupId,
+      creatorId,
       userEmail,
       sparkCategoryIds,
       contentTopicIds,
       anonymousUserCountryCode,
    } = state.sparksFeed
 
+   const feedScope = creatorId
+      ? { creatorId }
+      : groupId
+      ? { groupId }
+      : { userId: userEmail || null }
+
    return {
       numberOfSparks: numberOfSparksToFetch,
       sparkCategoryIds,
       contentTopicIds,
       anonymousUserCountryCode,
-      ...(groupId ? { groupId } : { userId: userEmail || null }),
+      ...feedScope,
    }
 }
 
@@ -469,6 +484,7 @@ export const {
    setOriginalSparkId,
    setSparks,
    setGroupId,
+   setCreatorId,
    setUserEmail,
    setSparkCategories,
    resetSparksFeed,
