@@ -38,7 +38,7 @@ export const sendReminderEmailToRegistrants = functions
          )
 
          const templates = []
-         users.forEach((recipient) => {
+         users?.forEach((recipient) => {
             const email = {
                TemplateId: req.body.templateId,
                From: "CareerFairy <noreply@careerfairy.io>",
