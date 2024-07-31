@@ -12,7 +12,6 @@ import {
    Typography,
 } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import { FC, useCallback, useMemo } from "react"
 import { AlertCircle, CheckCircle, User } from "react-feather"
@@ -183,7 +182,8 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
    const { group } = useGroupFromState()
-   const { jobHubV1 } = useFeatureFlags()
+   // const { jobHubV1 } = useFeatureFlags()
+   const { jobHubV1 } = { jobHubV1: true }
 
    const handleJobClick = useCallback(
       (jobId: string) => {

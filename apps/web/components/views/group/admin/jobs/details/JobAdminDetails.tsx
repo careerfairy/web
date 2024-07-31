@@ -3,7 +3,6 @@ import ChevronLeft from "@mui/icons-material/ChevronLeft"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 import { Box, Tab, Tabs, Tooltip, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { AlertCircle } from "react-feather"
@@ -89,7 +88,8 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
    const { push } = useRouter()
-   const { jobHubV1 } = useFeatureFlags()
+   // const { jobHubV1 } = useFeatureFlags()
+   const { jobHubV1 } = { jobHubV1: true }
 
    const TabsEnum = useMemo(
       () => ({

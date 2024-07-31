@@ -6,7 +6,6 @@ import {
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Grid, Stack } from "@mui/material"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { SlideUpTransition } from "components/views/common/transitions"
 import JobDialog from "components/views/group/admin/jobs/dialog"
 import JobFormDialog from "components/views/group/admin/jobs/dialog/createJob/JobFormDialog"
@@ -34,7 +33,8 @@ const CustomJobForm = () => {
    const { group } = useGroup()
    const allCustomJobs = useGroupCustomJobs(group.id)
    const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
-   const { jobHubV1 } = useFeatureFlags()
+   // const { jobHubV1 } = useFeatureFlags()
+   const { jobHubV1 } = { jobHubV1: true }
 
    const {
       values: {
