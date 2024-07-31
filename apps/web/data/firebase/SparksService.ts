@@ -123,7 +123,7 @@ export class SparksService {
          }
       >(
          this.functions,
-         "getSparksFeed_v6"
+         "getSparksFeed_v7"
       )(data)
 
       return {
