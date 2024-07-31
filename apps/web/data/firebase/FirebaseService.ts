@@ -2896,13 +2896,6 @@ class FirebaseService {
          .map((doc) => ({ id: doc.id, ...doc.data() }))
    }
 
-   listenToRecommendedEvents = (recommendedEventIds, callback) => {
-      const ref = this.firestore
-         .collection("livestreams")
-         .where("id", "in", recommendedEventIds || [])
-      return ref.onSnapshot(callback)
-   }
-
    createMultipleBreakoutRooms = async (
       livestreamId = "",
       numberOfRooms = 0

@@ -35,6 +35,7 @@ import {
    LivestreamStatsToUpdate,
    createLiveStreamStatsDoc,
 } from "./stats"
+import { sortByDateAscending } from "./util"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -54,9 +55,8 @@ export type PastEventsOptions = {
 
 export type RegisteredEventsOptions = {
    limit?: number
+   ended?: boolean
    from?: Date
-   to?: Date
-   orderByDirection?: "asc" | "desc"
 }
 
 export type ParticipatedEventsOptions = {
@@ -74,6 +74,17 @@ export interface ILivestreamRepository {
       limit?: number
    ): Promise<LivestreamEvent[] | null>
 
+   /**
+    * Retrieves registered live streams for a user.
+    *
+    * Uses a two-step query process:
+    * 1. Query userLivestreamData for registered stream IDs.
+    * 2. Fetch live stream events using these IDs.
+    *
+    * @param userEmail - The email of the user whose registrations we're fetching.
+    * @param options - Optional parameters for the query.
+    * @returns Promise<LivestreamEvent[]> - Array of LivestreamEvent objects.
+    */
    getRegisteredEvents(
       userEmail: string,
       options?: RegisteredEventsOptions
@@ -83,19 +94,6 @@ export interface ILivestreamRepository {
       userEmail: string,
       options?: ParticipatedEventsOptions
    ): Promise<LivestreamEvent[]>
-
-   getRecommendEvents(
-      userEmail: string,
-      userInterestsIds?: string[],
-      limit?: number
-   ): Promise<LivestreamEvent[] | null>
-
-   listenToRecommendedEvents(
-      userEmail: string,
-      userInterestsIds: string[],
-      limit: number,
-      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
-   )
 
    getPastEventsFrom(options: PastEventsOptions): Promise<LivestreamEvent[]>
 
@@ -107,11 +105,6 @@ export interface ILivestreamRepository {
 
    upcomingEventsQuery(
       showHidden?: boolean,
-      limit?: number
-   ): firebase.firestore.Query<firebase.firestore.DocumentData>
-
-   registeredEventsQuery(
-      userEmail: string,
       limit?: number
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
@@ -369,6 +362,14 @@ export interface ILivestreamRepository {
       userId: string,
       limit?: number
    ): Promise<LivestreamEvent[]>
+
+   /**
+    * Checks if a user is registered for a specific livestream
+    * @param livestreamId - The ID of the livestream
+    * @param userId - The ID of the user
+    * @returns A promise that resolves to a boolean indicating if the user is registered
+    */
+   isUserRegistered(livestreamId: string, userId: string): Promise<boolean>
 }
 
 export class FirebaseLivestreamRepository
@@ -727,55 +728,53 @@ export class FirebaseLivestreamRepository
       return query
    }
 
-   registeredEventsQuery(userEmail: string, limit?: number) {
-      let q = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("hasEnded", "==", false)
-         .where("registeredUsers", "array-contains", userEmail || "")
-         .orderBy("start", "asc")
-
-      if (limit) {
-         q = q.limit(limit)
-      }
-
-      return q
-   }
-
    async getRegisteredEvents(
       userEmail: string,
       options: RegisteredEventsOptions = {}
    ): Promise<LivestreamEvent[]> {
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .where("test", "==", false)
-         .where("registeredUsers", "array-contains", userEmail)
+      const { limit = 30, ended = false, from = new Date() } = options
 
-      if (options.orderByDirection) {
-         livestreamRef = livestreamRef.orderBy(
-            "start",
-            options.orderByDirection
-         )
-      } else {
-         livestreamRef = livestreamRef.orderBy("start", "asc")
+      let userLivestreamDataQuery = this.firestore
+         .collectionGroup("userLivestreamData")
+         .where("user.userEmail", "==", userEmail)
+         .orderBy("registered.date", "desc")
+         .withConverter(createCompatGenericConverter<UserLivestreamData>())
+
+      if (limit) {
+         userLivestreamDataQuery = userLivestreamDataQuery.limit(limit)
       }
 
-      if (options.from) {
-         livestreamRef = livestreamRef.where("start", ">", options.from)
-      }
+      const userLivestreamDataSnaps = await userLivestreamDataQuery.get()
 
-      if (options.to) {
-         livestreamRef = livestreamRef.where("start", "<", options.to)
-      }
+      const registeredLivestreamIds = userLivestreamDataSnaps.docs
+         .map((snap) => snap.data().livestreamId)
+         .filter(Boolean)
 
-      if (options.limit) {
-         livestreamRef = livestreamRef.limit(options.limit)
-      }
+      const chunks = chunkArray(registeredLivestreamIds, 30) // 30 is the max number of where clauses
 
-      const snapshots = await livestreamRef.get()
+      const livestreamPromises = chunks.map(async (ids) => {
+         let query = this.firestore
+            .collection("livestreams")
+            .where("id", "in", ids)
+            .where("test", "==", false)
+            .where("start", ">=", from)
+            .orderBy("start", "asc")
+            .withConverter(createCompatGenericConverter<LivestreamEvent>())
 
-      return this.mapLivestreamCollections(snapshots).get()
+         if (ended) {
+            query = query.where("hasEnded", "==", true)
+         }
+
+         return query.get()
+      })
+
+      const livestreamsSnapshots = await Promise.all(livestreamPromises)
+
+      const livestreams = livestreamsSnapshots
+         .flatMap((snapshot) => snapshot.docs.map((doc) => doc.data()))
+         .sort(sortByDateAscending)
+
+      return livestreams
    }
 
    async getParticipatedEvents(
@@ -890,49 +889,6 @@ export class FirebaseLivestreamRepository
             ? new Date(serializedEvent.lastUpdatedDateString)
             : null,
       }
-   }
-
-   async getRecommendEvents(
-      userEmail: string,
-      userInterestsIds?: string[],
-      limit?: number
-   ): Promise<LivestreamEvent[] | null> {
-      if (!userEmail || !userInterestsIds?.length) return null
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("interestsIds", "array-contains-any", userInterestsIds)
-         .orderBy("start", "asc")
-      if (limit) {
-         livestreamRef = livestreamRef.limit(limit)
-      }
-      const snapshots = await livestreamRef.get()
-      let interestedEvents = this.mapLivestreamCollections(snapshots).get()
-      if (interestedEvents) {
-         interestedEvents = interestedEvents.filter(
-            (event) => !event.registeredUsers?.includes(userEmail)
-         )
-      }
-      return interestedEvents
-   }
-
-   listenToRecommendedEvents(
-      userEmail: string,
-      userInterestsIds: string[],
-      limit: number,
-      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
-   ) {
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("interestsIds", "array-contains-any", userInterestsIds)
-         .orderBy("start", "asc")
-      if (limit) {
-         livestreamRef = livestreamRef.limit(limit)
-      }
-      return livestreamRef.onSnapshot(callback)
    }
 
    async getLivestreamUsers(
@@ -1117,16 +1073,10 @@ export class FirebaseLivestreamRepository
       userId: string,
       dateLimit: Date
    ): Promise<LivestreamEvent[]> {
-      const snap = await this.firestore
-         .collection("livestreams")
-         .where("test", "==", false)
-         .where("registeredUsers", "array-contains", userId)
-         .where("start", ">=", dateLimit)
-         .where("hasEnded", "==", true)
-         .orderBy("start", "asc")
-         .get()
-
-      return mapFirestoreDocuments<LivestreamEvent>(snap)
+      return this.getRegisteredEvents(userId, {
+         from: dateLimit,
+         ended: true,
+      })
    }
 
    async updateRecordingStats({
@@ -1612,6 +1562,24 @@ export class FirebaseLivestreamRepository
       )
       return sortedLivestreams
    }
+
+   async isUserRegistered(
+      livestreamId: string,
+      userId: string
+   ): Promise<boolean> {
+      if (!livestreamId || !userId) return false
+
+      const query = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("userLivestreamData")
+         .doc(userId)
+         .withConverter(createCompatGenericConverter<UserLivestreamData>())
+
+      const snap = await query.get()
+
+      return Boolean(snap.data()?.registered?.date)
+   }
 }
 
 /*
@@ -1691,14 +1659,6 @@ export class LivestreamsDataParser {
       return this
    }
 
-   filterByRegisteredUser(userId: string) {
-      this.livestreams = this.livestreams?.filter(({ registeredUsers }) =>
-         registeredUsers.includes(userId)
-      )
-
-      return this
-   }
-
    filterByTargetFieldsOfStudy(fieldsOfStudy: FieldOfStudy[]) {
       this.livestreams = this.livestreams?.filter(({ targetFieldsOfStudy }) => {
          const targetIds = targetFieldsOfStudy?.map((e) => e.id) ?? []
@@ -1714,23 +1674,6 @@ export class LivestreamsDataParser {
       this.livestreams = this.livestreams?.map((e) => ({
          ...e,
          startDate: e.start?.toDate(),
-      }))
-
-      return this
-   }
-
-   /**
-    * Remove sensitive data from the livestreams
-    * - registeredUsers
-    * - participatingStudents
-    * - talentPool
-    */
-   removeSensitiveData() {
-      this.livestreams = this.livestreams?.map((e) => ({
-         ...e,
-         registeredUsers: [],
-         participatingStudents: [],
-         talentPool: [],
       }))
 
       return this

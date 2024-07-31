@@ -1,4 +1,4 @@
-import { FirestoreDataConverter } from "firebase-admin/firestore"
+import { FirestoreDataConverter, Query } from "firebase-admin/firestore"
 
 export const createGenericConverter = <T>(): FirestoreDataConverter<T> => ({
    toFirestore: (modelObject: T) => modelObject,
@@ -9,3 +9,9 @@ export const createGenericConverter = <T>(): FirestoreDataConverter<T> => ({
       } as T
    },
 })
+
+export const getCount = async (query: Query) => {
+   const snap = await query.count().get()
+
+   return snap.data()?.count ?? 0
+}
