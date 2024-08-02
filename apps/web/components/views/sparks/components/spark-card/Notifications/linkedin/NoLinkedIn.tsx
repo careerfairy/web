@@ -1,7 +1,6 @@
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Button, Typography } from "@mui/material"
-import { LinkedInIcon } from "components/views/common/icons/LinkedInIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { sxStyles } from "types/commonTypes"
 import { MoreComing } from "./MoreComing"
@@ -115,11 +114,6 @@ export const NoLinkedIn = ({
                   alt={"Mentor's avatar"}
                   size={136}
                />
-               <Box sx={styles.linkedInContainer}>
-                  <Box sx={styles.linkedInWrapper}>
-                     <LinkedInIcon fill="white" />
-                  </Box>
-               </Box>
             </Box>
             <Box sx={styles.header}>
                <Typography variant={"h2"} sx={styles.title}>
