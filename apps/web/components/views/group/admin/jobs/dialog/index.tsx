@@ -33,6 +33,10 @@ import JobBasicInfo from "./createJob/JobBasicInfo"
 import JobFormDialog from "./createJob/JobFormDialog"
 import JobFormPreview from "./createJob/JobFormPreview"
 import JobLinkLiveStreams from "./createJob/JobLinkLiveStreams"
+import {
+   JobLinkLiveStreamsSkeleton,
+   JobLinkSparksSkeleton,
+} from "./createJob/JobLinkSkeleton"
 import JobLinkSparks from "./createJob/JobLinkSparks"
 import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
@@ -133,7 +137,9 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
               {
                  key: JobDialogStep.FORM_LINKED_LIVE_STREAMS.key,
                  Component: () => (
-                    <SuspenseWithBoundary fallback={<></>}>
+                    <SuspenseWithBoundary
+                       fallback={<JobLinkLiveStreamsSkeleton />}
+                    >
                        <JobLinkLiveStreams job={job} />
                     </SuspenseWithBoundary>
                  ),
@@ -141,7 +147,7 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
               {
                  key: JobDialogStep.FORM_LINKED_SPARKS.key,
                  Component: () => (
-                    <SuspenseWithBoundary fallback={<></>}>
+                    <SuspenseWithBoundary fallback={<JobLinkSparksSkeleton />}>
                        <JobLinkSparks />
                     </SuspenseWithBoundary>
                  ),
