@@ -11,9 +11,9 @@ import {
 } from "@mui/material"
 import useIsAtsLivestreamJobAssociation from "components/custom-hook/useIsAtsLivestreamJobAssociation"
 import useMenuState from "components/custom-hook/useMenuState"
-import Link from "components/views/common/Link"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import CollapsibleText from "components/views/common/inputs/CollapsibleText"
+import Link from "components/views/common/Link"
 import { X as DeleteIcon, Edit2 as EditIcon, MoreVertical } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
@@ -144,13 +144,17 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                         </>
                      ) : null}
 
-                     <Typography variant="brandedBody">
-                        {job.jobType}
-                     </Typography>
+                     {job.jobType ? (
+                        <>
+                           <Typography variant="brandedBody">
+                              {job.jobType}
+                           </Typography>
+                           <Divider orientation="vertical" />
+                        </>
+                     ) : null}
 
                      {job.deadline ? (
                         <>
-                           <Divider orientation="vertical" />
                            <Typography variant="brandedBody">
                               {DateUtil.formatDateToString(
                                  job.deadline.toDate()

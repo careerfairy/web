@@ -1,8 +1,11 @@
 import { Stack, useTheme } from "@mui/material"
+import { useCallback } from "react"
 import { AlertCircle } from "react-feather"
-import { useFormContext } from "react-hook-form"
+import { JobDialogStep } from ".."
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import SteppedDialog from "../../../../../stepped-dialog/SteppedDialog"
+import SteppedDialog, {
+   useStepper,
+} from "../../../../../stepped-dialog/SteppedDialog"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -41,9 +44,11 @@ const styles = sxStyles({
 
 const NoContentAvailableDialog = () => {
    const theme = useTheme()
-   const {
-      formState: { isSubmitting },
-   } = useFormContext()
+   const { goToStep } = useStepper()
+
+   const handleClick = useCallback(() => {
+      goToStep(JobDialogStep.FORM_PREVIEW.key)
+   }, [goToStep])
 
    return (
       <SteppedDialog.Container
@@ -79,13 +84,10 @@ const NoContentAvailableDialog = () => {
                   </SteppedDialog.Subtitle>
 
                   <SteppedDialog.Button
-                     type={"submit"}
-                     form="custom-job-form"
                      variant="contained"
                      color={"warning"}
-                     loading={isSubmitting}
-                     disabled={isSubmitting}
                      sx={styles.btn}
+                     onClick={handleClick}
                   >
                      Understood
                   </SteppedDialog.Button>

@@ -12,6 +12,8 @@ import { useCallback, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { JobDialogStep } from ".."
+import { useCustomJobForm } from "../CustomJobFormProvider"
+import { JobFormValues } from "./schemas"
 
 const styles = sxStyles({
    container: {
@@ -51,11 +53,11 @@ const JobFormPreview = () => {
       group.groupId
    )
    const { goToStep } = useStepper()
+   const { handleSubmit } = useCustomJobForm()
 
-   const {
-      formState: { isSubmitting },
-      getValues,
-   } = useFormContext()
+   const { getValues } = useFormContext()
+
+   const { isSubmitting } = useCustomJobForm()
 
    const fieldsValues = getValues([
       "basicInfo.title",
@@ -114,6 +116,12 @@ const JobFormPreview = () => {
       }
    }, [fieldValuesObject, group])
 
+   const onClick = useCallback(() => {
+      const values = getValues() as JobFormValues
+
+      handleSubmit(values)
+   }, [getValues, handleSubmit])
+
    return (
       <SteppedDialog.Container
          containerSx={styles.content}
@@ -138,7 +146,6 @@ const JobFormPreview = () => {
                      job={previewJob}
                      companyName={group.universityName}
                      companyLogoUrl={group.logoUrl}
-                     previewMode
                   />
                </Box>
             </SteppedDialog.Content>
@@ -149,17 +156,17 @@ const JobFormPreview = () => {
                   color="grey"
                   onClick={handlePrevClick}
                   sx={styles.cancelBtn}
+                  disabled={isSubmitting}
                >
                   Back
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
-                  type="submit"
-                  form="custom-job-form"
                   variant="contained"
                   color="secondary"
                   loading={isSubmitting}
                   disabled={isSubmitting}
+                  onClick={onClick}
                >
                   Publish job
                </SteppedDialog.Button>

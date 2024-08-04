@@ -302,13 +302,15 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                                     />
                                  }
                               >
-                                 <Typography
-                                    variant={"subtitle1"}
-                                    sx={styles.subtitle}
-                                    minWidth={"90px"}
-                                 >
-                                    {job.jobType}
-                                 </Typography>
+                                 {job.jobType ? (
+                                    <Typography
+                                       variant={"subtitle1"}
+                                       sx={styles.subtitle}
+                                       minWidth={"90px"}
+                                    >
+                                       {job.jobType}
+                                    </Typography>
+                                 ) : null}
 
                                  <Typography
                                     variant={"subtitle1"}

@@ -13,6 +13,7 @@ import { useCallback, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { JobDialogStep } from ".."
+import { useCustomJobForm } from "../CustomJobFormProvider"
 
 const styles = sxStyles({
    container: {
@@ -73,6 +74,7 @@ const JobLinkLiveStreams = ({
       filterByGroupId: group.groupId,
    })
    const linkedLiveStreams = useCustomJobLinkedLivestreams(job)
+   const { isSubmitting } = useCustomJobForm()
 
    const allLivesStreams = useMemo(
       () => [
@@ -201,6 +203,7 @@ const JobLinkLiveStreams = ({
                            onCardClick={() => handleCardClick(event.id)}
                            selectInput={selectInput(event.id)}
                            selected={livestreamIds.includes(event.id)}
+                           disableClick={isSubmitting}
                         />
                      </Grid>
                   ))}
