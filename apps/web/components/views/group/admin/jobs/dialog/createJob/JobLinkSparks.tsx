@@ -12,6 +12,7 @@ import { useCallback, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { JobDialogStep } from ".."
+import { useCustomJobForm } from "../CustomJobFormProvider"
 
 const styles = sxStyles({
    container: {
@@ -72,18 +73,18 @@ const JobLinkSparks = ({
       group.groupId
    )
    const isMobile = useIsMobile()
+   const { isSubmitting } = useCustomJobForm()
 
-   const {
-      formState: { isSubmitting },
-      watch,
-      setValue,
-      getValues,
-   } = useFormContext()
+   const { watch, setValue, getValues } = useFormContext()
 
    const sparkIds = watch(FIELD_NAME)
 
    const handleCardClick = useCallback(
       (sparkId: string) => {
+         if (isSubmitting) {
+            return
+         }
+
          if (sparkIds.includes(sparkId)) {
             setValue(
                FIELD_NAME,
@@ -93,7 +94,7 @@ const JobLinkSparks = ({
             setValue(FIELD_NAME, [...sparkIds, sparkId])
          }
       },
-      [sparkIds, setValue]
+      [isSubmitting, sparkIds, setValue]
    )
 
    const handleSecondaryClick = useCallback(() => {
@@ -223,8 +224,6 @@ const JobLinkSparks = ({
                   onClick={handlePrimaryClick}
                   variant="contained"
                   color="secondary"
-                  loading={isSubmitting}
-                  disabled={isSubmitting}
                >
                   {primaryButtonMessage || "Next"}
                </SteppedDialog.Button>

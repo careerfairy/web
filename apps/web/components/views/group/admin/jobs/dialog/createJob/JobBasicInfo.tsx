@@ -10,6 +10,7 @@ import SteppedDialog, {
 import { useEffect, useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
+import { useCustomJobForm } from "../CustomJobFormProvider"
 import { basicInfoSchema } from "./schemas"
 
 const styles = sxStyles({
@@ -52,10 +53,9 @@ const JobBasicInfo = () => {
    const [stepIsValid, setStepIsValid] = useState(false)
 
    const { moveToNext } = useStepper()
-   const {
-      formState: { isSubmitting },
-      watch,
-   } = useFormContext()
+   const { watch } = useFormContext()
+
+   const { isSubmitting } = useCustomJobForm()
 
    const watchFields = watch([
       "basicInfo.title",

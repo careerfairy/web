@@ -16,7 +16,6 @@ import {
 import useIsMobile from "components/custom-hook/useIsMobile"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
 import { FormBrandedAutocomplete } from "components/views/common/inputs/BrandedAutocomplete"
-import { props } from "lodash/fp"
 import { useCallback, useMemo } from "react"
 import { useDispatch } from "react-redux"
 import { openJobsDialog } from "store/reducers/adminJobsReducer"
@@ -118,11 +117,15 @@ const SelectorCustomJobsDropDown = ({
             <Typography sx={styles.optionTitle}>{job.title}</Typography>
 
             <Stack spacing={2} direction={"row"}>
-               <Typography sx={styles.optionInfo}>
-                  {isMobile ? getMobileJobType(job.jobType) : job.jobType}
-               </Typography>
+               {job.jobType ? (
+                  <>
+                     <Typography sx={styles.optionInfo}>
+                        {isMobile ? getMobileJobType(job.jobType) : job.jobType}
+                     </Typography>
 
-               <Divider orientation="vertical" flexItem />
+                     <Divider orientation="vertical" flexItem />
+                  </>
+               ) : null}
 
                <Typography sx={[styles.optionInfo, styles.ellipsis]}>
                   {job.postingUrl}
@@ -155,7 +158,6 @@ const SelectorCustomJobsDropDown = ({
          getOptionElement={getOptionElement}
          disabled={isSubmitting}
          limit={5}
-         {...props}
       />
    )
 }
