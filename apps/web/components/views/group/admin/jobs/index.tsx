@@ -1,21 +1,35 @@
-import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { useMemo } from "react"
+import {
+   CustomJob,
+   CustomJobStats,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
+import { useRouter } from "next/router"
+import { useCallback, useMemo } from "react"
 import useGroupCustomJobsStats from "../../../../custom-hook/custom-job/useGroupCustomJobsStats"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 import EmptyJobsView from "../../../admin/jobs/empty-jobs-view/EmptyJobsView"
-import JobList from "./jobList"
+import JobList from "./JobList"
 
 const JobsContent = () => {
    const { group } = useGroupFromState()
    const allJobsWithStats = useGroupCustomJobsStats(group.groupId)
+   // const { jobHubV1 } = useFeatureFlags()
+   const { jobHubV1 } = { jobHubV1: true }
+   const { push } = useRouter()
 
    const sortedJobs = useMemo(
-      () => sortJobs(allJobsWithStats),
-      [allJobsWithStats]
+      () => (jobHubV1 ? sortJobs(allJobsWithStats) : allJobsWithStats),
+      [allJobsWithStats, jobHubV1]
+   )
+
+   const handleJobClick = useCallback(
+      ({ id }: CustomJob) => {
+         void push(`/group/${group.groupId}/admin/jobs/${id}`)
+      },
+      [group.groupId, push]
    )
 
    return sortedJobs.length > 0 ? (
-      <JobList jobWithStats={sortedJobs} />
+      <JobList jobWithStats={sortedJobs} handCLick={handleJobClick} />
    ) : (
       <EmptyJobsView />
    )
