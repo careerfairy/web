@@ -1,8 +1,9 @@
 import { RootState } from ".."
 
 export const isOnLastSparkSelector = (state: RootState) => {
-   const sparks = state.sparksFeed.sparks
-   return state.sparksFeed.currentPlayingIndex === sparks.length - 1
+   let sparks = state.sparksFeed.sparks
+   sparks = sparks.filter((spark) => !spark.isCardNotification)
+   return state.sparksFeed.currentPlayingIndex >= sparks.length - 1
 }
 
 export const isOnFirstSparkSelector = (state: RootState) => {
@@ -68,8 +69,7 @@ export const originalSparkIdSelector = (state: RootState) =>
 
 export const groupIdSelector = (state: RootState) => state.sparksFeed.groupId
 
-export const creatorIdSelector = (state: RootState) =>
-   state.sparksFeed.creatorId
+export const creatorSelector = (state: RootState) => state.sparksFeed.creator
 
 export const emptyFilterSelector = (state: RootState) =>
    Boolean(
