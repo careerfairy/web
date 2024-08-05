@@ -7,13 +7,13 @@ import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { Button, Fade, Grow, Stack } from "@mui/material"
 import Box from "@mui/material/Box"
-import { useAuth } from "HOCs/AuthProvider"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
+import { useAuth } from "HOCs/AuthProvider"
 import {
    FC,
    SyntheticEvent,
@@ -100,6 +100,17 @@ const styles = sxStyles({
       "&::after": {
          background:
             "linear-gradient(357deg, #476E69 31%, #476E69 20%, rgba(311, 380, 0, 0.00) 31.1%), radial-gradient(101.03% 109.86% at 4.52% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.00) 100%), #0F423B",
+      },
+   },
+   creatorLinkedInCardContent: {
+      "&::after": {
+         background: `
+            linear-gradient(178deg, rgba(250, 250, 250, 0.00) 42.22%, rgba(250, 250, 250, 0.20) 42.23%), 
+            radial-gradient(150.3% 150.3% at 50% 50%, rgba(0, 0, 0, 0.00) 36.5%, rgba(0, 0, 0, 0.20) 100%), 
+            linear-gradient(151deg, rgba(0, 210, 170, 0.00) 34.37%, rgba(0, 210, 170, 0.50) 101.39%), 
+            linear-gradient(357deg, rgba(255, 255, 255, 0.00) 10.1%, rgba(255, 255, 255, 0.20) 106.38%), 
+            #2ABAA5
+         `,
       },
    },
    eventCardContentInner: {
@@ -236,6 +247,9 @@ const SparksFeedCard: FC<Props> = ({
 
          case SparkCardNotificationTypes.CONVERSION:
             return [styles.conversionCardContent]
+
+         case SparkCardNotificationTypes.CREATOR:
+            return [styles.creatorLinkedInCardContent]
       }
    }
    return (
