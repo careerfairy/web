@@ -1,13 +1,14 @@
-import { useSelector } from "react-redux"
-import { cardNotificationSelector } from "store/selectors/sparksFeedSelectors"
-import SparkEventFullCardNotification from "./SparkEventFullCardNotification"
-import SparkGroupFullCardNotification from "./SparkGroupFullCardNotification"
 import {
    SparkCardNotificationTypes,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { FC } from "react"
+import { useSelector } from "react-redux"
+import { cardNotificationSelector } from "store/selectors/sparksFeedSelectors"
 import SparkConversionFullCardNotification from "./SparkConversionFullCardNotification"
+import SparkEventFullCardNotification from "./SparkEventFullCardNotification"
+import SparkGroupFullCardNotification from "./SparkGroupFullCardNotification"
+import { SparkCreatorFullCardNotification } from "./linkedin/SparkCreatorFullCardNotification"
 
 type Props = {
    spark: SparkPresenter
@@ -29,6 +30,9 @@ const FullCardNotification: FC<Props> = ({ spark }) => {
 
       case SparkCardNotificationTypes.GROUP:
          return <SparkGroupFullCardNotification group={spark.group} />
+
+      case SparkCardNotificationTypes.CREATOR:
+         return <SparkCreatorFullCardNotification creator={spark.creator} />
    }
 }
 
