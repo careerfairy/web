@@ -15,7 +15,7 @@ const JobsContent = () => {
    )
 
    return sortedJobs.length > 0 ? (
-      <JobList jobsWithStats={sortedJobs} />
+      <JobList jobWithStats={sortedJobs} />
    ) : (
       <EmptyJobsView />
    )
