@@ -2,19 +2,18 @@ import {
    CustomJob,
    CustomJobStats,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import {
-   Box,
-   Divider,
-   Grid,
-   ListItem,
-   Stack,
-   Tooltip,
-   Typography,
-} from "@mui/material"
+import { Box, Grid, ListItem, Stack, Tooltip, Typography } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import { useRouter } from "next/router"
 import { FC, useCallback, useMemo } from "react"
-import { AlertCircle, CheckCircle, User } from "react-feather"
+import {
+   AlertCircle,
+   Briefcase,
+   CheckCircle,
+   Globe,
+   User,
+   Zap,
+} from "react-feather"
 import DateUtil from "util/DateUtil"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
@@ -33,30 +32,51 @@ const styles = sxStyles({
       flexDirection: { xs: "column", md: "row" },
       width: "100%",
       maxWidth: "calc(100% - 8px)",
-      p: { md: 3 },
+      p: { md: 2 },
    },
    infoWrapper: {
       p: { xs: 2, md: 0 },
    },
-   info: {
-      display: "flex",
-      px: { xs: 1, md: 0 },
-      mt: 1,
-   },
    title: {
       color: "text.primary",
-      fontWeight: "bold",
-      fontSize: "20px",
+      fontWeight: 600,
+      fontSize: "16px",
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
       px: { xs: 1, md: 0 },
    },
    subtitle: {
-      fontSize: { xs: "14px", md: "16px" },
+      display: { xs: "flex", md: "block" },
+      flexDirection: "column",
+
+      fontSize: "14px",
       color: "text.secondary",
+      fontWeight: 400,
+
+      whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
+   },
+   subtitleItem: {
+      display: "inline",
+      alignItems: "center",
+      marginRight: 2,
+
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+
+      "& svg": {
+         verticalAlign: "bottom",
+         marginRight: "6px",
+      },
+   },
+   expireDate: {
+      fontSize: "12px",
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[300],
+      mt: 2,
    },
    statsWrapper: {
       display: "flex",
@@ -80,13 +100,12 @@ const styles = sxStyles({
       background: theme.brand.white[300],
       border: theme.brand.white[400],
       borderRadius: "12px",
-      p: "12px 12px",
+      p: 1,
    }),
    mobileStatsValues: {
       display: "flex",
       alignItems: "center",
-      justifyContent: "space-between",
-      mt: 2,
+      justifyContent: "space-evenly",
    },
    mobileStatsLabel: {
       display: "flex",
@@ -175,9 +194,9 @@ const styles = sxStyles({
 })
 
 type Props = {
-   jobsWithStats: CustomJobStats[]
+   jobWithStats: CustomJobStats[]
 }
-const JobList: FC<Props> = ({ jobsWithStats }) => {
+const JobList: FC<Props> = ({ jobWithStats }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
    const { push } = useRouter()
@@ -191,8 +210,8 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
    )
 
    const jobsOptions = useMemo(
-      () => jobsWithStats.map((jobWithStats) => jobWithStats.job),
-      [jobsWithStats]
+      () => jobWithStats.map((jobWithStats) => jobWithStats.job),
+      [jobWithStats]
    )
 
    const getStateColor = useCallback(
@@ -219,7 +238,7 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
          </Stack>
 
          <Stack spacing={2}>
-            {jobsWithStats.map(({ job, clicks, applicants }) => (
+            {jobWithStats.map(({ job, clicks, applicants }) => (
                <ListItem
                   key={job.id}
                   sx={styles.listItem}
@@ -284,37 +303,37 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                                     </Grid>
                                  ) : null}
                               </Box>
-
-                              <Stack
-                                 spacing={isMobile ? 1 : 2}
-                                 sx={styles.info}
-                                 direction={isMobile ? "column" : "row"}
-                                 divider={
-                                    <Divider
-                                       orientation={
-                                          isMobile ? "horizontal" : "vertical"
-                                       }
-                                       flexItem
-                                    />
-                                 }
-                              >
-                                 {job.jobType ? (
-                                    <Typography
-                                       variant={"subtitle1"}
-                                       sx={styles.subtitle}
-                                       minWidth={"90px"}
-                                    >
-                                       {job.jobType}
-                                    </Typography>
-                                 ) : null}
-
+                              <Box>
                                  <Typography
                                     variant={"subtitle1"}
                                     sx={styles.subtitle}
                                  >
-                                    {formatJobPostingUrl(job.postingUrl)}
+                                    {job.jobType ? (
+                                       <Box sx={styles.subtitleItem}>
+                                          <Briefcase width={14} />
+                                          {job.jobType}
+                                       </Box>
+                                    ) : null}
+
+                                    {job.businessFunctionsTagIds?.length > 0 ? (
+                                       <Box sx={styles.subtitleItem}>
+                                          <Zap width={14} />
+                                          {job.businessFunctionsTagIds.join(
+                                             ", "
+                                          )}
+                                       </Box>
+                                    ) : null}
+
+                                    <Box sx={styles.subtitleItem}>
+                                       <Globe width={14} />
+                                       {formatJobPostingUrl(job.postingUrl)}
+                                    </Box>
                                  </Typography>
-                              </Stack>
+
+                                 <Typography sx={styles.expireDate}>
+                                    {getDeadLineMessage(job)}
+                                 </Typography>
+                              </Box>
                            </Grid>
 
                            <Grid
@@ -376,10 +395,20 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
    )
 }
 
+const getDeadLineMessage = (job: CustomJob) => {
+   const jobDeadlineDateString = DateUtil.formatDateToString(
+      job.deadline.toDate()
+   )
+
+   if (DateUtil.isDeadlineExpired(job.deadline.toDate())) {
+      return `Expired on ${jobDeadlineDateString}`
+   }
+
+   return `Application deadline ${jobDeadlineDateString}`
+}
+
 const renderMobileStats = (clicks: number, applicants: number) => (
    <Box sx={styles.mobileStats}>
-      <Typography sx={styles.mobileStatsLabel}>Applications:</Typography>
-
       <Box sx={styles.mobileStatsValues}>
          <Box sx={styles.initialized}>
             <User size={16} />
