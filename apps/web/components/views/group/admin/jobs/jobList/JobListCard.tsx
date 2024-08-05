@@ -77,7 +77,7 @@ const styles = sxStyles({
       fontSize: "12px",
       fontWeight: 400,
       color: (theme) => theme.palette.neutral[300],
-      mt: 2,
+      mt: 1,
    },
    mobileHeader: {
       display: "flex",
