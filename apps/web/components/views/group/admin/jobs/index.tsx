@@ -7,7 +7,7 @@ import { useCallback, useMemo } from "react"
 import useGroupCustomJobsStats from "../../../../custom-hook/custom-job/useGroupCustomJobsStats"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 import EmptyJobsView from "../../../admin/jobs/empty-jobs-view/EmptyJobsView"
-import JobList from "./JobList"
+import JobList from "./jobList"
 
 const JobsContent = () => {
    const { group } = useGroupFromState()
