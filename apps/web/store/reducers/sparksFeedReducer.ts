@@ -1,3 +1,4 @@
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import {
    SparkCardNotificationTypes,
    SparkPresenter,
@@ -26,7 +27,7 @@ interface SparksState {
    currentPlayingIndex: number
    hasMoreSparks: boolean
    groupId: string | null
-   creatorId: string | null
+   creator: PublicCreator | null
    userEmail: string | null
    numberOfSparksToFetch: number
    fetchNextSparksStatus: Status
@@ -58,7 +59,7 @@ const initialState: SparksState = {
    currentPlayingIndex: 0,
    hasMoreSparks: true,
    groupId: null,
-   creatorId: null,
+   creator: null,
    userEmail: null,
    numberOfSparksToFetch: 10,
    initialFetchStatus: "loading",
@@ -112,6 +113,7 @@ export const fetchNextSparks = createAsyncThunk(
       return sparkService.fetchNextSparks(lastSpark, sparkOptions)
    }
 )
+
 // Async thunk to fetch the next spark IDs
 export const fetchInitialSparksFeed = createAsyncThunk(
    "sparks/fetchInitial",
@@ -121,6 +123,34 @@ export const fetchInitialSparksFeed = createAsyncThunk(
       const sparkOptions = getSparkOptions(state)
 
       return sparkService.fetchFeed(sparkOptions)
+   }
+)
+
+export const fetchCompanySparksFeedWithoutCreator = createAsyncThunk(
+   "sparks/fetchCompanyWithoutCreator",
+   async (_, { getState }) => {
+      const state = getState() as RootState
+
+      const sparkOptions = getSparkOptions(state)
+      delete sparkOptions.creatorId
+      delete sparkOptions.userId
+
+      sparkOptions.groupId = state.sparksFeed.creator.groupId
+
+      const feed = await sparkService.fetchFeed(sparkOptions)
+
+      const sparksWithoutCreator = feed.sparks.filter(
+         (spark) => spark.creator.id !== state.sparksFeed.creator.id
+      )
+
+      if (sparksWithoutCreator.length === 0) {
+         return feed
+      }
+
+      return {
+         sparks: sparksWithoutCreator,
+         anonymousUserCountryCode: feed.anonymousUserCountryCode,
+      }
    }
 )
 
@@ -147,11 +177,8 @@ const sparksFeedSlice = createSlice({
       setGroupId: (state, action: PayloadAction<SparksState["groupId"]>) => {
          state.groupId = action.payload
       },
-      setCreatorId: (
-         state,
-         action: PayloadAction<SparksState["creatorId"]>
-      ) => {
-         state.creatorId = action.payload
+      setCreator: (state, action: PayloadAction<SparksState["creator"]>) => {
+         state.creator = action.payload
       },
       setUserEmail: (state, action: PayloadAction<string>) => {
          state.userEmail = action.payload
@@ -235,6 +262,10 @@ const sparksFeedSlice = createSlice({
       },
       removeGroupId: (state) => {
          state.groupId = null
+         state.hasMoreSparks = true
+      },
+      removeCreator: (state) => {
+         state.creator = null
          state.hasMoreSparks = true
       },
       setCameFromPageLink: (state, action: PayloadAction<string>) => {
@@ -377,6 +408,33 @@ const sparksFeedSlice = createSlice({
             state.initialFetchStatus = "failed"
             state.initialFetchError = action.error.message
          })
+         .addCase(
+            fetchCompanySparksFeedWithoutCreator.fulfilled,
+            (
+               state,
+               action: PayloadAction<{
+                  sparks: SparkPresenter[]
+                  anonymousUserCountryCode?: string
+               }>
+            ) => {
+               const { sparks } = state
+               const { sparks: sparksPayload, anonymousUserCountryCode } =
+                  action.payload
+
+               state.sparks = mergeSparks(sparks, sparksPayload)
+               state.creator = null
+
+               state.anonymousUserCountryCode = anonymousUserCountryCode
+               state.countrySpecificFeed = Boolean(anonymousUserCountryCode)
+            }
+         )
+         .addCase(
+            fetchCompanySparksFeedWithoutCreator.rejected,
+            (state, action) => {
+               state.initialFetchStatus = "failed"
+               state.initialFetchError = action.error.message
+            }
+         )
    },
 })
 
@@ -404,15 +462,15 @@ const getSparkOptions = (state: RootState) => {
    const {
       numberOfSparksToFetch,
       groupId,
-      creatorId,
+      creator,
       userEmail,
       sparkCategoryIds,
       contentTopicIds,
       anonymousUserCountryCode,
    } = state.sparksFeed
 
-   const feedScope = creatorId
-      ? { creatorId }
+   const feedScope = creator?.id
+      ? { creatorId: creator.id }
       : groupId
       ? { groupId }
       : { userId: userEmail || null }
@@ -484,7 +542,7 @@ export const {
    setOriginalSparkId,
    setSparks,
    setGroupId,
-   setCreatorId,
+   setCreator,
    setUserEmail,
    setSparkCategories,
    resetSparksFeed,
@@ -494,6 +552,7 @@ export const {
    showEventDetailsDialog,
    addCardNotificationToSparksList,
    removeGroupId,
+   removeCreator,
    setCardEventNotification,
    setCameFromPageLink,
    setInteractionSource,
