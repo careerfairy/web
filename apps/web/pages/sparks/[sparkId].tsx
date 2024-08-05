@@ -18,15 +18,16 @@ import { useMountedState } from "react-use"
 import {
    AddCardNotificationPayload,
    addCardNotificationToSparksList,
-   fetchCompanySparksFeedWithoutCreator,
    fetchInitialSparksFeed,
    fetchNextSparks,
+   removeCreatorId,
    removeGroupId,
    removeNotificationsByType,
    resetSparksFeed,
    setContentTopicIds,
    setConversionCardInterval,
    setGroupId,
+   setHasFetchedCompanyWithCreator,
    setInteractionSource,
    setOriginalSparkId,
    setSparks,
@@ -34,9 +35,10 @@ import {
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
-   creatorSelector,
+   creatorIdSelector,
    fetchNextErrorSelector,
    groupIdSelector,
+   hasFetchedCompanyWithCreatorSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
    isFetchingNextSparksSelector,
@@ -65,11 +67,14 @@ const SparksPage: NextPage<
    const isOnLastSpark = useSelector(isOnLastSparkSelector)
    const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
    const hasNoMoreSparks = useSelector(hasNoMoreSparksSelector)
+   const hasFetchedCompanyWithCreator = useSelector(
+      hasFetchedCompanyWithCreatorSelector
+   )
    const initialSparksFetched = useSelector(initialSparksFetchedSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
    const isFromGroupPage = useSelector(groupIdSelector)
-   const isFromCreatorPage = useSelector(creatorSelector)?.id
+   const isFromCreatorPage = useSelector(creatorIdSelector)
    const { userData } = useAuth()
 
    useEffect(() => {
@@ -138,31 +143,20 @@ const SparksPage: NextPage<
    }, [dispatch, interactionSource])
 
    useEffect(() => {
-      console.log("🔞🔞🔞🔞🔞🔞🔞🔞🔞")
-      console.log(
-         "🚀 ~ useEffect ~ initialSparksFetched:",
-         initialSparksFetched
-      )
-      console.log("🚀 ~ useEffect ~ isOnLastSpark:", isOnLastSpark)
-      console.log(
-         "🚀 ~ useEffect ~ isFetchingNextSparks:",
-         !isFetchingNextSparks
-      )
-      console.log("🚀 ~ useEffect ~ hasNoMoreSparks:", !hasNoMoreSparks)
-      console.log("🚀 ~ useEffect ~ fetchNextError:", !fetchNextError)
       if (
          initialSparksFetched &&
          isOnLastSpark &&
          !isFetchingNextSparks &&
          !hasNoMoreSparks &&
-         !fetchNextError
+         !fetchNextError &&
+         !hasFetchedCompanyWithCreator
       ) {
-         console.log("🌝")
          dispatch(fetchNextSparks())
       }
    }, [
       dispatch,
       fetchNextError,
+      hasFetchedCompanyWithCreator,
       hasNoMoreSparks,
       initialSparksFetched,
       isFetchingNextSparks,
@@ -173,17 +167,11 @@ const SparksPage: NextPage<
     * To manage the creation of card notifications, and after they are displayed, ensure that the Sparks feed continues with its content
     */
    useEffect(() => {
-      console.log(
-         "🚀 ~ useEffect ~ isFetchingNextSparks && hasNoMoreSparks && isOnLastSpark:",
-         { isFetchingNextSparks, hasNoMoreSparks, isOnLastSpark }
-      )
-
       if (
          // eslint-disable-next-line no-extra-boolean-cast
          Boolean(!isFetchingNextSparks && hasNoMoreSparks && isOnLastSpark)
       ) {
-         console.log("sparkId useEffect")
-         if (isFromGroupPage) {
+         if (isFromGroupPage && !isFromCreatorPage) {
             if (activeSpark?.isCardNotification) {
                dispatch(removeGroupId())
                dispatch(fetchInitialSparksFeed())
@@ -194,17 +182,22 @@ const SparksPage: NextPage<
                // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
                dispatch(addCardNotificationToSparksList(payload))
             }
-         }
-
-         if (isFromCreatorPage) {
+         } else if (isFromCreatorPage && !isFromGroupPage) {
             if (activeSpark?.isCardNotification) {
-               dispatch(fetchCompanySparksFeedWithoutCreator())
+               dispatch(setGroupId(activeSpark.creator.groupId))
+               dispatch(fetchInitialSparksFeed())
+               dispatch(removeCreatorId())
+               dispatch(setHasFetchedCompanyWithCreator(true))
             } else {
                const payload: AddCardNotificationPayload = {
                   type: SparkCardNotificationTypes.CREATOR,
                }
                dispatch(addCardNotificationToSparksList(payload))
             }
+         } else if (hasFetchedCompanyWithCreator) {
+            dispatch(removeGroupId())
+            dispatch(setHasFetchedCompanyWithCreator(false))
+            dispatch(fetchNextSparks())
          }
       }
    }, [
@@ -215,6 +208,9 @@ const SparksPage: NextPage<
       isFetchingNextSparks,
       isOnLastSpark,
       isFromCreatorPage,
+      activeSpark?.creator?.id,
+      activeSpark?.creator?.groupId,
+      hasFetchedCompanyWithCreator,
    ])
 
    useEffect(() => {
