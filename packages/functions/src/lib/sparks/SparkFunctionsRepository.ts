@@ -153,13 +153,23 @@ export interface ISparkFunctionsRepository {
    ): Promise<SerializedSpark[]>
 
    /**
+    * Get the group's feed of Sparks without a creator
+    * @param groupId ${groupId} The id of the group
+    * @param limit ${limit} The number of sparks to fetch (default: 10)
+    */
+   getGroupSparksFeedWithoutCreator(
+      groupId: string,
+      creatorId: string,
+      limit?: number
+   ): Promise<SerializedSpark[]>
+
+   /**
     * Get the creator's feed of Sparks
     * @param creatorId ${creatorId} The id of the creator
     * @param limit ${limit} The number of sparks to fetch (default: 10)
     */
    getCreatorSparksFeed(
       creatorId: string,
-      contentTopics?: string[],
       limit?: number
    ): Promise<SerializedSpark[]>
 
@@ -720,30 +730,41 @@ export class SparkFunctionsRepository
 
    async getCreatorSparksFeed(
       creatorId: string,
-      contentTopics?: string[],
       limit = 10
    ): Promise<SerializedSpark[]> {
-      let query = this.firestore
+      const query = this.firestore
          .collection("sparks")
          .where("creator.id", "==", creatorId)
          .where("group.publicSparks", "==", true)
-
-      if (contentTopics?.length) {
-         query = query.where(
-            "contentTopicsTagIds",
-            "array-contains-any",
-            contentTopics
-         )
-      }
-
-      const creatorFeedRef = query
          .orderBy("publishedAt", "desc")
          .limit(limit)
          .withConverter(createGenericConverter<Spark>())
 
-      const creatorFeedSnap = await creatorFeedRef.get()
+      const creatorFeedSnap = await query.get()
 
       return creatorFeedSnap.docs.map((doc) =>
+         SparkPresenter.serialize(doc.data())
+      )
+   }
+
+   async getGroupSparksFeedWithoutCreator(
+      groupId: string,
+      creatorId: string,
+      limit = 10
+   ): Promise<SerializedSpark[]> {
+      const query = this.firestore
+         .collection("sparks")
+         .where("group.id", "==", groupId)
+         .where("creator.id", "!=", creatorId)
+         .where("group.publicSparks", "==", true)
+         .orderBy("creator.id", "asc")
+         .orderBy("publishedAt", "desc")
+         .limit(limit)
+         .withConverter(createGenericConverter<Spark>())
+
+      const groupFeedSnap = await query.get()
+
+      return groupFeedSnap.docs.map((doc) =>
          SparkPresenter.serialize(doc.data())
       )
    }
