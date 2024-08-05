@@ -1,13 +1,14 @@
-import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobStats,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, ListItem, Stack } from "@mui/material"
-import { useRouter } from "next/router"
-import { FC, useCallback, useMemo } from "react"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
-import useIsMobile from "../../../../../custom-hook/useIsMobile"
-import CreateJobButton from "../../../../admin/jobs/components/CreateJobButton"
-import JobSearch from "../JobSearch"
-import JobListCard from "./JobListCard"
+import JobCard from "components/views/common/jobs/JobCard"
+import { FC, useMemo } from "react"
+import { sxStyles } from "../../../../../types/commonTypes"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
+import CreateJobButton from "../../../admin/jobs/components/CreateJobButton"
+import JobSearch from "./JobSearch"
 
 const styles = sxStyles({
    wrapper: {
@@ -35,18 +36,10 @@ const styles = sxStyles({
 
 type Props = {
    jobWithStats: CustomJobStats[]
+   handCLick: (job: CustomJob) => void
 }
-const JobList: FC<Props> = ({ jobWithStats }) => {
+const JobList: FC<Props> = ({ jobWithStats, handCLick }) => {
    const isMobile = useIsMobile()
-   const { push } = useRouter()
-   const { group } = useGroupFromState()
-
-   const handleJobClick = useCallback(
-      (jobId: string) => {
-         void push(`/group/${group.groupId}/admin/jobs/${jobId}`)
-      },
-      [group.groupId, push]
-   )
 
    const jobsOptions = useMemo(
       () => jobWithStats.map((jobWithStats) => jobWithStats.job),
@@ -62,15 +55,12 @@ const JobList: FC<Props> = ({ jobWithStats }) => {
 
          <Stack spacing={2}>
             {jobWithStats.map(({ job, clicks, applicants }) => (
-               <ListItem
-                  key={job.id}
-                  sx={styles.listItem}
-                  onClick={() => handleJobClick(job.id)}
-               >
-                  <JobListCard
+               <ListItem key={job.id} sx={styles.listItem}>
+                  <JobCard
                      job={job}
                      clicks={clicks}
                      applicants={applicants}
+                     handleClick={handCLick}
                   />
                </ListItem>
             ))}
