@@ -337,7 +337,6 @@ export class GroupDashboardPage extends CommonPage {
 
             if (speakerExists) {
                await this.page.locator("input[id='speakers.values']").click()
-               // await existingSpeaker.click()
                continue
             }
 
