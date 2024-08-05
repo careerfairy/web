@@ -72,7 +72,11 @@ export const groupAdminFixture = base.extend<{
          }
       }
 
+      if (!options.atsGroupType || options.atsGroupType === "NONE")
+         overrideFields.atsAdminPageFlag = false
+
       let group: Group
+
       if (options.completedGroup === true) {
          const completeCompanyData = GroupSeed.generateCompleteCompanyData()
          group = await GroupSeed.createGroup({

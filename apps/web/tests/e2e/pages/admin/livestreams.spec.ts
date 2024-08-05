@@ -34,8 +34,10 @@ test.describe("Group Admin Livestreams", () => {
     *
     * Beware as the new live stream form auto saves and the data is already filled for existing streams, and for the selectable chips,
     * namely (contentTopicsTagIds, businessFunctionsTagIds, fieldOfStudyIds and levelOfStudyIds) to prevent them from being cleared
-    * when filling the form for the 2nd time (editing a previously created form) they can be set as null in the override fields, thus impeding the form
-    * from updating those values. If the form would update those values it would result in clicking them again, deselecting the values which might not
+    * when filling the form for the 2nd time (editing a previously created form) they can be set as
+    * null in the override fields, thus impeding the form from updating those values.
+    *
+    * If the form would update those values it would result in clicking them again, deselecting the values which might not
     * be intended.
     */
    test("Publish a draft livestream and edit its title", async ({
@@ -97,13 +99,13 @@ test.describe("Group Admin Livestreams", () => {
    })
 
    // TODO: different tests for ats and not ats
+
    test("Create a draft live stream with job openings - No ATS", async ({
       groupPage,
-      group,
       customJobs,
    }) => {
       // TODO-WG: Confirm cannot use in beforeAll
-      await setupLivestreamData(group)
+      await setupLivestreamData()
 
       const jobs = customJobs.slice(0, 2) // only select some
       const livestreamJobAssociations = JobsSeed.getJobAssociations(jobs)
@@ -128,27 +130,4 @@ test.describe("Group Admin Livestreams", () => {
       )
       await groupPage.assertJobIsAttachedToStream(addedJobIds)
    })
-
-   // test.extend({
-   //    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   //    options: async ({ options }, use) => {
-   //       await use({
-   //          atsGroupType: "COMPLETE",
-   //          completedGroup: true,
-   //       })
-   //    },
-   // })(
-   //    "Create a draft live stream with job openings - With ATS",
-   //    async ({ groupPage, group }) => {
-
-   //       await setupLivestreamData(group)
-
-   //       const livestream = LivestreamSeed.randomDraft({
-   //          // jobs: livestreamJobAssociations,
-   //       })
-
-   //       await groupPage.clickCreateNewLivestreamTop()
-   //       await groupPage.fillLivestreamForm(livestream)
-   //    }
-   // )
 })
