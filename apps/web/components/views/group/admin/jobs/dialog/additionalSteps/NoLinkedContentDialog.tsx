@@ -1,15 +1,20 @@
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import { AlertCircle } from "react-feather"
-import { JobDialogStepEnum } from ".."
-import { sxStyles } from "../../../../../../../types/commonTypes"
+import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
+import useGroupFromState from "components/custom-hook/useGroupFromState"
 import SteppedDialog, {
    useStepper,
-} from "../../../../../stepped-dialog/SteppedDialog"
+} from "components/views/stepped-dialog/SteppedDialog"
+import { useCallback } from "react"
+import { AlertTriangle } from "react-feather"
+import { useFormContext } from "react-hook-form"
+import { JobDialogStep } from ".."
 
 const styles = sxStyles({
    wrapContainer: {
+      width: { xs: "100%", md: "450px" },
       height: {
+         xs: "310px",
          md: "100%",
       },
    },
@@ -17,12 +22,11 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      height: "100%",
       width: "100%",
       px: 2,
    },
    content: {
-      my: { xs: 1, md: "40px" },
+      my: 1,
    },
    info: {
       display: "flex",
@@ -30,75 +34,91 @@ const styles = sxStyles({
       alignItems: "center",
    },
    title: {
-      fontSize: { xs: "20px", md: "24px" },
+      fontSize: "20px !important",
+   },
+   subtitle: {
+      fontSize: "16px ",
    },
    btn: {
-      mt: 4,
-      width: "350px",
+      width: "100%",
    },
-   mobileDialog: {
-      top: "calc(100dvh - 500px)",
+   actions: {
+      border: "none !important",
    },
 })
 
-const NoLinkedContentDialog = () => {
-   const { handleClose, currentStep } = useStepper()
-   const isMobile = useIsMobile()
+const NoLinkContentDialog = () => {
+   const {
+      formState: { isSubmitting },
+   } = useFormContext()
+   const { moveToPrev, goToStep } = useStepper()
+   const { group } = useGroupFromState()
+   const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
+      group.groupId
+   )
 
-   const dialogElement: HTMLElement = document.querySelector('[role="dialog"]')
-
-   if (dialogElement) {
-      dialogElement.style.top =
-         isMobile && currentStep === JobDialogStepEnum.NO_LINKED_CONTENT
-            ? styles.mobileDialog.top
-            : "revert-layer"
-   }
+   const handlePrevClick = useCallback(() => {
+      if (group.publicSparks) {
+         moveToPrev()
+      } else if (groupHasUpcomingLivestreams) {
+         goToStep(JobDialogStep.FORM_LINKED_LIVE_STREAMS.key)
+      } else {
+         goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
+      }
+   }, [goToStep, group.publicSparks, groupHasUpcomingLivestreams, moveToPrev])
 
    return (
       <SteppedDialog.Container
          containerSx={styles.content}
          sx={styles.wrapContainer}
+         hideCloseButton
+         withActions
       >
          <>
             <SteppedDialog.Content sx={styles.container}>
-               <Stack spacing={3} sx={styles.info}>
-                  <AlertCircle color={"#FE9B0E"} size={68} />
+               <Stack spacing={2} sx={styles.info}>
+                  <AlertTriangle color={"#856DEE"} size={48} />
 
                   <SteppedDialog.Title sx={styles.title}>
-                     No content to link available
+                     Make your job visible!
                   </SteppedDialog.Title>
 
                   <SteppedDialog.Subtitle
                      maxWidth={"unset"}
                      textAlign={"center"}
+                     sx={styles.subtitle}
                   >
-                     Without an upcoming live stream or published Sparks to link
-                     to, your job opening won&apos;t be visible to talent.
-                     Create new content and link it to this job to make it
-                     visible.
+                     Linking your job opening to Sparks or upcoming live streams
+                     is necessary for qualified candidates to see it.
                   </SteppedDialog.Subtitle>
-
-                  <SteppedDialog.Subtitle
-                     maxWidth={"unset"}
-                     textAlign={"center"}
-                  >
-                     No worries, this job opening has been saved.
-                  </SteppedDialog.Subtitle>
-
-                  <SteppedDialog.Button
-                     variant="contained"
-                     color={"warning"}
-                     type="submit"
-                     onClick={() => handleClose()}
-                     sx={styles.btn}
-                  >
-                     Understood
-                  </SteppedDialog.Button>
                </Stack>
             </SteppedDialog.Content>
+
+            <SteppedDialog.Actions sx={styles.actions}>
+               <SteppedDialog.Button
+                  type="submit"
+                  form="custom-job-form"
+                  variant="outlined"
+                  color={"grey"}
+                  sx={styles.btn}
+                  loading={isSubmitting}
+                  disabled={isSubmitting}
+               >
+                  I&apos;ll do it later
+               </SteppedDialog.Button>
+
+               <SteppedDialog.Button
+                  variant="contained"
+                  color={"secondary"}
+                  sx={styles.btn}
+                  onClick={handlePrevClick}
+               >
+                  Link content
+               </SteppedDialog.Button>
+            </SteppedDialog.Actions>
          </>
       </SteppedDialog.Container>
    )
 }
 
-export default NoLinkedContentDialog
+export default NoLinkContentDialog

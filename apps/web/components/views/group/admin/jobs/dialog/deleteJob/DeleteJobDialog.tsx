@@ -2,8 +2,7 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box } from "@mui/material"
 import { FC, useCallback, useEffect, useState } from "react"
 import { Trash2 as DeleteIcon } from "react-feather"
-import { useDispatch, useSelector } from "react-redux"
-import { openDeleteJobWithLinkedContent } from "../../../../../../../store/reducers/adminJobsReducer"
+import { useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "../../../../../../../store/selectors/adminJobsSelectors"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import useCustomJobDelete from "../../../../../../custom-hook/custom-job/useCustomJobDelete"
@@ -73,7 +72,6 @@ type Props = {
 }
 
 const DeleteJobDialog: FC<Props> = ({ job }) => {
-   const dispatch = useDispatch()
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { handleClose } = useStepper<JobDialogStep>()
    const { isDeleting, handleDelete } = useCustomJobDelete(selectedJobId)
@@ -86,12 +84,6 @@ const DeleteJobDialog: FC<Props> = ({ job }) => {
          )
       }
    }, [isDeleting, job])
-
-   useEffect(() => {
-      if (hasLinkedContent) {
-         dispatch(openDeleteJobWithLinkedContent())
-      }
-   }, [dispatch, hasLinkedContent])
 
    const handleJobDelete = useCallback(async () => {
       await handleDelete()

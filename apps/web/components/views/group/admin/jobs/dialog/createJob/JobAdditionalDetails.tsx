@@ -1,4 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
+import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
+import useGroupFromState from "components/custom-hook/useGroupFromState"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
 import { datePickerDefaultStyles } from "components/views/calendar/utils"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
@@ -7,15 +10,14 @@ import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
 import GBLocale from "date-fns/locale/en-GB"
-import { MutableRefObject, useEffect, useState } from "react"
+import { MutableRefObject, useCallback, useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { Briefcase } from "react-feather"
+import { Briefcase, Calendar as CalendarIcon } from "react-feather"
 import { useFormContext } from "react-hook-form"
-import { useSelector } from "react-redux"
-import { jobsFormSelectedJobIdSelector } from "store/selectors/adminJobsSelectors"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
+import { JobDialogStep } from ".."
 import { additionalInfoSchema } from "./schemas"
 
 const styles = sxStyles({
@@ -23,7 +25,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      height: "100%",
+      height: { xs: "auto !important", md: "100%" },
       width: "100%",
       px: 2,
    },
@@ -39,6 +41,7 @@ const styles = sxStyles({
       my: "24px",
    },
    title: {
+      maxWidth: { xs: "90%", md: "unset" },
       fontSize: { xs: "28px", md: "32px" },
    },
    subtitle: {
@@ -47,10 +50,6 @@ const styles = sxStyles({
    },
    cancelBtn: {
       color: "neutral.500",
-   },
-   wrapperContainer: {
-      height: { xs: "80dvh", md: "auto !important" },
-      maxHeight: "800px",
    },
    subtitle2: {
       display: "flex",
@@ -64,6 +63,15 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[600],
       ml: 1,
    },
+   calendarIcon: {
+      "& svg": {
+         mt: "10px",
+      },
+   },
+   dateWrapper: {
+      zIndex: 99,
+      mt: "unset",
+   },
 })
 
 type Props = {
@@ -71,15 +79,21 @@ type Props = {
 }
 
 const JobAdditionalDetails = ({ quillInputRef }: Props) => {
+   const theme = useTheme()
    const [stepIsValid, setStepIsValid] = useState(false)
-   const { moveToPrev } = useStepper()
-   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const { moveToPrev, goToStep } = useStepper()
+   const { group } = useGroupFromState()
+   const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
+      group.groupId
+   )
 
    const {
-      formState: { isSubmitting, isDirty },
+      formState: { isSubmitting },
       watch,
       setValue,
+      getValues,
    } = useFormContext()
+
    const watchedFields = watch([
       "basicInfo.title",
       "additionalInfo.salary",
@@ -118,12 +132,20 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
       )
    }, [quillInputRef, watchedFieldsObject])
 
+   const handleNext = useCallback(() => {
+      const selectedLivestreams = getValues("livestreamIds")
+
+      if (groupHasUpcomingLivestreams || selectedLivestreams.length > 0) {
+         goToStep(JobDialogStep.FORM_LINKED_LIVE_STREAMS.key)
+      } else if (group.publicSparks) {
+         goToStep(JobDialogStep.FORM_LINKED_SPARKS.key)
+      } else {
+         goToStep(JobDialogStep.NO_CONTENT_AVAILABLE.key)
+      }
+   }, [getValues, goToStep, group.publicSparks, groupHasUpcomingLivestreams])
+
    return (
-      <SteppedDialog.Container
-         containerSx={styles.content}
-         sx={styles.wrapperContainer}
-         withActions
-      >
+      <SteppedDialog.Container containerSx={styles.content} withActions>
          <>
             <SteppedDialog.Content sx={styles.container}>
                <>
@@ -177,10 +199,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                         <Box
                            sx={[
                               datePickerDefaultStyles.datePicker,
-                              {
-                                 zIndex: 99,
-                                 mt: "unset",
-                              },
+                              styles.dateWrapper,
                            ]}
                         >
                            <DatePicker
@@ -196,9 +215,21 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                               shouldCloseOnSelect={true}
                               customInput={
                                  <BrandedTextField
-                                    label="Application Deadline (Required)"
-                                    placeholder="Insert date"
                                     fullWidth
+                                    label="Application Deadline (required)"
+                                    placeholder="Insert date"
+                                    sx={styles.calendarIcon}
+                                    InputProps={{
+                                       endAdornment: (
+                                          <CalendarIcon
+                                             color={
+                                                theme.palette.secondary.main
+                                             }
+                                          />
+                                       ),
+                                       disableUnderline: true,
+                                       readOnly: true,
+                                    }}
                                  />
                               }
                               onChange={(value) =>
@@ -233,14 +264,13 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
-                  type="submit"
-                  form="custom-job-form"
+                  onClick={handleNext}
                   variant="contained"
                   color="secondary"
                   loading={isSubmitting}
-                  disabled={isSubmitting || !isDirty || !stepIsValid}
+                  disabled={isSubmitting || !stepIsValid}
                >
-                  {selectedJobId ? "Update" : "Create"}
+                  Next
                </SteppedDialog.Button>
             </SteppedDialog.Actions>
          </>

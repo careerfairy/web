@@ -198,7 +198,7 @@ const JobFormDialog: FC<Props> = ({
  * Additionally, use the 'Date' data type instead of 'Timestamp' within the form.
  */
 export type JobFormValues = {
-   jobType: string
+   jobType?: string
    deadline: Date
    noDateValidation: boolean
 } & Omit<PublicCustomJob, "jobType" | "deadline">
@@ -234,6 +234,8 @@ const getInitialValues = (
       postingUrl: "",
       jobType: "",
       noDateValidation: false,
+      livestreams: [],
+      sparks: [],
    }
 }
 

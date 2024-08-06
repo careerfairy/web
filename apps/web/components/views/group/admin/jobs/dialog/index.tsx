@@ -8,10 +8,10 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import dynamic from "next/dynamic"
 import { MutableRefObject, useCallback, useMemo, useRef } from "react"
+import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
 import {
-   deleteJobWithLinkedLivestreamsDialogOpenSelector,
    deleteJobsDialogOpenSelector,
    jobsDialogOpenSelector,
    jobsFormSelectedJobIdSelector,
@@ -21,37 +21,67 @@ import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
 import SteppedDialog from "../../../../stepped-dialog/SteppedDialog"
 import CustomJobFormProvider from "./CustomJobFormProvider"
-import NoLinkedContentDialog from "./additionalSteps/NoLinkedContentDialog"
 import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
-import JobBasicInfo from "./createJob/JobBasicInfo"
 import JobFormDialog from "./createJob/JobFormDialog"
 import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
 export type JobDialogStep = ReturnType<typeof getViews>[number]["key"]
 
-export enum JobDialogStepEnum {
-   PRIVACY_POLICY = 0,
-   FORM_BASIC_INFO = 1,
-   FORM_ADDITIONAL_DETAILS = 2,
-   NO_LINKED_CONTENT = 3,
-   DELETE_JOB = 4,
+export const JobDialogStep = {
+   PRIVACY_POLICY: {
+      position: 0,
+      key: "privacy-policy",
+   },
+   DELETE_JOB: {
+      position: 1,
+      key: "delete-job",
+   },
+   NO_CONTENT_AVAILABLE: {
+      position: 2,
+      key: "no-content-available",
+   },
+   OLD_FORM: {
+      position: 2,
+      key: "oldJobForm",
+   },
+   FORM_BASIC_INFO: {
+      position: 3,
+      key: "form-basic-info",
+   },
+   FORM_ADDITIONAL_DETAILS: {
+      position: 4,
+      key: "form-additional-details",
+   },
+   FORM_LINKED_LIVE_STREAMS: {
+      position: 5,
+      key: "form-linked-live-streams",
+   },
+   FORM_LINKED_SPARKS: {
+      position: 6,
+      key: "form-linked-sparks-content",
+   },
+   NO_LINKED_CONTENT: {
+      position: 7,
+      key: "no-linked-content",
+   },
+   FORM_PREVIEW: {
+      position: 8,
+      key: "form-preview",
+   },
 }
 
 const styles = sxStyles({
    dialog: {
-      top: { xs: "20dvh", md: 0 },
+      height: { xs: "auto", md: "auto" },
+      maxHeight: { xs: "calc(90dvh)", md: "800px" },
+      alignSelf: { xs: "self-end", md: "unset" },
       borderRadius: 5,
    },
    smallDeleteDialog: {
       maxWidth: { md: 450 },
-      top: { xs: "calc(100dvh - 320px)", md: 0 },
-   },
-   jobWithList: {
-      top: { xs: "calc(100dvh - 500px)", md: 0 },
    },
 })
 
-// Due to the quillInputRef field
 const JobAdditionalDetails = dynamic(
    () => import("./createJob/JobAdditionalDetails"),
    {
@@ -59,40 +89,74 @@ const JobAdditionalDetails = dynamic(
    }
 )
 
+const JobLinkLiveStreams = dynamic(
+   () => import("./createJob/JobLinkLiveStreams")
+)
+
+type ViewsProps = {
+   jobHubV1: boolean
+   quillInputRef: any
+   job?: CustomJob
+}
+
 // This function dynamically generates an array of views based on the jobHubV1 flag and the presence of a job.
-const getViews = (jobHubV1: boolean, quillInputRef, job?: CustomJob) =>
+const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
    [
       {
-         key: "privacy-policy",
+         key: JobDialogStep.PRIVACY_POLICY.key,
          Component: () => <PrivacyPolicyDialog />,
+      },
+      {
+         key: JobDialogStep.DELETE_JOB.key,
+         Component: () => <DeleteJobDialog job={job} />,
       },
       ...(jobHubV1
          ? [
               {
-                 key: "create-job-basic-info",
-                 Component: () => <JobBasicInfo />,
+                 key: JobDialogStep.NO_CONTENT_AVAILABLE.key,
+                 Component: dynamic(
+                    () => import("./additionalSteps/NoContentAvailableDialog")
+                 ),
               },
               {
-                 key: "create-job-additional-details",
+                 key: JobDialogStep.FORM_BASIC_INFO.key,
+                 Component: dynamic(() => import("./createJob/JobBasicInfo")),
+              },
+              {
+                 key: JobDialogStep.FORM_ADDITIONAL_DETAILS.key,
                  Component: () => (
                     <JobAdditionalDetails quillInputRef={quillInputRef} />
                  ),
               },
+              {
+                 key: JobDialogStep.FORM_LINKED_LIVE_STREAMS.key,
+                 Component: () => (
+                    <SuspenseWithBoundary fallback={<></>}>
+                       <JobLinkLiveStreams job={job} />
+                    </SuspenseWithBoundary>
+                 ),
+              },
+              {
+                 key: JobDialogStep.FORM_LINKED_SPARKS.key,
+                 Component: dynamic(() => import("./createJob/JobLinkSparks")),
+              },
+              {
+                 key: JobDialogStep.NO_LINKED_CONTENT.key,
+                 Component: dynamic(
+                    () => import("./additionalSteps/NoLinkedContentDialog")
+                 ),
+              },
+              {
+                 key: JobDialogStep.FORM_PREVIEW.key,
+                 Component: dynamic(() => import("./createJob/JobFormPreview")),
+              },
            ]
          : [
               {
-                 key: "oldJobForm",
+                 key: JobDialogStep.OLD_FORM.key,
                  Component: () => <JobFormDialog />,
               },
            ]),
-      {
-         key: "no-linked-content",
-         Component: () => <NoLinkedContentDialog />,
-      },
-      {
-         key: "delete-job",
-         Component: () => <DeleteJobDialog job={job} />,
-      },
    ] as const
 
 type Props = {
@@ -143,26 +207,33 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
    const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
    const isDeleteJobDialogOpen = useSelector(deleteJobsDialogOpenSelector)
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
-   const isDeleteJobDialogWithLinkedLivestreamsOpen = useSelector(
-      deleteJobWithLinkedLivestreamsDialogOpenSelector
-   )
    const { jobHubV1 } = useFeatureFlags()
+   const { reset } = useFormContext()
 
    const handleCloseDialog = useCallback(() => {
       dispatch(closeJobsDialog())
-   }, [dispatch])
+      reset()
+   }, [dispatch, reset])
 
    const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
-         return JobDialogStepEnum.DELETE_JOB
+         return JobDialogStep.DELETE_JOB.position
       }
+
       return group.privacyPolicyActive || selectedJobId
-         ? JobDialogStepEnum.FORM_BASIC_INFO
-         : JobDialogStepEnum.PRIVACY_POLICY
-   }, [group.privacyPolicyActive, isDeleteJobDialogOpen, selectedJobId])
+         ? jobHubV1
+            ? JobDialogStep.FORM_BASIC_INFO.position
+            : JobDialogStep.OLD_FORM.position
+         : JobDialogStep.PRIVACY_POLICY.position
+   }, [
+      group.privacyPolicyActive,
+      isDeleteJobDialogOpen,
+      jobHubV1,
+      selectedJobId,
+   ])
 
    const views = useMemo(
-      () => getViews(jobHubV1, quillInputRef, job),
+      () => getViews({ jobHubV1, quillInputRef, job }),
       [job, jobHubV1, quillInputRef]
    )
 
@@ -178,10 +249,8 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
          sx={[
             styles.dialog,
             isDeleteJobDialogOpen ? styles.smallDeleteDialog : null,
-            isDeleteJobDialogWithLinkedLivestreamsOpen
-               ? styles.jobWithList
-               : null,
          ]}
+         fullWidth={false}
       />
    )
 }

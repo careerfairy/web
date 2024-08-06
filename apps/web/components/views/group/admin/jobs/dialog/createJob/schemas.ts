@@ -20,7 +20,7 @@ export const basicInfoSchema = Yup.object({
       value: Yup.string().required(),
       label: Yup.string().required(),
       id: Yup.string().required(),
-   }).optional(),
+   }).nullable(),
    businessTags: Yup.array()
       .of(groupOptionShape)
       .min(
@@ -30,13 +30,18 @@ export const basicInfoSchema = Yup.object({
       .required("Business option is required"),
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const additionalInfoSchema = (quillRef) =>
    Yup.object({
       salary: Yup.string().optional().nullable(),
       description: Yup.string()
-         .transform(() =>
-            quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")
-         ) //ReactQuill appends a new line to text
+         .transform((value) =>
+            quillRef?.current
+               ? quillRef.current.unprivilegedEditor
+                    .getText()
+                    .replace(/\n$/, "")
+               : value
+         )
          .required("Description is required")
          .min(
             CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH,
@@ -60,24 +65,28 @@ export const additionalInfoSchema = (quillRef) =>
          .required("Application deadline is required"),
    })
 
-export interface BasicInfoValues
-   extends Yup.InferType<typeof basicInfoSchema> {}
+export type BasicInfoValues = Yup.InferType<typeof basicInfoSchema>
 
-export interface AdditionalInfoValues
-   extends Yup.InferType<ReturnType<typeof additionalInfoSchema>> {}
+export type AdditionalInfoValues = Yup.InferType<
+   ReturnType<typeof additionalInfoSchema>
+>
 
-export const schema = (cenas) =>
+export const schema = (quillRef) =>
    Yup.object({
       id: Yup.string().required(),
       groupId: Yup.string().required(),
       basicInfo: basicInfoSchema,
-      additionalInfo: additionalInfoSchema(cenas),
+      additionalInfo: additionalInfoSchema(quillRef),
+      livestreamIds: Yup.array(Yup.string()),
+      sparkIds: Yup.array().of(Yup.string()),
    })
 
 //  export interface JobFormValues extends Yup.InferType<typeof schema>{
-export interface JobFormValues {
+export type JobFormValues = {
    id: string
    groupId: string
    basicInfo: BasicInfoValues
    additionalInfo: AdditionalInfoValues
+   livestreamIds: string[]
+   sparkIds: string[]
 }
