@@ -14,17 +14,10 @@ import DeleteJobDialogWithLinkedContent from "./DeleteJobDialogWithLinkedContent
 
 const styles = sxStyles({
    wrapContainer: {
-      height: {
-         xs: "320px",
-         md: "100%",
-      },
+      maxWidth: { md: 450 },
    },
    reducePadding: {
       px: { xs: 3, md: "28px !important" },
-      height: {
-         xs: "500px",
-         md: "100%",
-      },
    },
    container: {
       display: "flex",
@@ -61,9 +54,10 @@ const styles = sxStyles({
    },
    actionBtn: {
       width: "100%",
-      maxWidth: "300px",
-      height: "40px",
       boxShadow: "none",
+   },
+   actionsWrapper: {
+      height: "60px",
    },
 })
 
@@ -97,6 +91,7 @@ const DeleteJobDialog: FC<Props> = ({ job }) => {
             styles.wrapContainer,
             hasLinkedContent ? styles.reducePadding : null,
          ]}
+         actionsContainerSx={styles.actionsWrapper}
          hideCloseButton
          withActions
       >

@@ -1,11 +1,11 @@
-import React, { ReactNode } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
-import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCardForAdmin"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
+import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCardForAdmin"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
-import { sxStyles } from "types/commonTypes"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+import React, { ReactNode } from "react"
+import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
 const desktopSlideWidth = 306 + slideSpacing
@@ -76,12 +76,12 @@ const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
                        <Box key={spark.id} sx={styles.slide}>
                           {isAdmin ? (
                              <SparkCarouselCardForAdmin
-                                onClick={() => onSparkClick(spark)}
+                                onClick={() => onSparkClick?.(spark)}
                                 spark={spark}
                              />
                           ) : (
                              <SparkCarouselCard
-                                onClick={() => onSparkClick(spark)}
+                                onClick={() => onSparkClick?.(spark)}
                                 spark={spark}
                                 onGoNext={() => emblaApi.scrollNext()}
                              />

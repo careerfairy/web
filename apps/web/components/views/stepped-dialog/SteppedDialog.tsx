@@ -90,7 +90,14 @@ const styles = sxStyles({
       px: { xs: 3, md: 6 },
       position: "relative",
       height: "auto",
-      maxHeight: { xs: "90dvh", md: "800px" },
+
+      "@media (max-height: 850px)": {
+         maxHeight: "90dvh",
+      },
+
+      "@media (min-height: 850px)": {
+         maxHeight: { xs: "90dvh", md: "800px" },
+      },
    },
    container: {
       px: "unset !important",
@@ -370,6 +377,7 @@ type SteppedDialogContainerProps = BoxProps & {
    hideCloseButton?: boolean
    withActions?: boolean
    containerSx?: SxProps<Theme>
+   actionsContainerSx?: SxProps<Theme>
    handleCloseIconClick?: () => void
 }
 
@@ -381,6 +389,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
    containerSx,
    withActions,
    handleCloseIconClick,
+   actionsContainerSx,
 }) => {
    const stepper = useStepper()
 
@@ -411,7 +420,11 @@ const Container: FC<SteppedDialogContainerProps> = ({
                </Box>
             )}
          </MuiContainer>
-         {withActions ? <Box sx={styles.actionsContainer} /> : null}
+         {withActions ? (
+            <Box
+               sx={combineStyles(styles.actionsContainer, actionsContainerSx)}
+            />
+         ) : null}
       </Box>
    )
 }

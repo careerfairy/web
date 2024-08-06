@@ -13,6 +13,7 @@ import { MutableRefObject, ReactNode, useCallback } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "store/selectors/adminJobsSelectors"
+import DateUtil from "util/DateUtil"
 import { v4 as uuidv4 } from "uuid"
 import {
    AdditionalInfoValues,
@@ -34,7 +35,7 @@ const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
    if (job) {
       let pastJob = false
 
-      if (job.deadline?.toDate() < new Date()) {
+      if (DateUtil.isDeadlineExpired(job.deadline?.toDate())) {
          // The deadline for this job has already expired
          // In this case, we will proceed to update the job fields without validating the deadline
          pastJob = true
