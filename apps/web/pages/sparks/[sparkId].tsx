@@ -155,7 +155,8 @@ const SparksPage: NextPage<
          !isFetchingNextSparks &&
          !hasNoMoreSparks &&
          !fetchNextError &&
-         fetchedCompanyWithCreatorStatus === "finished"
+         (fetchedCompanyWithCreatorStatus === "unset" ||
+            fetchedCompanyWithCreatorStatus === "finished")
       ) {
          dispatch(fetchNextSparks())
       }
@@ -196,7 +197,7 @@ const SparksPage: NextPage<
                dispatch(setGroupId(activeSpark.creator.groupId))
                dispatch(fetchInitialSparksFeed())
                dispatch(removeCreatorId())
-               dispatch(setFetchedCompanyWithCreatorStatus("in-custom-feed"))
+               dispatch(setFetchedCompanyWithCreatorStatus("ongoing"))
             } else {
                const payload: AddCardNotificationPayload = {
                   type: SparkCardNotificationTypes.CREATOR,
