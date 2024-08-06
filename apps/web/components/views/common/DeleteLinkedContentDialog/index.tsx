@@ -1,5 +1,5 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { List, ListItem, Typography } from "@mui/material"
+import { List, ListItem, Typography, useTheme } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { ReactElement } from "react"
 import { Radio } from "react-feather"
@@ -19,7 +19,7 @@ const styles = sxStyles({
       px: 3,
       py: 2,
       my: 3,
-      background: "#F6F6FA",
+      background: (theme) => theme.brand.white[400],
       borderRadius: "4px",
       listStyleType: "disc",
    },
@@ -41,11 +41,12 @@ type Props = {
 }
 
 const DeleteLinkedContentDialog = ({ linkedJobs, contentType }: Props) => {
+   const theme = useTheme()
    const isSpark = contentType === "spark"
 
    return (
       <>
-         <Radio color={"#FF4545"} size={48} />
+         <Radio color={theme.brand.error[500]} size={48} />
 
          <SteppedDialog.Title sx={styles.title}>
             {`This ${

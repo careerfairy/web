@@ -70,7 +70,7 @@ const styles = sxStyles({
       },
    },
    dateWrapper: {
-      zIndex: 99,
+      zIndex: (theme) => theme.zIndex.tooltip,
       mt: "unset",
    },
 })

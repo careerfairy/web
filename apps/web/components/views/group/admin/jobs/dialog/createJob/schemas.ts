@@ -39,7 +39,7 @@ export const additionalInfoSchema = (quillRef) =>
             quillRef?.current
                ? quillRef.current.unprivilegedEditor
                     .getText()
-                    .replace(/\n$/, "")
+                    .replace(/\n$/, "") //ReactQuill appends a new line to text
                : value
          )
          .required("Description is required")

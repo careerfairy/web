@@ -1,5 +1,5 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, CircularProgress, List, ListItem } from "@mui/material"
+import { Box, CircularProgress, List, ListItem, useTheme } from "@mui/material"
 import Typography from "@mui/material/Typography"
 import useCustomJobLinkedSparks from "components/custom-hook/custom-job/useCustomJobLinkedSparks"
 import { FC, ReactElement } from "react"
@@ -22,7 +22,7 @@ const styles = sxStyles({
       width: "100%",
       px: 3,
       my: 3,
-      background: "#F6F6FA",
+      background: (theme) => theme.brand.white[400],
       borderRadius: "4px",
       listStyleType: "disc",
    },
@@ -45,10 +45,12 @@ type Props = {
    job: CustomJob | null
 }
 const DeleteJobDialogWithLinkedContent: FC<Props> = ({ job }) => {
+   const theme = useTheme()
+
    return (
       <>
          <Box mb={2}>
-            <Radio color={"#FF4545"} size={48} />
+            <Radio color={theme.brand.error[500]} size={48} />
          </Box>
 
          <SteppedDialog.Title sx={styles.title}>

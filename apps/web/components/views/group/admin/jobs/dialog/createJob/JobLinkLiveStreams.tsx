@@ -46,7 +46,7 @@ const styles = sxStyles({
       justifyContent: "center",
    },
    actions: {
-      zIndex: 99,
+      zIndex: (theme) => theme.zIndex.tooltip,
    },
 })
 
