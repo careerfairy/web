@@ -19,13 +19,18 @@ export type AddCardNotificationPayload = {
    type: SparkCardNotificationTypes
 }
 
+export type FetchedCompanyWithCreatorStatus =
+   | "initial"
+   | "in-custom-feed"
+   | "finished"
+
 // Initial state
 interface SparksState {
    originalSparkId: string | null
    sparks: SparkPresenter[]
    currentPlayingIndex: number
    hasMoreSparks: boolean
-   hasFetchedCompanyWithCreator: boolean
+   fetchedCompanyWithCreatorStatus: FetchedCompanyWithCreatorStatus
    groupId: string | null
    creatorId: string | null
    userEmail: string | null
@@ -58,7 +63,7 @@ const initialState: SparksState = {
    sparks: [],
    currentPlayingIndex: 0,
    hasMoreSparks: true,
-   hasFetchedCompanyWithCreator: false,
+   fetchedCompanyWithCreatorStatus: "initial",
    groupId: null,
    creatorId: null,
    userEmail: null,
@@ -159,11 +164,11 @@ const sparksFeedSlice = createSlice({
       setUserEmail: (state, action: PayloadAction<string>) => {
          state.userEmail = action.payload
       },
-      setHasFetchedCompanyWithCreator: (
+      setFetchedCompanyWithCreatorStatus: (
          state,
-         action: PayloadAction<boolean>
+         action: PayloadAction<FetchedCompanyWithCreatorStatus>
       ) => {
-         state.hasFetchedCompanyWithCreator = action.payload
+         state.fetchedCompanyWithCreatorStatus = action.payload
       },
       setSparkCategories: (
          state,
@@ -295,7 +300,7 @@ const sparksFeedSlice = createSlice({
          state.sparks = []
          state.currentPlayingIndex = 0
          state.hasMoreSparks = true
-         state.hasFetchedCompanyWithCreator = false
+         state.fetchedCompanyWithCreatorStatus = "initial"
          state.creatorId = null
          state.initialFetchStatus = "idle"
          state.initialSparksFetched = false
@@ -506,7 +511,7 @@ export const {
    addCardNotificationToSparksList,
    removeGroupId,
    removeCreatorId,
-   setHasFetchedCompanyWithCreator,
+   setFetchedCompanyWithCreatorStatus,
    setCardEventNotification,
    setCameFromPageLink,
    setInteractionSource,
