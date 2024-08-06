@@ -31,6 +31,7 @@ type Props = {
    isSelectable?: boolean
    selected?: boolean
    disableAutoPlay?: boolean
+   questionLimitLines?: boolean
 }
 
 const SparkCarouselCard: FC<Props> = ({
@@ -41,6 +42,7 @@ const SparkCarouselCard: FC<Props> = ({
    isSelectable,
    selected,
    disableAutoPlay,
+   questionLimitLines,
 }) => {
    const [autoPlaying, setAutoPlaying] = useState(false)
    const containerRef = useRef<HTMLDivElement>(null)
