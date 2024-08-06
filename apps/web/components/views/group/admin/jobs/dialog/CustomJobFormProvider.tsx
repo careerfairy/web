@@ -45,6 +45,8 @@ const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
          groupId: job.groupId,
          basicInfo: mapBasicInfo(job),
          additionalInfo: mapAdditionalInfo(job, pastJob),
+         livestreamIds: job.livestreams,
+         sparkIds: job.sparks,
       }
    }
 
@@ -63,6 +65,8 @@ const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
          postingUrl: "",
          noDateValidation: false,
       },
+      livestreamIds: [],
+      sparkIds: [],
    }
 }
 
@@ -85,6 +89,8 @@ const CustomJobFormProvider = ({
                additionalInfo: { deadline, postingUrl, ...additionalInfoRest },
                id,
                groupId,
+               livestreamIds,
+               sparkIds,
             } = values
 
             const businessFunctionsTagIds = businessTags.map((el) => el.id)
@@ -95,12 +101,14 @@ const CustomJobFormProvider = ({
                id,
                groupId,
                businessFunctionsTagIds,
-               jobType: jobType.value as JobType,
+               jobType: jobType ? (jobType.value as JobType) : null,
                deadline: Timestamp.fromDate(deadline),
                postingUrl:
                   postingUrl.indexOf("http") === 0
                      ? postingUrl
                      : `https://${postingUrl}`,
+               livestreams: livestreamIds ?? [],
+               sparks: sparkIds ?? [],
             }
 
             if (selectedJobId) {
@@ -161,7 +169,7 @@ const mapBasicInfo = ({
    businessFunctionsTagIds,
 }: CustomJob): BasicInfoValues => ({
    title,
-   jobType: { value: jobType, label: jobType, id: jobType },
+   jobType: jobType ? { value: jobType, label: jobType, id: jobType } : null,
    businessTags: getBusinessTagsByIds(businessFunctionsTagIds),
 })
 

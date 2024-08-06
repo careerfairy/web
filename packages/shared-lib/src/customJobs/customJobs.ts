@@ -13,7 +13,6 @@ export interface CustomJob extends Identifiable {
 
    title: string
    description: string
-   jobType: JobType
    postingUrl: string
    deadline: firebase.firestore.Timestamp
    createdAt: firebase.firestore.Timestamp
@@ -25,6 +24,7 @@ export interface CustomJob extends Identifiable {
    published: boolean
 
    // optional fields
+   jobType?: JobType
    salary?: string
    deleted?: boolean
    /**
@@ -46,6 +46,8 @@ export type PublicCustomJob = Pick<
    | "salary"
    | "deleted"
    | "businessFunctionsTagIds"
+   | "livestreams"
+   | "sparks"
 >
 
 export type PublicCustomJobApplicant = Pick<
@@ -84,6 +86,8 @@ export const pickPublicDataFromCustomJob = (
       salary: job.salary ?? null,
       deleted: job.deleted ?? false,
       businessFunctionsTagIds: job.businessFunctionsTagIds ?? [],
+      livestreams: job.livestreams ?? [],
+      sparks: job.sparks ?? [],
    }
 }
 

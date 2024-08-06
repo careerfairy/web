@@ -8,7 +8,3 @@ export const jobsFormSelectedJobIdSelector = (state: RootState): string =>
 
 export const deleteJobsDialogOpenSelector = (state: RootState): boolean =>
    state.adminJobs.deleteJobDialogOpen
-
-export const deleteJobWithLinkedLivestreamsDialogOpenSelector = (
-   state: RootState
-): boolean => state.adminJobs.deleteJobWithLinkedLivestreamsDialogOpen
