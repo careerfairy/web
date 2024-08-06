@@ -10,7 +10,7 @@ import {
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useMenuState from "components/custom-hook/useMenuState"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
-import { Dispatch, ReactElement, SetStateAction, useState } from "react"
+import { MouseEvent, ReactElement, useCallback, useState } from "react"
 import { X as DeleteIcon, Edit2 as EditIcon, MoreVertical } from "react-feather"
 
 const styles = sxStyles({
@@ -54,18 +54,18 @@ const styles = sxStyles({
 
 type MobileDrawerProps = {
    isDrawerOpen: boolean
-   setIsDrawerOpen: Dispatch<SetStateAction<boolean>>
+   handleCloseDrawer: (event: MouseEvent<HTMLElement>) => void
 } & MoreMenuProps
 
 const MobileDrawer = ({
    isDrawerOpen,
-   setIsDrawerOpen,
+   handleCloseDrawer,
    options,
 }: MobileDrawerProps) => {
    return (
       <SwipeableDrawer
          anchor="bottom"
-         onClose={() => setIsDrawerOpen(false)}
+         onClose={handleCloseDrawer}
          onOpen={() => null}
          open={isDrawerOpen}
          sx={styles.drawer}
@@ -100,16 +100,42 @@ const MoreMenu = ({ options }: MoreMenuProps) => {
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
+   const menuClick = useCallback(
+      (event: MouseEvent<HTMLElement>) => {
+         event.stopPropagation()
+         handleClick(event)
+      },
+      [handleClick]
+   )
+
+   const handleCloseMenu = useCallback(
+      (event: MouseEvent<HTMLElement>) => {
+         event.stopPropagation()
+         handleClose()
+      },
+      [handleClose]
+   )
+
+   const handleOpenDrawer = useCallback((event: MouseEvent<HTMLElement>) => {
+      event.stopPropagation()
+      setIsDrawerOpen(true)
+   }, [])
+
+   const handleCloseDrawer = useCallback((event: MouseEvent<HTMLElement>) => {
+      event.stopPropagation()
+      setIsDrawerOpen(false)
+   }, [])
+
    if (isMobile) {
       return (
          <>
-            <IconButton onClick={() => setIsDrawerOpen(true)} size="small">
+            <IconButton onClick={handleOpenDrawer} size="small">
                <MoreVertical />
             </IconButton>
             <MobileDrawer
                options={options}
                isDrawerOpen={isDrawerOpen}
-               setIsDrawerOpen={setIsDrawerOpen}
+               handleCloseDrawer={handleCloseDrawer}
             />
          </>
       )
@@ -117,11 +143,11 @@ const MoreMenu = ({ options }: MoreMenuProps) => {
 
    return (
       <>
-         <IconButton onClick={handleClick} size="small">
+         <IconButton onClick={menuClick} size="small">
             <MoreVertical />
          </IconButton>
          <BrandedMenu
-            onClose={handleClose}
+            onClose={handleCloseMenu}
             anchorEl={anchorEl}
             open={open}
             anchorOrigin={{
@@ -138,7 +164,7 @@ const MoreMenu = ({ options }: MoreMenuProps) => {
                <Box key={index}>
                   <MenuItem
                      onClick={(args) => {
-                        handleClose()
+                        handleCloseMenu(args)
                         option.handleClick(args)
                      }}
                      sx={option.menuItemSxProps}
