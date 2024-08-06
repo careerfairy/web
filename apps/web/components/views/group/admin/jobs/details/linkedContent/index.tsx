@@ -139,15 +139,10 @@ const LinkedContent = ({ job }: Props) => {
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
       group.groupId
    )
-   //    // const { jobHubV1 } = useFeatureFlags()
-   const { jobHubV1 } = { jobHubV1: true }
 
    const jobHasNoContent = useMemo(
-      () =>
-         jobHubV1
-            ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
-            : false,
-      [job.livestreams.length, job.sparks.length, jobHubV1]
+      () => Boolean(job.livestreams.length == 0 && job.sparks.length == 0),
+      [job.livestreams.length, job.sparks.length]
    )
 
    const linkJobToContentClick = useCallback(() => {
