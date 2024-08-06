@@ -42,7 +42,7 @@ export const EmptyCTAView = ({ onCreateClick }: Props) => {
                No call to action
             </Typography>
             <Typography variant="brandedBody" color="neutral.700">
-               {"There are no call to action created yet for this live stream"}
+               {"There are no calls to action created yet for this live stream"}
             </Typography>
          </Stack>
          <Button variant="contained" onClick={onCreateClick}>

@@ -68,7 +68,7 @@ type Props = {
    onClickDelete: (ctaId: string) => void
 }
 
-export const CTACard = forwardRef<HTMLDivElement, Props>(
+export const CTAHostCard = forwardRef<HTMLDivElement, Props>(
    ({ cta, onClickDelete }, ref) => {
       const [isEditing, setIsEditing] = useState(false)
 
@@ -102,7 +102,7 @@ export const CTACard = forwardRef<HTMLDivElement, Props>(
    }
 )
 
-CTACard.displayName = "CTACard"
+CTAHostCard.displayName = "CTACard"
 
 type ContentProps = {
    cta: LivestreamCTA
