@@ -846,8 +846,19 @@ export interface LivestreamCTA extends Identifiable {
    message: string
    buttonText: string
    buttonURL: string
-   timestamp: firebase.firestore.Timestamp
+   createdAt: firebase.firestore.Timestamp
    numberOfUsersWhoClickedLink: number
-   numberOfUsersWhoDismissed: number
    active: boolean
+   activatedAt?: firebase.firestore.Timestamp
+}
+
+export interface LivestreamCTAUserClick extends Identifiable {
+   ctaId: string
+   userId: string
+   numberOfClicks: number
+   clicks: UserCTAClick[]
+}
+
+export interface UserCTAClick {
+   timestamp: firebase.firestore.Timestamp[]
 }

@@ -14,6 +14,8 @@ import {
    EmoteType,
    EventRatingAnswer,
    FeedbackQuestionUserAnswer,
+   LivestreamCTA,
+   LivestreamCTAUserClick,
    CategoryDataOption as LivestreamCategoryDataOption,
    LivestreamChatEntry,
    LivestreamEmote,
@@ -1298,6 +1300,50 @@ export class LivestreamService {
          "toggleActiveCTA"
       )(options)
       return
+   }
+
+   getCTARef = (livestreamId: string, ctaId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "callToActions",
+         ctaId
+      ).withConverter(createGenericConverter<LivestreamCTA>())
+   }
+
+   clickCTA = async (
+      livestreamId: string,
+      ctaId: string,
+      userIdentifier: string
+   ) => {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const ctaRef = this.getCTARef(livestreamId, ctaId)
+
+         const userRef = doc(
+            ctaRef,
+            "usersWhoClickedLink",
+            userIdentifier
+         ).withConverter(createGenericConverter<LivestreamCTAUserClick>())
+
+         transaction.set(
+            userRef,
+            {
+               ctaId: ctaRef.id,
+
+               userId: userIdentifier,
+               numberOfClicks: increment(1),
+               clicks: arrayUnion({
+                  timestamp: Timestamp.now(),
+               }),
+            },
+            { merge: true }
+         )
+
+         transaction.update(ctaRef, {
+            numberOfUsersWhoClickedLink: increment(1),
+         })
+      })
    }
 }
 
