@@ -52,7 +52,7 @@ const FIELD_NAME = "sparkIds"
 const JobLinkSparks = () => {
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
-   const { data: publishedSparks } = useGroupSparks(group.id, {
+   const { data: publishedSparks } = useGroupSparks(group.groupId, {
       isPublished: true,
    })
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(

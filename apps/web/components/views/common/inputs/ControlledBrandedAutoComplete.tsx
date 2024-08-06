@@ -70,6 +70,8 @@ type AutocompleteElementComponent = <
 ) => JSX.Element
 
 const StyledMenuItem = styled("li")({
+   justifyContent: "space-between !important",
+
    '&[aria-selected="true"]': {
       backgroundColor: "#FAFAFA !important",
    },
@@ -151,9 +153,14 @@ export const ControlledBrandedAutoComplete = forwardRef(
             loading={loading}
             multiple={multiple}
             options={options}
-            getOptionDisabled={() => {
+            getOptionDisabled={(option) => {
                if (!props.multiple || !limit) return false
 
+               if (
+                  currentValue.findIndex((value) => value.id === option.id) >= 0
+               ) {
+                  return false
+               }
                return currentValue.length >= limit
             }}
             disableCloseOnSelect={
@@ -190,25 +197,17 @@ export const ControlledBrandedAutoComplete = forwardRef(
             ref={ref}
             renderOption={
                autocompleteProps?.renderOption ??
-               (showCheckbox
-                  ? (props, option, { selected }) => (
-                       <StyledMenuItem {...props}>
-                          <BrandedCheckbox
-                             sx={{ marginRight: 1 }}
-                             checked={selected}
-                          />
-                          {autocompleteProps?.getOptionLabel?.(option) ||
-                             option.value ||
-                             option}
-                       </StyledMenuItem>
-                    )
-                  : (props, option) => (
-                       <StyledMenuItem {...props} key={option?.id || option}>
-                          {autocompleteProps?.getOptionLabel?.(option) ||
-                             option.value ||
-                             option}
-                       </StyledMenuItem>
-                    ))
+               ((props, option, { selected }) => (
+                  <StyledMenuItem {...props} key={option?.id || option}>
+                     {autocompleteProps?.getOptionLabel?.(option) ||
+                        option.value ||
+                        option}
+
+                     {showCheckbox ? (
+                        <BrandedCheckbox checked={selected} />
+                     ) : null}
+                  </StyledMenuItem>
+               ))
             }
             onBlur={(event) => {
                field.onBlur()

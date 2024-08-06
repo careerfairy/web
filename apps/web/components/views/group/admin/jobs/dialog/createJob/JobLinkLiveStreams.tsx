@@ -27,6 +27,7 @@ const styles = sxStyles({
    },
    wrapperContainer: {
       px: { md: "24px !important" },
+      minWidth: { md: "750px" },
    },
    title: {
       maxWidth: { xs: "90%", md: "unset" },
@@ -58,7 +59,7 @@ const JobLinkLiveStreams = ({ job }: Props) => {
    const { group } = useGroupFromState()
    const isMobile = useIsMobile()
    const upcomingLiveStreams = useListenToStreams({
-      filterByGroupId: group.id ?? group.groupId,
+      filterByGroupId: group.groupId,
    })
    const linkedLiveStreams = useCustomJobLinkedLivestreams(job)
 
