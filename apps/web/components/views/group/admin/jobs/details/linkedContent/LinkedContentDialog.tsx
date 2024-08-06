@@ -11,6 +11,7 @@ import { sxStyles } from "types/commonTypes"
 import { EditDialogState } from "."
 import JobLinkLiveStreams from "../../dialog/createJob/JobLinkLiveStreams"
 import JobLinkSparks from "../../dialog/createJob/JobLinkSparks"
+import { getInitialValues } from "./LinkedContentFormProvider"
 
 const styles = sxStyles({
    dialog: {
@@ -33,7 +34,9 @@ const LinkedContentDialog = ({ job, dialogState, handleClose }: Props) => {
    const { getValues, reset } = useFormContext()
 
    useEffect(() => {
-      reset()
+      const updatedDefaultValues = getInitialValues(job)
+      reset(updatedDefaultValues)
+
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [dialogState.open])
 

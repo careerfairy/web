@@ -25,7 +25,10 @@ import { sxStyles } from "../../../../../../types/commonTypes"
 import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
 import SteppedDialog from "../../../../stepped-dialog/SteppedDialog"
-import { CustomJobFormProvider } from "./CustomJobFormProvider"
+import {
+   CustomJobFormProvider,
+   getInitialValues,
+} from "./CustomJobFormProvider"
 import NoContentAvailableDialog from "./additionalSteps/NoContentAvailableDialog"
 import NoLinkedContentDialog from "./additionalSteps/NoLinkedContentDialog"
 import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
@@ -226,7 +229,8 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
    const { reset } = useFormContext()
 
    useEffect(() => {
-      reset()
+      const updatedDefaultValues = getInitialValues(job, group.groupId)
+      reset(updatedDefaultValues)
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [isJobFormDialogOpen])
 

@@ -27,7 +27,7 @@ const LinkedContentFormProvider = ({ job, children }: Props) => {
 
 export default LinkedContentFormProvider
 
-const getInitialValues = (job: CustomJob): JobLinkedContentValues => ({
+export const getInitialValues = (job: CustomJob): JobLinkedContentValues => ({
    livestreamIds: job.livestreams,
    sparkIds: job.sparks,
 })

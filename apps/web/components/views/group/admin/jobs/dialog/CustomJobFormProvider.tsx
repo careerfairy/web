@@ -48,7 +48,10 @@ const CustomJobFormContext = createContext<CustomJobFormContextType>({
    isSubmitting: false,
 })
 
-const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
+export const getInitialValues = (
+   job: CustomJob,
+   groupId: string
+): JobFormValues => {
    // If the 'job' field is received, it indicates the intention to edit an existing job.
    if (job) {
       let pastJob = false
