@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux"
 import {
    setCameFromPageLink,
    setCreatorId,
+   setFetchedCompanyWithCreatorStatus,
 } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
 import SparkCarouselCard from "../sparks/components/spark-card/SparkCarouselCard"
@@ -52,6 +53,7 @@ export const SparksCarousel = ({ sparks }: SparksCarousel) => {
 
       dispatch(setCameFromPageLink(router.asPath))
       dispatch(setCreatorId(spark.creator.id))
+      dispatch(setFetchedCompanyWithCreatorStatus("started"))
 
       return router.push({
          pathname: `/sparks/${spark.id}`,

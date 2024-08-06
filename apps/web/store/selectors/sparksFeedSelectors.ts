@@ -112,7 +112,7 @@ export const isCreatorFeedSelector = (state: RootState) =>
    state.sparksFeed.creatorId && !state.sparksFeed.groupId
 
 export const isInCreatorFeedSelector = (state: RootState) =>
-   state.sparksFeed.fetchedCompanyWithCreatorStatus === "in-custom-feed"
+   state.sparksFeed.fetchedCompanyWithCreatorStatus === "ongoing"
 
 export const wasInCreatorFeedSelector = (state: RootState) =>
-   state.sparksFeed.fetchedCompanyWithCreatorStatus === "in-custom-feed"
+   state.sparksFeed.fetchedCompanyWithCreatorStatus === "ongoing"
