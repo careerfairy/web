@@ -53,11 +53,8 @@ const JobFormPreview = () => {
       group.groupId
    )
    const { goToStep } = useStepper()
-   const { handleSubmit } = useCustomJobForm()
-
+   const { handleSubmit, isSubmitting } = useCustomJobForm()
    const { getValues } = useFormContext()
-
-   const { isSubmitting } = useCustomJobForm()
 
    const fieldsValues = getValues([
       "basicInfo.title",

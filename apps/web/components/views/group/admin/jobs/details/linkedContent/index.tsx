@@ -23,7 +23,7 @@ import {
    useRef,
    useState,
 } from "react"
-import { Edit2 } from "react-feather"
+import { Edit2, PlayCircle, Radio } from "react-feather"
 import { useDispatch } from "react-redux"
 import { setSparkToPreview } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
@@ -45,11 +45,12 @@ const styles = sxStyles({
    slide: {
       flex: {
          xs: `0 0 90%`,
-         sm: `0 0 45%`,
-         md: `0 0 40%`,
-         lg: `0 0 30%`,
+         sm: `0 0 60%`,
+         md: "0 0 60%",
+         xl: "0 0 20%",
       },
       maxWidth: { md: 360 },
+      minWidth: 0,
       height: {
          xs: 355,
          md: 355,
@@ -65,7 +66,7 @@ const styles = sxStyles({
    wrapper: {
       p: 3,
       borderRadius: "15px",
-      background: (theme) => theme.palette.common.white,
+      background: "white",
    },
    header: {
       display: "flex",
@@ -77,6 +78,29 @@ const styles = sxStyles({
       width: "8px",
       height: "8px",
       borderRadius: "20px",
+   },
+   noContentWrapper: {
+      display: "flex",
+      background: (theme) => theme.brand.white[300],
+      borderRadius: "8px",
+      py: 4,
+      justifyContent: "center",
+
+      "& svg": {
+         color: "secondary.main",
+      },
+   },
+   noContentInfo: {
+      alignItems: "center",
+      textAlign: "center",
+   },
+   noContentTitle: {
+      fontSize: "20px",
+      fontWeight: 600,
+   },
+   noContentSubtitle: {
+      fontSize: "16px",
+      fontWeight: 400,
    },
 })
 
@@ -149,6 +173,7 @@ const LinkedContent = ({ job }: Props) => {
                         job={job}
                         setEditDialogState={setEditDialogState}
                         setLiveStreamDialog={setLivestreamDialog}
+                        hasUpcomingLiveStreams={groupHasUpcomingLivestreams}
                      />
                   </SuspenseWithBoundary>
 
@@ -156,6 +181,7 @@ const LinkedContent = ({ job }: Props) => {
                      <SparksContent
                         job={job}
                         setEditDialogState={setEditDialogState}
+                        hasSparksToLink={group.publicSparks}
                      />
                   </SuspenseWithBoundary>
                </Stack>
@@ -185,11 +211,14 @@ type ContentProps = {
    job: CustomJob
    setEditDialogState: Dispatch<SetStateAction<EditDialogState>>
    setLiveStreamDialog?: Dispatch<SetStateAction<LiveStreamDialogState>>
+   hasUpcomingLiveStreams?: boolean
+   hasSparksToLink?: boolean
 }
 const LiveStreamsContent = ({
    job,
    setEditDialogState,
    setLiveStreamDialog,
+   hasUpcomingLiveStreams,
 }: ContentProps) => {
    const linkedLivestreams = useCustomJobLinkedLivestreams(job)
    const isMobile = useIsMobile()
@@ -205,7 +234,12 @@ const LiveStreamsContent = ({
       [setLiveStreamDialog]
    )
 
-   return linkedLivestreams.length > 0 ? (
+   const hasLiveStreamsToLink = useMemo(
+      () => hasUpcomingLiveStreams || linkedLivestreams.length > 0,
+      [hasUpcomingLiveStreams, linkedLivestreams.length]
+   )
+
+   return hasLiveStreamsToLink ? (
       <>
          <Box sx={styles.header}>
             <Typography variant={"subtitle1"} sx={styles.subTitle}>
@@ -227,20 +261,34 @@ const LiveStreamsContent = ({
          </Box>
 
          <Box sx={styles.linkedContentWrapper}>
-            <EventsPreviewCarousel
-               id={"job-events"}
-               type={EventsTypes.JOB_EVENTS}
-               events={linkedLivestreams}
-               isEmbedded
-               styling={defaultStyling}
-               onCardClick={handleCardClick}
-            />
+            {linkedLivestreams.length > 0 ? (
+               <EventsPreviewCarousel
+                  id={"job-events"}
+                  type={EventsTypes.JOB_EVENTS}
+                  events={linkedLivestreams}
+                  isEmbedded
+                  styling={defaultStyling}
+                  onCardClick={handleCardClick}
+               />
+            ) : (
+               <MissingContent
+                  title="Link live streams to your job!"
+                  subtitle="Use live streams to give talent real-time insights into your company."
+                  handleClick={handleEditLiveStreams}
+                  icon={<Radio size={40} />}
+                  ctaText="Link live streams"
+               />
+            )}
          </Box>
       </>
    ) : null
 }
 
-const SparksContent = ({ job, setEditDialogState }: ContentProps) => {
+const SparksContent = ({
+   job,
+   setEditDialogState,
+   hasSparksToLink,
+}: ContentProps) => {
    const childRef = useRef(null)
    const isMobile = useIsMobile()
    const dispatch = useDispatch()
@@ -258,7 +306,7 @@ const SparksContent = ({ job, setEditDialogState }: ContentProps) => {
       setEditDialogState({ open: true, step: 1, editMode: true })
    }, [setEditDialogState])
 
-   return linkedSparks.length > 0 ? (
+   return hasSparksToLink ? (
       <>
          <Box sx={styles.header}>
             <Typography variant={"subtitle1"} sx={styles.subTitle}>
@@ -280,15 +328,58 @@ const SparksContent = ({ job, setEditDialogState }: ContentProps) => {
          </Box>
 
          <Box sx={styles.linkedContentWrapper}>
-            <SparksCarousel
-               ref={childRef}
-               sparks={linkedSparks}
-               options={sparksCarouselEmblaOptions}
-               onSparkClick={handleSparkClick}
-            />
+            {linkedSparks.length > 0 ? (
+               <SparksCarousel
+                  ref={childRef}
+                  sparks={linkedSparks}
+                  options={sparksCarouselEmblaOptions}
+                  onSparkClick={handleSparkClick}
+               />
+            ) : (
+               <MissingContent
+                  title="Link Sparks to your job!"
+                  subtitle="Use your Sparks to enrich this job listing and engage with talent."
+                  ctaText="Link Sparks"
+                  icon={<PlayCircle size={40} />}
+                  handleClick={handleEditSparks}
+               />
+            )}
          </Box>
       </>
    ) : null
+}
+
+type MissingContentProps = {
+   icon: JSX.Element
+   title: string
+   subtitle: string
+   ctaText: string
+   handleClick: () => void
+}
+
+const MissingContent = ({
+   title,
+   subtitle,
+   ctaText,
+   icon,
+   handleClick,
+}: MissingContentProps) => {
+   return (
+      <Box sx={styles.noContentWrapper}>
+         <Stack spacing={3} sx={styles.noContentInfo}>
+            {icon}
+
+            <Box>
+               <Typography sx={styles.noContentTitle}>{title}</Typography>
+               <Typography sx={styles.noContentSubtitle}>{subtitle}</Typography>
+            </Box>
+
+            <Button variant="contained" color="secondary" onClick={handleClick}>
+               {ctaText}
+            </Button>
+         </Stack>
+      </Box>
+   )
 }
 
 export default LinkedContent
