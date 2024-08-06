@@ -33,7 +33,6 @@ import NoContentAvailableDialog from "./additionalSteps/NoContentAvailableDialog
 import NoLinkedContentDialog from "./additionalSteps/NoLinkedContentDialog"
 import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
 import JobBasicInfo from "./createJob/JobBasicInfo"
-import JobFormDialog from "./createJob/JobFormDialog"
 import JobFormPreview from "./createJob/JobFormPreview"
 import JobLinkLiveStreams from "./createJob/JobLinkLiveStreams"
 import {
@@ -105,13 +104,11 @@ const JobAdditionalDetails = dynamic(
 )
 
 type ViewsProps = {
-   jobHubV1: boolean
    quillInputRef: any
    job?: CustomJob
 }
 
-// This function dynamically generates an array of views based on the jobHubV1 flag and the presence of a job.
-const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
+const getViews = ({ quillInputRef, job }: ViewsProps) =>
    [
       {
          key: JobDialogStep.PRIVACY_POLICY.key,
@@ -121,59 +118,48 @@ const getViews = ({ jobHubV1, quillInputRef, job }: ViewsProps) =>
          key: JobDialogStep.DELETE_JOB.key,
          Component: () => <DeleteJobDialog job={job} />,
       },
-      ...(jobHubV1
-         ? [
-              {
-                 key: JobDialogStep.NO_CONTENT_AVAILABLE.key,
-                 Component: () => <NoContentAvailableDialog />,
-              },
-              {
-                 key: JobDialogStep.FORM_BASIC_INFO.key,
-                 Component: () => <JobBasicInfo />,
-              },
-              {
-                 key: JobDialogStep.FORM_ADDITIONAL_DETAILS.key,
-                 Component: () => (
-                    <JobAdditionalDetails quillInputRef={quillInputRef} />
-                 ),
-              },
-              {
-                 key: JobDialogStep.FORM_LINKED_LIVE_STREAMS.key,
-                 Component: () => (
-                    <SuspenseWithBoundary
-                       fallback={<JobLinkLiveStreamsSkeleton />}
-                    >
-                       <JobLinkLiveStreams job={job} />
-                    </SuspenseWithBoundary>
-                 ),
-              },
-              {
-                 key: JobDialogStep.FORM_LINKED_SPARKS.key,
-                 Component: () => (
-                    <SuspenseWithBoundary fallback={<JobLinkSparksSkeleton />}>
-                       <JobLinkSparks />
-                    </SuspenseWithBoundary>
-                 ),
-              },
-              {
-                 key: JobDialogStep.NO_LINKED_CONTENT.key,
-                 Component: () => <NoLinkedContentDialog />,
-              },
-              {
-                 key: JobDialogStep.FORM_PREVIEW.key,
-                 Component: () => (
-                    <SuspenseWithBoundary fallback={<></>}>
-                       <JobFormPreview />
-                    </SuspenseWithBoundary>
-                 ),
-              },
-           ]
-         : [
-              {
-                 key: JobDialogStep.OLD_FORM.key,
-                 Component: () => <JobFormDialog />,
-              },
-           ]),
+      {
+         key: JobDialogStep.NO_CONTENT_AVAILABLE.key,
+         Component: () => <NoContentAvailableDialog />,
+      },
+      {
+         key: JobDialogStep.FORM_BASIC_INFO.key,
+         Component: () => <JobBasicInfo />,
+      },
+      {
+         key: JobDialogStep.FORM_ADDITIONAL_DETAILS.key,
+         Component: () => (
+            <JobAdditionalDetails quillInputRef={quillInputRef} />
+         ),
+      },
+      {
+         key: JobDialogStep.FORM_LINKED_LIVE_STREAMS.key,
+         Component: () => (
+            <SuspenseWithBoundary fallback={<JobLinkLiveStreamsSkeleton />}>
+               <JobLinkLiveStreams job={job} />
+            </SuspenseWithBoundary>
+         ),
+      },
+      {
+         key: JobDialogStep.FORM_LINKED_SPARKS.key,
+         Component: () => (
+            <SuspenseWithBoundary fallback={<JobLinkSparksSkeleton />}>
+               <JobLinkSparks />
+            </SuspenseWithBoundary>
+         ),
+      },
+      {
+         key: JobDialogStep.NO_LINKED_CONTENT.key,
+         Component: () => <NoLinkedContentDialog />,
+      },
+      {
+         key: JobDialogStep.FORM_PREVIEW.key,
+         Component: () => (
+            <SuspenseWithBoundary fallback={<></>}>
+               <JobFormPreview />
+            </SuspenseWithBoundary>
+         ),
+      },
    ] as const
 
 type Props = {
@@ -224,8 +210,6 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
    const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
    const isDeleteJobDialogOpen = useSelector(deleteJobsDialogOpenSelector)
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
-   // const { jobHubV1 } = useFeatureFlags()
-   const { jobHubV1 } = { jobHubV1: true }
    const { reset } = useFormContext()
 
    useEffect(() => {
@@ -244,20 +228,13 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
       }
 
       return group.privacyPolicyActive || selectedJobId
-         ? jobHubV1
-            ? JobDialogStep.FORM_BASIC_INFO.position
-            : JobDialogStep.OLD_FORM.position
-         : JobDialogStep.PRIVACY_POLICY.position
-   }, [
-      group.privacyPolicyActive,
-      isDeleteJobDialogOpen,
-      jobHubV1,
-      selectedJobId,
-   ])
+         ? JobDialogStep.FORM_BASIC_INFO.position
+         : JobDialogStep.OLD_FORM.position
+   }, [group.privacyPolicyActive, isDeleteJobDialogOpen, selectedJobId])
 
    const views = useMemo(
-      () => getViews({ jobHubV1, quillInputRef, job }),
-      [job, jobHubV1, quillInputRef]
+      () => getViews({ quillInputRef, job }),
+      [job, quillInputRef]
    )
 
    return (

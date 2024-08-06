@@ -8,12 +8,10 @@ import JobList from "./JobList"
 const JobsContent = () => {
    const { group } = useGroupFromState()
    const allJobsWithStats = useGroupCustomJobsStats(group.groupId)
-   // const { jobHubV1 } = useFeatureFlags()
-   const { jobHubV1 } = { jobHubV1: true }
 
    const sortedJobs = useMemo(
-      () => (jobHubV1 ? sortJobs(allJobsWithStats) : allJobsWithStats),
-      [allJobsWithStats, jobHubV1]
+      () => sortJobs(allJobsWithStats),
+      [allJobsWithStats]
    )
 
    return sortedJobs.length > 0 ? (
