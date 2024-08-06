@@ -218,46 +218,23 @@ export class GroupDashboardPage extends CommonPage {
          }
       }
 
-      await this.fillMultiSelectTagCategories(
-         "general.contentTopicsTagIds",
-         data.contentTopicsTagIds
+      const tagValueLooker = (tagId) => TagValuesLookup[tagId]
+
+      await this.fillMultiSelect(
+         "Choose at least 1 topic describing the content of the live stream",
+         data.contentTopicsTagIds,
+         tagValueLooker
       )
 
-      await this.fillMultiSelectTagCategories(
-         "general.businessFunctionsTagIds",
-         data.businessFunctionsTagIds
+      await this.fillMultiSelect(
+         "Choose at least 1 business function presented in this live stream",
+         data.businessFunctionsTagIds,
+         tagValueLooker
       )
 
-      // if(data.levelOfStudyIds?.length){
-      //    for(const levelOfStudy of data.levelOfStudyIds){
-      //       await this.handleMultiSelect(levelOfStudy, this.page.getByPlaceholder("Select levels of study"), levelId => {
-      //          return {
-      //             name: levelId,
-      //             exact: false
-      //          }
-      //       })
-      //    }
-      // }
+      await this.fillMultiSelect("Select fields of study", data.fieldOfStudyIds)
 
-      // if(data.fieldOfStudyIds?.length){
-      //    for(const fieldOfStudy of data.fieldOfStudyIds){
-      //       await this.handleMultiSelect(fieldOfStudy, this.page.getByPlaceholder("Select fields of study"), fieldId => {
-      //          return {
-      //             name: fieldId,
-      //             exact: false
-      //          }
-      //       })
-      //    }
-      // }
-      await this.fillMultiSelectTargetAudience(
-         "Select fields of study",
-         data.fieldOfStudyIds
-      )
-
-      await this.fillMultiSelectTargetAudience(
-         "Select levels of study",
-         data.levelOfStudyIds
-      )
+      await this.fillMultiSelect("Select levels of study", data.levelOfStudyIds)
 
       if (data.speakers) {
          await this.clickNextButton()
@@ -336,7 +313,7 @@ export class GroupDashboardPage extends CommonPage {
     * Fills a multi select, beware if called for the new live stream creation form, if already filled it will deselect the items.
     * The manipulation is done via deleting fields of the provided data but an improvement can be made for checking if the item is already selected.
     */
-   public async fillMultiSelectTargetAudience(
+   public async fillMultiSelect(
       placeholder: string,
       options: string[],
       nameMapper?: (string) => string
@@ -352,6 +329,8 @@ export class GroupDashboardPage extends CommonPage {
                   .click()
             })
          )
+
+         await this.page.getByLabel("Close").click()
       }
    }
 
@@ -362,15 +341,16 @@ export class GroupDashboardPage extends CommonPage {
    public async createSpeakers(speakers: Speaker[]) {
       if (speakers?.length) {
          for (const speaker of speakers) {
-            await this.page.locator("input[id='speakers.values']").click()
+            await this.page.getByLabel("Open").click()
 
             const existingSpeaker = await this.page
                .getByLabel("Speakers of this event")
                .getByText(speaker.email)
+
             const speakerExists = await existingSpeaker.isVisible()
 
             if (speakerExists) {
-               await this.page.locator("input[id='speakers.values']").click()
+               await this.page.getByLabel("Close").click()
                continue
             }
 
@@ -378,38 +358,32 @@ export class GroupDashboardPage extends CommonPage {
                .getByRole("menuitem", { name: "Create a new contributor" })
                .click()
 
+            const placeholders = {
+               John: () => speaker.firstName,
+               Doe: () => speaker.lastName,
+               "E.g.,: Marketing Manager": () => speaker.position,
+               "LinkedIn link": () => speaker.linkedInUrl,
+               "E.g.,: John@careerfairy.io": () => speaker.email,
+               "Tell talent a little more about your story and professional background!":
+                  () => speaker.background,
+            }
+
+            // fill inputs with placeholders
+            for (const [id, value] of Object.entries(placeholders)) {
+               const val = value() // calculate the value
+               if (val) {
+                  await this.page
+                     .getByPlaceholder(id, { exact: true })
+                     .fill(val)
+               }
+            }
+
             await this.clickAndUploadFiles(
                this.page.getByRole("button", {
                   name: "Upload speaker picture",
                }),
                "tests/e2e/assets/creatorAvatar.png"
             )
-
-            await this.page
-               .locator("input[id='creator.firstName']")
-               .fill(speaker.firstName)
-            await this.page
-               .locator("input[id='creator.lastName']")
-               .fill(speaker.lastName)
-            await this.page
-               .locator("input[id='creator.position']")
-               .fill(speaker.position)
-            await this.page
-               .locator("input[id='creator.email']")
-               .fill(speaker.email)
-            await this.page
-               .locator("input[id='creator.email']")
-               .fill(speaker.email)
-
-            if (speaker.linkedInUrl)
-               await this.page
-                  .locator("input[id='creator.linkedInUrl']")
-                  .fill(speaker.linkedInUrl)
-
-            if (speaker.background)
-               await this.page
-                  .getByLabel("Personal story")
-                  .fill(speaker.background)
 
             await this.page.getByRole("button", { name: "Create" }).click()
          }
