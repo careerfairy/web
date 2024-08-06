@@ -26,7 +26,7 @@ const styles = sxStyles({
       },
    },
    headliner: {
-      width: "auto",
+      width: "100%",
       height: "auto",
       marginBottom: "30px",
    },
