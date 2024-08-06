@@ -20,8 +20,9 @@ export type AddCardNotificationPayload = {
 }
 
 export type FetchedCompanyWithCreatorStatus =
-   | "initial"
-   | "in-custom-feed"
+   | "unset"
+   | "started"
+   | "ongoing"
    | "finished"
 
 // Initial state
@@ -63,7 +64,7 @@ const initialState: SparksState = {
    sparks: [],
    currentPlayingIndex: 0,
    hasMoreSparks: true,
-   fetchedCompanyWithCreatorStatus: "initial",
+   fetchedCompanyWithCreatorStatus: "unset",
    groupId: null,
    creatorId: null,
    userEmail: null,
@@ -300,7 +301,7 @@ const sparksFeedSlice = createSlice({
          state.sparks = []
          state.currentPlayingIndex = 0
          state.hasMoreSparks = true
-         state.fetchedCompanyWithCreatorStatus = "initial"
+         state.fetchedCompanyWithCreatorStatus = "unset"
          state.creatorId = null
          state.initialFetchStatus = "idle"
          state.initialSparksFetched = false
