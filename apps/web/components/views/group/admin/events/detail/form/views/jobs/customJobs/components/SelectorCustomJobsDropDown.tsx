@@ -114,10 +114,7 @@ const SelectorCustomJobsDropDown = ({
 
    const getOptionElement = useCallback(
       (job: PublicCustomJob) => (
-         <Box
-            sx={styles.optionElementContainer}
-            data-testid={`custom-job-${job.id}-data-test-id`}
-         >
+         <Box sx={styles.optionElementContainer}>
             <Typography sx={styles.optionTitle}>{job.title}</Typography>
 
             <Stack spacing={2} direction={"row"}>

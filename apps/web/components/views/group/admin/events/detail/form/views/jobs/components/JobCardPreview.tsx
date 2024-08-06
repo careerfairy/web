@@ -90,7 +90,7 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                </Typography>
 
                {!isAtsLivestreamAssociation && (
-                  <Box data-testid={`job-card-preview-custom-job-${job.id}`}>
+                  <Box>
                      <IconButton onClick={handleClick} size="small">
                         <MoreVertical size={24} />
                      </IconButton>

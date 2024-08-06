@@ -287,27 +287,31 @@ export class GroupDashboardPage extends CommonPage {
    }
    /**
     * Selects the jobs from the dropdown, currently you can only select one job
+    * and it does not support ATS Jobs
     * */
-   public async selectJobs(jobs: LivestreamJobAssociation[]) {
+   public async selectJobs(
+      jobs: LivestreamJobAssociation[],
+      atsJobs?: boolean
+   ) {
+      if (atsJobs) {
+         // TODO: Use atsJobs, implementing tests for ATS jobs
+         return
+      }
       await this.page.getByPlaceholder("Select jobs you want to attach").click()
 
       for (const job of jobs) {
          // TODO: Check if job is visible, if not create via UI
          // How to test a draft stream with saved job ?
-         await this.page
-            .getByTestId(`custom-job-${job.jobId}-data-test-id`)
-            .click()
+         await this.page.getByText(job.name).click()
       }
    }
 
-   public async assertJobIsAttachedToStream(jobIds: string[]) {
+   public async assertJobIsAttachedToStream(jobLinks: string[]) {
       await this.clickJobOpenings()
       await this.skipRequiredFields()
 
-      for (const jobId of jobIds) {
-         await expect(
-            this.page.getByTestId(`job-card-preview-custom-job-${jobId}`)
-         ).toBeVisible()
+      for (const link of jobLinks) {
+         await expect(this.page.getByRole("link", { name: link })).toBeVisible()
       }
    }
 

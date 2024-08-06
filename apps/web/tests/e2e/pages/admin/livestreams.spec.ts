@@ -125,9 +125,7 @@ test.describe("Group Admin Livestreams", () => {
       await livestreamsPage.clickDraftsTab()
       await livestreamsPage.launchEditModal()
 
-      const addedJobIds = livestreamJobAssociations.map(
-         (association) => association.jobId
-      )
-      await groupPage.assertJobIsAttachedToStream(addedJobIds)
+      const addedJobLinks = jobs.map((job) => job.postingUrl)
+      await groupPage.assertJobIsAttachedToStream(addedJobLinks)
    })
 })
