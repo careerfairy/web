@@ -127,14 +127,6 @@ const handleSearch = <AlgoliaResponseType>(
    const isTest = isTestEnvironment()
    const workflowId = getWorkflowId()
 
-   console.log(`🚀`, {
-      isTest,
-      workflowId,
-      filters,
-      query,
-      page,
-   })
-
    return index.search<AlgoliaResponseType>(query, {
       hitsPerPage: itemsPerPage,
       filters: (isTest ? `workflowId:${workflowId} AND ` : "") + filters,

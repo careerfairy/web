@@ -134,7 +134,7 @@ const JobFormPreview = () => {
                   </Box>
                </SteppedDialog.Title>
                <SteppedDialog.Subtitle sx={styles.subtitle}>
-                  You&apos;re almost there! Just make sure that everything is on
+                  You&apos;re almost there! Just make sure that everything is in
                   place
                </SteppedDialog.Subtitle>
 

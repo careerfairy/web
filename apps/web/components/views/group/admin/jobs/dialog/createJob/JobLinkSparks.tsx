@@ -45,7 +45,7 @@ const styles = sxStyles({
       mx: { xs: 4, md: "unset" },
    },
    actions: {
-      zIndex: 99,
+      zIndex: (theme) => theme.zIndex.tooltip,
    },
 })
 

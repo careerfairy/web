@@ -69,13 +69,13 @@ type AutocompleteElementComponent = <
       RefAttributes<HTMLDivElement>
 ) => JSX.Element
 
-const StyledMenuItem = styled("li")({
+const StyledMenuItem = styled("li")(({ theme }) => ({
    justifyContent: "space-between !important",
 
    '&[aria-selected="true"]': {
-      backgroundColor: "#FAFAFA !important",
+      backgroundColor: `${theme.brand.black[100]} !important`,
    },
-})
+}))
 
 export const ControlledBrandedAutoComplete = forwardRef(
    function AutocompleteElement<
