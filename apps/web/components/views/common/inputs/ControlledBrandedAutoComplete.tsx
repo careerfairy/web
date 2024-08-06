@@ -1,12 +1,4 @@
 import {
-   Control,
-   FieldError,
-   FieldPath,
-   FieldValues,
-   useController,
-   UseControllerProps,
-} from "react-hook-form"
-import {
    Autocomplete,
    AutocompleteProps,
    styled,
@@ -15,8 +7,16 @@ import {
 } from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
 import { forwardRef, ReactNode, Ref, RefAttributes } from "react"
-import BrandedTextField from "./BrandedTextField"
+import {
+   Control,
+   FieldError,
+   FieldPath,
+   FieldValues,
+   useController,
+   UseControllerProps,
+} from "react-hook-form"
 import BrandedCheckbox from "./BrandedCheckbox"
+import BrandedTextField from "./BrandedTextField"
 
 export type Option = {
    id: string | number
@@ -47,7 +47,10 @@ export type AutocompleteElementProps<
       AutocompleteProps<TValue, Multiple, DisableClearable, FreeSolo>,
       "name" | "options" | "loading" | "renderInput"
    >
-   textFieldProps?: Omit<TextFieldProps, "name" | "required" | "label">
+   textFieldProps?: Omit<TextFieldProps, "name" | "required" | "label"> & {
+      requiredText: string
+   }
+   limit?: number
 }
 
 type AutocompleteElementComponent = <
@@ -102,6 +105,7 @@ export const ControlledBrandedAutoComplete = forwardRef(
          multiple,
          matchId,
          label,
+         limit,
       } = props
 
       const loadingElement = loadingIndicator || (
@@ -147,6 +151,11 @@ export const ControlledBrandedAutoComplete = forwardRef(
             loading={loading}
             multiple={multiple}
             options={options}
+            getOptionDisabled={() => {
+               if (!props.multiple || !limit) return false
+
+               return currentValue.length >= limit
+            }}
             disableCloseOnSelect={
                typeof autocompleteProps?.disableCloseOnSelect === "boolean"
                   ? autocompleteProps.disableCloseOnSelect

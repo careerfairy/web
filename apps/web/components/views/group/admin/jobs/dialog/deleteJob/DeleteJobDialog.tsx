@@ -1,13 +1,11 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 import { FC, useCallback, useEffect, useState } from "react"
 import { Trash2 as DeleteIcon } from "react-feather"
 import { useDispatch, useSelector } from "react-redux"
-import JobFetchWrapper from "../../../../../../../HOCs/job/JobFetchWrapper"
 import { openDeleteJobWithLinkedContent } from "../../../../../../../store/reducers/adminJobsReducer"
 import { jobsFormSelectedJobIdSelector } from "../../../../../../../store/selectors/adminJobsSelectors"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
 import useCustomJobDelete from "../../../../../../custom-hook/custom-job/useCustomJobDelete"
 import SteppedDialog, {
    useStepper,
@@ -63,28 +61,18 @@ const styles = sxStyles({
       color: "grey",
    },
    actionBtn: {
-      width: "160px",
+      width: "100%",
+      maxWidth: "300px",
       height: "40px",
       boxShadow: "none",
    },
 })
 
-const DeleteJobDialog = () => {
-   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
-
-   return (
-      <SuspenseWithBoundary fallback={<CircularProgress />}>
-         <JobFetchWrapper jobId={selectedJobId}>
-            {(job) => <DeleteDialog job={job} />}
-         </JobFetchWrapper>
-      </SuspenseWithBoundary>
-   )
-}
-
-type DeleteDialogProps = {
+type Props = {
    job: CustomJob | null
 }
-const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
+
+const DeleteJobDialog: FC<Props> = ({ job }) => {
    const dispatch = useDispatch()
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { handleClose } = useStepper<JobDialogStep>()

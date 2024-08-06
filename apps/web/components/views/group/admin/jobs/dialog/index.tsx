@@ -1,4 +1,13 @@
-import { useCallback, useMemo } from "react"
+import {
+   CustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
+import { CircularProgress } from "@mui/material"
+import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import dynamic from "next/dynamic"
+import { MutableRefObject, useCallback, useMemo, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
 import {
@@ -10,19 +19,30 @@ import {
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
-import SteppedDialog, {
-   useStepper,
-} from "../../../../stepped-dialog/SteppedDialog"
-import JobFormDialog from "./JobFormDialog"
-import PrivacyPolicyDialog from "./PrivacyPolicyDialog"
+import SteppedDialog from "../../../../stepped-dialog/SteppedDialog"
+import CustomJobFormProvider from "./CustomJobFormProvider"
+import NoLinkedContentDialog from "./additionalSteps/NoLinkedContentDialog"
+import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
+import JobBasicInfo from "./createJob/JobBasicInfo"
+import JobFormDialog from "./createJob/JobFormDialog"
 import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
+
+export type JobDialogStep = ReturnType<typeof getViews>[number]["key"]
+
+export enum JobDialogStepEnum {
+   PRIVACY_POLICY = 0,
+   FORM_BASIC_INFO = 1,
+   FORM_ADDITIONAL_DETAILS = 2,
+   NO_LINKED_CONTENT = 3,
+   DELETE_JOB = 4,
+}
 
 const styles = sxStyles({
    dialog: {
-      top: { xs: "70px", md: 0 },
+      top: { xs: "20dvh", md: 0 },
       borderRadius: 5,
    },
-   smallDialog: {
+   smallDeleteDialog: {
       maxWidth: { md: 450 },
       top: { xs: "calc(100dvh - 320px)", md: 0 },
    },
@@ -30,31 +50,94 @@ const styles = sxStyles({
       top: { xs: "calc(100dvh - 500px)", md: 0 },
    },
 })
-const views = [
-   {
-      key: "privacy-policy",
-      Component: () => <PrivacyPolicyDialog />,
-   },
-   {
-      key: "create-form",
-      Component: () => <JobFormDialog />,
-   },
-   {
-      key: "delete-job",
-      Component: () => <DeleteJobDialog />,
-   },
-] as const
 
-export type JobDialogStep = (typeof views)[number]["key"]
+// Due to the quillInputRef field
+const JobAdditionalDetails = dynamic(
+   () => import("./createJob/JobAdditionalDetails"),
+   {
+      ssr: false,
+   }
+)
 
-enum JobDialogStepEnum {
-   PRIVACY_POLICY = 0,
-   FORM = 1,
-   DELETE_JOB = 2,
+// This function dynamically generates an array of views based on the jobHubV1 flag and the presence of a job.
+const getViews = (jobHubV1: boolean, quillInputRef, job?: CustomJob) =>
+   [
+      {
+         key: "privacy-policy",
+         Component: () => <PrivacyPolicyDialog />,
+      },
+      ...(jobHubV1
+         ? [
+              {
+                 key: "create-job-basic-info",
+                 Component: () => <JobBasicInfo />,
+              },
+              {
+                 key: "create-job-additional-details",
+                 Component: () => (
+                    <JobAdditionalDetails quillInputRef={quillInputRef} />
+                 ),
+              },
+           ]
+         : [
+              {
+                 key: "oldJobForm",
+                 Component: () => <JobFormDialog />,
+              },
+           ]),
+      {
+         key: "no-linked-content",
+         Component: () => <NoLinkedContentDialog />,
+      },
+      {
+         key: "delete-job",
+         Component: () => <DeleteJobDialog job={job} />,
+      },
+   ] as const
+
+type Props = {
+   afterCreateCustomJob?: (job: PublicCustomJob) => void
+   afterUpdateCustomJob?: (job: PublicCustomJob) => void
 }
 
-const JobDialog = () => {
-   const { handleClose } = useStepper<JobDialogStep>()
+const JobDialog = ({ afterCreateCustomJob, afterUpdateCustomJob }: Props) => {
+   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const quillInputRef = useRef()
+   const dispatch = useDispatch()
+
+   // This function is a default callback that closes the jobs dialog after the action has been completed
+   const defaultAfterAction = useCallback(() => {
+      dispatch(closeJobsDialog())
+   }, [dispatch])
+
+   return (
+      <SuspenseWithBoundary fallback={<CircularProgress />}>
+         <JobFetchWrapper jobId={selectedJobId}>
+            {(job) => (
+               <CustomJobFormProvider
+                  job={job}
+                  quillInputRef={quillInputRef}
+                  afterCreateCustomJob={
+                     afterCreateCustomJob ?? defaultAfterAction
+                  }
+                  afterUpdateCustomJob={
+                     afterUpdateCustomJob ?? defaultAfterAction
+                  }
+               >
+                  <Content job={job} quillInputRef={quillInputRef} />
+               </CustomJobFormProvider>
+            )}
+         </JobFetchWrapper>
+      </SuspenseWithBoundary>
+   )
+}
+
+type ContentProps = {
+   job: CustomJob
+   quillInputRef: MutableRefObject<any>
+}
+
+const Content = ({ job, quillInputRef }: ContentProps) => {
    const { group } = useGroupFromState()
    const dispatch = useDispatch()
    const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
@@ -63,20 +146,25 @@ const JobDialog = () => {
    const isDeleteJobDialogWithLinkedLivestreamsOpen = useSelector(
       deleteJobWithLinkedLivestreamsDialogOpenSelector
    )
+   const { jobHubV1 } = useFeatureFlags()
 
    const handleCloseDialog = useCallback(() => {
       dispatch(closeJobsDialog())
-      handleClose()
-   }, [dispatch, handleClose])
+   }, [dispatch])
 
-   const currentStep = useMemo(() => {
+   const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
          return JobDialogStepEnum.DELETE_JOB
       }
       return group.privacyPolicyActive || selectedJobId
-         ? JobDialogStepEnum.FORM
+         ? JobDialogStepEnum.FORM_BASIC_INFO
          : JobDialogStepEnum.PRIVACY_POLICY
    }, [group.privacyPolicyActive, isDeleteJobDialogOpen, selectedJobId])
+
+   const views = useMemo(
+      () => getViews(jobHubV1, quillInputRef, job),
+      [job, jobHubV1, quillInputRef]
+   )
 
    return (
       <SteppedDialog
@@ -85,11 +173,11 @@ const JobDialog = () => {
          handleClose={handleCloseDialog}
          open={isJobFormDialogOpen || isDeleteJobDialogOpen}
          views={views}
-         initialStep={currentStep}
+         initialStep={initialStep}
          transition={SlideUpTransition}
          sx={[
             styles.dialog,
-            isDeleteJobDialogOpen ? styles.smallDialog : null,
+            isDeleteJobDialogOpen ? styles.smallDeleteDialog : null,
             isDeleteJobDialogWithLinkedLivestreamsOpen
                ? styles.jobWithList
                : null,
