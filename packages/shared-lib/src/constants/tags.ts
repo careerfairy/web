@@ -107,9 +107,16 @@ export const TagValuesLookup = Object.fromEntries(
    TagValues.map((tag) => [tag.id, tag.name])
 )
 
-export const TagsLookup = Object.fromEntries(
-   TagValues.map((tag) => [tag.id, tag])
-)
+export const getBusinessTagsByIds = (tagIds: string[]): OptionGroup[] => {
+   const tagIdSet = new Set(tagIds)
+
+   return BusinessFunctionsTagValues.filter((tag) => tagIdSet.has(tag.id)).map(
+      (tag) => ({
+         id: tag.id,
+         name: tag.name,
+      })
+   )
+}
 
 export type ContentHitsCount = {
    sparks: number
@@ -159,3 +166,7 @@ export const getGroupedTags = (tagIds: string[]): GroupedTags => {
       language: Object.fromEntries(languages),
    }
 }
+
+export const TagsLookup = Object.fromEntries(
+   TagValues.map((tag) => [tag.id, tag])
+)

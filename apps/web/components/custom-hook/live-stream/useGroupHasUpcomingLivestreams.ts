@@ -25,7 +25,8 @@ const useGroupHasUpcomingLivestreams = (groupId: string) => {
    return (
       useFirestoreCollection<LivestreamEvent>(livestreamsQuery, {
          idField: "id",
-      }).data.length > 0
+         suspense: false,
+      }).data?.length > 0
    )
 }
 
