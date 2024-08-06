@@ -179,34 +179,42 @@ export class GroupDashboardPage extends CommonPage {
       data: Partial<LivestreamEvent>,
       publish?: boolean
    ) {
-      const matchById = {
-         "input[id='general.title']": () => data.title,
-         "input[id='general.startDate']": () =>
+      const SUMMARY_PLACEHOLDER = `Describe your live stream
+  • [Company] is one of the leading companies in the [industry]. We have [XYZ] employees globally...
+  • We are going to present how a day in the life of our consultants looks like
+  • Agenda: 30 minutes presentation and 30 minutes Q&A`
+
+      const placeholders = {
+         "Insert your live stream title": () => data.title,
+         [SUMMARY_PLACEHOLDER]: () => data.summary,
+         "Insert date": () =>
             data.start
                ? DateUtil.eventStartDate(data.start?.toDate?.())
                : undefined,
-         "input[id='general.duration']": () => data.duration?.toString(),
-         "textarea[id='general.summary']": () => data.summary,
-         "input[id='general.reasonsToJoin.0']": () =>
-            (data.reasonsToJoinLivestream_v2?.length &&
-               data.reasonsToJoinLivestream_v2.at(0)) ||
-            "",
-         "input[id='general.reasonsToJoin.1']": () =>
-            (data.reasonsToJoinLivestream_v2?.length > 1 &&
-               data.reasonsToJoinLivestream_v2.at(1)) ||
-            "",
-         "input[id='general.reasonsToJoin.2']": () =>
-            (data.reasonsToJoinLivestream_v2?.length > 2 &&
-               data.reasonsToJoinLivestream_v2.at(2)) ||
-            "",
+         "1 hour": () => data.duration?.toString(),
+         "E.g., Find out, which job benefits await you as a [title of open position/program]":
+            () =>
+               (data.reasonsToJoinLivestream_v2?.length &&
+                  data.reasonsToJoinLivestream_v2.at(0)) ||
+               "",
+         "E.g., Learn what skills from your studies you can apply in this working environment.":
+            () =>
+               (data.reasonsToJoinLivestream_v2?.length > 1 &&
+                  data.reasonsToJoinLivestream_v2.at(1)) ||
+               "",
+         "E.g., Start job application process in-stream and skip first round of interviews.":
+            () =>
+               (data.reasonsToJoinLivestream_v2?.length > 2 &&
+                  data.reasonsToJoinLivestream_v2.at(2)) ||
+               "",
       }
 
-      // fill inputs fields by id
-      for (const [id, value] of Object.entries(matchById)) {
+      // fill inputs with placeholders
+      for (const [id, value] of Object.entries(placeholders)) {
          const val = value() // calculate the value
          if (val) {
             // force because the input might be readonly (date picker)
-            await this.page.locator(id).fill(val, { force: true })
+            await this.page.getByPlaceholder(id).fill(val, { force: true })
          }
       }
 
@@ -214,16 +222,40 @@ export class GroupDashboardPage extends CommonPage {
          "general.contentTopicsTagIds",
          data.contentTopicsTagIds
       )
+
       await this.fillMultiSelectTagCategories(
          "general.businessFunctionsTagIds",
          data.businessFunctionsTagIds
       )
+
+      // if(data.levelOfStudyIds?.length){
+      //    for(const levelOfStudy of data.levelOfStudyIds){
+      //       await this.handleMultiSelect(levelOfStudy, this.page.getByPlaceholder("Select levels of study"), levelId => {
+      //          return {
+      //             name: levelId,
+      //             exact: false
+      //          }
+      //       })
+      //    }
+      // }
+
+      // if(data.fieldOfStudyIds?.length){
+      //    for(const fieldOfStudy of data.fieldOfStudyIds){
+      //       await this.handleMultiSelect(fieldOfStudy, this.page.getByPlaceholder("Select fields of study"), fieldId => {
+      //          return {
+      //             name: fieldId,
+      //             exact: false
+      //          }
+      //       })
+      //    }
+      // }
       await this.fillMultiSelectTargetAudience(
-         "general.targetFieldsOfStudy",
+         "Select fields of study",
          data.fieldOfStudyIds
       )
+
       await this.fillMultiSelectTargetAudience(
-         "general.targetLevelsOfStudy",
+         "Select levels of study",
          data.levelOfStudyIds
       )
 
@@ -305,19 +337,21 @@ export class GroupDashboardPage extends CommonPage {
     * The manipulation is done via deleting fields of the provided data but an improvement can be made for checking if the item is already selected.
     */
    public async fillMultiSelectTargetAudience(
-      dropdownId: string,
-      options: string[]
+      placeholder: string,
+      options: string[],
+      nameMapper?: (string) => string
    ) {
       if (options?.length) {
-         await this.page.locator(`input[id='${dropdownId}']`).click()
+         await this.page.getByPlaceholder(placeholder).click()
 
          await Promise.all(
             options.map((option) => {
-               return this.page.getByRole("option", { name: option }).click()
+               const optionName = nameMapper ? nameMapper(option) : option
+               return this.page
+                  .getByRole("option", { name: optionName })
+                  .click()
             })
          )
-
-         await this.page.locator(`input[id='${dropdownId}']`).click()
       }
    }
 
