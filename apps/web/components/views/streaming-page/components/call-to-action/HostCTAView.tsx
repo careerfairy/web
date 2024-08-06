@@ -4,9 +4,9 @@ import { useLivestreamCTA } from "components/custom-hook/streaming/call-to-actio
 import { Fragment, useState } from "react"
 import { TransitionGroup } from "react-transition-group"
 import { useStreamingContext } from "../../context"
-import { CTACard } from "./CTACard"
-import { CTACardSkeleton } from "./CTACardSkeleton"
+import { CTAHostCardSkeleton } from "./CTACardSkeleton"
 import { CTACreationButton } from "./CTACreationButton"
+import { CTAHostCard } from "./CTAHostCard"
 import { ConfirmDeleteCTADialog } from "./ConfirmDeleteCTADialog"
 import { EmptyCTAView } from "./EmptyCTAView"
 
@@ -51,8 +51,10 @@ const Content = () => {
                {ctaData.map((cta) => (
                   <Collapse key={cta.id}>
                      <Box>
-                        <SuspenseWithBoundary fallback={<CTACardSkeleton />}>
-                           <CTACard
+                        <SuspenseWithBoundary
+                           fallback={<CTAHostCardSkeleton />}
+                        >
+                           <CTAHostCard
                               cta={cta}
                               onClickDelete={handleOpenCTADeleteDialog}
                            />
@@ -74,8 +76,8 @@ const Content = () => {
 const Loader = () => {
    return (
       <Stack spacing={1}>
-         <CTACardSkeleton />
-         <CTACardSkeleton />
+         <CTAHostCardSkeleton />
+         <CTAHostCardSkeleton />
       </Stack>
    )
 }
