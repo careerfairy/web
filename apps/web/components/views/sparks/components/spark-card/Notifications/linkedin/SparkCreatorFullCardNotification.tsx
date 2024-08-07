@@ -10,6 +10,7 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { LinkedIn } from "./LinkedIn"
 import { NoLinkedIn } from "./NoLinkedIn"
+import { useIsTargetedUser } from "./useIsTargetedUser"
 
 type Props = {
    group: PublicGroup
@@ -21,6 +22,7 @@ export const SparkCreatorFullCardNotification = ({ group, creator }: Props) => {
    const dispatch = useDispatch()
    const currentSparkIndex = useSelector(currentSparkIndexSelector)
    const cameFromCompanyPageLink = useSelector(cameFromPageLinkSelector)
+   const isUserFromTargetedCountry = useIsTargetedUser(group)
 
    const handleBack = useCallback(() => {
       router.push(cameFromCompanyPageLink)
@@ -30,7 +32,7 @@ export const SparkCreatorFullCardNotification = ({ group, creator }: Props) => {
       dispatch(swipeToSparkByIndex(currentSparkIndex + 1))
    }, [currentSparkIndex, dispatch])
 
-   return creator?.linkedInUrl ? (
+   return isUserFromTargetedCountry && creator?.linkedInUrl ? (
       <LinkedIn
          group={group}
          creator={creator}
