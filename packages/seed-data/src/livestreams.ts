@@ -54,6 +54,14 @@ interface LivestreamSeed {
    random(overrideFields?: Partial<LivestreamEvent>): LivestreamEvent
 
    /**
+    * Generate a random draft livestream event object, meaning it might not contain some
+    * mandatory fields.
+    *
+    * Does not save to the database, used to fill forms
+    */
+   randomDraft(overrideFields?: Partial<LivestreamEvent>): LivestreamEvent
+
+   /**
     * Make a user as registered/participated to the livestream
     * Updates his userLivestreamData
     */
@@ -374,6 +382,9 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          type: "upcoming",
          universities: [],
          triGrams: livestreamTriGrams(title, company),
+         // TODO-WG: Should not be hard coded
+         contentTopicsTagIds: ["ApplicationProcess"],
+         businessFunctionsTagIds: ["BusinessDevelopment", "Consulting"],
       }
 
       const overrideFieldsCopy = { ...overrideFields }
@@ -393,6 +404,16 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       return {
          ...data,
          ...overrideFieldsCopy,
+      }
+   }
+
+   randomDraft(overrideFields?: Partial<LivestreamEvent>): LivestreamEvent {
+      const randomEvent = this.random(overrideFields)
+      return {
+         ...randomEvent,
+         isDraft: true,
+         contentTopicsTagIds: [],
+         summary: "",
       }
    }
 }

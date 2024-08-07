@@ -1,5 +1,5 @@
-import { firestore } from "./lib/firebase"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { firestore } from "./lib/firebase"
 
 interface FieldsOfStudySeed {
    /**

@@ -1,20 +1,20 @@
-import { Locator, Page } from "@playwright/test"
-import { expect } from "@playwright/test"
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { CommonPage } from "./CommonPage"
 import {
    LivestreamEvent,
    LivestreamJobAssociation,
+   Speaker,
 } from "@careerfairy/shared-lib/livestreams"
-import DateUtil from "../../../util/DateUtil"
-import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
+import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { Locator, Page, expect } from "@playwright/test"
+import DateUtil from "util/DateUtil"
 import { correctCompany, imageLogoPath } from "../../constants"
-import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 import { sleep } from "../utils"
+import { CommonPage } from "./CommonPage"
 import { ATSAdminPage } from "./admin/ATSAdminPage"
 import { FeedbackPage } from "./admin/FeedbackPage"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
@@ -175,47 +175,105 @@ export class GroupDashboardPage extends CommonPage {
          .click()
    }
 
-   public async fillLivestreamForm(data: Partial<LivestreamEvent>) {
-      const matchById = {
-         "#title": () => data.title,
-         "#start": () =>
+   public async fillLivestreamForm(
+      data: Partial<LivestreamEvent>,
+      publish?: boolean
+   ) {
+      const SUMMARY_PLACEHOLDER = `Describe your live stream
+  • [Company] is one of the leading companies in the [industry]. We have [XYZ] employees globally...
+  • We are going to present how a day in the life of our consultants looks like
+  • Agenda: 30 minutes presentation and 30 minutes Q&A`
+
+      const placeholders = {
+         "Insert your live stream title": () => data.title,
+         [SUMMARY_PLACEHOLDER]: () => data.summary,
+         "Insert date": () =>
             data.start
                ? DateUtil.eventStartDate(data.start?.toDate?.())
                : undefined,
-         "input[name=duration]": () => data.duration?.toString(),
-         "#summary": () => data.summary,
-         "#reasonsToJoinLivestream": () => data.reasonsToJoinLivestream,
+         "1 hour": () => data.duration?.toString(),
+         "E.g., Find out, which job benefits await you as a [title of open position/program]":
+            () =>
+               (data.reasonsToJoinLivestream_v2?.length &&
+                  data.reasonsToJoinLivestream_v2.at(0)) ||
+               "",
+         "E.g., Learn what skills from your studies you can apply in this working environment.":
+            () =>
+               (data.reasonsToJoinLivestream_v2?.length > 1 &&
+                  data.reasonsToJoinLivestream_v2.at(1)) ||
+               "",
+         "E.g., Start job application process in-stream and skip first round of interviews.":
+            () =>
+               (data.reasonsToJoinLivestream_v2?.length > 2 &&
+                  data.reasonsToJoinLivestream_v2.at(2)) ||
+               "",
       }
 
-      // fill inputs fields by id
-      for (const [id, value] of Object.entries(matchById)) {
+      // fill inputs with placeholders
+      for (const [placeholder, value] of Object.entries(placeholders)) {
          const val = value() // calculate the value
          if (val) {
             // force because the input might be readonly (date picker)
-            await this.page.locator(id).fill(val, { force: true })
+            await this.page
+               .getByPlaceholder(placeholder)
+               .fill(val, { force: true })
          }
       }
 
+      const tagValueLooker = (tagId) => TagValuesLookup[tagId]
+
+      await this.fillMultiSelect(
+         "Choose at least 1 topic describing the content of the live stream",
+         data.contentTopicsTagIds,
+         tagValueLooker
+      )
+
+      await this.fillMultiSelect(
+         "Choose at least 1 business function presented in this live stream",
+         data.businessFunctionsTagIds,
+         tagValueLooker
+      )
+
+      await this.fillMultiSelect("Select fields of study", data.fieldOfStudyIds)
+
+      await this.fillMultiSelect("Select levels of study", data.levelOfStudyIds)
+
       if (data.speakers) {
-         await this.fillSpeakerDetails(data.speakers)
+         await this.clickNextButton()
+         const isGeneralTabInvalid = await this.page
+            .getByRole("heading", { name: "Required fields missing" })
+            .isVisible()
+         if (isGeneralTabInvalid) {
+            await this.page
+               .getByRole("button", { name: "Skip for now" })
+               .click()
+         }
+         await this.createSpeakers(data.speakers)
       }
 
-      if (data.interestsIds?.length > 0) {
-         await this.selectInterests(data.interestsIds)
-      }
+      await expect(
+         this.page.getByText(`${data.isDraft ? "Draft" : "Changes"} saved`)
+      ).toBeVisible()
 
-      if (data.jobs?.length > 0) {
-         await this.selectJobs(data.jobs)
-      }
-   }
+      if (publish) {
+         const isPublishDisabled = await this.page
+            .getByRole("button", { name: "Publish" })
+            .isDisabled()
 
-   public async selectInterests(interests: string[]) {
-      await this.page
-         .getByPlaceholder("Choose 5 categories that best describe this event")
-         .click()
+         await expect(isPublishDisabled).toBe(false)
 
-      for (const interest of interests) {
-         await this.page.getByTestId(`interestsIds_${interest}_option`).click()
+         if (!isPublishDisabled) {
+            await this.page.getByRole("button", { name: "Publish" }).click()
+
+            const isConfirmPublishVisible = await this.page.getByRole(
+               "heading",
+               { name: "Ready to publish?" }
+            )
+
+            if (isConfirmPublishVisible) {
+               await this.page.getByRole("button", { name: "Publish" }).click()
+            }
+         }
       }
    }
 
@@ -230,60 +288,118 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
-   public async fillSpeakerDetails(speakers: Speaker[]) {
-      if (speakers.length > 1) {
-         // add extra speakers slots
-         let idx = speakers.length - 1
-         while (idx-- > 0) {
-            await this.page
-               .getByRole("button", { name: "Add a Speaker" })
-               .click()
-         }
-      }
+   /**
+    * Fills a multi select, beware if called for the new live stream creation form, if already filled it will deselect the items.
+    * The manipulation is done via deleting fields of the provided data but an improvement can be made for checking if the item is already selected.
+    */
+   public async fillMultiSelectTagCategories(
+      dropdownId: string,
+      tagIds: string[]
+   ) {
+      if (tagIds?.length) {
+         await this.page.locator(`input[id='${dropdownId}']`).click()
 
-      for (let i = 0; i < speakers.length; i++) {
-         const speaker = speakers[i]
-
-         const placeholders = {
-            "Enter the speaker’s first name": () => speaker.firstName,
-            "Enter the speaker’s last name": () => speaker.lastName,
-            "Enter the speaker’s position": () => speaker.position,
-            "Enter the speaker’s academic background": () => speaker.background,
-            "Enter the speaker’s email address": () => speaker.email,
-         }
-
-         // fill speaker fields
-         for (const [placeholder, value] of Object.entries(placeholders)) {
-            const val = value() // calculate the value
-            if (val) {
-               await this.page.getByPlaceholder(placeholder).nth(i).fill(val)
-            }
-         }
-
-         // upload avatar
-         await this.clickAndUploadFiles(
-            this.page.getByRole("button", { name: "Upload Avatar" }).nth(0),
-            imageLogoPath
+         await Promise.all(
+            tagIds.map((tagId) => {
+               return this.page
+                  .getByRole("option", { name: TagValuesLookup[tagId] })
+                  .click()
+            })
          )
+
+         await this.page.locator(`input[id='${dropdownId}']`).click()
       }
    }
 
-   public async clickCreateDraft() {
-      await this.page.getByRole("button", { name: "Create draft" }).click()
+   /**
+    * Fills a multi select, beware if called for the new live stream creation form, if already filled it will deselect the items.
+    * The manipulation is done via deleting fields of the provided data but an improvement can be made for checking if the item is already selected.
+    */
+   public async fillMultiSelect(
+      placeholder: string,
+      options: string[],
+      nameMapper?: (string) => string
+   ) {
+      if (options?.length) {
+         await this.page.getByPlaceholder(placeholder).click()
+
+         await Promise.all(
+            options.map((option) => {
+               const optionName = nameMapper ? nameMapper(option) : option
+               return this.page
+                  .getByRole("option", { name: optionName })
+                  .click()
+            })
+         )
+
+         await this.page.getByLabel("Close").click()
+      }
+   }
+
+   public async clickNextButton() {
+      return await this.page.locator("button[id='general.next']").click()
+   }
+
+   public async createSpeakers(speakers: Speaker[]) {
+      if (speakers?.length) {
+         for (const speaker of speakers) {
+            await this.page.getByLabel("Open").click()
+
+            const existingSpeaker = await this.page
+               .getByLabel("Speakers of this event")
+               .getByText(speaker.email)
+
+            const speakerExists = await existingSpeaker.isVisible()
+
+            if (speakerExists) {
+               await this.page.getByLabel("Close").click()
+               continue
+            }
+
+            await this.page
+               .getByRole("menuitem", { name: "Create a new contributor" })
+               .click()
+
+            const placeholders = {
+               John: () => speaker.firstName,
+               Doe: () => speaker.lastName,
+               "E.g.,: Marketing Manager": () => speaker.position,
+               "LinkedIn link": () => speaker.linkedInUrl,
+               "E.g.,: John@careerfairy.io": () => speaker.email,
+               "Tell talent a little more about your story and professional background!":
+                  () => speaker.background,
+            }
+
+            // fill inputs with placeholders
+            for (const [placeholder, value] of Object.entries(placeholders)) {
+               const val = value() // calculate the value
+               if (val) {
+                  await this.page
+                     .getByPlaceholder(placeholder, { exact: true })
+                     .fill(val)
+               }
+            }
+
+            await this.clickAndUploadFiles(
+               this.page.getByRole("button", {
+                  name: "Upload speaker picture",
+               }),
+               "tests/e2e/assets/creatorAvatar.png"
+            )
+
+            await this.page.getByRole("button", { name: "Create" }).click()
+         }
+      }
    }
 
    public async clickPublish() {
-      await this.page.locator("text=publish as stream").click()
+      await this.page.getByRole("button", { name: "Publish" }).click()
    }
 
    public async clickManageLivestream() {
       await this.page
          .getByRole("button", { name: "Manage your live stream" })
          .click()
-   }
-
-   public async clickUpdate() {
-      await this.page.getByRole("button", { name: "update and close" }).click()
    }
 
    private async goToPage(
