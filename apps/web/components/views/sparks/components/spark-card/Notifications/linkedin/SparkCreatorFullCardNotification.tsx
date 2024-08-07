@@ -1,9 +1,13 @@
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { swipeToSparkByIndex } from "store/reducers/sparksFeedReducer"
-import { currentSparkIndexSelector } from "store/selectors/sparksFeedSelectors"
+import {
+   cameFromPageLinkSelector,
+   currentSparkIndexSelector,
+} from "store/selectors/sparksFeedSelectors"
 import { LinkedIn } from "./LinkedIn"
 import { NoLinkedIn } from "./NoLinkedIn"
 
@@ -13,20 +17,30 @@ type Props = {
 }
 
 export const SparkCreatorFullCardNotification = ({ group, creator }: Props) => {
+   const router = useRouter()
    const dispatch = useDispatch()
    const currentSparkIndex = useSelector(currentSparkIndexSelector)
+   const cameFromCompanyPageLink = useSelector(cameFromPageLinkSelector)
+
+   const handleBack = useCallback(() => {
+      router.push(cameFromCompanyPageLink)
+   }, [cameFromCompanyPageLink, router])
 
    const handleSwipeToNext = useCallback(() => {
       dispatch(swipeToSparkByIndex(currentSparkIndex + 1))
    }, [currentSparkIndex, dispatch])
 
    return creator?.linkedInUrl ? (
-      <LinkedIn creator={creator} handleSwipeToNext={handleSwipeToNext} />
+      <LinkedIn
+         group={group}
+         creator={creator}
+         handleSwipeToNext={handleSwipeToNext}
+      />
    ) : (
       <NoLinkedIn
          group={group}
          creator={creator}
-         handleBack={() => alert("go back")}
+         handleBack={handleBack}
          handleSwipeToNext={handleSwipeToNext}
       />
    )
