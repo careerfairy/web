@@ -26,10 +26,8 @@ interface JobsSeed {
    ): Promise<LivestreamJobAssociation[]>
 
    /**
-    * TODO-WG: Add docs specifying does not create to database
-    * @param groupId
-    * @param livestreamIds
-    * @param overrideFields
+    * Creates a random customJob with the possibility of overriding the customJob fields.
+    * Does not actually created data on the database.
     */
    randomJob(
       groupId: string,
@@ -38,10 +36,8 @@ interface JobsSeed {
    ): Promise<CustomJob>
 
    /**
-    * TODO-WG: Add docs specifying does not create to database
-    * @param groupId
-    * @param livestreamIds
-    * @param overrideFields
+    * Creates multiple random customJob objects, with the possibility of overriding the customJob fields.
+    * Does not actually created data on the database.
     */
    randomJobs(
       groupId: string,
