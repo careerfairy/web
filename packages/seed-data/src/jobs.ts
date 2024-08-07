@@ -2,6 +2,7 @@ import {
    FirebaseCustomJobRepository,
    ICustomJobRepository,
 } from "@careerfairy/shared-lib/dist/customJobs/CustomJobRepository"
+
 import {
    CustomJob,
    JobType,
