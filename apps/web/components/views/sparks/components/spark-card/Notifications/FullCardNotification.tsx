@@ -32,7 +32,12 @@ const FullCardNotification: FC<Props> = ({ spark }) => {
          return <SparkGroupFullCardNotification group={spark.group} />
 
       case SparkCardNotificationTypes.CREATOR:
-         return <SparkCreatorFullCardNotification creator={spark.creator} />
+         return (
+            <SparkCreatorFullCardNotification
+               group={spark.group}
+               creator={spark.creator}
+            />
+         )
    }
 }
 
