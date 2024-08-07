@@ -8,7 +8,7 @@ import { LinkedIn } from "./LinkedIn"
 import { NoLinkedIn } from "./NoLinkedIn"
 
 type Props = {
-   group?: PublicGroup
+   group: PublicGroup
    creator: PublicCreator
 }
 
