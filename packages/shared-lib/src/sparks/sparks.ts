@@ -347,6 +347,12 @@ export type GetFeedData = {
          */
         groupId: string
      }
+   | {
+        /**
+         * If provided, we will only return sparks from this creator
+         */
+        creatorId: string
+     }
 )
 
 export const SparksCategories = {
