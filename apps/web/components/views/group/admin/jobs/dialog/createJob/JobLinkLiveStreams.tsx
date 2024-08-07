@@ -184,6 +184,11 @@ const JobLinkLiveStreams = ({
             <SteppedDialog.Content sx={styles.container}>
                {title}
 
+               <SteppedDialog.Subtitle sx={styles.subtitle}>
+                  Select at least one upcoming live stream to link to this job
+                  so it can be visible to talent.
+               </SteppedDialog.Subtitle>
+
                <Grid
                   container
                   spacing={2}

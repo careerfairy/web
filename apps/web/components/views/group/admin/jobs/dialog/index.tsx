@@ -36,10 +36,7 @@ import PrivacyPolicyDialog from "./additionalSteps/PrivacyPolicyDialog"
 import JobBasicInfo from "./createJob/JobBasicInfo"
 import JobFormPreview from "./createJob/JobFormPreview"
 import JobLinkLiveStreams from "./createJob/JobLinkLiveStreams"
-import {
-   JobLinkLiveStreamsSkeleton,
-   JobLinkSparksSkeleton,
-} from "./createJob/JobLinkSkeleton"
+import JobLinkSkeleton from "./createJob/JobLinkSkeleton"
 import JobLinkSparks from "./createJob/JobLinkSparks"
 import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
@@ -136,7 +133,7 @@ const getViews = ({ quillInputRef, job }: ViewsProps) =>
       {
          key: JobDialogStep.FORM_LINKED_LIVE_STREAMS.key,
          Component: () => (
-            <SuspenseWithBoundary fallback={<JobLinkLiveStreamsSkeleton />}>
+            <SuspenseWithBoundary fallback={<JobLinkSkeleton />}>
                <JobLinkLiveStreams job={job} />
             </SuspenseWithBoundary>
          ),
@@ -144,7 +141,7 @@ const getViews = ({ quillInputRef, job }: ViewsProps) =>
       {
          key: JobDialogStep.FORM_LINKED_SPARKS.key,
          Component: () => (
-            <SuspenseWithBoundary fallback={<JobLinkSparksSkeleton />}>
+            <SuspenseWithBoundary fallback={<JobLinkSkeleton />}>
                <JobLinkSparks />
             </SuspenseWithBoundary>
          ),

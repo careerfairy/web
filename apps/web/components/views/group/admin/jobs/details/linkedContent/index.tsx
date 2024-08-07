@@ -197,6 +197,7 @@ const LinkedContent = ({ job }: Props) => {
             handleClose={() => setLivestreamDialog({ open: false })}
             page={"details"}
             serverUserEmail={group.adminEmail}
+            mode="stand-alone"
          />
       </>
    )
