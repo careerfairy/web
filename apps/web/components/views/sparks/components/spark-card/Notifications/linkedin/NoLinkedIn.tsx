@@ -113,6 +113,7 @@ export const NoLinkedIn = ({
                   src={creator?.avatarUrl}
                   alt={"Mentor's avatar"}
                   size={136}
+                  objectFit="cover"
                />
             </Box>
             <Box sx={styles.header}>
