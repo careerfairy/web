@@ -1,13 +1,69 @@
+import {
+   PublicCreator,
+   pickPublicDataFromCreator,
+} from "@careerfairy/shared-lib/groups/creators"
 import { Box, Typography } from "@mui/material"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { ContentCarousel } from "components/views/mentor-page/ContentCarousel"
+import { useCallback, useEffect, useState } from "react"
 import { useMountedState } from "react-use"
 import { useCompanyPage } from ".."
+import { CreatorFormLayout } from "./CreatorFormLayout"
 import { MentorCard } from "./MentorCard"
+import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
+   const isMobile = useIsMobile()
+
    const { editMode, groupCreators } = useCompanyPage()
+   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
+      useDialogStateHandler()
 
    const isMounted = useMountedState()
+
+   const [mentors, setMentors] = useState<PublicCreator[]>(groupCreators)
+   const [selectedMentor, setSelectedMentor] = useState<PublicCreator | null>(
+      null
+   )
+
+   const handleSubmitCallback = useCallback((values) => {
+      setMentors((prevMentors) => {
+         const index = prevMentors.findIndex(
+            (mentor) => mentor.id === values.id
+         )
+         if (index !== -1) {
+            const updatedMentors = [...prevMentors]
+            const oldMentor = prevMentors[index]
+            const updatedMentor = {
+               ...pickPublicDataFromCreator(values),
+               groupId: oldMentor.groupId,
+            }
+            updatedMentors[index] = updatedMentor
+            return updatedMentors
+         }
+         return [...prevMentors, values]
+      })
+   }, [])
+
+   const handleOpen = useCallback(
+      (creator: PublicCreator) => {
+         setSelectedMentor(creator)
+         handleOpenDialog()
+      },
+      [handleOpenDialog]
+   )
+
+   const handleClose = useCallback(() => {
+      setSelectedMentor(null)
+      handleCloseDialog()
+   }, [handleCloseDialog])
+
+   useEffect(() => {
+      if (editMode) {
+         setMentors(groupCreators)
+      }
+   }, [editMode, groupCreators])
 
    if (!groupCreators?.length) return null
 
@@ -29,14 +85,27 @@ export const MentorsSection = () => {
                width: "calc(100% + 16px)",
             }}
          >
-            {groupCreators.map((creator) => (
-               <MentorCard
-                  key={`mentor-slide-box-${creator.id}`}
-                  creator={creator}
-                  isEditMode={editMode}
-               />
+            {mentors.map((creator) => (
+               <Box key={`mentor-slide-box-${JSON.stringify(creator)}`}>
+                  <MentorCard
+                     creator={creator}
+                     isEditMode={editMode}
+                     handleEdit={() => handleOpen(creator)}
+                  />
+               </Box>
             ))}
          </ContentCarousel>
+         <CreatorFormLayout.Dialog
+            isDialogOpen={isDialogOpen}
+            isMobile={isMobile}
+            handleCloseDialog={handleClose}
+         >
+            <MentorForm
+               mentor={selectedMentor}
+               handleSubmitCallback={handleSubmitCallback}
+               handleClose={handleClose}
+            />
+         </CreatorFormLayout.Dialog>
       </Box>
    )
 }
