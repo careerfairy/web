@@ -4,6 +4,11 @@ import { Box } from "@mui/material"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import { useRouter } from "next/router"
+import { useDispatch } from "react-redux"
+import {
+   setCameFromPageLink,
+   setCreatorId,
+} from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
 import SparkCarouselCard from "../sparks/components/spark-card/SparkCarouselCard"
 import { ContentCarousel } from "./ContentCarousel"
@@ -32,6 +37,7 @@ type SparksCarousel = {
 
 export const SparksCarousel = ({ sparks }: SparksCarousel) => {
    const router = useRouter()
+   const dispatch = useDispatch()
 
    const [emblaRef, emblaApi] = useEmblaCarousel(
       {
@@ -44,10 +50,13 @@ export const SparksCarousel = ({ sparks }: SparksCarousel) => {
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
 
+      dispatch(setCameFromPageLink(router.asPath))
+      dispatch(setCreatorId(spark.creator.id))
+
       return router.push({
-         pathname: `/sparks/${spark.id}?creatorId=${spark.creator.id}`,
+         pathname: `/sparks/${spark.id}`,
          query: {
-            ...router.query, // spread current query params
+            creatorId: spark.creator.id,
             interactionSource: SparkInteractionSources.Mentor_Page,
          },
       })

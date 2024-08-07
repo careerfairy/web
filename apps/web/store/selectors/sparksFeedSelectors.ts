@@ -68,6 +68,9 @@ export const originalSparkIdSelector = (state: RootState) =>
 
 export const groupIdSelector = (state: RootState) => state.sparksFeed.groupId
 
+export const creatorIdSelector = (state: RootState) =>
+   state.sparksFeed.creatorId
+
 export const emptyFilterSelector = (state: RootState) =>
    Boolean(
       state.sparksFeed.sparkCategoryIds.length &&
