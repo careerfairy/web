@@ -1,6 +1,7 @@
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Button, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { sxStyles } from "types/commonTypes"
 import { MoreComing } from "./MoreComing"
@@ -25,9 +26,17 @@ const styles = sxStyles({
       },
    },
    headliner: {
-      width: "auto",
-      height: "auto",
-      marginBottom: "30px",
+      desktop: {
+         width: "auto",
+         height: "auto",
+         marginBottom: "30px",
+      },
+      mobile: {
+         width: "auto",
+         height: "auto",
+         marginBottom: "20px",
+         marginTop: "30px",
+      },
    },
    header: {
       textAlign: "center",
@@ -42,7 +51,10 @@ const styles = sxStyles({
       },
    },
    subtitle: {
-      mt: 3,
+      mt: {
+         xs: 1,
+         md: 3,
+      },
 
       "@media (max-height: 800px)": {
          fontSize: "14px !important",
@@ -101,18 +113,24 @@ export const NoLinkedIn = ({
    handleBack,
    handleSwipeToNext,
 }: Props) => {
+   const isMobile = useIsMobile()
+
    return (
       <>
          <Box sx={styles.backgroundBanner}>
             <NoLinkedInBanner />
          </Box>
          <Box sx={styles.content}>
-            <MoreComing sx={styles.headliner} />
+            <MoreComing
+               sx={
+                  isMobile ? styles.headliner.mobile : styles.headliner.desktop
+               }
+            />
             <Box sx={styles.avatar}>
                <CircularLogo
                   src={creator?.avatarUrl}
                   alt={"Mentor's avatar"}
-                  size={136}
+                  size={isMobile ? 116 : 136}
                   objectFit="cover"
                />
             </Box>
