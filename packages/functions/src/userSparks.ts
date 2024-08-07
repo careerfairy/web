@@ -36,6 +36,7 @@ export const getSparksFeed = functions
          dataValidation({
             userId: string().trim().min(1).optional().nullable(),
             groupId: string().trim().min(1).optional(),
+            creatorId: string().trim().min(1).optional(),
             numberOfSparks: number().min(1).optional(),
             contentTopicIds: array().of(string()).optional(),
          }),
@@ -71,6 +72,17 @@ export const getSparksFeed = functions
                   return {
                      sparks: await sparkRepo.getGroupSparksFeed(
                         data.groupId,
+                        data.contentTopicIds,
+                        data.numberOfSparks
+                     ),
+                     anonymousUserCountryCode,
+                  }
+               }
+
+               if ("creatorId" in data) {
+                  return {
+                     sparks: await sparkRepo.getCreatorSparksFeed(
+                        data.creatorId,
                         data.contentTopicIds,
                         data.numberOfSparks
                      ),
