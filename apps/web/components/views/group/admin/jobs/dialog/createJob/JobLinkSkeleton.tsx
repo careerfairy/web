@@ -41,7 +41,7 @@ const styles = sxStyles({
    },
 })
 
-const JobLinkSparksSkeleton = () => {
+const JobLinkSkeleton = () => {
    return (
       <SteppedDialog.Container withActions>
          <>
@@ -64,27 +64,5 @@ const JobLinkSparksSkeleton = () => {
       </SteppedDialog.Container>
    )
 }
-const JobLinkLiveStreamsSkeleton = () => {
-   return (
-      <SteppedDialog.Container withActions>
-         <>
-            <SteppedDialog.Content sx={styles.container}>
-               <Skeleton variant="text" animation="wave" sx={styles.title} />
 
-               <Skeleton
-                  variant="rounded"
-                  animation="wave"
-                  sx={styles.content}
-               />
-            </SteppedDialog.Content>
-
-            <SteppedDialog.Actions>
-               <Skeleton variant="rounded" animation="wave" sx={styles.btn} />
-               <Skeleton variant="rounded" animation="wave" sx={styles.btn} />
-            </SteppedDialog.Actions>
-         </>
-      </SteppedDialog.Container>
-   )
-}
-
-export { JobLinkLiveStreamsSkeleton, JobLinkSparksSkeleton }
+export default JobLinkSkeleton
