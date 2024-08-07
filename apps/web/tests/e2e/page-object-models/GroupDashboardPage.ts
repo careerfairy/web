@@ -210,11 +210,13 @@ export class GroupDashboardPage extends CommonPage {
       }
 
       // fill inputs with placeholders
-      for (const [id, value] of Object.entries(placeholders)) {
+      for (const [placeholder, value] of Object.entries(placeholders)) {
          const val = value() // calculate the value
          if (val) {
             // force because the input might be readonly (date picker)
-            await this.page.getByPlaceholder(id).fill(val, { force: true })
+            await this.page
+               .getByPlaceholder(placeholder)
+               .fill(val, { force: true })
          }
       }
 
@@ -369,11 +371,11 @@ export class GroupDashboardPage extends CommonPage {
             }
 
             // fill inputs with placeholders
-            for (const [id, value] of Object.entries(placeholders)) {
+            for (const [placeholder, value] of Object.entries(placeholders)) {
                const val = value() // calculate the value
                if (val) {
                   await this.page
-                     .getByPlaceholder(id, { exact: true })
+                     .getByPlaceholder(placeholder, { exact: true })
                      .fill(val)
                }
             }

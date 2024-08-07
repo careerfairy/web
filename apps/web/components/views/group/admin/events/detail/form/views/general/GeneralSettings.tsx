@@ -46,9 +46,6 @@ const GeneralSettings = () => {
             label="Live stream title"
             placeholder="Insert your live stream title"
             requiredText="(required)"
-            inputProps={{
-               id: "general.title",
-            }}
          />
          {isCohostedEvent ? (
             <Stack
@@ -93,7 +90,6 @@ const GeneralSettings = () => {
             requiredText="(required)"
             multiline
             rows={isMobile ? 7 : 5}
-            inputProps={{ id: "general.summary" }}
             placeholder={SUMMARY_PLACEHOLDER}
          />
       </>

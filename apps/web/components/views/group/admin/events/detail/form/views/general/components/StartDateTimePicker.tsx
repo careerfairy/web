@@ -92,7 +92,6 @@ const CustomInputField = (params) => {
          onBlur={async () => {
             await onBlur({ target: { name: fieldName } })
          }}
-         inputProps={{ id: fieldName }}
       />
    )
 }
