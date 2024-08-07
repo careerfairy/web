@@ -28,7 +28,7 @@ import { IconButton } from "@mui/material"
 import useVerticalMouseScrollNavigation from "components/custom-hook/embla-carousel/useVerticalMouseScrollNavigation"
 import {
    activeSparkSelector,
-   cameFromCompanyPageLinkSelector,
+   cameFromPageLinkSelector,
    currentSparkIndexSelector,
    emptyFilterSelector,
    eventDetailsDialogVisibilitySelector,
@@ -384,7 +384,7 @@ const EmptyFeedSlide: FC<SlideProps> = ({ fullScreen }) => {
 }
 
 const BackToCompanyPageButton: FC = () => {
-   const cameFromCompanyPageLink = useSelector(cameFromCompanyPageLinkSelector)
+   const cameFromCompanyPageLink = useSelector(cameFromPageLinkSelector)
 
    const isFullScreen = useSparksFeedIsFullScreen()
 
