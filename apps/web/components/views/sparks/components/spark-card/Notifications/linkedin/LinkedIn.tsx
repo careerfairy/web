@@ -127,7 +127,7 @@ const LinkedInButton = ({ mentorLinkedInUrl }: LinkedInButtonProps) => {
 }
 
 type Props = {
-   group?: PublicGroup
+   group: PublicGroup
    creator: PublicCreator
    handleSwipeToNext: () => void
 }
