@@ -4,6 +4,7 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import EventPreviewCard from "../common/stream-cards/EventPreviewCard"
 import { ContentCarousel } from "./ContentCarousel"
 
@@ -17,10 +18,8 @@ const styles = sxStyles({
       margin: "-16px",
       width: "calc(100% + 16px)",
    },
-   carouselContainer: {
-      width: "100%",
-      gap: "12px",
-      overflow: "visible !important",
+   mobileCarouselContainer: {
+      gap: "32px !important",
    },
    cardWrapper: {
       width: CARD_WIDTH,
@@ -38,11 +37,14 @@ type LivestreamsCarouselProps = {
 export const LivestreamsCarousel = ({
    livestreams,
 }: LivestreamsCarouselProps) => {
+   const isMobile = useIsMobile()
+
    return (
       <ContentCarousel
          headerTitle="Live streams"
          slideWidth={CARD_WIDTH}
          viewportSx={styles.viewport}
+         containerSx={isMobile ? styles.mobileCarouselContainer : null}
       >
          {livestreams.map((livestream, index) => (
             <Box
