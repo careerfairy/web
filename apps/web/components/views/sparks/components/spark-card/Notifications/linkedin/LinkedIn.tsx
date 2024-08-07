@@ -1,6 +1,7 @@
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Button, Stack, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { LinkedInIcon } from "components/views/common/icons/LinkedInIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { sxStyles } from "types/commonTypes"
@@ -26,13 +27,24 @@ const styles = sxStyles({
       },
    },
    headliner: {
-      width: "100%",
-      height: "auto",
-      marginBottom: "30px",
+      desktop: {
+         width: "100%",
+         height: "auto",
+         marginBottom: "30px",
+      },
+      mobile: {
+         width: "100%",
+         height: "auto",
+         marginBottom: "20px",
+         marginTop: "30px",
+      },
    },
    header: {
       textAlign: "center",
-      mt: 4,
+      mt: {
+         xs: 3,
+         md: 4,
+      },
    },
    title: {
       fontWeight: "bold",
@@ -43,7 +55,10 @@ const styles = sxStyles({
       },
    },
    subtitle: {
-      mt: 3,
+      mt: {
+         xs: 1,
+         md: 3,
+      },
 
       "@media (max-height: 800px)": {
          fontSize: "14px !important",
@@ -52,7 +67,10 @@ const styles = sxStyles({
    actions: {
       display: "flex",
       flexDirection: "column",
-      mt: 6,
+      mt: {
+         xs: 4,
+         md: 6,
+      },
       alignItems: "center",
    },
    backBtn: {
@@ -133,18 +151,25 @@ type Props = {
 }
 
 export const LinkedIn = ({ group, creator, handleSwipeToNext }: Props) => {
+   const isMobile = useIsMobile()
+
    return (
       <>
          <Box sx={styles.backgroundBanner}>
             <AskYourQuestionsBackground />
          </Box>
          <Box sx={styles.content}>
-            <AskYourQuestions sx={styles.headliner} />
+            <AskYourQuestions
+               sx={
+                  isMobile ? styles.headliner.mobile : styles.headliner.desktop
+               }
+            />
             <Box sx={styles.avatar}>
                <CircularLogo
                   src={creator?.avatarUrl}
                   alt={"Mentor's avatar"}
-                  size={136}
+                  size={isMobile ? 116 : 136}
+                  objectFit="cover"
                />
                <Box sx={styles.linkedInContainer}>
                   <Box sx={styles.linkedInWrapper}>
