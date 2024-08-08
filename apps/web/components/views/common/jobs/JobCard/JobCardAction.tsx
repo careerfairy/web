@@ -18,6 +18,11 @@ const styles = sxStyles({
       fontSize: 12,
       padding: 0,
    },
+   mobileBtnWrapper: {
+      display: "flex",
+      justifyContent: "end",
+      alignItems: "center",
+   },
 })
 
 type Props = {
@@ -66,13 +71,7 @@ export const JobButtonAction = ({ published, smallCard = false }) => {
    return isMobile ? (
       button
    ) : (
-      <Grid
-         item
-         xs={1}
-         md={3}
-         lg={2.5}
-         sx={{ display: "flex", justifyContent: "end", alignItems: "center" }}
-      >
+      <Grid item xs={1} md={3} lg={2.5} sx={styles.mobileBtnWrapper}>
          {button}
       </Grid>
    )

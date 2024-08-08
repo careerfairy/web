@@ -14,15 +14,16 @@ const styles = sxStyles({
    jobState: {
       display: "flex",
       borderRadius: "16px 0 0 16px",
-      p: 0.5,
+      width: "8px",
    },
    listItemContainer: {
       display: "flex",
       flexDirection: "row",
       width: "100%",
-      borderRadius: "16px",
+      borderRadius: "12px 16px 16px 12px",
       background: "white",
       border: "1px solid #ECECEC",
+      borderLeft: "none",
    },
    itemWrapper: {
       display: "flex",
@@ -30,32 +31,20 @@ const styles = sxStyles({
       width: "100%",
       maxWidth: "calc(100% - 8px)",
       p: { md: 2 },
+      alignItems: { md: "center" },
    },
    infoWrapper: {
       p: { xs: 2, md: 0 },
    },
-   jobCard: (theme) => ({
+   jobCard: {
       display: "flex",
-      alignItems: "center",
-      alignSelf: "stretch",
-      borderRadius: 2,
-      border: `1px solid ${theme.brand.white[500]}`,
-      background: theme.brand.white[100],
-      overflow: "hidden",
       width: "100%",
       textAlign: "left",
-      font: "inherit",
-
-      "&:hover": {
-         background: theme.brand.white[300],
-      },
-   }),
+   },
    statsWrapper: {
       display: "flex",
       alignItems: "center",
       justifyContent: "end",
-      px: { xs: 1.5, md: 0 },
-      pb: { xs: 1.5, md: 0 },
    },
 })
 
