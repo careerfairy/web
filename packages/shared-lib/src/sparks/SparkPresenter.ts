@@ -105,7 +105,7 @@ export class SparkPresenter implements SparkPresenterInterface {
          src: this.video.url,
          height: 640 * 3,
          width: 360 * 3,
-         quality: 60,
+         quality: 40,
          maxSizeCrop: true,
       })
    }

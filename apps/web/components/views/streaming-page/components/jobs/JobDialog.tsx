@@ -149,7 +149,13 @@ const JobDialog = ({ job, handleDialogClose, livestreamId, open }: Props) => {
    }
 
    return (
-      <Dialog open={open} onClose={handleDialogClose} maxWidth={"md"} fullWidth>
+      <Dialog
+         open={open}
+         onClose={handleDialogClose}
+         maxWidth={"md"}
+         fullWidth
+         disableEnforceFocus
+      >
          <DialogTitle sx={styles.dialogTitle}>
             <Box sx={styles.title}>
                <IconButton
@@ -207,6 +213,7 @@ const MobileDrawer = ({
             sx: styles.drawer,
          }}
          onOpen={() => {}}
+         disableEnforceFocus
       >
          <Box sx={styles.dialogTitleMobile}>
             <IconButton

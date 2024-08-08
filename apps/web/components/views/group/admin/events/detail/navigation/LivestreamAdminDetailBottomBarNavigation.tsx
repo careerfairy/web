@@ -115,6 +115,7 @@ const LivestreamAdminDetailBottomBarNavigation = () => {
                   isMobile && styles.navigationButtonMobile,
                   isNextButtonDisabled && styles.navigationButtonDisabled,
                ]}
+               id="general.next"
                disabled={isNextButtonDisabled}
                onClick={navNextTab}
                endIcon={Boolean(isDesktop) && <ChevronRight />}

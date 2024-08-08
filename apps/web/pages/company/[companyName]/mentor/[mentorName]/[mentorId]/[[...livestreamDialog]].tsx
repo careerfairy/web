@@ -99,10 +99,12 @@ export const getStaticProps: GetStaticProps<{
                mentorId as string
             )
 
-            const sparks = await sparkService.getCreatorSparks(
-               mentorId as string,
-               serverSideGroup?.groupId
-            )
+            const sparks = serverSideGroup.publicSparks
+               ? await sparkService.getCreatorSparks(
+                    mentorId as string,
+                    serverSideGroup?.groupId
+                 )
+               : []
 
             const creatorLivestreams = {
                upcoming: serverSideUpcomingLivestreams?.filter((livestream) => {

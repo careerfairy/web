@@ -1,9 +1,9 @@
 import {
    Box,
    BoxProps,
-   Container as MuiContainer,
    Dialog,
    IconButton,
+   Container as MuiContainer,
    Stack,
    StackProps,
    Theme,
@@ -14,13 +14,17 @@ import {
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import SwipeableViews from "react-swipeable-views"
 
+import CloseIcon from "@mui/icons-material/CloseRounded"
+import { LoadingButton, LoadingButtonProps } from "@mui/lab"
+import { SxProps } from "@mui/material/styles"
+import { TransitionProps } from "@mui/material/transitions"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { AnimatedTabPanel } from "materialUI/GlobalPanels/GlobalPanels"
 import {
    ComponentType,
-   createContext,
    FC,
    JSXElementConstructor,
+   createContext,
    useCallback,
    useContext,
    useEffect,
@@ -29,10 +33,6 @@ import {
 } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
-import CloseIcon from "@mui/icons-material/CloseRounded"
-import { LoadingButton, LoadingButtonProps } from "@mui/lab"
-import { SxProps } from "@mui/material/styles"
-import { TransitionProps } from "@mui/material/transitions"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -49,7 +49,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       maxHeight: "none",
-      maxWidth: 770,
+      maxWidth: { md: 770 },
       overflowY: "auto",
    },
    content: {
@@ -89,9 +89,14 @@ const styles = sxStyles({
       py: `${mobileTopPadding}px`,
       px: { xs: 3, md: 6 },
       position: "relative",
-      height: {
-         xs: "90dvh",
-         [mobileBreakpoint]: "clamp(0px, calc(100dvh - 50px), 778px)",
+      height: "auto",
+
+      "@media (max-height: 850px)": {
+         maxHeight: "90dvh",
+      },
+
+      "@media (min-height: 850px)": {
+         maxHeight: { xs: "90dvh", md: "800px" },
       },
    },
    container: {
@@ -170,6 +175,7 @@ type StepperDialogProps = {
    sx?: SxProps<Theme>
    disableFullScreen?: boolean
    maxWidth?: number
+   fullWidth?: boolean
 }
 
 /**
@@ -241,6 +247,7 @@ const SteppedDialog = <K extends string>({
    sx,
    disableFullScreen,
    maxWidth,
+   fullWidth = true,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -307,7 +314,7 @@ const SteppedDialog = <K extends string>({
                : SlideUpTransition
          }
          maxWidth="md"
-         fullWidth
+         fullWidth={fullWidth}
          fullScreen={isMobile ? !disableFullScreen : null}
          closeAfterTransition={true}
          PaperProps={{
@@ -370,6 +377,7 @@ type SteppedDialogContainerProps = BoxProps & {
    hideCloseButton?: boolean
    withActions?: boolean
    containerSx?: SxProps<Theme>
+   actionsContainerSx?: SxProps<Theme>
    handleCloseIconClick?: () => void
 }
 
@@ -381,6 +389,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
    containerSx,
    withActions,
    handleCloseIconClick,
+   actionsContainerSx,
 }) => {
    const stepper = useStepper()
 
@@ -411,7 +420,11 @@ const Container: FC<SteppedDialogContainerProps> = ({
                </Box>
             )}
          </MuiContainer>
-         {withActions ? <Box sx={styles.actionsContainer} /> : null}
+         {withActions ? (
+            <Box
+               sx={combineStyles(styles.actionsContainer, actionsContainerSx)}
+            />
+         ) : null}
       </Box>
    )
 }
@@ -449,15 +462,13 @@ const ActionsOffset: FC<BoxProps> = ({ height = actionsHeight }) => {
 
 const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
    return (
-      <span>
-         <LoadingButton
-            sx={combineStyles(sx, styles.button)}
-            color="secondary"
-            {...props}
-         >
-            {children}
-         </LoadingButton>
-      </span>
+      <LoadingButton
+         sx={combineStyles(sx, styles.button)}
+         color="secondary"
+         {...props}
+      >
+         {children}
+      </LoadingButton>
    )
 }
 

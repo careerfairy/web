@@ -77,6 +77,7 @@ export const SidePanel = () => {
             onClose={handleToggle}
             open={isOpen}
             anchor="bottom"
+            disableEnforceFocus
             PaperProps={{
                sx: [styles.paper, isMaxHeight && styles.paperMaxHeight],
             }}

@@ -1,5 +1,9 @@
 import { isDefinedAndEqual } from "../utils"
-import { LivestreamQuestion, LivestreamQuestionComment } from "./livestreams"
+import {
+   LivestreamEvent,
+   LivestreamQuestion,
+   LivestreamQuestionComment,
+} from "./livestreams"
 
 /**
  * Backwards compatibility for checking if a user has upvoted a question
@@ -66,4 +70,8 @@ export const checkIsQuestionCommentAuthor = (
       isDefinedAndEqual(comment.userUid, identifiers.uid) ||
       isDefinedAndEqual(comment.agoraUserId, identifiers.agoraUid)
    )
+}
+
+export const sortByDateAscending = (a: LivestreamEvent, b: LivestreamEvent) => {
+   return a.start.toMillis() - b.start.toMillis()
 }

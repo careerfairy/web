@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react"
+import { ReactNode, useEffect, useRef } from "react"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import {
    groupRepo,
@@ -36,6 +36,15 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
    const { completeRegistrationProcess, registrationStatus } =
       useRegistrationHandler()
 
+   const completeRegistrationProcessRef = useRef(completeRegistrationProcess)
+
+   const livestreamRef = useRef(livestream)
+
+   useEffect(() => {
+      completeRegistrationProcessRef.current = completeRegistrationProcess
+      livestreamRef.current = livestream
+   }, [completeRegistrationProcess, livestream])
+
    // check if user has answered all questions / given consent
    useEffect(() => {
       const promises = []
@@ -50,7 +59,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
          // pre-load the user's existing answers
          groupRepo.mapUserAnswersToLivestreamGroupQuestions(
             userData,
-            livestream
+            livestreamRef.current
          )
       )
 
@@ -72,13 +81,14 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
                switch (registrationStatus()) {
                   case "can_register":
                      // we have enough information to complete the registration
-                     completeRegistrationProcess(
-                        userData,
-                        authenticatedUser,
-                        livestream,
-                        groupsWithPolicies,
-                        answers
-                     )
+                     completeRegistrationProcessRef
+                        .current(
+                           userData,
+                           authenticatedUser,
+                           livestreamRef.current,
+                           groupsWithPolicies,
+                           answers
+                        )
                         .then(() => {
                            if (onRegisterSuccess) {
                               onRegisterSuccess()
@@ -115,11 +125,9 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
       authenticatedUser,
       authenticatedUser.email,
       checkIfUserAgreedToGroupPolicy,
-      completeRegistrationProcess,
       errorNotification,
       goToView,
       groups,
-      livestream,
       registrationDispatch,
       userData,
       registrationStatus,
