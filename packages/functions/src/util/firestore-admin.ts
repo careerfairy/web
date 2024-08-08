@@ -1,4 +1,5 @@
-import { FirestoreDataConverter, Query } from "firebase-admin/firestore"
+import { Query } from "firebase-admin/firestore"
+import { FirestoreDataConverter } from "firebase/firestore"
 
 export const createGenericConverter = <T>(): FirestoreDataConverter<T> => ({
    toFirestore: (modelObject: T) => modelObject,
