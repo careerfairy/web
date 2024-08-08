@@ -120,6 +120,9 @@ const styles = sxStyles({
       padding: "0px 16px",
       flexDirection: "column",
    },
+   dialogContentWrapper: {
+      my: { xs: 2, md: 0 },
+   },
 })
 
 type Props = {
@@ -268,7 +271,7 @@ const JobDialogContent = ({
    }
 
    return (
-      <Stack spacing={3} marginTop={isMobile ? 1 : 0}>
+      <Stack spacing={3} sx={styles.dialogContentWrapper}>
          <Stack sx={styles.header}>
             <Stack direction="row" spacing={1}>
                <CircularLogo
@@ -294,13 +297,6 @@ const JobDialogContent = ({
                         </Typography>
                      </Box>
                   ) : null}
-                  {/* TODO: Add job business function */}
-                  {/* <Box sx={styles.jobIconWrapper}>
-                        <Box component={Zap} size={12} />
-                        <Typography variant="small">
-                           Business Function
-                        </Typography>
-                     </Box> */}
                </Box>
             </Stack>
          </Stack>
@@ -351,6 +347,7 @@ const JobDialogActions = ({
          setIsSendingEmail(false)
       }
    }
+
    return (
       <Stack
          direction={
