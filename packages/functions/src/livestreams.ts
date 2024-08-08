@@ -226,7 +226,11 @@ export const notifySlackWhenALivestreamStarts = functions
 export const notifySlackWhenALivestreamIsCreated = onDocumentCreated(
    "livestreams/{livestreamId}",
    async (event) => {
-      const livestream = event.data?.data()
+      const livestream = {
+         ...event.data.data(),
+         id: event.params.livestreamId,
+      } as LivestreamEvent
+
       if (!livestream) {
          logger.warn("No data associated with the event")
          return
