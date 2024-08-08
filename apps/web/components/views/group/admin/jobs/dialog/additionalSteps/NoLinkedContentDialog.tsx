@@ -1,5 +1,5 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Stack } from "@mui/material"
+import { Stack, useTheme } from "@mui/material"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import SteppedDialog, {
@@ -46,7 +46,8 @@ const styles = sxStyles({
    },
 })
 
-const NoLinkContentDialog = () => {
+const NoLinkedContentDialog = () => {
+   const theme = useTheme()
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
@@ -77,7 +78,10 @@ const NoLinkContentDialog = () => {
          <>
             <SteppedDialog.Content sx={styles.container}>
                <Stack spacing={2} sx={styles.info}>
-                  <AlertTriangle color={"#856DEE"} size={48} />
+                  <AlertTriangle
+                     color={theme.palette.secondary[500]}
+                     size={48}
+                  />
 
                   <SteppedDialog.Title sx={styles.title}>
                      Make your job visible!
@@ -118,4 +122,4 @@ const NoLinkContentDialog = () => {
    )
 }
 
-export default NoLinkContentDialog
+export default NoLinkedContentDialog

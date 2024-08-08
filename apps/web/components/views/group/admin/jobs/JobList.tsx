@@ -12,7 +12,6 @@ import {
    Typography,
 } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import { FC, useCallback, useMemo } from "react"
 import { AlertCircle, CheckCircle, User } from "react-feather"
@@ -183,7 +182,6 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
    const { group } = useGroupFromState()
-   const { jobHubV1 } = useFeatureFlags()
 
    const handleJobClick = useCallback(
       (jobId: string) => {
@@ -229,14 +227,13 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                >
                   <Grid key={job.id} container>
                      <Box sx={styles.listItemContainer}>
-                        {jobHubV1 ? (
-                           <Box
-                              sx={[
-                                 styles.jobState,
-                                 { background: getStateColor(job) },
-                              ]}
-                           />
-                        ) : null}
+                        <Box
+                           sx={[
+                              styles.jobState,
+                              { background: getStateColor(job) },
+                           ]}
+                        />
+
                         <Box sx={styles.itemWrapper}>
                            <Grid
                               item
@@ -254,8 +251,7 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                                        {job.title}
                                     </Typography>
 
-                                    {jobHubV1 &&
-                                    isValidButNoLinkedContent(job) ? (
+                                    {isValidButNoLinkedContent(job) ? (
                                        <Box sx={styles.warningContainer}>
                                           <Tooltip
                                              title={
@@ -302,13 +298,15 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                                     />
                                  }
                               >
-                                 <Typography
-                                    variant={"subtitle1"}
-                                    sx={styles.subtitle}
-                                    minWidth={"90px"}
-                                 >
-                                    {job.jobType}
-                                 </Typography>
+                                 {job.jobType ? (
+                                    <Typography
+                                       variant={"subtitle1"}
+                                       sx={styles.subtitle}
+                                       minWidth={"90px"}
+                                    >
+                                       {job.jobType}
+                                    </Typography>
+                                 ) : null}
 
                                  <Typography
                                     variant={"subtitle1"}

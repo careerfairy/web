@@ -3,6 +3,7 @@ import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/u
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import CardTopCheckBox from "components/views/common/CardTopCheckBox"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import SteppedDialog, {
    useStepper,
@@ -11,6 +12,7 @@ import { useCallback, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { JobDialogStep } from ".."
+import { useCustomJobForm } from "../CustomJobFormProvider"
 
 const styles = sxStyles({
    container: {
@@ -43,13 +45,25 @@ const styles = sxStyles({
       mx: { xs: 4, md: "unset" },
    },
    actions: {
-      zIndex: 99,
+      zIndex: (theme) => theme.zIndex.tooltip,
    },
 })
 
 const FIELD_NAME = "sparkIds"
 
-const JobLinkSparks = () => {
+type Props = {
+   handlePrimaryButton?: () => void
+   handleSecondaryButton?: () => void
+   primaryButtonMessage?: string
+   secondaryButtonMessage?: string
+}
+
+const JobLinkSparks = ({
+   handlePrimaryButton,
+   handleSecondaryButton,
+   primaryButtonMessage,
+   secondaryButtonMessage,
+}: Props) => {
    const { moveToPrev, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const { data: publishedSparks } = useGroupSparks(group.groupId, {
@@ -59,18 +73,18 @@ const JobLinkSparks = () => {
       group.groupId
    )
    const isMobile = useIsMobile()
+   const { isSubmitting } = useCustomJobForm()
 
-   const {
-      formState: { isSubmitting },
-      watch,
-      setValue,
-      getValues,
-   } = useFormContext()
+   const { watch, setValue, getValues } = useFormContext()
 
    const sparkIds = watch(FIELD_NAME)
 
    const handleCardClick = useCallback(
       (sparkId: string) => {
+         if (isSubmitting) {
+            return
+         }
+
          if (sparkIds.includes(sparkId)) {
             setValue(
                FIELD_NAME,
@@ -80,23 +94,40 @@ const JobLinkSparks = () => {
             setValue(FIELD_NAME, [...sparkIds, sparkId])
          }
       },
-      [sparkIds, setValue]
+      [isSubmitting, sparkIds, setValue]
    )
 
-   const handlePrevClick = useCallback(() => {
+   const handleSecondaryClick = useCallback(() => {
       const selectedLivestreams = getValues("livestreamIds")
 
       // If there are no upcoming livestreams and no livestreams are selected, navigate to the FORM_ADDITIONAL_DETAILS step
       if (!groupHasUpcomingLivestreams && selectedLivestreams.length === 0) {
-         goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
+         if (handleSecondaryButton) {
+            handleSecondaryButton()
+         } else {
+            goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
+         }
+      } else if (handleSecondaryButton) {
+         handleSecondaryButton()
       }
       // Otherwise, move to the previous step
       else {
          moveToPrev()
       }
-   }, [getValues, goToStep, groupHasUpcomingLivestreams, moveToPrev])
+   }, [
+      getValues,
+      goToStep,
+      groupHasUpcomingLivestreams,
+      handleSecondaryButton,
+      moveToPrev,
+   ])
 
-   const handleNextClick = useCallback(() => {
+   const handlePrimaryClick = useCallback(() => {
+      if (handlePrimaryButton) {
+         handlePrimaryButton()
+         return
+      }
+
       const [selectedLivestreams, selectedSparks] = getValues([
          "livestreamIds",
          FIELD_NAME,
@@ -110,7 +141,7 @@ const JobLinkSparks = () => {
       else {
          goToStep(JobDialogStep.NO_LINKED_CONTENT.key)
       }
-   }, [getValues, goToStep])
+   }, [getValues, goToStep, handlePrimaryButton])
 
    const adaptGrid = publishedSparks?.length > 2 && !isMobile
 
@@ -135,6 +166,13 @@ const JobLinkSparks = () => {
          </SteppedDialog.Title>
       )
    }, [getValues])
+
+   const selectInput = useCallback(
+      (sparkId: string) => (
+         <CardTopCheckBox id={sparkId} selected={sparkIds.includes(sparkId)} />
+      ),
+      [sparkIds]
+   )
 
    return (
       <SteppedDialog.Container containerSx={styles.content} withActions>
@@ -163,7 +201,7 @@ const JobLinkSparks = () => {
                         <SparkCarouselCard
                            spark={spark}
                            onClick={() => handleCardClick(spark.id)}
-                           isSelectable
+                           selectInput={selectInput(spark.id)}
                            selected={sparkIds.includes(spark.id)}
                            disableAutoPlay
                         />
@@ -176,20 +214,18 @@ const JobLinkSparks = () => {
                <SteppedDialog.Button
                   variant="outlined"
                   color="grey"
-                  onClick={handlePrevClick}
+                  onClick={handleSecondaryClick}
                   sx={styles.cancelBtn}
                >
-                  Back
+                  {secondaryButtonMessage || "Back"}
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
-                  onClick={handleNextClick}
+                  onClick={handlePrimaryClick}
                   variant="contained"
                   color="secondary"
-                  loading={isSubmitting}
-                  disabled={isSubmitting}
                >
-                  Next
+                  {primaryButtonMessage || "Next"}
                </SteppedDialog.Button>
             </SteppedDialog.Actions>
          </>

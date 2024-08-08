@@ -146,6 +146,7 @@ export class FirebaseCustomJobRepository
       linkedLivestreamId: string
    ): Promise<CustomJob> {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc()
+      const now = this.fieldValue.serverTimestamp() as Timestamp
 
       const isPublished = Boolean(
          job.livestreams.length || job.sparks.length || linkedLivestreamId
@@ -154,8 +155,8 @@ export class FirebaseCustomJobRepository
       const newJob: CustomJob = {
          documentType: this.COLLECTION_NAME,
          ...job,
-         createdAt: this.fieldValue.serverTimestamp() as Timestamp,
-         updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
+         createdAt: now,
+         updatedAt: now,
          livestreams: linkedLivestreamId
             ? [linkedLivestreamId]
             : job.livestreams,
@@ -170,14 +171,16 @@ export class FirebaseCustomJobRepository
 
    async updateCustomJob(job: Partial<CustomJob>): Promise<void> {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc(job.id)
+      const now = this.fieldValue.serverTimestamp() as Timestamp
 
-      const isJobPublished =
+      const hasContent =
          !job?.deleted && (job.livestreams.length > 0 || job.sparks.length > 0)
+      const expired = now < job.deadline
 
       const updatedJob: Partial<CustomJob> = {
          ...job,
-         updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
-         published: isJobPublished,
+         updatedAt: now,
+         published: !expired && hasContent,
       }
 
       await ref.update(updatedJob)

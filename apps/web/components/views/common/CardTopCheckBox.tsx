@@ -33,9 +33,10 @@ const checkedIcon = (
 
 const CardTopCheckBox = ({ id, selected, handleClick }: Props) => {
    return (
-      <Box sx={styles.cardSelectInput}>
+      <Box key={id} sx={styles.cardSelectInput}>
          <Checkbox
-            key={id}
+            id={id}
+            name={id}
             icon={icon}
             checkedIcon={checkedIcon}
             checked={selected}

@@ -1,8 +1,9 @@
-import { Stack } from "@mui/material"
+import { Stack, useTheme } from "@mui/material"
+import { useCallback } from "react"
 import { AlertCircle } from "react-feather"
-import { useFormContext } from "react-hook-form"
+import { JobDialogStep } from ".."
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import SteppedDialog from "../../../../../stepped-dialog/SteppedDialog"
+import SteppedDialog, { useStepper } from "../../../../../stepped-dialog/SteppedDialog"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -39,10 +40,13 @@ const styles = sxStyles({
    },
 })
 
-const NoLinkedContentDialog = () => {
-   const {
-      formState: { isSubmitting },
-   } = useFormContext()
+const NoContentAvailableDialog = () => {
+   const theme = useTheme()
+   const { goToStep } = useStepper()
+
+   const handleClick = useCallback(() => {
+      goToStep(JobDialogStep.FORM_PREVIEW.key)
+   }, [goToStep])
 
    return (
       <SteppedDialog.Container
@@ -53,7 +57,7 @@ const NoLinkedContentDialog = () => {
          <>
             <SteppedDialog.Content sx={styles.container}>
                <Stack spacing={3} sx={styles.info}>
-                  <AlertCircle color={"#FE9B0E"} size={48} />
+                  <AlertCircle color={theme.palette.warning.main} size={48} />
 
                   <SteppedDialog.Title sx={styles.title}>
                      No content to link available
@@ -78,13 +82,10 @@ const NoLinkedContentDialog = () => {
                   </SteppedDialog.Subtitle>
 
                   <SteppedDialog.Button
-                     type={"submit"}
-                     form="custom-job-form"
                      variant="contained"
                      color={"warning"}
-                     loading={isSubmitting}
-                     disabled={isSubmitting}
                      sx={styles.btn}
+                     onClick={handleClick}
                   >
                      Understood
                   </SteppedDialog.Button>
@@ -95,4 +96,4 @@ const NoLinkedContentDialog = () => {
    )
 }
 
-export default NoLinkedContentDialog
+export default NoContentAvailableDialog

@@ -18,6 +18,7 @@ import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { JobDialogStep } from ".."
+import { useCustomJobForm } from "../CustomJobFormProvider"
 import { additionalInfoSchema } from "./schemas"
 
 const styles = sxStyles({
@@ -69,7 +70,7 @@ const styles = sxStyles({
       },
    },
    dateWrapper: {
-      zIndex: 99,
+      zIndex: (theme) => theme.zIndex.tooltip,
       mt: "unset",
    },
 })
@@ -87,12 +88,9 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
       group.groupId
    )
 
-   const {
-      formState: { isSubmitting },
-      watch,
-      setValue,
-      getValues,
-   } = useFormContext()
+   const { watch, setValue, getValues } = useFormContext()
+
+   const { isSubmitting } = useCustomJobForm()
 
    const watchedFields = watch([
       "basicInfo.title",
@@ -229,6 +227,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                                        ),
                                        disableUnderline: true,
                                        readOnly: true,
+                                       disabled: isSubmitting,
                                     }}
                                  />
                               }
@@ -267,8 +266,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                   onClick={handleNext}
                   variant="contained"
                   color="secondary"
-                  loading={isSubmitting}
-                  disabled={isSubmitting || !stepIsValid}
+                  disabled={!stepIsValid}
                >
                   Next
                </SteppedDialog.Button>

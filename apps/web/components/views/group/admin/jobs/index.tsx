@@ -1,5 +1,5 @@
 import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { useMemo } from "react"
 import useGroupCustomJobsStats from "../../../../custom-hook/custom-job/useGroupCustomJobsStats"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 import EmptyJobsView from "../../../admin/jobs/empty-jobs-view/EmptyJobsView"
@@ -8,11 +8,13 @@ import JobList from "./JobList"
 const JobsContent = () => {
    const { group } = useGroupFromState()
    const allJobsWithStats = useGroupCustomJobsStats(group.groupId)
-   const { jobHubV1 } = useFeatureFlags()
 
-   const sortedJobs = jobHubV1 ? sortJobs(allJobsWithStats) : allJobsWithStats
+   const sortedJobs = useMemo(
+      () => sortJobs(allJobsWithStats),
+      [allJobsWithStats]
+   )
 
-   return allJobsWithStats.length > 0 ? (
+   return sortedJobs.length > 0 ? (
       <JobList jobsWithStats={sortedJobs} />
    ) : (
       <EmptyJobsView />

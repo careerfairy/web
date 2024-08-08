@@ -9,7 +9,15 @@ import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { customJobRepo } from "data/RepositoryInstances"
 import { Timestamp } from "firebase/firestore"
-import { MutableRefObject, ReactNode, useCallback } from "react"
+import {
+   createContext,
+   MutableRefObject,
+   ReactNode,
+   useCallback,
+   useContext,
+   useMemo,
+   useState,
+} from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "store/selectors/adminJobsSelectors"
@@ -30,7 +38,20 @@ type Props = {
    afterUpdateCustomJob?: (job: CustomJob) => void
 }
 
-const getInitialValues = (job: CustomJob, groupId: string): JobFormValues => {
+type CustomJobFormContextType = {
+   handleSubmit: (values: JobFormValues) => Promise<void>
+   isSubmitting: boolean
+}
+
+const CustomJobFormContext = createContext<CustomJobFormContextType>({
+   handleSubmit: () => null,
+   isSubmitting: false,
+})
+
+export const getInitialValues = (
+   job: CustomJob,
+   groupId: string
+): JobFormValues => {
    // If the 'job' field is received, it indicates the intention to edit an existing job.
    if (job) {
       let pastJob = false
@@ -81,10 +102,13 @@ const CustomJobFormProvider = ({
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { group } = useGroupFromState()
    const { successNotification, errorNotification } = useSnackbarNotifications()
+   const [isSubmitting, setIsSubmitting] = useState(false)
 
    const handleSubmit = useCallback(
       async (values: JobFormValues) => {
          try {
+            setIsSubmitting(true)
+
             const {
                basicInfo: { jobType, businessTags, ...basicInfoRest },
                additionalInfo: { deadline, postingUrl, ...additionalInfoRest },
@@ -132,6 +156,8 @@ const CustomJobFormProvider = ({
             }
          } catch (error) {
             errorNotification(error, "An error has occurred")
+         } finally {
+            setIsSubmitting(false)
          }
       },
       [
@@ -144,6 +170,11 @@ const CustomJobFormProvider = ({
       ]
    )
 
+   const contextValue = useMemo(
+      () => ({ handleSubmit, isSubmitting }),
+      [handleSubmit, isSubmitting]
+   )
+
    const formMethods = useForm<JobFormValues>({
       resolver: yupResolver(schema(quillInputRef)),
       defaultValues: getInitialValues(job, group.groupId),
@@ -151,18 +182,18 @@ const CustomJobFormProvider = ({
    })
 
    return (
-      <FormProvider {...formMethods}>
-         <form
-            id="custom-job-form"
-            onSubmit={formMethods.handleSubmit(handleSubmit)}
-         >
-            {children}
-         </form>
-      </FormProvider>
+      <CustomJobFormContext.Provider value={contextValue}>
+         <FormProvider {...formMethods}>
+            <form>{children}</form>
+         </FormProvider>
+      </CustomJobFormContext.Provider>
    )
 }
 
-export default CustomJobFormProvider
+const useCustomJobForm = () =>
+   useContext<CustomJobFormContextType>(CustomJobFormContext)
+
+export { CustomJobFormProvider, useCustomJobForm }
 
 const mapBasicInfo = ({
    title,

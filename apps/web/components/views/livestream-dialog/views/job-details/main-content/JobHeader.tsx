@@ -1,129 +1,258 @@
-import { FC } from "react"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import Stack from "@mui/material/Stack"
-import Box from "@mui/material/Box"
-import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
-import Typography from "@mui/material/Typography"
-import Skeleton from "@mui/material/Skeleton"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { Briefcase, MapPin as LocationIcon } from "react-feather"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
+import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { FC } from "react"
+import { Briefcase, Edit, MapPin as LocationIcon, Zap } from "react-feather"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
+import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
-   logoWrapper: {
-      background: "white",
+   header: {
+      display: "flex",
    },
-   companyNameWrapper: {
+   headerLeftSide: {
+      display: "flex",
+      width: "100%",
+      alignItems: "center",
+   },
+   headerContent: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      gap: "4px",
+      ml: 3,
+   },
+   jobName: {
+      fontWeight: 600,
+   },
+   subTitle: {
+      fontSize: "18px",
+      fontWeight: 600,
+   },
+   content: {
+      mt: 4,
+   },
+   editButton: {
+      textTransform: "none",
+      color: "#A0A0A0",
+      width: "max-content",
+   },
+   mobileEditBtnSection: {
+      mb: 3,
       display: "flex",
       justifyContent: "center",
+   },
+   detailsWrapper: {
+      display: { xs: "flex", md: "inline" },
       flexDirection: "column",
+   },
+   details: {
+      color: "#8B8B8B",
+      fontSize: "12px",
+   },
+   detailsValue: {
+      display: "inline",
+
+      "& svg": {
+         verticalAlign: "bottom",
+         mr: "6px !important",
+      },
+   },
+   skeletonDetailsValue: {
+      display: "flex",
+      alignItems: "center",
    },
    logoSkeleton: {
       borderRadius: 4,
-   },
-   jobTitle: {
-      fontWeight: 600,
-   },
-   jobDepartment: {
-      fontWeight: 400,
-   },
-   jobLocation: {
-      fontSize: "1rem",
-      fontWeight: 300,
-      display: "flex",
-      alignItems: "center",
-      "& svg": {
-         mr: 0.7,
-         width: "1em",
-         height: "1em",
-      },
-   },
-   lightText: {
-      color: "neutral.500",
    },
 })
 
 type Props = {
    job: Job | PublicCustomJob
-   livestreamPresenter: LivestreamPresenter
+   companyName: string
+   companyLogoUrl: string
+   editMode?: boolean
+   handleClick?: () => void
 }
 
-const JobHeader: FC<Props> = ({ job, livestreamPresenter }) => {
+const JobHeader = ({
+   job,
+   companyName,
+   companyLogoUrl,
+   editMode,
+   handleClick,
+}: Props) => {
    const isAtsJob = useIsAtsJob(job)
+   const isMobile = useIsMobile()
 
-   let jobName: string, jobLocation: string, jobDepartment: string
+   let jobName: string,
+      jobLocation: string,
+      jobType: string,
+      jobBusinessFunctionsTagIds: string[]
 
    if (isAtsJob) {
       jobName = job.name
       jobLocation = job.getLocation()
-      jobDepartment = job.getDepartment()
+      jobType = job.getDepartment()
    } else {
       jobName = job.title
-      jobDepartment = job.jobType
+      jobType = job.jobType
+      jobBusinessFunctionsTagIds = job.businessFunctionsTagIds || []
    }
 
    return (
-      <Stack spacing={"18px"} direction="row">
-         <Box sx={styles.logoWrapper}>
-            <CircularLogo
-               src={getResizedUrl(livestreamPresenter.companyLogoUrl, "lg")}
-               alt={livestreamPresenter.company}
-               size={63}
-            />
-         </Box>
-         <Box sx={styles.companyNameWrapper}>
-            <Typography sx={styles.jobTitle} variant="h4">
-               {jobName}
-            </Typography>
-            {jobDepartment ? (
-               <Box
-                  sx={styles.lightText}
-                  display="flex"
-                  alignItems="center"
-                  gap="6px"
+      <>
+         {isMobile && editMode ? (
+            <Box sx={styles.mobileEditBtnSection}>
+               <Button
+                  variant={"outlined"}
+                  startIcon={<Edit size="18" color="#A0A0A0" />}
+                  color={"grey"}
+                  sx={styles.editButton}
+                  fullWidth
+                  onClick={handleClick}
                >
-                  <Briefcase size={12} />
-                  <Typography sx={styles.jobDepartment}>
-                     {jobDepartment}
+                  Edit job posting
+               </Button>
+            </Box>
+         ) : null}
+
+         <Box sx={styles.header}>
+            <Box sx={styles.headerLeftSide}>
+               <CircularLogo
+                  src={getResizedUrl(companyLogoUrl, "lg")}
+                  alt={`company ${companyName} logo`}
+                  size={63}
+               />
+
+               <Box sx={styles.headerContent}>
+                  <Typography variant={"h4"} sx={styles.jobName}>
+                     {jobName}
                   </Typography>
+
+                  {isMobile ? (
+                     <Box sx={[styles.detailsWrapper, styles.detailsValue]}>
+                        {jobType ? (
+                           <Typography
+                              variant={"subtitle1"}
+                              sx={styles.details}
+                           >
+                              <Briefcase width={14} />
+                              {jobType}
+                           </Typography>
+                        ) : null}
+
+                        {jobBusinessFunctionsTagIds.length > 0 ? (
+                           <Typography
+                              variant={"subtitle1"}
+                              sx={styles.details}
+                           >
+                              <Zap width={14} />
+                              {jobBusinessFunctionsTagIds.join(", ")}
+                           </Typography>
+                        ) : null}
+
+                        {jobLocation ? (
+                           <Typography
+                              variant={"subtitle1"}
+                              sx={styles.details}
+                           >
+                              <LocationIcon width={14} />
+                              {jobLocation}
+                           </Typography>
+                        ) : null}
+                     </Box>
+                  ) : (
+                     <Box sx={styles.detailsWrapper}>
+                        <Typography variant={"subtitle1"} sx={styles.details}>
+                           <Stack
+                              direction={"row"}
+                              spacing={2}
+                              sx={styles.detailsValue}
+                           >
+                              {jobType ? (
+                                 <>
+                                    <Briefcase width={14} />
+                                    {jobType}
+                                 </>
+                              ) : null}
+                              {jobBusinessFunctionsTagIds.length > 0 ? (
+                                 <>
+                                    <Zap width={14} />
+                                    {jobBusinessFunctionsTagIds.join(", ")}
+                                 </>
+                              ) : null}
+                           </Stack>
+                        </Typography>
+                     </Box>
+                  )}
                </Box>
-            ) : null}
-            {jobLocation ? (
-               <Typography sx={[styles.jobLocation, styles.lightText]}>
-                  <LocationIcon />
-                  {jobLocation}
-               </Typography>
-            ) : null}
+            </Box>
+
+            {isMobile || !editMode ? null : (
+               <Box>
+                  <Button
+                     variant={"outlined"}
+                     startIcon={<Edit size="18" color="#A0A0A0" />}
+                     color={"grey"}
+                     sx={styles.editButton}
+                     fullWidth
+                     onClick={handleClick}
+                  >
+                     Edit job posting
+                  </Button>
+               </Box>
+            )}
          </Box>
-      </Stack>
+      </>
    )
 }
 
 export const JobHeaderSkeleton: FC = () => {
    return (
-      <Stack spacing={1.5} direction="row">
-         <Skeleton
-            sx={styles.logoSkeleton}
-            variant={"rectangular"}
-            width={58}
-            height={58}
-         />
-         <Box sx={styles.companyNameWrapper}>
-            <Typography sx={styles.jobTitle} component={"h4"}>
-               <Skeleton width={200} />
-            </Typography>
-            <Typography sx={[styles.jobDepartment, styles.lightText]}>
-               <Skeleton width={100} />
-            </Typography>
-            <Typography sx={[styles.jobLocation, styles.lightText]}>
-               <LocationIcon />
-               <Skeleton width={100} />
-            </Typography>
+      <Box sx={styles.header}>
+         <Box sx={styles.headerLeftSide}>
+            <Skeleton
+               sx={styles.logoSkeleton}
+               variant={"rectangular"}
+               width={63}
+               height={63}
+            />
+            <Box sx={styles.headerContent}>
+               <Typography variant={"h4"} sx={styles.jobName}>
+                  <Skeleton width={300} />
+               </Typography>
+
+               <Box sx={styles.detailsWrapper}>
+                  <Typography variant={"subtitle1"} sx={styles.details}>
+                     <Stack
+                        direction={"row"}
+                        spacing={2}
+                        sx={styles.skeletonDetailsValue}
+                     >
+                        <Skeleton
+                           sx={styles.logoSkeleton}
+                           variant={"rectangular"}
+                           width={14}
+                           height={14}
+                        />
+                        <Skeleton width={100} />
+                        <Skeleton
+                           sx={styles.logoSkeleton}
+                           variant={"rectangular"}
+                           width={14}
+                           height={14}
+                        />
+                        <Skeleton width={100} />
+                     </Stack>
+                  </Typography>
+               </Box>
+            </Box>
          </Box>
-      </Stack>
+      </Box>
    )
 }
 
