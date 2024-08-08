@@ -59,6 +59,9 @@ const styles: StylesProps = {
       color: (theme) => theme.palette.neutral[700],
       fontWeight: 400,
    },
+   fullWidth: {
+      width: "100%",
+   },
 }
 
 const Icon = ({ src, alt }: ImageProps) => {
@@ -107,6 +110,7 @@ const SentimentQuestion = ({
             readOnly={readOnly}
             IconContainerComponent={IconContainer}
             max={5}
+            sx={styles.fullWidth}
             onChange={(_event, value: number) => {
                onAnswerSubmit({ rating: value })
             }}

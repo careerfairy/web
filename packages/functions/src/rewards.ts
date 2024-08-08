@@ -1,15 +1,15 @@
 import functions = require("firebase-functions")
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { RewardAction, REWARDS } from "@careerfairy/shared-lib/rewards"
+import { RewardFilterFields } from "@careerfairy/shared-lib/rewards/RewardRepository"
+import { livestreamsRepo, rewardsRepo, userRepo } from "./api/repositories"
+import config from "./config"
 import {
    rewardCreateLivestream,
-   rewardCreateUserAction,
    rewardCreateReferralSignUpFollower,
+   rewardCreateUserAction,
 } from "./lib/reward"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { livestreamsRepo, rewardsRepo, userRepo } from "./api/repositories"
-import { RewardAction, REWARDS } from "@careerfairy/shared-lib/rewards"
 import { userUpdateFields } from "./lib/user"
-import { RewardFilterFields } from "@careerfairy/shared-lib/rewards/RewardRepository"
-import config from "./config"
 
 /**
  * Reward user for being invited to a livestream and participating
@@ -60,7 +60,7 @@ export const rewardLivestreamInvitationComplete = functions
          livestreamMustBeLive: true,
       })
 
-      validateDuplicatedReward(
+      await validateDuplicatedReward(
          userEmail,
          "LIVESTREAM_INVITE_COMPLETE_FOLLOWER",
          { livestreamId }
@@ -260,10 +260,12 @@ async function validateLivestreamEvent(
       )
    }
 
-   if (
-      flags.userMustBeRegistered &&
-      !livestreamDoc.registeredUsers?.includes(flags.userMustBeRegistered)
-   ) {
+   const isUserRegistered = await livestreamsRepo.isUserRegistered(
+      livestreamDoc.id,
+      flags.userMustBeRegistered
+   )
+
+   if (flags.userMustBeRegistered && !isUserRegistered) {
       functions.logger.error(
          "The user is not registered in the livestream, someone trying to hack us?",
          {

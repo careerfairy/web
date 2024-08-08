@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
 import { UserData } from "../users"
+import { CUSTOM_JOB_CONSTANTS } from "./constants"
 /**
  * Collection path: /careerCenterData/[groupId]/customJobs/[jobId]
  * CustomJob is attached to a single group but can be related to multiple live streams
@@ -12,7 +13,6 @@ export interface CustomJob extends Identifiable {
 
    title: string
    description: string
-   jobType: JobType
    postingUrl: string
    deadline: firebase.firestore.Timestamp
    createdAt: firebase.firestore.Timestamp
@@ -24,6 +24,7 @@ export interface CustomJob extends Identifiable {
    published: boolean
 
    // optional fields
+   jobType?: JobType
    salary?: string
    deleted?: boolean
    /**
@@ -44,7 +45,9 @@ export type PublicCustomJob = Pick<
    | "deadline"
    | "salary"
    | "deleted"
-   | "deadline"
+   | "businessFunctionsTagIds"
+   | "livestreams"
+   | "sparks"
 >
 
 export type PublicCustomJobApplicant = Pick<
@@ -82,6 +85,9 @@ export const pickPublicDataFromCustomJob = (
       deadline: job.deadline ?? null,
       salary: job.salary ?? null,
       deleted: job.deleted ?? false,
+      businessFunctionsTagIds: job.businessFunctionsTagIds ?? [],
+      livestreams: job.livestreams ?? [],
+      sparks: job.sparks ?? [],
    }
 }
 
@@ -124,4 +130,8 @@ export interface CustomJobApplicant extends Identifiable {
    companyCountry?: string
    companyIndustries?: string[]
    companySize?: string
+}
+
+export const getMaxDaysAfterDeadline = (): Date => {
+   return new Date(Date.now() - CUSTOM_JOB_CONSTANTS.MAX_DAYS_AFTER_DEADLINE)
 }

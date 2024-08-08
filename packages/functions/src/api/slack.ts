@@ -1,16 +1,33 @@
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import axios, { AxiosPromise } from "axios"
+import { firestore } from "firebase-admin"
 import { DateTime } from "luxon"
+import { getCount } from "../util/firestore-admin"
 
-export const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
+export const notifyLivestreamStarting = async (webhookUrl, livestreamObj) => {
    const link = makeLivestreamEventDetailsUrl(livestreamObj.id)
+
+   const registeredUsersCountQuery = firestore()
+      .collection("livestreams")
+      .doc(livestreamObj.id)
+      .collection("userLivestreamData")
+      .where("registered.date", "!=", null)
+
+   const talentPoolCountQuery = firestore()
+      .collection("livestreams")
+      .doc(livestreamObj.id)
+      .collection("userLivestreamData")
+      .where("talentPool.date", "!=", null)
+
+   const registeredUsersCount = await getCount(registeredUsersCountQuery)
+   const talentPoolCount = await getCount(talentPoolCountQuery)
 
    const body = {
       Company: livestreamObj.company,
       Speakers: livestreamObj.speakers?.length,
       Duration: `${livestreamObj.duration} minutes`,
-      "Registered Users": livestreamObj.registeredUsers?.length ?? 0,
-      "Talent Pool": livestreamObj.talentPool?.length ?? 0,
+      "Registered Users": registeredUsersCount,
+      "Talent Pool": talentPoolCount,
    }
 
    return generateRequest(webhookUrl, {

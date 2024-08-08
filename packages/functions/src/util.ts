@@ -51,9 +51,9 @@ export const generateReminderEmailData = ({
    minutesToRemindBefore,
    emailMaxChunkSize,
 }: IGenerateEmailDataProps): MailgunMessageData[] => {
-   const { company, start, registeredUsers, timezone } = stream
+   const { company, start, usersLivestreamData, timezone } = stream
 
-   if (!start || !registeredUsers?.length) {
+   if (!start || !usersLivestreamData?.length) {
       return []
    }
 
@@ -74,10 +74,14 @@ export const generateReminderEmailData = ({
       reminder.timeMessage
    )
 
+   const registeredUserEmails = usersLivestreamData.map(
+      ({ user }) => user.userEmail
+   )
+
    // Mailgun has a maximum of 1k emails per bulk email
    // So we will slice our registered users on chunks of 950 and send more than one bulk email if needed
    const registeredUsersChunks = getRegisteredUsersIntoChunks(
-      registeredUsers,
+      registeredUserEmails,
       emailMaxChunkSize
    )
 
@@ -151,13 +155,13 @@ export const generateNonAttendeesReminder = ({
  *
  */
 const getRegisteredUsersIntoChunks = (
-   registeredUsers: unknown[],
+   userEmails: string[],
    chunkSize: number
 ): string[][] => {
    const registeredUsersChunks = []
 
-   for (let i = 0; i < registeredUsers.length; i += chunkSize) {
-      const chunk = registeredUsers.slice(i, i + chunkSize)
+   for (let i = 0; i < userEmails.length; i += chunkSize) {
+      const chunk = userEmails.slice(i, i + chunkSize)
       registeredUsersChunks.push(chunk)
    }
 

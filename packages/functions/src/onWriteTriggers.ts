@@ -73,11 +73,6 @@ export const syncLivestreams = functions
                   )
                )
             })
-
-            // Notify every registered user of the live stream start
-            sideEffectPromises.push(
-               livestreamsRepo.createLivestreamStartUserNotifications(newValue)
-            )
          }
 
          if (newValue.startDate !== previousValue.startDate) {
@@ -103,6 +98,34 @@ export const syncLivestreams = functions
       }
 
       return handleSideEffects(sideEffectPromises)
+   })
+
+export const syncLivestreamStartNotifications = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("livestreams/{livestreamId}")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      logStart({
+         changeTypes,
+         context,
+         message: "handleLivestreamStartNotificationsOnWrite",
+      })
+
+      if (changeTypes.isUpdate) {
+         const newValue = change.after?.data() as LivestreamEvent
+         const previousValue = change.before?.data() as LivestreamEvent
+
+         if (newValue.hasStarted && !previousValue.hasStarted) {
+            // Notify every registered user of the live stream start
+            return livestreamsRepo.createLivestreamStartUserNotifications(
+               newValue
+            )
+         }
+      }
+
+      return null
    })
 
 export const syncUserLivestreamData = functions
@@ -266,7 +289,7 @@ export const onWriteGroup = functions
    })
 
 export const onWriteSpark = functions
-   .runWith(defaultTriggerRunTimeConfig)
+   .runWith({ ...defaultTriggerRunTimeConfig, memory: "512MB" })
    .region(config.region)
    .firestore.document("sparks/{sparkId}")
    .onWrite(async (change, context) => {
@@ -297,6 +320,9 @@ export const onWriteSpark = functions
       if (changeTypes.isDelete) {
          // Remove spark from all user feeds
          sideEffectPromises.push(sparkRepo.removeSparkFromAllUserFeeds(sparkId))
+
+         // Remove linked jobs
+         sideEffectPromises.push(customJobRepo.removeLinkedSpark(sparkId))
       }
 
       if (changeTypes.isUpdate || changeTypes.isCreate) {
@@ -349,7 +375,6 @@ export const onWriteCustomJobs = functions
 
       if (changeTypes.isCreate) {
          const newCustomJob = change.after.data() as CustomJob
-
          sideEffectPromises.push(
             customJobRepo.createCustomJobStats(newCustomJob)
          )
@@ -357,11 +382,11 @@ export const onWriteCustomJobs = functions
 
       // Run side effects for all custom jobs changes
       if (changeTypes.isUpdate) {
-         const newCustomJob = change.after.data() as CustomJob
+         const updatedCustomJob = change.after.data() as CustomJob
 
          sideEffectPromises.push(
-            customJobRepo.syncCustomJobDataToCustomJobStats(newCustomJob),
-            customJobRepo.syncCustomJobDataToJobApplications(newCustomJob)
+            customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
+            customJobRepo.syncCustomJobDataToJobApplications(updatedCustomJob)
          )
       }
 
@@ -375,6 +400,10 @@ export const onWriteCustomJobs = functions
             customJobRepo.syncDeletedCustomJobDataToJobApplications(
                deletedCustomJob
             ),
+            customJobRepo.syncDeletedCustomJobToLinkedLivestreams(
+               deletedCustomJob
+            ),
+            customJobRepo.syncDeletedCustomJobToLinkedSparks(deletedCustomJob),
             sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
                deletedCustomJob,
                deletedCustomJob,

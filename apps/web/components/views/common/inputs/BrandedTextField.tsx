@@ -1,3 +1,4 @@
+import InfoIcon from "@mui/icons-material/InfoOutlined"
 import {
    Box,
    FilledInputProps,
@@ -11,7 +12,6 @@ import { styled } from "@mui/material/styles"
 import { useField } from "formik"
 import { FC, ReactElement } from "react"
 import BrandedTooltip from "../tooltips/BrandedTooltip"
-import InfoIcon from "@mui/icons-material/InfoOutlined"
 
 export interface CustomBrandedTextFieldProps {
    /**

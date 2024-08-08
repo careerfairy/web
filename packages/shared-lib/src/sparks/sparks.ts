@@ -54,6 +54,8 @@ export interface Spark extends Identifiable {
 
    video: SparkVideo
 
+   hasJobs?: boolean
+
    // possible future fields
 
    // video metadata

@@ -2175,13 +2175,6 @@ class FirebaseService {
 
       const batch = this.firestore.batch()
 
-      batch.update(livestreamRef, {
-         // To be depreciated
-         registeredUsers: firebase.firestore.FieldValue.arrayUnion(
-            userData.userEmail
-         ),
-      })
-
       batch.set(userLivestreamDataRef, data, { merge: true })
 
       for (const groupId of idsOfGroupsWithPolicies) {
@@ -2259,10 +2252,6 @@ class FirebaseService {
             user: userData,
          } as UserLivestreamData)
       }
-
-      batch.update(livestreamRef, {
-         registeredUsers: firebase.firestore.FieldValue.arrayRemove(userEmail),
-      })
 
       await batch.commit()
    }
@@ -2905,13 +2894,6 @@ class FirebaseService {
       return eventSnaps
          .filter((doc) => doc.exists)
          .map((doc) => ({ id: doc.id, ...doc.data() }))
-   }
-
-   listenToRecommendedEvents = (recommendedEventIds, callback) => {
-      const ref = this.firestore
-         .collection("livestreams")
-         .where("id", "in", recommendedEventIds || [])
-      return ref.onSnapshot(callback)
    }
 
    createMultipleBreakoutRooms = async (

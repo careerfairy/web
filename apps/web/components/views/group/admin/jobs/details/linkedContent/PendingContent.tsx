@@ -1,15 +1,13 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Group } from "@careerfairy/shared-lib/groups"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
-import { FC } from "react"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { AlertTriangle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 type Props = {
    job: CustomJob
-   group: Group
 }
 
 const styles = sxStyles({
@@ -43,9 +41,10 @@ const styles = sxStyles({
    },
 })
 
-const PendingContent: FC<Props> = ({ job, group }) => {
+const PendingContent = ({ job }: Props) => {
+   const { group } = useGroup()
    const groupHasSparks = useGroupHasSparks(group.id, { isPublished: true })
-   const groupHasLivestreams = useGroupHasUpcomingLivestreams(group.id)
+   const groupHasLivestreams = useGroupHasUpcomingLivestreams(group.groupId)
 
    const handleClick = () => {
       // open job dialog on content section

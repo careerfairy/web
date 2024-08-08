@@ -5,7 +5,12 @@ import BaseFirebaseRepository, {
 import { Timestamp } from "../firebaseTypes"
 import { UserData } from "../users"
 import { chunkArray } from "../utils"
-import { CustomJob, CustomJobApplicant, PublicCustomJob } from "./customJobs"
+import {
+   CustomJob,
+   CustomJobApplicant,
+   PublicCustomJob,
+   getMaxDaysAfterDeadline,
+} from "./customJobs"
 
 export interface ICustomJobRepository {
    /**
@@ -24,7 +29,7 @@ export interface ICustomJobRepository {
     * To update an existing custom job on the CustomJob root collection
     * @param job
     */
-   updateCustomJob(job: PublicCustomJob): Promise<void>
+   updateCustomJob(job: Partial<CustomJob>): Promise<void>
 
    /**
     * To delete a custom job on the CustomJob root collection
@@ -37,6 +42,12 @@ export interface ICustomJobRepository {
     * @param jobId
     */
    getCustomJobById(jobId: string): Promise<CustomJob>
+
+   /**
+    * To get a custom jobs by ids from the CustomJob root collection
+    * @param jobIds
+    */
+   getCustomJobByIds(jobIds: string[]): Promise<CustomJob[]>
 
    /**
     * To get a custom job application by user and job id from the jobApplications root collection
@@ -99,6 +110,22 @@ export interface ICustomJobRepository {
     * @param groupId
     */
    getGroupJobs(groupId: string): Promise<CustomJob[]>
+
+   /**
+    * Get all group custom jobs by group ID
+    * @param groupId
+    */
+   getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]>
+
+   /**
+    * Delete all expired custom jobs
+    */
+   deleteExpiredCustomJobs(): Promise<void>
+
+   /**
+    * Update all custom jobs that have expired
+    */
+   syncExpiredCustomJobs(): Promise<void>
 }
 
 export class FirebaseCustomJobRepository
@@ -120,15 +147,20 @@ export class FirebaseCustomJobRepository
    ): Promise<CustomJob> {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc()
 
+      const isPublished = Boolean(
+         job.livestreams.length || job.sparks.length || linkedLivestreamId
+      )
+
       const newJob: CustomJob = {
          documentType: this.COLLECTION_NAME,
          ...job,
          createdAt: this.fieldValue.serverTimestamp() as Timestamp,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
-         livestreams: linkedLivestreamId ? [linkedLivestreamId] : [],
-         sparks: [],
+         livestreams: linkedLivestreamId
+            ? [linkedLivestreamId]
+            : job.livestreams,
          id: ref.id,
-         published: Boolean(linkedLivestreamId),
+         published: isPublished,
       }
 
       await ref.set(newJob, { merge: true })
@@ -136,12 +168,16 @@ export class FirebaseCustomJobRepository
       return newJob
    }
 
-   async updateCustomJob(job: CustomJob): Promise<void> {
+   async updateCustomJob(job: Partial<CustomJob>): Promise<void> {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc(job.id)
 
-      const updatedJob: CustomJob = {
+      const isJobPublished =
+         !job?.deleted && (job.livestreams.length > 0 || job.sparks.length > 0)
+
+      const updatedJob: Partial<CustomJob> = {
          ...job,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
+         published: isJobPublished,
       }
 
       await ref.update(updatedJob)
@@ -164,6 +200,37 @@ export class FirebaseCustomJobRepository
          return this.addIdToDoc<CustomJob>(snapshot)
       }
       return null
+   }
+
+   async getCustomJobByIds(jobIds: string[]): Promise<CustomJob[]> {
+      const chunks = chunkArray(jobIds, 10)
+      const promises = []
+
+      for (const chunk of chunks) {
+         promises.push(
+            this.firestore
+               .collection(this.COLLECTION_NAME)
+               .where("id", "in", chunk)
+               .get()
+               .then(mapFirestoreDocuments)
+         )
+      }
+
+      const responses = await Promise.allSettled(promises)
+
+      return responses
+         .filter((r) => {
+            if (r.status === "fulfilled") {
+               return true
+            } else {
+               // only log for debugging purposes
+               console.error("Promise failed", r)
+            }
+
+            return false
+         })
+         .map((r) => (r as PromiseFulfilledResult<CustomJob[]>).value)
+         .flat()
    }
 
    async getUserJobApplication(
@@ -250,22 +317,87 @@ export class FirebaseCustomJobRepository
       toRemove: boolean
    ): Promise<void> {
       const batch = this.firestore.batch()
+      const jobsToUpdate = await this.getCustomJobByIds(jobIdsToUpdate)
 
-      jobIdsToUpdate.forEach((jobId) => {
-         const ref = this.firestore.collection(this.COLLECTION_NAME).doc(jobId)
+      jobsToUpdate.forEach((job) => {
+         const ref = this.firestore.collection(this.COLLECTION_NAME).doc(job.id)
+         const jobIsNotExpired = job.deadline?.toDate() >= new Date()
 
          if (toRemove) {
+            const amountOfLinkedContent =
+               job.livestreams.length + job.sparks.length
+
             batch.update(ref, {
                livestreams: this.fieldValue.arrayRemove(livestreamId),
+               // if there are more than 1 linked content it means that will continue to have linked content after this removal
+               published: jobIsNotExpired && amountOfLinkedContent > 1,
             })
          } else {
             batch.update(ref, {
                livestreams: this.fieldValue.arrayUnion(livestreamId),
+               published: jobIsNotExpired,
             })
          }
       })
 
       return batch.commit()
+   }
+
+   async deleteExpiredCustomJobs(): Promise<void> {
+      const customJobRef = this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("deadline", "<", getMaxDaysAfterDeadline())
+
+      const snapshot = await customJobRef.get()
+      const chunks = chunkArray(snapshot.docs, 450)
+
+      const promises = chunks.map(async (chunk) => {
+         const batch = this.firestore.batch()
+
+         chunk.forEach((doc) => {
+            batch.delete(doc.ref)
+         })
+
+         return batch.commit()
+      })
+
+      await Promise.allSettled(promises)
+   }
+
+   async syncExpiredCustomJobs(): Promise<void> {
+      const customJobRef = this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("deadline", "<", new Date())
+
+      const snapshot = await customJobRef.get()
+      const chunks = chunkArray(snapshot.docs, 450)
+
+      const promises = chunks.map(async (chunk) => {
+         const batch = this.firestore.batch()
+
+         chunk.forEach((doc) => {
+            batch.update(doc.ref, {
+               published: false,
+            })
+         })
+
+         return batch.commit()
+      })
+
+      await Promise.allSettled(promises)
+   }
+
+   async getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]> {
+      const docs = await this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("groupId", "==", groupId)
+         .get()
+
+      if (docs.empty) {
+         return []
+      }
+
+      return this.addIdToDocs<CustomJob>(docs.docs)
    }
 
    async getCustomJobsByLinkedContentIds(

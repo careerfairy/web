@@ -96,7 +96,7 @@ const getMentorPlaceholderStory = ({
 
    const availableContentMessage =
       hasCreatedSparks && hasParticipatedInLivestreams
-         ? "Sparks (and live streams)"
+         ? "Sparks and live streams"
          : hasCreatedSparks
          ? "Sparks"
          : hasParticipatedInLivestreams
@@ -112,7 +112,7 @@ const getMentorPlaceholderStory = ({
       ? noLinkedInWithJobs
       : noLinkedInNoJobs
 
-   const targetCountryWithLinkedIn = `${watchMessage}. Reach out to me on LinkedIn anytime to ask your career questions and grow your professional network!`
+   const targetCountryWithLinkedIn = `${watchMessage} Reach out to me on LinkedIn anytime to ask your career questions and grow your professional network!`
 
    const placeholder =
       mentor?.linkedInUrl && isUserFromTargetedCountry

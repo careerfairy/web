@@ -2,6 +2,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import PlayIcon from "@mui/icons-material/PlayCircleOutline"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import { useRouter } from "next/router"
 import { FC, ReactNode, useMemo } from "react"
 import DateUtil from "../../../../util/DateUtil"
@@ -52,11 +53,7 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
       [livestreamPresenter]
    )
 
-   const hasRegistered = useMemo(
-      () => livestreamPresenter.isUserRegistered(userStats?.userId),
-      [livestreamPresenter, userStats?.userId]
-   )
-
+   const hasRegistered = useUserIsRegistered(livestreamPresenter.id)
    const headerTitle = useMemo(() => {
       if (eventIsUpcoming) {
          return "Coming Next!"
