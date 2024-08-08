@@ -4,7 +4,9 @@ import {
 } from "@careerfairy/seed-data/emulators"
 import FieldOfStudySeed from "@careerfairy/seed-data/fieldsOfStudy"
 import GroupSeed from "@careerfairy/seed-data/groups"
+import JobsSeed from "@careerfairy/seed-data/jobs"
 import UserSeed from "@careerfairy/seed-data/users"
+import { CustomJob } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { GROUP_DASHBOARD_ROLE, Group } from "@careerfairy/shared-lib/groups"
 import { Interest } from "@careerfairy/shared-lib/interests"
@@ -13,7 +15,6 @@ import { test as base } from "@playwright/test"
 import { credentials } from "../constants"
 import { GroupDashboardPage } from "./page-object-models/GroupDashboardPage"
 import { LoginPage } from "./page-object-models/LoginPage"
-
 type GroupAdminFixtureOptions = {
    /**
     * give the option for tests to not create a user
@@ -50,6 +51,7 @@ export const groupAdminFixture = base.extend<{
    interests: Interest[]
    levelOfStudyIds: FieldOfStudy[]
    fieldOfStudyIds: FieldOfStudy[]
+   customJobs: CustomJob[]
 }>({
    options: {
       createUser: true,
@@ -70,7 +72,11 @@ export const groupAdminFixture = base.extend<{
          }
       }
 
+      if (!options.atsGroupType || options.atsGroupType === "NONE")
+         overrideFields.atsAdminPageFlag = false
+
       let group: Group
+
       if (options.completedGroup === true) {
          const completeCompanyData = GroupSeed.generateCompleteCompanyData()
          group = await GroupSeed.createGroup({
@@ -92,6 +98,8 @@ export const groupAdminFixture = base.extend<{
             break
       }
 
+      await JobsSeed.createCustomJobs(group.groupId, [])
+
       await use(group)
    },
    user: async ({ group, options }, use) => {
@@ -106,6 +114,11 @@ export const groupAdminFixture = base.extend<{
 
          await use(user)
       }
+   },
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   customJobs: async ({ group }, use) => {
+      const customJobs = await JobsSeed.getCustomJobs(group.groupId)
+      await use(customJobs)
    },
    // eslint-disable-next-line @typescript-eslint/no-unused-vars
    levelOfStudyIds: async ({ options }, use) => {

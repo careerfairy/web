@@ -240,15 +240,14 @@ export class GroupDashboardPage extends CommonPage {
 
       if (data.speakers) {
          await this.clickNextButton()
-         const isGeneralTabInvalid = await this.page
-            .getByRole("heading", { name: "Required fields missing" })
-            .isVisible()
-         if (isGeneralTabInvalid) {
-            await this.page
-               .getByRole("button", { name: "Skip for now" })
-               .click()
-         }
+         await this.skipRequiredFields()
          await this.createSpeakers(data.speakers)
+      }
+
+      if (data.jobs) {
+         await this.clickJobOpenings()
+         await this.skipRequiredFields()
+         await this.selectJobs(data.jobs)
       }
 
       await expect(
@@ -277,14 +276,42 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
+   public async skipRequiredFields() {
+      const isGeneralTabInvalid = await this.page
+         .getByRole("heading", { name: "Required fields missing" })
+         .isVisible()
+
+      if (isGeneralTabInvalid) {
+         await this.page.getByRole("button", { name: "Skip for now" }).click()
+      }
+   }
    /**
     * Selects the jobs from the dropdown, currently you can only select one job
+    * and it does not support ATS Jobs
     * */
-   public async selectJobs(jobs: LivestreamJobAssociation[]) {
-      await this.page.getByPlaceholder("Select one job").click()
+   public async selectJobs(
+      jobs: LivestreamJobAssociation[],
+      atsJobs?: boolean
+   ) {
+      if (atsJobs) {
+         // TODO: Use atsJobs, implementing tests for ATS jobs
+         return
+      }
+      await this.page.getByPlaceholder("Select jobs you want to attach").click()
 
       for (const job of jobs) {
-         await this.page.getByTestId(`jobIds_${job.jobId}_option`).click()
+         // TODO: Check if job is visible, if not create via UI
+         // How to test a draft stream with saved job ?
+         await this.page.getByText(job.name).click()
+      }
+   }
+
+   public async assertJobIsAttachedToStream(jobLinks: string[]) {
+      await this.clickJobOpenings()
+      await this.skipRequiredFields()
+
+      for (const link of jobLinks) {
+         await expect(this.page.getByRole("link", { name: link })).toBeVisible()
       }
    }
 
@@ -392,6 +419,9 @@ export class GroupDashboardPage extends CommonPage {
       }
    }
 
+   public async clickJobOpenings() {
+      await this.page.getByRole("tab", { name: "Job openings" }).click()
+   }
    public async clickPublish() {
       await this.page.getByRole("button", { name: "Publish" }).click()
    }

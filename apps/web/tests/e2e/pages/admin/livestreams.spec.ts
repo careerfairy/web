@@ -1,3 +1,4 @@
+import JobsSeed from "@careerfairy/seed-data/jobs"
 import LivestreamSeed from "@careerfairy/seed-data/livestreams"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { setupLivestreamData } from "tests/e2e/setupData"
@@ -33,8 +34,10 @@ test.describe("Group Admin Livestreams", () => {
     *
     * Beware as the new live stream form auto saves and the data is already filled for existing streams, and for the selectable chips,
     * namely (contentTopicsTagIds, businessFunctionsTagIds, fieldOfStudyIds and levelOfStudyIds) to prevent them from being cleared
-    * when filling the form for the 2nd time (editing a previously created form) they can be set as null in the override fields, thus impeding the form
-    * from updating those values. If the form would update those values it would result in clicking them again, deselecting the values which might not
+    * when filling the form for the 2nd time (editing a previously created form) they can be set as
+    * null in the override fields, thus impeding the form from updating those values.
+    *
+    * If the form would update those values it would result in clicking them again, deselecting the values which might not
     * be intended.
     */
    test("Publish a draft livestream and edit its title", async ({
@@ -93,5 +96,36 @@ test.describe("Group Admin Livestreams", () => {
       // new title should be visible
       await groupPage.goToLivestreams()
       await groupPage.assertTextIsVisible(title)
+   })
+
+   // TODO: different tests for ats and not ats
+
+   test("Create a draft live stream with job openings - No ATS", async ({
+      groupPage,
+      customJobs,
+   }) => {
+      // TODO-WG: Confirm cannot use in beforeAll
+      await setupLivestreamData()
+
+      const jobs = customJobs.slice(0, 2) // only select some
+      const livestreamJobAssociations = JobsSeed.getJobAssociations(jobs)
+
+      const livestream = LivestreamSeed.randomDraft({
+         jobs: livestreamJobAssociations,
+         speakers: [],
+      })
+
+      await groupPage.clickCreateNewLivestreamTop()
+      await groupPage.fillLivestreamForm(livestream)
+
+      // Finish editing the draft
+      const livestreamsPage = await groupPage.goToLivestreams()
+
+      // Re edit to check custom jobs
+      await livestreamsPage.clickDraftsTab()
+      await livestreamsPage.launchEditModal()
+
+      const addedJobLinks = jobs.map((job) => job.postingUrl)
+      await groupPage.assertJobIsAttachedToStream(addedJobLinks)
    })
 })

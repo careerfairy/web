@@ -5,7 +5,10 @@ import LivestreamSeed, {
 } from "@careerfairy/seed-data/livestreams"
 import UniversitiesSeed from "@careerfairy/seed-data/universities"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamJobAssociation,
+} from "@careerfairy/shared-lib/livestreams"
 
 /**
  * Creates a livestream document with a group and group questions
@@ -18,12 +21,14 @@ export async function setupLivestreamData(
       feedbackQuestions?: string[]
       overrideGroupDetails?: Partial<Group>
       overrideLivestreamDetails?: Partial<LivestreamEvent>
+      jobs?: LivestreamJobAssociation[]
    } = {
       livestreamType: "create",
       userQuestions: [],
       feedbackQuestions: [],
       overrideGroupDetails: {},
       overrideLivestreamDetails: {},
+      jobs: [],
    }
 ) {
    const type = options.livestreamType || "create"

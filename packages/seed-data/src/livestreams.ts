@@ -382,7 +382,6 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          type: "upcoming",
          universities: [],
          triGrams: livestreamTriGrams(title, company),
-         // TODO-WG: Should not be hard coded
          contentTopicsTagIds: ["ApplicationProcess"],
          businessFunctionsTagIds: ["BusinessDevelopment", "Consulting"],
       }
