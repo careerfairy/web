@@ -222,7 +222,7 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
 
       return group.privacyPolicyActive || selectedJobId
          ? JobDialogStep.FORM_BASIC_INFO.position
-         : JobDialogStep.FORM_PREVIEW.position
+         : JobDialogStep.PRIVACY_POLICY.position
    }, [group.privacyPolicyActive, isDeleteJobDialogOpen, selectedJobId])
 
    const views = useMemo(
