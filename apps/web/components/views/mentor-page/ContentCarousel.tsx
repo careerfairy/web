@@ -14,7 +14,6 @@ const styles = sxStyles({
       position: "relative",
       flexDirection: "row",
       gap: 2,
-      paddingRight: "30px",
    },
    title: {
       fontSize: "24px",
