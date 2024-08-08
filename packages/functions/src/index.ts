@@ -17,6 +17,7 @@ dotenv.config()
 
 // to prevent import issue
 import { setGlobalOptions } from "firebase-functions/v2"
+import config from "./config"
 
 /**
  * Set the default region for all functions using the v2 SDK.
@@ -31,7 +32,6 @@ setGlobalOptions({
 })
 
 import { bundles } from "./bundles"
-import config from "./config"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
