@@ -4,6 +4,7 @@ import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/use
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
+import CardTopCheckBox from "components/views/common/CardTopCheckBox"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import SteppedDialog, {
    useStepper,
@@ -12,6 +13,7 @@ import { useCallback, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { JobDialogStep } from ".."
+import { useCustomJobForm } from "../CustomJobFormProvider"
 
 const styles = sxStyles({
    container: {
@@ -44,7 +46,7 @@ const styles = sxStyles({
       justifyContent: "center",
    },
    actions: {
-      zIndex: 99,
+      zIndex: (theme) => theme.zIndex.tooltip,
    },
 })
 
@@ -52,9 +54,19 @@ const FIELD_NAME = "livestreamIds"
 
 type Props = {
    job: CustomJob
+   handleSecondaryButton?: () => void
+   handlePrimaryButton?: () => void
+   primaryButtonMessage?: string
+   secondaryButtonMessage?: string
 }
 
-const JobLinkLiveStreams = ({ job }: Props) => {
+const JobLinkLiveStreams = ({
+   job,
+   handleSecondaryButton,
+   handlePrimaryButton,
+   primaryButtonMessage,
+   secondaryButtonMessage,
+}: Props) => {
    const { moveToPrev, moveToNext, goToStep } = useStepper()
    const { group } = useGroupFromState()
    const isMobile = useIsMobile()
@@ -62,6 +74,7 @@ const JobLinkLiveStreams = ({ job }: Props) => {
       filterByGroupId: group.groupId,
    })
    const linkedLiveStreams = useCustomJobLinkedLivestreams(job)
+   const { isSubmitting } = useCustomJobForm()
 
    const allLivesStreams = useMemo(
       () => [
@@ -79,11 +92,17 @@ const JobLinkLiveStreams = ({ job }: Props) => {
 
    const livestreamIds = watch(FIELD_NAME)
 
-   const handleNext = useCallback(() => {
+   const handlePrimaryClick = useCallback(() => {
+      if (handlePrimaryButton) {
+         handlePrimaryButton()
+         return
+      }
+
       // If the group has public sparks, move to the next step
       if (group.publicSparks) {
          moveToNext()
       }
+
       // If there are no livestream IDs selected and has no public sparks, go to the NO_LINKED_CONTENT step
       else if (livestreamIds.length === 0) {
          goToStep(JobDialogStep.NO_LINKED_CONTENT.key)
@@ -92,7 +111,21 @@ const JobLinkLiveStreams = ({ job }: Props) => {
       else {
          goToStep(JobDialogStep.FORM_PREVIEW.key)
       }
-   }, [goToStep, group.publicSparks, livestreamIds.length, moveToNext])
+   }, [
+      goToStep,
+      group.publicSparks,
+      handlePrimaryButton,
+      livestreamIds.length,
+      moveToNext,
+   ])
+
+   const handleSecondaryClick = useCallback(() => {
+      if (handleSecondaryButton) {
+         handleSecondaryButton()
+      } else {
+         moveToPrev()
+      }
+   }, [handleSecondaryButton, moveToPrev])
 
    const handleCardClick = useCallback(
       (eventId: string) => {
@@ -131,6 +164,16 @@ const JobLinkLiveStreams = ({ job }: Props) => {
       [group.publicSparks]
    )
 
+   const selectInput = useCallback(
+      (eventId: string) => (
+         <CardTopCheckBox
+            id={eventId}
+            selected={livestreamIds.includes(eventId)}
+         />
+      ),
+      [livestreamIds]
+   )
+
    return (
       <SteppedDialog.Container
          containerSx={styles.content}
@@ -140,6 +183,11 @@ const JobLinkLiveStreams = ({ job }: Props) => {
          <>
             <SteppedDialog.Content sx={styles.container}>
                {title}
+
+               <SteppedDialog.Subtitle sx={styles.subtitle}>
+                  Select at least one upcoming live stream to link to this job
+                  so it can be visible to talent.
+               </SteppedDialog.Subtitle>
 
                <Grid
                   container
@@ -158,8 +206,9 @@ const JobLinkLiveStreams = ({ job }: Props) => {
                            event={event}
                            hideChipLabels
                            onCardClick={() => handleCardClick(event.id)}
-                           isSelectable
+                           selectInput={selectInput(event.id)}
                            selected={livestreamIds.includes(event.id)}
+                           disableClick={isSubmitting}
                         />
                      </Grid>
                   ))}
@@ -170,18 +219,18 @@ const JobLinkLiveStreams = ({ job }: Props) => {
                <SteppedDialog.Button
                   variant="outlined"
                   color="grey"
-                  onClick={moveToPrev}
+                  onClick={handleSecondaryClick}
                   sx={styles.cancelBtn}
                >
-                  Back
+                  {secondaryButtonMessage || "Back"}
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
-                  onClick={handleNext}
+                  onClick={handlePrimaryClick}
                   variant="contained"
                   color="secondary"
                >
-                  Next
+                  {primaryButtonMessage || "Next"}
                </SteppedDialog.Button>
             </SteppedDialog.Actions>
          </>

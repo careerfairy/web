@@ -79,8 +79,7 @@ const JobDetailsView: FC = (props) => {
 
    const { livestreamDialog } = query
 
-   const [pathType, livestreamId, dialogPage, queryJobId] =
-      livestreamDialog || []
+   const [, , , queryJobId] = livestreamDialog || []
 
    const jobId = mode === "page" ? queryJobId : contextJobId // If the mode is page, we need to use the query param jobId o
 
@@ -175,7 +174,8 @@ const JobDetails: FC<Props> = ({ jobId }) => {
                <Stack spacing={3}>
                   <JobHeader
                      job={job}
-                     livestreamPresenter={livestreamPresenter}
+                     companyName={livestreamPresenter.company}
+                     companyLogoUrl={livestreamPresenter.companyLogoUrl}
                   />
 
                   <JobDescription job={job} />
