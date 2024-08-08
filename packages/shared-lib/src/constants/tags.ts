@@ -122,17 +122,6 @@ export const getBusinessTagsByIds = (tagIds: string[]): OptionGroup[] => {
    )
 }
 
-export const getBusinessTagsByIds = (tagIds: string[]): OptionGroup[] => {
-   const tagIdSet = new Set(tagIds)
-
-   return BusinessFunctionsTagValues.filter((tag) => tagIdSet.has(tag.id)).map(
-      (tag) => ({
-         id: tag.id,
-         name: tag.name,
-      })
-   )
-}
-
 export type ContentHitsCount = {
    sparks: number
    livestreams: number
