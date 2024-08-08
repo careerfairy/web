@@ -5,7 +5,6 @@ import {
 import { CircularProgress } from "@mui/material"
 import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import dynamic from "next/dynamic"
 import {
    MutableRefObject,
@@ -54,10 +53,6 @@ export const JobDialogStep = {
    NO_CONTENT_AVAILABLE: {
       position: 2,
       key: "no-content-available",
-   },
-   OLD_FORM: {
-      position: 2,
-      key: "oldJobForm",
    },
    FORM_BASIC_INFO: {
       position: 3,
@@ -227,7 +222,7 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
 
       return group.privacyPolicyActive || selectedJobId
          ? JobDialogStep.FORM_BASIC_INFO.position
-         : JobDialogStep.OLD_FORM.position
+         : JobDialogStep.FORM_PREVIEW.position
    }, [group.privacyPolicyActive, isDeleteJobDialogOpen, selectedJobId])
 
    const views = useMemo(
