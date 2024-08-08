@@ -135,3 +135,39 @@ export interface CustomJobApplicant extends Identifiable {
 export const getMaxDaysAfterDeadline = (): Date => {
    return new Date(Date.now() - CUSTOM_JOB_CONSTANTS.MAX_DAYS_AFTER_DEADLINE)
 }
+
+/**
+ * This function sorts an array of jobs or job statistics.
+ * It prioritizes jobs based on their publication status and deadline.
+ *
+ * @param jobs {(CustomJob | CustomJobStats)[]}
+ * @returns {(CustomJob | CustomJobStats)[]}
+ */
+export const sortCustomJobs = <T extends CustomJob | CustomJobStats>(
+   jobs: T[]
+): T[] => {
+   const now = new Date()
+
+   // Create a new array to avoid mutating the original 'jobs' array
+   const sortedJobs = [...jobs]
+
+   return sortedJobs.sort((a, b) => {
+      // Extracting the CustomJob object from 'a' and 'b' based on whether they have a 'job' property or not
+      const jobA: CustomJob = "job" in a ? a.job : a
+      const jobB: CustomJob = "job" in b ? b.job : b
+
+      // Sort by 'published' flag
+      if (jobA.published && !jobB.published) return -1
+      if (!jobA.published && jobB.published) return 1
+
+      // Both have the same 'published' status, so sort by 'deadline'
+      const aDeadlineValid = jobA.deadline.toDate() > now
+      const bDeadlineValid = jobB.deadline.toDate() > now
+
+      if (aDeadlineValid && !bDeadlineValid) return -1
+      if (!aDeadlineValid && bDeadlineValid) return 1
+
+      // If both jobs have the same 'published' status and 'deadline' validity, maintain the current order
+      return 0
+   })
+}
