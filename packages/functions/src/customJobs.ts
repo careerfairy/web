@@ -11,7 +11,7 @@ import {
 } from "./middlewares/validations"
 import { onCallWrapper } from "./util"
 
-export const userApplyToCustomJob = functions
+export const confirmUserApplyToCustomJob = functions
    .region(config.region)
    .runWith({
       secrets: ["MERGE_ACCESS_KEY"],
@@ -39,19 +39,18 @@ export const userApplyToCustomJob = functions
                   userRepo.getUserDataById(userId),
                ])
 
-            if (userCustomJobApplication) {
+            if (!userCustomJobApplication) {
                functions.logger.log(
-                  `User ${userId} have already applied to the job ${jobId}`
+                  `User ${userId} has not initiated job application for job with ID: ${jobId}`
                )
                return null
             }
 
             // create job application
             // Add job application details on the user document
-            return customJobRepo.applyUserToCustomJob(
+            return customJobRepo.confirmUserApplicationToCustomJob(
                user,
-               jobToApply,
-               livestreamId
+               jobToApply.id
             )
          })
       )

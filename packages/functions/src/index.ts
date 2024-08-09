@@ -284,7 +284,7 @@ exports.trackSparkSecondsWatched_v4 = userSparks.trackSparkSecondsWatched
 exports.getSparksAnalytics_v3 = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
-exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob
+exports.confirmUserJobApplication = customJobs.confirmUserApplyToCustomJob
 exports.updateCustomJobWithLinkedLivestreams_v2 =
    customJobs.updateCustomJobWithLinkedLivestreams
 exports.transferCustomJobsFromDraftToPublishedLivestream_v2 =

@@ -70,6 +70,16 @@ export interface ICustomJobRepository {
    ): Promise<void>
 
    /**
+    * Confirms a successful job application for an user, implying an initiation of the application to already
+    * be done.
+    * @param user User for which the application will be confirmed.
+    * @param jobId ID of the job the user is applying to.
+    */
+   confirmUserApplicationToCustomJob(
+      user: UserData,
+      jobId: string
+   ): Promise<void>
+   /**
     * To increment the 'clicks' field on a specific customJob
     * @param jobId
     */
@@ -139,6 +149,10 @@ export class FirebaseCustomJobRepository
       protected readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
+   }
+
+   private getJobApplicationId(jobId: string, userId: string) {
+      return `${jobId}_${userId}`
    }
 
    async createCustomJob(
@@ -260,16 +274,7 @@ export class FirebaseCustomJobRepository
       job: CustomJob,
       livestreamId: string
    ): Promise<void> {
-      const batch = this.firestore.batch()
-      const applicationId = `${job.id}_${user.userEmail}`
-
-      const jobApplicationRef = this.firestore
-         .collection("jobApplications")
-         .doc(applicationId)
-
-      const jobStatsRef = this.firestore
-         .collection("customJobStats")
-         .doc(job.id)
+      const applicationId = this.getJobApplicationId(job.id, user.userEmail)
 
       const newJobApplicant: CustomJobApplicant = {
          documentType: "customJobApplicant",
@@ -277,12 +282,37 @@ export class FirebaseCustomJobRepository
          jobId: job.id,
          groupId: job.groupId,
          livestreamId: livestreamId,
-         appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
+         appliedAt: null, // Initial application not confirmed so null date
          user,
          job,
+         completed: false,
       }
 
-      batch.set(jobApplicationRef, newJobApplicant, { merge: true })
+      return this.firestore
+         .collection("jobApplications")
+         .doc(applicationId)
+         .set(newJobApplicant)
+   }
+
+   async confirmUserApplicationToCustomJob(
+      user: UserData,
+      jobId: string
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+      const applicationId = this.getJobApplicationId(jobId, user.userEmail) // TODO-WG: Should use user.id ?
+
+      const jobApplicationRef = this.firestore
+         .collection("jobApplications")
+         .doc(applicationId)
+
+      const jobStatsRef = this.firestore.collection("customJobStats").doc(jobId)
+
+      const toUpdate: Pick<CustomJobApplicant, "completed" | "appliedAt"> = {
+         completed: true,
+         appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
+      }
+
+      batch.update(jobApplicationRef, toUpdate)
 
       if (!user.userEmail.includes("@careerfairy")) {
          // we only want to increment the count if the user is not from CareerFairy
