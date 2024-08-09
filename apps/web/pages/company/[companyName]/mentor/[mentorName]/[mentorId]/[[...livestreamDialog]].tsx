@@ -103,7 +103,7 @@ export const getStaticProps: GetStaticProps<{
             )
 
             const sparks = serverSideGroup.publicSparks
-               ? await sparkService.getCreatorSparks(
+               ? await sparkService.getCreatorPublicSparks(
                     mentorId as string,
                     serverSideGroup?.groupId
                  )
