@@ -2,7 +2,10 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Stack, Typography, useTheme } from "@mui/material"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useCallback } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
 import { LinkedInIcon } from "../common/icons/LinkedInIcon"
 import CollapsibleText from "../common/inputs/CollapsibleText"
@@ -138,7 +141,13 @@ export const MentorDetail = ({
    hasJobs,
 }: MentorDetailProps) => {
    const isDesktop = useIsDesktop()
+   const { data: visitorId } = useFingerPrint()
+   const { trackMentorLinkedInReach } = useFirebaseService()
    const isUserFromTargetedCountry = useIsTargetedUser(group)
+
+   const linkedInOnClick = useCallback(() => {
+      trackMentorLinkedInReach(group.groupId, mentor.id, visitorId)
+   }, [group?.groupId, mentor?.id, trackMentorLinkedInReach, visitorId])
 
    if (!mentor) return null
 
@@ -161,6 +170,7 @@ export const MentorDetail = ({
                LinkComponent="a"
                href={mentor.linkedInUrl}
                target="_blank"
+               onClick={linkedInOnClick}
             >
                <LinkedInButton />
             </Button>

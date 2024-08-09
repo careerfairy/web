@@ -49,7 +49,7 @@ export enum SparkCardNotificationTypes {
     */
    EVENT = "event",
    /**
-    * Default notification to be displayed at the end of group content
+    * Default notification to be displayed at the end of creator content
     */
    CREATOR = "creator",
 }

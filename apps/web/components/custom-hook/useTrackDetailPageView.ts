@@ -1,13 +1,13 @@
 import { InViewHookResponse, useInView } from "react-intersection-observer"
 
 // project imports
-import useFingerPrint from "./useFingerPrint"
 import { errorLogAndNotify } from "../../util/CommonUtil"
+import useFingerPrint from "./useFingerPrint"
 
 type TrackProps = {
    id: string
    visitorId: string
-   extraData?: unknown
+   extraData?: any
 }
 
 type Props = {
