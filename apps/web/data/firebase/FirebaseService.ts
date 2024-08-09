@@ -3140,7 +3140,6 @@ class FirebaseService {
       const visitorSnap = await visitorRef.get()
 
       if (!visitorSnap.exists) {
-         console.log("trackMentorPageView - set")
          await visitorRef.set({
             createdAt: this.getServerTimestamp(),
          })
