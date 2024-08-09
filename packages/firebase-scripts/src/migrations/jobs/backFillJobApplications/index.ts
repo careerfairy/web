@@ -1,5 +1,4 @@
 import { CustomJobApplicant } from "@careerfairy/shared-lib/src/customJobs/customJobs"
-import { Timestamp } from "firebase-admin/firestore"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { customJobRepo } from "../../../repositories"
@@ -58,7 +57,7 @@ const backfillJobApplications = async (
 
          const toUpdate: Pick<CustomJobApplicant, "completed" | "appliedAt"> = {
             completed: true,
-            appliedAt: Timestamp.now(),
+            appliedAt: customJobApplicant.job.updatedAt, // TODO-WG: Confirm when did the user apply ?
          }
 
          // eslint-disable-next-line @typescript-eslint/no-explicit-any
