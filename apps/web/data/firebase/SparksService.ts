@@ -107,6 +107,28 @@ export class SparksService {
    }
 
    /**
+    * Retrieves all public sparks created by a specific creator within a specified group.
+    *
+    * @param creatorId The unique identifier for the creator.
+    * @param creatorGroupId The group identifier to which the creator belongs.
+    * @returns A promise that resolves to an array of Spark objects.
+    */
+   async getCreatorPublicSparks(
+      creatorId: Creator["id"],
+      creatorGroupId: Creator["groupId"]
+   ): Promise<Spark[]> {
+      const q = query(
+         collection(FirestoreInstance, "sparks"),
+         where("creator.id", "==", creatorId),
+         where("creator.groupId", "==", creatorGroupId),
+         where("published", "==", true),
+         orderBy("createdAt", "desc")
+      ).withConverter(createGenericConverter<Spark>())
+      const result = await getDocs(q)
+      return result.docs.map((doc) => doc.data())
+   }
+
+   /**
     * Fetch the user's feed of sparks
     * @param userId  The user to fetch the feed for, if not provided, the public feed will be fetched
     * - If the user is not authenticated, the public feed will be fetched
