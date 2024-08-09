@@ -2,7 +2,10 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Stack, Typography, useTheme } from "@mui/material"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useCallback } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
 import { LinkedInIcon } from "../common/icons/LinkedInIcon"
 import CollapsibleText from "../common/inputs/CollapsibleText"
@@ -52,11 +55,15 @@ const styles = sxStyles({
    },
 })
 
-const LinkedInButton = () => {
+type LinkedInButtonProps = {
+   onClick: () => void
+}
+
+const LinkedInButton = ({ onClick }: LinkedInButtonProps) => {
    const theme = useTheme()
 
    return (
-      <Stack sx={styles.linkedInButtonInnerContainer}>
+      <Stack sx={styles.linkedInButtonInnerContainer} onClick={onClick}>
          <LinkedInIcon fill={theme.brand.info[700]} />
          <Typography variant="small">Reach out on LinkedIn</Typography>
       </Stack>
@@ -138,7 +145,13 @@ export const MentorDetail = ({
    hasJobs,
 }: MentorDetailProps) => {
    const isDesktop = useIsDesktop()
+   const { data: visitorId } = useFingerPrint()
+   const { trackMentorLinkedInReach } = useFirebaseService()
    const isUserFromTargetedCountry = useIsTargetedUser(group)
+
+   const linkedInOnClick = useCallback(() => {
+      trackMentorLinkedInReach(group.groupId, mentor.id, visitorId)
+   }, [group?.groupId, mentor?.id, trackMentorLinkedInReach, visitorId])
 
    if (!mentor) return null
 
@@ -162,7 +175,7 @@ export const MentorDetail = ({
                href={mentor.linkedInUrl}
                target="_blank"
             >
-               <LinkedInButton />
+               <LinkedInButton onClick={linkedInOnClick} />
             </Button>
          )}
          {isDesktop || !mentor.story ? (
