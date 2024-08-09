@@ -81,6 +81,14 @@ export const MentorsSection = () => {
                margin: "-16px",
                width: "calc(100% + 16px)",
             }}
+            emblaProps={{
+               emblaOptions: {
+                  dragFree: true,
+                  skipSnaps: true,
+                  loop: false,
+                  axis: "x",
+               },
+            }}
          >
             {mentors.map((creator) => (
                <Box key={`mentor-slide-box-${JSON.stringify(creator)}`}>
