@@ -1,6 +1,7 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, ButtonBase, Grid, useTheme } from "@mui/material"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useCallback } from "react"
@@ -68,6 +69,7 @@ const JobCard = ({
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const theme = useTheme()
+   const { jobHubV1 } = useFeatureFlags()
 
    const showAdditionalInfo = clicks !== undefined && applicants !== undefined
 
@@ -96,7 +98,7 @@ const JobCard = ({
       >
          <Grid container>
             <Box sx={styles.listItemContainer}>
-               {isAtsJob ? null : (
+               {isAtsJob || !jobHubV1 ? null : (
                   <Box
                      sx={[styles.jobState, { background: getStateColor(job) }]}
                   />
