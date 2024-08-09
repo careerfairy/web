@@ -55,15 +55,11 @@ const styles = sxStyles({
    },
 })
 
-type LinkedInButtonProps = {
-   onClick: () => void
-}
-
-const LinkedInButton = ({ onClick }: LinkedInButtonProps) => {
+const LinkedInButton = () => {
    const theme = useTheme()
 
    return (
-      <Stack sx={styles.linkedInButtonInnerContainer} onClick={onClick}>
+      <Stack sx={styles.linkedInButtonInnerContainer}>
          <LinkedInIcon fill={theme.brand.info[700]} />
          <Typography variant="small">Reach out on LinkedIn</Typography>
       </Stack>
@@ -174,8 +170,9 @@ export const MentorDetail = ({
                LinkComponent="a"
                href={mentor.linkedInUrl}
                target="_blank"
+               onClick={linkedInOnClick}
             >
-               <LinkedInButton onClick={linkedInOnClick} />
+               <LinkedInButton />
             </Button>
          )}
          {isDesktop || !mentor.story ? (
