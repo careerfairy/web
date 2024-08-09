@@ -3124,6 +3124,51 @@ class FirebaseService {
       }
    }
 
+   trackMentorPageView = async (
+      careerId: string,
+      creatorId: string,
+      visitorId: string
+   ) => {
+      const visitorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(careerId)
+         .collection("creators")
+         .doc(creatorId)
+         .collection("statPageView")
+         .doc(visitorId)
+
+      const visitorSnap = await visitorRef.get()
+
+      if (!visitorSnap.exists) {
+         console.log("trackMentorPageView - set")
+         await visitorRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
+      }
+   }
+
+   trackMentorLinkedInReach = async (
+      careerId: string,
+      creatorId: string,
+      visitorId: string
+   ) => {
+      const visitorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(careerId)
+         .collection("creators")
+         .doc(creatorId)
+         .collection("statLinkedInReach")
+         .doc(visitorId)
+
+      const visitorSnap = await visitorRef.get()
+
+      if (!visitorSnap.exists) {
+         await visitorRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
+      }
+   }
+
    trackCompanyPageView = async (
       groupId: string,
       visitorId: string
