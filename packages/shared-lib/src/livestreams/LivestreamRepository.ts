@@ -66,6 +66,11 @@ export type ParticipatedEventsOptions = {
    orderByDirection?: "asc" | "desc"
 }
 
+export type GetEventsOfGroupOptions = {
+   limit?: number
+   hideHidden?: boolean
+}
+
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
 
@@ -124,10 +129,7 @@ export interface ILivestreamRepository {
    getEventsOfGroup(
       groupId: string,
       type?: "upcoming" | "past",
-      options?: {
-         limit?: number
-         hideHidden?: boolean
-      }
+      options?: GetEventsOfGroupOptions
    ): Promise<LivestreamEvent[] | null>
 
    serializeEvent(event: LivestreamEvent): LivestreamEventSerialized
@@ -602,10 +604,7 @@ export class FirebaseLivestreamRepository
    async getEventsOfGroup(
       groupId: string,
       type?: "upcoming" | "past",
-      options?: {
-         limit?: number
-         hideHidden?: boolean
-      }
+      options?: GetEventsOfGroupOptions
    ): Promise<LivestreamEvent[] | null> {
       let query = this.eventsOfGroupQuery(groupId, type, options?.hideHidden)
 

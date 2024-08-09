@@ -4,7 +4,6 @@ import {
 } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { ContentCarousel } from "components/views/mentor-page/ContentCarousel"
 import { useCallback, useEffect, useState } from "react"
 import { useMountedState } from "react-use"
@@ -14,8 +13,6 @@ import { MentorCard } from "./MentorCard"
 import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
-   const isMobile = useIsMobile()
-
    const { editMode, groupCreators } = useCompanyPage()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -84,6 +81,14 @@ export const MentorsSection = () => {
                margin: "-16px",
                width: "calc(100% + 16px)",
             }}
+            emblaProps={{
+               emblaOptions: {
+                  dragFree: true,
+                  skipSnaps: true,
+                  loop: false,
+                  axis: "x",
+               },
+            }}
          >
             {mentors.map((creator) => (
                <Box key={`mentor-slide-box-${JSON.stringify(creator)}`}>
@@ -97,7 +102,6 @@ export const MentorsSection = () => {
          </ContentCarousel>
          <CreatorFormLayout.Dialog
             isDialogOpen={isDialogOpen}
-            isMobile={isMobile}
             handleCloseDialog={handleClose}
          >
             <MentorForm

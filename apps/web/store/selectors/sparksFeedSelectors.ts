@@ -28,6 +28,9 @@ export const initialSparksFetchedSelector = (state: RootState) =>
 export const hasNoMoreSparksSelector = (state: RootState) =>
    state.sparksFeed.hasMoreSparks === false
 
+export const fetchedCompanyWithCreatorStatusSelector = (state: RootState) =>
+   state.sparksFeed.fetchedCompanyWithCreatorStatus
+
 export const activeSparkSelector = (state: RootState) => {
    const sparks = state.sparksFeed.sparks
    const index = state.sparksFeed.currentPlayingIndex
@@ -101,3 +104,15 @@ export const anonymousUserCountryCodeSelector = (state: RootState) =>
 
 export const shouldShowLinkedInPopUpNotificationSelector = (state: RootState) =>
    state.sparksFeed.shouldShowLinkedInPopUpNotification
+
+export const isGroupFeedSelector = (state: RootState) =>
+   state.sparksFeed.groupId && !state.sparksFeed.creatorId
+
+export const isCreatorFeedSelector = (state: RootState) =>
+   state.sparksFeed.creatorId && !state.sparksFeed.groupId
+
+export const isInCreatorFeedSelector = (state: RootState) =>
+   state.sparksFeed.fetchedCompanyWithCreatorStatus === "ongoing"
+
+export const wasInCreatorFeedSelector = (state: RootState) =>
+   state.sparksFeed.fetchedCompanyWithCreatorStatus === "ongoing"

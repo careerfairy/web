@@ -48,6 +48,10 @@ export enum SparkCardNotificationTypes {
     * Notification to be displayed at the end of group content if the company does have any upcoming live stream
     */
    EVENT = "event",
+   /**
+    * Default notification to be displayed at the end of group content
+    */
+   CREATOR = "creator",
 }
 
 /**

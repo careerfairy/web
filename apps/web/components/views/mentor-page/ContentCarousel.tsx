@@ -1,6 +1,9 @@
 import { Stack, SxProps, Typography, TypographyProps } from "@mui/material"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
-import useEmblaCarousel, { UseEmblaCarouselType } from "embla-carousel-react"
+import useEmblaCarousel, {
+   EmblaOptionsType,
+   UseEmblaCarouselType,
+} from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import React, { ReactNode, useCallback, useRef } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
@@ -14,7 +17,6 @@ const styles = sxStyles({
       position: "relative",
       flexDirection: "row",
       gap: 2,
-      paddingRight: "30px",
    },
    title: {
       fontSize: "24px",
@@ -30,8 +32,9 @@ type ContentCarouselProps = Pick<GenericCarouselProps, "children"> & {
    viewportSx?: SxProps
    containerSx?: SxProps
    emblaProps?: {
-      emblaRef: UseEmblaCarouselType[0]
-      emblaApi: UseEmblaCarouselType[1]
+      emblaRef?: UseEmblaCarouselType[0]
+      emblaApi?: UseEmblaCarouselType[1]
+      emblaOptions?: EmblaOptionsType
    }
 }
 
@@ -46,7 +49,7 @@ export const ContentCarousel = ({
    const carouselContainerRef = useRef<HTMLDivElement>(null)
 
    const [emblaRef, emblaApi] = useEmblaCarousel(
-      {
+      emblaProps?.emblaOptions || {
          loop: false,
          axis: "x",
       },
