@@ -7,6 +7,7 @@ import {
    SwipeableDrawer,
    Typography,
 } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -183,16 +184,16 @@ const Actions = ({ children }) => {
 type BrandedDialogProps = {
    isDialogOpen: boolean
    handleCloseDialog: () => void
-   isMobile: boolean
    children: React.ReactNode
 }
 
 const BrandedDialog = ({
    isDialogOpen,
    handleCloseDialog,
-   isMobile,
    children,
 }: BrandedDialogProps) => {
+   const isMobile = useIsMobile()
+
    return isMobile ? (
       <SwipeableDrawer
          anchor="bottom"

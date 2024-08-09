@@ -87,7 +87,10 @@ export const getStaticProps: GetStaticProps<{
             } = await getLivestreamsAndDialogData(
                serverSideGroup?.groupId,
                ctx,
-               true
+               {
+                  hideHidden: true,
+                  limit: undefined,
+               }
             )
 
             const hasJobs =
@@ -100,7 +103,7 @@ export const getStaticProps: GetStaticProps<{
             )
 
             const sparks = serverSideGroup.publicSparks
-               ? await sparkService.getCreatorSparks(
+               ? await sparkService.getCreatorPublicSparks(
                     mentorId as string,
                     serverSideGroup?.groupId
                  )

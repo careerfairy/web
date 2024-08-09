@@ -5,6 +5,7 @@ import {
    deserializeGroup,
 } from "@careerfairy/shared-lib/groups"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { GetEventsOfGroupOptions } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import {
    MAX_PAST_STREAMS,
@@ -202,26 +203,24 @@ export const convertQueryParamsToString = (query: ParsedUrlQuery): string => {
 export const getLivestreamsAndDialogData = async (
    groupId: string,
    context: GetServerSidePropsContext | GetStaticPathsContext,
-   noLimits?: boolean
+   options?: GetEventsOfGroupOptions
 ) => {
    const results = await Promise.allSettled([
       livestreamRepo.getEventsOfGroup(
          groupId,
          "upcoming",
-         noLimits
-            ? undefined
-            : {
-                 limit: MAX_UPCOMING_STREAMS + 1, // fetch 10 + 1 to know if there are more
-              }
+         options || {
+            hideHidden: null,
+            limit: MAX_UPCOMING_STREAMS + 1, // fetch 10 + 1 to know if there are more
+         }
       ),
       livestreamRepo.getEventsOfGroup(
          groupId,
          "past",
-         noLimits
-            ? undefined
-            : {
-                 limit: MAX_PAST_STREAMS + 1, // fetch 5 + 1 to know if there are more
-              }
+         options || {
+            hideHidden: null,
+            limit: MAX_PAST_STREAMS + 1, // fetch 5 + 1 to know if there are more
+         }
       ),
       getLivestreamDialogData(context),
    ])

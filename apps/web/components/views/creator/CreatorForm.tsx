@@ -100,6 +100,7 @@ export const CreatorFormFields = () => {
                placeholder="E.g.,: https://linkedin.com/in/user"
                autoComplete="url"
                fullWidth
+               tooltipText="Add your LinkedIn profile to connect with more qualified candidates."
             />
          </Grid>
          <Grid item xs={12}>

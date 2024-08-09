@@ -19,12 +19,19 @@ export type AddCardNotificationPayload = {
    type: SparkCardNotificationTypes
 }
 
+export type FetchedCompanyWithCreatorStatus =
+   | "unset"
+   | "started"
+   | "ongoing"
+   | "finished"
+
 // Initial state
 interface SparksState {
    originalSparkId: string | null
    sparks: SparkPresenter[]
    currentPlayingIndex: number
    hasMoreSparks: boolean
+   fetchedCompanyWithCreatorStatus: FetchedCompanyWithCreatorStatus
    groupId: string | null
    creatorId: string | null
    userEmail: string | null
@@ -57,6 +64,7 @@ const initialState: SparksState = {
    sparks: [],
    currentPlayingIndex: 0,
    hasMoreSparks: true,
+   fetchedCompanyWithCreatorStatus: "unset",
    groupId: null,
    creatorId: null,
    userEmail: null,
@@ -112,6 +120,7 @@ export const fetchNextSparks = createAsyncThunk(
       return sparkService.fetchNextSparks(lastSpark, sparkOptions)
    }
 )
+
 // Async thunk to fetch the next spark IDs
 export const fetchInitialSparksFeed = createAsyncThunk(
    "sparks/fetchInitial",
@@ -155,6 +164,12 @@ const sparksFeedSlice = createSlice({
       },
       setUserEmail: (state, action: PayloadAction<string>) => {
          state.userEmail = action.payload
+      },
+      setFetchedCompanyWithCreatorStatus: (
+         state,
+         action: PayloadAction<FetchedCompanyWithCreatorStatus>
+      ) => {
+         state.fetchedCompanyWithCreatorStatus = action.payload
       },
       setSparkCategories: (
          state,
@@ -237,6 +252,10 @@ const sparksFeedSlice = createSlice({
          state.groupId = null
          state.hasMoreSparks = true
       },
+      removeCreatorId: (state) => {
+         state.creatorId = null
+         state.hasMoreSparks = true
+      },
       setCameFromPageLink: (state, action: PayloadAction<string>) => {
          state.cameFromPageLink = action.payload
       },
@@ -282,6 +301,8 @@ const sparksFeedSlice = createSlice({
          state.sparks = []
          state.currentPlayingIndex = 0
          state.hasMoreSparks = true
+         state.fetchedCompanyWithCreatorStatus = "unset"
+         state.creatorId = null
          state.initialFetchStatus = "idle"
          state.initialSparksFetched = false
          state.fetchNextSparksStatus = "idle"
@@ -411,18 +432,14 @@ const getSparkOptions = (state: RootState) => {
       anonymousUserCountryCode,
    } = state.sparksFeed
 
-   const feedScope = creatorId
-      ? { creatorId }
-      : groupId
-      ? { groupId }
-      : { userId: userEmail || null }
-
    return {
       numberOfSparks: numberOfSparksToFetch,
       sparkCategoryIds,
       contentTopicIds,
       anonymousUserCountryCode,
-      ...feedScope,
+      creatorId,
+      groupId,
+      userId: userEmail,
    }
 }
 
@@ -494,6 +511,8 @@ export const {
    showEventDetailsDialog,
    addCardNotificationToSparksList,
    removeGroupId,
+   removeCreatorId,
+   setFetchedCompanyWithCreatorStatus,
    setCardEventNotification,
    setCameFromPageLink,
    setInteractionSource,
