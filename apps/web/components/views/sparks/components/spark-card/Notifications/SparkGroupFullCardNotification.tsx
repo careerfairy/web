@@ -1,14 +1,14 @@
-import Image from "next/legacy/image"
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { Avatar, Box, Button, Typography } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
+import Image from "next/legacy/image"
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
-import { sxStyles } from "types/commonTypes"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { useDispatch, useSelector } from "react-redux"
 import { swipeToSparkByIndex } from "store/reducers/sparksFeedReducer"
 import { currentSparkIndexSelector } from "store/selectors/sparksFeedSelectors"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    content: {
@@ -53,12 +53,7 @@ const styles = sxStyles({
       textTransform: "none",
       mt: 2,
    },
-   avatar: {
-      width: (theme) => theme.spacing(15),
-      height: (theme) => theme.spacing(15),
-   },
    companyAvatar: {
-      padding: 1,
       backgroundColor: "white",
       boxShadow: 3,
       border: "3px solid white !important",
