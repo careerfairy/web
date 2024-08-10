@@ -3,6 +3,7 @@ import { Box, Stack } from "@mui/material"
 import Typography from "@mui/material/Typography"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import JobHeader from "components/views/livestream-dialog/views/job-details/main-content/JobHeader"
@@ -89,6 +90,7 @@ const CustomJobAdminDetails = ({
    companyLogoUrl,
 }: Props) => {
    const childRef = useRef(null)
+   const { jobHubV1 } = useFeatureFlags()
    const { description, salary, deadline, livestreams, sparks, groupId } = job
 
    const upcomingLiveStreams = useListenToStreams({ filterByGroupId: groupId })
@@ -183,7 +185,7 @@ const CustomJobAdminDetails = ({
                   </Box>
                ) : null}
 
-               {jobSparks.length > 0 ? (
+               {jobSparks.length > 0 && jobHubV1 ? (
                   <Box>
                      <Typography variant={"subtitle1"} sx={styles.subTitle}>
                         Sparks related to this job

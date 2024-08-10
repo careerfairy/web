@@ -3,6 +3,7 @@ import ChevronLeft from "@mui/icons-material/ChevronLeft"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 import { Box, Tab, Tabs, Tooltip, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { AlertCircle } from "react-feather"
@@ -94,6 +95,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
    const { push } = useRouter()
+   const { jobHubV1 } = useFeatureFlags()
 
    const allowToDisplayApplicantsData = group.privacyPolicyActive
 
@@ -120,16 +122,20 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   <NoApplicantsData />
                ),
          },
-         {
-            label: "Linked content",
-            component: () => <LinkedContent job={job} />,
-         },
+         ...(jobHubV1
+            ? [
+                 {
+                    label: "Linked content",
+                    component: () => <LinkedContent job={job} />,
+                 },
+              ]
+            : []),
          {
             label: "Job Opening",
             component: () => <JobPosting job={job} group={group} />,
          },
       ],
-      [allowToDisplayApplicantsData, group, job]
+      [allowToDisplayApplicantsData, group, job, jobHubV1]
    )
 
    if (!job) {
@@ -158,9 +164,13 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             TabIndicatorProps={{
                sx: [
                   styles.indicator,
-                  activeTabIndex === TabsEnum.LINKED_CONTENT &&
-                     jobHasNoContent &&
-                     styles.jobWarningIndicator,
+                  ...(jobHubV1
+                     ? [
+                          activeTabIndex === TabsEnum.LINKED_CONTENT &&
+                             jobHasNoContent &&
+                             styles.jobWarningIndicator,
+                       ]
+                     : []),
                ],
             }}
             sx={styles.tabs}
@@ -190,26 +200,31 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                }
             />
 
-            <Tab
-               key={"Linked content"}
-               label={
-                  <Box sx={styles.applicantsTab}>
-                     <Typography
-                        sx={{
-                           ...styles.tabsLabel,
-                           ...(activeTabIndex === TabsEnum.LINKED_CONTENT &&
-                              styles.activeTab),
-                           ...(jobHasNoContent && styles.warningTab),
-                        }}
-                     >
-                        Linked content
-                     </Typography>
-                     {jobHasNoContent ? (
-                        <Box component={AlertCircle} sx={styles.warningAlert} />
-                     ) : null}
-                  </Box>
-               }
-            />
+            {jobHubV1 ? (
+               <Tab
+                  key={"Linked content"}
+                  label={
+                     <Box sx={styles.applicantsTab}>
+                        <Typography
+                           sx={{
+                              ...styles.tabsLabel,
+                              ...(activeTabIndex === TabsEnum.LINKED_CONTENT &&
+                                 styles.activeTab),
+                              ...(jobHasNoContent && styles.warningTab),
+                           }}
+                        >
+                           Linked content
+                        </Typography>
+                        {jobHasNoContent ? (
+                           <Box
+                              component={AlertCircle}
+                              sx={styles.warningAlert}
+                           />
+                        ) : null}
+                     </Box>
+                  }
+               />
+            ) : null}
 
             <Tab
                key={"Job posting"}
