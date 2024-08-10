@@ -2,8 +2,10 @@ import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import { Box, Grid, Tooltip, Typography } from "@mui/material"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useMemo } from "react"
 import { AlertCircle, Briefcase, Globe, Zap } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
@@ -100,6 +102,7 @@ type Props = {
 const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
+   const { jobHubV1 } = useFeatureFlags()
 
    let jobName: string
    let jobType: string
@@ -120,6 +123,11 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
       jobBusinessTags = job.businessFunctionsTagIds?.join(", ")
    }
 
+   const showTooltip = useMemo(
+      () => !isAtsJob && isJobValidButNoLinkedContent(job) && jobHubV1,
+      [isAtsJob, job, jobHubV1]
+   )
+
    return (
       <>
          <Box sx={styles.wrapper}>
@@ -131,7 +139,7 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
                   {jobName}
                </Typography>
 
-               {!isAtsJob && isJobValidButNoLinkedContent(job) ? (
+               {showTooltip ? (
                   <Box sx={styles.warningContainer}>
                      <Tooltip
                         title={
