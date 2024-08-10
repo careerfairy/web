@@ -164,9 +164,13 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             TabIndicatorProps={{
                sx: [
                   styles.indicator,
-                  activeTabIndex === TabsEnum.LINKED_CONTENT &&
-                     jobHasNoContent &&
-                     styles.jobWarningIndicator,
+                  ...(jobHubV1
+                     ? [
+                          activeTabIndex === TabsEnum.LINKED_CONTENT &&
+                             jobHasNoContent &&
+                             styles.jobWarningIndicator,
+                       ]
+                     : []),
                ],
             }}
             sx={styles.tabs}
