@@ -57,7 +57,7 @@ const backfillJobApplications = async (
 
          const toUpdate: Pick<CustomJobApplicant, "completed" | "appliedAt"> = {
             completed: true,
-            appliedAt: customJobApplicant.job.updatedAt, // TODO-WG: Confirm when did the user apply ?
+            appliedAt: null, // TODO-WG: Confirm when did the user apply ?
          }
 
          // eslint-disable-next-line @typescript-eslint/no-explicit-any
