@@ -83,7 +83,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
          >
             <Button
                id="register-button"
-               color={"secondary"}
+               color={"primary"}
                variant={"contained"}
                sx={[
                   !isFixedToBottom && styles.btn,

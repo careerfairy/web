@@ -12,12 +12,10 @@ import useUserJobApplication from "./useUserJobApplication"
 
 const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
    const { userData } = useAuth()
-   const userCustomJob = useUserJobApplication(userData?.id, job.id)
+   const { alreadyApplied } = useUserJobApplication(userData?.id, job.id)
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { push, asPath } = useRouter()
-   const customJob = useCustomJob(userCustomJob.jobId)
-
-   const alreadyApplied: boolean = !!userCustomJob
+   const customJob = useCustomJob(job.id)
 
    const { trigger: handleApply, isMutating: isApplying } = useSWRMutation(
       `user-${userData?.id}-applyToCustomJob-${job.id}`,
