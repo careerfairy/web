@@ -20,7 +20,7 @@ const runtimeSettings: RuntimeOptions = {
    // may take a while
    timeoutSeconds: 60 * 9,
    // we may load lots of data into memory
-   memory: "4GB",
+   memory: "8GB",
 }
 
 const ITEMS_PER_BATCH = 250
