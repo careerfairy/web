@@ -64,7 +64,7 @@ export const notifyLivestreamCreated = (
    const eventLink = makeLivestreamEventDetailsUrl(livestreamObj.id)
 
    const body = {
-      "Start Date": formatEventStartDate(livestreamObj.start.toDate()),
+      "Start Date": formatEventStartDate(livestreamObj.start?.toDate?.()),
       Publisher: publisherEmailOrName,
       Company: livestreamObj.company,
       Speakers: livestreamObj.speakers?.length,

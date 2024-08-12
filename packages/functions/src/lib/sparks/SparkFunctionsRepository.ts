@@ -351,7 +351,7 @@ export class SparkFunctionsRepository
    async get(id: string): Promise<Spark | null> {
       const doc = await this.firestore
          .collection("sparks")
-         .withConverter(createGenericConverter<Spark>())
+         .withConverter<Spark>(createGenericConverter())
          .doc(id)
          .get()
 
@@ -591,7 +591,7 @@ export class SparkFunctionsRepository
       const userFeedRef = query
          .orderBy("publishedAt", "desc")
          .limit(limit)
-         .withConverter(createGenericConverter<Spark>())
+         .withConverter<Spark>(createGenericConverter())
 
       const userFeedSnap = await userFeedRef.get()
 
@@ -629,7 +629,7 @@ export class SparkFunctionsRepository
             const publicFeedRef = query
                .orderBy("publishedAt", "desc")
                .limit(limit)
-               .withConverter(createGenericConverter<Spark>())
+               .withConverter<Spark>(createGenericConverter())
 
             const publicFeedSnap = await publicFeedRef.get()
 
@@ -651,7 +651,7 @@ export class SparkFunctionsRepository
          const publicFeedRef = query
             .orderBy("publishedAt", "desc")
             .limit(limit)
-            .withConverter(createGenericConverter<Spark>())
+            .withConverter<Spark>(createGenericConverter())
 
          const publicFeedSnap = await publicFeedRef.get()
 
@@ -665,7 +665,7 @@ export class SparkFunctionsRepository
                .where("group.publicSparks", "==", true)
                .orderBy("publishedAt", "desc")
                .limit(limit)
-               .withConverter(createGenericConverter<Spark>())
+               .withConverter<Spark>(createGenericConverter())
 
             const publicFeedSnap = await publicFeedRef.get()
 
@@ -719,7 +719,7 @@ export class SparkFunctionsRepository
       const groupFeedRef = query
          .orderBy("publishedAt", "desc")
          .limit(limit)
-         .withConverter(createGenericConverter<Spark>())
+         .withConverter<Spark>(createGenericConverter())
 
       const groupFeedSnap = await groupFeedRef.get()
 
@@ -738,7 +738,7 @@ export class SparkFunctionsRepository
          .where("group.publicSparks", "==", true)
          .orderBy("publishedAt", "desc")
          .limit(limit)
-         .withConverter(createGenericConverter<Spark>())
+         .withConverter<Spark>(createGenericConverter())
 
       const creatorFeedSnap = await query.get()
 
@@ -772,7 +772,7 @@ export class SparkFunctionsRepository
    async getUserFeedMetrics(userId: string): Promise<UserSparksFeedMetrics> {
       const userFeedSnap = await this.firestore
          .collection("sparksFeedMetrics")
-         .withConverter(createGenericConverter<UserSparksFeedMetrics>())
+         .withConverter<UserSparksFeedMetrics>(createGenericConverter())
          .doc(userId)
          .get()
 
@@ -797,7 +797,7 @@ export class SparkFunctionsRepository
       const currentYear = DateTime.now().year // 2023
       const seenSparkDocRef = this.firestore
          .doc(`userData/${userId}/seenSparks/${currentYear}`)
-         .withConverter(createGenericConverter<SeenSparks>())
+         .withConverter<SeenSparks>(createGenericConverter())
 
       const seenSparkDoc = await seenSparkDocRef.get()
       let currentSeenSparks: SeenSparks
@@ -860,7 +860,7 @@ export class SparkFunctionsRepository
 
       const allUsersWithAFeedSnap = await this.firestore
          .collection("sparksFeedMetrics")
-         .withConverter(createGenericConverter<UserSparksFeedMetrics>())
+         .withConverter<UserSparksFeedMetrics>(createGenericConverter())
          .get()
 
       allUsersWithAFeedSnap.docs.forEach((metricsDoc) => {
@@ -920,7 +920,7 @@ export class SparkFunctionsRepository
    async getSparksByGroupId(groupId: string): Promise<Spark[]> {
       const snapshot = await this.firestore
          .collection("sparks")
-         .withConverter(createGenericConverter<Spark>())
+         .withConverter<Spark>(createGenericConverter())
          .where("group.id", "==", groupId)
          .orderBy("createdAt", "desc")
          .get()
@@ -931,7 +931,7 @@ export class SparkFunctionsRepository
    async getAllUserSparksFeedMetrics(): Promise<UserSparksFeedMetrics[]> {
       const snapshot = await this.firestore
          .collection("sparksFeedMetrics")
-         .withConverter(createGenericConverter<UserSparksFeedMetrics>())
+         .withConverter<UserSparksFeedMetrics>(createGenericConverter())
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
@@ -972,7 +972,7 @@ export class SparkFunctionsRepository
          .collection("userData")
          .doc(userId)
          .collection("sparksNotifications")
-         .withConverter(createGenericConverter<UserSparksNotification>())
+         .withConverter<UserSparksNotification>(createGenericConverter())
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
@@ -1092,7 +1092,7 @@ export class SparkFunctionsRepository
          .collection("userData")
          .doc(userId)
          .collection(subCollectionName)
-         .withConverter(createGenericConverter<T>())
+         .withConverter<T>(createGenericConverter())
          .get()
 
       return userSeenSparksSnapshot.docs.map((doc) => doc.data())
@@ -1103,7 +1103,7 @@ export class SparkFunctionsRepository
       const sparkRefs = uniqueSparkIds.map((sparkId) =>
          this.firestore
             .collection("sparks")
-            .withConverter(createGenericConverter<Spark>())
+            .withConverter<Spark>(createGenericConverter())
             .doc(sparkId)
       )
 
