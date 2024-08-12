@@ -55,9 +55,8 @@ const backfillJobApplications = async (
       customJobsApplicantsChunk.forEach((customJobApplicant) => {
          writeProgressBar.increment() // Increment progress bar
 
-         const toUpdate: Pick<CustomJobApplicant, "completed" | "appliedAt"> = {
+         const toUpdate: Pick<CustomJobApplicant, "completed"> = {
             completed: true,
-            appliedAt: null, // TODO-WG: Confirm when did the user apply ?
          }
 
          // eslint-disable-next-line @typescript-eslint/no-explicit-any

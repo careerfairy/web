@@ -132,6 +132,7 @@ export interface CustomJobApplicant extends Identifiable {
    livestreamId: string // The associated livestream where the user applied to the job
    job: CustomJob
    completed?: boolean
+   createdAt?: firebase.firestore.Timestamp
    // cascaded properties from groups (collection /careerCenterData)
    companyCountry?: string
    companyIndustries?: string[]
