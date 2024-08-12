@@ -760,7 +760,7 @@ export class SparkFunctionsRepository
          .orderBy("creator.id", "asc")
          .orderBy("publishedAt", "desc")
          .limit(limit)
-         .withConverter(createGenericConverter<Spark>())
+         .withConverter<Spark>(createGenericConverter())
 
       const groupFeedSnap = await query.get()
 
