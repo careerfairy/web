@@ -16,6 +16,21 @@ import dotenv = require("dotenv")
 dotenv.config()
 
 // to prevent import issue
+import { setGlobalOptions } from "firebase-functions/v2"
+import config from "./config"
+
+/**
+ * Set the default region for all functions using the v2 SDK.
+ * This configuration needs to be set before importing any functions.
+ *
+ * @remarks
+ * The region setting affects where the Cloud Functions will be deployed and executed.
+ * Setting it globally ensures consistency across all functions defined in this file.
+ */
+setGlobalOptions({
+   region: config.region,
+})
+
 import { bundles } from "./bundles"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
