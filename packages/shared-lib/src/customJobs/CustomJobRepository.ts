@@ -286,6 +286,7 @@ export class FirebaseCustomJobRepository
          user,
          job,
          completed: false,
+         createdAt: this.fieldValue.serverTimestamp() as Timestamp,
       }
 
       return this.firestore
