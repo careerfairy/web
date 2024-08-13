@@ -24,6 +24,7 @@ import {
    FirebaseLivestreamRepository,
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
+import { AudioProcessingStatus } from "@careerfairy/shared-lib/livestreams/ai"
 import {
    HandRaise,
    HandRaiseState,
@@ -285,6 +286,16 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       afterJob: CustomJob,
       beforeJob: CustomJob
    ): Promise<void>
+
+   /**
+    * Fetches livestreams that are ready for audio processing
+    * - start was at most 2 hours ago
+    * - hidden is false
+    * - denyRecordingAccess is false
+    */
+   getLivestreamsForAudioProcessing(
+      status: AudioProcessingStatus
+   ): Promise<LivestreamEvent[]>
 }
 
 export class LivestreamFunctionsRepository
@@ -1216,5 +1227,22 @@ export class LivestreamFunctionsRepository
       })
 
       await batch.commit()
+   }
+
+   async getLivestreamsForAudioProcessing(
+      status: AudioProcessingStatus
+   ): Promise<LivestreamEvent[]> {
+      const query = this.firestore
+         .collection("livestreams")
+         .where("audioProcessingStatus", "==", status)
+         .where("test", "==", false)
+         .where("hidden", "==", false)
+         .where("denyRecordingAccess", "==", false)
+         .where("start", "<=", DateTime.now().minus({ hours: 2 }).toJSDate()) // Time buffer to account for time it takes for cloud recording to finish
+         .withConverter(createCompatGenericConverter<LivestreamEvent>())
+
+      const snap = await query.get()
+
+      return snap.docs.map((doc) => doc.data())
    }
 }

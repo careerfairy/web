@@ -390,4 +390,9 @@ exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
 exports.customerIOWebhook = customerio.customerIOWebhook
 
 // AI
-exports.generateLiveStreamTranscript = ai.generateLiveStreamTranscript
+exports[ai.GENERATE_TRANSCRIPT_FUNCTION_NAME] = ai.generateLiveStreamTranscript
+exports.triggerTranscription = ai.triggerTranscription
+exports.processLivestreamAudioRecordingsHttp =
+   ai.processLivestreamAudioRecordingsHttp
+exports.processLivestreamAudioRecordingsScheduled =
+   ai.processLivestreamAudioRecordingsScheduled

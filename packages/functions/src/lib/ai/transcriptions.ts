@@ -9,12 +9,48 @@ import {
 import { TranscriptionSegment } from "@careerfairy/shared-lib/utils/transcription"
 import { logger } from "firebase-functions/v2"
 import { onRequest } from "firebase-functions/v2/https"
+import { onObjectFinalized } from "firebase-functions/v2/storage"
 import { firestore, Timestamp } from "../../api/firestoreAdmin"
 import { livestreamsRepo } from "../../api/repositories"
+import { invokeFirebaseHttpsFunction } from "../../util/axios"
 import { createGenericConverter } from "../../util/firestore-admin"
 import { createLivestreamSpeechContexts, transcribeLongAudio } from "./util"
 
 const TIMEOUT_SECONDS = 60 * 60 // 1 hour
+
+const BUCKET_NAME = "careerfairy-e1fd9.appspot.com"
+
+export const GENERATE_TRANSCRIPT_FUNCTION_NAME = "generateLiveStreamTranscript"
+
+export const triggerTranscription = onObjectFinalized(
+   {
+      bucket: BUCKET_NAME,
+   },
+   async (event) => {
+      if (
+         !event.data.name.startsWith("live-stream-audio-recordings/") ||
+         !event.data.name.endsWith(".wav")
+      ) {
+         console.log("Skipping file:", event.data.name)
+         return
+      }
+
+      const fileName = event.data.name
+      const livestreamId = fileName
+         .replace("live-stream-audio-recordings/", "")
+         .replace(".wav", "")
+
+      void invokeFirebaseHttpsFunction(GENERATE_TRANSCRIPT_FUNCTION_NAME, {
+         method: "GET",
+         params: {
+            livestreamId,
+         },
+         headers: {
+            secret: process.env.GENERATE_TRANSCRIPT_SECRET,
+         },
+      })
+   }
+)
 
 /**
  * Generates a transcript for a live stream using Google Cloud Speech-to-Text.
@@ -29,9 +65,16 @@ const TIMEOUT_SECONDS = 60 * 60 // 1 hour
 export const generateLiveStreamTranscript = onRequest(
    {
       timeoutSeconds: TIMEOUT_SECONDS,
+      memory: "2GiB",
    },
    async (req, res) => {
       const livestreamId = req.query.livestreamId
+      const secret = req.headers.secret
+
+      if (secret !== process.env.GENERATE_TRANSCRIPT_SECRET) {
+         res.status(401).send("Unauthorized")
+         return
+      }
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -39,7 +82,7 @@ export const generateLiveStreamTranscript = onRequest(
       }
 
       if (!livestreamId || typeof livestreamId !== "string") {
-         res.status(400).send("livestreamId is required as a query parameter")
+         res.status(400).send("liveStreamId is required as a query parameter")
          return
       }
 
@@ -50,13 +93,17 @@ export const generateLiveStreamTranscript = onRequest(
          return
       }
 
+      const progressObject = {
+         progress: 0,
+      }
+
       const { isProcessing, minutesElapsed } = await checkIsProcessing(
          livestream.id
       )
 
       if (isProcessing) {
          res.status(200).send(
-            `Transcription for live stream ${livestream.id} has been in progress for ${minutesElapsed} minutes. Please wait for it to complete.`
+            `Transcription for live stream ${livestream.id} has been in progress for ${minutesElapsed} minutes (${progressObject.progress}% complete). Please wait for it to complete.`
          )
          return
       }
@@ -64,7 +111,10 @@ export const generateLiveStreamTranscript = onRequest(
       try {
          await updateTranscriptStatus(livestream, "processing")
 
-         const processingPromise = processAndStoreTranscription(livestream)
+         const processingPromise = processAndStoreTranscription(
+            livestream,
+            progressObject
+         )
          const timeoutPromise = createTimeout((TIMEOUT_SECONDS - 30) * 1000) // Manually throw an error 30 seconds before the timeout so we can update the status to error
 
          /**
@@ -76,36 +126,43 @@ export const generateLiveStreamTranscript = onRequest(
          res.status(200).send(result)
       } catch (error) {
          logger.error("Error in generateLiveStreamTranscript:", error)
-         await updateTranscriptStatus(livestream, "error")
+         await updateTranscriptStatus(livestream, "error", error.message)
          res.status(500).send("An error occurred while processing the request")
       }
    }
 )
 
 async function processAndStoreTranscription(
-   livestream: LivestreamEvent
+   livestream: LivestreamEvent,
+   progressObject: { progress: number }
 ): Promise<string> {
    const gcsUri = `gs://careerfairy-e1fd9.appspot.com/live-stream-audio-recordings/${livestream.id}.wav`
 
    // Create speech contexts based on livestream information
    const speechContexts = createLivestreamSpeechContexts(livestream)
 
-   const transcriptionSegments = await transcribeLongAudio(gcsUri, {
-      encoding: "LINEAR16",
-      sampleRateHertz: 16000,
-      audioChannelCount: 1,
-      languageCode: getLanguageCode(livestream.language?.code),
-      alternativeLanguageCodes: ["en-GB", "de-DE", "fr-FR", "nl-NL"],
-      model: "latest_long", // Best model for long audio
-      diarizationConfig: {
+   const transcriptionSegments = await transcribeLongAudio(
+      gcsUri,
+      {
+         encoding: "LINEAR16",
+         sampleRateHertz: 16000,
+         audioChannelCount: 1,
+         languageCode: getLanguageCode(livestream.language?.code),
+         alternativeLanguageCodes: ["en-GB", "de-DE", "fr-FR", "nl-NL"],
+         model: "latest_long", // Best model for long audio
+         diarizationConfig: {
+            enableSpeakerDiarization: true,
+         },
+         speechContexts: speechContexts,
          enableSpeakerDiarization: true,
+         enableWordTimeOffsets: true,
+         enableAutomaticPunctuation: true,
+         enableWordConfidence: true,
       },
-      speechContexts: speechContexts,
-      enableSpeakerDiarization: true,
-      enableWordTimeOffsets: true,
-      enableAutomaticPunctuation: true,
-      enableWordConfidence: true,
-   })
+      (newProgress) => {
+         progressObject.progress = newProgress
+      }
+   )
 
    await storeLivestreamTranscript(livestream, transcriptionSegments)
 
@@ -148,23 +205,28 @@ async function checkIsProcessing(livestreamId: string) {
 
 async function updateTranscriptStatus(
    livestream: LivestreamEvent,
-   status: "processing" | "complete" | "error"
+   status: "processing" | "complete" | "error",
+   error?: string
 ) {
    logger.info(
       `Updating livestream ${livestream.id} transcript status to: ${status}`
    )
+   const updateData: Partial<LivestreamTranscript> = {
+      status,
+      statusUpdatedAt: Timestamp.now(),
+      livestream: pickPublicDataFromLivestream(livestream),
+   }
+
+   // Only add the error field if it's defined
+   if (error) {
+      updateData.error = error
+   }
+
    return firestore
       .collection("livestreamTranscripts")
       .withConverter<LivestreamTranscript>(createGenericConverter())
       .doc(livestream.id)
-      .set(
-         {
-            status,
-            statusUpdatedAt: Timestamp.now(),
-            livestream: pickPublicDataFromLivestream(livestream),
-         },
-         { merge: true }
-      )
+      .set(updateData, { merge: true })
 }
 
 async function storeLivestreamTranscript(
@@ -178,6 +240,10 @@ async function storeLivestreamTranscript(
       .withConverter<LivestreamTranscript>(createGenericConverter())
       .doc(livestream.id)
 
+   const transcript = transcriptSegments
+      .map((segment) => segment.transcript)
+      .join("\n")
+
    // Create main document
    void bulkWriter.set(
       mainDocRef,
@@ -187,9 +253,10 @@ async function storeLivestreamTranscript(
          status: "complete",
          statusUpdatedAt: Timestamp.now(),
          totalSegments: transcriptSegments.length,
-         transcript: transcriptSegments
-            .map((segment) => segment.transcript)
-            .join("\n"),
+         transcript,
+         id: mainDocRef.id,
+         numberOfWords: transcript.split(" ").length,
+         numberOfCharacters: transcript.length,
       },
       { merge: true }
    )

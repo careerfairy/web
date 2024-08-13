@@ -31,6 +31,7 @@ import {
    UserLivestreamData,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
+import { AudioProcessingStatus } from "@careerfairy/shared-lib/livestreams/ai"
 import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
@@ -671,6 +672,7 @@ class FirebaseService {
          livestream.author = author
          livestream.created = this.getServerTimestamp() as Timestamp
          livestream.currentSpeakerId = livestreamsRef.id
+         livestream.audioProcessingStatus = AudioProcessingStatus.PENDING
          livestream.id = livestreamsRef.id
          batch.set(livestreamsRef, livestream, { merge: true })
 
@@ -884,6 +886,7 @@ class FirebaseService {
          handRaiseActive: false,
          currentSpeakerId: streamRef.id,
          activeCallToActionIds: [],
+         audioProcessingStatus: AudioProcessingStatus.PENDING,
       })
 
       // Declare all the refs

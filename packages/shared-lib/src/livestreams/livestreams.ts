@@ -11,6 +11,7 @@ import {
    UserPublicData,
    UserStats,
 } from "../users"
+import { AudioProcessingStatus } from "./ai"
 import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
 
@@ -234,6 +235,16 @@ export interface LivestreamEvent extends Identifiable {
     * If true, SMS notifications are enabled for the live stream
     */
    smsEnabled?: boolean
+
+   /**
+    * The status of the conversion of the recording to audio
+    * The default is "pending"
+    * Files are saved in the path:
+    * /live-stream-audio-recordings/{livestreamId}.wav
+    */
+   audioProcessingStatus?: AudioProcessingStatus
+   audioProcessingError?: string
+   audioProcessedAtTimeMs?: number
 }
 
 export const LivestreamModes = {
