@@ -113,6 +113,14 @@ const styles = sxStyles({
       boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
    },
+   selectedWrapper: {
+      opacity: 0.5,
+      backgroundImage: (theme) =>
+         `linear-gradient(0deg, ${alpha(
+            theme.palette.common.black,
+            0.2
+         )}, ${alpha(theme.palette.common.black, 0.1)})`,
+   },
    mainContentWrapper: {
       position: "relative",
       height: (theme) => theme.spacing(43),
@@ -224,7 +232,10 @@ type EventPreviewCardProps = {
    disableClick?: boolean
    /* Overrides the default Link click behavior of the card */
    onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
+   selectInput?: React.ReactNode
+   selected?: boolean
 }
+
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (
       {
@@ -239,6 +250,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          hideChipLabels,
          disableClick,
          onCardClick,
+         selectInput,
+         selected,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -397,8 +410,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       return (
          <>
             <Wrapper
-               {...(event ? linkProps : {})}
-               {...(event && {
+               {...(isLink ? linkProps : {})}
+               {...(isLink && {
                   // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
                   shallow: true,
                   passHref: true,
@@ -424,10 +437,13 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      ref={ref}
                      sx={[
                         styles.mainAndLowerContentWrapper,
+                        selected && styles.selectedWrapper,
                         isLive && styles.cardIsLive,
                      ]}
                   >
                      <Box sx={styles.mainContentWrapper}>
+                        {selectInput || null}
+
                         <Box
                            className="backgroundImageWrapper"
                            sx={[

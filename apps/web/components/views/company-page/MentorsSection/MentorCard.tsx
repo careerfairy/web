@@ -7,9 +7,10 @@ import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { SyntheticEvent } from "react"
+import { ReactNode, SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { useCompanyPage } from ".."
 
 const CARD_WIDTH = 214
 
@@ -60,34 +61,53 @@ const styles = sxStyles({
    },
 })
 
-type MentorCardProps = {
-   key: string
-   creator: PublicCreator
-   isEditMode?: boolean
+type ContainerProps = Pick<MentorCardProps, "creator"> & {
+   children: ReactNode
 }
 
-export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
-   const creatorName = `${creator.firstName} ${creator.lastName}`
-   const theme = useTheme()
+const Container = ({ creator, children }: ContainerProps) => {
    const router = useRouter()
+   const { editMode } = useCompanyPage()
 
-   const handleEdit = (ev: SyntheticEvent) => {
-      ev.preventDefault()
-      ev.stopPropagation()
-      alert("Will open edit dialog")
-   }
-
-   return (
+   return editMode ? (
+      <Box sx={[styles.container, { cursor: "auto" }]}>{children}</Box>
+   ) : (
       <Box
-         key={key}
          sx={styles.container}
          component={Link}
          href={`/company/${
             router.query.companyName
          }/mentor/${transformCreatorNameIntoSlug(creator)}/${creator.id}`}
       >
+         {children}
+      </Box>
+   )
+}
+
+type MentorCardProps = {
+   creator: PublicCreator
+   isEditMode?: boolean
+   handleEdit?: () => void
+}
+
+export const MentorCard = ({
+   creator,
+   isEditMode,
+   handleEdit,
+}: MentorCardProps) => {
+   const creatorName = `${creator.firstName} ${creator.lastName}`
+   const theme = useTheme()
+
+   const _handleEdit = (ev: SyntheticEvent) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      handleEdit?.()
+   }
+
+   return (
+      <Container creator={creator}>
          {Boolean(isEditMode) && (
-            <IconButton sx={styles.edit} onClick={handleEdit}>
+            <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.palette.neutral[700]} />
             </IconButton>
          )}
@@ -104,7 +124,7 @@ export const MentorCard = ({ key, creator, isEditMode }: MentorCardProps) => {
          <Typography sx={styles.creator.position}>
             {creator.position}
          </Typography>
-      </Box>
+      </Container>
    )
 }
 

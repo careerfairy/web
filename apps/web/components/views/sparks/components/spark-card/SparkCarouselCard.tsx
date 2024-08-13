@@ -27,6 +27,9 @@ type Props = {
    preview?: boolean
    onClick?: () => void
    onGoNext?: () => void
+   selectInput?: React.ReactNode
+   selected?: boolean
+   disableAutoPlay?: boolean
    questionLimitLines?: boolean
 }
 
@@ -35,6 +38,9 @@ const SparkCarouselCard: FC<Props> = ({
    onClick,
    preview = false,
    onGoNext,
+   selectInput,
+   selected,
+   disableAutoPlay,
    questionLimitLines,
 }) => {
    const [autoPlaying, setAutoPlaying] = useState(false)
@@ -105,11 +111,18 @@ const SparkCarouselCard: FC<Props> = ({
             }),
             preview,
          }}
-         onMouseEnter={isMobile ? null : () => setAutoPlaying(true)}
-         onMouseLeave={isMobile ? null : () => setAutoPlaying(false)}
-         autoPlaying={autoPlaying}
+         onMouseEnter={
+            disableAutoPlay || isMobile ? null : () => setAutoPlaying(true)
+         }
+         onMouseLeave={
+            disableAutoPlay || isMobile ? null : () => setAutoPlaying(false)
+         }
+         autoPlaying={!disableAutoPlay && autoPlaying}
          containerRef={containerRef}
+         selected={selected}
       >
+         {selectInput || null}
+
          <Box px={cardPadding} pt={cardPadding}>
             <SparkHeader showAdminOptions={false} spark={spark} />
          </Box>

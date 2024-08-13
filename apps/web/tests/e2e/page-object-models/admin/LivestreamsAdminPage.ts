@@ -20,7 +20,7 @@ export class LivestreamsAdminPage extends CommonPage {
          .nth(nth)
          .click()
       await this.page
-         .getByRole("button", { name: "Edit Draft Event" })
+         .getByRole("button", { name: "Edit Event" })
          .nth(nth)
          .click()
    }

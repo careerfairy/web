@@ -16,6 +16,21 @@ import dotenv = require("dotenv")
 dotenv.config()
 
 // to prevent import issue
+import { setGlobalOptions } from "firebase-functions/v2"
+import config from "./config"
+
+/**
+ * Set the default region for all functions using the v2 SDK.
+ * This configuration needs to be set before importing any functions.
+ *
+ * @remarks
+ * The region setting affects where the Cloud Functions will be deployed and executed.
+ * Setting it globally ensures consistency across all functions defined in this file.
+ */
+setGlobalOptions({
+   region: config.region,
+})
+
 import { bundles } from "./bundles"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
@@ -259,7 +274,7 @@ exports.removeAndSyncUserSparkNotification_v2 =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
-exports.getSparksFeed_v6 = userSparks.getSparksFeed
+exports.getSparksFeed_v7 = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser_v3 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
@@ -269,10 +284,11 @@ exports.getSparksAnalytics_v2 = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob
-exports.updateCustomJobWithLinkedLivestreams =
+exports.updateCustomJobWithLinkedLivestreams_v2 =
    customJobs.updateCustomJobWithLinkedLivestreams
-exports.transferCustomJobsFromDraftToPublishedLivestream =
+exports.transferCustomJobsFromDraftToPublishedLivestream_v2 =
    customJobs.transferCustomJobsFromDraftToPublishedLivestream
+exports.deleteExpiredCustomJobs = customJobs.deleteExpiredCustomJobs
 
 // Group Subscription Plan Functions
 exports.startPlan_v3 = groupPlans.startPlan

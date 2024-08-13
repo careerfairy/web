@@ -2,13 +2,14 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Stack, Typography, useTheme } from "@mui/material"
-import { useAuth } from "HOCs/AuthProvider"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
-import useUserCountryCode from "components/custom-hook/useUserCountryCode"
-import { useMemo } from "react"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useCallback } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
 import { LinkedInIcon } from "../common/icons/LinkedInIcon"
 import CollapsibleText from "../common/inputs/CollapsibleText"
+import { useIsTargetedUser } from "../sparks/components/spark-card/Notifications/linkedin/useIsTargetedUser"
 import { SpeakerAvatar } from "./SpeakersAvatar"
 
 const styles = sxStyles({
@@ -140,30 +141,13 @@ export const MentorDetail = ({
    hasJobs,
 }: MentorDetailProps) => {
    const isDesktop = useIsDesktop()
-   const { userData, isLoggedIn } = useAuth()
+   const { data: visitorId } = useFingerPrint()
+   const { trackMentorLinkedInReach } = useFirebaseService()
+   const isUserFromTargetedCountry = useIsTargetedUser(group)
 
-   const { userCountryCode, isLoading } = useUserCountryCode()
-
-   const isUserFromTargetedCountry = useMemo(() => {
-      if (isLoading) return false
-
-      const isTargetedUser =
-         group.targetedCountries?.filter((country) => {
-            const userCode = isLoggedIn
-               ? userData?.universityCountryCode
-               : userCountryCode
-
-            return country.id === userCode
-         }).length > 0
-
-      return isTargetedUser
-   }, [
-      group.targetedCountries,
-      isLoading,
-      isLoggedIn,
-      userData?.universityCountryCode,
-      userCountryCode,
-   ])
+   const linkedInOnClick = useCallback(() => {
+      trackMentorLinkedInReach(group.groupId, mentor.id, visitorId)
+   }, [group?.groupId, mentor?.id, trackMentorLinkedInReach, visitorId])
 
    if (!mentor) return null
 
@@ -186,6 +170,7 @@ export const MentorDetail = ({
                LinkComponent="a"
                href={mentor.linkedInUrl}
                target="_blank"
+               onClick={linkedInOnClick}
             >
                <LinkedInButton />
             </Button>

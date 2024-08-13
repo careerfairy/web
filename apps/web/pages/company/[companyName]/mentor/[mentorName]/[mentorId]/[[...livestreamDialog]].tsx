@@ -11,12 +11,14 @@ import {
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
+import useTrackPageView from "components/custom-hook/useTrackDetailPageView"
 import SEO from "components/util/SEO"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
 } from "components/views/livestream-dialog"
 import { MentorDetailPage } from "components/views/mentor-page"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { customJobRepo, groupRepo } from "data/RepositoryInstances"
 import { sparkService } from "data/firebase/SparksService"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
@@ -36,6 +38,17 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    creator,
    hasJobs,
 }) => {
+   const { trackMentorPageView } = useFirebaseService()
+
+   const viewRef = useTrackPageView({
+      trackDocumentId: serverSideGroup.groupId,
+      handleTrack: ({ id, visitorId, extraData }) =>
+         trackMentorPageView(id, extraData.creatorId, visitorId),
+      extraData: {
+         creatorId: creator.id,
+      },
+   }) as unknown as React.RefObject<HTMLDivElement>
+
    const deseralizedSparks = sparks
       ?.map(SparkPresenter.deserialize)
       .map(SparkPresenter.toFirebaseObject)
@@ -48,7 +61,10 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
          />
 
          <GenericDashboardLayout>
-            <Box sx={{ backgroundColor: "inherit", minHeight: "100vh" }}>
+            <Box
+               sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
+               ref={viewRef}
+            >
                <MentorDetailPage
                   group={serverSideGroup}
                   mentor={creator}
@@ -87,7 +103,10 @@ export const getStaticProps: GetStaticProps<{
             } = await getLivestreamsAndDialogData(
                serverSideGroup?.groupId,
                ctx,
-               true
+               {
+                  hideHidden: true,
+                  limit: undefined,
+               }
             )
 
             const hasJobs =
@@ -100,7 +119,7 @@ export const getStaticProps: GetStaticProps<{
             )
 
             const sparks = serverSideGroup.publicSparks
-               ? await sparkService.getCreatorSparks(
+               ? await sparkService.getCreatorPublicSparks(
                     mentorId as string,
                     serverSideGroup?.groupId
                  )

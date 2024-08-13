@@ -2,17 +2,19 @@ import {
    clearAuthData,
    clearFirestoreData,
 } from "@careerfairy/seed-data/emulators"
-import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
+import FieldOfStudySeed from "@careerfairy/seed-data/fieldsOfStudy"
+import GroupSeed from "@careerfairy/seed-data/groups"
+import JobsSeed from "@careerfairy/seed-data/jobs"
+import UserSeed from "@careerfairy/seed-data/users"
+import { CustomJob } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { GROUP_DASHBOARD_ROLE, Group } from "@careerfairy/shared-lib/groups"
+import { Interest } from "@careerfairy/shared-lib/interests"
 import { UserData } from "@careerfairy/shared-lib/users"
+import { test as base } from "@playwright/test"
 import { credentials } from "../constants"
 import { GroupDashboardPage } from "./page-object-models/GroupDashboardPage"
 import { LoginPage } from "./page-object-models/LoginPage"
-import { test as base } from "@playwright/test"
-import GroupSeed from "@careerfairy/seed-data/groups"
-import UserSeed from "@careerfairy/seed-data/users"
-import InterestSeed from "@careerfairy/seed-data/interests"
-import { Interest } from "@careerfairy/shared-lib/interests"
-
 type GroupAdminFixtureOptions = {
    /**
     * give the option for tests to not create a user
@@ -47,6 +49,9 @@ export const groupAdminFixture = base.extend<{
    user: UserData
    groupPage: GroupDashboardPage
    interests: Interest[]
+   levelOfStudyIds: FieldOfStudy[]
+   fieldOfStudyIds: FieldOfStudy[]
+   customJobs: CustomJob[]
 }>({
    options: {
       createUser: true,
@@ -67,7 +72,11 @@ export const groupAdminFixture = base.extend<{
          }
       }
 
+      if (!options.atsGroupType || options.atsGroupType === "NONE")
+         overrideFields.atsAdminPageFlag = false
+
       let group: Group
+
       if (options.completedGroup === true) {
          const completeCompanyData = GroupSeed.generateCompleteCompanyData()
          group = await GroupSeed.createGroup({
@@ -89,6 +98,8 @@ export const groupAdminFixture = base.extend<{
             break
       }
 
+      await JobsSeed.createCustomJobs(group.groupId, [])
+
       await use(group)
    },
    user: async ({ group, options }, use) => {
@@ -104,11 +115,24 @@ export const groupAdminFixture = base.extend<{
          await use(user)
       }
    },
-   interests: async ({}, use) => {
-      const interests = await InterestSeed.createBasicInterests()
-      await use(interests)
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   customJobs: async ({ group }, use) => {
+      const customJobs = await JobsSeed.getCustomJobs(group.groupId)
+      await use(customJobs)
+   },
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   levelOfStudyIds: async ({ options }, use) => {
+      const levelOfStudies = await FieldOfStudySeed.getDummyLevelsOfStudy()
+      await use(levelOfStudies)
+   },
+
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   fieldOfStudyIds: async ({ options }, use) => {
+      const fieldOfStudies = await FieldOfStudySeed.getDummyFieldsOfStudy()
+      await use(fieldOfStudies)
    },
    // user dependency required
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    groupPage: async ({ page, user, group }, use) => {
       const groupPage = new GroupDashboardPage(page, group)
       await groupPage.setLocalStorageKeys()

@@ -171,7 +171,7 @@ const customJobShape = yup.object().shape({
    groupId: yup.string().required(),
    title: yup.string().required(),
    description: yup.string().required(),
-   jobType: yup.string().required(),
+   jobType: yup.string().nullable(),
    postingUrl: yup.string().required(),
    deleted: yup.bool(),
 })
