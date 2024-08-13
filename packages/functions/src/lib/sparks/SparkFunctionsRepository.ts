@@ -887,7 +887,7 @@ export class SparkFunctionsRepository
 
       const allUserMatchingSparksSnap = await this.firestore
          .collectionGroup("sparksFeed")
-         .withConverter(createGenericConverter<Spark>())
+         .withConverter<Spark>(createGenericConverter())
          .where("id", "==", spark.id)
          .get()
 
@@ -899,6 +899,7 @@ export class SparkFunctionsRepository
       } else {
          // If the spark is still public, update it in all user feeds
          allUserMatchingSparksSnap.docs.forEach((sparkDoc) => {
+            // @ts-ignore
             void bulkWriter.update(sparkDoc.ref, spark)
          })
       }
