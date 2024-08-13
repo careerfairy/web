@@ -136,6 +136,7 @@ const CTAButtonComponent = () => {
          color="error"
          variant="branded"
          badgeContent={!isCTAPanelActive ? unreadActiveCTA?.length : null}
+
       >
          <CircularButton onClick={handleClick} color="primary">
             <Link2 />

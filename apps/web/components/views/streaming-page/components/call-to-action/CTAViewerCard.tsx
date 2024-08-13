@@ -18,7 +18,6 @@ export const styles = sxStyles({
       alignSelf: "stretch",
       alignItems: "flex-start",
    },
-
    title: {
       fontWeight: 600,
    },

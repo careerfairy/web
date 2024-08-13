@@ -1667,7 +1667,6 @@ export class FirebaseLivestreamRepository
          createdAt: this.fieldValue.serverTimestamp() as unknown as Timestamp,
          id: docRef.id,
          numberOfUsersWhoClickedLink: 0,
-         numberOfUsersWhoDismissed: 0,
          active: false,
       }
 
