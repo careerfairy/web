@@ -88,6 +88,7 @@ export const ALL_PROJECT_COLLECTION_IDS = [
    "usersWhoClicked",
    "usersWhoClickedLink",
    "usersWhoDismissed",
+   "usersWhoInteracted",
    "videos",
    "voters",
    "wishes",

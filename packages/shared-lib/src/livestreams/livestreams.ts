@@ -85,7 +85,7 @@ export interface LivestreamEvent extends Identifiable {
    recommendedEventIds?: string[]
 
    /**
-    * Which call to actions have been activated for this event
+    * Which call to actions have been activated for this event. Deprecated - see callToActions subcollection
     */
    activeCallToActionIds?: string[]
 
@@ -848,17 +848,17 @@ export interface LivestreamCTA extends Identifiable {
    buttonURL: string
    createdAt: firebase.firestore.Timestamp
    numberOfUsersWhoClickedLink: number
+   numberOfUsersWhoDismissed: number
    active: boolean
    activatedAt?: firebase.firestore.Timestamp
 }
 
-export interface LivestreamCTAUserClick extends Identifiable {
+export interface LivestreamCTAUserInteraction extends Identifiable {
    ctaId: string
    userId: string
+   livestreamId: string
    numberOfClicks: number
-   clicks: UserCTAClick[]
-}
-
-export interface UserCTAClick {
-   timestamp: firebase.firestore.Timestamp[]
+   clickedAt: firebase.firestore.Timestamp[]
+   readAt: firebase.firestore.Timestamp
+   dismissedAt: firebase.firestore.Timestamp
 }
