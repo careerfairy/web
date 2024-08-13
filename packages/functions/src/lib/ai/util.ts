@@ -27,7 +27,8 @@ type SpeechContext = Config["speechContexts"]
  */
 export async function transcribeLongAudio(
    gcsUri: string,
-   config: IRecognizeRequest["config"] = {}
+   config: IRecognizeRequest["config"] = {},
+   onProgress?: (progress: number) => void
 ): Promise<TranscriptionSegment[]> {
    logger.debug("Initiating speech recognition", { gcsUri, config })
 
@@ -35,45 +36,61 @@ export async function transcribeLongAudio(
    const request: IRecognizeRequest = { audio, config }
 
    const [operation] = await speechClient.longRunningRecognize(request)
-   logger.info("Long-running speech recognition initiated")
+   logger.info(`Long-running speech recognition initiated for ${gcsUri}`)
 
-   operation.on("progress", (metadata) => {
-      const progress = metadata.progressPercent || 0
-      progress && logger.info(`Transcription progress: ${progress}%`)
-   })
+   const progressListener = (metadata: any) => {
+      const progress = metadata?.progressPercent || 0
 
-   const [response] = await operation.promise()
-   logger.info("Speech recognition completed")
+      if (onProgress) {
+         onProgress(progress)
+      }
 
-   const paragraphs = response.results.map((result) => result.alternatives[0])
-   const transcriptionLength = paragraphs.reduce(
-      (a, b) => a + b.transcript.length,
-      0
-   )
+      if (progress) {
+         logger.info(`Transcription progress: ${progress}% for ${gcsUri}`)
+      }
+   }
 
-   logger.info("Transcription generated", {
-      transcriptionLength,
-      paragraphCount: paragraphs.length,
-   })
+   operation.on("progress", progressListener)
 
-   return paragraphs.map<TranscriptionSegment>((segment, index) => ({
-      confidence: segment.confidence,
-      transcript: segment.transcript,
-      words: segment.words.map((word) => ({
-         word: word.word,
-         startTime: new Timestamp(
-            getSeconds(word.startTime.seconds),
-            word.startTime.nanos
-         ),
-         endTime: new Timestamp(
-            getSeconds(word.endTime.seconds),
-            word.endTime.nanos
-         ),
-         confidence: word.confidence ?? 0,
-         speakerTag: word.speakerTag ?? null,
-      })),
-      segmentIndex: index,
-   }))
+   try {
+      const [response] = await operation.promise()
+      logger.info(`Speech recognition completed for ${gcsUri}`)
+
+      const paragraphs = response.results.map(
+         (result) => result.alternatives[0]
+      )
+      const transcriptionLength = paragraphs.reduce(
+         (a, b) => a + b.transcript.length,
+         0
+      )
+
+      logger.info(`Transcription generated for ${gcsUri}`, {
+         transcriptionLength,
+         paragraphCount: paragraphs.length,
+      })
+
+      return paragraphs.map<TranscriptionSegment>((segment, index) => ({
+         confidence: segment.confidence,
+         transcript: segment.transcript,
+         words: segment.words.map((word) => ({
+            word: word.word,
+            startTime: new Timestamp(
+               getSeconds(word.startTime.seconds),
+               word.startTime.nanos
+            ),
+            endTime: new Timestamp(
+               getSeconds(word.endTime.seconds),
+               word.endTime.nanos
+            ),
+            confidence: word.confidence ?? 0,
+            speakerTag: word.speakerTag ?? null,
+         })),
+         segmentIndex: index,
+      }))
+   } finally {
+      // Remove the listener
+      operation.removeListener("progress", progressListener)
+   }
 }
 
 export function getSeconds(longValue: Long | string | number): number {
@@ -108,6 +125,7 @@ export const createLivestreamSpeechContexts = (
    const generalContext = [
       livestream.company,
       livestream.title,
+      livestream.summary,
       `${livestream.company} event`,
       `${livestream.company} live stream`,
       ...(livestream.businessFunctionsTagIds || []).map(
