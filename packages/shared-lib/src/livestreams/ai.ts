@@ -12,9 +12,12 @@ export interface LivestreamTranscript extends Identifiable {
    transcript: string
    transcriptUpdatedAt: Timestamp
    status: "processing" | "complete" | "error"
+   error?: string
    statusUpdatedAt: Timestamp
    livestream: LivestreamEventPublicData
    totalSegments: number
+   numberOfWords: number
+   numberOfCharacters: number
 }
 
 /**
@@ -25,4 +28,26 @@ export interface LivestreamTranscriptSegment
    extends Identifiable,
       TranscriptionSegment {
    documentType: "livestreamTranscriptSegment"
+}
+
+/**
+ * The status of the audio processing converting the livestream recording to a WAV file
+ */
+export enum AudioProcessingStatus {
+   /**
+    * The default status, not yet processed
+    */
+   PENDING = "pending",
+   /**
+    * The audio processing was successful
+    */
+   PROCESSED = "processed",
+   /**
+    * The audio processing was skipped, reasons: could not find the recording in s3
+    */
+   SKIPPED = "skipped",
+   /**
+    * The audio processing failed
+    */
+   ERROR = "error",
 }

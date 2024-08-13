@@ -366,4 +366,9 @@ exports.syncUserInRegisteredLivestreams =
 exports.fetchUserCountryCode = fetchUserCountryCode
 
 // AI
-exports.generateLiveStreamTranscript = ai.generateLiveStreamTranscript
+exports[ai.GENERATE_TRANSCRIPT_FUNCTION_NAME] = ai.generateLiveStreamTranscript
+exports.triggerTranscription = ai.triggerTranscription
+exports.processLivestreamAudioRecordingsHttp =
+   ai.processLivestreamAudioRecordingsHttp
+exports.processLivestreamAudioRecordingsScheduled =
+   ai.processLivestreamAudioRecordingsScheduled

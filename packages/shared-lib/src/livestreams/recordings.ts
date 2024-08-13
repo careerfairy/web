@@ -1,6 +1,7 @@
 export const S3_ROOT_PATH = "livestreams"
-export const S3_BUCKET = "agora-cf-cloud-recordings"
-export const S3_BUCKET_LINK = `https://${S3_BUCKET}.s3.eu-central-1.amazonaws.com`
+export const S3_BUCKET_NAME = "agora-cf-cloud-recordings"
+export const S3_BUCKET_LINK = `https://${S3_BUCKET_NAME}.s3.eu-central-1.amazonaws.com`
+export const NEW_CHANGES_DATE = 1653501600000
 
 /**
  * Max hours of a recording session
@@ -51,8 +52,7 @@ export const downloadLinkWithDate = (
     * Any recording before this date, should use the old path
     * https://github.com/careerfairy/web/pull/130
     */
-   const newChangesDate = 1653501600000
-   if (livestreamStartDate?.getTime() < newChangesDate) {
+   if (livestreamStartDate?.getTime() < NEW_CHANGES_DATE) {
       return `https://agora-cf-cloud-recordings.s3.eu-central-1.amazonaws.com/directory1/directory5/${sid}_${livestreamId}_0.mp4`
    } else {
       return downloadLink(livestreamId, sid, breakoutRoomID)
