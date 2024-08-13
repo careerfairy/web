@@ -1,9 +1,7 @@
 import { LivestreamCTA } from "@careerfairy/shared-lib/livestreams"
 import { Button, Stack, Typography } from "@mui/material"
 import { useClickCTA } from "components/custom-hook/streaming/call-to-action/useClickCTA"
-import { useAuth } from "HOCs/AuthProvider"
 import { forwardRef } from "react"
-import { useOpenStream } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 
@@ -12,12 +10,14 @@ export const styles = sxStyles({
       border: `1px solid ${theme.brand.white[500]}`,
       backgroundColor: theme.brand.white[100],
       borderRadius: "12px",
-      overflow: "hidden",
       padding: "16px",
-      gap: "16px",
+   }),
+   content: {
+      overflow: "hidden",
+      gap: "20px",
       alignSelf: "stretch",
       alignItems: "flex-start",
-   }),
+   },
 
    title: {
       fontWeight: 600,
@@ -43,33 +43,47 @@ type Props = {
 
 export const CTAViewerCard = forwardRef<HTMLDivElement, Props>(
    ({ cta }, ref) => {
-      const { livestreamId, agoraUserId } = useStreamingContext()
-      const { authenticatedUser } = useAuth()
-      const isOpenStream = useOpenStream()
-
-      const userId = isOpenStream
-         ? agoraUserId
-         : authenticatedUser?.email || agoraUserId
-
-      const { trigger: handleClick } = useClickCTA(livestreamId, cta.id, userId)
-
       return (
          <Stack sx={styles.root} ref={ref}>
-            <Typography variant="brandedBody" sx={styles.message}>
-               {cta.message}
-            </Typography>
-            <Button
-               variant="contained"
-               sx={styles.actionButton}
-               href={cta.buttonURL}
-               target="blank"
-               onClick={() => handleClick()}
-            >
-               {cta.buttonText}
-            </Button>
+            <CTAViewerCardContent cta={cta} />
          </Stack>
       )
    }
 )
 
-CTAViewerCard.displayName = "CTACard"
+type ContentProps = {
+   cta: LivestreamCTA
+   onClick?: () => void
+}
+
+export const CTAViewerCardContent = ({ cta, onClick }: ContentProps) => {
+   const { livestreamId, agoraUserId } = useStreamingContext()
+
+   const { trigger: handleClick } = useClickCTA(
+      livestreamId,
+      cta.id,
+      agoraUserId
+   )
+
+   return (
+      <Stack sx={styles.content}>
+         <Typography variant="brandedBody" sx={styles.message}>
+            {cta.message}
+         </Typography>
+         <Button
+            variant="contained"
+            sx={styles.actionButton}
+            href={cta.buttonURL}
+            target="blank"
+            onClick={() => {
+               handleClick()
+               onClick?.()
+            }}
+         >
+            {cta.buttonText}
+         </Button>
+      </Stack>
+   )
+}
+
+CTAViewerCard.displayName = "CTAViewerCard"
