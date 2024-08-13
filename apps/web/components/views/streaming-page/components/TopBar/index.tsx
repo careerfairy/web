@@ -1,6 +1,5 @@
 import { Box, Stack, StackProps } from "@mui/material"
 
-import { useLivestreamActiveCTA } from "components/custom-hook/streaming/call-to-action/useLivestreamActiveCTA"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ReactNode } from "react"
 import { useIsSpyMode } from "store/selectors/streamingAppSelectors"
@@ -77,15 +76,14 @@ const HostView = () => (
 )
 
 const ViewerView = () => {
-   const { shouldStream, livestreamId } = useStreamingContext()
-   const { data: activeCTA } = useLivestreamActiveCTA(livestreamId)
+   const { shouldStream } = useStreamingContext()
 
    return (
       <StackComponent justifyContent="flex-end">
          <MarginBox>
             <ViewCount />
          </MarginBox>
-         {activeCTA?.length ? <CallsToActionButton /> : null}
+         <CallsToActionButton />
          {shouldStream ? <ConnectionStatus /> : null}
          <CompanyButton />
          <CheckJobsButton />

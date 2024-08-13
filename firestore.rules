@@ -482,6 +482,10 @@ service cloud.firestore {
                     allow read: if true;
                     allow write: if true;
                 }
+                match /usersWhoInteracted/{userWhoInteracted} {
+                    allow read: if true;
+                    allow write: if true;
+                }
 
             }
             match /promotions/promotions {
@@ -544,6 +548,10 @@ service cloud.firestore {
                     allow write: if true;
                 }
 
+                match /usersWhoInteracted/{userWhoInteracted} {
+                    allow read: if true;
+                    allow write: if true;
+                }
             }
 
             match /questions/{question} {
@@ -656,6 +664,11 @@ service cloud.firestore {
             // Should be isSignedInAndIsSameUser(userId) but we can't 
             // access the userId as we don't have proper auth in the server 
             // fix would be to use admin sdk on the server side
+            allow read: if true;
+        }
+
+         // Livestream -> User CTA interactions query
+        match /{somePath=**}/usersWhoInteracted/{userId} {
             allow read: if true;
         }
 
