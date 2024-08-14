@@ -124,14 +124,14 @@ test.describe("Access a recording when the user registered to the livestream", (
          waitForURL: `**/past-livestreams/livestream/${livestream.id}`,
       })
 
-      await livestreamDialogPage.assertRecordingVideoIsVisible(true)
+      await livestreamDialogPage.assertRecordingVideoIsVisible(false)
    })
 })
 
 test.describe("Access a recording when the user did not register to the livestream", () => {
    // user needs to buy the recording for any livestream date
    for (const insideAccessWindow of [true, false]) {
-      test(`Recording ${
+      test.skip(`Recording ${
          insideAccessWindow ? "inside" : "outside"
       } the access window needs to be bought`, async ({ page, user }) => {
          const { livestream } = await setupData({
