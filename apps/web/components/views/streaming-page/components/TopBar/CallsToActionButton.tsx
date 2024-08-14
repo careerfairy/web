@@ -110,7 +110,11 @@ const CTAButtonComponent = () => {
             .filter((cta) => unreadCTAs.includes(cta.id))
             .concat(ctaWithNoUserInteraction)
 
-         setUnreadActiveCTA(unreadActiveCTAs)
+         const ctaIds = unreadActiveCTAs.map((cta) => cta.id)
+
+         ctaIds.length && isCTAPanelActive
+            ? livestreamService.markCTAAsRead(livestreamId, agoraUserId, ctaIds)
+            : setUnreadActiveCTA(unreadActiveCTAs)
 
          const notClickedOrDismissedActiveCTAs = activeCTA
             .filter((cta) => notClickedOrDismissedCTA.includes(cta.id))
