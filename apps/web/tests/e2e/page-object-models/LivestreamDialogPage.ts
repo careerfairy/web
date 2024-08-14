@@ -159,7 +159,7 @@ export default class LivestreamDialogPage extends CommonPage {
          ).toBeVisible()
       } else {
          await expect(
-            this.page.getByText("You bought access to this recording")
+            this.page.getByText("You have access to this recording")
          ).toBeVisible()
       }
 

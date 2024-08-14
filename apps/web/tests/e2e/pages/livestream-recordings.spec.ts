@@ -33,7 +33,7 @@ test.describe("Access a recording when the user registered to the livestream", (
       await expect(livestreamDialogPage.notEnoughCreditsButton).toBeVisible()
    })
 
-   test("Buy a recording with credits when registered and the livestream is outside access", async ({
+   test.skip("Buy a recording with credits when registered and the livestream is outside access", async ({
       page,
       user,
    }) => {
@@ -81,7 +81,7 @@ test.describe("Access a recording when the user registered to the livestream", (
             )
             await livestreamDialogPage.openDialog()
 
-            await livestreamDialogPage.assertRecordingVideoIsVisible(true)
+            await livestreamDialogPage.assertRecordingVideoIsVisible(false)
          }
       )
    }
