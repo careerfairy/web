@@ -5,7 +5,7 @@ import getConfig from "next/config"
 import { v4 as uuid } from "uuid"
 import LocalStorageUtil from "./LocalStorageUtil"
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig = {} } = getConfig()
 
 export function getRandom(arr, n) {
    var result = new Array(n),
