@@ -77,7 +77,7 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    syncDeletedCustomJobToLinkedLivestreams(
       deletedCustomJob: CustomJob
    ): Promise<void>
-
+  
    /**
     * This method syncs the deleted job on all the linked sparks
     * @param deletedCustomJob
@@ -393,7 +393,7 @@ export class CustomJobFunctionsRepository
          const ref = this.firestore.collection("sparks").doc(spark.id)
 
          batch.update(ref, {
-            hasJobs: true,
+            hasJobs: false
          })
       })
 
