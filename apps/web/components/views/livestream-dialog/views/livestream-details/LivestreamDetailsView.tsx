@@ -1,32 +1,31 @@
+import Box from "@mui/material/Box"
+import Stack from "@mui/material/Stack"
+import { boxShadowAnimation } from "materialUI/GlobalBackground/GlobalBackGround"
 import { FC } from "react"
+import { useInView } from "react-intersection-observer"
+import { sxStyles } from "types/commonTypes"
+import useTrackLivestreamView from "../../../../custom-hook/live-stream/useTrackLivestreamView"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
+import useRecordingAccess from "../../../upcoming-livestream/HeroSection/useRecordingAccess"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import Stack from "@mui/material/Stack"
+import useRegistrationHandler from "../../useRegistrationHandler"
 import CountDownTimer from "./CountDownTimer"
-import LivestreamTagsContainer from "./LivestreamTagsContainer"
+import HeroTags from "./HeroTags"
 import HostInfo from "./HostInfo"
+import LivestreamTagsContainer from "./LivestreamTagsContainer"
 import LivestreamTitle from "./LivestreamTitle"
-import ActionButton from "./action-button/ActionButton"
-import useRecordingAccess from "../../../upcoming-livestream/HeroSection/useRecordingAccess"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import RecordingPlayer from "./RecordingPlayer"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
-import ShareButton from "./ShareButton"
-import { useInView } from "react-intersection-observer"
 import MainContentNavigation from "./MainContentNavigation"
-import Speakers from "./main-content/Speakers"
+import RecordingPlayer from "./RecordingPlayer"
+import ShareButton from "./ShareButton"
+import ActionButton from "./action-button/ActionButton"
 import AboutCompany from "./main-content/AboutCompany"
 import AboutLivestream from "./main-content/AboutLivestream"
 import Jobs from "./main-content/Jobs"
 import Questions from "./main-content/Questions"
 import Section from "./main-content/Section"
-import Box from "@mui/material/Box"
-import useRegistrationHandler from "../../useRegistrationHandler"
-import HeroTags from "./HeroTags"
-import { sxStyles } from "types/commonTypes"
-import { boxShadowAnimation } from "materialUI/GlobalBackground/GlobalBackGround"
-import useTrackLivestreamView from "../../../../custom-hook/live-stream/useTrackLivestreamView"
+import Speakers from "./main-content/Speakers"
 
 const styles = sxStyles({
    liveHeroContent: {
@@ -35,28 +34,18 @@ const styles = sxStyles({
 })
 
 const LivestreamDetailsView: FC = () => {
-   const {
-      livestream,
-      livestreamPresenter,
-      updatedStats,
-      serverUserEmail,
-      closeDialog,
-   } = useLiveStreamDialog()
+   const { livestream, livestreamPresenter, serverUserEmail, closeDialog } =
+      useLiveStreamDialog()
 
    const { handleRegisterClick } = useRegistrationHandler()
 
-   const { authenticatedUser } = useAuth()
    const [heroRef, heroInView] = useInView()
 
    const isMobile = useIsMobile()
 
    const viewRef = useTrackLivestreamView(livestream)
 
-   const { showRecording, userHasBoughtRecording } = useRecordingAccess(
-      authenticatedUser.email || serverUserEmail,
-      livestreamPresenter,
-      updatedStats
-   )
+   const { showRecording } = useRecordingAccess(livestreamPresenter)
 
    const hasJobs = livestreamPresenter.hasJobs
 
@@ -90,7 +79,6 @@ const LivestreamDetailsView: FC = () => {
                      <RecordingPlayer
                         stream={livestream}
                         livestreamPresenter={livestreamPresenter}
-                        boughtAccess={userHasBoughtRecording}
                      />
                   ) : (
                      <CountDownTimer presenter={livestreamPresenter} />

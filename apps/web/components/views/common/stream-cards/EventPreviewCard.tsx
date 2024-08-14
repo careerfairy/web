@@ -316,7 +316,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       const getRecordingAvailableDays = useMemo<number | null>(() => {
          if (isPast && isLoggedIn && presenterEvent) {
-            if (presenterEvent.isAbleToShowRecording(hasRegistered)) {
+            if (presenterEvent.isAbleToShowRecording()) {
                const timeLeft = DateUtil.calculateTimeLeft(
                   presenterEvent.recordingAccessTimeLeft()
                )
@@ -326,7 +326,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          }
 
          return null
-      }, [isPast, isLoggedIn, hasRegistered, presenterEvent])
+      }, [isPast, isLoggedIn, presenterEvent])
 
       useEffect(() => {
          if (!loading) {

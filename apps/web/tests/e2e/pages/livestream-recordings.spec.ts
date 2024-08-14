@@ -1,22 +1,22 @@
-import { expect } from "@playwright/test"
-import UserSeed from "@careerfairy/seed-data/dist/users"
-import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
-import { signedInFixture as test } from "../fixtures"
-import { setupLivestreamData } from "../setupData"
-import { MAX_DAYS_TO_SHOW_RECORDING } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { credentials } from "../../constants"
-import { LoginPage } from "../page-object-models/LoginPage"
 import {
    clearAuthData,
    clearFirestoreData,
 } from "@careerfairy/seed-data/emulators"
+import LivestreamSeed from "@careerfairy/seed-data/livestreams"
+import UserSeed from "@careerfairy/seed-data/users"
+import { MAX_DAYS_TO_SHOW_RECORDING } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { expect } from "@playwright/test"
+import { credentials } from "../../constants"
+import { signedInFixture as test } from "../fixtures"
+import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
+import { LoginPage } from "../page-object-models/LoginPage"
+import { setupLivestreamData } from "../setupData"
 
 // outside access window =(means) livestream is older than the max days to show recording
 
 test.describe("Access a recording when the user registered to the livestream", () => {
-   test("Not enough credits to buy a recording when the livestream is outside access window", async ({
+   test.skip("Not enough credits to buy a recording when the livestream is outside access window", async ({
       page,
       user,
    }) => {
