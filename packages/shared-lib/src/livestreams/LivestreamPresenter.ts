@@ -224,9 +224,8 @@ export class LivestreamPresenter extends BaseModel {
 
    isAbleToShowRecording(): boolean {
       return (
-         this.isPast() &&
-         this.isAbleToAccessRecording() &&
-         new Date() <= this.recordingAccessTimeLeft()
+         this.isPast() && this.isAbleToAccessRecording()
+         // new Date() <= this.recordingAccessTimeLeft()
       )
    }
 

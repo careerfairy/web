@@ -92,7 +92,7 @@ const UpcomingLivestreamPage = ({
       return userStats ? userStats : userStatsPlain
    }, [userStatsPlain, userStats])
 
-   const { showRecording } = useRecordingAccess(streamPresenter)
+   const { showRecording } = useRecordingAccess(userEmail, streamPresenter)
 
    const companyGroupData = useMemo<Group | null>(() => {
       const companyGroups = unfilteredGroups?.filter(

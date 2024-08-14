@@ -30,6 +30,7 @@ type LivestreamContentProps = {
 const LivestreamContent: FC<LivestreamContentProps> = ({
    livestreamData,
    handleBannerPlayRecording,
+   userStats,
 }) => {
    const router = useRouter()
    const { data } = useLivestream(livestreamData.id, livestreamData)
@@ -41,7 +42,10 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
       [livestream, livestreamData]
    )
 
-   const { showRecording } = useRecordingAccess(livestreamPresenter)
+   const { showRecording } = useRecordingAccess(
+      userStats?.userId,
+      livestreamPresenter
+   )
 
    const eventIsUpcoming = useMemo(
       () => !livestreamPresenter.isPast(),

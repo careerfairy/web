@@ -3,9 +3,13 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 /**
  * Check if the user has access to a livestream recording
  */
-export const useRecordingAccess = (streamPresenter: LivestreamPresenter) => {
+export const useRecordingAccess = (
+   userEmail: string | null,
+   streamPresenter: LivestreamPresenter
+) => {
    return {
-      showRecording: streamPresenter?.isAbleToShowRecording(),
+      showRecording:
+         streamPresenter?.isAbleToShowRecording() && Boolean(userEmail),
    }
 }
 

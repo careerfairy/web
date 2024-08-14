@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
+import { useAuth } from "HOCs/AuthProvider"
 import { boxShadowAnimation } from "materialUI/GlobalBackground/GlobalBackGround"
 import { FC } from "react"
 import { useInView } from "react-intersection-observer"
@@ -44,8 +45,12 @@ const LivestreamDetailsView: FC = () => {
    const isMobile = useIsMobile()
 
    const viewRef = useTrackLivestreamView(livestream)
+   const { authenticatedUser } = useAuth()
 
-   const { showRecording } = useRecordingAccess(livestreamPresenter)
+   const { showRecording } = useRecordingAccess(
+      authenticatedUser.email || serverUserEmail,
+      livestreamPresenter
+   )
 
    const hasJobs = livestreamPresenter.hasJobs
 

@@ -9,8 +9,6 @@ import ActionButtonProvider, {
    ActionButtonContextType,
    useActionButtonContext,
 } from "./ActionButtonProvider"
-import BuyRecordingButton from "./BuyRecordingButton"
-import NotEnoughCreditsButton from "./NotEnoughCreditsButton"
 import RegisterButton from "./RegisterButton"
 import SignUpToWatchButton from "./SignUpToWatchButton"
 import styles from "./Styles"
@@ -25,8 +23,7 @@ const ActionButton: FC<ActionButtonContextType> = (props) => {
 }
 
 const ButtonElement: FC = () => {
-   const { livestreamPresenter, userEmailFromServer, canWatchRecording } =
-      useActionButtonContext()
+   const { livestreamPresenter, userEmailFromServer } = useActionButtonContext()
 
    const { isLoggedIn, userData, isLoggedOut } = useAuth()
 
@@ -62,21 +59,7 @@ const ButtonElement: FC = () => {
          return <SignUpToWatchButton />
       }
 
-      // Display the "Not Enough Credits" component if
-      // The user has no credits or negative credits
-      // and does not have access to this recording.
-      if (
-         (!userData?.credits || userData?.credits <= 0) &&
-         !canWatchRecording
-      ) {
-         return <NotEnoughCreditsButton />
-      }
-
-      if (canWatchRecording) {
-         return <WatchNowButton />
-      }
-
-      return <BuyRecordingButton />
+      return <WatchNowButton />
    }
 
    if (registered) {
