@@ -39,3 +39,5 @@ export const baseCreatorShape = {
 export const CreateCreatorSchema = yup.object(baseCreatorShape)
 
 export type CreateCreatorSchemaType = yup.InferType<typeof CreateCreatorSchema>
+
+// comment to trigger CI
