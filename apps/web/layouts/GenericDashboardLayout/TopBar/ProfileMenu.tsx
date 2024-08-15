@@ -1,26 +1,25 @@
 import { useRouter } from "next/router"
 
 // material-ui
-import { Box, ListItemIcon, Menu, MenuItem, Typography } from "@mui/material"
-import Tooltip from "@mui/material/Tooltip"
-import Stack from "@mui/material/Stack"
-import IconButton from "@mui/material/IconButton"
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
-import StarOutlineIcon from "@mui/icons-material/StarOutline"
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined"
 import ContentPasteOutlinedIcon from "@mui/icons-material/ContentPasteOutlined"
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined"
+import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined"
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
+import StarOutlineIcon from "@mui/icons-material/StarOutline"
+import { Box, ListItemIcon, Menu, MenuItem, Typography } from "@mui/material"
+import IconButton from "@mui/material/IconButton"
+import Stack from "@mui/material/Stack"
+import Tooltip from "@mui/material/Tooltip"
 
 // project imports
-import { sxStyles } from "../../../types/commonTypes"
+import Divider from "@mui/material/Divider"
+import { alpha } from "@mui/material/styles"
+import { FC, useCallback, useMemo } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
 import useMenuState from "../../../components/custom-hook/useMenuState"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
-import { alpha } from "@mui/material/styles"
-import Divider from "@mui/material/Divider"
-import CareerCoinIcon from "../../../components/views/common/CareerCoinIcon"
-import { FC, useCallback, useMemo } from "react"
+import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
+import { sxStyles } from "../../../types/commonTypes"
 
 const styles = sxStyles({
    ava: {
@@ -58,10 +57,7 @@ const styles = sxStyles({
    },
 })
 
-type Props = {
-   handleOpenCreditsDialog: () => void
-}
-const ProfileMenu: FC<Props> = ({ handleOpenCreditsDialog }) => {
+const ProfileMenu: FC = () => {
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
    const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { push } = useRouter()
@@ -176,36 +172,6 @@ const ProfileMenu: FC<Props> = ({ handleOpenCreditsDialog }) => {
                   <Typography color={"text.secondary"}>
                      My Recruiters
                   </Typography>
-               </MenuItem>
-
-               <MenuItem
-                  sx={{ mb: 1, alignItems: "start" }}
-                  onClick={handleOpenCreditsDialog}
-               >
-                  <ListItemIcon>
-                     <CareerCoinIcon />
-                  </ListItemIcon>
-                  <Box sx={styles.creditDetails}>
-                     <Box sx={{ display: "flex" }}>
-                        <Typography
-                           fontWeight={600}
-                           color={"text.secondary"}
-                           mr={1}
-                        >
-                           {userData?.credits || 0}
-                        </Typography>
-                        <Typography color={"text.secondary"}>
-                           CareerCoins
-                        </Typography>
-                     </Box>
-                     <Typography
-                        color={"text.secondary"}
-                        variant={"body2"}
-                        sx={{ textDecoration: "underline" }}
-                     >
-                        Get more now
-                     </Typography>
-                  </Box>
                </MenuItem>
 
                <Divider sx={{ width: "80%", alignSelf: "center" }} />

@@ -1,9 +1,9 @@
+import { UserStats } from "../users"
 import {
    Badge,
    calculateProgressForNumericField,
    DEFAULT_REWARDS,
 } from "./badges"
-import { UserStats } from "../users"
 
 export const ResearchBadge: Badge = new Badge(
    "Research",
@@ -21,7 +21,7 @@ export const ResearchBadge: Badge = new Badge(
             ),
       },
    ],
-   ["1 CareerCoin", ...DEFAULT_REWARDS]
+   [...DEFAULT_REWARDS]
 )
 
 export const ResearchBadgeLevel2: Badge = new Badge(
