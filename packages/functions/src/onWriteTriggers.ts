@@ -320,6 +320,9 @@ export const onWriteSpark = functions
       if (changeTypes.isDelete) {
          // Remove spark from all user feeds
          sideEffectPromises.push(sparkRepo.removeSparkFromAllUserFeeds(sparkId))
+
+         // Remove linked jobs
+         sideEffectPromises.push(customJobRepo.removeLinkedSpark(sparkId))
       }
 
       if (changeTypes.isUpdate || changeTypes.isCreate) {
@@ -372,7 +375,6 @@ export const onWriteCustomJobs = functions
 
       if (changeTypes.isCreate) {
          const newCustomJob = change.after.data() as CustomJob
-
          sideEffectPromises.push(
             customJobRepo.createCustomJobStats(newCustomJob)
          )
@@ -380,11 +382,11 @@ export const onWriteCustomJobs = functions
 
       // Run side effects for all custom jobs changes
       if (changeTypes.isUpdate) {
-         const newCustomJob = change.after.data() as CustomJob
+         const updatedCustomJob = change.after.data() as CustomJob
 
          sideEffectPromises.push(
-            customJobRepo.syncCustomJobDataToCustomJobStats(newCustomJob),
-            customJobRepo.syncCustomJobDataToJobApplications(newCustomJob)
+            customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
+            customJobRepo.syncCustomJobDataToJobApplications(updatedCustomJob)
          )
       }
 
@@ -401,6 +403,7 @@ export const onWriteCustomJobs = functions
             customJobRepo.syncDeletedCustomJobToLinkedLivestreams(
                deletedCustomJob
             ),
+            customJobRepo.syncDeletedCustomJobToLinkedSparks(deletedCustomJob),
             sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
                deletedCustomJob,
                deletedCustomJob,

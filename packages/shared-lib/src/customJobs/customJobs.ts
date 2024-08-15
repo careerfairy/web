@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
 import { UserData } from "../users"
+import { CUSTOM_JOB_CONSTANTS } from "./constants"
 /**
  * Collection path: /careerCenterData/[groupId]/customJobs/[jobId]
  * CustomJob is attached to a single group but can be related to multiple live streams
@@ -12,7 +13,6 @@ export interface CustomJob extends Identifiable {
 
    title: string
    description: string
-   jobType: JobType
    postingUrl: string
    deadline: firebase.firestore.Timestamp
    createdAt: firebase.firestore.Timestamp
@@ -24,6 +24,7 @@ export interface CustomJob extends Identifiable {
    published: boolean
 
    // optional fields
+   jobType?: JobType
    salary?: string
    deleted?: boolean
    /**
@@ -44,7 +45,9 @@ export type PublicCustomJob = Pick<
    | "deadline"
    | "salary"
    | "deleted"
-   | "deadline"
+   | "businessFunctionsTagIds"
+   | "livestreams"
+   | "sparks"
 >
 
 export type PublicCustomJobApplicant = Pick<
@@ -82,6 +85,9 @@ export const pickPublicDataFromCustomJob = (
       deadline: job.deadline ?? null,
       salary: job.salary ?? null,
       deleted: job.deleted ?? false,
+      businessFunctionsTagIds: job.businessFunctionsTagIds ?? [],
+      livestreams: job.livestreams ?? [],
+      sparks: job.sparks ?? [],
    }
 }
 
@@ -124,4 +130,44 @@ export interface CustomJobApplicant extends Identifiable {
    companyCountry?: string
    companyIndustries?: string[]
    companySize?: string
+}
+
+export const getMaxDaysAfterDeadline = (): Date => {
+   return new Date(Date.now() - CUSTOM_JOB_CONSTANTS.MAX_DAYS_AFTER_DEADLINE)
+}
+
+/**
+ * This function sorts an array of jobs or job statistics.
+ * It prioritizes jobs based on their publication status and deadline.
+ *
+ * @param jobs {(CustomJob | CustomJobStats)[]}
+ * @returns {(CustomJob | CustomJobStats)[]}
+ */
+export const sortCustomJobs = <T extends CustomJob | CustomJobStats>(
+   jobs: T[]
+): T[] => {
+   const now = new Date()
+
+   // Create a new array to avoid mutating the original 'jobs' array
+   const sortedJobs = [...jobs]
+
+   return sortedJobs.sort((a, b) => {
+      // Extracting the CustomJob object from 'a' and 'b' based on whether they have a 'job' property or not
+      const jobA: CustomJob = "job" in a ? a.job : a
+      const jobB: CustomJob = "job" in b ? b.job : b
+
+      // Sort by 'published' flag
+      if (jobA.published && !jobB.published) return -1
+      if (!jobA.published && jobB.published) return 1
+
+      // Both have the same 'published' status, so sort by 'deadline'
+      const aDeadlineValid = jobA.deadline.toDate() > now
+      const bDeadlineValid = jobB.deadline.toDate() > now
+
+      if (aDeadlineValid && !bDeadlineValid) return -1
+      if (!aDeadlineValid && bDeadlineValid) return 1
+
+      // If both jobs have the same 'published' status and 'deadline' validity, maintain the current order
+      return 0
+   })
 }

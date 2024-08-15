@@ -18,6 +18,7 @@ const useGroupHasUpcomingLivestreams = (groupId: string) => {
          where("groupIds", "array-contains", groupId),
          where("start", ">", now),
          where("test", "==", false),
+         where("hidden", "==", false),
          limit(1)
       )
    }, [groupId])
@@ -25,7 +26,8 @@ const useGroupHasUpcomingLivestreams = (groupId: string) => {
    return (
       useFirestoreCollection<LivestreamEvent>(livestreamsQuery, {
          idField: "id",
-      }).data.length > 0
+         suspense: false,
+      }).data?.length > 0
    )
 }
 

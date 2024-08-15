@@ -1,7 +1,7 @@
 import {
    dummyFieldsOfStudy,
    dummyLevelsOfStudy,
-} from "@careerfairy/seed-data/dist/fieldsOfStudy"
+} from "@careerfairy/seed-data/fieldsOfStudy"
 
 export const credentials = {
    correctEmail: "john@careerfairy.io",
@@ -45,6 +45,7 @@ export const correctRegistrationAnalyticsSteps = {
 
 export const imageLogoPath = "tests/e2e/assets/logo.png"
 export const pdfSamplePath = "tests/e2e/assets/sample.pdf"
+export const creatorAvatarImagePath = "tests/e2e/assets/creatorAvatar.png"
 
 export const correctCompany = {
    industry: "Technology & IT",

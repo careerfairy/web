@@ -209,9 +209,17 @@ service cloud.firestore {
                 return careerCenter in request.auth.token.adminGroups.keys();
             }
 
-            match /creators/{creatorEmail} {
-                allow read: if true;
-                allow write: if isCareerCenterAdmin() || isCFAdmin();
+            match /creators/{creatorId} {
+               allow read: if true;
+               allow write: if isCareerCenterAdmin() || isCFAdmin();
+
+               match /statPageView/{visitorId} {
+                  allow read; allow write;
+               }
+
+               match /statLinkedInReach/{visitorId} {
+                  allow read; allow write;
+               }
             }
 
             match /ats/{integrationId} {

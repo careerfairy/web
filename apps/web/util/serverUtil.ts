@@ -1,23 +1,24 @@
-import { store } from "store"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { fromDate } from "data/firebase/FirebaseInstance"
 import {
    Group,
    SerializedGroup,
    deserializeGroup,
 } from "@careerfairy/shared-lib/groups"
-import nookies from "nookies"
-import CookiesUtil from "./CookiesUtil"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { GetEventsOfGroupOptions } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { ParsedUrlQuery } from "querystring"
-import { GetServerSidePropsContext, GetStaticPathsContext } from "next"
 import {
    MAX_PAST_STREAMS,
    MAX_UPCOMING_STREAMS,
 } from "components/views/company-page/EventSection"
-import { livestreamRepo } from "data/RepositoryInstances"
 import { getLivestreamDialogData } from "components/views/livestream-dialog"
+import { livestreamRepo } from "data/RepositoryInstances"
+import { fromDate } from "data/firebase/FirebaseInstance"
+import { GetServerSidePropsContext, GetStaticPathsContext } from "next"
+import nookies from "nookies"
+import { ParsedUrlQuery } from "querystring"
+import { store } from "store"
+import CookiesUtil from "./CookiesUtil"
 
 export const getServerSideStream = async (
    livestreamId: string
@@ -191,6 +192,7 @@ export const convertQueryParamsToString = (query: ParsedUrlQuery): string => {
  *
  * @param {string} groupId - The ID of the group to fetch livestream events for.
  * @param {Object} context - The context object, usually provided by Next.js methods like getServerSideProps or getStaticProps.
+ * @param {boolean} noLimits - Whether to fetch all upcoming and past livestreams without limits.
  * @returns {Promise<Object>} An object containing arrays of upcoming and past livestreams, and livestream dialog data.
  *
  * @example
@@ -200,15 +202,26 @@ export const convertQueryParamsToString = (query: ParsedUrlQuery): string => {
  */
 export const getLivestreamsAndDialogData = async (
    groupId: string,
-   context: GetServerSidePropsContext | GetStaticPathsContext
+   context: GetServerSidePropsContext | GetStaticPathsContext,
+   options?: GetEventsOfGroupOptions
 ) => {
    const results = await Promise.allSettled([
-      livestreamRepo.getEventsOfGroup(groupId, "upcoming", {
-         limit: MAX_UPCOMING_STREAMS + 1, // fetch 10 + 1 to know if there are more
-      }),
-      livestreamRepo.getEventsOfGroup(groupId, "past", {
-         limit: MAX_PAST_STREAMS + 1, // fetch 5 + 1 to know if there are more
-      }),
+      livestreamRepo.getEventsOfGroup(
+         groupId,
+         "upcoming",
+         options || {
+            hideHidden: null,
+            limit: MAX_UPCOMING_STREAMS + 1, // fetch 10 + 1 to know if there are more
+         }
+      ),
+      livestreamRepo.getEventsOfGroup(
+         groupId,
+         "past",
+         options || {
+            hideHidden: null,
+            limit: MAX_PAST_STREAMS + 1, // fetch 5 + 1 to know if there are more
+         }
+      ),
       getLivestreamDialogData(context),
    ])
 

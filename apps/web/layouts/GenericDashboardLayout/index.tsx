@@ -1,23 +1,23 @@
-import NavBar from "./NavBar"
-import AdminGenericLayout from "../AdminGenericLayout"
-import TopBar from "./TopBar"
-import useIsMobile from "../../components/custom-hook/useIsMobile"
-import GenericNavList from "./GenericNavList"
+import ClockIcon from "@mui/icons-material/AccessTime"
+import DomainIcon from "@mui/icons-material/Domain"
 import { createContext, useContext, useMemo } from "react"
-import Footer from "../../components/views/footer/Footer"
-import CreditsDialogLayout from "../CreditsDialogLayout"
-import DropdownNavigator from "./DropdownNavigator"
-import { INavLink } from "../types"
 import {
    Home as HomeIcon,
    Radio as LiveStreamsIcon,
    PlayCircle as SparksIcon,
 } from "react-feather"
-import ClockIcon from "@mui/icons-material/AccessTime"
-import DomainIcon from "@mui/icons-material/Domain"
 import { useAuth } from "../../HOCs/AuthProvider"
 import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
 import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
+import Footer from "../../components/views/footer/Footer"
+import AdminGenericLayout from "../AdminGenericLayout"
+import CreditsDialogLayout from "../CreditsDialogLayout"
+import { INavLink } from "../types"
+import DropdownNavigator from "./DropdownNavigator"
+import GenericNavList from "./GenericNavList"
+import NavBar from "./NavBar"
+import TopBar from "./TopBar"
 
 type IGenericDashboardContext = {
    isPortalPage: boolean
@@ -113,7 +113,8 @@ const GenericDashboardLayout = ({
    isBottomNavDark = false,
    hideHeader,
 }: Props) => {
-   const isMobile = useIsMobile()
+   const isMobile = useIsMobile(989)
+
    const { isLoggedIn } = useAuth()
 
    const [
@@ -200,7 +201,11 @@ const GenericDashboardLayout = ({
                }
                drawerContent={<NavBar />}
                hideDrawer={hideDrawer}
-               bottomNavContent={hideBottomNav ? null : <GenericNavList isDark={isBottomNavDark} />}
+               bottomNavContent={
+                  hideBottomNav ? null : (
+                     <GenericNavList isDark={isBottomNavDark} />
+                  )
+               }
                drawerOpen={!isMobile}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
                topBarTransparent={topBarTransparent}
