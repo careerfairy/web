@@ -20,11 +20,13 @@ import {
    addCardNotificationToSparksList,
    fetchInitialSparksFeed,
    fetchNextSparks,
+   removeCreatorId,
    removeGroupId,
    removeNotificationsByType,
    resetSparksFeed,
    setContentTopicIds,
    setConversionCardInterval,
+   setFetchedCompanyWithCreatorStatus,
    setGroupId,
    setInteractionSource,
    setOriginalSparkId,
@@ -33,12 +35,17 @@ import {
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
+   fetchedCompanyWithCreatorStatusSelector,
    fetchNextErrorSelector,
    groupIdSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
+   isCreatorFeedSelector,
    isFetchingNextSparksSelector,
+   isGroupFeedSelector,
+   isInCreatorFeedSelector,
    isOnLastSparkSelector,
+   wasInCreatorFeedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
@@ -63,10 +70,17 @@ const SparksPage: NextPage<
    const isOnLastSpark = useSelector(isOnLastSparkSelector)
    const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
    const hasNoMoreSparks = useSelector(hasNoMoreSparksSelector)
+   const fetchedCompanyWithCreatorStatus = useSelector(
+      fetchedCompanyWithCreatorStatusSelector
+   )
    const initialSparksFetched = useSelector(initialSparksFetchedSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
-   const fromGroupPage = useSelector(groupIdSelector)
+   const isFromGroupPage = useSelector(groupIdSelector)
+   const isGroupFeed = useSelector(isGroupFeedSelector)
+   const isCreatorFeed = useSelector(isCreatorFeedSelector)
+   const isInCreatorFeed = useSelector(isInCreatorFeedSelector)
+   const wasInCreatorFeed = useSelector(wasInCreatorFeedSelector)
    const { userData } = useAuth()
 
    useEffect(() => {
@@ -98,7 +112,7 @@ const SparksPage: NextPage<
 
       dispatch(
          setConversionCardInterval(
-            userData || fromGroupPage ? 0 : validConversionInterval
+            userData || isFromGroupPage ? 0 : validConversionInterval
          )
       )
 
@@ -107,7 +121,7 @@ const SparksPage: NextPage<
             removeNotificationsByType(SparkCardNotificationTypes.CONVERSION)
          )
       }
-   }, [conversionInterval, dispatch, fromGroupPage, userData])
+   }, [conversionInterval, dispatch, isFromGroupPage, userData])
 
    useEffect(() => {
       if (!groupId) {
@@ -140,13 +154,16 @@ const SparksPage: NextPage<
          isOnLastSpark &&
          !isFetchingNextSparks &&
          !hasNoMoreSparks &&
-         !fetchNextError
+         !fetchNextError &&
+         (fetchedCompanyWithCreatorStatus === "unset" ||
+            fetchedCompanyWithCreatorStatus === "finished")
       ) {
          dispatch(fetchNextSparks())
       }
    }, [
       dispatch,
       fetchNextError,
+      fetchedCompanyWithCreatorStatus,
       hasNoMoreSparks,
       initialSparksFetched,
       isFetchingNextSparks,
@@ -159,31 +176,54 @@ const SparksPage: NextPage<
    useEffect(() => {
       if (
          // eslint-disable-next-line no-extra-boolean-cast
-         Boolean(
-            !isFetchingNextSparks &&
-               hasNoMoreSparks &&
-               isOnLastSpark &&
-               fromGroupPage
-         )
+         Boolean(!isFetchingNextSparks && hasNoMoreSparks && isOnLastSpark)
       ) {
-         if (activeSpark?.isCardNotification) {
-            dispatch(removeGroupId())
-            dispatch(fetchInitialSparksFeed())
-         } else {
-            const payload: AddCardNotificationPayload = {
-               type: SparkCardNotificationTypes.GROUP,
+         if (isGroupFeed) {
+            if (activeSpark?.isCardNotification) {
+               dispatch(removeGroupId())
+               if (wasInCreatorFeed) {
+                  dispatch(setFetchedCompanyWithCreatorStatus("finished"))
+               }
+               dispatch(fetchInitialSparksFeed())
+            } else {
+               const payload: AddCardNotificationPayload = {
+                  type: SparkCardNotificationTypes.GROUP,
+               }
+               // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
+               dispatch(addCardNotificationToSparksList(payload))
             }
-            // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
-            dispatch(addCardNotificationToSparksList(payload))
+         } else if (isCreatorFeed) {
+            if (activeSpark?.isCardNotification) {
+               dispatch(setGroupId(activeSpark.creator.groupId))
+               dispatch(fetchInitialSparksFeed())
+               dispatch(removeCreatorId())
+               dispatch(setFetchedCompanyWithCreatorStatus("ongoing"))
+            } else {
+               const payload: AddCardNotificationPayload = {
+                  type: SparkCardNotificationTypes.CREATOR,
+               }
+               dispatch(addCardNotificationToSparksList(payload))
+            }
+         } else if (isInCreatorFeed) {
+            dispatch(removeGroupId())
+            dispatch(setFetchedCompanyWithCreatorStatus("finished"))
+            dispatch(fetchNextSparks())
          }
       }
    }, [
       activeSpark?.isCardNotification,
       dispatch,
-      fromGroupPage,
+      isFromGroupPage,
       hasNoMoreSparks,
       isFetchingNextSparks,
       isOnLastSpark,
+      activeSpark?.creator?.id,
+      activeSpark?.creator?.groupId,
+      fetchedCompanyWithCreatorStatus,
+      isGroupFeed,
+      isCreatorFeed,
+      isInCreatorFeed,
+      wasInCreatorFeed,
    ])
 
    useEffect(() => {

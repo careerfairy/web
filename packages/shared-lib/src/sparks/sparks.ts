@@ -54,6 +54,8 @@ export interface Spark extends Identifiable {
 
    video: SparkVideo
 
+   hasJobs?: boolean
+
    // possible future fields
 
    // video metadata
@@ -344,6 +346,12 @@ export type GetFeedData = {
          * If provided, we will only return sparks from this group
          */
         groupId: string
+     }
+   | {
+        /**
+         * If provided, we will only return sparks from this creator
+         */
+        creatorId: string
      }
 )
 

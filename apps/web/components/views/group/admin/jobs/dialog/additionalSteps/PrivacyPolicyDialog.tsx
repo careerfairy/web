@@ -1,17 +1,18 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import Stack from "@mui/material/Stack"
+import { Form, Formik } from "formik"
+import { useCallback, useMemo } from "react"
+import { AlertTriangle } from "react-feather"
+import * as Yup from "yup"
+import { JobDialogStep } from ".."
+import { groupRepo } from "../../../../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import useGroupFromState from "../../../../../../custom-hook/useGroupFromState"
+import useSnackbarNotifications from "../../../../../../custom-hook/useSnackbarNotifications"
+import { FormBrandedTextField } from "../../../../../common/inputs/BrandedTextField"
 import SteppedDialog, {
    useStepper,
-} from "../../../../stepped-dialog/SteppedDialog"
-import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
-import React, { useCallback, useMemo } from "react"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import { AlertTriangle } from "react-feather"
-import Stack from "@mui/material/Stack"
-import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { groupRepo } from "../../../../../../data/RepositoryInstances"
-import { Form, Formik } from "formik"
-import { FormBrandedTextField } from "../../../../common/inputs/BrandedTextField"
-import * as Yup from "yup"
+} from "../../../../../stepped-dialog/SteppedDialog"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -46,7 +47,7 @@ const styles = sxStyles({
 
 const PrivacyPolicyDialog = () => {
    const { group } = useGroupFromState()
-   const { moveToNext } = useStepper()
+   const { goToStep } = useStepper()
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const initialValues = useMemo(
@@ -72,15 +73,15 @@ const PrivacyPolicyDialog = () => {
          } catch (error) {
             errorNotification(error, "An error has occurred")
          } finally {
-            moveToNext()
+            goToStep(JobDialogStep.FORM_BASIC_INFO.key)
          }
       },
-      [group.groupId, successNotification, errorNotification, moveToNext]
+      [group.groupId, successNotification, errorNotification, goToStep]
    )
 
    const handleSkip = useCallback(() => {
-      moveToNext()
-   }, [moveToNext])
+      goToStep(JobDialogStep.FORM_BASIC_INFO.key)
+   }, [goToStep])
 
    return (
       <Formik<FormValues>

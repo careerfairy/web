@@ -1,12 +1,4 @@
 import {
-   Control,
-   FieldError,
-   FieldPath,
-   FieldValues,
-   useController,
-   UseControllerProps,
-} from "react-hook-form"
-import {
    Autocomplete,
    AutocompleteProps,
    styled,
@@ -15,8 +7,16 @@ import {
 } from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
 import { forwardRef, ReactNode, Ref, RefAttributes } from "react"
-import BrandedTextField from "./BrandedTextField"
+import {
+   Control,
+   FieldError,
+   FieldPath,
+   FieldValues,
+   useController,
+   UseControllerProps,
+} from "react-hook-form"
 import BrandedCheckbox from "./BrandedCheckbox"
+import BrandedTextField from "./BrandedTextField"
 
 export type Option = {
    id: string | number
@@ -47,7 +47,10 @@ export type AutocompleteElementProps<
       AutocompleteProps<TValue, Multiple, DisableClearable, FreeSolo>,
       "name" | "options" | "loading" | "renderInput"
    >
-   textFieldProps?: Omit<TextFieldProps, "name" | "required" | "label">
+   textFieldProps?: Omit<TextFieldProps, "name" | "required" | "label"> & {
+      requiredText: string
+   }
+   limit?: number
 }
 
 type AutocompleteElementComponent = <
@@ -66,11 +69,13 @@ type AutocompleteElementComponent = <
       RefAttributes<HTMLDivElement>
 ) => JSX.Element
 
-const StyledMenuItem = styled("li")({
+const StyledMenuItem = styled("li")(({ theme }) => ({
+   justifyContent: "space-between !important",
+
    '&[aria-selected="true"]': {
-      backgroundColor: "#FAFAFA !important",
+      backgroundColor: `${theme.brand.black[100]} !important`,
    },
-})
+}))
 
 export const ControlledBrandedAutoComplete = forwardRef(
    function AutocompleteElement<
@@ -102,6 +107,7 @@ export const ControlledBrandedAutoComplete = forwardRef(
          multiple,
          matchId,
          label,
+         limit,
       } = props
 
       const loadingElement = loadingIndicator || (
@@ -147,6 +153,16 @@ export const ControlledBrandedAutoComplete = forwardRef(
             loading={loading}
             multiple={multiple}
             options={options}
+            getOptionDisabled={(option) => {
+               if (!props.multiple || !limit) return false
+
+               if (
+                  currentValue.findIndex((value) => value.id === option.id) >= 0
+               ) {
+                  return false
+               }
+               return currentValue.length >= limit
+            }}
             disableCloseOnSelect={
                typeof autocompleteProps?.disableCloseOnSelect === "boolean"
                   ? autocompleteProps.disableCloseOnSelect
@@ -181,25 +197,17 @@ export const ControlledBrandedAutoComplete = forwardRef(
             ref={ref}
             renderOption={
                autocompleteProps?.renderOption ??
-               (showCheckbox
-                  ? (props, option, { selected }) => (
-                       <StyledMenuItem {...props}>
-                          <BrandedCheckbox
-                             sx={{ marginRight: 1 }}
-                             checked={selected}
-                          />
-                          {autocompleteProps?.getOptionLabel?.(option) ||
-                             option.value ||
-                             option}
-                       </StyledMenuItem>
-                    )
-                  : (props, option) => (
-                       <StyledMenuItem {...props} key={option?.id || option}>
-                          {autocompleteProps?.getOptionLabel?.(option) ||
-                             option.value ||
-                             option}
-                       </StyledMenuItem>
-                    ))
+               ((props, option, { selected }) => (
+                  <StyledMenuItem {...props} key={option?.id || option}>
+                     {autocompleteProps?.getOptionLabel?.(option) ||
+                        option.value ||
+                        option}
+
+                     {showCheckbox ? (
+                        <BrandedCheckbox checked={selected} />
+                     ) : null}
+                  </StyledMenuItem>
+               ))
             }
             onBlur={(event) => {
                field.onBlur()

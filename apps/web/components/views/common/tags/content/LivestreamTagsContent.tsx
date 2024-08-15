@@ -5,13 +5,12 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Grid, Stack, Typography } from "@mui/material"
 import { useLivestreamsByTags } from "components/custom-hook/tags/useLivestreamsByTags"
+import useLivestreamsPerBatch from "components/custom-hook/tags/useLivestreamsPerBatch"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useMemo } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import EventPreviewCard from "../../stream-cards/EventPreviewCard"
-
-const EVENTS_PER_BATCH = 3
 
 const styles = sxStyles({
    seeMore: (theme) => ({
@@ -48,11 +47,13 @@ type Props = {
 }
 
 const LivestreamTagsContent = (props: Props) => {
+   const eventsPerBatch = useLivestreamsPerBatch(props.type)
+
    const {
       data: events,
       setSize: setNextPage,
       hasMorePages: hasMorePages,
-   } = useLivestreamsByTags(props.type, props.tags, EVENTS_PER_BATCH)
+   } = useLivestreamsByTags(props.type, props.tags, eventsPerBatch)
 
    if (!events.length) return null
 
@@ -102,14 +103,7 @@ const EventsPreview = ({
             <Grid container spacing={isMobile ? 2 : 3}>
                {events.map((livestream, idx, arr) => {
                   return (
-                     <Grid
-                        key={livestream.id}
-                        xs={12}
-                        sm={6}
-                        lg={4}
-                        xl={3}
-                        item
-                     >
+                     <Grid key={livestream.id} xs={12} sm={6} lg={4} item>
                         <EventPreviewCard
                            key={livestream.id}
                            index={idx}

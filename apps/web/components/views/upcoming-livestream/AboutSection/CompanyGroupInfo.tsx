@@ -1,19 +1,21 @@
-import React, { useMemo } from "react"
-import Box from "@mui/material/Box"
-import { Typography } from "@mui/material"
-import Stack from "@mui/material/Stack"
-import { ChevronRight as MoreIcon } from "react-feather"
-import Link from "../../common/Link"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { sxStyles } from "../../../../types/commonTypes"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import { Typography } from "@mui/material"
+import Box from "@mui/material/Box"
+import Stack from "@mui/material/Stack"
+import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import SanitizedHTML from "components/util/SanitizedHTML"
+import { useMemo } from "react"
+import { ChevronRight as MoreIcon } from "react-feather"
+import { sxStyles } from "../../../../types/commonTypes"
+import Link from "../../common/Link"
 import {
    CompanyCountryTag,
    CompanyIndustryTag,
    CompanySizeTag,
 } from "../../common/company/company-tags"
-import SanitizedHTML from "components/util/SanitizedHTML"
 
 type Props = {
    companyGroupData: Group
@@ -28,13 +30,17 @@ const styles = sxStyles({
    },
 })
 const CompanyGroupInfo = ({ companyGroupData }: Props) => {
+   const featureFlags = useFeatureFlags()
+   const { data: creators } = useGroupCreators(companyGroupData?.id)
    const showCompanyPageCta = useMemo(() => {
       const presenter = GroupPresenter.createFromDocument(companyGroupData)
+      presenter.setHasMentor(creators?.length > 0)
+      presenter.setFeatureFlags(featureFlags)
 
       return Boolean(
          companyGroupData.publicProfile && presenter.companyPageIsReady()
       )
-   }, [companyGroupData])
+   }, [companyGroupData, featureFlags, creators])
 
    return (
       <Box>

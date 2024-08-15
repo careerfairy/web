@@ -56,6 +56,7 @@ export const VALID_SOURCES: RegistrationSource[] = [
       id: RegistrationSourceIds.Sparks,
       helpDescription: "User registered through Sparks.",
       color: "#FFC200",
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       match: (utms) => false,
    },
    {

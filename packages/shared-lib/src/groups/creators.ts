@@ -123,3 +123,7 @@ export const mapCreatorToSpeaker = (
       roles: creator.roles,
    }
 }
+
+export function transformCreatorNameIntoSlug(creator: PublicCreator) {
+   return `${creator.firstName}-${creator.lastName}`.toLowerCase()
+}
