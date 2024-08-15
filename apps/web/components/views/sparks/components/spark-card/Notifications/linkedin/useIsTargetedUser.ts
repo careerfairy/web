@@ -11,13 +11,13 @@ export const useIsTargetedUser = (group: PublicGroup) => {
       if (isLoading) return false
 
       const isTargetedUser =
-         group.targetedCountries.filter((country) => {
+         group.targetedCountries?.filter((country) => {
             const userCode = isLoggedIn
                ? userData?.universityCountryCode
                : userCountryCode
 
             return country.id === userCode
-         }).length > 0
+         })?.length > 0
 
       return isTargetedUser
    }, [
