@@ -75,7 +75,7 @@ export const flagsInitialState = {
     * Hide or Show
     */
    mentorsV1: {
-      enabled: false,
+      enabled: true,
    },
 } satisfies FeatureFlagsDetails
 
