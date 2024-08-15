@@ -3,7 +3,6 @@ import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/record
 import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import { Box, Slide, Typography } from "@mui/material"
-import { ReactNode } from "react"
 import ReactPlayer from "react-player"
 import { sxStyles } from "../../../../types/commonTypes"
 import useIsMobile from "../../../custom-hook/useIsMobile"
@@ -79,10 +78,6 @@ const RecordingPlayer = ({
                         Live stream recording
                      </Typography>
                   )}
-
-                  <RecordingTitle isMobile={isMobile}>
-                     You have access to this recording:
-                  </RecordingTitle>
                </Box>
             </Slide>
          )}
@@ -112,24 +107,6 @@ const RecordingPlayer = ({
             />
          </Box>
       </Box>
-   )
-}
-
-const RecordingTitle = ({
-   isMobile,
-   children,
-}: {
-   isMobile: boolean
-   children: ReactNode
-}) => {
-   return (
-      <Typography
-         variant={isMobile ? "h4" : "h5"}
-         mt={1}
-         fontWeight={isMobile ? "bold" : "unset"}
-      >
-         {children}
-      </Typography>
    )
 }
 

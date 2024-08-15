@@ -81,7 +81,7 @@ test.describe("Access a recording when the user registered to the livestream", (
             )
             await livestreamDialogPage.openDialog()
 
-            await livestreamDialogPage.assertRecordingVideoIsVisible(false)
+            await livestreamDialogPage.assertRecordingVideoIsVisible()
          }
       )
    }
@@ -124,7 +124,7 @@ test.describe("Access a recording when the user registered to the livestream", (
          waitForURL: `**/past-livestreams/livestream/${livestream.id}`,
       })
 
-      await livestreamDialogPage.assertRecordingVideoIsVisible(false)
+      await livestreamDialogPage.assertRecordingVideoIsVisible()
    })
 })
 

@@ -151,18 +151,7 @@ export default class LivestreamDialogPage extends CommonPage {
       await this.registrationButton.click()
    }
 
-   async assertRecordingVideoIsVisible(free: boolean = false) {
-      if (free) {
-         // Only 0d 23h 59min 47sec left to rewatch for free!
-         await expect(
-            this.page.getByText("Recording unlocked for")
-         ).toBeVisible()
-      } else {
-         await expect(
-            this.page.getByText("You have access to this recording")
-         ).toBeVisible()
-      }
-
+   async assertRecordingVideoIsVisible() {
       // play button
       await expect(
          this.page.getByTestId("PlayArrowRoundedIcon").locator("path")

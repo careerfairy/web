@@ -8,7 +8,7 @@ import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import { Box, Skeleton, Typography } from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
 import { alpha } from "@mui/material/styles"
-import React, { FC, useCallback, useEffect, useMemo, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import ReactPlayer from "react-player"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { livestreamRepo } from "../../../../../data/RepositoryInstances"
@@ -145,16 +145,7 @@ const Player: FC<Props> = ({ stream, livestreamPresenter }) => {
          <Box sx={styles.playerWrapper} mt={1}>
             <ReactPlayer
                className="react-player"
-               playIcon={
-                  <>
-                     <Box sx={styles.countDown}>
-                        <RecordingTitle>
-                           You have access to this recording:
-                        </RecordingTitle>
-                     </Box>
-                     <PlayIcon sx={styles.icon} />
-                  </>
-               }
+               playIcon={<PlayIcon sx={styles.icon} />}
                width="100%"
                height="100%"
                controls={true}
@@ -213,16 +204,6 @@ const CountDown = ({ stream }: CountDownProps) => {
          color="primary"
       >
          {countDown}
-      </Typography>
-   )
-}
-
-const RecordingTitle: FC<{
-   children: React.ReactNode
-}> = ({ children }) => {
-   return (
-      <Typography sx={styles.recordingTitle} variant={"body1"}>
-         {children}
       </Typography>
    )
 }
