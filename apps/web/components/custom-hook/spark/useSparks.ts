@@ -1,6 +1,13 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { collection, getDocs, limit, query, where } from "firebase/firestore"
+import {
+   collection,
+   getDocs,
+   limit,
+   orderBy,
+   query,
+   where,
+} from "firebase/firestore"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
@@ -29,6 +36,7 @@ const useSparks = (options?: Options) => {
                collection(FirestoreInstance, "sparks"),
                where("group.publicSparks", "==", true),
                where("published", "==", true),
+               orderBy("publishedAt", "desc"),
                ...(groupId ? [where("group.id", "==", groupId)] : []),
                ...(totalItems ? [limit(totalItems)] : [])
             ).withConverter(createGenericConverter<Spark>())
