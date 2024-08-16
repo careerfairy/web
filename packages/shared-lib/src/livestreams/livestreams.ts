@@ -841,3 +841,13 @@ export type StreamerDetails = {
    avatarUrl: string
    linkedInUrl: string
 }
+
+export interface LivestreamCTA extends Identifiable {
+   message: string
+   buttonText: string
+   buttonURL: string
+   timestamp: firebase.firestore.Timestamp
+   numberOfUsersWhoClickedLink: number
+   numberOfUsersWhoDismissed: number
+   active: boolean
+}

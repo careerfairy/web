@@ -6,7 +6,9 @@ import {
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
 import {
+   CreateLivestreamCTARequest,
    CreateLivestreamPollRequest,
+   DeleteLivestreamCTARequest,
    DeleteLivestreamChatEntryRequest,
    DeleteLivestreamPollRequest,
    EmoteType,
@@ -29,7 +31,9 @@ import {
    ResetLivestreamQuestionRequest,
    Speaker,
    StreamerDetails,
+   ToggleActiveCTARequest,
    ToggleHandRaiseRequest,
+   UpdateLivestreamCTARequest,
    UpdateLivestreamPollRequest,
    UpsertSpeakerRequest,
    UserLivestreamData,
@@ -1262,6 +1266,38 @@ export class LivestreamService {
       const registeredSnap = await getDoc(registeredRef)
 
       return Boolean(registeredSnap.data()?.registered?.date)
+   }
+
+   createCTA = async (options: CreateLivestreamCTARequest) => {
+      await httpsCallable<CreateLivestreamCTARequest>(
+         this.functions,
+         "createCTA"
+      )(options)
+      return
+   }
+
+   updateCTA = async (options: UpdateLivestreamCTARequest) => {
+      await httpsCallable<UpdateLivestreamCTARequest>(
+         this.functions,
+         "updateCTA"
+      )(options)
+      return
+   }
+
+   deleteCTA = async (options: DeleteLivestreamCTARequest) => {
+      await httpsCallable<DeleteLivestreamCTARequest>(
+         this.functions,
+         "deleteCTA"
+      )(options)
+      return
+   }
+
+   toggleActiveCTA = async (options: ToggleActiveCTARequest) => {
+      await httpsCallable<ToggleActiveCTARequest>(
+         this.functions,
+         "toggleActiveCTA"
+      )(options)
+      return
    }
 }
 
