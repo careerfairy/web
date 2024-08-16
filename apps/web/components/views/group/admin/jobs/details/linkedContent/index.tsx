@@ -2,11 +2,11 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, Button, Stack, Typography } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useCustomJobLinkedSparks from "components/custom-hook/custom-job/useCustomJobLinkedSparks"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import EventsPreviewCarousel, {
@@ -47,7 +47,7 @@ const styles = sxStyles({
          xs: `0 0 90%`,
          sm: `0 0 60%`,
          md: "0 0 60%",
-         xl: "0 0 20%",
+         xl: "0 0 60%",
       },
       maxWidth: { md: 360 },
       minWidth: 0,

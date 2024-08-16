@@ -50,7 +50,7 @@ const styles = sxStyles({
          xs: `0 0 90%`,
          sm: `0 0 60%`,
          md: "0 0 60%",
-         xl: "0 0 20%",
+         xl: "0 0 60%",
       },
       maxWidth: { md: 360 },
       minWidth: 0,
