@@ -18,11 +18,14 @@
       "@careerfairy/shared-lib": "../shared-lib"
    },
    "dependencies": {
+      "@ai-sdk/google": "^0.0.38",
+      "@ai-sdk/openai": "^0.0.47",
       "@aws-sdk/client-s3": "^3.629.0",
       "@careerfairy/shared-lib": "*",
       "@google-cloud/bigquery": "^7.9.0",
       "@google-cloud/speech": "^6.7.0",
       "agora-token": "^2.0.3",
+      "ai": "^3.3.8",
       "algoliasearch": "^4.22.0",
       "axios": "^0.27.2",
       "country-state-city": "^3.2.1",

@@ -8,12 +8,15 @@ import {
 } from "@careerfairy/shared-lib/livestreams/ai"
 import { TranscriptionSegment } from "@careerfairy/shared-lib/utils/transcription"
 import { logger } from "firebase-functions/v2"
+import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
 import { onObjectFinalized } from "firebase-functions/v2/storage"
 import { firestore, Timestamp } from "../../api/firestoreAdmin"
 import { livestreamsRepo } from "../../api/repositories"
+import { ChangeType, getChangeTypeEnum } from "../../util"
 import { invokeFirebaseHttpsFunction } from "../../util/axios"
 import { createGenericConverter } from "../../util/firestore-admin"
+import { transcriptEmbeddingService } from "./embeddings/TranscriptEmbeddingService"
 import { createLivestreamSpeechContexts, transcribeLongAudio } from "./util"
 
 const TIMEOUT_SECONDS = 60 * 60 // 1 hour
@@ -128,6 +131,60 @@ export const generateLiveStreamTranscript = onRequest(
          logger.error("Error in generateLiveStreamTranscript:", error)
          await updateTranscriptStatus(livestream, "error", error.message)
          res.status(500).send("An error occurred while processing the request")
+      }
+   }
+)
+
+export const generateTranscriptEmbeddings = onDocumentWritten(
+   "livestreamTranscripts/{transcriptId}",
+   async (event) => {
+      const changeType = getChangeTypeEnum(event.data)
+      const snapshot = event.data
+
+      const transcript = snapshot.after.data() as
+         | LivestreamTranscript
+         | undefined
+
+      const oldTranscript = snapshot.before.data() as
+         | LivestreamTranscript
+         | undefined
+
+      if (changeType === ChangeType.DELETE) {
+         logger.info("Transcript deleted, deleting embeddings")
+         await transcriptEmbeddingService.deleteExistingEmbeddings(
+            oldTranscript?.livestream.id
+         )
+         return
+      }
+
+      if (transcript?.status !== "complete") {
+         logger.info(
+            `Transcript status is ${transcript.status}, not generating embeddings yet`
+         )
+         return
+      }
+
+      if (oldTranscript?.transcript === transcript.transcript) {
+         logger.info("Transcript has not changed, not generating embeddings")
+         return
+      }
+
+      try {
+         const livestream = await livestreamsRepo.getById(
+            transcript.livestream.id
+         )
+
+         await transcriptEmbeddingService.generateAndStoreTranscriptEmbeddings(
+            livestream,
+            transcript
+         )
+
+         logger.log(
+            `Successfully generated and stored embeddings for live stream ${livestream.id}`
+         )
+      } catch (error) {
+         logger.error("Error generating transcript embeddings:", error)
+         throw error // Rethrowing the error will cause the function to retry
       }
    }
 )

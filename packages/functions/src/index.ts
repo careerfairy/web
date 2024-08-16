@@ -396,3 +396,6 @@ exports.processLivestreamAudioRecordingsHttp =
    ai.processLivestreamAudioRecordingsHttp
 exports.processLivestreamAudioRecordingsScheduled =
    ai.processLivestreamAudioRecordingsScheduled
+
+// Embeddings
+exports.generateTranscriptEmbeddings = ai.generateTranscriptEmbeddings
