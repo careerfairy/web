@@ -1,9 +1,11 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { TranscriptionSegment } from "@careerfairy/shared-lib/utils/transcription"
 import { protos } from "@google-cloud/speech"
+import { embedMany } from "ai"
 import { Timestamp } from "firebase-admin/firestore"
 import { logger } from "firebase-functions/v2"
 import { speechClient } from "../../api/speech"
+import { EMBEDDING_MODEL } from "./constants"
 
 export type IRecognizeRequest =
    protos.google.cloud.speech.v1p1beta1.IRecognizeRequest
@@ -217,4 +219,21 @@ export const createLivestreamSpeechContexts = (
    }
 
    return contexts
+}
+
+export async function generateEmbeddings(texts: string[]) {
+   return embedMany({
+      model: EMBEDDING_MODEL,
+      values: texts,
+   })
+}
+
+/**
+ * Estimate the number of tokens in a given text
+ * @param text - The text to estimate tokens for
+ * @returns The estimated number of tokens
+ */
+export function estimateTokenCount(text: string): number {
+   // Simple token count estimator
+   return text.split(/\s+/).length
 }
