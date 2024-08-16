@@ -1,9 +1,8 @@
-import { expect } from "@playwright/test"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
-import { sleep } from "../../utils"
-import { groupAdminFixture as test } from "../../fixtures"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import UserSeed from "@careerfairy/seed-data/dist/users"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import { expect } from "@playwright/test"
+import { groupAdminFixture as test } from "../../fixtures"
 
 test.describe("Company page creation", () => {
    test.skip("Update company page description and location", async ({
@@ -53,9 +52,6 @@ test.describe("Company page creation", () => {
 
       // open about dialog and fill all the information
       await groupPage.openAndFillAboutInformation()
-
-      // open testimonial dialog and create one
-      await groupPage.openAndFillTestimonial()
 
       // fill required photos
       await groupPage.addCompanyPhotos()
