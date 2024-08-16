@@ -19,9 +19,15 @@ import {
 import { CircularButton } from "./CircularButton"
 
 export const CallsToActionButton = () => {
+   const { livestreamId, agoraUserId } = useStreamingContext()
+   const { data: userCtaInteractions } = useUserLivestreamCTA(
+      livestreamId,
+      agoraUserId
+   )
+
    return (
       <SuspenseWithBoundary fallback={<></>}>
-         <CTAButtonComponent />
+         {userCtaInteractions ? <CTAButtonComponent /> : null}
       </SuspenseWithBoundary>
    )
 }
@@ -43,12 +49,10 @@ const CTAButtonComponent = () => {
    )
 
    const ctaWithNoUserInteraction = useMemo(() => {
-      if (userCtaInteractions) {
-         const userInteractionsIds = userCtaInteractions.map(
-            (userCTA) => userCTA.ctaId
-         )
-         return activeCTA.filter((cta) => !userInteractionsIds.includes(cta.id))
-      } else return []
+      const userInteractionsIds = userCtaInteractions.map(
+         (userCTA) => userCTA.ctaId
+      )
+      return activeCTA.filter((cta) => !userInteractionsIds.includes(cta.id))
    }, [userCtaInteractions, activeCTA])
 
    const unreadCTAs = useMemo(
@@ -104,32 +108,36 @@ const CTAButtonComponent = () => {
       ]
    )
 
+   const activeCTAIds = useMemo(
+      () => activeCTA.map((cta) => cta.id).join(),
+      [activeCTA]
+   )
+
    useEffect(() => {
-      if (userCtaInteractions) {
-         const unreadActiveCTAs = activeCTA
-            .filter((cta) => unreadCTAs.includes(cta.id))
-            .concat(ctaWithNoUserInteraction)
+      const unreadActiveCTAs = activeCTA
+         .filter((cta) => unreadCTAs.includes(cta.id))
+         .concat(ctaWithNoUserInteraction)
 
-         const ctaIds = unreadActiveCTAs.map((cta) => cta.id)
+      const ctaIds = unreadActiveCTAs.map((cta) => cta.id)
 
-         ctaIds.length && isCTAPanelActive
-            ? livestreamService.markCTAAsRead(livestreamId, agoraUserId, ctaIds)
-            : setUnreadActiveCTA(unreadActiveCTAs)
+      ctaIds.length && isCTAPanelActive
+         ? livestreamService.markCTAAsRead(livestreamId, agoraUserId, ctaIds)
+         : setUnreadActiveCTA(unreadActiveCTAs)
 
-         const notClickedOrDismissedActiveCTAs = activeCTA
-            .filter((cta) => notClickedOrDismissedCTA.includes(cta.id))
-            .concat(ctaWithNoUserInteraction)
+      const notClickedOrDismissedActiveCTAs = activeCTA
+         .filter((cta) => notClickedOrDismissedCTA.includes(cta.id))
+         .concat(ctaWithNoUserInteraction)
 
-         queueCTASnackbarNotifications(notClickedOrDismissedActiveCTAs)
-      }
+      queueCTASnackbarNotifications(notClickedOrDismissedActiveCTAs)
 
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [activeCTA, userCtaInteractions])
+   }, [activeCTAIds]) //assures it only runs when CTA's active property changes
 
    const handleClick = async () => {
       dispatch(setActiveView(ActiveViews.CTA))
       const ctaIds = activeCTA.map((cta) => cta.id)
       livestreamService.markCTAAsRead(livestreamId, agoraUserId, ctaIds)
+      removeNotification(...ctaIds)
       setUnreadActiveCTA([])
    }
 
