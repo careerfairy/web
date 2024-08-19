@@ -16,7 +16,7 @@ export const LogoBackButton = () => {
       <Stack
          component={Link}
          noLinkStyle
-         href={"/"}
+         href={"/portal"}
          direction="row"
          alignItems="center"
       >

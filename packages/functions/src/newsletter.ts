@@ -96,7 +96,9 @@ export const manualTemplatedEmail = functions
    .region(config.region)
    .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
-      functions.logger.info("manualTemplatedEmail: v3.0 - AAB Talent Pool")
+      functions.logger.info(
+         "manualTemplatedEmail: v4.0 - B2C launch announcement"
+      )
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -117,11 +119,11 @@ export const manualTemplatedEmail = functions
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("AAB Talent Pool email sent to everyone")
+         res.status(200).send("B2C launch announcement email sent to everyone")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "AAB Talent Pool email sent to " + receivedEmails.join(", ")
+            "B2C launch announcement email sent to " + receivedEmails.join(", ")
          )
       }
    })
@@ -161,7 +163,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      functions.logger.info("ABB talent pool communication, skipping")
+      functions.logger.info("B2C launch announcement, skipping")
       return
    }
 
@@ -172,7 +174,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
 
    const newsletterService = new ManualTemplatedEmailService(
       userRepo,
-      livestreamsRepo,
+      // livestreamsRepo,
       emailBuilder,
       functions.logger
    )
@@ -186,7 +188,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   functions.logger.info("ABB talent pool communication execution done")
+   functions.logger.info("B2C launch announcement execution done")
 }
 
 /**

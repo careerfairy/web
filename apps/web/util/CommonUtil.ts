@@ -1,7 +1,11 @@
 /* eslint-disable no-var */
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import * as Sentry from "@sentry/nextjs"
+import getConfig from "next/config"
+import { v4 as uuid } from "uuid"
 import LocalStorageUtil from "./LocalStorageUtil"
+
+const { publicRuntimeConfig } = getConfig() || {}
 
 export function getRandom(arr, n) {
    var result = new Array(n),
@@ -241,13 +245,19 @@ export const shouldUseEmulators = () => {
 }
 
 /**
- * Get the workflow id from the environment variables
- * This is used to isolate test data and operations
- * @returns the workflow id or the dev name or "unknown" if neither is set
+ * Get the workflow ID for isolating test data and operations
+ *
+ * This function prioritizes:
+ * 1. The NEXT_PUBLIC_UNIQUE_WORKFLOW_ID set at build time (available through next/config)
+ * 2. The NEXT_PUBLIC_DEV_NAME environment variable (for local development)
+ * 3. "unknown" as a fallback
+ *
+ * Using next/config ensures consistent values across server and client-side rendering,
+ * solving issues related to Docker deployments and environment variables.
  */
 export const getWorkflowId = (): string => {
    return (
-      process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
+      publicRuntimeConfig.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
       process.env.NEXT_PUBLIC_DEV_NAME ||
       "unknown"
    )
@@ -369,3 +379,7 @@ export const sanitizeFileName = (fileName: string): string => {
 
 export const convertBytesToMB = (bytes: number) =>
    Number.isFinite(bytes) ? bytes / 1024 / 1024 : 0
+
+export const generateUniqueId = () => {
+   return uuid().replace(/-/g, "") // remove dashes
+}

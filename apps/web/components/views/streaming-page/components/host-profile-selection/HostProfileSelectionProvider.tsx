@@ -1,0 +1,144 @@
+import { Speaker } from "@careerfairy/shared-lib/livestreams"
+import { useAppDispatch } from "components/custom-hook/store"
+import {
+   ReactNode,
+   createContext,
+   useContext,
+   useMemo,
+   useReducer,
+} from "react"
+import { usePrevious } from "react-use"
+import { setSpeakerId, setUserUid } from "store/reducers/streamingAppReducer"
+
+export enum ProfileSelectEnum {
+   SELECT_SPEAKER,
+   EDIT_SPEAKER,
+   CREATE_SPEAKER,
+   JOIN_WITH_SPEAKER,
+}
+
+type State = {
+   selectedSpeaker: Speaker | null
+   activeView: ProfileSelectEnum
+   direction: 1 | -1
+}
+
+type Action =
+   | { type: ProfileSelectEnum.SELECT_SPEAKER }
+   | { type: ProfileSelectEnum.JOIN_WITH_SPEAKER; payload: Speaker }
+   | { type: ProfileSelectEnum.EDIT_SPEAKER; payload: Speaker }
+   | { type: ProfileSelectEnum.CREATE_SPEAKER }
+
+const reducer = (state: State, action: Action): State => {
+   state.direction = state.activeView > action.type ? -1 : 1
+   switch (action.type) {
+      case ProfileSelectEnum.SELECT_SPEAKER:
+         return {
+            ...state,
+            activeView: ProfileSelectEnum.SELECT_SPEAKER,
+         }
+      case ProfileSelectEnum.JOIN_WITH_SPEAKER:
+         return {
+            ...state,
+            selectedSpeaker: action.payload,
+            activeView: ProfileSelectEnum.JOIN_WITH_SPEAKER,
+         }
+      case ProfileSelectEnum.EDIT_SPEAKER:
+         return {
+            ...state,
+            selectedSpeaker: action.payload,
+            activeView: ProfileSelectEnum.EDIT_SPEAKER,
+         }
+      case ProfileSelectEnum.CREATE_SPEAKER:
+         return {
+            ...state,
+            selectedSpeaker: null,
+            activeView: ProfileSelectEnum.CREATE_SPEAKER,
+         }
+      default:
+         return state
+   }
+}
+
+type ProfileSelectContextType = {
+   joinLiveStreamWithSpeaker: (speakerId: string) => void
+   joinLiveStreamWithUser: (userId: string) => void
+   goBackToSelectSpeaker: () => void
+   editSpeaker: (speaker: Speaker) => void
+   selectSpeaker: (speaker: Speaker) => void
+   goToCreateNewSpeaker: () => void
+   selectedSpeaker: Speaker | null
+   activeView: ProfileSelectEnum
+   prevActiveView: ProfileSelectEnum | null
+   direction: 1 | -1
+}
+
+const ProfileSelectContext = createContext<
+   ProfileSelectContextType | undefined
+>(undefined)
+
+type Props = {
+   children: (activeView: ProfileSelectEnum) => ReactNode
+}
+
+export const ProfileSelectProvider = ({ children }: Props) => {
+   const appDispatch = useAppDispatch()
+
+   const [state, dispatch] = useReducer(reducer, {
+      selectedSpeaker: null,
+      activeView: ProfileSelectEnum.SELECT_SPEAKER,
+      direction: 1,
+   })
+
+   const prevActiveView = usePrevious(state.activeView)
+
+   const value = useMemo<ProfileSelectContextType>(
+      () => ({
+         direction: state.direction,
+         activeView: state.activeView,
+         prevActiveView,
+         selectedSpeaker: state.selectedSpeaker,
+         editSpeaker: (speaker: Speaker) => {
+            return dispatch({
+               type: ProfileSelectEnum.EDIT_SPEAKER,
+               payload: speaker,
+            })
+         },
+         selectSpeaker: (speaker: Speaker) => {
+            return dispatch({
+               type: ProfileSelectEnum.JOIN_WITH_SPEAKER,
+               payload: speaker,
+            })
+         },
+         goToCreateNewSpeaker: () => {
+            return dispatch({ type: ProfileSelectEnum.CREATE_SPEAKER })
+         },
+         goBackToSelectSpeaker: () => {
+            return dispatch({ type: ProfileSelectEnum.SELECT_SPEAKER })
+         },
+         joinLiveStreamWithSpeaker: (speakerId: string) => {
+            return appDispatch(setSpeakerId(speakerId))
+         },
+         joinLiveStreamWithUser: (userId: string) => {
+            return appDispatch(setUserUid(userId))
+         },
+      }),
+      [state, dispatch, appDispatch, prevActiveView]
+   )
+
+   return (
+      <ProfileSelectContext.Provider value={value}>
+         {children(state.activeView)}
+      </ProfileSelectContext.Provider>
+   )
+}
+
+export const useHostProfileSelection = () => {
+   const context = useContext(ProfileSelectContext)
+   if (!context) {
+      throw new Error(
+         "useHostProfileSelection must be used within a ProfileSelectProvider"
+      )
+   }
+   return context
+}

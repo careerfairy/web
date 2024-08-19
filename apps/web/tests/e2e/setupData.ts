@@ -1,12 +1,14 @@
-import GroupSeed from "@careerfairy/seed-data/dist/groups"
+import FieldsOfStudySeed from "@careerfairy/seed-data/fieldsOfStudy"
+import GroupSeed from "@careerfairy/seed-data/groups"
 import LivestreamSeed, {
    createLivestreamGroupQuestions,
-} from "@careerfairy/seed-data/dist/livestreams"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
-import InterestSeed from "@careerfairy/seed-data/dist/interests"
-import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
+} from "@careerfairy/seed-data/livestreams"
+import UniversitiesSeed from "@careerfairy/seed-data/universities"
+import { Group } from "@careerfairy/shared-lib/groups"
+import {
+   LivestreamEvent,
+   LivestreamJobAssociation,
+} from "@careerfairy/shared-lib/livestreams"
 
 /**
  * Creates a livestream document with a group and group questions
@@ -19,12 +21,14 @@ export async function setupLivestreamData(
       feedbackQuestions?: string[]
       overrideGroupDetails?: Partial<Group>
       overrideLivestreamDetails?: Partial<LivestreamEvent>
+      jobs?: LivestreamJobAssociation[]
    } = {
       livestreamType: "create",
       userQuestions: [],
       feedbackQuestions: [],
       overrideGroupDetails: {},
       overrideLivestreamDetails: {},
+      jobs: [],
    }
 ) {
    const type = options.livestreamType || "create"
@@ -62,6 +66,11 @@ export async function setupLivestreamData(
       )
    }
 
+   await Promise.all([
+      FieldsOfStudySeed.createCollection("fieldsOfStudy"),
+      FieldsOfStudySeed.createCollection("levelsOfStudy"),
+   ])
+
    return { group, livestream }
 }
 
@@ -70,7 +79,6 @@ export async function setupLivestreamData(
  */
 export async function setupUserSignUpData() {
    await Promise.all([
-      InterestSeed.createBasicInterests(),
       UniversitiesSeed.createBasicUniversities(),
       FieldsOfStudySeed.createCollection("fieldsOfStudy"),
       FieldsOfStudySeed.createCollection("levelsOfStudy"),

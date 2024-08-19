@@ -2,6 +2,7 @@ import { Box, BoxProps, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { ReactNode, forwardRef } from "react"
 import {
+   useIsRecordingWindow,
    useShowEndScreen,
    useStreamHasJobs,
 } from "store/selectors/streamingAppSelectors"
@@ -51,16 +52,19 @@ export const EndOfStream = ({ children, isHost }: Props) => {
 const EndOfStreamView = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
    const hasJobs = useStreamHasJobs()
    const { isLoggedIn } = useAuth()
+   const isRecordingWindow = useIsRecordingWindow()
 
    return (
       <Box ref={ref} {...props} sx={styles.root}>
          <EndOfStreamHeader />
          <Hero />
-         <Stack sx={styles.contentContainer} spacing={3}>
-            {Boolean(hasJobs) && <Jobs />}
-            {isLoggedIn ? <RecommendedStreams /> : <NextStreams />}
-            <Sparks />
-         </Stack>
+         {!isRecordingWindow && (
+            <Stack sx={styles.contentContainer} spacing={3}>
+               {Boolean(hasJobs) && <Jobs />}
+               {isLoggedIn ? <RecommendedStreams /> : <NextStreams />}
+               <Sparks />
+            </Stack>
+         )}
       </Box>
    )
 })

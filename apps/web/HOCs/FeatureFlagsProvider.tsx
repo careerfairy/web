@@ -1,13 +1,10 @@
+import {
+   FeatureFlagsDetails,
+   FeatureFlagsState,
+} from "@careerfairy/shared-lib/feature-flags/types"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import React, { useEffect, useState } from "react"
-
-type FlagKeys =
-   | "atsAdminPageFlag"
-   | "sparksAdminPageFlag"
-   | "sparksB2BOnboardingFlag"
-   | "livestreamCreationFlowV2"
-   | "jobHubV1"
 
 const testGoups = ["rTUGXDAG2XAtpVcgvAcc", "qENR2aNDhehkLDYryTRN"]
 
@@ -73,7 +70,14 @@ export const flagsInitialState = {
    jobHubV1: {
       enabled: false,
    },
-} satisfies Record<FlagKeys, FeatureFlag>
+   /**
+    * B2C and B2B mentors
+    * Hide or Show
+    */
+   mentorsV1: {
+      enabled: true,
+   },
+} satisfies FeatureFlagsDetails
 
 /**
  * Feature Flags provider
@@ -87,8 +91,8 @@ const FeatureFlagsProvider = (props) => {
    const router = useRouter()
 
    // map initial flag states
-   const [flags, setFlags] = useState<Record<FlagKeys, boolean>>(() => {
-      const map = {} as Record<FlagKeys, boolean>
+   const [flags, setFlags] = useState<FeatureFlagsState>(() => {
+      const map = {} as FeatureFlagsState
       for (const key in flagsInitialState) {
          map[key] = flagsInitialState[key].enabled
       }
@@ -135,22 +139,6 @@ const FeatureFlagsProvider = (props) => {
    )
 }
 
-export const FeatureFlagsContext =
-   React.createContext<Record<FlagKeys, boolean>>(null)
-
-type FeatureFlag = {
-   /**
-    * Initial state for the flag, usually disabled (false)
-    */
-   enabled: boolean
-
-   /**
-    * Useful to activate the feature on certain conditions (certain paths and params)
-    * Optional
-    * @param path
-    * @param params
-    */
-   conditionalEnable?: (path: string, params: ParsedUrlQuery) => boolean
-}
+export const FeatureFlagsContext = React.createContext<FeatureFlagsState>(null)
 
 export default FeatureFlagsProvider

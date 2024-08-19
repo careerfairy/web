@@ -1,5 +1,5 @@
+import firebase from "firebase/compat/app"
 import { useEffect, useState } from "react"
-import firebase from "firebase/compat"
 import firestore = firebase.firestore
 
 const useInfiniteScrollGet = <T>(query: firestore.Query, limit: number) => {
@@ -13,9 +13,11 @@ const useInfiniteScrollGet = <T>(query: firestore.Query, limit: number) => {
    const [hasMore, setHasMore] = useState(true)
 
    useEffect(() => {
-      ;(async () => {
+      const handleFirstBatch = async () => {
          await firstBatch()
-      })()
+      }
+      handleFirstBatch()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [query])
 
    useEffect(() => {
@@ -37,10 +39,12 @@ const useInfiniteScrollGet = <T>(query: firestore.Query, limit: number) => {
 
    useEffect(() => {
       if (isBottom && hasMore && !loadingMore && nextKey) {
-         ;(async () => {
+         const handleNextBatch = async () => {
             await nextBatch(nextKey)
-         })()
+         }
+         handleNextBatch()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [isBottom, hasMore, loadingMore, nextKey])
 
    /**

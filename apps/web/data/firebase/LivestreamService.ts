@@ -5,15 +5,15 @@ import {
    AgoraRTMTokenRequest,
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
+   CreateLivestreamCTARequest,
    CreateLivestreamPollRequest,
+   DeleteLivestreamCTARequest,
    DeleteLivestreamChatEntryRequest,
    DeleteLivestreamPollRequest,
    EmoteType,
    EventRatingAnswer,
    FeedbackQuestionUserAnswer,
-   FilterLivestreamsOptions,
    CategoryDataOption as LivestreamCategoryDataOption,
    LivestreamChatEntry,
    LivestreamEmote,
@@ -22,7 +22,6 @@ import {
    LivestreamModes,
    LivestreamPollVoter,
    LivestreamPresentation,
-   LivestreamQueryOptions,
    LivestreamQuestion,
    LivestreamQuestionComment,
    LivestreamVideo,
@@ -30,9 +29,13 @@ import {
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
    ResetLivestreamQuestionRequest,
+   Speaker,
    StreamerDetails,
+   ToggleActiveCTARequest,
    ToggleHandRaiseRequest,
+   UpdateLivestreamCTARequest,
    UpdateLivestreamPollRequest,
+   UpsertSpeakerRequest,
    UserLivestreamData,
    hasUpvotedLivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
@@ -54,10 +57,8 @@ import {
    arrayRemove,
    arrayUnion,
    collection,
-   collectionGroup,
    deleteDoc,
    doc,
-   documentId,
    getDoc,
    getDocs,
    increment,
@@ -72,7 +73,6 @@ import {
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
 
@@ -97,27 +97,6 @@ export type SetModeOptionsType<Mode extends LivestreamMode> =
 
 export class LivestreamService {
    constructor(private readonly functions: Functions) {}
-
-   /**
-    * Fetches livestreams with the given query options
-    * @param data  The query options
-    * */
-   async fetchLivestreams(
-      data: LivestreamQueryOptions & FilterLivestreamsOptions
-   ) {
-      const { data: serializedLivestreams } = await httpsCallable<
-         typeof data,
-         {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            [field: string]: any
-         }[]
-      >(
-         this.functions,
-         "fetchLivestreams_v2"
-      )(data)
-
-      return mapFromServerSide(serializedLivestreams)
-   }
 
    /**
     * Validates category data for a live stream, determining if a certain user as answered and performed all steps
@@ -167,10 +146,10 @@ export class LivestreamService {
 
             // The user might have answered all the questions but not registered to the event,
             // so we check if the user has registered to the event
-            const hasRegisteredToEvent =
-               currentLivestream?.registeredUsers?.includes?.(
-                  userData.userEmail
-               )
+            const hasRegisteredToEvent = await this.hasUserRegistered(
+               currentLivestream.id,
+               userData.userEmail
+            )
 
             if (
                !hasAnsweredAllQuestions || // if the user has not answered all the event questions
@@ -238,7 +217,7 @@ export class LivestreamService {
          return {
             firstName: data.firstName || "",
             lastName: data.lastName || "",
-            role: data.position || data.fieldOfStudy.name || "",
+            role: data.position || (data.fieldOfStudy?.name ?? "") || "Other",
             avatarUrl: data.avatar || "",
             linkedInUrl: data.linkedinUrl || "",
          }
@@ -247,38 +226,47 @@ export class LivestreamService {
       return null
    }
 
-   private async getCreatorDetails(
-      identifier: string
+   private async getLivestreamSpeakerDetails(
+      speakerId: string,
+      livestreamId: string
    ): Promise<StreamerDetails | null> {
-      const creatorQuery = query(
-         collectionGroup(FirestoreInstance, "creators"),
-         where(documentId(), "==", identifier),
-         limit(1)
-      ).withConverter(createGenericConverter<Creator>())
+      const livestream = await getDoc(this.getLivestreamRef(livestreamId))
 
-      const snapshot = await getDocs(creatorQuery)
+      if (livestream.exists) {
+         const data = livestream.data()
 
-      if (!snapshot.empty) {
-         const data = snapshot.docs[0].data()
+         const allSpeakers = (data?.speakers || []).concat(
+            data?.adHocSpeakers || []
+         )
+         const speaker = allSpeakers.find((speaker) => speaker.id === speakerId)
 
-         return {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            role: data.position,
-            avatarUrl: data.avatarUrl,
-            linkedInUrl: data.linkedInUrl,
+         if (speaker) {
+            return {
+               firstName: speaker.firstName,
+               lastName: speaker.lastName,
+               role: speaker.position,
+               avatarUrl: speaker.avatar,
+               linkedInUrl: speaker.linkedInUrl,
+            }
          }
       }
 
       return null
    }
 
-   private getTagAndIdentifierFromUid(uid: string): [StreamIdentifier, string] {
-      return uid.split("-") as [StreamIdentifier, string]
+   private getTagAndIdentifierFromUid(
+      uid: string
+   ): [StreamIdentifier, string, string] {
+      return uid.split("-") as [
+         StreamIdentifier,
+         string, // Identifier is the speaker/user id
+         string // Live stream id
+      ]
    }
 
    async getStreamerDetails(uid: string): Promise<StreamerDetails> {
-      const [tag, identifier] = this.getTagAndIdentifierFromUid(uid)
+      const [tag, identifier, livestreamId] =
+         this.getTagAndIdentifierFromUid(uid)
       let details: StreamerDetails | null = null
 
       switch (tag) {
@@ -291,8 +279,12 @@ export class LivestreamService {
                linkedInUrl: "",
             }
             break
-         case STREAM_IDENTIFIERS.CREATOR:
-            details = await this.getCreatorDetails(identifier)
+         case STREAM_IDENTIFIERS.SPEAKER:
+            details = await this.getLivestreamSpeakerDetails(
+               identifier,
+               livestreamId
+            )
+
             break
          case STREAM_IDENTIFIERS.USER:
             details = await this.getUserDetails(identifier)
@@ -307,11 +299,14 @@ export class LivestreamService {
                ""
             )
 
-            const [userTag, userIdentifier] =
+            const [userTag, userIdentifier, userLivestreamId] =
                this.getTagAndIdentifierFromUid(userUid)
 
-            if (userTag === STREAM_IDENTIFIERS.CREATOR) {
-               details = await this.getCreatorDetails(userIdentifier)
+            if (userTag === STREAM_IDENTIFIERS.SPEAKER) {
+               details = await this.getLivestreamSpeakerDetails(
+                  userIdentifier,
+                  userLivestreamId
+               )
             }
             if (userTag === STREAM_IDENTIFIERS.USER) {
                details = await this.getUserDetails(userIdentifier)
@@ -1197,6 +1192,112 @@ export class LivestreamService {
          timestamp: Timestamp.now(),
          user: { ...userData },
       })
+   }
+
+   toggleNewUI = async (livestreamId: string) => {
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+      const livestreamDoc = await getDoc(livestreamRef)
+      if (livestreamDoc.exists) {
+         return updateDoc(livestreamRef, {
+            useNewUI: !livestreamDoc.data().useNewUI,
+         })
+      }
+   }
+
+   /**
+    * Updates or adds a live stream speaker, including related creator updates and last-minute profiles for hosts.
+    */
+   async upsertLivestreamSpeaker(data: UpsertSpeakerRequest) {
+      return httpsCallable<UpsertSpeakerRequest, Speaker>(
+         this.functions,
+         "upsertLivestreamSpeaker"
+      )(data)
+   }
+
+   /**
+    * Fetches recommended live stream events for a user.
+    * @param {number} limit - Maximum number of events to fetch.
+    * @param {string} userId - ID of the user to get recommendations for.
+    * @returns Array of recommended live stream events.
+    *
+    * Filters out:
+    * 1. Events the user is already registered for.
+    * 2. Events that have already ended.
+    */
+   async getRecommendedEvents(limit: number, userId: string) {
+      const { data: eventIds } = await httpsCallable<
+         { limit: number },
+         string[]
+      >(
+         this.functions,
+         "getRecommendedEvents_v4"
+      )({ limit })
+
+      const recommendedLivestreams: LivestreamEvent[] = []
+
+      for (const eventId of eventIds) {
+         const isUserRegistered = await this.hasUserRegistered(eventId, userId)
+         // If the user is registered, we don't want to show them the event
+         if (isUserRegistered) continue
+
+         const eventSnap = await getDoc(this.getLivestreamRef(eventId))
+         const livestream = eventSnap.data()
+
+         // If the event has ended, we don't want to show it
+         if (livestream.hasEnded) continue
+
+         recommendedLivestreams.push(livestream)
+      }
+
+      return recommendedLivestreams
+   }
+
+   async hasUserRegistered(livestreamId: string, userId: string) {
+      if (!userId || !livestreamId) return false
+
+      const registeredRef = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "userLivestreamData",
+         userId
+      ).withConverter(createGenericConverter<UserLivestreamData>())
+
+      const registeredSnap = await getDoc(registeredRef)
+
+      return Boolean(registeredSnap.data()?.registered?.date)
+   }
+
+   createCTA = async (options: CreateLivestreamCTARequest) => {
+      await httpsCallable<CreateLivestreamCTARequest>(
+         this.functions,
+         "createCTA"
+      )(options)
+      return
+   }
+
+   updateCTA = async (options: UpdateLivestreamCTARequest) => {
+      await httpsCallable<UpdateLivestreamCTARequest>(
+         this.functions,
+         "updateCTA"
+      )(options)
+      return
+   }
+
+   deleteCTA = async (options: DeleteLivestreamCTARequest) => {
+      await httpsCallable<DeleteLivestreamCTARequest>(
+         this.functions,
+         "deleteCTA"
+      )(options)
+      return
+   }
+
+   toggleActiveCTA = async (options: ToggleActiveCTARequest) => {
+      await httpsCallable<ToggleActiveCTARequest>(
+         this.functions,
+         "toggleActiveCTA"
+      )(options)
+      return
    }
 }
 

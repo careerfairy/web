@@ -1,6 +1,9 @@
 import functions = require("firebase-functions")
 import { GROUP_DASHBOARD_ROLE, Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamCTA,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
 import { InferType } from "yup"
@@ -219,4 +222,16 @@ export async function validateLivestreamToken(
    }
 
    return
+}
+
+export async function validateCTAExists(
+   livestreamId: string,
+   ctaId: string
+): Promise<LivestreamCTA> {
+   const livestreamCTA = await livestreamsRepo.getCTA(livestreamId, ctaId)
+
+   if (!livestreamCTA) {
+      logAndThrow("CTA does not exist", livestreamId, ctaId)
+   }
+   return livestreamCTA
 }

@@ -23,8 +23,11 @@ import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamImpression,
+   LivestreamPoll,
    LivestreamPresentation,
    LivestreamPromotions,
+   LivestreamQuestion,
+   Speaker,
    UserLivestreamData,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
@@ -46,6 +49,7 @@ import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/url
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
+import { DateTime } from "luxon"
 import DateUtil from "util/DateUtil"
 import { v4 as uuidv4 } from "uuid"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
@@ -804,33 +808,44 @@ class FirebaseService {
    createTestLivestream = async () => {
       const livestreamDocRef = this.firestore.collection("livestreams").doc()
 
-      await livestreamDocRef.set({
+      const testStream: LivestreamEvent = {
          companyId: "CareerFairy",
          test: true,
          id: livestreamDocRef.id,
          universities: [],
-         createdAt: this.getServerTimestamp(),
+         created: this.getServerTimestamp() as Timestamp,
          start: firebase.firestore.Timestamp.fromDate(
-            new Date("March 17, 2020 03:24:00")
+            DateTime.now().plus({ months: 1 }).toJSDate()
          ),
-      })
+         hidden: true,
+         triGrams: {},
+         useNewUI: true,
+         title: "Test live stream",
+      }
+
+      await livestreamDocRef.set(testStream)
 
       return livestreamDocRef
    }
 
    setupTestLivestream = (
-      livestreamId,
-      testChats,
-      testQuestions,
-      testPolls
+      livestreamId: string,
+      testChats: LivestreamChatEntry[],
+      testQuestions: LivestreamQuestion[],
+      testPolls: LivestreamPoll[],
+      testSpeakers: Speaker[]
    ) => {
       const batch = this.firestore.batch()
       const livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
-      batch.update(livestreamRef, {
+      const livestreamUpdateData: Partial<LivestreamEvent> = {
          currentSpeakerId: livestreamId,
-      })
+         speakers: testSpeakers,
+      }
+
+      batch.update(livestreamRef, livestreamUpdateData)
+
       const chatsRef = livestreamRef.collection("chatEntries")
       testChats.forEach((chat) => {
          const docRef = chatsRef.doc()
@@ -2160,13 +2175,6 @@ class FirebaseService {
 
       const batch = this.firestore.batch()
 
-      batch.update(livestreamRef, {
-         // To be depreciated
-         registeredUsers: firebase.firestore.FieldValue.arrayUnion(
-            userData.userEmail
-         ),
-      })
-
       batch.set(userLivestreamDataRef, data, { merge: true })
 
       for (const groupId of idsOfGroupsWithPolicies) {
@@ -2244,10 +2252,6 @@ class FirebaseService {
             user: userData,
          } as UserLivestreamData)
       }
-
-      batch.update(livestreamRef, {
-         registeredUsers: firebase.firestore.FieldValue.arrayRemove(userEmail),
-      })
 
       await batch.commit()
    }
@@ -2892,13 +2896,6 @@ class FirebaseService {
          .map((doc) => ({ id: doc.id, ...doc.data() }))
    }
 
-   listenToRecommendedEvents = (recommendedEventIds, callback) => {
-      const ref = this.firestore
-         .collection("livestreams")
-         .where("id", "in", recommendedEventIds || [])
-      return ref.onSnapshot(callback)
-   }
-
    createMultipleBreakoutRooms = async (
       livestreamId = "",
       numberOfRooms = 0
@@ -3124,6 +3121,50 @@ class FirebaseService {
          })
       } else {
          return
+      }
+   }
+
+   trackMentorPageView = async (
+      careerId: string,
+      creatorId: string,
+      visitorId: string
+   ) => {
+      const visitorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(careerId)
+         .collection("creators")
+         .doc(creatorId)
+         .collection("statPageView")
+         .doc(visitorId)
+
+      const visitorSnap = await visitorRef.get()
+
+      if (!visitorSnap.exists) {
+         await visitorRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
+      }
+   }
+
+   trackMentorLinkedInReach = async (
+      careerId: string,
+      creatorId: string,
+      visitorId: string
+   ) => {
+      const visitorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(careerId)
+         .collection("creators")
+         .doc(creatorId)
+         .collection("statLinkedInReach")
+         .doc(visitorId)
+
+      const visitorSnap = await visitorRef.get()
+
+      if (!visitorSnap.exists) {
+         await visitorRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
       }
    }
 

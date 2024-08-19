@@ -5,13 +5,18 @@ import { useMemo } from "react"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
 const useGroupCreators = (groupId: string) => {
-   const groupSparksQuery = useMemo(() => {
+   const groupCreatorsQuery = useMemo(() => {
       return query(
-         collection(FirestoreInstance, "careerCenterData", groupId, "creators")
+         collection(
+            FirestoreInstance,
+            "careerCenterData",
+            groupId || "undefined",
+            "creators"
+         )
       )
    }, [groupId])
 
-   return useFirestoreCollection<Creator>(groupSparksQuery, {
+   return useFirestoreCollection<Creator>(groupCreatorsQuery, {
       idField: "id",
    })
 }

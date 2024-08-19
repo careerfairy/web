@@ -27,7 +27,8 @@ const useGroupHasSparks = (groupId: string, options?: Options) => {
    return (
       useFirestoreCollection<Spark>(groupSparksQuery, {
          idField: "id",
-      }).data.length > 0
+         suspense: false,
+      }).data?.length > 0
    )
 }
 

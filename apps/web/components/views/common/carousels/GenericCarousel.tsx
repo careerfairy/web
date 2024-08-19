@@ -1,4 +1,4 @@
-import { Box, BoxProps, SxProps } from "@mui/material"
+import { Box, BoxProps, IconButton, SxProps } from "@mui/material"
 import {
    EmblaCarouselType,
    EmblaOptionsType,
@@ -6,6 +6,7 @@ import {
    UseEmblaCarouselType,
 } from "embla-carousel-react"
 import { ReactElement, createContext, useContext, useMemo } from "react"
+import { ArrowLeft, ArrowRight } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -22,6 +23,12 @@ const styles = sxStyles({
    slide: {
       minWidth: 0,
       maxWidth: "100%" /* Prevent from growing larger than viewport */,
+   },
+   arrowIcon: {
+      padding: 0,
+      minHeight: { xs: "25px", md: "30px" },
+      minWidth: { xs: "25px", md: "30px" },
+      ml: 2,
    },
 })
 
@@ -49,6 +56,7 @@ export type GenericCarouselProps = {
    emblaApi: UseEmblaCarouselType[1]
    /** Prevents the last slide from touching the edge of the viewport */
    preventEdgeTouch?: boolean
+   containerRef?: React.RefObject<HTMLDivElement>
 }
 
 export const GenericCarousel = ({
@@ -59,6 +67,7 @@ export const GenericCarousel = ({
    emblaRef,
    emblaApi,
    preventEdgeTouch,
+   containerRef,
 }: GenericCarouselProps) => {
    const value = useMemo<GenericCarouselContextType>(
       () => ({ gap, emblaApi }),
@@ -76,6 +85,7 @@ export const GenericCarousel = ({
                id="generic-embla-carousel-container"
                marginLeft={`calc(${gap} * -1)`}
                sx={combineStyles(styles.container, containerSx)}
+               ref={containerRef}
             >
                {children}
                {Boolean(preventEdgeTouch) && <GenericCarousel.Slide />}
@@ -109,6 +119,37 @@ const Slide = ({ children, slideWidth, sx, ...props }: SlideProps) => {
 }
 
 GenericCarousel.Slide = Slide
+
+type ArrowsProps = {
+   emblaApi: UseEmblaCarouselType[1]
+}
+
+const Arrows = ({ emblaApi }: ArrowsProps) => {
+   return (
+      <Box>
+         <IconButton
+            color="inherit"
+            sx={styles.arrowIcon}
+            onClick={() => {
+               if (emblaApi && emblaApi.canScrollPrev()) emblaApi.scrollPrev()
+            }}
+         >
+            <ArrowLeft fontSize={"large"} />
+         </IconButton>
+         <IconButton
+            color="inherit"
+            sx={styles.arrowIcon}
+            onClick={() => {
+               if (emblaApi && emblaApi.canScrollNext()) emblaApi.scrollNext()
+            }}
+         >
+            <ArrowRight fontSize={"large"} />
+         </IconButton>
+      </Box>
+   )
+}
+
+GenericCarousel.Arrows = Arrows
 
 /**
  * Custom hook to access the GenericCarousel context.

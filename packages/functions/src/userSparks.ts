@@ -35,18 +35,59 @@ export const getSparksFeed = functions
       middlewares(
          dataValidation({
             userId: string().trim().min(1).optional().nullable(),
-            groupId: string().trim().min(1).optional(),
+            groupId: string().trim().min(1).optional().nullable(),
+            creatorId: string().trim().min(1).optional().nullable(),
             numberOfSparks: number().min(1).optional(),
+            contentTopicIds: array().of(string()).optional(),
          }),
          async (data: GetFeedData, context) => {
             try {
                const anonymousUserCountryCode = getCountryCode(context)
+
                const anonymousUserCountry = getCountryOptionByCountryCode(
                   anonymousUserCountryCode
                )
 
+               if ("creatorId" in data && "groupId" in data) {
+                  if (data.creatorId && data.groupId) {
+                     return {
+                        sparks:
+                           await sparkRepo.getGroupSparksFeedWithoutCreator(
+                              data.groupId as string,
+                              data.creatorId,
+                              data.numberOfSparks
+                           ),
+                     }
+                  }
+               }
+
+               if ("creatorId" in data) {
+                  if (data.creatorId) {
+                     return {
+                        sparks: await sparkRepo.getCreatorSparksFeed(
+                           data.creatorId,
+                           data.numberOfSparks
+                        ),
+                        anonymousUserCountryCode,
+                     }
+                  }
+               }
+
+               if ("groupId" in data) {
+                  if (data.groupId) {
+                     return {
+                        sparks: await sparkRepo.getGroupSparksFeed(
+                           data.groupId,
+                           data.contentTopicIds,
+                           data.numberOfSparks
+                        ),
+                        anonymousUserCountryCode,
+                     }
+                  }
+               }
+
                if ("userId" in data) {
-                  if (data.userId) {
+                  if (data.userId && !data.contentTopicIds?.length) {
                      return {
                         sparks: await sparkRepo.getUserSparksFeed(
                            data.userId,
@@ -57,18 +98,9 @@ export const getSparksFeed = functions
 
                   return {
                      sparks: await sparkRepo.getPublicSparksFeed(
+                        data.contentTopicIds,
                         data.numberOfSparks,
                         anonymousUserCountry
-                     ),
-                     anonymousUserCountryCode,
-                  }
-               }
-
-               if ("groupId" in data) {
-                  return {
-                     sparks: await sparkRepo.getGroupSparksFeed(
-                        data.groupId,
-                        data.numberOfSparks
                      ),
                      anonymousUserCountryCode,
                   }
@@ -79,6 +111,7 @@ export const getSparksFeed = functions
                   "No userId or groupId provided"
                )
             } catch (error) {
+               console.log("🚀 ~ error:", error)
                logAndThrow("Error in generating user feed", {
                   data,
                   error,

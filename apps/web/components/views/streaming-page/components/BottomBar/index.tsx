@@ -1,4 +1,5 @@
 import { Box, Stack } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import {
    useStreamIsLandscape,
    useStreamIsMobile,
@@ -6,7 +7,10 @@ import {
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
-import { useStreamHandRaiseEnabled } from "store/selectors/streamingAppSelectors"
+import {
+   useIsSpyMode,
+   useStreamHandRaiseEnabled,
+} from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { ActionsSpeedDial } from "./ActionsSpeedDial"
 import { AllActions } from "./AllActionComponents"
@@ -43,14 +47,27 @@ export const BottomBarActions = {
 
 export type BottomBarActionName = keyof typeof BottomBarActions
 
-const getHostActionNames = (isMobile: boolean): BottomBarActionName[] => {
+const getHostActionNames = (
+   isMobile: boolean,
+   isAdmin: boolean,
+   isSpyMode: boolean
+): BottomBarActionName[] => {
    if (isMobile) {
-      return ["Mic", "Video", "Share", "Divider", "Q&A", "Chat", "SpeedDial"]
+      return [
+         ...(isSpyMode ? [] : (["Mic"] as const)),
+         ...(isSpyMode ? [] : (["Video"] as const)),
+         "Share",
+         "Divider",
+         ...(isAdmin ? [] : (["Q&A"] as const)),
+         "Chat",
+         "SpeedDial",
+         ...(isAdmin ? (["Divider", "Admin"] as const) : []),
+      ]
    }
 
    return [
-      "Mic",
-      "Video",
+      ...(isSpyMode ? [] : (["Mic"] as const)),
+      ...(isSpyMode ? [] : (["Video"] as const)),
       "Share",
       "CTA",
       "Divider",
@@ -59,19 +76,24 @@ const getHostActionNames = (isMobile: boolean): BottomBarActionName[] => {
       "Polls",
       "Jobs",
       "Chat",
-      "Divider",
-      "Settings",
+
+      ...(isSpyMode ? [] : (["Divider", "Settings"] as const)),
+      ...(isAdmin ? (["Divider", "Admin"] as const) : []),
    ]
 }
 const HostView = () => {
    const isMobile = useStreamIsMobile()
+   const { userData } = useAuth()
+   const isSpyMode = useIsSpyMode()
 
    return (
       <ActionsBar>
-         {getHostActionNames(isMobile).map((action, index) => {
-            const Component = BottomBarActions[action]
-            return <Component enableTooltip key={index} />
-         })}
+         {getHostActionNames(isMobile, userData?.isAdmin, isSpyMode).map(
+            (action, index) => {
+               const Component = BottomBarActions[action]
+               return <Component enableTooltip key={index} />
+            }
+         )}
       </ActionsBar>
    )
 }
@@ -79,7 +101,8 @@ const getViewerActionNames = (
    isMobile: boolean,
    isStreaming: boolean,
    handRaiseEnabled: boolean,
-   userCanJoinPanel: boolean
+   userCanJoinPanel: boolean,
+   isAdmin: boolean
 ): BottomBarActionName[] => {
    const showRaiseHandButton = handRaiseEnabled && !userCanJoinPanel
    if (isStreaming) {
@@ -96,6 +119,7 @@ const getViewerActionNames = (
             ...(userCanJoinPanel
                ? (["Divider", "Stop hand raise"] as const)
                : (["Reactions"] as const)),
+            ...(isAdmin ? (["Divider", "Admin"] as const) : []),
          ]
       }
 
@@ -107,11 +131,10 @@ const getViewerActionNames = (
          "Polls",
          "Chat",
          ...(userCanJoinPanel ? [] : (["Reactions"] as const)),
-         "Divider",
-
          ...(userCanJoinPanel
-            ? (["Settings", "Stop hand raise"] as const)
+            ? (["Divider", "Settings", "Stop hand raise"] as const)
             : []),
+         ...(isAdmin ? (["Divider", "Admin"] as const) : []),
       ]
    }
    return [
@@ -120,11 +143,14 @@ const getViewerActionNames = (
       "Polls",
       "Chat",
       "Reactions",
+      ...(isAdmin ? (["Divider", "Admin"] as const) : []),
    ]
 }
 
 const ViewerView = () => {
    const isMobile = useStreamIsMobile()
+
+   const { userData } = useAuth()
 
    const { shouldStream, agoraUserId, livestreamId } = useStreamingContext()
    const handRaiseEnabled = useStreamHandRaiseEnabled()
@@ -135,7 +161,8 @@ const ViewerView = () => {
       isMobile,
       shouldStream,
       handRaiseEnabled,
-      userCanJoinPanel
+      userCanJoinPanel,
+      userData?.isAdmin
    )
 
    return (

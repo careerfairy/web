@@ -1,16 +1,26 @@
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import CalendarIcon from "@mui/icons-material/CalendarToday"
 import LanguageIcon from "@mui/icons-material/Language"
+import { CardActionArea } from "@mui/material"
 import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
    getMaxLineStyles,
    getResizedUrl,
    isInIframe,
 } from "components/helperFunctions/HelperFunctions"
 import Image from "next/legacy/image"
+import Link, { LinkProps } from "next/link"
 import { useRouter } from "next/router"
 import React, {
    Fragment,
@@ -20,20 +30,12 @@ import React, {
    useMemo,
    useState,
 } from "react"
+import { useInView } from "react-intersection-observer"
 import { checkIfPast } from "util/streamUtil"
-import WhiteTagChip from "../chips/TagChip"
-
-import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import CalendarIcon from "@mui/icons-material/CalendarToday"
-import { CardActionArea } from "@mui/material"
-import Link, { LinkProps } from "next/link"
 import { placeholderBanner } from "../../../../constants/images"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import { gradientAnimation } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
 import { sxStyles } from "../../../../types/commonTypes"
-import { Interest } from "../../../../types/interests"
 import DateUtil from "../../../../util/DateUtil"
 import { marketingSignUpFormId } from "../../../cms/constants"
 import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
@@ -43,6 +45,7 @@ import {
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
+import WhiteTagChip from "../chips/TagChip"
 import CircularLogo from "../logos/CircularLogo"
 import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
 
@@ -109,6 +112,14 @@ const styles = sxStyles({
       borderRadius: (theme) => theme.spacing(2),
       boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
+   },
+   selectedWrapper: {
+      opacity: 0.5,
+      backgroundImage: (theme) =>
+         `linear-gradient(0deg, ${alpha(
+            theme.palette.common.black,
+            0.2
+         )}, ${alpha(theme.palette.common.black, 0.1)})`,
    },
    mainContentWrapper: {
       position: "relative",
@@ -206,7 +217,6 @@ const styles = sxStyles({
 type EventPreviewCardProps = {
    event?: LivestreamEvent
    loading?: boolean
-   interests?: Interest[]
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
    isRecommended?: boolean
@@ -214,7 +224,7 @@ type EventPreviewCardProps = {
    index?: number
    // The total number of events in the list
    totalElements?: number
-   location?: ImpressionLocation
+   location?: ImpressionLocation | string
    ref?: React.Ref<HTMLDivElement>
    bottomElement?: React.ReactNode
    // If true, the chip labels will be hidden
@@ -222,13 +232,15 @@ type EventPreviewCardProps = {
    disableClick?: boolean
    /* Overrides the default Link click behavior of the card */
    onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
+   selectInput?: React.ReactNode
+   selected?: boolean
 }
+
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (
       {
          event,
          loading,
-         interests,
          animation,
          isRecommended,
          totalElements,
@@ -238,9 +250,19 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          hideChipLabels,
          disableClick,
          onCardClick,
+         selectInput,
+         selected,
       }: EventPreviewCardProps,
       ref
    ) => {
+      const { inView: cardInView, ref: cardInViewRef } = useInView({
+         fallbackInView: true,
+      })
+
+      const hasRegistered = useUserIsRegistered(event?.id, {
+         disabled: !cardInView, // Helps Reduce the number of listeners
+      })
+
       const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
       const trackImpressionsRef = useTrackLivestreamImpressions({
@@ -253,7 +275,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       })
       const router = useRouter()
       const { pathname } = router
-      const [eventInterests, setEventInterests] = useState([])
       const { authenticatedUser, isLoggedIn } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
 
@@ -267,14 +288,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          () => (event ? LivestreamPresenter.createFromDocument(event) : null),
          [event]
       )
-
-      const hasRegistered = useMemo<boolean>(() => {
-         if (loading) return false
-
-         return Boolean(
-            event?.registeredUsers?.includes(authenticatedUser?.email)
-         )
-      }, [loading, event?.registeredUsers, authenticatedUser?.email])
 
       const hasParticipated = useMemo<boolean>(() => {
          if (loading) return false
@@ -292,9 +305,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       const getRecordingAvailableDays = useMemo<number | null>(() => {
          if (isPast && isLoggedIn && presenterEvent) {
-            if (
-               presenterEvent.isAbleToShowRecording(authenticatedUser?.email)
-            ) {
+            if (presenterEvent.isAbleToShowRecording(hasRegistered)) {
                const timeLeft = DateUtil.calculateTimeLeft(
                   presenterEvent.recordingAccessTimeLeft()
                )
@@ -304,17 +315,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          }
 
          return null
-      }, [isPast, isLoggedIn, authenticatedUser?.email, presenterEvent])
-
-      useEffect(() => {
-         if (!loading && interests) {
-            setEventInterests(
-               interests.filter((interest) =>
-                  event?.interestsIds?.includes(interest.id)
-               )
-            )
-         }
-      }, [event?.interestsIds, loading, interests])
+      }, [isPast, isLoggedIn, hasRegistered, presenterEvent])
 
       useEffect(() => {
          if (!loading) {
@@ -363,10 +364,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             }
          }
 
-         if (
-            presenterEvent.isLive() &&
-            presenterEvent.isUserRegistered(authenticatedUser.email)
-         ) {
+         if (presenterEvent.isLive() && hasRegistered) {
             return {
                href: presenterEvent.getViewerEventRoomLink(),
             }
@@ -402,6 +400,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          marketingFormCompleted,
          pathname,
          router,
+         hasRegistered,
       ])
 
       const isLink = event && !onCardClick && !isPlaceholderEvent
@@ -411,8 +410,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       return (
          <>
             <Wrapper
-               {...(event ? linkProps : {})}
-               {...(event && {
+               {...(isLink ? linkProps : {})}
+               {...(isLink && {
                   // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
                   shallow: true,
                   passHref: true,
@@ -424,7 +423,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                <CardActionArea
                   component={isLink ? "a" : "div"}
                   sx={[event && styles.cursorPointer, styles.cardWrapper]}
-                  ref={trackImpressionsRef}
+                  ref={(e: HTMLDivElement | null) => {
+                     trackImpressionsRef(e)
+                     cardInViewRef(e)
+                  }}
                   target={isInIframe() ? "_blank" : undefined}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
@@ -435,10 +437,13 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      ref={ref}
                      sx={[
                         styles.mainAndLowerContentWrapper,
+                        selected && styles.selectedWrapper,
                         isLive && styles.cardIsLive,
                      ]}
                   >
                      <Box sx={styles.mainContentWrapper}>
+                        {selectInput || null}
+
                         <Box
                            className="backgroundImageWrapper"
                            sx={[
@@ -653,28 +658,32 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                              sx={{ border: "1px solid black" }}
                                           />
                                        ) : null}
-                                       {eventInterests
-                                          .slice(0, 1)
-                                          .map((interest) => (
+                                       {event?.businessFunctionsTagIds
+                                          ?.slice(0, 1)
+                                          ?.map((tagId) => (
                                              <WhiteTagChip
-                                                key={interest.id}
+                                                key={tagId}
                                                 variant="filled"
                                                 sx={{
                                                    maxWidth:
-                                                      eventInterests.length > 2
+                                                      event
+                                                         ?.businessFunctionsTagIds
+                                                         .length > 2
                                                          ? "50%"
                                                          : "80%",
                                                    border: "1px solid black",
                                                 }}
-                                                label={interest.name}
+                                                label={TagValuesLookup[tagId]}
                                              />
                                           ))}
-                                       {eventInterests.length > 2 ? (
+                                       {event?.businessFunctionsTagIds?.length >
+                                       2 ? (
                                           <WhiteTagChip
                                              variant="filled"
                                              sx={{ border: "1px solid black" }}
                                              label={`+ ${
-                                                eventInterests.length - 2
+                                                event.businessFunctionsTagIds
+                                                   .length - 1
                                              }`}
                                           />
                                        ) : null}

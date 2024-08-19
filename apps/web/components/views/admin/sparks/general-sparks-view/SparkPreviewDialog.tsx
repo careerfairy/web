@@ -5,9 +5,8 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
 import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
 import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCardForAdmin"
-import SparkCarouselCardSkeleton from "components/views/sparks/components/spark-card/SparkCarouselCardSkeleton"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { FC, useCallback } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { setSparkToPreview } from "store/reducers/adminSparksReducer"
 import { sparkToPreviewSelector } from "store/selectors/adminSparksSelectors"
@@ -58,9 +57,7 @@ const SparkPreviewDialog: FC = () => {
          >
             {sparkId ? (
                <Component onClose={handleClose} sparkId={sparkId} />
-            ) : (
-               <SparkSkeletonComponent sx={styles.aspectRoot} />
-            )}
+            ) : null}
          </SuspenseWithBoundary>
       </Dialog>
    )
@@ -72,11 +69,21 @@ type Props = {
 }
 
 const Component: FC<Props> = ({ sparkId, onClose }) => {
-   const { group } = useGroup()
+   // To prevent show/playing the video when the component unmounts
+   const [showContent, setShowContent] = useState(false)
 
+   const { group } = useGroup()
    const spark = useGroupSpark(group.id, sparkId)
 
-   return (
+   useEffect(() => {
+      setShowContent(true)
+
+      return () => {
+         setShowContent(false)
+      }
+   }, [])
+
+   return showContent ? (
       <>
          <IconButton
             sx={styles.closeButton}
@@ -92,15 +99,7 @@ const Component: FC<Props> = ({ sparkId, onClose }) => {
             </SparkAspectRatioBox>
          </Box>
       </>
-   )
-}
-
-const SkeletonComponent: FC = () => {
-   return (
-      <SparkAspectRatioBox sx={styles.aspectRoot}>
-         <SparkCarouselCardSkeleton />
-      </SparkAspectRatioBox>
-   )
+   ) : null
 }
 
 export default SparkPreviewDialog

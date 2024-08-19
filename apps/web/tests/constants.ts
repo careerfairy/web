@@ -1,7 +1,7 @@
 import {
-   dummyLevelsOfStudy,
    dummyFieldsOfStudy,
-} from "@careerfairy/seed-data/dist/fieldsOfStudy"
+   dummyLevelsOfStudy,
+} from "@careerfairy/seed-data/fieldsOfStudy"
 
 export const credentials = {
    correctEmail: "john@careerfairy.io",
@@ -20,7 +20,8 @@ export const credentials = {
    spokenLanguagesIds: ["en", "pt", "de"],
    countriesOfInterestIds: ["GB", "PT", "DE"],
    regionsOfInterestIds: ["asia", "africa"],
-   interestsIds: ["Le9yVcgRtkReAdwyh6tq"],
+   businessFunctionsTagIds: ["SupplyChainLogistics"],
+   contentTopicsTagIds: ["DayInTheLife"],
    correctFieldOfStudyName: dummyFieldsOfStudy[0].name,
    correctLevelOfStudyName: dummyLevelsOfStudy[0].name,
 }
@@ -44,6 +45,7 @@ export const correctRegistrationAnalyticsSteps = {
 
 export const imageLogoPath = "tests/e2e/assets/logo.png"
 export const pdfSamplePath = "tests/e2e/assets/sample.pdf"
+export const creatorAvatarImagePath = "tests/e2e/assets/creatorAvatar.png"
 
 export const correctCompany = {
    industry: "Technology & IT",

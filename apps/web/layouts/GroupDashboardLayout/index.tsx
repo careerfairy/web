@@ -8,6 +8,8 @@ import {
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
 import { CircularProgress, Typography } from "@mui/material"
+import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import React, {
    createContext,
@@ -84,8 +86,11 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { replace, push } = useRouter()
    const pathShouldShrink = usePathShouldShrink()
    const { userData, adminGroups, isLoggedOut } = useAuth()
+   const featureFlags = useFeatureFlags()
 
    const { group, stats } = useAdminGroup(groupId)
+
+   const { data: creators } = useGroupCreators(group?.id)
 
    const { errorNotification } = useSnackbarNotifications()
 
@@ -181,10 +186,15 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       }
    }, [groupId, group?.id])
 
-   const groupPresenter = useMemo(
-      () => group && GroupPresenter.createFromDocument(group),
-      [group]
-   )
+   const groupPresenter = useMemo(() => {
+      if (!group) return null
+
+      const presenter = GroupPresenter.createFromDocument(group)
+      presenter.setFeatureFlags(featureFlags)
+      presenter.setHasMentor(creators?.length > 0)
+
+      return presenter
+   }, [creators?.length, featureFlags, group])
 
    const livestreamDialog = useLivestreamDialog(group)
 

@@ -1,9 +1,9 @@
-import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
+import { GroupATSAccountDocument } from "@careerfairy/shared-lib/groups"
+import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { collection } from "firebase/firestore"
-import { useFirestore, useFirestoreCollectionData } from "reactfire"
-import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import { useMemo } from "react"
+import { useFirestore, useFirestoreCollectionData } from "reactfire"
 
 /**
  * Fetch ATS Account Integrations from Firestore

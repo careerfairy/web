@@ -1,4 +1,4 @@
-import { LivestreamPoll } from "./livestreams"
+import { LivestreamPoll, Speaker } from "./livestreams"
 
 export type DeleteLivestreamChatEntryRequest = {
    entryId?: string
@@ -57,4 +57,40 @@ export type ResetLivestreamQuestionRequest = {
 export type ToggleHandRaiseRequest = {
    livestreamId: string
    livestreamToken: string
+}
+
+export type UpsertSpeakerRequest = {
+   livestreamId: string
+   livestreamToken: string
+   /** If speaker has an id, it will be updated, otherwise it will be created */
+   speaker: Speaker & { id?: string }
+}
+
+export type CreateLivestreamCTARequest = {
+   livestreamId: string
+   livestreamToken: string
+   message: string
+   buttonText: string
+   buttonURL: string
+}
+
+export type UpdateLivestreamCTARequest = {
+   livestreamId: string
+   livestreamToken: string
+   ctaId: string
+   message?: string
+   buttonText?: string
+   buttonURL?: string
+}
+
+export type DeleteLivestreamCTARequest = {
+   livestreamId: string
+   livestreamToken: string
+   ctaId: string
+}
+
+export type ToggleActiveCTARequest = {
+   livestreamId: string
+   livestreamToken: string
+   ctaId: string
 }

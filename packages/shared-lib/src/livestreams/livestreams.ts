@@ -25,7 +25,10 @@ export interface LivestreamEvent extends Identifiable {
    backgroundImageUrl?: string
    company?: string
    companyId?: string
-   participants?: string[]
+   /**
+    * @deprecated Use userLivestreamData sub-collection instead.
+    * This field will be removed in a future version.
+    */
    participatingStudents?: string[]
    maxRegistrants?: number
    companyLogoUrl?: string
@@ -59,7 +62,6 @@ export interface LivestreamEvent extends Identifiable {
    start: firebase.firestore.Timestamp
    startDate?: Date
    status?: LivestreamStatus
-   registeredUsers?: string[]
    groupQuestionsMap?: LivestreamGroupQuestionsMap
    hasStarted?: boolean
    startedAt?: firebase.firestore.Timestamp
@@ -143,6 +145,11 @@ export interface LivestreamEvent extends Identifiable {
     * The speakers that are displayed on the upcoming-livestream landing page of the event
     */
    speakers?: Speaker[]
+
+   /**
+    * Speakers who joined during the live stream but are not displayed in the live stream details dialog
+    */
+   adHocSpeakers?: Speaker[]
 
    /**
     * The creators' identifiers of the speakers.
@@ -644,10 +651,8 @@ export const pickPublicDataFromLivestream = (
 export interface LivestreamEventSerialized
    extends Omit<
       LivestreamEvent,
-      | "registeredUsers"
       | "talentPool"
       | "participatingStudents"
-      | "participants"
       | "created"
       | "start"
       | "startDate"
@@ -715,6 +720,9 @@ export interface UserParticipatingStats extends DocumentData, Identifiable {
 
 export enum ImpressionLocation {
    recommendedEventsCarousel = "recommendedEventsCarousel",
+   businessFunctionsTagsCarousel = "businessFunctionsTagsCarousel",
+   contentTopicsTagsCarousel = "contentTopicsTagsCarousel",
+   otherTagsCarousel = "otherTagsCarousel",
    comingUpCarousel = "comingUpCarousel",
    myNextEventsCarousel = "myNextEventsCarousel",
    pastEventsCarousel = "pastEventsCarousel",
@@ -728,6 +736,7 @@ export enum ImpressionLocation {
    landingPageCarousel = "landingPageCarousel",
    viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
    endOfStreamLivestreams = "endOfStreamLivestreams",
+   mentorPageCarousel = "mentorPageCarousel",
    unknown = "unknown",
 }
 
@@ -831,4 +840,14 @@ export type StreamerDetails = {
    role: string
    avatarUrl: string
    linkedInUrl: string
+}
+
+export interface LivestreamCTA extends Identifiable {
+   message: string
+   buttonText: string
+   buttonURL: string
+   timestamp: firebase.firestore.Timestamp
+   numberOfUsersWhoClickedLink: number
+   numberOfUsersWhoDismissed: number
+   active: boolean
 }

@@ -148,7 +148,6 @@ export default class RecommendationServiceCore {
       }
 
       return userRecommendationBuilder
-         .userInterests()
          .userUniversityCountry()
          .userUniversity()
          .userFieldsOfStudy() // Uses livestream.targetFieldsOfStudy

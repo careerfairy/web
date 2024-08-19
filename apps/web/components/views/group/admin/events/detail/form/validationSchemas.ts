@@ -108,13 +108,6 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .test("length-requirement", null, (value) => {
             return value.filter(Boolean).length > 0
          }),
-      categories: yup.object().shape({
-         values: yup
-            .array()
-            .of(groupOptionShape)
-            .min(1, getSelectAtLeastOneMessage("category")),
-         options: yup.array().of(groupOptionShape),
-      }),
       targetCountries: yup.array().of(groupOptionShape),
       targetUniversities: yup.array().of(groupOptionShape),
       targetFieldsOfStudy: yup
@@ -128,6 +121,16 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .required()
          .min(1, getSelectAtLeastOneMessage("level of study")),
       groupIds: yup.array().of(yup.string()),
+      contentTopicsTagIds: yup
+         .array()
+         .of(groupOptionShape)
+         .required()
+         .min(1, getSelectAtLeastOneMessage("presented business function")),
+      businessFunctionsTagIds: yup
+         .array()
+         .of(groupOptionShape)
+         .required()
+         .min(1, getSelectAtLeastOneMessage("live stream content topic")),
    })
 
 const livestreamFormSpeakersTabValuesSchema = yup
@@ -168,7 +171,7 @@ const customJobShape = yup.object().shape({
    groupId: yup.string().required(),
    title: yup.string().required(),
    description: yup.string().required(),
-   jobType: yup.string().required(),
+   jobType: yup.string().nullable(),
    postingUrl: yup.string().required(),
    deleted: yup.bool(),
 })
