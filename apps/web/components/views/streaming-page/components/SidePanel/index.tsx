@@ -32,7 +32,7 @@ const styles = sxStyles({
    },
    paper: {
       borderRadius: "12px 12px 0 0",
-      minHeight: "50vh",
+      minHeight: "30vh",
       maxHeight: {
          xs: `calc(100vh - 140px)`,
          sm: `calc(100vh - 32px)`,
