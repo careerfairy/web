@@ -16,6 +16,7 @@ import {
    SharedSparks,
    Spark,
    SparkStats,
+   TagValuesToSparkCategoriesMapper,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
@@ -58,7 +59,7 @@ export class SparksService {
    async createSpark(data: AddSparkSparkData) {
       return httpsCallable<AddSparkSparkData, void>(
          this.functions,
-         "createSpark_v3"
+         "createSpark_v4"
       )(data)
    }
 
@@ -69,7 +70,7 @@ export class SparksService {
    async updateSpark(data: UpdateSparkData) {
       return httpsCallable<UpdateSparkData, void>(
          this.functions,
-         "updateSpark_v3"
+         "updateSpark_v4"
       )(data)
    }
 
@@ -106,6 +107,28 @@ export class SparksService {
    }
 
    /**
+    * Retrieves all public sparks created by a specific creator within a specified group.
+    *
+    * @param creatorId The unique identifier for the creator.
+    * @param creatorGroupId The group identifier to which the creator belongs.
+    * @returns A promise that resolves to an array of Spark objects.
+    */
+   async getCreatorPublicSparks(
+      creatorId: Creator["id"],
+      creatorGroupId: Creator["groupId"]
+   ): Promise<Spark[]> {
+      const q = query(
+         collection(FirestoreInstance, "sparks"),
+         where("creator.id", "==", creatorId),
+         where("creator.groupId", "==", creatorGroupId),
+         where("published", "==", true),
+         orderBy("createdAt", "desc")
+      ).withConverter(createGenericConverter<Spark>())
+      const result = await getDocs(q)
+      return result.docs.map((doc) => doc.data())
+   }
+
+   /**
     * Fetch the user's feed of sparks
     * @param userId  The user to fetch the feed for, if not provided, the public feed will be fetched
     * - If the user is not authenticated, the public feed will be fetched
@@ -122,7 +145,7 @@ export class SparksService {
          }
       >(
          this.functions,
-         "getSparksFeed_v5"
+         "getSparksFeed_v7"
       )(data)
 
       return {
@@ -204,7 +227,7 @@ export class SparksService {
          // Query the public sparks feed
          baseQuery = query(collection(db, "sparks"))
 
-         if (anonymousUserCountryCode) {
+         if (anonymousUserCountryCode && !options.contentTopicIds?.length) {
             const loggedOutCountry = getCountryOptionByCountryCode(
                anonymousUserCountryCode
             )
@@ -225,6 +248,18 @@ export class SparksService {
          baseQuery = query(
             baseQuery,
             where("category.id", "in", options.sparkCategoryIds)
+         )
+      }
+
+      // Filter the sparks by content topics
+      if (options.contentTopicIds?.length) {
+         baseQuery = query(
+            baseQuery,
+            where(
+               "category.id",
+               "==",
+               TagValuesToSparkCategoriesMapper[options.contentTopicIds[0]]
+            )
          )
       }
 

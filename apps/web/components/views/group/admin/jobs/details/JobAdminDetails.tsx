@@ -18,7 +18,6 @@ import JobApplicants from "./jobApplicants"
 import NoApplicantsData from "./jobApplicants/NoApplicantsData"
 import JobPosting from "./jobPosting"
 import LinkedContent from "./linkedContent"
-import PendingContent from "./linkedContent/PendingContent"
 
 const styles = sxStyles({
    wrapper: {
@@ -63,7 +62,6 @@ const styles = sxStyles({
    },
    tabs: {
       borderBottom: (theme) => `1px solid ${theme.palette.neutral[100]}`,
-
       "& .MuiTabs-scrollButtons": {
          width: "auto !important",
       },
@@ -87,20 +85,17 @@ type Props = {
    job: CustomJob
 }
 
+const TabsEnum = {
+   APPLICATION: 0,
+   LINKED_CONTENT: 1,
+   JOB_POSTING: 2,
+}
+
 const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
    const { push } = useRouter()
    const { jobHubV1 } = useFeatureFlags()
-
-   const TabsEnum = useMemo(
-      () => ({
-         APPLICATION: 0,
-         LINKED_CONTENT: jobHubV1 ? 1 : -1,
-         JOB_POSTING: jobHubV1 ? 2 : 1,
-      }),
-      [jobHubV1]
-   )
 
    const allowToDisplayApplicantsData = group.privacyPolicyActive
 
@@ -112,12 +107,12 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       []
    )
 
-   const jobHasNoContent = jobHubV1
-      ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
-      : false
+   const jobHasNoContent = Boolean(
+      job.livestreams.length == 0 && job.sparks.length == 0
+   )
 
-   const tabs = useMemo(() => {
-      const tabs = [
+   const tabs = useMemo(
+      () => [
          {
             label: "Applicants",
             component: () =>
@@ -131,12 +126,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             ? [
                  {
                     label: "Linked content",
-                    component: () =>
-                       jobHasNoContent ? (
-                          <PendingContent job={job} group={group} />
-                       ) : (
-                          <LinkedContent job={job} />
-                       ),
+                    component: () => <LinkedContent job={job} />,
                  },
               ]
             : []),
@@ -144,9 +134,9 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             label: "Job Opening",
             component: () => <JobPosting job={job} group={group} />,
          },
-      ]
-      return tabs
-   }, [allowToDisplayApplicantsData, group, job, jobHasNoContent, jobHubV1])
+      ],
+      [allowToDisplayApplicantsData, group, job, jobHubV1]
+   )
 
    if (!job) {
       return void push(`/group/${group.id}/admin/jobs`)
@@ -174,9 +164,13 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             TabIndicatorProps={{
                sx: [
                   styles.indicator,
-                  activeTabIndex === TabsEnum.LINKED_CONTENT &&
-                     jobHasNoContent &&
-                     styles.jobWarningIndicator,
+                  ...(jobHubV1
+                     ? [
+                          activeTabIndex === TabsEnum.LINKED_CONTENT &&
+                             jobHasNoContent &&
+                             styles.jobWarningIndicator,
+                       ]
+                     : []),
                ],
             }}
             sx={styles.tabs}
@@ -205,6 +199,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   </Box>
                }
             />
+
             {jobHubV1 ? (
                <Tab
                   key={"Linked content"}
@@ -230,6 +225,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   }
                />
             ) : null}
+
             <Tab
                key={"Job posting"}
                label={

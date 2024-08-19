@@ -1,16 +1,16 @@
-import { FC, useEffect, useRef, useState } from "react"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import Box from "@mui/material/Box"
-import { sxStyles } from "types/commonTypes"
-import SparkHeader from "./SparkHeader"
-import SparkCategoryChip from "./SparkCategoryChip"
-import SparkQuestion from "./SparkQuestion"
-import { Stack } from "@mui/material"
-import SparkCarouselCardContainer from "./SparkCarouselCardContainer"
-import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { imageKitLoader } from "@careerfairy/shared-lib/utils/video"
+import { Stack } from "@mui/material"
+import Box from "@mui/material/Box"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { debounce } from "lodash"
+import { FC, useEffect, useRef, useState } from "react"
+import { sxStyles } from "types/commonTypes"
+import SparkCarouselCardContainer from "./SparkCarouselCardContainer"
+import SparkCategoryChip from "./SparkCategoryChip"
+import SparkHeader from "./SparkHeader"
+import SparkQuestion from "./SparkQuestion"
 
 const cardPadding = 2
 
@@ -27,6 +27,10 @@ type Props = {
    preview?: boolean
    onClick?: () => void
    onGoNext?: () => void
+   selectInput?: React.ReactNode
+   selected?: boolean
+   disableAutoPlay?: boolean
+   questionLimitLines?: boolean
 }
 
 const SparkCarouselCard: FC<Props> = ({
@@ -34,8 +38,11 @@ const SparkCarouselCard: FC<Props> = ({
    onClick,
    preview = false,
    onGoNext,
+   selectInput,
+   selected,
+   disableAutoPlay,
+   questionLimitLines,
 }) => {
-   const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
    const [autoPlaying, setAutoPlaying] = useState(false)
    const containerRef = useRef<HTMLDivElement>(null)
    const isMobile = useIsMobile()
@@ -95,14 +102,27 @@ const SparkCarouselCard: FC<Props> = ({
       <SparkCarouselCardContainer
          video={{
             thumbnailUrl: spark.video.thumbnailUrl,
-            url: sparkPresenter.getTransformedVideoUrl(),
+            url: imageKitLoader({
+               src: spark.video.url,
+               height: 640 * 1,
+               width: 360 * 1,
+               quality: 40,
+               maxSizeCrop: true,
+            }),
             preview,
          }}
-         onMouseEnter={isMobile ? null : () => setAutoPlaying(true)}
-         onMouseLeave={isMobile ? null : () => setAutoPlaying(false)}
-         autoPlaying={autoPlaying}
+         onMouseEnter={
+            disableAutoPlay || isMobile ? null : () => setAutoPlaying(true)
+         }
+         onMouseLeave={
+            disableAutoPlay || isMobile ? null : () => setAutoPlaying(false)
+         }
+         autoPlaying={!disableAutoPlay && autoPlaying}
          containerRef={containerRef}
+         selected={selected}
       >
+         {selectInput || null}
+
          <Box px={cardPadding} pt={cardPadding}>
             <SparkHeader showAdminOptions={false} spark={spark} />
          </Box>
@@ -113,7 +133,10 @@ const SparkCarouselCard: FC<Props> = ({
             flexGrow={1}
          >
             <SparkCategoryChip categoryId={spark.category.id} />
-            <SparkQuestion question={spark.question}></SparkQuestion>
+            <SparkQuestion
+               question={spark.question}
+               limitLines={questionLimitLines}
+            />
          </Stack>
       </SparkCarouselCardContainer>
    )

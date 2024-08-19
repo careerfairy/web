@@ -1,100 +1,42 @@
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { collection, query, where } from "firebase/firestore"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { useEffect, useMemo } from "react"
-import { useFirestore, useFirestoreCollectionData } from "reactfire"
 import useSWR, { preload } from "swr"
 import { useAuth } from "../../HOCs/AuthProvider"
-import useFunctionsSWR, {
-   reducedRemoteCallsOptions,
-} from "./utils/useFunctionsSWRFetcher"
+import { reducedRemoteCallsOptions } from "./utils/useFunctionsSWRFetcher"
 
 type Config = {
    limit?: FirebaseInArrayLimit
    suspense?: boolean
 }
 
-const functionName = "getRecommendedEvents_v4"
 const useRecommendedEvents = (config?: Config) => {
-   const firestore = useFirestore()
-   const fetcher = useFunctionsSWR<string[]>()
    const { authenticatedUser } = useAuth()
 
    const limit = config?.limit || 10
    const suspense = config?.suspense || false
 
-   const { data: eventIds } = useSWR<string[]>(
+   const { data: events, isLoading } = useSWR<LivestreamEvent[]>(
       authenticatedUser.email
-         ? [
-              functionName,
-              {
-                 limit,
-              },
-           ]
+         ? ["getRecommendedEvents", limit, authenticatedUser.email]
          : null,
-      fetcher,
+      async () =>
+         livestreamService.getRecommendedEvents(limit, authenticatedUser.email),
       {
          ...reducedRemoteCallsOptions,
          suspense,
       }
    )
 
-   const collectionRef = useMemo(
-      () =>
-         query(
-            collection(firestore, "livestreams"),
-            // query method does not accept where() clauses with an empty array, it will throw an error, so we provide an initial value that will be filtered out
-            where("id", "in", eventIds?.length > 0 ? eventIds : [""])
-         ),
-      [eventIds, firestore]
-   )
-
-   const { data: events, status } = useFirestoreCollectionData<LivestreamEvent>(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      collectionRef as any,
-      {
-         idField: "id",
-         suspense,
-      }
-   )
-
-   const filteredEvents = filterRegisteredOrPastEvents(
-      authenticatedUser?.email,
-      events || []
-   )
-
-   // Sort the fetched livestreams based on index returned by recommendation engine, as collectionRef query
-   // does not take into account the sorting position
-   const sortedEvents = useMemo(
-      () =>
-         [...filteredEvents].sort((baseEvent, comparisonEvent) => {
-            return (
-               eventIds.indexOf(baseEvent.id) -
-               eventIds.indexOf(comparisonEvent.id)
-            )
-         }),
-      [eventIds, filteredEvents]
-   )
-
    return useMemo(
       () => ({
-         events: sortedEvents,
-         loading: status === "loading",
+         events,
+         loading: isLoading,
       }),
-      [status, sortedEvents]
+      [events, isLoading]
    )
 }
-
-/**
- * Filter events that the user has registered for or that have already occurred
- */
-const filterRegisteredOrPastEvents = (
-   userId: string,
-   events: LivestreamEvent[]
-): LivestreamEvent[] =>
-   events.filter(
-      (event) => !(event.hasEnded || event.registeredUsers?.includes(userId))
-   )
 
 type PreFetchConfig = {
    limit?: FirebaseInArrayLimit
@@ -105,23 +47,19 @@ type PreFetchConfig = {
 export const usePreFetchRecommendedEvents = (config?: PreFetchConfig) => {
    const limit = config?.limit || 10
    const { isLoggedIn } = useAuth()
-
-   const fetcher = useFunctionsSWR<string[]>()
+   const { authenticatedUser } = useAuth()
 
    useEffect(() => {
       // Only preload if the user is logged in, otherwise the function will throw a not authed error
       if (isLoggedIn) {
-         preload(
-            [
-               functionName,
-               {
-                  limit,
-               },
-            ],
-            fetcher
+         preload(["getRecommendedEvents", limit, authenticatedUser.email], () =>
+            livestreamService.getRecommendedEvents(
+               limit,
+               authenticatedUser.email
+            )
          )
       }
-   }, [limit, fetcher, isLoggedIn])
+   }, [limit, isLoggedIn, authenticatedUser.email])
 
    return null
 }

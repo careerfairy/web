@@ -1,4 +1,4 @@
-import { type IAgoraRTCError, useLocalCameraTrack } from "agora-rtc-react"
+import { useLocalCameraTrack, type IAgoraRTCError } from "agora-rtc-react"
 import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { v4 as uuidv4 } from "uuid"
 
@@ -9,7 +9,7 @@ export type GetUserStreamIdOptions = {
    useTempId: boolean
    streamId: string
    userId?: string
-   creatorId?: string
+   speakerId?: string
 }
 
 export const getAgoraUserId = (options: GetUserStreamIdOptions) => {
@@ -17,8 +17,8 @@ export const getAgoraUserId = (options: GetUserStreamIdOptions) => {
       return `${STREAM_IDENTIFIERS.RECORDING}-${randomId}-${options.streamId}` as const
    }
 
-   if (options.creatorId) {
-      return `${STREAM_IDENTIFIERS.CREATOR}-${options.creatorId}-${options.streamId}` as const
+   if (options.speakerId) {
+      return `${STREAM_IDENTIFIERS.SPEAKER}-${options.speakerId}-${options.streamId}` as const
    }
 
    if (options.useTempId || !options.userId) {
@@ -126,6 +126,15 @@ export const getAgoraRTC = async () => {
 
 export const getStreamerDisplayName = (firstName: string, lastName: string) => {
    return [firstName, lastName].filter(Boolean).join(" ")
+}
+
+export const getFormattedName = (firstName: string, lastName: string) => {
+   const lastNameInitial = lastName ? `${lastName.charAt(0)}.` : ""
+   return `${firstName} ${lastNameInitial}`
+}
+
+export const buildAgoraSpeakerId = (speakerId: string, streamId: string) => {
+   return `${STREAM_IDENTIFIERS.SPEAKER}-${speakerId}-${streamId}` as const
 }
 
 export enum UserType {

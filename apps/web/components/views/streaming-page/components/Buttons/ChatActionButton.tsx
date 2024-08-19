@@ -4,6 +4,7 @@ import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
 import { forwardRef } from "react"
 import { MessageCircle } from "react-feather"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
+import { useIsRecordingWindow } from "store/selectors/streamingAppSelectors"
 import { useStreamingContext } from "../../context"
 import { ActionTooltips } from "../BottomBar/AllActionComponents"
 import { BrandedTooltip } from "../BrandedTooltip"
@@ -19,10 +20,14 @@ export const ChatActionButton = forwardRef<
 
    const { livestreamId } = useStreamingContext()
    const numberOfNewChats = useNewChatCounter(livestreamId, !isActive)
+   const isRecordingWindow = useIsRecordingWindow()
 
    return (
       <BrandedTooltip title={enableTooltip ? ActionTooltips.Chat : null}>
-         <BrandedBadge color="error" badgeContent={numberOfNewChats}>
+         <BrandedBadge
+            color="error"
+            badgeContent={isRecordingWindow ? null : numberOfNewChats}
+         >
             <ActionBarButtonStyled
                onClick={handleSetActive}
                active={isActive}

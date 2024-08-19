@@ -10,8 +10,17 @@ import { useAuth } from "HOCs/AuthProvider"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
+import { useSpeakerId } from "store/selectors/streamingAppSelectors"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/waiting-room/WaitingRoom"
+
+const HostProfileSelection = dynamic(
+   () =>
+      import("./components/host-profile-selection/HostProfileSelection").then(
+         (mod) => mod.HostProfileSelection
+      ),
+   { ssr: false }
+)
 
 const EndOfStream = dynamic(
    () =>
@@ -93,7 +102,7 @@ const Layout = dynamic(
    }
 )
 
-const ToggleStreamModeButton = dynamic(
+/* const ToggleStreamModeButton = dynamic(
    () =>
       import("./components/ToggleStreamModeButton").then(
          (mod) => mod.ToggleStreamModeButton
@@ -101,7 +110,7 @@ const ToggleStreamModeButton = dynamic(
    {
       ssr: false,
    }
-)
+) */
 const StreamSetupWidget = dynamic(
    () =>
       import("./components/StreamSetupWidget").then(
@@ -215,6 +224,7 @@ const Component = ({ isHost }: Props) => {
    const livestream = useLivestreamData()
    const { authenticatedUser } = useAuth()
    const { query } = useRouter()
+   const speakerId = useSpeakerId()
 
    useConditionalRedirect(
       !livestream.useNewUI,
@@ -228,7 +238,7 @@ const Component = ({ isHost }: Props) => {
       useTempId: livestream.openStream && !isHost, // Use a temporary ID for viewers of open streams
       streamId: livestream.id,
       userId: authenticatedUser.uid,
-      creatorId: "", // TODO: CreatorID goes here once we introduce the select logic
+      speakerId,
    })
 
    /**
@@ -245,38 +255,40 @@ const Component = ({ isHost }: Props) => {
                      agoraUserId={agoraUserId}
                      livestreamId={livestream.id}
                   >
-                     <RTMSignalingProvider>
-                        <AgoraDevicesProvider>
-                           <LocalTracksProvider>
-                              <ScreenShareProvider>
-                                 <EndOfStream isHost={isHost}>
-                                    <Layout>
-                                       <Fragment>
-                                          <TopBar />
-                                          <MiddleContent />
-                                          <BottomBar />
-                                          <StreamSetupWidget />
-                                          <SettingsMenu />
-                                       </Fragment>
-                                    </Layout>
-                                 </EndOfStream>
-                                 {!isHost && authenticatedUser ? (
-                                    <FeedbackQuestions />
-                                 ) : null}
-                                 <ToggleStreamModeButton />
-                              </ScreenShareProvider>
-                           </LocalTracksProvider>
-                        </AgoraDevicesProvider>
-                        <AgoraTrackers />
-                        {isHost ? <HostTrackers /> : <ViewerTrackers />}
-                        {isHost ? null : <OngoingPollTracker />}
-                        {isHost ? null : <ThanksForJoiningHandRaiseDialog />}
-                        {isHost ? <UploadPDFPresentationDialog /> : null}
-                        {isHost ? <ShareVideoDialog /> : null}
-                        <EmotesRenderer />
-                        <SessionConflictModal />
-                        <SessionDisconnectedModal />
-                     </RTMSignalingProvider>
+                     <HostProfileSelection isHost={isHost}>
+                        <RTMSignalingProvider>
+                           <AgoraDevicesProvider>
+                              <LocalTracksProvider>
+                                 <ScreenShareProvider>
+                                    <EndOfStream isHost={isHost}>
+                                       <Layout>
+                                          <Fragment>
+                                             <TopBar />
+                                             <MiddleContent />
+                                             <BottomBar />
+                                             <StreamSetupWidget />
+                                             <SettingsMenu />
+                                          </Fragment>
+                                       </Layout>
+                                    </EndOfStream>
+                                    {!isHost && authenticatedUser ? (
+                                       <FeedbackQuestions />
+                                    ) : null}
+                                    {/* <ToggleStreamModeButton /> */}
+                                 </ScreenShareProvider>
+                              </LocalTracksProvider>
+                           </AgoraDevicesProvider>
+                           <AgoraTrackers />
+                           {isHost ? <HostTrackers /> : <ViewerTrackers />}
+                           {isHost ? null : <OngoingPollTracker />}
+                           {isHost ? null : <ThanksForJoiningHandRaiseDialog />}
+                           {isHost ? <UploadPDFPresentationDialog /> : null}
+                           {isHost ? <ShareVideoDialog /> : null}
+                           <EmotesRenderer />
+                           <SessionConflictModal />
+                           <SessionDisconnectedModal />
+                        </RTMSignalingProvider>
+                     </HostProfileSelection>
                   </StreamingProvider>
                </UserClientProvider>
             </WaitingRoom>

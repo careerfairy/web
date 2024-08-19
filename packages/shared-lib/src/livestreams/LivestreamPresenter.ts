@@ -39,7 +39,6 @@ export class LivestreamPresenter extends BaseModel {
       public readonly backgroundImageUrl: string,
       public readonly company: string,
       public readonly companyId: string,
-      public readonly participants: string[],
       public readonly participatingStudents: string[],
       public readonly companyLogoUrl: string,
       public readonly created: Date,
@@ -52,11 +51,12 @@ export class LivestreamPresenter extends BaseModel {
       public readonly recommendedImpressions: number,
       public readonly groupIds: string[],
       public readonly interestsIds: string[],
+      public readonly businessFunctionsTagIds: string[],
+      public readonly contentTopicsTagIds: string[],
       public readonly isRecording: boolean,
       public readonly hasNoTalentPool: boolean,
       public readonly test: boolean,
       public readonly openStream: boolean,
-      public readonly registeredUsers: string[],
       public readonly hasStarted: boolean,
       public readonly hasEnded: boolean,
       public readonly hidden: boolean,
@@ -188,25 +188,25 @@ export class LivestreamPresenter extends BaseModel {
             )
       )
    }
-   isRegistrationDisabled(userEmail: string): boolean {
+   isRegistrationDisabled(
+      isUserRegistered: boolean,
+      numRegistered: number
+   ): boolean {
       if (this.isPast()) return true
       //User should always be able to cancel registration
-      if (this.isUserRegistered(userEmail)) return false
+      if (isUserRegistered) return false
       //Disable registration if max number of registrants is reached
       if (this.maxRegistrants && this.maxRegistrants > 0) {
-         return this.registeredUsers
-            ? this.maxRegistrants <= this.registeredUsers.length
-            : false
+         return this.maxRegistrants <= numRegistered
       }
       return false
    }
 
-   hasNoSpotsLeft(): boolean {
+   hasNoSpotsLeft(numRegistered: number): boolean {
       return Boolean(
          this.maxRegistrants &&
             this.maxRegistrants > 0 &&
-            this.registeredUsers &&
-            this.maxRegistrants <= this.registeredUsers.length
+            this.maxRegistrants <= numRegistered
       )
    }
 
@@ -220,18 +220,12 @@ export class LivestreamPresenter extends BaseModel {
 
       return maxDateToShowRecording
    }
-   isUserRegistered(userEmail: string): boolean {
-      if (!userEmail) {
-         return false
-      }
-      return this.registeredUsers.includes(userEmail)
-   }
 
-   isAbleToShowRecording(userEmail: string): boolean {
+   isAbleToShowRecording(isRegistered: boolean): boolean {
       return (
          this.isPast() &&
          this.isAbleToAccessRecording() &&
-         this.isUserRegistered(userEmail) &&
+         isRegistered &&
          new Date() <= this.recordingAccessTimeLeft()
       )
    }
@@ -267,11 +261,11 @@ export class LivestreamPresenter extends BaseModel {
     *
     * @returns {number} The number of spots remaining.
     */
-   getNumberOfSpotsRemaining(): number {
+   getNumberOfSpotsRemaining(numRegistered: number): number {
       if (!this.maxRegistrants) return 0
-      else if (!this.registeredUsers) return this.maxRegistrants
+      else if (!numRegistered) return this.maxRegistrants
       else {
-         return this.maxRegistrants - this.registeredUsers.length
+         return this.maxRegistrants - numRegistered
       }
    }
 
@@ -296,7 +290,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.backgroundImageUrl ?? "",
          livestream.company ?? "",
          livestream.companyId ?? "",
-         livestream.participants ?? [],
          livestream.participatingStudents ?? [],
 
          livestream.companyLogoUrl || "",
@@ -310,11 +303,12 @@ export class LivestreamPresenter extends BaseModel {
          livestream.recommendedImpressions ?? 0,
          livestream.groupIds ?? [],
          livestream.interestsIds ?? [],
+         livestream.businessFunctionsTagIds ?? [],
+         livestream.contentTopicsTagIds ?? [],
          livestream.isRecording ?? false,
          livestream.hasNoTalentPool ?? false,
          livestream.test ?? false,
          livestream.openStream ?? false,
-         livestream.registeredUsers ?? [],
          livestream.hasStarted ?? false,
          livestream.hasEnded ?? false,
          livestream.hidden ?? false,
@@ -365,7 +359,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.backgroundImageUrl,
          livestream.company,
          livestream.companyId,
-         livestream.participants,
          livestream.participatingStudents,
          livestream.companyLogoUrl,
          fromSerializedDate(livestream.created),
@@ -378,11 +371,12 @@ export class LivestreamPresenter extends BaseModel {
          livestream.recommendedImpressions,
          livestream.groupIds,
          livestream.interestsIds,
+         livestream.businessFunctionsTagIds,
+         livestream.contentTopicsTagIds,
          livestream.isRecording,
          livestream.hasNoTalentPool,
          livestream.test,
          livestream.openStream,
-         livestream.registeredUsers,
          livestream.hasStarted,
          livestream.hasEnded,
          livestream.hidden,
@@ -452,7 +446,6 @@ export class LivestreamPresenter extends BaseModel {
          backgroundImageUrl: this.backgroundImageUrl,
          company: this.company,
          companyId: this.companyId,
-         participants: this.participants,
          participatingStudents: this.participatingStudents,
          companyLogoUrl: this.companyLogoUrl,
          created: fromDateConverter(this.created, fromDate),
@@ -465,11 +458,12 @@ export class LivestreamPresenter extends BaseModel {
          recommendedImpressions: this.recommendedImpressions,
          groupIds: this.groupIds,
          interestsIds: this.interestsIds,
+         businessFunctionsTagIds: this.businessFunctionsTagIds,
+         contentTopicsTagIds: this.contentTopicsTagIds,
          isRecording: this.isRecording,
          hasNoTalentPool: this.hasNoTalentPool,
          test: this.test,
          openStream: this.openStream,
-         registeredUsers: this.registeredUsers,
          hasStarted: this.hasStarted,
          startDate: this.start,
          address: this.address,

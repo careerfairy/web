@@ -4,43 +4,51 @@ import {
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Button } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import SparksFeedCarousel from "components/views/sparks-feed/SparksFeedCarousel"
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import SparkSeo from "components/views/sparks/components/SparkSeo"
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
-import SparksFeedCarousel from "components/views/sparks-feed/SparksFeedCarousel"
-import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { useMountedState } from "react-use"
 import {
+   AddCardNotificationPayload,
+   addCardNotificationToSparksList,
    fetchInitialSparksFeed,
    fetchNextSparks,
+   removeCreatorId,
    removeGroupId,
+   removeNotificationsByType,
    resetSparksFeed,
+   setContentTopicIds,
+   setConversionCardInterval,
+   setFetchedCompanyWithCreatorStatus,
    setGroupId,
+   setInteractionSource,
    setOriginalSparkId,
    setSparks,
    setUserEmail,
-   setConversionCardInterval,
-   AddCardNotificationPayload,
-   addCardNotificationToSparksList,
-   removeNotificationsByType,
-   setInteractionSource,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
+   fetchedCompanyWithCreatorStatusSelector,
    fetchNextErrorSelector,
    groupIdSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
+   isCreatorFeedSelector,
    isFetchingNextSparksSelector,
+   isGroupFeedSelector,
+   isInCreatorFeedSelector,
    isOnLastSparkSelector,
+   wasInCreatorFeedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
-import { useMountedState } from "react-use"
-import { useAuth } from "HOCs/AuthProvider"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -50,6 +58,7 @@ const SparksPage: NextPage<
    userEmail,
    conversionInterval,
    interactionSource,
+   contentTopic,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const mounted = useMountedState()
@@ -61,10 +70,17 @@ const SparksPage: NextPage<
    const isOnLastSpark = useSelector(isOnLastSparkSelector)
    const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
    const hasNoMoreSparks = useSelector(hasNoMoreSparksSelector)
+   const fetchedCompanyWithCreatorStatus = useSelector(
+      fetchedCompanyWithCreatorStatusSelector
+   )
    const initialSparksFetched = useSelector(initialSparksFetchedSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
-   const fromGroupPage = useSelector(groupIdSelector)
+   const isFromGroupPage = useSelector(groupIdSelector)
+   const isGroupFeed = useSelector(isGroupFeedSelector)
+   const isCreatorFeed = useSelector(isCreatorFeedSelector)
+   const isInCreatorFeed = useSelector(isInCreatorFeedSelector)
+   const wasInCreatorFeed = useSelector(wasInCreatorFeedSelector)
    const { userData } = useAuth()
 
    useEffect(() => {
@@ -77,6 +93,18 @@ const SparksPage: NextPage<
    }, [dispatch, groupId, serializedSpark, userEmail])
 
    useEffect(() => {
+      if (!contentTopic) {
+         dispatch(setContentTopicIds([]))
+      } else {
+         dispatch(setContentTopicIds([contentTopic]))
+      }
+
+      return () => {
+         dispatch(setContentTopicIds([]))
+      }
+   }, [dispatch, contentTopic])
+
+   useEffect(() => {
       const validConversionInterval =
          conversionInterval >= 2 && conversionInterval <= 10
             ? conversionInterval
@@ -84,7 +112,7 @@ const SparksPage: NextPage<
 
       dispatch(
          setConversionCardInterval(
-            userData || fromGroupPage ? 0 : validConversionInterval
+            userData || isFromGroupPage ? 0 : validConversionInterval
          )
       )
 
@@ -93,7 +121,7 @@ const SparksPage: NextPage<
             removeNotificationsByType(SparkCardNotificationTypes.CONVERSION)
          )
       }
-   }, [conversionInterval, dispatch, fromGroupPage, userData])
+   }, [conversionInterval, dispatch, isFromGroupPage, userData])
 
    useEffect(() => {
       if (!groupId) {
@@ -126,13 +154,16 @@ const SparksPage: NextPage<
          isOnLastSpark &&
          !isFetchingNextSparks &&
          !hasNoMoreSparks &&
-         !fetchNextError
+         !fetchNextError &&
+         (fetchedCompanyWithCreatorStatus === "unset" ||
+            fetchedCompanyWithCreatorStatus === "finished")
       ) {
          dispatch(fetchNextSparks())
       }
    }, [
       dispatch,
       fetchNextError,
+      fetchedCompanyWithCreatorStatus,
       hasNoMoreSparks,
       initialSparksFetched,
       isFetchingNextSparks,
@@ -145,31 +176,54 @@ const SparksPage: NextPage<
    useEffect(() => {
       if (
          // eslint-disable-next-line no-extra-boolean-cast
-         Boolean(
-            !isFetchingNextSparks &&
-               hasNoMoreSparks &&
-               isOnLastSpark &&
-               fromGroupPage
-         )
+         Boolean(!isFetchingNextSparks && hasNoMoreSparks && isOnLastSpark)
       ) {
-         if (activeSpark?.isCardNotification) {
-            dispatch(removeGroupId())
-            dispatch(fetchInitialSparksFeed())
-         } else {
-            const payload: AddCardNotificationPayload = {
-               type: SparkCardNotificationTypes.GROUP,
+         if (isGroupFeed) {
+            if (activeSpark?.isCardNotification) {
+               dispatch(removeGroupId())
+               if (wasInCreatorFeed) {
+                  dispatch(setFetchedCompanyWithCreatorStatus("finished"))
+               }
+               dispatch(fetchInitialSparksFeed())
+            } else {
+               const payload: AddCardNotificationPayload = {
+                  type: SparkCardNotificationTypes.GROUP,
+               }
+               // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
+               dispatch(addCardNotificationToSparksList(payload))
             }
-            // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
-            dispatch(addCardNotificationToSparksList(payload))
+         } else if (isCreatorFeed) {
+            if (activeSpark?.isCardNotification) {
+               dispatch(setGroupId(activeSpark.creator.groupId))
+               dispatch(fetchInitialSparksFeed())
+               dispatch(removeCreatorId())
+               dispatch(setFetchedCompanyWithCreatorStatus("ongoing"))
+            } else {
+               const payload: AddCardNotificationPayload = {
+                  type: SparkCardNotificationTypes.CREATOR,
+               }
+               dispatch(addCardNotificationToSparksList(payload))
+            }
+         } else if (isInCreatorFeed) {
+            dispatch(removeGroupId())
+            dispatch(setFetchedCompanyWithCreatorStatus("finished"))
+            dispatch(fetchNextSparks())
          }
       }
    }, [
       activeSpark?.isCardNotification,
       dispatch,
-      fromGroupPage,
+      isFromGroupPage,
       hasNoMoreSparks,
       isFetchingNextSparks,
       isOnLastSpark,
+      activeSpark?.creator?.id,
+      activeSpark?.creator?.groupId,
+      fetchedCompanyWithCreatorStatus,
+      isGroupFeed,
+      isCreatorFeed,
+      isInCreatorFeed,
+      wasInCreatorFeed,
    ])
 
    useEffect(() => {
@@ -241,6 +295,7 @@ type SparksPageProps = {
    userEmail: string | null
    conversionInterval: number
    interactionSource: string | null
+   contentTopic: string
 }
 
 export const getServerSideProps: GetServerSideProps<
@@ -260,6 +315,10 @@ export const getServerSideProps: GetServerSideProps<
 
    const interactionSource = context.query.interactionSource
       ? context.query.interactionSource.toString()
+      : null
+
+   const contentTopic = context.query.contentTopic
+      ? context.query.contentTopic.toString()
       : null
 
    const token = getUserTokenFromCookie(context)
@@ -284,6 +343,7 @@ export const getServerSideProps: GetServerSideProps<
          userEmail: token?.email ?? null,
          conversionInterval: +conversionInterval,
          interactionSource,
+         contentTopic: contentTopic,
       },
    }
 }

@@ -1,11 +1,8 @@
-import React from "react"
-import ConfirmationDialog, {
-   ConfirmationDialogAction,
-} from "materialUI/GlobalModals/ConfirmationDialog"
-import { Trash2 as DeleteIcon } from "react-feather"
-import { useDeleteLivestreamPoll } from "components/custom-hook/streaming/useDeleteLivestreamPoll"
-import { useStreamingContext } from "../../context"
 import { Box } from "@mui/material"
+import { useDeleteLivestreamPoll } from "components/custom-hook/streaming/useDeleteLivestreamPoll"
+import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
+import { Trash2 as DeleteIcon } from "react-feather"
+import { useStreamingContext } from "../../context"
 
 type Props = {
    pollId: string
@@ -27,29 +24,25 @@ export const ConfirmDeletePollDialog = ({ pollId, open, onClose }: Props) => {
       onClose()
    }
 
-   const primaryAction: ConfirmationDialogAction = {
-      text: "Delete",
-      color: "error",
-      callback: handleDelete,
-      variant: "contained",
-      loading: isMutating,
-   }
-
-   const secondaryAction: ConfirmationDialogAction = {
-      text: "Cancel",
-      color: "grey",
-      callback: onClose,
-      variant: "outlined",
-   }
-
    return (
       <ConfirmationDialog
          open={open}
-         title="Delete Poll"
+         title="Delete poll"
          description={`Are you sure you want to delete this poll? You will lose all voters' data, this action cannot be reversed.`}
          icon={<Box component={DeleteIcon} color="error.main" />}
-         primaryAction={primaryAction}
-         secondaryAction={secondaryAction}
+         primaryAction={{
+            text: "Delete",
+            color: "error",
+            callback: handleDelete,
+            variant: "contained",
+            loading: isMutating,
+         }}
+         secondaryAction={{
+            text: "Cancel",
+            color: "grey",
+            callback: onClose,
+            variant: "outlined",
+         }}
          handleClose={onClose}
          hideCloseIcon
       />

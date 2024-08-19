@@ -4,13 +4,13 @@ import {
    Timestamp,
 } from "firebase/firestore"
 import { fromSerializedDate } from "../BaseModel"
-import { Spark, SparkCategory, SparkVideo } from "./sparks"
-import { imageKitLoader } from "../utils/video"
 import {
    SerializedPublicGroup,
    deserializePublicGroup,
    serializePublicGroup,
 } from "../groups"
+import { imageKitLoader } from "../utils/video"
+import { Spark, SparkCategory, SparkVideo } from "./sparks"
 
 interface SparkPresenterInterface
    extends Omit<
@@ -48,6 +48,10 @@ export enum SparkCardNotificationTypes {
     * Notification to be displayed at the end of group content if the company does have any upcoming live stream
     */
    EVENT = "event",
+   /**
+    * Default notification to be displayed at the end of creator content
+    */
+   CREATOR = "creator",
 }
 
 /**
@@ -101,7 +105,7 @@ export class SparkPresenter implements SparkPresenterInterface {
          src: this.video.url,
          height: 640 * 3,
          width: 360 * 3,
-         quality: 60,
+         quality: 40,
          maxSizeCrop: true,
       })
    }

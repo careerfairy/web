@@ -4,9 +4,10 @@ import { Skeleton, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
 import { useCombinedJobs } from "components/custom-hook/streaming/useCombinedJobs"
-import { useState } from "react"
+import JobCard from "components/views/common/jobs/JobCard"
+import { useCallback, useState } from "react"
+import { dataLayerEvent } from "util/analyticsUtils"
 import { useStreamingContext } from "../../context"
-import JobCard from "../jobs/JobCard"
 import JobDialog from "../jobs/JobDialog"
 import { JobCardSkeleton } from "../jobs/JobListSkeleton"
 import { EndOfStreamContainer } from "./Container"
@@ -41,6 +42,16 @@ export const Content = ({ groupId }: ContentProps) => {
       setSelectedJob(null)
    }
 
+   const handleClick = useCallback((job: Job | CustomJob) => {
+      const jobName = (job as Job)?.name ?? (job as CustomJob)?.title
+
+      setSelectedJob(job)
+      dataLayerEvent("livestream_job_open", {
+         jobId: job.id,
+         jobName: jobName,
+      })
+   }, [])
+
    if (!jobsToShow) return null // we Need to fetch the jobs before even rendering the Header
 
    return (
@@ -53,7 +64,8 @@ export const Content = ({ groupId }: ContentProps) => {
                <JobCard
                   key={job.id}
                   job={job}
-                  handleSelectJob={setSelectedJob}
+                  handleClick={handleClick}
+                  previewMode
                />
             ))}
          </Stack>

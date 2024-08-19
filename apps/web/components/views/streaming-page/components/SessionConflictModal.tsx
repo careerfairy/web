@@ -1,9 +1,8 @@
-import React from "react"
-import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
-import { useRouter } from "next/router"
-import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
-import { AlertTriangle } from "react-feather"
 import { Box } from "@mui/material"
+import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
+import { useRouter } from "next/router"
+import { AlertTriangle } from "react-feather"
+import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -21,7 +20,7 @@ export const SessionConflictModal = () => {
 
    return (
       <ConfirmationDialog
-         title="Session Conflict Detected"
+         title="Session conflict detected"
          description="It looks like you're logged in from another browser or device."
          open={IsConnectedOnDifferentBrowser}
          icon={<Box component={AlertTriangle} color="warning.main" />}

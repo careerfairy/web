@@ -120,6 +120,9 @@ const styles = sxStyles({
       padding: "0px 16px",
       flexDirection: "column",
    },
+   dialogContentWrapper: {
+      my: { xs: 2, md: 0 },
+   },
 })
 
 type Props = {
@@ -149,7 +152,13 @@ const JobDialog = ({ job, handleDialogClose, livestreamId, open }: Props) => {
    }
 
    return (
-      <Dialog open={open} onClose={handleDialogClose} maxWidth={"md"} fullWidth>
+      <Dialog
+         open={open}
+         onClose={handleDialogClose}
+         maxWidth={"md"}
+         fullWidth
+         disableEnforceFocus
+      >
          <DialogTitle sx={styles.dialogTitle}>
             <Box sx={styles.title}>
                <IconButton
@@ -207,6 +216,7 @@ const MobileDrawer = ({
             sx: styles.drawer,
          }}
          onOpen={() => {}}
+         disableEnforceFocus
       >
          <Box sx={styles.dialogTitleMobile}>
             <IconButton
@@ -261,7 +271,7 @@ const JobDialogContent = ({
    }
 
    return (
-      <Stack spacing={3} marginTop={isMobile ? 1 : 0}>
+      <Stack spacing={3} sx={styles.dialogContentWrapper}>
          <Stack sx={styles.header}>
             <Stack direction="row" spacing={1}>
                <CircularLogo
@@ -287,13 +297,6 @@ const JobDialogContent = ({
                         </Typography>
                      </Box>
                   ) : null}
-                  {/* TODO: Add job business function */}
-                  {/* <Box sx={styles.jobIconWrapper}>
-                        <Box component={Zap} size={12} />
-                        <Typography variant="small">
-                           Business Function
-                        </Typography>
-                     </Box> */}
                </Box>
             </Stack>
          </Stack>
@@ -344,6 +347,7 @@ const JobDialogActions = ({
          setIsSendingEmail(false)
       }
    }
+
    return (
       <Stack
          direction={

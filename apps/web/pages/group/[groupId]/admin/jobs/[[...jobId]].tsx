@@ -1,15 +1,16 @@
-import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
-import CreateJobButton from "../../../../../components/views/admin/jobs/components/CreateJobButton"
-import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
-import { SuspenseWithBoundary } from "../../../../../components/ErrorBoundary"
-import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
-import JobAdminDetails from "../../../../../components/views/group/admin/jobs/details/JobAdminDetails"
-import JobDialog from "../../../../../components/views/group/admin/jobs/dialog"
-import JobsContent from "../../../../../components/views/group/admin/jobs"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 import { GetServerSidePropsContext } from "next"
 import { FC } from "react"
+import { SuspenseWithBoundary } from "../../../../../components/ErrorBoundary"
 import { SkeletonAdminPage } from "../../../../../components/util/Skeletons"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import CreateJobButton from "../../../../../components/views/admin/jobs/components/CreateJobButton"
+import JobsContent from "../../../../../components/views/group/admin/jobs"
+import JobAdminDetails from "../../../../../components/views/group/admin/jobs/details/JobAdminDetails"
+import JobDialog from "../../../../../components/views/group/admin/jobs/dialog"
+import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
+import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
+import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
 
 type Props = {
    groupId: string
@@ -25,7 +26,7 @@ const JobsPage: FC<Props> = ({ groupId, jobId }) => {
       >
          <DashboardHead title="CareerFairy | Jobs" />
          <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
-            {Boolean(jobId) ? (
+            {jobId ? (
                <JobFetchWrapper jobId={jobId}>
                   {(job: CustomJob) => <JobAdminDetails job={job} />}
                </JobFetchWrapper>
@@ -34,6 +35,8 @@ const JobsPage: FC<Props> = ({ groupId, jobId }) => {
             )}
          </SuspenseWithBoundary>
          <JobDialog />
+
+         <SparkPreviewDialog />
       </GroupDashboardLayout>
    )
 }

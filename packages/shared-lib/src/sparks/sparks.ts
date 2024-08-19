@@ -1,4 +1,5 @@
 import { Identifiable } from "../commonTypes"
+import { ContentTopicsTags } from "../constants/tags"
 import { Timestamp } from "../firebaseTypes"
 import { PublicGroup } from "../groups"
 import { PublicCreator } from "../groups/creators"
@@ -52,6 +53,8 @@ export interface Spark extends Identifiable {
    question: string
 
    video: SparkVideo
+
+   hasJobs?: boolean
 
    // possible future fields
 
@@ -323,6 +326,7 @@ export type GetFeedData = {
     */
    sparkCategoryIds?: SparkCategory["id"][]
 
+   contentTopicIds?: string[]
    /**
     * Country code when the user is not logged in
     * This is used to provide localized content in the feed for users who are not logged in.
@@ -342,6 +346,12 @@ export type GetFeedData = {
          * If provided, we will only return sparks from this group
          */
         groupId: string
+     }
+   | {
+        /**
+         * If provided, we will only return sparks from this creator
+         */
+        creatorId: string
      }
 )
 
@@ -371,6 +381,22 @@ export const SparksCategories = {
       name: "Events",
    },
 } as const
+
+export const SparkCategoriesToTagValuesMapper = {
+   [SparksCategories.Application.id]: ContentTopicsTags.ApplicationProcess.id,
+   [SparksCategories.CompanyCulture.id]: ContentTopicsTags.CompanyCulture.id,
+   [SparksCategories.DayInTheLife.id]: ContentTopicsTags.DayInTheLife.id,
+   [SparksCategories.Jobs.id]: ContentTopicsTags.Jobs.id,
+   [SparksCategories.Role.id]: ContentTopicsTags.Role.id,
+   [SparksCategories.Events.id]: ContentTopicsTags.Events.id,
+}
+
+export const TagValuesToSparkCategoriesMapper = Object.fromEntries(
+   Object.entries(SparkCategoriesToTagValuesMapper).map(([key, value]) => [
+      value,
+      key,
+   ])
+)
 
 export const sparksCategoriesArray = Object.values(SparksCategories)
 

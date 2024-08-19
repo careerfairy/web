@@ -1,11 +1,10 @@
-import { ResponsiveStreamButton } from "../Buttons"
 import { sxStyles } from "types/commonTypes"
+import { ResponsiveStreamButton } from "../Buttons"
 
-import { Eye } from "react-feather"
-import React from "react"
-import { useCurrentViewCount } from "store/selectors/streamingAppSelectors"
-import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
 import { useAppDispatch } from "components/custom-hook/store"
+import { Eye } from "react-feather"
+import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
+import { useCurrentViewCount } from "store/selectors/streamingAppSelectors"
 
 const styles = sxStyles({
    root: {
@@ -15,7 +14,6 @@ const styles = sxStyles({
 
 export const ViewCount = () => {
    const viewCount = useCurrentViewCount()
-
    const dispatch = useAppDispatch()
 
    const handleClick = () => {

@@ -1,4 +1,8 @@
 import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
+import {
+   PublicCreator,
+   pickPublicDataFromCreator,
+} from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
@@ -36,6 +40,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
    livestreamDialogData,
+   groupCreators,
 }) => {
    const { trackCompanyPageView } = useFirebaseService()
    const { universityName, id } = deserializeGroupClient(serverSideGroup)
@@ -60,6 +65,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             >
                <CompanyPageOverview
                   group={serverSideGroup}
+                  groupCreators={groupCreators}
                   upcomingLivestreams={mapFromServerSide(
                      serverSideUpcomingLivestreams
                   )}
@@ -79,6 +85,7 @@ export const getStaticProps: GetStaticProps<{
    // eslint-disable-next-line @typescript-eslint/no-explicit-any
    serverSidePastLivestreams: { [p: string]: any }[]
    livestreamDialogData: LiveStreamDialogData
+   groupCreators: PublicCreator[]
 }> = async (ctx) => {
    const { params } = ctx
    const { companyName: companyNameSlug } = params
@@ -93,7 +100,18 @@ export const getStaticProps: GetStaticProps<{
                serverSideUpcomingLivestreams,
                serverSidePastLivestreams,
                livestreamDialogData,
-            } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx)
+            } = await getLivestreamsAndDialogData(
+               serverSideGroup?.groupId,
+               ctx,
+               {
+                  hideHidden: true,
+                  limit: undefined,
+               }
+            )
+
+            const creators = await groupRepo.getCreatorsWithPublicContent(
+               serverSideGroup
+            )
 
             return {
                props: {
@@ -108,6 +126,7 @@ export const getStaticProps: GetStaticProps<{
                         LivestreamPresenter.serializeDocument
                      ) || [],
                   livestreamDialogData,
+                  groupCreators: creators?.map(pickPublicDataFromCreator) || [],
                },
                revalidate: 60,
             }

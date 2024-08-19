@@ -13,6 +13,7 @@ import { Group } from "../groups"
 import { UserPublicData } from "../users"
 import { arraySortByIndex, chunkArray, containsAny } from "../utils"
 import {
+   LivestreamCTA,
    LivestreamEvent,
    LivestreamEventParsed,
    LivestreamEventPublicData,
@@ -35,6 +36,7 @@ import {
    LivestreamStatsToUpdate,
    createLiveStreamStatsDoc,
 } from "./stats"
+import { sortByDateAscending } from "./util"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -54,9 +56,8 @@ export type PastEventsOptions = {
 
 export type RegisteredEventsOptions = {
    limit?: number
+   ended?: boolean
    from?: Date
-   to?: Date
-   orderByDirection?: "asc" | "desc"
 }
 
 export type ParticipatedEventsOptions = {
@@ -64,6 +65,11 @@ export type ParticipatedEventsOptions = {
    from?: Date
    to?: Date
    orderByDirection?: "asc" | "desc"
+}
+
+export type GetEventsOfGroupOptions = {
+   limit?: number
+   hideHidden?: boolean
 }
 
 export interface ILivestreamRepository {
@@ -74,6 +80,17 @@ export interface ILivestreamRepository {
       limit?: number
    ): Promise<LivestreamEvent[] | null>
 
+   /**
+    * Retrieves registered live streams for a user.
+    *
+    * Uses a two-step query process:
+    * 1. Query userLivestreamData for registered stream IDs.
+    * 2. Fetch live stream events using these IDs.
+    *
+    * @param userEmail - The email of the user whose registrations we're fetching.
+    * @param options - Optional parameters for the query.
+    * @returns Promise<LivestreamEvent[]> - Array of LivestreamEvent objects.
+    */
    getRegisteredEvents(
       userEmail: string,
       options?: RegisteredEventsOptions
@@ -83,25 +100,6 @@ export interface ILivestreamRepository {
       userEmail: string,
       options?: ParticipatedEventsOptions
    ): Promise<LivestreamEvent[]>
-
-   getRecommendEvents(
-      userEmail: string,
-      userInterestsIds?: string[],
-      limit?: number
-   ): Promise<LivestreamEvent[] | null>
-
-   listenToRecommendedEvents(
-      userEmail: string,
-      userInterestsIds: string[],
-      limit: number,
-      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
-   )
-
-   listenToRegisteredEvents(
-      userEmail: string,
-      limit: number,
-      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
-   )
 
    getPastEventsFrom(options: PastEventsOptions): Promise<LivestreamEvent[]>
 
@@ -113,11 +111,6 @@ export interface ILivestreamRepository {
 
    upcomingEventsQuery(
       showHidden?: boolean,
-      limit?: number
-   ): firebase.firestore.Query<firebase.firestore.DocumentData>
-
-   registeredEventsQuery(
-      userEmail: string,
       limit?: number
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
@@ -137,10 +130,7 @@ export interface ILivestreamRepository {
    getEventsOfGroup(
       groupId: string,
       type?: "upcoming" | "past",
-      options?: {
-         limit?: number
-         hideHidden?: boolean
-      }
+      options?: GetEventsOfGroupOptions
    ): Promise<LivestreamEvent[] | null>
 
    serializeEvent(event: LivestreamEvent): LivestreamEventSerialized
@@ -375,6 +365,63 @@ export interface ILivestreamRepository {
       userId: string,
       limit?: number
    ): Promise<LivestreamEvent[]>
+
+   /**
+    * Checks if a user is registered for a specific livestream
+    * @param livestreamId - The ID of the livestream
+    * @param userId - The ID of the user
+    * @returns A promise that resolves to a boolean indicating if the user is registered
+    */
+   isUserRegistered(livestreamId: string, userId: string): Promise<boolean>
+
+   /**
+    * Fetches a CTA from a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param ctaId - The ID of the CTA
+    */
+   getCTA(livestreamId: string, ctaId: string): Promise<LivestreamCTA>
+
+   /**
+    * Creates a CTA for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param message - The message of the CTA
+    * @param buttonText - The text in the button of the CTA
+    * @param buttonURL - The URL of the button of the CTA
+    */
+   createCTA(
+      livestreamId: string,
+      message: LivestreamCTA["message"],
+      buttonText: LivestreamCTA["buttonText"],
+      buttonURL: LivestreamCTA["buttonURL"]
+   ): Promise<void>
+
+   /**
+    * Updates a CTA for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param ctaId - The ID of the CTA
+    * @param cta - The cta data to update
+    */
+   updateCTA(
+      livestreamId: string,
+      ctaId: string,
+      cta: Partial<Pick<LivestreamCTA, "message" | "buttonText" | "buttonURL">>
+   ): Promise<void>
+
+   /**
+    * Marks a specific CTA as active/inactive
+    *
+    * @param livestreamId - The ID of the livestream
+    * @param ctaId - The ID of the CTA to activate
+    * @returns A Promise that resolves when the transaction is complete.
+    */
+   toggleActiveCTA(livestreamId: string, ctaId: string): Promise<void>
+
+   /**
+    * Deletes a CTA from a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param ctaId - The ID of the CTA
+    */
+   deleteCTA(livestreamId: string, ctaId: string): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -607,10 +654,7 @@ export class FirebaseLivestreamRepository
    async getEventsOfGroup(
       groupId: string,
       type?: "upcoming" | "past",
-      options?: {
-         limit?: number
-         hideHidden?: boolean
-      }
+      options?: GetEventsOfGroupOptions
    ): Promise<LivestreamEvent[] | null> {
       let query = this.eventsOfGroupQuery(groupId, type, options?.hideHidden)
 
@@ -733,55 +777,53 @@ export class FirebaseLivestreamRepository
       return query
    }
 
-   registeredEventsQuery(userEmail: string, limit?: number) {
-      let q = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("hasEnded", "==", false)
-         .where("registeredUsers", "array-contains", userEmail || "")
-         .orderBy("start", "asc")
-
-      if (limit) {
-         q = q.limit(limit)
-      }
-
-      return q
-   }
-
    async getRegisteredEvents(
       userEmail: string,
       options: RegisteredEventsOptions = {}
    ): Promise<LivestreamEvent[]> {
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .where("test", "==", false)
-         .where("registeredUsers", "array-contains", userEmail)
+      const { limit = 30, ended = false, from = new Date() } = options
 
-      if (options.orderByDirection) {
-         livestreamRef = livestreamRef.orderBy(
-            "start",
-            options.orderByDirection
-         )
-      } else {
-         livestreamRef = livestreamRef.orderBy("start", "asc")
+      let userLivestreamDataQuery = this.firestore
+         .collectionGroup("userLivestreamData")
+         .where("user.userEmail", "==", userEmail)
+         .orderBy("registered.date", "desc")
+         .withConverter(createCompatGenericConverter<UserLivestreamData>())
+
+      if (limit) {
+         userLivestreamDataQuery = userLivestreamDataQuery.limit(limit)
       }
 
-      if (options.from) {
-         livestreamRef = livestreamRef.where("start", ">", options.from)
-      }
+      const userLivestreamDataSnaps = await userLivestreamDataQuery.get()
 
-      if (options.to) {
-         livestreamRef = livestreamRef.where("start", "<", options.to)
-      }
+      const registeredLivestreamIds = userLivestreamDataSnaps.docs
+         .map((snap) => snap.data().livestreamId)
+         .filter(Boolean)
 
-      if (options.limit) {
-         livestreamRef = livestreamRef.limit(options.limit)
-      }
+      const chunks = chunkArray(registeredLivestreamIds, 30) // 30 is the max number of where clauses
 
-      const snapshots = await livestreamRef.get()
+      const livestreamPromises = chunks.map(async (ids) => {
+         let query = this.firestore
+            .collection("livestreams")
+            .where("id", "in", ids)
+            .where("test", "==", false)
+            .where("start", ">=", from)
+            .orderBy("start", "asc")
+            .withConverter(createCompatGenericConverter<LivestreamEvent>())
 
-      return this.mapLivestreamCollections(snapshots).get()
+         if (ended) {
+            query = query.where("hasEnded", "==", true)
+         }
+
+         return query.get()
+      })
+
+      const livestreamsSnapshots = await Promise.all(livestreamPromises)
+
+      const livestreams = livestreamsSnapshots
+         .flatMap((snapshot) => snapshot.docs.map((doc) => doc.data()))
+         .sort(sortByDateAscending)
+
+      return livestreams
    }
 
    async getParticipatedEvents(
@@ -817,24 +859,6 @@ export class FirebaseLivestreamRepository
       const snapshots = await livestreamRef.get()
 
       return this.mapLivestreamCollections(snapshots).get()
-   }
-
-   listenToRegisteredEvents(
-      userEmail: string,
-      limit: number,
-      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
-   ) {
-      if (!userEmail) return null
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("registeredUsers", "array-contains", userEmail)
-         .orderBy("start", "asc")
-      if (limit) {
-         livestreamRef = livestreamRef.limit(limit)
-      }
-      return livestreamRef.onSnapshot(callback)
    }
 
    recommendEventsQuery(userInterestsIds?: string[]) {
@@ -914,49 +938,6 @@ export class FirebaseLivestreamRepository
             ? new Date(serializedEvent.lastUpdatedDateString)
             : null,
       }
-   }
-
-   async getRecommendEvents(
-      userEmail: string,
-      userInterestsIds?: string[],
-      limit?: number
-   ): Promise<LivestreamEvent[] | null> {
-      if (!userEmail || !userInterestsIds?.length) return null
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("interestsIds", "array-contains-any", userInterestsIds)
-         .orderBy("start", "asc")
-      if (limit) {
-         livestreamRef = livestreamRef.limit(limit)
-      }
-      const snapshots = await livestreamRef.get()
-      let interestedEvents = this.mapLivestreamCollections(snapshots).get()
-      if (interestedEvents) {
-         interestedEvents = interestedEvents.filter(
-            (event) => !event.registeredUsers?.includes(userEmail)
-         )
-      }
-      return interestedEvents
-   }
-
-   listenToRecommendedEvents(
-      userEmail: string,
-      userInterestsIds: string[],
-      limit: number,
-      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
-   ) {
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("interestsIds", "array-contains-any", userInterestsIds)
-         .orderBy("start", "asc")
-      if (limit) {
-         livestreamRef = livestreamRef.limit(limit)
-      }
-      return livestreamRef.onSnapshot(callback)
    }
 
    async getLivestreamUsers(
@@ -1141,16 +1122,10 @@ export class FirebaseLivestreamRepository
       userId: string,
       dateLimit: Date
    ): Promise<LivestreamEvent[]> {
-      const snap = await this.firestore
-         .collection("livestreams")
-         .where("test", "==", false)
-         .where("registeredUsers", "array-contains", userId)
-         .where("start", ">=", dateLimit)
-         .where("hasEnded", "==", true)
-         .orderBy("start", "asc")
-         .get()
-
-      return mapFirestoreDocuments<LivestreamEvent>(snap)
+      return this.getRegisteredEvents(userId, {
+         from: dateLimit,
+         ended: true,
+      })
    }
 
    async updateRecordingStats({
@@ -1636,6 +1611,114 @@ export class FirebaseLivestreamRepository
       )
       return sortedLivestreams
    }
+
+   async isUserRegistered(
+      livestreamId: string,
+      userId: string
+   ): Promise<boolean> {
+      if (!livestreamId || !userId) return false
+
+      const query = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("userLivestreamData")
+         .doc(userId)
+         .withConverter(createCompatGenericConverter<UserLivestreamData>())
+
+      const snap = await query.get()
+
+      return Boolean(snap.data()?.registered?.date)
+   }
+
+   async getCTA(livestreamId: string, ctaId: string): Promise<LivestreamCTA> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .doc(ctaId)
+         .withConverter(createCompatGenericConverter<LivestreamCTA>())
+
+      const doc = await docRef.get()
+
+      if (!doc.exists) {
+         return null
+      }
+
+      return doc.data()
+   }
+
+   async createCTA(
+      livestreamId: string,
+      message: LivestreamCTA["message"],
+      buttonText: LivestreamCTA["buttonText"],
+      buttonURL: LivestreamCTA["buttonURL"]
+   ): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .withConverter(createCompatGenericConverter<LivestreamCTA>())
+         .doc()
+
+      const details: LivestreamCTA = {
+         message,
+         buttonText,
+         buttonURL,
+         timestamp: this.fieldValue.serverTimestamp() as unknown as Timestamp,
+         id: docRef.id,
+         numberOfUsersWhoClickedLink: 0,
+         numberOfUsersWhoDismissed: 0,
+         active: false,
+      }
+
+      return docRef.set(details)
+   }
+
+   async updateCTA(
+      livestreamId: string,
+      ctaId: string,
+      cta: Partial<Pick<LivestreamCTA, "message" | "buttonText" | "buttonURL">>
+   ): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .withConverter(createCompatGenericConverter<LivestreamCTA>())
+         .doc(ctaId)
+
+      const updateData: Partial<LivestreamCTA> = {
+         ...cta,
+      }
+
+      return docRef.update(updateData)
+   }
+
+   async toggleActiveCTA(livestreamId: string, ctaId: string): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .withConverter(createCompatGenericConverter<LivestreamCTA>())
+         .doc(ctaId)
+
+      const ctaSnap = await docRef.get()
+
+      const updateData: Pick<LivestreamCTA, "active"> = {
+         active: !ctaSnap.data().active,
+      }
+
+      return docRef.update(updateData)
+   }
+
+   async deleteCTA(livestreamId: string, ctaId: string): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("callToActions")
+         .doc(ctaId)
+
+      return docRef.delete()
+   }
 }
 
 /*
@@ -1715,14 +1798,6 @@ export class LivestreamsDataParser {
       return this
    }
 
-   filterByRegisteredUser(userId: string) {
-      this.livestreams = this.livestreams?.filter(({ registeredUsers }) =>
-         registeredUsers.includes(userId)
-      )
-
-      return this
-   }
-
    filterByTargetFieldsOfStudy(fieldsOfStudy: FieldOfStudy[]) {
       this.livestreams = this.livestreams?.filter(({ targetFieldsOfStudy }) => {
          const targetIds = targetFieldsOfStudy?.map((e) => e.id) ?? []
@@ -1738,25 +1813,6 @@ export class LivestreamsDataParser {
       this.livestreams = this.livestreams?.map((e) => ({
          ...e,
          startDate: e.start?.toDate(),
-      }))
-
-      return this
-   }
-
-   /**
-    * Remove sensitive data from the livestreams
-    * - registeredUsers
-    * - participants
-    * - participatingStudents
-    * - talentPool
-    */
-   removeSensitiveData() {
-      this.livestreams = this.livestreams?.map((e) => ({
-         ...e,
-         registeredUsers: [],
-         participants: [],
-         participatingStudents: [],
-         talentPool: [],
       }))
 
       return this

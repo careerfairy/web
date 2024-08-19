@@ -1,13 +1,13 @@
-import { expect, test } from "@playwright/test"
-import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
-import { SignupPage } from "../page-object-models/SignupPage"
-import UserSeed from "@careerfairy/seed-data/dist/users"
-import InterestSeed from "@careerfairy/seed-data/dist/interests"
 import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
-import { correctRegistrationAnalyticsSteps, credentials } from "../../constants"
-import { PortalPage } from "../page-object-models/PortalPage"
-import { LoginPage } from "../page-object-models/LoginPage"
+import InterestSeed from "@careerfairy/seed-data/dist/interests"
+import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/dist/rewards"
+import { expect, test } from "@playwright/test"
+import { correctRegistrationAnalyticsSteps, credentials } from "../../constants"
+import { LoginPage } from "../page-object-models/LoginPage"
+import { PortalPage } from "../page-object-models/PortalPage"
+import { SignupPage } from "../page-object-models/SignupPage"
 import { setupUserSignUpData } from "../setupData"
 
 test.describe("Signup Page Functionality", () => {
@@ -93,15 +93,22 @@ test.describe("Signup Page Functionality", () => {
          linkedinUrl: userDataLinkedinUrl,
          spokenLanguages: userDataSpokenLanguages,
          countriesOfInterest: userDataCountriesOfInterest,
-         interestsIds: userDataInterestsIds,
+         businessFunctionsTagIds: userDataBusinessFunctionsTagIds,
+         contentTopicsTagIds: userDataContentTopicsTagIds,
          isLookingForJob: userDataIsLookingForJob,
       } = userDataFromDb
+
+      const userBusinessFunctionsTagIds = (userDataBusinessFunctionsTagIds ??
+         []) as string[]
+      const userContentTopicsTagIds = (userDataContentTopicsTagIds ??
+         []) as string[]
 
       expect(userDataLinkedinUrl).toBeFalsy()
       expect(userDataIsLookingForJob).toBeFalsy()
       expect(userDataSpokenLanguages).toBeFalsy()
       expect(userDataCountriesOfInterest).toBeFalsy()
-      expect(userDataInterestsIds).toBeFalsy()
+      expect(userBusinessFunctionsTagIds.length).toBe(0)
+      expect(userContentTopicsTagIds.length).toBe(0)
       expect(userDataFromDb.credits).toBe(INITIAL_CREDITS)
    })
 
@@ -191,7 +198,8 @@ test.describe("Signup Page Functionality", () => {
          spokenLanguagesIds: [firstSpokenLanguageId],
          countriesOfInterestIds: [firstCountriesOfInterestId],
          regionsOfInterestIds: [firstRegionOfInterestId],
-         interestsIds: [firstInterestsId],
+         businessFunctionsTagIds: [firstBusinessFunctionTagId],
+         contentTopicsTagIds: [firstContentTopicTagId],
          correctLevelOfStudyName,
          correctFieldOfStudyName,
       } = credentials
@@ -237,7 +245,10 @@ test.describe("Signup Page Functionality", () => {
       // should be on the interest information step
       await expect(signup.interestsInformationStep).toBeVisible()
 
-      await signup.selectInterestsInputOption(firstInterestsId)
+      await signup.selectBusinessFunctionTagInputOption(
+         firstBusinessFunctionTagId
+      )
+      await signup.selectContentTopicTagInputOption(firstContentTopicTagId)
 
       await signup.clickContinueButton()
 
@@ -252,7 +263,8 @@ test.describe("Signup Page Functionality", () => {
          spokenLanguages: userDataSpokenLanguages,
          countriesOfInterest: userDataCountriesOfInterest,
          regionsOfInterest: userDataRegionsOfInterest,
-         interestsIds: userDataInterestsIds,
+         businessFunctionsTagIds: userBusinessFunctionsTagIds,
+         contentTopicsTagIds: userContentTopicsTagIds,
          isLookingForJob: userDataIsLookingForJob,
       } = userDataFromDb
 
@@ -261,7 +273,8 @@ test.describe("Signup Page Functionality", () => {
       expect(firstSpokenLanguageId).toEqual(userDataSpokenLanguages[0])
       expect(firstCountriesOfInterestId).toEqual(userDataCountriesOfInterest[0])
       expect(firstRegionOfInterestId).toEqual(userDataRegionsOfInterest[0])
-      expect(firstInterestsId).toEqual(userDataInterestsIds[0])
+      expect(firstBusinessFunctionTagId).toEqual(userBusinessFunctionsTagIds[0])
+      expect(firstContentTopicTagId).toEqual(userContentTopicsTagIds[0])
    })
 
    test("It successfully signs up with linkedin as empty since we fill an invalid linkedinUrl one", async ({

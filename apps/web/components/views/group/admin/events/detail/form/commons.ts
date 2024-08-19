@@ -9,7 +9,7 @@ import {
 import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import FirebaseService from "data/firebase/FirebaseService"
 import { Timestamp } from "firebase/firestore"
-import { get, has, isEqual, omit, set } from "lodash"
+import { get, has, isArray, isEqual, omit, set } from "lodash"
 import { LivestreamFormQuestionsTabValues, LivestreamFormValues } from "./types"
 
 export enum TAB_VALUES {
@@ -159,7 +159,8 @@ const formValuesLivestreamEventPropertyMap = [
    ["general.duration", "duration"],
    ["general.language", "language"],
    ["general.reasonsToJoin", "reasonsToJoinLivestream_v2"],
-   ["general.categories.values", "interestsIds"],
+   ["general.businessFunctionsTagIds", "businessFunctionsTagIds"],
+   ["general.contentTopicsTagIds", "contentTopicsTagIds"],
    ["general.targetCountries", "targetCountries"],
    ["general.targetUniversities", "targetUniversities"],
    ["general.targetFieldsOfStudy", "targetFieldsOfStudy"],
@@ -181,13 +182,21 @@ export const mapFormValuesToLivestreamObject = (
 
       if (has(formValues, fromProperty)) {
          const value = get(formValues, fromProperty)
-         set(result, toProperty, value)
+         // Sanitize values, as for various reasons arrays containing undefined can appear
+         // which happens for required field which do not meet the necessary length for example
+         let sanitizedValue = value
+         if (isArray(value)) {
+            sanitizedValue = (value as any[]).filter(Boolean)
+         }
+
+         set(result, toProperty, sanitizedValue)
       }
    })
 
-   const mappedInterestsIds =
-      formValues.general.categories?.values?.map((category) => category.id) ||
-      []
+   const mappedBusinessFunctionsTagIds =
+      formValues.general.businessFunctionsTagIds?.map((tag) => tag.id) || []
+   const mappedContentTopicsTagIds =
+      formValues.general.contentTopicsTagIds?.map((tag) => tag.id) || []
 
    const creatorsIds = formValues.speakers.options
       .filter((option) => option.isCreator)
@@ -205,16 +214,28 @@ export const mapFormValuesToLivestreamObject = (
          formValues.questions.registrationQuestions.values
       )
 
-   if (mappedInterestsIds.length > 0) {
-      result.interestsIds = mappedInterestsIds
-   }
-
    if (creatorsIds.length > 0) {
       result.creatorsIds = creatorsIds
    }
 
    if (mappedSpeakers?.length > 0) {
       result.speakers = mappedSpeakers
+   }
+
+   if (mappedSpeakers?.length > 0) {
+      result.speakers = mappedSpeakers
+   }
+
+   if (mappedSpeakers?.length > 0) {
+      result.speakers = mappedSpeakers
+   }
+
+   if (mappedBusinessFunctionsTagIds.length > 0) {
+      result.businessFunctionsTagIds = mappedBusinessFunctionsTagIds
+   }
+
+   if (mappedContentTopicsTagIds.length > 0) {
+      result.contentTopicsTagIds = mappedContentTopicsTagIds
    }
 
    if (Object.keys(mappedRegistrationQuestions).length > 0) {
