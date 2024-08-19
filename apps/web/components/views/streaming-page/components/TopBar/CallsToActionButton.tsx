@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { Link2 } from "react-feather"
 import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
 import { useIsRecordingWindow } from "store/selectors/streamingAppSelectors"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "../../context"
 import { CTASnackbarCard } from "../snackbar-notifications/CTASnackbarCard"
 import {
@@ -128,7 +129,8 @@ const CTAButtonComponent = () => {
          .filter((cta) => notClickedOrDismissedCTA.includes(cta.id))
          .concat(ctaWithNoUserInteraction)
 
-      queueCTASnackbarNotifications(notClickedOrDismissedActiveCTAs)
+      !isCTAPanelActive &&
+         queueCTASnackbarNotifications(notClickedOrDismissedActiveCTAs)
 
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [activeCTAIds]) //assures it only runs when CTA's active property changes
@@ -136,7 +138,14 @@ const CTAButtonComponent = () => {
    const handleClick = async () => {
       dispatch(setActiveView(ActiveViews.CTA))
       const ctaIds = activeCTA.map((cta) => cta.id)
-      livestreamService.markCTAAsRead(livestreamId, agoraUserId, ctaIds)
+      livestreamService
+         .markCTAAsRead(livestreamId, agoraUserId, ctaIds)
+         .catch((e) => {
+            errorLogAndNotify(e, {
+               message: "Failed to mark CTA as read for user",
+               agoraUserId,
+            })
+         })
       removeNotification(...ctaIds)
       setUnreadActiveCTA([])
    }
