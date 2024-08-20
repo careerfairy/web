@@ -9,7 +9,6 @@ import MaterialTable, {
 import AddBoxIcon from "@mui/icons-material/AddBox"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import DraftLinkIcon from "@mui/icons-material/Link"
 import PublishIcon from "@mui/icons-material/Publish"
 import GetStreamerLinksIcon from "@mui/icons-material/Share"
 import { Box, CircularProgress } from "@mui/material"
@@ -21,13 +20,9 @@ import { defaultTableOptions, tableIcons } from "components/util/tableUtils"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { useDispatch } from "react-redux"
-import * as storeActions from "store/actions"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
 import {
-   copyStringToClipboard,
-   getBaseUrl,
    getResizedUrl,
    prettyDate,
 } from "../../../../../helperFunctions/HelperFunctions"
@@ -101,8 +96,6 @@ const EventsTable = ({
 
    const featureFlags = useFeatureFlags()
    const router = useRouter()
-
-   const dispatch = useDispatch()
 
    const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
       useState("")
@@ -203,26 +196,6 @@ const EventsTable = ({
       setTargetLivestreamStreamerLinksId("")
    }, [])
 
-   const handleCreateExternalLink = useCallback(
-      (rowData) => {
-         const baseUrl = getBaseUrl()
-         const draftId = rowData.id
-         const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`
-         copyStringToClipboard(targetPath)
-         dispatch(
-            storeActions.enqueueSnackbar({
-               message: "Link has been copied to your clipboard!",
-               options: {
-                  variant: "success",
-                  preventDuplicate: true,
-                  key: targetPath,
-               },
-            })
-         )
-      },
-      [dispatch]
-   )
-
    const handleClickDeleteStream = useCallback((streamId) => {
       setStreamIdToBeDeleted(streamId)
    }, [])
@@ -268,15 +241,6 @@ const EventsTable = ({
                hintTitle: "Get Streamer Links",
                hintDescription:
                   "Copy your streamer links in your browser URL to access your streaming room. The first link should be use by one person only and all other speakers can use the second link.",
-            },
-            {
-               icon: <DraftLinkIcon color="action" />,
-               tooltip: "Generate external Link to Edit Draft",
-               onClick: () => handleCreateExternalLink(rowData),
-               hidden: !isDraft,
-               hintTitle: "Generate external Link to Edit Draft",
-               hintDescription:
-                  "Click here to create an external link that can be shared with a company or non-admin allowing them to edit or fill in the details of the event.",
             },
             {
                icon: <DeleteIcon color="action" />,
@@ -342,7 +306,6 @@ const EventsTable = ({
          handleEditStreamV2,
          handleEditStream,
          handleOpenStreamerLinksModal,
-         handleCreateExternalLink,
          handleClickDeleteStream,
          handlePublishStream,
       ]
