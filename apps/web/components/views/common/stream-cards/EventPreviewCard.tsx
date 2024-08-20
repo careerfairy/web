@@ -4,6 +4,7 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
 import LanguageIcon from "@mui/icons-material/Language"
 import { CardActionArea } from "@mui/material"
@@ -15,6 +16,7 @@ import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
+   getBaseUrl,
    getMaxLineStyles,
    getResizedUrl,
    isInIframe,
@@ -277,6 +279,13 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const { pathname } = router
       const { authenticatedUser, isLoggedIn } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
+      const [targetValue, setTargetValue] = useState<string | undefined>(undefined)
+
+      useEffect(() => {
+         // This code only runs on the client side
+         // It's safe to call isInIframe() here because window is available
+         setTargetValue(isInIframe() ? "_blank" : undefined)
+       }, [])
 
       const isOnMarketingLandingPage = pathname.includes(
          MARKETING_LANDING_PAGE_PATH
@@ -364,6 +373,23 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             }
          }
 
+          // If the application is running in an iframe, open the link in a new tab with UTM tags
+         if(isInIframe()) {
+            const baseUrl = getBaseUrl()
+            const link = addUtmTagsToLink({
+                  link: `${baseUrl}/portal/livestream/${presenterEvent.id}`,
+                  source: "uniwunder",
+                  medium: "iframe",
+                  campaign: "events"
+               })
+               
+            return {
+               href: link,
+               target: "_blank",
+            }
+               
+         }
+
          if (presenterEvent.isLive() && hasRegistered) {
             return {
                href: presenterEvent.getViewerEventRoomLink(),
@@ -427,7 +453,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      trackImpressionsRef(e)
                      cardInViewRef(e)
                   }}
-                  target={isInIframe() ? "_blank" : undefined}
+                  target={targetValue}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
                   disabled={disableClick}

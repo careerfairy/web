@@ -1,5 +1,5 @@
 import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
-import { queryParamToArr } from "@careerfairy/shared-lib/utils"
+import { addUtmTagsToLink, queryParamToArr } from "@careerfairy/shared-lib/utils"
 import {
    Box,
    Card,
@@ -12,6 +12,7 @@ import {
    FilterOptions,
    useLivestreamSearchAlgolia,
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import { getBaseUrl, isInIframe } from "components/helperFunctions/HelperFunctions"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -82,9 +83,7 @@ const NextLiveStreamsWithFilter = ({
    const { query, push } = router
 
    const { data: allFieldsOfStudy } = useFieldsOfStudy()
-
    const [inputValue, setInputValue] = useState("")
-
    const [debouncedInputValue, setDebouncedInputValue] = useState("")
 
    useDebounce(
@@ -236,6 +235,22 @@ const NextLiveStreamsWithFilter = ({
    const handleSearch = useCallback(
       (hit: LivestreamSearchResult | null) => {
          if (!hit || typeof hit === "string") return
+
+         // If the application is running in an iframe, open the link in a new tab with UTM tags
+         if (isInIframe()) {
+            const baseUrl = getBaseUrl()
+
+            window.open(
+               addUtmTagsToLink({
+                  link: `${baseUrl}/portal/livestream/${hit.id}`,
+                  source: "uniwunder",
+                  medium: "iframe",
+                  campaign: "events"
+               }), "_blank")
+               
+            return 
+         }
+
          void push(
             buildDialogLink({
                router,
