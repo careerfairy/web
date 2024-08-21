@@ -14,6 +14,27 @@ export type WithPastData<T> = {
 export type MostSomethingBase = string[]
 export type MostSomethingWithPastData = WithPastData<string[]>
 
+export type AudienceSegments =
+   | "business-plus"
+   | "engineering"
+   | "it-and-mathematics"
+   | "natural-sciences"
+   | "social-sciences"
+   | "other"
+
+export type AudienceBase = {
+   sparkId: string
+   audience: AudienceSegments
+   engagement: number
+}
+
+export type AudienceBaseWithPastData = WithPastData<AudienceBase[]>
+
+export type AudienceData<T> = {
+   [key in AudienceSegments]: T[]
+}
+export type AudienceWithPastData = WithPastData<AudienceData<AudienceBase>>
+
 export type LinearBarDataPoint = {
    label: string
    value: number
@@ -58,7 +79,7 @@ export type SparksAnalyticsDTO = {
    topFieldsOfStudy: PieChartWithPastData
    levelsOfStudy: PieChartWithPastData
    topSparksByIndustry: MostSomethingWithPastData
-   topSparksByAudience: MostSomethingWithPastData
+   topSparksByAudience: AudienceBaseWithPastData
 }
 
 // Frontend data types
@@ -95,7 +116,7 @@ export type SparkAnalyticsClientAudience = {
 
 export type SparksAnalyticsClientCompetitor = {
    topSparksByIndustry: MostSomethingBase
-   topSparksByAudience: MostSomethingBase
+   topSparksByAudience: AudienceWithPastData
 }
 
 export type SparkAnalyticsClient = SparkAnalyticsClientOverview &
