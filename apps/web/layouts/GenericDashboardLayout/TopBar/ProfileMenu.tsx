@@ -14,7 +14,7 @@ import Tooltip from "@mui/material/Tooltip"
 // project imports
 import Divider from "@mui/material/Divider"
 import { alpha } from "@mui/material/styles"
-import { FC, useCallback, useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import useMenuState from "../../../components/custom-hook/useMenuState"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
@@ -57,7 +57,7 @@ const styles = sxStyles({
    },
 })
 
-const ProfileMenu: FC = () => {
+const ProfileMenu = () => {
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
    const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { push } = useRouter()
