@@ -16,7 +16,7 @@ type CustomJobApplicantsWithRef = DataWithRef<true, CustomJobApplicant>
 export async function run() {
    try {
       Counter.log(
-         `Fetching data for Backfilling Job Applications: adding completed and userId to document - v${RUNNING_VERSION}`
+         `Fetching data for Backfilling Job Applications: adding applied to document - v${RUNNING_VERSION}`
       )
 
       const allJobApplications = await logAction(
@@ -55,8 +55,15 @@ const backfillJobApplications = async (
       customJobsApplicantsChunk.forEach((customJobApplicant) => {
          writeProgressBar.increment() // Increment progress bar
 
-         const toUpdate: Pick<CustomJobApplicant, "applied"> = {
+         const toUpdate: Pick<
+            CustomJobApplicant,
+            "applied" | "linkedContent" | "livestreamId"
+         > = {
             applied: true,
+            linkedContent: {
+               type: "livestream",
+               id: customJobApplicant.livestreamId,
+            },
          }
 
          // eslint-disable-next-line @typescript-eslint/no-explicit-any

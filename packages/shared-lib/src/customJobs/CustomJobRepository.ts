@@ -10,6 +10,7 @@ import {
    CustomJob,
    CustomJobApplicant,
    CustomJobContent,
+   JobApplicationContent,
    PublicCustomJob,
    getMaxDaysAfterDeadline,
 } from "./customJobs"
@@ -73,7 +74,7 @@ export interface ICustomJobRepository {
    applyUserToCustomJob(
       user: UserData,
       job: CustomJob,
-      livestreamId: string
+      linkedContent: JobApplicationContent
    ): Promise<void>
 
    /**
@@ -315,17 +316,16 @@ export class FirebaseCustomJobRepository
    async applyUserToCustomJob(
       user: UserData,
       job: CustomJob,
-      livestreamId: string
+      linkedContent: JobApplicationContent
    ): Promise<void> {
       const applicationId = this.getJobApplicationId(job.id, user.id)
-      console.log("🚀 ~ applyUserToCustomJob -> applicationId:", applicationId)
 
       const newJobApplicant: CustomJobApplicant = {
          documentType: "customJobApplicant",
          id: applicationId,
          jobId: job.id,
          groupId: job.groupId,
-         livestreamId: livestreamId,
+         linkedContent: linkedContent,
          appliedAt: null, // Initial application not confirmed so null date
          user,
          job,

@@ -79,11 +79,10 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
                `user-${userData?.id}-clicksOnCustomJob-${job.id}`
             )
             const jobApplication = userData
-               ? customJobRepo.applyUserToCustomJob(
-                    userData,
-                    customJob,
-                    livestreamId
-                 )
+               ? customJobRepo.applyUserToCustomJob(userData, customJob, {
+                    type: "livestream",
+                    id: livestreamId,
+                 })
                : customJobRepo.applyAnonymousUserToCustomJob(
                     fingerPrintId,
                     customJob,
