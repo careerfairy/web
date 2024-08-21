@@ -2,7 +2,6 @@ import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import { useAuth } from "HOCs/AuthProvider"
 import { boxShadowAnimation } from "materialUI/GlobalBackground/GlobalBackGround"
-import { FC } from "react"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
 import useTrackLivestreamView from "../../../../custom-hook/live-stream/useTrackLivestreamView"
@@ -34,7 +33,7 @@ const styles = sxStyles({
    },
 })
 
-const LivestreamDetailsView: FC = () => {
+const LivestreamDetailsView = () => {
    const { livestream, livestreamPresenter, serverUserEmail, closeDialog } =
       useLiveStreamDialog()
 

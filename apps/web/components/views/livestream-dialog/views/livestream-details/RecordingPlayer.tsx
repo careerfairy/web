@@ -134,7 +134,7 @@ export const PlayerSkeleton: FC = () => {
    )
 }
 
-const Player: FC<Props> = ({ stream, livestreamPresenter }) => {
+const Player = ({ stream, livestreamPresenter }: Props) => {
    const { handlePreviewPlay, handlePause, handlePlay } =
       useRecordingControls(stream)
 

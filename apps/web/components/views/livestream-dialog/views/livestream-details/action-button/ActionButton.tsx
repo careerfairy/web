@@ -22,7 +22,7 @@ const ActionButton: FC<ActionButtonContextType> = (props) => {
    )
 }
 
-const ButtonElement: FC = () => {
+const ButtonElement = () => {
    const { livestreamPresenter, userEmailFromServer } = useActionButtonContext()
 
    const { isLoggedIn, userData, isLoggedOut } = useAuth()
