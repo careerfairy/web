@@ -274,6 +274,12 @@ service cloud.firestore {
             allow write: if isSignedIn();
         }
 
+        match /anonymousJobApplications/{applicationId} {
+            allow write: if true;
+            allow read: if true;
+
+        }
+
         match /customJobStats/{jobStatsId} {
             allow read: if true;
             //TODO is not working as expected: allow write: if allowIncrementField('clicks');
@@ -286,6 +292,7 @@ service cloud.firestore {
             allow read: if true;
             // Here, we split the applicantId to call the isSignedInAndIsSameUser function
             // only with the userId
+            // TODO-WG: This is a bug for users with underscores
             allow write: if isSignedInAndIsSameUser(applicantId.split("_")[1]);
         }
 

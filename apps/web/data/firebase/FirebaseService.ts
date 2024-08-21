@@ -377,6 +377,16 @@ class FirebaseService {
       return this.functions.httpsCallable("deleteLoggedInUserAccount_eu")()
    }
 
+   setAnonymousJobApplicationsUserId = (
+      userId: string,
+      fingerPrintId: string
+   ) => {
+      return this.functions.httpsCallable("setAnonymousJobApplicationsUserId")({
+         userId,
+         fingerPrintId,
+      })
+   }
+
    // *** Auth API ***
 
    createUserWithEmailAndPassword = (email, password) => {

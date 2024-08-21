@@ -94,8 +94,8 @@ const CustomJobApplyConfirmation = ({
       useCustomJobApply(job, livestreamId)
 
    const handleClick = useCallback(async () => {
+      await handleApply()
       if (userData?.id) {
-         await handleApply()
          goToView("livestream-details")
       }
    }, [goToView, handleApply, userData])
@@ -118,7 +118,14 @@ const CustomJobApplyConfirmation = ({
       <Component
          job={job}
          handleClose={handleClose}
-         handleClick={isLoggedIn ? handleClick : handleRedirectClick}
+         handleClick={
+            isLoggedIn
+               ? handleClick
+               : () => {
+                    handleClick()
+                    handleRedirectClick()
+                 }
+         }
          isApplying={isApplying}
          isLoggedIn={isLoggedIn}
          sx={sx}

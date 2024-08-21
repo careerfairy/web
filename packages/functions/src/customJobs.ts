@@ -1,5 +1,6 @@
 import functions = require("firebase-functions")
-import { array, string } from "yup"
+import { CustomJobContent } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { array, mixed, string } from "yup"
 import { customJobRepo, userRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
@@ -52,6 +53,78 @@ export const confirmUserApplyToCustomJob = functions
                user,
                jobToApply.id
             )
+         })
+      )
+   )
+
+export const confirmAnonApplyToCustomJob = functions
+   .region(config.region)
+   .runWith({
+      secrets: ["MERGE_ACCESS_KEY"],
+   })
+   .https.onCall(
+      middlewares(
+         dataValidation({
+            fingerPrintId: string().required(),
+            jobId: string().required(),
+            linkedContentId: string().required(),
+            linkedContentType: mixed<CustomJobContent>().oneOf([
+               "livestream",
+               "spark",
+            ]),
+         }),
+         onCallWrapper(async (data) => {
+            const { linkedContentId, fingerPrintId, jobId, linkedContentType } =
+               data
+            functions.logger.log(
+               `Starting custom job ${jobId} apply process for the anonymous user with finger print ${fingerPrintId} on the ${linkedContentType} with ID ${linkedContentId}`
+            )
+
+            // Get custom job data and verify if the user already has any information related to the job application.
+            // If such information exists, it indicates that the user has previously applied to this specific job, and no further action is needed.
+            const [jobToApply, anonUserCustomJobApplication] =
+               await Promise.all([
+                  customJobRepo.getCustomJobById(jobId),
+                  customJobRepo.getAnonymousJobApplication(
+                     fingerPrintId,
+                     jobId
+                  ),
+               ])
+
+            if (!anonUserCustomJobApplication) {
+               functions.logger.log(
+                  `Anonymous user with finger print ${fingerPrintId} has not initiated job application for job with ID: ${jobId}`
+               )
+               return null
+            }
+
+            return customJobRepo.confirmAnonymousUserApplicationToCustomJob(
+               fingerPrintId,
+               jobToApply.id
+            )
+         })
+      )
+   )
+
+export const setAnonymousJobApplicationsUserId = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares(
+         dataValidation({
+            fingerPrintId: string().required(),
+            userId: string().required(),
+         }),
+         onCallWrapper(async (data) => {
+            const { userId, fingerPrintId } = data
+
+            const [, userData] = await Promise.all([
+               userRepo.updateUserAnonymousJobApplications(
+                  userId,
+                  fingerPrintId
+               ),
+               userRepo.getUserDataById(userId),
+            ])
+            await userRepo.migrateAnonymousJobApplications(userData)
          })
       )
    )

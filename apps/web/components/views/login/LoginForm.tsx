@@ -1,27 +1,28 @@
-import * as yup from "yup"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
-import { useRouter } from "next/router"
-import React, { useCallback, useEffect, useState } from "react"
-import { Formik, FormikValues } from "formik"
-import { FormikHelpers } from "formik/dist/types"
-import Container from "@mui/material/Container"
-import Box from "@mui/material/Box"
-import MicOutlinedIcon from "@mui/icons-material/MicOutlined"
 import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded"
+import MicOutlinedIcon from "@mui/icons-material/MicOutlined"
 import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded"
-import Typography from "@mui/material/Typography"
-import TextField from "@mui/material/TextField"
-import Collapse from "@mui/material/Collapse"
 import { FormHelperText } from "@mui/material"
+import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import CircularProgress from "@mui/material/CircularProgress"
+import Collapse from "@mui/material/Collapse"
+import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
+import TextField from "@mui/material/TextField"
+import Typography from "@mui/material/Typography"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
+import { Formik, FormikValues } from "formik"
+import { FormikHelpers } from "formik/dist/types"
 import Link from "next/link"
-import { dataLayerEvent } from "../../../util/analyticsUtils"
+import { useRouter } from "next/router"
+import { useCallback, useEffect, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
-import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
+import * as yup from "yup"
+import { useAuth } from "../../../HOCs/AuthProvider"
 import { BLACKLISTED_ABSOLUTE_PATHS } from "../../../constants/routes"
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
+import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
 
 const styles = {
    box: {
@@ -75,6 +76,7 @@ interface LoginFormProps {
 const LogInForm = ({ groupAdmin }: LoginFormProps) => {
    const signupPagePath = groupAdmin ? "/signup-admin" : "/signup"
    const { authenticatedUser, userData, adminGroups } = useAuth()
+   const { data: fingerPrintId } = useFingerPrint()
    const firebase = useFirebaseService()
    const [openManageCompaniesDialog, setOpenManageCompaniesDialog] =
       useState(false)
@@ -131,6 +133,8 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
       userData,
       firebase.auth?.currentUser?.emailVerified,
       adminGroups,
+      replace,
+      signupPagePath,
    ])
 
    const handleSubmit = useCallback(
@@ -139,6 +143,10 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
             await firebase.signInWithEmailAndPassword(
                values.email,
                values.password
+            )
+            await firebase.setAnonymousJobApplicationsUserId(
+               values.email,
+               fingerPrintId
             )
             helpers.setErrors({})
             dataLayerEvent("login_complete")
@@ -165,7 +173,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
          }
          helpers.setSubmitting(false)
       },
-      [firebase]
+      [firebase, fingerPrintId]
    )
 
    const handleAdminCloseDialog = useCallback(() => {
