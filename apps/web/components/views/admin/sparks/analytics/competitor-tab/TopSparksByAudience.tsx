@@ -16,23 +16,23 @@ import { StaticSparkCard } from "./StaticSparkCard"
 
 const AUDIENCE_OPTIOMS: TitleWithSelectOption[] = [
    {
-      value: "Business+",
+      value: "business-plus",
       label: "Business +",
    },
    {
-      value: "Engineering",
+      value: "engineering",
       label: "Engineering",
    },
    {
-      value: "ITMathematics",
+      value: "it-and-mathematics",
       label: "IT & Mathematics",
    },
    {
-      value: "NaturalSciences",
+      value: "natural-sciences",
       label: "Natural sciences",
    },
    {
-      value: "SocialSciences",
+      value: "social-sciences",
       label: "Social sciences",
    },
 ]
