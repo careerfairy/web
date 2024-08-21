@@ -77,7 +77,10 @@ const Container = ({ creator, children }: ContainerProps) => {
          component={Link}
          href={`/company/${
             router.query.companyName
-         }/mentor/${transformCreatorNameIntoSlug(creator)}/${creator.id}`}
+         }/mentor/${transformCreatorNameIntoSlug(
+            creator.firstName,
+            creator.lastName
+         )}/${creator.id}`}
       >
          {children}
       </Box>
