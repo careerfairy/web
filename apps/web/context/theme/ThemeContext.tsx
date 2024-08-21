@@ -86,7 +86,10 @@ const ThemeProviderWrapper = ({
 
    const classes = useStyles()
 
-   if (pathname === "/next-livestreams/embed" || pathname === "/next-livestreams/partnership") {
+   if (
+      pathname === "/next-livestreams/embed" ||
+      pathname === "/next-livestreams/partnership/:partnerSource"
+   ) {
       theme.palette.background.default = "transparent"
    }
 

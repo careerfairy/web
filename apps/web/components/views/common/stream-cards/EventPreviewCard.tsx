@@ -14,6 +14,7 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
+import { usePartnership } from "HOCs/PartnershipProvider"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
    getBaseUrl,
@@ -279,13 +280,16 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const { pathname } = router
       const { authenticatedUser, isLoggedIn } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
-      const [targetValue, setTargetValue] = useState<string | undefined>(undefined)
+      const [targetValue, setTargetValue] = useState<string | undefined>(
+         undefined
+      )
+      const { partnerSource } = usePartnership()
 
       useEffect(() => {
          // This code only runs on the client side
          // It's safe to call isInIframe() here because window is available
          setTargetValue(isInIframe() ? "_blank" : undefined)
-       }, [])
+      }, [])
 
       const isOnMarketingLandingPage = pathname.includes(
          MARKETING_LANDING_PAGE_PATH
@@ -373,21 +377,20 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             }
          }
 
-          // If the application is running in an iframe, open the link in a new tab with UTM tags
-         if(isInIframe()) {
+         // If the application is running in an iframe, open the link in a new tab with UTM tags
+         if (isInIframe()) {
             const baseUrl = getBaseUrl()
             const link = addUtmTagsToLink({
-                  link: `${baseUrl}/portal/livestream/${presenterEvent.id}`,
-                  source: "uniwunder",
-                  medium: "iframe",
-                  campaign: "events"
-               })
-               
+               link: `${baseUrl}/portal/livestream/${presenterEvent.id}`,
+               source: partnerSource || "partner",
+               medium: "iframe",
+               campaign: "events",
+            })
+
             return {
                href: link,
                target: "_blank",
             }
-               
          }
 
          if (presenterEvent.isLive() && hasRegistered) {
@@ -420,13 +423,14 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             target: isOnlivestreamDialogPage(pathname) ? undefined : "_blank",
          }
       }, [
-         authenticatedUser.email,
          presenterEvent,
+         hasRegistered,
+         router,
          isOnMarketingLandingPage,
+         authenticatedUser.email,
          marketingFormCompleted,
          pathname,
-         router,
-         hasRegistered,
+         partnerSource,
       ])
 
       const isLink = event && !onCardClick && !isPlaceholderEvent
