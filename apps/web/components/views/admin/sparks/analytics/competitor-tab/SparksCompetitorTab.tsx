@@ -3,7 +3,7 @@ import { Stack } from "@mui/material"
 import { useAnalyticsLocking } from "components/custom-hook/spark/analytics/useAnalyticsLocking"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { LockedSparksCompetitorTab } from "../components/locking/LockedSparksCompetitorTab"
-import { MostSomethingSkeleton } from "../overview-tab/SparksAnalyticsOverviewTabSkeletons"
+import { CompetitorSkeleton } from "../overview-tab/SparksAnalyticsCompetitorTabSkeletons"
 import { TopSparksByAudience } from "./TopSparksByAudience"
 import { TopSparksByIndustry } from "./TopSparksByIndustry"
 
@@ -22,10 +22,10 @@ export const SparksCompetitorTab = ({
 
    return (
       <Stack spacing={5} marginBottom={10}>
-         <SuspenseWithBoundary fallback={<MostSomethingSkeleton />}>
+         <SuspenseWithBoundary fallback={<CompetitorSkeleton />}>
             <TopSparksByIndustry timeFilter={timeFilter} />
          </SuspenseWithBoundary>
-         <SuspenseWithBoundary fallback={<MostSomethingSkeleton />}>
+         <SuspenseWithBoundary fallback={<CompetitorSkeleton />}>
             <TopSparksByAudience timeFilter={timeFilter} />
          </SuspenseWithBoundary>
       </Stack>
