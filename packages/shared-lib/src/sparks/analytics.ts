@@ -24,7 +24,6 @@ export type CompetitorAudienceSegments =
 
 export type CompetitorAudienceBase = {
    sparkId: string
-   groupId: string
    audience: CompetitorAudienceSegments
    engagement: number
 }
@@ -95,11 +94,6 @@ export type TimeSeriesForCharts = {
    series?: (number | null)[]
 }
 export type TimeSeriesForChartsWithPastData = WithPastData<TimeSeriesForCharts>
-
-export type CompetitorAudienceClientBase = {
-   sparkId: string
-   groupId: string
-}
 
 export type SparkAnalyticsClientOverview = {
    reach: {

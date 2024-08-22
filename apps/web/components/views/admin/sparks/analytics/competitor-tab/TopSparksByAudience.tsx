@@ -1,5 +1,4 @@
 import {
-   CompetitorAudienceClientBase,
    CompetitorAudienceSegments,
    SparkAnalyticsClientWithPastData,
    TimePeriodParams,
@@ -63,6 +62,12 @@ export const TopSparksByAudience = ({
       CompetitorAudienceSegments | "all"
    >("all")
 
+   console.log("🚀 ~ selectAudienceValue:", selectAudienceValue)
+   console.log(
+      "🚀 ~ topSparksByAudience:",
+      topSparksByAudience[selectAudienceValue]
+   )
+
    return (
       <GroupSparkAnalyticsCardContainer>
          <TitleWithSelect
@@ -76,10 +81,10 @@ export const TopSparksByAudience = ({
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
                {topSparksByAudience[selectAudienceValue].map(
-                  (data: CompetitorAudienceClientBase, index) => (
+                  (sparkId, index) => (
                      <StaticSparkCard
-                        key={`top-sparks-by-audience-${selectAudienceValue}-${data.sparkId}-${index}`}
-                        sparkId={data.sparkId}
+                        key={`top-sparks-by-audience-${selectAudienceValue}-${sparkId}-${index}`}
+                        sparkId={sparkId}
                      />
                   )
                )}
