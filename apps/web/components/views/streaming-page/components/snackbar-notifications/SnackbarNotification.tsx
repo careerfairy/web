@@ -73,13 +73,13 @@ export const SnackbarNotification = ({
 type SnackbarHeaderProps = {
    children: ReactNode
    handleClose: () => void
-   icon: ReactNode
+   icon?: ReactNode
 }
 
 const SnackbarHeader = ({
    children,
    handleClose,
-   icon = null,
+   icon,
 }: SnackbarHeaderProps) => {
    return (
       <Stack spacing={"20px"} sx={styles.content}>
