@@ -1,5 +1,6 @@
 import {
-   AudienceSegments,
+   CompetitorAudienceClientBase,
+   CompetitorAudienceSegments,
    SparkAnalyticsClientWithPastData,
    TimePeriodParams,
 } from "@careerfairy/shared-lib/sparks/analytics"
@@ -13,7 +14,7 @@ import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
 import { StaticSparkCard } from "./StaticSparkCard"
 
 type AudienceOption = {
-   value: AudienceSegments | "all"
+   value: CompetitorAudienceSegments | "all"
    label: string
 }
 
@@ -59,7 +60,7 @@ export const TopSparksByAudience = ({
    )[timeFilter]
 
    const [selectAudienceValue, setSelectAudienceValue] = useState<
-      AudienceSegments | "all"
+      CompetitorAudienceSegments | "all"
    >("all")
 
    return (
@@ -75,10 +76,10 @@ export const TopSparksByAudience = ({
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
                {topSparksByAudience[selectAudienceValue].map(
-                  (sparkId, index) => (
+                  (data: CompetitorAudienceClientBase, index) => (
                      <StaticSparkCard
-                        key={`top-sparks-by-audience-${selectAudienceValue}-${sparkId}-${index}`}
-                        sparkId={sparkId}
+                        key={`top-sparks-by-audience-${selectAudienceValue}-${data.sparkId}-${index}`}
+                        sparkId={data.sparkId}
                      />
                   )
                )}
