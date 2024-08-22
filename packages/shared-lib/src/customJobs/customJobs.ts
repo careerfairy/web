@@ -76,6 +76,15 @@ export const jobTypeOptions = [
    { value: "Internship", label: "Internship", id: "Internship" },
 ]
 
+export type JobApplicationSource =
+   | "pastLivestream"
+   | "upcomingLivestream"
+   | "spark"
+   | "profile"
+   | "companyPage"
+   | "portal"
+   | "notification"
+
 export const pickPublicDataFromCustomJob = (
    job: CustomJob
 ): PublicCustomJob => {

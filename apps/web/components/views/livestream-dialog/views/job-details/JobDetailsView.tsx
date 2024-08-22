@@ -6,10 +6,10 @@ import {
 import { ButtonProps, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
+import useJobApplicationSource from "components/custom-hook/custom-job/useJobApplicationSource"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
-import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
 import { useRouter } from "next/router"
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect } from "react"
 import { useSelector } from "react-redux"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
@@ -24,9 +24,7 @@ import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
-import useRegistrationHandler from "../../useRegistrationHandler"
 import NotFoundView from "../common/NotFoundView"
-import ActionButton from "../livestream-details/action-button/ActionButton"
 import JobDetailsViewSkeleton from "./JobDetailsViewSkeleton"
 import CustomJobApplyConfirmation from "./main-content/CustomJobApplyConfirmation"
 import CustomJobCTAButton from "./main-content/CustomJobCTAButton"
@@ -97,8 +95,8 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
    const customJob = useCustomJob(jobId)
-   const [isLiveStreamButtonDisabled, setIsLiveStreamButtonDisabled] =
-      useState(false)
+   // const [isLiveStreamButtonDisabled] =
+   //    useState(false)
    const autoActionType = useSelector(autoAction)
 
    const { userData } = useAuth()
@@ -201,28 +199,12 @@ const JobDetails: FC<Props> = ({ jobId }) => {
             </MainContent>
          }
          fixedBottomContent={
-            // TODO-WG: Separate buttons and UI styling for the different scenarios, coming in new stack
-            <Stack
-               sx={[
-                  styles.btnWrapper,
-                  isLiveStreamButtonDisabled
-                     ? styles.btnSecondary
-                     : styles.btnPrimary,
-               ]}
-            >
-               <LiveStreamButton
-                  setIsDisabled={setIsLiveStreamButtonDisabled}
-               />
-
-               <Stack direction="row" spacing="10px">
-                  <JobButton
-                     job={job as Job}
-                     livestreamId={livestream.id}
-                     isSecondary={!isLiveStreamButtonDisabled}
-                     handleOpen={handleOpen}
-                  />
-               </Stack>
-            </Stack>
+            <JobButton
+               job={job as Job}
+               livestreamId={livestream.id}
+               // isSecondary={!isLiveStreamButtonDisabled}
+               handleOpen={handleOpen}
+            />
          }
       />
    )
@@ -244,7 +226,7 @@ export const JobButton: FC<JobButtonProps> = ({
 }) => {
    const isAtsJob = useIsAtsJob(job)
    const { isLoggedOut } = useAuth()
-
+   const from = useJobApplicationSource()
    return (
       <>
          {isAtsJob ? (
@@ -263,35 +245,10 @@ export const JobButton: FC<JobButtonProps> = ({
                handleClick={handleOpen}
                isSecondary={isSecondary}
                {...props}
+               from={from}
             />
          )}
       </>
-   )
-}
-
-type LiveStreamButtonProps = {
-   setIsDisabled: (value: boolean) => void
-}
-
-const LiveStreamButton: FC<LiveStreamButtonProps> = ({ setIsDisabled }) => {
-   const { authenticatedUser } = useAuth()
-   const { handleRegisterClick } = useRegistrationHandler()
-   const { livestreamPresenter, serverUserEmail } = useLiveStreamDialog()
-
-   const { showRecording } = useRecordingAccess(
-      authenticatedUser.email,
-      livestreamPresenter
-   )
-
-   return (
-      <ActionButton
-         livestreamPresenter={livestreamPresenter}
-         onRegisterClick={handleRegisterClick}
-         userEmailFromServer={serverUserEmail}
-         isFixedToBottom
-         canWatchRecording={showRecording}
-         setIsDisabled={setIsDisabled}
-      />
    )
 }
 

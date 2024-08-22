@@ -79,14 +79,14 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
             onMouseLeave={() => buttonDisabled && handleClose()}
             component="span"
             width="100%"
-            maxWidth={572}
+            // maxWidth={572}
          >
             <Button
                id="register-button"
                color={"primary"}
                variant={"contained"}
                sx={[
-                  !isFixedToBottom && styles.btn,
+                  isFixedToBottom ? styles.fixedBottomBtn : styles.btn,
                   registered && !isFixedToBottom && styles.successButton,
                ]}
                fullWidth

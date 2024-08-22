@@ -1,5 +1,4 @@
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { tooltipClasses } from "@mui/material"
 
 const styles = sxStyles({
    btn: {
@@ -98,6 +97,11 @@ const styles = sxStyles({
    },
    actionButtonSkeleton: {
       borderRadius: 8,
+   },
+   fixedBottomBtn: {
+      whiteSpace: "nowrap",
+      width: "100%",
+      // ml: 2
    },
 })
 

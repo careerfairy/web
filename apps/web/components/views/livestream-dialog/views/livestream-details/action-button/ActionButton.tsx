@@ -122,7 +122,7 @@ export const ActionButtonWrapper: FC<ActionButtonWrapperProps> = ({
       <Box
          component="span"
          sx={[
-            !isFixedToBottom && styles.btnWrapper,
+            isFixedToBottom ? styles.fixedBottomBtn : styles.btnWrapper,
             isFloating && styles.floatingBtnWrapper,
             disableMarginTop && styles.noMarginTop,
          ]}
