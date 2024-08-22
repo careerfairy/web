@@ -9,14 +9,16 @@ type Props = {
 type PartnershipContextType = {
    partnerSource?: string
    handlePartnerEventClick: (eventId: string) => void
+   getPartnerEventLink: (eventId: string) => string
 }
 
 const PartnershipContext = createContext<PartnershipContextType>({
    handlePartnerEventClick: () => null,
+   getPartnerEventLink: () => null,
 })
 
 const PartnershipProvider = ({ partnerSource, children }: Props) => {
-   const handlePartnerEventClick = useCallback(
+   const getPartnerEventLink = useCallback(
       (eventId: string) => {
          const baseUrl = getBaseUrl()
          const link = addUtmTagsToLink({
@@ -25,14 +27,22 @@ const PartnershipProvider = ({ partnerSource, children }: Props) => {
             medium: "iframe",
             campaign: "events",
          })
-         window.open(link, "_blank")
+
+         return link
       },
       [partnerSource]
    )
 
+   const handlePartnerEventClick = useCallback(
+      (eventId: string) => {
+         window.open(getPartnerEventLink(eventId), "_blank")
+      },
+      [getPartnerEventLink]
+   )
+
    const contextValue = useMemo(
-      () => ({ partnerSource, handlePartnerEventClick }),
-      [handlePartnerEventClick, partnerSource]
+      () => ({ partnerSource, handlePartnerEventClick, getPartnerEventLink }),
+      [getPartnerEventLink, handlePartnerEventClick, partnerSource]
    )
 
    return (

@@ -4,7 +4,6 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
 import LanguageIcon from "@mui/icons-material/Language"
 import { CardActionArea } from "@mui/material"
@@ -17,7 +16,6 @@ import { useAuth } from "HOCs/AuthProvider"
 import { usePartnership } from "HOCs/PartnershipProvider"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
-   getBaseUrl,
    getMaxLineStyles,
    getResizedUrl,
    isInIframe,
@@ -283,7 +281,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const [targetValue, setTargetValue] = useState<string | undefined>(
          undefined
       )
-      const { partnerSource } = usePartnership()
+      const { getPartnerEventLink } = usePartnership()
 
       useEffect(() => {
          // This code only runs on the client side
@@ -379,16 +377,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
          // If the application is running in an iframe, open the link in a new tab with UTM tags
          if (isInIframe()) {
-            const baseUrl = getBaseUrl()
-            const link = addUtmTagsToLink({
-               link: `${baseUrl}/portal/livestream/${presenterEvent.id}`,
-               source: partnerSource || "partner",
-               medium: "iframe",
-               campaign: "events",
-            })
-
             return {
-               href: link,
+               href: getPartnerEventLink(presenterEvent.id),
                target: "_blank",
             }
          }
@@ -430,7 +420,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          authenticatedUser.email,
          marketingFormCompleted,
          pathname,
-         partnerSource,
+         getPartnerEventLink,
       ])
 
       const isLink = event && !onCardClick && !isPlaceholderEvent
