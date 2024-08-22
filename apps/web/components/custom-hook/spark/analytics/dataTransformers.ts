@@ -1,7 +1,6 @@
 // Collection of helper functions for data mapping between the backend and frontend
 
 import {
-   CompetitorAudienceClientBase,
    CompetitorAudienceData,
    LinearBarDataPoint,
    MostSomethingBase,
@@ -51,7 +50,7 @@ const mapMostSomethingData = (data): MostSomethingBase => {
 
 const mapAudienceData = (
    data: SparksAnalyticsDTO["topSparksByAudience"][TimePeriodParams]
-): CompetitorAudienceData<CompetitorAudienceClientBase> => {
+): CompetitorAudienceData<string> => {
    const audienceSegmentsMap = {
       all: [],
       "business-plus": [],
@@ -64,10 +63,7 @@ const mapAudienceData = (
 
    for (const item of data) {
       if (audienceSegmentsMap[item.audience].length < AUDIENCE_SPARKS_LIMIT) {
-         audienceSegmentsMap[item.audience].push({
-            sparkId: item.sparkId,
-            groupId: item.groupId,
-         })
+         audienceSegmentsMap[item.audience].push(item.sparkId)
       }
    }
 
@@ -75,14 +71,13 @@ const mapAudienceData = (
 
    for (const item of data) {
       if (auxAllSet.size < AUDIENCE_SPARKS_LIMIT) {
-         auxAllSet.add({
-            sparkId: item.sparkId,
-            groupId: item.groupId,
-         })
+         auxAllSet.add(item.sparkId)
       }
    }
 
    audienceSegmentsMap["all"] = Array.from(auxAllSet)
+
+   console.log("🚀 ~ audienceSegmentsMap['all']:", audienceSegmentsMap["all"])
 
    return audienceSegmentsMap
 }
