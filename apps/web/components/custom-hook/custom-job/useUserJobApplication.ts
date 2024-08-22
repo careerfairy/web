@@ -35,7 +35,6 @@ const useUserJobApplication = (userId: string, jobId: string) => {
    return {
       job: data,
       alreadyApplied,
-      // alreadyAppliedAnonymously: anonApplicationData?.applied,
       applicationInitiatedOnly,
    }
 }
