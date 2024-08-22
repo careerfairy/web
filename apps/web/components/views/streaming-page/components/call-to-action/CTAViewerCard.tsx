@@ -18,9 +18,6 @@ export const styles = sxStyles({
       alignSelf: "stretch",
       alignItems: "flex-start",
    },
-   title: {
-      fontWeight: 600,
-   },
    message: {
       gap: "4px",
       alignSelf: "stretch",
@@ -73,7 +70,7 @@ export const CTAViewerCardContent = ({ cta, onClick }: ContentProps) => {
             variant="contained"
             sx={styles.actionButton}
             href={cta.buttonURL}
-            target="blank"
+            target="_blank"
             onClick={() => {
                handleClick()
                onClick?.()
