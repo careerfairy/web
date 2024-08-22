@@ -14,7 +14,7 @@ export type WithPastData<T> = {
 export type MostSomethingBase = string[]
 export type MostSomethingWithPastData = WithPastData<string[]>
 
-export type AudienceSegments =
+export type CompetitorAudienceSegments =
    | "business-plus"
    | "engineering"
    | "it-and-mathematics"
@@ -22,18 +22,23 @@ export type AudienceSegments =
    | "social-sciences"
    | "other"
 
-export type AudienceBase = {
+export type CompetitorAudienceBase = {
    sparkId: string
-   audience: AudienceSegments
+   groupId: string
+   audience: CompetitorAudienceSegments
    engagement: number
 }
 
-export type AudienceBaseWithPastData = WithPastData<AudienceBase[]>
+export type CompetitorAudienceBaseWithPastData = WithPastData<
+   CompetitorAudienceBase[]
+>
 
-export type AudienceData<T> = {
-   [key in AudienceSegments]: T[]
+export type CompetitorAudienceData<T> = {
+   [key in CompetitorAudienceSegments]: T[]
 }
-export type AudienceWithPastData = WithPastData<AudienceData<AudienceBase>>
+export type CompetitorAudienceWithPastData = WithPastData<
+   CompetitorAudienceData<CompetitorAudienceBase>
+>
 
 export type LinearBarDataPoint = {
    label: string
@@ -79,7 +84,7 @@ export type SparksAnalyticsDTO = {
    topFieldsOfStudy: PieChartWithPastData
    levelsOfStudy: PieChartWithPastData
    topSparksByIndustry: MostSomethingWithPastData
-   topSparksByAudience: AudienceBaseWithPastData
+   topSparksByAudience: CompetitorAudienceBaseWithPastData
 }
 
 // Frontend data types
@@ -90,6 +95,11 @@ export type TimeSeriesForCharts = {
    series?: (number | null)[]
 }
 export type TimeSeriesForChartsWithPastData = WithPastData<TimeSeriesForCharts>
+
+export type CompetitorAudienceClientBase = {
+   sparkId: string
+   groupId: string
+}
 
 export type SparkAnalyticsClientOverview = {
    reach: {
@@ -116,7 +126,7 @@ export type SparkAnalyticsClientAudience = {
 
 export type SparksAnalyticsClientCompetitor = {
    topSparksByIndustry: MostSomethingBase
-   topSparksByAudience: AudienceWithPastData
+   topSparksByAudience: CompetitorAudienceWithPastData
 }
 
 export type SparkAnalyticsClient = SparkAnalyticsClientOverview &
