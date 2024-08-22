@@ -41,13 +41,13 @@ export const SnackbarNotificationsProvider = ({ children }: Props) => {
     * Using a Map disregards duplicates, and the object indirection
     * avoids recreating a new Map at every set state */
    const [notifications, setNotifications] = useState<{
-      queue: Map<SnackbarNotification["id"], SnackbarNotification>
-   }>({ queue: new Map() })
+      map: Map<SnackbarNotification["id"], SnackbarNotification>
+   }>({ map: new Map() })
 
-   const showNotifications = Boolean(notifications?.queue?.size >= 1)
+   const showNotifications = Boolean(notifications?.map?.size >= 1)
 
    const allNotifications = useMemo(
-      () => [...notifications.queue.values()],
+      () => [...notifications.map.values()],
       [notifications]
    )
    const firstActiveNotification = useMemo(() => {
@@ -58,9 +58,9 @@ export const SnackbarNotificationsProvider = ({ children }: Props) => {
    const removeNotification = useCallback((...notificationIds: string[]) => {
       setNotifications((prev) => {
          notificationIds.forEach((notificationId) => {
-            prev.queue.delete(notificationId)
+            prev.map.delete(notificationId)
          })
-         return { queue: prev.queue }
+         return { map: prev.map }
       })
    }, [])
 
@@ -68,16 +68,16 @@ export const SnackbarNotificationsProvider = ({ children }: Props) => {
       (...notifications: SnackbarNotification[]) => {
          setNotifications((prev) => {
             notifications.forEach((notification) => {
-               prev.queue.set(notification.id, notification)
+               prev.map.set(notification.id, notification)
             })
-            return { queue: prev.queue }
+            return { map: prev.map }
          })
       },
       []
    )
 
    const clearNotifications = useCallback(() => {
-      setNotifications({ queue: new Map() })
+      setNotifications({ map: new Map() })
    }, [])
 
    const value = useMemo<SnackbarNotificationsContextType>(
