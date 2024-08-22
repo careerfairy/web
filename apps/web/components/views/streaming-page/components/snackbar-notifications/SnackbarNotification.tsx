@@ -8,6 +8,7 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
+import { ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -50,7 +51,15 @@ const styles = sxStyles({
    },
 })
 
-export const SnackbarNotification = ({ open, notification }) => {
+type SnackbarNotificationProps = {
+   open: boolean
+   notification: ReactNode
+}
+
+export const SnackbarNotification = ({
+   open,
+   notification,
+}: SnackbarNotificationProps) => {
    return (
       <Snackbar open={open} TransitionComponent={SlideTransition}>
          <SnackbarContent
@@ -61,7 +70,17 @@ export const SnackbarNotification = ({ open, notification }) => {
    )
 }
 
-const SnackbarHeader = ({ children, handleClose, icon = null }) => {
+type SnackbarHeaderProps = {
+   children: ReactNode
+   handleClose: () => void
+   icon: ReactNode
+}
+
+const SnackbarHeader = ({
+   children,
+   handleClose,
+   icon = null,
+}: SnackbarHeaderProps) => {
    return (
       <Stack spacing={"20px"} sx={styles.content}>
          <Stack sx={styles.header}>

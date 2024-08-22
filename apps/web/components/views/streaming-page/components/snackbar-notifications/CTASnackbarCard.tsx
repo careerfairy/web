@@ -1,3 +1,4 @@
+import { LivestreamCTA } from "@careerfairy/shared-lib/livestreams"
 import { Stack } from "@mui/material"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useCallback } from "react"
@@ -7,7 +8,11 @@ import { CTAViewerCardContent } from "../call-to-action/CTAViewerCard"
 import { SnackbarNotification } from "./SnackbarNotification"
 import { useSnackbarNotifications } from "./SnackbarNotificationsProvider"
 
-export const CTASnackbarCard = ({ cta }) => {
+type CTASnackbarCardProps = {
+   cta: LivestreamCTA
+}
+
+export const CTASnackbarCard = ({ cta }: CTASnackbarCardProps) => {
    const { livestreamId, agoraUserId } = useStreamingContext()
    const { removeNotification } = useSnackbarNotifications()
 

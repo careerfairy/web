@@ -135,7 +135,7 @@ const CTAButtonComponent = () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [activeCTAIds]) //assures it only runs when CTA's active property changes
 
-   const handleClick = async () => {
+   const handleClick = () => {
       dispatch(setActiveView(ActiveViews.CTA))
       const ctaIds = activeCTA.map((cta) => cta.id)
       livestreamService
