@@ -1,7 +1,10 @@
 // Collection of helper functions for data mapping between the backend and frontend
 
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    CompetitorAudienceData,
+   CompetitorIndustryData,
    LinearBarDataPoint,
    MostSomethingBase,
    PieChartDataPoint,
@@ -14,6 +17,7 @@ import {
 import { universityCountriesMap } from "components/util/constants/universityCountries"
 
 const AUDIENCE_SPARKS_LIMIT = 4
+const INDUSTRY_SPARKS_LIMIT = 4
 
 type FilterTimeSeriesDataByTimeFrame = (
    data: TimeseriesDataPoint[],
@@ -48,7 +52,40 @@ const mapMostSomethingData = (data): MostSomethingBase => {
    return data.map((d) => d.sparkId)
 }
 
-const mapAudienceData = (
+const createIndustryMap = (
+   industries: OptionGroup[]
+): Record<string, any[]> => {
+   return industries.reduce((acc, industry) => {
+      acc[industry.id] = []
+      return acc
+   }, {} as Record<string, any[]>)
+}
+
+const mapCompetitorIndustryData = (
+   data: SparksAnalyticsDTO["topSparksByIndustry"][TimePeriodParams]
+): CompetitorIndustryData => {
+   const industrySegmentsMap = createIndustryMap(CompanyIndustryValues)
+
+   for (const item of data) {
+      if (industrySegmentsMap[item.industry].length < INDUSTRY_SPARKS_LIMIT) {
+         industrySegmentsMap[item.industry].push(item.sparkId)
+      }
+   }
+
+   const auxAllSet = new Set()
+
+   for (const item of data) {
+      if (auxAllSet.size < INDUSTRY_SPARKS_LIMIT) {
+         auxAllSet.add(item.sparkId)
+      }
+   }
+
+   industrySegmentsMap["all"] = Array.from(auxAllSet)
+
+   return industrySegmentsMap
+}
+
+const mapCompetitorAudienceData = (
    data: SparksAnalyticsDTO["topSparksByAudience"][TimePeriodParams]
 ): CompetitorAudienceData<string> => {
    const audienceSegmentsMap = {
@@ -76,8 +113,6 @@ const mapAudienceData = (
    }
 
    audienceSegmentsMap["all"] = Array.from(auxAllSet)
-
-   console.log("🚀 ~ audienceSegmentsMap['all']:", audienceSegmentsMap["all"])
 
    return audienceSegmentsMap
 }
@@ -250,10 +285,10 @@ export const convertToClientModel = (
                   levelsOfStudy[timeFrame],
                   levelsOfStudyLookup
                ),
-               topSparksByIndustry: mapMostSomethingData(
+               topSparksByIndustry: mapCompetitorIndustryData(
                   topSparksByIndustry[timeFrame]
                ),
-               topSparksByAudience: mapAudienceData(
+               topSparksByAudience: mapCompetitorAudienceData(
                   topSparksByAudience[timeFrame]
                ),
             }
