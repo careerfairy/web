@@ -62,12 +62,6 @@ export const TopSparksByAudience = ({
       CompetitorAudienceSegments | "all"
    >("all")
 
-   console.log("🚀 ~ selectAudienceValue:", selectAudienceValue)
-   console.log(
-      "🚀 ~ topSparksByAudience:",
-      topSparksByAudience[selectAudienceValue]
-   )
-
    return (
       <GroupSparkAnalyticsCardContainer>
          <TitleWithSelect
