@@ -1,10 +1,10 @@
-import React, { FC } from "react"
-import { useActionButtonContext } from "./ActionButtonProvider"
-import { Button } from "@mui/material"
-import styles from "./Styles"
 import PlayIcon from "@mui/icons-material/PlayCircleOutlineRounded"
-import { ActionButtonWrapper } from "./ActionButton"
+import { Button } from "@mui/material"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
+import { FC } from "react"
+import { ActionButtonWrapper } from "./ActionButton"
+import { useActionButtonContext } from "./ActionButtonProvider"
+import styles from "./Styles"
 
 const scrollToHero = () => {
    const element = document.getElementById("live-stream-dialog-hero")
@@ -16,26 +16,44 @@ const scrollToHero = () => {
       })
    }
 }
-
-const WatchNowButton: FC = () => {
-   const { isFloating, heroVisible, isFixedToBottom } = useActionButtonContext()
+type WatchNowButtonProps = {
+   sx?: any
+}
+const WatchNowButton: FC = ({ sx: customSx }: WatchNowButtonProps) => {
+   const {
+      isFloating,
+      heroVisible,
+      isFixedToBottom,
+      showIcon,
+      secondary,
+      outlined,
+      onClickWatchRecording,
+   } = useActionButtonContext()
    const { goToView } = useLiveStreamDialog()
 
    const handleWatchRecording = () => {
-      goToView("livestream-details")
+      if (onClickWatchRecording) {
+         onClickWatchRecording()
+      } else {
+         goToView("livestream-details")
+      }
    }
 
    return (
-      <ActionButtonWrapper disableMarginTop isFloating={isFloating} isFixedToBottom={isFixedToBottom}>
+      <ActionButtonWrapper
+         disableMarginTop
+         isFloating={isFloating}
+         isFixedToBottom={isFixedToBottom}
+      >
          <Button
             id="watch-now-button"
-            color="primary"
-            sx={[styles.btn, heroVisible && styles.hiddenButton]}
-            variant={"contained"}
+            color={secondary ? "secondary" : "primary"}
+            sx={[styles.btn, heroVisible && styles.hiddenButton, customSx]}
+            variant={outlined ? "outlined" : "contained"}
             fullWidth
             onClick={isFixedToBottom ? handleWatchRecording : scrollToHero}
             disableElevation
-            endIcon={isFixedToBottom ? null : <PlayIcon />}
+            endIcon={isFixedToBottom && !showIcon ? null : <PlayIcon />}
             data-testid="livestream-watch-now-button"
             size={isFixedToBottom ? "medium" : "large"}
          >

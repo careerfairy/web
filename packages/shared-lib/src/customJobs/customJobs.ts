@@ -77,8 +77,7 @@ export const jobTypeOptions = [
 ]
 
 export type JobApplicationSource =
-   | "pastLivestream"
-   | "upcomingLivestream"
+   | "livestream"
    | "spark"
    | "profile"
    | "companyPage"

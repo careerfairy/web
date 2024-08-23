@@ -1217,13 +1217,17 @@ export class FirebaseLivestreamRepository
          .collection("recordingStats")
          .doc("stats")
 
+      // const existingViewers = ((await docRef.get()).data() as LivestreamRecordingDetails).viewers
+
       const details: Omit<LivestreamRecordingDetails, "id"> = {
          livestreamId,
          livestreamStartDate: livestreamStartDate ?? null,
          minutesWatched: this.fieldValue.increment(
             minutesWatched
          ) as unknown as number,
-         viewers: this.fieldValue.arrayUnion(userId) as unknown as string[],
+         viewers: userId
+            ? (this.fieldValue.arrayUnion(userId) as unknown as string[])
+            : (this.fieldValue.arrayUnion() as unknown as string[]),
          views: this.fieldValue.increment(1) as unknown as number,
       }
 
