@@ -1,14 +1,9 @@
-import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import { Box, Tab, Tabs } from "@mui/material"
-import { useAuth } from "HOCs/AuthProvider"
-import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
 import { SparksCompetitorTab } from "./competitor-tab/SparksCompetitorTab"
-import { LockedSparksAnalytics } from "./components/LockedSparksAnalytics"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
 import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
 
@@ -72,13 +67,6 @@ type TimeFilter = {
 }
 
 const GroupSparkAnalytics = () => {
-   const { group } = useGroup()
-   const { userData } = useAuth()
-   const planStatus = useGroupPlanIsValid(group.groupId, [
-      GroupPlanTypes.Tier1,
-      GroupPlanTypes.Tier2,
-      GroupPlanTypes.Tier3,
-   ])
    const [tabValue, setTabValue] = useState("overview")
    const [selectTimeFilter, setSelectTimeFilter] =
       useState<TimeFilter["value"]>("30days")
@@ -87,19 +75,12 @@ const GroupSparkAnalytics = () => {
       setTabValue(newValue)
    }
 
-   // CF Admins can see analytics in trial mode
-   const shouldLockAnalytics = !userData.isAdmin && !planStatus.valid
-
    const options: TimeFilter[] = [
       { value: "7days", label: "Past 7 days" },
       { value: "30days", label: "Past 30 days" },
       { value: "6months", label: "Past 6 months" },
       { value: "1year", label: "Last year" },
    ]
-
-   if (shouldLockAnalytics) {
-      return <LockedSparksAnalytics />
-   }
 
    return (
       <Box sx={styles.root}>
