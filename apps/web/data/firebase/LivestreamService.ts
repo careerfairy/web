@@ -14,6 +14,8 @@ import {
    EmoteType,
    EventRatingAnswer,
    FeedbackQuestionUserAnswer,
+   LivestreamCTA,
+   LivestreamCTAUserInteraction,
    CategoryDataOption as LivestreamCategoryDataOption,
    LivestreamChatEntry,
    LivestreamEmote,
@@ -1298,6 +1300,104 @@ export class LivestreamService {
          "toggleActiveCTA"
       )(options)
       return
+   }
+
+   getCTARef = (livestreamId: string, ctaId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "callToActions",
+         ctaId
+      ).withConverter(createGenericConverter<LivestreamCTA>())
+   }
+
+   getUserCTARef = (livestreamId: string, ctaId: string, userId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "callToActions",
+         ctaId,
+         "usersWhoInteracted",
+         userId
+      ).withConverter(createGenericConverter<LivestreamCTAUserInteraction>())
+   }
+
+   clickCTA = async (
+      livestreamId: string,
+      ctaId: string,
+      userIdentifier: string
+   ) => {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const ctaRef = this.getCTARef(livestreamId, ctaId)
+         const userRef = this.getUserCTARef(livestreamId, ctaId, userIdentifier)
+
+         transaction.set(
+            userRef,
+            {
+               ctaId: ctaId,
+               livestreamId: livestreamId,
+               userId: userIdentifier,
+               numberOfClicks: increment(1),
+               clickedAt: arrayUnion({
+                  timestamp: Timestamp.now(),
+               }),
+            },
+            { merge: true }
+         )
+
+         transaction.update(ctaRef, {
+            numberOfUsersWhoClickedLink: increment(1),
+         })
+      })
+   }
+
+   dismissCTA = async (
+      livestreamId: string,
+      ctaId: string,
+      userIdentifier: string
+   ) => {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const ctaRef = this.getCTARef(livestreamId, ctaId)
+         const userRef = this.getUserCTARef(livestreamId, ctaId, userIdentifier)
+
+         transaction.set(
+            userRef,
+            {
+               userId: userIdentifier,
+               ctaId: ctaId,
+               livestreamId: livestreamId,
+               dismissedAt: Timestamp.now(),
+            },
+            { merge: true }
+         )
+
+         transaction.update(ctaRef, {
+            numberOfUsersWhoDismissed: increment(1),
+         })
+      })
+   }
+
+   markCTAAsRead = async (
+      livestreamId: string,
+      userIdentifier: string,
+      ctaIds: string[]
+   ) => {
+      ctaIds.forEach((ctaId) => {
+         const userRef = this.getUserCTARef(livestreamId, ctaId, userIdentifier)
+
+         setDoc(
+            userRef,
+            {
+               userId: userIdentifier,
+               ctaId: ctaId,
+               livestreamId: livestreamId,
+               readAt: Timestamp.now(),
+            },
+            { merge: true }
+         )
+      })
    }
 }
 

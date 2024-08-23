@@ -22,6 +22,14 @@ const HostProfileSelection = dynamic(
    { ssr: false }
 )
 
+const SnackbarNotificationsProvider = dynamic(
+   () =>
+      import(
+         "./components/snackbar-notifications/SnackbarNotificationsProvider"
+      ).then((mod) => mod.SnackbarNotificationsProvider),
+   { ssr: false }
+)
+
 const EndOfStream = dynamic(
    () =>
       import("./components/end-of-stream/EndOfStream").then(
@@ -126,10 +134,10 @@ const SettingsMenu = dynamic(
       ssr: false,
    }
 )
-const FeedbackQuestions = dynamic(
+const FeedbackQuestionsTracker = dynamic(
    () =>
-      import("./components/feedback-questions/FeedbackQuestions").then(
-         (mod) => mod.FeedbackQuestions
+      import("./components/feedback-questions/FeedbackQuestionsTracker").then(
+         (mod) => mod.FeedbackQuestionsTracker
       ),
    {
       ssr: false,
@@ -257,36 +265,41 @@ const Component = ({ isHost }: Props) => {
                   >
                      <HostProfileSelection isHost={isHost}>
                         <RTMSignalingProvider>
-                           <AgoraDevicesProvider>
-                              <LocalTracksProvider>
-                                 <ScreenShareProvider>
-                                    <EndOfStream isHost={isHost}>
-                                       <Layout>
-                                          <Fragment>
-                                             <TopBar />
-                                             <MiddleContent />
-                                             <BottomBar />
-                                             <StreamSetupWidget />
-                                             <SettingsMenu />
-                                          </Fragment>
-                                       </Layout>
-                                    </EndOfStream>
-                                    {!isHost && authenticatedUser ? (
-                                       <FeedbackQuestions />
-                                    ) : null}
-                                    {/* <ToggleStreamModeButton /> */}
-                                 </ScreenShareProvider>
-                              </LocalTracksProvider>
-                           </AgoraDevicesProvider>
-                           <AgoraTrackers />
-                           {isHost ? <HostTrackers /> : <ViewerTrackers />}
-                           {isHost ? null : <OngoingPollTracker />}
-                           {isHost ? null : <ThanksForJoiningHandRaiseDialog />}
-                           {isHost ? <UploadPDFPresentationDialog /> : null}
-                           {isHost ? <ShareVideoDialog /> : null}
-                           <EmotesRenderer />
-                           <SessionConflictModal />
-                           <SessionDisconnectedModal />
+                           <SnackbarNotificationsProvider>
+                              <AgoraDevicesProvider>
+                                 <LocalTracksProvider>
+                                    <ScreenShareProvider>
+                                       <EndOfStream isHost={isHost}>
+                                          <Layout>
+                                             <Fragment>
+                                                <TopBar />
+                                                <MiddleContent />
+                                                <BottomBar />
+                                                <StreamSetupWidget />
+                                                <SettingsMenu />
+                                             </Fragment>
+                                          </Layout>
+                                       </EndOfStream>
+
+                                       {/* <ToggleStreamModeButton /> */}
+                                    </ScreenShareProvider>
+                                 </LocalTracksProvider>
+                              </AgoraDevicesProvider>
+                              <AgoraTrackers />
+                              {isHost ? <HostTrackers /> : <ViewerTrackers />}
+                              {isHost ? null : <OngoingPollTracker />}
+                              {isHost ? null : (
+                                 <ThanksForJoiningHandRaiseDialog />
+                              )}
+                              {isHost ? <UploadPDFPresentationDialog /> : null}
+                              {isHost ? <ShareVideoDialog /> : null}
+                              {!isHost && authenticatedUser ? (
+                                 <FeedbackQuestionsTracker />
+                              ) : null}
+                              <EmotesRenderer />
+                              <SessionConflictModal />
+                              <SessionDisconnectedModal />
+                           </SnackbarNotificationsProvider>
                         </RTMSignalingProvider>
                      </HostProfileSelection>
                   </StreamingProvider>
