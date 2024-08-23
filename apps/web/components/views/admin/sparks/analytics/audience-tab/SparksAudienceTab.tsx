@@ -1,16 +1,14 @@
-import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import { Grid } from "@mui/material"
-import { useAuth } from "HOCs/AuthProvider"
-import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
+import { useAnalyticsLocking } from "components/custom-hook/spark/analytics/useAnalyticsLocking"
 import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { FC } from "react"
-import BulletChart from "../components/BulletChart"
+import BulletChart from "../components/charts/BulletChart"
+import CFPieChart from "../components/charts/CFPieChart"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkAnalyticsCardTitle"
-import { LockedSparksAudienceTab } from "../components/LockedSparksAudienceTab"
-import CFPieChart from "../components/charts/CFPieChart"
+import { LockedSparksAudienceTab } from "../components/locking/LockedSparksAudienceTab"
 import {
    EmptyDataCheckerForBulletChart,
    EmptyDataCheckerForPieChart,
@@ -28,17 +26,11 @@ type SparksAudienceTabProps = {
 }
 
 const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
-   const { userData } = useAuth()
+   const { isLocked } = useAnalyticsLocking("audience")
    const { group } = useGroup()
-   const planStatus = useGroupPlanIsValid(group.groupId, [
-      GroupPlanTypes.Tier2,
-      GroupPlanTypes.Tier3,
-   ])
-
    const { topCountries, topUniversities, topFieldsOfStudy, levelsOfStudy } =
       useSparksAnalytics(group.id)[timeFilter]
 
-   const shouldLockAudiences = !userData.isAdmin && !planStatus.valid
    /*
     * The calculations below scale the bars' values relative to the maximum
     * absolute value of the dataset. This creates a better user experience
@@ -66,9 +58,10 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
       maxUniversityValue
    )
 
-   if (shouldLockAudiences) {
+   if (isLocked) {
       return <LockedSparksAudienceTab />
    }
+
    return (
       <Grid container spacing={5} marginBottom={10} alignItems="stretch">
          <Grid item xs={12} md={6}>
