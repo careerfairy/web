@@ -1,6 +1,4 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { UPCOMING_STREAM_THRESHOLD_MINUTES } from "@careerfairy/shared-lib/livestreams/constants"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
@@ -10,13 +8,11 @@ import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
 import { isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
+import { logger } from "firebase-functions/v2"
+import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import ical from "ical-generator"
 import { DateTime } from "luxon"
-import { InferType, array, boolean, mixed, object, string } from "yup"
 import { firestore } from "./api/firestoreAdmin"
-import { livestreamsRepo } from "./api/repositories"
-import { middlewares } from "./middlewares/middlewares"
-import { dataValidation } from "./middlewares/validations"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)
@@ -227,26 +223,32 @@ export const notifySlackWhenALivestreamStarts = functions
       }
    })
 
-export const notifySlackWhenALivestreamIsCreated = functions
-   .region(config.region)
-   .firestore.document("livestreams/{livestreamId}")
-   .onCreate(async (snap) => {
-      const event = snap.data()
-      let publisherEmailOrName = event.author?.email
+export const notifySlackWhenALivestreamIsCreated = onDocumentCreated(
+   "livestreams/{livestreamId}",
+   async (event) => {
+      const livestream = {
+         ...event.data.data(),
+         id: event.params.livestreamId,
+      } as LivestreamEvent
 
-      if (event.test) {
-         functions.logger.log(
-            "The livestream is a test, skipping the notification"
-         )
+      if (!livestream) {
+         logger.warn("No data associated with the event")
+         return
+      }
+
+      let publisherEmailOrName = livestream.author?.email
+
+      if (livestream.test) {
+         logger.log("The live stream is a test, skipping the notification")
          return
       }
 
       // cancel notification if the event start date is more than 1w in the past
       // we create events in the past to test, we don't want to notify in that case
       const oneWeekMs = 7 * 24 * 3600 * 1000
-      if (event.start?.toMillis() - Date.now() < -oneWeekMs) {
-         functions.logger.log(
-            "The livestream start date is more than 7 days in the past, skipping the notification"
+      if (livestream.start?.toMillis() - Date.now() < -oneWeekMs) {
+         logger.log(
+            "The live stream start date is more than 7 days in the past, skipping the notification"
          )
          return
       }
@@ -266,83 +268,13 @@ export const notifySlackWhenALivestreamIsCreated = functions
          }
 
          const webhookUrl = config.slackWebhooks.livestreamCreated
-         await notifyLivestreamCreated(webhookUrl, publisherEmailOrName, event)
+         await notifyLivestreamCreated(
+            webhookUrl,
+            publisherEmailOrName,
+            livestream
+         )
       } catch (e) {
-         functions.logger.error(
-            "error in notifySlackWhenALivestreamIsCreated",
-            e
-         )
+         logger.error("error in notifySlackWhenALivestreamIsCreated", e)
       }
-   })
-
-const FieldOfStudySchema = object().shape({
-   id: string().required(),
-   name: string().required(),
-})
-
-const FilterLivestreamsOptionsSchema = {
-   languageCodes: array().of(string()),
-   withRecordings: boolean(),
-   withTest: boolean(),
-   withHidden: boolean(),
-   targetGroupId: string().nullable(),
-   type: mixed<"pastEvents" | "upcomingEvents">()
-      .oneOf(["pastEvents", "upcomingEvents"])
-      .defined(),
-   companyIndustries: array().of(string()),
-   companyCountries: array().of(string()),
-   targetFieldsOfStudy: array().of(FieldOfStudySchema),
-}
-
-const schema = object().shape(FilterLivestreamsOptionsSchema)
-
-type FilterLivestreamsOptions = InferType<typeof schema>
-
-export const fetchLivestreams = functions.region(config.region).https.onCall(
-   middlewares(
-      dataValidation(FilterLivestreamsOptionsSchema),
-      async (data: FilterLivestreamsOptions) => {
-         const {
-            type,
-            targetGroupId = null,
-            withRecordings = false,
-            withTest = false,
-            withHidden = false,
-            companyIndustries = [],
-            companyCountries = [],
-            targetFieldsOfStudy = [],
-            languageCodes = [],
-         } = data
-
-         const pastTwoYearsLivestreams = await livestreamsRepo.fetchLivestreams(
-            {
-               type,
-               languageCodes,
-               targetGroupId,
-               withHidden,
-               withRecordings,
-               withTest,
-            }
-         )
-
-         let res = new LivestreamsDataParser(pastTwoYearsLivestreams)
-
-         if (companyIndustries.length > 0) {
-            res = res.filterByCompanyIndustry(companyIndustries)
-         }
-
-         if (companyCountries.length > 0) {
-            res = res.filterByCompanyCountry(companyCountries)
-         }
-
-         if (targetFieldsOfStudy.length > 0) {
-            res = res.filterByTargetFieldsOfStudy(targetFieldsOfStudy)
-         }
-
-         return res
-            .removeSensitiveData()
-            .get()
-            .map(LivestreamPresenter.serializeDocument)
-      }
-   )
+   }
 )

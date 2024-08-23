@@ -2,7 +2,7 @@ import {
    JobType,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import React, { useCallback, useMemo } from "react"
+import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import {
    Avatar,
    Box,
@@ -13,15 +13,14 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import AddRoundedIcon from "@mui/icons-material/AddRounded"
-import { sxStyles } from "types/commonTypes"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
 import { FormBrandedAutocomplete } from "components/views/common/inputs/BrandedAutocomplete"
-import { props } from "lodash/fp"
-import { useLivestreamFormValues } from "../../../../useLivestreamFormValues"
+import { useCallback, useMemo } from "react"
 import { useDispatch } from "react-redux"
 import { openJobsDialog } from "store/reducers/adminJobsReducer"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import { sxStyles } from "types/commonTypes"
+import { useLivestreamFormValues } from "../../../../useLivestreamFormValues"
 
 const styles = sxStyles({
    menuItem: {
@@ -118,11 +117,15 @@ const SelectorCustomJobsDropDown = ({
             <Typography sx={styles.optionTitle}>{job.title}</Typography>
 
             <Stack spacing={2} direction={"row"}>
-               <Typography sx={styles.optionInfo}>
-                  {isMobile ? getMobileJobType(job.jobType) : job.jobType}
-               </Typography>
+               {job.jobType ? (
+                  <>
+                     <Typography sx={styles.optionInfo}>
+                        {isMobile ? getMobileJobType(job.jobType) : job.jobType}
+                     </Typography>
 
-               <Divider orientation="vertical" flexItem />
+                     <Divider orientation="vertical" flexItem />
+                  </>
+               ) : null}
 
                <Typography sx={[styles.optionInfo, styles.ellipsis]}>
                   {job.postingUrl}
@@ -155,7 +158,6 @@ const SelectorCustomJobsDropDown = ({
          getOptionElement={getOptionElement}
          disabled={isSubmitting}
          limit={5}
-         {...props}
       />
    )
 }

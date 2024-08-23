@@ -25,7 +25,10 @@ export interface LivestreamEvent extends Identifiable {
    backgroundImageUrl?: string
    company?: string
    companyId?: string
-   participants?: string[]
+   /**
+    * @deprecated Use userLivestreamData sub-collection instead.
+    * This field will be removed in a future version.
+    */
    participatingStudents?: string[]
    maxRegistrants?: number
    companyLogoUrl?: string
@@ -59,7 +62,6 @@ export interface LivestreamEvent extends Identifiable {
    start: firebase.firestore.Timestamp
    startDate?: Date
    status?: LivestreamStatus
-   registeredUsers?: string[]
    groupQuestionsMap?: LivestreamGroupQuestionsMap
    hasStarted?: boolean
    startedAt?: firebase.firestore.Timestamp
@@ -83,7 +85,7 @@ export interface LivestreamEvent extends Identifiable {
    recommendedEventIds?: string[]
 
    /**
-    * Which call to actions have been activated for this event
+    * Which call to actions have been activated for this event. Deprecated - see callToActions subcollection
     */
    activeCallToActionIds?: string[]
 
@@ -649,10 +651,8 @@ export const pickPublicDataFromLivestream = (
 export interface LivestreamEventSerialized
    extends Omit<
       LivestreamEvent,
-      | "registeredUsers"
       | "talentPool"
       | "participatingStudents"
-      | "participants"
       | "created"
       | "start"
       | "startDate"
@@ -736,6 +736,7 @@ export enum ImpressionLocation {
    landingPageCarousel = "landingPageCarousel",
    viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
    endOfStreamLivestreams = "endOfStreamLivestreams",
+   mentorPageCarousel = "mentorPageCarousel",
    unknown = "unknown",
 }
 
@@ -839,4 +840,25 @@ export type StreamerDetails = {
    role: string
    avatarUrl: string
    linkedInUrl: string
+}
+
+export interface LivestreamCTA extends Identifiable {
+   message: string
+   buttonText: string
+   buttonURL: string
+   createdAt: firebase.firestore.Timestamp
+   numberOfUsersWhoClickedLink: number
+   numberOfUsersWhoDismissed: number
+   active: boolean
+   activatedAt?: firebase.firestore.Timestamp
+}
+
+export interface LivestreamCTAUserInteraction extends Identifiable {
+   ctaId: string
+   userId: string
+   livestreamId: string
+   numberOfClicks: number
+   clickedAt: firebase.firestore.Timestamp[]
+   readAt: firebase.firestore.Timestamp
+   dismissedAt: firebase.firestore.Timestamp
 }

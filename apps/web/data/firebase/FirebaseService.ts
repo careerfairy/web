@@ -2175,13 +2175,6 @@ class FirebaseService {
 
       const batch = this.firestore.batch()
 
-      batch.update(livestreamRef, {
-         // To be depreciated
-         registeredUsers: firebase.firestore.FieldValue.arrayUnion(
-            userData.userEmail
-         ),
-      })
-
       batch.set(userLivestreamDataRef, data, { merge: true })
 
       for (const groupId of idsOfGroupsWithPolicies) {
@@ -2259,10 +2252,6 @@ class FirebaseService {
             user: userData,
          } as UserLivestreamData)
       }
-
-      batch.update(livestreamRef, {
-         registeredUsers: firebase.firestore.FieldValue.arrayRemove(userEmail),
-      })
 
       await batch.commit()
    }
@@ -2907,13 +2896,6 @@ class FirebaseService {
          .map((doc) => ({ id: doc.id, ...doc.data() }))
    }
 
-   listenToRecommendedEvents = (recommendedEventIds, callback) => {
-      const ref = this.firestore
-         .collection("livestreams")
-         .where("id", "in", recommendedEventIds || [])
-      return ref.onSnapshot(callback)
-   }
-
    createMultipleBreakoutRooms = async (
       livestreamId = "",
       numberOfRooms = 0
@@ -3139,6 +3121,50 @@ class FirebaseService {
          })
       } else {
          return
+      }
+   }
+
+   trackMentorPageView = async (
+      careerId: string,
+      creatorId: string,
+      visitorId: string
+   ) => {
+      const visitorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(careerId)
+         .collection("creators")
+         .doc(creatorId)
+         .collection("statPageView")
+         .doc(visitorId)
+
+      const visitorSnap = await visitorRef.get()
+
+      if (!visitorSnap.exists) {
+         await visitorRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
+      }
+   }
+
+   trackMentorLinkedInReach = async (
+      careerId: string,
+      creatorId: string,
+      visitorId: string
+   ) => {
+      const visitorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(careerId)
+         .collection("creators")
+         .doc(creatorId)
+         .collection("statLinkedInReach")
+         .doc(visitorId)
+
+      const visitorSnap = await visitorRef.get()
+
+      if (!visitorSnap.exists) {
+         await visitorRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
       }
    }
 

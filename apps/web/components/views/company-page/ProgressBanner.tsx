@@ -1,19 +1,19 @@
-import React, { useCallback, useMemo } from "react"
-import { TabValue, TabValueType, useCompanyPage } from "./index"
+import Arrow from "@mui/icons-material/ArrowForwardRounded"
+import CloseIcon from "@mui/icons-material/Close"
 import {
    Box,
    Container,
    Grid,
    IconButton,
    LinearProgress,
-   linearProgressClasses,
    Stack,
    Typography,
+   linearProgressClasses,
 } from "@mui/material"
-import { sxStyles } from "../../../types/commonTypes"
-import CloseIcon from "@mui/icons-material/Close"
+import { useCallback, useMemo } from "react"
 import { useSessionStorage } from "react-use"
-import Arrow from "@mui/icons-material/ArrowForwardRounded"
+import { sxStyles } from "../../../types/commonTypes"
+import { TabValue, TabValueType, useCompanyPage } from "./index"
 
 const styles = sxStyles({
    root: {
@@ -108,8 +108,8 @@ const ProgressBanner = () => {
                return TabValue.media
             case "videos":
                return TabValue.video
-            case "testimonials":
-               return TabValue.testimonials
+            case "testimonialsOrMentors":
+               return TabValue.testimonialsOrMentors
             case "livestreams":
                return TabValue.livesStreams
             default:

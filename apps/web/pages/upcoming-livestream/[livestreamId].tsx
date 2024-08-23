@@ -1,49 +1,51 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { UserStats } from "@careerfairy/shared-lib/users"
+import { useMediaQuery } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
+import { useLivestreamUsersCount } from "components/custom-hook/live-stream/useLivestreamUsersCount"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
+import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { fromDate } from "data/firebase/FirebaseInstance"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { omit } from "lodash"
+import { GetServerSidePropsContext } from "next"
+import { useRouter } from "next/router"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import useRedirectToEventRoom from "../../components/custom-hook/live-stream/useRedirectToEventRoom"
+import useTrackLivestreamView from "../../components/custom-hook/live-stream/useTrackLivestreamView"
+import { useInterests } from "../../components/custom-hook/useCollection"
+import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
+import {
+   getBaseUrl,
+   getResizedUrl,
+} from "../../components/helperFunctions/HelperFunctions"
+import { languageCodesDict } from "../../components/helperFunctions/streamFormFunctions"
+import SEO from "../../components/util/SEO"
+import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
+import FooterButton from "../../components/views/common/FooterButton"
+import LivestreamDialog from "../../components/views/livestream-dialog/LivestreamDialog"
+import useRegistrationData from "../../components/views/livestream-dialog/views/registration/useRegistrationData"
+import AboutSection from "../../components/views/upcoming-livestream/AboutSection"
+import ContactSection from "../../components/views/upcoming-livestream/ContactSection"
+import HeroSection from "../../components/views/upcoming-livestream/HeroSection"
+import Navigation from "../../components/views/upcoming-livestream/Navigation"
+import QuestionsSection from "../../components/views/upcoming-livestream/QuestionsSection"
+import ReferralSection from "../../components/views/upcoming-livestream/ReferralSection"
+import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection"
+import UserUtil from "../../data/util/UserUtil"
+import { useAuth } from "../../HOCs/AuthProvider"
+import UpcomingLayout from "../../layouts/UpcomingLayout"
+import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { dateIsInUnder24Hours, streamIsOld } from "../../util/CommonUtil"
+import { getStreamMetaInfo } from "../../util/SeoUtil"
 import {
    getServerSideStream,
    getServerSideUserStats,
    getUserTokenFromCookie,
 } from "../../util/serverUtil"
-import { getStreamMetaInfo } from "../../util/SeoUtil"
-import UpcomingLayout from "../../layouts/UpcomingLayout"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import {
-   getBaseUrl,
-   getResizedUrl,
-} from "../../components/helperFunctions/HelperFunctions"
-import HeroSection from "../../components/views/upcoming-livestream/HeroSection"
-import { useAuth } from "../../HOCs/AuthProvider"
-import { dateIsInUnder24Hours, streamIsOld } from "../../util/CommonUtil"
-import UserUtil from "../../data/util/UserUtil"
-import { useRouter } from "next/router"
-import AboutSection from "../../components/views/upcoming-livestream/AboutSection"
-import QuestionsSection from "../../components/views/upcoming-livestream/QuestionsSection"
-import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection"
-import { useTheme } from "@mui/material/styles"
-import ContactSection from "../../components/views/upcoming-livestream/ContactSection"
-import Navigation from "../../components/views/upcoming-livestream/Navigation"
-import { useMediaQuery } from "@mui/material"
-import { languageCodesDict } from "../../components/helperFunctions/streamFormFunctions"
-import { useInterests } from "../../components/custom-hook/useCollection"
-import ReferralSection from "../../components/views/upcoming-livestream/ReferralSection"
-import SEO from "../../components/util/SEO"
-import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
-import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import FooterButton from "../../components/views/common/FooterButton"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { omit } from "lodash"
-import { fromDate } from "data/firebase/FirebaseInstance"
-import { recommendationServiceInstance } from "data/firebase/RecommendationService"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { GetServerSidePropsContext } from "next"
-import { UserStats } from "@careerfairy/shared-lib/users"
-import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
-import useRegistrationData from "../../components/views/livestream-dialog/views/registration/useRegistrationData"
-import LivestreamDialog from "../../components/views/livestream-dialog/LivestreamDialog"
-import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
-import useRedirectToEventRoom from "../../components/custom-hook/live-stream/useRedirectToEventRoom"
-import useTrackLivestreamView from "../../components/custom-hook/live-stream/useTrackLivestreamView"
 
 const UpcomingLivestreamPage = ({
    serverStream,
@@ -63,6 +65,12 @@ const UpcomingLivestreamPage = ({
    const [stream, setStream] = useState(
       LivestreamPresenter.parseDocument(serverStream, fromDate)
    )
+   const streamId = stream.id || serverStream.id
+   const { count: registeredUsersCount } = useLivestreamUsersCount(
+      streamId,
+      "registered"
+   )
+   const registered = useUserIsRegistered(streamId)
 
    const streamPresenter = useMemo(
       () => LivestreamPresenter.createFromDocument(stream),
@@ -103,13 +111,6 @@ const UpcomingLivestreamPage = ({
 
       return null
    }, [unfilteredGroups])
-
-   const registered = useMemo(() => {
-      return Boolean(
-         authenticatedUser &&
-            stream?.registeredUsers?.includes(authenticatedUser.email)
-      )
-   }, [stream, authenticatedUser])
 
    const [isPastEvent, setIsPastEvent] = useState(streamIsOld(stream?.start))
 
@@ -154,8 +155,8 @@ const UpcomingLivestreamPage = ({
    }, [listenToScheduledLivestreamById, stream?.id])
 
    useEffect(() => {
-      ;(async function handleAutoRegister() {
-         if (stream?.registeredUsers?.includes(authenticatedUser.email)) {
+      async function handleAutoRegister() {
+         if (registered) {
             if (stream?.hasStarted) {
                return
             }
@@ -173,18 +174,19 @@ const UpcomingLivestreamPage = ({
          if (
             query.register === stream?.id &&
             unfilteredGroups.length &&
-            !stream?.registeredUsers?.includes(authenticatedUser.email)
+            !registered
          ) {
             handleOpenDialog()
          }
-      })()
+      }
+      handleAutoRegister()
    }, [
       handleOpenDialog,
       query?.register,
       stream?.id,
       stream?.hasStarted,
       unfilteredGroups,
-      stream?.registeredUsers,
+      registered,
       authenticatedUser?.email,
       query,
       push,
@@ -199,12 +201,18 @@ const UpcomingLivestreamPage = ({
       if (authenticatedUser && registered) return false
       //Disable registration if max number of registrants is reached
       if (stream.maxRegistrants && stream.maxRegistrants > 0) {
-         return stream.registeredUsers
-            ? stream.maxRegistrants <= stream.registeredUsers.length
+         return registeredUsersCount
+            ? stream.maxRegistrants <= registeredUsersCount
             : false
       }
       return false
-   }, [isPastEvent, stream, authenticatedUser, registered])
+   }, [
+      isPastEvent,
+      stream,
+      authenticatedUser,
+      registered,
+      registeredUsersCount,
+   ])
 
    const linkToStream = useMemo(() => {
       const url = new URL(getBaseUrl() + asPath)
@@ -220,11 +228,11 @@ const UpcomingLivestreamPage = ({
 
    const numberOfSpotsRemaining = useMemo(() => {
       if (!stream.maxRegistrants) return 0
-      else if (!stream.registeredUsers) return stream.maxRegistrants
+      else if (!registeredUsersCount) return stream.maxRegistrants
       else {
-         return stream.maxRegistrants - stream.registeredUsers.length
+         return stream.maxRegistrants - registeredUsersCount
       }
-   }, [stream?.maxRegistrants, stream?.registeredUsers])
+   }, [stream?.maxRegistrants, registeredUsersCount])
 
    const streamAboutToStart = useMemo(() => {
       return Boolean(
@@ -447,7 +455,6 @@ const serializeLivestream = (stream: LivestreamEvent): object => {
    return omit(serverSideStream, [
       "talentPool",
       "participatingStudents",
-      "participants",
       "liveSpeakers",
       "author",
    ])

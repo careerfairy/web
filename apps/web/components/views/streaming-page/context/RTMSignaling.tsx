@@ -5,10 +5,18 @@ import { useAgoraRtmToken } from "components/custom-hook/streaming/useAgoraRtmTo
 import { useForcedProxyMode } from "components/custom-hook/streaming/useForcedProxyMode"
 import { agoraCredentials } from "data/agora/AgoraInstance"
 import { ReactNode, useCallback, useEffect, useState } from "react"
-import { setRTMFailedToConnect } from "store/reducers/streamingAppReducer"
+import {
+   setIsRecordingBotInRoom,
+   setRTMFailedToConnect,
+   setViewCount,
+} from "store/reducers/streamingAppReducer"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "./Streaming"
 import { AgoraRTMChannelProvider, AgoraRTMClientProvider } from "./rtm"
+import {
+   fetchChannelMembers,
+   filterMembers,
+} from "./rtm/hooks/useChannelMembers"
 
 type RTMSignalingProviderProps = {
    children: ReactNode
@@ -81,12 +89,45 @@ export const RTMSignalingProvider = ({
    useEffect(() => {
       if (token) {
          login()
-
          return () => {
             logout()
          }
       }
    }, [login, logout, token])
+
+   useEffect(() => {
+      const initMemberInfo = () => {
+         if (rtmState.channel && rtmState.client) {
+            /* filter members after joining to adjust view count */
+            fetchChannelMembers(rtmState.channel)
+               .then((members) => {
+                  const { hasRecordBot } = filterMembers(members)
+                  if (hasRecordBot) {
+                     dispatch(setIsRecordingBotInRoom(true))
+                  }
+               })
+               .catch((e) => {
+                  errorLogAndNotify(e, {
+                     message: "Failed to fetch channel members",
+                  })
+               })
+
+            /* dispatch current view count for users that join mid-stream */
+            rtmState.client
+               .getChannelMemberCount([rtmState.channel.channelId])
+               .then((channelMemberCount) => {
+                  channelMemberCount[livestreamId] &&
+                     dispatch(setViewCount(channelMemberCount[livestreamId]))
+               })
+               .catch((e) => {
+                  errorLogAndNotify(e, {
+                     message: "Failed to get channel member count",
+                  })
+               })
+         }
+      }
+      initMemberInfo()
+   }, [rtmState, dispatch, livestreamId])
 
    return (
       <AgoraRTMClientProvider client={rtmState.client}>

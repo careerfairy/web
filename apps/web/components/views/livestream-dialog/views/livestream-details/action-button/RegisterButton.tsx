@@ -1,32 +1,42 @@
-import React, { FC, useCallback, useEffect, useState } from "react"
-import Box from "@mui/material/Box"
-import { Button } from "@mui/material"
-import styles from "./Styles"
 import CheckIcon from "@mui/icons-material/Check"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import { ActionButtonWrapper, LinkText } from "./ActionButton"
-import { useActionButtonContext } from "./ActionButtonProvider"
+import { Button } from "@mui/material"
+import Box from "@mui/material/Box"
+import { useLivestreamUsersCount } from "components/custom-hook/live-stream/useLivestreamUsersCount"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
+import { FC, useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import StyledToolTip from "../../../../../../materialUI/GlobalTooltips/StyledToolTip"
+import { ActionButtonWrapper, LinkText } from "./ActionButton"
+import { useActionButtonContext } from "./ActionButtonProvider"
+import styles from "./Styles"
 
 type RegisterButtonProps = {
    label: string
    toolTip?: string
 }
 const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
-   const { authenticatedUser, isLoadingUserData, isLoadingAuth } = useAuth()
-   const { onRegisterClick, livestreamPresenter, isFloating, isFixedToBottom, setIsDisabled } =
-      useActionButtonContext()
+   const { isLoadingUserData, isLoadingAuth } = useAuth()
+   const {
+      onRegisterClick,
+      livestreamPresenter,
+      isFloating,
+      isFixedToBottom,
+      setIsDisabled,
+   } = useActionButtonContext()
 
    // Must use controlled open state for Tooltip to work with disabled button
    const [open, setOpen] = useState(false)
 
-   const registered = livestreamPresenter.isUserRegistered(
-      authenticatedUser.email
+   const registered = useUserIsRegistered(livestreamPresenter.id)
+   const { count } = useLivestreamUsersCount(
+      livestreamPresenter.id,
+      "registered"
    )
 
    const disabled = livestreamPresenter.isRegistrationDisabled(
-      authenticatedUser.email
+      registered,
+      count || 0
    )
 
    const isPast = livestreamPresenter.isPast()
@@ -54,13 +64,16 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
    }, [isLoadingUserData, isLoadingAuth, onRegisterClick, isFloating])
 
    useEffect(() => {
-      if (buttonDisabled && setIsDisabled){
-         setIsDisabled(true);
+      if (buttonDisabled && setIsDisabled) {
+         setIsDisabled(true)
       }
    }, [buttonDisabled, setIsDisabled])
 
    return (
-      <ActionButtonWrapper isFloating={isFloating} isFixedToBottom={isFixedToBottom}>
+      <ActionButtonWrapper
+         isFloating={isFloating}
+         isFixedToBottom={isFixedToBottom}
+      >
          <Box
             onMouseEnter={() => buttonDisabled && handleOpen()}
             onMouseLeave={() => buttonDisabled && handleClose()}
@@ -72,7 +85,10 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
                id="register-button"
                color={"secondary"}
                variant={"contained"}
-               sx={[!isFixedToBottom && styles.btn, registered && !isFixedToBottom && styles.successButton]}
+               sx={[
+                  !isFixedToBottom && styles.btn,
+                  registered && !isFixedToBottom && styles.successButton,
+               ]}
                fullWidth
                startIcon={registered ? <CheckIcon /> : null}
                endIcon={
@@ -94,7 +110,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
                onClick={handleClick}
                disableElevation
                data-testid="livestream-registration-button"
-               size={isFixedToBottom? "medium" : "large"}
+               size={isFixedToBottom ? "medium" : "large"}
             >
                {label}
             </Button>

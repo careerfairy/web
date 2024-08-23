@@ -36,6 +36,9 @@ const styles = sxStyles({
    cardDetails: {
       cursor: "pointer",
    },
+   cardSelected: {
+      opacity: 0.5,
+   },
 })
 
 type Props = {
@@ -46,6 +49,7 @@ type Props = {
    onMouseLeave?: () => void
    autoPlaying?: boolean
    containerRef?: React.RefObject<HTMLDivElement>
+   selected?: boolean
 }
 
 const SparkCarouselCardContainer: FC<Props> = ({
@@ -56,13 +60,14 @@ const SparkCarouselCardContainer: FC<Props> = ({
    onMouseLeave,
    autoPlaying,
    containerRef,
+   selected,
 }) => {
    const autoPlayEnabled = autoPlaying !== undefined
 
    return (
       <Box
          ref={containerRef}
-         sx={styles.root}
+         sx={[styles.root, selected && styles.cardSelected]}
          onMouseEnter={onMouseEnter}
          onMouseLeave={onMouseLeave}
       >

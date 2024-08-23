@@ -1,3 +1,5 @@
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    Divider,
@@ -7,16 +9,14 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { X as DeleteIcon, Edit2 as EditIcon, MoreVertical } from "react-feather"
+import useIsAtsLivestreamJobAssociation from "components/custom-hook/useIsAtsLivestreamJobAssociation"
 import useMenuState from "components/custom-hook/useMenuState"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import CollapsibleText from "components/views/common/inputs/CollapsibleText"
+import Link from "components/views/common/Link"
+import { X as DeleteIcon, Edit2 as EditIcon, MoreVertical } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
-import Link from "components/views/common/Link"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
-import useIsAtsLivestreamJobAssociation from "components/custom-hook/useIsAtsLivestreamJobAssociation"
 
 const styles = sxStyles({
    wrapper: {
@@ -144,13 +144,17 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                         </>
                      ) : null}
 
-                     <Typography variant="brandedBody">
-                        {job.jobType}
-                     </Typography>
+                     {job.jobType ? (
+                        <>
+                           <Typography variant="brandedBody">
+                              {job.jobType}
+                           </Typography>
+                           <Divider orientation="vertical" />
+                        </>
+                     ) : null}
 
                      {job.deadline ? (
                         <>
-                           <Divider orientation="vertical" />
                            <Typography variant="brandedBody">
                               {DateUtil.formatDateToString(
                                  job.deadline.toDate()

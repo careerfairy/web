@@ -1,0 +1,38 @@
+import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import { collection, query, where } from "firebase/firestore"
+import { useFirestore } from "reactfire"
+import useSWRCountQuery from "../useSWRCountQuery"
+
+type UserType = keyof Pick<
+   UserLivestreamData,
+   "registered" | "talentPool" | "participated"
+>
+
+/**
+ * Hook to fetch the count of users for a specific live stream based on user type.
+ * @param {string} livestreamId - The ID of the live stream.
+ * @param {UserType} userType - The type of user to count ('registered', 'talentPool', or 'participated').
+ * @returns the count and loading state
+ */
+export const useLivestreamUsersCount = (
+   livestreamId: string,
+   userType: UserType
+) => {
+   const firestore = useFirestore()
+
+   const userLivestreamDataRef = collection(
+      firestore,
+      "livestreams",
+      livestreamId,
+      "userLivestreamData"
+   )
+
+   const registeredUsersQuery = query(
+      userLivestreamDataRef,
+      where(`${userType}.date`, "!=", null)
+   )
+
+   return useSWRCountQuery(registeredUsersQuery, {
+      revalidateOnFocus: true, // revalidate when the user returns to the page to see the latest count
+   })
+}

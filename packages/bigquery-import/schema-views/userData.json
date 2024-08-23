@@ -157,6 +157,10 @@
          ],
          "name": "accountCreationUTMParams",
          "type": "map"
+      },
+      {
+         "name": "spokenLanguages",
+         "type": "stringified_map"
       }
    ]
 }

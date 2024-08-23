@@ -16,7 +16,23 @@ import dotenv = require("dotenv")
 dotenv.config()
 
 // to prevent import issue
+import { setGlobalOptions } from "firebase-functions/v2"
+import config from "./config"
+
+/**
+ * Set the default region for all functions using the v2 SDK.
+ * This configuration needs to be set before importing any functions.
+ *
+ * @remarks
+ * The region setting affects where the Cloud Functions will be deployed and executed.
+ * Setting it globally ensures consistency across all functions defined in this file.
+ */
+setGlobalOptions({
+   region: config.region,
+})
+
 import { bundles } from "./bundles"
+import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
@@ -133,7 +149,8 @@ exports.notifySlackWhenALivestreamStarts =
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
-exports.fetchLivestreams_v2 = livestreams.fetchLivestreams
+
+exports.upsertLivestreamSpeaker = streaming.upsertLivestreamSpeaker
 
 // Tags
 exports.fetchTagsContentHits = tags.fetchContentHits
@@ -171,7 +188,7 @@ exports.slackHandleInteractions = slack.slackHandleInteractions
 // Rewards
 exports.rewardLivestreamInvitationComplete_eu =
    rewards.rewardLivestreamInvitationComplete
-exports.rewardUserAction_eu = rewards.rewardUserAction
+exports.rewardUserAction_v2 = rewards.rewardUserAction
 exports.applyReferralCode_eu = rewards.applyReferralCode
 
 // Ratings
@@ -217,6 +234,8 @@ exports.getRecommendedEvents_v4 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
+exports.syncLivestreamStartNotifications =
+   onWriteTriggers.syncLivestreamStartNotifications
 exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
 exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 exports.syncUserStats = onWriteTriggers.syncUserStats
@@ -256,7 +275,7 @@ exports.removeAndSyncUserSparkNotification_v2 =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
-exports.getSparksFeed_v6 = userSparks.getSparksFeed
+exports.getSparksFeed_v7 = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser_v3 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
@@ -266,10 +285,11 @@ exports.getSparksAnalytics_v2 = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob
-exports.updateCustomJobWithLinkedLivestreams =
+exports.updateCustomJobWithLinkedLivestreams_v2 =
    customJobs.updateCustomJobWithLinkedLivestreams
-exports.transferCustomJobsFromDraftToPublishedLivestream =
+exports.transferCustomJobsFromDraftToPublishedLivestream_v2 =
    customJobs.transferCustomJobsFromDraftToPublishedLivestream
+exports.deleteExpiredCustomJobs = customJobs.deleteExpiredCustomJobs
 
 // Group Subscription Plan Functions
 exports.startPlan_v3 = groupPlans.startPlan
@@ -299,3 +319,10 @@ exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent
 exports.markQuestionAsDone = streaming.markQuestionAsDone
 exports.toggleHandRaise = streaming.toggleHandRaise
 exports.upsertLivestreamSpeaker = streaming.upsertLivestreamSpeaker
+exports.createCTA = streaming.createCTA
+exports.deleteCTA = streaming.deleteCTA
+exports.updateCTA = streaming.updateCTA
+exports.toggleActiveCTA = streaming.toggleActiveCTA
+
+// Utils
+exports.fetchUserCountryCode = fetchUserCountryCode

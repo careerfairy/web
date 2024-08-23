@@ -1,7 +1,7 @@
 import functions = require("firebase-functions")
 
-import { getChangeTypes } from "../../util"
 import { RuntimeOptions } from "firebase-functions"
+import { getChangeTypes } from "../../util"
 
 export const defaultTriggerRunTimeConfig: RuntimeOptions = {
    // Ensure that the function has enough time to finish all side effects
@@ -28,7 +28,7 @@ export const logStart = ({
    changeTypes,
 }: {
    message: string
-   context: functions.EventContext
+   context: Pick<functions.EventContext, "params">
    changeTypes: ReturnType<typeof getChangeTypes>
 }) => {
    functions.logger.info(message, {

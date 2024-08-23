@@ -1,22 +1,22 @@
-import { sxStyles } from "../../../../types/commonTypes"
-import { Box, Button, Stack, Typography } from "@mui/material"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import { placeholderBanner } from "../../../../constants/images"
-import React, { useCallback, useMemo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import DateUtil from "../../../../util/DateUtil"
-import { useCompanyPage } from "../index"
-import Link from "next/link"
-import useIsMobile from "../../../custom-hook/useIsMobile"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import ChevronRight from "@mui/icons-material/ChevronRight"
-import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
-import { getRelevantHosts } from "../../../../util/streamUtil"
-import Image from "next/legacy/image"
 import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
-import { buildDialogLink } from "../../livestream-dialog"
+import ChevronRight from "@mui/icons-material/ChevronRight"
+import { Box, Button, Stack, Typography } from "@mui/material"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
+import Image from "next/legacy/image"
+import Link from "next/link"
 import { useRouter } from "next/router"
+import { useCallback, useMemo } from "react"
+import { placeholderBanner } from "../../../../constants/images"
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
+import { sxStyles } from "../../../../types/commonTypes"
+import DateUtil from "../../../../util/DateUtil"
+import { getRelevantHosts } from "../../../../util/streamUtil"
+import useIsMobile from "../../../custom-hook/useIsMobile"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import { buildDialogLink } from "../../livestream-dialog"
+import { useCompanyPage } from "../index"
 
 const styles = sxStyles({
    wrapper: {
@@ -85,15 +85,10 @@ const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
    const router = useRouter()
    const { editMode, group } = useCompanyPage()
    const isMobile = useIsMobile()
-   const { userData } = useAuth()
    const firebaseService = useFirebaseService()
 
    const eventPresenter = LivestreamPresenter.createFromDocument(event)
-   const isRegistered = useMemo(
-      () => eventPresenter.isUserRegistered(userData?.userEmail),
-      [eventPresenter, userData?.userEmail]
-   )
-
+   const isRegistered = useUserIsRegistered(eventPresenter.id)
    const handleRegisterClick = useCallback(async () => {
       const newHosts = await firebaseService.getCareerCentersByGroupId(
          event?.groupIds || []
