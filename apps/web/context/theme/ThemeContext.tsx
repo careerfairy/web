@@ -1,4 +1,10 @@
-import React, {
+import { CssBaseline, PaletteMode } from "@mui/material"
+import { responsiveFontSizes, ThemeProvider } from "@mui/material/styles"
+import { DefaultTheme } from "@mui/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import { useRouter } from "next/router"
+import { SnackbarProvider } from "notistack"
+import {
    createContext,
    ReactNode,
    useCallback,
@@ -8,13 +14,7 @@ import React, {
    useState,
 } from "react"
 import { brandedDarkTheme, brandedLightTheme } from "../../materialUI"
-import { responsiveFontSizes, ThemeProvider } from "@mui/material/styles"
-import { SnackbarProvider } from "notistack"
-import { useRouter } from "next/router"
-import { CssBaseline, PaletteMode } from "@mui/material"
-import makeStyles from "@mui/styles/makeStyles"
 import { dataLayerEvent } from "../../util/analyticsUtils"
-import { DefaultTheme } from "@mui/styles"
 
 type ThemeContextType = {
    toggleTheme: () => void
@@ -86,7 +86,10 @@ const ThemeProviderWrapper = ({
 
    const classes = useStyles()
 
-   if (pathname === "/next-livestreams/embed") {
+   if (
+      pathname === "/next-livestreams/embed" ||
+      pathname === "/next-livestreams/partnership/:partnerSource"
+   ) {
       theme.palette.background.default = "transparent"
    }
 
