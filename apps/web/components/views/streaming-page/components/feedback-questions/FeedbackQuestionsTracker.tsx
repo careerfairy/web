@@ -1,7 +1,6 @@
 import { useFeedbackQuestions } from "components/views/group/admin/events/detail/form/views/questions/useFeedbackQuestions"
 import { useCallback, useEffect, useState } from "react"
 
-import { Slide, SlideProps, Snackbar, SnackbarContent } from "@mui/material"
 import { EventRatingWithType } from "components/views/group/admin/events/detail/form/views/questions/commons"
 import { livestreamService } from "data/firebase/LivestreamService"
 import {
@@ -10,37 +9,20 @@ import {
    useIsRecordingWindow,
    useStartedAt,
 } from "store/selectors/streamingAppSelectors"
-import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import DateUtil from "util/DateUtil"
 import { useStreamingContext } from "../../context"
-import { FeedbackQuestionCard } from "./FeedbackQuestionCard"
+import { FeedbackQuestionSnackbarCard } from "../snackbar-notifications/FeedbackQuestionSnackbarCard"
+import {
+   SnackbarNotificationType,
+   useSnackbarNotifications,
+} from "../snackbar-notifications/SnackbarNotificationsProvider"
 
-const styles = sxStyles({
-   dialog: {
-      display: "inline-flex",
-      padding: 2,
-      flexDirection: "column",
-      alignItems: "flex-start",
-      gap: 1.5,
-      width: "352px",
-      borderRadius: "12px",
-      background: "white",
-      boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
-      color: (theme) => theme.palette.neutral[900],
-      "& .MuiSnackbarContent-message": {
-         padding: 0,
-         width: "100%",
-      },
-   },
-})
+export type FeedbackQuestion = EventRatingWithType & { answered: boolean }
 
-type FeedbackQuestion = EventRatingWithType & { answered: boolean }
-
-export const FeedbackQuestions = () => {
+export const FeedbackQuestionsTracker = () => {
    const { livestreamId } = useStreamingContext()
    const isRecordingWindow = useIsRecordingWindow()
-
    const { feedbackQuestions } = useFeedbackQuestions(
       livestreamId,
       "livestreams"
@@ -67,22 +49,16 @@ export const FeedbackQuestionsComponent = ({
    const startedAt = useStartedAt()
    const hasStarted = useHasStarted()
    const hasEnded = useHasEnded()
-   const [open, setOpen] = useState<boolean>(false)
+   const { queueNotification, removeNotification, clearNotifications } =
+      useSnackbarNotifications()
+
    const [minutesPassed, setMinutesPassed] = useState(
       hasStarted ? DateUtil.getMinutesPassed(new Date(startedAt)) : 0
    )
-   /** The queue of questions that will show up to the user
-    * Using a Map disregards duplicates, and the object indirection
-    * avoids recreating a new Map at every set state */
-   const [activeQuestions, setActiveQuestions] = useState<{
-      questions: Map<FeedbackQuestion["id"], FeedbackQuestion>
-   }>({ questions: new Map() })
 
    /** The local answers data to avoid too many fetch requests */
    const [feedbackQuestionsData, setFeedbackQuestionsData] =
       useState<FeedbackQuestion[]>(feedbackQuestions)
-
-   const [firstActiveQuestion] = activeQuestions.questions.values()
 
    const getQuestionIndex = useCallback(
       (question: FeedbackQuestion) => {
@@ -93,7 +69,7 @@ export const FeedbackQuestionsComponent = ({
       [feedbackQuestionsData]
    )
 
-   const markAsAnswered = useCallback(
+   const saveAnswerData = useCallback(
       (question: FeedbackQuestion) => {
          const questionIndex = getQuestionIndex(question)
          const newQuestionsData = [...feedbackQuestionsData]
@@ -105,14 +81,10 @@ export const FeedbackQuestionsComponent = ({
 
    const handleAnswer = useCallback(
       (question: FeedbackQuestion) => {
-         if (activeQuestions.questions.size == 1) setOpen(false)
-         setActiveQuestions((prev) => {
-            prev.questions.delete(question.id)
-            return { questions: prev.questions }
-         })
-         markAsAnswered(question)
+         removeNotification(question.id)
+         saveAnswerData(question)
       },
-      [activeQuestions, markAsAnswered]
+      [removeNotification, saveAnswerData]
    )
 
    const questionShouldBeActive = useCallback(
@@ -132,7 +104,7 @@ export const FeedbackQuestionsComponent = ({
                      )
 
                   // Save answer data to avoid fetching it again
-                  markAsAnswered(question)
+                  saveAnswerData(question)
 
                   return !hasAnswered
                } catch (error) {
@@ -146,34 +118,39 @@ export const FeedbackQuestionsComponent = ({
          }
          return false
       },
-      [livestreamId, agoraUserId, minutesPassed, markAsAnswered, hasEnded]
-   )
-
-   const isAlreadyActive = useCallback(
-      (question: FeedbackQuestion) => {
-         return activeQuestions.questions.has(question.id)
-      },
-      [activeQuestions]
+      [livestreamId, agoraUserId, minutesPassed, saveAnswerData, hasEnded]
    )
 
    const checkFeedbackQuestions = useCallback(() => {
       feedbackQuestionsData.forEach(async (question: FeedbackQuestion) => {
          const shouldActivate = await questionShouldBeActive(question)
-         if (shouldActivate && !isAlreadyActive(question)) {
-            setActiveQuestions((prev) => {
-               prev.questions.set(question.id, question)
-               return { questions: prev.questions }
+         if (shouldActivate) {
+            queueNotification({
+               id: question.id,
+               type: SnackbarNotificationType.FEEDBACK_QUESTION,
+               notification: (
+                  <FeedbackQuestionSnackbarCard
+                     question={question}
+                     questionNumber={getQuestionIndex(question) + 1}
+                     onAnswer={handleAnswer}
+                  />
+               ),
             })
-            setOpen(true)
          }
       })
-   }, [feedbackQuestionsData, isAlreadyActive, questionShouldBeActive])
+   }, [
+      feedbackQuestionsData,
+      questionShouldBeActive,
+      handleAnswer,
+      queueNotification,
+      getQuestionIndex,
+   ])
 
    useEffect(() => {
       // listen for changes in questions mid live stream
       setFeedbackQuestionsData(feedbackQuestions)
-      setActiveQuestions({ questions: new Map() })
-   }, [feedbackQuestions])
+      clearNotifications()
+   }, [feedbackQuestions, clearNotifications])
 
    useEffect(() => {
       if (hasStarted && startedAt) {
@@ -193,24 +170,5 @@ export const FeedbackQuestionsComponent = ({
       }
    }, [minutesPassed, checkFeedbackQuestions, hasEnded])
 
-   return (
-      <Snackbar open={open} TransitionComponent={SlideTransition}>
-         <SnackbarContent
-            sx={styles.dialog}
-            message={
-               firstActiveQuestion ? (
-                  <FeedbackQuestionCard
-                     question={firstActiveQuestion}
-                     questionNumber={getQuestionIndex(firstActiveQuestion) + 1}
-                     onAnswer={handleAnswer}
-                  />
-               ) : null
-            }
-         />
-      </Snackbar>
-   )
-}
-
-function SlideTransition(props: SlideProps) {
-   return <Slide {...props} direction="up" />
+   return null
 }
