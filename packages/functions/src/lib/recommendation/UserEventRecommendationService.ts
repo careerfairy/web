@@ -13,6 +13,7 @@ import {
    handlePromisesAllSettled,
    sortRankedByPoints,
 } from "@careerfairy/shared-lib/recommendation/utils"
+import { filterRegisteredLiveStreams } from "../livestream"
 import { IRecommendationDataFetcher } from "./services/DataFetcherRecommendations"
 import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
 
@@ -112,8 +113,9 @@ export default class UserEventRecommendationService
       limit = 10
    ): Promise<RankedLivestreamEvent[]> {
       // Get only the events the user has previously registered
-      const livestreamsUserRegistered = this.pastLivestreams.filter((s) =>
-         s.registeredUsers?.includes(this.user?.userEmail)
+      const livestreamsUserRegistered = await filterRegisteredLiveStreams(
+         this.pastLivestreams,
+         this.user?.userEmail
       )
 
       const livestreamBasedRecommendations =

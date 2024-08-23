@@ -1,3 +1,4 @@
+import { sortCustomJobs } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useMemo } from "react"
 import useGroupCustomJobs from "../custom-job/useGroupCustomJobs"
 import useLivestreamJobs from "../useLivestreamJobs"
@@ -14,8 +15,13 @@ export const useCombinedJobs = (
       livestreamId: livestreamId,
    })
 
+   const sortedJobs = useMemo(
+      () => sortCustomJobs(livestreamCustomJobs),
+      [livestreamCustomJobs]
+   )
+
    return useMemo(
-      () => (atsJobs.length ? atsJobs : livestreamCustomJobs || []),
-      [atsJobs, livestreamCustomJobs]
+      () => (atsJobs.length ? atsJobs : sortedJobs || []),
+      [atsJobs, sortedJobs]
    )
 }

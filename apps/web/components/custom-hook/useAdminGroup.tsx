@@ -1,24 +1,15 @@
-import { useEffect, useMemo } from "react"
-import { useFirestoreConnect } from "react-redux-firebase"
-import { CAREER_CENTER_COLLECTION } from "../util/constants"
-import { shallowEqual, useDispatch, useSelector } from "react-redux"
-import * as actions from "store/actions"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
+import { useMemo } from "react"
+import { shallowEqual, useSelector } from "react-redux"
+import { useFirestoreConnect } from "react-redux-firebase"
+import { CAREER_CENTER_COLLECTION } from "../util/constants"
 
 const useAdminGroup = (
    groupId: string
 ): { group: Group; stats: GroupStats } => {
-   const dispatch = useDispatch()
-
-   useEffect(() => {
-      return () => {
-         dispatch(actions.clearUserDataSet())
-      }
-   }, [dispatch])
-
    const queries = useMemo(() => {
-      let queriesArray = []
+      const queriesArray = []
       if (groupId) {
          queriesArray.push(
             ...[

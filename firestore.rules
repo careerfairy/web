@@ -209,9 +209,17 @@ service cloud.firestore {
                 return careerCenter in request.auth.token.adminGroups.keys();
             }
 
-            match /creators/{creatorEmail} {
-                allow read: if true;
-                allow write: if isCareerCenterAdmin() || isCFAdmin();
+            match /creators/{creatorId} {
+               allow read: if true;
+               allow write: if isCareerCenterAdmin() || isCFAdmin();
+
+               match /statPageView/{visitorId} {
+                  allow read; allow write;
+               }
+
+               match /statLinkedInReach/{visitorId} {
+                  allow read; allow write;
+               }
             }
 
             match /ats/{integrationId} {
@@ -320,7 +328,7 @@ service cloud.firestore {
 
             // signed in users can update certain fields
             //            function publicFieldsUsersCanUpdate() {
-            //                let allowedFields = ['participatingStudents', 'registeredUsers', 'talentPool', 'screenSharerId'];
+            //                let allowedFields = ['participatingStudents', 'talentPool', 'screenSharerId'];
             //                let diff = request.resource.data.diff(resource.data);
             //                return isSignedIn() && diff.affectedKeys().hasAny(allowedFields);
             //            }
@@ -474,6 +482,10 @@ service cloud.firestore {
                     allow read: if true;
                     allow write: if true;
                 }
+                match /usersWhoInteracted/{userWhoInteracted} {
+                    allow read: if true;
+                    allow write: if true;
+                }
 
             }
             match /promotions/promotions {
@@ -536,6 +548,10 @@ service cloud.firestore {
                     allow write: if true;
                 }
 
+                match /usersWhoInteracted/{userWhoInteracted} {
+                    allow read: if true;
+                    allow write: if true;
+                }
             }
 
             match /questions/{question} {
@@ -648,6 +664,11 @@ service cloud.firestore {
             // Should be isSignedInAndIsSameUser(userId) but we can't 
             // access the userId as we don't have proper auth in the server 
             // fix would be to use admin sdk on the server side
+            allow read: if true;
+        }
+
+         // Livestream -> User CTA interactions query
+        match /{somePath=**}/usersWhoInteracted/{userId} {
             allow read: if true;
         }
 

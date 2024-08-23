@@ -1,18 +1,11 @@
-import React, { FC, useMemo } from "react"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
-import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
-import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
 import { Box, Button, Stack, Typography } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
-import Heading from "../common/Heading"
+import useRegisteredStreams from "components/custom-hook/useRegisteredStreams"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-
-const config = {
-   suspense: false,
-   initialData: [],
-}
+import { FC } from "react"
+import { sxStyles } from "types/commonTypes"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import Heading from "../common/Heading"
+import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
 
 const slideSpacing = 21
 
@@ -164,21 +157,9 @@ const styles = sxStyles({
       pb: 1,
    },
 })
-const MyNextEvents = ({ limit }: Props) => {
+const MyNextEvents = () => {
    const { authenticatedUser } = useAuth()
-   const registeredEventsQuery = useMemo(() => {
-      return livestreamRepo.registeredEventsQuery(
-         authenticatedUser.email,
-         limit
-      )
-   }, [authenticatedUser.email, limit])
-
-   const { data: events, status } = useFirestoreCollection<LivestreamEvent>(
-      registeredEventsQuery,
-      config
-   )
-
-   const isLoading = status === "loading"
+   const { data: registeredStreams, isLoading } = useRegisteredStreams()
 
    if (!authenticatedUser.email) {
       return null
@@ -186,19 +167,19 @@ const MyNextEvents = ({ limit }: Props) => {
    return (
       <Box
          sx={[
-            events?.length > 0 ? null : styles.boxContainerEmpty,
+            registeredStreams?.length > 0 ? null : styles.boxContainerEmpty,
             styles.boxContainer,
          ]}
       >
          <ConditionalWrapper
-            condition={Boolean(events?.length)}
+            condition={Boolean(registeredStreams?.length)}
             fallback={<EmptyRegistrationsBanner></EmptyRegistrationsBanner>}
          >
             <EventsPreviewCarousel
                id={"my-next-events"}
                type={EventsTypes.MY_NEXT}
-               events={events}
-               isEmpty={Boolean(!isLoading && !events.length)}
+               events={registeredStreams}
+               isEmpty={Boolean(!isLoading && !registeredStreams?.length)}
                title={MY_NEXT_EVENTS_TITLE}
                loading={isLoading}
                seeMoreLink="/next-livestreams/my-registrations"
@@ -210,7 +191,7 @@ const MyNextEvents = ({ limit }: Props) => {
                   slide: styles.slide,
                   viewportSx: styles.viewportSx,
                   title:
-                     events?.length > 0
+                     registeredStreams?.length > 0
                         ? styles.eventTitle
                         : styles.eventTitleEmpty,
                   eventsHeader: styles.eventsHeader,
@@ -275,9 +256,7 @@ const EmptyRegistrationsBanner: FC = () => {
       </Box>
    )
 }
+
 export const MY_NEXT_EVENTS_TITLE = "My registrations"
-type Props = {
-   limit?: number
-}
 
 export default MyNextEvents

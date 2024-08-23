@@ -1,18 +1,20 @@
-import React, { FC } from "react"
 import { Skeleton, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
+import { useLivestreamUsersCount } from "components/custom-hook/live-stream/useLivestreamUsersCount"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
+import React, { FC } from "react"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import Link from "../../../../common/Link"
-import Box from "@mui/material/Box"
 import ActionButtonProvider, {
    ActionButtonContextType,
    useActionButtonContext,
 } from "./ActionButtonProvider"
-import styles from "./Styles"
-import SignUpToWatchButton from "./SignUpToWatchButton"
-import WatchNowButton from "./WatchNowButton"
 import BuyRecordingButton from "./BuyRecordingButton"
 import NotEnoughCreditsButton from "./NotEnoughCreditsButton"
 import RegisterButton from "./RegisterButton"
+import SignUpToWatchButton from "./SignUpToWatchButton"
+import styles from "./Styles"
+import WatchNowButton from "./WatchNowButton"
 
 const ActionButton: FC<ActionButtonContextType> = (props) => {
    return (
@@ -26,11 +28,15 @@ const ButtonElement: FC = () => {
    const { livestreamPresenter, userEmailFromServer, canWatchRecording } =
       useActionButtonContext()
 
-   const { authenticatedUser, isLoggedIn, userData, isLoggedOut } = useAuth()
+   const { isLoggedIn, userData, isLoggedOut } = useAuth()
 
-   const registered = livestreamPresenter.isUserRegistered(
-      authenticatedUser.email || userEmailFromServer
+   const registered = useUserIsRegistered(livestreamPresenter.id)
+   const { count } = useLivestreamUsersCount(
+      livestreamPresenter.id,
+      "registered"
    )
+
+   const registeredUsersCount = count || 0
 
    if (livestreamPresenter.isPast()) {
       if (livestreamPresenter.denyRecordingAccess) {
@@ -77,7 +83,7 @@ const ButtonElement: FC = () => {
       return <RegisterButton label="You're registered" />
    }
 
-   if (livestreamPresenter.hasNoSpotsLeft()) {
+   if (livestreamPresenter.hasNoSpotsLeft(registeredUsersCount)) {
       return <RegisterButton label="No spots left" />
    }
 

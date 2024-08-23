@@ -13,6 +13,8 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
+import { usePartnership } from "HOCs/PartnershipProvider"
+import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
    getMaxLineStyles,
    getResizedUrl,
@@ -29,6 +31,7 @@ import React, {
    useMemo,
    useState,
 } from "react"
+import { useInView } from "react-intersection-observer"
 import { checkIfPast } from "util/streamUtil"
 import { placeholderBanner } from "../../../../constants/images"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
@@ -110,6 +113,14 @@ const styles = sxStyles({
       borderRadius: (theme) => theme.spacing(2),
       boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
+   },
+   selectedWrapper: {
+      opacity: 0.5,
+      backgroundImage: (theme) =>
+         `linear-gradient(0deg, ${alpha(
+            theme.palette.common.black,
+            0.2
+         )}, ${alpha(theme.palette.common.black, 0.1)})`,
    },
    mainContentWrapper: {
       position: "relative",
@@ -222,7 +233,10 @@ type EventPreviewCardProps = {
    disableClick?: boolean
    /* Overrides the default Link click behavior of the card */
    onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
+   selectInput?: React.ReactNode
+   selected?: boolean
 }
+
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (
       {
@@ -237,9 +251,19 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          hideChipLabels,
          disableClick,
          onCardClick,
+         selectInput,
+         selected,
       }: EventPreviewCardProps,
       ref
    ) => {
+      const { inView: cardInView, ref: cardInViewRef } = useInView({
+         fallbackInView: true,
+      })
+
+      const hasRegistered = useUserIsRegistered(event?.id, {
+         disabled: !cardInView, // Helps Reduce the number of listeners
+      })
+
       const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
       const trackImpressionsRef = useTrackLivestreamImpressions({
@@ -254,6 +278,16 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const { pathname } = router
       const { authenticatedUser, isLoggedIn } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
+      const [targetValue, setTargetValue] = useState<string | undefined>(
+         undefined
+      )
+      const { getPartnerEventLink } = usePartnership()
+
+      useEffect(() => {
+         // This code only runs on the client side
+         // It's safe to call isInIframe() here because window is available
+         setTargetValue(isInIframe() ? "_blank" : undefined)
+      }, [])
 
       const isOnMarketingLandingPage = pathname.includes(
          MARKETING_LANDING_PAGE_PATH
@@ -265,14 +299,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          () => (event ? LivestreamPresenter.createFromDocument(event) : null),
          [event]
       )
-
-      const hasRegistered = useMemo<boolean>(() => {
-         if (loading) return false
-
-         return Boolean(
-            event?.registeredUsers?.includes(authenticatedUser?.email)
-         )
-      }, [loading, event?.registeredUsers, authenticatedUser?.email])
 
       const hasParticipated = useMemo<boolean>(() => {
          if (loading) return false
@@ -290,9 +316,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       const getRecordingAvailableDays = useMemo<number | null>(() => {
          if (isPast && isLoggedIn && presenterEvent) {
-            if (
-               presenterEvent.isAbleToShowRecording(authenticatedUser?.email)
-            ) {
+            if (presenterEvent.isAbleToShowRecording(hasRegistered)) {
                const timeLeft = DateUtil.calculateTimeLeft(
                   presenterEvent.recordingAccessTimeLeft()
                )
@@ -302,7 +326,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          }
 
          return null
-      }, [isPast, isLoggedIn, authenticatedUser?.email, presenterEvent])
+      }, [isPast, isLoggedIn, hasRegistered, presenterEvent])
 
       useEffect(() => {
          if (!loading) {
@@ -351,10 +375,15 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             }
          }
 
-         if (
-            presenterEvent.isLive() &&
-            presenterEvent.isUserRegistered(authenticatedUser.email)
-         ) {
+         // If the application is running in an iframe, open the link in a new tab with UTM tags
+         if (isInIframe()) {
+            return {
+               href: getPartnerEventLink(presenterEvent.id),
+               target: "_blank",
+            }
+         }
+
+         if (presenterEvent.isLive() && hasRegistered) {
             return {
                href: presenterEvent.getViewerEventRoomLink(),
             }
@@ -384,12 +413,14 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             target: isOnlivestreamDialogPage(pathname) ? undefined : "_blank",
          }
       }, [
-         authenticatedUser.email,
          presenterEvent,
+         hasRegistered,
+         router,
          isOnMarketingLandingPage,
+         authenticatedUser.email,
          marketingFormCompleted,
          pathname,
-         router,
+         getPartnerEventLink,
       ])
 
       const isLink = event && !onCardClick && !isPlaceholderEvent
@@ -399,8 +430,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       return (
          <>
             <Wrapper
-               {...(event ? linkProps : {})}
-               {...(event && {
+               {...(isLink ? linkProps : {})}
+               {...(isLink && {
                   // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
                   shallow: true,
                   passHref: true,
@@ -412,8 +443,11 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                <CardActionArea
                   component={isLink ? "a" : "div"}
                   sx={[event && styles.cursorPointer, styles.cardWrapper]}
-                  ref={trackImpressionsRef}
-                  target={isInIframe() ? "_blank" : undefined}
+                  ref={(e: HTMLDivElement | null) => {
+                     trackImpressionsRef(e)
+                     cardInViewRef(e)
+                  }}
+                  target={targetValue}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
                   disabled={disableClick}
@@ -423,10 +457,13 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      ref={ref}
                      sx={[
                         styles.mainAndLowerContentWrapper,
+                        selected && styles.selectedWrapper,
                         isLive && styles.cardIsLive,
                      ]}
                   >
                      <Box sx={styles.mainContentWrapper}>
+                        {selectInput || null}
+
                         <Box
                            className="backgroundImageWrapper"
                            sx={[

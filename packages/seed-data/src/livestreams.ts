@@ -54,6 +54,14 @@ interface LivestreamSeed {
    random(overrideFields?: Partial<LivestreamEvent>): LivestreamEvent
 
    /**
+    * Generate a random draft livestream event object, meaning it might not contain some
+    * mandatory fields.
+    *
+    * Does not save to the database, used to fill forms
+    */
+   randomDraft(overrideFields?: Partial<LivestreamEvent>): LivestreamEvent
+
+   /**
     * Make a user as registered/participated to the livestream
     * Updates his userLivestreamData
     */
@@ -90,14 +98,6 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       const livestreamRef = firestore
          .collection("livestreams")
          .doc(options.livestream.id)
-
-      if (options.registered) {
-         await livestreamRef.update({
-            registeredUsers: admin.firestore.FieldValue.arrayUnion(
-               options.user.userEmail
-            ),
-         })
-      }
 
       const userLivestreamDataRef = livestreamRef
          .collection("userLivestreamData")
@@ -241,12 +241,6 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       overrideFields?: Partial<LivestreamEvent>
    ): Promise<LivestreamEvent> {
       const batch = firestore.batch()
-      const registeredUsers = Array.from(
-         {
-            length: faker.datatype.number({ min: 0, max: 100 }),
-         },
-         () => faker.internet.email()
-      )
 
       const groupId = uuidv4()
 
@@ -259,7 +253,6 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
             email: faker.internet.email(),
             groupId: groupId,
          },
-         registeredUsers,
          groupIds: [groupId],
          hasEnded: false,
          ...overrideFields,
@@ -389,6 +382,8 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          type: "upcoming",
          universities: [],
          triGrams: livestreamTriGrams(title, company),
+         contentTopicsTagIds: ["ApplicationProcess"],
+         businessFunctionsTagIds: ["BusinessDevelopment", "Consulting"],
       }
 
       const overrideFieldsCopy = { ...overrideFields }
@@ -408,6 +403,16 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       return {
          ...data,
          ...overrideFieldsCopy,
+      }
+   }
+
+   randomDraft(overrideFields?: Partial<LivestreamEvent>): LivestreamEvent {
+      const randomEvent = this.random(overrideFields)
+      return {
+         ...randomEvent,
+         isDraft: true,
+         contentTopicsTagIds: [],
+         summary: "",
       }
    }
 }

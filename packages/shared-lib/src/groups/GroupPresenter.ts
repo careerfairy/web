@@ -1,3 +1,10 @@
+import { ImageType } from "../commonTypes"
+import { IFeatureFlagsConsumer } from "../feature-flags/IFeatureFlagsConsumer"
+import { FeatureFlagsState } from "../feature-flags/types"
+import { toDate } from "../firebaseTypes"
+import { UserData } from "../users"
+import { IMAGE_CONSTANTS } from "../utils/image"
+import { GroupATSAccount } from "./GroupATSAccount"
 import {
    Group,
    GroupOption,
@@ -9,16 +16,11 @@ import {
    GroupVideo,
    Testimonial,
 } from "./groups"
-import { GroupATSAccount } from "./GroupATSAccount"
-import { UserData } from "../users"
-import { IMAGE_CONSTANTS } from "../utils/image"
-import { ImageType } from "../commonTypes"
 import {
    PLAN_CONSTANTS,
    PlanConstants,
    getPlanConstants,
 } from "./planConstants"
-import { toDate } from "../firebaseTypes"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
@@ -48,9 +50,11 @@ export const LOGO_IMAGE_SPECS = {
    allowedFormats: IMAGE_CONSTANTS.allowedFormats,
 }
 
-export class GroupPresenter {
+export class GroupPresenter implements IFeatureFlagsConsumer {
    public atsAccounts: GroupATSAccount[]
    public hasLivestream: boolean
+   public featureFlags: FeatureFlagsState
+   public hasMentors: boolean
 
    constructor(
       public readonly id: string,
@@ -78,6 +82,10 @@ export class GroupPresenter {
          startedAt: Date | null
       } | null
    ) {}
+
+   setFeatureFlags(featureFlags: FeatureFlagsState): void {
+      this.featureFlags = featureFlags
+   }
 
    setAtsAccounts(accounts: GroupATSAccount[]) {
       this.atsAccounts = accounts
@@ -152,6 +160,11 @@ export class GroupPresenter {
    setHasLivestream(hasLivestream: boolean) {
       this.hasLivestream = hasLivestream
    }
+
+   setHasMentor(hasMentors: boolean) {
+      this.hasMentors = hasMentors
+   }
+
    companyPageIsReady() {
       return this.getCompanyPageSteps()
          .filter((action) => action.isInitial)
@@ -179,7 +192,7 @@ export class GroupPresenter {
 
       return [
          {
-            label: "Add company logo and banner",
+            label: "Add company logo and banner (recommended size: 2880x57px)",
             checkIsComplete: () => Boolean(this.logoUrl && this.bannerImageUrl),
             isInitial: true,
             section: "banner",
@@ -208,12 +221,23 @@ export class GroupPresenter {
             isInitial: false,
             section: "videos",
          },
-         {
-            label: "Share an employee’s story",
-            checkIsComplete: () => this.testimonials.length > 0,
-            isInitial: false,
-            section: "testimonials",
-         },
+         ...(this.featureFlags?.mentorsV1
+            ? [
+                 {
+                    label: "Add a mentor",
+                    checkIsComplete: () => this.hasMentors,
+                    isInitial: false,
+                    section: "mentors",
+                 },
+              ]
+            : [
+                 {
+                    label: "Share an employee’s story",
+                    checkIsComplete: () => this.testimonials.length > 0,
+                    isInitial: false,
+                    section: "testimonials",
+                 },
+              ]),
          {
             label: "Create a live stream",
             checkIsComplete: () => this.hasLivestream,

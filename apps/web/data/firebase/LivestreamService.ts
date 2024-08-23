@@ -6,13 +6,16 @@ import {
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
 import {
+   CreateLivestreamCTARequest,
    CreateLivestreamPollRequest,
+   DeleteLivestreamCTARequest,
    DeleteLivestreamChatEntryRequest,
    DeleteLivestreamPollRequest,
    EmoteType,
    EventRatingAnswer,
    FeedbackQuestionUserAnswer,
-   FilterLivestreamsOptions,
+   LivestreamCTA,
+   LivestreamCTAUserInteraction,
    CategoryDataOption as LivestreamCategoryDataOption,
    LivestreamChatEntry,
    LivestreamEmote,
@@ -21,7 +24,6 @@ import {
    LivestreamModes,
    LivestreamPollVoter,
    LivestreamPresentation,
-   LivestreamQueryOptions,
    LivestreamQuestion,
    LivestreamQuestionComment,
    LivestreamVideo,
@@ -31,7 +33,9 @@ import {
    ResetLivestreamQuestionRequest,
    Speaker,
    StreamerDetails,
+   ToggleActiveCTARequest,
    ToggleHandRaiseRequest,
+   UpdateLivestreamCTARequest,
    UpdateLivestreamPollRequest,
    UpsertSpeakerRequest,
    UserLivestreamData,
@@ -71,7 +75,6 @@ import {
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
 
@@ -96,27 +99,6 @@ export type SetModeOptionsType<Mode extends LivestreamMode> =
 
 export class LivestreamService {
    constructor(private readonly functions: Functions) {}
-
-   /**
-    * Fetches livestreams with the given query options
-    * @param data  The query options
-    * */
-   async fetchLivestreams(
-      data: LivestreamQueryOptions & FilterLivestreamsOptions
-   ) {
-      const { data: serializedLivestreams } = await httpsCallable<
-         typeof data,
-         {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            [field: string]: any
-         }[]
-      >(
-         this.functions,
-         "fetchLivestreams_v2"
-      )(data)
-
-      return mapFromServerSide(serializedLivestreams)
-   }
 
    /**
     * Validates category data for a live stream, determining if a certain user as answered and performed all steps
@@ -166,10 +148,10 @@ export class LivestreamService {
 
             // The user might have answered all the questions but not registered to the event,
             // so we check if the user has registered to the event
-            const hasRegisteredToEvent =
-               currentLivestream?.registeredUsers?.includes?.(
-                  userData.userEmail
-               )
+            const hasRegisteredToEvent = await this.hasUserRegistered(
+               currentLivestream.id,
+               userData.userEmail
+            )
 
             if (
                !hasAnsweredAllQuestions || // if the user has not answered all the event questions
@@ -237,7 +219,7 @@ export class LivestreamService {
          return {
             firstName: data.firstName || "",
             lastName: data.lastName || "",
-            role: data.position || data.fieldOfStudy.name || "",
+            role: data.position || (data.fieldOfStudy?.name ?? "") || "Other",
             avatarUrl: data.avatar || "",
             linkedInUrl: data.linkedinUrl || "",
          }
@@ -1232,6 +1214,190 @@ export class LivestreamService {
          this.functions,
          "upsertLivestreamSpeaker"
       )(data)
+   }
+
+   /**
+    * Fetches recommended live stream events for a user.
+    * @param {number} limit - Maximum number of events to fetch.
+    * @param {string} userId - ID of the user to get recommendations for.
+    * @returns Array of recommended live stream events.
+    *
+    * Filters out:
+    * 1. Events the user is already registered for.
+    * 2. Events that have already ended.
+    */
+   async getRecommendedEvents(limit: number, userId: string) {
+      const { data: eventIds } = await httpsCallable<
+         { limit: number },
+         string[]
+      >(
+         this.functions,
+         "getRecommendedEvents_v4"
+      )({ limit })
+
+      const recommendedLivestreams: LivestreamEvent[] = []
+
+      for (const eventId of eventIds) {
+         const isUserRegistered = await this.hasUserRegistered(eventId, userId)
+         // If the user is registered, we don't want to show them the event
+         if (isUserRegistered) continue
+
+         const eventSnap = await getDoc(this.getLivestreamRef(eventId))
+         const livestream = eventSnap.data()
+
+         // If the event has ended, we don't want to show it
+         if (livestream.hasEnded) continue
+
+         recommendedLivestreams.push(livestream)
+      }
+
+      return recommendedLivestreams
+   }
+
+   async hasUserRegistered(livestreamId: string, userId: string) {
+      if (!userId || !livestreamId) return false
+
+      const registeredRef = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "userLivestreamData",
+         userId
+      ).withConverter(createGenericConverter<UserLivestreamData>())
+
+      const registeredSnap = await getDoc(registeredRef)
+
+      return Boolean(registeredSnap.data()?.registered?.date)
+   }
+
+   createCTA = async (options: CreateLivestreamCTARequest) => {
+      await httpsCallable<CreateLivestreamCTARequest>(
+         this.functions,
+         "createCTA"
+      )(options)
+      return
+   }
+
+   updateCTA = async (options: UpdateLivestreamCTARequest) => {
+      await httpsCallable<UpdateLivestreamCTARequest>(
+         this.functions,
+         "updateCTA"
+      )(options)
+      return
+   }
+
+   deleteCTA = async (options: DeleteLivestreamCTARequest) => {
+      await httpsCallable<DeleteLivestreamCTARequest>(
+         this.functions,
+         "deleteCTA"
+      )(options)
+      return
+   }
+
+   toggleActiveCTA = async (options: ToggleActiveCTARequest) => {
+      await httpsCallable<ToggleActiveCTARequest>(
+         this.functions,
+         "toggleActiveCTA"
+      )(options)
+      return
+   }
+
+   getCTARef = (livestreamId: string, ctaId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "callToActions",
+         ctaId
+      ).withConverter(createGenericConverter<LivestreamCTA>())
+   }
+
+   getUserCTARef = (livestreamId: string, ctaId: string, userId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "callToActions",
+         ctaId,
+         "usersWhoInteracted",
+         userId
+      ).withConverter(createGenericConverter<LivestreamCTAUserInteraction>())
+   }
+
+   clickCTA = async (
+      livestreamId: string,
+      ctaId: string,
+      userIdentifier: string
+   ) => {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const ctaRef = this.getCTARef(livestreamId, ctaId)
+         const userRef = this.getUserCTARef(livestreamId, ctaId, userIdentifier)
+
+         transaction.set(
+            userRef,
+            {
+               ctaId: ctaId,
+               livestreamId: livestreamId,
+               userId: userIdentifier,
+               numberOfClicks: increment(1),
+               clickedAt: arrayUnion({
+                  timestamp: Timestamp.now(),
+               }),
+            },
+            { merge: true }
+         )
+
+         transaction.update(ctaRef, {
+            numberOfUsersWhoClickedLink: increment(1),
+         })
+      })
+   }
+
+   dismissCTA = async (
+      livestreamId: string,
+      ctaId: string,
+      userIdentifier: string
+   ) => {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const ctaRef = this.getCTARef(livestreamId, ctaId)
+         const userRef = this.getUserCTARef(livestreamId, ctaId, userIdentifier)
+
+         transaction.set(
+            userRef,
+            {
+               userId: userIdentifier,
+               ctaId: ctaId,
+               livestreamId: livestreamId,
+               dismissedAt: Timestamp.now(),
+            },
+            { merge: true }
+         )
+
+         transaction.update(ctaRef, {
+            numberOfUsersWhoDismissed: increment(1),
+         })
+      })
+   }
+
+   markCTAAsRead = async (
+      livestreamId: string,
+      userIdentifier: string,
+      ctaIds: string[]
+   ) => {
+      ctaIds.forEach((ctaId) => {
+         const userRef = this.getUserCTARef(livestreamId, ctaId, userIdentifier)
+
+         setDoc(
+            userRef,
+            {
+               userId: userIdentifier,
+               ctaId: ctaId,
+               livestreamId: livestreamId,
+               readAt: Timestamp.now(),
+            },
+            { merge: true }
+         )
+      })
    }
 }
 

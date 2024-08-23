@@ -5,6 +5,7 @@ import { ReactNode } from "react"
 import { useIsSpyMode } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context/Streaming"
+import { CallsToActionButton } from "./CallsToActionButton"
 import { CheckJobsButton } from "./CheckJobsButton"
 import { CompanyButton } from "./CompanyButton"
 import { ConnectionStatus } from "./ConnectionStatus"
@@ -82,7 +83,7 @@ const ViewerView = () => {
          <MarginBox>
             <ViewCount />
          </MarginBox>
-         {/* <CallToActionsButton /> */}
+         <CallsToActionButton />
          {shouldStream ? <ConnectionStatus /> : null}
          <CompanyButton />
          <CheckJobsButton />
