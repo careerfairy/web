@@ -25,6 +25,7 @@ export const ActiveViews = {
    CTA: "cta",
    HAND_RAISE: "handRaise",
    VIEWERS: "viewers",
+   HELP: "help",
 } as const
 
 export const StreamLayouts = {
