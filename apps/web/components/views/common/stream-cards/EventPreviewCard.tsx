@@ -13,6 +13,7 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
+import { usePartnership } from "HOCs/PartnershipProvider"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
    getMaxLineStyles,
@@ -277,6 +278,16 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const { pathname } = router
       const { authenticatedUser, isLoggedIn } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
+      const [targetValue, setTargetValue] = useState<string | undefined>(
+         undefined
+      )
+      const { getPartnerEventLink } = usePartnership()
+
+      useEffect(() => {
+         // This code only runs on the client side
+         // It's safe to call isInIframe() here because window is available
+         setTargetValue(isInIframe() ? "_blank" : undefined)
+      }, [])
 
       const isOnMarketingLandingPage = pathname.includes(
          MARKETING_LANDING_PAGE_PATH
@@ -364,6 +375,14 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             }
          }
 
+         // If the application is running in an iframe, open the link in a new tab with UTM tags
+         if (isInIframe()) {
+            return {
+               href: getPartnerEventLink(presenterEvent.id),
+               target: "_blank",
+            }
+         }
+
          if (presenterEvent.isLive() && hasRegistered) {
             return {
                href: presenterEvent.getViewerEventRoomLink(),
@@ -394,13 +413,14 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             target: isOnlivestreamDialogPage(pathname) ? undefined : "_blank",
          }
       }, [
-         authenticatedUser.email,
          presenterEvent,
+         hasRegistered,
+         router,
          isOnMarketingLandingPage,
+         authenticatedUser.email,
          marketingFormCompleted,
          pathname,
-         router,
-         hasRegistered,
+         getPartnerEventLink,
       ])
 
       const isLink = event && !onCardClick && !isPlaceholderEvent
@@ -427,7 +447,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      trackImpressionsRef(e)
                      cardInViewRef(e)
                   }}
-                  target={isInIframe() ? "_blank" : undefined}
+                  target={targetValue}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
                   disabled={disableClick}

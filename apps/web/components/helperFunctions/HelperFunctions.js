@@ -1,7 +1,6 @@
 import { isEmpty } from "lodash/fp"
-import React from "react"
-import { LONG_NUMBER } from "../util/constants"
 import { v4 as uuidv4 } from "uuid"
+import { LONG_NUMBER } from "../util/constants"
 
 var dayjs = require("dayjs")
 var relativeTime = require("dayjs/plugin/relativeTime")
@@ -162,8 +161,18 @@ export const isServer = () => {
    return typeof window === "undefined"
 }
 
-export const isInIframe = () =>
-   isServer() ? false : window.self !== window.top
+export const isInIframe = () => {
+  
+  if(isServer()) {
+   return false
+  }
+
+  try {
+      return window.self !== window.top
+   } catch (e) {
+      return true
+   }
+}
 
 export const convertCamelToSentence = (string) => {
    if (typeof string === "string" || string instanceof String) {
@@ -319,7 +328,7 @@ export const toTitleCase = (str) => {
 
 export const makeExternalLink = (url) => {
    const urlPattern = new RegExp(
-      /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
+      /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w-._~:/?#[\]@!$&'(),;=.]+$/
    )
    let string = url
 
