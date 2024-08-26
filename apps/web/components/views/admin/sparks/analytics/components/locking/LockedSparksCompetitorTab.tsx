@@ -1,10 +1,24 @@
-import useIsMobile from "components/custom-hook/useIsMobile"
-import LockedComponents from "./LockedComponents"
+import { Box, Stack } from "@mui/material"
+import { sxStyles } from "types/commonTypes"
+import { GroupSparkAnalyticsCardContainer } from "../GroupSparkAnalyticsCardContainer"
+import { SectionsWrapper } from "../SectionsWrapper"
+import { TitleWithSelect } from "../TitleWithSelect"
+import { MockedData } from "./locked-mocked-data"
+import { LockedComponentsModal } from "./LockedComponentsModal"
+import { MockedStaticSparkCard } from "./MockedStaticSparkCard"
 
-const lockedSparkAnalyticsDesktopImage =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-locked-background.png?alt=media&token=f724cb9e-1a8d-4891-a56c-432039935835"
-const lockedSparkAnalyticsMobileImage =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-locked-background-mobile.png?alt=media&token=22923a7d-9b9c-4eeb-90df-43e5624bac0e"
+const styles = sxStyles({
+   analyticsContainer: {
+      filter: "brightness(0.97) blur(5px)",
+   },
+   cardsContainer: {
+      flexDirection: {
+         xs: "column",
+         md: "row",
+      },
+      gap: 1.5,
+   },
+})
 
 const metrics = [
    "Benchmark Performance",
@@ -13,20 +27,51 @@ const metrics = [
 ]
 
 export const LockedSparksCompetitorTab = () => {
-   const isMobile = useIsMobile()
-
-   const src = isMobile
-      ? lockedSparkAnalyticsMobileImage
-      : lockedSparkAnalyticsDesktopImage
-
    return (
-      <LockedComponents>
-         <LockedComponents.PlaceholderImage src={src} />
-         <LockedComponents.Info
+      <>
+         <LockedComponentsModal
             title="Unlock competitor analytics"
             text="Upgrade to our premium plan to unlock in-depth competitor analytics and gain insights into how your company stacks up against the competition."
             metrics={metrics}
          />
-      </LockedComponents>
+         <Box sx={styles.analyticsContainer}>
+            <SectionsWrapper>
+               <GroupSparkAnalyticsCardContainer>
+                  <TitleWithSelect
+                     title="Top Sparks by industry:&nbsp;"
+                     selectedOption={"all"}
+                     setSelectedOption={() => null}
+                     options={[{ value: "all", label: "All Industries" }]}
+                  />
+                  <Stack sx={styles.cardsContainer}>
+                     {MockedData.industry.map((mockedSpark, index) => (
+                        <MockedStaticSparkCard
+                           key={`top-sparks-by-industry-all-${mockedSpark.spark.id}-${index}`}
+                           spark={mockedSpark.spark}
+                           stats={mockedSpark.stats}
+                        />
+                     ))}
+                  </Stack>
+               </GroupSparkAnalyticsCardContainer>
+               <GroupSparkAnalyticsCardContainer>
+                  <TitleWithSelect
+                     title="Top Sparks by industry:&nbsp;"
+                     selectedOption={"all"}
+                     setSelectedOption={() => null}
+                     options={[{ value: "all", label: "All Industries" }]}
+                  />
+                  <Stack sx={styles.cardsContainer}>
+                     {MockedData.audience.map((mockedSpark, index) => (
+                        <MockedStaticSparkCard
+                           key={`top-sparks-by-industry-all-${mockedSpark.spark.id}-${index}`}
+                           spark={mockedSpark.spark}
+                           stats={mockedSpark.stats}
+                        />
+                     ))}
+                  </Stack>
+               </GroupSparkAnalyticsCardContainer>
+            </SectionsWrapper>
+         </Box>
+      </>
    )
 }
