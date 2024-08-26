@@ -9,8 +9,7 @@ import {
    AnonymousJobApplication,
    CustomJob,
    CustomJobApplicant,
-   CustomJobContent,
-   JobApplicationContent,
+   JobApplicationContext,
    PublicCustomJob,
    getMaxDaysAfterDeadline,
 } from "./customJobs"
@@ -74,7 +73,7 @@ export interface ICustomJobRepository {
    applyUserToCustomJob(
       user: UserData,
       job: CustomJob,
-      linkedContent: JobApplicationContent
+      linkedContent: JobApplicationContext
    ): Promise<void>
 
    /**
@@ -88,8 +87,7 @@ export interface ICustomJobRepository {
    applyAnonymousUserToCustomJob(
       fingerPrintId: string,
       job: CustomJob,
-      contentId: string,
-      contentType: CustomJobContent
+      linkedContent: JobApplicationContext
    ): Promise<void>
 
    /**
@@ -316,7 +314,7 @@ export class FirebaseCustomJobRepository
    async applyUserToCustomJob(
       user: UserData,
       job: CustomJob,
-      linkedContent: JobApplicationContent
+      linkedContent: JobApplicationContext
    ): Promise<void> {
       const applicationId = this.getJobApplicationId(job.id, user.id)
 
@@ -342,8 +340,7 @@ export class FirebaseCustomJobRepository
    async applyAnonymousUserToCustomJob(
       fingerPrintId: string,
       job: CustomJob,
-      contentId: string,
-      contentType: CustomJobContent
+      linkedContent: JobApplicationContext
    ): Promise<void> {
       const anonApplicationId = this.getJobApplicationId(job.id, fingerPrintId)
 
@@ -352,10 +349,7 @@ export class FirebaseCustomJobRepository
          fingerPrintId: fingerPrintId,
          createdAt: this.fieldValue.serverTimestamp() as Timestamp,
          jobId: job.id,
-         linkedContent: {
-            type: contentType,
-            id: contentId,
-         },
+         linkedContent: linkedContent,
          applied: false,
          appliedAt: null,
          userId: null,

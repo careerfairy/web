@@ -1,4 +1,7 @@
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   JobApplicationContext,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    Button,
    CircularProgress,
@@ -76,14 +79,14 @@ const styles = sxStyles({
 type Props = {
    handleClose: () => void
    job: PublicCustomJob
-   livestreamId: string
+   applicationContext: JobApplicationContext
    autoApply?: boolean
    sx?: SxProps
 }
 const CustomJobApplyConfirmation = ({
    handleClose,
    job,
-   livestreamId,
+   applicationContext,
    autoApply,
    sx,
 }: Props) => {
@@ -91,7 +94,7 @@ const CustomJobApplyConfirmation = ({
    const { goToView } = useLiveStreamDialog()
    const dispatch = useDispatch()
    const { handleApply, alreadyApplied, isApplying, redirectToSignUp } =
-      useCustomJobApply(job, livestreamId)
+      useCustomJobApply(job, applicationContext)
 
    const handleClick = useCallback(async () => {
       await handleApply()

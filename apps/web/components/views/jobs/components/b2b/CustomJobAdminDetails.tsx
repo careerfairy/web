@@ -1,32 +1,56 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, Stack } from "@mui/material"
-import Typography from "@mui/material/Typography"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import JobHeader from "components/views/livestream-dialog/views/job-details/main-content/JobHeader"
+import { Box } from "@mui/material"
 import { sxStyles } from "../../../../../types/commonTypes"
-import DateUtil from "../../../../../util/DateUtil"
-import SanitizedHTML from "../../../../util/SanitizedHTML"
-import LinkedContentDetails from "./LinkedContentDetails"
+import CustomJobDetailsView from "../CustomJobDetailsView"
 
 const styles = sxStyles({
    wrapper: {
       p: 2,
    },
-   subTitle: {
-      fontSize: "18px",
-      fontWeight: 600,
-   },
-   jobValues: {
-      fontSize: "16px",
-   },
-   content: {
-      mt: 4,
-   },
-   description: {
-      fontSize: "16px",
-      fontWeight: 400,
-      color: (theme) => theme.palette.text.secondary,
-   },
+   // jobName: {
+   //    fontWeight: 600,
+   // },
+   // subTitle: {
+   //    fontSize: "18px",
+   //    fontWeight: 600,
+   // },
+   // jobValues: {
+   //    fontSize: "16px",
+   // },
+   // content: {
+   //    mt: 4,
+   // },
+   // description: {
+   //    fontSize: "16px",
+   //    fontWeight: 400,
+   //    color: (theme) => theme.palette.text.secondary,
+   // },
+   // linkedContentWrapper: {
+   //    mt: 2,
+   // },
+   // viewport: {
+   //    overflow: "hidden",
+   // },
+   // slide: {
+   //    flex: {
+   //       xs: `0 0 90%`,
+   //       sm: `0 0 60%`,
+   //       md: "0 0 60%",
+   //       xl: "0 0 60%",
+   //    },
+   //    maxWidth: { md: 360 },
+   //    minWidth: 0,
+   //    height: {
+   //       xs: 355,
+   //       md: 355,
+   //    },
+   //    "&:not(:first-of-type)": {
+   //       ml: `15px`,
+   //    },
+   //    "&:first-of-type": {
+   //       ml: 0.3,
+   //    },
+   // },
 })
 
 type Props = {
@@ -41,61 +65,15 @@ const CustomJobAdminDetails = ({
    companyName,
    companyLogoUrl,
 }: Props) => {
-   const { description, salary, deadline } = job
-
-   const jobDeadline = deadline
-      ? DateUtil.formatDateToString(deadline.toDate())
-      : ""
-
    return (
       <Box sx={styles.wrapper}>
-         <JobHeader
+         <CustomJobDetailsView
             job={job}
             companyName={companyName}
             companyLogoUrl={companyLogoUrl}
-            editMode={!!handleEdit}
-            handleClick={handleEdit}
+            handleEdit={handleEdit}
+            disabledLinkedContentClick
          />
-
-         <Box sx={styles.content}>
-            <Stack spacing={2}>
-               <Box>
-                  <Typography variant={"subtitle1"} sx={styles.subTitle}>
-                     Job description
-                  </Typography>
-                  <SanitizedHTML
-                     sx={styles.description}
-                     htmlString={description}
-                  />
-               </Box>
-
-               {salary ? (
-                  <Box>
-                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
-                        Salary
-                     </Typography>
-                     <Typography variant={"body1"} sx={styles.jobValues}>
-                        {salary}
-                     </Typography>
-                  </Box>
-               ) : null}
-
-               {jobDeadline ? (
-                  <Box>
-                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
-                        Application deadline
-                     </Typography>
-                     <Typography variant={"body1"} sx={styles.jobValues}>
-                        {jobDeadline}
-                     </Typography>
-                  </Box>
-               ) : null}
-
-               <SuspenseWithBoundary fallback={<></>}>
-                  <LinkedContentDetails job={job} />
-               </SuspenseWithBoundary>
-            </Stack>
-         </Box>
       </Box>
    )
 }

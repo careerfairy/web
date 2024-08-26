@@ -1,7 +1,6 @@
 import PlayIcon from "@mui/icons-material/PlayCircleOutlineRounded"
 import { Button } from "@mui/material"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
-import { FC } from "react"
 import { ActionButtonWrapper } from "./ActionButton"
 import { useActionButtonContext } from "./ActionButtonProvider"
 import styles from "./Styles"
@@ -17,9 +16,9 @@ const scrollToHero = () => {
    }
 }
 type WatchNowButtonProps = {
-   sx?: any
+   fullWidth?: boolean
 }
-const WatchNowButton: FC = ({ sx: customSx }: WatchNowButtonProps) => {
+const WatchNowButton = ({ fullWidth }: WatchNowButtonProps) => {
    const {
       isFloating,
       heroVisible,
@@ -48,7 +47,11 @@ const WatchNowButton: FC = ({ sx: customSx }: WatchNowButtonProps) => {
          <Button
             id="watch-now-button"
             color={secondary ? "secondary" : "primary"}
-            sx={[styles.btn, heroVisible && styles.hiddenButton, customSx]}
+            sx={[
+               styles.btn,
+               heroVisible && styles.hiddenButton,
+               fullWidth && styles.btnFullWidth,
+            ]}
             variant={outlined ? "outlined" : "contained"}
             fullWidth
             onClick={isFixedToBottom ? handleWatchRecording : scrollToHero}

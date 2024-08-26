@@ -1,4 +1,7 @@
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   JobApplicationContext,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Button, CircularProgress } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
@@ -16,21 +19,21 @@ const styles = sxStyles({
 
 type Props = {
    job: PublicCustomJob
-   livestreamId: string
+   applicationContext: JobApplicationContext
    handleApplyClick: () => void
    isSecondary?: boolean
 }
 
 const CustomJobEntryApply = ({
    job,
-   livestreamId,
+   applicationContext,
    handleApplyClick,
    isSecondary,
 }: Props) => {
    const { userData } = useAuth()
    const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
-      livestreamId
+      applicationContext
    )
 
    const { alreadyApplied } = useUserJobApplication(userData?.id, job.id)

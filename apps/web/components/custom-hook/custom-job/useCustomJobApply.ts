@@ -1,4 +1,7 @@
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   JobApplicationContext,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import useSWRMutation from "swr/mutation"
@@ -11,7 +14,11 @@ import useSnackbarNotifications from "../useSnackbarNotifications"
 import useCustomJob from "./useCustomJob"
 import useUserJobApplication from "./useUserJobApplication"
 
-const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
+// TODO-WG: Refactor logs, etc
+const useCustomJobApply = (
+   job: PublicCustomJob,
+   context: JobApplicationContext
+) => {
    const { userData } = useAuth()
    const { data: fingerPrintId } = useFingerPrint()
 
@@ -28,17 +35,11 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
       `user-${userData?.id}-applyToCustomJob-${job.id}`,
       () => {
          if (userData) {
-            customJobServiceInstance.confirmJobApplication(
-               livestreamId,
-               job.id,
-               userData?.id
-            )
+            customJobServiceInstance.confirmJobApplication(job.id, userData?.id)
          } else {
             customJobServiceInstance.confirmAnonymousJobApplication(
-               fingerPrintId,
                job.id,
-               livestreamId,
-               "livestream"
+               fingerPrintId
             )
          }
       },
@@ -55,7 +56,7 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
                "Congrats"
             )
 
-            dataLayerEvent("livestream_custom_job_application_complete", {
+            dataLayerEvent("custom_job_application_complete", {
                jobId: job?.id,
                jobName: job?.title,
             })
@@ -75,15 +76,15 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
          `user-${userData?.id}-clicksOnCustomJob-${job.id}`,
          async () => {
             const jobApplication = userData
-               ? customJobRepo.applyUserToCustomJob(userData, customJob, {
-                    type: "livestream",
-                    id: livestreamId,
-                 })
+               ? customJobRepo.applyUserToCustomJob(
+                    userData,
+                    customJob,
+                    context
+                 )
                : customJobRepo.applyAnonymousUserToCustomJob(
                     fingerPrintId,
                     customJob,
-                    livestreamId,
-                    "livestream"
+                    context
                  )
 
             return await Promise.all([

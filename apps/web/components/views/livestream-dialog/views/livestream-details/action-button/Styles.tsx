@@ -11,6 +11,10 @@ const styles = sxStyles({
       textTransform: "none",
       transition: (theme) => theme.transitions.create(["opacity"]),
    },
+   btnFullWidth: {
+      whiteSpace: "nowrap",
+      maxWidth: "100%",
+   },
    hiddenButton: {
       height: 0,
       opacity: 0,

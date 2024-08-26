@@ -12,6 +12,9 @@ import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 const styles = sxStyles({
    header: {
       display: "flex",
+      backgroundColor: (theme) => theme.brand.white[400],
+      borderRadius: "8px",
+      padding: "12px",
    },
    headerLeftSide: {
       display: "flex",

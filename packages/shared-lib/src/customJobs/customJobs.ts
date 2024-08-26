@@ -129,9 +129,14 @@ export interface CustomJobStats extends Identifiable {
    deleted: boolean
    deletedAt: firebase.firestore.Timestamp | null
 }
-export type CustomJobContent = "spark" | "livestream"
+export type CustomJobContent =
+   | "spark"
+   | "livestream"
+   | "group"
+   | "portal"
+   | "profile"
 
-export type JobApplicationContent = {
+export type JobApplicationContext = {
    type: CustomJobContent
 } & Identifiable
 // collection path /jobApplications
@@ -142,7 +147,7 @@ export interface CustomJobApplicant extends Identifiable {
    groupId: string // Makes it easier to query for all applicants in a group
    appliedAt?: firebase.firestore.Timestamp
    livestreamId?: string // The associated livestream where the user applied to the job
-   linkedContent: JobApplicationContent // replaces livestreamId only
+   linkedContent?: JobApplicationContext // replaces livestreamId only
    job: CustomJob
    applied?: boolean
    createdAt?: firebase.firestore.Timestamp
@@ -158,7 +163,7 @@ export interface AnonymousJobApplication extends Identifiable {
    createdAt: firebase.firestore.Timestamp
    fingerPrintId: string
    jobId: string
-   linkedContent: JobApplicationContent
+   linkedContent: JobApplicationContext
    applied: boolean
    appliedAt?: firebase.firestore.Timestamp
    userId?: string // Optional and set upon user registration when matching the finger print ID

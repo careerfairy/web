@@ -255,6 +255,7 @@ const JobDialogContent = ({
    isConfirmationDialogOpen,
    handleCloseConfirmationDialog,
 }) => {
+   // TODO-WG: Check this dialog for new component
    const { data: hostCompany } = useLivestreamCompanyHostSWR(livestreamId)
    const isMobile = useStreamIsMobile()
    const isLandscape = useStreamIsLandscape()
@@ -307,7 +308,7 @@ const JobDialogContent = ({
             <CustomJobApplyConfirmation
                handleClose={handleCloseConfirmationDialog}
                job={job as PublicCustomJob}
-               livestreamId={livestreamId}
+               applicationContext={{ id: livestreamId, type: "livestream" }}
                sx={{
                   bottom:
                      isMobile && !isLandscape ? { xs: "130px", sm: "90px" } : 0,

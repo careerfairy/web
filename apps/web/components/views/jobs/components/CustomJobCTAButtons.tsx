@@ -1,4 +1,5 @@
 import {
+   JobApplicationContext,
    JobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
@@ -16,11 +17,13 @@ import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 
+import ActionButton from "components/views/livestream-dialog/views/livestream-details/action-button/ActionButton"
+import ActionButtonProvider, {
+   useActionButtonContext,
+} from "components/views/livestream-dialog/views/livestream-details/action-button/ActionButtonProvider"
+import WatchNowButton from "components/views/livestream-dialog/views/livestream-details/action-button/WatchNowButton"
 import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
 import { CheckCircle, ExternalLink } from "react-feather"
-import ActionButton from "../../livestream-details/action-button/ActionButton"
-import ActionButtonProvider from "../../livestream-details/action-button/ActionButtonProvider"
-import WatchNowButton from "../../livestream-details/action-button/WatchNowButton"
 
 const styles = sxStyles({
    ctaWrapper: {
@@ -68,18 +71,17 @@ const styles = sxStyles({
 })
 
 type Props = {
-   livestreamId: string
+   applicationContext?: JobApplicationContext
    job: PublicCustomJob
-   handleClick?: () => void
-   isSecondary?: boolean
-   from?: JobApplicationSource
+   handleApplyClick?: () => void
 }
 
 type CustomJobCTAProps = Props & {
+   isSecondary?: boolean
    alreadyApplied?: boolean
 }
 
-const CustomJobCTAButton = (props: Props) => {
+const CustomJobCTAButtons = (props: Props) => {
    const { userData } = useAuth()
    const { alreadyApplied } = useUserJobApplication(userData?.id, props.job.id)
 
@@ -104,7 +106,7 @@ const CustomJobCTAButton = (props: Props) => {
       },
    }
 
-   return ctas[props.from](props)
+   return ctas[props.applicationContext.type](props)
 }
 
 type LivestreamCustomJobCTAProps = CustomJobCTAProps & {
@@ -112,8 +114,8 @@ type LivestreamCustomJobCTAProps = CustomJobCTAProps & {
 }
 
 const LivestreamJobCTA = (props: LivestreamCustomJobCTAProps) => {
-   const isUserRegisteredToEvent = useUserIsRegistered(props.livestreamId)
    const { livestreamPresenter } = useLiveStreamDialog()
+   const isUserRegisteredToEvent = useUserIsRegistered(livestreamPresenter.id)
    const isPast = (livestreamPresenter as LivestreamPresenter).isPast()
 
    return isPast ? (
@@ -133,13 +135,14 @@ const LivestreamJobCTA = (props: LivestreamCustomJobCTAProps) => {
 
 // TODO-WG: Update according to upcoming
 const PastLivestreamJobCTA = ({
-   livestreamId,
+   applicationContext,
    job,
-   handleClick,
+   handleApplyClick: handleApplyClick,
    alreadyApplied,
    isUserRegistered,
 }: LivestreamCustomJobCTAProps) => {
    const isMobile = useIsMobile()
+   const { onRegisterClick, userEmailFromServer } = useActionButtonContext()
    const jobExpired = useIsJobExpired(job)
    const { userData } = useAuth()
    const { livestreamPresenter, handleBack } = useLiveStreamDialog()
@@ -160,8 +163,8 @@ const PastLivestreamJobCTA = ({
          >
             <CustomJobApplyButton
                job={job as PublicCustomJob}
-               livestreamId={livestreamId}
-               handleClick={handleClick}
+               applicationContext={applicationContext}
+               handleApplyClick={handleApplyClick}
                isSecondary={jobExpired || isUserRegistered}
                alreadyApplied={alreadyApplied}
             />
@@ -170,11 +173,14 @@ const PastLivestreamJobCTA = ({
                <Box width={isMobile ? "100%" : "auto"}>
                   <ActionButtonProvider
                      isFixedToBottom
+                     livestreamPresenter={livestreamPresenter}
+                     userEmailFromServer={userEmailFromServer}
+                     onRegisterClick={onRegisterClick}
                      showIcon
                      outlined={!jobExpired && !alreadyApplied}
                      onClickWatchRecording={onClickWatchRecording}
                   >
-                     <WatchNowButton sx={styles.watchNowBtn} />
+                     <WatchNowButton fullWidth />
                   </ActionButtonProvider>
                </Box>
             ) : null}
@@ -186,9 +192,9 @@ const PastLivestreamJobCTA = ({
 }
 
 const UpcomingLivestreamJobCTA = ({
-   livestreamId,
+   applicationContext,
    job,
-   handleClick,
+   handleApplyClick: handleClick,
    alreadyApplied,
    isUserRegistered,
 }: LivestreamCustomJobCTAProps) => {
@@ -206,8 +212,8 @@ const UpcomingLivestreamJobCTA = ({
             {!isUserRegistered ? <LiveStreamButton /> : null}
             <CustomJobApplyButton
                job={job as PublicCustomJob}
-               livestreamId={livestreamId}
-               handleClick={handleClick}
+               applicationContext={applicationContext}
+               handleApplyClick={handleClick}
                isSecondary={!isUserRegistered}
                alreadyApplied={alreadyApplied}
             />
@@ -302,16 +308,16 @@ const JobExpiredButton = ({ alreadyApplied, job }: JobExpiredButtonProps) => {
 }
 
 const CustomJobApplyButton = ({
+   applicationContext,
    job,
-   livestreamId,
-   handleClick,
+   handleApplyClick: handleClick,
    isSecondary,
    alreadyApplied,
 }: CustomJobCTAProps) => {
    const jobExpired = useIsJobExpired(job)
    const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
-      livestreamId
+      applicationContext
    )
 
    const handleApplyClick = useCallback(async () => {
@@ -343,4 +349,4 @@ const CustomJobApplyButton = ({
    ) : null
 }
 
-export default CustomJobCTAButton
+export default CustomJobCTAButtons
