@@ -23,11 +23,13 @@ import useCustomJob from "../../../../custom-hook/custom-job/useCustomJob"
 import useDialogStateHandler from "../../../../custom-hook/useDialogStateHandler"
 import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import { HeroContent } from "../../BaseDialogView"
+import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import NotFoundView from "../common/NotFoundView"
 import JobDetailsViewSkeleton from "./JobDetailsViewSkeleton"
 import JobCTAButton from "./main-content/JobCTAButton"
+import JobDescription from "./main-content/JobDescription"
+import JobHeader from "./main-content/JobHeader"
 
 const styles = sxStyles({
    btnWrapper: {
@@ -159,7 +161,33 @@ const JobDetails: FC<Props> = ({ jobId }) => {
       </HeroContent>
    )
 
-   return !isAtsJob ? (
+   return isAtsJob ? (
+      <BaseDialogView
+         heroContent={livestreamDetailCustomJobHeroContent}
+         mainContent={
+            <MainContent>
+               <Stack spacing={3}>
+                  <JobHeader
+                     job={job}
+                     companyName={livestreamPresenter.company}
+                     companyLogoUrl={livestreamPresenter.companyLogoUrl}
+                  />
+
+                  <JobDescription job={job} />
+               </Stack>
+            </MainContent>
+         }
+         fixedBottomContent={
+            // TODO-WG: Separate buttons and UI styling for the different scenarios, coming in new stack
+            <JobButton
+               job={job as Job}
+               livestreamId={livestream.id}
+               // isSecondary={!isLiveStreamButtonDisabled}
+               handleOpen={handleOpen}
+            />
+         }
+      />
+   ) : (
       <CustomJobDetailsView
          job={job as CustomJob}
          heroContent={livestreamDetailCustomJobHeroContent}
@@ -167,7 +195,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
          companyLogoUrl={livestreamPresenter.companyLogoUrl}
          context={{ id: livestreamPresenter.id, type: "livestream" }}
       />
-   ) : null
+   )
 }
 
 type JobButtonProps = {

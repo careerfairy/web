@@ -78,7 +78,6 @@ const Jobs: FC<Props> = (props) => {
 }
 
 const JobsComponent: FC<Props> = ({ presenter }) => {
-   const { goToJobDetails } = useLiveStreamDialog()
    const livestreamCustomJobs = useGroupCustomJobs(presenter.groupIds[0], {
       livestreamId: presenter.id,
    })?.filter((job) => job.published)
@@ -93,13 +92,8 @@ const JobsComponent: FC<Props> = ({ presenter }) => {
 
    return (
       <Stack spacing={2}>
-         {jobsToPresent.map((job, idx) => (
-            <JobCard
-               key={`job-card-${idx}`}
-               job={job as CustomJob}
-               previewMode
-               handleClick={() => goToJobDetails((job as CustomJob).id)}
-            />
+         {jobsToPresent.map((job, index) => (
+            <JobItem presenter={presenter} key={index} job={job} />
          ))}
       </Stack>
    )
@@ -146,7 +140,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
       }
    }
 
-   return (
+   return isAtsLivestreamAssociation ? (
       <Stack
          direction={{
             xs: "column",
@@ -184,6 +178,12 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
             </span>
          </Box>
       </Stack>
+   ) : (
+      <JobCard
+         job={job as CustomJob}
+         previewMode
+         handleClick={() => goToJobDetails((job as CustomJob).id)}
+      />
    )
 }
 

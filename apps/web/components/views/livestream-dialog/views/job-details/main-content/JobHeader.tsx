@@ -80,7 +80,7 @@ type Props = {
    editMode?: boolean
    handleClick?: () => void
 }
-
+// TODO-WG: Move to better location
 const JobHeader = ({
    job,
    companyName,
