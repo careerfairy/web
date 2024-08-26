@@ -178,11 +178,9 @@ const JobDetails: FC<Props> = ({ jobId }) => {
             </MainContent>
          }
          fixedBottomContent={
-            // TODO-WG: Separate buttons and UI styling for the different scenarios, coming in new stack
             <JobButton
                job={job as Job}
                livestreamId={livestream.id}
-               // isSecondary={!isLiveStreamButtonDisabled}
                handleOpen={handleOpen}
             />
          }
