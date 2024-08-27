@@ -1,9 +1,9 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import { Stack } from "@mui/material"
 import { useAnalyticsLocking } from "components/custom-hook/spark/analytics/useAnalyticsLocking"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { FC } from "react"
 import { LockedSparksAnalytics } from "../components/locking/LockedSparksAnalytics"
+import { SectionsWrapper } from "../components/SectionsWrapper"
 import { timeFrameLabels } from "../util"
 import EngagementAnalyticsContainer from "./EngagementAnalyticsContainer"
 import MostSomethingAnalyticsContainer from "./MostSomethingAnalyticsContainer"
@@ -26,7 +26,7 @@ const SparksOverviewTab: FC<SparksOverviewTabProps> = ({ timeFilter }) => {
    }
 
    return (
-      <Stack spacing={5} marginBottom={10}>
+      <SectionsWrapper>
          <SuspenseWithBoundary fallback={<ReachAnalyticsSkeleton />}>
             <ReachAnalyticsContainer
                timeFilter={timeFilter}
@@ -42,7 +42,7 @@ const SparksOverviewTab: FC<SparksOverviewTabProps> = ({ timeFilter }) => {
          <SuspenseWithBoundary fallback={<MostSomethingSkeleton />}>
             <MostSomethingAnalyticsContainer timeFilter={timeFilter} />
          </SuspenseWithBoundary>
-      </Stack>
+      </SectionsWrapper>
    )
 }
 
