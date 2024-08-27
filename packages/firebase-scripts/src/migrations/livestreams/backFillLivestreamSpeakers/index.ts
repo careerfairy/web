@@ -33,7 +33,7 @@ export async function run() {
       await backfillLivestreamsSpeakers(allFutureLivestreams, "livestreams")
 
       const allDraftLivestreams = await logAction(
-         () => livestreamRepo.getAllDraftLivestreams(false),
+         () => livestreamRepo.getAllDraftLivestreams(),
          "Fetching all draft live streams"
       )
 
