@@ -8,7 +8,7 @@ import { sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    root: {
       position: "fixed",
-      zIndex: 9000,
+      zIndex: 1,
       left: "50%",
       top: "50%",
       transform: {
