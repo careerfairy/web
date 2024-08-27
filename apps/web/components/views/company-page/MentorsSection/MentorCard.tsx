@@ -45,7 +45,7 @@ const styles = sxStyles({
       position: {
          fontSize: "14px",
          fontWeight: 400,
-         lineHeight: "20px",
+         lineHeight: "21px",
          textAlign: "center",
          color: "neutral.400",
          ...getMaxLineStyles(2),
