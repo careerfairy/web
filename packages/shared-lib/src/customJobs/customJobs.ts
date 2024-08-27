@@ -136,9 +136,12 @@ export type CustomJobContent =
    | "portal"
    | "profile"
 
+// Beware some IDs are logical, meaning it might not lead to a specific document in collections, i.e. when type = 'portal', the ID
+// of the linked content is purely logical thus retrieving a document with this ID is not intended.
 export type JobApplicationContext = {
    type: CustomJobContent
 } & Identifiable
+
 // collection path /jobApplications
 export interface CustomJobApplicant extends Identifiable {
    documentType: "customJobApplicant" // simplify groupCollection Queries
