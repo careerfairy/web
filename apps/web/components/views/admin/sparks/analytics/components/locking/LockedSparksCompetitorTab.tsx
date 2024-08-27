@@ -1,16 +1,14 @@
-import { Box, Stack } from "@mui/material"
+import { Stack } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { GroupSparkAnalyticsCardContainer } from "../GroupSparkAnalyticsCardContainer"
 import { SectionsWrapper } from "../SectionsWrapper"
 import { TitleWithSelect } from "../TitleWithSelect"
 import { MockedData } from "./locked-mocked-data"
 import { LockedComponentsModal } from "./LockedComponentsModal"
+import { LockedContent } from "./LockedContent"
 import { MockedStaticSparkCard } from "./MockedStaticSparkCard"
 
 const styles = sxStyles({
-   analyticsContainer: {
-      filter: "brightness(0.97) blur(5px)",
-   },
    cardsContainer: {
       flexDirection: {
          xs: "column",
@@ -34,7 +32,7 @@ export const LockedSparksCompetitorTab = () => {
             text="Upgrade to our premium plan to unlock in-depth competitor analytics and gain insights into how your company stacks up against the competition."
             metrics={metrics}
          />
-         <Box sx={styles.analyticsContainer}>
+         <LockedContent>
             <SectionsWrapper>
                <GroupSparkAnalyticsCardContainer>
                   <TitleWithSelect
@@ -44,13 +42,15 @@ export const LockedSparksCompetitorTab = () => {
                      options={[{ value: "all", label: "All Industries" }]}
                   />
                   <Stack sx={styles.cardsContainer}>
-                     {MockedData.industry.map((mockedSpark, index) => (
-                        <MockedStaticSparkCard
-                           key={`top-sparks-by-industry-all-${mockedSpark.spark.id}-${index}`}
-                           spark={mockedSpark.spark}
-                           stats={mockedSpark.stats}
-                        />
-                     ))}
+                     {MockedData.competitor.industry.map(
+                        (mockedSpark, index) => (
+                           <MockedStaticSparkCard
+                              key={`top-sparks-by-industry-all-${mockedSpark.spark.id}-${index}`}
+                              spark={mockedSpark.spark}
+                              stats={mockedSpark.stats}
+                           />
+                        )
+                     )}
                   </Stack>
                </GroupSparkAnalyticsCardContainer>
                <GroupSparkAnalyticsCardContainer>
@@ -61,17 +61,19 @@ export const LockedSparksCompetitorTab = () => {
                      options={[{ value: "all", label: "All Industries" }]}
                   />
                   <Stack sx={styles.cardsContainer}>
-                     {MockedData.audience.map((mockedSpark, index) => (
-                        <MockedStaticSparkCard
-                           key={`top-sparks-by-industry-all-${mockedSpark.spark.id}-${index}`}
-                           spark={mockedSpark.spark}
-                           stats={mockedSpark.stats}
-                        />
-                     ))}
+                     {MockedData.competitor.audience.map(
+                        (mockedSpark, index) => (
+                           <MockedStaticSparkCard
+                              key={`top-sparks-by-industry-all-${mockedSpark.spark.id}-${index}`}
+                              spark={mockedSpark.spark}
+                              stats={mockedSpark.stats}
+                           />
+                        )
+                     )}
                   </Stack>
                </GroupSparkAnalyticsCardContainer>
             </SectionsWrapper>
-         </Box>
+         </LockedContent>
       </>
    )
 }
