@@ -19,9 +19,8 @@ import {
    setAutoAction,
    setJobToOpen,
 } from "store/reducers/sparksFeedReducer"
-import { combineStyles, sxStyles } from "../../../../../../types/commonTypes"
-import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
-import { useLiveStreamDialog } from "../../../LivestreamDialog"
+import { combineStyles, sxStyles } from "../../../../../types/commonTypes"
+import useCustomJobApply from "../../../../custom-hook/custom-job/useCustomJobApply"
 
 const styles = sxStyles({
    confirmationWrapper: {
@@ -82,26 +81,26 @@ type Props = {
    applicationContext: JobApplicationContext
    autoApply?: boolean
    sx?: SxProps
+   onApply?: () => void
 }
+
 const CustomJobApplyConfirmation = ({
    handleClose,
    job,
    applicationContext,
    autoApply,
+   onApply,
    sx,
 }: Props) => {
    const { isLoggedIn, userData } = useAuth()
-   const { goToView } = useLiveStreamDialog()
    const dispatch = useDispatch()
    const { handleApply, alreadyApplied, isApplying, redirectToSignUp } =
       useCustomJobApply(job, applicationContext)
 
    const handleClick = useCallback(async () => {
       await handleApply()
-      if (userData?.id) {
-         goToView("livestream-details")
-      }
-   }, [goToView, handleApply, userData])
+      onApply && onApply()
+   }, [onApply, handleApply])
 
    const handleRedirectClick = () => {
       dispatch(setJobToOpen(job.id))

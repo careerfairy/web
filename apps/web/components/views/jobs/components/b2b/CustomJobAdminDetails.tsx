@@ -1,7 +1,7 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box } from "@mui/material"
 import { sxStyles } from "../../../../../types/commonTypes"
-import CustomJobDetailsView from "../CustomJobDetailsView"
+import CustomJobDetailsView from "../custom-jobs/CustomJobDetailsView"
 
 const styles = sxStyles({
    wrapper: {

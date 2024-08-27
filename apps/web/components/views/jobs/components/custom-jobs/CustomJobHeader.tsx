@@ -1,13 +1,14 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { FC } from "react"
-import { Briefcase, Edit, MapPin as LocationIcon, Zap } from "react-feather"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
-import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
+import { Briefcase, Edit, Zap } from "react-feather"
+import { sxStyles } from "../../../../../types/commonTypes"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    header: {
@@ -28,7 +29,7 @@ const styles = sxStyles({
       gap: "4px",
       ml: 3,
    },
-   jobName: {
+   jobTitle: {
       fontWeight: 600,
    },
    subTitle: {
@@ -74,37 +75,21 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | PublicCustomJob
+   job: CustomJob | PublicCustomJob
    companyName: string
    companyLogoUrl: string
    editMode?: boolean
    handleClick?: () => void
 }
 
-const JobHeader = ({
+const CustomJobHeader = ({
    job,
    companyName,
    companyLogoUrl,
    editMode,
    handleClick,
 }: Props) => {
-   const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
-
-   let jobName: string,
-      jobLocation: string,
-      jobType: string,
-      jobBusinessFunctionsTagIds: string[]
-
-   if (isAtsJob) {
-      jobName = job.name
-      jobLocation = job.getLocation()
-      jobType = job.getDepartment()
-   } else {
-      jobName = job.title
-      jobType = job.jobType
-      jobBusinessFunctionsTagIds = job.businessFunctionsTagIds || []
-   }
 
    return (
       <>
@@ -132,39 +117,29 @@ const JobHeader = ({
                />
 
                <Box sx={styles.headerContent}>
-                  <Typography variant={"h4"} sx={styles.jobName}>
-                     {jobName}
+                  <Typography variant={"h4"} sx={styles.jobTitle}>
+                     {job.title}
                   </Typography>
 
                   {isMobile ? (
                      <Box sx={[styles.detailsWrapper, styles.detailsValue]}>
-                        {jobType ? (
+                        {job.jobType ? (
                            <Typography
                               variant={"subtitle1"}
                               sx={styles.details}
                            >
                               <Briefcase width={14} />
-                              {jobType}
+                              {job.jobType}
                            </Typography>
                         ) : null}
 
-                        {jobBusinessFunctionsTagIds?.length > 0 ? (
+                        {(job.businessFunctionsTagIds || [])?.length > 0 ? (
                            <Typography
                               variant={"subtitle1"}
                               sx={styles.details}
                            >
                               <Zap width={14} />
-                              {jobBusinessFunctionsTagIds.join(", ")}
-                           </Typography>
-                        ) : null}
-
-                        {jobLocation ? (
-                           <Typography
-                              variant={"subtitle1"}
-                              sx={styles.details}
-                           >
-                              <LocationIcon width={14} />
-                              {jobLocation}
+                              {(job.businessFunctionsTagIds || []).join(", ")}
                            </Typography>
                         ) : null}
                      </Box>
@@ -176,16 +151,19 @@ const JobHeader = ({
                               spacing={2}
                               sx={styles.detailsValue}
                            >
-                              {jobType ? (
+                              {job.jobType ? (
                                  <>
                                     <Briefcase width={14} />
-                                    {jobType}
+                                    {job.jobType}
                                  </>
                               ) : null}
-                              {jobBusinessFunctionsTagIds?.length > 0 ? (
+                              {(job.businessFunctionsTagIds || [])?.length >
+                              0 ? (
                                  <>
                                     <Zap width={14} />
-                                    {jobBusinessFunctionsTagIds.join(", ")}
+                                    {(job.businessFunctionsTagIds || []).join(
+                                       ", "
+                                    )}
                                  </>
                               ) : null}
                            </Stack>
@@ -225,7 +203,7 @@ export const JobHeaderSkeleton: FC = () => {
                height={63}
             />
             <Box sx={styles.headerContent}>
-               <Typography variant={"h4"} sx={styles.jobName}>
+               <Typography variant={"h4"} sx={styles.jobTitle}>
                   <Skeleton width={300} />
                </Typography>
 
@@ -259,4 +237,4 @@ export const JobHeaderSkeleton: FC = () => {
    )
 }
 
-export default JobHeader
+export default CustomJobHeader

@@ -25,8 +25,8 @@ import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import { JobButton } from "components/views/livestream-dialog/views/job-details/JobDetailsView"
-import CustomJobApplyConfirmation from "components/views/livestream-dialog/views/job-details/main-content/CustomJobApplyConfirmation"
 import JobDescription from "components/views/livestream-dialog/views/job-details/main-content/JobDescription"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useState } from "react"
@@ -255,7 +255,6 @@ const JobDialogContent = ({
    isConfirmationDialogOpen,
    handleCloseConfirmationDialog,
 }) => {
-   // TODO-WG: Check this dialog for new component
    const { data: hostCompany } = useLivestreamCompanyHostSWR(livestreamId)
    const isMobile = useStreamIsMobile()
    const isLandscape = useStreamIsLandscape()

@@ -133,7 +133,6 @@ const LivestreamJobCTA = (props: LivestreamCustomJobCTAProps) => {
    )
 }
 
-// TODO-WG: Update according to upcoming
 const PastLivestreamJobCTA = ({
    applicationContext,
    job,

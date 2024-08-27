@@ -1,6 +1,4 @@
 import { Box, Stack, SxProps } from "@mui/material"
-import JobDescription from "components/views/livestream-dialog/views/job-details/main-content/JobDescription"
-import JobHeader from "components/views/livestream-dialog/views/job-details/main-content/JobHeader"
 
 import {
    CustomJob,
@@ -9,18 +7,22 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { useAuth } from "HOCs/AuthProvider"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import CustomJobApplyConfirmation from "components/views/livestream-dialog/views/job-details/main-content/CustomJobApplyConfirmation"
+import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import { props } from "lodash/fp"
 import { ReactNode, forwardRef } from "react"
 import { useSelector } from "react-redux"
 import { useMeasure } from "react-use"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
-import { combineStyles, sxStyles } from "../../../../types/commonTypes"
+import { combineStyles, sxStyles } from "../../../../../types/commonTypes"
 import CustomJobCTAButtons from "./CustomJobCTAButtons"
+import CustomJobDescription from "./CustomJobDescription"
+import CustomJobHeader from "./CustomJobHeader"
 import CustomJobLinkedContents from "./CustomJobLinkedContents"
+import CustomJobDetailsSkeleton from "./skeletons/CustomJobDetailsSkeleton"
 
 const responsiveBreakpoint = "md"
 
@@ -59,12 +61,28 @@ type Props = {
    hideBottomDivider?: boolean
    disabledLinkedContentClick?: boolean
    handleEdit?: () => void
+   onApply?: () => void
    hideCTAButtons?: boolean
    companyName: string
    companyLogoUrl: string
 }
 
-const CustomJobDetailsView = ({
+const CustomJobDetailsView = (props: Props) => {
+   if (!props.job)
+      return <CustomJobDetailsSkeleton heroContent={!!props.heroContent} />
+
+   return (
+      <SuspenseWithBoundary
+         fallback={
+            <CustomJobDetailsSkeleton heroContent={!!props.heroContent} />
+         }
+      >
+         <CustomJobDetails {...props} />
+      </SuspenseWithBoundary>
+   )
+}
+
+const CustomJobDetails = ({
    job,
    handleEdit,
    companyLogoUrl,
@@ -74,6 +92,7 @@ const CustomJobDetailsView = ({
    disabledLinkedContentClick,
    sx,
    hideBottomDivider,
+   onApply,
 }: Props) => {
    const { userData } = useAuth()
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
@@ -92,7 +111,7 @@ const CustomJobDetailsView = ({
          <Stack spacing={4.75} sx={combineStyles(customStyles.root, sx)}>
             {heroContent}
             <Box>
-               <JobHeader
+               <CustomJobHeader
                   job={job}
                   companyName={companyName}
                   companyLogoUrl={companyLogoUrl}
@@ -102,7 +121,7 @@ const CustomJobDetailsView = ({
 
                <Box sx={customStyles.content}>
                   <Stack spacing={2}>
-                     <JobDescription job={job} />
+                     <CustomJobDescription job={job} />
                      <CustomJobLinkedContents
                         job={job}
                         disableEventClick={disabledLinkedContentClick}
@@ -116,6 +135,7 @@ const CustomJobDetailsView = ({
                      job={job as PublicCustomJob}
                      applicationContext={context}
                      autoApply={isAutoApply}
+                     onApply={onApply}
                      sx={customStyles.jobApplyConfirmationDialog}
                   />
                ) : null}

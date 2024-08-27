@@ -14,7 +14,6 @@ import useSnackbarNotifications from "../useSnackbarNotifications"
 import useCustomJob from "./useCustomJob"
 import useUserJobApplication from "./useUserJobApplication"
 
-// TODO-WG: Refactor logs, etc
 const useCustomJobApply = (
    job: PublicCustomJob,
    context: JobApplicationContext

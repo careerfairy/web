@@ -7,10 +7,10 @@ import {
 import { ButtonProps, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
-import CustomJobCTAButtons from "components/views/jobs/components/CustomJobCTAButtons"
-import CustomJobDetailsView from "components/views/jobs/components/CustomJobDetailsView"
+import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
+import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import { useRouter } from "next/router"
-import { FC, useEffect } from "react"
+import { FC, useCallback, useEffect } from "react"
 import { useSelector } from "react-redux"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
@@ -91,11 +91,18 @@ const JobDetailsView: FC = (props) => {
 }
 
 const JobDetails: FC<Props> = ({ jobId }) => {
+   const { userData } = useAuth()
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
    const [, handleOpen] = useDialogStateHandler()
    const customJob = useCustomJob(jobId)
 
    const autoActionType = useSelector(autoAction)
+
+   const onApply = useCallback(() => {
+      if (userData?.id) {
+         goToView("livestream-details")
+      }
+   }, [userData, goToView])
 
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
@@ -192,6 +199,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
          companyName={livestreamPresenter.company}
          companyLogoUrl={livestreamPresenter.companyLogoUrl}
          context={{ id: livestreamPresenter.id, type: "livestream" }}
+         onApply={onApply}
       />
    )
 }
