@@ -1,28 +1,28 @@
 import {
+   DocRef,
+   mapFirestoreDocuments,
+} from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import {
+   EventRating,
+   EventRatingAnswer,
+   LiveStreamEventWithUsersLivestreamData,
+   LivestreamEvent,
+   LivestreamRecordingDetails,
+   LivestreamUserAction,
+   RecordingStatsUser,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import {
    FirebaseLivestreamRepository,
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
+import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
 import {
    ParticipatingStudent,
    RegisteredStudent,
    TalentPoolStudent,
 } from "@careerfairy/shared-lib/dist/users"
-import {
-   EventRating,
-   EventRatingAnswer,
-   LivestreamEvent,
-   LiveStreamEventWithUsersLivestreamData,
-   LivestreamUserAction,
-   LivestreamRecordingDetails,
-   RecordingStatsUser,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import {
-   DocRef,
-   mapFirestoreDocuments,
-} from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { DataWithRef } from "../util/types"
-import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
 
 export interface ILivestreamScriptsRepository extends ILivestreamRepository {
    getAllRegisteredStudents(withRef?: boolean): Promise<RegisteredStudent[]>
@@ -53,6 +53,10 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
 
    getAllLivestreams<T extends boolean>(
       withTest?: boolean,
+      withRef?: T
+   ): Promise<DataWithRef<T, LivestreamEvent>[]>
+
+   getAllDraftLivestreams<T extends boolean>(
       withRef?: T
    ): Promise<DataWithRef<T, LivestreamEvent>[]>
 
@@ -201,7 +205,7 @@ export class LivestreamScriptsRepository
    }
 
    async getAllLivestreams<T extends boolean>(
-      withTest: boolean = false,
+      withTest = false,
       withRef?: T
    ): Promise<DataWithRef<T, LivestreamEvent>[]> {
       let snaps
@@ -216,9 +220,16 @@ export class LivestreamScriptsRepository
       return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
    }
 
+   async getAllDraftLivestreams<T extends boolean>(
+      withRef?: boolean
+   ): Promise<DataWithRef<T, LivestreamEvent>[]> {
+      const snaps = await this.firestore.collection("draftLivestreams").get()
+      return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
+   }
+
    async getAllLivestreamsWithCompanySize<T extends boolean>(
       companySize: string,
-      withTest: boolean = false,
+      withTest = false,
       withRef?: T
    ): Promise<DataWithRef<T, LivestreamEvent>[]> {
       let snaps
@@ -234,10 +245,10 @@ export class LivestreamScriptsRepository
    }
 
    async getAllFutureLivestreams<T extends boolean>(
-      withTest: boolean = false,
+      withTest = false,
       withRef?: T
    ): Promise<DataWithRef<T, LivestreamEvent>[]> {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .where("start", ">=", new Date())
 
@@ -251,14 +262,18 @@ export class LivestreamScriptsRepository
    }
 
    async getAllLivestreamsWithUserLivestreamDataAfterRelease<T extends boolean>(
-      withTest: boolean = false,
+      withTest = false,
       withRef?: T
    ): Promise<DataWithRef<T, LiveStreamEventWithUsersLivestreamData>[]> {
-      const snaps = await this.firestore
+      let query = this.firestore
          .collection("livestreams")
          .where("start", ">=", new Date(2023, 0, 31))
-         .orderBy("start", "asc")
-         .get()
+
+      if (!withTest) {
+         query = query.where("test", "==", false)
+      }
+
+      const snaps = await query.orderBy("start", "asc").get()
 
       const streams = mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
 
