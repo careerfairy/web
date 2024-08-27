@@ -30,38 +30,42 @@ const useCustomJobApply = (
    const { push, asPath } = useRouter()
    const customJob = useCustomJob(job.id)
 
-   const { trigger: handleApply, isMutating: isApplying } = useSWRMutation(
-      `user-${userData?.id}-applyToCustomJob-${job.id}`,
-      () => {
-         if (userData) {
-            customJobServiceInstance.confirmJobApplication(job.id, userData?.id)
-         } else {
-            customJobServiceInstance.confirmAnonymousJobApplication(
-               job.id,
-               fingerPrintId
-            )
-         }
-      },
-      {
-         onError: (error) => {
-            errorNotification(
-               error,
-               "Sorry! Something failed, maybe try again later"
-            )
+   const { trigger: handleConfirmApply, isMutating: isApplying } =
+      useSWRMutation(
+         `user-${userData?.id}-applyToCustomJob-${job.id}`,
+         () => {
+            if (userData) {
+               customJobServiceInstance.confirmJobApplication(
+                  job.id,
+                  userData?.id
+               )
+            } else {
+               customJobServiceInstance.confirmAnonymousJobApplication(
+                  job.id,
+                  fingerPrintId
+               )
+            }
          },
-         onSuccess: () => {
-            successNotification(
-               "You have successfully applied to the job!",
-               "Congrats"
-            )
+         {
+            onError: (error) => {
+               errorNotification(
+                  error,
+                  "Sorry! Something failed, maybe try again later"
+               )
+            },
+            onSuccess: () => {
+               successNotification(
+                  "You have successfully applied to the job!",
+                  "Congrats"
+               )
 
-            dataLayerEvent("custom_job_application_complete", {
-               jobId: job?.id,
-               jobName: job?.title,
-            })
-         },
-      }
-   )
+               dataLayerEvent("custom_job_application_complete", {
+                  jobId: job?.id,
+                  jobName: job?.title,
+               })
+            },
+         }
+      )
 
    const redirectToSignUp = useCallback(() => {
       return push({
@@ -95,7 +99,7 @@ const useCustomJobApply = (
 
    return {
       alreadyApplied,
-      handleApply,
+      handleConfirmApply,
       isApplying,
       handleClickApplyBtn,
       isClickingOnApplyBtn,

@@ -81,16 +81,16 @@ const CustomJobApplyConfirmationDialog = ({
    job,
    applicationContext,
 }: Props) => {
-   const { handleApply, alreadyApplied, isApplying } = useCustomJobApply(
+   const { handleConfirmApply, alreadyApplied, isApplying } = useCustomJobApply(
       job,
       applicationContext
    )
    const isMobile = useIsMobile()
 
    const handleClick = useCallback(async () => {
-      await handleApply()
+      await handleConfirmApply()
       handleClose()
-   }, [handleApply, handleClose])
+   }, [handleConfirmApply, handleClose])
 
    if (alreadyApplied) {
       handleClose()

@@ -94,19 +94,21 @@ const CustomJobApplyConfirmation = ({
 }: Props) => {
    const { isLoggedIn, userData } = useAuth()
    const dispatch = useDispatch()
-   const { handleApply, alreadyApplied, isApplying, redirectToSignUp } =
+   const { handleConfirmApply, alreadyApplied, isApplying, redirectToSignUp } =
       useCustomJobApply(job, applicationContext)
 
-   const handleClick = useCallback(async () => {
-      await handleApply()
-      onApply && onApply()
-   }, [onApply, handleApply])
-
-   const handleRedirectClick = () => {
+   const handleRedirectClick = useCallback(() => {
       dispatch(setJobToOpen(job.id))
       dispatch(setAutoAction(AutomaticActions.APPLY))
       redirectToSignUp()
-   }
+   }, [job, dispatch, redirectToSignUp])
+
+   const handleClick = useCallback(async () => {
+      await handleConfirmApply()
+      onApply && onApply()
+
+      !isLoggedIn && handleRedirectClick()
+   }, [onApply, handleConfirmApply, handleRedirectClick, isLoggedIn])
 
    useEffect(() => {
       if (userData?.id && autoApply && !alreadyApplied) {
@@ -120,14 +122,7 @@ const CustomJobApplyConfirmation = ({
       <Component
          job={job}
          handleClose={handleClose}
-         handleClick={
-            isLoggedIn
-               ? handleClick
-               : () => {
-                    handleClick()
-                    handleRedirectClick()
-                 }
-         }
+         handleClick={handleClick}
          isApplying={isApplying}
          isLoggedIn={isLoggedIn}
          sx={sx}
