@@ -5,13 +5,9 @@ import { customJobRepo } from "../../../repositories"
 import { writeProgressBar } from "../../../util/bulkWriter"
 import { logAction } from "../../../util/logger"
 import { throwMigrationError } from "../../../util/misc"
-import { DataWithRef } from "../../../util/types"
 
 const RUNNING_VERSION = "0.1"
 const counter = new Counter()
-
-// types
-type CustomJobApplicantsWithRef = DataWithRef<true, CustomJobApplicant>
 
 export async function run() {
    try {
@@ -20,7 +16,7 @@ export async function run() {
       )
 
       const allJobApplications = await logAction(
-         () => customJobRepo.getAllJobApplications(true),
+         () => customJobRepo.getAllJobApplications(false),
          "Fetching all Job Applications"
       )
 
@@ -38,7 +34,7 @@ export async function run() {
 }
 
 const backfillJobApplications = async (
-   jobApplications: CustomJobApplicantsWithRef[]
+   jobApplications: CustomJobApplicant[]
 ) => {
    const batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
 
@@ -55,10 +51,12 @@ const backfillJobApplications = async (
       customJobsApplicantsChunk.forEach((customJobApplicant) => {
          writeProgressBar.increment() // Increment progress bar
 
-         const toUpdate: Pick<
-            CustomJobApplicant,
-            "applied" | "linkedContent" | "livestreamId"
-         > = {
+         const jobApplicationRef = firestore
+            .collection("jobApplications")
+            .doc(customJobApplicant.id)
+
+         const toUpdate: CustomJobApplicant = {
+            ...customJobApplicant,
             applied: true,
             linkedContent: {
                type: "livestream",
@@ -66,8 +64,9 @@ const backfillJobApplications = async (
             },
          }
 
-         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-         batch.update(customJobApplicant._ref as any, toUpdate)
+         delete toUpdate["livestreamId"]
+
+         batch.set(jobApplicationRef, toUpdate)
          counter.writeIncrement() // Increment write counter
       })
 
