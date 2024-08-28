@@ -61,6 +61,7 @@ const styles = sxStyles({
       position: "absolute",
       top: {
          xs: -50,
+         sm: -140,
          md: -48,
       },
       right: {
@@ -78,12 +79,18 @@ const styles = sxStyles({
    },
    imageWrapper: {
       position: "absolute",
+      transform: {
+         xs: "none",
+         sm: "scale(2)",
+         md: "none",
+      },
       bottom: {
          xs: -20,
          md: -38,
       },
       right: {
          xs: -70,
+         sm: 80,
          md: -20,
       },
       zIndex: 2,
