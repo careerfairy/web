@@ -11,7 +11,14 @@ const styles = sxStyles({
       textAlign: "left",
       marginBottom: "21px",
       display: "flex",
-      alignItems: "center",
+      flexDirection: {
+         xs: "column",
+         md: "row",
+      },
+      alignItems: {
+         xs: "flex-start",
+         md: "center",
+      },
    },
    select: {
       width: "100%",
