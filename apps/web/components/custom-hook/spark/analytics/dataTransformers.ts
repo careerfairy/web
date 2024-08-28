@@ -225,7 +225,5 @@ export const convertToClientModel = (
          {}
       )
 
-   console.log("🚀 ~ analytics:", analytics)
-
    return analytics
 }
