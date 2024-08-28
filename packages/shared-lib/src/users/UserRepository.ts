@@ -773,6 +773,7 @@ export class FirebaseUserRepository
    }
 
    async migrateAnonymousJobApplications(userData: UserData): Promise<void> {
+      // TODO-WG: Update job stats
       const batch = this.firestore.batch()
 
       const ref = this.firestore
