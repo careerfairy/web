@@ -4,6 +4,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { LockedSparksCompetitorTab } from "../components/locking/LockedSparksCompetitorTab"
 import { SectionsWrapper } from "../components/SectionsWrapper"
 import { CompetitorSkeleton } from "../overview-tab/SparksAnalyticsCompetitorTabSkeletons"
+import { BannerForCompetitorTable } from "./banner-competitor-table/BannerForCompetitorTable"
 import { TopSparksByAudience } from "./TopSparksByAudience"
 import { TopSparksByIndustry } from "./TopSparksByIndustry"
 
@@ -28,6 +29,7 @@ export const SparksCompetitorTab = ({
          <SuspenseWithBoundary fallback={<CompetitorSkeleton />}>
             <TopSparksByAudience timeFilter={timeFilter} />
          </SuspenseWithBoundary>
+         <BannerForCompetitorTable />
       </SectionsWrapper>
    )
 }
