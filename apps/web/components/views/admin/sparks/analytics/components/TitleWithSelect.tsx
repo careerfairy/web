@@ -27,9 +27,6 @@ const styles = sxStyles({
       fontWeight: 600,
       lineHeight: "30px",
       letterSpacing: "0em",
-      ".MuiSelect-select:first-letter": {
-         textTransform: "lowercase",
-      },
    },
    selectMenu: {
       marginTop: 4,
