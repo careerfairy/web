@@ -13,8 +13,8 @@ export const LockedSparksAudienceTab = () => {
    return (
       <>
          <LockedComponentsModal
-            title="Unlock audience"
-            text="Unlock in-depth audience insights"
+            title="Unlock audience analytics"
+            text="Unlock in-depth analytics by upgrading your free trial to the full Sparks feature. You will have access to:"
             metrics={metrics}
          />
          <LockedContent>
