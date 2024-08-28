@@ -20,7 +20,7 @@ type AudienceOption = {
 const AUDIENCE_OPTIOMS: AudienceOption[] = [
    {
       value: "all",
-      label: "All audiences",
+      label: "All Audiences",
    },
    {
       value: "business-plus",
