@@ -174,8 +174,8 @@ const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
                />
             }
             // Only use the first name in firstName if user has two names
-            title={`${spark.creator.firstName.split(" ")[0]} ${
-               spark.creator.lastName
+            title={`${spark.creator?.firstName?.split(" ")[0]} ${
+               spark.creator?.lastName
             }`}
             subheader={`From ${spark.group.universityName}`}
             sx={styles.cardHeader}
