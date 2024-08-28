@@ -773,7 +773,6 @@ export class FirebaseUserRepository
    }
 
    async migrateAnonymousJobApplications(userData: UserData): Promise<void> {
-      // TODO-WG: Update job stats
       const batch = this.firestore.batch()
 
       const ref = this.firestore
@@ -822,6 +821,18 @@ export class FirebaseUserRepository
             .doc(`${customJob.id}_${userData.id}`)
 
          batch.set(jobApplicationRef, jobApplication)
+
+         const jobStatsRef = this.firestore
+            .collection("customJobStats")
+            .doc(jobApplication.jobId)
+
+         if (!userData.userEmail.includes("@careerfairy")) {
+            // we only want to increment the count if the user is not from CareerFairy
+            const applicantsCount = jobApplication.applied ? 1 : 0
+            batch.update(jobStatsRef, {
+               applicants: this.fieldValue.increment(applicantsCount),
+            })
+         }
 
          const toUpdateAnonJobApplication: Pick<
             AnonymousJobApplication,

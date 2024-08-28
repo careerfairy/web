@@ -7,6 +7,7 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import { props } from "lodash/fp"
@@ -92,7 +93,10 @@ const CustomJobDetails = ({
    hideBottomDivider,
    onApply,
 }: Props) => {
-   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
+   const { applicationInitiatedOnly } = useCustomJobApply(job, context)
+   const [isOpen, handleOpen, handleClose] = useDialogStateHandler(
+      applicationInitiatedOnly
+   )
 
    const [ref, { height }] = useMeasure()
 

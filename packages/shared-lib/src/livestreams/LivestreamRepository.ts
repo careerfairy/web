@@ -1217,8 +1217,6 @@ export class FirebaseLivestreamRepository
          .collection("recordingStats")
          .doc("stats")
 
-      // const existingViewers = ((await docRef.get()).data() as LivestreamRecordingDetails).viewers
-
       const details: Omit<LivestreamRecordingDetails, "id"> = {
          livestreamId,
          livestreamStartDate: livestreamStartDate ?? null,

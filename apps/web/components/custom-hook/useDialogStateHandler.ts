@@ -8,9 +8,12 @@ import React, { useCallback } from "react"
  *   - `handleOpen`: A function to set the dialog state to open.
  *   - `handleClose`: A function to set the dialog state to closed.
  */
-const useDialogStateHandler: () => [boolean, () => void, () => void] = () => {
+const useDialogStateHandler: (
+   initialValue?: boolean
+) => [boolean, () => void, () => void] = (initialValue?: boolean) => {
    //  create a use dialog hook with a default value of false
-   const [IsOpen, setIsOpen] = React.useState(false)
+   // eslint-disable-next-line react/hook-use-state
+   const [IsOpen, setIsOpen] = React.useState(initialValue)
 
    const handleOpen = useCallback(() => {
       setIsOpen(true)
