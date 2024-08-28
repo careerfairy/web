@@ -18,7 +18,11 @@ const styles = sxStyles({
 })
 
 // White list of valid partner sources
-const VALID_PARTNER_SOURCES = ["uniwunder", "careerfairy"]
+const VALID_PARTNER_SOURCES = [
+   "uniwunder",
+   "careerfairy",
+   "unibasel-business-student-council",
+]
 
 type Props = {
    partnerSource: string
