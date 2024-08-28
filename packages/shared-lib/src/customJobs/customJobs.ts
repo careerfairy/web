@@ -87,6 +87,7 @@ export type JobApplicationSource =
 export const pickPublicDataFromCustomJob = (
    job: CustomJob
 ): PublicCustomJob => {
+   if (!job) return null
    return {
       id: job.id,
       groupId: job.groupId ?? null,

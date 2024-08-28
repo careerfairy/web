@@ -6,9 +6,7 @@ import {
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
-import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import { props } from "lodash/fp"
@@ -94,12 +92,8 @@ const CustomJobDetails = ({
    hideBottomDivider,
    onApply,
 }: Props) => {
-   const { userData } = useAuth()
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
-   const { applicationInitiatedOnly } = useUserJobApplication(
-      userData?.id,
-      job.id
-   )
+
    const [ref, { height }] = useMeasure()
 
    const autoActionType = useSelector(autoAction)
@@ -129,7 +123,7 @@ const CustomJobDetails = ({
                   </Stack>
                </Box>
 
-               {context && (isOpen || applicationInitiatedOnly) ? (
+               {context && isOpen ? (
                   <CustomJobApplyConfirmation
                      handleClose={handleClose}
                      job={job as PublicCustomJob}
