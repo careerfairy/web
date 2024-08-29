@@ -114,6 +114,7 @@ const CustomJobHeader = ({
          <Box sx={styles.header}>
             <Box sx={styles.headerLeftSide}>
                <Box sx={styles.headerContent}>
+               {companyLogoUrl && companyName ? (
                   <Stack direction={"row"} alignItems={"center"} spacing={1}>
                      <CircularLogo
                         src={getResizedUrl(companyLogoUrl, "lg")}
@@ -124,6 +125,7 @@ const CustomJobHeader = ({
                         {companyName}
                      </Typography>
                   </Stack>
+               ): null }
                   <Typography variant={"h4"} sx={styles.jobTitle}>
                      {job.title}
                   </Typography>

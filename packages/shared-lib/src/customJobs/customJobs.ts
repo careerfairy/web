@@ -140,7 +140,7 @@ export type CustomJobContent =
 // Beware some IDs are logical, meaning it might not lead to a specific document in collections, i.e. when type = 'portal', the ID
 // of the linked content is purely logical thus retrieving a document with this ID is not intended.
 export type JobApplicationContext = {
-   type: CustomJobContent
+   type: JobApplicationSource
 } & Identifiable
 
 // collection path /jobApplications

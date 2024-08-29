@@ -26,6 +26,7 @@ import useListenToStreams from "../../custom-hook/useListenToStreams"
 import AboutSection from "./AboutSection"
 import EventSection from "./EventSection"
 import Header from "./Header"
+import JobsSection from "./JobsSection"
 import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
 import ProgressBanner from "./ProgressBanner"
@@ -216,6 +217,7 @@ const CompanyPageOverview = ({
                   <Grid item xs={12} md={6}>
                      <Stack px={3} spacing={{ xs: 2, md: 5 }}>
                         <AboutSection />
+                        <JobsSection groupId={group.id} />
                         {group.publicSparks ? (
                            <SparksSection key={group.id} groupId={group.id} />
                         ) : null}

@@ -1,13 +1,14 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
-import { Box, Grid, Tooltip, Typography } from "@mui/material"
+import { Box, Grid, SxProps, Tooltip, Typography } from "@mui/material"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useMemo } from "react"
 import { AlertCircle, Briefcase, Globe, Zap } from "react-feather"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { isJobValidButNoLinkedContent } from "../utils"
 import { JobButtonAction, JobMenuAction } from "./JobCardAction"
@@ -97,9 +98,16 @@ type Props = {
    previewMode: boolean
    smallCard: boolean
    hideJobUrl?: boolean
+   titleSx?: SxProps<DefaultTheme>
 }
 
-const JobCardDetails = ({ job, previewMode, smallCard, hideJobUrl }: Props) => {
+const JobCardDetails = ({
+   job,
+   previewMode,
+   smallCard,
+   hideJobUrl,
+   titleSx,
+}: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const { jobHubV1 } = useFeatureFlags()
@@ -136,7 +144,10 @@ const JobCardDetails = ({ job, previewMode, smallCard, hideJobUrl }: Props) => {
             <Grid item display={"flex"} xs={11} md={12}>
                <Typography
                   variant={"h5"}
-                  sx={[styles.title, smallCard ? styles.smallTitle : null]}
+                  sx={combineStyles(
+                     [styles.title, smallCard ? styles.smallTitle : null],
+                     titleSx
+                  )}
                >
                   {jobName}
                </Typography>

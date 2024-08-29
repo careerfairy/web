@@ -23,6 +23,12 @@ const styles = sxStyles({
       justifyContent: "end",
       alignItems: "center",
    },
+   inlineButton: {
+      whiteSpace: "nowrap",
+      // minWidth: "140px",
+      textAlign: "center",
+      px: 10,
+   },
 })
 
 type Props = {
@@ -71,7 +77,10 @@ export const JobButtonAction = ({ published, smallCard = false }) => {
       <Button
          variant={published && !isMobile ? "contained" : "text"}
          color={published ? "primary" : "grey"}
-         sx={[isMobile ? styles.smallButton : styles.button]}
+         sx={[
+            isMobile ? styles.smallButton : styles.button,
+            styles.inlineButton,
+         ]}
       >
          Check details
       </Button>
@@ -83,6 +92,9 @@ export const JobButtonAction = ({ published, smallCard = false }) => {
       <Grid item xs={1} md={3} lg={2.5} sx={styles.mobileBtnWrapper}>
          {button}
       </Grid>
+      // <Box sx={[styles.mobileBtnWrapper, {  maxWidth: "100%"}]}>
+      //    {button}
+      // </Box>
    )
 }
 

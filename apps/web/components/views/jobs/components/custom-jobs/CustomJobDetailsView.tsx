@@ -32,6 +32,14 @@ const customStyles = sxStyles({
          xs: 1,
          [responsiveBreakpoint]: 2.25,
       },
+      // px: {
+      //    xs: 1,
+      //    [responsiveBreakpoint]: 2.25,
+      // },
+      // pb: {
+      //    xs: 1,
+      //    [responsiveBreakpoint]: 2.25,
+      // },
    },
    content: {
       mt: "24px",
@@ -61,8 +69,8 @@ type Props = {
    handleEdit?: () => void
    onApply?: () => void
    hideCTAButtons?: boolean
-   companyName: string
-   companyLogoUrl: string
+   companyName?: string
+   companyLogoUrl?: string
 }
 
 const CustomJobDetailsView = (props: Props) => {
@@ -107,8 +115,8 @@ const CustomJobDetails = ({
 
    return (
       <>
+         <Box sx={combineStyles(customStyles.root)}>{heroContent}</Box>
          <Stack spacing={4.75} sx={combineStyles(customStyles.root, sx)}>
-            {heroContent}
             <Box>
                <CustomJobHeader
                   job={job}
@@ -145,6 +153,7 @@ const CustomJobDetails = ({
                ) : null}
             </Box>
          </Stack>
+         {/* TODO-WG: Remove as in dialog should be set */}
          {context ? (
             <>
                <CustomJobCTABottomContent

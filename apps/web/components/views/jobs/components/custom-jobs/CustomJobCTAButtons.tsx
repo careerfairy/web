@@ -10,7 +10,7 @@ import useRegistrationHandler from "components/views/livestream-dialog/useRegist
 import { FC, useCallback } from "react"
 
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { sxStyles } from "@careerfairy/shared-ui"
+
 import { useAuth } from "HOCs/AuthProvider"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
@@ -24,6 +24,7 @@ import ActionButtonProvider, {
 import WatchNowButton from "components/views/livestream-dialog/views/livestream-details/action-button/WatchNowButton"
 import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
 import { CheckCircle, ExternalLink } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    ctaWrapper: {
@@ -96,11 +97,9 @@ const CustomJobCTAButtons = (props: Props) => {
          return <></>
       },
       companyPage: () => {
-         return <></>
+         return <PortalJobCTA {...props} />
       },
-      portal: () => {
-         return <></>
-      },
+      portal: () => <></>,
       notification: () => {
          return <></>
       },
@@ -214,6 +213,40 @@ const UpcomingLivestreamJobCTA = ({
                applicationContext={applicationContext}
                handleApplyClick={handleClick}
                isSecondary={!isUserRegistered}
+               alreadyApplied={alreadyApplied}
+            />
+            <ApplicationAlreadySentButton alreadyApplied={alreadyApplied} />
+            <VisitApplicationPageButton
+               job={job}
+               alreadyApplied={alreadyApplied}
+            />
+            <JobExpiredButton job={job} alreadyApplied={alreadyApplied} />
+         </Stack>
+      </Stack>
+   )
+}
+
+const PortalJobCTA = ({
+   alreadyApplied,
+   applicationContext,
+   handleApplyClick,
+   job,
+}: CustomJobCTAProps) => {
+   const isMobile = useIsMobile()
+   return (
+      <Stack sx={[styles.ctaWrapper]}>
+         <Stack
+            direction={isMobile ? "column" : "row-reverse"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            width={isMobile ? "100%" : "auto"}
+            spacing={2}
+         >
+            <CustomJobApplyButton
+               job={job as PublicCustomJob}
+               applicationContext={applicationContext}
+               handleApplyClick={handleApplyClick}
+               isSecondary={false}
                alreadyApplied={alreadyApplied}
             />
             <ApplicationAlreadySentButton alreadyApplied={alreadyApplied} />
