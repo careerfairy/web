@@ -15,6 +15,7 @@ export const QaActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
       return (
          <BrandedTooltip title={enableTooltip ? ActionTooltips["Q&A"] : null}>
             <ActionBarButtonStyled
+               id="qanda-button"
                onClick={handleSetActive}
                active={isActive}
                ref={ref}
