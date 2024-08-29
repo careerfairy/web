@@ -394,6 +394,7 @@ export class FirebaseCustomJobRepository
       fingerPrintId: string,
       jobId: string
    ): Promise<void> {
+      const batch = this.firestore.batch()
       const applicationId = this.getJobApplicationId(jobId, fingerPrintId)
 
       const ref = this.firestore
@@ -405,7 +406,12 @@ export class FirebaseCustomJobRepository
          appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
       }
 
-      return ref.update(toUpdate)
+      const jobStatsRef = this.firestore.collection("customJobStats").doc(jobId)
+
+      batch.update(jobStatsRef, { applicants: this.fieldValue.increment(1) })
+      batch.update(ref, toUpdate)
+
+      return batch.commit()
    }
 
    async incrementCustomJobClicks(jobId: string): Promise<void> {
