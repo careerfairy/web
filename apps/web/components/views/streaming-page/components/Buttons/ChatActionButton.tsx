@@ -29,6 +29,7 @@ export const ChatActionButton = forwardRef<
             badgeContent={isRecordingWindow ? null : numberOfNewChats}
          >
             <ActionBarButtonStyled
+               id="chat-button"
                onClick={handleSetActive}
                active={isActive}
                ref={ref}

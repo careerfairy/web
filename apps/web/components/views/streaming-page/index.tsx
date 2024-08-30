@@ -22,6 +22,14 @@ const HostProfileSelection = dynamic(
    { ssr: false }
 )
 
+const TutorialProvider = dynamic(
+   () =>
+      import("./components/tutorial/LivestreamTutorialProvider").then(
+         (mod) => mod.LivestreamTutorialProvider
+      ),
+   { ssr: false }
+)
+
 const SnackbarNotificationsProvider = dynamic(
    () =>
       import(
@@ -269,17 +277,19 @@ const Component = ({ isHost }: Props) => {
                               <AgoraDevicesProvider>
                                  <LocalTracksProvider>
                                     <ScreenShareProvider>
-                                       <EndOfStream isHost={isHost}>
-                                          <Layout>
-                                             <Fragment>
-                                                <TopBar />
-                                                <MiddleContent />
-                                                <BottomBar />
-                                                <StreamSetupWidget />
-                                                <SettingsMenu />
-                                             </Fragment>
-                                          </Layout>
-                                       </EndOfStream>
+                                       <TutorialProvider>
+                                          <EndOfStream isHost={isHost}>
+                                             <Layout>
+                                                <Fragment>
+                                                   <TopBar />
+                                                   <MiddleContent />
+                                                   <BottomBar />
+                                                   <StreamSetupWidget />
+                                                   <SettingsMenu />
+                                                </Fragment>
+                                             </Layout>
+                                          </EndOfStream>
+                                       </TutorialProvider>
 
                                        {/* <ToggleStreamModeButton /> */}
                                     </ScreenShareProvider>
