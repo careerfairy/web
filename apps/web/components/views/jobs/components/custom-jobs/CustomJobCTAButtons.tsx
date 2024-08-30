@@ -97,7 +97,7 @@ const CustomJobCTAButtons = (props: Props) => {
          return <></>
       },
       companyPage: () => {
-         return <PortalJobCTA {...props} />
+         return <PortalJobCTA {...props} alreadyApplied={alreadyApplied} />
       },
       portal: () => <></>,
       notification: () => {

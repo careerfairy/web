@@ -2,7 +2,7 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CloseOutlined } from "@mui/icons-material"
 import {
    Box,
-   Button,
+   IconButton,
    ListItem,
    Skeleton,
    Stack,
@@ -67,13 +67,22 @@ const JobsSectionDetails = ({ groupId }: Props) => {
             onClose={onCloseJobDialog}
             isOpen={isJobsDialogOpen}
             context={{ type: "companyPage", id: selectedJob.groupId }}
+            heroSx={{
+               pb: "0px !important",
+               pr: "8px !important",
+               pt: "8px !important",
+            }}
             heroContent={
-               <Box display={"flex"} flexDirection={"row-reverse"} pt={1}>
-                  <Button
-                     endIcon={<CloseOutlined sx={{ p: 0, m: 0 }} />}
+               <Box display={"flex"} flexDirection={"row-reverse"} p={0} m={0}>
+                  <IconButton onClick={onCloseJobDialog}>
+                     <CloseOutlined />
+                  </IconButton>
+                  {/* <Button
+                      
+                     startIcon={<CloseOutlined />}
                      color="black"
                      onClick={onCloseJobDialog}
-                  />
+                  />  */}
                </Box>
             }
          />

@@ -3,13 +3,26 @@ import {
    JobApplicationContext,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Dialog, DialogActions, DialogContent, Grow } from "@mui/material"
+import {
+   Dialog,
+   DialogActions,
+   DialogContent,
+   Grow,
+   SxProps,
+} from "@mui/material"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
+import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useGroupsByIds from "components/custom-hook/useGroupsByIds"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import { ReactNode, useCallback } from "react"
+import { useSelector } from "react-redux"
+import { AutomaticActions } from "store/reducers/sparksFeedReducer"
+import { autoAction } from "store/selectors/sparksFeedSelectors"
 import { sxStyles } from "types/commonTypes"
-
 const styles = sxStyles({
    title: {
       textTransform: "uppercase",
@@ -39,6 +52,10 @@ const styles = sxStyles({
       bgcolor: "background.paper",
       // display: "flex",
    },
+
+   jobApplyConfirmationDialog: {
+      m: 2,
+   },
 })
 
 type Props = {
@@ -46,8 +63,8 @@ type Props = {
    customJob: CustomJob
    context?: JobApplicationContext
    onClose?: () => void
-   onApply?: () => void
    heroContent?: ReactNode
+   heroSx?: SxProps<DefaultTheme>
 }
 
 const CustomJobDetailsDialog = ({
@@ -55,23 +72,39 @@ const CustomJobDetailsDialog = ({
    customJob,
    context,
    onClose,
-   onApply,
    heroContent,
+   heroSx,
 }: Props) => {
    const [, , handleClose] = useDialogStateHandler(true)
-
+   const { handleClickApplyBtn, applicationInitiatedOnly, handleConfirmApply } =
+      useCustomJobApply(customJob as PublicCustomJob, context)
+   const [
+      isConfirmApplyOpened,
+      handleConfirmApplyOpen,
+      handleConfirmApplyClose,
+   ] = useDialogStateHandler(applicationInitiatedOnly)
+   const isMobile = useIsMobile()
    const onCloseDialog = useCallback(() => {
       handleClose()
       onClose && onClose()
    }, [handleClose, onClose])
 
+   const {
+      data: [group],
+   } = useGroupsByIds([customJob.groupId])
+
+   const autoActionType = useSelector(autoAction)
+
+   const isAutoApply = autoActionType === AutomaticActions.APPLY
+
    // TODO-WG: Use dialog state handler and move
    // use hero content for back buttons
    return (
       <Dialog
-         maxWidth="md"
+         maxWidth={"md"}
          scroll="paper"
          fullWidth
+         fullScreen={isMobile}
          TransitionComponent={Grow}
          open={isOpen}
          onClose={onCloseDialog}
@@ -85,14 +118,34 @@ const CustomJobDetailsDialog = ({
             <CustomJobDetailsView
                job={customJob}
                heroContent={heroContent}
+               heroSx={heroSx}
                sx={{ pt: "0px !important" }}
+               companyLogoUrl={group.logoUrl}
+               companyName={group.universityName}
+               hideCTAButtons
             />
+            {isConfirmApplyOpened ? (
+               <CustomJobApplyConfirmation
+                  handleClose={handleConfirmApplyClose}
+                  job={customJob as PublicCustomJob}
+                  applicationContext={context}
+                  autoApply={isAutoApply}
+                  onApply={() => {
+                     handleConfirmApplyClose()
+                     handleConfirmApply
+                  }}
+                  sx={styles.jobApplyConfirmationDialog}
+               />
+            ) : null}
          </DialogContent>
          <DialogActions sx={styles.fixedBottomContent}>
             <CustomJobCTAButtons
                applicationContext={context}
                job={customJob as PublicCustomJob}
-               handleApplyClick={onApply}
+               handleApplyClick={() => {
+                  handleConfirmApplyOpen()
+                  handleClickApplyBtn()
+               }}
             />
          </DialogActions>
       </Dialog>

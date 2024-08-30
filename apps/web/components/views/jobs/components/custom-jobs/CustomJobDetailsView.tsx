@@ -64,6 +64,7 @@ type Props = {
    context?: JobApplicationContext
    heroContent?: ReactNode
    sx?: SxProps<DefaultTheme>
+   heroSx?: SxProps<DefaultTheme>
    hideBottomDivider?: boolean
    disabledLinkedContentClick?: boolean
    handleEdit?: () => void
@@ -74,9 +75,11 @@ type Props = {
 }
 
 const CustomJobDetailsView = (props: Props) => {
-   if (!props.job)
+   console.log("🚀 ~ CustomJobDetailsView ~ props:", props.job)
+   if (!props.job) {
+      console.log("🚀 ~ NOT  ~ job:")
       return <CustomJobDetailsSkeleton heroContent={!!props.heroContent} />
-
+   }
    if (props.disableSuspense) return <CustomJobDetails {...props} />
 
    return (
@@ -90,7 +93,7 @@ const CustomJobDetailsView = (props: Props) => {
    )
 }
 
-const CustomJobDetails = ({
+export const CustomJobDetails = ({
    job,
    handleEdit,
    companyLogoUrl,
@@ -99,7 +102,9 @@ const CustomJobDetails = ({
    heroContent,
    disabledLinkedContentClick,
    sx,
+   heroSx,
    hideBottomDivider,
+   hideCTAButtons,
    onApply,
 }: Props) => {
    const { applicationInitiatedOnly } = useCustomJobApply(job, context)
@@ -115,7 +120,7 @@ const CustomJobDetails = ({
 
    return (
       <>
-         <Box sx={combineStyles(customStyles.root)}>{heroContent}</Box>
+         <Box sx={combineStyles(customStyles.root, heroSx)}>{heroContent}</Box>
          <Stack spacing={4.75} sx={combineStyles(customStyles.root, sx)}>
             <Box>
                <CustomJobHeader
@@ -136,7 +141,7 @@ const CustomJobDetails = ({
                   </Stack>
                </Box>
 
-               {context && isOpen ? (
+               {!hideCTAButtons && context && isOpen ? (
                   <CustomJobApplyConfirmation
                      handleClose={handleClose}
                      job={job as PublicCustomJob}
@@ -154,7 +159,7 @@ const CustomJobDetails = ({
             </Box>
          </Stack>
          {/* TODO-WG: Remove as in dialog should be set */}
-         {context ? (
+         {!hideCTAButtons && context ? (
             <>
                <CustomJobCTABottomContent
                   hideBottomDivider={hideBottomDivider}
