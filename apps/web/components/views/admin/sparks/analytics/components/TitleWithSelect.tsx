@@ -20,14 +20,14 @@ const styles = sxStyles({
          md: "center",
       },
    },
-   select: {
+   select: (theme) => ({
       width: "100%",
-      color: "#6749EA",
+      color: theme.palette.secondary.main,
       fontSize: "20px",
       fontWeight: 600,
       lineHeight: "30px",
       letterSpacing: "0em",
-   },
+   }),
    selectMenu: {
       marginTop: 4,
       marginLeft: "-3px",
