@@ -1,28 +1,71 @@
-import useIsMobile from "components/custom-hook/useIsMobile"
-import LockedComponents from "./LockedComponents"
-
-const lockedSparkAnalyticsDesktopImage =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-locked-background.png?alt=media&token=f724cb9e-1a8d-4891-a56c-432039935835"
-const lockedSparkAnalyticsMobileImage =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-locked-background-mobile.png?alt=media&token=22923a7d-9b9c-4eeb-90df-43e5624bac0e"
+import { Grid } from "@mui/material"
+import BulletChart from "../charts/BulletChart"
+import CFPieChart from "../charts/CFPieChart"
+import { GroupSparkAnalyticsCardContainer } from "../GroupSparkAnalyticsCardContainer"
+import { GroupSparkAnalyticsCardContainerTitle } from "../GroupSparkAnalyticsCardTitle"
+import { MockedData } from "./locked-mocked-data"
+import { LockedComponentsModal } from "./LockedComponentsModal"
+import { LockedContent } from "./LockedContent"
 
 const metrics = ["Top countries", "Top universities", "Top field of studies"]
 
 export const LockedSparksAudienceTab = () => {
-   const isMobile = useIsMobile()
-
-   const src = isMobile
-      ? lockedSparkAnalyticsMobileImage
-      : lockedSparkAnalyticsDesktopImage
-
    return (
-      <LockedComponents>
-         <LockedComponents.PlaceholderImage src={src} />
-         <LockedComponents.Info
-            title="Unlock audience"
-            text="Unlock in-depth audience insights"
+      <>
+         <LockedComponentsModal
+            title="Unlock audience analytics"
+            text="Unlock in-depth analytics by upgrading your free trial to the full Sparks feature. You will have access to:"
             metrics={metrics}
          />
-      </LockedComponents>
+         <LockedContent>
+            <Grid container spacing={5} marginBottom={10} alignItems="stretch">
+               <Grid item xs={12} md={6}>
+                  <GroupSparkAnalyticsCardContainer>
+                     <GroupSparkAnalyticsCardContainerTitle>
+                        Top 10 countries
+                     </GroupSparkAnalyticsCardContainerTitle>
+                     <BulletChart
+                        data={MockedData.audience.top10Countries}
+                        valueIndexer="relativePercentage"
+                     />
+                  </GroupSparkAnalyticsCardContainer>
+               </Grid>
+               <Grid item xs={12} md={6}>
+                  <GroupSparkAnalyticsCardContainer>
+                     <GroupSparkAnalyticsCardContainerTitle>
+                        Top 10 universities
+                     </GroupSparkAnalyticsCardContainerTitle>
+                     <BulletChart
+                        data={MockedData.audience.top10Universities}
+                        valueIndexer="relativePercentage"
+                        showPercentageOnly
+                     />
+                  </GroupSparkAnalyticsCardContainer>
+               </Grid>
+               <Grid item xs={12} md={6}>
+                  <GroupSparkAnalyticsCardContainer>
+                     <GroupSparkAnalyticsCardContainerTitle
+                        sx={{ marginBottom: 0 }}
+                     >
+                        Top 10 fields of study
+                     </GroupSparkAnalyticsCardContainerTitle>
+                     <CFPieChart
+                        data={MockedData.audience.top10FieldsOfStudy}
+                     />
+                  </GroupSparkAnalyticsCardContainer>
+               </Grid>
+               <Grid item xs={12} md={6}>
+                  <GroupSparkAnalyticsCardContainer>
+                     <GroupSparkAnalyticsCardContainerTitle
+                        sx={{ marginBottom: 0 }}
+                     >
+                        Level of study
+                     </GroupSparkAnalyticsCardContainerTitle>
+                     <CFPieChart data={MockedData.audience.levelsOfStudy} />
+                  </GroupSparkAnalyticsCardContainer>
+               </Grid>
+            </Grid>
+         </LockedContent>
+      </>
    )
 }
