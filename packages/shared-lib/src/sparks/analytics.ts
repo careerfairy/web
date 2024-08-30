@@ -17,6 +17,8 @@ export type MostSomethingWithPastData = WithPastData<string[]>
 export type CompetitorIndustryBase = {
    sparkId: string
    industry: string
+   plays: number
+   avg_watched_time: number
    engagement: number
 }
 
@@ -25,7 +27,7 @@ export type CompetitorIndustryBaseWithPastData = WithPastData<
 >
 
 export type CompetitorIndustryData = {
-   [key in string]: string[]
+   [key in string]: CompetitorIndustryBase[]
 }
 
 export type CompetitorIndustryWithPastData =
@@ -42,6 +44,15 @@ export type CompetitorAudienceSegments =
 export type CompetitorAudienceBase = {
    sparkId: string
    audience: CompetitorAudienceSegments
+   plays: number
+   avg_watched_time: number
+   engagement: number
+}
+
+export type CompetitorSparkData = {
+   sparkId: string
+   plays: number
+   avgWatchedTime: number
    engagement: number
 }
 

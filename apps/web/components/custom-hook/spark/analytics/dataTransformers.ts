@@ -5,6 +5,7 @@ import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    CompetitorAudienceData,
    CompetitorIndustryData,
+   CompetitorSparkData,
    LinearBarDataPoint,
    MostSomethingBase,
    PieChartDataPoint,
@@ -68,7 +69,12 @@ const mapCompetitorIndustryData = (
 
    for (const item of data) {
       if (industrySegmentsMap[item.industry]?.length < INDUSTRY_SPARKS_LIMIT) {
-         industrySegmentsMap[item.industry].push(item.sparkId)
+         industrySegmentsMap[item.industry].push({
+            sparkId: item.sparkId,
+            plays: item.plays,
+            avgWatchedTime: item.avg_watched_time,
+            engagement: item.engagement,
+         })
       }
    }
 
@@ -76,7 +82,12 @@ const mapCompetitorIndustryData = (
 
    for (const item of data) {
       if (auxAllSet.size < INDUSTRY_SPARKS_LIMIT) {
-         auxAllSet.add(item.sparkId)
+         auxAllSet.add({
+            sparkId: item.sparkId,
+            plays: item.plays,
+            avgWatchedTime: item.avg_watched_time,
+            engagement: item.engagement,
+         })
       }
    }
 
@@ -87,7 +98,7 @@ const mapCompetitorIndustryData = (
 
 const mapCompetitorAudienceData = (
    data: SparksAnalyticsDTO["topSparksByAudience"][TimePeriodParams]
-): CompetitorAudienceData<string> => {
+): CompetitorAudienceData<CompetitorSparkData> => {
    const audienceSegmentsMap = {
       all: [],
       "business-plus": [],
@@ -100,7 +111,12 @@ const mapCompetitorAudienceData = (
 
    for (const item of data) {
       if (audienceSegmentsMap[item.audience]?.length < AUDIENCE_SPARKS_LIMIT) {
-         audienceSegmentsMap[item.audience].push(item.sparkId)
+         audienceSegmentsMap[item.audience].push({
+            sparkId: item.sparkId,
+            plays: item.plays,
+            avgWatchedTime: item.avg_watched_time,
+            engagement: item.engagement,
+         })
       }
    }
 
@@ -108,7 +124,12 @@ const mapCompetitorAudienceData = (
 
    for (const item of data) {
       if (auxAllSet.size < AUDIENCE_SPARKS_LIMIT) {
-         auxAllSet.add(item.sparkId)
+         auxAllSet.add({
+            sparkId: item.sparkId,
+            plays: item.plays,
+            avgWatchedTime: item.avg_watched_time,
+            engagement: item.engagement,
+         })
       }
    }
 
