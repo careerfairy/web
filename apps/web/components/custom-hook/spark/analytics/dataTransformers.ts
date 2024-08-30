@@ -1,6 +1,7 @@
 // Collection of helper functions for data mapping between the backend and frontend
 
 import {
+   CompetitorAudienceData,
    LinearBarDataPoint,
    MostSomethingBase,
    PieChartDataPoint,
@@ -11,6 +12,8 @@ import {
    TimeseriesDataPoint,
 } from "@careerfairy/shared-lib/src/sparks/analytics"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
+
+const AUDIENCE_SPARKS_LIMIT = 4
 
 type FilterTimeSeriesDataByTimeFrame = (
    data: TimeseriesDataPoint[],
@@ -43,6 +46,40 @@ const filterTimeSeriesDataByTimeFrameInMonths: FilterTimeSeriesDataByTimeFrame =
 
 const mapMostSomethingData = (data): MostSomethingBase => {
    return data.map((d) => d.sparkId)
+}
+
+const mapAudienceData = (
+   data: SparksAnalyticsDTO["topSparksByAudience"][TimePeriodParams]
+): CompetitorAudienceData<string> => {
+   const audienceSegmentsMap = {
+      all: [],
+      "business-plus": [],
+      engineering: [],
+      "it-and-mathematics": [],
+      "natural-sciences": [],
+      "social-sciences": [],
+      other: [],
+   }
+
+   for (const item of data) {
+      if (audienceSegmentsMap[item.audience].length < AUDIENCE_SPARKS_LIMIT) {
+         audienceSegmentsMap[item.audience].push(item.sparkId)
+      }
+   }
+
+   const auxAllSet = new Set()
+
+   for (const item of data) {
+      if (auxAllSet.size < AUDIENCE_SPARKS_LIMIT) {
+         auxAllSet.add(item.sparkId)
+      }
+   }
+
+   audienceSegmentsMap["all"] = Array.from(auxAllSet)
+
+   console.log("🚀 ~ audienceSegmentsMap['all']:", audienceSegmentsMap["all"])
+
+   return audienceSegmentsMap
 }
 
 const getxAxisData = (data): Date[] => {
@@ -216,7 +253,7 @@ export const convertToClientModel = (
                topSparksByIndustry: mapMostSomethingData(
                   topSparksByIndustry[timeFrame]
                ),
-               topSparksByAudience: mapMostSomethingData(
+               topSparksByAudience: mapAudienceData(
                   topSparksByAudience[timeFrame]
                ),
             }
