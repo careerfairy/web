@@ -74,14 +74,15 @@ export const TopSparksByAudience = ({
             <EmptyDataCheckerForMostSomething />
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-               {topSparksByAudience[selectAudienceValue].map(
-                  (sparkId, index) => (
-                     <StaticSparkCard
-                        key={`top-sparks-by-audience-${selectAudienceValue}-${sparkId}-${index}`}
-                        sparkId={sparkId}
-                     />
-                  )
-               )}
+               {topSparksByAudience[selectAudienceValue].map((data, index) => (
+                  <StaticSparkCard
+                     key={`top-sparks-by-audience-${selectAudienceValue}-${data.sparkId}-${index}`}
+                     sparkId={data.sparkId}
+                     plays={data.plays}
+                     avgWatchedTime={data.avgWatchedTime}
+                     engagement={data.engagement}
+                  />
+               ))}
             </Stack>
          )}
       </GroupSparkAnalyticsCardContainer>
