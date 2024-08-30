@@ -76,7 +76,7 @@ const formInitialValues: LivestreamFormValues = {
 const mapSpeakerToCreator = (speaker: Speaker): Creator => {
    return {
       id: speaker.id,
-      groupId: null,
+      groupId: speaker.groupId,
       documentType: "groupCreator",
       firstName: speaker.firstName || null,
       lastName: speaker.lastName || null,
