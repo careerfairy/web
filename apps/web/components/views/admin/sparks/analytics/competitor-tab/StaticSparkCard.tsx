@@ -15,6 +15,7 @@ import ShareIcon from "components/views/common/icons/ShareIcon"
 import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { ReactElement } from "react"
 import { sxStyles } from "types/commonTypes"
 import useSpark from "./useSpark"
@@ -125,6 +126,9 @@ const styles = sxStyles({
       letterSpacing: "0em",
       textAlign: "left",
    },
+   cardWithBorder: {
+      border: (theme) => `2px solid ${theme.palette.primary["500"]}`,
+   },
 })
 
 type StatContainerProps = {
@@ -151,6 +155,7 @@ type StaticSparkCardProps = {
 }
 
 export const StaticSparkCard = ({ sparkId }: StaticSparkCardProps) => {
+   const { group } = useGroup()
    const spark = useSpark(sparkId)
    const { data: sparkStats } = useSparkStats(sparkId)
 
@@ -159,10 +164,15 @@ export const StaticSparkCard = ({ sparkId }: StaticSparkCardProps) => {
    const shareCTA = sparkStats?.shareCTA || "0"
    const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || "0"
 
+   const isSparkFromGroup = spark?.group.id === group?.groupId
+
    if (!spark) return null
 
    return (
-      <Card variant="outlined" sx={styles.card}>
+      <Card
+         variant="outlined"
+         sx={[styles.card, isSparkFromGroup && styles.cardWithBorder]}
+      >
          <CardHeader
             avatar={
                <CircularLogo

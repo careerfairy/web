@@ -1,4 +1,5 @@
 import {
+   CompetitorAudienceSegments,
    SparkAnalyticsClientWithPastData,
    TimePeriodParams,
 } from "@careerfairy/shared-lib/sparks/analytics"
@@ -7,32 +8,38 @@ import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparks
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useState } from "react"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
-import {
-   TitleWithSelect,
-   TitleWithSelectOption,
-} from "../components/TitleWithSelect"
+import { TitleWithSelect } from "../components/TitleWithSelect"
 import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
 import { StaticSparkCard } from "./StaticSparkCard"
 
-const AUDIENCE_OPTIOMS: TitleWithSelectOption[] = [
+type AudienceOption = {
+   value: CompetitorAudienceSegments | "all"
+   label: string
+}
+
+const AUDIENCE_OPTIOMS: AudienceOption[] = [
    {
-      value: "Business+",
+      value: "all",
+      label: "All Audiences",
+   },
+   {
+      value: "business-plus",
       label: "Business+",
    },
    {
-      value: "Engineering",
+      value: "engineering",
       label: "Engineering",
    },
    {
-      value: "ITMathematics",
+      value: "it-and-mathematics",
       label: "IT & Mathematics",
    },
    {
-      value: "NaturalSciences",
+      value: "natural-sciences",
       label: "Natural sciences",
    },
    {
-      value: "SocialSciences",
+      value: "social-sciences",
       label: "Social sciences",
    },
 ]
@@ -51,27 +58,30 @@ export const TopSparksByAudience = ({
       group.id
    )[timeFilter]
 
-   const [selectMostSomethingValue, setSelectMostSomethingValue] =
-      useState<string>("Business+")
+   const [selectAudienceValue, setSelectAudienceValue] = useState<
+      CompetitorAudienceSegments | "all"
+   >("all")
 
    return (
       <GroupSparkAnalyticsCardContainer>
          <TitleWithSelect
             title="Top Sparks by audience:&nbsp;"
-            selectedOption={selectMostSomethingValue}
-            setSelectedOption={setSelectMostSomethingValue}
+            selectedOption={selectAudienceValue}
+            setSelectedOption={setSelectAudienceValue}
             options={AUDIENCE_OPTIOMS}
          />
-         {topSparksByAudience?.length === 0 ? (
+         {topSparksByAudience[selectAudienceValue]?.length === 0 ? (
             <EmptyDataCheckerForMostSomething />
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-               {topSparksByAudience.map((sparkId, index) => (
-                  <StaticSparkCard
-                     key={`top-sparks-by-audience-${selectMostSomethingValue}-${sparkId}-${index}`}
-                     sparkId={sparkId}
-                  />
-               ))}
+               {topSparksByAudience[selectAudienceValue].map(
+                  (sparkId, index) => (
+                     <StaticSparkCard
+                        key={`top-sparks-by-audience-${selectAudienceValue}-${sparkId}-${index}`}
+                        sparkId={sparkId}
+                     />
+                  )
+               )}
             </Stack>
          )}
       </GroupSparkAnalyticsCardContainer>
