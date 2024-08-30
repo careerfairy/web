@@ -220,6 +220,7 @@ const StreamerActions = ({
             <LoadingButton
                color="primary"
                variant="outlined"
+               id="highlight-question-button"
                onClick={() =>
                   markQuestionAsCurrent().then(onQuestionHighlighted)
                }

@@ -82,6 +82,7 @@ export const HandRaiseActionButton = forwardRef<
                badgeContent={numberOfHandRaiseNotifications || null}
             >
                <ActionBarButtonStyled
+                  id="hand-raise-button"
                   active={isActive}
                   onClick={handleClick}
                   ref={ref}
