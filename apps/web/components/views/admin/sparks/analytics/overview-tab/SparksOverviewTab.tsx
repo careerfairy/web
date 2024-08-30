@@ -1,11 +1,13 @@
-import { FC } from "react"
-import { Stack } from "@mui/material"
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import ReachAnalyticsContainer from "./ReachAnalyticsContainer"
+import { useAnalyticsLocking } from "components/custom-hook/spark/analytics/useAnalyticsLocking"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { FC } from "react"
+import { LockedSparksAnalytics } from "../components/locking/LockedSparksAnalytics"
+import { SectionsWrapper } from "../components/SectionsWrapper"
+import { timeFrameLabels } from "../util"
 import EngagementAnalyticsContainer from "./EngagementAnalyticsContainer"
 import MostSomethingAnalyticsContainer from "./MostSomethingAnalyticsContainer"
-import { timeFrameLabels } from "../util"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import ReachAnalyticsContainer from "./ReachAnalyticsContainer"
 import {
    EngagementAnalyticsSkeleton,
    MostSomethingSkeleton,
@@ -17,8 +19,14 @@ type SparksOverviewTabProps = {
 }
 
 const SparksOverviewTab: FC<SparksOverviewTabProps> = ({ timeFilter }) => {
+   const { isLocked } = useAnalyticsLocking("overview")
+
+   if (isLocked) {
+      return <LockedSparksAnalytics />
+   }
+
    return (
-      <Stack spacing={5} marginBottom={10}>
+      <SectionsWrapper>
          <SuspenseWithBoundary fallback={<ReachAnalyticsSkeleton />}>
             <ReachAnalyticsContainer
                timeFilter={timeFilter}
@@ -34,7 +42,7 @@ const SparksOverviewTab: FC<SparksOverviewTabProps> = ({ timeFilter }) => {
          <SuspenseWithBoundary fallback={<MostSomethingSkeleton />}>
             <MostSomethingAnalyticsContainer timeFilter={timeFilter} />
          </SuspenseWithBoundary>
-      </Stack>
+      </SectionsWrapper>
    )
 }
 

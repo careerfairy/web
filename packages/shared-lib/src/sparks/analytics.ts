@@ -2,7 +2,7 @@
 
 export type TimeseriesDataPoint = {
    x: string | number
-   y: any
+   y: unknown
 }
 
 export type TimePeriodParams = "7days" | "30days" | "6months" | "1year"
@@ -13,6 +13,59 @@ export type WithPastData<T> = {
 
 export type MostSomethingBase = string[]
 export type MostSomethingWithPastData = WithPastData<string[]>
+
+export type CompetitorIndustryBase = {
+   sparkId: string
+   industry: string
+   plays: number
+   avg_watched_time: number
+   engagement: number
+}
+
+export type CompetitorIndustryBaseWithPastData = WithPastData<
+   CompetitorIndustryBase[]
+>
+
+export type CompetitorIndustryData = {
+   [key in string]: CompetitorIndustryBase[]
+}
+
+export type CompetitorIndustryWithPastData =
+   WithPastData<CompetitorIndustryData>
+
+export type CompetitorAudienceSegments =
+   | "business-plus"
+   | "engineering"
+   | "it-and-mathematics"
+   | "natural-sciences"
+   | "social-sciences"
+   | "other"
+
+export type CompetitorAudienceBase = {
+   sparkId: string
+   audience: CompetitorAudienceSegments
+   plays: number
+   avg_watched_time: number
+   engagement: number
+}
+
+export type CompetitorSparkData = {
+   sparkId: string
+   plays: number
+   avgWatchedTime: number
+   engagement: number
+}
+
+export type CompetitorAudienceBaseWithPastData = WithPastData<
+   CompetitorAudienceBase[]
+>
+
+export type CompetitorAudienceData<T> = {
+   [key in CompetitorAudienceSegments]: T[]
+}
+export type CompetitorAudienceWithPastData = WithPastData<
+   CompetitorAudienceData<CompetitorAudienceBase>
+>
 
 export type LinearBarDataPoint = {
    label: string
@@ -57,13 +110,15 @@ export type SparksAnalyticsDTO = {
    topUniversities: LinearBarWithPastData
    topFieldsOfStudy: PieChartWithPastData
    levelsOfStudy: PieChartWithPastData
+   topSparksByIndustry: CompetitorIndustryBaseWithPastData
+   topSparksByAudience: CompetitorAudienceBaseWithPastData
 }
 
 // Frontend data types
 
 export type TimeSeriesForCharts = {
    totalCount: number
-   xAxis?: any[]
+   xAxis?: unknown[]
    series?: (number | null)[]
 }
 export type TimeSeriesForChartsWithPastData = WithPastData<TimeSeriesForCharts>
@@ -91,8 +146,14 @@ export type SparkAnalyticsClientAudience = {
    levelsOfStudy: PieChartDataPoint[]
 }
 
+export type SparksAnalyticsClientCompetitor = {
+   topSparksByIndustry: CompetitorIndustryBaseWithPastData
+   topSparksByAudience: CompetitorAudienceWithPastData
+}
+
 export type SparkAnalyticsClient = SparkAnalyticsClientOverview &
-   SparkAnalyticsClientAudience
+   SparkAnalyticsClientAudience &
+   SparksAnalyticsClientCompetitor
 
 export type SparkAnalyticsClientWithPastData =
    WithPastData<SparkAnalyticsClient>

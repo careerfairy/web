@@ -1,5 +1,5 @@
 import { Stack, Typography } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { SpyIcon } from "components/views/streaming-page/components/TopBar/SpyIcon"
 import { sxStyles } from "types/commonTypes"
 
@@ -33,7 +33,7 @@ const styles = sxStyles({
 })
 
 export const SpyModeBanner = () => {
-   const isMobile = useIsMobile()
+   const isMobile = useStreamIsMobile()
    return (
       <Stack
          direction="row"
