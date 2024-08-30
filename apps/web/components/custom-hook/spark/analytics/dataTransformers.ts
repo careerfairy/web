@@ -67,7 +67,7 @@ const mapCompetitorIndustryData = (
    const industrySegmentsMap = createIndustryMap(CompanyIndustryValues)
 
    for (const item of data) {
-      if (industrySegmentsMap[item.industry].length < INDUSTRY_SPARKS_LIMIT) {
+      if (industrySegmentsMap[item.industry]?.length < INDUSTRY_SPARKS_LIMIT) {
          industrySegmentsMap[item.industry].push(item.sparkId)
       }
    }
@@ -99,7 +99,7 @@ const mapCompetitorAudienceData = (
    }
 
    for (const item of data) {
-      if (audienceSegmentsMap[item.audience].length < AUDIENCE_SPARKS_LIMIT) {
+      if (audienceSegmentsMap[item.audience]?.length < AUDIENCE_SPARKS_LIMIT) {
          audienceSegmentsMap[item.audience].push(item.sparkId)
       }
    }
