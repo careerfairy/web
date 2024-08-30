@@ -1,14 +1,33 @@
 export function topSparksByIndustry(timePeriod: string) {
    return `
-    SELECT 
-      sparkId, 
-      count(sparkId) as num_views
-    FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents 
-    WHERE actionType = "Played_Spark"
-      AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
-    GROUP BY sparkId
-    ORDER BY count(sparkId) DESC
-    LIMIT 4
+      WITH GroupByIndustry AS (
+         SELECT
+            groupId,
+            JSON_EXTRACT_SCALAR(item, '$.id') as industry,
+         FROM careerfairy-e1fd9.firestore_export.groups_schema_groups_latest,
+         UNNEST(JSON_EXTRACT_ARRAY(companyIndustries)) AS item
+      )
+
+      SELECT 
+         SparkEvents.sparkId,
+         GroupByIndustry.industry,
+         ROUND(SUM(
+            CASE 
+               WHEN SparkEvents.actionType = "Played_Spark" THEN 0.02
+               WHEN SparkEvents.actionType = "Watched_CompleteSpark" THEN 0.05
+               WHEN SparkEvents.actionType = "Like" THEN 0.4
+               WHEN SparkEvents.actionType LIKE "Share_%" THEN 0.5
+               WHEN SparkEvents.actionType LIKE "Click_%" THEN 0.5
+               ELSE 0.0
+            END
+         ), 2) AS engagement
+      FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+      INNER JOIN GroupByIndustry
+         ON SparkEvents.groupId = GroupByIndustry.groupId
+      WHERE actionType = "Played_Spark"
+         AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+      GROUP BY SparkEvents.sparkId, GroupByIndustry.industry
+      ORDER BY count(sparkId) DESC
   `
 }
 
