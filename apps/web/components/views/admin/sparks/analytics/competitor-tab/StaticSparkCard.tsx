@@ -20,7 +20,7 @@ import { sxStyles } from "types/commonTypes"
 import useSpark from "./useSpark"
 
 const styles = sxStyles({
-   card: {
+   card: (theme) => ({
       width: {
          xs: "100%",
          md: 281,
@@ -31,14 +31,13 @@ const styles = sxStyles({
       },
       boxShadow: "none",
       borderRadius: "12px",
-      border: "1px solid #F3F3F5",
-      background:
-         "linear-gradient(0deg, #FAFAFE, #FAFAFE), linear-gradient(0deg, #F3F3F5, #F3F3F5)",
+      border: `1px solid ${theme.brand.white["500"]}`,
+      background: `linear-gradient(0deg, ${theme.brand.white["300"]}, ${theme.brand.white["300"]}), linear-gradient(0deg, ${theme.brand.white["500"]}, ${theme.brand.white["500"]})`,
       "& .MuiCardHeader-root": {
          display: "flex",
          alignItems: "center",
       },
-   },
+   }),
    cardHeader: {
       height: "62px",
       padding: "10px 12px 10px 12px",
@@ -71,16 +70,16 @@ const styles = sxStyles({
       },
       objectFit: "cover",
    },
-   sparksTypeAndTitle: {
+   sparksTypeAndTitle: (theme) => ({
       position: "absolute",
       bottom: "6px",
       left: "12px",
-      color: "#FFFFFF",
+      color: theme.brand.white["50"],
       display: "flex",
       flexDirection: "column",
       gap: "6px",
       zIndex: 2,
-   },
+   }),
    cardMediaGradientOverlay: {
       position: "absolute",
       width: "100%",
@@ -104,20 +103,20 @@ const styles = sxStyles({
       width: "14px !important",
       paddingTop: "30% !important",
    },
-   statContainer: {
+   statContainer: (theme) => ({
       fontWeight: "400",
       letterSpacing: "0em",
-      color: "#6B6B7F",
-   },
-   statIcon: {
+      color: theme.palette.neutral["600"],
+   }),
+   statIcon: (theme) => ({
       "& svg": {
          width: "12px",
          paddingTop: "3px",
          "& path": {
-            fill: "#6B6B7F",
+            fill: theme.palette.neutral["600"],
          },
       },
-   },
+   }),
    statValue: {
       fontSize: "14px",
       fontWeight: "400",
