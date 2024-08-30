@@ -1,11 +1,11 @@
 import { UID } from "agora-rtc-react"
-import { errorLogAndNotify } from "util/CommonUtil"
 import { livestreamService } from "data/firebase/LivestreamService"
-import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 import useSWR from "swr"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 export type StreamerDetails = Awaited<
-   ReturnType<typeof livestreamService.getStreamerDetails>
+   ReturnType<typeof livestreamService.getParticipantDetails>
 >
 
 const initialData: StreamerDetails = {
@@ -14,6 +14,8 @@ const initialData: StreamerDetails = {
    role: "",
    avatarUrl: "",
    linkedInUrl: "",
+   id: "",
+   groupId: "",
 }
 
 export const useStreamerDetails = (uid: UID) => {
@@ -22,7 +24,7 @@ export const useStreamerDetails = (uid: UID) => {
       async () => {
          // Call the service only if uid is present
          if (uid) {
-            return livestreamService.getStreamerDetails(uid.toString())
+            return livestreamService.getParticipantDetails(uid.toString())
          }
          // Return initialData directly if uid is not present
          return initialData
