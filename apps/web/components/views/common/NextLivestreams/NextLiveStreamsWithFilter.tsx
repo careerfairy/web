@@ -12,6 +12,8 @@ import {
    FilterOptions,
    useLivestreamSearchAlgolia,
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import { isInIframe } from "components/helperFunctions/HelperFunctions"
+import { usePartnership } from "HOCs/PartnershipProvider"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -80,11 +82,10 @@ const NextLiveStreamsWithFilter = ({
 }: Props) => {
    const router = useRouter()
    const { query, push } = router
+   const { handlePartnerEventClick } = usePartnership()
 
    const { data: allFieldsOfStudy } = useFieldsOfStudy()
-
    const [inputValue, setInputValue] = useState("")
-
    const [debouncedInputValue, setDebouncedInputValue] = useState("")
 
    useDebounce(
@@ -236,6 +237,13 @@ const NextLiveStreamsWithFilter = ({
    const handleSearch = useCallback(
       (hit: LivestreamSearchResult | null) => {
          if (!hit || typeof hit === "string") return
+
+         // If the application is running in an iframe, open the link in a new tab with UTM tags
+         if (isInIframe()) {
+            handlePartnerEventClick(hit.id)
+            return
+         }
+
          void push(
             buildDialogLink({
                router,
@@ -251,7 +259,7 @@ const NextLiveStreamsWithFilter = ({
             }
          )
       },
-      [push, router]
+      [handlePartnerEventClick, push, router]
    )
 
    return (

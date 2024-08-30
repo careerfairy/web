@@ -20,8 +20,8 @@ const styles = sxStyles({
       cursor: "default",
       px: 1.5,
       py: {
-         xs: 0.5,
-         tablet: 1,
+         xs: "5px",
+         tablet: "7px",
       },
       "& svg": {
          width: {

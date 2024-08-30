@@ -1,8 +1,10 @@
 import { Box, Grow, Stack, Typography } from "@mui/material"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
-import { MicOff } from "react-feather"
+import { Info, MicOff } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { StreamerInfoDialog } from "../../streamer-info/StreamerInfoDialog"
 import { getStreamerDisplayName } from "../../util"
 import { FloatingContent } from "./VideoTrackWrapper"
 
@@ -25,6 +27,9 @@ const styles = sxStyles({
    role: {
       ...getMaxLineStyles(1),
    },
+   detailsButton: {
+      cursor: "pointer",
+   },
 })
 
 type Props = {
@@ -38,42 +43,56 @@ export const DetailsOverlay = ({
    streamerDetails,
    showIcons,
 }: Props) => {
+   const [isStreamerInfoDialogOpen, handleDialogOpen, handleDialogClose] =
+      useDialogStateHandler()
+
    const displayName = getStreamerDisplayName(
       streamerDetails.firstName,
       streamerDetails.lastName
    )
 
    return (
-      <FloatingContent sx={styles.root}>
-         <Stack
-            mt="auto"
-            width="100%"
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            spacing={0.3}
-         >
-            <Stack spacing={-0.5} minWidth={0}>
-               {Boolean(displayName) && (
-                  <Typography variant="brandedBody" sx={styles.displayName}>
-                     {displayName}
-                  </Typography>
-               )}
-               {Boolean(streamerDetails.role) && (
-                  <Typography sx={styles.role} variant="small">
-                     {streamerDetails.role}
-                  </Typography>
+      <>
+         <FloatingContent sx={styles.root}>
+            <Stack
+               mt="auto"
+               width="100%"
+               direction="row"
+               justifyContent="space-between"
+               alignItems="center"
+               spacing={0.3}
+            >
+               <Stack spacing={-0.5} minWidth={0}>
+                  {Boolean(displayName) && (
+                     <Typography variant="brandedBody" sx={styles.displayName}>
+                        {displayName}
+                     </Typography>
+                  )}
+                  {Boolean(streamerDetails.role) && (
+                     <Typography sx={styles.role} variant="small">
+                        {streamerDetails.role}
+                     </Typography>
+                  )}
+               </Stack>
+               {Boolean(showIcons) && (
+                  <Stack direction="row" spacing={1.5}>
+                     <Grow in={!micActive} unmountOnExit>
+                        <Box sx={styles.micOff} component={MicOff} />
+                     </Grow>
+                     <Box
+                        component={Info}
+                        onClick={handleDialogOpen}
+                        sx={styles.detailsButton}
+                     />
+                  </Stack>
                )}
             </Stack>
-            {Boolean(showIcons) && (
-               <Stack direction="row" spacing={1.5}>
-                  <Grow in={!micActive} unmountOnExit>
-                     <Box sx={styles.micOff} component={MicOff} />
-                  </Grow>
-                  {/* <Info /> */}
-               </Stack>
-            )}
-         </Stack>
-      </FloatingContent>
+         </FloatingContent>
+         <StreamerInfoDialog
+            open={isStreamerInfoDialogOpen}
+            handleClose={handleDialogClose}
+            streamerDetails={streamerDetails}
+         />
+      </>
    )
 }

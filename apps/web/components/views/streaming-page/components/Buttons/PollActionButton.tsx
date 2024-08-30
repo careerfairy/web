@@ -17,6 +17,7 @@ export const PollActionButton = forwardRef<
    return (
       <BrandedTooltip title={enableTooltip ? ActionTooltips.Polls : null}>
          <ActionBarButtonStyled
+            id="polls-button"
             active={isActive}
             onClick={handleSetActive}
             ref={ref}

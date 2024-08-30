@@ -1,18 +1,18 @@
-import React, { useMemo, useState } from "react"
-import { wishListBorderRadius } from "../../../../constants/pages"
-import { alpha } from "@mui/material/styles"
 import SearchIcon from "@mui/icons-material/Search"
-import { Box, Button, InputBase, Typography } from "@mui/material"
+import { Avatar, Button, InputBase, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
 import Stack from "@mui/material/Stack"
-import FilterMenu from "./FilterMenu"
+import { alpha } from "@mui/material/styles"
 import { useRouter } from "next/router"
+import React, { useMemo, useState } from "react"
+import { Filter } from "react-feather"
 import { useDebounce } from "react-use"
-import useIsMobile from "../../../custom-hook/useIsMobile"
-import { FilterEnum, useFilter } from "./Filter"
+import { wishListBorderRadius } from "../../../../constants/pages"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import { Filter } from "react-feather"
+import useIsMobile from "../../../custom-hook/useIsMobile"
+import { FilterEnum, useFilter } from "./Filter"
+import FilterMenu from "./FilterMenu"
 
 const styles = sxStyles({
    root: {
@@ -49,15 +49,15 @@ const styles = sxStyles({
       },
       color: "#3D3D47",
    },
-   roundNumber: {
+   filterBadge: {
       width: 25,
       height: 25,
+      fontSize: '14px',
       fontWeight: 500,
-      borderRadius: "50%",
       ml: 1,
-      px: 1.2,
-      backgroundColor: (theme) => theme.palette.primary.main,
-   },
+      bgcolor: 'primary.main',
+      color: 'text.primary',
+    },
 })
 
 const FilterSelector = () => {
@@ -165,9 +165,9 @@ const FilterSelector = () => {
                   >
                      Filters
                   </Typography>
-                  {numberOfActiveFilters > 0 ? (
-                     <Box sx={styles.roundNumber}>{numberOfActiveFilters}</Box>
-                  ) : null}
+                  {numberOfActiveFilters > 0 && (
+                     <Avatar sx={styles.filterBadge}>{numberOfActiveFilters}</Avatar>
+                  )}
                </Button>
             )}
          </Stack>

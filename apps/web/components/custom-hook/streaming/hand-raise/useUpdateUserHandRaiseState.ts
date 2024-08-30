@@ -29,7 +29,7 @@ export const useUpdateUserHandRaiseState = (livestreamId: string) => {
    const { errorNotification } = useSnackbarNotifications()
 
    const fetcher: FetcherType = async (_, options) => {
-      const streamerDetails = await livestreamService.getStreamerDetails(
+      const streamerDetails = await livestreamService.getParticipantDetails(
          options.arg.handRaiseId
       )
       return livestreamService.setUserHandRaiseState(
