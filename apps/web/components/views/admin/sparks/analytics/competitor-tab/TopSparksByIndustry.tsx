@@ -76,14 +76,20 @@ export const TopSparksByIndustry = ({
             <EmptyDataCheckerForMostSomething />
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-               {topSparksByIndustry[selectIndustryValue].map(
-                  (sparkId, index) => (
+               {topSparksByIndustry[selectIndustryValue].map((data, index) => {
+                  console.log("-------------------")
+                  console.log(data)
+                  console.log("-------------------")
+                  return (
                      <StaticSparkCard
-                        key={`top-sparks-by-industry-${selectIndustryValue}-${sparkId}-${index}`}
-                        sparkId={sparkId}
+                        key={`top-sparks-by-industry-${selectIndustryValue}-${data.sparkId}-${index}`}
+                        sparkId={data.sparkId}
+                        plays={data.plays}
+                        avgWatchedTime={data.avgWatchedTime}
+                        engagement={data.engagement}
                      />
                   )
-               )}
+               })}
             </Stack>
          )}
       </GroupSparkAnalyticsCardContainer>
