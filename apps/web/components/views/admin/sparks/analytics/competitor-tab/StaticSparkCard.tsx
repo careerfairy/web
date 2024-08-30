@@ -10,8 +10,8 @@ import {
 } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import ClockIcon from "components/views/common/icons/ClockIcon"
+import EngagementIcon from "components/views/common/icons/EngagementIcon"
 import ImpressionsIcon from "components/views/common/icons/ImpressionsIcon"
-import ShareIcon from "components/views/common/icons/ShareIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -208,7 +208,10 @@ export const StaticSparkCard = ({
                icon={<ClockIcon />}
                value={Math.ceil(avgWatchedTime) + "s"}
             />
-            <StatContainer icon={<ShareIcon />} value={engagement} />
+            <StatContainer
+               icon={<EngagementIcon />}
+               value={Math.ceil(engagement)}
+            />
          </CardActions>
       </Card>
    )
