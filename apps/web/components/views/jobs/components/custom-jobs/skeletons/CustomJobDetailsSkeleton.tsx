@@ -100,7 +100,7 @@ const styles = sxStyles({
 type Props = {
    heroContent?: boolean
 }
-const CustomJobDetailsSkeleton = ({ heroContent }: Props) => {
+export const CustomJobDetailsSkeleton = ({ heroContent }: Props) => {
    return (
       <>
          <Stack spacing={4.75} sx={combineStyles(styles.root)}>

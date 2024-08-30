@@ -200,6 +200,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
          companyLogoUrl={livestreamPresenter.companyLogoUrl}
          context={{ id: livestreamPresenter.id, type: "livestream" }}
          onApply={onApply}
+         disableSuspense
       />
    )
 }

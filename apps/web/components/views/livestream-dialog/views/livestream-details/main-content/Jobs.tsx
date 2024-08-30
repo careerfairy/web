@@ -7,7 +7,6 @@ import Button from "@mui/material/Button"
 import Stack from "@mui/material/Stack"
 import { alpha } from "@mui/material/styles"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import JobCard from "components/views/common/jobs/JobCard"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
 import { LinkProps } from "next/dist/client/link"
@@ -104,10 +103,9 @@ type JobItemProps = {
    job: LivestreamJobAssociation | CustomJob
    presenter: LivestreamPresenter
 }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
    const router = useRouter()
-   const isMobile = useIsMobile()
    const { mode, goToJobDetails } = useLiveStreamDialog()
    const isAtsLivestreamAssociation = useIsAtsLivestreamJobAssociation(job)
 
@@ -185,7 +183,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
          job={job as CustomJob}
          previewMode
          handleClick={() => goToJobDetails((job as CustomJob).id)}
-         hideJobUrl={isMobile}
+         hideJobUrl
       />
    )
 }

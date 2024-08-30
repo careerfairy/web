@@ -226,7 +226,7 @@ export const JobHeaderSkeleton: FC = () => {
             />
             <Box sx={styles.headerContent}>
                <Typography variant={"h4"} sx={styles.jobName}>
-                  <Skeleton width={300} />
+                  <Skeleton width={200} />
                </Typography>
 
                <Box sx={styles.detailsWrapper}>

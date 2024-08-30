@@ -53,6 +53,7 @@ const customStyles = sxStyles({
 })
 
 type Props = {
+   disableSuspense?: boolean
    job: CustomJob
    context?: JobApplicationContext
    heroContent?: ReactNode
@@ -69,6 +70,8 @@ type Props = {
 const CustomJobDetailsView = (props: Props) => {
    if (!props.job)
       return <CustomJobDetailsSkeleton heroContent={!!props.heroContent} />
+
+   if (props.disableSuspense) return <CustomJobDetails {...props} />
 
    return (
       <SuspenseWithBoundary
