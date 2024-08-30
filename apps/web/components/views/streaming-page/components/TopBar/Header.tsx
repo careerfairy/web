@@ -15,6 +15,9 @@ const styles = sxStyles({
    mobileAppBar: {
       pb: 0,
    },
+   mobileContainer: {
+      px: "12px !important",
+   },
    toolbar: (theme) => ({
       minHeight: "auto !important",
       "@media (min-width:0px)": {
@@ -42,7 +45,10 @@ export const Header = ({ children }: Props) => {
          position="static"
          sx={[styles.appBar, streamIsMobile && styles.mobileAppBar]}
       >
-         <Container maxWidth={false}>
+         <Container
+            maxWidth={false}
+            sx={Boolean(streamIsMobile) && styles.mobileContainer}
+         >
             <Toolbar sx={styles.toolbar} disableGutters>
                {children}
             </Toolbar>
