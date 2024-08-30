@@ -11,19 +11,23 @@ const styles = sxStyles({
       textAlign: "left",
       marginBottom: "21px",
       display: "flex",
-      alignItems: "center",
+      flexDirection: {
+         xs: "column",
+         md: "row",
+      },
+      alignItems: {
+         xs: "flex-start",
+         md: "center",
+      },
    },
-   select: {
+   select: (theme) => ({
       width: "100%",
-      color: "#6749EA",
+      color: theme.palette.secondary.main,
       fontSize: "20px",
       fontWeight: 600,
       lineHeight: "30px",
       letterSpacing: "0em",
-      ".MuiSelect-select:first-letter": {
-         textTransform: "lowercase",
-      },
-   },
+   }),
    selectMenu: {
       marginTop: 4,
       marginLeft: "-3px",
