@@ -77,9 +77,6 @@ export const TopSparksByIndustry = ({
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
                {topSparksByIndustry[selectIndustryValue].map((data, index) => {
-                  console.log("-------------------")
-                  console.log(data)
-                  console.log("-------------------")
                   return (
                      <StaticSparkCard
                         key={`top-sparks-by-industry-${selectIndustryValue}-${data.sparkId}-${index}`}
