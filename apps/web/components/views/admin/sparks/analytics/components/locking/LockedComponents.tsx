@@ -1,10 +1,8 @@
 import { Box, Stack, Typography } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import GroupPlansDialog from "components/views/checkout/GroupPlansDialog"
 import UpgradePlanButton from "components/views/checkout/forms/UpgradePlanButton"
+import GroupPlansDialog from "components/views/checkout/GroupPlansDialog"
 import LockedIcon from "components/views/common/icons/LockedIcon"
 import Image from "next/image"
-import React from "react"
 import { Unlock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -78,40 +76,36 @@ const styles = sxStyles({
       },
    },
 })
-const lockedSparkAnalyticsDesktopImage =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-locked-background.png?alt=media&token=f724cb9e-1a8d-4891-a56c-432039935835"
-const lockedSparkAnalyticsMobileImage =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-locked-background-mobile.png?alt=media&token=22923a7d-9b9c-4eeb-90df-43e5624bac0e"
 
-const metrics = ["Reach", "Engagement", "Audience"]
-
-export const LockedSparksAnalytics = () => {
-   const isMobile = useIsMobile()
-
-   const src = isMobile
-      ? lockedSparkAnalyticsMobileImage
-      : lockedSparkAnalyticsDesktopImage
-
+const LockedComponents = ({ children }) => {
    return (
       <Box sx={styles.root} data-testid="locked-spark-analytics">
-         <Image src={src} alt="locked spark analytics" fill objectFit="cover" />
-         <Info />
+         {children}
       </Box>
    )
 }
 
-const Info = () => {
+const PlaceholderImage = ({ src }) => {
+   return (
+      <Image src={src} alt="locked spark analytics" fill objectFit="cover" />
+   )
+}
+
+type InfoProps = {
+   title: string
+   text: string
+   metrics: string[]
+}
+
+const Info = ({ title, text, metrics }: InfoProps) => {
    return (
       <Stack spacing={2} sx={styles.infoWrapper}>
          <Stack spacing={1} sx={styles.heading}>
             <LockedIcon sx={styles.lockedIcon} />
             <Typography component="h3" sx={styles.title}>
-               Unlock enhanced analytics
+               {title}
             </Typography>
-            <Typography sx={styles.text}>
-               Unlock in-depth analytics by upgrading your free trial to the
-               full Sparks feature. You will have access to:
-            </Typography>
+            <Typography sx={styles.text}>{text}</Typography>
          </Stack>
          <Box component="ul" sx={styles.metrics}>
             {metrics.map((metric) => (
@@ -130,3 +124,8 @@ const Info = () => {
       </Stack>
    )
 }
+
+LockedComponents.PlaceholderImage = PlaceholderImage
+LockedComponents.Info = Info
+
+export default LockedComponents
