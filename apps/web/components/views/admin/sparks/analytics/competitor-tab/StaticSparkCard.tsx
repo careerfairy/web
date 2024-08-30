@@ -1,3 +1,4 @@
+import { CompetitorSparkData } from "@careerfairy/shared-lib/sparks/analytics"
 import {
    Box,
    Card,
@@ -7,12 +8,10 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import useSparkStats from "components/custom-hook/spark/useSparkStats"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
+import ClockIcon from "components/views/common/icons/ClockIcon"
 import ImpressionsIcon from "components/views/common/icons/ImpressionsIcon"
-import LikeIcon from "components/views/common/icons/LikeIcon"
 import ShareIcon from "components/views/common/icons/ShareIcon"
-import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -150,19 +149,14 @@ const StatContainer = ({ icon, value }: StatContainerProps) => {
    )
 }
 
-type StaticSparkCardProps = {
-   sparkId: string
-}
-
-export const StaticSparkCard = ({ sparkId }: StaticSparkCardProps) => {
+export const StaticSparkCard = ({
+   sparkId,
+   plays,
+   avgWatchedTime,
+   engagement,
+}: CompetitorSparkData) => {
    const { group } = useGroup()
    const spark = useSpark(sparkId)
-   const { data: sparkStats } = useSparkStats(sparkId)
-
-   const plays = sparkStats?.plays || "0"
-   const likes = sparkStats?.likes || "0"
-   const shareCTA = sparkStats?.shareCTA || "0"
-   const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || "0"
 
    const isSparkFromGroup = spark?.group.id === group?.groupId
 
@@ -211,12 +205,11 @@ export const StaticSparkCard = ({ sparkId }: StaticSparkCardProps) => {
                icon={<ImpressionsIcon sx={styles.impressionsIcon} />}
                value={plays}
             />
-            <StatContainer icon={<LikeIcon />} value={likes} />
-            <StatContainer icon={<ShareIcon />} value={shareCTA} />
             <StatContainer
-               icon={<TotalPlaysIcon />}
-               value={numberOfCareerPageClicks}
+               icon={<ClockIcon />}
+               value={Math.ceil(avgWatchedTime) + "s"}
             />
+            <StatContainer icon={<ShareIcon />} value={engagement} />
          </CardActions>
       </Card>
    )
