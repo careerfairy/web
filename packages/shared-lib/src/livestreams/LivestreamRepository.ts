@@ -1664,7 +1664,7 @@ export class FirebaseLivestreamRepository
          message,
          buttonText,
          buttonURL,
-         timestamp: this.fieldValue.serverTimestamp() as unknown as Timestamp,
+         createdAt: this.fieldValue.serverTimestamp() as unknown as Timestamp,
          id: docRef.id,
          numberOfUsersWhoClickedLink: 0,
          numberOfUsersWhoDismissed: 0,
@@ -1703,8 +1703,9 @@ export class FirebaseLivestreamRepository
 
       const ctaSnap = await docRef.get()
 
-      const updateData: Pick<LivestreamCTA, "active"> = {
+      const updateData: Pick<LivestreamCTA, "active" | "activatedAt"> = {
          active: !ctaSnap.data().active,
+         activatedAt: this.fieldValue.serverTimestamp() as unknown as Timestamp,
       }
 
       return docRef.update(updateData)

@@ -14,6 +14,8 @@ import {
    EmoteType,
    EventRatingAnswer,
    FeedbackQuestionUserAnswer,
+   LivestreamCTA,
+   LivestreamCTAUserInteraction,
    CategoryDataOption as LivestreamCategoryDataOption,
    LivestreamChatEntry,
    LivestreamEmote,
@@ -28,9 +30,9 @@ import {
    MarkLivestreamPollAsCurrentRequest,
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
+   ParticipantDetails,
    ResetLivestreamQuestionRequest,
    Speaker,
-   StreamerDetails,
    ToggleActiveCTARequest,
    ToggleHandRaiseRequest,
    UpdateLivestreamCTARequest,
@@ -202,7 +204,7 @@ export class LivestreamService {
 
    private async getUserDetails(
       identifier: string
-   ): Promise<StreamerDetails | null> {
+   ): Promise<ParticipantDetails | null> {
       const userQuery = query(
          collection(FirestoreInstance, "userData"),
          where("authId", "==", identifier),
@@ -220,6 +222,7 @@ export class LivestreamService {
             role: data.position || (data.fieldOfStudy?.name ?? "") || "Other",
             avatarUrl: data.avatar || "",
             linkedInUrl: data.linkedinUrl || "",
+            id: identifier,
          }
       }
 
@@ -229,7 +232,7 @@ export class LivestreamService {
    private async getLivestreamSpeakerDetails(
       speakerId: string,
       livestreamId: string
-   ): Promise<StreamerDetails | null> {
+   ): Promise<ParticipantDetails | null> {
       const livestream = await getDoc(this.getLivestreamRef(livestreamId))
 
       if (livestream.exists) {
@@ -247,6 +250,9 @@ export class LivestreamService {
                role: speaker.position,
                avatarUrl: speaker.avatar,
                linkedInUrl: speaker.linkedInUrl,
+               id: speakerId,
+               groupId: speaker.groupId,
+               background: speaker.background,
             }
          }
       }
@@ -264,10 +270,10 @@ export class LivestreamService {
       ]
    }
 
-   async getStreamerDetails(uid: string): Promise<StreamerDetails> {
+   async getParticipantDetails(uid: string): Promise<ParticipantDetails> {
       const [tag, identifier, livestreamId] =
          this.getTagAndIdentifierFromUid(uid)
-      let details: StreamerDetails | null = null
+      let details: ParticipantDetails | null = null
 
       switch (tag) {
          case STREAM_IDENTIFIERS.RECORDING:
@@ -277,6 +283,7 @@ export class LivestreamService {
                role: "Recording",
                avatarUrl: "",
                linkedInUrl: "",
+               id: identifier,
             }
             break
          case STREAM_IDENTIFIERS.SPEAKER:
@@ -329,6 +336,7 @@ export class LivestreamService {
                   : "User",
             avatarUrl: "",
             linkedInUrl: "",
+            id: "",
          }
       )
    }
@@ -1150,7 +1158,7 @@ export class LivestreamService {
       livestreamId: string,
       questionId: string,
       voterId: string,
-      userData: StreamerDetails
+      userData: ParticipantDetails
    ) => {
       const ref = doc(
          FirestoreInstance,
@@ -1173,7 +1181,7 @@ export class LivestreamService {
       livestreamId: string,
       questionId: string,
       voterId: string,
-      userData: StreamerDetails,
+      userData: ParticipantDetails,
       answer: FeedbackQuestionUserAnswer
    ) => {
       const ref = doc(
@@ -1298,6 +1306,104 @@ export class LivestreamService {
          "toggleActiveCTA"
       )(options)
       return
+   }
+
+   getCTARef = (livestreamId: string, ctaId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "callToActions",
+         ctaId
+      ).withConverter(createGenericConverter<LivestreamCTA>())
+   }
+
+   getUserCTARef = (livestreamId: string, ctaId: string, userId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "callToActions",
+         ctaId,
+         "usersWhoInteracted",
+         userId
+      ).withConverter(createGenericConverter<LivestreamCTAUserInteraction>())
+   }
+
+   clickCTA = async (
+      livestreamId: string,
+      ctaId: string,
+      userIdentifier: string
+   ) => {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const ctaRef = this.getCTARef(livestreamId, ctaId)
+         const userRef = this.getUserCTARef(livestreamId, ctaId, userIdentifier)
+
+         transaction.set(
+            userRef,
+            {
+               ctaId: ctaId,
+               livestreamId: livestreamId,
+               userId: userIdentifier,
+               numberOfClicks: increment(1),
+               clickedAt: arrayUnion({
+                  timestamp: Timestamp.now(),
+               }),
+            },
+            { merge: true }
+         )
+
+         transaction.update(ctaRef, {
+            numberOfUsersWhoClickedLink: increment(1),
+         })
+      })
+   }
+
+   dismissCTA = async (
+      livestreamId: string,
+      ctaId: string,
+      userIdentifier: string
+   ) => {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const ctaRef = this.getCTARef(livestreamId, ctaId)
+         const userRef = this.getUserCTARef(livestreamId, ctaId, userIdentifier)
+
+         transaction.set(
+            userRef,
+            {
+               userId: userIdentifier,
+               ctaId: ctaId,
+               livestreamId: livestreamId,
+               dismissedAt: Timestamp.now(),
+            },
+            { merge: true }
+         )
+
+         transaction.update(ctaRef, {
+            numberOfUsersWhoDismissed: increment(1),
+         })
+      })
+   }
+
+   markCTAAsRead = async (
+      livestreamId: string,
+      userIdentifier: string,
+      ctaIds: string[]
+   ) => {
+      ctaIds.forEach((ctaId) => {
+         const userRef = this.getUserCTARef(livestreamId, ctaId, userIdentifier)
+
+         setDoc(
+            userRef,
+            {
+               userId: userIdentifier,
+               ctaId: ctaId,
+               livestreamId: livestreamId,
+               readAt: Timestamp.now(),
+            },
+            { merge: true }
+         )
+      })
    }
 }
 

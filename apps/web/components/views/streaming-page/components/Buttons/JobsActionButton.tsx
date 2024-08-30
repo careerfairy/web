@@ -17,6 +17,7 @@ export const JobsActionButton = forwardRef<
    return (
       <BrandedTooltip title={enableTooltip ? ActionTooltips.Jobs : null}>
          <ActionBarButtonStyled
+            id="jobs-button"
             onClick={handleSetActive}
             active={isActive}
             ref={ref}

@@ -34,6 +34,7 @@ export const baseCreatorShape = {
       .array()
       .of(yup.mixed<CreatorRole>().oneOf(Object.values(CreatorRoles))),
    id: yup.string(),
+   groupId: yup.string(),
 }
 
 export const CreateCreatorSchema = yup.object(baseCreatorShape)

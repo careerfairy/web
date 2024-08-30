@@ -1,4 +1,4 @@
-import { Box, Skeleton, Stack, Typography } from "@mui/material"
+import { Box, Container, Skeleton, Stack, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 
 export const styles = sxStyles({
@@ -40,9 +40,16 @@ export const styles = sxStyles({
    text: {
       width: "100%",
    },
+   actionButton: {
+      justifyContent: "center",
+      alignItems: "center",
+      gap: "8px",
+      alignSelf: "stretch",
+      width: "100%",
+   },
 })
 
-export const CTACardSkeleton = () => {
+export const CTAHostCardSkeleton = () => {
    return (
       <Stack sx={styles.root}>
          <Stack spacing={1.5}>
@@ -91,6 +98,20 @@ export const CTACardSkeleton = () => {
                </Stack>
             </Stack>
          </Stack>
+      </Stack>
+   )
+}
+
+export const CTAViewerCardSkeleton = () => {
+   return (
+      <Stack sx={styles.root}>
+         <Stack>
+            <Skeleton variant="text" sx={styles.text} />
+            <Skeleton variant="text" sx={styles.text} />
+         </Stack>
+         <Container>
+            <Skeleton variant="rounded" sx={styles.actionButton} height={20} />
+         </Container>
       </Stack>
    )
 }

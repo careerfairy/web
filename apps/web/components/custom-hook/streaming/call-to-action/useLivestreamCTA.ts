@@ -18,7 +18,7 @@ export const useLivestreamCTA = (livestreamId: string) => {
             livestreamId,
             "callToActions"
          ),
-         orderBy("timestamp", "desc")
+         orderBy("createdAt", "desc")
       ),
       reactFireOptions
    )

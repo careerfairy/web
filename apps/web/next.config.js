@@ -296,6 +296,16 @@ const moduleExports = {
                },
             ],
          },
+         {
+            source: "/next-livestreams/partnership/:partnerSource",
+            // allow embedding iframes on this path
+            headers: [
+               {
+                  key: "X-Frame-Options",
+                  value: "",
+               },
+            ],
+         },
       ]
    },
    experimental: {

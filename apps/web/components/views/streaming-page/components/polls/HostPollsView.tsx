@@ -1,15 +1,17 @@
+import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import { Box, Collapse, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamPolls } from "components/custom-hook/streaming/useLivestreamPolls"
 import { Fragment, useMemo, useState } from "react"
 import { TransitionGroup } from "react-transition-group"
 import { useStreamingContext } from "../../context"
+import { useLivestreamTutorial } from "../tutorial/LivestreamTutorialProvider"
+import { TutorialSteps } from "../tutorial/TutorialSteps"
+import { ConfirmDeletePollDialog } from "./ConfirmDeletePollDialog"
+import { ConfirmReopenPollDialog } from "./ConfirmReopenPollDialog"
 import { PollCard } from "./PollCard"
 import { PollCardSkeleton } from "./PollCardSkeleton"
 import { PollCreationButton } from "./PollCreationButton"
-import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
-import { ConfirmDeletePollDialog } from "./ConfirmDeletePollDialog"
-import { ConfirmReopenPollDialog } from "./ConfirmReopenPollDialog"
 
 type Props = {
    onPollStarted: () => void
@@ -35,6 +37,7 @@ const customSortPolls = (a: LivestreamPoll, b: LivestreamPoll) => {
 const Content = ({ onPollStarted }: Props) => {
    const { livestreamId, isHost } = useStreamingContext()
    const { data: polls } = useLivestreamPolls(livestreamId)
+   const { isActive: isTutorialActive, activeStepId } = useLivestreamTutorial()
    const [pollIdToDelete, setPollIdToDelete] = useState<string | null>(null)
 
    const [pollIdToReopen, setPollIdToReopen] = useState<string | null>(null)
@@ -61,32 +64,44 @@ const Content = ({ onPollStarted }: Props) => {
 
    const hasPolls = polls.length > 0
 
+   const createPollFormOpen = isTutorialActive
+      ? activeStepId === TutorialSteps.POLLS_2
+      : isCreatePollFormOpen
+
+   const showPolls = isTutorialActive
+      ? activeStepId !== TutorialSteps.POLLS_2
+      : true
+
    return (
       <Fragment>
          <Stack spacing={1.5}>
             {isHost ? (
                <PollCreationButton
                   setIsCreatePollFormOpen={setIsCreatePollFormOpen}
-                  isCreatePollFormOpen={isCreatePollFormOpen}
+                  isCreatePollFormOpen={createPollFormOpen}
                   hasPolls={hasPolls}
                />
             ) : null}
-            <Stack spacing={1} component={TransitionGroup}>
-               {orderedPolls.map((poll) => (
-                  <Collapse key={poll.id}>
-                     <Box>
-                        <SuspenseWithBoundary fallback={<PollCardSkeleton />}>
-                           <PollCard
-                              poll={poll}
-                              onClickDelete={handleOpenPollDeleteDialog}
-                              onClickReopen={handleOpenPollReopenDialog}
-                              onPollStarted={onPollStarted}
-                           />
-                        </SuspenseWithBoundary>
-                     </Box>
-                  </Collapse>
-               ))}
-            </Stack>
+            {showPolls ? (
+               <Stack spacing={1} component={TransitionGroup}>
+                  {orderedPolls.map((poll) => (
+                     <Collapse key={poll.id}>
+                        <Box>
+                           <SuspenseWithBoundary
+                              fallback={<PollCardSkeleton />}
+                           >
+                              <PollCard
+                                 poll={poll}
+                                 onClickDelete={handleOpenPollDeleteDialog}
+                                 onClickReopen={handleOpenPollReopenDialog}
+                                 onPollStarted={onPollStarted}
+                              />
+                           </SuspenseWithBoundary>
+                        </Box>
+                     </Collapse>
+                  ))}
+               </Stack>
+            ) : null}
          </Stack>
          <ConfirmDeletePollDialog
             open={Boolean(pollIdToDelete)}

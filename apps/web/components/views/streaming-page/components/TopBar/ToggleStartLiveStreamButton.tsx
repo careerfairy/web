@@ -68,10 +68,10 @@ export const ToggleStartLiveStreamButton = () => {
                >
                   {hasStarted
                      ? isMobile
-                        ? "Stop"
+                        ? "End stream"
                         : "End live stream"
                      : isMobile
-                     ? "Start"
+                     ? "Start stream"
                      : "Start live stream"}
                </ResponsiveStreamButton>
             </span>

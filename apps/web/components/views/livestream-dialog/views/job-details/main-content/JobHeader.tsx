@@ -145,7 +145,7 @@ const JobHeader = ({
                            </Typography>
                         ) : null}
 
-                        {jobBusinessFunctionsTagIds.length > 0 ? (
+                        {jobBusinessFunctionsTagIds?.length > 0 ? (
                            <Typography
                               variant={"subtitle1"}
                               sx={styles.details}
@@ -179,7 +179,7 @@ const JobHeader = ({
                                     {jobType}
                                  </>
                               ) : null}
-                              {jobBusinessFunctionsTagIds.length > 0 ? (
+                              {jobBusinessFunctionsTagIds?.length > 0 ? (
                                  <>
                                     <Zap width={14} />
                                     {jobBusinessFunctionsTagIds.join(", ")}

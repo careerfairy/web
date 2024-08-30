@@ -1,14 +1,17 @@
 import { Box, Stack, StackProps } from "@mui/material"
 
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ReactNode } from "react"
 import { useIsSpyMode } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context/Streaming"
+import { CallsToActionButton } from "./CallsToActionButton"
 import { CheckJobsButton } from "./CheckJobsButton"
 import { CompanyButton } from "./CompanyButton"
 import { ConnectionStatus } from "./ConnectionStatus"
 import { Header } from "./Header"
+import { HelpButton } from "./HelpButton"
 import { LogoBackButton } from "./LogoBackButton"
 import { SpyModeBanner } from "./SpyModeBanner"
 import { Timer } from "./Timer"
@@ -26,13 +29,18 @@ const styles = sxStyles({
       alignItems: "center",
       gap: "8px",
    },
+   rightButtons: {
+      flexDirection: "row",
+      gap: "8px",
+   },
 })
 
-const TOOLBAR_WRAP_BREAKPOINT = 660
+const TOOLBAR_WRAP_BREAKPOINT = 720
 
 export const TopBar = () => {
    const { isHost } = useStreamingContext()
-   const isStreamMobile = useIsMobile()
+   const isStreamMobile = useStreamIsMobile()
+
    const isSpyMode = useIsSpyMode()
 
    const isNarrow = useIsMobile(TOOLBAR_WRAP_BREAKPOINT)
@@ -51,6 +59,7 @@ export const TopBar = () => {
                >
                   <LogoBackButton />
                   <Stack direction="row" sx={styles.leftSide}>
+                     {isHost && isNarrow ? <HelpButton /> : null}
                      {isSpyMode && isStreamMobile ? <SpyModeBanner /> : null}
                      <Timer />
                   </Stack>
@@ -63,16 +72,27 @@ export const TopBar = () => {
    )
 }
 
-const HostView = () => (
-   <StackComponent justifyContent="flex-end">
-      <MarginBox>
-         <ConnectionStatus />
-      </MarginBox>
-      <ToggleStartLiveStreamButton />
-      <CompanyButton />
-      <ViewCount />
-   </StackComponent>
-)
+const HostView = () => {
+   const isNarrow = useIsMobile(TOOLBAR_WRAP_BREAKPOINT)
+   const { isHost } = useStreamingContext()
+
+   return (
+      <StackComponent
+         justifyContent={isNarrow ? "space-between" : "flex-end"}
+         sx={{ flex: isNarrow ? "1 0 0" : "unset" }}
+      >
+         {isHost && !isNarrow ? <HelpButton /> : null}
+         <MarginBox>
+            <ConnectionStatus />
+         </MarginBox>
+         <Stack sx={styles.rightButtons}>
+            <ToggleStartLiveStreamButton />
+            <CompanyButton />
+            <ViewCount />
+         </Stack>
+      </StackComponent>
+   )
+}
 
 const ViewerView = () => {
    const { shouldStream } = useStreamingContext()
@@ -82,7 +102,7 @@ const ViewerView = () => {
          <MarginBox>
             <ViewCount />
          </MarginBox>
-         {/* <CallToActionsButton /> */}
+         <CallsToActionButton />
          {shouldStream ? <ConnectionStatus /> : null}
          <CompanyButton />
          <CheckJobsButton />

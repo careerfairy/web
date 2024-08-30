@@ -1,5 +1,5 @@
 import { FieldOfStudy } from "../../fieldOfStudy"
-import { LivestreamEvent } from "../../livestreams"
+import { LivestreamCountryTarget, LivestreamEvent } from "../../livestreams"
 import { sortElementsByFrequency } from "../utils"
 import { RECOMMENDATION_POINTS } from "./constants"
 
@@ -104,7 +104,7 @@ export class RankedLivestreamEvent {
       return this.model?.targetUniversities || []
    }
 
-   getTargetCountries(): string[] {
+   getTargetCountries(): LivestreamCountryTarget[] {
       return this.model?.targetCountries || []
    }
 

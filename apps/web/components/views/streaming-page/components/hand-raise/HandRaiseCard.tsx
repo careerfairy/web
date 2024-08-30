@@ -68,7 +68,7 @@ export const HandRaiseCard = forwardRef<HTMLDivElement, Props>(
             <Stack spacing={1.5}>
                {handRaise.state === HandRaiseState.requested && (
                   <Typography color="primary" variant="small">
-                     Raised hands {timeSinceHandRaise}
+                     Raised hand {timeSinceHandRaise}
                   </Typography>
                )}
                {handRaise.state === HandRaiseState.invited && (

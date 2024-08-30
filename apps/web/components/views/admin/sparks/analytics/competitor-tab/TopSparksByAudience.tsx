@@ -20,11 +20,11 @@ type AudienceOption = {
 const AUDIENCE_OPTIOMS: AudienceOption[] = [
    {
       value: "all",
-      label: "All audiences",
+      label: "All Audiences",
    },
    {
       value: "business-plus",
-      label: "Business +",
+      label: "Business+",
    },
    {
       value: "engineering",
