@@ -10,6 +10,7 @@ import {
    AuthorInfo,
    IEmailSent,
    LiveSpeaker,
+   LivestreamCountryTarget,
    LivestreamEvent,
    LivestreamEventPublicData,
    LivestreamGroupQuestionsMap,
@@ -85,7 +86,7 @@ export class LivestreamPresenter extends BaseModel {
        * An empty array means the livestream should target all the fields of study
        * [] -> All fields of study
        */
-      public readonly targetCountries: string[],
+      public readonly targetCountries: LivestreamCountryTarget[],
 
       /**
        * An empty array means the livestream should target all the fields of study

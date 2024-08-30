@@ -82,7 +82,7 @@ export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
 export const mapSpeakerToCreator = (speaker: Speaker): Creator => {
    return {
       id: speaker.id,
-      groupId: null,
+      groupId: speaker.groupId,
       documentType: "groupCreator",
       firstName: speaker.firstName || null,
       lastName: speaker.lastName || null,
@@ -109,6 +109,7 @@ export const mapCreatorToSpeaker = (
       | "email"
       | "linkedInUrl"
       | "roles"
+      | "groupId"
    >
 ): Speaker => {
    return {
@@ -121,9 +122,13 @@ export const mapCreatorToSpeaker = (
       email: creator.email,
       linkedInUrl: creator.linkedInUrl,
       roles: creator.roles,
+      groupId: creator.groupId,
    }
 }
 
-export function transformCreatorNameIntoSlug(creator: PublicCreator) {
-   return `${creator.firstName}-${creator.lastName}`.toLowerCase()
+export function transformCreatorNameIntoSlug(
+   firstName: string,
+   lastName: string
+) {
+   return `${firstName}-${lastName}`.toLowerCase()
 }

@@ -45,7 +45,7 @@ const styles = sxStyles({
       position: {
          fontSize: "14px",
          fontWeight: 400,
-         lineHeight: "20px",
+         lineHeight: "21px",
          textAlign: "center",
          color: "neutral.400",
          ...getMaxLineStyles(2),
@@ -77,7 +77,10 @@ const Container = ({ creator, children }: ContainerProps) => {
          component={Link}
          href={`/company/${
             router.query.companyName
-         }/mentor/${transformCreatorNameIntoSlug(creator)}/${creator.id}`}
+         }/mentor/${transformCreatorNameIntoSlug(
+            creator.firstName,
+            creator.lastName
+         )}/${creator.id}`}
       >
          {children}
       </Box>

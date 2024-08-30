@@ -5,9 +5,15 @@ import {
    TimePeriodParams,
    TimeseriesDataPoint,
 } from "@careerfairy/shared-lib/sparks/analytics"
-import IBigQueryService from "../../bigQuery/IBigQueryService"
 import { BigQuery } from "@google-cloud/bigquery"
-import { totalViewsPastYear, uniqueViewersPastYear } from "./queries/Reach"
+import IBigQueryService from "../../bigQuery/IBigQueryService"
+import {
+   top10Countries,
+   top10FieldsOfStudy,
+   top10Universities,
+   topLevelsOfStudy,
+} from "./queries/Audience"
+import { topSparksByAudience, topSparksByIndustry } from "./queries/Competitor"
 import {
    timeseriesLikesPastYear,
    timeseriesPageClicksPastYear,
@@ -20,12 +26,7 @@ import {
    mostShared,
    mostWatched,
 } from "./queries/MostSomething"
-import {
-   top10Countries,
-   top10FieldsOfStudy,
-   top10Universities,
-   topLevelsOfStudy,
-} from "./queries/Audience"
+import { totalViewsPastYear, uniqueViewersPastYear } from "./queries/Reach"
 
 /**
  * Interface for the GroupSparksAnalyticsRepository
@@ -128,6 +129,14 @@ interface IGroupSparksAnalyticsRepository {
     * @returns {Promise<PieChartDataPoint[]>} Promise object represents the levels of study for the given time period
     */
    getLevelsOfStudy(timeperiod: TimePeriodParams): Promise<PieChartDataPoint[]>
+
+   getTopSparksByIndustry(
+      timeperiod: TimePeriodParams
+   ): Promise<MostSomethingBase>
+
+   getTopSparksByAudience(
+      timeperiod: TimePeriodParams
+   ): Promise<MostSomethingBase>
 }
 
 class GroupSparksAnalyticsRepository
@@ -242,6 +251,24 @@ class GroupSparksAnalyticsRepository
       return this.handleQueryPromiseWithTimePeriodValidation<
          PieChartDataPoint[]
       >(topLevelsOfStudy, timeperiod)
+   }
+
+   getTopSparksByIndustry(
+      timeperiod: TimePeriodParams
+   ): Promise<MostSomethingBase> {
+      return this.handleQueryPromiseWithTimePeriodValidation<MostSomethingBase>(
+         topSparksByIndustry,
+         timeperiod
+      )
+   }
+
+   getTopSparksByAudience(
+      timeperiod: TimePeriodParams
+   ): Promise<MostSomethingBase> {
+      return this.handleQueryPromiseWithTimePeriodValidation<MostSomethingBase>(
+         topSparksByAudience,
+         timeperiod
+      )
    }
 
    private async handleQueryPromise<T>(

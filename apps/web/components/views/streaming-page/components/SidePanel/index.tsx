@@ -12,6 +12,7 @@ import { sxStyles } from "types/commonTypes"
 import { CTAPanel } from "./CTAPanel"
 import { ChatPanel } from "./ChatPanel"
 import { HandRaisePanel } from "./HandRaisePanel"
+import { HelpPanel } from "./HelpPanel"
 import { JobsPanel } from "./JobsPanel"
 import { PollsPanel } from "./PollsPanel"
 import { QAndAPanel } from "./QAndAPanel"
@@ -51,6 +52,7 @@ const viewComponents = {
    cta: <CTAPanel />,
    handRaise: <HandRaisePanel />,
    viewers: <ViewersPanel />,
+   help: <HelpPanel />,
    default: null,
 } satisfies Record<ActiveView | "default", ReactNode>
 
@@ -68,7 +70,8 @@ export const SidePanel = () => {
 
    const isMaxHeight =
       activeView === ActiveViews.VIEWERS ||
-      activeView === ActiveViews.HAND_RAISE
+      activeView === ActiveViews.HAND_RAISE ||
+      activeView === ActiveViews.HELP
 
    if (isMobile) {
       return (

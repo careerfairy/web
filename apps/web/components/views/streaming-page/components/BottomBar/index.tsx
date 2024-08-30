@@ -180,7 +180,7 @@ type ActionsBarProps = {
 }
 const ActionsBar = ({ children }: ActionsBarProps) => {
    return (
-      <Stack direction="row" spacing={2} sx={styles.actionsBar}>
+      <Stack direction="row" spacing={2} sx={styles.actionsBar} id="action-bar">
          {children}
       </Stack>
    )
