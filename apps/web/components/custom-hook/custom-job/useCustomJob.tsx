@@ -7,6 +7,8 @@ import { useFirestoreDocument } from "../utils/useFirestoreDocument"
  * @param jobId
  */
 const useCustomJob = (jobId: string) => {
+   console.log("🚀 ~ useCustomJob ~ jobId:", jobId)
+
    const { data } = useFirestoreDocument<CustomJob>("customJobs", [jobId], {
       idField: "id",
    })

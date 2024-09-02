@@ -21,15 +21,20 @@ const CustomJobAdminDetails = ({
    companyName,
    companyLogoUrl,
 }: Props) => {
+   // if(!job.id)
+   //    return null
    return (
       <Box sx={styles.wrapper}>
+         {/* <SuspenseWithBoundary> */}
          <CustomJobDetailsView
             job={job}
             companyName={companyName}
             companyLogoUrl={companyLogoUrl}
             handleEdit={handleEdit}
             disabledLinkedContentClick
+            // disableSuspense
          />
+         {/* </SuspenseWithBoundary> */}
       </Box>
    )
 }

@@ -75,6 +75,7 @@ const CustomJobDetailsDialog = ({
    heroContent,
    heroSx,
 }: Props) => {
+   console.log("🚀 ~ customJob:", customJob)
    const [, , handleClose] = useDialogStateHandler(true)
    const { handleClickApplyBtn, applicationInitiatedOnly, handleConfirmApply } =
       useCustomJobApply(customJob as PublicCustomJob, context)

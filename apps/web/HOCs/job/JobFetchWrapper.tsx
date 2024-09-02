@@ -1,8 +1,8 @@
-import { FC, ReactNode } from "react"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import FirestoreConditionalDocumentFetcher, {
    WrapperProps,
 } from "HOCs/FirestoreConditionalDocumentFetcher"
+import { FC, ReactNode } from "react"
 
 /**
  * Props for JobFetcher component.

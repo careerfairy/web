@@ -1,10 +1,9 @@
-import { Box, Stack, SxProps } from "@mui/material"
-
 import {
    CustomJob,
    JobApplicationContext,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Box, Stack, SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
@@ -75,7 +74,9 @@ type Props = {
 }
 
 const CustomJobDetailsView = (props: Props) => {
+   console.log("🚀 ~ CustomJobDetailsView ~ props:", props)
    console.log("🚀 ~ CustomJobDetailsView ~ props:", props.job)
+
    if (!props.job) {
       console.log("🚀 ~ NOT  ~ job:")
       return <CustomJobDetailsSkeleton heroContent={!!props.heroContent} />
