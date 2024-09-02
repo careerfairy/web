@@ -57,7 +57,6 @@ const customStyles = sxStyles({
 })
 
 type Props = {
-   disableSuspense?: boolean
    job: CustomJob
    applicationInitiatedOnly: boolean
    context?: JobApplicationContext
@@ -74,12 +73,6 @@ type Props = {
 }
 
 const CustomJobDetailsView = (props: Props) => {
-   if (props.disableSuspense) return <CustomJobDetails {...props} />
-
-   console.log(
-      "🚀 ~ CustomJobDetailsView ~ disableSuspense:",
-      props.disableSuspense
-   )
    return (
       <SuspenseWithBoundary
          fallback={
