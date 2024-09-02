@@ -1,9 +1,10 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
 import {
    Group,
    SerializedGroup,
    deserializeGroup,
 } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { GetEventsOfGroupOptions } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
@@ -12,7 +13,7 @@ import {
    MAX_UPCOMING_STREAMS,
 } from "components/views/company-page/EventSection"
 import { getLivestreamDialogData } from "components/views/livestream-dialog"
-import { livestreamRepo } from "data/RepositoryInstances"
+import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { GetServerSidePropsContext, GetStaticPathsContext } from "next"
 import nookies from "nookies"
@@ -111,6 +112,19 @@ export const mapFromServerSide = (
    return events.map((e) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       LivestreamPresenter.parseDocument(e as any, fromDate)
+   )
+}
+
+export const mapCustomJobsFromServerSide = (
+   data: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [p: string]: any
+   }[]
+) => {
+   if (!data) return []
+   return data.map((job) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      CustomJobsPresenter.parseDocument(job as any, fromDate)
    )
 }
 
@@ -222,12 +236,14 @@ export const getLivestreamsAndDialogData = async (
             limit: MAX_PAST_STREAMS + 1, // fetch 5 + 1 to know if there are more
          }
       ),
+      groupRepo.getGroupAvailableCustomJobs(groupId),
       getLivestreamDialogData(context),
    ])
 
    const [
       serverSideUpcomingLivestreamsResult,
       serverSidePastLivestreamsResult,
+      serverSideGroupCustomJobsResult,
       livestreamDialogDataResult,
    ] = results
 
@@ -241,6 +257,11 @@ export const getLivestreamsAndDialogData = async (
          ? serverSidePastLivestreamsResult.value
          : []
 
+   const serverSideGroupAvailableCustomJobs =
+      serverSideGroupCustomJobsResult.status === "fulfilled"
+         ? serverSideGroupCustomJobsResult.value
+         : []
+
    const livestreamDialogData =
       livestreamDialogDataResult.status === "fulfilled"
          ? livestreamDialogDataResult.value
@@ -249,6 +270,7 @@ export const getLivestreamsAndDialogData = async (
    return {
       serverSideUpcomingLivestreams,
       serverSidePastLivestreams,
+      serverSideGroupAvailableCustomJobs,
       livestreamDialogData,
    }
 }

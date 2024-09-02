@@ -1,3 +1,4 @@
+import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
 import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import {
    PublicCreator,
@@ -27,6 +28,7 @@ import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
 import {
    deserializeGroupClient,
    getLivestreamsAndDialogData,
+   mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../util/serverUtil"
 
@@ -39,6 +41,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
+   serverSideCustomJobs,
    livestreamDialogData,
    groupCreators,
 }) => {
@@ -70,6 +73,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                      serverSideUpcomingLivestreams
                   )}
                   pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
+                  customJobs={mapCustomJobsFromServerSide(serverSideCustomJobs)}
                   editMode={false}
                />
             </Box>
@@ -84,6 +88,8 @@ export const getStaticProps: GetStaticProps<{
    serverSideUpcomingLivestreams: { [p: string]: any }[]
    // eslint-disable-next-line @typescript-eslint/no-explicit-any
    serverSidePastLivestreams: { [p: string]: any }[]
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   serverSideCustomJobs: { [p: string]: any }[]
    livestreamDialogData: LiveStreamDialogData
    groupCreators: PublicCreator[]
 }> = async (ctx) => {
@@ -99,6 +105,7 @@ export const getStaticProps: GetStaticProps<{
             const {
                serverSideUpcomingLivestreams,
                serverSidePastLivestreams,
+               serverSideGroupAvailableCustomJobs,
                livestreamDialogData,
             } = await getLivestreamsAndDialogData(
                serverSideGroup?.groupId,
@@ -124,6 +131,10 @@ export const getStaticProps: GetStaticProps<{
                   serverSidePastLivestreams:
                      serverSidePastLivestreams?.map(
                         LivestreamPresenter.serializeDocument
+                     ) || [],
+                  serverSideCustomJobs:
+                     serverSideGroupAvailableCustomJobs?.map(
+                        CustomJobsPresenter.serializeDocument
                      ) || [],
                   livestreamDialogData,
                   groupCreators: creators?.map(pickPublicDataFromCreator) || [],

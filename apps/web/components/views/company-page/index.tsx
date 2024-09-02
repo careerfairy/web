@@ -1,10 +1,12 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { FeatureFlagsState } from "@careerfairy/shared-lib/feature-flags/types"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Container, Grid, Stack } from "@mui/material"
+import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGroupAvailableCustomJobs"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { doc } from "firebase/firestore"
@@ -40,6 +42,7 @@ type Props = {
    upcomingLivestreams: LivestreamEvent[]
    pastLivestreams: LivestreamEvent[]
    groupCreators: PublicCreator[]
+   customJobs: CustomJob[]
 }
 
 export const TabValue = {
@@ -49,6 +52,7 @@ export const TabValue = {
    livesStreams: "livesStreams-section",
    banner: "banner-section",
    video: "video-section",
+   jobs: "jobs-section",
 } as const
 
 export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
@@ -60,6 +64,8 @@ export const getTabLabel = (
    switch (tabId) {
       case TabValue.profile:
          return "About"
+      case TabValue.jobs:
+         return "Jobs"
       case TabValue.media:
          return "Media"
       case TabValue.testimonialsOrMentors:
@@ -73,6 +79,7 @@ export const getTabLabel = (
 
 export type SectionRefs = {
    aboutSectionRef: MutableRefObject<HTMLElement>
+   jobsSectionRef: MutableRefObject<HTMLElement>
    testimonialOrMentorsSectionRef: MutableRefObject<HTMLElement>
    eventSectionRef: MutableRefObject<HTMLElement>
    mediaSectionRef: MutableRefObject<HTMLElement>
@@ -85,6 +92,7 @@ type ICompanyPageContext = {
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
    pastLivestreams: LivestreamEvent[]
+   customJobs: CustomJob[]
    sectionRefs: SectionRefs
 }
 
@@ -95,8 +103,10 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
    editMode: false,
    upcomingLivestreams: [],
    pastLivestreams: [],
+   customJobs: [],
    sectionRefs: {
       aboutSectionRef: null,
+      jobsSectionRef: null,
       eventSectionRef: null,
       mediaSectionRef: null,
       testimonialOrMentorsSectionRef: null,
@@ -108,6 +118,7 @@ const CompanyPageOverview = ({
    editMode,
    upcomingLivestreams,
    pastLivestreams,
+   customJobs,
    groupCreators,
 }: Props) => {
    const featureFlags = useFeatureFlags()
@@ -134,10 +145,13 @@ const CompanyPageOverview = ({
       listenToPastEvents: true,
    })
 
+   const contextGroupAvailableJobs = useGroupAvailableCustomJobs(group.groupId)
+
    const aboutSectionRef = useRef<HTMLElement>(null)
    const testimonialOrMentorsSectionRef = useRef<HTMLElement>(null)
    const eventSectionRef = useRef<HTMLElement>(null)
    const mediaSectionRef = useRef<HTMLElement>(null)
+   const jobsSectionRef = useRef<HTMLElement>(null)
 
    const presenter = useMemo(() => {
       const presenter = GroupPresenter.createFromDocument(contextGroup)
@@ -183,8 +197,10 @@ const CompanyPageOverview = ({
          editMode,
          upcomingLivestreams: contextUpcomingLivestream || upcomingLivestreams,
          pastLivestreams: contextPastLivestreams || pastLivestreams,
+         customJobs: contextGroupAvailableJobs || customJobs,
          sectionRefs: {
             aboutSectionRef,
+            jobsSectionRef,
             testimonialOrMentorsSectionRef,
             eventSectionRef,
             mediaSectionRef,
@@ -199,6 +215,8 @@ const CompanyPageOverview = ({
          upcomingLivestreams,
          contextPastLivestreams,
          pastLivestreams,
+         contextGroupAvailableJobs,
+         customJobs,
       ]
    )
 
@@ -217,7 +235,7 @@ const CompanyPageOverview = ({
                   <Grid item xs={12} md={6}>
                      <Stack px={3} spacing={{ xs: 2, md: 5 }}>
                         <AboutSection />
-                        <JobsSection groupId={group.id} />
+                        <JobsSection />
                         {group.publicSparks ? (
                            <SparksSection key={group.id} groupId={group.id} />
                         ) : null}

@@ -7,6 +7,7 @@ import BaseFirebaseRepository, {
    Unsubscribe,
 } from "../BaseFirebaseRepository"
 import { Create, ImageType } from "../commonTypes"
+import { CustomJob } from "../customJobs/customJobs"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import { Spark } from "../sparks/sparks"
 import {
@@ -142,6 +143,11 @@ export interface IGroupRepository {
     * Gets the admins of a group document
     * */
    getGroupAdmins(groupId: string): Promise<GroupAdmin[]>
+
+   groupAvailableCustomJobsQuery(
+      groupId: string
+   ): firebase.firestore.Query<firebase.firestore.DocumentData>
+   getGroupAvailableCustomJobs(groupId: string): Promise<CustomJob[]>
 
    getGroupByGroupName(groupName: string): Promise<Group>
 
@@ -497,6 +503,16 @@ export class FirebaseGroupRepository
          .where("questionType", "==", "custom")
    }
 
+   groupAvailableCustomJobsQuery(
+      groupId: string
+   ): firebase.firestore.Query<firebase.firestore.DocumentData> {
+      return this.firestore
+         .collection("customJobs")
+         .where("groupId", "==", groupId)
+         .where("deadline", ">", new Date())
+         .orderBy("deadline", "desc")
+   }
+
    listenToGroupQuestions(
       groupId: string,
       callback: OnSnapshotCallback<GroupQuestion>
@@ -779,6 +795,13 @@ export class FirebaseGroupRepository
 
       return mapFirestoreDocuments(adminsSnap)
    }
+
+   async getGroupAvailableCustomJobs(groupId: string): Promise<CustomJob[]> {
+      const snaps = await this.groupAvailableCustomJobsQuery(groupId).get()
+
+      return mapFirestoreDocuments<CustomJob>(snaps)
+   }
+
    async getGroupByGroupName(groupName: string): Promise<Group> {
       const adminsSnap = await this.firestore
          .collection("careerCenterData")
