@@ -30,7 +30,7 @@ const JobsSection = () => {
    const isMounted = useMountedState()
 
    return (
-      <Box>
+      <Box sx={{ position: "relative" }}>
          <SectionAnchor ref={jobsSectionRef} tabValue={TabValue.jobs} />
          {isMounted() ? (
             <SuspenseWithBoundary fallback={<JobsSectionDetailsSkeleton />}>
