@@ -6,7 +6,6 @@ import {
 import { Box, Stack, SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
@@ -60,6 +59,7 @@ const customStyles = sxStyles({
 type Props = {
    disableSuspense?: boolean
    job: CustomJob
+   applicationInitiatedOnly: boolean
    context?: JobApplicationContext
    heroContent?: ReactNode
    sx?: SxProps<DefaultTheme>
@@ -74,15 +74,12 @@ type Props = {
 }
 
 const CustomJobDetailsView = (props: Props) => {
-   console.log("🚀 ~ CustomJobDetailsView ~ props:", props)
-   console.log("🚀 ~ CustomJobDetailsView ~ props:", props.job)
-
-   if (!props.job) {
-      console.log("🚀 ~ NOT  ~ job:")
-      return <CustomJobDetailsSkeleton heroContent={!!props.heroContent} />
-   }
    if (props.disableSuspense) return <CustomJobDetails {...props} />
 
+   console.log(
+      "🚀 ~ CustomJobDetailsView ~ disableSuspense:",
+      props.disableSuspense
+   )
    return (
       <SuspenseWithBoundary
          fallback={
@@ -96,6 +93,7 @@ const CustomJobDetailsView = (props: Props) => {
 
 export const CustomJobDetails = ({
    job,
+   applicationInitiatedOnly,
    handleEdit,
    companyLogoUrl,
    companyName,
@@ -108,7 +106,6 @@ export const CustomJobDetails = ({
    hideCTAButtons,
    onApply,
 }: Props) => {
-   const { applicationInitiatedOnly } = useCustomJobApply(job, context)
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler(
       applicationInitiatedOnly
    )
@@ -159,7 +156,6 @@ export const CustomJobDetails = ({
                ) : null}
             </Box>
          </Stack>
-         {/* TODO-WG: Remove as in dialog should be set */}
          {!hideCTAButtons && context ? (
             <>
                <CustomJobCTABottomContent

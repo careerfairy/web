@@ -75,7 +75,6 @@ const CustomJobDetailsDialog = ({
    heroContent,
    heroSx,
 }: Props) => {
-   console.log("🚀 ~ customJob:", customJob)
    const [, , handleClose] = useDialogStateHandler(true)
    const { handleClickApplyBtn, applicationInitiatedOnly, handleConfirmApply } =
       useCustomJobApply(customJob as PublicCustomJob, context)
@@ -98,8 +97,6 @@ const CustomJobDetailsDialog = ({
 
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
-   // TODO-WG: Use dialog state handler and move
-   // use hero content for back buttons
    return (
       <Dialog
          maxWidth={"md"}
@@ -119,6 +116,7 @@ const CustomJobDetailsDialog = ({
             <CustomJobDetailsView
                job={customJob}
                heroContent={heroContent}
+               applicationInitiatedOnly={applicationInitiatedOnly}
                heroSx={heroSx}
                sx={{ pt: "0px !important" }}
                companyLogoUrl={group.logoUrl}
