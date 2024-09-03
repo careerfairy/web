@@ -1,6 +1,6 @@
+import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
 import { RtcRole, RtcTokenBuilder } from "agora-token"
 import axios, { Method } from "axios"
-import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
 import { isLocalEnvironment } from "../util"
 
 // Project: Production
@@ -30,8 +30,8 @@ export const agoraCredentials = {
 const staticUID = "1234232"
 
 // AWS Storage
-export const awsSecretKey = "tenlla/MPorZigMkl+wa7OGoxe63MuVYn7lgwrhW"
-export const awsAccessKey = "AKIAIUSA7ZDE4TYSY3RA"
+export const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY
+export const awsAccessKey = process.env.AWS_ACCESS_KEY_ID
 
 export default class AgoraClient {
    private readonly authorizationHeader
