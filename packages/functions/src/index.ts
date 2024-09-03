@@ -33,6 +33,7 @@ setGlobalOptions({
 
 import { bundles } from "./bundles"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
+import * as ai from "./lib/ai"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
@@ -363,3 +364,6 @@ exports.syncUserInRegisteredLivestreams =
 
 // Utils
 exports.fetchUserCountryCode = fetchUserCountryCode
+
+// AI
+exports.generateLiveStreamTranscript = ai.generateLiveStreamTranscript
