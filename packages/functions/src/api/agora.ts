@@ -30,8 +30,8 @@ export const agoraCredentials = {
 const staticUID = "1234232"
 
 // AWS Storage
-export const awsSecretKey = "tenlla/MPorZigMkl+wa7OGoxe63MuVYn7lgwrhW"
-export const awsAccessKey = "AKIAIUSA7ZDE4TYSY3RA"
+export const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY
+export const awsAccessKey = process.env.AWS_ACCESS_KEY_ID
 
 export default class AgoraClient {
    private readonly authorizationHeader
