@@ -18,6 +18,7 @@ import Joyride, {
    Status,
    STATUS,
 } from "react-joyride"
+import { useLocalStorage } from "react-use"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
 import {
    useIsTestLivestream,
@@ -63,7 +64,7 @@ type TutorialAction =
    | { type: TutorialActionEnum.SHOW_SKIP }
    | { type: TutorialActionEnum.WAIT }
    | { type: TutorialActionEnum.RESUME }
-   | { type: TutorialActionEnum.END_TUTORIAL }
+   | { type: TutorialActionEnum.END_TUTORIAL; payload: () => void }
    | { type: TutorialActionEnum.CONFIRM_SKIP }
    | { type: TutorialActionEnum.SHOW_START }
    | { type: TutorialActionEnum.NEW_STEP; payload: CallBackProps }
@@ -116,6 +117,7 @@ const reducer = (
             isActive: false,
          }
       case TutorialActionEnum.END_TUTORIAL:
+         action.payload && action.payload()
          return {
             ...state,
             endDialogOpen: false,
@@ -168,6 +170,8 @@ export const LivestreamTutorialProvider = ({ children }: Props) => {
       livestreamId,
       streamerAuthToken
    )
+   const [hasDismissedStreamTutorial, setHasDismissedStreamTutorial] =
+      useLocalStorage("hasDismissedStreamTutorial", false)
 
    const [tutorialState, dispatch] = useReducer(reducer, {
       startDialogOpen: isTestStream && isHost && isReady,
@@ -189,10 +193,22 @@ export const LivestreamTutorialProvider = ({ children }: Props) => {
    }
 
    useEffect(() => {
-      if (isTestStream && isHost && isReady && !isLivestreamMobile) {
+      if (
+         isTestStream &&
+         isHost &&
+         isReady &&
+         !hasDismissedStreamTutorial &&
+         !isLivestreamMobile
+      ) {
          dispatch({ type: TutorialActionEnum.SHOW_START })
       }
-   }, [isReady, isHost, isTestStream, isLivestreamMobile])
+   }, [
+      isReady,
+      isHost,
+      isTestStream,
+      isLivestreamMobile,
+      hasDismissedStreamTutorial,
+   ])
 
    useEffect(() => {
       const check = async () => {
@@ -332,7 +348,10 @@ export const LivestreamTutorialProvider = ({ children }: Props) => {
          <EndTutorialDialog
             open={tutorialState.endDialogOpen}
             handleClose={() =>
-               dispatch({ type: TutorialActionEnum.END_TUTORIAL })
+               dispatch({
+                  type: TutorialActionEnum.END_TUTORIAL,
+                  payload: () => setHasDismissedStreamTutorial(true),
+               })
             }
          />
       </TutorialContext.Provider>
