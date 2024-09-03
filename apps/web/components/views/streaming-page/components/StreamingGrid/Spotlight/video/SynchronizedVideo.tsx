@@ -58,7 +58,7 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
    isVideoSharerRef.current = isVideoSharer
 
    const [autoPlayFailed, setAutoPlayFailed] = useState(
-      !navigator.userActivation.hasBeenActive
+      !navigator?.userActivation?.hasBeenActive
    )
 
    // If you have not interacted with the page before, you are muted
