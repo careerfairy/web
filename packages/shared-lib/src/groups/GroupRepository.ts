@@ -799,7 +799,9 @@ export class FirebaseGroupRepository
    async getGroupAvailableCustomJobs(groupId: string): Promise<CustomJob[]> {
       const snaps = await this.groupAvailableCustomJobsQuery(groupId).get()
 
-      return mapFirestoreDocuments<CustomJob>(snaps)
+      return mapFirestoreDocuments<CustomJob>(snaps)?.filter(
+         (job) => job.livestreams?.length || job.sparks?.length
+      )
    }
 
    async getGroupByGroupName(groupName: string): Promise<Group> {
