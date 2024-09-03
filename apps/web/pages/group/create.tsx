@@ -1,30 +1,31 @@
-import { useEffect, useState } from "react"
-import Head from "next/head"
-import { useRouter } from "next/router"
-import { v4 as uuidv4 } from "uuid"
-import { Container, Step, StepLabel, Stepper } from "@mui/material"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import {
    Group,
    GroupQuestion,
    sortGroupQuestionOptionsByName,
 } from "@careerfairy/shared-lib/groups"
-import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
+import { Container, Step, StepLabel, Stepper } from "@mui/material"
+import Head from "next/head"
+import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
+import { v4 as uuidv4 } from "uuid"
 
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import Header from "../../components/views/header/Header"
+import useFirebaseUpload from "components/custom-hook/useFirebaseUpload"
+import { useAuth } from "../../HOCs/AuthProvider"
+import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 import Footer from "../../components/views/footer/Footer"
+import CompleteGroup from "../../components/views/group/create/CompleteGroup"
 import CreateBaseGroup, {
    GroupedUniversity,
 } from "../../components/views/group/create/CreateBaseGroup"
 import CreateGroupQuestions from "../../components/views/group/create/CreateGroupQuestions"
-import CompleteGroup from "../../components/views/group/create/CompleteGroup"
-import { GlobalBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
+import Header from "../../components/views/header/Header"
 import Loader from "../../components/views/loader/Loader"
-import { useAuth } from "../../HOCs/AuthProvider"
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import { fieldOfStudyRepo } from "../../data/RepositoryInstances"
-import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
+import { GlobalBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
 
 function getSteps() {
    return [
@@ -49,6 +50,7 @@ export type BaseGroupInfo = {
 }
 const CreateGroup = () => {
    const firebase = useFirebaseService()
+   const [upload] = useFirebaseUpload()
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const router = useRouter()
    const [activeStep, setActiveStep] = useState(0)
@@ -169,16 +171,7 @@ const CreateGroup = () => {
    }
 
    const uploadLogo = async (fileObject) => {
-      try {
-         const storageRef = firebase.getStorageRef()
-         const fullPath = "group-logos" + "/" + fileObject.name
-         const companyLogoRef = storageRef.child(fullPath)
-         const uploadTask = companyLogoRef.put(fileObject)
-         await uploadTask.then()
-         return uploadTask.snapshot.ref.getDownloadURL()
-      } catch (e) {
-         console.log("error in async", e)
-      }
+      return await upload(fileObject, "group-logos" + "/" + fileObject.name)
    }
 
    const createCareerCenter = async () => {
