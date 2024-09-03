@@ -95,7 +95,10 @@ export const getFieldsOfStudyWithoutOtherOption = (
    return removeFieldOfStudyFromOptions(allFieldsOfStudy, OTHER_OPTION_ID)
 }
 
-const mapCreatorToSpeaker = (creator: Creator): Speaker => {
+const mapCreatorToSpeaker = (
+   creator: Creator,
+   groupIds?: string[]
+): Speaker => {
    return {
       id: creator.id,
       avatar: creator.avatarUrl,
@@ -106,7 +109,7 @@ const mapCreatorToSpeaker = (creator: Creator): Speaker => {
       email: creator.email,
       linkedInUrl: creator.linkedInUrl,
       roles: creator.roles,
-      groupId: creator.groupId,
+      groupId: creator.groupId || groupIds?.at(0),
    }
 }
 
@@ -208,7 +211,9 @@ export const mapFormValuesToLivestreamObject = (
       })
       .map((creator) => creator.id)
 
-   const mappedSpeakers = formValues.speakers.values?.map(mapCreatorToSpeaker)
+   const mappedSpeakers = formValues.speakers.values?.map((val) =>
+      mapCreatorToSpeaker(val, formValues.general.groupIds)
+   )
 
    const mappedRegistrationQuestions =
       mapRegistrationQuestionsToGroupQuestionsMap(
