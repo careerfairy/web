@@ -195,6 +195,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    ) : (
       <CustomJobDetailsView
          job={job as CustomJob}
+         sx={{ p: "24px !important" }}
          heroContent={livestreamDetailCustomJobHeroContent}
          companyName={livestreamPresenter.company}
          companyLogoUrl={livestreamPresenter.companyLogoUrl}

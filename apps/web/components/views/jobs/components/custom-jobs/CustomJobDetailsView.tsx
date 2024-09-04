@@ -9,6 +9,7 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import { props } from "lodash/fp"
 import { ReactNode, forwardRef } from "react"
@@ -46,9 +47,6 @@ const customStyles = sxStyles({
    },
    noDivider: {
       borderTop: "none",
-   },
-   jobApplyConfirmationDialog: {
-      bottom: "100px",
    },
 })
 
@@ -104,7 +102,7 @@ const CustomJobDetails = ({
    const [ref, { height }] = useMeasure()
 
    const autoActionType = useSelector(autoAction)
-
+   const isMobile = useIsMobile()
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
    return (
@@ -137,7 +135,12 @@ const CustomJobDetails = ({
                      applicationContext={context}
                      autoApply={isAutoApply}
                      onApply={onApply}
-                     sx={customStyles.jobApplyConfirmationDialog}
+                     sx={{
+                        bottom:
+                           isMobile && context.type == "livestream"
+                              ? "150px"
+                              : "100px",
+                     }}
                   />
                ) : null}
             </Box>
