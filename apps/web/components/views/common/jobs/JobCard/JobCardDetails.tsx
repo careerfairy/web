@@ -195,14 +195,16 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
                   alignItems: "center",
                }}
             >
-               <Typography
-                  sx={[
-                     styles.expireDate,
-                     smallCard ? styles.smallExpiredDate : null,
-                  ]}
-               >
-                  {getDeadLineMessage(jobDeadline, previewMode)}
-               </Typography>
+               {jobDeadline ? (
+                  <Typography
+                     sx={[
+                        styles.expireDate,
+                        smallCard ? styles.smallExpiredDate : null,
+                     ]}
+                  >
+                     {getDeadLineMessage(jobDeadline, previewMode)}
+                  </Typography>
+               ) : null}
 
                {(isMobile || smallCard) && previewMode ? (
                   <JobButtonAction
