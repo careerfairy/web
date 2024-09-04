@@ -105,7 +105,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
    job = useLivestreamJob(livestreamPresenter.getAssociatedJob(jobId))
 
-   if (!job) {
+   if (!job && customJob) {
       // If entered here, it means that the current job is no Ats Job or don't exist
       // In this situation, let's validate if it's a customJob
       job = pickPublicDataFromCustomJob(customJob)

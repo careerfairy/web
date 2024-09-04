@@ -1,5 +1,4 @@
 import StudentViewIcon from "@mui/icons-material/FaceRounded"
-import ShareIcon from "@mui/icons-material/Share"
 import {
    Dialog,
    List,
@@ -11,14 +10,10 @@ import {
    Slide,
 } from "@mui/material"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import { useSnackbar } from "notistack"
 import PropTypes from "prop-types"
 import { useState } from "react"
 import { Film as StreamIcon } from "react-feather"
-import {
-   copyStringToClipboard,
-   getBaseUrl,
-} from "../../../../helperFunctions/HelperFunctions"
+import { getBaseUrl } from "../../../../helperFunctions/HelperFunctions"
 import HintIcon from "../../../common/HintIcon"
 import { useLivestreamRouting } from "./useLivestreamRouting"
 
@@ -29,7 +24,6 @@ const ToolbarActionsDialogContent = ({
 }) => {
    const featureFlags = useFeatureFlags()
    const { createDraftLivestream } = useLivestreamRouting()
-   const { enqueueSnackbar } = useSnackbar()
 
    const handleNewStream_v2 = async () => {
       await createDraftLivestream()
@@ -60,16 +54,6 @@ const ToolbarActionsDialogContent = ({
          description: "New live stream creation form!",
       },
       {
-         name: "Share a link to create a draft live stream",
-         onClick: () => {
-            handleShareDraftLink()
-            handleClose()
-         },
-         icon: <ShareIcon />,
-         description:
-            "This button copies a shareable link to your clipboard to create a new live stream draft. You can send this link to anyone in charge of setting up a live stream for your CareerFairy group. The stream that they create will not be published and only visible by you as a draft within this dashboard.",
-      },
-      {
          name: "See your upcoming streams as a student",
          onClick: () => {
             handleOpenStudentView()
@@ -80,20 +64,6 @@ const ToolbarActionsDialogContent = ({
             "Go to your public group page and see your events as a student.",
       },
    ])
-
-   const handleShareDraftLink = () => {
-      let baseUrl = "https://careerfairy.io"
-      if (window?.location?.origin) {
-         baseUrl = window.location.origin
-      }
-      const groupId = group.id
-      const targetPath = `${baseUrl}/draft-stream?careerCenterIds=${groupId}`
-      copyStringToClipboard(targetPath)
-      enqueueSnackbar("Link has been copied to your clipboard", {
-         variant: "default",
-         preventDuplicate: true,
-      })
-   }
 
    const handleOpenStudentView = () => {
       const baseUrl = getBaseUrl()
