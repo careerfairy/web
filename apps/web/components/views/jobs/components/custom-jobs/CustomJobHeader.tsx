@@ -30,6 +30,9 @@ const styles = sxStyles({
       ml: 3,
    },
    jobTitle: {
+      fontWeight: 700,
+   },
+   groupName: {
       fontWeight: 600,
    },
    subTitle: {
@@ -110,13 +113,17 @@ const CustomJobHeader = ({
 
          <Box sx={styles.header}>
             <Box sx={styles.headerLeftSide}>
-               <CircularLogo
-                  src={getResizedUrl(companyLogoUrl, "lg")}
-                  alt={`company ${companyName} logo`}
-                  size={63}
-               />
-
                <Box sx={styles.headerContent}>
+                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                     <CircularLogo
+                        src={getResizedUrl(companyLogoUrl, "lg")}
+                        alt={`company ${companyName} logo`}
+                        size={63}
+                     />
+                     <Typography variant={"h4"} sx={styles.groupName}>
+                        {companyName}
+                     </Typography>
+                  </Stack>
                   <Typography variant={"h4"} sx={styles.jobTitle}>
                      {job.title}
                   </Typography>

@@ -64,7 +64,7 @@ const CustomJobDescription: FC<Props> = ({ job }) => {
 
    return (
       <Stack spacing={"24px"}>
-         <Box sx={styles.wrapper}>
+         <Box sx={styles.wrapper} mt={0}>
             <Typography sx={styles.jobTitle} variant="h6">
                Job Description
             </Typography>

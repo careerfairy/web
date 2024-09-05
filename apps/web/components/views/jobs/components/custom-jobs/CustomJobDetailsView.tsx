@@ -34,7 +34,7 @@ const customStyles = sxStyles({
       },
    },
    content: {
-      mt: 4,
+      mt: "24px",
    },
    fixedBottomContent: {
       position: "fixed",
