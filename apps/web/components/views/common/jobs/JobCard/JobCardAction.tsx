@@ -25,7 +25,6 @@ const styles = sxStyles({
    },
    inlineButton: {
       whiteSpace: "nowrap",
-      // minWidth: "140px",
       textAlign: "center",
       px: 10,
    },
@@ -92,9 +91,6 @@ export const JobButtonAction = ({ published, smallCard = false }) => {
       <Grid item xs={1} md={3} lg={2.5} sx={styles.mobileBtnWrapper}>
          {button}
       </Grid>
-      // <Box sx={[styles.mobileBtnWrapper, {  maxWidth: "100%"}]}>
-      //    {button}
-      // </Box>
    )
 }
 

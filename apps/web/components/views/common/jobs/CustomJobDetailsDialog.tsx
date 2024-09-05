@@ -44,13 +44,9 @@ const styles = sxStyles({
       justifyContent: "center",
    },
    fixedBottomContent: {
-      // position: "fixed",
-      // bottom: 0,
-      // width: "100%",
       p: 2.5,
       borderTop: "1px solid #F1F1F1",
       bgcolor: "background.paper",
-      // display: "flex",
    },
 
    jobApplyConfirmationDialog: {

@@ -79,7 +79,6 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
       <Stack width={"100%"} spacing={2}>
          {groupCustomJobs.map((customJob, idx) => {
             return (
-               // <Box  component={Link} href={selectedJob?.id === customJob.id && isJobsDialogOpen ? `/company/${ router.query.companyName }/jobs/${selectedJob.id}`: ""}>
                <Link
                   href={`/company/${router.query.companyName}/jobs/${customJob.id}`}
                   // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing

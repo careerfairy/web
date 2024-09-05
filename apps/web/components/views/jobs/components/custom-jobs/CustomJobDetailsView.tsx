@@ -30,14 +30,6 @@ const customStyles = sxStyles({
          xs: 1,
          [responsiveBreakpoint]: 2.25,
       },
-      // px: {
-      //    xs: 1,
-      //    [responsiveBreakpoint]: 2.25,
-      // },
-      // pb: {
-      //    xs: 1,
-      //    [responsiveBreakpoint]: 2.25,
-      // },
    },
    content: {
       mt: "24px",
