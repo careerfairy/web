@@ -1,7 +1,6 @@
 import { Spark } from "@careerfairy/shared-lib/dist/sparks/sparks"
 import * as cliProgress from "cli-progress"
 import { BulkWriter } from "firebase-admin/firestore"
-import { getVideoDurationInSeconds } from "get-video-duration"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { groupRepo } from "../../../repositories"
@@ -13,6 +12,16 @@ import {
 import { logAction } from "../../../util/logger"
 import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
 import { DataWithRef } from "../../../util/types"
+
+async function getVideoDurationInSeconds(url: string) {
+   /*
+   * In order to avoid adding one more node module to the project,
+   + instead I will leave the functions unimplemented and if ever needed just 
+   * install get-video-duration:
+   *  ● npm install --workspace @careerfairy/firebase-scripts get-video-duration
+   */
+   throw new Error("Not implemented. Trying to get video duration for " + url)
+}
 
 type SparkDataWithRef = DataWithRef<true, Spark>
 
