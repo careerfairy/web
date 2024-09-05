@@ -142,6 +142,7 @@ const PortalPage = ({
                               serverSideEvents={comingUpNext}
                               limit={20}
                            />
+                           {/* TODO-WG: <AvailableCustomJobs /> */}
                            <MyNextEvents />
                            <ConditionalWrapper
                               condition={Boolean(events?.length)}
@@ -227,6 +228,7 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
          {selectedCategories.length ? (
             <CategoryTagsContent categories={categoriesData} />
          ) : (
+            // TODO-WG: Pass selected tags via context provider
             children
          )}
       </Box>
