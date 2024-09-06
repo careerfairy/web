@@ -2,6 +2,7 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CloseOutlined } from "@mui/icons-material"
 import { Box, IconButton, ListItem, Stack } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import JobCard from "components/views/common/jobs/JobCard"
 import Link from "next/link"
@@ -16,7 +17,10 @@ const styles = sxStyles({
       pt: "8px !important",
    },
    title: {
-      maxWidth: "calc(100% - 70px)",
+      maxWidth: "calc(100% - 50px)",
+   },
+   typography: {
+      maxWidth: "calc(100% - 50px)",
    },
    jobListItemWrapper: { m: 0, p: 0 },
 })
@@ -39,8 +43,8 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
       useDialogStateHandler(Boolean(selectedJob))
 
    const onCloseJobDialog = useCallback(() => {
-      setSelectedJob(null)
       handleCloseJobsDialog()
+      setSelectedJob(null)
       router.push(`/company/${router.query.companyName}`, undefined, {
          shallow: true,
       })
@@ -54,15 +58,17 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
       [setSelectedJob, handleOpenJobsDialog]
    )
 
+   const isMobile = useIsMobile("lg")
+
    if (!groupCustomJobs?.length) return null
 
-   if (selectedJob) {
-      return (
+   return (
+      <Stack width={"100%"} spacing={2}>
          <CustomJobDetailsDialog
             customJob={selectedJob}
             onClose={onCloseJobDialog}
             isOpen={isJobsDialogOpen}
-            context={{ type: "companyPage", id: selectedJob.groupId }}
+            context={{ type: "companyPage", id: selectedJob?.groupId }}
             heroSx={styles.heroContent}
             heroContent={
                <Box display={"flex"} flexDirection={"row-reverse"} p={0} m={0}>
@@ -72,11 +78,6 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
                </Box>
             }
          />
-      )
-   }
-
-   return (
-      <Stack width={"100%"} spacing={2}>
          {groupCustomJobs.map((customJob, idx) => {
             return (
                <Link
@@ -93,9 +94,11 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
                      <JobCard
                         job={customJob}
                         previewMode
-                        titleSx={styles.title}
+                        titleSx={isMobile ? null : styles.title}
+                        typographySx={isMobile ? null : styles.typography}
                         handleClick={() => onClickJobCard(customJob)}
                         hideJobUrl
+                        smallCard={isMobile}
                      />
                   </ListItem>
                </Link>

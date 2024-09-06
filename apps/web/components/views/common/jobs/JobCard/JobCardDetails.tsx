@@ -1,4 +1,5 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import { Box, Grid, SxProps, Tooltip, Typography } from "@mui/material"
@@ -22,7 +23,7 @@ const styles = sxStyles({
    title: {
       color: "text.primary",
       fontWeight: 600,
-      fontSize: "16px",
+      fontSize: "16px !important",
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
@@ -61,7 +62,6 @@ const styles = sxStyles({
       display: "inline",
       alignItems: "center",
       marginRight: 2,
-
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
@@ -99,6 +99,7 @@ type Props = {
    smallCard: boolean
    hideJobUrl?: boolean
    titleSx?: SxProps<DefaultTheme>
+   typographySx?: SxProps<DefaultTheme>
 }
 
 const JobCardDetails = ({
@@ -107,6 +108,7 @@ const JobCardDetails = ({
    smallCard,
    hideJobUrl,
    titleSx,
+   typographySx,
 }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
@@ -117,7 +119,7 @@ const JobCardDetails = ({
    let jobDeadline: Timestamp
    let jobPostingUrl: string
    let jobPublished: boolean
-   let jobBusinessTags: string | string[]
+   let jobBusinessTags: string
    let jobIsPermanentlyExpired: boolean
 
    if (isAtsJob) {
@@ -129,7 +131,9 @@ const JobCardDetails = ({
       jobDeadline = job.deadline
       jobPostingUrl = job.postingUrl
       jobPublished = job.published
-      jobBusinessTags = job.businessFunctionsTagIds?.join(", ")
+      jobBusinessTags = (job.businessFunctionsTagIds || [])
+         .map((tagId) => TagValuesLookup[tagId])
+         .join(", ")
       jobIsPermanentlyExpired = job.isPermanentlyExpired
    }
 
@@ -183,7 +187,11 @@ const JobCardDetails = ({
          <Box>
             <Typography
                variant={"subtitle1"}
-               sx={[styles.subtitle, smallCard ? styles.smallSubtitle : null]}
+               sx={combineStyles(
+                  styles.subtitle,
+                  smallCard ? styles.smallSubtitle : null,
+                  typographySx
+               )}
             >
                {jobType ? (
                   <Box sx={styles.subtitleItem}>
@@ -192,7 +200,7 @@ const JobCardDetails = ({
                   </Box>
                ) : null}
 
-               {jobBusinessTags ? (
+               {jobBusinessTags.length ? (
                   <Box sx={styles.subtitleItem}>
                      <Zap width={smallCard ? 12 : 14} />
                      {jobBusinessTags}

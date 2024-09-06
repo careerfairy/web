@@ -58,6 +58,7 @@ type Props = {
    smallCard?: boolean
    hideJobUrl?: boolean
    titleSx?: SxProps<DefaultTheme>
+   typographySx?: SxProps<DefaultTheme>
 }
 
 const JobCard = ({
@@ -69,6 +70,7 @@ const JobCard = ({
    smallCard,
    hideJobUrl,
    titleSx,
+   typographySx,
 }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
@@ -121,6 +123,7 @@ const JobCard = ({
                         smallCard={smallCard}
                         hideJobUrl={hideJobUrl}
                         titleSx={titleSx}
+                        typographySx={typographySx}
                      />
                   </Grid>
 

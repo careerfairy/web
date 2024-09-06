@@ -12,7 +12,9 @@ const styles = sxStyles({
       alignItems: "center",
    },
    button: {
+      fontSize: "14px",
       padding: "8px 12px",
+      minWidth: "140px !important",
    },
    smallButton: {
       fontSize: 12,
@@ -26,7 +28,6 @@ const styles = sxStyles({
    inlineButton: {
       whiteSpace: "nowrap",
       textAlign: "center",
-      px: 10,
    },
 })
 

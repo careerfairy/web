@@ -29,6 +29,8 @@ const JobsSection = () => {
 
    const isMounted = useMountedState()
 
+   if (!customJobs?.length) return null
+
    return (
       <Box sx={{ position: "relative" }}>
          <SectionAnchor ref={jobsSectionRef} tabValue={TabValue.jobs} />
