@@ -5,15 +5,18 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Dialog, DialogActions, DialogContent, SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { useAuth } from "HOCs/AuthProvider"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
+import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useGroupsByIds from "components/custom-hook/useGroupsByIds"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
-import { ReactNode } from "react"
+import { ReactNode, useEffect } from "react"
 import { useSelector } from "react-redux"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
@@ -68,6 +71,23 @@ const CustomJobDetailsDialog = ({
    heroSx,
 }: Props) => {
    const isMobile = useIsMobile()
+   const { userData } = useAuth()
+   const { data: fingerPrintId } = useFingerPrint()
+
+   const { applicationInitiatedOnly } = useUserJobApplication(
+      userData?.id || fingerPrintId,
+      customJob?.id
+   )
+
+   const [
+      isApplyConfirmationOpen,
+      handleConfirmationOpen,
+      handleConfirmationClose,
+   ] = useDialogStateHandler(applicationInitiatedOnly)
+
+   useEffect(() => {
+      if (applicationInitiatedOnly) handleConfirmationOpen()
+   }, [applicationInitiatedOnly, handleConfirmationOpen])
 
    return (
       <Dialog
@@ -91,12 +111,18 @@ const CustomJobDetailsDialog = ({
                   context={context}
                   heroContent={heroContent}
                   heroSx={heroSx}
+                  showApplyConfirmation={isApplyConfirmationOpen}
+                  onApplyConfirmationClose={handleConfirmationClose}
                />
             </ConditionalWrapper>
          </DialogContent>
          <DialogActions sx={styles.fixedBottomContent}>
             <ConditionalWrapper condition={Boolean(customJob)}>
-               <Actions context={context} customJob={customJob} />
+               <Actions
+                  context={context}
+                  customJob={customJob}
+                  onApplyClick={handleConfirmationOpen}
+               />
             </ConditionalWrapper>
          </DialogActions>
       </Dialog>
@@ -106,15 +132,23 @@ const CustomJobDetailsDialog = ({
 type ContentProps = Pick<
    Props,
    "customJob" | "context" | "heroContent" | "heroSx"
->
+> & {
+   showApplyConfirmation?: boolean
+   onApplyConfirmationClose?: () => void
+}
 
-const Content = ({ customJob, context, heroContent, heroSx }: ContentProps) => {
+const Content = ({
+   customJob,
+   context,
+   heroContent,
+   heroSx,
+   showApplyConfirmation,
+   onApplyConfirmationClose,
+}: ContentProps) => {
    const { applicationInitiatedOnly, handleConfirmApply } = useCustomJobApply(
       customJob as PublicCustomJob,
       context
    )
-   const [isConfirmApplyOpened, handleConfirmApplyClose] =
-      useDialogStateHandler(applicationInitiatedOnly)
 
    const {
       data: [group],
@@ -136,16 +170,13 @@ const Content = ({ customJob, context, heroContent, heroSx }: ContentProps) => {
             companyName={group.universityName}
             hideCTAButtons
          />
-         {isConfirmApplyOpened ? (
+         {showApplyConfirmation ? (
             <CustomJobApplyConfirmation
-               handleClose={handleConfirmApplyClose}
+               handleClose={onApplyConfirmationClose}
                job={customJob as PublicCustomJob}
                applicationContext={context}
                autoApply={isAutoApply}
-               onApply={() => {
-                  handleConfirmApplyClose()
-                  handleConfirmApply
-               }}
+               onApply={handleConfirmApply}
                sx={styles.jobApplyConfirmationDialog}
             />
          ) : null}
@@ -153,9 +184,11 @@ const Content = ({ customJob, context, heroContent, heroSx }: ContentProps) => {
    )
 }
 
-type ActionProps = Pick<Props, "customJob" | "context">
+type ActionProps = Pick<Props, "customJob" | "context"> & {
+   onApplyClick?: () => void
+}
 
-const Actions = ({ context, customJob }: ActionProps) => {
+const Actions = ({ context, customJob, onApplyClick }: ActionProps) => {
    const { handleClickApplyBtn, applicationInitiatedOnly } = useCustomJobApply(
       customJob as PublicCustomJob,
       context
@@ -169,6 +202,7 @@ const Actions = ({ context, customJob }: ActionProps) => {
          applicationContext={context}
          job={customJob as PublicCustomJob}
          handleApplyClick={() => {
+            onApplyClick && onApplyClick()
             handleConfirmApplyOpen()
             handleClickApplyBtn()
          }}
