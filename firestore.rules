@@ -305,6 +305,11 @@ service cloud.firestore {
             }
         }
 
+        match /sparksAnalytics/{groupId} {
+            allow read: if true;
+            allow write: if false;
+        }
+
         match /videos/{video} {
             allow read: if true;
             allow write: if false;
