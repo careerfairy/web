@@ -1,11 +1,12 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import { Box, Tab, Tabs } from "@mui/material"
+import { Box, Button, Tab, Tabs } from "@mui/material"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
-import { SparksCompetitorTab } from "./competitor-tab/SparksCompetitorTab"
+import { SparksAudienceTab } from "./audience-tab"
+import { SparksCompetitorTab } from "./competitor-tab"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
-import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
+import { SparksOverviewTab } from "./overview-tab"
+import { useSparksAnalytics } from "./SparksAnalyticsContext"
 
 const styles = sxStyles({
    root: {
@@ -68,9 +69,8 @@ type TimeFilter = {
 
 const GroupSparkAnalytics = () => {
    const [tabValue, setTabValue] = useState("overview")
-   const [selectTimeFilter, setSelectTimeFilter] =
-      useState<TimeFilter["value"]>("30days")
-
+   const { selectTimeFilter, setSelectTimeFilter, updateAnalytics } =
+      useSparksAnalytics()
    const handleTabChange = (_, newValue) => {
       setTabValue(newValue)
    }
@@ -96,25 +96,22 @@ const GroupSparkAnalytics = () => {
                <Tab label="Competitor" value="competitor" />
             </Tabs>
             <Box component="span" sx={styles.mobileLimiter} />
-            <ResponsiveSelectWithDrawer
-               selectValue={selectTimeFilter}
-               setSelectValue={setSelectTimeFilter}
-               options={options}
-               selectContainerProps={{
-                  sx: styles.selectDrawer,
-               }}
-            />
+            <Box>
+               <Button onClick={updateAnalytics}>Update</Button>
+               <ResponsiveSelectWithDrawer
+                  selectValue={selectTimeFilter}
+                  setSelectValue={setSelectTimeFilter}
+                  options={options}
+                  selectContainerProps={{
+                     sx: styles.selectDrawer,
+                  }}
+               />
+            </Box>
          </Box>
          <Box>
-            {tabValue === "overview" && (
-               <SparksOverviewTab timeFilter={selectTimeFilter} />
-            )}
-            {tabValue === "audience" && (
-               <SparksAudienceTab timeFilter={selectTimeFilter} />
-            )}
-            {tabValue === "competitor" && (
-               <SparksCompetitorTab timeFilter={selectTimeFilter} />
-            )}
+            {tabValue === "overview" && <SparksOverviewTab />}
+            {tabValue === "audience" && <SparksAudienceTab />}
+            {tabValue === "competitor" && <SparksCompetitorTab />}
          </Box>
       </Box>
    )
