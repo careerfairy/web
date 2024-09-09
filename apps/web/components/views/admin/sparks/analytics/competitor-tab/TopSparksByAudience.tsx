@@ -1,15 +1,10 @@
-import {
-   CompetitorAudienceSegments,
-   SparkAnalyticsClientWithPastData,
-   TimePeriodParams,
-} from "@careerfairy/shared-lib/sparks/analytics"
+import { CompetitorAudienceSegments } from "@careerfairy/shared-lib/sparks/analytics"
 import { Stack } from "@mui/material"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import { useState } from "react"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { TitleWithSelect } from "../components/TitleWithSelect"
 import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
 import { StaticSparkCard } from "./StaticSparkCard"
 
 type AudienceOption = {
@@ -44,19 +39,10 @@ const AUDIENCE_OPTIOMS: AudienceOption[] = [
    },
 ]
 
-type TopSparksByIndustryContainerProps = {
-   timeFilter: TimePeriodParams
-}
-
-export const TopSparksByAudience = ({
-   timeFilter,
-}: TopSparksByIndustryContainerProps) => {
-   const { group } = useGroup()
+export const TopSparksByAudience = () => {
    const {
-      topSparksByAudience,
-   }: SparkAnalyticsClientWithPastData[TimePeriodParams] = useSparksAnalytics(
-      group.id
-   )[timeFilter]
+      filteredAnalytics: { topSparksByAudience },
+   } = useSparksAnalytics()
 
    const [selectAudienceValue, setSelectAudienceValue] = useState<
       CompetitorAudienceSegments | "all"
