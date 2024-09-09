@@ -1,18 +1,13 @@
-import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import CFPieChart from "../components/charts/CFPieChart"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkAnalyticsCardTitle"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
 import { EmptyDataCheckerForPieChart } from "./EmptyDataCheckers"
 
-type TopFieldsOfStudyProps = {
-   timeFilter: TimePeriodParams
-}
-
-export const TopFieldsOfStudy = ({ timeFilter }: TopFieldsOfStudyProps) => {
-   const { group } = useGroup()
-   const { topFieldsOfStudy } = useSparksAnalytics(group.id)[timeFilter]
+export const TopFieldsOfStudy = () => {
+   const {
+      filteredAnalytics: { topFieldsOfStudy },
+   } = useSparksAnalytics()
 
    return (
       <GroupSparkAnalyticsCardContainer>
