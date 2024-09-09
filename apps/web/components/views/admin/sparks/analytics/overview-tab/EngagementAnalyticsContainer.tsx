@@ -1,20 +1,20 @@
-import { FC, useState } from "react"
+import { EngagementData } from "@careerfairy/shared-lib/sparks/analytics"
 import { Box } from "@mui/material"
-import { AbstractButtonSelect, useResetChartsTooltip } from "../util"
-import {
-   EngagementData,
-   TimePeriodParams,
-} from "@careerfairy/shared-lib/sparks/analytics"
-import { numberToString } from "util/CommonUtil"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
-import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
-import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkAnalyticsCardTitle"
+import { useState } from "react"
+import { numberToString } from "util/CommonUtil"
 import BrandedSwipeableViews from "../components/BrandedSwipeableViews"
+import CFLineChart from "../components/charts/CFLineChart"
 import ChartSwitchButton from "../components/charts/ChartSwitchButton"
 import ChartSwitchButtonGroupContainer from "../components/ChartSwitchButtonGroupContainer"
-import CFLineChart from "../components/charts/CFLineChart"
+import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
+import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkAnalyticsCardTitle"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
+import {
+   AbstractButtonSelect,
+   timeFrameLabels,
+   useResetChartsTooltip,
+} from "../util"
 
 const engagementSelectOptions: AbstractButtonSelect<EngagementData> = {
    likes: "Likes",
@@ -23,18 +23,12 @@ const engagementSelectOptions: AbstractButtonSelect<EngagementData> = {
    pageClicks: "Clicks",
 } as const
 
-type EngagementAnalyticsContainerProps = {
-   timeFilter: TimePeriodParams
-   timeFrameLabel: string
-}
-
-const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
-   timeFilter,
-   timeFrameLabel,
-}) => {
+export const EngagementAnalyticsContainer = () => {
    const isMobile = useIsMobile()
-   const { group } = useGroup()
-   const { engagement } = useSparksAnalytics(group.id)[timeFilter]
+   const {
+      filteredAnalytics: { engagement },
+      selectTimeFilter,
+   } = useSparksAnalytics()
    const resetChartsTooltip = useResetChartsTooltip()
 
    const [engagementSelectValue, setEngagementSelectValue] =
@@ -44,6 +38,8 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
    const totalSharesCount = engagement.shares.totalCount
    const totalRegistrationsCount = engagement.registrations.totalCount
    const totalPageClicksCount = engagement.pageClicks.totalCount
+
+   const timeFrameLabel = timeFrameLabels[selectTimeFilter]
 
    return (
       <>
@@ -145,5 +141,3 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
       </>
    )
 }
-
-export default EngagementAnalyticsContainer
