@@ -1,5 +1,7 @@
 // Backend data types
 
+import { Timestamp } from "../firebaseTypes"
+
 export type TimeseriesDataPoint = {
    x: string | number
    y: unknown
@@ -112,6 +114,7 @@ export type SparksAnalyticsDTO = {
    levelsOfStudy: PieChartWithPastData
    topSparksByIndustry: CompetitorIndustryBaseWithPastData
    topSparksByAudience: CompetitorAudienceBaseWithPastData
+   updatedAt: Timestamp
 }
 
 // Frontend data types
