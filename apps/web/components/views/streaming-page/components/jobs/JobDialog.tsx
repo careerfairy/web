@@ -1,5 +1,8 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJobApplicationSourceTypes,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import CloseIcon from "@mui/icons-material/Close"
 import { LoadingButton } from "@mui/lab"
 import {
@@ -307,7 +310,10 @@ const JobDialogContent = ({
             <CustomJobApplyConfirmation
                handleClose={handleCloseConfirmationDialog}
                job={job as PublicCustomJob}
-               applicationContext={{ id: livestreamId, type: "livestream" }}
+               applicationSource={{
+                  id: livestreamId,
+                  source: CustomJobApplicationSourceTypes.Livestream,
+               }}
                sx={{
                   bottom:
                      isMobile && !isLandscape ? { xs: "130px", sm: "90px" } : 0,

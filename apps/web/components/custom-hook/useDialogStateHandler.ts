@@ -12,8 +12,7 @@ const useDialogStateHandler: (
    initialValue?: boolean
 ) => [boolean, () => void, () => void] = (initialValue?: boolean) => {
    //  create a use dialog hook with a default value of false
-   // eslint-disable-next-line react/hook-use-state
-   const [IsOpen, setIsOpen] = React.useState(initialValue)
+   const [isOpen, setIsOpen] = React.useState<boolean>(initialValue)
 
    const handleOpen = useCallback(() => {
       setIsOpen(true)
@@ -23,7 +22,7 @@ const useDialogStateHandler: (
       setIsOpen(false)
    }, [])
 
-   return [IsOpen, handleOpen, handleClose] as [boolean, () => void, () => void]
+   return [isOpen, handleOpen, handleClose] as [boolean, () => void, () => void]
 }
 
 export default useDialogStateHandler

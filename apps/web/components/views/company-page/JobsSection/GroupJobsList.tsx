@@ -1,4 +1,7 @@
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CloseOutlined } from "@mui/icons-material"
 import { Box, IconButton, ListItem, Stack } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
@@ -68,7 +71,10 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
             customJob={selectedJob}
             onClose={onCloseJobDialog}
             isOpen={isJobsDialogOpen}
-            context={{ type: "companyPage", id: selectedJob?.groupId }}
+            context={{
+               source: CustomJobApplicationSourceTypes.Group,
+               id: selectedJob?.groupId,
+            }}
             heroSx={styles.heroContent}
             heroContent={
                <Box display={"flex"} flexDirection={"row-reverse"} p={0} m={0}>

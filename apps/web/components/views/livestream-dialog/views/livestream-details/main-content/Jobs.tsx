@@ -7,6 +7,7 @@ import Button from "@mui/material/Button"
 import Stack from "@mui/material/Stack"
 import { alpha } from "@mui/material/styles"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import JobCard from "components/views/common/jobs/JobCard"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
 import { LinkProps } from "next/dist/client/link"
@@ -108,6 +109,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
    const router = useRouter()
    const { mode, goToJobDetails } = useLiveStreamDialog()
    const isAtsLivestreamAssociation = useIsAtsLivestreamJobAssociation(job)
+   const featureFlags = useFeatureFlags()
 
    let jobId: string, jobName: string
 
@@ -140,7 +142,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
       }
    }
 
-   return isAtsLivestreamAssociation ? (
+   return isAtsLivestreamAssociation || !featureFlags.jobHubV1 ? (
       <Stack
          direction={{
             xs: "column",

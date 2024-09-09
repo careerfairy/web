@@ -1,5 +1,5 @@
 import {
-   JobApplicationContext,
+   CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import CloseIcon from "@mui/icons-material/Close"
@@ -72,18 +72,18 @@ const styles = sxStyles({
 type Props = {
    handleClose: () => void
    job: PublicCustomJob
-   applicationContext: JobApplicationContext
+   applicationSource: CustomJobApplicationSource
    open: boolean
 }
 const CustomJobApplyConfirmationDialog = ({
    open,
    handleClose,
    job,
-   applicationContext,
+   applicationSource,
 }: Props) => {
    const { handleConfirmApply, alreadyApplied, isApplying } = useCustomJobApply(
       job,
-      applicationContext
+      applicationSource
    )
    const isMobile = useIsMobile()
 

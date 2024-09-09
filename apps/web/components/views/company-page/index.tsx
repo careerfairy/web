@@ -223,6 +223,9 @@ const CompanyPageOverview = ({
    const showFollowCompanyCta = isLoggedIn && !editMode
    const showSignUpCta = isLoggedOut && !editMode
 
+   const showJobs = featureFlags.jobHubV1
+   console.log("🚀 ~ showJobs:", showJobs)
+
    return (
       <CompanyPageContext.Provider value={contextValue}>
          <Box height={"100%"} pb={5}>
@@ -235,7 +238,7 @@ const CompanyPageOverview = ({
                   <Grid item xs={12} md={6}>
                      <Stack px={3} spacing={{ xs: 2, md: 5 }}>
                         <AboutSection />
-                        <JobsSection />
+                        {showJobs ? <JobsSection /> : null}
                         {group.publicSparks ? (
                            <SparksSection key={group.id} groupId={group.id} />
                         ) : null}

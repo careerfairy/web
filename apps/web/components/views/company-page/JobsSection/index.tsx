@@ -35,7 +35,7 @@ const JobsSection = () => {
       <Box sx={{ position: "relative" }}>
          <SectionAnchor ref={jobsSectionRef} tabValue={TabValue.jobs} />
          {isMounted() ? (
-            <SuspenseWithBoundary fallback={<JobsSectionDetailsSkeleton />}>
+            <SuspenseWithBoundary>
                <Stack width={"100%"} spacing={2}>
                   <Box sx={styles.titleSection}>
                      <Header />

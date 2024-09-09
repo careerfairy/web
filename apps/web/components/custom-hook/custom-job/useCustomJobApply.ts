@@ -1,5 +1,5 @@
 import {
-   JobApplicationContext,
+   CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useRouter } from "next/router"
@@ -16,7 +16,7 @@ import useUserJobApplication from "./useUserJobApplication"
 
 const useCustomJobApply = (
    job: PublicCustomJob,
-   context: JobApplicationContext
+   context: CustomJobApplicationSource
 ) => {
    const { userData } = useAuth()
    const { data: fingerPrintId } = useFingerPrint()

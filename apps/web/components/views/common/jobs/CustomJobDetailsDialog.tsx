@@ -1,6 +1,6 @@
 import {
    CustomJob,
-   JobApplicationContext,
+   CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Dialog, DialogActions, DialogContent, SxProps } from "@mui/material"
@@ -56,7 +56,7 @@ const styles = sxStyles({
 type Props = {
    isOpen: boolean
    customJob: CustomJob
-   context?: JobApplicationContext
+   context?: CustomJobApplicationSource
    onClose?: () => void
    heroContent?: ReactNode
    heroSx?: SxProps<DefaultTheme>
@@ -174,7 +174,7 @@ const Content = ({
             <CustomJobApplyConfirmation
                handleClose={onApplyConfirmationClose}
                job={customJob as PublicCustomJob}
-               applicationContext={context}
+               applicationSource={context}
                autoApply={isAutoApply}
                onApply={handleConfirmApply}
                sx={styles.jobApplyConfirmationDialog}
@@ -199,7 +199,7 @@ const Actions = ({ context, customJob, onApplyClick }: ActionProps) => {
 
    return (
       <CustomJobCTAButtons
-         applicationContext={context}
+         applicationSource={context}
          job={customJob as PublicCustomJob}
          handleApplyClick={() => {
             onApplyClick && onApplyClick()

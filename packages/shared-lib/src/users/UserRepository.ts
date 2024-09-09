@@ -806,7 +806,7 @@ export class FirebaseUserRepository
             user: userData,
             groupId: customJob.groupId,
             appliedAt: anonymousApplicationData.appliedAt || null,
-            linkedContent: anonymousApplicationData.linkedContent,
+            applicationSource: anonymousApplicationData.applicationSource,
             job: customJob,
             applied: anonymousApplicationData.applied,
             createdAt: anonymousApplicationData.createdAt,

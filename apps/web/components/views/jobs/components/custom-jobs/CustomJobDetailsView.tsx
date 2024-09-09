@@ -1,6 +1,6 @@
 import {
    CustomJob,
-   JobApplicationContext,
+   CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Stack, SxProps } from "@mui/material"
@@ -51,7 +51,7 @@ const customStyles = sxStyles({
 type Props = {
    job: CustomJob
    applicationInitiatedOnly: boolean
-   context?: JobApplicationContext
+   context?: CustomJobApplicationSource
    heroContent?: ReactNode
    sx?: SxProps<DefaultTheme>
    heroSx?: SxProps<DefaultTheme>
@@ -128,12 +128,12 @@ export const CustomJobDetails = ({
                   <CustomJobApplyConfirmation
                      handleClose={handleClose}
                      job={job as PublicCustomJob}
-                     applicationContext={context}
+                     applicationSource={context}
                      autoApply={isAutoApply}
                      onApply={onApply}
                      sx={{
                         bottom:
-                           isMobile && context.type == "livestream"
+                           isMobile && context.source == "livestream"
                               ? "150px"
                               : "100px",
                      }}
@@ -148,7 +148,7 @@ export const CustomJobDetails = ({
                   ref={ref}
                >
                   <CustomJobCTAButtons
-                     applicationContext={context}
+                     applicationSource={context}
                      job={job as PublicCustomJob}
                      handleApplyClick={handleOpen}
                      {...props}

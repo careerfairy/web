@@ -1,7 +1,8 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    CustomJob,
-   JobApplicationContext,
+   CustomJobApplicationSource,
+   CustomJobApplicationSourceTypes,
    PublicCustomJob,
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
@@ -97,14 +98,14 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
    const [, handleOpen] = useDialogStateHandler()
    const customJob = useCustomJob(jobId)
-   const context: JobApplicationContext = {
+   const applicationSource: CustomJobApplicationSource = {
       id: livestreamPresenter.id,
-      type: "livestream",
+      source: CustomJobApplicationSourceTypes.Livestream,
    }
 
    const { applicationInitiatedOnly } = useCustomJobApply(
       customJob as PublicCustomJob,
-      context
+      applicationSource
    )
    const autoActionType = useSelector(autoAction)
 
@@ -209,7 +210,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
          heroContent={livestreamDetailCustomJobHeroContent}
          companyName={livestreamPresenter.company}
          companyLogoUrl={livestreamPresenter.companyLogoUrl}
-         context={context}
+         context={applicationSource}
          onApply={onApply}
          applicationInitiatedOnly={applicationInitiatedOnly}
       />
@@ -246,7 +247,10 @@ export const JobButton: FC<JobButtonProps> = ({
             )
          ) : (
             <CustomJobCTAButtons
-               applicationContext={{ id: livestreamId, type: "livestream" }}
+               applicationSource={{
+                  id: livestreamId,
+                  source: CustomJobApplicationSourceTypes.Livestream,
+               }}
                job={job as PublicCustomJob}
                handleApplyClick={handleOpen}
             />

@@ -1,5 +1,5 @@
 import {
-   JobApplicationContext,
+   CustomJobApplicationSource,
    JobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
@@ -72,7 +72,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   applicationContext?: JobApplicationContext
+   applicationSource?: CustomJobApplicationSource
    job: PublicCustomJob
    handleApplyClick?: () => void
 }
@@ -96,7 +96,7 @@ const CustomJobCTAButtons = (props: Props) => {
       profile: () => {
          return <></>
       },
-      companyPage: () => {
+      group: () => {
          return <PortalJobCTA {...props} alreadyApplied={alreadyApplied} />
       },
       portal: () => <></>,
@@ -105,7 +105,7 @@ const CustomJobCTAButtons = (props: Props) => {
       },
    }
 
-   return ctas[props.applicationContext.type](props)
+   return ctas[props.applicationSource.source](props)
 }
 
 type LivestreamCustomJobCTAProps = CustomJobCTAProps & {
@@ -133,7 +133,7 @@ const LivestreamJobCTA = (props: LivestreamCustomJobCTAProps) => {
 }
 
 const PastLivestreamJobCTA = ({
-   applicationContext,
+   applicationSource,
    job,
    handleApplyClick: handleApplyClick,
    alreadyApplied,
@@ -161,7 +161,7 @@ const PastLivestreamJobCTA = ({
          >
             <CustomJobApplyButton
                job={job as PublicCustomJob}
-               applicationContext={applicationContext}
+               applicationSource={applicationSource}
                handleApplyClick={handleApplyClick}
                isSecondary={jobExpired || isUserRegistered}
                alreadyApplied={alreadyApplied}
@@ -190,7 +190,7 @@ const PastLivestreamJobCTA = ({
 }
 
 const UpcomingLivestreamJobCTA = ({
-   applicationContext,
+   applicationSource,
    job,
    handleApplyClick: handleClick,
    alreadyApplied,
@@ -210,7 +210,7 @@ const UpcomingLivestreamJobCTA = ({
             {!isUserRegistered ? <LiveStreamButton /> : null}
             <CustomJobApplyButton
                job={job as PublicCustomJob}
-               applicationContext={applicationContext}
+               applicationSource={applicationSource}
                handleApplyClick={handleClick}
                isSecondary={!isUserRegistered}
                alreadyApplied={alreadyApplied}
@@ -228,7 +228,7 @@ const UpcomingLivestreamJobCTA = ({
 
 const PortalJobCTA = ({
    alreadyApplied,
-   applicationContext,
+   applicationSource,
    handleApplyClick,
    job,
 }: CustomJobCTAProps) => {
@@ -244,7 +244,7 @@ const PortalJobCTA = ({
          >
             <CustomJobApplyButton
                job={job as PublicCustomJob}
-               applicationContext={applicationContext}
+               applicationSource={applicationSource}
                handleApplyClick={handleApplyClick}
                isSecondary={false}
                alreadyApplied={alreadyApplied}
@@ -340,7 +340,7 @@ const JobExpiredButton = ({ alreadyApplied, job }: JobExpiredButtonProps) => {
 }
 
 const CustomJobApplyButton = ({
-   applicationContext,
+   applicationSource,
    job,
    handleApplyClick: handleClick,
    isSecondary,
@@ -349,7 +349,7 @@ const CustomJobApplyButton = ({
    const jobExpired = useIsJobExpired(job)
    const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
-      applicationContext
+      applicationSource
    )
 
    const handleApplyClick = useCallback(async () => {
