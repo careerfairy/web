@@ -219,7 +219,7 @@ export const LivestreamTutorialProvider = ({ children }: Props) => {
             handRaiseEnabled
          ) {
             // wait for animations to complete
-            await new Promise((resolve) => setTimeout(resolve, 200))
+            await new Promise((resolve) => setTimeout(resolve, 300))
             resume()
          }
       }
@@ -237,7 +237,7 @@ export const LivestreamTutorialProvider = ({ children }: Props) => {
             !tutorialState.isWaiting && wait()
          } else {
             // wait for animations to complete
-            await new Promise((resolve) => setTimeout(resolve, 200))
+            await new Promise((resolve) => setTimeout(resolve, 300))
             resume()
          }
       }
@@ -265,7 +265,9 @@ export const LivestreamTutorialProvider = ({ children }: Props) => {
             type
          )
       ) {
-         // actions to perform before running step
+         // actions to perform before running next step
+         // return if you want to stay in this step while waiting (backdrop won't be visible) or
+         // don't return to move onto next step (backdrop visible but next step target already needs to be mounted)
          if (stepId === TutorialSteps.Q_AND_A_1 && !isQAndAPanelOpen) {
             wait()
             return toggleQAndAPanel()
@@ -280,7 +282,7 @@ export const LivestreamTutorialProvider = ({ children }: Props) => {
             !handRaiseEnabled
          ) {
             wait()
-            return toggleHandRaise()
+            toggleHandRaise()
          } else if (stepId === TutorialSteps.POLLS_1 && !isPollsPanelOpen) {
             wait()
             return togglePollsPanel()
@@ -309,6 +311,7 @@ export const LivestreamTutorialProvider = ({ children }: Props) => {
       }),
       [tutorialState]
    )
+
    return (
       <TutorialContext.Provider value={value}>
          <Joyride
