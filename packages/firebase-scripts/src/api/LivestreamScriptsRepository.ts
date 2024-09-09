@@ -85,6 +85,10 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
    getAllLivestreamRecordingStats(): Promise<LivestreamRecordingDetails[]>
 
    getAllLivestreamUserRecordingStats(): Promise<RecordingStatsUser[]>
+
+   getAllLivestreamsWithJobs<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, LivestreamEvent>[]>
 }
 
 export class LivestreamScriptsRepository
@@ -297,5 +301,16 @@ export class LivestreamScriptsRepository
          .where("id", "==", "livestreamStats")
          .get()
       return mapFirestoreDocuments<LiveStreamStats, true>(snaps, true)
+   }
+
+   async getAllLivestreamsWithJobs<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, LivestreamEvent>[]> {
+      const snaps = await this.firestore
+         .collection("livestreams")
+         .where("hasJobs", "==", true)
+         .get()
+
+      return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
    }
 }
