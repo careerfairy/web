@@ -105,7 +105,7 @@ export const publicSparksNotificationsRepo: IPublicSparksNotificationsRepository
 export const getSparksAnalyticsRepoInstance = (
    groupId: string
 ): GroupSparksAnalyticsRepository => {
-   return new GroupSparksAnalyticsRepository(groupId, bigQueryClient)
+   return new GroupSparksAnalyticsRepository(groupId, bigQueryClient, firestore)
 }
 
 export const customJobRepo: ICustomJobFunctionsRepository =
