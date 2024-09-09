@@ -1,11 +1,14 @@
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    LinearBarDataPoint,
    MostSomethingBase,
    PieChartDataPoint,
+   SparksAnalyticsDTO,
    TimePeriodParams,
    TimeseriesDataPoint,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { BigQuery } from "@google-cloud/bigquery"
+import { Firestore } from "firebase-admin/firestore"
 import IBigQueryService from "../../bigQuery/IBigQueryService"
 import {
    top10Countries,
@@ -130,13 +133,36 @@ interface IGroupSparksAnalyticsRepository {
     */
    getLevelsOfStudy(timeperiod: TimePeriodParams): Promise<PieChartDataPoint[]>
 
+   /**
+    * Get group's top sparks by industry for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<MostSomethingBase>} Promise object represents the top sparks by industry for the given time period
+    */
    getTopSparksByIndustry(
       timeperiod: TimePeriodParams
    ): Promise<MostSomethingBase>
 
+   /**
+    * Get group's top sparks by audience for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<MostSomethingBase>} Promise object represents the top sparks by audience for the given time period
+    */
    getTopSparksByAudience(
       timeperiod: TimePeriodParams
    ): Promise<MostSomethingBase>
+
+   /**
+    * Retrieves the cached analytics data for the group.
+    * @returns {Promise<SparksAnalyticsDTO | null>} A promise that resolves to the cached analytics data, or null if no cache exists.
+    */
+   getCachedAnalytics(): Promise<SparksAnalyticsDTO | null>
+
+   /**
+    * Updates the analytics cache with new data.
+    * @param {SparksAnalyticsDTO} analytics - The new analytics data to cache.
+    * @returns {Promise<void>} A promise that resolves when the cache has been updated.
+    */
+   updateAnalyticsCache(analytics: SparksAnalyticsDTO): Promise<void>
 }
 
 class GroupSparksAnalyticsRepository
@@ -144,6 +170,7 @@ class GroupSparksAnalyticsRepository
 {
    private readonly groupId: string
    private bigQueryService: IBigQueryService
+   private firestore: Firestore
    private readonly timePeriodMap: Record<TimePeriodParams, string> = {
       "7days": "7 DAY",
       "30days": "30 DAY",
@@ -151,9 +178,31 @@ class GroupSparksAnalyticsRepository
       "1year": "1 YEAR",
    }
 
-   constructor(groupId: string, bigQueryClient: BigQuery) {
+   constructor(
+      groupId: string,
+      bigQueryClient: BigQuery,
+      firestoreClient: Firestore
+   ) {
       this.groupId = groupId
       this.bigQueryService = new IBigQueryService(bigQueryClient)
+      this.firestore = firestoreClient
+   }
+
+   async getCachedAnalytics(): Promise<SparksAnalyticsDTO | null> {
+      const doc = await this.firestore
+         .collection("sparksAnalytics")
+         .withConverter<SparksAnalyticsDTO>(createGenericConverter())
+         .doc(this.groupId)
+         .get()
+
+      return doc.exists ? doc.data() : null
+   }
+
+   async updateAnalyticsCache(analytics: SparksAnalyticsDTO): Promise<void> {
+      await this.firestore
+         .collection("sparksAnalytics")
+         .doc(this.groupId)
+         .set(analytics)
    }
 
    getTotalViewsPastYear(): Promise<TimeseriesDataPoint[]> {
