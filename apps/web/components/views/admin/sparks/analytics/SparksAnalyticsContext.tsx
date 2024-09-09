@@ -75,13 +75,11 @@ export const SparksAnalyticsProvider = ({ children }) => {
          sparksAnalyticsService
             .fetchSparksAnalytics(group.id, updateCache)
             .then((fetchedAnalytics) => {
-               console.log("🚀 ~ .then ~ fetchedAnalytics:", fetchedAnalytics)
                const updatedAnalytics = convertToClientModel(
                   fetchedAnalytics,
                   fieldsOfStudyLookup,
                   levelsOfStudyLookup
                )
-               console.log("🚀 ~ .then ~ updatedAnalytics:", updatedAnalytics)
                setAnalytics(updatedAnalytics)
                setIsLoading(false)
             })
