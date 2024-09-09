@@ -1,37 +1,32 @@
-import { FC, useState } from "react"
-import { AbstractButtonSelect, useResetChartsTooltip } from "../util"
-import {
-   ReachData,
-   TimePeriodParams,
-} from "@careerfairy/shared-lib/sparks/analytics"
-import { numberToString } from "util/CommonUtil"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
+import { ReachData } from "@careerfairy/shared-lib/sparks/analytics"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useState } from "react"
+import { numberToString } from "util/CommonUtil"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
+import BrandedSwipeableViews from "../components/BrandedSwipeableViews"
+import ChartSwitchButtonGroupContainer from "../components/ChartSwitchButtonGroupContainer"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkAnalyticsCardTitle"
-import ChartSwitchButton from "../components/charts/ChartSwitchButton"
-import ChartSwitchButtonGroupContainer from "../components/ChartSwitchButtonGroupContainer"
 import CFLineChart from "../components/charts/CFLineChart"
-import BrandedSwipeableViews from "../components/BrandedSwipeableViews"
+import ChartSwitchButton from "../components/charts/ChartSwitchButton"
+import {
+   AbstractButtonSelect,
+   timeFrameLabels,
+   useResetChartsTooltip,
+} from "../util"
 
 const reachSelectOptions: AbstractButtonSelect<ReachData> = {
    totalViews: "Views",
    uniqueViewers: "Viewers",
 } as const
 
-type ReachAnalyticsContainerProps = {
-   timeFilter: TimePeriodParams
-   timeFrameLabel: string
-}
-
-const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
-   timeFilter,
-   timeFrameLabel,
-}) => {
+export const ReachAnalyticsContainer = () => {
    const isMobile = useIsMobile()
-   const { group } = useGroup()
-   const { reach } = useSparksAnalytics(group.id)[timeFilter]
+   const {
+      filteredAnalytics: { reach },
+      selectTimeFilter,
+   } = useSparksAnalytics()
+
    const resetChartsTooltip = useResetChartsTooltip()
 
    const [reachSelectValue, setReachSelectValue] =
@@ -39,6 +34,8 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
 
    const totalViewsCount = reach.totalViews.totalCount
    const totalUniqueViewersCount = reach.uniqueViewers.totalCount
+
+   const timeFrameLabel = timeFrameLabels[selectTimeFilter]
 
    return (
       <>
@@ -100,5 +97,3 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
       </>
    )
 }
-
-export default ReachAnalyticsContainer
