@@ -1,10 +1,11 @@
-import { FC } from "react"
-import { useRouter } from "next/router"
 import GroupSparkAnalytics from "components/views/admin/sparks/analytics"
+import { SparksAnalyticsProvider } from "components/views/admin/sparks/analytics/SparksAnalyticsContext"
 import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
+import SparksDialog from "components/views/admin/sparks/sparks-dialog/SparksDialog"
+import { useRouter } from "next/router"
+import { FC } from "react"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
-import SparksDialog from "components/views/admin/sparks/sparks-dialog/SparksDialog"
 
 const CreateSparkButtonWrapper: FC = () => {
    return (
@@ -27,7 +28,9 @@ const AdminSparksAnalyticsPage: FC = () => {
          topBarCta={<CreateSparkButtonWrapper />}
       >
          <DashboardHead title="CareerFairy | My Sparks Analytics" />
-         <GroupSparkAnalytics />
+         <SparksAnalyticsProvider>
+            <GroupSparkAnalytics />
+         </SparksAnalyticsProvider>
       </GroupDashboardLayout>
    )
 }
