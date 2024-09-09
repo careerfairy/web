@@ -1,16 +1,12 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
-import {
-   SparkAnalyticsClientWithPastData,
-   TimePeriodParams,
-} from "@careerfairy/shared-lib/sparks/analytics"
 import { Stack } from "@mui/material"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo, useState } from "react"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { TitleWithSelect } from "../components/TitleWithSelect"
 import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
 import { StaticSparkCard } from "./StaticSparkCard"
 
 const ENOUGH_CONTENT_THRESHOLD = 3
@@ -20,19 +16,11 @@ const ALL_INDUSTRIES_OPTION: OptionGroup = {
    name: "All Industries",
 }
 
-type TopSparksByIndustryContainerProps = {
-   timeFilter: TimePeriodParams
-}
-
-export const TopSparksByIndustry = ({
-   timeFilter,
-}: TopSparksByIndustryContainerProps) => {
+export const TopSparksByIndustry = () => {
    const { group } = useGroup()
    const {
-      topSparksByIndustry,
-   }: SparkAnalyticsClientWithPastData[TimePeriodParams] = useSparksAnalytics(
-      group.id
-   )[timeFilter]
+      filteredAnalytics: { topSparksByIndustry },
+   } = useSparksAnalytics()
 
    const [selectIndustryValue, setSelectIndustryValue] = useState<string>("all")
 
