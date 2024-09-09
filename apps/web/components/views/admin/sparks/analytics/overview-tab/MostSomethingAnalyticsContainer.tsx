@@ -1,16 +1,11 @@
-import { FC, useState } from "react"
+import { MostSomethingData } from "@careerfairy/shared-lib/sparks/analytics"
 import { Box, Stack } from "@mui/material"
+import { FC, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
-import SparksStaticCard from "../components/SparksStaticCard"
-import { ResponsiveSelectWithDrawer } from "../components/ResponsiveSelectWithDrawer"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
-import {
-   MostSomethingData,
-   SparkAnalyticsClientWithPastData,
-   TimePeriodParams,
-} from "@careerfairy/shared-lib/sparks/analytics"
+import { ResponsiveSelectWithDrawer } from "../components/ResponsiveSelectWithDrawer"
+import SparksStaticCard from "../components/SparksStaticCard"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
 import EmptyDataCheckerForMostSomething from "./EmptyDataCheckers"
 
 const styles = sxStyles({
@@ -108,16 +103,10 @@ const MostSomethingTitle: FC<MostSomethingTitleProps> = ({
    )
 }
 
-type MostSomethingAnalyticsContainerProps = {
-   timeFilter: TimePeriodParams
-}
-
-const MostSomethingAnalyticsContainer: FC<
-   MostSomethingAnalyticsContainerProps
-> = ({ timeFilter }) => {
-   const { group } = useGroup()
-   const { most }: SparkAnalyticsClientWithPastData[TimePeriodParams] =
-      useSparksAnalytics(group.id)[timeFilter]
+export const MostSomethingAnalyticsContainer = () => {
+   const {
+      filteredAnalytics: { most },
+   } = useSparksAnalytics()
 
    const [selectMostSomethingValue, setSelectMostSomethingValue] =
       useState<keyof MostSomethingData>("watched")
@@ -144,5 +133,3 @@ const MostSomethingAnalyticsContainer: FC<
       </GroupSparkAnalyticsCardContainer>
    )
 }
-
-export default MostSomethingAnalyticsContainer
