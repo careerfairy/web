@@ -1,6 +1,7 @@
-// Backend data types
-
+import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
 import { Timestamp } from "../firebaseTypes"
+
+// Backend data type
 
 export type TimeseriesDataPoint = {
    x: string | number
@@ -115,7 +116,7 @@ export type SparksAnalyticsDTO = {
    topSparksByIndustry: CompetitorIndustryBaseWithPastData
    topSparksByAudience: CompetitorAudienceBaseWithPastData
    updatedAt: Timestamp
-}
+} & Identifiable
 
 // Frontend data types
 
@@ -159,4 +160,6 @@ export type SparkAnalyticsClient = SparkAnalyticsClientOverview &
    SparksAnalyticsClientCompetitor
 
 export type SparkAnalyticsClientWithPastData =
-   WithPastData<SparkAnalyticsClient>
+   WithPastData<SparkAnalyticsClient> & {
+      updatedAt: Date
+   }
