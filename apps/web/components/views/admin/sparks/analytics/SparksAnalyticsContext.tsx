@@ -62,10 +62,9 @@ export const SparksAnalyticsProvider = ({ children }) => {
       [levelsOfStudy]
    )
 
-   const [analytics, setAnalytics] = useState<
-      SparkAnalyticsClientWithPastData | object | null
-   >(null)
-   const [updatedAt, setUpdatedAt] = useState<Date>(null)
+   const [analytics, setAnalytics] =
+      useState<SparkAnalyticsClientWithPastData>(null)
+   const [updatedAtLabel, setUpdatedAtLabel] = useState<string>(null)
    const [isLoading, setIsLoading] = useState<boolean>(true)
    const [error, setError] = useState<string | null>(null)
 
@@ -87,7 +86,6 @@ export const SparksAnalyticsProvider = ({ children }) => {
                levelsOfStudyLookup
             )
 
-            setUpdatedAt(updatedAnalytics.updatedAt)
             setAnalytics(updatedAnalytics)
             setIsLoading(false)
          } catch (error) {
@@ -107,35 +105,6 @@ export const SparksAnalyticsProvider = ({ children }) => {
    const filteredAnalytics = useMemo<SparkAnalyticsClient>(() => {
       return analytics?.[selectTimeFilter]
    }, [analytics, selectTimeFilter])
-
-   const updatedAtLabel = useMemo(() => {
-      if (!updatedAt) return ""
-
-      const now = Date.now()
-      const diff = now - updatedAt.getTime()
-      const seconds = Math.floor(diff / 1000)
-      const minutes = Math.floor(seconds / 60)
-      const hours = Math.floor(minutes / 60)
-      const days = Math.floor(hours / 24)
-
-      if (seconds < 60) {
-         return "Last updated: now"
-      } else if (minutes < 1) {
-         return `Last updated: ${seconds} ${
-            seconds === 1 ? "second" : "seconds"
-         }`
-      } else if (hours < 1) {
-         return `Last updated: ${minutes} ${
-            minutes === 1 ? "minute" : "minutes"
-         }`
-      } else if (days < 1) {
-         return `Last updated: ${hours} ${hours === 1 ? "hour" : "hours"}`
-      } else if (days <= 28) {
-         return `Last updated: ${days} ${days === 1 ? "day" : "days"}`
-      } else {
-         return `Last updated: ${updatedAt.toLocaleDateString()}`
-      }
-   }, [updatedAt])
 
    const value = useMemo(() => {
       return {
@@ -159,6 +128,45 @@ export const SparksAnalyticsProvider = ({ children }) => {
    useEffect(() => {
       fetchAnalytics(false)
    }, [fetchAnalytics])
+
+   useEffect(() => {
+      const updateLabel = () => {
+         if (!analytics?.updatedAt) return ""
+
+         const now = Date.now()
+         const diff = now - analytics.updatedAt.getTime()
+         const seconds = Math.floor(diff / 1000)
+         const minutes = Math.floor(seconds / 60)
+         const hours = Math.floor(minutes / 60)
+         const days = Math.floor(hours / 24)
+
+         let label
+         if (seconds < 60) {
+            label = "Last updated: now"
+         } else if (minutes < 1) {
+            label = `Last updated: ${seconds} ${
+               seconds === 1 ? "second" : "seconds"
+            }`
+         } else if (hours < 1) {
+            label = `Last updated: ${minutes} ${
+               minutes === 1 ? "minute" : "minutes"
+            }`
+         } else if (days < 1) {
+            label = `Last updated: ${hours} ${hours === 1 ? "hour" : "hours"}`
+         } else if (days <= 28) {
+            label = `Last updated: ${days} ${days === 1 ? "day" : "days"}`
+         } else {
+            label = `Last updated: ${analytics.updatedAt.toLocaleDateString()}`
+         }
+
+         setUpdatedAtLabel(label)
+      }
+
+      updateLabel()
+
+      const interval = setInterval(updateLabel, 1000)
+      return () => clearInterval(interval)
+   }, [analytics?.updatedAt])
 
    return (
       <SparksAnalyticsContext.Provider value={value}>
