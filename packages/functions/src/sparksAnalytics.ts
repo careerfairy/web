@@ -131,7 +131,7 @@ async function fetchAnalyticsFromBigQuery(
       ),
    ])
 
-   const SparksAnalyticsPayload: SparksAnalyticsDTO = {
+   const SparksAnalyticsPayload: Omit<SparksAnalyticsDTO, "id"> = {
       reach: {
          totalViews: totalViews,
          uniqueViewers: uniqueViewers,
@@ -231,12 +231,16 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                const bigQueryAnalyticsData = await fetchAnalyticsFromBigQuery(
                   sparksAnalyticsRepo
                )
-               await sparksAnalyticsRepo.updateAnalyticsCache(
-                  bigQueryAnalyticsData
-               )
+
+               await sparksAnalyticsRepo.updateAnalyticsCache({
+                  ...bigQueryAnalyticsData,
+                  id: groupId,
+               })
+
                functions.logger.info(
                   "Sparks analytics cache updated in Firestore."
                )
+
                return bigQueryAnalyticsData
             }
 
