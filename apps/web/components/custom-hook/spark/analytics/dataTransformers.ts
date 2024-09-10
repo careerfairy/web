@@ -4,6 +4,8 @@ import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    CompetitorAudienceData,
+   CompetitorAudienceWithPastData,
+   CompetitorIndustryBaseWithPastData,
    CompetitorIndustryData,
    CompetitorSparkData,
    LinearBarDataPoint,
@@ -16,6 +18,7 @@ import {
    TimeseriesDataPoint,
 } from "@careerfairy/shared-lib/src/sparks/analytics"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
+import { Timestamp } from "data/firebase/FirebaseInstance"
 
 const AUDIENCE_SPARKS_LIMIT = 4
 const INDUSTRY_SPARKS_LIMIT = 4
@@ -216,7 +219,7 @@ export const convertToClientModel = (
    data: SparksAnalyticsDTO,
    fieldsOfStudyLookup,
    levelsOfStudyLookup
-): SparkAnalyticsClientWithPastData | object => {
+): SparkAnalyticsClientWithPastData => {
    const {
       reach,
       engagement,
@@ -252,71 +255,75 @@ export const convertToClientModel = (
       },
    ]
 
-   const analytics: SparkAnalyticsClientWithPastData | object =
-      timeFramesFilters.reduce(
-         (acc, { timeFrame, value, timeFrameFilterCallback }) => {
-            acc[timeFrame] = {
-               reach: {
-                  totalViews: transformDataForClient(
-                     reach.totalViews,
-                     value,
-                     timeFrameFilterCallback
-                  ),
-                  uniqueViewers: transformDataForClient(
-                     reach.uniqueViewers,
-                     value,
-                     timeFrameFilterCallback
-                  ),
-               },
-               engagement: {
-                  likes: transformDataForClient(
-                     engagement.likes,
-                     value,
-                     timeFrameFilterCallback
-                  ),
-                  shares: transformDataForClient(
-                     engagement.shares,
-                     value,
-                     timeFrameFilterCallback
-                  ),
-                  registrations: transformDataForClient(
-                     engagement.registrations,
-                     value,
-                     timeFrameFilterCallback
-                  ),
-                  pageClicks: transformDataForClient(
-                     engagement.pageClicks,
-                     value,
-                     timeFrameFilterCallback
-                  ),
-               },
-               most: {
-                  watched: mapMostSomethingData(most.watched[timeFrame]),
-                  liked: mapMostSomethingData(most.liked[timeFrame]),
-                  shared: mapMostSomethingData(most.shared[timeFrame]),
-                  recent: mapMostSomethingData(most.recent),
-               },
-               topCountries: mapCountryCodes(topCountries[timeFrame]),
-               topUniversities: topUniversities[timeFrame],
-               topFieldsOfStudy: transformPieChartData(
-                  topFieldsOfStudy[timeFrame],
-                  fieldsOfStudyLookup
+   const analytics: SparkAnalyticsClientWithPastData = timeFramesFilters.reduce(
+      (acc, { timeFrame, value, timeFrameFilterCallback }) => {
+         acc[timeFrame] = {
+            reach: {
+               totalViews: transformDataForClient(
+                  reach.totalViews,
+                  value,
+                  timeFrameFilterCallback
                ),
-               levelsOfStudy: transformPieChartData(
-                  levelsOfStudy[timeFrame],
-                  levelsOfStudyLookup
+               uniqueViewers: transformDataForClient(
+                  reach.uniqueViewers,
+                  value,
+                  timeFrameFilterCallback
                ),
-               topSparksByIndustry: mapCompetitorIndustryData(
-                  topSparksByIndustry[timeFrame]
+            },
+            engagement: {
+               likes: transformDataForClient(
+                  engagement.likes,
+                  value,
+                  timeFrameFilterCallback
                ),
-               topSparksByAudience: mapCompetitorAudienceData(
-                  topSparksByAudience[timeFrame]
+               shares: transformDataForClient(
+                  engagement.shares,
+                  value,
+                  timeFrameFilterCallback
                ),
-            }
-            return acc
-         },
-         {}
-      )
+               registrations: transformDataForClient(
+                  engagement.registrations,
+                  value,
+                  timeFrameFilterCallback
+               ),
+               pageClicks: transformDataForClient(
+                  engagement.pageClicks,
+                  value,
+                  timeFrameFilterCallback
+               ),
+            },
+            most: {
+               watched: mapMostSomethingData(most.watched[timeFrame]),
+               liked: mapMostSomethingData(most.liked[timeFrame]),
+               shared: mapMostSomethingData(most.shared[timeFrame]),
+               recent: mapMostSomethingData(most.recent),
+            },
+            topCountries: mapCountryCodes(topCountries[timeFrame]),
+            topUniversities: topUniversities[timeFrame],
+            topFieldsOfStudy: transformPieChartData(
+               topFieldsOfStudy[timeFrame],
+               fieldsOfStudyLookup
+            ),
+            levelsOfStudy: transformPieChartData(
+               levelsOfStudy[timeFrame],
+               levelsOfStudyLookup
+            ),
+            topSparksByIndustry: mapCompetitorIndustryData(
+               topSparksByIndustry[timeFrame]
+            ) as CompetitorIndustryBaseWithPastData,
+            topSparksByAudience: mapCompetitorAudienceData(
+               topSparksByAudience[timeFrame]
+            ) as unknown as CompetitorAudienceWithPastData,
+         }
+         return acc
+      },
+      {} as SparkAnalyticsClientWithPastData
+   )
+
+   analytics.updatedAt = new Timestamp(
+      data.updatedAt["_seconds"],
+      data.updatedAt["_nanoseconds"]
+   ).toDate()
 
    return analytics
 }
