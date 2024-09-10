@@ -1,5 +1,5 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import { Box, Button, Tab, Tabs } from "@mui/material"
+import { Box, Button, Tab, Tabs, Typography } from "@mui/material"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { SparksAudienceTab } from "./audience-tab"
@@ -69,8 +69,12 @@ type TimeFilter = {
 
 const GroupSparkAnalytics = () => {
    const [tabValue, setTabValue] = useState("overview")
-   const { selectTimeFilter, setSelectTimeFilter, updateAnalytics } =
-      useSparksAnalytics()
+   const {
+      selectTimeFilter,
+      setSelectTimeFilter,
+      updateAnalytics,
+      updatedAtLabel,
+   } = useSparksAnalytics()
    const handleTabChange = (_, newValue) => {
       setTabValue(newValue)
    }
@@ -97,6 +101,7 @@ const GroupSparkAnalytics = () => {
             </Tabs>
             <Box component="span" sx={styles.mobileLimiter} />
             <Box>
+               <Typography variant="xsmall">{updatedAtLabel}</Typography>
                <Button onClick={updateAnalytics}>Update</Button>
                <ResponsiveSelectWithDrawer
                   selectValue={selectTimeFilter}
