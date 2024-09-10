@@ -188,14 +188,14 @@ class GroupSparksAnalyticsRepository
       this.firestore = firestoreClient
    }
 
-   async getCachedAnalytics(): Promise<SparksAnalyticsDTO | null> {
+   async getCachedAnalytics(): Promise<SparksAnalyticsDTO> {
       const doc = await this.firestore
          .collection("sparksAnalytics")
-         .withConverter<SparksAnalyticsDTO>(createGenericConverter())
+         .withConverter(createGenericConverter<SparksAnalyticsDTO>())
          .doc(this.groupId)
          .get()
 
-      return doc.exists ? doc.data() : null
+      return doc.data() as SparksAnalyticsDTO
    }
 
    async updateAnalyticsCache(analytics: SparksAnalyticsDTO): Promise<void> {
