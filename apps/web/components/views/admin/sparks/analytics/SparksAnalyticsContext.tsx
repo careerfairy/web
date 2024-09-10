@@ -28,6 +28,7 @@ interface SparksAnalyticsContextType {
    updateAnalytics: () => void
    selectTimeFilter: TimePeriodParams
    setSelectTimeFilter: (selectTimeFilter: TimePeriodParams) => void
+   updatedAtLabel: string
 }
 
 const SparksAnalyticsContext = createContext<
@@ -64,6 +65,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
    const [analytics, setAnalytics] = useState<
       SparkAnalyticsClientWithPastData | object | null
    >(null)
+   const [updatedAt, setUpdatedAt] = useState<Date>(null)
    const [isLoading, setIsLoading] = useState<boolean>(true)
    const [error, setError] = useState<string | null>(null)
 
@@ -71,22 +73,28 @@ export const SparksAnalyticsProvider = ({ children }) => {
       useState<TimePeriodParams>("30days")
 
    const fetchAnalytics = useCallback(
-      (updateCache: boolean) => {
-         sparksAnalyticsService
-            .fetchSparksAnalytics(group.id, updateCache)
-            .then((fetchedAnalytics) => {
-               const updatedAnalytics = convertToClientModel(
-                  fetchedAnalytics,
-                  fieldsOfStudyLookup,
-                  levelsOfStudyLookup
+      async (updateCache: boolean) => {
+         try {
+            const fetchedAnalytics =
+               await sparksAnalyticsService.fetchSparksAnalytics(
+                  group.id,
+                  updateCache
                )
-               setAnalytics(updatedAnalytics)
-               setIsLoading(false)
-            })
-            .catch((error) => {
-               setError(error.message)
-               setIsLoading(false)
-            })
+
+            const updatedAnalytics = convertToClientModel(
+               fetchedAnalytics,
+               fieldsOfStudyLookup,
+               levelsOfStudyLookup
+            )
+
+            setUpdatedAt(updatedAnalytics.updatedAt)
+            setAnalytics(updatedAnalytics)
+            setIsLoading(false)
+         } catch (error) {
+            console.log(error)
+            setError(error.message)
+            setIsLoading(false)
+         }
       },
       [fieldsOfStudyLookup, group.id, levelsOfStudyLookup]
    )
@@ -97,12 +105,37 @@ export const SparksAnalyticsProvider = ({ children }) => {
    }, [fetchAnalytics])
 
    const filteredAnalytics = useMemo<SparkAnalyticsClient>(() => {
-      console.log(
-         "🚀 ~ filteredAnalytics ~ analytics:",
-         analytics?.[selectTimeFilter]
-      )
       return analytics?.[selectTimeFilter]
    }, [analytics, selectTimeFilter])
+
+   const updatedAtLabel = useMemo(() => {
+      if (!updatedAt) return ""
+
+      const now = Date.now()
+      const diff = now - updatedAt.getTime()
+      const seconds = Math.floor(diff / 1000)
+      const minutes = Math.floor(seconds / 60)
+      const hours = Math.floor(minutes / 60)
+      const days = Math.floor(hours / 24)
+
+      if (seconds < 60) {
+         return "Last updated: now"
+      } else if (minutes < 1) {
+         return `Last updated: ${seconds} ${
+            seconds === 1 ? "second" : "seconds"
+         }`
+      } else if (hours < 1) {
+         return `Last updated: ${minutes} ${
+            minutes === 1 ? "minute" : "minutes"
+         }`
+      } else if (days < 1) {
+         return `Last updated: ${hours} ${hours === 1 ? "hour" : "hours"}`
+      } else if (days <= 28) {
+         return `Last updated: ${days} ${days === 1 ? "day" : "days"}`
+      } else {
+         return `Last updated: ${updatedAt.toLocaleDateString()}`
+      }
+   }, [updatedAt])
 
    const value = useMemo(() => {
       return {
@@ -112,8 +145,16 @@ export const SparksAnalyticsProvider = ({ children }) => {
          updateAnalytics,
          selectTimeFilter,
          setSelectTimeFilter,
+         updatedAtLabel,
       }
-   }, [filteredAnalytics, isLoading, error, updateAnalytics, selectTimeFilter])
+   }, [
+      filteredAnalytics,
+      isLoading,
+      error,
+      updateAnalytics,
+      selectTimeFilter,
+      updatedAtLabel,
+   ])
 
    useEffect(() => {
       fetchAnalytics(false)
