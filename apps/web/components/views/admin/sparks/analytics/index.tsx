@@ -1,5 +1,6 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import { Box, Button, Tab, Tabs, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { useState } from "react"
 import { RefreshCw } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -65,7 +66,14 @@ const styles = sxStyles({
    },
    controlsWrapper: {
       display: "flex",
-      justifyContent: "center",
+      flexDirection: {
+         xs: "row-reverse",
+         md: "row",
+      },
+      justifyContent: {
+         xs: "space-between",
+         md: "center",
+      },
       alignItems: "center",
       gap: 1,
    },
@@ -85,6 +93,12 @@ const styles = sxStyles({
          backgroundColor: `${theme.palette.neutral["50"]}`,
       },
    }),
+   updateControlsWrapper: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 1,
+   },
    updateIcon: (theme) => ({
       height: UPDATE_ICON_SIZE,
       width: UPDATE_ICON_SIZE,
@@ -92,6 +106,11 @@ const styles = sxStyles({
    }),
    updatedAtLabel: (theme) => ({
       color: theme.palette.neutral["500"],
+      textAlign: "right",
+      lineHeight: {
+         xs: "17px",
+         md: "initial",
+      },
    }),
    spinningAnimation: {
       "@keyframes spin": {
@@ -108,6 +127,7 @@ type TimeFilter = {
 }
 
 const GroupSparkAnalytics = () => {
+   const isMobile = useIsMobile()
    const [tabValue, setTabValue] = useState("overview")
    const {
       selectTimeFilter,
@@ -142,19 +162,22 @@ const GroupSparkAnalytics = () => {
             </Tabs>
             <Box component="span" sx={styles.mobileLimiter} />
             <Box sx={styles.controlsWrapper}>
-               <Typography variant="small" sx={styles.updatedAtLabel}>
-                  {updatedAtLabel}
-               </Typography>
-               <Button onClick={updateAnalytics} sx={styles.updateButton}>
-                  <Box
-                     sx={[
-                        isLoading ? styles.spinningAnimation : {},
-                        styles.updateIcon,
-                     ]}
-                  >
-                     <RefreshCw size={UPDATE_ICON_SIZE} />
-                  </Box>
-               </Button>
+               <Box sx={styles.updateControlsWrapper}>
+                  <Typography variant="small" sx={styles.updatedAtLabel}>
+                     Last updated:{isMobile ? <br /> : " "}
+                     {updatedAtLabel}
+                  </Typography>
+                  <Button onClick={updateAnalytics} sx={styles.updateButton}>
+                     <Box
+                        sx={[
+                           isLoading ? styles.spinningAnimation : {},
+                           styles.updateIcon,
+                        ]}
+                     >
+                        <RefreshCw size={UPDATE_ICON_SIZE} />
+                     </Box>
+                  </Button>
+               </Box>
                <ResponsiveSelectWithDrawer
                   selectValue={selectTimeFilter}
                   setSelectValue={setSelectTimeFilter}
