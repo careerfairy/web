@@ -1,3 +1,5 @@
+import { useAuth } from "HOCs/AuthProvider"
+
 type Options = {
    totalItems: number
    disabled?: boolean
@@ -8,9 +10,19 @@ type Options = {
  **/
 const useCustomJobsByUser = (options?: Options) => {
    console.log("🚀 ~ useCustomJobsByUser ~ options:", options)
-   // const { userData } = useAuth()
+   const { userData } = useAuth()
 
-   // const businessFunctions = userData?.businessFunctionsTagIds || []
+   const businessFunctions = userData?.businessFunctionsTagIds || []
+   console.log(
+      "🚀 ~ useCustomJobsByUser ~ businessFunctions:",
+      businessFunctions
+   )
+
+   // 1. Fetch all customJobs for tags if tags with limit
+
+   // 2. Fetch other jobs ignoring already fetched also with limit
+
+   // 3. Concat jobs and slice according to limit
 
    // const { totalItems, businessFunctionTagIds, disabled, ignoreIds = [] } = options
 
