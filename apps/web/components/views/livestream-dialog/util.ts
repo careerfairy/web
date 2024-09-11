@@ -16,7 +16,6 @@ export const getLivestreamDialogData = async (
 ): Promise<LiveStreamDialogData> => {
    try {
       const livestreamParams = (ctx.params.livestreamDialog as string[]) || []
-      console.log("🚀 ~ params v4:", ctx.params)
 
       let email = null
       if ("req" in ctx) {

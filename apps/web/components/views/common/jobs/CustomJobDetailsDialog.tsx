@@ -53,6 +53,10 @@ const styles = sxStyles({
    jobApplyConfirmationDialog: {
       m: 2,
    },
+   dialogContent: {
+      p: 0,
+      m: 0,
+   },
 })
 
 type Props = {
@@ -67,23 +71,6 @@ type Props = {
 
 const CustomJobDetailsDialog = (props: Props) => {
    const isMobile = useIsMobile()
-   // const { userData } = useAuth()
-   // const { data: fingerPrintId } = useFingerPrint()
-
-   // const { applicationInitiatedOnly } = useUserJobApplication(
-   //    userData?.id || fingerPrintId,
-   //    customJobId
-   // )
-
-   // const [
-   //    isApplyConfirmationOpen,
-   //    handleConfirmationOpen,
-   //    handleConfirmationClose,
-   // ] = useDialogStateHandler(false)
-
-   // useEffect(() => {
-   //    if (applicationInitiatedOnly) handleConfirmationOpen()
-   // }, [applicationInitiatedOnly, handleConfirmationOpen])
 
    return (
       <Dialog
@@ -135,12 +122,7 @@ const DialogDetailsContent = ({
 
    return (
       <>
-         <DialogContent
-            sx={{
-               p: 0,
-               m: 0,
-            }}
-         >
+         <DialogContent sx={styles.dialogContent}>
             <Content
                serverSideCustomJob={serverSideCustomJob}
                customJobId={customJobId}
@@ -246,7 +228,6 @@ const Actions = ({
       customJobId,
       hasInitialData ? serverSideCustomJob : undefined
    )
-   console.log("🚀 ~ Actions ~ customJob:", customJob)
 
    const { handleClickApplyBtn, applicationInitiatedOnly } = useCustomJobApply(
       customJob as PublicCustomJob,
@@ -255,6 +236,8 @@ const Actions = ({
    const [, handleConfirmApplyOpen] = useDialogStateHandler(
       applicationInitiatedOnly
    )
+
+   if (!customJob) return null
 
    return (
       <CustomJobCTAButtons

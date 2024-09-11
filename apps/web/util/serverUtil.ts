@@ -260,7 +260,7 @@ export const getLivestreamsAndDialogData = async (
       ),
       groupRepo.getGroupAvailableCustomJobs(groupId),
       getLivestreamDialogData(context),
-      getCustomJobDialogData(context),
+      getCustomJobDialogData(context, "livestreamDialog"),
    ])
 
    const [

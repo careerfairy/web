@@ -29,7 +29,6 @@ const CustomJobAdminDetails = ({
             companyLogoUrl={companyLogoUrl}
             handleEdit={handleEdit}
             disabledLinkedContentClick
-            applicationInitiatedOnly={false}
          />
       </Box>
    )

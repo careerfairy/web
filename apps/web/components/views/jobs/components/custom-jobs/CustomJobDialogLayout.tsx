@@ -7,6 +7,7 @@ import { fromDate } from "data/firebase/FirebaseInstance"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import React, { FC, useCallback, useMemo } from "react"
+import { DialogSources } from "./utils"
 
 // apps/web/components/views/common/jobs/CustomJobDetailsDialog.tsx
 // const CustomJobsDialog = dynamic(() => import("../../../common/jobs/CustomJobDetailsDialog"))
@@ -17,6 +18,7 @@ export type CustomJobDialogData = {
 
 type Props = {
    source: CustomJobApplicationSource
+   dialogSource: DialogSources
    customJobDialogData?: CustomJobDialogData
    children: React.ReactNode
 }
@@ -32,6 +34,7 @@ type Props = {
  */
 export const CustomJobDialogLayout: FC<Props> = ({
    customJobDialogData,
+   dialogSource,
    children,
    source,
 }) => {
@@ -47,8 +50,10 @@ export const CustomJobDialogLayout: FC<Props> = ({
       )
    }, [customJobDialogData?.serverSideCustomJob])
 
-   const dialogOpen = useMemo(() => isCustomJobDialogOpen(query), [query])
-   console.log("🚀 ~ dialogOpen:", dialogOpen)
+   const dialogOpen = useMemo(
+      () => isCustomJobDialogOpen(query, dialogSource),
+      [query, dialogSource]
+   )
 
    const handleClose = useCallback(() => {
       void push(
@@ -57,7 +62,7 @@ export const CustomJobDialogLayout: FC<Props> = ({
             query: {
                ...query,
                // Remove the jobId path param that opened the dialog.
-               livestreamDialog: undefined,
+               [dialogSource]: undefined,
             },
          },
          undefined,
@@ -66,7 +71,7 @@ export const CustomJobDialogLayout: FC<Props> = ({
             shallow: true, // Prevents GSSP/GSP/GIP from running again. https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
          }
       )
-   }, [pathname, push, query])
+   }, [pathname, push, query, dialogSource])
 
    return (
       <>
@@ -90,9 +95,12 @@ export const CustomJobDialogLayout: FC<Props> = ({
    )
 }
 
-export const isCustomJobDialogOpen = (query: ParsedUrlQuery) => {
-   const { livestreamDialog } = query
-   const [pathType, customJobId] = livestreamDialog || []
+export const isCustomJobDialogOpen = (
+   query: ParsedUrlQuery,
+   dialogSource: DialogSources
+) => {
+   const dialog = query[dialogSource]
+   const [pathType, customJobId] = dialog || []
 
    return Boolean(pathType === "jobs" && customJobId)
 }

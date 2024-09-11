@@ -28,34 +28,16 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "flex-start",
       gap: "4px",
-      ml: 3,
    },
    jobTitle: {
       fontWeight: 700,
       wordBreak: "break-word",
-   },
-   jobTitleDesktop: {
-      fontSize: "24px",
-   },
-   jobTitleMobile: {
-      fontSize: "20px",
+      color: (t) => t.palette.neutral[800],
    },
    groupName: {
       fontWeight: 600,
       wordBreak: "break-word",
-   },
-   groupNameDesktop: {
-      fontSize: "16px",
-   },
-   groupNameMobile: {
-      fontSize: "14px",
-   },
-   subTitle: {
-      fontSize: "18px",
-      fontWeight: 600,
-   },
-   content: {
-      mt: 4,
+      color: (t) => t.palette.neutral[800],
    },
    editButton: {
       textTransform: "none",
@@ -72,12 +54,11 @@ const styles = sxStyles({
       flexDirection: "column",
    },
    details: {
-      color: "#8B8B8B",
+      color: (t) => t.palette.neutral[500],
       fontSize: "12px",
    },
    detailsValue: {
       display: "inline",
-
       "& svg": {
          verticalAlign: "bottom",
          mr: "6px !important",
@@ -134,34 +115,26 @@ const CustomJobHeader = ({
             <Box sx={styles.headerLeftSide}>
                <Box sx={styles.headerContent}>
                   {companyLogoUrl && companyName ? (
-                     <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                     <Stack
+                        direction={"row"}
+                        alignItems={"center"}
+                        spacing={1}
+                        mb={"8px"}
+                     >
                         <CircularLogo
                            src={getResizedUrl(companyLogoUrl, "lg")}
                            alt={`company ${companyName} logo`}
-                           size={63}
+                           size={44}
                         />
                         <Typography
-                           variant={"h4"}
-                           sx={[
-                              styles.groupName,
-                              isMobile
-                                 ? styles.groupNameMobile
-                                 : styles.groupNameDesktop,
-                           ]}
+                           variant={isMobile ? "small" : "medium"}
+                           sx={styles.groupName}
                         >
                            {companyName}
                         </Typography>
                      </Stack>
                   ) : null}
-                  <Typography
-                     variant={"h4"}
-                     sx={[
-                        styles.jobTitle,
-                        isMobile
-                           ? styles.jobTitleMobile
-                           : styles.jobTitleDesktop,
-                     ]}
-                  >
+                  <Typography variant={"brandedH3"} sx={styles.jobTitle}>
                      {job.title}
                   </Typography>
 
@@ -177,7 +150,7 @@ const CustomJobHeader = ({
                            </Typography>
                         ) : null}
 
-                        {businessFunctionTags.length > 0 ? (
+                        {businessFunctionTags ? (
                            <Typography
                               variant={"subtitle1"}
                               sx={styles.details}
@@ -201,7 +174,7 @@ const CustomJobHeader = ({
                                     {job.jobType}
                                  </>
                               ) : null}
-                              {businessFunctionTags.length > 0 ? (
+                              {businessFunctionTags ? (
                                  <>
                                     <Zap width={14} />
                                     {businessFunctionTags}

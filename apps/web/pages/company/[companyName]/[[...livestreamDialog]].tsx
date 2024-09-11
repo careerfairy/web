@@ -65,6 +65,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
          <CustomJobDialogLayout
             customJobDialogData={customJobDialogData}
             source={{ source: CustomJobApplicationSourceTypes.Group, id: id }}
+            dialogSource="livestreamDialog"
          >
             <SEO
                id={`CareerFairy | ${universityName}`}
@@ -132,8 +133,6 @@ export const getStaticProps: GetStaticProps<{
                   limit: undefined,
                }
             )
-
-            console.log("🚀 ~ customJobDialogData v2:", customJobDialogData)
 
             const creators = await groupRepo.getCreatorsWithPublicContent(
                serverSideGroup

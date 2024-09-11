@@ -11,6 +11,9 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
    },
+   wrapper: {
+      position: "relative",
+   },
 })
 
 const Header = () => {
@@ -29,10 +32,8 @@ const JobsSection = () => {
 
    const isMounted = useMountedState()
 
-   if (!customJobs?.length) return null
-
    return (
-      <Box sx={{ position: "relative" }}>
+      <Box sx={styles.wrapper}>
          <SectionAnchor ref={jobsSectionRef} tabValue={TabValue.jobs} />
          {isMounted() ? (
             <SuspenseWithBoundary>

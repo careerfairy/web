@@ -50,7 +50,7 @@ const customStyles = sxStyles({
 
 type Props = {
    job: CustomJob
-   applicationInitiatedOnly: boolean
+   applicationInitiatedOnly?: boolean
    context?: CustomJobApplicationSource
    heroContent?: ReactNode
    sx?: SxProps<DefaultTheme>
