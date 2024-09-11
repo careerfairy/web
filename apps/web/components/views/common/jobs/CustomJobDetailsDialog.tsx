@@ -24,32 +24,13 @@ import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
 import { sxStyles } from "types/commonTypes"
 import { SlideUpTransition } from "../transitions"
+
 const styles = sxStyles({
-   title: {
-      textTransform: "uppercase",
-      fontWeight: "800",
-   },
-   body2: {
-      fontSize: "1rem",
-      mb: 3,
-   },
-   imageBox: {
-      p: 0,
-      "& img": {
-         height: 50,
-      },
-   },
-   titleBox: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-   },
    fixedBottomContent: {
       p: 2.5,
       borderTop: "1px solid #F1F1F1",
       bgcolor: "background.paper",
    },
-
    jobApplyConfirmationDialog: {
       m: 2,
    },
@@ -57,6 +38,7 @@ const styles = sxStyles({
       p: 0,
       m: 0,
    },
+   customJobDetailsView: { pt: "0px !important" },
 })
 
 type Props = {
@@ -187,7 +169,7 @@ const Content = ({
             heroContent={heroContent}
             applicationInitiatedOnly={applicationInitiatedOnly}
             heroSx={heroSx}
-            sx={{ pt: "0px !important" }}
+            sx={styles.customJobDetailsView}
             companyLogoUrl={group.logoUrl}
             companyName={group.universityName}
             hideCTAButtons

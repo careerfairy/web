@@ -23,25 +23,25 @@ const useCustomJobApply = (
 
    const { alreadyApplied, applicationInitiatedOnly } = useUserJobApplication(
       userData?.id,
-      job?.id
+      job.id
    )
 
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { push, asPath } = useRouter()
-   const customJob = useCustomJob(job?.id)
+   const customJob = useCustomJob(job.id)
 
    const { trigger: handleConfirmApply, isMutating: isApplying } =
       useSWRMutation(
-         `user-${userData?.id}-applyToCustomJob-${job?.id}`,
+         `user-${userData?.id}-applyToCustomJob-${job.id}`,
          () => {
             if (userData) {
                customJobServiceInstance.confirmJobApplication(
-                  job?.id,
+                  job.id,
                   userData?.id
                )
             } else {
                customJobServiceInstance.confirmAnonymousJobApplication(
-                  job?.id,
+                  job.id,
                   fingerPrintId
                )
             }
@@ -60,8 +60,8 @@ const useCustomJobApply = (
                )
 
                dataLayerEvent("custom_job_application_complete", {
-                  jobId: job?.id,
-                  jobName: job?.title,
+                  jobId: job.id,
+                  jobName: job.title,
                })
             },
          }
@@ -76,7 +76,7 @@ const useCustomJobApply = (
 
    const { trigger: handleClickApplyBtn, isMutating: isClickingOnApplyBtn } =
       useSWRMutation(
-         `user-${userData?.id}-clicksOnCustomJob-${job?.id}`,
+         `user-${userData?.id}-clicksOnCustomJob-${job.id}`,
          async () => {
             const jobApplication = userData
                ? customJobRepo.applyUserToCustomJob(
@@ -91,7 +91,7 @@ const useCustomJobApply = (
                  )
 
             return await Promise.all([
-               customJobRepo.incrementCustomJobClicks(job?.id),
+               customJobRepo.incrementCustomJobClicks(job.id),
                jobApplication,
             ])
          }
