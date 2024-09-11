@@ -78,6 +78,12 @@ const styles = sxStyles({
       minHeight: "38px",
       maxHeight: "38px",
       padding: 0,
+      "&:hover": {
+         backgroundColor: `${theme.palette.neutral["50"]}`,
+      },
+      ".MuiTouchRipple-child": {
+         backgroundColor: `${theme.palette.neutral["50"]}`,
+      },
    }),
    updateIcon: (theme) => ({
       height: UPDATE_ICON_SIZE,
@@ -88,7 +94,6 @@ const styles = sxStyles({
       color: theme.palette.neutral["500"],
    }),
    spinningAnimation: {
-      height: UPDATE_ICON_SIZE,
       "@keyframes spin": {
          "0%": { transform: "rotate(0deg)" },
          "100%": { transform: "rotate(360deg)" },
