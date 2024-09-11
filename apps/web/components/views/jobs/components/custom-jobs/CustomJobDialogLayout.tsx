@@ -7,7 +7,6 @@ import { fromDate } from "data/firebase/FirebaseInstance"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import React, { FC, useCallback, useMemo } from "react"
-import { DialogSources } from "./utils"
 
 // apps/web/components/views/common/jobs/CustomJobDetailsDialog.tsx
 // const CustomJobsDialog = dynamic(() => import("../../../common/jobs/CustomJobDetailsDialog"))
@@ -18,7 +17,7 @@ export type CustomJobDialogData = {
 
 type Props = {
    source: CustomJobApplicationSource
-   dialogSource: DialogSources
+   dialogSource?: string
    customJobDialogData?: CustomJobDialogData
    children: React.ReactNode
 }
@@ -34,7 +33,7 @@ type Props = {
  */
 export const CustomJobDialogLayout: FC<Props> = ({
    customJobDialogData,
-   dialogSource,
+   dialogSource = "jobsDialog",
    children,
    source,
 }) => {
@@ -97,7 +96,7 @@ export const CustomJobDialogLayout: FC<Props> = ({
 
 export const isCustomJobDialogOpen = (
    query: ParsedUrlQuery,
-   dialogSource: DialogSources
+   dialogSource: string
 ) => {
    const dialog = query[dialogSource]
    const [pathType, customJobId] = dialog || []

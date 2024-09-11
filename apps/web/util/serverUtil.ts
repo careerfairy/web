@@ -239,7 +239,8 @@ export const convertQueryParamsToString = (query: ParsedUrlQuery): string => {
 export const getLivestreamsAndDialogData = async (
    groupId: string,
    context: GetServerSidePropsContext | GetStaticPathsContext,
-   options?: GetEventsOfGroupOptions
+   options?: GetEventsOfGroupOptions,
+   parameterSource = "livestreamDialog"
 ) => {
    const results = await Promise.allSettled([
       livestreamRepo.getEventsOfGroup(
@@ -260,7 +261,7 @@ export const getLivestreamsAndDialogData = async (
       ),
       groupRepo.getGroupAvailableCustomJobs(groupId),
       getLivestreamDialogData(context),
-      getCustomJobDialogData(context, "livestreamDialog"),
+      getCustomJobDialogData(context, parameterSource),
    ])
 
    const [

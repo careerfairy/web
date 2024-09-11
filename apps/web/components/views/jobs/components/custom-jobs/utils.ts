@@ -4,13 +4,12 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { getServerSideCustomJob } from "util/serverUtil"
 import { CustomJobDialogData } from "./CustomJobDialogLayout"
 
-export type DialogSources = "livestreamDialog" | "tbd"
 export const getCustomJobDialogData = async (
    ctx: GetServerSidePropsContext | GetStaticPropsContext,
-   dialog: DialogSources
+   parameterSource = "jobDialog"
 ): Promise<CustomJobDialogData> => {
    try {
-      const customJobParams = (ctx.params[dialog] as string[]) || []
+      const customJobParams = (ctx.params[parameterSource] as string[]) || []
 
       if (customJobParams[0] === "jobs" && customJobParams[1]) {
          const customJob = await getServerSideCustomJob(customJobParams[1])
