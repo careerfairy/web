@@ -1,3 +1,5 @@
+import { GroupOption } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useFieldsOfStudy } from "components/custom-hook/useCollection"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -26,17 +28,23 @@ export const usePublishLivestream = () => {
          return
       }
 
-      const livestreamObject = mapFormValuesToLivestreamObject(
-         values,
-         allFieldsOfStudy,
-         firebaseService
-      )
+      const livestreamObject: Partial<LivestreamEvent> =
+         mapFormValuesToLivestreamObject(
+            values,
+            allFieldsOfStudy,
+            firebaseService
+         )
       livestreamObject.id = livestream.id
       livestreamObject.test = false
       livestreamObject.hasEnded = false
       livestreamObject.questionsDisabled = false
       livestreamObject.denyRecordingAccess = false
       livestreamObject.type = "upcoming"
+      livestreamObject.companyCountries = [group.companyCountry?.id || ""]
+      livestreamObject.companyIndustries =
+         group.companyIndustries?.map(
+            (industry: GroupOption) => industry?.id
+         ) || []
 
       const ratings = values.questions.feedbackQuestions
          .filter(
@@ -53,6 +61,8 @@ export const usePublishLivestream = () => {
       allFieldsOfStudy,
       enqueueSnackbar,
       firebaseService,
+      group.companyCountry?.id,
+      group.companyIndustries,
       handlePublishStream,
       isValid,
       livestream.id,
