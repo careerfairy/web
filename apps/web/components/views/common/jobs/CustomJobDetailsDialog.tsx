@@ -110,6 +110,14 @@ const DialogDetailsContent = ({
       customJobId
    )
 
+   const hasInitialData =
+      serverSideCustomJob && customJobId === serverSideCustomJob?.id
+
+   const customJob = useCustomJob(
+      customJobId,
+      hasInitialData ? serverSideCustomJob : undefined
+   )
+
    const [
       isApplyConfirmationOpen,
       handleConfirmationOpen,
@@ -120,12 +128,13 @@ const DialogDetailsContent = ({
       if (applicationInitiatedOnly) handleConfirmationOpen()
    }, [applicationInitiatedOnly, handleConfirmationOpen])
 
+   if (!customJob) return null
+
    return (
       <>
          <DialogContent sx={styles.dialogContent}>
             <Content
-               serverSideCustomJob={serverSideCustomJob}
-               customJobId={customJobId}
+               customJob={customJob}
                source={source}
                heroContent={heroContent}
                heroSx={heroSx}
@@ -136,8 +145,7 @@ const DialogDetailsContent = ({
          <DialogActions sx={styles.fixedBottomContent}>
             <Actions
                source={source}
-               serverSideCustomJob={serverSideCustomJob}
-               customJobId={customJobId}
+               customJob={customJob}
                onApplyClick={handleConfirmationOpen}
             />
          </DialogActions>
@@ -145,32 +153,20 @@ const DialogDetailsContent = ({
    )
 }
 
-type ContentProps = Pick<
-   Props,
-   "source" | "heroContent" | "heroSx" | "customJobId"
-> & {
-   serverSideCustomJob?: CustomJob
+type ContentProps = Pick<Props, "source" | "heroContent" | "heroSx"> & {
+   customJob: CustomJob
    showApplyConfirmation?: boolean
    onApplyConfirmationClose?: () => void
 }
 
 const Content = ({
-   customJobId,
-   serverSideCustomJob,
+   customJob,
    source,
    heroContent,
    heroSx,
    showApplyConfirmation,
    onApplyConfirmationClose,
 }: ContentProps) => {
-   const hasInitialData =
-      serverSideCustomJob && customJobId === serverSideCustomJob?.id
-
-   const customJob = useCustomJob(
-      customJobId,
-      hasInitialData ? serverSideCustomJob : undefined
-   )
-
    const { applicationInitiatedOnly, handleConfirmApply } = useCustomJobApply(
       customJob as PublicCustomJob,
       source
@@ -210,25 +206,12 @@ const Content = ({
    )
 }
 
-type ActionProps = Pick<Props, "source" | "customJobId"> & {
-   serverSideCustomJob?: CustomJob
+type ActionProps = Pick<Props, "source"> & {
+   customJob: CustomJob
    onApplyClick?: () => void
 }
 
-const Actions = ({
-   source,
-   serverSideCustomJob,
-   customJobId,
-   onApplyClick,
-}: ActionProps) => {
-   const hasInitialData =
-      serverSideCustomJob && customJobId === serverSideCustomJob?.id
-
-   const customJob = useCustomJob(
-      customJobId,
-      hasInitialData ? serverSideCustomJob : undefined
-   )
-
+const Actions = ({ source, customJob, onApplyClick }: ActionProps) => {
    const { handleClickApplyBtn, applicationInitiatedOnly } = useCustomJobApply(
       customJob as PublicCustomJob,
       source
@@ -236,8 +219,6 @@ const Actions = ({
    const [, handleConfirmApplyOpen] = useDialogStateHandler(
       applicationInitiatedOnly
    )
-
-   if (!customJob) return null
 
    return (
       <CustomJobCTAButtons
