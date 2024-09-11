@@ -7,6 +7,7 @@ import { Box, Button, FormHelperText, Stack, Typography } from "@mui/material"
 import useUploadSparkThumbnail from "components/custom-hook/spark/useUploadSparkThumbnail"
 import useUploadSparkVideo from "components/custom-hook/spark/useUploadSparkVideo"
 import useFileUploader from "components/custom-hook/useFileUploader"
+import { type FileMetadata } from "components/custom-hook/useUploadFile"
 import useFirebaseDelete from "components/custom-hook/utils/useFirebaseDelete"
 import { dataURLtoFile } from "components/helperFunctions/HelperFunctions"
 import {
@@ -24,7 +25,6 @@ import { FC, Fragment, ReactNode, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkVideoPreview from "./SparkVideoPreview"
 import UploadOverlay from "./UploadOverlay"
-import { type FileMetadata } from "components/custom-hook/useUploadFile"
 
 const styles = sxStyles({
    root: {
@@ -189,6 +189,7 @@ const VideoUpload: FC<Props> = ({ name, editing }) => {
             url: videoData.url,
             fileExtension: videoData.fileExtension,
             thumbnailUrl: thumbnailData.url,
+            duration: duration,
          }
          helpers.setValue(newValue)
       },

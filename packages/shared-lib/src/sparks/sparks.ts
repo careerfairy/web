@@ -284,6 +284,11 @@ export type SparkVideo = {
     * https://console.firebase.google.com/u/0/project/careerfairy-e1fd9/storage/careerfairy-e1fd9.appspot.com/files/~2Fsparks~2Fthumbnails /[id]
     */
    thumbnailUrl: string
+
+   /**
+    * Video duration in seconds
+    */
+   duration: number
 }
 
 export type SparkVisibility = "public" | "private"
