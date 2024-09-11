@@ -37,9 +37,9 @@ export const usePublishLivestream = () => {
       livestreamObject.questionsDisabled = false
       livestreamObject.denyRecordingAccess = false
       livestreamObject.type = "upcoming"
-      livestreamObject.companyCountries = [group.companyCountry?.id]
+      livestreamObject.companyCountries = [group.companyCountry?.id || ""]
       livestreamObject.companyIndustries =
-         group.companyIndustries?.map((industry) => industry.id) || []
+         group.companyIndustries?.map((industry) => industry?.id) || []
 
       const ratings = values.questions.feedbackQuestions
          .filter(
