@@ -1,21 +1,23 @@
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { GetServerSidePropsContext, GetStaticPropsContext } from "next"
+import { NextRouter } from "next/router"
+import { UrlObject } from "url"
+import { errorLogAndNotify } from "../../../util/CommonUtil"
 import {
    getServerSideStream,
    getServerSideUserStats,
    getUserTokenFromCookie,
 } from "../../../util/serverUtil"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { LiveStreamDialogData } from "./LivestreamDialogLayout"
-import { errorLogAndNotify } from "../../../util/CommonUtil"
-import { NextRouter } from "next/router"
-import { UrlObject } from "url"
 import { getBaseUrl } from "../../helperFunctions/HelperFunctions"
+import { LiveStreamDialogData } from "./LivestreamDialogLayout"
 
 export const getLivestreamDialogData = async (
    ctx: GetServerSidePropsContext | GetStaticPropsContext
 ): Promise<LiveStreamDialogData> => {
    try {
       const livestreamParams = (ctx.params.livestreamDialog as string[]) || []
+      console.log("🚀 ~ params v4:", ctx.params)
+
       let email = null
       if ("req" in ctx) {
          // Check if ctx is GetServerSidePropsContext

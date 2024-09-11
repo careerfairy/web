@@ -1,4 +1,5 @@
 import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
+import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import {
    PublicCreator,
@@ -8,6 +9,10 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
+import {
+   CustomJobDialogData,
+   CustomJobDialogLayout,
+} from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import {
    GetStaticPaths,
    GetStaticProps,
@@ -43,6 +48,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSidePastLivestreams,
    serverSideCustomJobs,
    livestreamDialogData,
+   customJobDialogData,
    groupCreators,
 }) => {
    const { trackCompanyPageView } = useFirebaseService()
@@ -56,28 +62,37 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
-         <SEO
-            id={`CareerFairy | ${universityName}`}
-            title={`CareerFairy | ${universityName}`}
-         />
+         <CustomJobDialogLayout
+            customJobDialogData={customJobDialogData}
+            source={{ source: CustomJobApplicationSourceTypes.Group, id: id }}
+         >
+            <SEO
+               id={`CareerFairy | ${universityName}`}
+               title={`CareerFairy | ${universityName}`}
+            />
 
-         <GenericDashboardLayout pageDisplayName={""}>
-            <Box
-               sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
-               ref={viewRef}
-            >
-               <CompanyPageOverview
-                  group={serverSideGroup}
-                  groupCreators={groupCreators}
-                  upcomingLivestreams={mapFromServerSide(
-                     serverSideUpcomingLivestreams
-                  )}
-                  pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
-                  customJobs={mapCustomJobsFromServerSide(serverSideCustomJobs)}
-                  editMode={false}
-               />
-            </Box>
-         </GenericDashboardLayout>
+            <GenericDashboardLayout pageDisplayName={""}>
+               <Box
+                  sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
+                  ref={viewRef}
+               >
+                  <CompanyPageOverview
+                     group={serverSideGroup}
+                     groupCreators={groupCreators}
+                     upcomingLivestreams={mapFromServerSide(
+                        serverSideUpcomingLivestreams
+                     )}
+                     pastLivestreams={mapFromServerSide(
+                        serverSidePastLivestreams
+                     )}
+                     customJobs={mapCustomJobsFromServerSide(
+                        serverSideCustomJobs
+                     )}
+                     editMode={false}
+                  />
+               </Box>
+            </GenericDashboardLayout>
+         </CustomJobDialogLayout>
       </LivestreamDialogLayout>
    )
 }
@@ -91,6 +106,7 @@ export const getStaticProps: GetStaticProps<{
    // eslint-disable-next-line @typescript-eslint/no-explicit-any
    serverSideCustomJobs: { [p: string]: any }[]
    livestreamDialogData: LiveStreamDialogData
+   customJobDialogData: CustomJobDialogData
    groupCreators: PublicCreator[]
 }> = async (ctx) => {
    const { params } = ctx
@@ -107,6 +123,7 @@ export const getStaticProps: GetStaticProps<{
                serverSidePastLivestreams,
                serverSideGroupAvailableCustomJobs,
                livestreamDialogData,
+               customJobDialogData,
             } = await getLivestreamsAndDialogData(
                serverSideGroup?.groupId,
                ctx,
@@ -115,6 +132,8 @@ export const getStaticProps: GetStaticProps<{
                   limit: undefined,
                }
             )
+
+            console.log("🚀 ~ customJobDialogData v2:", customJobDialogData)
 
             const creators = await groupRepo.getCreatorsWithPublicContent(
                serverSideGroup
@@ -137,6 +156,7 @@ export const getStaticProps: GetStaticProps<{
                         CustomJobsPresenter.serializeDocument
                      ) || [],
                   livestreamDialogData,
+                  customJobDialogData,
                   groupCreators: creators?.map(pickPublicDataFromCreator) || [],
                },
                revalidate: 60,

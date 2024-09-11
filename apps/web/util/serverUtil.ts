@@ -1,4 +1,5 @@
 import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    Group,
    SerializedGroup,
@@ -12,6 +13,7 @@ import {
    MAX_PAST_STREAMS,
    MAX_UPCOMING_STREAMS,
 } from "components/views/company-page/EventSection"
+import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import { getLivestreamDialogData } from "components/views/livestream-dialog"
 import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { fromDate } from "data/firebase/FirebaseInstance"
@@ -39,6 +41,26 @@ export const getServerSideStream = async (
       }
    }
    return serverSideStream
+}
+
+export const getServerSideCustomJob = async (
+   customJobId: string
+): Promise<CustomJob> => {
+   let serverSideCustomJob = null
+   if (customJobId) {
+      // @ts-ignore
+      const customJobSnap = await store.firestore.get({
+         collection: "customJobs",
+         doc: customJobId,
+      })
+      if (customJobSnap.exists) {
+         serverSideCustomJob = {
+            id: customJobSnap.id,
+            ...customJobSnap.data(),
+         } as CustomJob
+      }
+   }
+   return serverSideCustomJob
 }
 
 export const getServerSideUserStats = async (
@@ -238,6 +260,7 @@ export const getLivestreamsAndDialogData = async (
       ),
       groupRepo.getGroupAvailableCustomJobs(groupId),
       getLivestreamDialogData(context),
+      getCustomJobDialogData(context),
    ])
 
    const [
@@ -245,6 +268,7 @@ export const getLivestreamsAndDialogData = async (
       serverSidePastLivestreamsResult,
       serverSideGroupCustomJobsResult,
       livestreamDialogDataResult,
+      customJobDialogDataResult,
    ] = results
 
    const serverSideUpcomingLivestreams =
@@ -267,10 +291,15 @@ export const getLivestreamsAndDialogData = async (
          ? livestreamDialogDataResult.value
          : null
 
+   const customJobDialogData =
+      customJobDialogDataResult.status === "fulfilled"
+         ? customJobDialogDataResult.value
+         : null
    return {
       serverSideUpcomingLivestreams,
       serverSidePastLivestreams,
       serverSideGroupAvailableCustomJobs,
       livestreamDialogData,
+      customJobDialogData,
    }
 }

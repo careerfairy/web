@@ -224,7 +224,6 @@ const CompanyPageOverview = ({
    const showSignUpCta = isLoggedOut && !editMode
 
    const showJobs = featureFlags.jobHubV1
-   console.log("🚀 ~ showJobs:", showJobs)
 
    return (
       <CompanyPageContext.Provider value={contextValue}>

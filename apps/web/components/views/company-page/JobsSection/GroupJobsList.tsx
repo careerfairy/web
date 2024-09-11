@@ -1,16 +1,9 @@
-import {
-   CustomJob,
-   CustomJobApplicationSourceTypes,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
-import { CloseOutlined } from "@mui/icons-material"
-import { Box, IconButton, ListItem, Stack } from "@mui/material"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { ListItem, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import JobCard from "components/views/common/jobs/JobCard"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -34,32 +27,6 @@ type Props = {
 
 const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
    const router = useRouter()
-   const routerJobId = router.asPath.split("jobs/")?.at(1)
-
-   const [selectedJob, setSelectedJob] = useState<CustomJob>(() => {
-      if (routerJobId) {
-         return groupCustomJobs.find((job) => job.id === routerJobId)
-      }
-   })
-
-   const [isJobsDialogOpen, handleOpenJobsDialog, handleCloseJobsDialog] =
-      useDialogStateHandler(Boolean(selectedJob))
-
-   const onCloseJobDialog = useCallback(() => {
-      handleCloseJobsDialog()
-      setSelectedJob(null)
-      router.push(`/company/${router.query.companyName}`, undefined, {
-         shallow: true,
-      })
-   }, [setSelectedJob, handleCloseJobsDialog, router])
-
-   const onClickJobCard = useCallback(
-      (customJob: CustomJob) => {
-         setSelectedJob(customJob)
-         handleOpenJobsDialog()
-      },
-      [setSelectedJob, handleOpenJobsDialog]
-   )
 
    const isMobile = useIsMobile("lg")
 
@@ -67,23 +34,6 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
 
    return (
       <Stack width={"100%"} spacing={2}>
-         <CustomJobDetailsDialog
-            customJob={selectedJob}
-            onClose={onCloseJobDialog}
-            isOpen={isJobsDialogOpen}
-            context={{
-               source: CustomJobApplicationSourceTypes.Group,
-               id: selectedJob?.groupId,
-            }}
-            heroSx={styles.heroContent}
-            heroContent={
-               <Box display={"flex"} flexDirection={"row-reverse"} p={0} m={0}>
-                  <IconButton onClick={onCloseJobDialog}>
-                     <CloseOutlined />
-                  </IconButton>
-               </Box>
-            }
-         />
          {groupCustomJobs.map((customJob, idx) => {
             return (
                <Link
@@ -102,7 +52,6 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
                         previewMode
                         titleSx={isMobile ? null : styles.title}
                         typographySx={isMobile ? null : styles.typography}
-                        handleClick={() => onClickJobCard(customJob)}
                         hideJobUrl
                         smallCard={isMobile}
                      />
