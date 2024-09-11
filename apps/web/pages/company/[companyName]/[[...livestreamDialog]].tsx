@@ -13,6 +13,7 @@ import {
    CustomJobDialogData,
    CustomJobDialogLayout,
 } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
+import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import {
    GetStaticPaths,
    GetStaticProps,
@@ -36,6 +37,8 @@ import {
    mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../util/serverUtil"
+
+const PARAMETER_SOURCE = "livestreamDialog"
 
 type TrackProps = {
    id: string
@@ -65,7 +68,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
          <CustomJobDialogLayout
             customJobDialogData={customJobDialogData}
             source={{ source: CustomJobApplicationSourceTypes.Group, id: id }}
-            dialogSource="livestreamDialog"
+            dialogSource={PARAMETER_SOURCE}
          >
             <SEO
                id={`CareerFairy | ${universityName}`}
@@ -119,24 +122,23 @@ export const getStaticProps: GetStaticProps<{
 
       if (serverSideGroup) {
          if (serverSideGroup.publicProfile) {
-            const {
-               serverSideUpcomingLivestreams,
-               serverSidePastLivestreams,
-               serverSideGroupAvailableCustomJobs,
-               livestreamDialogData,
-               customJobDialogData,
-            } = await getLivestreamsAndDialogData(
-               serverSideGroup?.groupId,
-               ctx,
+            const [
                {
+                  serverSideUpcomingLivestreams,
+                  serverSidePastLivestreams,
+                  serverSideGroupAvailableCustomJobs,
+                  livestreamDialogData,
+               },
+               customJobDialogData,
+               creators,
+            ] = await Promise.all([
+               getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx, {
                   hideHidden: true,
                   limit: undefined,
-               }
-            )
-
-            const creators = await groupRepo.getCreatorsWithPublicContent(
-               serverSideGroup
-            )
+               }),
+               getCustomJobDialogData(ctx, PARAMETER_SOURCE),
+               groupRepo.getCreatorsWithPublicContent(serverSideGroup),
+            ])
 
             return {
                props: {

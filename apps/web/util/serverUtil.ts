@@ -13,7 +13,6 @@ import {
    MAX_PAST_STREAMS,
    MAX_UPCOMING_STREAMS,
 } from "components/views/company-page/EventSection"
-import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import { getLivestreamDialogData } from "components/views/livestream-dialog"
 import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { fromDate } from "data/firebase/FirebaseInstance"
@@ -239,8 +238,7 @@ export const convertQueryParamsToString = (query: ParsedUrlQuery): string => {
 export const getLivestreamsAndDialogData = async (
    groupId: string,
    context: GetServerSidePropsContext | GetStaticPathsContext,
-   options?: GetEventsOfGroupOptions,
-   parameterSource = "livestreamDialog"
+   options?: GetEventsOfGroupOptions
 ) => {
    const results = await Promise.allSettled([
       livestreamRepo.getEventsOfGroup(
@@ -261,7 +259,6 @@ export const getLivestreamsAndDialogData = async (
       ),
       groupRepo.getGroupAvailableCustomJobs(groupId),
       getLivestreamDialogData(context),
-      getCustomJobDialogData(context, parameterSource),
    ])
 
    const [
@@ -269,7 +266,6 @@ export const getLivestreamsAndDialogData = async (
       serverSidePastLivestreamsResult,
       serverSideGroupCustomJobsResult,
       livestreamDialogDataResult,
-      customJobDialogDataResult,
    ] = results
 
    const serverSideUpcomingLivestreams =
@@ -292,15 +288,10 @@ export const getLivestreamsAndDialogData = async (
          ? livestreamDialogDataResult.value
          : null
 
-   const customJobDialogData =
-      customJobDialogDataResult.status === "fulfilled"
-         ? customJobDialogDataResult.value
-         : null
    return {
       serverSideUpcomingLivestreams,
       serverSidePastLivestreams,
       serverSideGroupAvailableCustomJobs,
       livestreamDialogData,
-      customJobDialogData,
    }
 }
