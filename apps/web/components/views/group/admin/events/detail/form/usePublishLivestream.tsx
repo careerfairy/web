@@ -37,12 +37,9 @@ export const usePublishLivestream = () => {
       livestreamObject.questionsDisabled = false
       livestreamObject.denyRecordingAccess = false
       livestreamObject.type = "upcoming"
-      // livestreamObject.companyCountries = [group.companyCountry?.id]
-      // livestreamObject.companyIndustries =
-      //    group.companyIndustries?.map((industry: GroupOption) => industry.id) ||
-      //    []
-
-      console.log("test bla bla bla")
+      livestreamObject.companyCountries = [group.companyCountry?.id]
+      livestreamObject.companyIndustries =
+         group.companyIndustries?.map((industry) => industry.id) || []
 
       const ratings = values.questions.feedbackQuestions
          .filter(
@@ -59,6 +56,8 @@ export const usePublishLivestream = () => {
       allFieldsOfStudy,
       enqueueSnackbar,
       firebaseService,
+      group.companyCountry?.id,
+      group.companyIndustries,
       handlePublishStream,
       isValid,
       livestream.id,
