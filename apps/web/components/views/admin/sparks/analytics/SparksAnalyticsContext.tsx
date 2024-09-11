@@ -142,21 +142,17 @@ export const SparksAnalyticsProvider = ({ children }) => {
 
          let label
          if (seconds < 60) {
-            label = "Last updated: now"
+            label = "now"
          } else if (minutes < 1) {
-            label = `Last updated: ${seconds} ${
-               seconds === 1 ? "second" : "seconds"
-            }`
+            label = `${seconds} ${seconds === 1 ? "second" : "seconds"}`
          } else if (hours < 1) {
-            label = `Last updated: ${minutes} ${
-               minutes === 1 ? "minute" : "minutes"
-            }`
+            label = `${minutes} ${minutes === 1 ? "minute" : "minutes"}`
          } else if (days < 1) {
-            label = `Last updated: ${hours} ${hours === 1 ? "hour" : "hours"}`
+            label = `${hours} ${hours === 1 ? "hour" : "hours"}`
          } else if (days <= 28) {
-            label = `Last updated: ${days} ${days === 1 ? "day" : "days"}`
+            label = `${days} ${days === 1 ? "day" : "days"}`
          } else {
-            label = `Last updated: ${analytics.updatedAt.toLocaleDateString()}`
+            label = `${analytics.updatedAt.toLocaleDateString()}`
          }
 
          setUpdatedAtLabel(label)
