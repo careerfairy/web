@@ -8,25 +8,36 @@ import {
    query,
    where,
 } from "firebase/firestore"
+import { useState } from "react"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 type Options = {
-   totalItems?: number
-   businessFunctionTagIds?: string[]
+   totalItems: number
+   businessFunctionTagIds: string[]
+   ignoreIds?: string[]
    disabled?: boolean
 }
 
 /**
- * Fetches the stats for a given spark if it belongs to the given group.
+ * Fetches the custom jobs according to the specified options.
  **/
-const useCustomJobs = (options?: Options) => {
-   const { totalItems = 3, businessFunctionTagIds = [], disabled } = options
+const useCustomJobsByTags = (options?: Options) => {
+   const {
+      totalItems,
+      businessFunctionTagIds,
+      disabled,
+      ignoreIds = [],
+   } = options
 
-   return useSWR(
-      disabled ? null : ["get-custom-jobs", totalItems, businessFunctionTagIds],
+   const [itemsPerBatch, setItemsPerBatch] = useState<number>(totalItems)
+
+   const { data } = useSWR(
+      disabled
+         ? null
+         : ["get-custom-jobs", totalItems, businessFunctionTagIds, ignoreIds],
       async () => {
          const querySnapshot = await getDocs(
             query(
@@ -42,7 +53,7 @@ const useCustomJobs = (options?: Options) => {
                        ),
                     ]
                   : []),
-               ...(totalItems ? [limit(totalItems)] : [])
+               limit(itemsPerBatch)
             ).withConverter(createGenericConverter<CustomJob>())
          )
 
@@ -59,6 +70,11 @@ const useCustomJobs = (options?: Options) => {
          },
       }
    )
+
+   return {
+      customJobs: data,
+      setItemsPerBatch,
+   }
 }
 
-export default useCustomJobs
+export default useCustomJobsByTags
