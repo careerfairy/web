@@ -39,12 +39,10 @@ const progressBar = new cliProgress.SingleBar(
 // eslint-disable-next-line
 export async function run() {
    try {
-      const [allSparks] = await Promise.all([
-         logAction(
-            () => groupRepo.getAllSparks(true),
-            "Fetching all sparks..."
-         ),
-      ])
+      const allSparks = await logAction(
+         () => groupRepo.getAllSparks(true),
+         "Fetching all sparks..."
+      )
 
       Counter.log(`Fetched ${allSparks?.length} sparks`)
 
@@ -102,7 +100,7 @@ const updateSparkVideoDuration = async (
          loopProgressBar.update(index + 1)
 
          if (index % WRITE_BATCH === 0) {
-            //await bulkWriter.flush()
+            await bulkWriter.flush()
          }
 
          index++
