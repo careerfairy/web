@@ -1,16 +1,16 @@
-import { UserData } from "@careerfairy/shared-lib/users"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
 } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import {
    getPdfCategoryChartData,
    PdfCategoryChartData,
    PdfReportData,
 } from "@careerfairy/shared-lib/groups/pdf-report"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
 import {
    fieldOfStudyRepo,
    groupRepo,
@@ -18,12 +18,15 @@ import {
 } from "./api/repositories"
 
 import {
-   getDateString,
-   getRatingsAverage,
-   makeRequestingGroupIdFirst,
-   onCallWrapper,
-   partition,
-} from "./util"
+   GroupDashboardInvite,
+   WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
+} from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { UserRecord } from "firebase-admin/auth"
+import { array, boolean, mixed, object, string } from "yup"
+import { auth, firestore } from "./api/firestoreAdmin"
+import { client } from "./api/postmark"
+import config from "./config"
 import {
    logAndThrow,
    validateData,
@@ -31,16 +34,13 @@ import {
    validateUserIsGroupAdminOwnerRole,
 } from "./lib/validations"
 import {
-   GroupDashboardInvite,
-   WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
-} from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
-import { array, boolean, mixed, object, string } from "yup"
+   getDateString,
+   getRatingsAverage,
+   makeRequestingGroupIdFirst,
+   onCallWrapper,
+   partition,
+} from "./util"
 import functions = require("firebase-functions")
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { client } from "./api/postmark"
-import config from "./config"
-import { firestore, auth } from "./api/firestoreAdmin"
-import { UserRecord } from "firebase-admin/auth"
 
 export const sendDraftApprovalRequestEmail = functions
    .region(config.region)
@@ -178,6 +178,10 @@ export const sendNewlyPublishedEventEmail = functions
 
 export const getLivestreamReportData = functions
    .region(config.region)
+   .runWith({
+      timeoutSeconds: 540, // 9 minutes (max)
+      memory: "512MB",
+   })
    .https.onCall(async (data, context) => {
       const { targetStreamId, targetGroupId, userEmail } = data
       const hostsData: PdfReportData["hostsData"] = []
