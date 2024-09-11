@@ -1,12 +1,15 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import { Box, Button, Tab, Tabs, Typography } from "@mui/material"
 import { useState } from "react"
+import { RefreshCw } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { SparksAudienceTab } from "./audience-tab"
 import { SparksCompetitorTab } from "./competitor-tab"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
 import { SparksOverviewTab } from "./overview-tab"
 import { useSparksAnalytics } from "./SparksAnalyticsContext"
+
+const UPDATE_ICON_SIZE = 18
 
 const styles = sxStyles({
    root: {
@@ -60,6 +63,38 @@ const styles = sxStyles({
          md: 0,
       },
    },
+   controlsWrapper: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 1,
+   },
+   updateButton: (theme) => ({
+      background: theme.brand.white["300"],
+      border: `1px solid ${theme.palette.neutral["200"]}`,
+      borderRadius: "100%",
+      minWidth: "38px",
+      maxWidth: "38px",
+      minHeight: "38px",
+      maxHeight: "38px",
+      padding: 0,
+   }),
+   updateIcon: (theme) => ({
+      height: UPDATE_ICON_SIZE,
+      width: UPDATE_ICON_SIZE,
+      color: theme.palette.neutral["500"],
+   }),
+   updatedAtLabel: (theme) => ({
+      color: theme.palette.neutral["500"],
+   }),
+   spinningAnimation: {
+      height: UPDATE_ICON_SIZE,
+      "@keyframes spin": {
+         "0%": { transform: "rotate(0deg)" },
+         "100%": { transform: "rotate(360deg)" },
+      },
+      animation: "spin 1s linear infinite",
+   },
 })
 
 type TimeFilter = {
@@ -74,6 +109,7 @@ const GroupSparkAnalytics = () => {
       setSelectTimeFilter,
       updateAnalytics,
       updatedAtLabel,
+      isLoading,
    } = useSparksAnalytics()
    const handleTabChange = (_, newValue) => {
       setTabValue(newValue)
@@ -100,9 +136,20 @@ const GroupSparkAnalytics = () => {
                <Tab label="Competitor" value="competitor" />
             </Tabs>
             <Box component="span" sx={styles.mobileLimiter} />
-            <Box>
-               <Typography variant="xsmall">{updatedAtLabel}</Typography>
-               <Button onClick={updateAnalytics}>Update</Button>
+            <Box sx={styles.controlsWrapper}>
+               <Typography variant="small" sx={styles.updatedAtLabel}>
+                  {updatedAtLabel}
+               </Typography>
+               <Button onClick={updateAnalytics} sx={styles.updateButton}>
+                  <Box
+                     sx={[
+                        isLoading ? styles.spinningAnimation : {},
+                        styles.updateIcon,
+                     ]}
+                  >
+                     <RefreshCw size={UPDATE_ICON_SIZE} />
+                  </Box>
+               </Button>
                <ResponsiveSelectWithDrawer
                   selectValue={selectTimeFilter}
                   setSelectValue={setSelectTimeFilter}
