@@ -84,6 +84,11 @@ export type PieChartDataPoint = {
 }
 export type PieChartWithPastData = WithPastData<PieChartDataPoint[]>
 
+export type FunctionSignature = {
+   groupId: string
+   forceUpdate: boolean
+}
+
 // DTO data types
 
 export type ReachData = {
