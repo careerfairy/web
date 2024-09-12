@@ -121,21 +121,33 @@ const styles = sxStyles({
    },
 })
 
+const UpdatedAtLabel = () => {
+   const { updatedAtLabel, isLoading } = useSparksAnalytics()
+   const isMobile = useIsMobile()
+
+   if (isLoading) {
+      return <Typography sx={styles.updatedAtLabel}>Updating...</Typography>
+   }
+
+   return (
+      Boolean(updatedAtLabel) && (
+         <Typography sx={styles.updatedAtLabel}>
+            Last updated:{isMobile ? <br /> : " "}
+            {updatedAtLabel}
+         </Typography>
+      )
+   )
+}
+
 type TimeFilter = {
    value: TimePeriodParams
    label: string
 }
 
 const GroupSparkAnalytics = () => {
-   const isMobile = useIsMobile()
    const [tabValue, setTabValue] = useState("overview")
-   const {
-      selectTimeFilter,
-      setSelectTimeFilter,
-      updateAnalytics,
-      updatedAtLabel,
-      isLoading,
-   } = useSparksAnalytics()
+   const { selectTimeFilter, setSelectTimeFilter, updateAnalytics, isLoading } =
+      useSparksAnalytics()
    const handleTabChange = (_, newValue) => {
       setTabValue(newValue)
    }
@@ -163,10 +175,7 @@ const GroupSparkAnalytics = () => {
             <Box component="span" sx={styles.mobileLimiter} />
             <Box sx={styles.controlsWrapper}>
                <Box sx={styles.updateControlsWrapper}>
-                  <Typography variant="small" sx={styles.updatedAtLabel}>
-                     Last updated:{isMobile ? <br /> : " "}
-                     {updatedAtLabel}
-                  </Typography>
+                  <UpdatedAtLabel />
                   <Button onClick={updateAnalytics} sx={styles.updateButton}>
                      <Box
                         sx={[
