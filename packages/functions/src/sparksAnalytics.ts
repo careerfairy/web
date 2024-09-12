@@ -9,23 +9,11 @@ import { getSparksAnalyticsRepoInstance } from "./api/repositories"
 import config from "./config"
 import GroupSparksAnalyticsRepository from "./lib/sparks/analytics/GroupSparksAnalyticsRepository"
 import { logAndThrow } from "./lib/validations"
-import {
-   CacheKeyOnCallFn,
-   cacheOnCallValues,
-} from "./middlewares/cacheMiddleware"
 import { middlewares } from "./middlewares/middlewares"
 import {
    dataValidation,
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
-
-// Define cache settings
-const cache = (cacheKeyFn: CacheKeyOnCallFn) =>
-   cacheOnCallValues("sparks-analytics", cacheKeyFn, 600) // 5min
-
-const sparksAnalyticsCacheKey = (args: { groupId: string }) => {
-   return ["getSparksAnalytics", args.groupId]
-}
 
 const fetchTimePeriodData = (
    repoPromise: (timeperiod: TimePeriodParams) => Promise<any>
@@ -214,16 +202,16 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
          forceUpdate: boolean().required(),
       }),
       userShouldBeGroupAdmin(),
-      cache((data) => sparksAnalyticsCacheKey({ ...data })),
       async (data, context) => {
-         const { groupId, forceUpdate } = data
-         const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(groupId)
-
-         functions.logger.info(
-            `Fetching sparks analytics for group ${groupId}...`
-         )
-
          try {
+            const { groupId, forceUpdate } = data
+            const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(groupId)
+
+            console.log("EXECUTING FUNCTION")
+
+            functions.logger.info(
+               `Fetching sparks analytics for group ${groupId}...`
+            )
             const cachedAnalyticsData =
                await sparksAnalyticsRepo.getCachedAnalytics()
 
@@ -231,6 +219,8 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                const bigQueryAnalyticsData = await fetchAnalyticsFromBigQuery(
                   sparksAnalyticsRepo
                )
+
+               console.log("FETCHED FROM BIGQUERY")
 
                await sparksAnalyticsRepo.updateAnalyticsCache({
                   ...bigQueryAnalyticsData,
