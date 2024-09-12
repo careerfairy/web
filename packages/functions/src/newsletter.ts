@@ -1,4 +1,7 @@
 import { RuntimeOptions } from "firebase-functions"
+import { logger } from "firebase-functions/v2"
+import { onRequest } from "firebase-functions/v2/https"
+import { onSchedule } from "firebase-functions/v2/scheduler"
 import { DateTime } from "luxon"
 import { PostmarkEmailSender } from "./api/postmark"
 import {
@@ -43,6 +46,7 @@ const runtimeSettings: RuntimeOptions = {
 
 /**
  * Send a newsletter to all users every other tuesday
+ * Disabled while transitioning to V2 so that newsletters are not sent twice
  */
 export const newsletter = functions
    .region(config.region)
@@ -50,47 +54,61 @@ export const newsletter = functions
    .pubsub.schedule("0 18 * * Tue") // every tuesday at 6pm
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      const shouldSend = await shouldSendNewsletter()
+      functions.logger.warn("This function is disabled")
+      /* const shouldSend = await shouldSendNewsletter()
       if (!shouldSend) {
          functions.logger.info("Newsletter not sent")
          return
       }
 
-      await sendNewsletter()
+      await sendNewsletter() */
    })
+
+/**
+ * Send a newsletter to all users every other tuesday
+ */
+export const newsletterV2 = onSchedule(
+   { schedule: "0 18 * * Tue", timeZone: "Europe/Zurich" },
+   async () => {
+      const shouldSend = await shouldSendNewsletter()
+      if (!shouldSend) {
+         logger.info("Newsletter not sent")
+         return
+      }
+
+      await sendNewsletter()
+   }
+)
 
 /**
  * Send the newsletter manually to everyone or to a list of emails
  */
-export const manualNewsletter = functions
-   .region(config.region)
-   .runWith(runtimeSettings)
-   .https.onRequest(async (req, res) => {
-      if (req.method !== "GET") {
-         res.status(400).send("Only GET requests are allowed")
-         return
-      }
+export const manualNewsletter = onRequest(async (req, res) => {
+   if (req.method !== "GET") {
+      res.status(400).send("Only GET requests are allowed")
+      return
+   }
 
-      const receivedEmails = ((req.query.emails as string) ?? "")
-         .split(",")
-         .map((email) => email?.trim())
-         .filter(Boolean)
+   const receivedEmails = ((req.query.emails as string) ?? "")
+      .split(",")
+      .map((email) => email?.trim())
+      .filter(Boolean)
 
-      functions.logger.info("Received emails", receivedEmails)
+   logger.info("Received emails", receivedEmails)
 
-      if (receivedEmails.length === 0) {
-         res.status(400).send("No emails provided")
-         return
-      }
+   if (receivedEmails.length === 0) {
+      res.status(400).send("No emails provided")
+      return
+   }
 
-      if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
-         await sendNewsletter()
-         res.status(200).send("Newsletter sent to everyone")
-      } else {
-         await sendNewsletter(receivedEmails)
-         res.status(200).send("Newsletter sent to " + receivedEmails.join(", "))
-      }
-   })
+   if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
+      await sendNewsletter()
+      res.status(200).send("Newsletter sent to everyone")
+   } else {
+      await sendNewsletter(receivedEmails)
+      res.status(200).send("Newsletter sent to " + receivedEmails.join(", "))
+   }
+})
 
 export const manualTemplatedEmail = functions
    .region(config.region)
