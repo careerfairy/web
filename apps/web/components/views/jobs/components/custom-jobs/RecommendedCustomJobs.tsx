@@ -1,4 +1,5 @@
 import { Button, ListItem, Stack, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobsByUser from "components/custom-hook/custom-job/useCustomJobsByUser"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
@@ -43,7 +44,7 @@ const styles = sxStyles({
 
 const RecommendedCustomJobs = () => {
    const featureFlags = useFeatureFlags()
-
+   const { isLoggedOut } = useAuth()
    if (!featureFlags.jobHubV1) return null
    return (
       <Stack spacing={0} sx={styles.wrapper}>
@@ -52,7 +53,7 @@ const RecommendedCustomJobs = () => {
             sx={styles.heading}
             color="neutral.800"
          >
-            Jobs matching your interests
+            {isLoggedOut ? "Jobs in focus" : "Jobs matching your interests"}
          </Typography>
          <SuspenseWithBoundary>
             <Content />

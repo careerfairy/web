@@ -50,7 +50,7 @@ const useCustomJobs = (options?: Options) => {
                collection(FirestoreInstance, "customJobs"),
                where("deadline", ">", new Date()),
                where("published", "==", true),
-               orderBy("deadline", "desc"),
+               orderBy("deadline", "asc"),
                ...(businessFunctionTagIds.length
                   ? [
                        where(
@@ -94,7 +94,6 @@ export const useCustomJobsCount = (options?: Options) => {
       collection(FirestoreInstance, "customJobs"),
       where("deadline", ">", new Date()),
       where("published", "==", true),
-      orderBy("deadline", "desc"),
       ...(businessFunctionTagIds.length
          ? [
               where(
