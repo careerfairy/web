@@ -7,6 +7,9 @@ import { useRouter } from "next/router"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
+   title: {
+      maxWidth: "calc(100% - 50px)",
+   },
    typography: {
       maxWidth: "calc(100% - 50px)",
    },
