@@ -223,7 +223,7 @@ const CompanyPageOverview = ({
    const showFollowCompanyCta = isLoggedIn && !editMode
    const showSignUpCta = isLoggedOut && !editMode
 
-   const showJobs = featureFlags.jobHubV1
+   const showJobs = featureFlags.jobHubV1 && customJobs?.length
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
