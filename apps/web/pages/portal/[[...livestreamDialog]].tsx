@@ -41,6 +41,7 @@ import EventsPreviewCarousel, {
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
 import { UserSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
+import dynamic from "next/dynamic"
 import { sxStyles } from "types/commonTypes"
 import {
    getLivestreamDialogData,
@@ -53,6 +54,17 @@ const styles = sxStyles({
       pr: 2,
    },
 })
+
+// apps/web/components/views/jobs/components/custom-jobs/RecommendedCustomJobs.tsx
+const RecommendedCustomJobs = dynamic(
+   () =>
+      import(
+         "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
+      ),
+   {
+      ssr: false,
+   }
+)
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -142,7 +154,7 @@ const PortalPage = ({
                               serverSideEvents={comingUpNext}
                               limit={20}
                            />
-                           {/* TODO-WG: <AvailableCustomJobs /> */}
+                           <RecommendedCustomJobs />
                            <MyNextEvents />
                            <ConditionalWrapper
                               condition={Boolean(events?.length)}
@@ -228,7 +240,6 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
          {selectedCategories.length ? (
             <CategoryTagsContent categories={categoriesData} />
          ) : (
-            // TODO-WG: Pass selected tags via context provider
             children
          )}
       </Box>

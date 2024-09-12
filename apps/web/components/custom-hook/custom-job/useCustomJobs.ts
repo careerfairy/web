@@ -1,14 +1,6 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import {
-   collection,
-   getDocs,
-   limit,
-   orderBy,
-   query,
-   where,
-} from "firebase/firestore"
-import { useState } from "react"
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
@@ -24,7 +16,7 @@ type Options = {
 /**
  * Fetches the custom jobs according to the specified options.
  **/
-const useCustomJobsByTags = (options?: Options) => {
+const useCustomJobs = (options?: Options) => {
    const {
       totalItems,
       businessFunctionTagIds,
@@ -32,12 +24,18 @@ const useCustomJobsByTags = (options?: Options) => {
       ignoreIds = [],
    } = options
 
-   const [itemsPerBatch, setItemsPerBatch] = useState<number>(totalItems)
+   // Due to limitations, cannot filter id using 'not-in' as deadline is also used with inequality operator
+   // so filtering the ignore ids is done in memory
 
    const { data } = useSWR(
       disabled
          ? null
-         : ["get-custom-jobs", totalItems, businessFunctionTagIds, ignoreIds],
+         : [
+              "get-custom-jobs-by-tags",
+              totalItems,
+              businessFunctionTagIds,
+              ignoreIds,
+           ],
       async () => {
          const querySnapshot = await getDocs(
             query(
@@ -52,12 +50,15 @@ const useCustomJobsByTags = (options?: Options) => {
                           businessFunctionTagIds
                        ),
                     ]
-                  : []),
-               limit(itemsPerBatch)
+                  : [])
             ).withConverter(createGenericConverter<CustomJob>())
          )
 
-         return querySnapshot.docs.map((doc) => doc.data())
+         return (
+            querySnapshot.docs
+               ?.map((doc) => doc.data())
+               ?.filter((job) => !ignoreIds.includes(job.id)) || []
+         )
       },
       {
          ...reducedRemoteCallsOptions,
@@ -65,6 +66,7 @@ const useCustomJobsByTags = (options?: Options) => {
             errorLogAndNotify(error, {
                key,
                businessFunctionTagIds,
+               ignoreIds,
                totalItems,
             })
          },
@@ -73,8 +75,7 @@ const useCustomJobsByTags = (options?: Options) => {
 
    return {
       customJobs: data,
-      setItemsPerBatch,
    }
 }
 
-export default useCustomJobsByTags
+export default useCustomJobs
