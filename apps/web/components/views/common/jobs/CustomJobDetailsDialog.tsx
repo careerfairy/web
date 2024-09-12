@@ -33,6 +33,7 @@ const styles = sxStyles({
    },
    jobApplyConfirmationDialog: {
       m: 2,
+      bottom: 10,
    },
    dialogContent: {
       p: 0,
