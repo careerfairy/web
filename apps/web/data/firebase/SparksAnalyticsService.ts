@@ -1,4 +1,7 @@
-import { SparksAnalyticsDTO } from "@careerfairy/shared-lib/sparks/analytics"
+import {
+   FunctionSignature,
+   SparksAnalyticsDTO,
+} from "@careerfairy/shared-lib/sparks/analytics"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"
 
@@ -10,7 +13,7 @@ export class SparksAnalyticsService {
       forceUpdate: boolean
    ): Promise<SparksAnalyticsDTO> {
       const { data: analytics } = await httpsCallable<
-         { groupId: string; forceUpdate: boolean },
+         FunctionSignature,
          SparksAnalyticsDTO
       >(
          this.functions,
