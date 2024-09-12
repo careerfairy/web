@@ -59,12 +59,7 @@ const CategoryTagsContentComponent = ({ categories }: Props) => {
                selectedTagLabel={selectedTagLabel}
             />
          </ConditionalWrapper>
-         <ConditionalWrapper condition={hasBusinessFunctions}>
-            <CustomJobsTagsContent
-               tags={tags}
-               title={"Top " + selectedTagLabel + " jobs"}
-            />
-         </ConditionalWrapper>
+
          <ConditionalWrapper
             condition={hasBusinessFunctions || hasContentTopics || hasLanguages}
          >
@@ -73,7 +68,12 @@ const CategoryTagsContentComponent = ({ categories }: Props) => {
                type="future"
                tags={tags}
             />
-
+            <ConditionalWrapper condition={hasBusinessFunctions}>
+               <CustomJobsTagsContent
+                  tags={tags}
+                  title={"Top " + selectedTagLabel + " jobs"}
+               />
+            </ConditionalWrapper>
             <LivestreamTagsContent
                title={"Top " + selectedTagLabel + " recordings"}
                type="past"

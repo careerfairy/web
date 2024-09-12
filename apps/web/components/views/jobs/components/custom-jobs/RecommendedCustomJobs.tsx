@@ -1,6 +1,7 @@
 import { Button, ListItem, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobsByUser from "components/custom-hook/custom-job/useCustomJobsByUser"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import JobCard from "components/views/common/jobs/JobCard"
 import Link from "next/link"
@@ -34,12 +35,23 @@ const styles = sxStyles({
       width: "100%",
    },
    jobListItemWrapper: { m: 0, p: 0 },
+   wrapper: {
+      m: 0,
+      p: 0,
+   },
 })
 
 const RecommendedCustomJobs = () => {
+   const featureFlags = useFeatureFlags()
+
+   if (!featureFlags.jobHubV1) return null
    return (
-      <Stack spacing={0} m={0} p={0}>
-         <Typography variant="brandedH4" sx={styles.heading} color="black">
+      <Stack spacing={0} sx={styles.wrapper}>
+         <Typography
+            variant="brandedH4"
+            sx={styles.heading}
+            color="neutral.800"
+         >
             Jobs matching your interests
          </Typography>
          <SuspenseWithBoundary>

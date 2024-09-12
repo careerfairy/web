@@ -14,14 +14,12 @@ const useCustomJobsByUser = (batchSize: number, disabled?: boolean) => {
    // 1. Fetch all customJobs for tags if tags with limit
 
    const { customJobs: businessFunctionCustomJobs } = useCustomJobs({
-      totalItems: batchSize,
       businessFunctionTagIds: businessFunctions,
       disabled: disabled,
    })
    // 2. Fetch other jobs ignoring already fetched also with limit
 
    const { customJobs: otherCustomJobs } = useCustomJobs({
-      totalItems: batchSize,
       businessFunctionTagIds: [],
       ignoreIds: businessFunctionCustomJobs.map((job) => job.id),
       disabled: disabled,

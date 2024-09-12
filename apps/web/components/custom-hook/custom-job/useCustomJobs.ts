@@ -1,13 +1,21 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore"
+import {
+   collection,
+   getDocs,
+   limit,
+   orderBy,
+   query,
+   where,
+} from "firebase/firestore"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
+import useCountQuery from "../useCountQuery"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 type Options = {
-   totalItems: number
+   totalItems?: number
    businessFunctionTagIds: string[]
    ignoreIds?: string[]
    disabled?: boolean
@@ -41,16 +49,18 @@ const useCustomJobs = (options?: Options) => {
             query(
                collection(FirestoreInstance, "customJobs"),
                where("deadline", ">", new Date()),
+               where("published", "==", true),
                orderBy("deadline", "desc"),
                ...(businessFunctionTagIds.length
                   ? [
                        where(
                           "businessFunctionsTagIds",
-                          "array-contains",
+                          "array-contains-any",
                           businessFunctionTagIds
                        ),
                     ]
-                  : [])
+                  : []),
+               ...(totalItems ? [limit(totalItems)] : [])
             ).withConverter(createGenericConverter<CustomJob>())
          )
 
@@ -76,6 +86,27 @@ const useCustomJobs = (options?: Options) => {
    return {
       customJobs: data,
    }
+}
+
+export const useCustomJobsCount = (options?: Options) => {
+   const { businessFunctionTagIds } = options
+   const countQuery = query(
+      collection(FirestoreInstance, "customJobs"),
+      where("deadline", ">", new Date()),
+      where("published", "==", true),
+      orderBy("deadline", "desc"),
+      ...(businessFunctionTagIds.length
+         ? [
+              where(
+                 "businessFunctionsTagIds",
+                 "array-contains-any",
+                 businessFunctionTagIds
+              ),
+           ]
+         : [])
+   )
+
+   return useCountQuery(countQuery)
 }
 
 export default useCustomJobs
