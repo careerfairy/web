@@ -66,6 +66,8 @@ export const newsletter = functions
 
 /**
  * Send a newsletter to all users every other tuesday
+ * The function runs every tuesday and only inside of it is it specified to run
+ * every other tuesday
  */
 export const newsletterV2 = onSchedule(
    { schedule: "0 18 * * Tue", timeZone: "Europe/Zurich" },
