@@ -32,6 +32,9 @@ export interface CustomJob extends Identifiable {
     * e.g: ["BusinessDevelopment", "Consulting"]
     */
    businessFunctionsTagIds?: string[]
+
+   // for jobs that have expired more than 30 days ago
+   isPermanentlyExpired?: boolean
 }
 
 export type PublicCustomJob = Pick<
