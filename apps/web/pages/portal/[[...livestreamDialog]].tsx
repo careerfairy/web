@@ -1,6 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { Box } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
@@ -37,7 +37,6 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
-import Heading from "components/views/portal/common/Heading"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
@@ -150,14 +149,31 @@ const PortalPage = ({
                            <PortalTagsContent>
                               {isMounted ? (
                                  <UserSparksCarousel
-                                    header={<Heading>SPARKS</Heading>}
+                                    header={
+                                       <Typography
+                                          variant="brandedH4"
+                                          color="neutral.800"
+                                          fontWeight="600"
+                                       >
+                                          Sparks
+                                       </Typography>
+                                    }
                                     headerSx={styles.sparksCarouselHeader}
                                     handleSparksClicked={handleSparksClicked}
                                     showArrows={!isMobile}
+                                    sx={{ mb: 4 }}
                                  />
                               ) : (
                                  <FallbackComponent
-                                    header={<Heading>SPARKS</Heading>}
+                                    header={
+                                       <Typography
+                                          variant="brandedH4"
+                                          color="neutral.800"
+                                          fontWeight="600"
+                                       >
+                                          Sparks
+                                       </Typography>
+                                    }
                                  />
                               )}
                               {hasInterests ? (

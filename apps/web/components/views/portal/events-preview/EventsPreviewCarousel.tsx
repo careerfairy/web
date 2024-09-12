@@ -55,12 +55,8 @@ const styles = sxStyles({
       textDecoration: "underline",
    },
    eventTitle: {
-      fontFamily: "Poppins",
-      fontSize: "18px",
-      fontStyle: "normal",
       fontWeight: "600",
-      lineHeight: "27px",
-      color: "black",
+      color: (theme) => theme.palette.neutral[800],
    },
    viewport: {
       overflow: "hidden",
@@ -127,7 +123,7 @@ const defaultStyling: EventsCarouselStyling = {
    padding: true,
    slide: styles.slide,
    title: styles.eventTitle,
-   titleVariant: "h6",
+   titleVariant: "brandedH4",
    eventsHeader: styles.eventsHeader,
 }
 const defaultEmblaOptions: EmblaOptionsType = {
