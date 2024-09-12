@@ -12,7 +12,9 @@ import JobList from "./JobList"
 
 const JobsContent = () => {
    const { group } = useGroupFromState()
-   const allJobsWithStats = useGroupCustomJobsStats(group.groupId)
+   const allJobsWithStats = useGroupCustomJobsStats(group.groupId, {
+      deletedJobs: false,
+   })
    const { push } = useRouter()
    const { jobHubV1 } = useFeatureFlags()
 

@@ -118,9 +118,9 @@ export interface ICustomJobRepository {
    getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]>
 
    /**
-    * Delete all expired custom jobs
+    * Update all custom jobs that are expired for more than 30 days to be permanently expired
     */
-   deleteExpiredCustomJobs(): Promise<void>
+   syncPermanentlyExpiredCustomJobs(): Promise<void>
 
    /**
     * Update all custom jobs that have expired
@@ -346,8 +346,7 @@ export class FirebaseCustomJobRepository
       return batch.commit()
    }
 
-
-   async deleteExpiredCustomJobs(): Promise<void> {
+   async syncPermanentlyExpiredCustomJobs(): Promise<void> {
       const customJobRef = this.firestore
          .collection(this.COLLECTION_NAME)
          .where("deadline", "<", getMaxDaysAfterDeadline())
@@ -359,7 +358,9 @@ export class FirebaseCustomJobRepository
          const batch = this.firestore.batch()
 
          chunk.forEach((doc) => {
-            batch.delete(doc.ref)
+            batch.update(doc.ref, {
+               isPermanentlyExpired: true,
+            })
          })
 
          return batch.commit()
