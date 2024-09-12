@@ -7,14 +7,6 @@ import { useRouter } from "next/router"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   heroContent: {
-      pb: "0px !important",
-      pr: "8px !important",
-      pt: "8px !important",
-   },
-   title: {
-      maxWidth: "calc(100% - 50px)",
-   },
    typography: {
       maxWidth: "calc(100% - 50px)",
    },
