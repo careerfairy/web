@@ -10,7 +10,10 @@ import { DateTime } from "luxon"
 const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 
 export interface IUserFunctionsRepository extends IUserRepository {
-   getSubscribedUsers(userEmails?: string[]): Promise<UserData[]>
+   getSubscribedUsers(
+      userEmails?: string[],
+      locationFilters?: string[]
+   ): Promise<UserData[]>
 
    getSubscribedUsersByCountryCode(
       countryCode: string,
@@ -34,7 +37,10 @@ export class UserFunctionsRepository
    extends FirebaseUserRepository
    implements IUserFunctionsRepository
 {
-   async getSubscribedUsers(userEmails?: string[]): Promise<UserData[]> {
+   async getSubscribedUsers(
+      userEmails?: string[],
+      locationFilters?: string[]
+   ): Promise<UserData[]> {
       const earlierThan = DateTime.now()
          .minus({ months: SUBSCRIBED_BEFORE_MONTHS_COUNT })
          .toJSDate()
@@ -43,6 +49,10 @@ export class UserFunctionsRepository
          .collection("userData")
          .where("unsubscribed", "==", false)
          .where("lastActivityAt", ">=", earlierThan)
+
+      if (locationFilters?.length) {
+         query = query.where("universityCountryCode", "in", locationFilters)
+      }
 
       if (userEmails?.length) {
          const withinLimit = isWithinNormalizationLimit(30, userEmails)

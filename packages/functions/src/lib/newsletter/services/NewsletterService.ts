@@ -19,6 +19,38 @@ import { IRecommendationDataFetcher } from "../../recommendation/services/DataFe
 import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
 
 const TOLERANCE_DAYS = 2
+const LOCATION_FILTERS = [
+   "AT",
+   "BE",
+   "BG",
+   "CH",
+   "CZ",
+   "DE",
+   "DK",
+   "EE",
+   "ES",
+   "FI",
+   "FR",
+   "GB",
+   "GR",
+   "HR",
+   "HU",
+   "IE",
+   "IT",
+   "LI",
+   "LU",
+   "MT",
+   "NL",
+   "NO",
+   "PL",
+   "PT",
+   "RO",
+   "RS",
+   "SE",
+   "SI",
+   "SK",
+   "SM",
+]
 /**
  * Data structure used to associate each user with his recommended livestreams
  * and groups he is following
@@ -128,7 +160,7 @@ export class NewsletterService {
    async fetchRequiredData() {
       // start fetching in parallel
       const promises = [
-         this.userRepo.getSubscribedUsers(),
+         this.userRepo.getSubscribedUsers(null, LOCATION_FILTERS),
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
       ] as const
