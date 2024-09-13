@@ -59,6 +59,7 @@ type Props = {
    hideJobUrl?: boolean
    titleSx?: SxProps<DefaultTheme>
    typographySx?: SxProps<DefaultTheme>
+   companyName?: string
 }
 
 const JobCard = ({
@@ -71,12 +72,12 @@ const JobCard = ({
    hideJobUrl,
    titleSx,
    typographySx,
+   companyName,
 }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const theme = useTheme()
    const { jobHubV1 } = useFeatureFlags()
-
    const showAdditionalInfo = clicks !== undefined && applicants !== undefined
 
    const getStateColor = useCallback(
@@ -124,6 +125,7 @@ const JobCard = ({
                         hideJobUrl={hideJobUrl}
                         titleSx={titleSx}
                         typographySx={typographySx}
+                        companyName={companyName}
                      />
                   </Grid>
 

@@ -1,10 +1,12 @@
 import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Button, ListItem, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobs, {
    useCustomJobsCount,
 } from "components/custom-hook/custom-job/useCustomJobs"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import useGroupsByIds from "components/custom-hook/useGroupsByIds"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import Link from "next/link"
 import { useCallback, useState } from "react"
@@ -92,6 +94,18 @@ const Content = ({ businessFunctionTagIds, totalCount }: ContentProps) => {
       setBatchSize(batchSize + ITEMS_PER_BATCH)
    }, [setBatchSize, batchSize])
 
+   const { data: jobsGroups } = useGroupsByIds(
+      customJobs.map((job) => job.groupId)
+   )
+
+   const getJobCompanyName = useCallback(
+      (job: CustomJob) => {
+         return jobsGroups?.find((group) => group.id == job.groupId)
+            ?.universityName
+      },
+      [jobsGroups]
+   )
+
    const seeMoreDisabled = customJobs.length == totalCount
 
    return (
@@ -115,6 +129,7 @@ const Content = ({ businessFunctionTagIds, totalCount }: ContentProps) => {
                            previewMode
                            hideJobUrl
                            smallCard={isMobile}
+                           companyName={getJobCompanyName(customJob)}
                         />
                      </ListItem>
                   </Link>
