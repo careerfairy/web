@@ -34,7 +34,7 @@ export interface CustomJob extends Identifiable {
    businessFunctionsTagIds?: string[]
 
    // for jobs that have expired more than 30 days ago
-   isPermanentlyExpired?: boolean
+   isPermanentlyExpired: boolean
 }
 
 export type PublicCustomJob = Pick<
@@ -51,6 +51,7 @@ export type PublicCustomJob = Pick<
    | "businessFunctionsTagIds"
    | "livestreams"
    | "sparks"
+   | "isPermanentlyExpired"
 >
 
 export type PublicCustomJobApplicant = Pick<
@@ -91,6 +92,7 @@ export const pickPublicDataFromCustomJob = (
       businessFunctionsTagIds: job.businessFunctionsTagIds ?? [],
       livestreams: job.livestreams ?? [],
       sparks: job.sparks ?? [],
+      isPermanentlyExpired: job.isPermanentlyExpired ?? false,
    }
 }
 
@@ -136,7 +138,10 @@ export interface CustomJobApplicant extends Identifiable {
 }
 
 export const getMaxDaysAfterDeadline = (): Date => {
-   return new Date(Date.now() - CUSTOM_JOB_CONSTANTS.MAX_DAYS_AFTER_DEADLINE)
+   const date = new Date()
+   date.setDate(date.getDate() - CUSTOM_JOB_CONSTANTS.MAX_DAYS_AFTER_DEADLINE)
+
+   return date
 }
 
 /**

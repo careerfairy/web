@@ -293,6 +293,7 @@ const LivestreamFormikProvider = ({ livestream, group, children }: Props) => {
    )
    const initialSelectedCustomJobs = useGroupCustomJobs(group?.id, {
       livestreamId: livestream?.id,
+      includePermanentlyExpired: true,
    })
 
    const formValues: LivestreamFormValues = livestream

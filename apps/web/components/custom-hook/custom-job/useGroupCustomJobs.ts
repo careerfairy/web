@@ -6,6 +6,7 @@ import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 type Options = {
    livestreamId?: string
    sparkId?: string
+   includePermanentlyExpired?: boolean
 }
 
 /**
@@ -15,7 +16,11 @@ type Options = {
  * @param {Options} options - Optional parameters to filter custom jobs by livestream ID or spark ID.
  */
 const useGroupCustomJobs = (groupId: string, options: Options = {}) => {
-   const { livestreamId = "", sparkId = "" } = options
+   const {
+      livestreamId = "",
+      sparkId = "",
+      includePermanentlyExpired,
+   } = options
 
    const collectionRef = query(
       collection(useFirestore(), "customJobs"),
@@ -24,6 +29,9 @@ const useGroupCustomJobs = (groupId: string, options: Options = {}) => {
          ? [where("livestreams", "array-contains", livestreamId)]
          : []),
       ...(sparkId ? [where("sparks", "array-contains", sparkId)] : []),
+      ...(includePermanentlyExpired
+         ? []
+         : [where("isPermanentlyExpired", "==", false)]),
       orderBy("createdAt", "desc")
    )
 
