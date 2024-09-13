@@ -162,6 +162,7 @@ export class FirebaseCustomJobRepository
             : job.livestreams,
          id: ref.id,
          published: isPublished,
+         isPermanentlyExpired: false,
       }
 
       await ref.set(newJob, { merge: true })

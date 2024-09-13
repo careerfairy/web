@@ -110,6 +110,7 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
    let jobPostingUrl: string
    let jobPublished: boolean
    let jobBusinessTags: string | string[]
+   let jobIsPermanentlyExpired: boolean
 
    if (isAtsJob) {
       jobName = job.name
@@ -121,6 +122,7 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
       jobPostingUrl = job.postingUrl
       jobPublished = job.published
       jobBusinessTags = job.businessFunctionsTagIds?.join(", ")
+      jobIsPermanentlyExpired = job.isPermanentlyExpired
    }
 
    const showTooltip = useMemo(
@@ -160,7 +162,12 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
                ) : null}
             </Grid>
 
-            {isMobile && !previewMode ? <JobMenuAction jobId={job.id} /> : null}
+            {isMobile && !previewMode ? (
+               <JobMenuAction
+                  jobId={job.id}
+                  notEditable={jobIsPermanentlyExpired}
+               />
+            ) : null}
          </Box>
          <Box>
             <Typography
