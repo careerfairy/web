@@ -289,7 +289,8 @@ exports.updateCustomJobWithLinkedLivestreams_v2 =
    customJobs.updateCustomJobWithLinkedLivestreams
 exports.transferCustomJobsFromDraftToPublishedLivestream_v2 =
    customJobs.transferCustomJobsFromDraftToPublishedLivestream
-exports.deleteExpiredCustomJobs = customJobs.deleteExpiredCustomJobs
+exports.syncPermanentlyExpiredCustomJobs =
+   customJobs.syncPermanentlyExpiredCustomJobs
 
 // Group Subscription Plan Functions
 exports.startPlan_v3 = groupPlans.startPlan

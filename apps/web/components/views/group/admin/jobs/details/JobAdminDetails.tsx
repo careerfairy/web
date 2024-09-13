@@ -122,7 +122,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   <NoApplicantsData />
                ),
          },
-         ...(jobHubV1
+         ...(jobHubV1 && !job.isPermanentlyExpired
             ? [
                  {
                     label: "Linked content",
@@ -164,7 +164,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             TabIndicatorProps={{
                sx: [
                   styles.indicator,
-                  ...(jobHubV1
+                  ...(jobHubV1 && !job.isPermanentlyExpired
                      ? [
                           activeTabIndex === TabsEnum.LINKED_CONTENT &&
                              jobHasNoContent &&
@@ -200,7 +200,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                }
             />
 
-            {jobHubV1 ? (
+            {jobHubV1 && !job.isPermanentlyExpired ? (
                <Tab
                   key={"Linked content"}
                   label={

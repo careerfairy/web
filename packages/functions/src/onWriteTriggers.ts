@@ -388,6 +388,20 @@ export const onWriteCustomJobs = functions
             customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
             customJobRepo.syncCustomJobDataToJobApplications(updatedCustomJob)
          )
+
+         if (updatedCustomJob.isPermanentlyExpired) {
+            sideEffectPromises.push(
+               customJobRepo.syncDeletedCustomJobDataToJobApplications(
+                  updatedCustomJob
+               ),
+               customJobRepo.syncDeletedCustomJobToLinkedLivestreams(
+                  updatedCustomJob
+               ),
+               customJobRepo.syncDeletedCustomJobToLinkedSparks(
+                  updatedCustomJob
+               )
+            )
+         }
       }
 
       if (changeTypes.isDelete) {
