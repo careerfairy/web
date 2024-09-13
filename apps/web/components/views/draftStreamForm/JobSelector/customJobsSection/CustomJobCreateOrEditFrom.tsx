@@ -63,7 +63,7 @@ const schema = (quillRef) =>
 type CustomJobObj = {
    jobType?: string
    deadline: Date
-} & Omit<PublicCustomJob, "jobType" | "deadline">
+} & Omit<PublicCustomJob, "jobType" | "deadline" | "isPermanentlyExpired">
 
 const styles = sxStyles({
    header: {
@@ -144,6 +144,7 @@ const CustomJobCreateOrEditFrom = ({
                      values.postingUrl.indexOf("http") === 0
                         ? values.postingUrl
                         : `https://${values.postingUrl}`,
+                  isPermanentlyExpired: false,
                }
 
                await handleCreateNewJob(formatValues)
