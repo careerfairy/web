@@ -103,6 +103,7 @@ class JobsFirebaseSeed implements JobsSeed {
          })}-${faker.random.numeric(6, { allowLeadingZeros: false })}`,
          deleted: false,
          businessFunctionsTagIds: [],
+         isPermanentlyExpired: false,
       }
 
       return {

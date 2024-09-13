@@ -32,6 +32,9 @@ export interface CustomJob extends Identifiable {
     * e.g: ["BusinessDevelopment", "Consulting"]
     */
    businessFunctionsTagIds?: string[]
+
+   // for jobs that have expired more than 30 days ago
+   isPermanentlyExpired: boolean
 }
 
 export type PublicCustomJob = Pick<
@@ -48,6 +51,7 @@ export type PublicCustomJob = Pick<
    | "businessFunctionsTagIds"
    | "livestreams"
    | "sparks"
+   | "isPermanentlyExpired"
 >
 
 export type PublicCustomJobApplicant = Pick<
@@ -88,6 +92,7 @@ export const pickPublicDataFromCustomJob = (
       businessFunctionsTagIds: job.businessFunctionsTagIds ?? [],
       livestreams: job.livestreams ?? [],
       sparks: job.sparks ?? [],
+      isPermanentlyExpired: job.isPermanentlyExpired ?? false,
    }
 }
 
@@ -133,41 +138,51 @@ export interface CustomJobApplicant extends Identifiable {
 }
 
 export const getMaxDaysAfterDeadline = (): Date => {
-   return new Date(Date.now() - CUSTOM_JOB_CONSTANTS.MAX_DAYS_AFTER_DEADLINE)
+   const date = new Date()
+   date.setDate(date.getDate() - CUSTOM_JOB_CONSTANTS.MAX_DAYS_AFTER_DEADLINE)
+
+   return date
 }
 
 /**
- * This function sorts an array of jobs or job statistics.
- * It prioritizes jobs based on their publication status and deadline.
+ * Sorts an array of jobs or job statistics based on their deadline.
  *
- * @param jobs {(CustomJob | CustomJobStats)[]}
- * @returns {(CustomJob | CustomJobStats)[]}
+ * This function prioritizes jobs that are still active (not expired) and then sorts them by their deadline proximity to the current date.
+ *
+ * @param jobs {(CustomJob | CustomJobStats)[]} - The array of jobs or job statistics to be sorted.
+ * @returns {(CustomJob | CustomJobStats)[]} - The sorted array of jobs or job statistics.
  */
 export const sortCustomJobs = <T extends CustomJob | CustomJobStats>(
    jobs: T[]
 ): T[] => {
    const now = new Date()
 
-   // Create a new array to avoid mutating the original 'jobs' array
+   // Clone the original 'jobs' array to avoid mutation
    const sortedJobs = [...jobs]
 
    return sortedJobs.sort((a, b) => {
-      // Extracting the CustomJob object from 'a' and 'b' based on whether they have a 'job' property or not
+      // Extract the CustomJob object from 'a' and 'b' based on the presence of a 'job' property
       const jobA: CustomJob = "job" in a ? a.job : a
       const jobB: CustomJob = "job" in b ? b.job : b
 
-      // Sort by 'published' flag
-      if (jobA.published && !jobB.published) return -1
-      if (!jobA.published && jobB.published) return 1
-
-      // Both have the same 'published' status, so sort by 'deadline'
+      // First, prioritize jobs that are still active (not expired)
       const aDeadlineValid = jobA.deadline.toDate() > now
       const bDeadlineValid = jobB.deadline.toDate() > now
 
-      if (aDeadlineValid && !bDeadlineValid) return -1
-      if (!aDeadlineValid && bDeadlineValid) return 1
+      if (aDeadlineValid && !bDeadlineValid) return -1 // 'a' is active, 'b' is not
+      if (!aDeadlineValid && bDeadlineValid) return 1 // 'a' is not active, 'b' is
 
-      // If both jobs have the same 'published' status and 'deadline' validity, maintain the current order
+      // For jobs with the same expiration status, sort by deadline proximity to the current date
+      const aDeadline = jobA.deadline.toDate()
+      const bDeadline = jobB.deadline.toDate()
+
+      const aDeadlineDiff = Math.abs(aDeadline.getTime() - now.getTime())
+      const bDeadlineDiff = Math.abs(bDeadline.getTime() - now.getTime())
+
+      if (aDeadlineDiff < bDeadlineDiff) return -1 // 'a' deadline is closer to today
+      if (aDeadlineDiff > bDeadlineDiff) return 1 // 'b' deadline is closer to today
+
+      // If all conditions are equal, maintain the original order
       return 0
    })
 }

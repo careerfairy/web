@@ -32,15 +32,24 @@ type Props = {
 
 const JobCardAction = ({ job, previewMode }: Props) => {
    const jobPublished = (job as CustomJob)?.published ?? true
+   const isJobEditable = !(job as CustomJob)?.isPermanentlyExpired ?? true
 
    if (previewMode) {
       return <JobButtonAction published={jobPublished} />
    }
 
-   return <JobMenuAction jobId={job.id} />
+   return <JobMenuAction jobId={job.id} editable={isJobEditable} />
 }
 
-export const JobMenuAction = ({ jobId }) => {
+type JobMenuActionProps = {
+   jobId: string
+   editable?: boolean
+}
+
+export const JobMenuAction = ({
+   jobId,
+   editable = true,
+}: JobMenuActionProps) => {
    const isMobile = useIsMobile()
    return (
       <Grid
@@ -50,7 +59,7 @@ export const JobMenuAction = ({ jobId }) => {
          height={25}
          sx={isMobile ? null : styles.editButtonDesktop}
       >
-         <JobMenu jobId={jobId} />
+         <JobMenu jobId={jobId} editable={editable} />
       </Grid>
    )
 }

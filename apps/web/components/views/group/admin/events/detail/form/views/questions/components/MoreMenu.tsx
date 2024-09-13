@@ -194,17 +194,25 @@ const MoreMenuWithEditAndRemoveOptions = ({
    labels = defaultLabels,
 }: MoreMenuWithEditAndRemoveProps) => {
    const options: MoreMenuProps["options"] = [
-      {
-         label: labels[0],
-         icon: <EditIcon color="#6B6B7F" />,
-         handleClick: handleEdit,
-      },
-      {
-         label: labels[1],
-         icon: <DeleteIcon />,
-         handleClick: handleRemove,
-         menuItemSxProps: styles.deleteMenuItem,
-      },
+      ...(handleEdit
+         ? [
+              {
+                 label: labels[0],
+                 icon: <EditIcon color="#6B6B7F" />,
+                 handleClick: handleEdit,
+              },
+           ]
+         : []),
+      ...(handleRemove
+         ? [
+              {
+                 label: labels[1],
+                 icon: <DeleteIcon />,
+                 handleClick: handleRemove,
+                 menuItemSxProps: styles.deleteMenuItem,
+              },
+           ]
+         : []),
    ]
 
    return <MoreMenu options={options} />
