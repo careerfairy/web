@@ -76,6 +76,9 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
    const isAtsLivestreamAssociation = useIsAtsLivestreamJobAssociation(job)
 
+   const jobIsPermanentlyExpired =
+      (job as PublicCustomJob)?.isPermanentlyExpired ?? false
+
    const handleClickEdit = () => {
       handleEditJob(job as PublicCustomJob)
       handleClose()
@@ -89,7 +92,7 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                   {isAtsLivestreamAssociation ? job.name : job.title}
                </Typography>
 
-               {!isAtsLivestreamAssociation && (
+               {!isAtsLivestreamAssociation && !jobIsPermanentlyExpired && (
                   <Box>
                      <IconButton onClick={handleClick} size="small">
                         <MoreVertical size={24} />
