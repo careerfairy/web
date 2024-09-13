@@ -134,6 +134,7 @@ const CustomJobFormProvider = ({
                      : `https://${postingUrl}`,
                livestreams: livestreamIds ?? [],
                sparks: sparkIds ?? [],
+               isPermanentlyExpired: false,
             }
 
             if (selectedJobId) {
