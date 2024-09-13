@@ -510,6 +510,7 @@ export class FirebaseGroupRepository
          .collection("customJobs")
          .where("groupId", "==", groupId)
          .where("deadline", ">", new Date())
+         .where("published", "==", true)
          .orderBy("deadline", "desc")
    }
 
@@ -799,9 +800,7 @@ export class FirebaseGroupRepository
    async getGroupAvailableCustomJobs(groupId: string): Promise<CustomJob[]> {
       const snaps = await this.groupAvailableCustomJobsQuery(groupId).get()
 
-      return mapFirestoreDocuments<CustomJob>(snaps)?.filter(
-         (job) => job.livestreams?.length || job.sparks?.length
-      )
+      return mapFirestoreDocuments<CustomJob>(snaps)
    }
 
    async getGroupByGroupName(groupName: string): Promise<Group> {

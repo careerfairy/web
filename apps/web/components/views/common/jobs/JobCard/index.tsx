@@ -31,7 +31,7 @@ const styles = sxStyles({
       flexDirection: { xs: "column", md: "row" },
       width: "100%",
       maxWidth: "calc(100% - 8px)",
-      p: { md: 2 },
+      p: { md: 1.5 },
       alignItems: { md: "center" },
    },
    infoWrapper: {
