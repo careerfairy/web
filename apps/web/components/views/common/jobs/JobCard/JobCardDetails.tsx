@@ -165,7 +165,7 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
             {isMobile && !previewMode ? (
                <JobMenuAction
                   jobId={job.id}
-                  notEditable={jobIsPermanentlyExpired}
+                  editable={!jobIsPermanentlyExpired}
                />
             ) : null}
          </Box>
