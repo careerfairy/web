@@ -2,7 +2,6 @@ import {
    CustomJob,
    sortCustomJobs,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import { useCallback, useMemo } from "react"
 import useGroupCustomJobsStats from "../../../../custom-hook/custom-job/useGroupCustomJobsStats"
@@ -16,11 +15,10 @@ const JobsContent = () => {
       deletedJobs: false,
    })
    const { push } = useRouter()
-   const { jobHubV1 } = useFeatureFlags()
 
    const sortedJobs = useMemo(
-      () => (jobHubV1 ? sortCustomJobs(allJobsWithStats) : allJobsWithStats),
-      [allJobsWithStats, jobHubV1]
+      () => sortCustomJobs(allJobsWithStats),
+      [allJobsWithStats]
    )
 
    const handleJobClick = useCallback(
