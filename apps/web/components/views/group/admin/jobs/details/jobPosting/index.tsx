@@ -1,10 +1,10 @@
-import { Paper } from "@mui/material"
-import CustomJobAdminDetails from "../../../../../jobs/components/b2b/CustomJobAdminDetails"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { FC, useCallback } from "react"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { Paper } from "@mui/material"
+import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
 import { openJobsDialog } from "../../../../../../../store/reducers/adminJobsReducer"
+import CustomJobAdminDetails from "../../../../../jobs/components/b2b/CustomJobAdminDetails"
 
 type Props = {
    job: CustomJob
@@ -23,7 +23,7 @@ const JobPosting: FC<Props> = ({ job, group }) => {
             job={job}
             companyName={group.universityName}
             companyLogoUrl={group.logoUrl}
-            handleEdit={handleClick}
+            handleEdit={job.isPermanentlyExpired ? null : handleClick}
          />
       </Paper>
    )

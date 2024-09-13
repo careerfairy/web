@@ -53,6 +53,7 @@ export const createNewAndOldCustomJobData = (
       salary: "23000",
       deleted: false,
       businessFunctionsTagIds: newCustomJobOptions.businessFunctionTagIds ?? [],
+      isPermanentlyExpired: false,
    }
 
    const oldJob: CustomJob = {
@@ -75,6 +76,7 @@ export const createNewAndOldCustomJobData = (
       deleted: false,
       businessFunctionsTagIds:
          oldCustomJobOUserOptions?.businessFunctionTagIds ?? [],
+      isPermanentlyExpired: false,
    }
 
    return {
@@ -154,5 +156,6 @@ const generateCustomJobsData = (
       livestreams: options.livestreams ?? [],
       sparks: options.sparks ?? [],
       businessFunctionsTagIds: options.businessFunctionTagIds ?? [],
+      isPermanentlyExpired: false,
    }
 }

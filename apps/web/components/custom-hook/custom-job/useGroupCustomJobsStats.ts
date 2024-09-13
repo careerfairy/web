@@ -14,12 +14,14 @@ type Options = {
  * @param options
  */
 const useGroupCustomJobsStats = (groupId: string, options: Options = {}) => {
-   const { deletedJobs = false } = options
+   const { deletedJobs } = options
 
    const collectionRef = query(
       collection(useFirestore(), "customJobStats"),
       where("groupId", "==", groupId),
-      where("deleted", "==", deletedJobs),
+      ...(deletedJobs !== undefined
+         ? [where("deleted", "==", deletedJobs)]
+         : []),
       orderBy("job.deadline", "asc")
    )
 

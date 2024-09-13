@@ -9,8 +9,9 @@ import MoreMenuWithEditAndRemoveOptions from "../events/detail/form/views/questi
 
 type Props = {
    jobId: string
+   editable?: boolean
 }
-const JobMenu: FC<Props> = ({ jobId }) => {
+const JobMenu: FC<Props> = ({ jobId, editable = true }) => {
    const { handleClose } = useMenuState()
    const dispatch = useDispatch()
 
@@ -34,7 +35,7 @@ const JobMenu: FC<Props> = ({ jobId }) => {
    return (
       <MoreMenuWithEditAndRemoveOptions
          labels={["Edit job opening details", "Delete job opening"]}
-         handleEdit={handleEditJob}
+         handleEdit={editable ? handleEditJob : null}
          handleRemove={handleRemoveJob}
       />
    )

@@ -157,18 +157,20 @@ export const transferCustomJobsFromDraftToPublishedLivestream = functions
 /**
  * Every day at 6 AM, check
  * all the custom jobs that expired and updates the published flag if needed
- * all the custom jobs that are expired for more than 30 day and delete them
+ * all the custom jobs that are expired for more than 30 day should be permanently expired
  */
-export const deleteExpiredCustomJobs = functions
+export const syncPermanentlyExpiredCustomJobs = functions
    .region(config.region)
    .pubsub.schedule("0 6 * * *") // everyday at 6am
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      functions.logger.info("Starting execution of deleteExpiredCustomJobs")
+      functions.logger.info(
+         "Starting execution of syncPermanentlyExpiredCustomJobs"
+      )
 
       try {
          const promises = [
-            customJobRepo.deleteExpiredCustomJobs(),
+            customJobRepo.syncPermanentlyExpiredCustomJobs(),
             customJobRepo.syncExpiredCustomJobs(),
          ]
 
