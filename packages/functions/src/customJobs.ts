@@ -21,12 +21,36 @@ const UserCustomJobApplicationSchema: SchemaOf<UserCustomJobApplication> =
       authId: string().required(),
       jobId: string().required(),
    })
-
 type CustomJobsGroupNames = {
    [jobId: string]: {
       groupId: string
    }
 }
+
+// Validation schema
+const CustomJobsGroupNamesSchema: SchemaOf<CustomJobsGroupNames> = object()
+   .shape({})
+   .noUnknown(true)
+   .test(
+      "dynamic-keys",
+      "Each key must have an object with a valid groupId",
+      (value) => {
+         if (!value || typeof value !== "object") return false
+
+         // Validate each key-value pair
+         return Object.entries(value).every(([key, val]) => {
+            // Ensure each value has the structure { groupId: string }
+            return (
+               typeof key === "string" &&
+               typeof val === "object" &&
+               val !== null &&
+               "groupId" in val &&
+               typeof val["groupId"] === "string"
+            )
+         })
+      }
+   )
+   .defined()
 
 export const confirmUserApplyToCustomJob = functions
    .region(config.region)
@@ -113,6 +137,7 @@ export const getCustomJobGroupNames = functions
    .region(config.region)
    .https.onCall(
       middlewares(
+         dataValidation(CustomJobsGroupNamesSchema),
          onCallWrapper(async (data: CustomJobsGroupNames) => {
             const jobIds = Object.keys(data)
 
