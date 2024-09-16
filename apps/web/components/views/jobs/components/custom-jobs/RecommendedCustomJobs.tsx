@@ -1,10 +1,9 @@
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Button, ListItem, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobsByUser from "components/custom-hook/custom-job/useCustomJobsByUser"
+import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import useGroupsByIds from "components/custom-hook/useGroupsByIds"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import JobCard from "components/views/common/jobs/JobCard"
 import Link from "next/link"
@@ -71,11 +70,6 @@ const Content = () => {
 
    const { customJobs, totalCount } = useCustomJobsByUser(batchSize)
 
-   // const {customJobs, hasMore} = useRecommendedCustomJobs({
-   //    limit: batchSize,
-   //    suspense: true
-   // })
-
    // Ref to store the last job from the previous batch
    const lastLoadedJobRef = useRef<HTMLLIElement | null>(null)
 
@@ -84,17 +78,7 @@ const Content = () => {
       setClickedSeeMore(true)
    }, [setBatchSize, batchSize])
 
-   const { data: jobsGroups } = useGroupsByIds(
-      customJobs.map((job) => job.groupId)
-   )
-
-   const getJobCompanyName = useCallback(
-      (job: CustomJob) => {
-         return jobsGroups?.find((group) => group.id == job.groupId)
-            ?.universityName
-      },
-      [jobsGroups]
-   )
+   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(customJobs)
 
    useEffect(() => {
       // Scroll to the "See more" button after jobs are loaded
@@ -104,7 +88,6 @@ const Content = () => {
       }
    }, [customJobs, clickedSeeMore])
 
-   // const seeMoreDisabled = !hasMore
    const seeMoreDisabled = customJobs.length == totalCount
 
    return (
@@ -132,7 +115,7 @@ const Content = () => {
                            previewMode
                            hideJobUrl
                            smallCard={isMobile}
-                           companyName={getJobCompanyName(customJob)}
+                           companyName={jobsGroupNamesMap[customJob.id]}
                         />
                      </ListItem>
                   </Link>
