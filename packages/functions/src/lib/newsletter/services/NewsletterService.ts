@@ -135,23 +135,27 @@ export class NewsletterService {
     * @returns UserData[] - Filtered users according to onboarding step and tolerance for the last notification
     */
    private async filterUsers(users: UserData[]): Promise<UserData[]> {
-      const promises = users.map(async (user) => {
-         const notifications =
-            await this.notificationsRepo.getUserReceivedNotifications(
-               user.userEmail
-            )
-         return {
-            user: user,
-            notifications: notifications,
-         }
-      })
-      const usersDataItems = (await Promise.all(promises)) ?? []
-      const filteredData = usersDataItems.filter((userData) =>
-         this.isSent(userData.notifications, [
-            "livestream1stRegistrationDiscovery",
-         ])
-      )
-      return filteredData.map((userData) => userData.user)
+      if (users?.length) {
+         const promises = users.map(async (user) => {
+            const notifications =
+               await this.notificationsRepo.getUserReceivedNotifications(
+                  user.userEmail
+               )
+            return {
+               user: user,
+               notifications: notifications,
+            }
+         })
+         const usersDataItems = (await Promise.all(promises)) ?? []
+         const filteredData = usersDataItems.filter((userData) =>
+            this.isSent(userData.notifications, [
+               "livestream1stRegistrationDiscovery",
+            ])
+         )
+         return filteredData.map((userData) => userData.user)
+      }
+
+      return []
    }
 
    /**
@@ -168,9 +172,16 @@ export class NewsletterService {
       const [subscribedUsers, futureLivestreams, pastLivestreams] =
          await Promise.all(promises)
 
-      const filteredUsers = await this.filterUsers(
-         subscribedUsers?.length ? subscribedUsers : ([] as UserData[])
+      const filteredUsers =
+         (await this.filterUsers(
+            subscribedUsers?.length ? subscribedUsers : ([] as UserData[])
+         )) ?? []
+
+      console.log(
+         "🚀 ~ NewsletterService ~ fetchRequiredData ~ filteredUsers:",
+         filteredUsers
       )
+
       this.subscribedUsers = convertDocArrayToDict(filteredUsers)
       this.logger.info(
          "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
