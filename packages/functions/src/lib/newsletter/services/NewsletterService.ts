@@ -19,6 +19,38 @@ import { IRecommendationDataFetcher } from "../../recommendation/services/DataFe
 import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
 
 const TOLERANCE_DAYS = 2
+const LOCATION_FILTERS = [
+   "AT",
+   "BE",
+   "BG",
+   "CH",
+   "CZ",
+   "DE",
+   "DK",
+   "EE",
+   "ES",
+   "FI",
+   "FR",
+   "GB",
+   "GR",
+   "HR",
+   "HU",
+   "IE",
+   "IT",
+   "LI",
+   "LU",
+   "MT",
+   "NL",
+   "NO",
+   "PL",
+   "PT",
+   "RO",
+   "RS",
+   "SE",
+   "SI",
+   "SK",
+   "SM",
+]
 /**
  * Data structure used to associate each user with his recommended livestreams
  * and groups he is following
@@ -113,7 +145,7 @@ export class NewsletterService {
             notifications: notifications,
          }
       })
-      const usersDataItems = await Promise.all(promises)
+      const usersDataItems = (await Promise.all(promises)) ?? []
       const filteredData = usersDataItems.filter((userData) =>
          this.isSent(userData.notifications, [
             "livestream1stRegistrationDiscovery",
@@ -128,7 +160,7 @@ export class NewsletterService {
    async fetchRequiredData() {
       // start fetching in parallel
       const promises = [
-         this.userRepo.getSubscribedUsers(),
+         this.userRepo.getSubscribedUsers(null, LOCATION_FILTERS),
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
       ] as const
@@ -137,7 +169,7 @@ export class NewsletterService {
          await Promise.all(promises)
 
       const filteredUsers = await this.filterUsers(
-         subscribedUsers as UserData[]
+         subscribedUsers?.length ? subscribedUsers : ([] as UserData[])
       )
       this.subscribedUsers = convertDocArrayToDict(filteredUsers)
       this.logger.info(
@@ -147,8 +179,8 @@ export class NewsletterService {
          )
       )
 
-      this.futureLivestreams = futureLivestreams
-      this.pastLivestreams = pastLivestreams
+      this.futureLivestreams = futureLivestreams ?? []
+      this.pastLivestreams = pastLivestreams ?? []
 
       this.futureLivestreams = this.futureLivestreams.filter((l) => {
          // filter out livestreams before now, the bundle might have events for the same day
@@ -158,13 +190,16 @@ export class NewsletterService {
 
       this.logger.info(
          "Total Users subscribed to the newsletter",
-         subscribedUsers.length
+         subscribedUsers?.length ?? 0
       )
       this.logger.info(
          "Total Future Livestreams fetched",
-         futureLivestreams.length
+         futureLivestreams?.length ?? 0
       )
-      this.logger.info("Total Past Livestreams fetched", pastLivestreams.length)
+      this.logger.info(
+         "Total Past Livestreams fetched",
+         pastLivestreams?.length ?? 0
+      )
 
       return this
    }
@@ -263,25 +298,27 @@ export class NewsletterService {
       for (const userEmail of emails) {
          const user = this.users[userEmail]
 
-         if (user.recommendedLivestreams.length < 3) {
-            // we need at least 3 recommended livestreams to send the newsletter
-            usersWithoutMinimumRecommendedLivestreams.push(userEmail)
-            continue
+         if (user) {
+            if (user.recommendedLivestreams.length < 3) {
+               // we need at least 3 recommended livestreams to send the newsletter
+               usersWithoutMinimumRecommendedLivestreams.push(userEmail)
+               continue
+            }
+
+            const name = this.subscribedUsers[userEmail]?.firstName ?? ""
+
+            const followingLivestreams = Object.values(user.followingCompanies)
+               .map((g) => g.livestreams)
+               .flat()
+               .sort(sortLivestreamsDesc)
+
+            this.emailBuilder.addRecipient(
+               userEmail,
+               name,
+               followingLivestreams,
+               user.recommendedLivestreams
+            )
          }
-
-         const name = this.subscribedUsers[userEmail]?.firstName ?? ""
-
-         const followingLivestreams = Object.values(user.followingCompanies)
-            .map((g) => g.livestreams)
-            .flat()
-            .sort(sortLivestreamsDesc)
-
-         this.emailBuilder.addRecipient(
-            userEmail,
-            name,
-            followingLivestreams,
-            user.recommendedLivestreams
-         )
       }
 
       this.logger.info(

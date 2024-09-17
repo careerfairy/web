@@ -122,7 +122,8 @@ exports.sendReminderForNonAttendeesByStreamId =
    reminders.sendReminderForNonAttendeesByStreamId
 
 exports.newsletter = newsletter.newsletter
-exports.manualNewsletter = newsletter.manualNewsletter
+exports.newsletter_v2 = newsletter.newsletterV2
+exports.manualNewsletter_v2 = newsletter.manualNewsletter
 exports.onboardingNewsletter = onboardingNewsletter.onboardingNewsletter
 exports.manualOnboardingNewsletter =
    onboardingNewsletter.manualOnboardingNewsletter
