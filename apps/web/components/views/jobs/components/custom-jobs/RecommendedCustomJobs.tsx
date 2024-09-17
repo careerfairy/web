@@ -7,7 +7,7 @@ import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import JobCard from "components/views/common/jobs/JobCard"
 import Link from "next/link"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -66,27 +66,18 @@ const RecommendedCustomJobs = () => {
 const Content = () => {
    const isMobile = useIsMobile()
    const [batchSize, setBatchSize] = useState<number>(ITEMS_PER_BATCH)
-   const [clickedSeeMore, setClickedSeeMore] = useState<boolean>(false)
 
-   const { customJobs, totalCount } = useCustomJobsByUser(batchSize)
+   const { customJobs: allCustomJobs, totalCount } = useCustomJobsByUser()
 
-   // Ref to store the last job from the previous batch
-   const lastLoadedJobRef = useRef<HTMLLIElement | null>(null)
+   const customJobs = useMemo(() => {
+      return allCustomJobs.slice(0, batchSize)
+   }, [allCustomJobs, batchSize])
 
    const onSeeMore = useCallback(() => {
       setBatchSize(batchSize + ITEMS_PER_BATCH)
-      setClickedSeeMore(true)
    }, [setBatchSize, batchSize])
 
-   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(customJobs)
-
-   useEffect(() => {
-      // Scroll to the "See more" button after jobs are loaded
-      if (clickedSeeMore && lastLoadedJobRef.current) {
-         lastLoadedJobRef.current.scrollIntoView({ behavior: "instant" })
-         setClickedSeeMore(false)
-      }
-   }, [customJobs, clickedSeeMore])
+   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(allCustomJobs)
 
    const seeMoreDisabled = customJobs.length == totalCount
 
@@ -94,7 +85,6 @@ const Content = () => {
       <Stack direction={"column"} sx={{ width: "100%" }} spacing={0}>
          <Stack sx={styles.jobListWrapper} width={"100%"} spacing={1}>
             {customJobs.map((customJob, idx) => {
-               const isLastJob = idx === customJobs.length - ITEMS_PER_BATCH - 1 // Mark the last job of the previous batch
                return (
                   <Link
                      href={`/portal/jobs/${customJob.id}`}
@@ -106,10 +96,7 @@ const Content = () => {
                      legacyBehavior
                      key={idx}
                   >
-                     <ListItem
-                        sx={styles.jobListItemWrapper}
-                        ref={isLastJob ? lastLoadedJobRef : null}
-                     >
+                     <ListItem sx={styles.jobListItemWrapper}>
                         <JobCard
                            job={customJob}
                            previewMode
@@ -135,7 +122,7 @@ const Content = () => {
    )
 }
 
-const RecommendedCustomJobsSkeleton = () => {
+export const RecommendedCustomJobsSkeleton = () => {
    return (
       <Stack sx={styles.jobListWrapper} width={"100%"} spacing={1}>
          <JobCardSkeleton />

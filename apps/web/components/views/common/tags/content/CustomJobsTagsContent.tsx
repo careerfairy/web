@@ -1,15 +1,15 @@
 import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Button, ListItem, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobs, {
    useCustomJobsCount,
 } from "components/custom-hook/custom-job/useCustomJobs"
+import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import useGroupsByIds from "components/custom-hook/useGroupsByIds"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { RecommendedCustomJobsSkeleton } from "components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
 import Link from "next/link"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import JobCard from "../../jobs/JobCard"
@@ -67,7 +67,7 @@ const CustomJobsTagsContent = ({ tags, title }: Props) => {
          <Typography sx={styles.heading} color="neutral.800">
             {title}
          </Typography>
-         <SuspenseWithBoundary>
+         <SuspenseWithBoundary fallback={<RecommendedCustomJobsSkeleton />}>
             <Content
                businessFunctionTagIds={businessFunctionTagIds}
                totalCount={count}
@@ -85,26 +85,19 @@ const Content = ({ businessFunctionTagIds, totalCount }: ContentProps) => {
    const isMobile = useIsMobile()
    const [batchSize, setBatchSize] = useState<number>(ITEMS_PER_BATCH)
 
-   const { customJobs } = useCustomJobs({
-      totalItems: batchSize,
+   const { customJobs: allCustomJobs } = useCustomJobs({
       businessFunctionTagIds: businessFunctionTagIds,
    })
+
+   const customJobs = useMemo(() => {
+      return allCustomJobs.slice(0, batchSize)
+   }, [allCustomJobs, batchSize])
 
    const onSeeMore = useCallback(() => {
       setBatchSize(batchSize + ITEMS_PER_BATCH)
    }, [setBatchSize, batchSize])
 
-   const { data: jobsGroups } = useGroupsByIds(
-      customJobs.map((job) => job.groupId)
-   )
-
-   const getJobCompanyName = useCallback(
-      (job: CustomJob) => {
-         return jobsGroups?.find((group) => group.id == job.groupId)
-            ?.universityName
-      },
-      [jobsGroups]
-   )
+   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(allCustomJobs)
 
    const seeMoreDisabled = customJobs.length == totalCount
 
@@ -129,7 +122,7 @@ const Content = ({ businessFunctionTagIds, totalCount }: ContentProps) => {
                            previewMode
                            hideJobUrl
                            smallCard={isMobile}
-                           companyName={getJobCompanyName(customJob)}
+                           companyName={jobsGroupNamesMap[customJob.id]}
                         />
                      </ListItem>
                   </Link>
