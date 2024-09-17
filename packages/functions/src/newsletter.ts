@@ -1,4 +1,7 @@
 import { RuntimeOptions } from "firebase-functions"
+import { logger } from "firebase-functions/v2"
+import { onRequest } from "firebase-functions/v2/https"
+import { onSchedule } from "firebase-functions/v2/scheduler"
 import { DateTime } from "luxon"
 import { PostmarkEmailSender } from "./api/postmark"
 import {
@@ -43,6 +46,7 @@ const runtimeSettings: RuntimeOptions = {
 
 /**
  * Send a newsletter to all users every other tuesday
+ * Disabled while transitioning to V2 so that newsletters are not sent twice
  */
 export const newsletter = functions
    .region(config.region)
@@ -50,22 +54,40 @@ export const newsletter = functions
    .pubsub.schedule("0 18 * * Tue") // every tuesday at 6pm
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      const shouldSend = await shouldSendNewsletter()
+      functions.logger.warn("This function is disabled")
+      /* const shouldSend = await shouldSendNewsletter()
       if (!shouldSend) {
          functions.logger.info("Newsletter not sent")
          return
       }
 
-      await sendNewsletter()
+      await sendNewsletter() */
    })
+
+/**
+ * Send a newsletter to all users every other tuesday
+ * The function runs every tuesday and only inside of it is it specified to run
+ * every other tuesday
+ */
+export const newsletterV2 = onSchedule(
+   { schedule: "0 18 * * Tue", timeZone: "Europe/Zurich" },
+   async () => {
+      const shouldSend = await shouldSendNewsletter()
+      if (!shouldSend) {
+         logger.info("Newsletter not sent")
+         return
+      }
+
+      await sendNewsletter()
+   }
+)
 
 /**
  * Send the newsletter manually to everyone or to a list of emails
  */
-export const manualNewsletter = functions
-   .region(config.region)
-   .runWith(runtimeSettings)
-   .https.onRequest(async (req, res) => {
+export const manualNewsletter = onRequest(
+   { timeoutSeconds: 540, memory: "8GiB" },
+   async (req, res) => {
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
          return
@@ -76,7 +98,7 @@ export const manualNewsletter = functions
          .map((email) => email?.trim())
          .filter(Boolean)
 
-      functions.logger.info("Received emails", receivedEmails)
+      logger.info("Received emails", receivedEmails)
 
       if (receivedEmails.length === 0) {
          res.status(400).send("No emails provided")
@@ -90,7 +112,8 @@ export const manualNewsletter = functions
          await sendNewsletter(receivedEmails)
          res.status(200).send("Newsletter sent to " + receivedEmails.join(", "))
       }
-   })
+   }
+)
 
 export const manualTemplatedEmail = functions
    .region(config.region)
@@ -147,10 +170,16 @@ async function sendNewsletter(overrideUsers?: string[]) {
       functions.logger
    )
 
+   functions.logger.info("Fetching required data...")
    await newsletterService.fetchRequiredData()
+
+   functions.logger.info("Fetching recommendation data...")
    await newsletterService.generateRecommendations()
+
+   functions.logger.info("Fetching populated users...")
    await newsletterService.populateUsers()
 
+   functions.logger.info("Sending newsletter...")
    await newsletterService.send(overrideUsers)
 
    if (!overrideUsers) {
