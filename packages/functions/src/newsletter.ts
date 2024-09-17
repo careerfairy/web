@@ -85,32 +85,35 @@ export const newsletterV2 = onSchedule(
 /**
  * Send the newsletter manually to everyone or to a list of emails
  */
-export const manualNewsletter = onRequest(async (req, res) => {
-   if (req.method !== "GET") {
-      res.status(400).send("Only GET requests are allowed")
-      return
+export const manualNewsletter = onRequest(
+   { timeoutSeconds: 540, memory: "8GiB" },
+   async (req, res) => {
+      if (req.method !== "GET") {
+         res.status(400).send("Only GET requests are allowed")
+         return
+      }
+
+      const receivedEmails = ((req.query.emails as string) ?? "")
+         .split(",")
+         .map((email) => email?.trim())
+         .filter(Boolean)
+
+      logger.info("Received emails", receivedEmails)
+
+      if (receivedEmails.length === 0) {
+         res.status(400).send("No emails provided")
+         return
+      }
+
+      if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
+         await sendNewsletter()
+         res.status(200).send("Newsletter sent to everyone")
+      } else {
+         await sendNewsletter(receivedEmails)
+         res.status(200).send("Newsletter sent to " + receivedEmails.join(", "))
+      }
    }
-
-   const receivedEmails = ((req.query.emails as string) ?? "")
-      .split(",")
-      .map((email) => email?.trim())
-      .filter(Boolean)
-
-   logger.info("Received emails", receivedEmails)
-
-   if (receivedEmails.length === 0) {
-      res.status(400).send("No emails provided")
-      return
-   }
-
-   if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
-      await sendNewsletter()
-      res.status(200).send("Newsletter sent to everyone")
-   } else {
-      await sendNewsletter(receivedEmails)
-      res.status(200).send("Newsletter sent to " + receivedEmails.join(", "))
-   }
-})
+)
 
 export const manualTemplatedEmail = functions
    .region(config.region)
@@ -167,10 +170,16 @@ async function sendNewsletter(overrideUsers?: string[]) {
       functions.logger
    )
 
+   functions.logger.info("Fetching required data...")
    await newsletterService.fetchRequiredData()
+
+   functions.logger.info("Fetching recommendation data...")
    await newsletterService.generateRecommendations()
+
+   functions.logger.info("Fetching populated users...")
    await newsletterService.populateUsers()
 
+   functions.logger.info("Sending newsletter...")
    await newsletterService.send(overrideUsers)
 
    if (!overrideUsers) {
