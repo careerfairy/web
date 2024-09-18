@@ -7,7 +7,7 @@ import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyt
 import { TitleWithSelect } from "../components/TitleWithSelect"
 import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
 import { useSparksAnalytics } from "../SparksAnalyticsContext"
-import { StaticSparkCard } from "./StaticSparkCard"
+import { CompetitorSparkStaticCard } from "./CompetitorSparkStaticCard"
 
 const ENOUGH_CONTENT_THRESHOLD = 3
 
@@ -66,11 +66,11 @@ export const TopSparksByIndustry = () => {
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
                {topSparksByIndustry[selectIndustryValue].map((data, index) => {
                   return (
-                     <StaticSparkCard
-                        key={`top-sparks-by-industry-${selectIndustryValue}-${data.sparkId}-${index}`}
-                        sparkId={data.sparkId}
+                     <CompetitorSparkStaticCard
+                        key={`top-sparks-by-industry-${selectIndustryValue}-${index}`}
+                        sparkData={data.sparkData}
                         plays={data.plays}
-                        avgWatchedTime={data.avgWatchedTime}
+                        avg_watched_time={data.avg_watched_time}
                         engagement={data.engagement}
                      />
                   )
