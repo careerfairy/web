@@ -176,7 +176,11 @@ const GroupSparkAnalytics = () => {
             <Box sx={styles.controlsWrapper}>
                <Box sx={styles.updateControlsWrapper}>
                   <UpdatedAtLabel />
-                  <Button onClick={updateAnalytics} sx={styles.updateButton}>
+                  <Button
+                     onClick={updateAnalytics}
+                     sx={styles.updateButton}
+                     disabled={isLoading}
+                  >
                      <Box
                         sx={[
                            isLoading ? styles.spinningAnimation : {},
