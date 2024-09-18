@@ -5,7 +5,7 @@ import {
 import { Timestamp } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { boolean, string } from "yup"
-import { getSparksAnalyticsRepoInstance } from "./api/repositories"
+import { getSparksAnalyticsRepoInstance, sparkRepo } from "./api/repositories"
 import config from "./config"
 import GroupSparksAnalyticsRepository from "./lib/sparks/analytics/GroupSparksAnalyticsRepository"
 import { logAndThrow } from "./lib/validations"
@@ -44,7 +44,7 @@ async function fetchAnalyticsFromBigQuery(
       ],
       [mostLiked7days, mostLiked30days, mostLiked6months, mostLiked1year],
       [mostShared7days, mostShared30days, mostShared6months, mostShared1year],
-      mostRecent,
+      [mostRecent7days, mostRecent30days, mostRecent6months, mostRecent1year],
       [
          topCountries7days,
          topCountries30days,
@@ -98,7 +98,9 @@ async function fetchAnalyticsFromBigQuery(
       fetchTimePeriodData(
          sparksAnalyticsRepo.getMostSharedSparks.bind(sparksAnalyticsRepo)
       ),
-      sparksAnalyticsRepo.getMostRecentSparks(),
+      fetchTimePeriodData(
+         sparksAnalyticsRepo.getMostRecentSparks.bind(sparksAnalyticsRepo)
+      ),
       fetchTimePeriodData(
          sparksAnalyticsRepo.getTopCountries.bind(sparksAnalyticsRepo)
       ),
@@ -149,7 +151,12 @@ async function fetchAnalyticsFromBigQuery(
             "6months": mostShared6months,
             "1year": mostShared1year,
          },
-         recent: mostRecent,
+         recent: {
+            "7days": mostRecent7days,
+            "30days": mostRecent30days,
+            "6months": mostRecent6months,
+            "1year": mostRecent1year,
+         },
       },
       topCountries: {
          "7days": topCountries7days,
@@ -205,9 +212,10 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
       async (data, context) => {
          try {
             const { groupId, forceUpdate } = data
-            const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(groupId)
-
-            console.log("EXECUTING FUNCTION")
+            const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
+               groupId,
+               sparkRepo
+            )
 
             functions.logger.info(
                `Fetching sparks analytics for group ${groupId}...`
@@ -219,8 +227,6 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                const bigQueryAnalyticsData = await fetchAnalyticsFromBigQuery(
                   sparksAnalyticsRepo
                )
-
-               console.log("FETCHED FROM BIGQUERY")
 
                await sparksAnalyticsRepo.updateAnalyticsCache({
                   ...bigQueryAnalyticsData,
@@ -236,6 +242,7 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
 
             return cachedAnalyticsData
          } catch (error) {
+            console.log("🚀 ~ error:", error)
             logAndThrow("Error fetching sparks analytics", {
                data,
                error,
