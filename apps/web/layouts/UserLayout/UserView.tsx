@@ -7,6 +7,7 @@ import Tab from "@mui/material/Tab"
 import Tabs from "@mui/material/Tabs"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useAuth } from "../../HOCs/AuthProvider"
 import Link from "../../components/views/common/Link"
 import CareerSkills from "../../components/views/profile/career-skills/CareerSkills"
@@ -109,10 +110,15 @@ const UserView = ({ currentPath }: Props) => {
    const theme = useTheme()
    const native = useMediaQuery(theme.breakpoints.down("sm"))
    const { userData } = useAuth()
+   const { jobHubV1 } = useFeatureFlags()
 
    // hide the jobs tab
    if (!userData?.hasJobApplications) {
       delete pages["/profile/jobs"]
+   }
+
+   if (!jobHubV1) {
+      delete pages["/profile/custom-jobs"]
    }
 
    const views = Object.entries(pages).map(([key, value], index) => (
