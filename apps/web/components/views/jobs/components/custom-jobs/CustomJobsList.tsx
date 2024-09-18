@@ -1,0 +1,60 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { ListItem, Stack, SxProps } from "@mui/material"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
+import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import JobCard from "components/views/common/jobs/JobCard"
+import Link from "next/link"
+import { combineStyles, sxStyles } from "types/commonTypes"
+const styles = sxStyles({
+   jobListWrapper: {
+      px: { xs: 2, md: 2 },
+      pb: { xs: 3, md: 3 },
+      width: "100%",
+   },
+   jobListItemWrapper: { m: 0, p: 0 },
+})
+
+type Props = {
+   customJobs: CustomJob[]
+   hrefLink: string // example: /portal/jobs
+   jobWrapperSx?: SxProps<DefaultTheme>
+}
+const CustomJobsList = ({ customJobs, hrefLink, jobWrapperSx }: Props) => {
+   const isMobile = useIsMobile()
+   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(customJobs)
+   return (
+      <Stack
+         sx={combineStyles(styles.jobListWrapper, jobWrapperSx)}
+         width={"100%"}
+         spacing={1}
+      >
+         {customJobs.map((customJob, idx) => {
+            return (
+               <Link
+                  href={`${hrefLink}/${customJob.id}`}
+                  // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+                  shallow
+                  passHref
+                  // Prevents the page from scrolling to the top when the link is clicked
+                  scroll={false}
+                  legacyBehavior
+                  key={idx}
+               >
+                  <ListItem sx={styles.jobListItemWrapper}>
+                     <JobCard
+                        job={customJob}
+                        previewMode
+                        hideJobUrl
+                        smallCard={isMobile}
+                        companyName={jobsGroupNamesMap[customJob.id]}
+                     />
+                  </ListItem>
+               </Link>
+            )
+         })}
+      </Stack>
+   )
+}
+
+export default CustomJobsList
