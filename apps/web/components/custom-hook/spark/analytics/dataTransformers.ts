@@ -1,15 +1,7 @@
 // Collection of helper functions for data mapping between the backend and frontend
 
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
-import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
-   CompetitorAudienceData,
-   CompetitorAudienceWithPastData,
-   CompetitorIndustryBaseWithPastData,
-   CompetitorIndustryData,
-   CompetitorSparkData,
    LinearBarDataPoint,
-   MostSomethingBase,
    PieChartDataPoint,
    SparkAnalyticsClientWithPastData,
    SparksAnalyticsDTO,
@@ -19,9 +11,6 @@ import {
 } from "@careerfairy/shared-lib/src/sparks/analytics"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
 import { Timestamp } from "data/firebase/FirebaseInstance"
-
-const AUDIENCE_SPARKS_LIMIT = 4
-const INDUSTRY_SPARKS_LIMIT = 4
 
 type FilterTimeSeriesDataByTimeFrame = (
    data: TimeseriesDataPoint[],
@@ -51,95 +40,6 @@ const filterTimeSeriesDataByTimeFrameInMonths: FilterTimeSeriesDataByTimeFrame =
          return itemDate >= cutoff
       })
    }
-
-const mapMostSomethingData = (data): MostSomethingBase => {
-   return data.map((d) => d.sparkId)
-}
-
-const createIndustryMap = (
-   industries: OptionGroup[]
-): Record<string, any[]> => {
-   return industries.reduce((acc, industry) => {
-      acc[industry.id] = []
-      return acc
-   }, {} as Record<string, any[]>)
-}
-
-const mapCompetitorIndustryData = (
-   data: SparksAnalyticsDTO["topSparksByIndustry"][TimePeriodParams]
-): CompetitorIndustryData => {
-   const industrySegmentsMap = createIndustryMap(CompanyIndustryValues)
-
-   for (const item of data) {
-      if (industrySegmentsMap[item.industry]?.length < INDUSTRY_SPARKS_LIMIT) {
-         industrySegmentsMap[item.industry].push({
-            sparkId: item.sparkId,
-            plays: item.plays,
-            avgWatchedTime: item.avg_watched_time,
-            engagement: item.engagement,
-         })
-      }
-   }
-
-   const auxAllSet = new Set()
-
-   for (const item of data) {
-      if (auxAllSet.size < INDUSTRY_SPARKS_LIMIT) {
-         auxAllSet.add({
-            sparkId: item.sparkId,
-            plays: item.plays,
-            avgWatchedTime: item.avg_watched_time,
-            engagement: item.engagement,
-         })
-      }
-   }
-
-   industrySegmentsMap["all"] = Array.from(auxAllSet)
-
-   return industrySegmentsMap
-}
-
-const mapCompetitorAudienceData = (
-   data: SparksAnalyticsDTO["topSparksByAudience"][TimePeriodParams]
-): CompetitorAudienceData<CompetitorSparkData> => {
-   const audienceSegmentsMap = {
-      all: [],
-      "business-plus": [],
-      engineering: [],
-      "it-and-mathematics": [],
-      "natural-sciences": [],
-      "social-sciences": [],
-      other: [],
-   }
-
-   for (const item of data) {
-      if (audienceSegmentsMap[item.audience]?.length < AUDIENCE_SPARKS_LIMIT) {
-         audienceSegmentsMap[item.audience].push({
-            sparkId: item.sparkId,
-            plays: item.plays,
-            avgWatchedTime: item.avg_watched_time,
-            engagement: item.engagement,
-         })
-      }
-   }
-
-   const auxAllSet = new Set()
-
-   for (const item of data) {
-      if (auxAllSet.size < AUDIENCE_SPARKS_LIMIT) {
-         auxAllSet.add({
-            sparkId: item.sparkId,
-            plays: item.plays,
-            avgWatchedTime: item.avg_watched_time,
-            engagement: item.engagement,
-         })
-      }
-   }
-
-   audienceSegmentsMap["all"] = Array.from(auxAllSet)
-
-   return audienceSegmentsMap
-}
 
 const getxAxisData = (data): Date[] => {
    return data.map((d) => new Date(d.x))
@@ -293,10 +193,10 @@ export const convertToClientModel = (
                ),
             },
             most: {
-               watched: mapMostSomethingData(most.watched[timeFrame]),
-               liked: mapMostSomethingData(most.liked[timeFrame]),
-               shared: mapMostSomethingData(most.shared[timeFrame]),
-               recent: mapMostSomethingData(most.recent),
+               watched: most.watched[timeFrame],
+               liked: most.liked[timeFrame],
+               shared: most.shared[timeFrame],
+               recent: most.recent[timeFrame],
             },
             topCountries: mapCountryCodes(topCountries[timeFrame]),
             topUniversities: topUniversities[timeFrame],
@@ -308,12 +208,8 @@ export const convertToClientModel = (
                levelsOfStudy[timeFrame],
                levelsOfStudyLookup
             ),
-            topSparksByIndustry: mapCompetitorIndustryData(
-               topSparksByIndustry[timeFrame]
-            ) as CompetitorIndustryBaseWithPastData,
-            topSparksByAudience: mapCompetitorAudienceData(
-               topSparksByAudience[timeFrame]
-            ) as unknown as CompetitorAudienceWithPastData,
+            topSparksByIndustry: topSparksByIndustry[timeFrame],
+            topSparksByAudience: topSparksByAudience[timeFrame],
          }
          return acc
       },
