@@ -234,6 +234,17 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       livestreamId: string,
       speaker: Create<Speaker>
    ): Promise<Speaker>
+
+   /**
+    * Synchronizes the 'hasJobs' flag for Group livestreams based on the changes in the custom job.
+    * This function updates the 'hasJobs' flag for livestreams associated with the custom job.
+    * @param afterJob The custom job after the update.
+    * @param beforeJob The custom job before the update.
+    */
+   syncGroupLivestreamsHasJobsFlag(
+      afterJob: CustomJob,
+      beforeJob: CustomJob
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -901,5 +912,87 @@ export class LivestreamFunctionsRepository
          .update(toUpdate)
 
       return speakerWithId
+   }
+
+   async syncGroupLivestreamsHasJobsFlag(
+      afterJob: CustomJob,
+      beforeJob: CustomJob
+   ): Promise<void> {
+      // Check if the livestreams in afterJob and beforeJob are the same, regardless of order
+      const areLivestreamsEqual =
+         afterJob.livestreams.sort().join(",") ===
+         beforeJob.livestreams.sort().join(",")
+      if (areLivestreamsEqual) {
+         // If the livestreams are the same, exit the function early
+         return
+      }
+
+      // Get the livestreams that were added to afterJob
+      const addedLivestreams = afterJob.livestreams.filter(
+         (id) => !beforeJob.livestreams.includes(id)
+      )
+      // Get the livestreams that were removed from beforeJob
+      const removedLivestreams = beforeJob.livestreams.filter(
+         (id) => !afterJob.livestreams.includes(id)
+      )
+
+      // Get all customJobs from the group id
+      const customJobs = await customJobRepo.getCustomJobsByGroupId(
+         afterJob.groupId
+      )
+
+      // Remove the current job from the array
+      const filteredCustomJobs = customJobs.filter(
+         (job) => job.id !== afterJob.id
+      )
+
+      // Filter the livestreams that have been removed from the jobs
+      const livestreamsWithoutJobs = removedLivestreams.filter(
+         (livestreamId) => {
+            return filteredCustomJobs.every(
+               (job) => !job.livestreams.includes(livestreamId)
+            )
+         }
+      )
+
+      // Filter the livestreams that have been added to the jobs
+      const livestreamsWithNewJobAssignment = addedLivestreams.filter(
+         (livestreamId) => {
+            return !filteredCustomJobs.some((job) =>
+               job.livestreams.includes(livestreamId)
+            )
+         }
+      )
+
+      const batch = this.firestore.batch()
+
+      // Update the livestreams without jobs to have hasJob: false
+      livestreamsWithoutJobs.forEach((livestreamId) => {
+         functions.logger.log(
+            `Update live stream ${livestreamId} to be with hasJobs flag as false`
+         )
+         batch.update(
+            this.firestore.collection("livestreams").doc(livestreamId),
+            {
+               hasJob: false,
+            }
+         )
+      })
+
+      // Update the livestreams with new job assignment to have hasJob: true
+      livestreamsWithNewJobAssignment.forEach((livestreamId) => {
+         functions.logger.log(
+            `Update live stream ${livestreamId} to be with hasJobs flag as true`
+         )
+
+         batch.update(
+            this.firestore.collection("livestreams").doc(livestreamId),
+            {
+               hasJob: true,
+            }
+         )
+      })
+
+      await batch.commit()
    }
 }
