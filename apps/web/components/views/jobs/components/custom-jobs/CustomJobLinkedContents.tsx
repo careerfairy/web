@@ -4,6 +4,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, Stack, Typography } from "@mui/material"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
@@ -65,6 +66,7 @@ const CustomJobLinkedContents = ({
    job,
    disableEventClick,
 }: CustomJobLinkedContentsProps) => {
+   const { jobHubV1 } = useFeatureFlags()
    const { sparks, groupId } = job
    const jobLivestreams = useCustomJobLinkedLivestreams(job)
 
@@ -83,7 +85,7 @@ const CustomJobLinkedContents = ({
             livestreams={jobLivestreams}
             disableEventClick={disableEventClick}
          />
-         <CustomJobLinkedSparks sparks={jobSparks} />
+         {jobHubV1 ? <CustomJobLinkedSparks sparks={jobSparks} /> : null}
       </Stack>
    )
 }
