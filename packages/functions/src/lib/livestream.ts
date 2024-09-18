@@ -7,7 +7,25 @@ import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordi
 import { WriteBatch } from "firebase-admin/firestore"
 import { firestore } from "../api/firestoreAdmin"
 import { livestreamsRepo } from "../api/repositories"
-import { addMinutesDate, removeMinutesDate } from "../util"
+import { addMinutesDate, delay, removeMinutesDate } from "../util"
+
+const MAX_RETRIES = 3
+const RETRY_DELAY = 1000 // 1 second
+
+async function retryOperation<T>(operation: () => Promise<T>): Promise<T> {
+   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+         return await operation()
+      } catch (error) {
+         if (attempt === MAX_RETRIES) throw error
+         console.warn(
+            `Operation failed, retrying (${attempt}/${MAX_RETRIES})...`
+         )
+         await delay(RETRY_DELAY)
+      }
+   }
+   throw new Error("Max retries reached")
+}
 
 export const livestreamGetSecureToken = async (
    id: string,
@@ -233,7 +251,9 @@ const getRegistrationStatus = async (
 
    return Promise.all(
       streams.map((stream) =>
-         livestreamsRepo.isUserRegistered(stream.id, userId)
+         retryOperation(() =>
+            livestreamsRepo.isUserRegistered(stream.id, userId)
+         )
       )
    )
 }
