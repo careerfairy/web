@@ -17,7 +17,6 @@ import SparkCategoryChip from "components/views/sparks/components/spark-card/Spa
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { ReactElement } from "react"
 import { sxStyles } from "types/commonTypes"
-import useSpark from "./useSpark"
 
 const styles = sxStyles({
    card: (theme) => ({
@@ -148,18 +147,17 @@ const StatContainer = ({ icon, value }: StatContainerProps) => {
    )
 }
 
-export const StaticSparkCard = ({
-   sparkId,
+export const CompetitorSparkStaticCard = ({
+   sparkData,
    plays,
-   avgWatchedTime,
+   avg_watched_time,
    engagement,
 }: CompetitorSparkData) => {
    const { group } = useGroup()
-   const spark = useSpark(sparkId)
 
-   const isSparkFromGroup = spark?.group.id === group?.groupId
+   const isSparkFromGroup = sparkData?.group.id === group?.groupId
 
-   if (!spark) return null
+   if (!sparkData) return null
 
    return (
       <Card
@@ -169,33 +167,35 @@ export const StaticSparkCard = ({
          <CardHeader
             avatar={
                <CircularLogo
-                  src={spark?.creator.avatarUrl}
+                  src={sparkData?.creator.avatarUrl}
                   alt={"Creator's Avatar"}
                   objectFit="cover"
                   size={46}
                />
             }
             // Only use the first name in firstName if user has two names
-            title={`${spark.creator?.firstName.split(" ")[0]} ${
-               spark.creator.lastName
+            title={`${sparkData.creator.firstName.split(" ")[0]} ${
+               sparkData.creator.lastName
             }`}
             subheader={`From ${
-               spark.group.universityName.length > 30
-                  ? spark.group.universityName.substring(0, 25) + "..."
-                  : spark.group.universityName
+               sparkData.group.name.length > 30
+                  ? sparkData.group.name.substring(0, 25) + "..."
+                  : sparkData.group.name
             }`}
             sx={styles.cardHeader}
          />
          <Box sx={{ position: "relative" }}>
             <Box sx={styles.sparksTypeAndTitle}>
-               <SparkCategoryChip categoryId={spark.category.id} />
-               <Typography sx={styles.sparksTitle}>{spark.question}</Typography>
+               <SparkCategoryChip categoryId={sparkData.spark.categoryId} />
+               <Typography sx={styles.sparksTitle}>
+                  {sparkData.spark.question}
+               </Typography>
             </Box>
             <Box sx={styles.cardMediaGradientOverlay} />
             <CardMedia
                component="img"
                sx={styles.cardMedia}
-               image={getResizedUrl(spark.video.thumbnailUrl, "md")}
+               image={getResizedUrl(sparkData.spark.videoThumbnailUrl, "md")}
                alt="Spark's thumbnail"
             />
          </Box>
@@ -206,7 +206,7 @@ export const StaticSparkCard = ({
             />
             <StatContainer
                icon={<ClockIcon />}
-               value={Math.ceil(avgWatchedTime) + "s"}
+               value={Math.ceil(avg_watched_time) + "s"}
             />
             <StatContainer
                icon={<EngagementIcon />}
