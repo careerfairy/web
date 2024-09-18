@@ -1,6 +1,8 @@
 import { Box, Stack, Tab, Tabs, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
+import useUserAppliedJobs from "components/custom-hook/custom-job/useUserAppliedJobs"
+import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"
 import { useState } from "react"
 import { Briefcase } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -50,18 +52,12 @@ const styles = sxStyles({
       fontSize: "14px",
       fontWeight: 400,
    },
+   jobWrapper: {
+      p: "0px !important",
+   },
 })
 
 const ProfileCustomJobs = () => {
-   // TODO-WG: set skeleton
-   return (
-      <SuspenseWithBoundary>
-         <ProfileCustomJobsView />
-      </SuspenseWithBoundary>
-   )
-}
-
-const ProfileCustomJobsView = () => {
    const [tabValue, setTabValue] = useState(TAB_VALUES.initiated.value)
 
    const handleTabChange = (_, newValue) => {
@@ -86,16 +82,12 @@ const ProfileCustomJobsView = () => {
             />
          </Tabs>
          <Box sx={styles.tabsContentWrapper}>
-            <ConditionalWrapper
-               condition={tabValue === TAB_VALUES.initiated.value}
-            >
+            {tabValue === TAB_VALUES.initiated.value ? (
                <UserInitiatedCustomJobs />
-            </ConditionalWrapper>
-            <ConditionalWrapper
-               condition={tabValue === TAB_VALUES.applied.value}
-            >
+            ) : null}
+            {tabValue === TAB_VALUES.applied.value ? (
                <UserAppliedCustomJobs />
-            </ConditionalWrapper>
+            ) : null}
          </Box>
       </Box>
    )
@@ -124,19 +116,53 @@ const UserEmptyApplications = () => {
       </Box>
    )
 }
-const UserInitiatedCustomJobs = () => {
-   const hasInitiatedJobs = false
 
-   if (!hasInitiatedJobs) return <UserEmptyApplications />
-   return <>User initiated jobs</>
+const UserInitiatedCustomJobs = () => {
+   // TODO-WG: set skeleton
+   return (
+      <SuspenseWithBoundary>
+         <UserInitiatedCustomJobsView />
+      </SuspenseWithBoundary>
+   )
+}
+
+const UserInitiatedCustomJobsView = () => {
+   const { userData } = useAuth()
+   const initiatedJobs = useUserAppliedJobs(userData.id, false)
+
+   if (!initiatedJobs?.length) return <UserEmptyApplications />
+
+   return (
+      <CustomJobsList
+         customJobs={initiatedJobs}
+         hrefLink="/profile/jobs"
+         jobWrapperSx={styles.jobWrapper}
+      />
+   )
 }
 
 const UserAppliedCustomJobs = () => {
-   const hasAppliedJobs = false
+   // TODO-WG: set skeleton
+   return (
+      <SuspenseWithBoundary>
+         <UserAppliedCustomJobsView />
+      </SuspenseWithBoundary>
+   )
+}
 
-   if (!hasAppliedJobs) return <UserEmptyApplications />
+const UserAppliedCustomJobsView = () => {
+   const { userData } = useAuth()
+   const appliedJobs = useUserAppliedJobs(userData.id, true)
 
-   return <>User applied jobs</>
+   if (!appliedJobs?.length) return <UserEmptyApplications />
+
+   return (
+      <CustomJobsList
+         customJobs={appliedJobs}
+         hrefLink="/profile/jobs"
+         jobWrapperSx={styles.jobWrapper}
+      />
+   )
 }
 
 export default ProfileCustomJobs
