@@ -643,3 +643,6 @@ export const getCountryCode = (
    const appEngineCountry = context?.rawRequest?.headers["x-appengine-country"]
    return appEngineCountry ? appEngineCountry.toString() : null
 }
+
+export const delay = (ms: number) =>
+   new Promise((resolve) => setTimeout(resolve, ms))
