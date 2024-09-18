@@ -58,6 +58,10 @@ export function topSparksByIndustry(timePeriod: string) {
          ON SparkEvents.sparkId = Views.sparkId
       WHERE SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
       GROUP BY SparkEvents.sparkId, GroupByIndustry.industry, Views.value, AvgWatchedTime.seconds
+      HAVING plays IS NOT NULL
+         AND avg_watched_time IS NOT NULL
+         AND engagement IS NOT NULL
+         AND engagement > 0.0
       ORDER BY rank DESC;
   `
 }
