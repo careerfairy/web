@@ -13,7 +13,7 @@ export interface ISparkRepository {
     * @param ids
     * @param limit
     */
-   getSparksByIds(ids: string[], limit?: number)
+   getSparksByIds(ids: string[], limit?: number): Promise<Spark[]>
 }
 
 export class FirebaseSparkRepository
