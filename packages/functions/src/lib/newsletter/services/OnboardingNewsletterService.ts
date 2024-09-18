@@ -15,6 +15,7 @@ import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { DateTime } from "luxon"
 import { IRecommendationDataFetcher } from "src/lib/recommendation/services/DataFetcherRecommendations"
+import { processInBatches } from "../../../util"
 import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
 import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
 import { ISparkFunctionsRepository } from "../../sparks/SparkFunctionsRepository"
@@ -354,7 +355,9 @@ export class OnboardingNewsletterService {
     * Generates the recommendations for each user and populates the users object
     */
    private async generateRecommendations() {
-      const promises = this.onboardingUsers.map(async (onboardingUser) => {
+      const BATCH_SIZE = 4000
+
+      const processUser = async (onboardingUser: OnboardingUserData) => {
          const recommendationService = new UserEventRecommendationService(
             onboardingUser.user,
             this.futureLivestreams,
@@ -366,13 +369,28 @@ export class OnboardingNewsletterService {
          const recommendedIds = await recommendationService.getRecommendations(
             3
          )
-         this.userRecommendedLivestreams[onboardingUser.user.id] =
-            recommendedIds.map((id) =>
+         return {
+            userId: onboardingUser.user.id,
+            recommendations: recommendedIds.map((id) =>
                this.futureLivestreams.find((s) => s.id === id)
-            )
+            ),
+         }
+      }
+
+      const results = await processInBatches(
+         this.onboardingUsers,
+         BATCH_SIZE,
+         processUser
+      )
+
+      results.forEach((result) => {
+         if (result) {
+            this.userRecommendedLivestreams[result.userId] =
+               result.recommendations
+         }
       })
 
-      return await Promise.all(promises)
+      this.logger.info(`Generated recommendations for ${results.length} users`)
    }
 
    /**

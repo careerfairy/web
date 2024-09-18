@@ -1,4 +1,3 @@
-import { RuntimeOptions } from "firebase-functions"
 import { logger } from "firebase-functions/v2"
 import { onRequest } from "firebase-functions/v2/https"
 import { onSchedule } from "firebase-functions/v2/scheduler"
@@ -10,13 +9,11 @@ import {
    livestreamsRepo,
    userRepo,
 } from "./api/repositories"
-import config from "./config"
 import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
 import { ManualTemplatedEmailService } from "./lib/ManualTemplatedEmailService"
 import { NewsletterEmailBuilder } from "./lib/newsletter/NewsletterEmailBuilder"
 import { NewsletterService } from "./lib/newsletter/services/NewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
-import functions = require("firebase-functions")
 
 /**
  * To be sure we only send 1 newsletter when manually triggered
@@ -37,44 +34,28 @@ let newsletterAlreadySent = false
 /**
  * Newsletter functions runtime settings
  */
-const runtimeSettings: RuntimeOptions = {
+const runtimeSettings = {
    // may take a while
    timeoutSeconds: 60 * 9,
    // we may load lots of data into memory
-   memory: "2GB",
-}
-
-/**
- * Send a newsletter to all users every other tuesday
- * Disabled while transitioning to V2 so that newsletters are not sent twice
- */
-export const newsletter = functions
-   .region(config.region)
-   .runWith(runtimeSettings)
-   .pubsub.schedule("0 18 * * Tue") // every tuesday at 6pm
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
-      functions.logger.warn("This function is disabled")
-      /* const shouldSend = await shouldSendNewsletter()
-      if (!shouldSend) {
-         functions.logger.info("Newsletter not sent")
-         return
-      }
-
-      await sendNewsletter() */
-   })
+   memory: "8GiB",
+} as const
 
 /**
  * Send a newsletter to all users every other tuesday
  * The function runs every tuesday and only inside of it is it specified to run
  * every other tuesday
  */
-export const newsletterV2 = onSchedule(
-   { schedule: "0 18 * * Tue", timeZone: "Europe/Zurich" },
+export const newsletter = onSchedule(
+   {
+      schedule: "0 18 * * Tue",
+      timeZone: "Europe/Zurich",
+      ...runtimeSettings,
+   },
    async () => {
       const shouldSend = await shouldSendNewsletter()
       if (!shouldSend) {
-         logger.info("Newsletter not sent")
+         logger.info("Newsletter not sent, reason: Only send every other week")
          return
       }
 
@@ -85,9 +66,38 @@ export const newsletterV2 = onSchedule(
 /**
  * Send the newsletter manually to everyone or to a list of emails
  */
-export const manualNewsletter = onRequest(
-   { timeoutSeconds: 540, memory: "8GiB" },
+export const manualNewsletter = onRequest(runtimeSettings, async (req, res) => {
+   if (req.method !== "GET") {
+      res.status(400).send("Only GET requests are allowed")
+      return
+   }
+
+   const receivedEmails = ((req.query.emails as string) ?? "")
+      .split(",")
+      .map((email) => email?.trim())
+      .filter(Boolean)
+
+   logger.info("Received emails", receivedEmails)
+
+   if (receivedEmails.length === 0) {
+      res.status(400).send("No emails provided")
+      return
+   }
+
+   if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
+      await sendNewsletter()
+      res.status(200).send("Newsletter sent to everyone")
+   } else {
+      await sendNewsletter(receivedEmails)
+      res.status(200).send("Newsletter sent to " + receivedEmails.join(", "))
+   }
+})
+
+export const manualTemplatedEmail = onRequest(
+   runtimeSettings,
    async (req, res) => {
+      logger.info("manualTemplatedEmail: v4.0 - B2C launch announcement")
+
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
          return
@@ -106,41 +116,6 @@ export const manualNewsletter = onRequest(
       }
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
-         await sendNewsletter()
-         res.status(200).send("Newsletter sent to everyone")
-      } else {
-         await sendNewsletter(receivedEmails)
-         res.status(200).send("Newsletter sent to " + receivedEmails.join(", "))
-      }
-   }
-)
-
-export const manualTemplatedEmail = functions
-   .region(config.region)
-   .runWith(runtimeSettings)
-   .https.onRequest(async (req, res) => {
-      functions.logger.info(
-         "manualTemplatedEmail: v4.0 - B2C launch announcement"
-      )
-
-      if (req.method !== "GET") {
-         res.status(400).send("Only GET requests are allowed")
-         return
-      }
-
-      const receivedEmails = ((req.query.emails as string) ?? "")
-         .split(",")
-         .map((email) => email?.trim())
-         .filter(Boolean)
-
-      functions.logger.info("Received emails", receivedEmails)
-
-      if (receivedEmails.length === 0) {
-         res.status(400).send("No emails provided")
-         return
-      }
-
-      if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
          res.status(200).send("B2C launch announcement email sent to everyone")
       } else {
@@ -149,11 +124,12 @@ export const manualTemplatedEmail = functions
             "B2C launch announcement email sent to " + receivedEmails.join(", ")
          )
       }
-   })
+   }
+)
 
 async function sendNewsletter(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      functions.logger.info(
+      logger.info(
          "Newsletter was already sent in this execution environment, skipping"
       )
       return
@@ -167,19 +143,19 @@ async function sendNewsletter(overrideUsers?: string[]) {
       emailNotificationsRepo,
       dataLoader,
       emailBuilder,
-      functions.logger
+      logger
    )
 
-   functions.logger.info("Fetching required data...")
+   logger.info("Fetching required data...")
    await newsletterService.fetchRequiredData()
 
-   functions.logger.info("Fetching recommendation data...")
+   logger.info("Fetching recommendation data...")
    await newsletterService.generateRecommendations()
 
-   functions.logger.info("Fetching populated users...")
+   logger.info("Fetching populated users...")
    await newsletterService.populateUsers()
 
-   functions.logger.info("Sending newsletter...")
+   logger.info("Sending newsletter...")
    await newsletterService.send(overrideUsers)
 
    if (!overrideUsers) {
@@ -187,25 +163,25 @@ async function sendNewsletter(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   functions.logger.info("Newsletter sent")
+   logger.info("Newsletter sent")
 }
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      functions.logger.info("B2C launch announcement, skipping")
+      logger.info("B2C launch announcement, skipping")
       return
    }
 
    const emailBuilder = new ManualTemplatedEmailBuilder(
       PostmarkEmailSender.create(),
-      functions.logger
+      logger
    )
 
    const newsletterService = new ManualTemplatedEmailService(
       userRepo,
       // livestreamsRepo,
       emailBuilder,
-      functions.logger
+      logger
    )
 
    await newsletterService.fetchRequiredData(overrideUsers)
@@ -217,7 +193,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   functions.logger.info("B2C launch announcement execution done")
+   logger.info("B2C launch announcement execution done")
 }
 
 /**
@@ -245,11 +221,11 @@ async function shouldSendNewsletter() {
          numberOfDays
       )
 
-   functions.logger.info(
+   logger.info(
       `Has more than ${numberOfLivestreams} livestreams in next ${numberOfDays} days:`,
       hasMoreThanEightLivestreamsInNext30Days
    )
-   functions.logger.info("Week number", weekNumber)
+   logger.info("Week number", weekNumber)
 
    return weekNumber % 2 === 0 && hasMoreThanEightLivestreamsInNext30Days
 }
