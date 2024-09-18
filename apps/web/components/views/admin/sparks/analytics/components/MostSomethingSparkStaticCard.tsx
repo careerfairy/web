@@ -1,3 +1,4 @@
+import { MostSomethingBase } from "@careerfairy/shared-lib/sparks/analytics"
 import {
    Box,
    Card,
@@ -7,8 +8,6 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
-import useSparkStats from "components/custom-hook/spark/useSparkStats"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import ImpressionsIcon from "components/views/common/icons/ImpressionsIcon"
 import LikeIcon from "components/views/common/icons/LikeIcon"
@@ -16,7 +15,6 @@ import ShareIcon from "components/views/common/icons/ShareIcon"
 import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import { FC, ReactElement } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -147,66 +145,55 @@ const StatContainer: FC<StatContainerProps> = ({ icon, value }) => {
    )
 }
 
-type SparksStaticCardProps = {
-   sparkId: string
-}
-
-const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
-   const { group } = useGroup()
-
-   const spark = useGroupSpark(group.id, sparkId)
-   const { data: sparkStats } = useSparkStats(sparkId)
-
-   const plays = sparkStats?.plays || "0"
-   const likes = sparkStats?.likes || "0"
-   const shareCTA = sparkStats?.shareCTA || "0"
-   const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || "0"
-
+export const MostSomethingSparkStaticCard = ({
+   sparkData,
+   num_views,
+   num_likes,
+   num_shares,
+   num_clicks,
+}: MostSomethingBase) => {
    return (
       <Card variant="outlined" sx={styles.card}>
          <CardHeader
             avatar={
                <CircularLogo
-                  src={spark?.creator.avatarUrl}
+                  src={sparkData?.creator.avatarUrl}
                   alt={"Creator's Avatar"}
                   objectFit="cover"
                   size={46}
                />
             }
             // Only use the first name in firstName if user has two names
-            title={`${spark.creator?.firstName?.split(" ")[0]} ${
-               spark.creator?.lastName
+            title={`${sparkData.creator?.firstName?.split(" ")[0]} ${
+               sparkData.creator?.lastName
             }`}
-            subheader={`From ${spark.group.universityName}`}
+            subheader={`From ${sparkData.group.name}`}
             sx={styles.cardHeader}
          />
          <Box sx={{ position: "relative" }}>
             <Box sx={styles.sparksTypeAndTitle}>
-               <SparkCategoryChip categoryId={spark.category.id} />
-               <Typography sx={styles.sparksTitle}>{spark.question}</Typography>
+               <SparkCategoryChip categoryId={sparkData.spark.categoryId} />
+               <Typography sx={styles.sparksTitle}>
+                  {sparkData.spark.question}
+               </Typography>
             </Box>
             <Box sx={styles.cardMediaGradientOverlay} />
             <CardMedia
                component="img"
                sx={styles.cardMedia}
-               image={getResizedUrl(spark.video.thumbnailUrl, "md")}
+               image={getResizedUrl(sparkData.spark.videoThumbnailUrl, "md")}
                alt="Spark's thumbnail"
             />
          </Box>
          <CardActions sx={styles.cardActions}>
             <StatContainer
                icon={<ImpressionsIcon sx={styles.impressionsIcon} />}
-               value={plays}
+               value={num_views}
             />
-            <StatContainer icon={<LikeIcon />} value={likes} />
-            <StatContainer icon={<ShareIcon />} value={shareCTA} />
-            <StatContainer
-               icon={<TotalPlaysIcon />}
-               value={numberOfCareerPageClicks}
-            />
+            <StatContainer icon={<LikeIcon />} value={num_likes} />
+            <StatContainer icon={<ShareIcon />} value={num_shares} />
+            <StatContainer icon={<TotalPlaysIcon />} value={num_clicks} />
          </CardActions>
       </Card>
    )
 }
-
-export default SparksStaticCard
