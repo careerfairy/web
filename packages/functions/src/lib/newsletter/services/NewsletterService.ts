@@ -12,6 +12,7 @@ import {
    sortLivestreamsDesc,
 } from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
+import { delay } from "../../../util"
 import { IGroupFunctionsRepository } from "../../GroupFunctionsRepository"
 import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
 import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
@@ -135,27 +136,49 @@ export class NewsletterService {
     * @returns UserData[] - Filtered users according to onboarding step and tolerance for the last notification
     */
    private async filterUsers(users: UserData[]): Promise<UserData[]> {
-      if (users?.length) {
-         const promises = users.map(async (user) => {
+      if (!users?.length) return []
+
+      const BATCH_SIZE = 3000
+
+      const fetchNotifications = async (user: UserData) => {
+         try {
             const notifications =
                await this.notificationsRepo.getUserReceivedNotifications(
                   user.userEmail
                )
-            return {
-               user: user,
-               notifications: notifications,
-            }
-         })
-         const usersDataItems = (await Promise.all(promises)) ?? []
-         const filteredData = usersDataItems.filter((userData) =>
-            this.isSent(userData.notifications, [
-               "livestream1stRegistrationDiscovery",
-            ])
-         )
-         return filteredData.map((userData) => userData.user)
+            return { user, notifications }
+         } catch (error) {
+            this.logger.error(
+               `Failed to fetch notifications for user ${user.userEmail}:`,
+               error
+            )
+            return { user, notifications: [] }
+         }
       }
 
-      return []
+      const processBatch = async (batch: UserData[]) => {
+         const results = await Promise.all(batch.map(fetchNotifications))
+         await delay(500) // Add some buffer between batches
+         return results
+      }
+
+      const usersDataItems: {
+         user: UserData
+         notifications: EmailNotification[]
+      }[] = []
+      for (let i = 0; i < users.length; i += BATCH_SIZE) {
+         const batch = users.slice(i, i + BATCH_SIZE)
+         const batchResults = await processBatch(batch)
+         usersDataItems.push(...batchResults)
+      }
+
+      const filteredData = usersDataItems.filter((userData) =>
+         this.isSent(userData.notifications, [
+            "livestream1stRegistrationDiscovery",
+         ])
+      )
+
+      return filteredData.map((userData) => userData.user)
    }
 
    /**
@@ -172,15 +195,19 @@ export class NewsletterService {
       const [subscribedUsers, futureLivestreams, pastLivestreams] =
          await Promise.all(promises)
 
+      this.logger.info(
+         "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
+         subscribedUsers?.length
+      )
+
+      this.logger.info("filtering users")
+
       const filteredUsers =
          (await this.filterUsers(
             subscribedUsers?.length ? subscribedUsers : ([] as UserData[])
          )) ?? []
 
-      console.log(
-         "🚀 ~ NewsletterService ~ fetchRequiredData ~ filteredUsers:",
-         filteredUsers
-      )
+      this.logger.info("filtered users", filteredUsers?.length)
 
       this.subscribedUsers = convertDocArrayToDict(filteredUsers)
       this.logger.info(
