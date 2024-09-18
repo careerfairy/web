@@ -12,7 +12,7 @@ import {
    sortLivestreamsDesc,
 } from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { delay } from "../../../util"
+import { processInBatches } from "../../../util" // Make sure to import the function
 import { IGroupFunctionsRepository } from "../../GroupFunctionsRepository"
 import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
 import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
@@ -140,7 +140,7 @@ export class NewsletterService {
 
       const BATCH_SIZE = 3000
 
-      const fetchNotifications = async (user: UserData) => {
+      const processUser = async (user: UserData) => {
          try {
             const notifications =
                await this.notificationsRepo.getUserReceivedNotifications(
@@ -156,21 +156,11 @@ export class NewsletterService {
          }
       }
 
-      const processBatch = async (batch: UserData[]) => {
-         const results = await Promise.all(batch.map(fetchNotifications))
-         await delay(500) // Add some buffer between batches
-         return results
-      }
-
-      const usersDataItems: {
-         user: UserData
-         notifications: EmailNotification[]
-      }[] = []
-      for (let i = 0; i < users.length; i += BATCH_SIZE) {
-         const batch = users.slice(i, i + BATCH_SIZE)
-         const batchResults = await processBatch(batch)
-         usersDataItems.push(...batchResults)
-      }
+      const usersDataItems = await processInBatches(
+         users,
+         BATCH_SIZE,
+         processUser
+      )
 
       const filteredData = usersDataItems.filter((userData) =>
          this.isSent(userData.notifications, [
@@ -246,31 +236,46 @@ export class NewsletterService {
     * Generates the recommendations for each user and populates the users object
     */
    async generateRecommendations() {
-      for (const userId of Object.keys(this.subscribedUsers)) {
+      const BATCH_SIZE = 4000
+
+      const processUser = async (userId: string) => {
          const user = this.subscribedUsers[userId]
-         if (user.userEmail) {
-            const recommendationService = new UserEventRecommendationService(
-               user,
-               this.futureLivestreams,
-               this.pastLivestreams,
-               null,
-               false
-            )
+         if (!user.userEmail) return null
 
-            // no need to parallelize this, all the promises should be resolved
-            // its just a matter of waiting for the event loop to go through
-            // all the values
-            const recommendedIds =
-               await recommendationService.getRecommendations(3)
+         const recommendationService = new UserEventRecommendationService(
+            user,
+            this.futureLivestreams,
+            this.pastLivestreams,
+            null,
+            false
+         )
 
-            this.users[user.userEmail] = {
+         const recommendedIds = await recommendationService.getRecommendations(
+            3
+         )
+
+         return {
+            email: user.userEmail,
+            recommendations: {
                recommendedLivestreams: recommendedIds.map((id) =>
                   this.futureLivestreams.find((s) => s.id === id)
                ),
                followingCompanies: {},
-            }
+            },
          }
       }
+
+      const results = await processInBatches(
+         Object.keys(this.subscribedUsers),
+         BATCH_SIZE,
+         processUser
+      )
+
+      results.forEach((result) => {
+         if (result) {
+            this.users[result.email] = result.recommendations
+         }
+      })
 
       return this
    }

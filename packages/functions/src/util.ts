@@ -646,3 +646,35 @@ export const getCountryCode = (
 
 export const delay = (ms: number) =>
    new Promise((resolve) => setTimeout(resolve, ms))
+
+/**
+ * Chunk an array into smaller arrays of a given size
+ * @param items
+ * @param batchSize
+ * @returns
+ */
+const chunk = <T>(items: T[], batchSize: number): T[][] => {
+   const chunks = []
+   for (let i = 0; i < items.length; i += batchSize) {
+      chunks.push(items.slice(i, i + batchSize))
+   }
+   return chunks
+}
+
+export const processInBatches = async <T, R>(
+   items: T[],
+   batchSize: number,
+   processItem: (item: T) => Promise<R>,
+   delayMs = 500
+): Promise<R[]> => {
+   const batches = chunk(items, batchSize)
+   const results: R[] = []
+
+   for (const batch of batches) {
+      const batchResults = await Promise.all(batch.map(processItem))
+      results.push(...batchResults)
+      await delay(delayMs)
+   }
+
+   return results
+}
