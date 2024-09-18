@@ -205,13 +205,6 @@ export const sortCustomJobs = <T extends CustomJob | CustomJobStats>(
       // First, prioritize jobs that are still active (not expired)
       const aDeadlineValid = jobA.deadline.toDate() > now
       const bDeadlineValid = jobB.deadline.toDate() > now
-      // Sort by 'published' flag
-      if (jobA.published && !jobB.published) return -1
-      if (!jobA.published && jobB.published) return 1
-
-      // Both have the same 'published' status, so sort by 'deadline'
-      const aDeadlineValid = jobA?.deadline?.toDate() > now
-      const bDeadlineValid = jobB?.deadline?.toDate() > now
 
       if (aDeadlineValid && !bDeadlineValid) return -1 // 'a' is active, 'b' is not
       if (!aDeadlineValid && bDeadlineValid) return 1 // 'a' is not active, 'b' is
