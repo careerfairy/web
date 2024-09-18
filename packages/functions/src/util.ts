@@ -665,6 +665,9 @@ export const processInBatches = async <T, R>(
    items: T[],
    batchSize: number,
    processItem: (item: T) => Promise<R>,
+   logger: {
+      info: (message: string) => void
+   },
    delayMs = 500
 ): Promise<R[]> => {
    const batches = chunk(items, batchSize)
@@ -673,6 +676,7 @@ export const processInBatches = async <T, R>(
    for (const batch of batches) {
       const batchResults = await Promise.all(batch.map(processItem))
       results.push(...batchResults)
+      logger?.info(`Processed batch of ${batchResults.length} items`)
       await delay(delayMs)
    }
 

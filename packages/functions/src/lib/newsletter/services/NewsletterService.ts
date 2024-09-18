@@ -159,7 +159,8 @@ export class NewsletterService {
       const usersDataItems = await processInBatches(
          users,
          BATCH_SIZE,
-         processUser
+         processUser,
+         this.logger
       )
 
       const filteredData = usersDataItems.filter((userData) =>
@@ -236,7 +237,7 @@ export class NewsletterService {
     * Generates the recommendations for each user and populates the users object
     */
    async generateRecommendations() {
-      const BATCH_SIZE = 4000
+      const BATCH_SIZE = 500
 
       const processUser = async (userId: string) => {
          const user = this.subscribedUsers[userId]
@@ -268,7 +269,8 @@ export class NewsletterService {
       const results = await processInBatches(
          Object.keys(this.subscribedUsers),
          BATCH_SIZE,
-         processUser
+         processUser,
+         this.logger
       )
 
       results.forEach((result) => {

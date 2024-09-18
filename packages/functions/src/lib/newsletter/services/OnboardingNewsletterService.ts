@@ -355,7 +355,7 @@ export class OnboardingNewsletterService {
     * Generates the recommendations for each user and populates the users object
     */
    private async generateRecommendations() {
-      const BATCH_SIZE = 4000
+      const BATCH_SIZE = 500
 
       const processUser = async (onboardingUser: OnboardingUserData) => {
          const recommendationService = new UserEventRecommendationService(
@@ -380,7 +380,8 @@ export class OnboardingNewsletterService {
       const results = await processInBatches(
          this.onboardingUsers,
          BATCH_SIZE,
-         processUser
+         processUser,
+         this.logger
       )
 
       results.forEach((result) => {
