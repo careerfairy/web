@@ -1,11 +1,14 @@
-import { CompetitorAudienceSegments } from "@careerfairy/shared-lib/sparks/analytics"
+import {
+   CompetitorAudienceSegments,
+   CompetitorSparkData,
+} from "@careerfairy/shared-lib/sparks/analytics"
 import { Stack } from "@mui/material"
 import { useState } from "react"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { TitleWithSelect } from "../components/TitleWithSelect"
 import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
 import { useSparksAnalytics } from "../SparksAnalyticsContext"
-import { StaticSparkCard } from "./StaticSparkCard"
+import { CompetitorSparkStaticCard } from "./CompetitorSparkStaticCard"
 
 type AudienceOption = {
    value: CompetitorAudienceSegments | "all"
@@ -60,15 +63,17 @@ export const TopSparksByAudience = () => {
             <EmptyDataCheckerForMostSomething />
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-               {topSparksByAudience[selectAudienceValue].map((data, index) => (
-                  <StaticSparkCard
-                     key={`top-sparks-by-audience-${selectAudienceValue}-${data.sparkId}-${index}`}
-                     sparkId={data.sparkId}
-                     plays={data.plays}
-                     avgWatchedTime={data.avgWatchedTime}
-                     engagement={data.engagement}
-                  />
-               ))}
+               {topSparksByAudience[selectAudienceValue].map(
+                  (data: CompetitorSparkData, index) => (
+                     <CompetitorSparkStaticCard
+                        key={`top-sparks-by-audience-${selectAudienceValue}-${index}`}
+                        sparkData={data.sparkData}
+                        plays={data.plays}
+                        avg_watched_time={data.avg_watched_time}
+                        engagement={data.engagement}
+                     />
+                  )
+               )}
             </Stack>
          )}
       </GroupSparkAnalyticsCardContainer>
