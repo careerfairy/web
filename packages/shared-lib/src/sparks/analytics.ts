@@ -1,5 +1,6 @@
 import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
 import { Timestamp } from "../firebaseTypes"
+import { Spark } from "./sparks"
 
 // Backend data type
 
@@ -14,26 +15,65 @@ export type WithPastData<T> = {
    [key in TimePeriodParams]: T
 }
 
-export type MostSomethingBase = string[]
-export type MostSomethingWithPastData = WithPastData<string[]>
+export type SparkStatsFromBigQuery = {
+   num_views: number
+   num_likes: number
+   num_shares: number
+   num_clicks: number
+}
 
-export type CompetitorIndustryBase = {
+export type CompetitorSparkCard = {
+   creator: {
+      avatarUrl: string
+      firstName: string
+      lastName: string
+   }
+   group: {
+      id: string
+      name: string
+   }
+   spark: {
+      question: Spark["question"]
+      categoryId: Spark["category"]["id"]
+      videoThumbnailUrl: string
+   }
+}
+
+export type MostSomethingSparkCard = Omit<CompetitorSparkCard, "group.id">
+
+export type MostSomethingStatsKeys = keyof SparkStatsFromBigQuery
+
+export type MostSomethingBigQueryResult = {
    sparkId: string
-   industry: string
+} & SparkStatsFromBigQuery
+
+export type MostSomethingBase = {
+   sparkData: MostSomethingSparkCard
+} & SparkStatsFromBigQuery
+
+export type MostSomethingWithPastData = WithPastData<MostSomethingBase[]>
+
+export type CompetitorStatsFromBigQuery = {
    plays: number
    avg_watched_time: number
    engagement: number
 }
 
-export type CompetitorIndustryBaseWithPastData = WithPastData<
-   CompetitorIndustryBase[]
->
+export type CompetitorIndustryBigQueryResult = {
+   sparkId: string
+   industry: string
+} & CompetitorStatsFromBigQuery
+
+export type CompetitorIndustryBase = {
+   sparkData: CompetitorSparkCard
+   industry: string
+} & CompetitorStatsFromBigQuery
 
 export type CompetitorIndustryData = {
    [key in string]: CompetitorIndustryBase[]
 }
 
-export type CompetitorIndustryWithPastData =
+export type CompetitorIndustryBaseWithPastData =
    WithPastData<CompetitorIndustryData>
 
 export type CompetitorAudienceSegments =
@@ -44,20 +84,19 @@ export type CompetitorAudienceSegments =
    | "social-sciences"
    | "other"
 
-export type CompetitorAudienceBase = {
+export type CompetitorAudienceBigQueryResult = {
    sparkId: string
    audience: CompetitorAudienceSegments
-   plays: number
-   avg_watched_time: number
-   engagement: number
-}
+} & CompetitorStatsFromBigQuery
+
+export type CompetitorAudienceBase = {
+   sparkData: CompetitorSparkCard
+   audience: CompetitorAudienceSegments
+} & CompetitorStatsFromBigQuery
 
 export type CompetitorSparkData = {
-   sparkId: string
-   plays: number
-   avgWatchedTime: number
-   engagement: number
-}
+   sparkData: CompetitorSparkCard
+} & CompetitorStatsFromBigQuery
 
 export type CompetitorAudienceBaseWithPastData = WithPastData<
    CompetitorAudienceBase[]
@@ -66,9 +105,6 @@ export type CompetitorAudienceBaseWithPastData = WithPastData<
 export type CompetitorAudienceData<T> = {
    [key in CompetitorAudienceSegments]: T[]
 }
-export type CompetitorAudienceWithPastData = WithPastData<
-   CompetitorAudienceData<CompetitorAudienceBase>
->
 
 export type LinearBarDataPoint = {
    label: string
@@ -107,7 +143,7 @@ export type MostSomethingData = {
    watched: MostSomethingWithPastData
    liked: MostSomethingWithPastData
    shared: MostSomethingWithPastData
-   recent: MostSomethingBase
+   recent: MostSomethingWithPastData
 }
 
 export type SparksAnalyticsDTO = {
@@ -144,7 +180,7 @@ export type SparkAnalyticsClientOverview = {
       pageClicks: TimeSeriesForCharts
    }
    most: {
-      [key in keyof MostSomethingData]: MostSomethingBase
+      [key in keyof MostSomethingData]: MostSomethingBase[]
    }
 }
 
@@ -156,8 +192,8 @@ export type SparkAnalyticsClientAudience = {
 }
 
 export type SparksAnalyticsClientCompetitor = {
-   topSparksByIndustry: CompetitorIndustryBaseWithPastData
-   topSparksByAudience: CompetitorAudienceWithPastData
+   topSparksByIndustry: CompetitorIndustryData
+   topSparksByAudience: CompetitorAudienceBase[]
 }
 
 export type SparkAnalyticsClient = SparkAnalyticsClientOverview &
