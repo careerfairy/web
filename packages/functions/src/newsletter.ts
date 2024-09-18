@@ -38,7 +38,7 @@ const runtimeSettings = {
    // may take a while
    timeoutSeconds: 60 * 9,
    // we may load lots of data into memory
-   memory: "8GiB",
+   memory: "16GiB",
 } as const
 
 /**
