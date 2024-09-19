@@ -12,6 +12,7 @@ import {
    sortLivestreamsDesc,
 } from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
+import { processInBatches } from "../../../util" // Make sure to import the function
 import { IGroupFunctionsRepository } from "../../GroupFunctionsRepository"
 import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
 import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
@@ -103,27 +104,40 @@ export class NewsletterService {
     * @returns UserData[] - Filtered users according to onboarding step and tolerance for the last notification
     */
    private async filterUsers(users: UserData[]): Promise<UserData[]> {
-      if (users?.length) {
-         const promises = users.map(async (user) => {
+      if (!users?.length) return []
+
+      const BATCH_SIZE = 3000
+
+      const processUser = async (user: UserData) => {
+         try {
             const notifications =
                await this.notificationsRepo.getUserReceivedNotifications(
                   user.userEmail
                )
-            return {
-               user: user,
-               notifications: notifications,
-            }
-         })
-         const usersDataItems = (await Promise.all(promises)) ?? []
-         const filteredData = usersDataItems.filter((userData) =>
-            this.isSent(userData.notifications, [
-               "livestream1stRegistrationDiscovery",
-            ])
-         )
-         return filteredData.map((userData) => userData.user)
+            return { user, notifications }
+         } catch (error) {
+            this.logger.error(
+               `Failed to fetch notifications for user ${user.userEmail}:`,
+               error
+            )
+            return { user, notifications: [] }
+         }
       }
 
-      return []
+      const usersDataItems = await processInBatches(
+         users,
+         BATCH_SIZE,
+         processUser,
+         this.logger
+      )
+
+      const filteredData = usersDataItems.filter((userData) =>
+         this.isSent(userData.notifications, [
+            "livestream1stRegistrationDiscovery",
+         ])
+      )
+
+      return filteredData.map((userData) => userData.user)
    }
 
    /**
@@ -140,15 +154,19 @@ export class NewsletterService {
       const [subscribedUsers, futureLivestreams, pastLivestreams] =
          await Promise.all(promises)
 
+      this.logger.info(
+         "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
+         subscribedUsers?.length
+      )
+
+      this.logger.info("filtering users")
+
       const filteredUsers =
          (await this.filterUsers(
             subscribedUsers?.length ? subscribedUsers : ([] as UserData[])
          )) ?? []
 
-      console.log(
-         "🚀 ~ NewsletterService ~ fetchRequiredData ~ filteredUsers:",
-         filteredUsers
-      )
+      this.logger.info("filtered users", filteredUsers?.length)
 
       this.subscribedUsers = convertDocArrayToDict(filteredUsers)
       this.logger.info(
@@ -187,31 +205,47 @@ export class NewsletterService {
     * Generates the recommendations for each user and populates the users object
     */
    async generateRecommendations() {
-      for (const userId of Object.keys(this.subscribedUsers)) {
+      const BATCH_SIZE = 500
+
+      const processUser = async (userId: string) => {
          const user = this.subscribedUsers[userId]
-         if (user.userEmail) {
-            const recommendationService = new UserEventRecommendationService(
-               user,
-               this.futureLivestreams,
-               this.pastLivestreams,
-               null,
-               false
-            )
+         if (!user.userEmail) return null
 
-            // no need to parallelize this, all the promises should be resolved
-            // its just a matter of waiting for the event loop to go through
-            // all the values
-            const recommendedIds =
-               await recommendationService.getRecommendations(3)
+         const recommendationService = new UserEventRecommendationService(
+            user,
+            this.futureLivestreams,
+            this.pastLivestreams,
+            null,
+            false
+         )
 
-            this.users[user.userEmail] = {
+         const recommendedIds = await recommendationService.getRecommendations(
+            3
+         )
+
+         return {
+            email: user.userEmail,
+            recommendations: {
                recommendedLivestreams: recommendedIds.map((id) =>
                   this.futureLivestreams.find((s) => s.id === id)
                ),
                followingCompanies: {},
-            }
+            },
          }
       }
+
+      const results = await processInBatches(
+         Object.keys(this.subscribedUsers),
+         BATCH_SIZE,
+         processUser,
+         this.logger
+      )
+
+      results.forEach((result) => {
+         if (result) {
+            this.users[result.email] = result.recommendations
+         }
+      })
 
       return this
    }
