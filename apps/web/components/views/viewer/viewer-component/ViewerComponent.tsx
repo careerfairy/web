@@ -292,7 +292,10 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       userData &&
       !spyModeEnabled
    ) {
-      return <EndOfStreamView />
+      const isWorldBankLiveStream = presenter.groupIds.includes(
+         "qGGtl7ZfdoBbvZLFGbM2"
+      )
+      return <EndOfStreamView showRecommendedEvents={!isWorldBankLiveStream} />
    }
 
    return (
