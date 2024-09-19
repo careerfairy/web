@@ -1,6 +1,7 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, ButtonBase, Grid, useTheme } from "@mui/material"
+import { Box, ButtonBase, Grid, SxProps, useTheme } from "@mui/material"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -10,7 +11,6 @@ import { isJobValidButNoLinkedContent } from "../utils"
 import JobCardAction from "./JobCardAction"
 import JobCardDetails from "./JobCardDetails"
 import JobCardStats from "./JobCardStats"
-
 const styles = sxStyles({
    jobState: {
       display: "flex",
@@ -31,7 +31,7 @@ const styles = sxStyles({
       flexDirection: { xs: "column", md: "row" },
       width: "100%",
       maxWidth: "calc(100% - 8px)",
-      p: { md: 2 },
+      p: { md: 1.5 },
       alignItems: { md: "center" },
    },
    infoWrapper: {
@@ -54,9 +54,11 @@ type Props = {
    clicks?: number
    applicants?: number
    previewMode?: boolean
-   handleClick: (job: Job | CustomJob) => void
+   handleClick?: (job: Job | CustomJob) => void
    smallCard?: boolean
    hideJobUrl?: boolean
+   titleSx?: SxProps<DefaultTheme>
+   typographySx?: SxProps<DefaultTheme>
 }
 
 const JobCard = ({
@@ -67,6 +69,8 @@ const JobCard = ({
    handleClick,
    smallCard,
    hideJobUrl,
+   titleSx,
+   typographySx,
 }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
@@ -94,7 +98,7 @@ const JobCard = ({
    return (
       <ButtonBase
          key={job.id}
-         onClick={() => handleClick(job)}
+         onClick={() => handleClick && handleClick(job)}
          sx={styles.jobCard}
          focusRipple
       >
@@ -118,6 +122,8 @@ const JobCard = ({
                         previewMode={previewMode}
                         smallCard={smallCard}
                         hideJobUrl={hideJobUrl}
+                        titleSx={titleSx}
+                        typographySx={typographySx}
                      />
                   </Grid>
 

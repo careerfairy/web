@@ -1,5 +1,5 @@
 import {
-   JobApplicationContext,
+   CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
@@ -78,7 +78,7 @@ const styles = sxStyles({
 type Props = {
    handleClose: () => void
    job: PublicCustomJob
-   applicationContext: JobApplicationContext
+   applicationSource: CustomJobApplicationSource
    autoApply?: boolean
    sx?: SxProps
    onApply?: () => void
@@ -87,7 +87,7 @@ type Props = {
 const CustomJobApplyConfirmation = ({
    handleClose,
    job,
-   applicationContext,
+   applicationSource,
    autoApply,
    onApply,
    sx,
@@ -95,7 +95,7 @@ const CustomJobApplyConfirmation = ({
    const { isLoggedIn, userData } = useAuth()
    const dispatch = useDispatch()
    const { handleConfirmApply, alreadyApplied, isApplying, redirectToSignUp } =
-      useCustomJobApply(job, applicationContext)
+      useCustomJobApply(job, applicationSource)
 
    const handleRedirectClick = useCallback(() => {
       dispatch(setJobToOpen(job.id))
