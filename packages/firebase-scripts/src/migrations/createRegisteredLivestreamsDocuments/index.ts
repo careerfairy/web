@@ -20,6 +20,8 @@ const getTotalUserLivestreamDataCount = async () => {
    return totalUserLivestreamDataDocumentCountSnapshot.data().count
 }
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export async function run() {
    const counter = new Counter()
    const bulkWriter = firestore.bulkWriter()
@@ -77,6 +79,7 @@ export async function run() {
          )
 
          await bulkWriter.flush()
+         await wait(5000)
       }
 
       await bulkWriter.close()
