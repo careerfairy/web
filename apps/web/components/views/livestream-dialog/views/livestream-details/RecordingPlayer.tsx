@@ -266,7 +266,7 @@ export const useRecordingControls = (
       // update recording stats
       void livestreamRepo.updateRecordingStats({
          livestreamId: stream.id,
-         userId: userData.userEmail,
+         userId: userData?.userEmail,
          livestreamStartDate: stream.start,
       })
 

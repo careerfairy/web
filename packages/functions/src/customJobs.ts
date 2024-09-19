@@ -1,6 +1,5 @@
 import functions = require("firebase-functions")
-import { CustomJobContent } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { array, mixed, string } from "yup"
+import { SchemaOf, array, object, string } from "yup"
 import { customJobRepo, userRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
@@ -12,6 +11,17 @@ import {
 } from "./middlewares/validations"
 import { onCallWrapper } from "./util"
 
+type UserCustomJobApplication = {
+   authId: string
+   jobId: string
+}
+
+const UserCustomJobApplicationSchema: SchemaOf<UserCustomJobApplication> =
+   object().shape({
+      authId: string().required(),
+      jobId: string().required(),
+   })
+
 export const confirmUserApplyToCustomJob = functions
    .region(config.region)
    .runWith({
@@ -19,16 +29,12 @@ export const confirmUserApplyToCustomJob = functions
    })
    .https.onCall(
       middlewares(
-         dataValidation({
-            livestreamId: string(),
-            userId: string().required(),
-            jobId: string().required(),
-         }),
+         dataValidation(UserCustomJobApplicationSchema),
          userAuthExists(),
-         onCallWrapper(async (data) => {
-            const { livestreamId, userId, jobId } = data
+         onCallWrapper(async (data: UserCustomJobApplication) => {
+            const { authId: userId, jobId } = data
             functions.logger.log(
-               `Starting custom job ${jobId} apply process for the user ${userId} on the livestream ${livestreamId}`
+               `Starting custom job ${jobId} apply confirmation process for the user ${userId}`
             )
 
             // Get custom job data and verify if the user already has any information related to the job application.
@@ -64,20 +70,11 @@ export const confirmAnonApplyToCustomJob = functions
    })
    .https.onCall(
       middlewares(
-         dataValidation({
-            fingerPrintId: string().required(),
-            jobId: string().required(),
-            linkedContentId: string().required(),
-            linkedContentType: mixed<CustomJobContent>().oneOf([
-               "livestream",
-               "spark",
-            ]),
-         }),
-         onCallWrapper(async (data) => {
-            const { linkedContentId, fingerPrintId, jobId, linkedContentType } =
-               data
+         dataValidation(UserCustomJobApplicationSchema),
+         onCallWrapper(async (data: UserCustomJobApplication) => {
+            const { authId: fingerPrintId, jobId } = data
             functions.logger.log(
-               `Starting custom job ${jobId} apply process for the anonymous user with finger print ${fingerPrintId} on the ${linkedContentType} with ID ${linkedContentId}`
+               `Starting custom job ${jobId} apply confirmation process for the anonymous user with finger print ${fingerPrintId}`
             )
 
             // Get custom job data and verify if the user already has any information related to the job application.

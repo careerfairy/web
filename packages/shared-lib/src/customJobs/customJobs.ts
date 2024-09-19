@@ -76,9 +76,18 @@ export const jobTypeOptions = [
    { value: "Internship", label: "Internship", id: "Internship" },
 ]
 
+export type JobApplicationSource =
+   | "livestream"
+   | "spark"
+   | "profile"
+   | "companyPage"
+   | "portal"
+   | "notification"
+
 export const pickPublicDataFromCustomJob = (
    job: CustomJob
 ): PublicCustomJob => {
+   if (!job) return null
    return {
       id: job.id,
       groupId: job.groupId ?? null,
@@ -121,11 +130,19 @@ export interface CustomJobStats extends Identifiable {
    deleted: boolean
    deletedAt: firebase.firestore.Timestamp | null
 }
-export type CustomJobContent = "spark" | "livestream"
+export type CustomJobContent =
+   | "spark"
+   | "livestream"
+   | "group"
+   | "portal"
+   | "profile"
 
-export type JobApplicationContent = {
+// Beware some IDs are logical, meaning it might not lead to a specific document in collections, i.e. when type = 'portal', the ID
+// of the linked content is purely logical thus retrieving a document with this ID is not intended.
+export type JobApplicationContext = {
    type: CustomJobContent
 } & Identifiable
+
 // collection path /jobApplications
 export interface CustomJobApplicant extends Identifiable {
    documentType: "customJobApplicant" // simplify groupCollection Queries
@@ -134,7 +151,7 @@ export interface CustomJobApplicant extends Identifiable {
    groupId: string // Makes it easier to query for all applicants in a group
    appliedAt?: firebase.firestore.Timestamp
    livestreamId?: string // The associated livestream where the user applied to the job
-   linkedContent: JobApplicationContent // replaces livestreamId only
+   linkedContent?: JobApplicationContext // replaces livestreamId only
    job: CustomJob
    applied?: boolean
    createdAt?: firebase.firestore.Timestamp
@@ -150,7 +167,7 @@ export interface AnonymousJobApplication extends Identifiable {
    createdAt: firebase.firestore.Timestamp
    fingerPrintId: string
    jobId: string
-   linkedContent: JobApplicationContent
+   linkedContent: JobApplicationContext
    applied: boolean
    appliedAt?: firebase.firestore.Timestamp
    userId?: string // Optional and set upon user registration when matching the finger print ID

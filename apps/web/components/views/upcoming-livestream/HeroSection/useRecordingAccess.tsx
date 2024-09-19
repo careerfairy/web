@@ -8,8 +8,7 @@ export const useRecordingAccess = (
    streamPresenter: LivestreamPresenter
 ) => {
    return {
-      showRecording:
-         streamPresenter?.isAbleToShowRecording() && Boolean(userEmail),
+      showRecording: streamPresenter?.isAbleToShowRecording(),
    }
 }
 

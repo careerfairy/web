@@ -1,24 +1,25 @@
-import React, { FC, useMemo } from "react"
-import Box from "@mui/material/Box"
-import SectionTitle from "./SectionTitle"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import Stack from "@mui/material/Stack"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import { Typography } from "@mui/material"
-import { alpha } from "@mui/material/styles"
-import { Briefcase as JobIcon } from "react-feather"
-import Button from "@mui/material/Button"
-import Link from "../../../../common/Link"
-import { useRouter } from "next/router"
-import { LinkProps } from "next/dist/client/link"
-import { buildDialogLink } from "../../../util"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
-import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
-import useIsAtsLivestreamJobAssociation from "../../../../../custom-hook/useIsAtsLivestreamJobAssociation"
-import useGroupCustomJobs from "../../../../../custom-hook/custom-job/useGroupCustomJobs"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { Typography } from "@mui/material"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Stack from "@mui/material/Stack"
+import { alpha } from "@mui/material/styles"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import JobCard from "components/views/common/jobs/JobCard"
+import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
+import { LinkProps } from "next/dist/client/link"
+import { useRouter } from "next/router"
+import { FC, useMemo } from "react"
+import { Briefcase as JobIcon } from "react-feather"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import useGroupCustomJobs from "../../../../../custom-hook/custom-job/useGroupCustomJobs"
+import useIsAtsLivestreamJobAssociation from "../../../../../custom-hook/useIsAtsLivestreamJobAssociation"
+import Link from "../../../../common/Link"
 import Loader from "../../../../loader/Loader"
+import { buildDialogLink } from "../../../util"
+import SectionTitle from "./SectionTitle"
 
 const styles = sxStyles({
    jobItemRoot: {
@@ -68,7 +69,7 @@ interface Props {
 const Jobs: FC<Props> = (props) => {
    return (
       <Box>
-         <SectionTitle>Linked Jobs</SectionTitle>
+         <SectionTitle>Jobs in focus</SectionTitle>
          <SuspenseWithBoundary fallback={<Loader />}>
             <JobsComponent {...props} />
          </SuspenseWithBoundary>
@@ -79,7 +80,7 @@ const Jobs: FC<Props> = (props) => {
 const JobsComponent: FC<Props> = ({ presenter }) => {
    const livestreamCustomJobs = useGroupCustomJobs(presenter.groupIds[0], {
       livestreamId: presenter.id,
-   })
+   })?.filter((job) => job.published)
 
    let jobsToPresent: (LivestreamJobAssociation | CustomJob)[]
 
@@ -139,7 +140,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
       }
    }
 
-   return (
+   return isAtsLivestreamAssociation ? (
       <Stack
          direction={{
             xs: "column",
@@ -177,6 +178,13 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
             </span>
          </Box>
       </Stack>
+   ) : (
+      <JobCard
+         job={job as CustomJob}
+         previewMode
+         handleClick={() => goToJobDetails((job as CustomJob).id)}
+         hideJobUrl
+      />
    )
 }
 
