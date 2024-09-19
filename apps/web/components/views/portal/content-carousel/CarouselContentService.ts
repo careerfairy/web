@@ -191,23 +191,6 @@ export class CarouselContentService {
          }
       })
 
-      // check whether to add Credits CTA
-      const shouldSeeCreditsCTABanner = userShouldSeeCTABannerToday(
-         this.options.userData,
-         CTASlideTopics.CareerCoins
-      )
-
-      // If the user has not bought a recording, add slide before the content
-      if (!this.userHasBoughtRecording() && shouldSeeCreditsCTABanner) {
-         content = [
-            {
-               contentType: "CTASlide",
-               topic: CTASlideTopics.CareerCoins,
-            },
-            ...content,
-         ]
-      }
-
       // check whether to add Sparks CTA
       const shouldSeeSparksCTABanner = userShouldSeeCTABannerToday(
          this.options.userData,

@@ -1,9 +1,9 @@
+import { UserStats } from "../users"
 import {
    Badge,
    calculateProgressForNumericField,
    DEFAULT_REWARDS,
 } from "./badges"
-import { UserStats } from "../users"
 
 export const NetworkerBadge: Badge = new Badge(
    "Networker",
@@ -32,7 +32,7 @@ export const NetworkerBadgeLevel2: Badge = new Badge(
             calculateProgressForNumericField(userStats?.referralsCount, 3),
       },
    ],
-   ["3 CareerCoins", "Save Recruiters during a livestream"]
+   ["Save Recruiters during a livestream"]
 )
 
 export const NetworkerBadgeLevel3: Badge = new Badge(
