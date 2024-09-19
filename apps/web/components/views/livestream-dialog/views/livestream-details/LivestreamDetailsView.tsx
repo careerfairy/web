@@ -75,6 +75,7 @@ const LivestreamDetailsView = () => {
                   alignItems="center"
                   justifyContent={"center"}
                   spacing={2.5}
+                  width={"100%"}
                >
                   <HostInfo presenter={livestreamPresenter} />
                   <LivestreamTitle text={livestream.title} />

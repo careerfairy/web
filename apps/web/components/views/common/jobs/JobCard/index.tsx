@@ -56,6 +56,7 @@ type Props = {
    previewMode?: boolean
    handleClick: (job: Job | CustomJob) => void
    smallCard?: boolean
+   hideJobUrl?: boolean
 }
 
 const JobCard = ({
@@ -65,6 +66,7 @@ const JobCard = ({
    previewMode,
    handleClick,
    smallCard,
+   hideJobUrl,
 }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
@@ -115,6 +117,7 @@ const JobCard = ({
                         job={job}
                         previewMode={previewMode}
                         smallCard={smallCard}
+                        hideJobUrl={hideJobUrl}
                      />
                   </Grid>
 

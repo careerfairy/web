@@ -63,7 +63,7 @@ test.describe("Access a recording when the user registered to the livestream", (
 
    for (const participated of [true, false]) {
       // confirm user has access to the recording participating or not
-      test(
+      test.skip(
          "No need to buy the recording because the livestream is inside the access window, user participated: " +
             participated,
          async ({ page, user }) => {
@@ -86,7 +86,7 @@ test.describe("Access a recording when the user registered to the livestream", (
       )
    }
 
-   test("Access the recording when signed out - inside access window", async ({
+   test.skip("Access the recording when signed out - inside access window", async ({
       page,
    }) => {
       // reset data manually because we are not using

@@ -1,15 +1,16 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
+   CustomJob,
    PublicCustomJob,
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { ButtonProps, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
-import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
-import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
+import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
+import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import { useRouter } from "next/router"
-import { FC, useEffect, useState } from "react"
+import { FC, useCallback, useEffect } from "react"
 import { useSelector } from "react-redux"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
@@ -24,12 +25,8 @@ import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
-import useRegistrationHandler from "../../useRegistrationHandler"
 import NotFoundView from "../common/NotFoundView"
-import ActionButton from "../livestream-details/action-button/ActionButton"
 import JobDetailsViewSkeleton from "./JobDetailsViewSkeleton"
-import CustomJobApplyConfirmation from "./main-content/CustomJobApplyConfirmation"
-import CustomJobCTAButton from "./main-content/CustomJobCTAButton"
 import JobCTAButton from "./main-content/JobCTAButton"
 import JobDescription from "./main-content/JobDescription"
 import JobHeader from "./main-content/JobHeader"
@@ -94,19 +91,19 @@ const JobDetailsView: FC = (props) => {
 }
 
 const JobDetails: FC<Props> = ({ jobId }) => {
+   const { userData } = useAuth()
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
-   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
+   const [, handleOpen] = useDialogStateHandler()
    const customJob = useCustomJob(jobId)
-   const [isLiveStreamButtonDisabled, setIsLiveStreamButtonDisabled] =
-      useState(false)
+
    const autoActionType = useSelector(autoAction)
 
-   const { userData } = useAuth()
+   const onApply = useCallback(() => {
+      if (userData?.id) {
+         goToView("livestream-details")
+      }
+   }, [userData, goToView])
 
-   const { applicationInitiatedOnly } = useUserJobApplication(
-      userData?.id,
-      jobId
-   )
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
    let job: Job | PublicCustomJob
@@ -136,47 +133,44 @@ const JobDetails: FC<Props> = ({ jobId }) => {
       )
    }
 
-   return (
+   const livestreamDetailCustomJobHeroContent = (
+      <HeroContent
+         backgroundImg={getResizedUrl(livestream.backgroundImageUrl, "lg")}
+         onBackPosition={"top-left"}
+         onBackClick={() => goToView("livestream-details")}
+         noMinHeight
+         sx={styles.heroContent}
+      >
+         <Box sx={styles.copyContainer}>
+            <Stack sx={styles.copyStackContainer}>
+               <Typography
+                  align="center"
+                  variant={"h4"}
+                  sx={styles.livestreamCopy}
+               >
+                  {livestreamPresenter.isPast()
+                     ? "Ace your application: watch the stream recording and gain exclusive insights"
+                     : "Ace your application: discover exclusive insights in the live stream"}
+               </Typography>
+               <Typography
+                  align="center"
+                  variant={"body1"}
+                  sx={styles.livestreamDateCopy}
+               >
+                  {livestreamPresenter.isPast()
+                     ? `Live streamed on: ${DateUtil.getJobApplicationDate(
+                          livestreamPresenter.start
+                       )}`
+                     : `${DateUtil.formatLiveDate(livestreamPresenter.start)}`}
+               </Typography>
+            </Stack>
+         </Box>
+      </HeroContent>
+   )
+
+   return isAtsJob ? (
       <BaseDialogView
-         heroContent={
-            <HeroContent
-               backgroundImg={getResizedUrl(
-                  livestream.backgroundImageUrl,
-                  "lg"
-               )}
-               onBackPosition={"top-left"}
-               onBackClick={() => goToView("livestream-details")}
-               noMinHeight
-               sx={styles.heroContent}
-            >
-               <Box sx={styles.copyContainer}>
-                  <Stack sx={styles.copyStackContainer}>
-                     <Typography
-                        align="center"
-                        variant={"h4"}
-                        sx={styles.livestreamCopy}
-                     >
-                        {livestreamPresenter.isPast()
-                           ? "Ace your application: watch the stream recording and gain exclusive insights"
-                           : "Ace your application: discover exclusive insights in the live stream"}
-                     </Typography>
-                     <Typography
-                        align="center"
-                        variant={"body1"}
-                        sx={styles.livestreamDateCopy}
-                     >
-                        {livestreamPresenter.isPast()
-                           ? `Live streamed on: ${DateUtil.getJobApplicationDate(
-                                livestreamPresenter.start
-                             )}`
-                           : `${DateUtil.formatLiveDate(
-                                livestreamPresenter.start
-                             )}`}
-                     </Typography>
-                  </Stack>
-               </Box>
-            </HeroContent>
-         }
+         heroContent={livestreamDetailCustomJobHeroContent}
          mainContent={
             <MainContent>
                <Stack spacing={3}>
@@ -187,43 +181,27 @@ const JobDetails: FC<Props> = ({ jobId }) => {
                   />
 
                   <JobDescription job={job} />
-
-                  {(isOpen || applicationInitiatedOnly) && !isAtsJob ? (
-                     <CustomJobApplyConfirmation
-                        handleClose={handleClose}
-                        job={job as PublicCustomJob}
-                        livestreamId={livestream.id}
-                        autoApply={isAutoApply}
-                        sx={styles.jobApplyConfirmationDialog}
-                     />
-                  ) : null}
                </Stack>
             </MainContent>
          }
          fixedBottomContent={
-            // TODO-WG: Separate buttons and UI styling for the different scenarios, coming in new stack
-            <Stack
-               sx={[
-                  styles.btnWrapper,
-                  isLiveStreamButtonDisabled
-                     ? styles.btnSecondary
-                     : styles.btnPrimary,
-               ]}
-            >
-               <LiveStreamButton
-                  setIsDisabled={setIsLiveStreamButtonDisabled}
-               />
-
-               <Stack direction="row" spacing="10px">
-                  <JobButton
-                     job={job as Job}
-                     livestreamId={livestream.id}
-                     isSecondary={!isLiveStreamButtonDisabled}
-                     handleOpen={handleOpen}
-                  />
-               </Stack>
-            </Stack>
+            <JobButton
+               job={job as Job}
+               livestreamId={livestream.id}
+               handleOpen={handleOpen}
+            />
          }
+      />
+   ) : (
+      <CustomJobDetailsView
+         job={job as CustomJob}
+         sx={{ p: "24px !important" }}
+         heroContent={livestreamDetailCustomJobHeroContent}
+         companyName={livestreamPresenter.company}
+         companyLogoUrl={livestreamPresenter.companyLogoUrl}
+         context={{ id: livestreamPresenter.id, type: "livestream" }}
+         onApply={onApply}
+         disableSuspense
       />
    )
 }
@@ -257,41 +235,13 @@ export const JobButton: FC<JobButtonProps> = ({
                />
             )
          ) : (
-            <CustomJobCTAButton
-               livestreamId={livestreamId}
+            <CustomJobCTAButtons
+               applicationContext={{ id: livestreamId, type: "livestream" }}
                job={job as PublicCustomJob}
-               handleClick={handleOpen}
-               isSecondary={isSecondary}
-               {...props}
+               handleApplyClick={handleOpen}
             />
          )}
       </>
-   )
-}
-
-type LiveStreamButtonProps = {
-   setIsDisabled: (value: boolean) => void
-}
-
-const LiveStreamButton: FC<LiveStreamButtonProps> = ({ setIsDisabled }) => {
-   const { authenticatedUser } = useAuth()
-   const { handleRegisterClick } = useRegistrationHandler()
-   const { livestreamPresenter, serverUserEmail } = useLiveStreamDialog()
-
-   const { showRecording } = useRecordingAccess(
-      authenticatedUser.email,
-      livestreamPresenter
-   )
-
-   return (
-      <ActionButton
-         livestreamPresenter={livestreamPresenter}
-         onRegisterClick={handleRegisterClick}
-         userEmailFromServer={serverUserEmail}
-         isFixedToBottom
-         canWatchRecording={showRecording}
-         setIsDisabled={setIsDisabled}
-      />
    )
 }
 

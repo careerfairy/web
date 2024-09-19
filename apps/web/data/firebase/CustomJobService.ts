@@ -1,4 +1,3 @@
-import { CustomJobContent } from "@careerfairy/shared-lib/customJobs/customJobs"
 import firebase from "firebase/compat/app"
 import { FunctionsInstance } from "./FirebaseInstance"
 import HttpsCallableResult = firebase.functions.HttpsCallableResult
@@ -9,30 +8,24 @@ export class CustomJobService {
    ) {}
 
    async confirmJobApplication(
-      livestreamId: string,
       jobId: string,
       userId: string
    ): Promise<HttpsCallableResult> {
       return this.firebaseFunctions.httpsCallable("confirmUserJobApplication")({
-         livestreamId,
-         userId,
+         authId: userId,
          jobId,
       })
    }
 
    async confirmAnonymousJobApplication(
-      fingerPrintId: string,
       jobId: string,
-      linkedContentId: string,
-      linkedContentType: CustomJobContent
+      fingerPrintId: string
    ): Promise<HttpsCallableResult> {
       return this.firebaseFunctions.httpsCallable(
          "confirmAnonymousJobApplication"
       )({
-         fingerPrintId,
-         linkedContentId,
+         authId: fingerPrintId,
          jobId,
-         linkedContentType,
       })
    }
 

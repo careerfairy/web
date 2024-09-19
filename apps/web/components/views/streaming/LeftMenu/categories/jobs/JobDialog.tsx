@@ -173,7 +173,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
          <Box>
             <CustomJobEntryApply
                job={job}
-               livestreamId={livestream.id}
+               applicationContext={{ id: livestream.id, type: "livestream" }}
                handleApplyClick={handleShowConfirmation}
             />
          </Box>
@@ -194,7 +194,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
             open={open}
             handleClose={handleClose}
             job={job}
-            livestreamId={livestream.id}
+            applicationContext={{ id: livestream.id, type: "livestream" }}
          />
       )
    }

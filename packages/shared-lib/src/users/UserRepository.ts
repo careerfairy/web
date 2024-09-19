@@ -752,11 +752,6 @@ export class FirebaseUserRepository
       userEmail: string,
       fingerPrintId: string
    ): Promise<void> {
-      console.log(
-         "🚀 ~ updateUserAnonymousJobApplications ~ userEmail, fingerPrintId:",
-         userEmail,
-         fingerPrintId
-      )
       const batch = this.firestore.batch()
 
       const ref = this.firestore

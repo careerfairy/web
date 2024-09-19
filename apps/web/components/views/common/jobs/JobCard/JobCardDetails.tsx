@@ -25,7 +25,6 @@ const styles = sxStyles({
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
-      px: { xs: 1, md: 0 },
    },
    warningContainer: {
       display: "flex",
@@ -97,9 +96,10 @@ type Props = {
    job: Job | CustomJob
    previewMode: boolean
    smallCard: boolean
+   hideJobUrl?: boolean
 }
 
-const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
+const JobCardDetails = ({ job, previewMode, smallCard, hideJobUrl }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const { jobHubV1 } = useFeatureFlags()
@@ -188,10 +188,12 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
                   </Box>
                ) : null}
 
-               <Box sx={styles.subtitleItem}>
-                  <Globe width={smallCard ? 12 : 14} />
-                  {formatJobPostingUrl(jobPostingUrl)}
-               </Box>
+               {!hideJobUrl ? (
+                  <Box sx={styles.subtitleItem}>
+                     <Globe width={smallCard ? 12 : 14} />
+                     {formatJobPostingUrl(jobPostingUrl)}
+                  </Box>
+               ) : null}
             </Typography>
 
             <Box
@@ -226,9 +228,11 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
 }
 
 const getDeadLineMessage = (jobDeadline: Timestamp, previewMode: boolean) => {
-   const deadlineText = DateUtil.formatDateToString(jobDeadline.toDate())
+   const deadlineText =
+      (jobDeadline && DateUtil.formatDateToString(jobDeadline.toDate())) ||
+      "{no deadline set}"
 
-   if (DateUtil.isDeadlineExpired(jobDeadline.toDate())) {
+   if (jobDeadline && DateUtil.isDeadlineExpired(jobDeadline.toDate())) {
       return previewMode ? "Job expired" : `Expired on ${deadlineText}`
    }
 
@@ -238,7 +242,8 @@ const getDeadLineMessage = (jobDeadline: Timestamp, previewMode: boolean) => {
 }
 
 const formatJobPostingUrl = (postingUrl: string): string => {
-   const withoutProtocol = postingUrl.split("://")[1]
+   const withoutProtocol =
+      postingUrl?.includes("://") && postingUrl.split("://")?.at(1)
    return withoutProtocol ? withoutProtocol : postingUrl
 }
 

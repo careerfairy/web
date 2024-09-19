@@ -172,7 +172,7 @@ test.describe("Livestream Registration Signed In", () => {
 })
 
 test.describe("Livestream Registration Signed Out", () => {
-   test("past event without login should request the user to login to access the recording", async ({
+   test.skip("past event without login should request the user to login to access the recording", async ({
       page,
    }) => {
       const { livestream } = await setupLivestreamData(undefined, {

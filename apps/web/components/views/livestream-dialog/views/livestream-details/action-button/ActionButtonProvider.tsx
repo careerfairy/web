@@ -1,5 +1,5 @@
-import React, { createContext, useContext, FC } from "react"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import React, { FC, createContext, useContext } from "react"
 
 export type ActionButtonContextType = {
    onRegisterClick: (floating: boolean) => void
@@ -14,6 +14,10 @@ export type ActionButtonContextType = {
     * Force dark subtext color for legacy upcoming livestreams page
     * */
    forceDarkSubText?: boolean
+   showIcon?: boolean
+   secondary?: boolean
+   outlined?: boolean
+   onClickWatchRecording?: () => void
 }
 
 const ActionButtonContext = createContext<ActionButtonContextType>({

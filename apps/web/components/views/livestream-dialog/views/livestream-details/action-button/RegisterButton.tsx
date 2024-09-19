@@ -86,7 +86,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
                color={"primary"}
                variant={"contained"}
                sx={[
-                  !isFixedToBottom && styles.btn,
+                  isFixedToBottom ? styles.fixedBottomBtn : styles.btn,
                   registered && !isFixedToBottom && styles.successButton,
                ]}
                fullWidth

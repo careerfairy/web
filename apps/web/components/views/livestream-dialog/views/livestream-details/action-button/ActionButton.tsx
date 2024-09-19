@@ -10,7 +10,6 @@ import ActionButtonProvider, {
    useActionButtonContext,
 } from "./ActionButtonProvider"
 import RegisterButton from "./RegisterButton"
-import SignUpToWatchButton from "./SignUpToWatchButton"
 import styles from "./Styles"
 import WatchNowButton from "./WatchNowButton"
 
@@ -25,7 +24,7 @@ const ActionButton: FC<ActionButtonContextType> = (props) => {
 const ButtonElement = () => {
    const { livestreamPresenter, userEmailFromServer } = useActionButtonContext()
 
-   const { isLoggedIn, userData, isLoggedOut } = useAuth()
+   const { isLoggedIn, userData } = useAuth()
 
    const registered = useUserIsRegistered(livestreamPresenter.id)
    const { count } = useLivestreamUsersCount(
@@ -53,10 +52,6 @@ const ButtonElement = () => {
       // but we're still loading the user on the client side
       if (userEmailFromServer && (!isLoggedIn || !userData)) {
          return <ActionButtonSkeleton />
-      }
-
-      if (!isLoggedIn || isLoggedOut) {
-         return <SignUpToWatchButton />
       }
 
       return <WatchNowButton />
@@ -122,7 +117,7 @@ export const ActionButtonWrapper: FC<ActionButtonWrapperProps> = ({
       <Box
          component="span"
          sx={[
-            !isFixedToBottom && styles.btnWrapper,
+            isFixedToBottom ? styles.fixedBottomBtn : styles.btnWrapper,
             isFloating && styles.floatingBtnWrapper,
             disableMarginTop && styles.noMarginTop,
          ]}
