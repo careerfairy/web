@@ -643,3 +643,42 @@ export const getCountryCode = (
    const appEngineCountry = context?.rawRequest?.headers["x-appengine-country"]
    return appEngineCountry ? appEngineCountry.toString() : null
 }
+
+export const delay = (ms: number) =>
+   new Promise((resolve) => setTimeout(resolve, ms))
+
+/**
+ * Chunk an array into smaller arrays of a given size
+ * @param items
+ * @param batchSize
+ * @returns
+ */
+const chunk = <T>(items: T[], batchSize: number): T[][] => {
+   const chunks = []
+   for (let i = 0; i < items.length; i += batchSize) {
+      chunks.push(items.slice(i, i + batchSize))
+   }
+   return chunks
+}
+
+export const processInBatches = async <T, R>(
+   items: T[],
+   batchSize: number,
+   processItem: (item: T) => Promise<R>,
+   logger: {
+      info: (message: string) => void
+   },
+   delayMs = 500
+): Promise<R[]> => {
+   const batches = chunk(items, batchSize)
+   const results: R[] = []
+
+   for (const batch of batches) {
+      const batchResults = await Promise.all(batch.map(processItem))
+      results.push(...batchResults)
+      logger?.info(`Processed batch of ${batchResults.length} items`)
+      await delay(delayMs)
+   }
+
+   return results
+}
