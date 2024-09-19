@@ -18,6 +18,8 @@ const TAB_VALUES = {
    },
 }
 
+const JOBS_DIALOG_LINK = "/profile/custom-jobs"
+
 const styles = sxStyles({
    tabs: {
       "& *": {
@@ -135,7 +137,7 @@ const UserInitiatedCustomJobsView = () => {
    return (
       <CustomJobsList
          customJobs={initiatedJobs}
-         hrefLink="/profile/jobs"
+         hrefLink={JOBS_DIALOG_LINK}
          jobWrapperSx={styles.jobWrapper}
       />
    )
@@ -159,7 +161,7 @@ const UserAppliedCustomJobsView = () => {
    return (
       <CustomJobsList
          customJobs={appliedJobs}
-         hrefLink="/profile/jobs"
+         hrefLink={JOBS_DIALOG_LINK}
          jobWrapperSx={styles.jobWrapper}
       />
    )
