@@ -2,8 +2,11 @@ import {
    createCompatGenericConverter,
    mapFirestoreDocuments,
 } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { RegisteredLivestreams } from "@careerfairy/shared-lib/livestreams"
-import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
+import {
+   CompanyFollowed,
+   RegisteredLivestreams,
+   UserData,
+} from "@careerfairy/shared-lib/users"
 import {
    FirebaseUserRepository,
    IUserRepository,
@@ -37,10 +40,13 @@ export interface IUserFunctionsRepository extends IUserRepository {
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
 
    /**
-    * Retrieves all the registered livestreams for all users
-    * @returns All the registered livestreams for all users
+    * Retrieves all the registered livestreams for users
+    * @returns All the registered livestreams for users
     */
-   getAllUserRegisteredLivestreams(): Promise<RegisteredLivestreams[]>
+   getAllUserRegisteredLivestreams(
+      userEmails?: string[],
+      locationFilters?: string[]
+   ): Promise<RegisteredLivestreams[]>
 }
 
 export class UserFunctionsRepository
@@ -129,11 +135,37 @@ export class UserFunctionsRepository
       return querySnapshot.docs?.map((doc) => doc.data() as CompanyFollowed)
    }
 
-   async getAllUserRegisteredLivestreams(): Promise<RegisteredLivestreams[]> {
-      const querySnapshot = await this.firestore
+   async getAllUserRegisteredLivestreams(
+      userEmails?: string[],
+      locationFilters?: string[]
+   ): Promise<RegisteredLivestreams[]> {
+      const earlierThan = DateTime.now()
+         .minus({ months: SUBSCRIBED_BEFORE_MONTHS_COUNT })
+         .toJSDate()
+
+      let query = this.firestore
          .collection("registeredLivestreams")
          .withConverter(createCompatGenericConverter<RegisteredLivestreams>())
-         .get()
+
+         .where("user.unsubscribed", "==", false)
+         .where("user.lastActivityAt", ">=", earlierThan)
+
+      if (locationFilters?.length) {
+         query = query.where(
+            "user.universityCountryCode",
+            "in",
+            locationFilters
+         )
+      }
+
+      if (userEmails?.length) {
+         const withinLimit = isWithinNormalizationLimit(30, userEmails)
+         if (withinLimit) {
+            query = query.where("user.userEmail", "in", userEmails)
+         }
+      }
+
+      const querySnapshot = await query.get()
 
       return querySnapshot.docs.map((doc) => doc.data())
    }

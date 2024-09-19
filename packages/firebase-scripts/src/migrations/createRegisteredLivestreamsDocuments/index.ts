@@ -1,7 +1,5 @@
-import {
-   RegisteredLivestreams,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import { RegisteredLivestreams } from "@careerfairy/shared-lib/dist/users"
 import { Timestamp } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import counterConstants from "../../lib/Counter/constants"
@@ -20,21 +18,24 @@ export async function run() {
    try {
       // Query all userLivestreamData documents
 
-      const userLivestreamDataDocs = await logAction(
+      const userLivestreamDataSnapshot = await logAction(
          () => firestore.collectionGroup("userLivestreamData").get(),
          "Querying userLivestreamData documents"
       )
 
-      counter.addToReadCount(userLivestreamDataDocs.size)
+      const userLivestreamDataDocs = userLivestreamDataSnapshot.docs.map(
+         (doc) => doc.data() as UserLivestreamData
+      )
+
+      counter.addToReadCount(userLivestreamDataDocs.length)
       Counter.log(
-         `Found ${userLivestreamDataDocs.size} userLivestreamData documents`
+         `Found ${userLivestreamDataDocs.length} userLivestreamData documents`
       )
 
       const userRegistrations = new Map<string, Map<string, Timestamp>>()
 
       // Process userLivestreamData documents
-      userLivestreamDataDocs.forEach((doc) => {
-         const data = doc.data() as UserLivestreamData
+      userLivestreamDataDocs.forEach((data) => {
          if (data.registered && data.registered.date && data.userId) {
             if (!userRegistrations.has(data.userId)) {
                userRegistrations.set(data.userId, new Map())
@@ -69,9 +70,18 @@ export async function run() {
             .collection("registeredLivestreams")
             .doc(userId)
 
+         const user = userLivestreamDataDocs.find(
+            (userData) => userData.user.authId === userId
+         ).user
+
+         if (!user) {
+            console.error(`User ${userId} not found`)
+            continue
+         }
+
          const data: RegisteredLivestreams = {
             id: userId,
-            userId,
+            user,
             registeredLivestreams: Object.fromEntries(livestreams),
             size: livestreams.size,
          }

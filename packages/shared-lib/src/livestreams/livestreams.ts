@@ -342,24 +342,6 @@ export interface UserLivestreamData extends Identifiable {
    }
 }
 
-/**
- * Collection Path: registeredLivestreams/{userAuthId}
- */
-export interface RegisteredLivestreams extends Identifiable {
-   /**
-    * The user's auth ID
-    */
-   userId: string
-   /**
-    * A map of livestream IDs to registration timestamps
-    */
-   registeredLivestreams: Record<string, firebase.firestore.Timestamp>
-   /**
-    * The size of the registeredLivestreams map
-    */
-   size: number
-}
-
 export interface RecordingToken extends Identifiable {
    recourseId: string
    sid: string
