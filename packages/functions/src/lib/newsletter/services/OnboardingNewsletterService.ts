@@ -6,7 +6,11 @@ import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/Lives
 import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 import { EmailNotification } from "@careerfairy/shared-lib/notifications/notifications"
 import { SeenSparks } from "@careerfairy/shared-lib/sparks/sparks"
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import {
+   RegisteredLivestreams,
+   UserData,
+   UserStats,
+} from "@careerfairy/shared-lib/users"
 import {
    addUtmTagsToLink,
    getDateDifferenceInDays,
@@ -63,6 +67,7 @@ export class OnboardingNewsletterService {
    private pastLivestreams: LivestreamEvent[]
 
    private userRecommendedLivestreams: Record<string, LivestreamEvent[]> = {}
+   private registeredLivestreams: RegisteredLivestreams[] = []
 
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
@@ -363,6 +368,11 @@ export class OnboardingNewsletterService {
             this.futureLivestreams,
             this.pastLivestreams,
             null,
+            this.registeredLivestreams.find(
+               (registeredLivestream) =>
+                  registeredLivestream.user.userEmail ===
+                  onboardingUser.user.userEmail
+            ),
             false
          )
 
@@ -497,9 +507,11 @@ export class OnboardingNewsletterService {
       const promises = [
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
+         this.userRepo.getAllUserRegisteredLivestreams(),
       ] as const
 
-      const [futureLivestreams, pastLivestreams] = await Promise.all(promises)
+      const [futureLivestreams, pastLivestreams, registeredLivestreams] =
+         await Promise.all(promises)
 
       this.futureLivestreams = futureLivestreams.filter((l) => {
          // filter out livestreams before now, the bundle might have events for the same day
@@ -508,6 +520,8 @@ export class OnboardingNewsletterService {
       })
 
       this.pastLivestreams = pastLivestreams
+
+      this.registeredLivestreams = registeredLivestreams
 
       this.onboardingUsers = await Promise.all(onboardingUserPromises)
 

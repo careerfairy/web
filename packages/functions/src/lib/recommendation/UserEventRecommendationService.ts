@@ -3,12 +3,9 @@ import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRe
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { RegisteredLivestreams, UserData } from "@careerfairy/shared-lib/users"
 
-import {
-   LivestreamEvent,
-   RegisteredLivestreams,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
 import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
@@ -16,7 +13,6 @@ import {
    handlePromisesAllSettled,
    sortRankedByPoints,
 } from "@careerfairy/shared-lib/recommendation/utils"
-import { filterRegisteredLiveStreams } from "../livestream"
 import { IRecommendationDataFetcher } from "./services/DataFetcherRecommendations"
 import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
 
@@ -33,10 +29,7 @@ export default class UserEventRecommendationService
       private readonly futureLivestreams: LivestreamEvent[],
       private readonly pastLivestreams: LivestreamEvent[],
       private readonly implicitData?: ImplicitLivestreamRecommendationData,
-      private readonly registeredLivestreams: Record<
-         string,
-         RegisteredLivestreams
-      >,
+      private readonly registeredLivestreams?: RegisteredLivestreams,
       // control if the service should log debug info
       // when generating the newsletter, we don't want to log
       debug = true
@@ -120,9 +113,9 @@ export default class UserEventRecommendationService
       limit = 10
    ): Promise<RankedLivestreamEvent[]> {
       // Get only the events the user has previously registered
-      const livestreamsUserRegistered = await filterRegisteredLiveStreams(
-         this.pastLivestreams,
-         this.user?.userEmail
+      const livestreamsUserRegistered = this.pastLivestreams.filter(
+         (livestream) =>
+            this.registeredLivestreams?.registeredLivestreams[livestream.id]
       )
 
       const livestreamBasedRecommendations =
@@ -144,11 +137,13 @@ export default class UserEventRecommendationService
    static async create(
       dataFetcher: IRecommendationDataFetcher
    ): Promise<IRecommendationService> {
-      const [user, futureLivestreams, pastLivestreams] = await Promise.all([
-         dataFetcher.getUser(),
-         dataFetcher.getFutureLivestreams(),
-         dataFetcher.getPastLivestreams(),
-      ])
+      const [user, futureLivestreams, pastLivestreams, registeredLivestreams] =
+         await Promise.all([
+            dataFetcher.getUser(),
+            dataFetcher.getFutureLivestreams(),
+            dataFetcher.getPastLivestreams(),
+            dataFetcher.getUserRegisteredLivestreams(),
+         ])
 
       const [watchedSparks, interactedEvents, appliedJobs, followedCompanies] =
          await Promise.all([
@@ -169,7 +164,8 @@ export default class UserEventRecommendationService
          user,
          futureLivestreams,
          pastLivestreams,
-         implicitData
+         implicitData,
+         registeredLivestreams
       )
    }
 }

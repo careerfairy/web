@@ -9,15 +9,12 @@ import { Create } from "../commonTypes"
 import { CustomJobApplicant } from "../customJobs/customJobs"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
-import {
-   LivestreamEvent,
-   pickPublicDataFromLivestream,
-   RegisteredLivestreams,
-} from "../livestreams"
+import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import { SeenSparks } from "../sparks/sparks"
 import {
    CompanyFollowed,
    IUserReminder,
+   RegisteredLivestreams,
    RegistrationStep,
    SavedRecruiter,
    UserActivity,
@@ -204,10 +201,12 @@ export interface IUserRepository {
 
    /**
     * Retrieves the registered livestreams for a user
-    * @param userId - The user ID
+    * @param userEmail - The user email
     * @returns The registered livestreams for the user
     */
-   getUserRegisteredLivestreams(userId: string): Promise<RegisteredLivestreams>
+   getUserRegisteredLivestreams(
+      userEmail: string
+   ): Promise<RegisteredLivestreams>
 }
 
 export class FirebaseUserRepository
@@ -912,20 +911,20 @@ export class FirebaseUserRepository
    }
 
    async getUserRegisteredLivestreams(
-      userId: string
+      userEmail: string
    ): Promise<RegisteredLivestreams> {
       const docRef = this.firestore
          .collection("registeredLivestreams")
-         .doc(userId)
+         .where("user.userEmail", "==", userEmail)
          .withConverter(createCompatGenericConverter<RegisteredLivestreams>())
 
       const snap = await docRef.get()
 
-      if (!snap.exists) {
+      if (snap.empty) {
          return null
       }
 
-      return snap.data()
+      return snap.docs[0].data()
    }
 }
 
