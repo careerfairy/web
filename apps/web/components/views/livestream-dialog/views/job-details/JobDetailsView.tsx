@@ -193,6 +193,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
             </MainContent>
          }
          fixedBottomContent={
+            // TODO-WG: Separate buttons and UI styling for the different scenarios, coming in new stack
             <Stack
                sx={[
                   styles.btnWrapper,
