@@ -206,6 +206,7 @@ export const updateUnfinishedLivestreams = async () => {
    )
 
    const batch = firestore.batch()
+   const updatedLivestreams: LivestreamEvent[] = []
 
    const collection = await firestore
       .collection("livestreams")
@@ -224,15 +225,25 @@ export const updateUnfinishedLivestreams = async () => {
       )
 
       if (startDatePlusDuration <= new Date()) {
-         batch.update(doc.ref, {
+         const toUpdate: Partial<LivestreamEvent> = {
             hasStarted: false,
             hasEnded: true,
             isRecording: false,
+         }
+
+         batch.update(doc.ref, toUpdate)
+
+         updatedLivestreams.push({
+            id: doc.id,
+            ...event,
+            ...toUpdate,
          })
       }
    })
 
-   return batch.commit()
+   await batch.commit()
+
+   return updatedLivestreams
 }
 
 /**
