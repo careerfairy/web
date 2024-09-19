@@ -445,8 +445,4 @@ export interface RegisteredLivestreams extends Identifiable {
     * TODO: Update this when user registers/de-registers for a livestream
     */
    registeredLivestreams: Record<string, firebase.firestore.Timestamp>
-   /**
-    * The size of the registeredLivestreams map
-    */
-   size: number
 }

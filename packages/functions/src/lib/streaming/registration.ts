@@ -52,41 +52,39 @@ export const onUserRegistration = onDocumentWritten(
       const userDataRef = firestore().collection("userData").doc(userEmail)
 
       try {
-         await firestore().runTransaction(async (transaction) => {
-            const [registeredLivestreamsDoc, userDataDoc] = await Promise.all([
-               transaction.get(registeredLivestreamsRef),
-               transaction.get(userDataRef),
-            ])
+         const [registeredLivestreamsDoc, userDataDoc] = await Promise.all([
+            registeredLivestreamsRef.get(),
+            userDataRef.get(),
+         ])
 
-            const userData = userDataDoc.data() as UserData | undefined
-            const registeredLivestreams = getOrCreateRegisteredLivestreams(
-               registeredLivestreamsDoc,
-               userData
+         const userData = userDataDoc.data() as UserData | undefined
+         const registeredLivestreams = getOrCreateRegisteredLivestreams(
+            registeredLivestreamsDoc,
+            userData
+         )
+
+         if (!registeredLivestreams) {
+            logger.warn(
+               `Unable to process registration for user ${userEmail}: missing data`
             )
+            return
+         }
 
-            if (!registeredLivestreams) {
-               logger.warn(
-                  `Unable to process registration for user ${userEmail}: missing data`
-               )
-               return
-            }
+         updateRegisteredLivestreams(
+            registeredLivestreams,
+            livestreamId,
+            newUserLivestreamData
+         )
 
-            updateRegisteredLivestreams(
-               registeredLivestreams,
-               livestreamId,
-               newUserLivestreamData
-            )
-
-            transaction.set(registeredLivestreamsRef, registeredLivestreams, {
-               merge: true,
-            })
-
-            if (!IS_BACKFILL) {
-               logger.info(
-                  `Successfully updated registered live streams for user ${userEmail}`
-               )
-            }
+         await registeredLivestreamsRef.set(registeredLivestreams, {
+            merge: true,
          })
+
+         if (!IS_BACKFILL) {
+            logger.info(
+               `Successfully updated registered live streams for user ${userEmail}`
+            )
+         }
       } catch (error) {
          logger.error(
             `Error updating registered live streams for user ${userEmail}:`,
@@ -123,15 +121,16 @@ function getOrCreateRegisteredLivestreams(
       return null
    }
 
-   logger.info(
-      `Creating new RegisteredLivestreams document for user ${userData.authId}`
-   )
+   if (!IS_BACKFILL) {
+      logger.info(
+         `Creating new RegisteredLivestreams document for user ${userData.authId}`
+      )
+   }
 
    return {
       id: userData.authId,
       user: userData,
       registeredLivestreams: {},
-      size: 0,
    }
 }
 
@@ -143,22 +142,25 @@ function updateRegisteredLivestreams(
    if (newUserLivestreamData.registered?.date) {
       registeredLivestreams.registeredLivestreams[livestreamId] =
          newUserLivestreamData.registered.date
-      logger.info(
-         `User ${registeredLivestreams.id} registered for live stream ${livestreamId}`
-      )
+      if (!IS_BACKFILL) {
+         logger.info(
+            `User ${registeredLivestreams.id} registered for live stream ${livestreamId}`
+         )
+      }
    } else {
       delete registeredLivestreams.registeredLivestreams[livestreamId]
-      logger.info(
-         `User ${registeredLivestreams.id} unregistered from live stream ${livestreamId}`
-      )
+      if (!IS_BACKFILL) {
+         logger.info(
+            `User ${registeredLivestreams.id} unregistered from live stream ${livestreamId}`
+         )
+      }
    }
 
-   registeredLivestreams.size = Object.keys(
-      registeredLivestreams.registeredLivestreams
-   ).length
    registeredLivestreams.user = newUserLivestreamData.user
 
-   logger.info(
-      `Updated RegisteredLivestreams for user ${registeredLivestreams.id}. New size: ${registeredLivestreams.size}`
-   )
+   if (!IS_BACKFILL) {
+      logger.info(
+         `Updated RegisteredLivestreams for user ${registeredLivestreams.id}`
+      )
+   }
 }
