@@ -34,20 +34,6 @@ const styles = sxStyles({
    jobTitle: {
       fontWeight: 600,
    },
-   subTitle: {
-      fontSize: "18px",
-      fontWeight: 600,
-   },
-   editButton: {
-      textTransform: "none",
-      color: "#A0A0A0",
-      width: "max-content",
-   },
-   mobileEditBtnSection: {
-      mb: 3,
-      display: "flex",
-      justifyContent: "center",
-   },
    detailsWrapper: {
       display: { xs: "flex", md: "inline" },
       flexDirection: "column",
@@ -55,14 +41,6 @@ const styles = sxStyles({
    details: {
       color: "#8B8B8B",
       fontSize: "12px",
-   },
-   detailsValue: {
-      display: "inline",
-
-      "& svg": {
-         verticalAlign: "bottom",
-         mr: "6px !important",
-      },
    },
    skeletonDetailsValue: {
       display: "flex",

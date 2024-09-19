@@ -1,5 +1,5 @@
 import {
-   JobApplicationContext,
+   CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Button, CircularProgress } from "@mui/material"
@@ -19,21 +19,21 @@ const styles = sxStyles({
 
 type Props = {
    job: PublicCustomJob
-   applicationContext: JobApplicationContext
+   applicationSource: CustomJobApplicationSource
    handleApplyClick: () => void
    isSecondary?: boolean
 }
 
 const CustomJobEntryApply = ({
    job,
-   applicationContext,
+   applicationSource,
    handleApplyClick,
    isSecondary,
 }: Props) => {
    const { userData } = useAuth()
    const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
-      applicationContext
+      applicationSource
    )
 
    const { alreadyApplied } = useUserJobApplication(userData?.id, job.id)

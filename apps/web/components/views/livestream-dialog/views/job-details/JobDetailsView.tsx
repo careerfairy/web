@@ -1,12 +1,15 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    CustomJob,
+   CustomJobApplicationSource,
+   CustomJobApplicationSourceTypes,
    PublicCustomJob,
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { ButtonProps, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
+import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import { useRouter } from "next/router"
@@ -95,7 +98,15 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
    const [, handleOpen] = useDialogStateHandler()
    const customJob = useCustomJob(jobId)
+   const applicationSource: CustomJobApplicationSource = {
+      id: livestreamPresenter.id,
+      source: CustomJobApplicationSourceTypes.Livestream,
+   }
 
+   const { applicationInitiatedOnly } = useCustomJobApply(
+      customJob as PublicCustomJob,
+      applicationSource
+   )
    const autoActionType = useSelector(autoAction)
 
    const onApply = useCallback(() => {
@@ -195,13 +206,14 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    ) : (
       <CustomJobDetailsView
          job={job as CustomJob}
-         sx={{ p: "24px !important" }}
+         sx={{ p: "16px !important" }}
+         heroSx={{ p: "16px !important" }}
          heroContent={livestreamDetailCustomJobHeroContent}
          companyName={livestreamPresenter.company}
          companyLogoUrl={livestreamPresenter.companyLogoUrl}
-         context={{ id: livestreamPresenter.id, type: "livestream" }}
+         context={applicationSource}
          onApply={onApply}
-         disableSuspense
+         applicationInitiatedOnly={applicationInitiatedOnly}
       />
    )
 }
@@ -236,7 +248,10 @@ export const JobButton: FC<JobButtonProps> = ({
             )
          ) : (
             <CustomJobCTAButtons
-               applicationContext={{ id: livestreamId, type: "livestream" }}
+               applicationSource={{
+                  id: livestreamId,
+                  source: CustomJobApplicationSourceTypes.Livestream,
+               }}
                job={job as PublicCustomJob}
                handleApplyClick={handleOpen}
             />

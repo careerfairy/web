@@ -1,3 +1,4 @@
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import {
    CustomJob,
    PublicCustomJob,
@@ -27,20 +28,16 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "flex-start",
       gap: "4px",
-      ml: 3,
    },
    jobTitle: {
       fontWeight: 700,
+      wordBreak: "break-word",
+      color: (t) => t.palette.neutral[800],
    },
    groupName: {
       fontWeight: 600,
-   },
-   subTitle: {
-      fontSize: "18px",
-      fontWeight: 600,
-   },
-   content: {
-      mt: 4,
+      wordBreak: "break-word",
+      color: (t) => t.palette.neutral[800],
    },
    editButton: {
       textTransform: "none",
@@ -57,12 +54,11 @@ const styles = sxStyles({
       flexDirection: "column",
    },
    details: {
-      color: "#8B8B8B",
+      color: (t) => t.palette.neutral[500],
       fontSize: "12px",
    },
    detailsValue: {
       display: "inline",
-
       "& svg": {
          verticalAlign: "bottom",
          mr: "6px !important",
@@ -94,6 +90,10 @@ const CustomJobHeader = ({
 }: Props) => {
    const isMobile = useIsMobile()
 
+   const businessFunctionTags = (job.businessFunctionsTagIds || [])
+      .map((tagId) => TagValuesLookup[tagId])
+      .join(", ")
+
    return (
       <>
          {isMobile && editMode ? (
@@ -114,17 +114,27 @@ const CustomJobHeader = ({
          <Box sx={styles.header}>
             <Box sx={styles.headerLeftSide}>
                <Box sx={styles.headerContent}>
-                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
-                     <CircularLogo
-                        src={getResizedUrl(companyLogoUrl, "lg")}
-                        alt={`company ${companyName} logo`}
-                        size={63}
-                     />
-                     <Typography variant={"h4"} sx={styles.groupName}>
-                        {companyName}
-                     </Typography>
-                  </Stack>
-                  <Typography variant={"h4"} sx={styles.jobTitle}>
+                  {companyLogoUrl && companyName ? (
+                     <Stack
+                        direction={"row"}
+                        alignItems={"center"}
+                        spacing={1}
+                        mb={"8px"}
+                     >
+                        <CircularLogo
+                           src={getResizedUrl(companyLogoUrl, "lg")}
+                           alt={`company ${companyName} logo`}
+                           size={44}
+                        />
+                        <Typography
+                           variant={isMobile ? "small" : "medium"}
+                           sx={styles.groupName}
+                        >
+                           {companyName}
+                        </Typography>
+                     </Stack>
+                  ) : null}
+                  <Typography variant={"brandedH3"} sx={styles.jobTitle}>
                      {job.title}
                   </Typography>
 
@@ -140,13 +150,13 @@ const CustomJobHeader = ({
                            </Typography>
                         ) : null}
 
-                        {(job.businessFunctionsTagIds || [])?.length > 0 ? (
+                        {businessFunctionTags ? (
                            <Typography
                               variant={"subtitle1"}
                               sx={styles.details}
                            >
                               <Zap width={14} />
-                              {(job.businessFunctionsTagIds || []).join(", ")}
+                              {businessFunctionTags}
                            </Typography>
                         ) : null}
                      </Box>
@@ -164,13 +174,10 @@ const CustomJobHeader = ({
                                     {job.jobType}
                                  </>
                               ) : null}
-                              {(job.businessFunctionsTagIds || [])?.length >
-                              0 ? (
+                              {businessFunctionTags ? (
                                  <>
                                     <Zap width={14} />
-                                    {(job.businessFunctionsTagIds || []).join(
-                                       ", "
-                                    )}
+                                    {businessFunctionTags}
                                  </>
                               ) : null}
                            </Stack>

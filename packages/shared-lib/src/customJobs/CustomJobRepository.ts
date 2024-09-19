@@ -9,7 +9,7 @@ import {
    AnonymousJobApplication,
    CustomJob,
    CustomJobApplicant,
-   JobApplicationContext,
+   CustomJobApplicationSource,
    PublicCustomJob,
    getMaxDaysAfterDeadline,
 } from "./customJobs"
@@ -73,7 +73,7 @@ export interface ICustomJobRepository {
    applyUserToCustomJob(
       user: UserData,
       job: CustomJob,
-      linkedContent: JobApplicationContext
+      applicationSource: CustomJobApplicationSource
    ): Promise<void>
 
    /**
@@ -87,7 +87,7 @@ export interface ICustomJobRepository {
    applyAnonymousUserToCustomJob(
       fingerPrintId: string,
       job: CustomJob,
-      linkedContent: JobApplicationContext
+      applicationSource: CustomJobApplicationSource
    ): Promise<void>
 
    /**
@@ -314,7 +314,7 @@ export class FirebaseCustomJobRepository
    async applyUserToCustomJob(
       user: UserData,
       job: CustomJob,
-      linkedContent: JobApplicationContext
+      applicationSource: CustomJobApplicationSource
    ): Promise<void> {
       const applicationId = this.getJobApplicationId(job.id, user.id)
 
@@ -323,7 +323,7 @@ export class FirebaseCustomJobRepository
          id: applicationId,
          jobId: job.id,
          groupId: job.groupId,
-         linkedContent: linkedContent,
+         applicationSource: applicationSource,
          appliedAt: null, // Initial application not confirmed so null date
          user,
          job,
@@ -340,7 +340,7 @@ export class FirebaseCustomJobRepository
    async applyAnonymousUserToCustomJob(
       fingerPrintId: string,
       job: CustomJob,
-      linkedContent: JobApplicationContext
+      applicationSource: CustomJobApplicationSource
    ): Promise<void> {
       const anonApplicationId = this.getJobApplicationId(job.id, fingerPrintId)
 
@@ -349,7 +349,7 @@ export class FirebaseCustomJobRepository
          fingerPrintId: fingerPrintId,
          createdAt: this.fieldValue.serverTimestamp() as Timestamp,
          jobId: job.id,
-         linkedContent: linkedContent,
+         applicationSource: applicationSource,
          applied: false,
          appliedAt: null,
          userId: null,

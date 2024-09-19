@@ -45,6 +45,7 @@ const CompanyPage: NextPage<
                   serverSideUpcomingLivestreams
                )}
                pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
+               customJobs={[]}
                editMode={true}
             />
          </GroupDashboardLayout>

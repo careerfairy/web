@@ -35,7 +35,7 @@ const useUserJobApplication = (userId: string, jobId: string) => {
    return {
       job: data,
       alreadyApplied,
-      applicationInitiatedOnly, // TODO-WG: Confirm if can be useful other wise might be removed as not used
+      applicationInitiatedOnly,
    }
 }
 

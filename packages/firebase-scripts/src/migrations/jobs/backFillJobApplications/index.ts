@@ -1,4 +1,7 @@
-import { CustomJobApplicant } from "@careerfairy/shared-lib/src/customJobs/customJobs"
+import {
+   CustomJobApplicant,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/src/customJobs/customJobs"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { customJobRepo } from "../../../repositories"
@@ -58,8 +61,8 @@ const backfillJobApplications = async (
          const toUpdate: CustomJobApplicant = {
             ...customJobApplicant,
             applied: true,
-            linkedContent: {
-               type: "livestream",
+            applicationSource: {
+               source: CustomJobApplicationSourceTypes.Livestream,
                id: customJobApplicant.livestreamId,
             },
          }

@@ -12,7 +12,9 @@ const styles = sxStyles({
       alignItems: "center",
    },
    button: {
+      fontSize: "14px",
       padding: "8px 12px",
+      minWidth: "140px !important",
    },
    smallButton: {
       fontSize: 12,
@@ -22,6 +24,10 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "end",
       alignItems: "center",
+   },
+   inlineButton: {
+      whiteSpace: "nowrap",
+      textAlign: "center",
    },
 })
 
@@ -71,7 +77,10 @@ export const JobButtonAction = ({ published, smallCard = false }) => {
       <Button
          variant={published && !isMobile ? "contained" : "text"}
          color={published ? "primary" : "grey"}
-         sx={[isMobile ? styles.smallButton : styles.button]}
+         sx={[
+            isMobile ? styles.smallButton : styles.button,
+            styles.inlineButton,
+         ]}
       >
          Check details
       </Button>

@@ -1,13 +1,11 @@
-import { Box, Stack, SxProps } from "@mui/material"
-
 import {
    CustomJob,
-   JobApplicationContext,
+   CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Box, Stack, SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
@@ -29,8 +27,8 @@ const responsiveBreakpoint = "md"
 const customStyles = sxStyles({
    root: {
       p: {
-         xs: 1,
-         [responsiveBreakpoint]: 2.25,
+         xs: 2,
+         [responsiveBreakpoint]: 3,
       },
    },
    content: {
@@ -51,26 +49,22 @@ const customStyles = sxStyles({
 })
 
 type Props = {
-   disableSuspense?: boolean
    job: CustomJob
-   context?: JobApplicationContext
+   applicationInitiatedOnly?: boolean
+   context?: CustomJobApplicationSource
    heroContent?: ReactNode
    sx?: SxProps<DefaultTheme>
+   heroSx?: SxProps<DefaultTheme>
    hideBottomDivider?: boolean
    disabledLinkedContentClick?: boolean
    handleEdit?: () => void
    onApply?: () => void
    hideCTAButtons?: boolean
-   companyName: string
-   companyLogoUrl: string
+   companyName?: string
+   companyLogoUrl?: string
 }
 
 const CustomJobDetailsView = (props: Props) => {
-   if (!props.job)
-      return <CustomJobDetailsSkeleton heroContent={!!props.heroContent} />
-
-   if (props.disableSuspense) return <CustomJobDetails {...props} />
-
    return (
       <SuspenseWithBoundary
          fallback={
@@ -82,8 +76,9 @@ const CustomJobDetailsView = (props: Props) => {
    )
 }
 
-const CustomJobDetails = ({
+export const CustomJobDetails = ({
    job,
+   applicationInitiatedOnly,
    handleEdit,
    companyLogoUrl,
    companyName,
@@ -91,10 +86,11 @@ const CustomJobDetails = ({
    heroContent,
    disabledLinkedContentClick,
    sx,
+   heroSx,
    hideBottomDivider,
+   hideCTAButtons,
    onApply,
 }: Props) => {
-   const { applicationInitiatedOnly } = useCustomJobApply(job, context)
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler(
       applicationInitiatedOnly
    )
@@ -107,8 +103,8 @@ const CustomJobDetails = ({
 
    return (
       <>
+         <Box sx={combineStyles(customStyles.root, heroSx)}>{heroContent}</Box>
          <Stack spacing={4.75} sx={combineStyles(customStyles.root, sx)}>
-            {heroContent}
             <Box>
                <CustomJobHeader
                   job={job}
@@ -128,16 +124,16 @@ const CustomJobDetails = ({
                   </Stack>
                </Box>
 
-               {context && isOpen ? (
+               {!hideCTAButtons && context && isOpen ? (
                   <CustomJobApplyConfirmation
                      handleClose={handleClose}
                      job={job as PublicCustomJob}
-                     applicationContext={context}
+                     applicationSource={context}
                      autoApply={isAutoApply}
                      onApply={onApply}
                      sx={{
                         bottom:
-                           isMobile && context.type == "livestream"
+                           isMobile && context.source == "livestream"
                               ? "150px"
                               : "100px",
                      }}
@@ -145,14 +141,14 @@ const CustomJobDetails = ({
                ) : null}
             </Box>
          </Stack>
-         {context ? (
+         {!hideCTAButtons && context ? (
             <>
                <CustomJobCTABottomContent
                   hideBottomDivider={hideBottomDivider}
                   ref={ref}
                >
                   <CustomJobCTAButtons
-                     applicationContext={context}
+                     applicationSource={context}
                      job={job as PublicCustomJob}
                      handleApplyClick={handleOpen}
                      {...props}
