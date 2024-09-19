@@ -16,3 +16,13 @@ Execute the following command:
 ```shell
 npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/createRegisteredLivestreamsDocuments
 ```
+
+## Output
+
+The script will update all documents in the `userLivestreamData` collection group. Each document will have a new field added:
+
+```javascript
+{  ...existing UserLivestreamData,
+   migrationTrigger: Date.now(), // timestamp of when the migration was triggered
+}
+```

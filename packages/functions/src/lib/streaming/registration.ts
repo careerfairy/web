@@ -52,11 +52,18 @@ export const onUserRegistration = onDocumentWritten(
                transaction.get(userDataRef),
             ])
 
-            const userData = userDataDoc.data() as UserData
+            const userData = userDataDoc.data() as UserData | undefined
             const registeredLivestreams = getOrCreateRegisteredLivestreams(
                registeredLivestreamsDoc,
                userData
             )
+
+            if (!registeredLivestreams) {
+               logger.warn(
+                  `Unable to process registration for user ${userEmail}: missing data`
+               )
+               return
+            }
 
             updateRegisteredLivestreams(
                registeredLivestreams,
@@ -93,24 +100,31 @@ export const onUserRegistration = onDocumentWritten(
 
 function getOrCreateRegisteredLivestreams(
    doc: FirebaseFirestore.DocumentSnapshot,
-   userData: UserData
-): RegisteredLivestreams {
+   userData: UserData | undefined
+): RegisteredLivestreams | null {
    const existingData = doc.data() as RegisteredLivestreams | undefined
 
-   if (!existingData) {
-      logger.info(
-         `Creating new RegisteredLivestreams document for user ${userData.authId}`
-      )
+   if (existingData) {
+      return existingData
    }
 
-   return (
-      existingData ?? {
-         id: userData.authId,
-         user: userData,
-         registeredLivestreams: {},
-         size: 0,
-      }
+   if (!userData?.authId) {
+      logger.warn(
+         "Unable to create RegisteredLivestreams: missing userData or authId"
+      )
+      return null
+   }
+
+   logger.info(
+      `Creating new RegisteredLivestreams document for user ${userData.authId}`
    )
+
+   return {
+      id: userData.authId,
+      user: userData,
+      registeredLivestreams: {},
+      size: 0,
+   }
 }
 
 function updateRegisteredLivestreams(
