@@ -1,20 +1,18 @@
-import React from "react"
-import { Box, Hidden, IconButton } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
-import { MainLogo } from "components/logos"
+import { Box, Hidden, IconButton } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import useGeneralLinks from "components/custom-hook/useGeneralLinks"
-import * as actions from "store/actions"
+import { MainLogo } from "components/logos"
 import { useDispatch } from "react-redux"
+import * as actions from "store/actions"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import LoginButton from "../../../components/views/common/LoginButton"
 import GeneralHeader from "../../../components/views/header/GeneralHeader"
 import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
-import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import ProfileMenu from "../../GenericDashboardLayout/TopBar/ProfileMenu"
-import { useCreditsDialog } from "../../CreditsDialogLayout"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -25,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 const TopBar = () => {
-   const { handleOpenCreditsDialog } = useCreditsDialog()
    const theme = useTheme()
    const classes = useStyles()
    const isMobile = useIsMobile()
@@ -65,9 +62,7 @@ const TopBar = () => {
                         <LoginButton />
                      </div>
                   ) : (
-                     <ProfileMenu
-                        handleOpenCreditsDialog={handleOpenCreditsDialog}
-                     />
+                     <ProfileMenu />
                   )}
                </Box>
             </Hidden>

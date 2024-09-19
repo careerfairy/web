@@ -175,7 +175,7 @@ export const getCustomRewardMessageForAction = (
 ): string => {
    switch (action) {
       case "USER_CV_UPLOAD":
-         return `As a reward for uploading your CV you’ve received +${REWARDS[action].credits} CareerCoin to use inside our platform.`
+         return ""
 
       default:
          return ""
