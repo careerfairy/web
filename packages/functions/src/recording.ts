@@ -29,11 +29,6 @@ export const automaticallyRecordLivestream = functions
       const previousValue = change.before.data() as LivestreamEvent
       const newValue = change.after.data() as LivestreamEvent
 
-      functions.logger.info(
-         `Automatically recording live stream: ${context.params.livestreamId}`,
-         { previousValue, newValue }
-      )
-
       await automaticallyRecord(
          context.params.livestreamId,
          previousValue,
@@ -55,11 +50,6 @@ export const automaticallyRecordLivestreamBreakoutRoom = functions
    .onUpdate(async (change, context) => {
       const previousValue = change.before.data() as LivestreamEvent
       const newValue = change.after.data() as LivestreamEvent
-
-      functions.logger.info(
-         `Automatically recording live stream breakout room: ${context.params.livestreamId}/${context.params.breakoutRoomId}`,
-         { previousValue, newValue }
-      )
 
       await automaticallyRecord(
          context.params.livestreamId,
@@ -107,12 +97,6 @@ const automaticallyRecord = async (
    newValue: LivestreamEvent,
    breakoutRoomId: string = null
 ) => {
-   functions.logger.info(`Automatically recording: ${livestreamId}`, {
-      breakoutRoomId,
-      previousValue,
-      newValue,
-   })
-
    // Don't automatically record test events
    // start the recording manually instead
    if (newValue.test === true) {
@@ -127,7 +111,7 @@ const automaticallyRecord = async (
       !newValue.isRecording
    ) {
       functions.logger.info(
-         `Starting recording for newly started live stream: ${livestreamId}`,
+         `Starting recording conditions have been met for newly started live stream: ${livestreamId}`,
          {
             reason: "Live stream has started and is not currently recording",
             previousStarted: previousValue.hasStarted,
@@ -143,7 +127,7 @@ const automaticallyRecord = async (
 
    if (!previousValue.hasEnded && newValue.hasEnded && newValue.isRecording) {
       functions.logger.info(
-         `Stopping recording for ended live stream: ${livestreamId}`,
+         `Stopping recording conditions have been met for ended live stream: ${livestreamId}`,
          {
             reason: "Live stream has ended and is still recording",
             previousEnded: previousValue.hasEnded,
@@ -166,7 +150,7 @@ const automaticallyRecord = async (
       newValue.isRecording
    ) {
       functions.logger.warn(
-         `Stopping recording for already ended live stream: ${livestreamId}`,
+         `Stopping recording conditions have been met for already ended live stream: ${livestreamId}`,
          {
             reason: "Live stream has already ended but is still recording",
             previousEnded: previousValue.hasEnded,
