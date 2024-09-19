@@ -1,5 +1,8 @@
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   RegisteredLivestreams,
+} from "@careerfairy/shared-lib/livestreams"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import {
    LikedSparks,
@@ -103,7 +106,11 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
       private readonly userId: string,
       private readonly livestreamRepo: ILivestreamRepository,
       private readonly userRepo: IUserRepository,
-      private readonly sparksRepo: ISparkFunctionsRepository
+      private readonly sparksRepo: ISparkFunctionsRepository,
+      private readonly registeredLivestreams: Record<
+         string,
+         RegisteredLivestreams
+      >
    ) {
       this.loader = new BundleLoader()
    }
@@ -116,6 +123,10 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
       await this.loader.fetch("allFutureLivestreams")
 
       return this.loader.getDocs<LivestreamEvent>("future-livestreams-query")
+   }
+
+   async getRegisteredLivestreams(): Promise<RegisteredLivestreams> {
+      return this.userRepo.getUserRegisteredLivestreams(this.userId)
    }
 
    getPastLivestreams(): Promise<LivestreamEvent[]> {

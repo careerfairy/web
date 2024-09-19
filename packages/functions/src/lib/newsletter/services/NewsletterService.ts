@@ -1,6 +1,9 @@
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   RegisteredLivestreams,
+} from "@careerfairy/shared-lib/livestreams"
 import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 import {
    EmailNotification,
@@ -94,6 +97,8 @@ export class NewsletterService {
     */
    private users: Record<string, UserLivestreams> = {}
 
+   private registeredLivestreams: Record<string, RegisteredLivestreams>
+
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
       private readonly groupRepo: IGroupFunctionsRepository,
@@ -181,10 +186,15 @@ export class NewsletterService {
          this.userRepo.getSubscribedUsers(null, LOCATION_FILTERS),
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
+         this.userRepo.getAllUserRegisteredLivestreams(),
       ] as const
 
-      const [subscribedUsers, futureLivestreams, pastLivestreams] =
-         await Promise.all(promises)
+      const [
+         subscribedUsers,
+         futureLivestreams,
+         pastLivestreams,
+         registeredLivestreams,
+      ] = await Promise.all(promises)
 
       this.logger.info(
          "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
@@ -201,6 +211,7 @@ export class NewsletterService {
       this.logger.info("filtered users", filteredUsers?.length)
 
       this.subscribedUsers = convertDocArrayToDict(filteredUsers)
+      this.registeredLivestreams = convertDocArrayToDict(registeredLivestreams)
       this.logger.info(
          "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
          Object.keys(this.subscribedUsers).map(

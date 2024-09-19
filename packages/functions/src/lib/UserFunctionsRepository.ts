@@ -1,4 +1,8 @@
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import {
+   createCompatGenericConverter,
+   mapFirestoreDocuments,
+} from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { RegisteredLivestreams } from "@careerfairy/shared-lib/livestreams"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import {
    FirebaseUserRepository,
@@ -31,6 +35,12 @@ export interface IUserFunctionsRepository extends IUserRepository {
       earlierThanDays?: number
    ): Promise<UserData[]>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
+
+   /**
+    * Retrieves all the registered livestreams for all users
+    * @returns All the registered livestreams for all users
+    */
+   getAllUserRegisteredLivestreams(): Promise<RegisteredLivestreams[]>
 }
 
 export class UserFunctionsRepository
@@ -117,5 +127,14 @@ export class UserFunctionsRepository
          .get()
 
       return querySnapshot.docs?.map((doc) => doc.data() as CompanyFollowed)
+   }
+
+   async getAllUserRegisteredLivestreams(): Promise<RegisteredLivestreams[]> {
+      const querySnapshot = await this.firestore
+         .collection("registeredLivestreams")
+         .withConverter(createCompatGenericConverter<RegisteredLivestreams>())
+         .get()
+
+      return querySnapshot.docs.map((doc) => doc.data())
    }
 }

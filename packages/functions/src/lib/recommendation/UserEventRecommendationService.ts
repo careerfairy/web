@@ -5,7 +5,10 @@ import RecommendationServiceCore, {
 } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
 import { UserData } from "@careerfairy/shared-lib/users"
 
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   RegisteredLivestreams,
+} from "@careerfairy/shared-lib/livestreams"
 import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
 import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
@@ -30,6 +33,10 @@ export default class UserEventRecommendationService
       private readonly futureLivestreams: LivestreamEvent[],
       private readonly pastLivestreams: LivestreamEvent[],
       private readonly implicitData?: ImplicitLivestreamRecommendationData,
+      private readonly registeredLivestreams: Record<
+         string,
+         RegisteredLivestreams
+      >,
       // control if the service should log debug info
       // when generating the newsletter, we don't want to log
       debug = true
