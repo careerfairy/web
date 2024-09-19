@@ -70,15 +70,12 @@ export const onUserRegistration = onDocumentWritten(
             return
          }
 
-         updateRegisteredLivestreams(
-            registeredLivestreams,
+         const updateData = updateRegisteredLivestreams(
             livestreamId,
             newUserLivestreamData
          )
 
-         await registeredLivestreamsRef.set(registeredLivestreams, {
-            merge: true,
-         })
+         await registeredLivestreamsRef.set(updateData, { merge: true })
 
          if (!IS_BACKFILL) {
             logger.info(
@@ -135,32 +132,36 @@ function getOrCreateRegisteredLivestreams(
 }
 
 function updateRegisteredLivestreams(
-   registeredLivestreams: RegisteredLivestreams,
    livestreamId: string,
    newUserLivestreamData: UserLivestreamData
-): void {
+): Partial<RegisteredLivestreams> {
+   const updateData: Partial<RegisteredLivestreams> = {
+      user: newUserLivestreamData.user,
+   }
+
    if (newUserLivestreamData.registered?.date) {
-      registeredLivestreams.registeredLivestreams[livestreamId] =
+      updateData[`registeredLivestreams.${livestreamId}`] =
          newUserLivestreamData.registered.date
       if (!IS_BACKFILL) {
          logger.info(
-            `User ${registeredLivestreams.id} registered for live stream ${livestreamId}`
+            `User ${newUserLivestreamData.userId} registered for live stream ${livestreamId}`
          )
       }
    } else {
-      delete registeredLivestreams.registeredLivestreams[livestreamId]
+      updateData[`registeredLivestreams.${livestreamId}`] =
+         firestore.FieldValue.delete()
       if (!IS_BACKFILL) {
          logger.info(
-            `User ${registeredLivestreams.id} unregistered from live stream ${livestreamId}`
+            `User ${newUserLivestreamData.userId} unregistered from live stream ${livestreamId}`
          )
       }
    }
 
-   registeredLivestreams.user = newUserLivestreamData.user
-
    if (!IS_BACKFILL) {
       logger.info(
-         `Updated RegisteredLivestreams for user ${registeredLivestreams.id}`
+         `Updated RegisteredLivestreams for user ${newUserLivestreamData.userId}`
       )
    }
+
+   return updateData
 }
