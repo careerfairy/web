@@ -1,8 +1,14 @@
-import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   AnonymousJobApplication,
+   CustomJobApplicant,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
+import useFingerPrint from "../useFingerPrint"
 import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 
 const useUserJobApplication = (userId: string, jobId: string) => {
+   const { data: fingerPrintId } = useFingerPrint()
    const jobApplicationId = `${jobId}_${userId}`
+   const anonApplicationId = `${jobId}_${fingerPrintId}`
 
    const { data } = useFirestoreDocument<CustomJobApplicant>(
       "jobApplications",
@@ -12,9 +18,24 @@ const useUserJobApplication = (userId: string, jobId: string) => {
       }
    )
 
+   const { data: anonApplicationData } =
+      useFirestoreDocument<AnonymousJobApplication>(
+         "anonymousJobApplications",
+         [anonApplicationId],
+         {
+            idField: "id",
+         }
+      )
+
+   const applicationInitiatedOnly: boolean =
+      Boolean(data || anonApplicationData) &&
+      !(data?.applied || anonApplicationData?.applied)
+
+   const alreadyApplied = data?.applied || anonApplicationData?.applied
    return {
       job: data,
-      alreadyApplied: data?.completed,
+      alreadyApplied,
+      applicationInitiatedOnly,
    }
 }
 

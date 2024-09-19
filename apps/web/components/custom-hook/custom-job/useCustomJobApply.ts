@@ -6,25 +6,42 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import { customJobRepo } from "../../../data/RepositoryInstances"
 import { customJobServiceInstance } from "../../../data/firebase/CustomJobService"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
+import useFingerPrint from "../useFingerPrint"
 import useSnackbarNotifications from "../useSnackbarNotifications"
 import useCustomJob from "./useCustomJob"
 import useUserJobApplication from "./useUserJobApplication"
 
 const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
    const { userData } = useAuth()
-   const { alreadyApplied } = useUserJobApplication(userData?.id, job.id)
+   const { data: fingerPrintId } = useFingerPrint()
+
+   const { alreadyApplied, applicationInitiatedOnly } = useUserJobApplication(
+      userData?.id,
+      job.id
+   )
+
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { push, asPath } = useRouter()
    const customJob = useCustomJob(job.id)
 
    const { trigger: handleApply, isMutating: isApplying } = useSWRMutation(
       `user-${userData?.id}-applyToCustomJob-${job.id}`,
-      () =>
-         customJobServiceInstance.confirmJobApplication(
-            livestreamId,
-            job.id,
-            userData?.id
-         ),
+      () => {
+         if (userData) {
+            customJobServiceInstance.confirmJobApplication(
+               livestreamId,
+               job.id,
+               userData?.id
+            )
+         } else {
+            customJobServiceInstance.confirmAnonymousJobApplication(
+               fingerPrintId,
+               job.id,
+               livestreamId,
+               "livestream"
+            )
+         }
+      },
       {
          onError: (error) => {
             errorNotification(
@@ -57,13 +74,26 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
       useSWRMutation(
          `user-${userData?.id}-clicksOnCustomJob-${job.id}`,
          async () => {
+            console.log(
+               "🚀 ~ handleClickApplyBtn:",
+               `user-${userData?.id}-clicksOnCustomJob-${job.id}`
+            )
+            const jobApplication = userData
+               ? customJobRepo.applyUserToCustomJob(
+                    userData,
+                    customJob,
+                    livestreamId
+                 )
+               : customJobRepo.applyAnonymousUserToCustomJob(
+                    fingerPrintId,
+                    customJob,
+                    livestreamId,
+                    "livestream"
+                 )
+
             return await Promise.all([
                customJobRepo.incrementCustomJobClicks(job.id),
-               customJobRepo.applyUserToCustomJob(
-                  userData,
-                  customJob,
-                  livestreamId
-               ),
+               jobApplication,
             ])
          }
       )
@@ -75,6 +105,7 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
       handleClickApplyBtn,
       isClickingOnApplyBtn,
       redirectToSignUp,
+      applicationInitiatedOnly,
    }
 }
 

@@ -19,8 +19,8 @@ export async function run() {
          `Fetching data for Backfilling Job Applications: adding completed and userId to document - v${RUNNING_VERSION}`
       )
 
-      const [allJobApplications] = await logAction(
-         () => Promise.all([customJobRepo.getAllJobApplications(true)]),
+      const allJobApplications = await logAction(
+         () => customJobRepo.getAllJobApplications(true),
          "Fetching all Job Applications"
       )
 
@@ -55,8 +55,8 @@ const backfillJobApplications = async (
       customJobsApplicantsChunk.forEach((customJobApplicant) => {
          writeProgressBar.increment() // Increment progress bar
 
-         const toUpdate: Pick<CustomJobApplicant, "completed"> = {
-            completed: true,
+         const toUpdate: Pick<CustomJobApplicant, "applied"> = {
+            applied: true,
          }
 
          // eslint-disable-next-line @typescript-eslint/no-explicit-any
