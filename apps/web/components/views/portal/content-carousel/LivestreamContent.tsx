@@ -42,11 +42,10 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
       [livestream, livestreamData]
    )
 
-   const {
-      userHasAccessToRecordingThroughRegistering,
-      userHasBoughtRecording,
-      showRecording,
-   } = useRecordingAccess(userStats?.userId, livestreamPresenter, userStats)
+   const { showRecording } = useRecordingAccess(
+      userStats?.userId,
+      livestreamPresenter
+   )
 
    const eventIsUpcoming = useMemo(
       () => !livestreamPresenter.isPast(),
@@ -59,12 +58,8 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
          return "Coming Next!"
       }
 
-      if (userHasAccessToRecordingThroughRegistering) {
-         return "What You've Missed"
-      }
-
       return "Worth A Look!"
-   }, [eventIsUpcoming, userHasAccessToRecordingThroughRegistering])
+   }, [eventIsUpcoming])
 
    const subtitle = useMemo(() => {
       if (eventIsUpcoming) {
@@ -72,27 +67,8 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
          return `Live on ${DateUtil.dateWithYear(livestream.start.toDate())}`
       }
 
-      if (
-         !userHasBoughtRecording &&
-         userHasAccessToRecordingThroughRegistering
-      ) {
-         const timeLeft = DateUtil.calculateTimeLeft(
-            livestreamPresenter.recordingAccessTimeLeft()
-         )
-
-         return timeLeft?.Days === 0
-            ? "Last day to rewatch"
-            : `Recording available for ${timeLeft.Days} days`
-      }
-
       return ""
-   }, [
-      eventIsUpcoming,
-      livestream.start,
-      livestreamPresenter,
-      userHasAccessToRecordingThroughRegistering,
-      userHasBoughtRecording,
-   ])
+   }, [eventIsUpcoming, livestream.start])
 
    const actionItem = useMemo<ReactNode>(() => {
       if (eventIsUpcoming) {

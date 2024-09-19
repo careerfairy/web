@@ -1,32 +1,15 @@
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { UserStats } from "@careerfairy/shared-lib/users"
-import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
-import { rewardService } from "data/firebase/RewardService"
 
 /**
  * Check if the user has access to a livestream recording
  */
 export const useRecordingAccess = (
    userEmail: string | null,
-   streamPresenter: LivestreamPresenter,
-   userStats: UserStats | null
+   streamPresenter: LivestreamPresenter
 ) => {
-   const userHasBoughtRecording = rewardService.canAccessRecording(
-      userStats,
-      streamPresenter?.id
-   )
-
-   const isRegistered = useUserIsRegistered(streamPresenter.id)
-
-   const userHasAccessToRecordingThroughRegistering = Boolean(
-      streamPresenter?.isAbleToShowRecording(isRegistered)
-   )
-
    return {
       showRecording:
-         userHasAccessToRecordingThroughRegistering || userHasBoughtRecording,
-      userHasBoughtRecording,
-      userHasAccessToRecordingThroughRegistering,
+         streamPresenter?.isAbleToShowRecording() && Boolean(userEmail),
    }
 }
 

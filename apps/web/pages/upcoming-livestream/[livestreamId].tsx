@@ -14,6 +14,7 @@ import { omit } from "lodash"
 import { GetServerSidePropsContext } from "next"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useAuth } from "../../HOCs/AuthProvider"
 import useRedirectToEventRoom from "../../components/custom-hook/live-stream/useRedirectToEventRoom"
 import useTrackLivestreamView from "../../components/custom-hook/live-stream/useTrackLivestreamView"
 import { useInterests } from "../../components/custom-hook/useCollection"
@@ -36,11 +37,10 @@ import QuestionsSection from "../../components/views/upcoming-livestream/Questio
 import ReferralSection from "../../components/views/upcoming-livestream/ReferralSection"
 import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection"
 import UserUtil from "../../data/util/UserUtil"
-import { useAuth } from "../../HOCs/AuthProvider"
 import UpcomingLayout from "../../layouts/UpcomingLayout"
-import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { dateIsInUnder24Hours, streamIsOld } from "../../util/CommonUtil"
 import { getStreamMetaInfo } from "../../util/SeoUtil"
+import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import {
    getServerSideStream,
    getServerSideUserStats,
@@ -92,11 +92,7 @@ const UpcomingLivestreamPage = ({
       return userStats ? userStats : userStatsPlain
    }, [userStatsPlain, userStats])
 
-   const { showRecording, userHasBoughtRecording } = useRecordingAccess(
-      userEmail,
-      streamPresenter,
-      updatedStats
-   )
+   const { showRecording } = useRecordingAccess(userEmail, streamPresenter)
 
    const companyGroupData = useMemo<Group | null>(() => {
       const companyGroups = unfilteredGroups?.filter(
@@ -331,7 +327,6 @@ const UpcomingLivestreamPage = ({
                showScrollButton={true}
                isPastEvent={isPastEvent}
                showRecording={showRecording}
-               userHasBoughtRecording={userHasBoughtRecording}
                userEmailFromServer={userEmail}
             />
             <Navigation

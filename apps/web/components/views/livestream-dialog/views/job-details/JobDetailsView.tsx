@@ -268,12 +268,11 @@ type LiveStreamButtonProps = {
 const LiveStreamButton: FC<LiveStreamButtonProps> = ({ setIsDisabled }) => {
    const { authenticatedUser } = useAuth()
    const { handleRegisterClick } = useRegistrationHandler()
-   const { livestreamPresenter, serverUserEmail, updatedStats } =
-      useLiveStreamDialog()
+   const { livestreamPresenter, serverUserEmail } = useLiveStreamDialog()
+
    const { showRecording } = useRecordingAccess(
-      authenticatedUser.email || serverUserEmail,
-      livestreamPresenter,
-      updatedStats
+      authenticatedUser.email,
+      livestreamPresenter
    )
 
    return (
