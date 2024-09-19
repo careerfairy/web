@@ -1,101 +1,94 @@
-import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
-import { RegisteredLivestreams } from "@careerfairy/shared-lib/dist/users"
-import { Timestamp } from "firebase-admin/firestore"
+import { FieldPath } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
-import counterConstants from "../../lib/Counter/constants"
 import { firestore } from "../../lib/firebase"
 import {
    handleBulkWriterError,
    handleBulkWriterSuccess,
-   loopProgressBar,
+   writeProgressBar,
 } from "../../util/bulkWriter"
 import { logAction } from "../../util/logger"
+
+const BATCH_SIZE = 5_000
+const TRIGGER_FIELD = "migrationTrigger"
+
+const getTotalUserLivestreamDataCount = async () => {
+   const totalUserLivestreamDataDocumentCountSnapshot = await firestore
+      .collectionGroup("userLivestreamData")
+      .count()
+      .get()
+
+   return totalUserLivestreamDataDocumentCountSnapshot.data().count
+}
 
 export async function run() {
    const counter = new Counter()
    const bulkWriter = firestore.bulkWriter()
 
+   let totalIntendedWrites = 0
+   let successfulWrites = 0
+   let processedDocuments = 0
+
+   bulkWriter.onWriteResult(() => {
+      successfulWrites++
+      writeProgressBar.update(successfulWrites)
+   })
+
+   const totalDocumentsCounts = await getTotalUserLivestreamDataCount()
+
+   console.log(`Total userLivestreamData documents: ${totalDocumentsCounts}`)
+
    try {
-      // Query all userLivestreamData documents
+      let lastDocPath = null
+      let hasMoreDocs = true
 
-      const userLivestreamDataSnapshot = await logAction(
-         () => firestore.collectionGroup("userLivestreamData").get(),
-         "Querying userLivestreamData documents"
-      )
+      while (hasMoreDocs) {
+         let query = firestore
+            .collectionGroup("userLivestreamData")
+            .orderBy(FieldPath.documentId())
+            .limit(BATCH_SIZE)
 
-      const userLivestreamDataDocs = userLivestreamDataSnapshot.docs.map(
-         (doc) => doc.data() as UserLivestreamData
-      )
-
-      counter.addToReadCount(userLivestreamDataDocs.length)
-      Counter.log(
-         `Found ${userLivestreamDataDocs.length} userLivestreamData documents`
-      )
-
-      const userRegistrations = new Map<string, Map<string, Timestamp>>()
-
-      // Process userLivestreamData documents
-      userLivestreamDataDocs.forEach((data) => {
-         if (data.registered && data.registered.date && data.userId) {
-            if (!userRegistrations.has(data.userId)) {
-               userRegistrations.set(data.userId, new Map())
-            }
-            userRegistrations
-               .get(data.userId)
-               .set(data.livestreamId, data.registered.date)
-         }
-      })
-
-      counter.setCustomCount(
-         counterConstants.totalNumDocs,
-         userRegistrations.size
-      )
-
-      const totalWrites = userRegistrations.size
-      loopProgressBar.start(totalWrites, 0)
-
-      let completedWrites = 0
-
-      bulkWriter.onWriteResult(() => {
-         completedWrites++
-         loopProgressBar.update(completedWrites)
-         counter.writeIncrement()
-      })
-
-      let index = 0
-      for (const [userId, livestreams] of userRegistrations) {
-         counter.setCustomCount(counterConstants.currentDocIndex, index)
-
-         const docRef = firestore
-            .collection("registeredLivestreams")
-            .doc(userId)
-
-         const user = userLivestreamDataDocs.find(
-            (userData) => userData.user.authId === userId
-         ).user
-
-         if (!user) {
-            console.error(`User ${userId} not found`)
-            continue
+         if (lastDocPath) {
+            query = query.startAfter(lastDocPath)
          }
 
-         const data: RegisteredLivestreams = {
-            id: userId,
-            user,
-            registeredLivestreams: Object.fromEntries(livestreams),
-            size: livestreams.size,
+         const snapshot = await logAction(
+            () => query.get(),
+            "Getting next page of userLivestreamData documents"
+         )
+
+         if (snapshot.empty) {
+            hasMoreDocs = false
+            break
          }
 
-         bulkWriter
-            .set(docRef, data)
-            .then(() => handleBulkWriterSuccess(counter))
-            .catch((err) => handleBulkWriterError(err, counter))
+         const docs = snapshot.docs
+         processedDocuments += docs.length
 
-         index++
+         for (const doc of docs) {
+            totalIntendedWrites++
+            bulkWriter
+               .update(doc.ref, {
+                  [TRIGGER_FIELD]: Date.now(),
+               })
+               .then(() => handleBulkWriterSuccess(counter))
+               .catch((err) => handleBulkWriterError(err, counter))
+         }
+
+         lastDocPath = docs[docs.length - 1].ref.path
+
+         // Log batch progress
+         const progress = (processedDocuments / totalDocumentsCounts) * 100
+         console.log(
+            `Processed ${processedDocuments} out of ${totalDocumentsCounts} documents (${progress.toFixed(
+               2
+            )}%)`
+         )
       }
 
+      writeProgressBar.start(totalIntendedWrites, 0)
+
       await bulkWriter.close()
-      loopProgressBar.stop()
+      writeProgressBar.stop()
       Counter.log("Finished processing")
    } catch (error) {
       console.error("Error:", error)
