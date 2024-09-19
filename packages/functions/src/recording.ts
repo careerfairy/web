@@ -1,5 +1,11 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   downloadLink,
+   MAX_RECORDING_HOURS,
+   S3_ROOT_PATH,
+} from "@careerfairy/shared-lib/livestreams/recordings"
 import AgoraClient from "./api/agora"
-import functions = require("firebase-functions")
+import config from "./config"
 import {
    livestreamGetRecordingToken,
    livestreamGetSecureToken,
@@ -8,19 +14,13 @@ import {
    updateUnfinishedLivestreams,
 } from "./lib/livestream"
 import { logAxiosErrorAndThrow } from "./util"
-import {
-   downloadLink,
-   S3_ROOT_PATH,
-   MAX_RECORDING_HOURS,
-} from "@careerfairy/shared-lib/livestreams/recordings"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import config from "./config"
+import functions = require("firebase-functions")
 
 /**
- * Automatically record a livestream
+ * Automatically record a live stream
  *
- * Starts when the livestream starts
- * Stops when the livestream ends
+ * Starts when the live stream starts
+ * Stops when the live stream ends
  */
 export const automaticallyRecordLivestream = functions
    .region(config.region)
@@ -37,7 +37,7 @@ export const automaticallyRecordLivestream = functions
    })
 
 /**
- * Automatically record a livestream breakout room
+ * Automatically record a live stream breakout room
  *
  * Starts when the breakout room starts/is opened
  * Stops when the breakout room is closed
@@ -62,22 +62,30 @@ export const automaticallyRecordLivestreamBreakoutRoom = functions
 /**
  * Manually start a recording
  *
- * Works for both livestreams and breakout rooms
+ * Works for both live streams and breakout rooms
  */
 export const startRecordingLivestream = functions
    .region(config.region)
    .https.onCall(async (data) => {
+      functions.logger.info(
+         `Manually starting recording for stream: ${data.streamId}`,
+         { breakoutRoomId: data.breakoutRoomId }
+      )
       await startRecording(data.streamId, data.token, data.breakoutRoomId)
    })
 
 /**
  * Manually stop a recording
  *
- * Works for both livestreams and breakout rooms
+ * Works for both live streams and breakout rooms
  */
 export const stopRecordingLivestream = functions
    .region(config.region)
    .https.onCall(async (data) => {
+      functions.logger.info(
+         `Manually stopping recording for stream: ${data.streamId}`,
+         { breakoutRoomId: data.breakoutRoomId }
+      )
       await stopRecording(data.streamId, data.token, data.breakoutRoomId)
    })
 
@@ -92,14 +100,25 @@ const automaticallyRecord = async (
    // Don't automatically record test events
    // start the recording manually instead
    if (newValue.test === true) {
+      functions.logger.info(
+         `Skipping automatic recording for test event: ${livestreamId}`
+      )
       return
    }
-
    if (
       !previousValue.hasStarted &&
       newValue.hasStarted &&
       !newValue.isRecording
    ) {
+      functions.logger.info(
+         `Starting recording conditions have been met for newly started live stream: ${livestreamId}`,
+         {
+            reason: "Live stream has started and is not currently recording",
+            previousStarted: previousValue.hasStarted,
+            newStarted: newValue.hasStarted,
+            isRecording: newValue.isRecording,
+         }
+      )
       const token = (
          await livestreamGetSecureToken(livestreamId, breakoutRoomId)
       )?.value
@@ -107,6 +126,15 @@ const automaticallyRecord = async (
    }
 
    if (!previousValue.hasEnded && newValue.hasEnded && newValue.isRecording) {
+      functions.logger.info(
+         `Stopping recording conditions have been met for ended live stream: ${livestreamId}`,
+         {
+            reason: "Live stream has ended and is still recording",
+            previousEnded: previousValue.hasEnded,
+            newEnded: newValue.hasEnded,
+            isRecording: newValue.isRecording,
+         }
+      )
       const token = (
          await livestreamGetSecureToken(livestreamId, breakoutRoomId)
       )?.value
@@ -121,6 +149,16 @@ const automaticallyRecord = async (
       newValue.hasEnded &&
       newValue.isRecording
    ) {
+      functions.logger.warn(
+         `Stopping recording conditions have been met for already ended live stream: ${livestreamId}`,
+         {
+            reason: "Live stream has already ended but is still recording",
+            previousEnded: previousValue.hasEnded,
+            newStarted: newValue.hasStarted,
+            newEnded: newValue.hasEnded,
+            isRecording: newValue.isRecording,
+         }
+      )
       const token = (
          await livestreamGetSecureToken(livestreamId, breakoutRoomId)
       )?.value
@@ -133,7 +171,9 @@ const startRecording = async (
    token: string,
    breakoutRoomId?: string
 ) => {
-   functions.logger.info("Starting recording")
+   functions.logger.info(`Starting recording for: ${livestreamId}`, {
+      breakoutRoomId,
+   })
    const agora = new AgoraClient()
 
    const cname = breakoutRoomId ?? livestreamId
@@ -141,6 +181,10 @@ const startRecording = async (
    let acquire = null
    try {
       acquire = await agora.recordingAcquire(cname)
+      functions.logger.info(
+         `Successfully acquired recording for: ${livestreamId}`,
+         { resourceId: acquire.data.resourceId }
+      )
    } catch (e) {
       logAxiosErrorAndThrow(
          "Failed to acquire recording",
@@ -160,9 +204,8 @@ const startRecording = async (
    )
    if (storedTokenDoc?.value !== token) {
       functions.logger.error(
-         "Stored token does not match",
-         storedTokenDoc,
-         token
+         `Stored token does not match for: ${livestreamId}`,
+         { storedToken: storedTokenDoc?.value, providedToken: token }
       )
       throw new functions.https.HttpsError(
          "permission-denied",
@@ -179,12 +222,20 @@ const startRecording = async (
          storagePath.push(breakoutRoomId)
       }
 
+      functions.logger.info(`Starting Agora recording for: ${livestreamId}`, {
+         url,
+         storagePath,
+      })
       start = await agora.recordingStart(
          cname,
          resourceId,
          rtcToken,
          url,
          storagePath
+      )
+      functions.logger.info(
+         `Successfully started Agora recording for: ${livestreamId}`,
+         { sid: start.data.sid }
       )
    } catch (e) {
       logAxiosErrorAndThrow("Failed to start recording", e, livestreamId)
@@ -200,6 +251,10 @@ const startRecording = async (
    )
 
    await livestreamSetIsRecording(livestreamId, true, breakoutRoomId)
+   functions.logger.info(
+      `Recording started successfully for: ${livestreamId}`,
+      { breakoutRoomId }
+   )
 }
 
 const stopRecording = async (
@@ -207,7 +262,9 @@ const stopRecording = async (
    token: string,
    breakoutRoomId?: string
 ) => {
-   functions.logger.info("Stopping recording")
+   functions.logger.info(`Stopping recording for: ${livestreamId}`, {
+      breakoutRoomId,
+   })
    const agora = new AgoraClient()
 
    const cname = breakoutRoomId ?? livestreamId
@@ -217,6 +274,10 @@ const stopRecording = async (
       breakoutRoomId
    )
    if (storedTokenDoc?.value !== token) {
+      functions.logger.warn(
+         `Token mismatch when stopping recording for: ${livestreamId}`,
+         { breakoutRoomId }
+      )
       return
    }
 
@@ -236,7 +297,7 @@ const stopRecording = async (
       livestreamSetIsRecording(livestreamId, false, breakoutRoomId)
    )
 
-   Promise.allSettled(promises).then(async (results) => {
+   await Promise.allSettled(promises).then(async (results) => {
       const rejectedPromises = results.filter(
          ({ status }) => status === "rejected"
       ) as PromiseRejectedResult[]
@@ -247,6 +308,11 @@ const stopRecording = async (
             rejectedPromises[0].reason,
             livestreamId,
             breakoutRoomId
+         )
+      } else {
+         functions.logger.info(
+            `Successfully stopped recording for: ${livestreamId}`,
+            { breakoutRoomId }
          )
       }
    })
@@ -261,18 +327,23 @@ const stopRecording = async (
 }
 
 /**
- * Every 30 minutes, it searches for livestreams that have started but have not finished after { MAX_RECORDING_HOURS }
+ * Every 30 minutes, it searches for live streams that have started but have not finished after { MAX_RECORDING_HOURS }
  */
 export const checkForUnfinishedLivestreamsAndStopRecording = functions
    .region(config.region)
    .pubsub.schedule("every 30 minutes")
    .timeZone("Europe/Zurich")
    .onRun(async () => {
+      functions.logger.info("Checking for unfinished live streams")
       try {
-         await updateUnfinishedLivestreams()
+         const updatedLivestreams = await updateUnfinishedLivestreams()
+         functions.logger.info("Updated unfinished live streams", {
+            count: updatedLivestreams.length,
+            livestreams: updatedLivestreams,
+         })
       } catch (e) {
          logAxiosErrorAndThrow(
-            `Failed to update livestreams that have started but have not finished after ${MAX_RECORDING_HOURS} hours`,
+            `Failed to update live streams that have started but have not finished after ${MAX_RECORDING_HOURS} hours`,
             e
          )
       }
