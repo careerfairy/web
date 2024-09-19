@@ -6,6 +6,7 @@ import {
 import { ButtonProps, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
+import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
 import { useRouter } from "next/router"
 import { FC, useEffect, useState } from "react"
@@ -99,6 +100,13 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    const [isLiveStreamButtonDisabled, setIsLiveStreamButtonDisabled] =
       useState(false)
    const autoActionType = useSelector(autoAction)
+
+   const { userData } = useAuth()
+
+   const { applicationInitiatedOnly } = useUserJobApplication(
+      userData?.id,
+      jobId
+   )
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
    let job: Job | PublicCustomJob
@@ -180,7 +188,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
                   <JobDescription job={job} />
 
-                  {isOpen && !isAtsJob ? (
+                  {(isOpen || applicationInitiatedOnly) && !isAtsJob ? (
                      <CustomJobApplyConfirmation
                         handleClose={handleClose}
                         job={job as PublicCustomJob}

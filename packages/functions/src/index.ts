@@ -250,6 +250,7 @@ exports.onCreateLivestreamPopularityEvents =
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
 exports.onCreateUserData = onCreateTriggers.onCreateUserData
+exports.onUpdateUserData = onCreateTriggers.onUpdateUserData
 exports.onCreateReward = onCreateTriggers.onCreateReward
 exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
 exports.onCreateUserSparkFeed = onCreateTriggers.onCreateUserSparkFeed
@@ -285,6 +286,9 @@ exports.getSparksAnalytics_v3 = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.confirmUserJobApplication = customJobs.confirmUserApplyToCustomJob
+exports.confirmAnonymousJobApplication = customJobs.confirmAnonApplyToCustomJob
+exports.setAnonymousJobApplicationsUserId =
+   customJobs.setAnonymousJobApplicationsUserId
 exports.updateCustomJobWithLinkedLivestreams_v2 =
    customJobs.updateCustomJobWithLinkedLivestreams
 exports.transferCustomJobsFromDraftToPublishedLivestream_v2 =

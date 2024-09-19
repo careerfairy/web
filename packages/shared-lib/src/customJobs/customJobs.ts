@@ -128,15 +128,33 @@ export interface CustomJobApplicant extends Identifiable {
    jobId: string
    user: UserData
    groupId: string // Makes it easier to query for all applicants in a group
-   appliedAt: firebase.firestore.Timestamp
+   appliedAt?: firebase.firestore.Timestamp
    livestreamId: string // The associated livestream where the user applied to the job
    job: CustomJob
-   completed?: boolean
+   applied?: boolean
    createdAt?: firebase.firestore.Timestamp
    // cascaded properties from groups (collection /careerCenterData)
    companyCountry?: string
    companyIndustries?: string[]
    companySize?: string
+}
+
+export type CustomJobContent = "spark" | "livestream"
+
+export type JobApplicationContent = {
+   type: CustomJobContent
+} & Identifiable
+// collection path /anonymousJobApplications
+// The id of this collection shall be the user finger print id (see custom hook 'useFingerPrint')
+export interface AnonymousJobApplication extends Identifiable {
+   createdAt: firebase.firestore.Timestamp
+   fingerPrintId: string
+   jobId: string
+   linkedContent: JobApplicationContent
+   applied: boolean
+   appliedAt?: firebase.firestore.Timestamp
+   userId?: string // Optional and set upon user registration when matching the finger print ID
+   applicationSynchronized?: boolean
 }
 
 export const getMaxDaysAfterDeadline = (): Date => {

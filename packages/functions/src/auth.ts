@@ -1,18 +1,18 @@
 import functions = require("firebase-functions")
-import { UserData } from "@careerfairy/shared-lib/users"
-import { generateReferralCode } from "./util"
-import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
-import { logAndThrow } from "./lib/validations"
 import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import config from "./config"
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/rewards"
-import { userUpdateFields } from "./lib/user"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { FieldValue, auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
-import { auth, FieldValue, firestore } from "./api/firestoreAdmin"
+import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
+import config from "./config"
+import { userUpdateFields } from "./lib/user"
+import { logAndThrow } from "./lib/validations"
+import { generateReferralCode } from "./util"
 
 export const createNewUserAccount = functions
    .region(config.region)
@@ -314,6 +314,8 @@ export const validateUserEmailWithPin = functions
    .https.onCall(async (data) => {
       const recipientEmail = data.userInfo.recipientEmail
       const pinCode = data.userInfo.pinCode
+      const fingerPrintId = data.userInfo.fingerPrintId
+
       let error: any
 
       functions.logger.log(
@@ -374,6 +376,27 @@ export const validateUserEmailWithPin = functions
                } catch (error) {
                   functions.logger.error(
                      `An error has occurred sending welcome email to ${recipientEmail}`
+                  )
+               }
+
+               try {
+                  if (fingerPrintId) {
+                     const [, userData] = await Promise.all([
+                        userRepo.updateUserAnonymousJobApplications(
+                           recipientEmail,
+                           fingerPrintId
+                        ),
+                        userRepo.getUserDataById(recipientEmail),
+                     ])
+
+                     await userRepo.migrateAnonymousJobApplications(userData)
+                     functions.logger.log(
+                        `Migrated anonymous user job applications (userId update) for user ${recipientEmail} and finger print id ${fingerPrintId}`
+                     )
+                  }
+               } catch (error) {
+                  functions.logger.error(
+                     `An error has occurred while updating userId for anonymous job applications for user ${recipientEmail} and finger print id ${fingerPrintId}`
                   )
                }
 
