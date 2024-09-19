@@ -276,7 +276,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       })
       const router = useRouter()
       const { pathname } = router
-      const { authenticatedUser, isLoggedIn } = useAuth()
+      const { authenticatedUser } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
       const [targetValue, setTargetValue] = useState<string | undefined>(
          undefined
@@ -313,20 +313,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
          return Boolean(event?.hasJobs || event?.jobs?.length > 0)
       }, [event?.hasJobs, event?.jobs?.length, loading])
-
-      const getRecordingAvailableDays = useMemo<number | null>(() => {
-         if (isPast && isLoggedIn && presenterEvent) {
-            if (presenterEvent.isAbleToShowRecording(hasRegistered)) {
-               const timeLeft = DateUtil.calculateTimeLeft(
-                  presenterEvent.recordingAccessTimeLeft()
-               )
-
-               return timeLeft?.Days + 1
-            }
-         }
-
-         return null
-      }, [isPast, isLoggedIn, hasRegistered, presenterEvent])
 
       useEffect(() => {
          if (!loading) {
@@ -504,7 +490,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                               isLive={isLive}
                               hasRegistered={hasRegistered}
                               hasJobToApply={hasJobsToApply}
-                              recordingAvailableDays={getRecordingAvailableDays}
                            />
                         )}
 
