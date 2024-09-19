@@ -4,6 +4,8 @@ import { firestore } from "firebase-admin"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 
+const IS_BACKFILL = true // will disable logging for backfill and force update of all documents
+
 export const onUserRegistration = onDocumentWritten(
    {
       document: "livestreams/{livestreamId}/userLivestreamData/{userEmail}",
@@ -12,32 +14,36 @@ export const onUserRegistration = onDocumentWritten(
       const { params } = event
       const { livestreamId, userEmail } = params
 
-      logger.info(
-         `Processing registration for live stream ${livestreamId} and user ${userEmail}`
-      )
+      if (!IS_BACKFILL) {
+         logger.info(
+            `Processing registration for live stream ${livestreamId} and user ${userEmail}`
+         )
+      }
 
       const newUserLivestreamData =
          event.data.after.data() as UserLivestreamData
 
-      /* commented out for backfill */
-      // const oldUserLivestreamData =
-      //    event.data.before.data() as UserLivestreamData
+      // on backfill, we don't need to check for registration changes, we need to update all documents
+      if (!IS_BACKFILL) {
+         const oldUserLivestreamData =
+            event.data.before.data() as UserLivestreamData
 
-      // const registrationChanged = hasRegistrationChanged(
-      //    oldUserLivestreamData,
-      //    newUserLivestreamData
-      // )
+         const registrationChanged = hasRegistrationChanged(
+            oldUserLivestreamData,
+            newUserLivestreamData
+         )
 
-      // if (!registrationChanged) {
-      //    logger.info(
-      //       `No registration change detected for live stream ${livestreamId} and user ${userEmail}`
-      //    )
-      //    return
-      // }
+         if (!registrationChanged) {
+            logger.info(
+               `No registration change detected for live stream ${livestreamId} and user ${userEmail}`
+            )
+            return
+         }
 
-      logger.info(
-         `Registration change detected for live stream ${livestreamId} and user ${userEmail}`
-      )
+         logger.info(
+            `Registration change detected for live stream ${livestreamId} and user ${userEmail}`
+         )
+      }
 
       const registeredLivestreamsRef = firestore()
          .collection("registeredLivestreams")
@@ -75,9 +81,11 @@ export const onUserRegistration = onDocumentWritten(
                merge: true,
             })
 
-            logger.info(
-               `Successfully updated registered live streams for user ${userEmail}`
-            )
+            if (!IS_BACKFILL) {
+               logger.info(
+                  `Successfully updated registered live streams for user ${userEmail}`
+               )
+            }
          })
       } catch (error) {
          logger.error(
@@ -89,14 +97,14 @@ export const onUserRegistration = onDocumentWritten(
    }
 )
 
-// function hasRegistrationChanged(
-//    oldData: UserLivestreamData,
-//    newData: UserLivestreamData
-// ): boolean {
-//    return (
-//       Boolean(oldData?.registered?.date) !== Boolean(newData?.registered?.date)
-//    )
-// }
+function hasRegistrationChanged(
+   oldData: UserLivestreamData,
+   newData: UserLivestreamData
+): boolean {
+   return (
+      Boolean(oldData?.registered?.date) !== Boolean(newData?.registered?.date)
+   )
+}
 
 function getOrCreateRegisteredLivestreams(
    doc: FirebaseFirestore.DocumentSnapshot,
