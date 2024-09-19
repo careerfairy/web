@@ -8,11 +8,9 @@ import Tabs from "@mui/material/Tabs"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import { useAuth } from "../../HOCs/AuthProvider"
 import Link from "../../components/views/common/Link"
 import CareerSkills from "../../components/views/profile/career-skills/CareerSkills"
 import ProfileCustomJobs from "../../components/views/profile/custom-jobs/ProfileCustomJobs"
-import Jobs from "../../components/views/profile/jobs/Jobs"
 import Groups from "../../components/views/profile/my-groups/Groups"
 import ReferralProfileTab from "../../components/views/profile/referral/ReferralProfileTab"
 import MyRecruitersTab from "../../components/views/profile/saved-recruiters/MyRecruitersTab"
@@ -93,13 +91,6 @@ const pages = {
       },
       component: () => <Groups />,
    },
-   "/profile/jobs": {
-      title: {
-         compact: "Jobs",
-         full: "Jobs",
-      },
-      component: Jobs,
-   },
 }
 
 type Props = {
@@ -109,13 +100,7 @@ type Props = {
 const UserView = ({ currentPath }: Props) => {
    const theme = useTheme()
    const native = useMediaQuery(theme.breakpoints.down("sm"))
-   const { userData } = useAuth()
    const { jobHubV1 } = useFeatureFlags()
-
-   // hide the jobs tab
-   if (!userData?.hasJobApplications) {
-      delete pages["/profile/jobs"]
-   }
 
    if (!jobHubV1) {
       delete pages["/profile/custom-jobs"]
