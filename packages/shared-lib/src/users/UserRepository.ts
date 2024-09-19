@@ -811,8 +811,7 @@ export class FirebaseUserRepository
             user: userData,
             groupId: customJob.groupId,
             appliedAt: anonymousApplicationData.appliedAt || null,
-            // TODO-WG: Disregard as it will be updated in next stack to use linkedContent
-            livestreamId: anonymousApplicationData.linkedContent.id,
+            linkedContent: anonymousApplicationData.linkedContent,
             job: customJob,
             applied: anonymousApplicationData.applied,
             createdAt: anonymousApplicationData.createdAt,
@@ -821,7 +820,6 @@ export class FirebaseUserRepository
                group.companyIndustries?.map((industry) => industry.id) || [],
             companySize: group.companySize,
          }
-         // console.log("🚀 ~ migrateAnonymousJobApplications ~ jobApplication:", jobApplication)
 
          const jobApplicationRef = this.firestore
             .collection("jobApplications")

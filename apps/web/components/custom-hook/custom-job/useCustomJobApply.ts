@@ -74,16 +74,11 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
       useSWRMutation(
          `user-${userData?.id}-clicksOnCustomJob-${job.id}`,
          async () => {
-            console.log(
-               "🚀 ~ handleClickApplyBtn:",
-               `user-${userData?.id}-clicksOnCustomJob-${job.id}`
-            )
             const jobApplication = userData
-               ? customJobRepo.applyUserToCustomJob(
-                    userData,
-                    customJob,
-                    livestreamId
-                 )
+               ? customJobRepo.applyUserToCustomJob(userData, customJob, {
+                    type: "livestream",
+                    id: livestreamId,
+                 })
                : customJobRepo.applyAnonymousUserToCustomJob(
                     fingerPrintId,
                     customJob,
