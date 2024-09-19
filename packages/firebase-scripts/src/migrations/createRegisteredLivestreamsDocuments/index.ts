@@ -8,7 +8,7 @@ import {
 } from "../../util/bulkWriter"
 import { logAction } from "../../util/logger"
 
-const BATCH_SIZE = 5_000
+const BATCH_SIZE = 1_000
 const TRIGGER_FIELD = "migrationTrigger"
 
 const getTotalUserLivestreamDataCount = async () => {
@@ -24,14 +24,7 @@ export async function run() {
    const counter = new Counter()
    const bulkWriter = firestore.bulkWriter()
 
-   let totalIntendedWrites = 0
-   let successfulWrites = 0
    let processedDocuments = 0
-
-   bulkWriter.onWriteResult(() => {
-      successfulWrites++
-      writeProgressBar.update(successfulWrites)
-   })
 
    const totalDocumentsCounts = await getTotalUserLivestreamDataCount()
 
@@ -65,7 +58,6 @@ export async function run() {
          processedDocuments += docs.length
 
          for (const doc of docs) {
-            totalIntendedWrites++
             bulkWriter
                .update(doc.ref, {
                   [TRIGGER_FIELD]: Date.now(),
@@ -83,9 +75,9 @@ export async function run() {
                2
             )}%)`
          )
-      }
 
-      writeProgressBar.start(totalIntendedWrites, 0)
+         await bulkWriter.flush()
+      }
 
       await bulkWriter.close()
       writeProgressBar.stop()
