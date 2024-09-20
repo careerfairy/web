@@ -36,7 +36,7 @@ const CustomJobsList = ({
          {customJobs.map((customJob, idx) => {
             return (
                <Link
-                  href={`${hrefLink}/jobs/${customJob.id}`}
+                  href={`${hrefLink}/${customJob.id}`}
                   // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
                   shallow
                   passHref
