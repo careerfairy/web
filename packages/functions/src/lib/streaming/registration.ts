@@ -3,6 +3,7 @@ import { RegisteredLivestreams, UserData } from "@careerfairy/shared-lib/users"
 import { firestore } from "firebase-admin"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
+import { userRepo } from "src/api/repositories"
 
 const IS_BACKFILL = true // will disable logging for backfill and force update of all documents
 
@@ -44,40 +45,26 @@ export const onUserRegistration = onDocumentWritten(
          )
       }
 
-      const userAuthId =
-         newUserLivestreamData.userId || oldUserLivestreamData.userId
-
-      if (!userAuthId) {
-         logger.warn(
-            `Unable to process registration for user ${userEmail}: missing userAuthId`
-         )
-         return
-      }
-
-      const registeredLivestreamsRef = firestore()
-         .collection("registeredLivestreams")
-         .doc(userAuthId)
-
-      const userDataRef = firestore().collection("userData").doc(userEmail)
-
       try {
-         const [registeredLivestreamsDoc, userDataDoc] = await Promise.all([
-            registeredLivestreamsRef.get(),
-            userDataRef.get(),
-         ])
+         const userData = await userRepo.getUserDataById(userEmail)
 
-         const userData = userDataDoc.data() as UserData | undefined
+         if (!userData.authId) {
+            logger.warn(
+               `Unable to process registration for user ${userEmail}: missing authId`
+            )
+            return
+         }
+
+         const registeredLivestreamsRef = firestore()
+            .collection("registeredLivestreams")
+            .doc(userData.authId)
+
+         const registeredLivestreamsDoc = await registeredLivestreamsRef.get()
+
          const registeredLivestreams = getOrCreateRegisteredLivestreams(
             registeredLivestreamsDoc,
             userData
          )
-
-         if (!registeredLivestreams) {
-            logger.warn(
-               `Unable to process registration for user ${userEmail}: missing data`
-            )
-            return
-         }
 
          // If the document doesn't exist, create it first
          if (!registeredLivestreamsDoc.exists) {
@@ -86,7 +73,8 @@ export const onUserRegistration = onDocumentWritten(
 
          const updateData = updateRegisteredLivestreams(
             livestreamId,
-            newUserLivestreamData
+            newUserLivestreamData,
+            userData
          )
 
          // Now we can always use update
@@ -126,32 +114,22 @@ function getOrCreateRegisteredLivestreams(
       return existingData
    }
 
-   if (!userData?.authId) {
-      logger.warn(
-         "Unable to create RegisteredLivestreams: missing userData or authId"
-      )
-      return null
-   }
-
-   if (!IS_BACKFILL) {
-      logger.info(
-         `Creating new RegisteredLivestreams document for user ${userData.authId}`
-      )
-   }
-
    return {
       id: userData.authId,
-      user: userData,
+      userAuthId: userData.authId,
+      userEmail: userData.id,
+      unsubscribed: Boolean(userData.unsubscribed),
       registeredLivestreams: {},
    }
 }
 
 function updateRegisteredLivestreams(
    livestreamId: string,
-   newUserLivestreamData: UserLivestreamData
+   newUserLivestreamData: UserLivestreamData,
+   userData: UserData
 ): Partial<RegisteredLivestreams> {
    const updateData: Partial<RegisteredLivestreams> = {
-      user: newUserLivestreamData.user,
+      unsubscribed: Boolean(userData.unsubscribed),
    }
 
    if (newUserLivestreamData.registered?.date) {

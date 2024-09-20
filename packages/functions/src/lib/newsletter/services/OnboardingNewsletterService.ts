@@ -370,7 +370,7 @@ export class OnboardingNewsletterService {
             null,
             this.registeredLivestreams.find(
                (registeredLivestream) =>
-                  registeredLivestream.user.userEmail ===
+                  registeredLivestream.userEmail ===
                   onboardingUser.user.userEmail
             ),
             false

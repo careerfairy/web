@@ -432,17 +432,11 @@ export type UserSparksNotification = {
  * Collection Path: registeredLivestreams/{userAuthId}
  */
 export interface RegisteredLivestreams extends Identifiable {
+   userAuthId: string
+   userEmail: string
+   unsubscribed: boolean
    /**
-    * Snapshot of the user at the time of running migration script
-    *
-    * Note: This is not synced with the user document, so it's not 100% reliable
-    * TODO: Create an on-write trigger to update the user's data
-    */
-   user: UserData
-   /**
-    * Snapshot of the registered livestreams at the time of running migration script
-    *
-    * TODO: Update this when user registers/de-registers for a livestream
+    * Map of the registered livestreams at the time of running migration script
     */
    registeredLivestreams: Record<string, firebase.firestore.Timestamp>
 }

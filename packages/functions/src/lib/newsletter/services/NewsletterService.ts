@@ -214,7 +214,7 @@ export class NewsletterService {
       this.subscribedUsers = convertDocArrayToDict(filteredUsers)
       this.registeredLivestreams = Object.fromEntries(
          registeredLivestreams.map((registeredLivestream) => [
-            registeredLivestream.user.userEmail,
+            registeredLivestream.userEmail,
             registeredLivestream,
          ])
       )
