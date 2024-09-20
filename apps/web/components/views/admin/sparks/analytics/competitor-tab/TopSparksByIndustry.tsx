@@ -4,6 +4,7 @@ import { Stack } from "@mui/material"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo, useState } from "react"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
+import { SparksCarousel } from "../components/SparksCarousel"
 import { TitleWithSelect } from "../components/TitleWithSelect"
 import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
 import { useSparksAnalytics } from "../SparksAnalyticsContext"
@@ -64,17 +65,21 @@ export const TopSparksByIndustry = () => {
             <EmptyDataCheckerForMostSomething />
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-               {topSparksByIndustry[selectIndustryValue].map((data, index) => {
-                  return (
-                     <CompetitorSparkStaticCard
-                        key={`top-sparks-by-industry-${selectIndustryValue}-${index}`}
-                        sparkData={data.sparkData}
-                        plays={data.plays}
-                        avg_watched_time={data.avg_watched_time}
-                        engagement={data.engagement}
-                     />
-                  )
-               })}
+               <SparksCarousel>
+                  {topSparksByIndustry[selectIndustryValue].map(
+                     (data, index) => {
+                        return (
+                           <CompetitorSparkStaticCard
+                              key={`top-sparks-by-industry-${selectIndustryValue}-${index}`}
+                              sparkData={data.sparkData}
+                              plays={data.plays}
+                              avg_watched_time={data.avg_watched_time}
+                              engagement={data.engagement}
+                           />
+                        )
+                     }
+                  )}
+               </SparksCarousel>
             </Stack>
          )}
       </GroupSparkAnalyticsCardContainer>
