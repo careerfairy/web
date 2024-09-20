@@ -22,12 +22,11 @@ export const onUserRegistration = onDocumentWritten(
 
       const newUserLivestreamData =
          event.data.after.data() as UserLivestreamData
+      const oldUserLivestreamData =
+         event.data.before.data() as UserLivestreamData
 
       // on backfill, we don't need to check for registration changes, we need to update all documents
       if (!IS_BACKFILL) {
-         const oldUserLivestreamData =
-            event.data.before.data() as UserLivestreamData
-
          const registrationChanged = hasRegistrationChanged(
             oldUserLivestreamData,
             newUserLivestreamData
@@ -45,9 +44,19 @@ export const onUserRegistration = onDocumentWritten(
          )
       }
 
+      const userAuthId =
+         newUserLivestreamData.userId || oldUserLivestreamData.userId
+
+      if (!userAuthId) {
+         logger.warn(
+            `Unable to process registration for user ${userEmail}: missing userAuthId`
+         )
+         return
+      }
+
       const registeredLivestreamsRef = firestore()
          .collection("registeredLivestreams")
-         .doc(newUserLivestreamData.userId)
+         .doc(userAuthId)
 
       const userDataRef = firestore().collection("userData").doc(userEmail)
 
