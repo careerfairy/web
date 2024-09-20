@@ -87,7 +87,12 @@ const CustomJobLinkedContents = ({
             livestreams={jobLivestreams}
             disableEventClick={disableEventClick}
          />
-         {jobHubV1 ? <CustomJobLinkedSparks sparks={jobSparks} /> : null}
+         {jobHubV1 ? (
+            <CustomJobLinkedSparks
+               disableSparkClick={disableEventClick}
+               sparks={jobSparks}
+            />
+         ) : null}
       </Stack>
    )
 }
@@ -122,14 +127,18 @@ const CustomJobLinkedLivestreams = ({
 
 type CustomJobLinkedSparksProps = {
    sparks: Spark[]
+   disableSparkClick?: boolean
 }
 
-const CustomJobLinkedSparks = ({ sparks }: CustomJobLinkedSparksProps) => {
+const CustomJobLinkedSparks = ({
+   sparks,
+   disableSparkClick,
+}: CustomJobLinkedSparksProps) => {
    const childRef = useRef(null)
    const router = useRouter()
 
    const handleSparksClicked = (spark: Spark) => {
-      if (!spark) return
+      if (!spark || disableSparkClick) return
 
       return router.push({
          pathname: `/sparks/${spark.id}`,
