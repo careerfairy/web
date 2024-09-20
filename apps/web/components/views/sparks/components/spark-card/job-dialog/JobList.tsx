@@ -5,6 +5,7 @@ import {
    DialogContent,
    DialogTitle,
    IconButton,
+   Stack,
    Typography,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -66,19 +67,21 @@ const JobList = ({ jobs, handleClose, handleClick }: Props) => {
          </DialogTitle>
 
          <DialogContent>
-            {jobs.map((job: CustomJob) => (
-               <Box key={job.id}>
-                  <SuspenseWithBoundary fallback={<JobCardSkeleton />}>
-                     <JobCard
-                        job={job}
-                        handleClick={onClick}
-                        previewMode
-                        hideJobUrl
-                        smallCard={isMobile}
-                     />
-                  </SuspenseWithBoundary>
-               </Box>
-            ))}
+            <Stack spacing={2}>
+               {jobs.map((job: CustomJob) => (
+                  <Box key={job.id}>
+                     <SuspenseWithBoundary fallback={<JobCardSkeleton />}>
+                        <JobCard
+                           job={job}
+                           handleClick={onClick}
+                           previewMode
+                           hideJobUrl
+                           smallCard={isMobile}
+                        />
+                     </SuspenseWithBoundary>
+                  </Box>
+               ))}
+            </Stack>
          </DialogContent>
       </>
    )
