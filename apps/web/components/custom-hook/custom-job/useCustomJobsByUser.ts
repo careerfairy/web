@@ -6,19 +6,18 @@ import useCustomJobs from "./useCustomJobs"
  * the first batch of custom jobs which appear first.
  * @param batchSize Total number of items per batch to be sliced.
  **/
-const useCustomJobsByUser = (batchSize?: number, disabled?: boolean) => {
+const useCustomJobsByUser = (disabled?: boolean) => {
    const { userData } = useAuth()
 
    const businessFunctions = userData?.businessFunctionsTagIds || []
 
    // 1. Fetch all customJobs for tags if tags with limit
-
    const { customJobs: businessFunctionCustomJobs } = useCustomJobs({
       businessFunctionTagIds: businessFunctions,
       disabled: disabled,
    })
-   // 2. Fetch other jobs ignoring already fetched also with limit
 
+   // 2. Fetch other jobs ignoring already fetched also with limit
    const { customJobs: otherCustomJobs } = useCustomJobs({
       businessFunctionTagIds: [],
       ignoreIds: businessFunctionCustomJobs?.map((job) => job.id),
@@ -29,8 +28,6 @@ const useCustomJobsByUser = (batchSize?: number, disabled?: boolean) => {
    const allCustomJobs = (businessFunctionCustomJobs || []).concat(
       otherCustomJobs || []
    )
-
-   // const customJobs = allCustomJobs.slice(0, batchSize)
 
    return {
       customJobs: allCustomJobs,
