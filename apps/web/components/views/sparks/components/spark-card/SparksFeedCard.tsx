@@ -8,6 +8,7 @@ import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { Button, Fade, Grow, Stack } from "@mui/material"
 import Box from "@mui/material/Box"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
@@ -23,6 +24,7 @@ import {
    useRef,
    useState,
 } from "react"
+import { isMobile } from "react-device-detect"
 import { useSelector } from "react-redux"
 import {
    eventDetailsDialogVisibilitySelector,
@@ -34,6 +36,7 @@ import { SparksPopUpNotificationManager } from "./Notifications/SparksPopUpNotif
 import { useLinkedInNotificationStateManagement } from "./Notifications/useLinkedInNotificationStateManagement"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
+import SparkJobButton from "./SparkJobButton"
 import SparkQuestion from "./SparkQuestion"
 import VideoPreview from "./VideoPreview"
 
@@ -147,6 +150,13 @@ const styles = sxStyles({
    },
    hideOverlay: {
       background: "transparent",
+   },
+   jobButton: {
+      mt: 1.5,
+   },
+   jobButtonMobile: {
+      mx: 1,
+      mb: 2,
    },
 })
 
@@ -319,6 +329,9 @@ const SparksFeedCard: FC<Props> = ({
                         <SparkCategoryChip categoryId={spark.category.id} />
                         <Box mt={1.5} />
                         <SparkQuestion question={spark.question} />
+                        {spark.hasJobs && !isMobile ? (
+                           <JobButton spark={spark} />
+                        ) : null}
                      </Stack>
                   ) : null}
                   {!showCardNotification && isFullScreen ? (
@@ -331,6 +344,7 @@ const SparksFeedCard: FC<Props> = ({
                      </>
                   ) : null}
                </Box>
+               {spark.hasJobs && isMobile ? <JobButton spark={spark} /> : null}
             </Box>
          </Box>
          {!showCardNotification && !isFullScreen ? (
@@ -378,3 +392,15 @@ export const ClickToUnmuteOverlay = () => {
 }
 
 export default SparksFeedCard
+
+type JobButtonProps = {
+   spark: SparkPresenter
+}
+
+const JobButton = ({ spark }: JobButtonProps) => (
+   <Box sx={styles.jobButtonMobile}>
+      <SuspenseWithBoundary fallback={<></>}>
+         <SparkJobButton spark={spark} />
+      </SuspenseWithBoundary>
+   </Box>
+)

@@ -54,7 +54,7 @@ type Props = {
    clicks?: number
    applicants?: number
    previewMode?: boolean
-   handleClick?: (job: Job | CustomJob) => void
+   handleClick?: (job: Job | CustomJob, event?: React.MouseEvent) => void
    smallCard?: boolean
    hideJobUrl?: boolean
    titleSx?: SxProps<DefaultTheme>
@@ -99,7 +99,7 @@ const JobCard = ({
    return (
       <ButtonBase
          key={job.id}
-         onClick={() => handleClick && handleClick(job)}
+         onClick={(event) => handleClick && handleClick(job, event)}
          sx={styles.jobCard}
          focusRipple
       >
