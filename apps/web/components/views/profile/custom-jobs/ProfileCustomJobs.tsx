@@ -19,7 +19,7 @@ const TAB_VALUES = {
    },
 }
 
-const JOBS_DIALOG_LINK = "/profile/custom-jobs"
+const JOBS_DIALOG_LINK = "/profile/my-jobs"
 
 const styles = sxStyles({
    tabs: {

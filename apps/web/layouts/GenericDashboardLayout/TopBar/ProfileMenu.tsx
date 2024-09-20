@@ -14,7 +14,9 @@ import Tooltip from "@mui/material/Tooltip"
 // project imports
 import Divider from "@mui/material/Divider"
 import { alpha } from "@mui/material/styles"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useCallback, useMemo } from "react"
+import { Briefcase } from "react-feather"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import useMenuState from "../../../components/custom-hook/useMenuState"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
@@ -65,7 +67,7 @@ const ProfileMenu = () => {
       () => userPresenter?.getFieldOfStudyDisplayName(),
       [userPresenter]
    )
-
+   const { jobHubV1 } = useFeatureFlags()
    const handleProfileClick = useCallback(() => {
       if (Object.keys(adminGroups).length) {
          const groupId = Object.keys(adminGroups)[0]
@@ -151,6 +153,14 @@ const ProfileMenu = () => {
                   </ListItemIcon>
                   <Typography color={"text.secondary"}>Profile</Typography>
                </MenuItem>
+               {jobHubV1 ? (
+                  <MenuItem onClick={() => push("/profile/my-jobs")}>
+                     <ListItemIcon>
+                        <Briefcase width={"17.5px"} height={"17.5px"} />
+                     </ListItemIcon>
+                     <Typography color={"text.secondary"}>My Jobs</Typography>
+                  </MenuItem>
+               ) : null}
                <MenuItem onClick={() => push("/profile/career-skills")}>
                   <ListItemIcon>
                      <StarOutlineIcon fontSize="small" />

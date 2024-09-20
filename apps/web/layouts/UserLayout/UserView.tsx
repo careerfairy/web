@@ -56,6 +56,13 @@ const pages = {
       },
       component: UserData,
    },
+   "/profile/my-jobs": {
+      title: {
+         compact: "Jobs",
+         full: "My Jobs",
+      },
+      component: ProfileCustomJobs,
+   },
    "/profile/career-skills": {
       title: {
          compact: "Career Skills",
@@ -77,13 +84,6 @@ const pages = {
       },
       component: MyRecruitersTab,
    },
-   "/profile/custom-jobs": {
-      title: {
-         compact: "Jobs",
-         full: "Jobs",
-      },
-      component: ProfileCustomJobs,
-   },
    "/profile/groups": {
       title: {
          compact: "Groups",
@@ -103,7 +103,7 @@ const UserView = ({ currentPath }: Props) => {
    const { jobHubV1 } = useFeatureFlags()
 
    if (!jobHubV1) {
-      delete pages["/profile/custom-jobs"]
+      delete pages["/profile/my-jobs"]
    }
 
    const views = Object.entries(pages).map(([key, value], index) => (

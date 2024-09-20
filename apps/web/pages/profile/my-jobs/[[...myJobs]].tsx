@@ -7,7 +7,7 @@ import SEO from "../../../components/util/SEO"
 import UserLayout from "../../../layouts/UserLayout"
 import UserView from "../../../layouts/UserLayout/UserView"
 
-export const DIALOG_SOURCE = "customJobs"
+export const DIALOG_SOURCE = "myJobs"
 
 const CustomJobsPage = ({
    customJobDialogData,
@@ -22,13 +22,13 @@ const CustomJobsPage = ({
                source: CustomJobApplicationSourceTypes.Profile,
                id: CustomJobApplicationSourceTypes.Profile,
             }}
-            dialogSource={"customJobs"}
+            dialogSource={DIALOG_SOURCE}
          >
             <SEO
                title="CareerFairy | Jobs"
                canonical={`https://www.careerfairy.io${pathname}`}
             />
-            <UserView currentPath="/profile/custom-jobs" />
+            <UserView currentPath="/profile/my-jobs" />
          </CustomJobDialogLayout>
       </UserLayout>
    )
