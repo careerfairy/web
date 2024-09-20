@@ -5,6 +5,7 @@ import { sxStyles } from "types/commonTypes"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { MostSomethingSparkStaticCard } from "../components/MostSomethingSparkStaticCard"
 import { ResponsiveSelectWithDrawer } from "../components/ResponsiveSelectWithDrawer"
+import { SparksCarousel } from "../components/SparksCarousel"
 import { useSparksAnalytics } from "../SparksAnalyticsContext"
 import EmptyDataCheckerForMostSomething from "./EmptyDataCheckers"
 
@@ -122,16 +123,18 @@ export const MostSomethingAnalyticsContainer = () => {
             <EmptyDataCheckerForMostSomething />
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-               {most[selectMostSomethingValue].map((data, index) => (
-                  <MostSomethingSparkStaticCard
-                     key={`most-${selectMostSomethingValue}-${index}`}
-                     sparkData={data.sparkData}
-                     num_views={data.num_views}
-                     num_likes={data.num_likes}
-                     num_shares={data.num_shares}
-                     num_clicks={data.num_clicks}
-                  />
-               ))}
+               <SparksCarousel>
+                  {most[selectMostSomethingValue].map((data, index) => (
+                     <MostSomethingSparkStaticCard
+                        key={`most-${selectMostSomethingValue}-${index}`}
+                        sparkData={data.sparkData}
+                        num_views={data.num_views}
+                        num_likes={data.num_likes}
+                        num_shares={data.num_shares}
+                        num_clicks={data.num_clicks}
+                     />
+                  ))}
+               </SparksCarousel>
             </Stack>
          )}
       </GroupSparkAnalyticsCardContainer>
