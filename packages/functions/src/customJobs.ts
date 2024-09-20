@@ -21,35 +21,19 @@ const UserCustomJobApplicationSchema: SchemaOf<UserCustomJobApplication> =
       authId: string().required(),
       jobId: string().required(),
    })
-type CustomJobsGroupNames = {
-   [jobId: string]: {
-      groupId: string
-   }
-}
+type CustomJobsGroupNames = Record<string, string>
 
 // Validation schema
 const CustomJobsGroupNamesSchema: SchemaOf<CustomJobsGroupNames> = object()
    .shape({})
-   .noUnknown(true)
-   .test(
-      "dynamic-keys",
-      "Each key must have an object with a valid groupId",
-      (value) => {
-         if (!value || typeof value !== "object") return false
-
-         // Validate each key-value pair
-         return Object.entries(value).every(([key, val]) => {
-            // Ensure each value has the structure { groupId: string }
-            return (
-               typeof key === "string" &&
-               typeof val === "object" &&
-               val !== null &&
-               "groupId" in val &&
-               typeof val["groupId"] === "string"
-            )
-         })
+   .test("is-valid-record", "All values must be strings", (value) => {
+      if (typeof value !== "object" || value === null) {
+         return false
       }
-   )
+
+      // Validate all values in the object are strings
+      return Object.values(value).every((v) => typeof v === "string")
+   })
    .defined()
 
 export const confirmUserApplyToCustomJob = functions
@@ -146,13 +130,11 @@ export const getCustomJobGroupNames = functions
             )
 
             const promises = jobIds.map(async (jobId) => {
-               return groupRepo
-                  .getGroupById(data[jobId].groupId)
-                  .then((group) => {
-                     return {
-                        [jobId]: group.universityName,
-                     }
-                  })
+               return groupRepo.getGroupById(data[jobId]).then((group) => {
+                  return {
+                     [jobId]: group.universityName,
+                  }
+               })
             })
 
             const jobsGroupNamesMap = await Promise.all(promises)

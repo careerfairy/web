@@ -9,23 +9,16 @@ type Result = {
    [jobId: string]: string
 }
 const useCustomJobsGroupNames = (customJobs: CustomJob[]) => {
-   const options: { [jobId: string]: { groupId: string } } = useMemo(() => {
-      return customJobs
-         .map((job) => {
-            return {
-               [job.id]: {
-                  groupId: job.groupId,
-               },
-            }
-         })
-         .reduce((acc, curr) => {
-            return { ...acc, ...curr } // Merge the current object into the accumulator
-         }, {})
+   const options: Record<string, string> = useMemo(() => {
+      return customJobs.reduce((acc, job) => {
+         acc[job.id] = job.groupId
+         return acc
+      }, {} as Record<string, string>)
    }, [customJobs])
 
    const fetcher = useFunctionsSWR<Result>()
 
-   return useSWR(
+   return useSWR<Record<string, string>>(
       ["fetchCustomJobGroupNames", options],
       fetcher,
       reducedRemoteCallsOptions

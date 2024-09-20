@@ -1,7 +1,6 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { ListItem, Stack, SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
-import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import JobCard from "components/views/common/jobs/JobCard"
 import Link from "next/link"
@@ -18,15 +17,20 @@ const styles = sxStyles({
 type Props = {
    customJobs: CustomJob[]
    hrefLink: string // example: /portal/jobs
+   jobsGroupNamesMap: Record<string, string> // {"id_of_job1": "name_of_group", ... }
    jobWrapperSx?: SxProps<DefaultTheme>
 }
-const CustomJobsList = ({ customJobs, hrefLink, jobWrapperSx }: Props) => {
+const CustomJobsList = ({
+   customJobs,
+   hrefLink,
+   jobWrapperSx,
+   jobsGroupNamesMap,
+}: Props) => {
    const isMobile = useIsMobile()
-   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(customJobs)
+
    return (
       <Stack
          sx={combineStyles(styles.jobListWrapper, jobWrapperSx)}
-         width={"100%"}
          spacing={1}
       >
          {customJobs.map((customJob, idx) => {

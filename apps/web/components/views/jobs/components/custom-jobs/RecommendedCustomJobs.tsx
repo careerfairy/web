@@ -1,15 +1,13 @@
-import { Button, ListItem, Skeleton, Stack, Typography } from "@mui/material"
+import { Button, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobsByUser from "components/custom-hook/custom-job/useCustomJobsByUser"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import JobCard from "components/views/common/jobs/JobCard"
-import Link from "next/link"
 import { useCallback, useMemo, useState } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import CustomJobsList from "./CustomJobsList"
 
 const ITEMS_PER_BATCH = 3
 
@@ -30,6 +28,9 @@ const styles = sxStyles({
       fontWeight: 600,
       m: 2,
       mt: 4,
+   },
+   jobsWrapper: {
+      width: "100%",
    },
    jobListWrapper: {
       px: { xs: 2, md: 2 },
@@ -54,7 +55,7 @@ const RecommendedCustomJobs = () => {
             sx={styles.heading}
             color="neutral.800"
          >
-            {isLoggedOut ? "Jobs in focus" : "Jobs matching your interests"}
+            {isLoggedOut ? "Highlighted jobs" : "Jobs matching your interests"}
          </Typography>
          <SuspenseWithBoundary fallback={<RecommendedCustomJobsSkeleton />}>
             <Content />
@@ -64,7 +65,6 @@ const RecommendedCustomJobs = () => {
 }
 
 const Content = () => {
-   const isMobile = useIsMobile()
    const [batchSize, setBatchSize] = useState<number>(ITEMS_PER_BATCH)
 
    const { customJobs: allCustomJobs, totalCount } = useCustomJobsByUser()
@@ -82,33 +82,12 @@ const Content = () => {
    const seeMoreDisabled = customJobs.length == totalCount
 
    return (
-      <Stack direction={"column"} sx={{ width: "100%" }} spacing={0}>
-         <Stack sx={styles.jobListWrapper} width={"100%"} spacing={1}>
-            {customJobs.map((customJob, idx) => {
-               return (
-                  <Link
-                     href={`/portal/jobs/${customJob.id}`}
-                     // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
-                     shallow
-                     passHref
-                     // Prevents the page from scrolling to the top when the link is clicked
-                     scroll={false}
-                     legacyBehavior
-                     key={idx}
-                  >
-                     <ListItem sx={styles.jobListItemWrapper}>
-                        <JobCard
-                           job={customJob}
-                           previewMode
-                           hideJobUrl
-                           smallCard={isMobile}
-                           companyName={jobsGroupNamesMap[customJob.id]}
-                        />
-                     </ListItem>
-                  </Link>
-               )
-            })}
-         </Stack>
+      <Stack sx={styles.jobsWrapper}>
+         <CustomJobsList
+            customJobs={customJobs}
+            hrefLink="/portal/jobs"
+            jobsGroupNamesMap={jobsGroupNamesMap}
+         />
          {seeMoreDisabled ? undefined : (
             <Button
                disabled={seeMoreDisabled}
