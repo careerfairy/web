@@ -20,14 +20,8 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    card: (theme) => ({
-      width: {
-         xs: "100%",
-         md: 281,
-      },
-      height: {
-         xs: "154vw",
-         md: "initial",
-      },
+      width: "265px",
+      height: "481px",
       boxShadow: "none",
       borderRadius: "12px",
       border: `1px solid ${theme.brand.white["500"]}`,
@@ -38,7 +32,7 @@ const styles = sxStyles({
       },
    }),
    cardHeader: {
-      height: "62px",
+      height: "56px",
       padding: "10px 12px 10px 12px",
       "& .MuiCardHeader-avatar": {
          marginRight: "6px",
@@ -63,10 +57,7 @@ const styles = sxStyles({
       },
    },
    cardMedia: {
-      height: {
-         xs: "calc(154vw - 62px - 55px)",
-         md: 406,
-      },
+      height: "377px",
       objectFit: "cover",
    },
    sparksTypeAndTitle: (theme) => ({
@@ -97,6 +88,7 @@ const styles = sxStyles({
    cardActions: {
       justifyContent: "space-between",
       padding: "14px 16px 14px 16px",
+      height: "48px",
    },
    impressionsIcon: {
       width: "14px !important",
