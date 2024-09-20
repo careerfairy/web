@@ -152,11 +152,9 @@ const styles = sxStyles({
       background: "transparent",
    },
    jobButton: {
-      mt: 1.5,
-   },
-   jobButtonMobile: {
-      mx: 1,
-      mb: 2,
+      mt: { md: 1.5 },
+      mb: { xs: 2, md: "unset" },
+      mx: { xs: 1, md: "unset" },
    },
 })
 
@@ -398,7 +396,7 @@ type JobButtonProps = {
 }
 
 const JobButton = ({ spark }: JobButtonProps) => (
-   <Box sx={styles.jobButtonMobile}>
+   <Box sx={styles.jobButton}>
       <SuspenseWithBoundary fallback={<></>}>
          <SparkJobButton spark={spark} />
       </SuspenseWithBoundary>
