@@ -966,7 +966,7 @@ export class LivestreamFunctionsRepository
 
       const batch = this.firestore.batch()
 
-      // Update the livestreams without jobs to have hasJob: false
+      // Update the livestreams without jobs to have hasJobs: false
       livestreamsWithoutJobs.forEach((livestreamId) => {
          functions.logger.log(
             `Update live stream ${livestreamId} to be with hasJobs flag as false`
@@ -974,12 +974,12 @@ export class LivestreamFunctionsRepository
          batch.update(
             this.firestore.collection("livestreams").doc(livestreamId),
             {
-               hasJob: false,
+               hasJobs: false,
             }
          )
       })
 
-      // Update the livestreams with new job assignment to have hasJob: true
+      // Update the livestreams with new job assignment to have hasJobs: true
       livestreamsWithNewJobAssignment.forEach((livestreamId) => {
          functions.logger.log(
             `Update live stream ${livestreamId} to be with hasJobs flag as true`
@@ -988,7 +988,7 @@ export class LivestreamFunctionsRepository
          batch.update(
             this.firestore.collection("livestreams").doc(livestreamId),
             {
-               hasJob: true,
+               hasJobs: true,
             }
          )
       })
