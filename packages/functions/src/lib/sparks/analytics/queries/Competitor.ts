@@ -13,6 +13,7 @@ export function topSparksByIndustry(timePeriod: string) {
             sparkId,
             ROUND(AVG(videoEventPositionInSeconds), 2) as seconds
          FROM careerfairy-e1fd9.SparkAnalytics.SparkSecondsWatched
+         WHERE SparkSecondsWatched.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
          GROUP BY sparkId
       ),
 
@@ -22,6 +23,7 @@ export function topSparksByIndustry(timePeriod: string) {
             COUNT(sparkId) as value
          FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
          WHERE actionType = "Played_Spark"
+           AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
          GROUP BY sparkId
       )
 
@@ -73,6 +75,7 @@ export function topSparksByAudience(timePeriod: string) {
             sparkId,
             ROUND(AVG(videoEventPositionInSeconds), 2) as seconds
          FROM careerfairy-e1fd9.SparkAnalytics.SparkSecondsWatched
+         WHERE SparkSecondsWatched.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
          GROUP BY sparkId
       ),
 
@@ -82,6 +85,7 @@ export function topSparksByAudience(timePeriod: string) {
             COUNT(sparkId) as value
          FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
          WHERE actionType = "Played_Spark"
+           AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
          GROUP BY sparkId
       )
 
