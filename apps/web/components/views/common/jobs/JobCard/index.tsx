@@ -7,7 +7,6 @@ import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
-import DateUtil from "util/DateUtil"
 import { isJobValidButNoLinkedContent } from "../utils"
 import JobCardAction from "./JobCardAction"
 import JobCardDetails from "./JobCardDetails"
@@ -83,12 +82,6 @@ const JobCard = ({
 
    const getStateColor = useCallback(
       (job: CustomJob): string => {
-         // TODO-WG: Confirm when updating a job, the onWriteTrigger should update the published flag to false and also the jobApplications/job
-         // should be updated whenever a job is updated, otherwise the jobApplication job information will be out of sync.
-         if (DateUtil.isDeadlineExpired(job.deadline.toDate())) {
-            return theme.brand.black[500]
-         }
-
          if (job.published) {
             return theme.palette.primary[300]
          }
