@@ -3,7 +3,7 @@ import { RegisteredLivestreams, UserData } from "@careerfairy/shared-lib/users"
 import { firestore } from "firebase-admin"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
-import { userRepo } from "src/api/repositories"
+import { userRepo } from "../../api/repositories"
 
 const IS_BACKFILL = true // will disable logging for backfill and force update of all documents
 
