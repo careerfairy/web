@@ -220,7 +220,7 @@ export class CustomJobFunctionsRepository
       )
 
       const docs = await this.firestore
-         .collection("JobApplications")
+         .collection("jobApplications")
          .where("jobId", "==", updatedCustomJob.id)
          .get()
 

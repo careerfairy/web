@@ -6,17 +6,12 @@ import {
 import { Box, Stack, SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
-import { props } from "lodash/fp"
-import { ReactNode, forwardRef } from "react"
+import { ReactNode } from "react"
 import { useSelector } from "react-redux"
-import { useMeasure } from "react-use"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
 import { combineStyles, sxStyles } from "../../../../../types/commonTypes"
-import CustomJobCTAButtons from "./CustomJobCTAButtons"
 import CustomJobDescription from "./CustomJobDescription"
 import CustomJobHeader from "./CustomJobHeader"
 import CustomJobLinkedContents from "./CustomJobLinkedContents"
@@ -46,22 +41,25 @@ const customStyles = sxStyles({
    noDivider: {
       borderTop: "none",
    },
+   confirmation: {
+      marginTop: { xs: 2, md: 1 },
+   },
 })
 
 type Props = {
    job: CustomJob
-   applicationInitiatedOnly?: boolean
    context?: CustomJobApplicationSource
    heroContent?: ReactNode
    sx?: SxProps<DefaultTheme>
    heroSx?: SxProps<DefaultTheme>
-   hideBottomDivider?: boolean
    disabledLinkedContentClick?: boolean
    handleEdit?: () => void
    onApply?: () => void
-   hideCTAButtons?: boolean
    companyName?: string
    companyLogoUrl?: string
+   isApplyConfirmationOpen?: boolean
+   applyConfirmationSx?: SxProps<DefaultTheme>
+   handleApplyConfirmationClose?: () => void
 }
 
 const CustomJobDetailsView = (props: Props) => {
@@ -78,7 +76,6 @@ const CustomJobDetailsView = (props: Props) => {
 
 export const CustomJobDetails = ({
    job,
-   applicationInitiatedOnly,
    handleEdit,
    companyLogoUrl,
    companyName,
@@ -87,23 +84,21 @@ export const CustomJobDetails = ({
    disabledLinkedContentClick,
    sx,
    heroSx,
-   hideBottomDivider,
-   hideCTAButtons,
+   isApplyConfirmationOpen,
+   handleApplyConfirmationClose,
    onApply,
+   applyConfirmationSx,
 }: Props) => {
-   const [isOpen, handleOpen, handleClose] = useDialogStateHandler(
-      applicationInitiatedOnly
-   )
-
-   const [ref, { height }] = useMeasure()
-
    const autoActionType = useSelector(autoAction)
-   const isMobile = useIsMobile()
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
    return (
       <>
-         <Box sx={combineStyles(customStyles.root, heroSx)}>{heroContent}</Box>
+         {heroContent ? (
+            <Box sx={combineStyles(customStyles.root, heroSx)}>
+               {heroContent}
+            </Box>
+         ) : null}
          <Stack spacing={4.75} sx={combineStyles(customStyles.root, sx)}>
             <Box>
                <CustomJobHeader
@@ -124,63 +119,23 @@ export const CustomJobDetails = ({
                   </Stack>
                </Box>
 
-               {!hideCTAButtons && context && isOpen ? (
+               {context && isApplyConfirmationOpen ? (
                   <CustomJobApplyConfirmation
-                     handleClose={handleClose}
+                     handleClose={handleApplyConfirmationClose}
                      job={job as PublicCustomJob}
                      applicationSource={context}
                      autoApply={isAutoApply}
                      onApply={onApply}
-                     sx={{
-                        bottom:
-                           isMobile && context.source == "livestream"
-                              ? "150px"
-                              : "100px",
-                     }}
+                     sx={combineStyles(
+                        customStyles.confirmation,
+                        applyConfirmationSx
+                     )}
                   />
                ) : null}
             </Box>
          </Stack>
-         {!hideCTAButtons && context ? (
-            <>
-               <CustomJobCTABottomContent
-                  hideBottomDivider={hideBottomDivider}
-                  ref={ref}
-               >
-                  <CustomJobCTAButtons
-                     applicationSource={context}
-                     job={job as PublicCustomJob}
-                     handleApplyClick={handleOpen}
-                     {...props}
-                  />
-               </CustomJobCTABottomContent>
-               <Box height={`calc(${height}px + 40px)`} />
-            </>
-         ) : null}
       </>
    )
 }
-
-type CustomJobCTABottomContentProps = {
-   children: ReactNode
-   hideBottomDivider: boolean
-}
-
-export const CustomJobCTABottomContent = forwardRef<
-   HTMLDivElement,
-   CustomJobCTABottomContentProps
->(function CustomJobCTABottomContent({ children, hideBottomDivider }, ref) {
-   return (
-      <Box
-         ref={ref}
-         sx={[
-            customStyles.fixedBottomContent,
-            hideBottomDivider && customStyles.noDivider,
-         ]}
-      >
-         {children}
-      </Box>
-   )
-})
 
 export default CustomJobDetailsView
