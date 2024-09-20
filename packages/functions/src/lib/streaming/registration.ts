@@ -70,12 +70,18 @@ export const onUserRegistration = onDocumentWritten(
             return
          }
 
+         // If the document doesn't exist, create it first
+         if (!registeredLivestreamsDoc.exists) {
+            await registeredLivestreamsRef.set(registeredLivestreams)
+         }
+
          const updateData = updateRegisteredLivestreams(
             livestreamId,
             newUserLivestreamData
          )
 
-         await registeredLivestreamsRef.set(updateData, { merge: true })
+         // Now we can always use update
+         await registeredLivestreamsRef.update(updateData)
 
          if (!IS_BACKFILL) {
             logger.info(
