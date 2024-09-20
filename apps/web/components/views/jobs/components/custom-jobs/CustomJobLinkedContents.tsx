@@ -1,6 +1,7 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Box, Stack, Typography } from "@mui/material"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
@@ -11,6 +12,7 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
+import { useRouter } from "next/router"
 import { useMemo, useRef } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -124,6 +126,19 @@ type CustomJobLinkedSparksProps = {
 
 const CustomJobLinkedSparks = ({ sparks }: CustomJobLinkedSparksProps) => {
    const childRef = useRef(null)
+   const router = useRouter()
+
+   const handleSparksClicked = (spark: Spark) => {
+      if (!spark) return
+
+      return router.push({
+         pathname: `/sparks/${spark.id}`,
+         query: {
+            // Not spreading params
+            interactionSource: SparkInteractionSources.CustomJob,
+         },
+      })
+   }
 
    if (!sparks.length) return null
    return (
@@ -136,6 +151,7 @@ const CustomJobLinkedSparks = ({ sparks }: CustomJobLinkedSparksProps) => {
                ref={childRef}
                sparks={sparks}
                options={sparksCarouselEmblaOptions}
+               onSparkClick={handleSparksClicked}
             />
          </Box>
       </Box>

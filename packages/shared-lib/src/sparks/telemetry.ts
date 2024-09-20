@@ -151,4 +151,5 @@ export const SparkInteractionSources = {
    New_Spark_Notification: "new_spark_notification",
    Livestream_End_Screen: "livestream_end_screen",
    Mentor_Page: "mentor_page",
+   CustomJob: "custom_job",
 } as const
