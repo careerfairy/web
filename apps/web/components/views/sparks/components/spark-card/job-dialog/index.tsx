@@ -1,6 +1,8 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { SlideUpTransition } from "components/views/common/transitions"
+import CustomJobDetailsSkeleton from "components/views/jobs/components/custom-jobs/skeletons/CustomJobDetailsSkeleton"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -58,7 +60,11 @@ const JobDialog = ({ isOpen, handleClose, jobs, spark }: Props) => {
          },
          {
             key: "job-detail",
-            Component: () => <JobDetails job={selectedJob} spark={spark} />,
+            Component: () => (
+               <SuspenseWithBoundary fallback={<CustomJobDetailsSkeleton />}>
+                  <JobDetails job={selectedJob} spark={spark} />
+               </SuspenseWithBoundary>
+            ),
          },
       ],
       [handleClose, handleJobListCLick, jobs, selectedJob, spark]

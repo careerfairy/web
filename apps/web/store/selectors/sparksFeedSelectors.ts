@@ -116,3 +116,6 @@ export const isInCreatorFeedSelector = (state: RootState) =>
 
 export const wasInCreatorFeedSelector = (state: RootState) =>
    state.sparksFeed.fetchedCompanyWithCreatorStatus === "ongoing"
+
+export const isJobDialogOpenSelector = (state: RootState) =>
+   state.sparksFeed.isJobDialogOpen
