@@ -1,6 +1,7 @@
 import { Box, Stack, Tab, Tabs, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import useUserAppliedJobs from "components/custom-hook/custom-job/useUserAppliedJobs"
 import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"
 import { useState } from "react"
@@ -131,6 +132,7 @@ const UserInitiatedCustomJobs = () => {
 const UserInitiatedCustomJobsView = () => {
    const { userData } = useAuth()
    const initiatedJobs = useUserAppliedJobs(userData.id, false)
+   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(initiatedJobs)
 
    if (!initiatedJobs?.length) return <UserEmptyApplications />
 
@@ -139,6 +141,7 @@ const UserInitiatedCustomJobsView = () => {
          customJobs={initiatedJobs}
          hrefLink={JOBS_DIALOG_LINK}
          jobWrapperSx={styles.jobWrapper}
+         jobsGroupNamesMap={jobsGroupNamesMap}
       />
    )
 }
@@ -156,6 +159,8 @@ const UserAppliedCustomJobsView = () => {
    const { userData } = useAuth()
    const appliedJobs = useUserAppliedJobs(userData.id, true)
 
+   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(appliedJobs)
+
    if (!appliedJobs?.length) return <UserEmptyApplications />
 
    return (
@@ -163,6 +168,7 @@ const UserAppliedCustomJobsView = () => {
          customJobs={appliedJobs}
          hrefLink={JOBS_DIALOG_LINK}
          jobWrapperSx={styles.jobWrapper}
+         jobsGroupNamesMap={jobsGroupNamesMap}
       />
    )
 }
