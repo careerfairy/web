@@ -27,12 +27,14 @@ export class ManualTemplatedEmailService {
    async fetchRequiredData(overrideUsers: string[]) {
       const dateFrom = new Date("2023-01-01")
       const lastActivityTimestamp = Timestamp.fromDate(dateFrom)
+
       // start fetching
       const swissSubscribedUsers =
          await this.userRepo.getSubscribedUsersByCountryCode(
             "CH",
             overrideUsers
          )
+
       const users = (swissSubscribedUsers || []).filter(
          (user) => user.lastActivityAt >= lastActivityTimestamp
       )
