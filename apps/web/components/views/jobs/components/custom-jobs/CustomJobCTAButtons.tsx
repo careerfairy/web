@@ -326,7 +326,7 @@ const ProfileJobCTA = ({
 
       if (alreadyApplied)
          return (
-            <Stack direction={"row"} alignItems={"center"} spacing={1}>
+            <Stack direction={"row"} alignItems={"center"}>
                <XCircle
                   width={"18px"}
                   height={"18px"}
