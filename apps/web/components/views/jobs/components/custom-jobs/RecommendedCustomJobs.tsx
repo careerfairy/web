@@ -1,9 +1,10 @@
-import { Button, Skeleton, Stack, Typography } from "@mui/material"
+import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobsByUser from "components/custom-hook/custom-job/useCustomJobsByUser"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
 import { useCallback, useMemo, useState } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -107,20 +108,6 @@ export const RecommendedCustomJobsSkeleton = () => {
          <JobCardSkeleton />
          <JobCardSkeleton />
          <JobCardSkeleton />
-      </Stack>
-   )
-}
-
-const JobCardSkeleton = () => {
-   return (
-      <Stack direction={"column"}>
-         <Skeleton height={"30px"} sx={{ mr: "20%" }} />
-         <Skeleton height={"10px"} sx={{ mr: "50%" }} />
-         <Stack direction={"row"} spacing={1}>
-            <Skeleton width={"100px"} />
-            <Skeleton width={"100px"} />
-         </Stack>
-         <Skeleton width={"80px"} height={"10px"} />
       </Stack>
    )
 }
