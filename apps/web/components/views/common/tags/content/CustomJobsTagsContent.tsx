@@ -1,9 +1,8 @@
 import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
 import { Button, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useCustomJobs, {
-   useCustomJobsCount,
-} from "components/custom-hook/custom-job/useCustomJobs"
+import useCustomJobs from "components/custom-hook/custom-job/useCustomJobs"
+import useCustomJobsCount from "components/custom-hook/custom-job/useCustomJobsCount"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"

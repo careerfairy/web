@@ -11,7 +11,6 @@ import {
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import useCountQuery from "../useCountQuery"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 type Options = {
@@ -86,26 +85,6 @@ const useCustomJobs = (options?: Options) => {
    return {
       customJobs: data,
    }
-}
-
-export const useCustomJobsCount = (options?: Options) => {
-   const { businessFunctionTagIds } = options
-   const countQuery = query(
-      collection(FirestoreInstance, "customJobs"),
-      where("deadline", ">", new Date()),
-      where("published", "==", true),
-      ...(businessFunctionTagIds.length
-         ? [
-              where(
-                 "businessFunctionsTagIds",
-                 "array-contains-any",
-                 businessFunctionTagIds
-              ),
-           ]
-         : [])
-   )
-
-   return useCountQuery(countQuery)
 }
 
 export default useCustomJobs
