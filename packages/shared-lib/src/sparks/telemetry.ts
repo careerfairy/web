@@ -139,6 +139,7 @@ export const SparkEventActions = {
    Watched_CompleteSpark: "Watched_CompleteSpark",
    Played_Spark: "Played_Spark",
    Register_Event: "Register_Event",
+   Click_JobCTA: "Click_JobCTA",
 } as const
 
 export type SparkEventActionType =

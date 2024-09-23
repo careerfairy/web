@@ -1,9 +1,11 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Button } from "@mui/material"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { maybePluralize } from "components/helperFunctions/HelperFunctions"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { setIsJobDialogOpen } from "store/reducers/sparksFeedReducer"
@@ -32,9 +34,11 @@ const SparkJobButton = ({ spark }: Props) => {
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
    const dispatch = useDispatch()
+   const { trackEvent } = useSparksFeedTracker()
 
    const handleClick = (event: React.MouseEvent) => {
       handleOpenDialog()
+      trackEvent(SparkEventActions.Click_JobCTA)
       event.stopPropagation()
    }
 
