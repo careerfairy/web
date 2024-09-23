@@ -75,6 +75,7 @@ export const MockedData = {
                likes: 8,
                shareCTA: 2,
                numberOfCareerPageClicks: 9,
+               numberOfMentorPageClicks: 0,
             },
          },
          {
@@ -94,6 +95,7 @@ export const MockedData = {
                likes: 0,
                shareCTA: 2,
                numberOfCareerPageClicks: 2,
+               numberOfMentorPageClicks: 0,
             },
          },
          {
@@ -113,6 +115,7 @@ export const MockedData = {
                likes: 1,
                shareCTA: 2,
                numberOfCareerPageClicks: 3,
+               numberOfMentorPageClicks: 0,
             },
          },
       ],
@@ -333,6 +336,7 @@ export const MockedData = {
                likes: 6,
                shareCTA: 1,
                numberOfCareerPageClicks: 8,
+               numberOfMentorPageClicks: 0,
             },
          },
          {
@@ -353,6 +357,7 @@ export const MockedData = {
                likes: 6,
                shareCTA: 3,
                numberOfCareerPageClicks: 14,
+               numberOfMentorPageClicks: 0,
             },
          },
          {
@@ -373,6 +378,7 @@ export const MockedData = {
                likes: 0,
                shareCTA: 0,
                numberOfCareerPageClicks: 5,
+               numberOfMentorPageClicks: 0,
             },
          },
          {
@@ -392,6 +398,7 @@ export const MockedData = {
                likes: 4,
                shareCTA: 5,
                numberOfCareerPageClicks: 0,
+               numberOfMentorPageClicks: 0,
             },
          },
       ],
@@ -414,6 +421,7 @@ export const MockedData = {
                likes: 6,
                shareCTA: 3,
                numberOfCareerPageClicks: 14,
+               numberOfMentorPageClicks: 0,
             },
          },
          {
@@ -434,6 +442,7 @@ export const MockedData = {
                likes: 6,
                shareCTA: 4,
                numberOfCareerPageClicks: 17,
+               numberOfMentorPageClicks: 0,
             },
          },
          {
@@ -454,6 +463,7 @@ export const MockedData = {
                likes: 8,
                shareCTA: 2,
                numberOfCareerPageClicks: 9,
+               numberOfMentorPageClicks: 0,
             },
          },
          {
@@ -473,6 +483,7 @@ export const MockedData = {
                likes: 2,
                shareCTA: 1,
                numberOfCareerPageClicks: 3,
+               numberOfMentorPageClicks: 0,
             },
          },
       ],

@@ -162,6 +162,7 @@ type StaticSparkCardProps = {
       likes: number
       shareCTA: number
       numberOfCareerPageClicks: number
+      numberOfMentorPageClicks: number
    }
 }
 

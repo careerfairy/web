@@ -1,3 +1,4 @@
+import { transformCreatorNameIntoSlug } from "@careerfairy/shared-lib/groups/creators"
 import {
    SparkCardNotificationTypes,
    SparkPresenter,
@@ -207,11 +208,18 @@ const SparksFeedCard: FC<Props> = ({
       ? `/company/${companyNameSlugify(spark.group.universityName)}`
       : undefined
 
-   const onSparkDetailsClick = useCallback(() => {
-      if (companyPageLink) {
-         trackEvent(SparkEventActions.Click_CompanyPageCTA)
+   const mentorPageLink = `/company/${
+      spark.group.universityName
+   }/mentor/${transformCreatorNameIntoSlug(
+      spark.creator.firstName,
+      spark.creator.lastName
+   )}/${spark.creator.id}`
+
+   const onCreatorDetailsClick = useCallback(() => {
+      if (mentorPageLink) {
+         trackEvent(SparkEventActions.Click_MentorPageCTA)
       }
-   }, [companyPageLink, trackEvent])
+   }, [mentorPageLink, trackEvent])
 
    const onVideoPlay = useCallback(() => {
       trackEvent(SparkEventActions.Played_Spark)
@@ -318,14 +326,14 @@ const SparksFeedCard: FC<Props> = ({
                      <Stack sx={styles.desktopContentInner}>
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
-                              spark.group.logoUrl,
+                              spark.creator.avatarUrl,
                               "md"
                            )}
-                           onClick={onSparkDetailsClick}
+                           onClick={onCreatorDetailsClick}
                            displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
                            companyName={spark.group.universityName}
                            creatorPosition={spark.creator.position}
-                           linkToCompanyPage={companyPageLink}
+                           linkToMentorPage={mentorPageLink}
                         />
                         <Box mt={2} />
                         <SparkCategoryChip categoryId={spark.category.id} />
@@ -342,6 +350,7 @@ const SparksFeedCard: FC<Props> = ({
                         <FeedCardActions
                            hide={!isOverlayedOntop}
                            spark={spark}
+                           linkToCompanyPage={companyPageLink}
                         />
                      </>
                   ) : null}
@@ -351,7 +360,11 @@ const SparksFeedCard: FC<Props> = ({
          </Box>
          {!showCardNotification && !isFullScreen ? (
             <Box sx={styles.outerActionsWrapper}>
-               <FeedCardActions hide={!isOverlayedOntop} spark={spark} />
+               <FeedCardActions
+                  hide={!isOverlayedOntop}
+                  spark={spark}
+                  linkToCompanyPage={companyPageLink}
+               />
             </Box>
          ) : null}
       </>

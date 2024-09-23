@@ -110,6 +110,11 @@ export interface SparkStats extends Identifiable {
     */
    numberTimesCompletelyWatched: number
 
+   /**
+    * How many times the mentor page icon is clicked on the platform
+    */
+   numberOfMentorPageClicks: number
+
    deleted: boolean
 
    deletedAt: Timestamp
