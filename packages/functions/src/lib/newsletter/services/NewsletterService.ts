@@ -192,10 +192,6 @@ export class NewsletterService {
          pastLivestreams,
          registeredLivestreams,
       ] = await Promise.all(promises)
-      console.log(
-         "🚀 ~ file: NewsletterService.ts:197 ~ NewsletterService ~ fetchRequiredData ~ registeredLivestreams:",
-         registeredLivestreams
-      )
 
       this.logger.info(
          "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",

@@ -147,21 +147,17 @@ export class UserFunctionsRepository
          .collection("registeredLivestreams")
          .withConverter(createCompatGenericConverter<RegisteredLivestreams>())
 
-         .where("user.unsubscribed", "==", false)
-         .where("user.lastActivityAt", ">=", earlierThan)
+         .where("unsubscribed", "==", false)
+         .where("lastActivityAt", ">=", earlierThan)
 
       if (locationFilters?.length) {
-         query = query.where(
-            "user.universityCountryCode",
-            "in",
-            locationFilters
-         )
+         query = query.where("universityCountryCode", "in", locationFilters)
       }
 
       if (userEmails?.length) {
          const withinLimit = isWithinNormalizationLimit(30, userEmails)
          if (withinLimit) {
-            query = query.where("user.userEmail", "in", userEmails)
+            query = query.where("userEmail", "in", userEmails)
          }
       }
 
