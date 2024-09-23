@@ -145,10 +145,6 @@
          "type": "number"
       },
       {
-         "name": "numberOfMentorPageClicks",
-         "type": "number"
-      },
-      {
          "name": "numberOfCompanyPageClicks",
          "type": "number"
       },
