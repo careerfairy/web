@@ -350,7 +350,7 @@ export class NewsletterService {
     */
    send(overrideUsers?: string[]) {
       const emails = overrideUsers ?? Object.keys(this.users)
-
+      this.logger.info("Total emails to send", emails.length)
       // counters
       const usersWithoutMinimumRecommendedLivestreams = []
       const sentEmails = []
