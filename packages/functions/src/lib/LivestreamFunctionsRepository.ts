@@ -41,7 +41,7 @@ import {
    createLiveStreamStatsDoc,
 } from "@careerfairy/shared-lib/livestreams/stats"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import { chunkArray } from "@careerfairy/shared-lib/utils"
+import { chunkArray, getArrayDifference } from "@careerfairy/shared-lib/utils"
 import type { Change } from "firebase-functions"
 import * as functions from "firebase-functions"
 import { isEmpty } from "lodash"
@@ -920,21 +920,27 @@ export class LivestreamFunctionsRepository
    ): Promise<void> {
       // Check if the livestreams in afterJob and beforeJob are the same, regardless of order
       const areLivestreamsEqual =
-         afterJob.livestreams.sort().join(",") ===
-         beforeJob.livestreams.sort().join(",")
+         getArrayDifference(afterJob.livestreams, beforeJob.livestreams)
+            .length === 0 &&
+         getArrayDifference(beforeJob.livestreams, afterJob.livestreams)
+            .length === 0
+
       if (areLivestreamsEqual) {
          // If the livestreams are the same, exit the function early
          return
       }
 
       // Get the livestreams that were added to afterJob
-      const addedLivestreams = afterJob.livestreams.filter(
-         (id) => !beforeJob.livestreams.includes(id)
-      )
+      const addedLivestreams = getArrayDifference(
+         beforeJob.livestreams,
+         afterJob.livestreams
+      ) as string[]
+
       // Get the livestreams that were removed from beforeJob
-      const removedLivestreams = beforeJob.livestreams.filter(
-         (id) => !afterJob.livestreams.includes(id)
-      )
+      const removedLivestreams = getArrayDifference(
+         afterJob.livestreams,
+         beforeJob.livestreams
+      ) as string[]
 
       // Get all customJobs from the group id
       const customJobs = await customJobRepo.getCustomJobsByGroupId(

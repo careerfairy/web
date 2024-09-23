@@ -33,6 +33,7 @@ import {
 } from "@careerfairy/shared-lib/src/commonTypes"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
+import { getArrayDifference } from "@careerfairy/shared-lib/utils"
 import { DocumentSnapshot } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
@@ -1194,7 +1195,9 @@ export class SparkFunctionsRepository
    ): Promise<void> {
       // Check if the sparks in afterJob and beforeJob are the same, regardless of order
       const areSparksEqual =
-         afterJob.sparks.sort().join(",") === beforeJob.sparks.sort().join(",")
+         getArrayDifference(afterJob.sparks, beforeJob.sparks).length === 0 &&
+         getArrayDifference(beforeJob.sparks, afterJob.sparks).length === 0
+
       if (areSparksEqual) {
          // If the sparks are the same, exit the function early
          return
@@ -1238,7 +1241,7 @@ export class SparkFunctionsRepository
             `Update spark ${sparkId} to be with hasJobs flag as false`
          )
          batch.update(this.firestore.collection("sparks").doc(sparkId), {
-            hasJob: false,
+            hasJobs: false,
          })
       })
 
@@ -1249,7 +1252,7 @@ export class SparkFunctionsRepository
          )
 
          batch.update(this.firestore.collection("sparks").doc(sparkId), {
-            hasJob: true,
+            hasJobs: true,
          })
       })
 
