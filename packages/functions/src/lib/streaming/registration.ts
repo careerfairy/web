@@ -6,8 +6,6 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { userRepo } from "../../api/repositories"
 import { ChangeType, getChangeTypeEnum } from "../../util"
 
-const IS_BACKFILL = true // will disable logging for backfill and force update of all documents
-
 export const onUserRegistration = onDocumentWritten(
    {
       document: "livestreams/{livestreamId}/userLivestreamData/{userEmail}",
@@ -16,11 +14,9 @@ export const onUserRegistration = onDocumentWritten(
       const { params } = event
       const { livestreamId, userEmail } = params
 
-      if (!IS_BACKFILL) {
-         logger.info(
-            `Processing registration for live stream ${livestreamId} and user ${userEmail}`
-         )
-      }
+      logger.info(
+         `Processing registration for live stream ${livestreamId} and user ${userEmail}`
+      )
 
       const newUserLivestreamData =
          event.data.after.data() as UserLivestreamData
@@ -28,23 +24,21 @@ export const onUserRegistration = onDocumentWritten(
          event.data.before.data() as UserLivestreamData
 
       // on backfill, we don't need to check for registration changes, we need to update all documents
-      if (!IS_BACKFILL) {
-         const registrationChanged = hasRegistrationChanged(
-            oldUserLivestreamData,
-            newUserLivestreamData
-         )
+      const registrationChanged = hasRegistrationChanged(
+         oldUserLivestreamData,
+         newUserLivestreamData
+      )
 
-         if (!registrationChanged) {
-            logger.info(
-               `No registration change detected for live stream ${livestreamId} and user ${userEmail}`
-            )
-            return
-         }
-
+      if (!registrationChanged) {
          logger.info(
-            `Registration change detected for live stream ${livestreamId} and user ${userEmail}`
+            `No registration change detected for live stream ${livestreamId} and user ${userEmail}`
          )
+         return
       }
+
+      logger.info(
+         `Registration change detected for live stream ${livestreamId} and user ${userEmail}`
+      )
 
       try {
          const userData = await userRepo.getUserDataById(userEmail)
@@ -81,11 +75,9 @@ export const onUserRegistration = onDocumentWritten(
          // Now we can always use update
          await registeredLivestreamsRef.update(updateData)
 
-         if (!IS_BACKFILL) {
-            logger.info(
-               `Successfully updated registered live streams for user ${userEmail}`
-            )
-         }
+         logger.info(
+            `Successfully updated registered live streams for user ${userEmail}`
+         )
       } catch (error) {
          logger.error(
             `Error updating registered live streams for user ${userEmail}:`,
@@ -171,8 +163,8 @@ function getOrCreateRegisteredLivestreams(
       userEmail: userData.id,
       unsubscribed: Boolean(userData?.unsubscribed),
       registeredLivestreams: {},
-      lastActivityAt: null,
-      universityCountryCode: "",
+      lastActivityAt: userData.lastActivityAt || null,
+      universityCountryCode: userData?.universityCountryCode || "",
    }
 }
 
@@ -190,26 +182,20 @@ function updateRegisteredLivestreams(
    if (newUserLivestreamData.registered?.date) {
       updateData[`registeredLivestreams.${livestreamId}`] =
          newUserLivestreamData.registered.date
-      if (!IS_BACKFILL) {
-         logger.info(
-            `User ${newUserLivestreamData.userId} registered for live stream ${livestreamId}`
-         )
-      }
+      logger.info(
+         `User ${newUserLivestreamData.userId} registered for live stream ${livestreamId}`
+      )
    } else {
       updateData[`registeredLivestreams.${livestreamId}`] =
          firestore.FieldValue.delete()
-      if (!IS_BACKFILL) {
-         logger.info(
-            `User ${newUserLivestreamData.userId} unregistered from live stream ${livestreamId}`
-         )
-      }
-   }
-
-   if (!IS_BACKFILL) {
       logger.info(
-         `Updated RegisteredLivestreams for user ${newUserLivestreamData.userId}`
+         `User ${newUserLivestreamData.userId} unregistered from live stream ${livestreamId}`
       )
    }
+
+   logger.info(
+      `Updated RegisteredLivestreams for user ${newUserLivestreamData.userId}`
+   )
 
    return updateData
 }
