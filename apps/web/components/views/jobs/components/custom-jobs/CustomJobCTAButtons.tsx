@@ -99,7 +99,7 @@ const CustomJobCTAButtons = (props: Props) => {
       group: () => {
          return <PortalJobCTA {...props} alreadyApplied={alreadyApplied} />
       },
-      portal: () => <></>,
+      portal: () => <PortalJobCTA {...props} alreadyApplied={alreadyApplied} />,
       notification: () => {
          return <></>
       },

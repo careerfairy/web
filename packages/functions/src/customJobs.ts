@@ -1,6 +1,6 @@
 import functions = require("firebase-functions")
 import { SchemaOf, array, object, string } from "yup"
-import { customJobRepo, userRepo } from "./api/repositories"
+import { customJobRepo, groupRepo, userRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
@@ -21,6 +21,20 @@ const UserCustomJobApplicationSchema: SchemaOf<UserCustomJobApplication> =
       authId: string().required(),
       jobId: string().required(),
    })
+type CustomJobsGroupNames = Record<string, string>
+
+// Validation schema
+const CustomJobsGroupNamesSchema: SchemaOf<CustomJobsGroupNames> = object()
+   .shape({})
+   .test("is-valid-record", "All values must be strings", (value) => {
+      if (typeof value !== "object" || value === null) {
+         return false
+      }
+
+      // Validate all values in the object are strings
+      return Object.values(value).every((v) => typeof v === "string")
+   })
+   .defined()
 
 export const confirmUserApplyToCustomJob = functions
    .region(config.region)
@@ -103,6 +117,35 @@ export const confirmAnonApplyToCustomJob = functions
       )
    )
 
+export const getCustomJobGroupNames = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares(
+         dataValidation(CustomJobsGroupNamesSchema),
+         onCallWrapper(async (data: CustomJobsGroupNames) => {
+            const jobIds = Object.keys(data)
+
+            functions.logger.log(
+               `Starting get custom job group names for jobs: ${jobIds}`
+            )
+
+            const promises = jobIds.map(async (jobId) => {
+               return groupRepo.getGroupById(data[jobId]).then((group) => {
+                  return {
+                     [jobId]: group.universityName,
+                  }
+               })
+            })
+
+            const jobsGroupNamesMap = await Promise.all(promises)
+
+            // Convert the array of objects to a single dynamic object
+            return jobsGroupNamesMap.reduce((acc, curr) => {
+               return { ...acc, ...curr } // Merge the current object into the accumulator
+            }, {})
+         })
+      )
+   )
 export const setAnonymousJobApplicationsUserId = functions
    .region(config.region)
    .https.onCall(

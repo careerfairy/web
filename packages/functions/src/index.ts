@@ -295,6 +295,7 @@ exports.transferCustomJobsFromDraftToPublishedLivestream_v2 =
    customJobs.transferCustomJobsFromDraftToPublishedLivestream
 exports.syncPermanentlyExpiredCustomJobs =
    customJobs.syncPermanentlyExpiredCustomJobs
+exports.fetchCustomJobGroupNames = customJobs.getCustomJobGroupNames
 
 // Group Subscription Plan Functions
 exports.startPlan_v3 = groupPlans.startPlan
