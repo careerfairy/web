@@ -17,9 +17,9 @@ import {
    isOnFirstSparkSelector,
    originalSparkIdSelector,
 } from "store/selectors/sparksFeedSelectors"
+import CookiesUtil from "util/CookiesUtil"
 import { v4 as uuidv4 } from "uuid"
 import useFingerPrint from "../../components/custom-hook/useFingerPrint"
-import CookiesUtil from "util/CookiesUtil"
 
 const BATCH_SIZE = 10 // Maximum number of events that can be batched
 const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
@@ -129,10 +129,10 @@ export const SparksFeedTrackerProvider: FC<{
          }
 
          switch (options.actionType) {
-            case SparkEventActions.Click_CareerPageCTA:
+            case SparkEventActions.Click_MentorPageCTA:
                sparkService.incrementSparkCount(
                   currentSparkId,
-                  "numberOfCareerPageClicks"
+                  "numberOfMentorPageClicks"
                )
                break
             case SparkEventActions.Like:

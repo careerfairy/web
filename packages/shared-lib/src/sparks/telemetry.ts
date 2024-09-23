@@ -132,6 +132,7 @@ export const SparkEventActions = {
    Unlike: "Unlike",
    Impression: "Impression",
    Click_CareerPageCTA: "Click_CareerPageCTA",
+   Click_MentorPageCTA: "Click_MentorPageCTA",
    Click_CompanyPageCTA: "Click_CompanyPageCTA",
    Click_DiscoverLivestreamCTA: "Click_DiscoverLivestreamCTA",
    Click_ReachOut_LinkedIn: "Click_ReachOut_LinkedIn",

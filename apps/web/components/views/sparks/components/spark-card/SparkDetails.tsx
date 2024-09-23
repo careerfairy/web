@@ -1,11 +1,11 @@
-import { FC } from "react"
-import { sxStyles } from "types/commonTypes"
 import Box from "@mui/material/Box"
-import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
-import CircularLogo from "components/views/common/logos/CircularLogo"
 import Link from "components/views/common/Link"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
+import { FC } from "react"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
@@ -48,7 +48,7 @@ type Props = {
    displayName: string
    companyName: string
    companyLogoUrl: string
-   linkToCompanyPage?: string
+   linkToMentorPage?: string
    creatorPosition?: string
    onClick?: () => void
 }
@@ -57,7 +57,7 @@ const SparkDetails: FC<Props> = ({
    companyName,
    displayName,
    companyLogoUrl,
-   linkToCompanyPage,
+   linkToMentorPage,
    creatorPosition,
    onClick,
 }) => {
@@ -82,8 +82,8 @@ const SparkDetails: FC<Props> = ({
 
    return (
       <Box
-         component={linkToCompanyPage ? Link : undefined}
-         href={linkToCompanyPage}
+         component={linkToMentorPage ? Link : undefined}
+         href={linkToMentorPage}
          sx={styles.root}
          onClick={onClick}
       >

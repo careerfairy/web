@@ -308,7 +308,7 @@ service cloud.firestore {
             // Allow to increment only the selected fields.
             match /_counter_shards_/{shardId} {
                 allow get;
-                allow write: if request.resource.data.keys().hasOnly(["likes", "impressions", "numberOfCareerPageClicks", "shareCTA", "uniquePlays", "plays", "numberOfCompanyPageClicks", "numberTimesCompletelyWatched", "totalWatchedMinutes" ]) 
+                allow write: if request.resource.data.keys().hasOnly(["likes", "impressions", "numberOfCareerPageClicks", "numberOfMentorPageClicks", "shareCTA", "uniquePlays", "plays", "numberOfCompanyPageClicks", "numberTimesCompletelyWatched", "totalWatchedMinutes" ]) 
             }
         }
 

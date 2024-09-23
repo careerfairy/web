@@ -454,6 +454,7 @@ export class SparksService {
          | "numberOfCompanyPageClicks"
          | "numberTimesCompletelyWatched"
          | "totalWatchedMinutes"
+         | "numberOfMentorPageClicks"
       >,
       increment = 1
    ) {
@@ -461,7 +462,6 @@ export class SparksService {
          FirestoreInstance.doc(`sparkStats/${sparkId}`),
          field
       )
-
       sparkCounter.incrementBy(increment)
    }
 
