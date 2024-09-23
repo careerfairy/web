@@ -118,8 +118,10 @@ function getOrCreateRegisteredLivestreams(
       id: userData.authId,
       userAuthId: userData.authId,
       userEmail: userData.id,
-      unsubscribed: Boolean(userData.unsubscribed),
+      unsubscribed: Boolean(userData?.unsubscribed),
       registeredLivestreams: {},
+      lastActivityAt: null,
+      universityCountryCode: "",
    }
 }
 
@@ -130,6 +132,8 @@ function updateRegisteredLivestreams(
 ): Partial<RegisteredLivestreams> {
    const updateData: Partial<RegisteredLivestreams> = {
       unsubscribed: Boolean(userData.unsubscribed),
+      lastActivityAt: userData?.lastActivityAt || null,
+      universityCountryCode: userData?.universityCountryCode || "",
    }
 
    if (newUserLivestreamData.registered?.date) {

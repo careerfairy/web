@@ -435,6 +435,8 @@ export interface RegisteredLivestreams extends Identifiable {
    userAuthId: string
    userEmail: string
    unsubscribed: boolean
+   lastActivityAt: Timestamp
+   universityCountryCode: string
    /**
     * Map of the registered livestreams at the time of running migration script
     */
