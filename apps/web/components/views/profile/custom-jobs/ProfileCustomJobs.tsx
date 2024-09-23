@@ -5,6 +5,7 @@ import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustom
 import { useUserAppliedJobs } from "components/custom-hook/custom-job/useUserAppliedJobs"
 import { useUserInitiatedJobs } from "components/custom-hook/custom-job/useUserInitiatedJobs"
 import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"
+import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
 import { useState } from "react"
 import { Briefcase } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -122,9 +123,8 @@ const UserEmptyApplications = () => {
 }
 
 const UserInitiatedCustomJobs = () => {
-   // TODO-WG: set skeleton
    return (
-      <SuspenseWithBoundary>
+      <SuspenseWithBoundary fallback={<JobCardSkeleton />}>
          <UserInitiatedCustomJobsView />
       </SuspenseWithBoundary>
    )
@@ -148,9 +148,8 @@ const UserInitiatedCustomJobsView = () => {
 }
 
 const UserAppliedCustomJobs = () => {
-   // TODO-WG: set skeleton
    return (
-      <SuspenseWithBoundary>
+      <SuspenseWithBoundary fallback={<JobCardSkeleton />}>
          <UserAppliedCustomJobsView />
       </SuspenseWithBoundary>
    )
