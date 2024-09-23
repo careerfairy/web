@@ -48,9 +48,9 @@ export const onUserRegistration = onDocumentWritten(
       try {
          const userData = await userRepo.getUserDataById(userEmail)
 
-         if (!userData.authId) {
+         if (!userData || !userData.authId) {
             logger.warn(
-               `Unable to process registration for user ${userEmail}: missing authId`
+               `Unable to process registration for user ${userEmail}: user data not found or missing authId`
             )
             return
          }
