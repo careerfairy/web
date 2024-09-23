@@ -193,10 +193,7 @@ export class NewsletterService {
          registeredLivestreams,
       ] = await Promise.all(promises)
 
-      this.logger.info(
-         "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
-         subscribedUsers?.length
-      )
+      this.logger.info("fetched subscribed users", subscribedUsers?.length)
 
       this.logger.info("filtering users")
 
@@ -351,7 +348,6 @@ export class NewsletterService {
    send(overrideUsers?: string[]) {
       const emails = overrideUsers ?? Object.keys(this.users)
       this.logger.info("Total emails to send to", emails.length)
-      this.logger.info("Users data", this.users)
       if (overrideUsers) {
          this.logger.info("Override users provided", overrideUsers)
       }
@@ -396,7 +392,7 @@ export class NewsletterService {
       )
 
       return this.emailBuilder.send().then(() => {
-         console.log("🚀 Emails sent to:", sentEmails)
+         console.log("Successfully sent newsletters to", sentEmails.length)
       })
    }
 }
