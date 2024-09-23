@@ -4,6 +4,7 @@ import { firestore } from "firebase-admin"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { userRepo } from "../../api/repositories"
+import { ChangeType, getChangeTypeEnum } from "../../util"
 
 const IS_BACKFILL = true // will disable logging for backfill and force update of all documents
 
@@ -95,6 +96,56 @@ export const onUserRegistration = onDocumentWritten(
    }
 )
 
+export const syncUserInRegisteredLivestreams = onDocumentWritten(
+   {
+      document: "userData/{userEmail}",
+   },
+   async (event) => {
+      const { params } = event
+      const { userEmail } = params
+
+      const changeType = getChangeTypeEnum(event.data)
+
+      if (
+         changeType === ChangeType.UPDATE ||
+         changeType === ChangeType.CREATE
+      ) {
+         try {
+            const newUserData = event.data.after.data() as UserData
+
+            if (!newUserData || !newUserData.authId) {
+               logger.warn(
+                  `Unable to process registration for user ${userEmail}: user data not found or missing authId`
+               )
+               return null
+            }
+
+            const registeredLivestreamsRef = firestore()
+               .collection("registeredLivestreams")
+               .doc(newUserData.authId)
+
+            const toUpdate: Partial<RegisteredLivestreams> = {
+               lastActivityAt: newUserData?.lastActivityAt || null,
+               universityCountryCode: newUserData?.universityCountryCode || "",
+               unsubscribed: Boolean(newUserData.unsubscribed),
+               userEmail: newUserData.userEmail || newUserData.id,
+               userAuthId: newUserData.authId,
+               id: newUserData.authId,
+            }
+
+            await registeredLivestreamsRef.set(toUpdate, { merge: true })
+
+            return null
+         } catch (error) {
+            logger.error(
+               `Error updating registered live streams for user ${userEmail}:`,
+               error
+            )
+            throw error
+         }
+      }
+   }
+)
 function hasRegistrationChanged(
    oldData: UserLivestreamData,
    newData: UserLivestreamData
