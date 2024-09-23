@@ -3,7 +3,7 @@ import { collection, orderBy, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
-const useUserAppliedJobs = (userId: string, applied: boolean) => {
+const useUserJobApplications = (userId: string, applied: boolean) => {
    const collectionRef = query(
       collection(useFirestore(), "jobApplications"),
       where("user.id", "==", userId),
@@ -21,4 +21,4 @@ const useUserAppliedJobs = (userId: string, applied: boolean) => {
    return customJobs
 }
 
-export default useUserAppliedJobs
+export default useUserJobApplications

@@ -2,7 +2,8 @@ import { Box, Stack, Tab, Tabs, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
-import useUserAppliedJobs from "components/custom-hook/custom-job/useUserAppliedJobs"
+import { useUserAppliedJobs } from "components/custom-hook/custom-job/useUserAppliedJobs"
+import { useUserInitiatedJobs } from "components/custom-hook/custom-job/useUserInitiatedJobs"
 import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"
 import { useState } from "react"
 import { Briefcase } from "react-feather"
@@ -131,7 +132,7 @@ const UserInitiatedCustomJobs = () => {
 
 const UserInitiatedCustomJobsView = () => {
    const { userData } = useAuth()
-   const initiatedJobs = useUserAppliedJobs(userData.id, false)
+   const initiatedJobs = useUserInitiatedJobs(userData.id)
    const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(initiatedJobs)
 
    if (!initiatedJobs?.length) return <UserEmptyApplications />
@@ -157,7 +158,7 @@ const UserAppliedCustomJobs = () => {
 
 const UserAppliedCustomJobsView = () => {
    const { userData } = useAuth()
-   const appliedJobs = useUserAppliedJobs(userData.id, true)
+   const appliedJobs = useUserAppliedJobs(userData.id)
 
    const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(appliedJobs)
 
