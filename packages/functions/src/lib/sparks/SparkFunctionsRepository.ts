@@ -1035,7 +1035,6 @@ export class SparkFunctionsRepository
             impressions: 0,
             likes: 0,
             numberOfCareerPageClicks: 0,
-            numberOfMentorPageClicks: 0,
             numberOfCompanyPageClicks: 0,
             plays: 0,
             shareCTA: 0,

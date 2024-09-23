@@ -129,12 +129,6 @@ export const SparksFeedTrackerProvider: FC<{
          }
 
          switch (options.actionType) {
-            case SparkEventActions.Click_MentorPageCTA:
-               sparkService.incrementSparkCount(
-                  currentSparkId,
-                  "numberOfMentorPageClicks"
-               )
-               break
             case SparkEventActions.Like:
                sparkService.incrementSparkCount(currentSparkId, "likes")
                break

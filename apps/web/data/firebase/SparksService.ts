@@ -454,7 +454,6 @@ export class SparksService {
          | "numberOfCompanyPageClicks"
          | "numberTimesCompletelyWatched"
          | "totalWatchedMinutes"
-         | "numberOfMentorPageClicks"
       >,
       increment = 1
    ) {
