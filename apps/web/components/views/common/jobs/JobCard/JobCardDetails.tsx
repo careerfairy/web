@@ -91,6 +91,18 @@ const styles = sxStyles({
    smallExpiredDate: {
       fontSize: "12px !important",
    },
+   companyName: {
+      fontFamily: "Poppins",
+      fontWeight: 400,
+   },
+   companyNameWrapper: {
+      mt: "4px",
+      mb: "4px",
+   },
+   companyNameWrapperMobile: {
+      mt: "4px",
+      mb: "8px",
+   },
 })
 
 type Props = {
@@ -100,6 +112,7 @@ type Props = {
    hideJobUrl?: boolean
    titleSx?: SxProps<DefaultTheme>
    typographySx?: SxProps<DefaultTheme>
+   companyName?: string
 }
 
 const JobCardDetails = ({
@@ -109,6 +122,7 @@ const JobCardDetails = ({
    hideJobUrl,
    titleSx,
    typographySx,
+   companyName,
 }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
@@ -155,7 +169,6 @@ const JobCardDetails = ({
                >
                   {jobName}
                </Typography>
-
                {showTooltip ? (
                   <Box sx={styles.warningContainer}>
                      <Tooltip
@@ -184,6 +197,23 @@ const JobCardDetails = ({
                />
             ) : null}
          </Box>
+         {companyName ? (
+            <Box
+               sx={
+                  isMobile
+                     ? styles.companyNameWrapperMobile
+                     : styles.companyNameWrapper
+               }
+            >
+               <Typography
+                  variant={"xsmall"}
+                  sx={styles.companyName}
+                  color="neutral.500"
+               >
+                  {companyName}
+               </Typography>
+            </Box>
+         ) : null}
          <Box>
             <Typography
                variant={"subtitle1"}

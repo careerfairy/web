@@ -1,11 +1,13 @@
-import React, { useMemo } from "react"
-import { EventsCarouselStyling, EventsTypes } from "./EventsPreviewCarousel"
+import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { useMemo } from "react"
+import { sxStyles } from "types/commonTypes"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
-import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import EventsPreviewCarousel from "./EventsPreviewCarousel"
-import { sxStyles } from "types/commonTypes"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
+import EventsPreviewCarousel, {
+   EventsCarouselStyling,
+   EventsTypes,
+} from "./EventsPreviewCarousel"
 
 const slideSpacing = 21
 
@@ -38,12 +40,8 @@ const styles = sxStyles({
       textDecoration: "underline",
    },
    eventTitle: {
-      fontFamily: "Poppins",
-      fontSize: "18px",
-      fontStyle: "normal",
       fontWeight: "600",
-      lineHeight: "27px",
-      color: "black",
+      color: (theme) => theme.palette.neutral[800],
    },
    viewport: {
       overflow: "hidden",
@@ -99,7 +97,7 @@ const defaultStyling: EventsCarouselStyling = {
    padding: true,
    slide: styles.slide,
    title: styles.eventTitle,
-   titleVariant: "h6",
+   titleVariant: "brandedH4",
    eventsHeader: styles.eventsHeader,
    mainWrapperBoxSx: {
       mt: 2,
