@@ -2274,9 +2274,6 @@ class FirebaseService {
       const userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
-      const streamRef = this.firestore
-         .collection("livestreams")
-         .doc(livestream.id)
       const userLivestreamDataRef = this.firestore
          .collection("livestreams")
          .doc(livestream.id)
@@ -2295,11 +2292,6 @@ class FirebaseService {
                transaction.update(userRef, {
                   talentPools:
                      firebase.firestore.FieldValue.arrayUnion(companyId),
-               })
-               transaction.update(streamRef, {
-                  talentPool: firebase.firestore.FieldValue.arrayUnion(
-                     userData.userEmail
-                  ),
                })
 
                // insert related talent profiles (for each group id)
@@ -2397,11 +2389,6 @@ class FirebaseService {
                   talentPools:
                      firebase.firestore.FieldValue.arrayRemove(companyId),
                })
-               transaction.update(streamRef, {
-                  talentPool: firebase.firestore.FieldValue.arrayRemove(
-                     userData.userEmail
-                  ),
-               })
             })
       })
    }
@@ -2462,31 +2449,7 @@ class FirebaseService {
          // Set the user Participating data in the userLivestreamData collection
          batch.set(participantsRef, data, { merge: true })
 
-         // Set the user's email in the participants array of the livestream document
-         batch.update(streamRef, {
-            participatingStudents: firebase.firestore.FieldValue.arrayUnion(
-               userData.userEmail
-            ),
-         })
-
          await batch.commit()
-
-         // Events with huge number of participants
-         //
-         // await participantsRef.set(data, { merge: true })
-         // const futureIntervalMs = getRandomInt(2500, 30000)
-
-         // // distribute writes to the single livestream doc
-         // setTimeout(() => {
-         //    streamRef
-         //       .update({
-         //          participatingStudents:
-         //             firebase.firestore.FieldValue.arrayUnion(
-         //                userData.userEmail
-         //             ),
-         //       })
-         //       .catch(console.error)
-         // }, futureIntervalMs)
       }
    }
 

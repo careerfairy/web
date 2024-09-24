@@ -335,7 +335,7 @@ service cloud.firestore {
 
             // signed in users can update certain fields
             //            function publicFieldsUsersCanUpdate() {
-            //                let allowedFields = ['participatingStudents', 'talentPool', 'screenSharerId'];
+            //                let allowedFields = ['screenSharerId'];
             //                let diff = request.resource.data.diff(resource.data);
             //                return isSignedIn() && diff.affectedKeys().hasAny(allowedFields);
             //            }

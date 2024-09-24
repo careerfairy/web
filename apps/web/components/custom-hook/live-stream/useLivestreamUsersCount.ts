@@ -1,12 +1,17 @@
 import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { collection, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
+import { SWRConfiguration } from "swr"
 import useSWRCountQuery from "../useSWRCountQuery"
 
 type UserType = keyof Pick<
    UserLivestreamData,
    "registered" | "talentPool" | "participated"
 >
+
+type Options = {
+   disabled?: boolean
+} & SWRConfiguration<number>
 
 /**
  * Hook to fetch the count of users for a specific live stream based on user type.
@@ -16,7 +21,8 @@ type UserType = keyof Pick<
  */
 export const useLivestreamUsersCount = (
    livestreamId: string,
-   userType: UserType
+   userType: UserType,
+   { disabled, ...options }: Options = {}
 ) => {
    const firestore = useFirestore()
 
@@ -32,7 +38,8 @@ export const useLivestreamUsersCount = (
       where(`${userType}.date`, "!=", null)
    )
 
-   return useSWRCountQuery(registeredUsersQuery, {
+   return useSWRCountQuery(disabled ? null : registeredUsersQuery, {
       revalidateOnFocus: true, // revalidate when the user returns to the page to see the latest count
+      ...options,
    })
 }

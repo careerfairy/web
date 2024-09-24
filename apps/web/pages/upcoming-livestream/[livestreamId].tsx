@@ -447,12 +447,7 @@ export async function getServerSideProps({
 const serializeLivestream = (stream: LivestreamEvent): object => {
    const serverSideStream = LivestreamPresenter.serializeDocument(stream)
 
-   return omit(serverSideStream, [
-      "talentPool",
-      "participatingStudents",
-      "liveSpeakers",
-      "author",
-   ])
+   return omit(serverSideStream, ["liveSpeakers", "author"])
 }
 
 export default UpcomingLivestreamPage
