@@ -156,6 +156,10 @@ const styles = sxStyles({
       mb: { xs: 2, md: "unset" },
       mx: { xs: 1, md: "unset" },
    },
+   desktopContentInner: {
+      justifyContent: "flex-end",
+      width: "100%",
+   },
 })
 
 type Props = {
@@ -311,7 +315,7 @@ const SparksFeedCard: FC<Props> = ({
                   {showCardNotification ? (
                      <FullCardNotification spark={spark} />
                   ) : isOverlayedOntop ? (
-                     <Stack justifyContent="flex-end">
+                     <Stack sx={styles.desktopContentInner}>
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
                               spark.group.logoUrl,

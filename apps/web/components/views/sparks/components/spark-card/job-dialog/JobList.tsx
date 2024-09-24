@@ -20,8 +20,8 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      pl: 3,
-      pr: 2,
+      pl: { xs: 2, md: 3 },
+      pr: { xs: 0.5, md: 1.5 },
    },
    mobileTitle: {
       fontWeight: 600,
@@ -37,6 +37,9 @@ const styles = sxStyles({
          height: { xs: "32px", md: "24px" },
          color: "black.main",
       },
+   },
+   content: {
+      px: { xs: 2, md: 3 },
    },
 })
 
@@ -66,7 +69,7 @@ const JobList = ({ jobs, handleClose, handleClick }: Props) => {
             </Box>
          </DialogTitle>
 
-         <DialogContent>
+         <DialogContent sx={styles.content}>
             <Stack spacing={2}>
                {jobs.map((job: CustomJob) => (
                   <Box key={job.id}>
