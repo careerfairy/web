@@ -1,26 +1,26 @@
-import { UserData } from "@careerfairy/shared-lib/users"
-import { SparksDataFetcher } from "./services/DataFetcherRecommendations"
+import { combineRankedDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import RecommendationSparksServiceCore, {
+   IRecommendationSparksService,
+} from "@careerfairy/shared-lib/recommendation/sparks/IRecommendationSparksService"
+import { RankedSpark } from "@careerfairy/shared-lib/recommendation/sparks/RankedSpark"
+import { RankedSparkRepository } from "@careerfairy/shared-lib/recommendation/sparks/service/RankedSparkRepository"
+import {
+   handlePromisesAllSettled,
+   sortRankedByPoints,
+} from "@careerfairy/shared-lib/recommendation/utils"
 import {
    LikedSparks,
    SeenSparks,
    SharedSparks,
    SparkStats,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { RankedSpark } from "@careerfairy/shared-lib/recommendation/sparks/RankedSpark"
-import {
-   sortRankedByPoints,
-   handlePromisesAllSettled,
-} from "@careerfairy/shared-lib/recommendation/utils"
-import RecommendationSparksServiceCore, {
-   IRecommendationSparksService,
-} from "@careerfairy/shared-lib/recommendation/sparks/IRecommendationSparksService"
-import { combineRankedDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { SparkBasedRecommendationsBuilder } from "./services/SparkBasedRecommendationsBuilder"
-import { RankedSparkRepository } from "@careerfairy/shared-lib/recommendation/sparks/service/RankedSparkRepository"
-import functions = require("firebase-functions")
-import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { Timestamp } from "../../api/firestoreAdmin"
+import { SparksDataFetcher } from "./services/DataFetcherRecommendations"
+import { SparkBasedRecommendationsBuilder } from "./services/SparkBasedRecommendationsBuilder"
+import functions = require("firebase-functions")
 
 export default class SparkRecommendationService
    extends RecommendationSparksServiceCore

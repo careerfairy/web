@@ -1,7 +1,4 @@
-import {
-   LivestreamEvent,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import { BulkWriter, FieldValue, Timestamp } from "firebase-admin/firestore"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
@@ -43,8 +40,6 @@ export async function run() {
          (doc) => doc.id
       )
 
-      updateLivestreamWithParticipants(participatingEmails, bulkWriter, counter)
-
       await markUsersAsParticipated(participatingEmails, bulkWriter, counter)
 
       await bulkWriter.close()
@@ -56,28 +51,6 @@ export async function run() {
    } finally {
       counter.print()
    }
-}
-
-const updateLivestreamWithParticipants = async (
-   participantEmails: string[],
-   bulkWriter: BulkWriter,
-   counter: Counter
-) => {
-   const livestreamUpdate: Pick<LivestreamEvent, "participatingStudents"> = {
-      participatingStudents: FieldValue.arrayUnion(
-         ...participantEmails
-      ) as unknown as string[],
-   }
-
-   Counter.log(
-      `Updating live stream document with ${participantEmails.length} participating students`
-   )
-   const livestreamRef = firestore
-      .collection("livestreams")
-      .doc(TARGET_LIVESTREAM_ID)
-
-   bulkWriter.update(livestreamRef, livestreamUpdate)
-   counter.writeIncrement()
 }
 
 const markUsersAsParticipated = async (
