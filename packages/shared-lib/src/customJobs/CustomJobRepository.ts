@@ -518,6 +518,7 @@ export class FirebaseCustomJobRepository
       const docs = await this.firestore
          .collection(this.COLLECTION_NAME)
          .where("groupId", "==", groupId)
+         .where("isPermanentlyExpired", "==", false)
          .get()
 
       if (docs.empty) {

@@ -931,16 +931,20 @@ export class LivestreamFunctionsRepository
       }
 
       // Get the livestreams that were added to afterJob
-      const addedLivestreams = getArrayDifference(
-         beforeJob.livestreams,
-         afterJob.livestreams
-      ) as string[]
+      const addedLivestreams = beforeJob
+         ? (getArrayDifference(
+              beforeJob.livestreams,
+              afterJob.livestreams
+           ) as string[])
+         : afterJob.livestreams
 
       // Get the livestreams that were removed from beforeJob
-      const removedLivestreams = getArrayDifference(
-         afterJob.livestreams,
-         beforeJob.livestreams
-      ) as string[]
+      const removedLivestreams = beforeJob
+         ? (getArrayDifference(
+              afterJob.livestreams,
+              beforeJob.livestreams
+           ) as string[])
+         : []
 
       // Get all customJobs from the group id
       const customJobs = await customJobRepo.getCustomJobsByGroupId(

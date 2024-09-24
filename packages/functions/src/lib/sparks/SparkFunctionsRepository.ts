@@ -1205,16 +1205,14 @@ export class SparkFunctionsRepository
       }
 
       // Get the sparks that were added to afterJob
-      const addedSparks = getArrayDifference(
-         beforeJob.sparks,
-         afterJob.sparks
-      ) as string[]
+      const addedSparks = beforeJob
+         ? (getArrayDifference(beforeJob.sparks, afterJob.sparks) as string[])
+         : afterJob.sparks
 
-      // Get the livestreams that were removed from beforeJob
-      const removedSparks = getArrayDifference(
-         afterJob.sparks,
-         beforeJob.sparks
-      ) as string[]
+      // Get the live streams that were removed from beforeJob
+      const removedSparks = beforeJob
+         ? (getArrayDifference(afterJob.sparks, beforeJob.sparks) as string[])
+         : []
 
       // Get all customJobs from the group id
       const customJobs = await customJobRepo.getCustomJobsByGroupId(
