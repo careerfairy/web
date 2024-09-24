@@ -6,11 +6,23 @@ import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { setIsJobDialogOpen } from "store/reducers/sparksFeedReducer"
+import { sxStyles } from "types/commonTypes"
 import JobDialog from "./job-dialog"
 
 type Props = {
    spark: SparkPresenter
 }
+
+const styles = sxStyles({
+   btn: {
+      borderRadius: "8px",
+      px: 0,
+
+      "@media (max-height: 800px)": {
+         fontSize: "14px",
+      },
+   },
+})
 
 const SparkJobButton = ({ spark }: Props) => {
    const jobs: CustomJob[] = useGroupCustomJobs(spark.group.id, {
@@ -35,7 +47,7 @@ const SparkJobButton = ({ spark }: Props) => {
             <Button
                variant="contained"
                color="primary"
-               sx={{ borderRadius: "8px" }}
+               sx={styles.btn}
                onClick={handleClick}
                fullWidth
             >
