@@ -1,14 +1,12 @@
-import React, { useMemo } from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import { useCurrentStream } from "../../../../../context/stream/StreamContext"
-import { Grid } from "@mui/material"
-import TalentPoolPercentage from "./TalentPoolPercentage"
-import AudienceCategoryChart from "./AudienceCategoryChart"
-import { isEmpty, isLoaded } from "react-redux-firebase"
-import LoadingDisplay from "../displays/LoadingDisplay"
-import EmptyDisplay from "../displays/EmptyDisplay"
 import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { Grid } from "@mui/material"
+import makeStyles from "@mui/styles/makeStyles"
+import { useMemo } from "react"
+import { isEmpty, isLoaded } from "react-redux-firebase"
+import EmptyDisplay from "../displays/EmptyDisplay"
+import LoadingDisplay from "../displays/LoadingDisplay"
+import AudienceCategoryChart from "./AudienceCategoryChart"
+import TalentPoolPercentage from "./TalentPoolPercentage"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -22,9 +20,6 @@ interface Props {
 
 const BreakdownTab = ({ audience }: Props) => {
    const classes = useStyles()
-   const {
-      currentLivestream: { talentPool },
-   } = useCurrentStream()
 
    const talentPoolPercentage = useMemo(() => {
       const totalCount = audience.length
@@ -33,7 +28,7 @@ const BreakdownTab = ({ audience }: Props) => {
       ).length
       const percentage = (inTalentPoolCount / totalCount) * 100
       return isNaN(percentage) ? 0 : Math.round(percentage)
-   }, [audience, talentPool])
+   }, [audience])
 
    const users = useMemo(() => audience.map((data) => data.user), [audience])
 

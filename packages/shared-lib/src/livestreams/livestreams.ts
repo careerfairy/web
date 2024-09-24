@@ -49,7 +49,6 @@ export interface LivestreamEvent extends Identifiable {
    isRecording?: boolean
    language?: LivestreamLanguage
    hidden: boolean
-   talentPool?: string[]
    hasNoTalentPool?: boolean
    test: boolean
    title?: string
@@ -651,7 +650,6 @@ export const pickPublicDataFromLivestream = (
 export interface LivestreamEventSerialized
    extends Omit<
       LivestreamEvent,
-      | "talentPool"
       | "created"
       | "start"
       | "startDate"
