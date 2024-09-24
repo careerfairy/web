@@ -105,6 +105,12 @@ export interface ICustomJobRepository {
       fingerPrintId: string,
       jobId: string
    ): Promise<void>
+
+   setRemovedUserCustomJobApplication(
+      userId: string,
+      jobId: string
+   ): Promise<void>
+
    /**
     * To increment the 'clicks' field on a specific customJob
     * @param jobId
@@ -412,6 +418,23 @@ export class FirebaseCustomJobRepository
       batch.update(ref, toUpdate)
 
       return batch.commit()
+   }
+
+   async setRemovedUserCustomJobApplication(
+      userId: string,
+      jobId: string
+   ): Promise<void> {
+      const applicationId = this.getJobApplicationId(jobId, userId)
+
+      const ref = this.firestore
+         .collection("jobApplications")
+         .doc(applicationId)
+
+      const toUpdate: Pick<CustomJobApplicant, "removedFromUserProfile"> = {
+         removedFromUserProfile: true,
+      }
+
+      return ref.update(toUpdate)
    }
 
    async incrementCustomJobClicks(jobId: string): Promise<void> {

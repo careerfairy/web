@@ -16,7 +16,10 @@ const useUserJobApplications = (userId: string, applied: boolean) => {
       idField: "id", // this field will be added to the firestore object
    })
 
-   const customJobs = (data || []).map((jobApplication) => jobApplication.job)
+   // Filter for removedFromUserProfile done in memory due to firestore limitations when handling optional params, can be moved to CF or backfilled if necessary
+   const customJobs = (data || [])
+      .filter((jobApplication) => !jobApplication.removedFromUserProfile)
+      .map((jobApplication) => jobApplication.job)
 
    return customJobs
 }

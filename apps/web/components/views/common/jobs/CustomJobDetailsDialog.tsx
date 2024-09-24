@@ -1,6 +1,7 @@
 import {
    CustomJob,
    CustomJobApplicationSource,
+   CustomJobApplicationSourceTypes,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Dialog, DialogActions, DialogContent, SxProps } from "@mui/material"
@@ -17,6 +18,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
+import ProfileRemoveCustomJobConfirmation from "components/views/jobs/components/custom-jobs/ProfileRemoveCustomJobConfirmation"
 import CustomJobDetailsSkeleton from "components/views/jobs/components/custom-jobs/skeletons/CustomJobDetailsSkeleton"
 import { ReactNode, useEffect } from "react"
 import { useSelector } from "react-redux"
@@ -50,6 +52,8 @@ type Props = {
    onClose?: () => void
    heroContent?: ReactNode
    heroSx?: SxProps<DefaultTheme>
+   paperPropsSx?: SxProps<DefaultTheme>
+   hideApplicationConfirmation?: boolean
 }
 
 const CustomJobDetailsDialog = (props: Props) => {
@@ -64,6 +68,9 @@ const CustomJobDetailsDialog = (props: Props) => {
          TransitionComponent={SlideUpTransition}
          open={props.isOpen}
          onClose={props.onClose}
+         PaperProps={{
+            sx: props.paperPropsSx,
+         }}
       >
          {props.customJobId ? <DialogDetails {...props} /> : null}
       </Dialog>
@@ -84,6 +91,7 @@ const DialogDetailsContent = ({
    source,
    heroContent,
    heroSx,
+   hideApplicationConfirmation,
 }: Props) => {
    const { userData } = useAuth()
    const { data: fingerPrintId } = useFingerPrint()
@@ -107,6 +115,9 @@ const DialogDetailsContent = ({
       handleConfirmationClose,
    ] = useDialogStateHandler(false)
 
+   const [isRemoveConfirmationOpen, handleRemoveJobOpen, handleRemoveJobClose] =
+      useDialogStateHandler(false)
+
    useEffect(() => {
       if (applicationInitiatedOnly) handleConfirmationOpen()
    }, [applicationInitiatedOnly, handleConfirmationOpen])
@@ -123,6 +134,9 @@ const DialogDetailsContent = ({
                heroSx={heroSx}
                showApplyConfirmation={isApplyConfirmationOpen}
                onApplyConfirmationClose={handleConfirmationClose}
+               hideApplicationConfirmation={hideApplicationConfirmation}
+               showRemoveConfirmation={isRemoveConfirmationOpen}
+               onRemoveConfirmationClose={handleRemoveJobClose}
             />
          </DialogContent>
          <DialogActions sx={styles.fixedBottomContent}>
@@ -130,16 +144,22 @@ const DialogDetailsContent = ({
                source={source}
                customJob={customJob}
                onApplyClick={handleConfirmationOpen}
+               onRemoveClick={handleRemoveJobOpen}
             />
          </DialogActions>
       </>
    )
 }
 
-type ContentProps = Pick<Props, "source" | "heroContent" | "heroSx"> & {
+type ContentProps = Pick<
+   Props,
+   "source" | "heroContent" | "heroSx" | "hideApplicationConfirmation"
+> & {
    customJob: CustomJob
    showApplyConfirmation?: boolean
    onApplyConfirmationClose?: () => void
+   showRemoveConfirmation?: boolean
+   onRemoveConfirmationClose?: () => void
 }
 
 const Content = ({
@@ -149,6 +169,9 @@ const Content = ({
    heroSx,
    showApplyConfirmation,
    onApplyConfirmationClose,
+   hideApplicationConfirmation,
+   showRemoveConfirmation,
+   onRemoveConfirmationClose,
 }: ContentProps) => {
    const { applicationInitiatedOnly, handleConfirmApply } = useCustomJobApply(
       customJob as PublicCustomJob,
@@ -173,9 +196,9 @@ const Content = ({
             sx={styles.customJobDetailsView}
             companyLogoUrl={group.logoUrl}
             companyName={group.universityName}
-            hideCTAButtons
          />
-         {showApplyConfirmation ? (
+         
+         {!hideApplicationConfirmation && showApplyConfirmation ? (
             <CustomJobApplyConfirmation
                handleClose={onApplyConfirmationClose}
                job={customJob as PublicCustomJob}
@@ -185,6 +208,16 @@ const Content = ({
                sx={styles.jobApplyConfirmationDialog}
             />
          ) : null}
+
+         <ProfileRemoveCustomJobConfirmation
+            isOpen={Boolean(
+               showRemoveConfirmation &&
+                  source.source == CustomJobApplicationSourceTypes.Profile
+            )}
+            handleClose={onRemoveConfirmationClose}
+            job={customJob as PublicCustomJob}
+            onRemove={onRemoveConfirmationClose}
+         />
       </>
    )
 }
@@ -192,9 +225,15 @@ const Content = ({
 type ActionProps = Pick<Props, "source"> & {
    customJob: CustomJob
    onApplyClick?: () => void
+   onRemoveClick?: () => void
 }
 
-const Actions = ({ source, customJob, onApplyClick }: ActionProps) => {
+const Actions = ({
+   source,
+   customJob,
+   onApplyClick,
+   onRemoveClick,
+}: ActionProps) => {
    const { handleClickApplyBtn, applicationInitiatedOnly } = useCustomJobApply(
       customJob as PublicCustomJob,
       source
@@ -212,6 +251,7 @@ const Actions = ({ source, customJob, onApplyClick }: ActionProps) => {
             handleConfirmApplyOpen()
             handleClickApplyBtn()
          }}
+         handleRemoveClick={onRemoveClick}
       />
    )
 }

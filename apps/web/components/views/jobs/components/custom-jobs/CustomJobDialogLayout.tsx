@@ -1,5 +1,8 @@
 import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
-import { CustomJobApplicationSource } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJobApplicationSource,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CloseOutlined } from "@mui/icons-material"
 import { Box, IconButton } from "@mui/material"
 import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
@@ -7,9 +10,11 @@ import { fromDate } from "data/firebase/FirebaseInstance"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import React, { FC, useCallback, useMemo } from "react"
+import { sxStyles } from "types/commonTypes"
 
-// apps/web/components/views/common/jobs/CustomJobDetailsDialog.tsx
-// const CustomJobsDialog = dynamic(() => import("../../../common/jobs/CustomJobDetailsDialog"))
+const styles = sxStyles({
+   profilePaperProps: {},
+})
 
 export type CustomJobDialogData = {
    serverSideCustomJob: { [p: string]: any } | null
@@ -20,6 +25,7 @@ type Props = {
    dialogSource?: string
    customJobDialogData?: CustomJobDialogData
    children: React.ReactNode
+   hideApplicationConfirmation?: boolean
 }
 
 /**
@@ -36,6 +42,7 @@ export const CustomJobDialogLayout: FC<Props> = ({
    dialogSource = "jobsDialog",
    children,
    source,
+   hideApplicationConfirmation,
 }) => {
    const { query, push, pathname } = useRouter()
    const dialog = query[dialogSource]
@@ -89,6 +96,12 @@ export const CustomJobDialogLayout: FC<Props> = ({
                </Box>
             }
             heroSx={{ m: 0, py: "0px !important", px: "10px !important" }}
+            paperPropsSx={
+               source.source == CustomJobApplicationSourceTypes.Profile
+                  ? styles.profilePaperProps
+                  : null
+            }
+            hideApplicationConfirmation={hideApplicationConfirmation}
          />
       </>
    )
