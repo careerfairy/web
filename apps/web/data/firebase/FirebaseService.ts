@@ -2264,9 +2264,6 @@ class FirebaseService {
       const userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
-      const streamRef = this.firestore
-         .collection("livestreams")
-         .doc(livestream.id)
       const userLivestreamDataRef = this.firestore
          .collection("livestreams")
          .doc(livestream.id)
@@ -2285,11 +2282,6 @@ class FirebaseService {
                transaction.update(userRef, {
                   talentPools:
                      firebase.firestore.FieldValue.arrayUnion(companyId),
-               })
-               transaction.update(streamRef, {
-                  talentPool: firebase.firestore.FieldValue.arrayUnion(
-                     userData.userEmail
-                  ),
                })
 
                // insert related talent profiles (for each group id)
@@ -2386,11 +2378,6 @@ class FirebaseService {
                transaction.update(userRef, {
                   talentPools:
                      firebase.firestore.FieldValue.arrayRemove(companyId),
-               })
-               transaction.update(streamRef, {
-                  talentPool: firebase.firestore.FieldValue.arrayRemove(
-                     userData.userEmail
-                  ),
                })
             })
       })
