@@ -1193,10 +1193,11 @@ export class SparkFunctionsRepository
       afterJob: CustomJob,
       beforeJob: CustomJob
    ): Promise<void> {
-      // Check if the sparks in afterJob and beforeJob are the same, regardless of order
-      const areSparksEqual =
-         getArrayDifference(afterJob.sparks, beforeJob.sparks).length === 0 &&
-         getArrayDifference(beforeJob.sparks, afterJob.sparks).length === 0
+      // Compare the sparks in afterJob and beforeJob to determine if they are identical
+      const areSparksEqual = beforeJob
+         ? getArrayDifference(afterJob.sparks, beforeJob.sparks).length === 0 &&
+           getArrayDifference(beforeJob.sparks, afterJob.sparks).length === 0
+         : true
 
       if (areSparksEqual) {
          // If the sparks are the same, exit the function early
@@ -1204,14 +1205,16 @@ export class SparkFunctionsRepository
       }
 
       // Get the sparks that were added to afterJob
-      const addedSparks = afterJob.sparks.filter(
-         (id) => !beforeJob.sparks.includes(id)
-      )
+      const addedSparks = getArrayDifference(
+         beforeJob.sparks,
+         afterJob.sparks
+      ) as string[]
 
-      // Get the sparks that were removed from beforeJob
-      const removedSparks = beforeJob.sparks.filter(
-         (id) => !afterJob.sparks.includes(id)
-      )
+      // Get the livestreams that were removed from beforeJob
+      const removedSparks = getArrayDifference(
+         afterJob.sparks,
+         beforeJob.sparks
+      ) as string[]
 
       // Get all customJobs from the group id
       const customJobs = await customJobRepo.getCustomJobsByGroupId(
