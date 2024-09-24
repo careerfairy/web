@@ -14,6 +14,7 @@ import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
 import { usePartnership } from "HOCs/PartnershipProvider"
+import { useUserHasParticipated } from "components/custom-hook/live-stream/useUserHasParticipated"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
    getMaxLineStyles,
@@ -264,6 +265,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          disabled: !cardInView, // Helps Reduce the number of listeners
       })
 
+      const hasParticipated = useUserHasParticipated(event?.id, {
+         disabled: !cardInView, // Helps Reduce the number of listeners
+      })
+
       const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
       const trackImpressionsRef = useTrackLivestreamImpressions({
@@ -299,14 +304,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          () => (event ? LivestreamPresenter.createFromDocument(event) : null),
          [event]
       )
-
-      const hasParticipated = useMemo<boolean>(() => {
-         if (loading) return false
-
-         return Boolean(
-            event?.participatingStudents?.includes(authenticatedUser?.email)
-         )
-      }, [loading, event?.participatingStudents, authenticatedUser?.email])
 
       const hasJobsToApply = useMemo<boolean>(() => {
          if (loading) return false

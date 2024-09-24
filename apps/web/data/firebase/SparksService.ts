@@ -145,7 +145,7 @@ export class SparksService {
          }
       >(
          this.functions,
-         "getSparksFeed_v7"
+         "getSparksFeed_v8"
       )(data)
 
       return {
@@ -328,7 +328,7 @@ export class SparksService {
       if (!userId) return // Should not be called if not logged in
       return httpsCallable<{ sparkId: string }, void>(
          this.functions,
-         "markSparkAsSeenByUser_v3"
+         "markSparkAsSeenByUser_v4"
       )({ sparkId })
    }
 
