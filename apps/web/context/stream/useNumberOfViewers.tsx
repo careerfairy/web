@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { useLivestreamUsersCount } from "components/custom-hook/live-stream/useLivestreamUsersCount"
 import { useMemo } from "react"
 import { useSelector } from "react-redux"
 import { RootState } from "store"
@@ -15,18 +16,23 @@ export const useNumberOfViewers = (currentLivestream: LivestreamEvent) => {
    )
    const rtmFailedToJoin = useSelector(sessionRTMFailedToJoin)
 
+   const { count: participatedUsersCount } = useLivestreamUsersCount(
+      currentLivestream.id,
+      "participated",
+      {
+         disabled: !rtmFailedToJoin, // When we fail to connect to RTM to get the users count, we fallback to counting the participants in the userLivestreamData collection
+         refreshInterval: 20000, // Refresh the count every 20 seconds
+      }
+   )
+
    return useMemo(() => {
       if (rtmFailedToJoin) {
          /**
           * Fall back to the number of participants in the stream doc if RTM fails to join
           */
-         return currentLivestream?.participatingStudents?.length ?? 0
+         return isNaN(participatedUsersCount) ? 0 : participatedUsersCount
       }
 
       return numberOfViewersRTM
-   }, [
-      currentLivestream?.participatingStudents?.length,
-      numberOfViewersRTM,
-      rtmFailedToJoin,
-   ])
+   }, [numberOfViewersRTM, participatedUsersCount, rtmFailedToJoin])
 }

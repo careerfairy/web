@@ -25,11 +25,6 @@ export interface LivestreamEvent extends Identifiable {
    backgroundImageUrl?: string
    company?: string
    companyId?: string
-   /**
-    * @deprecated Use userLivestreamData sub-collection instead.
-    * This field will be removed in a future version.
-    */
-   participatingStudents?: string[]
    maxRegistrants?: number
    companyLogoUrl?: string
    created?: Timestamp
@@ -54,7 +49,6 @@ export interface LivestreamEvent extends Identifiable {
    isRecording?: boolean
    language?: LivestreamLanguage
    hidden: boolean
-   talentPool?: string[]
    hasNoTalentPool?: boolean
    test: boolean
    title?: string
@@ -656,8 +650,6 @@ export const pickPublicDataFromLivestream = (
 export interface LivestreamEventSerialized
    extends Omit<
       LivestreamEvent,
-      | "talentPool"
-      | "participatingStudents"
       | "created"
       | "start"
       | "startDate"

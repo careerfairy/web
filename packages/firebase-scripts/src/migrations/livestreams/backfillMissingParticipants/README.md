@@ -10,19 +10,17 @@ This script targets a specific live stream (defined by `TARGET_LIVESTREAM_ID`) a
 
 1. Retrieves all documents from the `participatingStats` subcollection of the target live stream.
 2. Extracts the email addresses (document IDs) of participating students.
-3. Updates the main live stream document by adding these email addresses to the `participatingStudents` array field.
+3. Marks these users as participated in the live stream in the `userLivestreamData` collection.
 
 #### Example Output:
 
-The script will update the `livestreams/{TARGET_LIVESTREAM_ID}` document:
+The script will update the `livestreams/{TARGET_LIVESTREAM_ID}/userLivestreamData` document:
 
 ```javascript
 {
-  // ... existing fields ...
-  "participatingStudents": [
-    "student1@example.com",
-    "student2@example.com",
-    // ... more participating student emails ...
-  ]
+  // ... existing userLivestreamData fields ...
+  "participated": {
+    "date": Timestamp,
+  }
 }
 ```
