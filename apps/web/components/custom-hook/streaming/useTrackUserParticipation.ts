@@ -6,7 +6,7 @@ import { errorLogAndNotify } from "util/CommonUtil"
 /**
  * A custom hook that utilizes the `setUserIsParticipating` method from `@LivestreamService.ts`.
  * This method updates Firestore to reflect a user's participation status in a livestream.
- * It sets user data and stats in the `userLivestreamData` collection and adds the user's email to the `participatingStudents` array of the livestream document.
+ * It sets user data and stats in the `userLivestreamData` collection.
  *
  * @param {string} livestreamId - The ID of the livestream.
  * @param {UserData} userData - The user's data.
