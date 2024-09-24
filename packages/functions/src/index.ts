@@ -296,6 +296,7 @@ exports.transferCustomJobsFromDraftToPublishedLivestream_v2 =
 exports.syncPermanentlyExpiredCustomJobs =
    customJobs.syncPermanentlyExpiredCustomJobs
 exports.fetchCustomJobGroupNames = customJobs.getCustomJobGroupNames
+exports.setRemoveUserJobApplication = customJobs.setRemoveUserJobApplication
 
 // Group Subscription Plan Functions
 exports.startPlan_v3 = groupPlans.startPlan
