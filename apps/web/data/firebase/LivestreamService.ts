@@ -425,7 +425,7 @@ export class LivestreamService {
    }
 
    /**
-    * Updates Firestore to mark a user as participating in a live stream. This involves updating the user's status in `userLivestreamData` and adding their email to `participatingStudents`.
+    * Updates Firestore to mark a user as participating in a live stream. This involves updating the user's status in `userLivestreamData`.
     *
     * @param {string} livestreamId - Livestream ID.
     * @param {UserData} userData - User data.
@@ -443,7 +443,6 @@ export class LivestreamService {
          livestreamId,
          userData.userEmail
       )
-      const livestreamRef = this.getLivestreamRef(livestreamId)
 
       const userLivestreamDataSnapshot = await getDoc(userLivestreamDataRef)
 
@@ -479,11 +478,6 @@ export class LivestreamService {
             merge: true,
          }
       )
-
-      // Set the user's email in the participants array of the live stream document
-      batch.update(livestreamRef, {
-         participatingStudents: arrayUnion(userData.userEmail),
-      })
 
       return batch.commit()
    }

@@ -174,11 +174,7 @@ export class SparksDataFetcher {
 
    // Get the last 5 participated livestreams for this user only
    getParticipatedLivestreams(): Promise<LivestreamEvent[]> {
-      return this.livestreamRepo.getParticipatedEvents(this.userId, {
-         to: new Date(),
-         orderByDirection: "desc",
-         limit: 5,
-      })
+      return this.livestreamRepo.getParticipatedEvents(this.userId, 5)
    }
 
    // Fetch all spark statistics

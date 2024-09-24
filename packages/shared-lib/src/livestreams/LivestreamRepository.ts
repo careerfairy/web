@@ -60,13 +60,6 @@ export type RegisteredEventsOptions = {
    from?: Date
 }
 
-export type ParticipatedEventsOptions = {
-   limit?: number
-   from?: Date
-   to?: Date
-   orderByDirection?: "asc" | "desc"
-}
-
 export type GetEventsOfGroupOptions = {
    limit?: number
    hideHidden?: boolean
@@ -98,7 +91,7 @@ export interface ILivestreamRepository {
 
    getParticipatedEvents(
       userEmail: string,
-      options?: ParticipatedEventsOptions
+      limit?: number
    ): Promise<LivestreamEvent[]>
 
    getPastEventsFrom(options: PastEventsOptions): Promise<LivestreamEvent[]>
@@ -828,37 +821,38 @@ export class FirebaseLivestreamRepository
 
    async getParticipatedEvents(
       userEmail: string,
-      options: ParticipatedEventsOptions = {}
+      limit = 5
    ): Promise<LivestreamEvent[]> {
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .where("test", "==", false)
-         .where("participatingStudents", "array-contains", userEmail)
+      const userLivestreamDataQuery = this.firestore
+         .collectionGroup("userLivestreamData")
+         .where("user.userEmail", "==", userEmail)
+         .where("participated.date", "<", new Date())
+         .orderBy("participated.date", "desc")
+         .limit(limit)
+         .withConverter(createCompatGenericConverter<UserLivestreamData>())
 
-      if (options.orderByDirection) {
-         livestreamRef = livestreamRef.orderBy(
-            "start",
-            options.orderByDirection
-         )
-      } else {
-         livestreamRef = livestreamRef.orderBy("start", "asc")
-      }
+      const snapshots = await userLivestreamDataQuery.get()
 
-      if (options.from) {
-         livestreamRef = livestreamRef.where("start", ">", options.from)
-      }
+      const participatedLivestreamIds = snapshots.docs
+         .map((snap) => snap.data().livestreamId)
+         .filter(Boolean)
 
-      if (options.to) {
-         livestreamRef = livestreamRef.where("start", "<", options.to)
-      }
+      const chunks = chunkArray(participatedLivestreamIds, 30)
 
-      if (options.limit) {
-         livestreamRef = livestreamRef.limit(options.limit)
-      }
+      const livestreamPromises = chunks.map((ids) =>
+         this.firestore
+            .collection("livestreams")
+            .where("id", "in", ids)
+            .where("test", "==", false)
+            .withConverter(createCompatGenericConverter<LivestreamEvent>())
+            .get()
+      )
 
-      const snapshots = await livestreamRef.get()
+      const livestreams = await Promise.all(livestreamPromises)
 
-      return this.mapLivestreamCollections(snapshots).get()
+      return livestreams.flatMap((snapshot) =>
+         snapshot.docs.map((doc) => doc.data())
+      )
    }
 
    recommendEventsQuery(userInterestsIds?: string[]) {

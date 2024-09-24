@@ -1,5 +1,6 @@
 import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
+import { useLivestreamUsersCount } from "components/custom-hook/live-stream/useLivestreamUsersCount"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useLivestreamData } from "components/custom-hook/streaming"
 import { useRouter } from "next/router"
@@ -21,6 +22,7 @@ import {
    setTest,
    setTitle,
 } from "store/reducers/streamingAppReducer"
+import { useFailedToConnectToRTM } from "store/selectors/streamingAppSelectors"
 import { setCompanyLogoUrl } from "../../../../../store/reducers/streamingAppReducer"
 
 /**
@@ -38,6 +40,17 @@ export const LivestreamStateTrackers = (): null => {
    const { query } = useRouter()
    const { userData } = useAuth()
 
+   const failedToConnectToRTM = useFailedToConnectToRTM()
+
+   const { count: participatedUsersCount } = useLivestreamUsersCount(
+      livestream.id,
+      "participated",
+      {
+         disabled: !failedToConnectToRTM, // When we fail to connect to RTM to get the users count, we fallback to counting the participants in the userLivestreamData collection
+         refreshInterval: 20000, // Refresh the count every 20 seconds
+      }
+   )
+
    useEffect(() => {
       dispatch(setLivestreamMode(livestream.mode ?? LivestreamModes.DEFAULT))
    }, [dispatch, livestream.mode])
@@ -48,9 +61,11 @@ export const LivestreamStateTrackers = (): null => {
 
    useEffect(() => {
       dispatch(
-         setNumberOfParticipants(livestream.participatingStudents?.length ?? 0)
+         setNumberOfParticipants(
+            isNaN(participatedUsersCount) ? 0 : participatedUsersCount
+         )
       )
-   }, [dispatch, livestream.participatingStudents?.length])
+   }, [dispatch, participatedUsersCount])
 
    // convert to primitive for comparison
    const startsAtMillis = livestream.start?.toMillis() ?? null
