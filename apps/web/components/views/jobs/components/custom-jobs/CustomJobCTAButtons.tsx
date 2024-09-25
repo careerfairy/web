@@ -84,6 +84,7 @@ const styles = sxStyles({
    removeJobBtn: {
       color: (theme) => theme.palette.neutral[500],
       borderColor: (theme) => theme.palette.neutral[200],
+      backgroundColor: "white",
       whiteSpace: "nowrap",
       "&:hover": {
          borderColor: (theme) => theme.palette.grey[100],
@@ -424,7 +425,6 @@ const UserProfileJobOptionsButtons = ({
          <Button
             fullWidth
             variant="outlined"
-            color="secondary"
             sx={[styles.removeJobBtn]}
             endIcon={<XCircle size={18} />}
             onClick={handleRemoveClick}
