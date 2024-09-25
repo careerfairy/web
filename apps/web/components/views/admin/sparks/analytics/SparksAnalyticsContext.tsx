@@ -1,25 +1,10 @@
 import {
-   FieldOfStudy,
-   LevelOfStudy,
-} from "@careerfairy/shared-lib/fieldOfStudy"
-import {
    SparkAnalyticsClient,
-   SparkAnalyticsClientWithPastData,
    TimePeriodParams,
 } from "@careerfairy/shared-lib/sparks/analytics"
-import { createLookup } from "@careerfairy/shared-lib/utils"
-import { convertToClientModel } from "components/custom-hook/spark/analytics/dataTransformers"
-import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
-import { sparksAnalyticsService } from "data/firebase/SparksAnalyticsService"
+import { useFetchSparksAnalytics } from "components/custom-hook/spark/analytics/useFetchSparksAnalytics"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import {
-   createContext,
-   useCallback,
-   useContext,
-   useEffect,
-   useMemo,
-   useState,
-} from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 
 interface SparksAnalyticsContextType {
    filteredAnalytics: SparkAnalyticsClient | null
@@ -48,59 +33,13 @@ export const useSparksAnalytics = () => {
 export const SparksAnalyticsProvider = ({ children }) => {
    const { group } = useGroup()
 
-   const { data: fieldsOfStudy } =
-      useFirestoreCollection<FieldOfStudy>("fieldsOfStudy")
-   const { data: levelsOfStudy } =
-      useFirestoreCollection<LevelOfStudy>("levelsOfStudy")
-
-   const fieldsOfStudyLookup = useMemo(
-      () => createLookup(fieldsOfStudy, "name"),
-      [fieldsOfStudy]
-   )
-   const levelsOfStudyLookup = useMemo(
-      () => createLookup(levelsOfStudy, "name"),
-      [levelsOfStudy]
-   )
-
-   const [analytics, setAnalytics] =
-      useState<SparkAnalyticsClientWithPastData>(null)
    const [updatedAtLabel, setUpdatedAtLabel] = useState<string>(null)
-   const [isLoading, setIsLoading] = useState<boolean>(true)
-   const [error, setError] = useState<string | null>(null)
 
    const [selectTimeFilter, setSelectTimeFilter] =
       useState<TimePeriodParams>("30days")
 
-   const fetchAnalytics = useCallback(
-      async (updateCache: boolean) => {
-         try {
-            const fetchedAnalytics =
-               await sparksAnalyticsService.fetchSparksAnalytics(
-                  group.id,
-                  updateCache
-               )
-
-            const updatedAnalytics = convertToClientModel(
-               fetchedAnalytics,
-               fieldsOfStudyLookup,
-               levelsOfStudyLookup
-            )
-
-            setAnalytics(updatedAnalytics)
-            setIsLoading(false)
-         } catch (error) {
-            console.log(error)
-            setError(error.message)
-            setIsLoading(false)
-         }
-      },
-      [fieldsOfStudyLookup, group.id, levelsOfStudyLookup]
-   )
-
-   const updateAnalytics = useCallback(() => {
-      setIsLoading(true)
-      fetchAnalytics(true)
-   }, [fetchAnalytics])
+   const { analytics, error, isLoading, updateAnalytics } =
+      useFetchSparksAnalytics(group.id)
 
    const filteredAnalytics = useMemo<SparkAnalyticsClient>(() => {
       return analytics?.[selectTimeFilter]
@@ -124,10 +63,6 @@ export const SparksAnalyticsProvider = ({ children }) => {
       selectTimeFilter,
       updatedAtLabel,
    ])
-
-   useEffect(() => {
-      fetchAnalytics(false)
-   }, [fetchAnalytics])
 
    useEffect(() => {
       const updateLabel = () => {
