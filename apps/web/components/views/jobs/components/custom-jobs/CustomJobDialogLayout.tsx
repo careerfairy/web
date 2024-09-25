@@ -5,6 +5,7 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CloseOutlined } from "@mui/icons-material"
 import { Box, IconButton } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { useRouter } from "next/router"
@@ -13,7 +14,17 @@ import React, { FC, useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   profilePaperProps: {},
+   profilePaperProps: {
+      position: "fixed", // Fix the dialog at the bottom of the screen
+      bottom: 0, // Align it to the bottom
+      left: 0, // Ensure it starts from the left side of the screen
+      right: 0, // Ensure it spans the entire width
+      margin: "0", // Remove any external margin
+      width: "100%", // Full width on mobile
+      maxHeight: "85vh", // Allow content to dictate the height
+      height: "auto", // Dynamically adjust the height based on content
+      borderRadius: "12px 12px 0 0", // Optional rounded corners at the top
+   },
 })
 
 export type CustomJobDialogData = {
@@ -44,6 +55,7 @@ export const CustomJobDialogLayout: FC<Props> = ({
    source,
    hideApplicationConfirmation,
 }) => {
+   const isMobile = useIsMobile()
    const { query, push, pathname } = useRouter()
    const dialog = query[dialogSource]
    const [, customJobId] = dialog || []
@@ -97,7 +109,8 @@ export const CustomJobDialogLayout: FC<Props> = ({
             }
             heroSx={{ m: 0, py: "0px !important", px: "10px !important" }}
             paperPropsSx={
-               source.source == CustomJobApplicationSourceTypes.Profile
+               source.source == CustomJobApplicationSourceTypes.Profile &&
+               isMobile
                   ? styles.profilePaperProps
                   : null
             }
