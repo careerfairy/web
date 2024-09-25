@@ -273,33 +273,35 @@ class GroupSparksAnalyticsRepository
 
       const sparks = await this.sparksRepo.getSparksByIds(sparkIds)
 
-      const result = bigQueryResults.map((bigQueryResult) => {
-         const spark = sparks.find(
-            (spark) => spark.id === bigQueryResult.sparkId
-         )
-         return {
-            sparkData: {
-               creator: {
-                  avatarUrl: spark.creator.avatarUrl,
-                  firstName: spark.creator.firstName,
-                  lastName: spark.creator.lastName,
+      const result = bigQueryResults.map<MostSomethingBase>(
+         (bigQueryResult) => {
+            const spark = sparks.find(
+               (spark) => spark.id === bigQueryResult.sparkId
+            )
+            return {
+               sparkData: {
+                  creator: {
+                     avatarUrl: spark.creator.avatarUrl,
+                     firstName: spark.creator.firstName,
+                     lastName: spark.creator.lastName,
+                  },
+                  group: {
+                     id: spark.group.id,
+                     name: spark.group.universityName,
+                  },
+                  spark: {
+                     question: spark.question,
+                     categoryId: spark.category.id,
+                     videoThumbnailUrl: spark.video.thumbnailUrl,
+                  },
                },
-               group: {
-                  id: spark.group.id,
-                  name: spark.group.universityName,
-               },
-               spark: {
-                  question: spark.question,
-                  categoryId: spark.category.id,
-                  videoThumbnailUrl: spark.video.thumbnailUrl,
-               },
-            },
-            num_views: bigQueryResult.num_views,
-            num_likes: bigQueryResult.num_likes,
-            num_shares: bigQueryResult.num_shares,
-            num_clicks: bigQueryResult.num_clicks,
-         } as MostSomethingBase
-      })
+               num_views: bigQueryResult.num_views,
+               num_likes: bigQueryResult.num_likes,
+               num_shares: bigQueryResult.num_shares,
+               num_clicks: bigQueryResult.num_clicks,
+            }
+         }
+      )
 
       return result
    }
@@ -334,33 +336,35 @@ class GroupSparksAnalyticsRepository
 
       const sparks = await this.sparksRepo.getSparksByIds(sparkIds)
 
-      const result = bigQueryResults.map((bigQueryResult) => {
-         const spark = sparks.find(
-            (spark) => spark.id === bigQueryResult.sparkId
-         )
-         return {
-            sparkData: {
-               creator: {
-                  avatarUrl: spark.creator.avatarUrl,
-                  firstName: spark.creator.firstName,
-                  lastName: spark.creator.lastName,
+      const result = bigQueryResults.map<MostSomethingBase>(
+         (bigQueryResult) => {
+            const spark = sparks.find(
+               (spark) => spark.id === bigQueryResult.sparkId
+            )
+            return {
+               sparkData: {
+                  creator: {
+                     avatarUrl: spark.creator.avatarUrl,
+                     firstName: spark.creator.firstName,
+                     lastName: spark.creator.lastName,
+                  },
+                  group: {
+                     id: spark.group.id,
+                     name: spark.group.universityName,
+                  },
+                  spark: {
+                     question: spark.question,
+                     categoryId: spark.category.id,
+                     videoThumbnailUrl: spark.video.thumbnailUrl,
+                  },
                },
-               group: {
-                  id: spark.group.id,
-                  name: spark.group.universityName,
-               },
-               spark: {
-                  question: spark.question,
-                  categoryId: spark.category.id,
-                  videoThumbnailUrl: spark.video.thumbnailUrl,
-               },
-            },
-            num_views: bigQueryResult.num_views,
-            num_likes: bigQueryResult.num_likes,
-            num_shares: bigQueryResult.num_shares,
-            num_clicks: bigQueryResult.num_clicks,
-         } as MostSomethingBase
-      })
+               num_views: bigQueryResult.num_views,
+               num_likes: bigQueryResult.num_likes,
+               num_shares: bigQueryResult.num_shares,
+               num_clicks: bigQueryResult.num_clicks,
+            }
+         }
+      )
 
       return result
    }
