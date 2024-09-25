@@ -51,7 +51,9 @@ const SparkJobButton = ({ spark }: Props) => {
                onClick={handleClick}
                fullWidth
             >
-               {jobs.length} job openings available, check now
+               {`${jobs.length} job opening${
+                  jobs.length > 1 ? "s" : ""
+               } available, check now`}
             </Button>
 
             <JobDialog

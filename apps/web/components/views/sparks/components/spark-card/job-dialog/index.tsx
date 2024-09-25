@@ -8,7 +8,7 @@ import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import JobDetails from "./JobDetails"
-import JobList from "./JobList"
+import { JobList } from "./JobList"
 
 const styles = sxStyles({
    dialog: {
