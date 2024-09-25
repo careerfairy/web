@@ -4,6 +4,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { useLivestreamCreationContext } from "../../../LivestreamCreationContext"
 import FormSectionHeader from "../../FormSectionHeader"
+import { AcademicCalendarCTA } from "./components/AcademicCalendarCTA"
 import BannerImageSelect from "./components/BannerImageSelect"
 import EstimatedDurationSelect from "./components/EstimatedDurationSelect"
 import LanguageSelect from "./components/LanguageSelect"
@@ -71,6 +72,9 @@ const GeneralSettings = () => {
             </Grid>
             <Grid item xs={12} md={4}>
                <LanguageSelect />
+            </Grid>
+            <Grid item xs={12}>
+               <AcademicCalendarCTA />
             </Grid>
          </Grid>
          {Boolean(isCohostedEvent) && (
