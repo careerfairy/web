@@ -8,14 +8,14 @@ import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { Button, Fade, Grow, Stack } from "@mui/material"
 import Box from "@mui/material/Box"
-import useFingerPrint from "components/custom-hook/useFingerPrint"
+import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
-import { useAuth } from "HOCs/AuthProvider"
 import {
    FC,
    SyntheticEvent,
@@ -86,6 +86,9 @@ const styles = sxStyles({
       pb: {
          xs: 3.25,
          sparksFullscreen: 4,
+      },
+      mr: {
+         xs: 1.5,
       },
    },
    eventCardContent: {

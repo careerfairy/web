@@ -8,6 +8,7 @@ import {
    IconButtonProps,
    Popover,
    Stack,
+   Tooltip,
    Typography,
    alpha,
 } from "@mui/material"
@@ -43,7 +44,8 @@ import SparksShareDialog from "../sparks/components/SparksShareDialog"
 import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialog"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
-const actionWidth = 52
+const actionWidth = 48
+const fullScreenActionWidth = 24
 
 const styles = sxStyles({
    hidden: {
@@ -51,14 +53,12 @@ const styles = sxStyles({
    },
    root: {
       alignItems: "center",
-      width: actionWidth,
    },
    actionRoot: {
       color: "#5C5C5C",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      width: actionWidth,
       position: "relative",
       transition: (theme) => theme.transitions.create(["color", "background"]),
       "& .MuiIconButton-root": {
@@ -70,22 +70,42 @@ const styles = sxStyles({
       "& .MuiIconButton-root": {
          background: (theme) => `${alpha(theme.palette.primary[600], 0.21)}`,
       },
+      "& svg": {
+         width: "24px",
+         height: "24px",
+      },
+   },
+   defaultLiked: {
+      "& svg": {
+         width: "24px",
+         height: "24px",
+      },
    },
    actionLikedFullScreen: {
       "& .MuiIconButton-root": {
          background: "none",
+      },
+      "& svg": {
+         width: "24px",
+         height: "24px",
       },
    },
    fullScreenActionRoot: {
       color: "white",
    },
    actionBtn: {
-      width: actionWidth,
-      height: actionWidth,
       background: "#DEDEDE",
       "& svg": {
          color: "inherit",
       },
+   },
+   actionBtnSize: {
+      width: actionWidth,
+      height: actionWidth,
+   },
+   actionBtnSizeFullScreen: {
+      width: fullScreenActionWidth,
+      height: fullScreenActionWidth,
    },
    buttonChip: {
       position: "absolute",
@@ -111,7 +131,7 @@ const styles = sxStyles({
    },
    actionLabel: {
       color: "inherit",
-      fontSize: "1.142rem",
+      fontSize: "14px",
       lineHeight: "117.5%",
       letterSpacing: "-0.437px",
       textAlign: "center",
@@ -119,7 +139,7 @@ const styles = sxStyles({
    },
    fullScreenActionLabel: {
       color: "white",
-      mt: 0.5,
+      mt: 1,
    },
    loginBtn: {
       color: (theme) => `${theme.palette.primary.main} !important`,
@@ -129,8 +149,8 @@ const styles = sxStyles({
       height: "24px",
    },
    shareIcon: {
-      width: "28px",
-      height: "28px",
+      width: "24px",
+      height: "24px",
       transform: "rotateY(180deg)",
    },
    actionFilter: {
@@ -175,6 +195,7 @@ type ActionProps = {
    sx?: BoxProps["sx"]
    disabled?: boolean
    actionId: string
+   tooltip?: string
 }
 const Action: FC<ActionProps> = ({
    icon,
@@ -187,6 +208,7 @@ const Action: FC<ActionProps> = ({
    sx,
    disabled,
    actionId,
+   tooltip,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const actionLabel = label ? (
@@ -202,6 +224,30 @@ const Action: FC<ActionProps> = ({
       [chipValue]
    )
 
+   const IconButtonComponent = (
+      <IconButton
+         id={`action-button-${actionId}-${sparkId}`}
+         sx={[
+            styles.actionBtn,
+            isFullScreen && styles.fullScreenActionBtn,
+            isFullScreen ? null : styles.actionBtnSize,
+         ]}
+         color="inherit"
+         onClick={(e) => {
+            e.stopPropagation()
+            onClick(e)
+         }}
+         disabled={disabled}
+         size={isFullScreen ? "small" : "medium"}
+         component={href ? Link : "button"}
+         href={href}
+         target={hrefTarget}
+      >
+         {icon}
+         {isFullScreen ? actionLabel : null}
+      </IconButton>
+   )
+
    return (
       <Box
          htmlFor={`action-button-${actionId}-${sparkId}`}
@@ -211,25 +257,16 @@ const Action: FC<ActionProps> = ({
             isFullScreen && styles.fullScreenActionRoot,
             ...(sx ? (Array.isArray(sx) ? sx : [sx]) : []),
          ]}
+         width={isFullScreen ? fullScreenActionWidth : actionWidth}
       >
-         <IconButton
-            id={`action-button-${actionId}-${sparkId}`}
-            sx={[styles.actionBtn, isFullScreen && styles.fullScreenActionBtn]}
-            color="inherit"
-            onClick={(e) => {
-               e.stopPropagation()
-               onClick(e)
-            }}
-            disabled={disabled}
-            size={isFullScreen ? "small" : "medium"}
-            component={href ? Link : "button"}
-            href={href}
-            target={hrefTarget}
-         >
-            {icon}
+         {tooltip ? (
+            <Tooltip title={tooltip} placement="top">
+               {IconButtonComponent}
+            </Tooltip>
+         ) : (
+            IconButtonComponent
+         )}
 
-            {isFullScreen ? actionLabel : null}
-         </IconButton>
          {showChip ? (
             <Chip
                sx={[styles.buttonChip, chipValue == 1 && styles.buttonChip1]}
@@ -282,6 +319,7 @@ const LikeAction: FC<{
             disabled={isLoading}
             sx={[
                liked && styles.actionLiked,
+               styles.defaultLiked,
                isFullScreen && styles.actionLikedFullScreen,
             ]}
          />
@@ -315,7 +353,7 @@ const CompanyPageAction: FC<{
    companyLogoUrl: string
 }> = ({ sparkId, href, companyLogoUrl }) => {
    const { trackEvent } = useSparksFeedTracker()
-
+   const isFullScreen = useSparksFeedIsFullScreen()
    const handleCompanyPageClick = useCallback(() => {
       trackEvent(SparkEventActions.Click_CompanyPageCTA)
    }, [trackEvent])
@@ -330,11 +368,12 @@ const CompanyPageAction: FC<{
             <CircularLogo
                src={companyLogoUrl}
                alt={"companyName"}
-               size={52}
+               size={isFullScreen ? 40 : 48}
                sx={{ border: "none" }}
             />
          }
          onClick={handleCompanyPageClick}
+         tooltip="Visit company page"
       />
    )
 }
@@ -451,7 +490,7 @@ const FilterAction: FC<FilterActionProps> = ({ sparkId }) => {
          <Action
             actionId="Filter"
             sparkId={sparkId}
-            icon={<FilterIcon />}
+            icon={<FilterIcon width={"24px"} height={"24px"} />}
             onClick={handleOpenFilterDialog}
             label="Filter"
             chipValue={selectedSparkCategories.length}
