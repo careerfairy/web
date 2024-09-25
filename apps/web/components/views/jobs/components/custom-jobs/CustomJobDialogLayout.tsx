@@ -91,6 +91,12 @@ export const CustomJobDialogLayout: FC<Props> = ({
       )
    }, [pathname, push, query, dialogSource])
 
+   const hasPaperProps = Boolean(
+      (source.source == CustomJobApplicationSourceTypes.Profile ||
+         source.source == CustomJobApplicationSourceTypes.Portal) &&
+         isMobile
+   )
+
    return (
       <>
          {children}
@@ -108,12 +114,7 @@ export const CustomJobDialogLayout: FC<Props> = ({
                </Box>
             }
             heroSx={{ m: 0, py: "0px !important", px: "10px !important" }}
-            paperPropsSx={
-               source.source == CustomJobApplicationSourceTypes.Profile &&
-               isMobile
-                  ? styles.profilePaperProps
-                  : null
-            }
+            paperPropsSx={hasPaperProps ? styles.profilePaperProps : null}
             hideApplicationConfirmation={hideApplicationConfirmation}
          />
       </>
