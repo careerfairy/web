@@ -7,6 +7,7 @@ const styles = sxStyles({
    root: {
       textDecorationColor: "transparent",
       color: "neutral.700",
+      display: "inline-flex",
       transition: (theme) =>
          theme.transitions.create(["text-decoration-color"], {
             duration: theme.transitions.duration.short,
