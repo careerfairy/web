@@ -49,7 +49,7 @@ type Props = {
    handleClick: (job: CustomJob, event: React.MouseEvent) => void
 }
 
-const JobList = ({ jobs, handleClose, handleClick }: Props) => {
+export const JobList = ({ jobs, handleClose, handleClick }: Props) => {
    const { moveToNext } = useStepper()
    const isMobile = useIsMobile()
 
@@ -89,5 +89,3 @@ const JobList = ({ jobs, handleClose, handleClick }: Props) => {
       </>
    )
 }
-
-export default JobList
