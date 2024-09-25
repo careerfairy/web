@@ -79,7 +79,7 @@ type Props = {
    onRemove?: () => void
 }
 
-const ProfileRemoveCustomJobConfirmation = ({
+export const ProfileRemoveCustomJobConfirmation = ({
    isOpen,
    handleClose,
    job,
@@ -150,5 +150,3 @@ const ProfileRemoveCustomJobConfirmation = ({
       </Dialog>
    )
 }
-
-export default ProfileRemoveCustomJobConfirmation
