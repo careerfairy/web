@@ -4,6 +4,7 @@ import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import Link from "components/views/common/Link"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -61,6 +62,7 @@ const SparkDetails: FC<Props> = ({
    creatorPosition,
    onClick,
 }) => {
+   const isFullScreen = useSparksFeedIsFullScreen()
    const showCreatorPosition = Boolean(creatorPosition)
 
    const detailsTooltipTitle = showCreatorPosition
@@ -88,7 +90,11 @@ const SparkDetails: FC<Props> = ({
          onClick={onClick}
       >
          <span>
-            <CircularLogo src={companyLogoUrl} alt={companyName} size={60} />
+            <CircularLogo
+               src={companyLogoUrl}
+               alt={companyName}
+               size={isFullScreen ? 48 : 60}
+            />
          </span>
          <Box mr={0.75} />
          <Box sx={styles.creatorDetails}>
