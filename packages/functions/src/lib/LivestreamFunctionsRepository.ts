@@ -41,7 +41,7 @@ import {
    createLiveStreamStatsDoc,
 } from "@careerfairy/shared-lib/livestreams/stats"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import { chunkArray } from "@careerfairy/shared-lib/utils"
+import { chunkArray, getArrayDifference } from "@careerfairy/shared-lib/utils"
 import type { Change } from "firebase-functions"
 import * as functions from "firebase-functions"
 import { isEmpty } from "lodash"
@@ -234,6 +234,17 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       livestreamId: string,
       speaker: Create<Speaker>
    ): Promise<Speaker>
+
+   /**
+    * Synchronizes the 'hasJobs' flag for Group livestreams based on the changes in the custom job.
+    * This function updates the 'hasJobs' flag for livestreams associated with the custom job.
+    * @param afterJob The custom job after the update.
+    * @param beforeJob The custom job before the update.
+    */
+   syncGroupLivestreamsHasJobsFlag(
+      afterJob: CustomJob,
+      beforeJob: CustomJob
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -901,5 +912,97 @@ export class LivestreamFunctionsRepository
          .update(toUpdate)
 
       return speakerWithId
+   }
+
+   async syncGroupLivestreamsHasJobsFlag(
+      afterJob: CustomJob,
+      beforeJob: CustomJob
+   ): Promise<void> {
+      // Check if the livestreams in afterJob and beforeJob are the same, regardless of order
+      const areLivestreamsEqual =
+         getArrayDifference(afterJob.livestreams, beforeJob.livestreams)
+            .length === 0 &&
+         getArrayDifference(beforeJob.livestreams, afterJob.livestreams)
+            .length === 0
+
+      if (areLivestreamsEqual) {
+         // If the livestreams are the same, exit the function early
+         return
+      }
+
+      // Get the livestreams that were added to afterJob
+      const addedLivestreams = beforeJob
+         ? (getArrayDifference(
+              beforeJob.livestreams,
+              afterJob.livestreams
+           ) as string[])
+         : afterJob.livestreams
+
+      // Get the livestreams that were removed from beforeJob
+      const removedLivestreams = beforeJob
+         ? (getArrayDifference(
+              afterJob.livestreams,
+              beforeJob.livestreams
+           ) as string[])
+         : []
+
+      // Get all customJobs from the group id
+      const customJobs = await customJobRepo.getCustomJobsByGroupId(
+         afterJob.groupId
+      )
+
+      // Remove the current job from the array
+      const filteredCustomJobs = customJobs.filter(
+         (job) => job.id !== afterJob.id
+      )
+
+      // Filter the livestreams that have been removed from the jobs
+      const livestreamsWithoutJobs = removedLivestreams.filter(
+         (livestreamId) => {
+            return filteredCustomJobs.every(
+               (job) => !job.livestreams.includes(livestreamId)
+            )
+         }
+      )
+
+      // Filter the livestreams that have been added to the jobs
+      const livestreamsWithNewJobAssignment = addedLivestreams.filter(
+         (livestreamId) => {
+            return !filteredCustomJobs.some((job) =>
+               job.livestreams.includes(livestreamId)
+            )
+         }
+      )
+
+      const batch = this.firestore.batch()
+
+      // Update the livestreams without jobs to have hasJobs: false
+      livestreamsWithoutJobs.forEach((livestreamId) => {
+         functions.logger.log(
+            `Update live stream ${livestreamId} to be with hasJobs flag as false`
+         )
+         batch.update(
+            this.firestore.collection("livestreams").doc(livestreamId),
+            {
+               hasJobs: false,
+            }
+         )
+      })
+
+      // Update the livestreams with new job assignment to have hasJobs: true
+      livestreamsWithNewJobAssignment.forEach((livestreamId) => {
+         functions.logger.log(
+            `Update live stream ${livestreamId} to be with hasJobs flag as true`
+         )
+
+         batch.update(
+            this.firestore.collection("livestreams").doc(livestreamId),
+            {
+               hasJobs: true,
+            }
+         )
+      })
+
+      await batch.commit()
    }
 }
