@@ -1,6 +1,7 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { SlideUpTransition } from "components/views/common/transitions"
 import CustomJobDetailsSkeleton from "components/views/jobs/components/custom-jobs/skeletons/CustomJobDetailsSkeleton"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
@@ -16,6 +17,9 @@ const styles = sxStyles({
       alignSelf: { xs: "self-end", md: "unset" },
       borderRadius: "12px",
       background: "white",
+   },
+   dialogMobile: {
+      borderRadius: "12px 12px 0px 0px",
    },
 })
 
@@ -71,6 +75,7 @@ const JobDialog = ({ isOpen, handleClose, jobs, spark }: Props) => {
       [handleClose, handleJobListCLick, jobs, selectedJob, spark]
    )
 
+   const isMobile = useIsMobile()
    return (
       <SteppedDialog
          key={isOpen ? "open" : "closed"}
@@ -80,7 +85,7 @@ const JobDialog = ({ isOpen, handleClose, jobs, spark }: Props) => {
          views={views}
          initialStep={0}
          transition={SlideUpTransition}
-         sx={styles.dialog}
+         sx={[styles.dialog, isMobile ? styles.dialogMobile : null]}
          onClick={handleDialogInteraction}
       />
    )
