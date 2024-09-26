@@ -87,7 +87,7 @@ const styles = sxStyles({
          xs: 3.25,
          sparksFullscreen: 4,
       },
-      mr: {
+      mx: {
          xs: 1.5,
       },
    },

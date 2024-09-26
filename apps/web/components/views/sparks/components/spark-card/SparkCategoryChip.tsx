@@ -10,6 +10,7 @@ import { sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    root: {
       bgcolor: "rgba(142, 142, 142, 0.80)",
+      backdropFilter: "blur(10px)",
    },
 })
 
