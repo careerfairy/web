@@ -10,7 +10,11 @@ import {
    sortSeenSparks,
    sortSparksByIds,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
+import {
+   CompanyFollowed,
+   RegisteredLivestreams,
+   UserData,
+} from "@careerfairy/shared-lib/users"
 import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
 import { ISparkFunctionsRepository } from "src/lib/sparks/SparkFunctionsRepository"
 import { BundleLoader } from "../../bundleLoader"
@@ -31,6 +35,8 @@ export interface IRecommendationDataFetcher {
 
    getAppliedJobs(userId: string): Promise<CustomJobApplicant[]>
    getFollowedCompanies(userId: string): Promise<CompanyFollowed[]>
+
+   getUserRegisteredLivestreams(): Promise<RegisteredLivestreams>
 }
 
 /**
@@ -53,6 +59,12 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
 
    getPastLivestreams(): Promise<LivestreamEvent[]> {
       return this.loader.getDocs<LivestreamEvent>("past-livestreams-query")
+   }
+
+   async getUserRegisteredLivestreams(): Promise<RegisteredLivestreams> {
+      // Not implemented for newsletter, since data fetching would be per
+      // user meaning an excess number requests would be made for each subscribed user
+      throw new Error("Not implemented")
    }
 
    async getInteractedLivestreams(userId: string): Promise<LivestreamEvent[]> {
@@ -116,6 +128,10 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
       await this.loader.fetch("allFutureLivestreams")
 
       return this.loader.getDocs<LivestreamEvent>("future-livestreams-query")
+   }
+
+   async getUserRegisteredLivestreams(): Promise<RegisteredLivestreams> {
+      return this.userRepo.getUserRegisteredLivestreams(this.userId)
    }
 
    getPastLivestreams(): Promise<LivestreamEvent[]> {

@@ -19,11 +19,12 @@ import { SeenSparks } from "../sparks/sparks"
 import {
    CompanyFollowed,
    IUserReminder,
+   RegisteredLivestreams,
    RegistrationStep,
    SavedRecruiter,
+   UserActivity,
    UserATSDocument,
    UserATSRelations,
-   UserActivity,
    UserData,
    UserJobApplicationDocument,
    UserPublicData,
@@ -211,6 +212,15 @@ export interface IUserRepository {
       userId: string,
       limit: number
    ): Promise<CustomJobApplicant[]>
+
+   /**
+    * Retrieves the registered live streams for a user
+    * @param userEmail - The user email
+    * @returns The registered live streams for the user
+    */
+   getUserRegisteredLivestreams(
+      userEmail: string
+   ): Promise<RegisteredLivestreams>
 }
 
 export class FirebaseUserRepository
@@ -1020,6 +1030,23 @@ export class FirebaseUserRepository
       )
 
       return sortedSeenSparks
+   }
+
+   async getUserRegisteredLivestreams(
+      userEmail: string
+   ): Promise<RegisteredLivestreams> {
+      const docRef = this.firestore
+         .collection("registeredLivestreams")
+         .where("user.userEmail", "==", userEmail)
+         .withConverter(createCompatGenericConverter<RegisteredLivestreams>())
+
+      const snap = await docRef.get()
+
+      if (snap.empty) {
+         return null
+      }
+
+      return snap.docs[0].data()
    }
 }
 
