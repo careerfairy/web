@@ -32,6 +32,7 @@ import {
    currentSparkIndexSelector,
    emptyFilterSelector,
    eventDetailsDialogVisibilitySelector,
+   isJobDialogOpenSelector,
    isOnEdgeSelector,
    isPlayingSelector,
    sparksSelector,
@@ -142,6 +143,7 @@ const SparksFeedCarousel: FC = () => {
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
+   const isJobDialogOpen = useSelector(isJobDialogOpenSelector)
    const isOnEdge = useSelector(isOnEdgeSelector)
    const videoIsMuted = useSelector(videosMuttedSelector)
 
@@ -198,11 +200,11 @@ const SparksFeedCarousel: FC = () => {
     * Custom plugin hooks for Embla Carousel
     */
    useKeyboardNavigation(emblaApi, {
-      disabled: eventDetailsDialogVisibility,
+      disabled: eventDetailsDialogVisibility || isJobDialogOpen,
       mode: "upDown",
    })
    useVerticalMouseScrollNavigation(emblaApi, {
-      disabled: eventDetailsDialogVisibility,
+      disabled: eventDetailsDialogVisibility || isJobDialogOpen,
    })
 
    /**
