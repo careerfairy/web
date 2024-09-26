@@ -14,10 +14,14 @@ import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useGroupsByIds from "components/custom-hook/useGroupsByIds"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import CustomJobDetailsSkeleton from "components/views/jobs/components/custom-jobs/skeletons/CustomJobDetailsSkeleton"
 import { ReactNode, useEffect } from "react"
+import { useSelector } from "react-redux"
+import { AutomaticActions } from "store/reducers/sparksFeedReducer"
+import { autoAction } from "store/selectors/sparksFeedSelectors"
 import { sxStyles } from "types/commonTypes"
 import { SlideUpTransition } from "../transitions"
 
@@ -28,6 +32,7 @@ const styles = sxStyles({
       bgcolor: "background.paper",
    },
    jobApplyConfirmationDialog: {
+      m: 2,
       bottom: 10,
    },
    dialogContent: {
@@ -100,7 +105,7 @@ const DialogDetailsContent = ({
       isApplyConfirmationOpen,
       handleConfirmationOpen,
       handleConfirmationClose,
-   ] = useDialogStateHandler(applicationInitiatedOnly)
+   ] = useDialogStateHandler(false)
 
    useEffect(() => {
       if (applicationInitiatedOnly) handleConfirmationOpen()
@@ -145,24 +150,41 @@ const Content = ({
    showApplyConfirmation,
    onApplyConfirmationClose,
 }: ContentProps) => {
+   const { applicationInitiatedOnly, handleConfirmApply } = useCustomJobApply(
+      customJob as PublicCustomJob,
+      source
+   )
+
    const {
       data: [group],
    } = useGroupsByIds([customJob.groupId])
+
+   const autoActionType = useSelector(autoAction)
+
+   const isAutoApply = autoActionType === AutomaticActions.APPLY
 
    return (
       <>
          <CustomJobDetailsView
             job={customJob}
             heroContent={heroContent}
-            context={source}
+            applicationInitiatedOnly={applicationInitiatedOnly}
             heroSx={heroSx}
             sx={styles.customJobDetailsView}
             companyLogoUrl={group.logoUrl}
             companyName={group.universityName}
-            isApplyConfirmationOpen={showApplyConfirmation}
-            handleApplyConfirmationClose={onApplyConfirmationClose}
-            applyConfirmationSx={styles.jobApplyConfirmationDialog}
+            hideCTAButtons
          />
+         {showApplyConfirmation ? (
+            <CustomJobApplyConfirmation
+               handleClose={onApplyConfirmationClose}
+               job={customJob as PublicCustomJob}
+               applicationSource={source}
+               autoApply={isAutoApply}
+               onApply={handleConfirmApply}
+               sx={styles.jobApplyConfirmationDialog}
+            />
+         ) : null}
       </>
    )
 }
