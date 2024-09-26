@@ -6,7 +6,7 @@ import {
    EmailNotification,
    EmailNotificationType,
 } from "@careerfairy/shared-lib/notifications/notifications"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { RegisteredLivestreams, UserData } from "@careerfairy/shared-lib/users"
 import {
    getDateDifferenceInDays,
    sortLivestreamsDesc,
@@ -21,7 +21,7 @@ import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
 
 const TOLERANCE_DAYS = 2
 /**
- * Data structure used to associate each user with his recommended livestreams
+ * Data structure used to associate each user with his recommended live streams
  * and groups he is following
  */
 type UserLivestreams = {
@@ -44,23 +44,25 @@ export class NewsletterService {
    private subscribedUsers: Record<string, UserData>
 
    /**
-    * The future livestreams that are fetched from the data bundles
-    * Used for generating the recommendations and display the livestreams
+    * The future live streams that are fetched from the data bundles
+    * Used for generating the recommendations and display the live streams
     * for the groups the user follows
     */
    private futureLivestreams: LivestreamEvent[]
 
    /**
-    * The past livestreams that are fetched from the data bundles
+    * The past live streams that are fetched from the data bundles
     * Used for generating the user recommendations only
     */
    private pastLivestreams: LivestreamEvent[]
 
    /**
-    * The livestreams for each user
+    * The live streams for each user
     * Recommended and from the companies he is following
     */
    private users: Record<string, UserLivestreams> = {}
+
+   private registeredLivestreams: Record<string, RegisteredLivestreams>
 
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
@@ -97,8 +99,8 @@ export class NewsletterService {
 
    /**
     * Filters all the fetched and subscribed users according to the onboarding project. Users now should only
-    * receive the newsletter if the onboarding/guidance step, has reached the livestream step (livestream discovery).
-    * Also it takes into consideration, when livestream discovery notification was sent, introducing a tolerance of 2 days as not
+    * receive the newsletter if the onboarding/guidance step, has reached the live stream step (live stream discovery).
+    * Also it takes into consideration, when live stream discovery notification was sent, introducing a tolerance of 2 days as not
     * to send close emails to the user.
     * @param users
     * @returns UserData[] - Filtered users according to onboarding step and tolerance for the last notification
@@ -149,15 +151,17 @@ export class NewsletterService {
          this.userRepo.getSubscribedUsers(),
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
+         this.userRepo.getAllUserRegisteredLivestreams(null, LOCATION_FILTERS),
       ] as const
 
-      const [subscribedUsers, futureLivestreams, pastLivestreams] =
-         await Promise.all(promises)
+      const [
+         subscribedUsers,
+         futureLivestreams,
+         pastLivestreams,
+         registeredLivestreams,
+      ] = await Promise.all(promises)
 
-      this.logger.info(
-         "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
-         subscribedUsers?.length
-      )
+      this.logger.info("fetched subscribed users", subscribedUsers?.length)
 
       this.logger.info("filtering users")
 
@@ -169,6 +173,12 @@ export class NewsletterService {
       this.logger.info("filtered users", filteredUsers?.length)
 
       this.subscribedUsers = convertDocArrayToDict(filteredUsers)
+      this.registeredLivestreams = Object.fromEntries(
+         registeredLivestreams.map((registeredLivestream) => [
+            registeredLivestream.userEmail,
+            registeredLivestream,
+         ])
+      )
       this.logger.info(
          "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
          Object.keys(this.subscribedUsers).map(
@@ -180,7 +190,7 @@ export class NewsletterService {
       this.pastLivestreams = pastLivestreams ?? []
 
       this.futureLivestreams = this.futureLivestreams.filter((l) => {
-         // filter out livestreams before now, the bundle might have events for the same day
+         // filter out live streams before now, the bundle might have events for the same day
          // already started/ended, also hide the hidden ones
          return l.start.toDate().getTime() > Date.now() && !l.hidden
       })
@@ -190,11 +200,11 @@ export class NewsletterService {
          subscribedUsers?.length ?? 0
       )
       this.logger.info(
-         "Total Future Livestreams fetched",
+         "Total Future Live streams fetched",
          futureLivestreams?.length ?? 0
       )
       this.logger.info(
-         "Total Past Livestreams fetched",
+         "Total Past Live streams fetched",
          pastLivestreams?.length ?? 0
       )
 
@@ -216,6 +226,7 @@ export class NewsletterService {
             this.futureLivestreams,
             this.pastLivestreams,
             null,
+            this.registeredLivestreams[user.userEmail],
             false
          )
 
@@ -252,7 +263,7 @@ export class NewsletterService {
 
    /**
     * Grabs all company followers, and populates the users object
-    * with the livestreams for each group the user is following
+    * with the live streams for each group the user is following
     */
    async populateUsers() {
       const allCompanyFollowers =
@@ -278,11 +289,11 @@ export class NewsletterService {
          )
 
          if (groupLivestreams.length === 0) {
-            // nothing to populate, this group doesn't have future livestreams
+            // nothing to populate, this group doesn't have future live streams
             continue
          }
 
-         // add the group livestreams to the user
+         // add the group live streams to the user
          this.users[follower.user.id].followingCompanies[follower.groupId] = {
             livestreams: groupLivestreams,
             group: follower.group,
@@ -291,7 +302,7 @@ export class NewsletterService {
       }
 
       this.logger.info(
-         "Total Company Followers whose groups have future livestreams",
+         "Total Company Followers whose groups have future live streams",
          followersWithGroupLivestreams++
       )
    }
@@ -304,16 +315,20 @@ export class NewsletterService {
     */
    send(overrideUsers?: string[]) {
       const emails = overrideUsers ?? Object.keys(this.users)
-
+      this.logger.info("Total emails to send to", emails.length)
+      if (overrideUsers) {
+         this.logger.info("Override users provided", overrideUsers)
+      }
       // counters
       const usersWithoutMinimumRecommendedLivestreams = []
+      const sentEmails = []
 
       for (const userEmail of emails) {
          const user = this.users[userEmail]
 
          if (user) {
             if (user.recommendedLivestreams.length < 3) {
-               // we need at least 3 recommended livestreams to send the newsletter
+               // we need at least 3 recommended live streams to send the newsletter
                usersWithoutMinimumRecommendedLivestreams.push(userEmail)
                continue
             }
@@ -331,11 +346,12 @@ export class NewsletterService {
                followingLivestreams,
                user.recommendedLivestreams
             )
+            sentEmails.push(userEmail)
          }
       }
 
       this.logger.info(
-         "Total Users without minimum recommended livestreams",
+         "Total Users without minimum recommended live streams",
          usersWithoutMinimumRecommendedLivestreams.length,
          {
             // so that we can investigate later
@@ -343,6 +359,8 @@ export class NewsletterService {
          }
       )
 
-      return this.emailBuilder.send()
+      return this.emailBuilder.send().then(() => {
+         console.log("Successfully sent newsletters to", sentEmails.length)
+      })
    }
 }
