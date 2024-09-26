@@ -3,7 +3,7 @@ import {
    JobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, Button, CircularProgress, Stack } from "@mui/material"
+import { Box, Button, CircularProgress, Stack, useTheme } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useLiveStreamDialog } from "components/views/livestream-dialog"
 import useRegistrationHandler from "components/views/livestream-dialog/useRegistrationHandler"
@@ -23,7 +23,7 @@ import ActionButtonProvider, {
 } from "components/views/livestream-dialog/views/livestream-details/action-button/ActionButtonProvider"
 import WatchNowButton from "components/views/livestream-dialog/views/livestream-details/action-button/WatchNowButton"
 import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
-import { CheckCircle, ExternalLink } from "react-feather"
+import { CheckCircle, ExternalLink, XCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -75,6 +75,12 @@ const styles = sxStyles({
       alignItems: "center",
       width: { xs: "100%", md: "auto" },
    },
+   noLongerAccepting: {
+      fontSize: "16px",
+      wordBreak: "keep-all",
+      textAlign: "center",
+      minWidth: "290px",
+   },
 })
 
 type Props = {
@@ -90,7 +96,10 @@ type CustomJobCTAProps = Props & {
 
 const CustomJobCTAButtons = (props: Props) => {
    const { userData } = useAuth()
-   const { alreadyApplied } = useUserJobApplication(userData?.id, props.job.id)
+   const { alreadyApplied, applicationInitiatedOnly } = useUserJobApplication(
+      userData?.id,
+      props.job.id
+   )
 
    const ctas: { [source in JobApplicationSource]: FC } = {
       livestream: () => (
@@ -100,7 +109,13 @@ const CustomJobCTAButtons = (props: Props) => {
          return <SparkJobCTA {...props} alreadyApplied={alreadyApplied} />
       },
       profile: () => {
-         return <></>
+         return (
+            <ProfileJobCTA
+               {...props}
+               alreadyApplied={alreadyApplied}
+               applicationInitiatedOnly={applicationInitiatedOnly}
+            />
+         )
       },
       group: () => {
          return <PortalJobCTA {...props} alreadyApplied={alreadyApplied} />
@@ -286,6 +301,70 @@ const PortalJobCTA = ({
                alreadyApplied={alreadyApplied}
             />
             <JobExpiredButton job={job} alreadyApplied={alreadyApplied} />
+         </Stack>
+      </Stack>
+   )
+}
+
+type ProfileJobCTAProps = CustomJobCTAProps & {
+   applicationInitiatedOnly?: boolean
+}
+
+const ProfileJobCTA = ({
+   alreadyApplied,
+   applicationSource,
+   handleApplyClick,
+   job,
+   applicationInitiatedOnly,
+}: ProfileJobCTAProps) => {
+   const theme = useTheme()
+   const isMobile = useIsMobile()
+   const jobExpired = useIsJobExpired(job)
+
+   const JobExpiredDetails = () => {
+      if (!jobExpired) return null
+
+      if (alreadyApplied)
+         return (
+            <Stack direction={"row"} alignItems={"center"}>
+               <XCircle
+                  width={"18px"}
+                  height={"18px"}
+                  color={theme.brand.error[400]}
+               />
+               <Box sx={styles.noLongerAccepting} color={"error.400"}>
+                  No longer accepting applications
+               </Box>
+            </Stack>
+         )
+
+      if (applicationInitiatedOnly)
+         return <JobExpiredButton job={job} alreadyApplied={false} />
+   }
+   return (
+      <Stack sx={[styles.ctaWrapper]}>
+         <Stack
+            direction={isMobile ? "column" : "row-reverse"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            width={isMobile ? "100%" : "auto"}
+            spacing={2}
+         >
+            <CustomJobApplyButton
+               job={job as PublicCustomJob}
+               applicationSource={applicationSource}
+               handleApplyClick={handleApplyClick}
+               isSecondary={false}
+               alreadyApplied={alreadyApplied}
+            />
+            <ApplicationAlreadySentButton alreadyApplied={alreadyApplied} />
+            {!jobExpired ? (
+               <VisitApplicationPageButton
+                  job={job}
+                  alreadyApplied={alreadyApplied}
+               />
+            ) : null}
+            <JobExpiredDetails />
          </Stack>
       </Stack>
    )
