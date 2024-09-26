@@ -167,35 +167,35 @@ export const CompetitorSparkStaticCard = ({
          <CardHeader
             avatar={
                <CircularLogo
-                  src={sparkData?.creator.avatarUrl}
+                  src={sparkData?.creator?.avatarUrl}
                   alt={"Creator's Avatar"}
                   objectFit="cover"
                   size={46}
                />
             }
             // Only use the first name in firstName if user has two names
-            title={`${sparkData.creator.firstName.split(" ")[0]} ${
-               sparkData.creator.lastName
+            title={`${sparkData?.creator?.firstName?.split(" ")[0]} ${
+               sparkData?.creator?.lastName
             }`}
             subheader={`From ${
-               sparkData.group.name.length > 30
-                  ? sparkData.group.name.substring(0, 25) + "..."
-                  : sparkData.group.name
+               sparkData?.group?.name?.length > 30
+                  ? sparkData?.group?.name?.substring(0, 25) + "..."
+                  : sparkData?.group?.name
             }`}
             sx={styles.cardHeader}
          />
          <Box sx={{ position: "relative" }}>
             <Box sx={styles.sparksTypeAndTitle}>
-               <SparkCategoryChip categoryId={sparkData.spark.categoryId} />
+               <SparkCategoryChip categoryId={sparkData?.spark?.categoryId} />
                <Typography sx={styles.sparksTitle}>
-                  {sparkData.spark.question}
+                  {sparkData?.spark?.question}
                </Typography>
             </Box>
             <Box sx={styles.cardMediaGradientOverlay} />
             <CardMedia
                component="img"
                sx={styles.cardMedia}
-               image={getResizedUrl(sparkData.spark.videoThumbnailUrl, "md")}
+               image={getResizedUrl(sparkData?.spark?.videoThumbnailUrl, "md")}
                alt="Spark's thumbnail"
             />
          </Box>
