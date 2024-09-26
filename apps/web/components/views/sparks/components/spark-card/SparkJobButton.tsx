@@ -3,6 +3,7 @@ import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Button } from "@mui/material"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { maybePluralize } from "components/helperFunctions/HelperFunctions"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { setIsJobDialogOpen } from "store/reducers/sparksFeedReducer"
@@ -51,9 +52,10 @@ const SparkJobButton = ({ spark }: Props) => {
                onClick={handleClick}
                fullWidth
             >
-               {`${jobs.length} job opening${
-                  jobs.length > 1 ? "s" : ""
-               } available, check now`}
+               {`${jobs.length} ${maybePluralize(
+                  jobs.length,
+                  "job opening"
+               )} available, check now`}
             </Button>
 
             <JobDialog
