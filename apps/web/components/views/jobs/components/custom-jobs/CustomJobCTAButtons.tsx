@@ -69,6 +69,12 @@ const styles = sxStyles({
       whiteSpace: "nowrap",
       maxWidth: "100%",
    },
+   sparkJobCTA: {
+      flexDirection: { xs: "column", md: "row-reverse" },
+      justifyContent: "center",
+      alignItems: "center",
+      width: { xs: "100%", md: "auto" },
+   },
 })
 
 type Props = {
@@ -91,7 +97,7 @@ const CustomJobCTAButtons = (props: Props) => {
          <LivestreamJobCTA {...props} alreadyApplied={alreadyApplied} />
       ),
       spark: () => {
-         return <></>
+         return <SparkJobCTA {...props} alreadyApplied={alreadyApplied} />
       },
       profile: () => {
          return <></>
@@ -129,6 +135,31 @@ const LivestreamJobCTA = (props: LivestreamCustomJobCTAProps) => {
          alreadyApplied={props.alreadyApplied}
          isUserRegistered={isUserRegisteredToEvent}
       />
+   )
+}
+
+const SparkJobCTA = ({
+   applicationSource,
+   job,
+   handleApplyClick: handleApplyClick,
+   alreadyApplied,
+   isUserRegistered,
+}: LivestreamCustomJobCTAProps) => {
+   const jobExpired = useIsJobExpired(job)
+
+   return (
+      <Stack sx={[styles.ctaWrapper]}>
+         <Stack sx={styles.sparkJobCTA} spacing={2}>
+            <CustomJobApplyButton
+               job={job as PublicCustomJob}
+               applicationSource={applicationSource}
+               handleApplyClick={handleApplyClick}
+               isSecondary={jobExpired || isUserRegistered}
+               alreadyApplied={alreadyApplied}
+            />
+            <ApplicationAlreadySentButton alreadyApplied={alreadyApplied} />
+         </Stack>
+      </Stack>
    )
 }
 
