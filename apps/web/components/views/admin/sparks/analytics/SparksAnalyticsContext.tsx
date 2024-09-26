@@ -97,7 +97,8 @@ export const SparksAnalyticsProvider = ({ children }) => {
 
       const interval = setInterval(updateLabel, 1000)
       return () => clearInterval(interval)
-   }, [analytics?.updatedAt])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [analytics?.updatedAt?.getTime()])
 
    return (
       <SparksAnalyticsContext.Provider value={value}>
