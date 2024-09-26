@@ -32,8 +32,6 @@ const securePaths = [
    "/group/[groupId]/admin/livestream",
    "/group/[groupId]/admin/livestream/[[...livestreamId]]",
    "/new-livestream",
-   "/group/invite",
-   "/group/invite/[inviteId]",
    "/group/create",
    "/next-livestreams/my-registrations",
    "/past-livestreams/unlocked-content",
