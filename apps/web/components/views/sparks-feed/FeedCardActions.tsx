@@ -161,6 +161,12 @@ const styles = sxStyles({
          height: "24px",
       },
    },
+   actionTooltip: {
+      fontSize: "12px",
+      color: (theme) => theme.palette.neutral[700],
+      p: 1,
+      fontWeight: 400,
+   },
 })
 
 type Props = {
@@ -260,7 +266,12 @@ const Action: FC<ActionProps> = ({
          width={isFullScreen ? fullScreenActionWidth : actionWidth}
       >
          {tooltip ? (
-            <Tooltip title={tooltip} placement="top">
+            <Tooltip
+               title={
+                  <Typography sx={styles.actionTooltip}>{tooltip}</Typography>
+               }
+               placement="top"
+            >
                {IconButtonComponent}
             </Tooltip>
          ) : (
