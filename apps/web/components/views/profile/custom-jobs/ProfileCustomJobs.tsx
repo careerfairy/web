@@ -86,12 +86,10 @@ const ProfileCustomJobs = () => {
             />
          </Tabs>
          <Box sx={styles.tabsContentWrapper}>
-            {tabValue === TAB_VALUES.initiated.value ? (
+            {tabValue === TAB_VALUES.initiated.value && (
                <UserInitiatedCustomJobs />
-            ) : null}
-            {tabValue === TAB_VALUES.applied.value ? (
-               <UserAppliedCustomJobs />
-            ) : null}
+            )}
+            {tabValue === TAB_VALUES.applied.value && <UserAppliedCustomJobs />}
          </Box>
       </Box>
    )
