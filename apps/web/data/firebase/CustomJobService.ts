@@ -30,6 +30,27 @@ export class CustomJobService {
    }
 
    /**
+    * Removes the job application for the specified user and job via cloud function after a user confirms the removal of the job
+    * in the confirmation dialog.
+    *
+    * The removal only sets the property 'removed' to true, which will remove the job from being displayed on the user profile.
+    * The user job application is not actually removed, only a flag is set to true indicating the user wishing its removal from his profile.
+    * @param jobId Id of the job the user wishes the application not to appear anymore on the his profile.
+    * @param userId Id of the user.
+    */
+   async removeUserJobApplication(
+      jobId: string,
+      userId: string
+   ): Promise<HttpsCallableResult> {
+      return this.firebaseFunctions.httpsCallable(
+         "setRemoveUserJobApplication"
+      )({
+         userId,
+         jobId,
+      })
+   }
+
+   /**
     * Synchronizes linked custom jobs for a livestream after creation or update.
     *
     * This function is designed to be triggered after the creation or update of a livestream.

@@ -33,14 +33,14 @@ const useCustomJobApply = (
    const { trigger: handleConfirmApply, isMutating: isApplying } =
       useSWRMutation(
          `user-${userData?.id}-applyToCustomJob-${job.id}`,
-         () => {
+         async () => {
             if (userData) {
-               customJobServiceInstance.confirmJobApplication(
+               return await customJobServiceInstance.confirmJobApplication(
                   job.id,
                   userData?.id
                )
             } else {
-               customJobServiceInstance.confirmAnonymousJobApplication(
+               return await customJobServiceInstance.confirmAnonymousJobApplication(
                   job.id,
                   fingerPrintId
                )

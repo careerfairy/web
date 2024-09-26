@@ -81,12 +81,26 @@ const styles = sxStyles({
       textAlign: "center",
       minWidth: "290px",
    },
+   removeJobBtn: {
+      color: (theme) => theme.palette.neutral[500],
+      borderColor: (theme) => theme.palette.neutral[200],
+      backgroundColor: "white",
+      whiteSpace: "nowrap",
+      "&:hover": {
+         borderColor: (theme) => theme.palette.grey[100],
+         backgroundColor: (theme) => theme.palette.grey[100],
+      },
+   },
+   haveAppliedBtn: {
+      whiteSpace: "nowrap",
+   },
 })
 
 type Props = {
    applicationSource?: CustomJobApplicationSource
    job: PublicCustomJob
    handleApplyClick?: () => void
+   handleRemoveClick?: () => void
 }
 
 type CustomJobCTAProps = Props & {
@@ -314,12 +328,21 @@ const ProfileJobCTA = ({
    alreadyApplied,
    applicationSource,
    handleApplyClick,
+   handleRemoveClick,
    job,
    applicationInitiatedOnly,
 }: ProfileJobCTAProps) => {
+   const { userData } = useAuth()
    const theme = useTheme()
    const isMobile = useIsMobile()
    const jobExpired = useIsJobExpired(job)
+
+   const { handleConfirmApply, isApplying } = useCustomJobApply(
+      job,
+      applicationSource
+   )
+
+   const { job: jobApplication } = useUserJobApplication(userData.id, job.id)
 
    const JobExpiredDetails = () => {
       if (!jobExpired) return null
@@ -341,6 +364,7 @@ const ProfileJobCTA = ({
       if (applicationInitiatedOnly)
          return <JobExpiredButton job={job} alreadyApplied={false} />
    }
+
    return (
       <Stack sx={[styles.ctaWrapper]}>
          <Stack
@@ -348,7 +372,7 @@ const ProfileJobCTA = ({
             justifyContent={"center"}
             alignItems={"center"}
             width={isMobile ? "100%" : "auto"}
-            spacing={2}
+            spacing={isMobile ? 1.5 : 1.25}
          >
             <CustomJobApplyButton
                job={job as PublicCustomJob}
@@ -358,6 +382,14 @@ const ProfileJobCTA = ({
                alreadyApplied={alreadyApplied}
             />
             <ApplicationAlreadySentButton alreadyApplied={alreadyApplied} />
+            {!jobApplication.removedFromUserProfile ? (
+               <UserProfileJobOptionsButtons
+                  applicationInitiatedOnly={applicationInitiatedOnly}
+                  handleRemoveClick={handleRemoveClick}
+                  handleApplyClick={handleConfirmApply}
+                  isApplying={isApplying}
+               />
+            ) : null}
             {!jobExpired ? (
                <VisitApplicationPageButton
                   job={job}
@@ -366,6 +398,55 @@ const ProfileJobCTA = ({
             ) : null}
             <JobExpiredDetails />
          </Stack>
+      </Stack>
+   )
+}
+
+type UserProfileJobOptionsButtons = Pick<
+   ProfileJobCTAProps,
+   "applicationInitiatedOnly" | "handleRemoveClick" | "handleApplyClick"
+> & {
+   isApplying?: boolean
+}
+
+const UserProfileJobOptionsButtons = ({
+   applicationInitiatedOnly,
+   handleApplyClick,
+   isApplying,
+   handleRemoveClick,
+}: UserProfileJobOptionsButtons) => {
+   const isMobile = useIsMobile()
+
+   if (!applicationInitiatedOnly) return null
+
+   const haveAppliedText = "I've applied"
+   return (
+      <Stack spacing={isMobile ? 1 : 1.25} direction={"row"} width={"100%"}>
+         <Button
+            fullWidth
+            variant="outlined"
+            sx={[styles.removeJobBtn]}
+            endIcon={<XCircle size={18} />}
+            onClick={handleRemoveClick}
+         >
+            Remove job
+         </Button>
+         <Button
+            fullWidth
+            variant="outlined"
+            sx={[styles.btn, styles.haveAppliedBtn]}
+            onClick={handleApplyClick}
+            color="primary"
+            endIcon={
+               isApplying ? (
+                  <CircularProgress color="inherit" size={18} />
+               ) : (
+                  <CheckCircle size={18} />
+               )
+            }
+         >
+            {haveAppliedText}
+         </Button>
       </Stack>
    )
 }
