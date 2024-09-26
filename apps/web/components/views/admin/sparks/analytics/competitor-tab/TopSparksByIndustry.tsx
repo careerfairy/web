@@ -1,17 +1,13 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
-import {
-   SparkAnalyticsClientWithPastData,
-   TimePeriodParams,
-} from "@careerfairy/shared-lib/sparks/analytics"
 import { Stack } from "@mui/material"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo, useState } from "react"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { TitleWithSelect } from "../components/TitleWithSelect"
 import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
-import { StaticSparkCard } from "./StaticSparkCard"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
+import { CompetitorSparkStaticCard } from "./CompetitorSparkStaticCard"
 
 const ENOUGH_CONTENT_THRESHOLD = 3
 
@@ -20,19 +16,11 @@ const ALL_INDUSTRIES_OPTION: OptionGroup = {
    name: "All Industries",
 }
 
-type TopSparksByIndustryContainerProps = {
-   timeFilter: TimePeriodParams
-}
-
-export const TopSparksByIndustry = ({
-   timeFilter,
-}: TopSparksByIndustryContainerProps) => {
+export const TopSparksByIndustry = () => {
    const { group } = useGroup()
    const {
-      topSparksByIndustry,
-   }: SparkAnalyticsClientWithPastData[TimePeriodParams] = useSparksAnalytics(
-      group.id
-   )[timeFilter]
+      filteredAnalytics: { topSparksByIndustry },
+   } = useSparksAnalytics()
 
    const [selectIndustryValue, setSelectIndustryValue] = useState<string>("all")
 
@@ -78,11 +66,11 @@ export const TopSparksByIndustry = ({
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
                {topSparksByIndustry[selectIndustryValue].map((data, index) => {
                   return (
-                     <StaticSparkCard
-                        key={`top-sparks-by-industry-${selectIndustryValue}-${data.sparkId}-${index}`}
-                        sparkId={data.sparkId}
+                     <CompetitorSparkStaticCard
+                        key={`top-sparks-by-industry-${selectIndustryValue}-${index}`}
+                        sparkData={data.sparkData}
                         plays={data.plays}
-                        avgWatchedTime={data.avgWatchedTime}
+                        avg_watched_time={data.avg_watched_time}
                         engagement={data.engagement}
                      />
                   )
