@@ -38,8 +38,8 @@ export const CustomJobDialogLayout: FC<Props> = ({
    source,
 }) => {
    const { query, push, pathname } = useRouter()
-   const { livestreamDialog } = query
-   const [, customJobId] = livestreamDialog || []
+   const dialog = query[dialogSource]
+   const [, customJobId] = dialog || []
 
    const serverCustomJob = useMemo(() => {
       if (!customJobDialogData?.serverSideCustomJob) return null
