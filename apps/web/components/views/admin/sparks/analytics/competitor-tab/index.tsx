@@ -1,0 +1,32 @@
+import { useAnalyticsLocking } from "components/custom-hook/spark/analytics/useAnalyticsLocking"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { LockedSparksCompetitorTab } from "../components/locking/LockedSparksCompetitorTab"
+import { SectionsWrapper } from "../components/SectionsWrapper"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
+import { BannerForCompetitorTable } from "./banner-competitor-table/BannerForCompetitorTable"
+import { SparksCompetitorTabSkeleton } from "./SparksCompetitorTabSkeleton"
+import { TopSparksByAudience } from "./TopSparksByAudience"
+import { TopSparksByIndustry } from "./TopSparksByIndustry"
+
+export const SparksCompetitorTab = () => {
+   const { isLocked } = useAnalyticsLocking("competitor")
+   const { isLoading } = useSparksAnalytics()
+
+   if (isLocked) {
+      return <LockedSparksCompetitorTab />
+   }
+
+   if (isLoading) {
+      return <SparksCompetitorTabSkeleton />
+   }
+
+   return (
+      <SuspenseWithBoundary fallback={<SparksCompetitorTabSkeleton />}>
+         <SectionsWrapper>
+            <TopSparksByIndustry />
+            <TopSparksByAudience />
+            <BannerForCompetitorTable />
+         </SectionsWrapper>
+      </SuspenseWithBoundary>
+   )
+}

@@ -1,19 +1,14 @@
-import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import BulletChart from "../components/charts/BulletChart"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkAnalyticsCardTitle"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
 import { EmptyDataCheckerForBulletChart } from "./EmptyDataCheckers"
 import { updateRelativePercentage, valueIllusionMargin } from "./utils"
 
-type TopCountriesProps = {
-   timeFilter: TimePeriodParams
-}
-
-export const TopCountries = ({ timeFilter }: TopCountriesProps) => {
-   const { group } = useGroup()
-   const { topCountries } = useSparksAnalytics(group.id)[timeFilter]
+export const TopCountries = () => {
+   const {
+      filteredAnalytics: { topCountries },
+   } = useSparksAnalytics()
 
    const maxCountryValue =
       Math.max(...topCountries.map((country) => country.value)) *

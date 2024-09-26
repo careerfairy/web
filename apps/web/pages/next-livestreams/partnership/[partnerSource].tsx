@@ -22,6 +22,7 @@ const VALID_PARTNER_SOURCES = [
    "uniwunder",
    "careerfairy",
    "unibasel-business-student-council",
+   "fhoststgallen-student-association",
 ]
 
 type Props = {

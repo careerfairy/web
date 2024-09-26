@@ -1,16 +1,11 @@
-import { FC, useState } from "react"
+import { MostSomethingData } from "@careerfairy/shared-lib/sparks/analytics"
 import { Box, Stack } from "@mui/material"
+import { FC, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
-import SparksStaticCard from "../components/SparksStaticCard"
-import { ResponsiveSelectWithDrawer } from "../components/ResponsiveSelectWithDrawer"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
-import {
-   MostSomethingData,
-   SparkAnalyticsClientWithPastData,
-   TimePeriodParams,
-} from "@careerfairy/shared-lib/sparks/analytics"
+import { MostSomethingSparkStaticCard } from "../components/MostSomethingSparkStaticCard"
+import { ResponsiveSelectWithDrawer } from "../components/ResponsiveSelectWithDrawer"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
 import EmptyDataCheckerForMostSomething from "./EmptyDataCheckers"
 
 const styles = sxStyles({
@@ -108,16 +103,10 @@ const MostSomethingTitle: FC<MostSomethingTitleProps> = ({
    )
 }
 
-type MostSomethingAnalyticsContainerProps = {
-   timeFilter: TimePeriodParams
-}
-
-const MostSomethingAnalyticsContainer: FC<
-   MostSomethingAnalyticsContainerProps
-> = ({ timeFilter }) => {
-   const { group } = useGroup()
-   const { most }: SparkAnalyticsClientWithPastData[TimePeriodParams] =
-      useSparksAnalytics(group.id)[timeFilter]
+export const MostSomethingAnalyticsContainer = () => {
+   const {
+      filteredAnalytics: { most },
+   } = useSparksAnalytics()
 
    const [selectMostSomethingValue, setSelectMostSomethingValue] =
       useState<keyof MostSomethingData>("watched")
@@ -133,10 +122,14 @@ const MostSomethingAnalyticsContainer: FC<
             <EmptyDataCheckerForMostSomething />
          ) : (
             <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-               {most[selectMostSomethingValue].map((sparkId, index) => (
-                  <SparksStaticCard
-                     key={`most-${selectMostSomethingValue}-${sparkId}-${index}`}
-                     sparkId={sparkId}
+               {most[selectMostSomethingValue].map((data, index) => (
+                  <MostSomethingSparkStaticCard
+                     key={`most-${selectMostSomethingValue}-${index}`}
+                     sparkData={data.sparkData}
+                     num_views={data.num_views}
+                     num_likes={data.num_likes}
+                     num_shares={data.num_shares}
+                     num_clicks={data.num_clicks}
                   />
                ))}
             </Stack>
@@ -144,5 +137,3 @@ const MostSomethingAnalyticsContainer: FC<
       </GroupSparkAnalyticsCardContainer>
    )
 }
-
-export default MostSomethingAnalyticsContainer
