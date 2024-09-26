@@ -9,8 +9,6 @@ import {
 import { ButtonProps, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
-import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import { useRouter } from "next/router"
@@ -36,6 +34,20 @@ import JobDescription from "./main-content/JobDescription"
 import JobHeader from "./main-content/JobHeader"
 
 const styles = sxStyles({
+   btnWrapper: {
+      display: "flex",
+      gap: "10px",
+      alignItems: { xs: "center", sm: "flex-end" },
+      width: "100%",
+   },
+   btnPrimary: {
+      flexDirection: { xs: "column", sm: "row-reverse" },
+      justifyContent: { xs: "center", sm: "flex-start" },
+   },
+   btnSecondary: {
+      flexDirection: { xs: "column-reverse", sm: "row" },
+      justifyContent: { xs: "center", sm: "flex-end" },
+   },
    livestreamCopy: {
       fontWeight: 700,
    },
@@ -51,6 +63,9 @@ const styles = sxStyles({
    },
    heroContent: {
       padding: "10%",
+   },
+   jobApplyConfirmationDialog: {
+      bottom: "100px",
    },
 })
 
@@ -79,22 +94,13 @@ const JobDetailsView: FC = (props) => {
 
 const JobDetails: FC<Props> = ({ jobId }) => {
    const { userData } = useAuth()
-   const isMobile = useIsMobile()
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
+   const [, handleOpen] = useDialogStateHandler()
    const customJob = useCustomJob(jobId)
    const applicationSource: CustomJobApplicationSource = {
       id: livestreamPresenter.id,
       source: CustomJobApplicationSourceTypes.Livestream,
    }
-   const { applicationInitiatedOnly } = useCustomJobApply(
-      customJob as PublicCustomJob,
-      applicationSource
-   )
-   const [
-      isApplyConfirmationOpen,
-      handleApplyConfirmationOpen,
-      handleApplyConfirmationClose,
-   ] = useDialogStateHandler(applicationInitiatedOnly)
 
    const autoActionType = useSelector(autoAction)
 
@@ -120,9 +126,9 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
    useEffect(() => {
       if (job && isAutoApply) {
-         handleApplyConfirmationOpen()
+         handleOpen()
       }
-   }, [isAutoApply, handleApplyConfirmationOpen, job])
+   }, [isAutoApply, handleOpen, job])
 
    if (!job) {
       return (
@@ -188,39 +194,20 @@ const JobDetails: FC<Props> = ({ jobId }) => {
             <JobButton
                job={job as Job}
                livestreamId={livestream.id}
-               handleOpen={handleApplyConfirmationOpen}
+               handleOpen={handleOpen}
             />
          }
       />
    ) : (
-      <BaseDialogView
-         mainContent={
-            <CustomJobDetailsView
-               job={job as CustomJob}
-               sx={{ p: "0px !important" }}
-               heroSx={{ p: "0px !important" }}
-               heroContent={livestreamDetailCustomJobHeroContent}
-               companyName={livestreamPresenter.company}
-               companyLogoUrl={livestreamPresenter.companyLogoUrl}
-               context={applicationSource}
-               onApply={onApply}
-               isApplyConfirmationOpen={isApplyConfirmationOpen}
-               handleApplyConfirmationClose={handleApplyConfirmationClose}
-               applyConfirmationSx={{
-                  bottom:
-                     isMobile && applicationSource.source == "livestream"
-                        ? "150px"
-                        : "100px",
-               }}
-            />
-         }
-         fixedBottomContent={
-            <JobButton
-               job={job as Job}
-               livestreamId={livestream.id}
-               handleOpen={handleApplyConfirmationOpen}
-            />
-         }
+      <CustomJobDetailsView
+         job={job as CustomJob}
+         sx={{ p: "16px !important" }}
+         heroSx={{ p: "16px !important" }}
+         heroContent={livestreamDetailCustomJobHeroContent}
+         companyName={livestreamPresenter.company}
+         companyLogoUrl={livestreamPresenter.companyLogoUrl}
+         context={applicationSource}
+         onApply={onApply}
       />
    )
 }

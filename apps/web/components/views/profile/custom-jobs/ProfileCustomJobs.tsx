@@ -1,0 +1,175 @@
+import { Box, Stack, Tab, Tabs, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
+import { useUserAppliedJobs } from "components/custom-hook/custom-job/useUserAppliedJobs"
+import { useUserInitiatedJobs } from "components/custom-hook/custom-job/useUserInitiatedJobs"
+import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"
+import { useState } from "react"
+import { Briefcase } from "react-feather"
+import { sxStyles } from "types/commonTypes"
+
+const TAB_VALUES = {
+   initiated: {
+      value: "initiated",
+      label: "Initiated",
+   },
+   applied: {
+      value: "applied",
+      label: "Applied",
+   },
+}
+
+const JOBS_DIALOG_LINK = "/profile/my-jobs/jobs"
+
+const styles = sxStyles({
+   tabs: {
+      "& *": {
+         textTransform: "none !important",
+         fontWeight: "400 !important",
+         fontSize: "16px !important",
+      },
+      "& .MuiTab-root.Mui-selected": {
+         fontWeight: "600 !important",
+         color: (theme) => theme.palette.primary.main,
+      },
+      "& .MuiTabs-indicator": {
+         backgroundColor: (theme) => theme.palette.primary.main,
+      },
+      borderBottom: "1px solid #EAEAEA",
+   },
+   tabsContentWrapper: {
+      mt: 3,
+      mx: 2,
+   },
+   emptyApplications: {
+      p: "20px",
+      backgroundColor: (theme) => theme.brand.white[300],
+      border: (theme) => `1px solid ${theme.brand.white[400]}`,
+      borderRadius: "8px",
+   },
+   noApplicationsYet: {
+      fontSize: "16px",
+      fontWeight: 600,
+   },
+   startApplying: {
+      fontSize: "14px",
+      fontWeight: 400,
+   },
+   jobWrapper: {
+      p: "0px !important",
+   },
+})
+
+const ProfileCustomJobs = () => {
+   const [tabValue, setTabValue] = useState(TAB_VALUES.initiated.value)
+
+   const handleTabChange = (_, newValue) => {
+      setTabValue(newValue)
+   }
+
+   return (
+      <Box>
+         <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="Job tabs"
+            sx={styles.tabs}
+         >
+            <Tab
+               label={TAB_VALUES.initiated.label}
+               value={TAB_VALUES.initiated.value}
+            />
+            <Tab
+               label={TAB_VALUES.applied.label}
+               value={TAB_VALUES.applied.value}
+            />
+         </Tabs>
+         <Box sx={styles.tabsContentWrapper}>
+            {tabValue === TAB_VALUES.initiated.value && (
+               <UserInitiatedCustomJobs />
+            )}
+            {tabValue === TAB_VALUES.applied.value && <UserAppliedCustomJobs />}
+         </Box>
+      </Box>
+   )
+}
+
+const UserEmptyApplications = () => {
+   return (
+      <Box
+         sx={styles.emptyApplications}
+         display={"flex"}
+         flexDirection="column"
+         alignItems={"center"}
+         justifyContent={"center"}
+      >
+         <Stack alignItems={"center"}>
+            <Box color={"primary.main"} mb={1.5}>
+               <Briefcase width={"44px"} height={"44px"} />
+            </Box>
+            <Typography sx={styles.noApplicationsYet} color="neutral.800">
+               No applications yet
+            </Typography>
+            <Typography sx={styles.startApplying} color={"neutral.600"}>
+               Start applying to jobs and track your applications right here.
+            </Typography>
+         </Stack>
+      </Box>
+   )
+}
+
+const UserInitiatedCustomJobs = () => {
+   // TODO-WG: set skeleton
+   return (
+      <SuspenseWithBoundary>
+         <UserInitiatedCustomJobsView />
+      </SuspenseWithBoundary>
+   )
+}
+
+const UserInitiatedCustomJobsView = () => {
+   const { userData } = useAuth()
+   const initiatedJobs = useUserInitiatedJobs(userData.id)
+   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(initiatedJobs)
+
+   if (!initiatedJobs?.length) return <UserEmptyApplications />
+
+   return (
+      <CustomJobsList
+         customJobs={initiatedJobs}
+         hrefLink={JOBS_DIALOG_LINK}
+         jobWrapperSx={styles.jobWrapper}
+         jobsGroupNamesMap={jobsGroupNamesMap}
+      />
+   )
+}
+
+const UserAppliedCustomJobs = () => {
+   // TODO-WG: set skeleton
+   return (
+      <SuspenseWithBoundary>
+         <UserAppliedCustomJobsView />
+      </SuspenseWithBoundary>
+   )
+}
+
+const UserAppliedCustomJobsView = () => {
+   const { userData } = useAuth()
+   const appliedJobs = useUserAppliedJobs(userData.id)
+
+   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(appliedJobs)
+
+   if (!appliedJobs?.length) return <UserEmptyApplications />
+
+   return (
+      <CustomJobsList
+         customJobs={appliedJobs}
+         hrefLink={JOBS_DIALOG_LINK}
+         jobWrapperSx={styles.jobWrapper}
+         jobsGroupNamesMap={jobsGroupNamesMap}
+      />
+   )
+}
+
+export default ProfileCustomJobs

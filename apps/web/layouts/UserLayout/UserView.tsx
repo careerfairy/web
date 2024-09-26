@@ -1,22 +1,21 @@
-import React from "react"
 import { useTheme } from "@mui/material/styles"
 
+import { Container } from "@mui/material"
 import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
 import Tab from "@mui/material/Tab"
 import Tabs from "@mui/material/Tabs"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import Groups from "../../components/views/profile/my-groups/Groups"
-import UserData from "../../components/views/profile/userData"
-import ReferralProfileTab from "../../components/views/profile/referral/ReferralProfileTab"
-import { StylesProps } from "../../types/commonTypes"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import Link from "../../components/views/common/Link"
-import { Container } from "@mui/material"
-import MyRecruitersTab from "../../components/views/profile/saved-recruiters/MyRecruitersTab"
 import CareerSkills from "../../components/views/profile/career-skills/CareerSkills"
-import Jobs from "../../components/views/profile/jobs/Jobs"
-import { useAuth } from "../../HOCs/AuthProvider"
+import ProfileCustomJobs from "../../components/views/profile/custom-jobs/ProfileCustomJobs"
+import Groups from "../../components/views/profile/my-groups/Groups"
+import ReferralProfileTab from "../../components/views/profile/referral/ReferralProfileTab"
+import MyRecruitersTab from "../../components/views/profile/saved-recruiters/MyRecruitersTab"
+import UserData from "../../components/views/profile/userData"
+import { StylesProps } from "../../types/commonTypes"
 
 type TabPanelProps = {
    children: () => JSX.Element
@@ -57,6 +56,13 @@ const pages = {
       },
       component: UserData,
    },
+   "/profile/my-jobs": {
+      title: {
+         compact: "Jobs",
+         full: "My Jobs",
+      },
+      component: ProfileCustomJobs,
+   },
    "/profile/career-skills": {
       title: {
          compact: "Career Skills",
@@ -85,13 +91,6 @@ const pages = {
       },
       component: () => <Groups />,
    },
-   "/profile/jobs": {
-      title: {
-         compact: "Jobs",
-         full: "Jobs",
-      },
-      component: Jobs,
-   },
 }
 
 type Props = {
@@ -101,11 +100,10 @@ type Props = {
 const UserView = ({ currentPath }: Props) => {
    const theme = useTheme()
    const native = useMediaQuery(theme.breakpoints.down("sm"))
-   const { userData } = useAuth()
+   const { jobHubV1 } = useFeatureFlags()
 
-   // hide the jobs tab
-   if (!userData?.hasJobApplications) {
-      delete pages["/profile/jobs"]
+   if (!jobHubV1) {
+      delete pages["/profile/my-jobs"]
    }
 
    const views = Object.entries(pages).map(([key, value], index) => (
