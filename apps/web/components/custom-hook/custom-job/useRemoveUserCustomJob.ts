@@ -25,7 +25,7 @@ const useRemoveUserCustomJob = (job: PublicCustomJob) => {
             onError: (error) => {
                errorNotification(
                   error,
-                  "Sorry! Something failed, maybe try again later"
+                  "Failed to remove job. We've been notified and are looking into it."
                )
             },
             onSuccess: () => {
