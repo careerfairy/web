@@ -173,14 +173,14 @@ interface IGroupSparksAnalyticsRepository {
     * Retrieves the cached analytics data for the group.
     * @returns {Promise<SparksAnalyticsDTO | null>} A promise that resolves to the cached analytics data, or null if no cache exists.
     */
-   getCachedAnalytics(): Promise<SparksAnalyticsDTO | null>
+   getAnalyticsFromFirestore(): Promise<SparksAnalyticsDTO | null>
 
    /**
     * Updates the analytics cache with new data.
     * @param {SparksAnalyticsDTO} analytics - The new analytics data to cache.
     * @returns {Promise<void>} A promise that resolves when the cache has been updated.
     */
-   updateAnalyticsCache(analytics: SparksAnalyticsDTO): Promise<void>
+   updateAnalyticsInFirestore(analytics: SparksAnalyticsDTO): Promise<void>
 }
 
 class GroupSparksAnalyticsRepository
@@ -209,7 +209,7 @@ class GroupSparksAnalyticsRepository
       this.sparksRepo = sparksRepo
    }
 
-   async getCachedAnalytics(): Promise<SparksAnalyticsDTO> {
+   async getAnalyticsFromFirestore(): Promise<SparksAnalyticsDTO> {
       const doc = await this.firestore
          .collection("sparksAnalytics")
          .withConverter(createGenericConverter<SparksAnalyticsDTO>())
@@ -219,7 +219,9 @@ class GroupSparksAnalyticsRepository
       return doc.data() as SparksAnalyticsDTO
    }
 
-   async updateAnalyticsCache(analytics: SparksAnalyticsDTO): Promise<void> {
+   async updateAnalyticsInFirestore(
+      analytics: SparksAnalyticsDTO
+   ): Promise<void> {
       await this.firestore
          .collection("sparksAnalytics")
          .doc(this.groupId)
