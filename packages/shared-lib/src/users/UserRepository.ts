@@ -200,9 +200,9 @@ export interface IUserRepository {
    ): Promise<CustomJobApplicant[]>
 
    /**
-    * Retrieves the registered livestreams for a user
+    * Retrieves the registered live streams for a user
     * @param userEmail - The user email
-    * @returns The registered livestreams for the user
+    * @returns The registered live streams for the user
     */
    getUserRegisteredLivestreams(
       userEmail: string

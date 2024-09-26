@@ -438,7 +438,7 @@ export interface RegisteredLivestreams extends Identifiable {
    lastActivityAt: Timestamp
    universityCountryCode: string
    /**
-    * Map of the registered livestreams at the time of running migration script
+    * Map of the registered live streams at the time of running migration script
     */
    registeredLivestreams: Record<string, firebase.firestore.Timestamp>
 }

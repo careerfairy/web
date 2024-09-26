@@ -40,8 +40,8 @@ export interface IUserFunctionsRepository extends IUserRepository {
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
 
    /**
-    * Retrieves all the registered livestreams for users
-    * @returns All the registered livestreams for users
+    * Retrieves all the registered live streams for users
+    * @returns All the registered live streams for users
     */
    getAllUserRegisteredLivestreams(
       userEmails?: string[],
@@ -146,7 +146,6 @@ export class UserFunctionsRepository
       let query = this.firestore
          .collection("registeredLivestreams")
          .withConverter(createCompatGenericConverter<RegisteredLivestreams>())
-
          .where("unsubscribed", "==", false)
          .where("lastActivityAt", ">=", earlierThan)
 
