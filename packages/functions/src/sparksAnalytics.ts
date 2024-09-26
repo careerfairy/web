@@ -221,14 +221,14 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                `Fetching sparks analytics for group ${groupId}...`
             )
             const cachedAnalyticsData =
-               await sparksAnalyticsRepo.getCachedAnalytics()
+               await sparksAnalyticsRepo.getAnalyticsFromFirestore()
 
             if (forceUpdate || !cachedAnalyticsData) {
                const bigQueryAnalyticsData = await fetchAnalyticsFromBigQuery(
                   sparksAnalyticsRepo
                )
 
-               await sparksAnalyticsRepo.updateAnalyticsCache({
+               await sparksAnalyticsRepo.updateAnalyticsInFirestore({
                   ...bigQueryAnalyticsData,
                   id: groupId,
                })
