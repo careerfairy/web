@@ -32,7 +32,6 @@ type Props = {
 
 const JobDialog = ({ isOpen, handleClose, jobs, spark }: Props) => {
    const [selectedJob, setSelectedJob] = useState<CustomJob>(null)
-   // const dialogRef = useRef<HTMLDivElement>(null)
 
    // This function prevents the event from propagating up the parent Spark Card when the dialog is clicked.
    const handleDialogInteraction = useCallback(

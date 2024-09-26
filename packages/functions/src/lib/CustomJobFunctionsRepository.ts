@@ -343,9 +343,14 @@ export class CustomJobFunctionsRepository
          }
       )
 
-      // update live streams hasJobs flag
+      // update live streams or draft live streams hasJobs flag
       livestreamsToUpdate.map((livestream) => {
-         const ref = this.firestore.collection("livestreams").doc(livestream.id)
+         const collectionToUpdate = livestream.isDraft
+            ? "draftLivestreams"
+            : "livestreams"
+         const ref = this.firestore
+            .collection(collectionToUpdate)
+            .doc(livestream.id)
 
          batch.update(ref, {
             hasJobs: false,
