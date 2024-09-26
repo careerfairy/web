@@ -427,3 +427,18 @@ export type UserSparksNotification = {
    startDate: Date
    groupId: string
 } & Identifiable
+
+/**
+ * Collection Path: registeredLivestreams/{userAuthId}
+ */
+export interface RegisteredLivestreams extends Identifiable {
+   userAuthId: string
+   userEmail: string
+   unsubscribed: boolean
+   lastActivityAt: Timestamp
+   universityCountryCode: string
+   /**
+    * Map of the registered live streams at the time of running migration script
+    */
+   registeredLivestreams: Record<string, firebase.firestore.Timestamp>
+}

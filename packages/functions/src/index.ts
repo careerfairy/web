@@ -324,6 +324,9 @@ exports.createCTA = streaming.createCTA
 exports.deleteCTA = streaming.deleteCTA
 exports.updateCTA = streaming.updateCTA
 exports.toggleActiveCTA = streaming.toggleActiveCTA
+exports.onUserRegistration = streaming.onUserRegistration
+exports.syncUserInRegisteredLivestreams =
+   streaming.syncUserInRegisteredLivestreams
 
 // Utils
 exports.fetchUserCountryCode = fetchUserCountryCode

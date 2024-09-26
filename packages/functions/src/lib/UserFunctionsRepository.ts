@@ -1,5 +1,12 @@
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
+import {
+   createCompatGenericConverter,
+   mapFirestoreDocuments,
+} from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import {
+   CompanyFollowed,
+   RegisteredLivestreams,
+   UserData,
+} from "@careerfairy/shared-lib/users"
 import {
    FirebaseUserRepository,
    IUserRepository,
@@ -31,6 +38,15 @@ export interface IUserFunctionsRepository extends IUserRepository {
       earlierThanDays?: number
    ): Promise<UserData[]>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
+
+   /**
+    * Retrieves all the registered live streams for users
+    * @returns All the registered live streams for users
+    */
+   getAllUserRegisteredLivestreams(
+      userEmails?: string[],
+      locationFilters?: string[]
+   ): Promise<RegisteredLivestreams[]>
 }
 
 export class UserFunctionsRepository
@@ -117,5 +133,35 @@ export class UserFunctionsRepository
          .get()
 
       return querySnapshot.docs?.map((doc) => doc.data() as CompanyFollowed)
+   }
+
+   async getAllUserRegisteredLivestreams(
+      userEmails?: string[],
+      locationFilters?: string[]
+   ): Promise<RegisteredLivestreams[]> {
+      const earlierThan = DateTime.now()
+         .minus({ months: SUBSCRIBED_BEFORE_MONTHS_COUNT })
+         .toJSDate()
+
+      let query = this.firestore
+         .collection("registeredLivestreams")
+         .withConverter(createCompatGenericConverter<RegisteredLivestreams>())
+         .where("unsubscribed", "==", false)
+         .where("lastActivityAt", ">=", earlierThan)
+
+      if (locationFilters?.length) {
+         query = query.where("universityCountryCode", "in", locationFilters)
+      }
+
+      if (userEmails?.length) {
+         const withinLimit = isWithinNormalizationLimit(30, userEmails)
+         if (withinLimit) {
+            query = query.where("userEmail", "in", userEmails)
+         }
+      }
+
+      const querySnapshot = await query.get()
+
+      return querySnapshot.docs.map((doc) => doc.data())
    }
 }
