@@ -36,6 +36,17 @@ const CustomJobsGroupNamesSchema: SchemaOf<CustomJobsGroupNames> = object()
    })
    .defined()
 
+type SetRemoveUserCustomJobApplicationData = {
+   userId: string
+   jobId: string
+}
+
+const SetRemoveUserCustomJobApplicationDataSchema: SchemaOf<SetRemoveUserCustomJobApplicationData> =
+   object().shape({
+      userId: string().required(),
+      jobId: string().required(),
+   })
+
 export const confirmUserApplyToCustomJob = functions
    .region(config.region)
    .runWith({
@@ -291,3 +302,19 @@ export const syncPermanentlyExpiredCustomJobs = functions
          logAndThrow(e)
       }
    })
+
+export const setRemoveUserJobApplication = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares(
+         dataValidation(SetRemoveUserCustomJobApplicationDataSchema),
+         onCallWrapper(async (data: SetRemoveUserCustomJobApplicationData) => {
+            const { userId, jobId } = data
+
+            await customJobRepo.setRemovedUserCustomJobApplication(
+               userId,
+               jobId
+            )
+         })
+      )
+   )

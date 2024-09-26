@@ -23,6 +23,7 @@ const CustomJobsPage = ({
                id: CustomJobApplicationSourceTypes.Profile,
             }}
             dialogSource={DIALOG_SOURCE}
+            hideApplicationConfirmation
          >
             <SEO
                title="CareerFairy | Jobs"

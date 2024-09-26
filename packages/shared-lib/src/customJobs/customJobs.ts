@@ -157,6 +157,11 @@ export interface CustomJobApplicant extends Identifiable {
    companyCountry?: string
    companyIndustries?: string[]
    companySize?: string
+
+   // when set to true the job application should not appear in the listings
+   // when reapplying since this is not taken into consideration this field will not be present, making the
+   // still appear again in the user profile
+   removedFromUserProfile?: boolean
 }
 
 // collection path /anonymousJobApplications
