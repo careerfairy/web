@@ -6,7 +6,10 @@ import DateUtil from "util/DateUtil"
  *
  */
 export const isJobValidButNoLinkedContent = (job: CustomJob): boolean => {
-   const jobHasNoContent = job.livestreams.length == 0 && job.sparks.length == 0
+   const jobLivestreams = job.livestreams || []
+   const jobSparks = job.sparks || []
+
+   const jobHasNoContent = jobLivestreams.length == 0 && jobSparks.length == 0
 
    return jobHasNoContent && !DateUtil.isDeadlineExpired(job.deadline.toDate())
 }
