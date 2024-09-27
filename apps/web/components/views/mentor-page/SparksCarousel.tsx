@@ -37,9 +37,10 @@ const styles = sxStyles({
 
 type SparksCarousel = {
    sparks: Spark[]
+   disableClick?: boolean
 }
 
-export const SparksCarousel = ({ sparks }: SparksCarousel) => {
+export const SparksCarousel = ({ sparks, disableClick }: SparksCarousel) => {
    const router = useRouter()
    const dispatch = useDispatch()
 
@@ -52,7 +53,7 @@ export const SparksCarousel = ({ sparks }: SparksCarousel) => {
    )
 
    const handleSparksClicked = (spark: Spark) => {
-      if (!spark) return
+      if (!spark || disableClick) return
 
       dispatch(setCameFromPageLink(router.asPath))
       dispatch(setCreatorId(spark.creator.id))
