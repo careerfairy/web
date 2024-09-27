@@ -1,3 +1,4 @@
+import { CircularProgress } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import AgoraRTC from "agora-rtc-sdk-ng"
 import useLivestreamCategoryDataSWR from "components/custom-hook/live-stream/useLivestreamCategoryDataSWR"
@@ -8,7 +9,7 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
-import { ReactNode } from "react"
+import { ReactNode, useState } from "react"
 
 const isBrowserAgoraCompatible = AgoraRTC.checkSystemRequirements()
 
@@ -51,11 +52,22 @@ const LivestreamValidationsComponent = ({
 
    const livestreamToken = useLivestreamSecureTokenSWR(livestream.id)
 
-   const { data: isUserRegistered, mutate: refetchQuestions } =
-      useLivestreamCategoryDataSWR(firebase, {
-         livestream: livestream,
-         userData: userData,
-      })
+   const { data: isUserRegistered, isLoading: isLoadingIsUserRegistered } =
+      useLivestreamCategoryDataSWR(
+         firebase,
+         {
+            livestream: livestream,
+            userData: userData,
+         },
+         (hasRegistered) =>
+            setLivestreamDialogOpen(
+               !isHost && !hasRegistered && !isRecordingWindow
+            )
+      )
+
+   const [livestreamDialogOpen, setLivestreamDialogOpen] = useState(
+      !isHost && !isUserRegistered && !isRecordingWindow
+   )
 
    // Custom validations
 
@@ -64,8 +76,6 @@ const LivestreamValidationsComponent = ({
 
    const isInvalidToken =
       needsTokenValidation && token !== livestreamToken?.data?.value
-
-   const needsToRegister = !isHost && !isUserRegistered && !isRecordingWindow
 
    const needsToBeLoggedIn =
       !isHost &&
@@ -82,10 +92,14 @@ const LivestreamValidationsComponent = ({
    }
 
    const afterRegistrationMutations = () => {
-      refetchQuestions()
+      setLivestreamDialogOpen(false)
    }
 
-   if (needsToRegister) {
+   if (isLoadingIsUserRegistered && !isHost) {
+      return <CircularProgress />
+   }
+
+   if (livestreamDialogOpen) {
       return (
          <LivestreamDialog
             open
