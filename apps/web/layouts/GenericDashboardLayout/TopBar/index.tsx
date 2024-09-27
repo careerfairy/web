@@ -3,20 +3,18 @@ import { Box, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 
 // project imports
-import { sxStyles } from "../../../types/commonTypes"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import {
    getMaxLineStyles,
    isServer,
 } from "../../../components/helperFunctions/HelperFunctions"
-import ProfileMenu from "./ProfileMenu"
-import LoginButton from "../../../components/views/common/LoginButton"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { MainLogo } from "../../../components/logos"
-import React from "react"
+import LoginButton from "../../../components/views/common/LoginButton"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
-import { useCreditsDialog } from "../../CreditsDialogLayout"
+import { sxStyles } from "../../../types/commonTypes"
 import Notifications from "./Notifications"
+import ProfileMenu from "./ProfileMenu"
 
 const styles = sxStyles({
    root: {
@@ -49,8 +47,6 @@ type Props = {
 }
 
 const TopBar = ({ title, bgColor }: Props) => {
-   const { handleOpenCreditsDialog } = useCreditsDialog()
-
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
 
@@ -86,9 +82,7 @@ const TopBar = ({ title, bgColor }: Props) => {
             ) : (
                <>
                   <Notifications />
-                  <ProfileMenu
-                     handleOpenCreditsDialog={handleOpenCreditsDialog}
-                  />
+                  <ProfileMenu />
                </>
             )}
          </Stack>

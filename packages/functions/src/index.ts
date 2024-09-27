@@ -250,6 +250,7 @@ exports.onCreateLivestreamPopularityEvents =
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
 exports.onCreateUserData = onCreateTriggers.onCreateUserData
+exports.onUpdateUserData = onCreateTriggers.onUpdateUserData
 exports.onCreateReward = onCreateTriggers.onCreateReward
 exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
 exports.onCreateUserSparkFeed = onCreateTriggers.onCreateUserSparkFeed
@@ -262,7 +263,7 @@ exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 
 // Group Spark Functions
-exports.createSpark_v4 = groupSparks.createSpark
+exports.createSpark_v5 = groupSparks.createSpark
 exports.updateSpark_v4 = groupSparks.updateSpark
 exports.deleteSpark_v3 = groupSparks.deleteSpark
 
@@ -281,16 +282,21 @@ exports.markSparkAsSeenByUser_v4 = userSparks.markSparkAsSeenByUser
 // Spark Analytics Functions
 exports.trackSparkEvents_v6 = userSparks.trackSparkEvents
 exports.trackSparkSecondsWatched_v4 = userSparks.trackSparkSecondsWatched
-exports.getSparksAnalytics_v3 = sparksAnalytics.getSparksAnalytics
+exports.getSparksAnalytics_v4 = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
-exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob
+exports.confirmUserJobApplication = customJobs.confirmUserApplyToCustomJob
+exports.confirmAnonymousJobApplication = customJobs.confirmAnonApplyToCustomJob
+exports.setAnonymousJobApplicationsUserId =
+   customJobs.setAnonymousJobApplicationsUserId
 exports.updateCustomJobWithLinkedLivestreams_v2 =
    customJobs.updateCustomJobWithLinkedLivestreams
 exports.transferCustomJobsFromDraftToPublishedLivestream_v2 =
    customJobs.transferCustomJobsFromDraftToPublishedLivestream
 exports.syncPermanentlyExpiredCustomJobs =
    customJobs.syncPermanentlyExpiredCustomJobs
+exports.fetchCustomJobGroupNames = customJobs.getCustomJobGroupNames
+exports.setRemoveUserJobApplication = customJobs.setRemoveUserJobApplication
 
 // Group Subscription Plan Functions
 exports.startPlan_v3 = groupPlans.startPlan

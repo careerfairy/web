@@ -68,7 +68,7 @@ export const flagsInitialState = {
     * Hide or Show
     */
    jobHubV1: {
-      enabled: false,
+      enabled: true,
    },
    /**
     * B2C and B2B mentors

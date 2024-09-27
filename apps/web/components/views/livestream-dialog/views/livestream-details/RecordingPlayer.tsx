@@ -1,23 +1,23 @@
-import { Box, Skeleton, Typography } from "@mui/material"
-import ReactPlayer from "react-player"
-import PlayIcon from "@mui/icons-material/PlayArrowRounded"
-import React, { FC, useCallback, useEffect, useMemo, useState } from "react"
-import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import DateUtil from "../../../../../util/DateUtil"
-import { sxStyles } from "../../../../../types/commonTypes"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
-import { useFirestoreDocument } from "../../../../custom-hook/utils/useFirestoreDocument"
 import {
    LivestreamEvent,
    RecordingToken,
 } from "@careerfairy/shared-lib/livestreams"
-import useCountTime from "../../../../custom-hook/useCountTime"
-import { livestreamRepo } from "../../../../../data/RepositoryInstances"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
-import { alpha } from "@mui/material/styles"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
+import PlayIcon from "@mui/icons-material/PlayArrowRounded"
+import { Box, Skeleton, Typography } from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
+import { alpha } from "@mui/material/styles"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
+import ReactPlayer from "react-player"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { livestreamRepo } from "../../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../../types/commonTypes"
+import DateUtil from "../../../../../util/DateUtil"
+import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
+import useCountTime from "../../../../custom-hook/useCountTime"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { useFirestoreDocument } from "../../../../custom-hook/utils/useFirestoreDocument"
 
 const styles = sxStyles({
    root: {
@@ -107,7 +107,6 @@ const styles = sxStyles({
 type Props = {
    stream: LivestreamEvent
    livestreamPresenter: LivestreamPresenter
-   boughtAccess: boolean
 }
 
 const RecordingPlayer: FC<Props> = (props) => {
@@ -135,15 +134,9 @@ export const PlayerSkeleton: FC = () => {
    )
 }
 
-const Player: FC<Props> = ({
-   stream,
-   boughtAccess = false,
-   livestreamPresenter,
-}) => {
-   const { handlePreviewPlay, handlePause, handlePlay } = useRecordingControls(
-      stream,
-      boughtAccess
-   )
+const Player = ({ stream, livestreamPresenter }: Props) => {
+   const { handlePreviewPlay, handlePause, handlePlay } =
+      useRecordingControls(stream)
 
    const { data: recordingToken } = useRecordingToken(stream.id)
    // Updated recording title - WG
@@ -152,23 +145,7 @@ const Player: FC<Props> = ({
          <Box sx={styles.playerWrapper} mt={1}>
             <ReactPlayer
                className="react-player"
-               playIcon={
-                  <>
-                     <Box sx={styles.countDown}>
-                        {!boughtAccess ? (
-                           <RecordingTitle>
-                              Recording unlocked for{" "}
-                              <CountDown stream={livestreamPresenter} />
-                           </RecordingTitle>
-                        ) : (
-                           <RecordingTitle>
-                              You bought access to this recording:
-                           </RecordingTitle>
-                        )}
-                     </Box>
-                     <PlayIcon sx={styles.icon} />
-                  </>
-               }
+               playIcon={<PlayIcon sx={styles.icon} />}
                width="100%"
                height="100%"
                controls={true}
@@ -192,6 +169,7 @@ const Player: FC<Props> = ({
 type CountDownProps = {
    stream: LivestreamPresenter
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CountDown = ({ stream }: CountDownProps) => {
    const [countDown, setCountDown] = useState("")
 
@@ -230,16 +208,6 @@ const CountDown = ({ stream }: CountDownProps) => {
    )
 }
 
-const RecordingTitle: FC<{
-   children: React.ReactNode
-}> = ({ children }) => {
-   return (
-      <Typography sx={styles.recordingTitle} variant={"body1"}>
-         {children}
-      </Typography>
-   )
-}
-
 type UseRecordingControls = {
    handlePlay: () => void
    handlePause: () => void
@@ -249,8 +217,7 @@ type UseRecordingControls = {
    videoPaused: boolean
 }
 export const useRecordingControls = (
-   stream: LivestreamEvent,
-   userHasBoughtRecording: boolean
+   stream: LivestreamEvent
 ): UseRecordingControls => {
    const isMobile = useIsMobile()
    const { userData } = useAuth()
@@ -299,20 +266,13 @@ export const useRecordingControls = (
       // update recording stats
       void livestreamRepo.updateRecordingStats({
          livestreamId: stream.id,
-         userId: userData.userEmail,
+         userId: userData?.userEmail,
          livestreamStartDate: stream.start,
-         usedCredits: Boolean(userHasBoughtRecording),
       })
 
       // play recording
       handleRecordingPlay()
-   }, [
-      handleRecordingPlay,
-      stream?.id,
-      stream?.start,
-      userData?.userEmail,
-      userHasBoughtRecording,
-   ])
+   }, [handleRecordingPlay, stream?.id, stream?.start, userData?.userEmail])
 
    const handlePause = useCallback(() => {
       pauseCounting()

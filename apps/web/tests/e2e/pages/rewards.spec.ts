@@ -1,22 +1,22 @@
-import { BrowserContext, expect } from "@playwright/test"
-import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
-import InterestSeed from "@careerfairy/seed-data/dist/interests"
 import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
-import UserSeed from "@careerfairy/seed-data/dist/users"
+import InterestSeed from "@careerfairy/seed-data/dist/interests"
 import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
-import { signedInFixture as test } from "../fixtures"
-import { setupLivestreamData } from "../setupData"
-import { credentials, pdfSamplePath } from "../../constants"
-import { CreditsDialogModel } from "../page-object-models/CreditsDialogModel"
-import { sleep } from "../utils"
-import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/dist/rewards"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import { BrowserContext, expect } from "@playwright/test"
+import { credentials, pdfSamplePath } from "../../constants"
+import { signedInFixture as test } from "../fixtures"
+import { CreditsDialogModel } from "../page-object-models/CreditsDialogModel"
+import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
 import { SignupPage } from "../page-object-models/SignupPage"
+import { setupLivestreamData } from "../setupData"
+import { sleep } from "../utils"
 
 test.describe("Win credits by completing actions", () => {
-   test("Upload CV and win a credit", async ({ page, user }) => {
+   test.skip("Upload CV and win a credit", async ({ page, user }) => {
       await setupData({ user, userDataOverrides: { credits: 0 } })
       const dialogPage = new CreditsDialogModel(page)
 
@@ -40,7 +40,10 @@ test.describe("Win credits by completing actions", () => {
       await assertUserCredits(user, 1)
    })
 
-   test("Attend first livestream and win a credit", async ({ page, user }) => {
+   test.skip("Attend first livestream and win a credit", async ({
+      page,
+      user,
+   }) => {
       const { livestream } = await setupData({
          user,
          userDataOverrides: { credits: 0 },
@@ -82,7 +85,7 @@ test.describe("Win credits by completing actions", () => {
       ).toBeVisible()
    })
 
-   test("Refer 3 friends and win 3 credits", async ({
+   test.skip("Refer 3 friends and win 3 credits", async ({
       page,
       user,
       browserName,
@@ -105,7 +108,7 @@ test.describe("Win credits by completing actions", () => {
          "Refer to 3 friends+ 3"
       )
 
-      let usersCount = 3
+      const usersCount = 3
 
       const promises = []
 

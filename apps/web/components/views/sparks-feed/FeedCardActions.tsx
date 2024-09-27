@@ -1,10 +1,5 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { FC, MouseEvent, useCallback, useMemo, useState } from "react"
-
-import { sxStyles } from "types/commonTypes"
-
-import Work from "@mui/icons-material/Work"
 import {
    Box,
    BoxProps,
@@ -13,12 +8,16 @@ import {
    IconButtonProps,
    Popover,
    Stack,
+   Tooltip,
    Typography,
    alpha,
 } from "@mui/material"
+import { FC, MouseEvent, useCallback, useMemo, useState } from "react"
+import { sxStyles } from "types/commonTypes"
 
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 import { getHost } from "@careerfairy/shared-lib/utils/urls"
+import { Reply } from "@mui/icons-material"
 import { useAuth } from "HOCs/AuthProvider"
 import useUserSparkLike from "components/custom-hook/spark/useUserSparkLike"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
@@ -28,11 +27,10 @@ import {
    SocialPlatformObject,
    SocialPlatformType,
 } from "components/custom-hook/useSocials"
-import FilterIcon from "components/views/common/icons/FilterIcon"
 import LikeIcon from "components/views/common/icons/LikeIcon"
-import ShareIcon from "components/views/common/icons/ShareIcon"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
+import { Filter as FilterIcon } from "react-feather"
 import { useSelector } from "react-redux"
 import {
    currentSparkIdSelector,
@@ -41,11 +39,13 @@ import {
 import Link from "../common/Link"
 import LoginButton from "../common/LoginButton"
 import LikeActiveIcon from "../common/icons/LikeActiveIcon"
+import CircularLogo from "../common/logos/CircularLogo"
 import SparksShareDialog from "../sparks/components/SparksShareDialog"
 import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialog"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
-const actionWidth = 52
+const actionWidth = 48
+const fullScreenActionWidth = 24
 
 const styles = sxStyles({
    hidden: {
@@ -53,14 +53,12 @@ const styles = sxStyles({
    },
    root: {
       alignItems: "center",
-      width: 52,
    },
    actionRoot: {
       color: "#5C5C5C",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      width: actionWidth,
       position: "relative",
       transition: (theme) => theme.transitions.create(["color", "background"]),
       "& .MuiIconButton-root": {
@@ -72,23 +70,42 @@ const styles = sxStyles({
       "& .MuiIconButton-root": {
          background: (theme) => `${alpha(theme.palette.primary[600], 0.21)}`,
       },
+      "& svg": {
+         width: "24px",
+         height: "24px",
+      },
+   },
+   defaultLiked: {
+      "& svg": {
+         width: "24px",
+         height: "24px",
+      },
    },
    actionLikedFullScreen: {
       "& .MuiIconButton-root": {
          background: "none",
+      },
+      "& svg": {
+         width: "24px",
+         height: "24px",
       },
    },
    fullScreenActionRoot: {
       color: "white",
    },
    actionBtn: {
-      width: actionWidth,
-      height: actionWidth,
       background: "#DEDEDE",
       "& svg": {
          color: "inherit",
       },
-      mb: 1.25,
+   },
+   actionBtnSize: {
+      width: actionWidth,
+      height: actionWidth,
+   },
+   actionBtnSizeFullScreen: {
+      width: fullScreenActionWidth,
+      height: fullScreenActionWidth,
    },
    buttonChip: {
       position: "absolute",
@@ -114,39 +131,59 @@ const styles = sxStyles({
    },
    actionLabel: {
       color: "inherit",
-      fontSize: "1.142rem",
+      fontSize: "14px",
       lineHeight: "117.5%",
       letterSpacing: "-0.437px",
       textAlign: "center",
+      mt: 1.25,
    },
    fullScreenActionLabel: {
       color: "white",
-      mt: 0.5,
+      mt: 1,
    },
    loginBtn: {
       color: (theme) => `${theme.palette.primary.main} !important`,
    },
    icon: {
-      height: "24px",
       width: "24px",
+      height: "24px",
+   },
+   shareIcon: {
+      width: "24px",
+      height: "24px",
+      transform: "rotateY(180deg)",
+   },
+   actionFilter: {
+      "& svg": {
+         fill: "currentcolor",
+         transform: "rotateY(180deg)",
+         width: "24px",
+         height: "24px",
+      },
+   },
+   actionTooltip: {
+      fontSize: "12px",
+      color: (theme) => theme.palette.neutral[700],
+      p: 1,
+      fontWeight: 400,
    },
 })
 
 type Props = {
    spark: Spark | SparkPresenter
    hide?: boolean
+   linkToCompanyPage: string
 }
 
-const FeedCardActions: FC<Props> = ({ spark, hide }) => {
+const FeedCardActions: FC<Props> = ({ spark, hide, linkToCompanyPage }) => {
    return (
       <Stack spacing={3} sx={[styles.root, hide && styles.hidden]}>
+         <CompanyPageAction
+            sparkId={spark.id}
+            href={linkToCompanyPage}
+            companyLogoUrl={spark.group.logoUrl}
+         />
          <LikeAction sparkId={spark.id} />
-         {spark.group.careerPageUrl ? (
-            <CareerPageAction
-               sparkId={spark.id}
-               href={spark.group.careerPageUrl}
-            />
-         ) : null}
          <ShareAction sparkId={spark.id} />
          <FilterAction sparkId={spark.id} />
       </Stack>
@@ -158,11 +195,13 @@ type ActionProps = {
    onClick?: IconButtonProps<"a">["onClick"]
    href?: string
    hrefTarget?: string
-   label: string
+   label?: string
    sparkId: string
    chipValue?: number
    sx?: BoxProps["sx"]
    disabled?: boolean
+   actionId: string
+   tooltip?: string
 }
 const Action: FC<ActionProps> = ({
    icon,
@@ -174,49 +213,71 @@ const Action: FC<ActionProps> = ({
    hrefTarget,
    sx,
    disabled,
+   actionId,
+   tooltip,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
-   const actionLabel = (
+   const actionLabel = label ? (
       <Typography
          sx={[styles.actionLabel, isFullScreen && styles.fullScreenActionLabel]}
       >
          {label}
       </Typography>
-   )
+   ) : null
 
    const showChip = useMemo(
       () => (chipValue ? chipValue > 0 : false),
       [chipValue]
    )
 
+   const IconButtonComponent = (
+      <IconButton
+         id={`action-button-${actionId}-${sparkId}`}
+         sx={[
+            styles.actionBtn,
+            isFullScreen && styles.fullScreenActionBtn,
+            isFullScreen ? null : styles.actionBtnSize,
+         ]}
+         color="inherit"
+         onClick={(e) => {
+            e.stopPropagation()
+            onClick(e)
+         }}
+         disabled={disabled}
+         size={isFullScreen ? "small" : "medium"}
+         component={href ? Link : "button"}
+         href={href}
+         target={hrefTarget}
+      >
+         {icon}
+         {isFullScreen ? actionLabel : null}
+      </IconButton>
+   )
+
    return (
       <Box
-         htmlFor={`action-button-${label}-${sparkId}`}
+         htmlFor={`action-button-${actionId}-${sparkId}`}
          component={isFullScreen ? undefined : "label"}
          sx={[
             styles.actionRoot,
             isFullScreen && styles.fullScreenActionRoot,
             ...(sx ? (Array.isArray(sx) ? sx : [sx]) : []),
          ]}
+         width={isFullScreen ? fullScreenActionWidth : actionWidth}
       >
-         <IconButton
-            id={`action-button-${label}-${sparkId}`}
-            sx={[styles.actionBtn, isFullScreen && styles.fullScreenActionBtn]}
-            color="inherit"
-            onClick={(e) => {
-               e.stopPropagation()
-               onClick(e)
-            }}
-            disabled={disabled}
-            size={isFullScreen ? "small" : "medium"}
-            component={href ? Link : "button"}
-            href={href}
-            target={hrefTarget}
-         >
-            {icon}
+         {tooltip ? (
+            <Tooltip
+               title={
+                  <Typography sx={styles.actionTooltip}>{tooltip}</Typography>
+               }
+               placement="top"
+            >
+               {IconButtonComponent}
+            </Tooltip>
+         ) : (
+            IconButtonComponent
+         )}
 
-            {isFullScreen ? actionLabel : null}
-         </IconButton>
          {showChip ? (
             <Chip
                sx={[styles.buttonChip, chipValue == 1 && styles.buttonChip1]}
@@ -261,6 +322,7 @@ const LikeAction: FC<{
    return (
       <>
          <Action
+            actionId={liked ? "Liked" : "Like"}
             sparkId={sparkId}
             icon={liked && isFullScreen ? <LikeActiveIcon /> : <LikeIcon />}
             onClick={handleClicked}
@@ -268,6 +330,7 @@ const LikeAction: FC<{
             disabled={isLoading}
             sx={[
                liked && styles.actionLiked,
+               styles.defaultLiked,
                isFullScreen && styles.actionLikedFullScreen,
             ]}
          />
@@ -295,24 +358,33 @@ const LikeAction: FC<{
    )
 }
 
-const CareerPageAction: FC<{
+const CompanyPageAction: FC<{
    sparkId: string
    href: string
-}> = ({ sparkId, href }) => {
+   companyLogoUrl: string
+}> = ({ sparkId, href, companyLogoUrl }) => {
    const { trackEvent } = useSparksFeedTracker()
-
-   const handleCareerPageClick = useCallback(() => {
-      trackEvent(SparkEventActions.Click_CareerPageCTA)
+   const isFullScreen = useSparksFeedIsFullScreen()
+   const handleCompanyPageClick = useCallback(() => {
+      trackEvent(SparkEventActions.Click_CompanyPageCTA)
    }, [trackEvent])
 
    return (
       <Action
+         actionId="companyPageAction"
          href={href}
          hrefTarget="_blank"
          sparkId={sparkId}
-         icon={<Work sx={styles.icon} />}
-         onClick={handleCareerPageClick}
-         label="Jobs"
+         icon={
+            <CircularLogo
+               src={companyLogoUrl}
+               alt={"companyName"}
+               size={isFullScreen ? 40 : 48}
+               sx={{ border: "none" }}
+            />
+         }
+         onClick={handleCompanyPageClick}
+         tooltip="Visit company page"
       />
    )
 }
@@ -400,8 +472,9 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    return (
       <>
          <Action
+            actionId="Share"
             sparkId={sparkId}
-            icon={<ShareIcon />}
+            icon={<Reply sx={styles.shareIcon} />}
             onClick={handleShare}
             label="Share"
          />
@@ -426,11 +499,13 @@ const FilterAction: FC<FilterActionProps> = ({ sparkId }) => {
    return (
       <>
          <Action
+            actionId="Filter"
             sparkId={sparkId}
-            icon={<FilterIcon />}
+            icon={<FilterIcon width={"24px"} height={"24px"} />}
             onClick={handleOpenFilterDialog}
             label="Filter"
             chipValue={selectedSparkCategories.length}
+            sx={styles.actionFilter}
          />
          <SparksFilterDialog
             isOpen={isFilterDialogOpen}

@@ -7,6 +7,7 @@ import { Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import CustomJobsTagsContent from "./content/CustomJobsTagsContent"
 import LivestreamTagsContent from "./content/LivestreamTagsContent"
 import SparksTagsContent from "./content/SparksTagsContent"
 
@@ -58,6 +59,7 @@ const CategoryTagsContentComponent = ({ categories }: Props) => {
                selectedTagLabel={selectedTagLabel}
             />
          </ConditionalWrapper>
+
          <ConditionalWrapper
             condition={hasBusinessFunctions || hasContentTopics || hasLanguages}
          >
@@ -66,6 +68,12 @@ const CategoryTagsContentComponent = ({ categories }: Props) => {
                type="future"
                tags={tags}
             />
+            <ConditionalWrapper condition={hasBusinessFunctions}>
+               <CustomJobsTagsContent
+                  tags={tags}
+                  title={"Top " + selectedTagLabel + " jobs"}
+               />
+            </ConditionalWrapper>
             <LivestreamTagsContent
                title={"Top " + selectedTagLabel + " recordings"}
                type="past"

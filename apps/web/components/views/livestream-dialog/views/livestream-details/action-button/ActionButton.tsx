@@ -9,10 +9,7 @@ import ActionButtonProvider, {
    ActionButtonContextType,
    useActionButtonContext,
 } from "./ActionButtonProvider"
-import BuyRecordingButton from "./BuyRecordingButton"
-import NotEnoughCreditsButton from "./NotEnoughCreditsButton"
 import RegisterButton from "./RegisterButton"
-import SignUpToWatchButton from "./SignUpToWatchButton"
 import styles from "./Styles"
 import WatchNowButton from "./WatchNowButton"
 
@@ -24,11 +21,10 @@ const ActionButton: FC<ActionButtonContextType> = (props) => {
    )
 }
 
-const ButtonElement: FC = () => {
-   const { livestreamPresenter, userEmailFromServer, canWatchRecording } =
-      useActionButtonContext()
+const ButtonElement = () => {
+   const { livestreamPresenter, userEmailFromServer } = useActionButtonContext()
 
-   const { isLoggedIn, userData, isLoggedOut } = useAuth()
+   const { isLoggedIn, userData } = useAuth()
 
    const registered = useUserIsRegistered(livestreamPresenter.id)
    const { count } = useLivestreamUsersCount(
@@ -58,25 +54,7 @@ const ButtonElement: FC = () => {
          return <ActionButtonSkeleton />
       }
 
-      if (!isLoggedIn || isLoggedOut) {
-         return <SignUpToWatchButton />
-      }
-
-      // Display the "Not Enough Credits" component if
-      // The user has no credits or negative credits
-      // and does not have access to this recording.
-      if (
-         (!userData?.credits || userData?.credits <= 0) &&
-         !canWatchRecording
-      ) {
-         return <NotEnoughCreditsButton />
-      }
-
-      if (canWatchRecording) {
-         return <WatchNowButton />
-      }
-
-      return <BuyRecordingButton />
+      return <WatchNowButton />
    }
 
    if (registered) {
@@ -139,7 +117,7 @@ export const ActionButtonWrapper: FC<ActionButtonWrapperProps> = ({
       <Box
          component="span"
          sx={[
-            !isFixedToBottom && styles.btnWrapper,
+            isFixedToBottom ? styles.fixedBottomBtn : styles.btnWrapper,
             isFloating && styles.floatingBtnWrapper,
             disableMarginTop && styles.noMarginTop,
          ]}

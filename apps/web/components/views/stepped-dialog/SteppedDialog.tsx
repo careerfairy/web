@@ -176,6 +176,7 @@ type StepperDialogProps = {
    disableFullScreen?: boolean
    maxWidth?: number
    fullWidth?: boolean
+   onClick?: (e: React.MouseEvent) => void
 }
 
 /**
@@ -248,6 +249,7 @@ const SteppedDialog = <K extends string>({
    disableFullScreen,
    maxWidth,
    fullWidth = true,
+   onClick,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -327,6 +329,7 @@ const SteppedDialog = <K extends string>({
                sx
             ),
          }}
+         onClick={onClick}
       >
          <StepperContext.Provider value={value}>
             <SwipeableViews

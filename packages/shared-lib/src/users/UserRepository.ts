@@ -6,9 +6,14 @@ import BaseFirebaseRepository, {
 import { Application } from "../ats/Application"
 import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
 import { Create } from "../commonTypes"
-import { CustomJobApplicant } from "../customJobs/customJobs"
+import {
+   AnonymousJobApplication,
+   CustomJob,
+   CustomJobApplicant,
+} from "../customJobs/customJobs"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
+import { Group } from "../groups"
 import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import { SeenSparks } from "../sparks/sparks"
 import {
@@ -112,6 +117,15 @@ export interface IUserRepository {
       userEmail: string,
       notification: IUserReminder
    ): Promise<void>
+
+   updateUserAnonymousJobApplications(
+      userEmail: string,
+      fingerPrintId: string
+   ): Promise<void>
+
+   migrateAnonymousJobApplications(userData: UserData): Promise<void>
+
+   updateJobApplicationsUserData(userData: UserData): Promise<void>
 
    getUserReminders(userEmail: string): Promise<IUserReminder[]>
 
@@ -742,6 +756,114 @@ export class FirebaseUserRepository
          .collection("userReminders")
          .doc(notification.type)
          .set(notification, { merge: true })
+   }
+
+   async updateUserAnonymousJobApplications(
+      userEmail: string,
+      fingerPrintId: string
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const ref = this.firestore
+         .collection("anonymousJobApplications")
+         .where("fingerPrintId", "==", fingerPrintId)
+         .where("userId", "==", null)
+
+      const snaps = await ref.get()
+
+      // Update only user email
+      snaps.forEach((snap) => {
+         const updateData: Pick<AnonymousJobApplication, "userId"> = {
+            userId: userEmail,
+         }
+         batch.update(snap.ref, updateData)
+      })
+
+      return batch.commit()
+   }
+
+   async migrateAnonymousJobApplications(userData: UserData): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const ref = this.firestore
+         .collection("anonymousJobApplications")
+         .where("userId", "==", userData.id)
+         .where("applicationSynchronized", "==", false)
+
+      const snaps = await ref.get()
+
+      for (let i = 0; snaps.size && i < snaps.docs.length; i++) {
+         const anonymousApplicationData = snaps.docs
+            .at(i)
+            .data() as AnonymousJobApplication
+         // Get the job which user anonymously applied to
+         const jobRef = this.firestore
+            .collection("customJobs")
+            .doc(anonymousApplicationData.jobId)
+
+         const customJob = (await jobRef.get()).data() as CustomJob
+
+         const groupRef = this.firestore
+            .collection("careerCenterData")
+            .doc(customJob.groupId)
+
+         const group = (await groupRef.get()).data() as Group
+
+         const jobApplication: CustomJobApplicant = {
+            id: `${customJob.id}_${userData.id}`,
+            documentType: "customJobApplicant",
+            jobId: customJob.id,
+            user: userData,
+            groupId: customJob.groupId,
+            appliedAt: anonymousApplicationData.appliedAt || null,
+            applicationSource: anonymousApplicationData.applicationSource,
+            job: customJob,
+            applied: anonymousApplicationData.applied,
+            createdAt: anonymousApplicationData.createdAt,
+            companyCountry: group.companyCountry?.id,
+            companyIndustries:
+               group.companyIndustries?.map((industry) => industry.id) || [],
+            companySize: group.companySize,
+         }
+
+         const jobApplicationRef = this.firestore
+            .collection("jobApplications")
+            .doc(`${customJob.id}_${userData.id}`)
+
+         batch.set(jobApplicationRef, jobApplication)
+
+         const toUpdateAnonJobApplication: Pick<
+            AnonymousJobApplication,
+            "applicationSynchronized"
+         > = {
+            applicationSynchronized: true,
+         }
+
+         batch.update(snaps.docs.at(i).ref, toUpdateAnonJobApplication)
+      }
+
+      return batch.commit()
+   }
+
+   // updateJobApplicationsUserData
+   async updateJobApplicationsUserData(userData: UserData): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const ref = this.firestore
+         .collection("jobApplications")
+         .where("user.id", "==", userData.id)
+
+      const snaps = await ref.get()
+
+      for (let i = 0; snaps.size && i < snaps.docs.length; i++) {
+         const toUpdateJobApplication: Pick<CustomJobApplicant, "user"> = {
+            user: userData,
+         }
+
+         batch.update(snaps.docs.at(i).ref, toUpdateJobApplication)
+      }
+
+      return batch.commit()
    }
 
    async getUserReminders(userEmail): Promise<IUserReminder[]> {

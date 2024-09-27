@@ -1,4 +1,9 @@
 import {
+   CustomJobApplicationSource,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
+import CloseIcon from "@mui/icons-material/Close"
+import {
    Box,
    Button,
    CircularProgress,
@@ -6,14 +11,12 @@ import {
    DialogContent,
    Typography,
 } from "@mui/material"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import IconButton from "@mui/material/IconButton"
+import { useCallback } from "react"
+import { HelpCircle } from "react-feather"
+import { sxStyles } from "../../../../../../types/commonTypes"
 import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import IconButton from "@mui/material/IconButton"
-import CloseIcon from "@mui/icons-material/Close"
-import React, { useCallback } from "react"
-import { HelpCircle } from "react-feather"
 
 const styles = sxStyles({
    wrapper: {
@@ -69,25 +72,25 @@ const styles = sxStyles({
 type Props = {
    handleClose: () => void
    job: PublicCustomJob
-   livestreamId: string
+   applicationSource: CustomJobApplicationSource
    open: boolean
 }
 const CustomJobApplyConfirmationDialog = ({
    open,
    handleClose,
    job,
-   livestreamId,
+   applicationSource,
 }: Props) => {
-   const { handleApply, alreadyApplied, isApplying } = useCustomJobApply(
+   const { handleConfirmApply, alreadyApplied, isApplying } = useCustomJobApply(
       job,
-      livestreamId
+      applicationSource
    )
    const isMobile = useIsMobile()
 
    const handleClick = useCallback(async () => {
-      await handleApply()
+      await handleConfirmApply()
       handleClose()
-   }, [handleApply, handleClose])
+   }, [handleConfirmApply, handleClose])
 
    if (alreadyApplied) {
       handleClose()

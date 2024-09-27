@@ -1,6 +1,6 @@
 import functions = require("firebase-functions")
-import { array, string } from "yup"
-import { customJobRepo, userRepo } from "./api/repositories"
+import { SchemaOf, array, object, string } from "yup"
+import { customJobRepo, groupRepo, userRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
@@ -11,23 +11,55 @@ import {
 } from "./middlewares/validations"
 import { onCallWrapper } from "./util"
 
-export const userApplyToCustomJob = functions
+type UserCustomJobApplication = {
+   authId: string
+   jobId: string
+}
+
+const UserCustomJobApplicationSchema: SchemaOf<UserCustomJobApplication> =
+   object().shape({
+      authId: string().required(),
+      jobId: string().required(),
+   })
+type CustomJobsGroupNames = Record<string, string>
+
+// Validation schema
+const CustomJobsGroupNamesSchema: SchemaOf<CustomJobsGroupNames> = object()
+   .shape({})
+   .test("is-valid-record", "All values must be strings", (value) => {
+      if (typeof value !== "object" || value === null) {
+         return false
+      }
+
+      // Validate all values in the object are strings
+      return Object.values(value).every((v) => typeof v === "string")
+   })
+   .defined()
+
+type SetRemoveUserCustomJobApplicationData = {
+   userId: string
+   jobId: string
+}
+
+const SetRemoveUserCustomJobApplicationDataSchema: SchemaOf<SetRemoveUserCustomJobApplicationData> =
+   object().shape({
+      userId: string().required(),
+      jobId: string().required(),
+   })
+
+export const confirmUserApplyToCustomJob = functions
    .region(config.region)
    .runWith({
       secrets: ["MERGE_ACCESS_KEY"],
    })
    .https.onCall(
       middlewares(
-         dataValidation({
-            livestreamId: string(),
-            userId: string().required(),
-            jobId: string().required(),
-         }),
+         dataValidation(UserCustomJobApplicationSchema),
          userAuthExists(),
-         onCallWrapper(async (data) => {
-            const { livestreamId, userId, jobId } = data
+         onCallWrapper(async (data: UserCustomJobApplication) => {
+            const { authId: userId, jobId } = data
             functions.logger.log(
-               `Starting custom job ${jobId} apply process for the user ${userId} on the livestream ${livestreamId}`
+               `Starting custom job ${jobId} apply confirmation process for the user ${userId}`
             )
 
             // Get custom job data and verify if the user already has any information related to the job application.
@@ -39,20 +71,111 @@ export const userApplyToCustomJob = functions
                   userRepo.getUserDataById(userId),
                ])
 
-            if (userCustomJobApplication) {
+            if (!userCustomJobApplication) {
                functions.logger.log(
-                  `User ${userId} have already applied to the job ${jobId}`
+                  `User ${userId} has not initiated job application for job with ID: ${jobId}`
                )
                return null
             }
 
             // create job application
             // Add job application details on the user document
-            return customJobRepo.applyUserToCustomJob(
+            return customJobRepo.confirmUserApplicationToCustomJob(
                user,
-               jobToApply,
-               livestreamId
+               jobToApply.id
             )
+         })
+      )
+   )
+
+export const confirmAnonApplyToCustomJob = functions
+   .region(config.region)
+   .runWith({
+      secrets: ["MERGE_ACCESS_KEY"],
+   })
+   .https.onCall(
+      middlewares(
+         dataValidation(UserCustomJobApplicationSchema),
+         onCallWrapper(async (data: UserCustomJobApplication) => {
+            const { authId: fingerPrintId, jobId } = data
+            functions.logger.log(
+               `Starting custom job ${jobId} apply confirmation process for the anonymous user with finger print ${fingerPrintId}`
+            )
+
+            // Get custom job data and verify if the user already has any information related to the job application.
+            // If such information exists, it indicates that the user has previously applied to this specific job, and no further action is needed.
+            const [jobToApply, anonUserCustomJobApplication] =
+               await Promise.all([
+                  customJobRepo.getCustomJobById(jobId),
+                  customJobRepo.getAnonymousJobApplication(
+                     fingerPrintId,
+                     jobId
+                  ),
+               ])
+
+            if (!anonUserCustomJobApplication) {
+               functions.logger.log(
+                  `Anonymous user with finger print ${fingerPrintId} has not initiated job application for job with ID: ${jobId}`
+               )
+               return null
+            }
+
+            return customJobRepo.confirmAnonymousUserApplicationToCustomJob(
+               fingerPrintId,
+               jobToApply.id
+            )
+         })
+      )
+   )
+
+export const getCustomJobGroupNames = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares(
+         dataValidation(CustomJobsGroupNamesSchema),
+         onCallWrapper(async (data: CustomJobsGroupNames) => {
+            const jobIds = Object.keys(data)
+
+            functions.logger.log(
+               `Starting get custom job group names for jobs: ${jobIds}`
+            )
+
+            const promises = jobIds.map(async (jobId) => {
+               return groupRepo.getGroupById(data[jobId]).then((group) => {
+                  return {
+                     [jobId]: group.universityName,
+                  }
+               })
+            })
+
+            const jobsGroupNamesMap = await Promise.all(promises)
+
+            // Convert the array of objects to a single dynamic object
+            return jobsGroupNamesMap.reduce((acc, curr) => {
+               return { ...acc, ...curr } // Merge the current object into the accumulator
+            }, {})
+         })
+      )
+   )
+export const setAnonymousJobApplicationsUserId = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares(
+         dataValidation({
+            fingerPrintId: string().required(),
+            userId: string().required(),
+         }),
+         onCallWrapper(async (data) => {
+            const { userId, fingerPrintId } = data
+
+            const [, userData] = await Promise.all([
+               userRepo.updateUserAnonymousJobApplications(
+                  userId,
+                  fingerPrintId
+               ),
+               userRepo.getUserDataById(userId),
+            ])
+            await userRepo.migrateAnonymousJobApplications(userData)
          })
       )
    )
@@ -179,3 +302,19 @@ export const syncPermanentlyExpiredCustomJobs = functions
          logAndThrow(e)
       }
    })
+
+export const setRemoveUserJobApplication = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares(
+         dataValidation(SetRemoveUserCustomJobApplicationDataSchema),
+         onCallWrapper(async (data: SetRemoveUserCustomJobApplicationData) => {
+            const { userId, jobId } = data
+
+            await customJobRepo.setRemovedUserCustomJobApplication(
+               userId,
+               jobId
+            )
+         })
+      )
+   )

@@ -79,6 +79,7 @@ export const jobTypeOptions = [
 export const pickPublicDataFromCustomJob = (
    job: CustomJob
 ): PublicCustomJob => {
+   if (!job) return null
    return {
       id: job.id,
       groupId: job.groupId ?? null,
@@ -122,19 +123,58 @@ export interface CustomJobStats extends Identifiable {
    deletedAt: firebase.firestore.Timestamp | null
 }
 
+export const CustomJobApplicationSourceTypes = {
+   Spark: "spark",
+   Livestream: "livestream",
+   Group: "group",
+   Portal: "portal",
+   Profile: "profile",
+   Notification: "notification",
+} as const
+
+export type JobApplicationSource =
+   (typeof CustomJobApplicationSourceTypes)[keyof typeof CustomJobApplicationSourceTypes]
+
+// Beware some IDs are logical, meaning it might not lead to a specific document in collections, i.e. when type = 'portal', the ID
+// of the linked content is purely logical thus retrieving a document with this ID is not intended.
+export type CustomJobApplicationSource = {
+   source: JobApplicationSource
+} & Identifiable
+
 // collection path /jobApplications
 export interface CustomJobApplicant extends Identifiable {
    documentType: "customJobApplicant" // simplify groupCollection Queries
    jobId: string
    user: UserData
    groupId: string // Makes it easier to query for all applicants in a group
-   appliedAt: firebase.firestore.Timestamp
-   livestreamId: string // The associated livestream where the user applied to the job
+   appliedAt?: firebase.firestore.Timestamp
+   livestreamId?: string // The associated livestream where the user applied to the job
+   applicationSource?: CustomJobApplicationSource // replaces livestreamId only
    job: CustomJob
+   applied?: boolean
+   createdAt?: firebase.firestore.Timestamp
    // cascaded properties from groups (collection /careerCenterData)
    companyCountry?: string
    companyIndustries?: string[]
    companySize?: string
+
+   // when set to true the job application should not appear in the listings
+   // when reapplying since this is not taken into consideration this field will not be present, making the
+   // still appear again in the user profile
+   removedFromUserProfile?: boolean
+}
+
+// collection path /anonymousJobApplications
+// The id of this collection shall be the user finger print id (see custom hook 'useFingerPrint')
+export interface AnonymousJobApplication extends Identifiable {
+   createdAt: firebase.firestore.Timestamp
+   fingerPrintId: string
+   jobId: string
+   applicationSource: CustomJobApplicationSource
+   applied: boolean
+   appliedAt?: firebase.firestore.Timestamp
+   userId?: string // Optional and set upon user registration when matching the finger print ID
+   applicationSynchronized?: boolean
 }
 
 export const getMaxDaysAfterDeadline = (): Date => {

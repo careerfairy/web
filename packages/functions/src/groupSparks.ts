@@ -7,7 +7,7 @@ import {
    UpdateSparkData,
    sparksCategoriesArray,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { boolean, object, string } from "yup"
+import { boolean, number, object, string } from "yup"
 import { groupRepo, sparkRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
@@ -38,6 +38,7 @@ const videoDataValidator = {
          fileExtension: string().required(),
          url: string().required(),
          thumbnailUrl: string().required(),
+         duration: number().required(),
       })
       .required(),
 } as const

@@ -1,5 +1,8 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJobApplicationSourceTypes,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import CloseIcon from "@mui/icons-material/Close"
 import { LoadingButton } from "@mui/lab"
 import {
@@ -25,8 +28,8 @@ import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import { JobButton } from "components/views/livestream-dialog/views/job-details/JobDetailsView"
-import CustomJobApplyConfirmation from "components/views/livestream-dialog/views/job-details/main-content/CustomJobApplyConfirmation"
 import JobDescription from "components/views/livestream-dialog/views/job-details/main-content/JobDescription"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useState } from "react"
@@ -307,7 +310,10 @@ const JobDialogContent = ({
             <CustomJobApplyConfirmation
                handleClose={handleCloseConfirmationDialog}
                job={job as PublicCustomJob}
-               livestreamId={livestreamId}
+               applicationSource={{
+                  id: livestreamId,
+                  source: CustomJobApplicationSourceTypes.Livestream,
+               }}
                sx={{
                   bottom:
                      isMobile && !isLandscape ? { xs: "130px", sm: "90px" } : 0,

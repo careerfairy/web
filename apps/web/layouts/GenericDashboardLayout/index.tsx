@@ -49,12 +49,6 @@ const NextLivestreamsPath: INavLink = {
    pathname: `/next-livestreams/[[...livestreamDialog]]`,
    title: "Next live streams",
 }
-const UnlockedContentPath: INavLink = {
-   id: "unlocked-content",
-   href: `/past-livestreams/unlocked-content`,
-   pathname: `/past-livestreams/unlocked-content/[[...livestreamDialog]]`,
-   title: "Unlocked content",
-}
 
 const PastLivestreamsPath: INavLink = {
    id: "all-past-live-streams",
@@ -150,10 +144,7 @@ const GenericDashboardLayout = ({
             mobileTitle: "Past streams",
             Icon: ClockIcon,
             href: `/past-livestreams`,
-            childLinks: [
-               PastLivestreamsPath,
-               ...(isLoggedIn ? [UnlockedContentPath] : []),
-            ],
+            childLinks: [PastLivestreamsPath],
          },
          {
             id: "sparks",

@@ -220,12 +220,10 @@ export class LivestreamPresenter extends BaseModel {
       return maxDateToShowRecording
    }
 
-   isAbleToShowRecording(isRegistered: boolean): boolean {
+   isAbleToShowRecording(): boolean {
       return (
-         this.isPast() &&
-         this.isAbleToAccessRecording() &&
-         isRegistered &&
-         new Date() <= this.recordingAccessTimeLeft()
+         this.isPast() && this.isAbleToAccessRecording()
+         // new Date() <= this.recordingAccessTimeLeft()
       )
    }
 

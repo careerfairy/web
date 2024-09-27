@@ -182,6 +182,52 @@
          "name": "reasonsToJoinLivestream_v2",
          "type": "array",
          "description": "Each element of the array represents a 'reason'. The array has at most three elements in this version (v2)."
+      },
+      {
+         "name": "targetUniversities",
+         "type": "array"
+      },
+      {
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            }
+         ],
+         "name": "targetCountries",
+         "type": "array"
+      },
+      {
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            }
+         ],
+         "name": "targetFieldsOfStudy",
+         "type": "array"
+      },
+      {
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            }
+         ],
+         "name": "targetLevelsOfStudy",
+         "type": "array"
       }
    ]
 }

@@ -132,12 +132,14 @@ export const SparkEventActions = {
    Unlike: "Unlike",
    Impression: "Impression",
    Click_CareerPageCTA: "Click_CareerPageCTA",
+   Click_MentorPageCTA: "Click_MentorPageCTA",
    Click_CompanyPageCTA: "Click_CompanyPageCTA",
    Click_DiscoverLivestreamCTA: "Click_DiscoverLivestreamCTA",
    Click_ReachOut_LinkedIn: "Click_ReachOut_LinkedIn",
    Watched_CompleteSpark: "Watched_CompleteSpark",
    Played_Spark: "Played_Spark",
    Register_Event: "Register_Event",
+   Click_JobCTA: "Click_JobCTA",
 } as const
 
 export type SparkEventActionType =
@@ -151,4 +153,5 @@ export const SparkInteractionSources = {
    New_Spark_Notification: "new_spark_notification",
    Livestream_End_Screen: "livestream_end_screen",
    Mentor_Page: "mentor_page",
+   CustomJob: "custom_job",
 } as const

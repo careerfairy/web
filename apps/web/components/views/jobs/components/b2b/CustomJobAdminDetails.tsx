@@ -47,6 +47,7 @@ const CustomJobAdminDetails = ({
       ? DateUtil.formatDateToString(deadline.toDate())
       : ""
 
+
    return (
       <Box sx={styles.wrapper}>
          <JobHeader

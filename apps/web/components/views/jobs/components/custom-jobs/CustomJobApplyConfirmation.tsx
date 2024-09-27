@@ -1,4 +1,7 @@
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJobApplicationSource,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    Button,
    CircularProgress,
@@ -16,9 +19,8 @@ import {
    setAutoAction,
    setJobToOpen,
 } from "store/reducers/sparksFeedReducer"
-import { combineStyles, sxStyles } from "../../../../../../types/commonTypes"
-import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
-import { useLiveStreamDialog } from "../../../LivestreamDialog"
+import { combineStyles, sxStyles } from "../../../../../types/commonTypes"
+import useCustomJobApply from "../../../../custom-hook/custom-job/useCustomJobApply"
 
 const styles = sxStyles({
    confirmationWrapper: {
@@ -76,35 +78,37 @@ const styles = sxStyles({
 type Props = {
    handleClose: () => void
    job: PublicCustomJob
-   livestreamId: string
+   applicationSource: CustomJobApplicationSource
    autoApply?: boolean
    sx?: SxProps
+   onApply?: () => void
 }
+
 const CustomJobApplyConfirmation = ({
    handleClose,
    job,
-   livestreamId,
+   applicationSource,
    autoApply,
+   onApply,
    sx,
 }: Props) => {
    const { isLoggedIn, userData } = useAuth()
-   const { goToView } = useLiveStreamDialog()
    const dispatch = useDispatch()
-   const { handleApply, alreadyApplied, isApplying, redirectToSignUp } =
-      useCustomJobApply(job, livestreamId)
+   const { handleConfirmApply, alreadyApplied, isApplying, redirectToSignUp } =
+      useCustomJobApply(job, applicationSource)
 
-   const handleClick = useCallback(async () => {
-      if (userData?.id) {
-         await handleApply()
-         goToView("livestream-details")
-      }
-   }, [goToView, handleApply, userData])
-
-   const handleRedirectClick = () => {
+   const handleRedirectClick = useCallback(() => {
       dispatch(setJobToOpen(job.id))
       dispatch(setAutoAction(AutomaticActions.APPLY))
       redirectToSignUp()
-   }
+   }, [job, dispatch, redirectToSignUp])
+
+   const handleClick = useCallback(async () => {
+      await handleConfirmApply()
+      onApply && onApply()
+
+      !isLoggedIn && handleRedirectClick()
+   }, [onApply, handleConfirmApply, handleRedirectClick, isLoggedIn])
 
    useEffect(() => {
       if (userData?.id && autoApply && !alreadyApplied) {
@@ -118,7 +122,7 @@ const CustomJobApplyConfirmation = ({
       <Component
          job={job}
          handleClose={handleClose}
-         handleClick={isLoggedIn ? handleClick : handleRedirectClick}
+         handleClick={handleClick}
          isApplying={isApplying}
          isLoggedIn={isLoggedIn}
          sx={sx}

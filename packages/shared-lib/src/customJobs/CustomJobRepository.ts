@@ -6,8 +6,10 @@ import { Timestamp } from "../firebaseTypes"
 import { UserData } from "../users"
 import { chunkArray } from "../utils"
 import {
+   AnonymousJobApplication,
    CustomJob,
    CustomJobApplicant,
+   CustomJobApplicationSource,
    PublicCustomJob,
    getMaxDaysAfterDeadline,
 } from "./customJobs"
@@ -56,6 +58,11 @@ export interface ICustomJobRepository {
     */
    getUserJobApplication(userId: string, jobId: string): Promise<CustomJob>
 
+   getAnonymousJobApplication(
+      fingerPrintId: string,
+      jobId: string
+   ): Promise<AnonymousJobApplication>
+
    /**
     * To create or update an existing jobApplication with a new applicant
     * Also increase the applicants field on the corresponding jobStats document
@@ -66,7 +73,42 @@ export interface ICustomJobRepository {
    applyUserToCustomJob(
       user: UserData,
       job: CustomJob,
-      livestreamId: string
+      applicationSource: CustomJobApplicationSource
+   ): Promise<void>
+
+   /**
+    * Handles anonymous user custom job applications, while also taking into consideration
+    * that multiple applications can be made for the anon user.
+    * @param fingerPrintId
+    * @param job
+    * @param contentId
+    * @param contentType
+    */
+   applyAnonymousUserToCustomJob(
+      fingerPrintId: string,
+      job: CustomJob,
+      applicationSource: CustomJobApplicationSource
+   ): Promise<void>
+
+   /**
+    * Confirms a successful job application for an user, implying an initiation of the application to already
+    * be done.
+    * @param user User for which the application will be confirmed.
+    * @param jobId ID of the job the user is applying to.
+    */
+   confirmUserApplicationToCustomJob(
+      user: UserData,
+      jobId: string
+   ): Promise<void>
+
+   confirmAnonymousUserApplicationToCustomJob(
+      fingerPrintId: string,
+      jobId: string
+   ): Promise<void>
+
+   setRemovedUserCustomJobApplication(
+      userId: string,
+      jobId: string
    ): Promise<void>
 
    /**
@@ -139,6 +181,10 @@ export class FirebaseCustomJobRepository
       protected readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
+   }
+
+   private getJobApplicationId(jobId: string, userId: string) {
+      return `${jobId}_${userId}`
    }
 
    async createCustomJob(
@@ -255,34 +301,92 @@ export class FirebaseCustomJobRepository
       return null
    }
 
+   async getAnonymousJobApplication(
+      fingerPrintId: string,
+      jobId: string
+   ): Promise<AnonymousJobApplication> {
+      const id = this.getJobApplicationId(jobId, fingerPrintId)
+
+      const ref = this.firestore.collection("anonymousJobApplications").doc(id)
+
+      const snapshot = await ref.get()
+
+      if (snapshot.exists) {
+         return this.addIdToDoc<AnonymousJobApplication>(snapshot)
+      }
+      return null
+   }
+
    async applyUserToCustomJob(
       user: UserData,
       job: CustomJob,
-      livestreamId: string
+      applicationSource: CustomJobApplicationSource
    ): Promise<void> {
-      const batch = this.firestore.batch()
-      const applicationId = `${job.id}_${user.userEmail}`
-
-      const jobApplicationRef = this.firestore
-         .collection("jobApplications")
-         .doc(applicationId)
-
-      const jobStatsRef = this.firestore
-         .collection("customJobStats")
-         .doc(job.id)
+      const applicationId = this.getJobApplicationId(job.id, user.id)
 
       const newJobApplicant: CustomJobApplicant = {
          documentType: "customJobApplicant",
          id: applicationId,
          jobId: job.id,
          groupId: job.groupId,
-         livestreamId: livestreamId,
-         appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
+         applicationSource: applicationSource,
+         appliedAt: null, // Initial application not confirmed so null date
          user,
          job,
+         applied: false,
+         createdAt: this.fieldValue.serverTimestamp() as Timestamp,
       }
 
-      batch.set(jobApplicationRef, newJobApplicant, { merge: true })
+      return this.firestore
+         .collection("jobApplications")
+         .doc(applicationId)
+         .set(newJobApplicant)
+   }
+
+   async applyAnonymousUserToCustomJob(
+      fingerPrintId: string,
+      job: CustomJob,
+      applicationSource: CustomJobApplicationSource
+   ): Promise<void> {
+      const anonApplicationId = this.getJobApplicationId(job.id, fingerPrintId)
+
+      const newAnonApplication: AnonymousJobApplication = {
+         id: anonApplicationId,
+         fingerPrintId: fingerPrintId,
+         createdAt: this.fieldValue.serverTimestamp() as Timestamp,
+         jobId: job.id,
+         applicationSource: applicationSource,
+         applied: false,
+         appliedAt: null,
+         userId: null,
+         applicationSynchronized: false,
+      }
+
+      return this.firestore
+         .collection("anonymousJobApplications")
+         .doc(newAnonApplication.id)
+         .set(newAnonApplication)
+   }
+
+   async confirmUserApplicationToCustomJob(
+      user: UserData,
+      jobId: string
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+      const applicationId = this.getJobApplicationId(jobId, user.userEmail)
+
+      const jobApplicationRef = this.firestore
+         .collection("jobApplications")
+         .doc(applicationId)
+
+      const jobStatsRef = this.firestore.collection("customJobStats").doc(jobId)
+
+      const toUpdate: Pick<CustomJobApplicant, "applied" | "appliedAt"> = {
+         applied: true,
+         appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
+      }
+
+      batch.update(jobApplicationRef, toUpdate)
 
       if (!user.userEmail.includes("@careerfairy")) {
          // we only want to increment the count if the user is not from CareerFairy
@@ -290,6 +394,47 @@ export class FirebaseCustomJobRepository
       }
 
       return batch.commit()
+   }
+
+   async confirmAnonymousUserApplicationToCustomJob(
+      fingerPrintId: string,
+      jobId: string
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+      const applicationId = this.getJobApplicationId(jobId, fingerPrintId)
+
+      const ref = this.firestore
+         .collection("anonymousJobApplications")
+         .doc(applicationId)
+
+      const toUpdate: Pick<AnonymousJobApplication, "applied" | "appliedAt"> = {
+         applied: true,
+         appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
+      }
+
+      const jobStatsRef = this.firestore.collection("customJobStats").doc(jobId)
+
+      batch.update(jobStatsRef, { applicants: this.fieldValue.increment(1) })
+      batch.update(ref, toUpdate)
+
+      return batch.commit()
+   }
+
+   async setRemovedUserCustomJobApplication(
+      userId: string,
+      jobId: string
+   ): Promise<void> {
+      const applicationId = this.getJobApplicationId(jobId, userId)
+
+      const ref = this.firestore
+         .collection("jobApplications")
+         .doc(applicationId)
+
+      const toUpdate: Pick<CustomJobApplicant, "removedFromUserProfile"> = {
+         removedFromUserProfile: true,
+      }
+
+      return ref.update(toUpdate)
    }
 
    async incrementCustomJobClicks(jobId: string): Promise<void> {
@@ -397,6 +542,7 @@ export class FirebaseCustomJobRepository
       const docs = await this.firestore
          .collection(this.COLLECTION_NAME)
          .where("groupId", "==", groupId)
+         .where("isPermanentlyExpired", "==", false)
          .get()
 
       if (docs.empty) {

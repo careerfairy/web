@@ -1,6 +1,3 @@
-import React, { Fragment, useContext, useState } from "react"
-import { Formik } from "formik"
-import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
 import {
    Box,
    Button,
@@ -12,15 +9,19 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { Formik } from "formik"
+import { Fragment, useContext, useState } from "react"
+import { useDispatch } from "react-redux"
+import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
 import * as yup from "yup"
 import { useAuth } from "../../../../HOCs/AuthProvider"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 import {
    IMultiStepContext,
    MultiStepContext,
 } from "../../common/MultiStepWrapper"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { useDispatch } from "react-redux"
 
 const schema = yup.object().shape({
    pinCode: yup
@@ -34,12 +35,14 @@ const schema = yup.object().shape({
 
 const SignUpPinForm = () => {
    const firebase = useFirebaseService()
+   // eslint-disable-next-line react/hook-use-state
    const [errorMessageShown] = useState(false)
    const [incorrectPin, setIncorrectPin] = useState(false)
    const [generalLoading, setGeneralLoading] = useState(false)
    const { authenticatedUser: user } = useAuth()
    const { nextStep } = useContext<IMultiStepContext>(MultiStepContext)
    const dispatch = useDispatch()
+   const { data: fingerPrintId } = useFingerPrint()
 
    async function resendVerificationEmail() {
       setGeneralLoading(true)
@@ -67,7 +70,9 @@ const SignUpPinForm = () => {
       const userInfo = {
          recipientEmail: user.email,
          pinCode: parseInt(values.pinCode),
+         fingerPrintId: fingerPrintId,
       }
+
       try {
          await firebase.validateUserEmailWithPin(userInfo)
 
@@ -168,7 +173,7 @@ const SignUpPinForm = () => {
                      variant="contained"
                      disabled={isSubmitting || generalLoading}
                      endIcon={
-                        (isSubmitting || generalLoading) && (
+                        Boolean(isSubmitting || generalLoading) && (
                            <CircularProgress color="inherit" size={20} />
                         )
                      }

@@ -57,6 +57,7 @@ interface SparksState {
    anonymousUserCountryCode?: string
    countrySpecificFeed?: boolean
    shouldShowLinkedInPopUpNotification: boolean
+   isJobDialogOpen: boolean
 }
 
 const initialState: SparksState = {
@@ -90,6 +91,7 @@ const initialState: SparksState = {
    anonymousUserCountryCode: null,
    countrySpecificFeed: null,
    shouldShowLinkedInPopUpNotification: false,
+   isJobDialogOpen: false,
 }
 
 // Async thunk to fetch the next sparks
@@ -322,6 +324,9 @@ const sparksFeedSlice = createSlice({
       disableCountrySpecificFeed: (state) => {
          state.countrySpecificFeed = null
       },
+      setIsJobDialogOpen: (state, action: PayloadAction<boolean>) => {
+         state.isJobDialogOpen = action.payload
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -527,6 +532,7 @@ export const {
    setConversionCardInterval,
    removeNotificationsByType,
    disableCountrySpecificFeed,
+   setIsJobDialogOpen,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

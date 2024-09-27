@@ -96,7 +96,7 @@ export const manualNewsletter = onRequest(runtimeSettings, async (req, res) => {
 export const manualTemplatedEmail = onRequest(
    runtimeSettings,
    async (req, res) => {
-      logger.info("manualTemplatedEmail: v4.0 - B2C launch announcement")
+      logger.info("manualTemplatedEmail: v5.0 - Talendo email")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -117,11 +117,11 @@ export const manualTemplatedEmail = onRequest(
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("B2C launch announcement email sent to everyone")
+         res.status(200).send("Talendo email email sent to everyone")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "B2C launch announcement email sent to " + receivedEmails.join(", ")
+            "Talendo email email sent to " + receivedEmails.join(", ")
          )
       }
    }
@@ -168,7 +168,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      logger.info("B2C launch announcement, skipping")
+      logger.info("Talendo email, skipping")
       return
    }
 

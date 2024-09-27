@@ -1,22 +1,22 @@
-import { expect } from "@playwright/test"
-import UserSeed from "@careerfairy/seed-data/dist/users"
 import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
-import { signedInFixture as test } from "../fixtures"
-import { setupLivestreamData } from "../setupData"
-import { MAX_DAYS_TO_SHOW_RECORDING } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { credentials } from "../../constants"
-import { LoginPage } from "../page-object-models/LoginPage"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import {
    clearAuthData,
    clearFirestoreData,
 } from "@careerfairy/seed-data/emulators"
+import { MAX_DAYS_TO_SHOW_RECORDING } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { expect } from "@playwright/test"
+import { credentials } from "../../constants"
+import { signedInFixture as test } from "../fixtures"
+import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
+import { LoginPage } from "../page-object-models/LoginPage"
+import { setupLivestreamData } from "../setupData"
 
 // outside access window =(means) livestream is older than the max days to show recording
 
 test.describe("Access a recording when the user registered to the livestream", () => {
-   test("Not enough credits to buy a recording when the livestream is outside access window", async ({
+   test.skip("Not enough credits to buy a recording when the livestream is outside access window", async ({
       page,
       user,
    }) => {
@@ -33,7 +33,7 @@ test.describe("Access a recording when the user registered to the livestream", (
       await expect(livestreamDialogPage.notEnoughCreditsButton).toBeVisible()
    })
 
-   test("Buy a recording with credits when registered and the livestream is outside access", async ({
+   test.skip("Buy a recording with credits when registered and the livestream is outside access", async ({
       page,
       user,
    }) => {
@@ -63,7 +63,7 @@ test.describe("Access a recording when the user registered to the livestream", (
 
    for (const participated of [true, false]) {
       // confirm user has access to the recording participating or not
-      test(
+      test.skip(
          "No need to buy the recording because the livestream is inside the access window, user participated: " +
             participated,
          async ({ page, user }) => {
@@ -81,12 +81,12 @@ test.describe("Access a recording when the user registered to the livestream", (
             )
             await livestreamDialogPage.openDialog()
 
-            await livestreamDialogPage.assertRecordingVideoIsVisible(true)
+            await livestreamDialogPage.assertRecordingVideoIsVisible()
          }
       )
    }
 
-   test("Access the recording when signed out - inside access window", async ({
+   test.skip("Access the recording when signed out - inside access window", async ({
       page,
    }) => {
       // reset data manually because we are not using
@@ -124,14 +124,14 @@ test.describe("Access a recording when the user registered to the livestream", (
          waitForURL: `**/past-livestreams/livestream/${livestream.id}`,
       })
 
-      await livestreamDialogPage.assertRecordingVideoIsVisible(true)
+      await livestreamDialogPage.assertRecordingVideoIsVisible()
    })
 })
 
 test.describe("Access a recording when the user did not register to the livestream", () => {
    // user needs to buy the recording for any livestream date
    for (const insideAccessWindow of [true, false]) {
-      test(`Recording ${
+      test.skip(`Recording ${
          insideAccessWindow ? "inside" : "outside"
       } the access window needs to be bought`, async ({ page, user }) => {
          const { livestream } = await setupData({

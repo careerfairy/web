@@ -1,6 +1,7 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, ButtonBase, Grid, useTheme } from "@mui/material"
+import { Box, ButtonBase, Grid, SxProps, useTheme } from "@mui/material"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -10,7 +11,6 @@ import { isJobValidButNoLinkedContent } from "../utils"
 import JobCardAction from "./JobCardAction"
 import JobCardDetails from "./JobCardDetails"
 import JobCardStats from "./JobCardStats"
-
 const styles = sxStyles({
    jobState: {
       display: "flex",
@@ -31,7 +31,7 @@ const styles = sxStyles({
       flexDirection: { xs: "column", md: "row" },
       width: "100%",
       maxWidth: "calc(100% - 8px)",
-      p: { md: 2 },
+      p: { md: 1.5 },
       alignItems: { md: "center" },
    },
    infoWrapper: {
@@ -54,8 +54,12 @@ type Props = {
    clicks?: number
    applicants?: number
    previewMode?: boolean
-   handleClick: (job: Job | CustomJob) => void
+   handleClick?: (job: Job | CustomJob, event?: React.MouseEvent) => void
    smallCard?: boolean
+   hideJobUrl?: boolean
+   titleSx?: SxProps<DefaultTheme>
+   typographySx?: SxProps<DefaultTheme>
+   companyName?: string
 }
 
 const JobCard = ({
@@ -65,12 +69,15 @@ const JobCard = ({
    previewMode,
    handleClick,
    smallCard,
+   hideJobUrl,
+   titleSx,
+   typographySx,
+   companyName,
 }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const theme = useTheme()
    const { jobHubV1 } = useFeatureFlags()
-
    const showAdditionalInfo = clicks !== undefined && applicants !== undefined
 
    const getStateColor = useCallback(
@@ -92,7 +99,7 @@ const JobCard = ({
    return (
       <ButtonBase
          key={job.id}
-         onClick={() => handleClick(job)}
+         onClick={(event) => handleClick && handleClick(job, event)}
          sx={styles.jobCard}
          focusRipple
       >
@@ -115,6 +122,10 @@ const JobCard = ({
                         job={job}
                         previewMode={previewMode}
                         smallCard={smallCard}
+                        hideJobUrl={hideJobUrl}
+                        titleSx={titleSx}
+                        typographySx={typographySx}
+                        companyName={companyName}
                      />
                   </Grid>
 
