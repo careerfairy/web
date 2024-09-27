@@ -1,11 +1,12 @@
-import { FC } from "react"
-import { sxStyles } from "types/commonTypes"
 import Box from "@mui/material/Box"
-import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
-import CircularLogo from "components/views/common/logos/CircularLogo"
 import Link from "components/views/common/Link"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
+import { FC } from "react"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
@@ -48,7 +49,7 @@ type Props = {
    displayName: string
    companyName: string
    companyLogoUrl: string
-   linkToCompanyPage?: string
+   linkToMentorPage?: string
    creatorPosition?: string
    onClick?: () => void
 }
@@ -57,10 +58,11 @@ const SparkDetails: FC<Props> = ({
    companyName,
    displayName,
    companyLogoUrl,
-   linkToCompanyPage,
+   linkToMentorPage,
    creatorPosition,
    onClick,
 }) => {
+   const isFullScreen = useSparksFeedIsFullScreen()
    const showCreatorPosition = Boolean(creatorPosition)
 
    const detailsTooltipTitle = showCreatorPosition
@@ -82,13 +84,18 @@ const SparkDetails: FC<Props> = ({
 
    return (
       <Box
-         component={linkToCompanyPage ? Link : undefined}
-         href={linkToCompanyPage}
+         component={linkToMentorPage ? Link : undefined}
+         href={linkToMentorPage}
          sx={styles.root}
          onClick={onClick}
       >
          <span>
-            <CircularLogo src={companyLogoUrl} alt={companyName} size={60} />
+            <CircularLogo
+               src={companyLogoUrl}
+               alt={companyName}
+               size={isFullScreen ? 48 : 60}
+               objectFit="cover"
+            />
          </span>
          <Box mr={0.75} />
          <Box sx={styles.creatorDetails}>

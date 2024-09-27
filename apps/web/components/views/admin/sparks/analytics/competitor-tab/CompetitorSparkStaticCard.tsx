@@ -1,3 +1,4 @@
+import { CompetitorSparkData } from "@careerfairy/shared-lib/sparks/analytics"
 import {
    Box,
    Card,
@@ -7,41 +8,31 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
-import useSparkStats from "components/custom-hook/spark/useSparkStats"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
+import ClockIcon from "components/views/common/icons/ClockIcon"
+import EngagementIcon from "components/views/common/icons/EngagementIcon"
 import ImpressionsIcon from "components/views/common/icons/ImpressionsIcon"
-import LikeIcon from "components/views/common/icons/LikeIcon"
-import ShareIcon from "components/views/common/icons/ShareIcon"
-import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { FC, ReactElement } from "react"
+import { ReactElement } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   card: {
-      width: {
-         xs: "100%",
-         md: 281,
-      },
-      height: {
-         xs: "154vw",
-         md: "initial",
-      },
+   card: (theme) => ({
+      width: "265px",
+      height: "481px",
       boxShadow: "none",
       borderRadius: "12px",
-      border: "1px solid #F3F3F5",
-      background:
-         "linear-gradient(0deg, #FAFAFE, #FAFAFE), linear-gradient(0deg, #F3F3F5, #F3F3F5)",
+      border: `1px solid ${theme.brand.white["500"]}`,
+      background: `linear-gradient(0deg, ${theme.brand.white["300"]}, ${theme.brand.white["300"]}), linear-gradient(0deg, ${theme.brand.white["500"]}, ${theme.brand.white["500"]})`,
       "& .MuiCardHeader-root": {
          display: "flex",
          alignItems: "center",
       },
-   },
+   }),
    cardHeader: {
-      height: "62px",
+      height: "56px",
       padding: "10px 12px 10px 12px",
       "& .MuiCardHeader-avatar": {
          marginRight: "6px",
@@ -66,22 +57,19 @@ const styles = sxStyles({
       },
    },
    cardMedia: {
-      height: {
-         xs: "calc(154vw - 62px - 55px)",
-         md: 406,
-      },
+      height: "377px",
       objectFit: "cover",
    },
-   sparksTypeAndTitle: {
+   sparksTypeAndTitle: (theme) => ({
       position: "absolute",
       bottom: "6px",
       left: "12px",
-      color: "#FFFFFF",
+      color: theme.brand.white["50"],
       display: "flex",
       flexDirection: "column",
       gap: "6px",
       zIndex: 2,
-   },
+   }),
    cardMediaGradientOverlay: {
       position: "absolute",
       width: "100%",
@@ -100,31 +88,35 @@ const styles = sxStyles({
    cardActions: {
       justifyContent: "space-between",
       padding: "14px 16px 14px 16px",
+      height: "48px",
    },
    impressionsIcon: {
       width: "14px !important",
       paddingTop: "30% !important",
    },
-   statContainer: {
+   statContainer: (theme) => ({
       fontWeight: "400",
       letterSpacing: "0em",
-      color: "#6B6B7F",
-   },
-   statIcon: {
+      color: theme.palette.neutral["600"],
+   }),
+   statIcon: (theme) => ({
       "& svg": {
          width: "12px",
          paddingTop: "3px",
          "& path": {
-            fill: "#6B6B7F",
+            fill: theme.palette.neutral["600"],
          },
       },
-   },
+   }),
    statValue: {
       fontSize: "14px",
       fontWeight: "400",
       lineHeight: "24px",
       letterSpacing: "0em",
       textAlign: "left",
+   },
+   cardWithBorder: {
+      border: (theme) => `2px solid ${theme.palette.primary["500"]}`,
    },
 })
 
@@ -133,7 +125,7 @@ type StatContainerProps = {
    value: string | number
 }
 
-const StatContainer: FC<StatContainerProps> = ({ icon, value }) => {
+const StatContainer = ({ icon, value }: StatContainerProps) => {
    return (
       <Stack
          direction="row"
@@ -147,49 +139,55 @@ const StatContainer: FC<StatContainerProps> = ({ icon, value }) => {
    )
 }
 
-type SparksStaticCardProps = {
-   sparkId: string
-}
-
-const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
+export const CompetitorSparkStaticCard = ({
+   sparkData,
+   plays,
+   avg_watched_time,
+   engagement,
+}: CompetitorSparkData) => {
    const { group } = useGroup()
 
-   const spark = useGroupSpark(group.id, sparkId)
-   const { data: sparkStats } = useSparkStats(sparkId)
+   const isSparkFromGroup = sparkData?.group.id === group?.groupId
 
-   const plays = sparkStats?.plays || "0"
-   const likes = sparkStats?.likes || "0"
-   const shareCTA = sparkStats?.shareCTA || "0"
-   const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || "0"
+   if (!sparkData) return null
 
    return (
-      <Card variant="outlined" sx={styles.card}>
+      <Card
+         variant="outlined"
+         sx={[styles.card, isSparkFromGroup && styles.cardWithBorder]}
+      >
          <CardHeader
             avatar={
                <CircularLogo
-                  src={spark?.creator.avatarUrl}
+                  src={sparkData?.creator?.avatarUrl}
                   alt={"Creator's Avatar"}
                   objectFit="cover"
                   size={46}
                />
             }
             // Only use the first name in firstName if user has two names
-            title={`${spark.creator?.firstName?.split(" ")[0]} ${
-               spark.creator?.lastName
+            title={`${sparkData?.creator?.firstName?.split(" ")[0]} ${
+               sparkData?.creator?.lastName
             }`}
-            subheader={`From ${spark.group.universityName}`}
+            subheader={`From ${
+               sparkData?.group?.name?.length > 30
+                  ? sparkData?.group?.name?.substring(0, 25) + "..."
+                  : sparkData?.group?.name
+            }`}
             sx={styles.cardHeader}
          />
          <Box sx={{ position: "relative" }}>
             <Box sx={styles.sparksTypeAndTitle}>
-               <SparkCategoryChip categoryId={spark.category.id} />
-               <Typography sx={styles.sparksTitle}>{spark.question}</Typography>
+               <SparkCategoryChip categoryId={sparkData?.spark?.categoryId} />
+               <Typography sx={styles.sparksTitle}>
+                  {sparkData?.spark?.question}
+               </Typography>
             </Box>
             <Box sx={styles.cardMediaGradientOverlay} />
             <CardMedia
                component="img"
                sx={styles.cardMedia}
-               image={getResizedUrl(spark.video.thumbnailUrl, "md")}
+               image={getResizedUrl(sparkData?.spark?.videoThumbnailUrl, "md")}
                alt="Spark's thumbnail"
             />
          </Box>
@@ -198,15 +196,15 @@ const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
                icon={<ImpressionsIcon sx={styles.impressionsIcon} />}
                value={plays}
             />
-            <StatContainer icon={<LikeIcon />} value={likes} />
-            <StatContainer icon={<ShareIcon />} value={shareCTA} />
             <StatContainer
-               icon={<TotalPlaysIcon />}
-               value={numberOfCareerPageClicks}
+               icon={<ClockIcon />}
+               value={Math.ceil(avg_watched_time) + "s"}
+            />
+            <StatContainer
+               icon={<EngagementIcon />}
+               value={Math.ceil(engagement)}
             />
          </CardActions>
       </Card>
    )
 }
-
-export default SparksStaticCard

@@ -58,12 +58,7 @@ const styles = sxStyles({
          "0px 11px 15px -7px rgba(34, 149, 132,0.2),0px 24px 38px 3px rgba(34, 149, 132, 0.14),0px 9px 46px 100px rgba(34, 149, 132, 0.12)",
    },
    title: {
-      fontFamily: "Poppins",
-      fontSize: "18px",
-      fontStyle: "normal",
       fontWeight: "600",
-      lineHeight: "27px",
-      color: "black",
    },
    cardWrapper: {
       display: "flex",
@@ -208,10 +203,10 @@ const EmptyRegistrationsBanner: FC = () => {
       <Box sx={styles.contentWrapper}>
          <Box>
             <Typography
-               variant={"h6"}
+               variant={"brandedH4"}
                sx={styles.title}
                fontWeight={"600"}
-               color="black"
+               color="neutral.800"
             >
                My Registrations
             </Typography>

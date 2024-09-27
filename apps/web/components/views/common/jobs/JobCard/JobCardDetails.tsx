@@ -1,13 +1,15 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
-import { Box, Grid, Tooltip, Typography } from "@mui/material"
+import { Box, Grid, SxProps, Tooltip, Typography } from "@mui/material"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useMemo } from "react"
 import { AlertCircle, Briefcase, Globe, Zap } from "react-feather"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { isJobValidButNoLinkedContent } from "../utils"
 import { JobButtonAction, JobMenuAction } from "./JobCardAction"
@@ -21,11 +23,10 @@ const styles = sxStyles({
    title: {
       color: "text.primary",
       fontWeight: 600,
-      fontSize: "16px",
+      fontSize: "16px !important",
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
-      px: { xs: 1, md: 0 },
    },
    warningContainer: {
       display: "flex",
@@ -61,7 +62,6 @@ const styles = sxStyles({
       display: "inline",
       alignItems: "center",
       marginRight: 2,
-
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
@@ -91,15 +91,39 @@ const styles = sxStyles({
    smallExpiredDate: {
       fontSize: "12px !important",
    },
+   companyName: {
+      fontFamily: "Poppins",
+      fontWeight: 400,
+   },
+   companyNameWrapper: {
+      mt: "4px",
+      mb: "4px",
+   },
+   companyNameWrapperMobile: {
+      mt: "4px",
+      mb: "8px",
+   },
 })
 
 type Props = {
    job: Job | CustomJob
    previewMode: boolean
    smallCard: boolean
+   hideJobUrl?: boolean
+   titleSx?: SxProps<DefaultTheme>
+   typographySx?: SxProps<DefaultTheme>
+   companyName?: string
 }
 
-const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
+const JobCardDetails = ({
+   job,
+   previewMode,
+   smallCard,
+   hideJobUrl,
+   titleSx,
+   typographySx,
+   companyName,
+}: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const { jobHubV1 } = useFeatureFlags()
@@ -109,7 +133,8 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
    let jobDeadline: Timestamp
    let jobPostingUrl: string
    let jobPublished: boolean
-   let jobBusinessTags: string | string[]
+   let jobBusinessTags: string
+
    let jobIsPermanentlyExpired: boolean
 
    if (isAtsJob) {
@@ -121,7 +146,10 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
       jobDeadline = job.deadline
       jobPostingUrl = job.postingUrl
       jobPublished = job.published
-      jobBusinessTags = job.businessFunctionsTagIds?.join(", ")
+      jobBusinessTags = (job.businessFunctionsTagIds || [])
+         .map((tagId) => TagValuesLookup[tagId])
+         .join(", ")
+
       jobIsPermanentlyExpired = job.isPermanentlyExpired
    }
 
@@ -136,11 +164,13 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
             <Grid item display={"flex"} xs={11} md={12}>
                <Typography
                   variant={"h5"}
-                  sx={[styles.title, smallCard ? styles.smallTitle : null]}
+                  sx={combineStyles(
+                     [styles.title, smallCard ? styles.smallTitle : null],
+                     titleSx
+                  )}
                >
                   {jobName}
                </Typography>
-
                {showTooltip ? (
                   <Box sx={styles.warningContainer}>
                      <Tooltip
@@ -169,10 +199,31 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
                />
             ) : null}
          </Box>
+         {companyName ? (
+            <Box
+               sx={
+                  isMobile
+                     ? styles.companyNameWrapperMobile
+                     : styles.companyNameWrapper
+               }
+            >
+               <Typography
+                  variant={"xsmall"}
+                  sx={styles.companyName}
+                  color="neutral.500"
+               >
+                  {companyName}
+               </Typography>
+            </Box>
+         ) : null}
          <Box>
             <Typography
                variant={"subtitle1"}
-               sx={[styles.subtitle, smallCard ? styles.smallSubtitle : null]}
+               sx={combineStyles(
+                  styles.subtitle,
+                  smallCard ? styles.smallSubtitle : null,
+                  typographySx
+               )}
             >
                {jobType ? (
                   <Box sx={styles.subtitleItem}>
@@ -181,17 +232,19 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
                   </Box>
                ) : null}
 
-               {jobBusinessTags ? (
+               {jobBusinessTags.length ? (
                   <Box sx={styles.subtitleItem}>
                      <Zap width={smallCard ? 12 : 14} />
                      {jobBusinessTags}
                   </Box>
                ) : null}
 
-               <Box sx={styles.subtitleItem}>
-                  <Globe width={smallCard ? 12 : 14} />
-                  {formatJobPostingUrl(jobPostingUrl)}
-               </Box>
+               {!hideJobUrl ? (
+                  <Box sx={styles.subtitleItem}>
+                     <Globe width={smallCard ? 12 : 14} />
+                     {formatJobPostingUrl(jobPostingUrl)}
+                  </Box>
+               ) : null}
             </Typography>
 
             <Box
@@ -226,9 +279,11 @@ const JobCardDetails = ({ job, previewMode, smallCard }: Props) => {
 }
 
 const getDeadLineMessage = (jobDeadline: Timestamp, previewMode: boolean) => {
-   const deadlineText = DateUtil.formatDateToString(jobDeadline.toDate())
+   const deadlineText =
+      (jobDeadline && DateUtil.formatDateToString(jobDeadline.toDate())) ||
+      "{no deadline set}"
 
-   if (DateUtil.isDeadlineExpired(jobDeadline.toDate())) {
+   if (jobDeadline && DateUtil.isDeadlineExpired(jobDeadline.toDate())) {
       return previewMode ? "Job expired" : `Expired on ${deadlineText}`
    }
 
@@ -238,7 +293,8 @@ const getDeadLineMessage = (jobDeadline: Timestamp, previewMode: boolean) => {
 }
 
 const formatJobPostingUrl = (postingUrl: string): string => {
-   const withoutProtocol = postingUrl.split("://")[1]
+   const withoutProtocol =
+      postingUrl?.includes("://") && postingUrl.split("://")?.at(1)
    return withoutProtocol ? withoutProtocol : postingUrl
 }
 

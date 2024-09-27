@@ -1,7 +1,7 @@
+import { forwardRef } from "react"
 import ReactQuill, { Quill, ReactQuillProps } from "react-quill"
 import "react-quill/dist/quill.bubble.css"
 import "react-quill/dist/quill.snow.css"
-import { forwardRef } from "react"
 
 export type CustomRichTextEditorProps = ReactQuillProps & {
    name: string
@@ -59,6 +59,7 @@ const modules = {
       ["clean"],
    ],
    clipboard: {
+      matchVisual: false, // Disable Quill's default clipboard pasting style matching
       matchers: [
          [
             Node.ELEMENT_NODE,
@@ -67,7 +68,6 @@ const modules = {
                   new Delta().retain(delta.length(), {
                      color: false,
                      background: false,
-                     link: false,
                   })
                )
             },

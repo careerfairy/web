@@ -1,18 +1,18 @@
-import * as functions from "firebase-functions"
-import {
-   handleSideEffects,
-   defaultTriggerRunTimeConfig,
-} from "./lib/triggers/util"
-import config from "./config"
-import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
-import { PopularityEventData } from "@careerfairy/shared-lib/livestreams/popularity"
 import {
    EventRatingAnswer,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
-import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
+import { PopularityEventData } from "@careerfairy/shared-lib/livestreams/popularity"
 import { RewardDoc } from "@careerfairy/shared-lib/rewards"
+import { UserData, pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
+import * as functions from "firebase-functions"
+import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
+import config from "./config"
 import { rewardApply, rewardLivestreamRegistrant } from "./lib/reward"
+import {
+   defaultTriggerRunTimeConfig,
+   handleSideEffects,
+} from "./lib/triggers/util"
 
 export const onCreateLivestreamPopularityEvents = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -91,6 +91,31 @@ export const onCreateUserData = functions
             false // we already set the lastActivityDate when creating the doc
          )
       )
+
+      // No need to check if application has been synched since the user was just created
+      // so synching cannot have been already done
+      sideEffectPromises.push(
+         userRepo.migrateAnonymousJobApplications(userData)
+      )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onUpdateUserData = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("userData/{userId}")
+   .onUpdate(async (snapshot, context) => {
+      functions.logger.info(context.params)
+
+      const userData: UserData = snapshot.after.data() as UserData
+
+      if (!userData) return
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      sideEffectPromises.push(userRepo.updateJobApplicationsUserData(userData))
 
       return handleSideEffects(sideEffectPromises)
    })

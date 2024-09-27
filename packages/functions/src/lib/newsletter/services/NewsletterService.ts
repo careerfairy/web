@@ -20,6 +20,7 @@ import { IRecommendationDataFetcher } from "../../recommendation/services/DataFe
 import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
 
 const TOLERANCE_DAYS = 2
+
 const LOCATION_FILTERS = [
    "AT",
    "BE",
@@ -52,6 +53,7 @@ const LOCATION_FILTERS = [
    "SK",
    "SM",
 ]
+
 /**
  * Data structure used to associate each user with his recommended live streams
  * and groups he is following

@@ -1,6 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { Box } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
@@ -26,6 +26,7 @@ import {
    mapFromServerSide,
 } from "../../util/serverUtil"
 
+import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
@@ -34,13 +35,15 @@ import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
-import Heading from "components/views/portal/common/Heading"
+import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
+import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
 import { UserSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
+import dynamic from "next/dynamic"
 import { sxStyles } from "types/commonTypes"
 import {
    getLivestreamDialogData,
@@ -54,12 +57,25 @@ const styles = sxStyles({
    },
 })
 
+const DIALOG_SOURCE = "livestreamDialog"
+
+const RecommendedCustomJobs = dynamic(
+   () =>
+      import(
+         "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
+      ),
+   {
+      ssr: false,
+   }
+)
+
 const PortalPage = ({
    comingUpNextEvents,
    pastEvents,
    serializedCarouselContent,
    serverUserStats,
    livestreamDialogData,
+   customJobDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
@@ -114,49 +130,76 @@ const PortalPage = ({
                <LivestreamDialogLayout
                   livestreamDialogData={livestreamDialogData}
                >
-                  <>
-                     <Box position="relative" mb={4}>
-                        <ContentCarousel
-                           content={carouselContent}
-                           serverUserStats={serverUserStats}
-                        />
-                     </Box>
-                     <Container disableGutters>
-                        <PortalTagsContent>
-                           {isMounted ? (
-                              <UserSparksCarousel
-                                 header={<Heading>SPARKS</Heading>}
-                                 headerSx={styles.sparksCarouselHeader}
-                                 handleSparksClicked={handleSparksClicked}
-                                 showArrows={!isMobile}
-                              />
-                           ) : (
-                              <FallbackComponent
-                                 header={<Heading>SPARKS</Heading>}
-                              />
-                           )}
-                           {hasInterests ? (
-                              <RecommendedEvents limit={10} />
-                           ) : null}
-                           <ComingUpNextEvents
-                              serverSideEvents={comingUpNext}
-                              limit={20}
+                  <CustomJobDialogLayout
+                     customJobDialogData={customJobDialogData}
+                     source={{
+                        source: CustomJobApplicationSourceTypes.Portal,
+                        id: CustomJobApplicationSourceTypes.Portal,
+                     }}
+                     dialogSource={DIALOG_SOURCE}
+                  >
+                     <>
+                        <Box position="relative" mb={4}>
+                           <ContentCarousel
+                              content={carouselContent}
+                              serverUserStats={serverUserStats}
                            />
-                           <MyNextEvents />
-                           <ConditionalWrapper
-                              condition={Boolean(events?.length)}
-                           >
-                              <EventsPreviewCarousel
-                                 id={"past-events"}
-                                 title={"Past live streams"}
-                                 type={EventsTypes.PAST_EVENTS}
-                                 events={events}
-                                 seeMoreLink={"/past-livestreams"}
+                        </Box>
+                        <Container disableGutters>
+                           <PortalTagsContent>
+                              {isMounted ? (
+                                 <UserSparksCarousel
+                                    header={
+                                       <Typography
+                                          variant="brandedH4"
+                                          color="neutral.800"
+                                          fontWeight="600"
+                                       >
+                                          Sparks
+                                       </Typography>
+                                    }
+                                    headerSx={styles.sparksCarouselHeader}
+                                    handleSparksClicked={handleSparksClicked}
+                                    showArrows={!isMobile}
+                                    sx={{ mb: 4 }}
+                                 />
+                              ) : (
+                                 <FallbackComponent
+                                    header={
+                                       <Typography
+                                          variant="brandedH4"
+                                          color="neutral.800"
+                                          fontWeight="600"
+                                       >
+                                          Sparks
+                                       </Typography>
+                                    }
+                                 />
+                              )}
+                              {hasInterests ? (
+                                 <RecommendedEvents limit={10} />
+                              ) : null}
+                              <ComingUpNextEvents
+                                 serverSideEvents={comingUpNext}
+                                 limit={20}
                               />
-                           </ConditionalWrapper>
-                        </PortalTagsContent>
-                     </Container>
-                  </>
+                              <RecommendedCustomJobs />
+                              <MyNextEvents />
+                              <ConditionalWrapper
+                                 condition={Boolean(events?.length)}
+                              >
+                                 <EventsPreviewCarousel
+                                    id={"past-events"}
+                                    title={"Past live streams"}
+                                    type={EventsTypes.PAST_EVENTS}
+                                    events={events}
+                                    seeMoreLink={"/past-livestreams"}
+                                 />
+                              </ConditionalWrapper>
+                           </PortalTagsContent>
+                        </Container>
+                     </>
+                  </CustomJobDialogLayout>
                </LivestreamDialogLayout>
                <WelcomeDialogContainer />
             </>
@@ -274,10 +317,12 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
 
-   const [upcomingLivestreams, pastLivestreams] = await Promise.all([
-      filterNonRegisteredStreams(comingUpNextEvents || [], token?.email),
-      filterNonRegisteredStreams(pastEvents || [], token?.email),
-   ])
+   const [upcomingLivestreams, pastLivestreams, customJobDialogData] =
+      await Promise.all([
+         filterNonRegisteredStreams(comingUpNextEvents || [], token?.email),
+         filterNonRegisteredStreams(pastEvents || [], token?.email),
+         getCustomJobDialogData(ctx, DIALOG_SOURCE),
+      ])
 
    const carouselContentService = new CarouselContentService({
       userData: userData,
@@ -304,6 +349,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
             serializedCarouselContent:
                CarouselContentService.serializeContent(carouselContent),
          }),
+         customJobDialogData,
          livestreamDialogData,
       },
    }

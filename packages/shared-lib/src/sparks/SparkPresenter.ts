@@ -83,6 +83,7 @@ export class SparkPresenter implements SparkPresenterInterface {
    // Additional properties can be added here as the Spark structure evolves
    isCardNotification?: boolean
    cardNotificationType?: SparkCardNotificationTypes
+   hasJobs?: boolean
 
    // The SparkPresenter constructor
    constructor(data: Partial<SparkPresenter>) {

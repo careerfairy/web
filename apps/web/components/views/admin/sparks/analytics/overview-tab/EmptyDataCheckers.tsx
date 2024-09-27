@@ -1,6 +1,6 @@
 import { Stack, Typography } from "@mui/material"
-import { WarningIcon } from "./WarningIcon"
 import { sxStyles } from "types/commonTypes"
+import { WarningIcon } from "../components/WarningIcon"
 
 const styles = sxStyles({
    root: {

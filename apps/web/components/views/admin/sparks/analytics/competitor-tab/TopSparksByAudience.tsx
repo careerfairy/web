@@ -1,16 +1,15 @@
 import {
    CompetitorAudienceSegments,
-   SparkAnalyticsClientWithPastData,
-   TimePeriodParams,
+   CompetitorSparkData,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { Stack } from "@mui/material"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import { useState } from "react"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
+import { SparksCarousel } from "../components/SparksCarousel"
 import { TitleWithSelect } from "../components/TitleWithSelect"
-import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
-import { StaticSparkCard } from "./StaticSparkCard"
+import { useSparksAnalytics } from "../SparksAnalyticsContext"
+import { CompetitorSparkStaticCard } from "./CompetitorSparkStaticCard"
+import { EmptySparksList } from "./EmptySparksList"
 
 type AudienceOption = {
    value: CompetitorAudienceSegments | "all"
@@ -44,19 +43,11 @@ const AUDIENCE_OPTIOMS: AudienceOption[] = [
    },
 ]
 
-type TopSparksByIndustryContainerProps = {
-   timeFilter: TimePeriodParams
-}
-
-export const TopSparksByAudience = ({
-   timeFilter,
-}: TopSparksByIndustryContainerProps) => {
-   const { group } = useGroup()
+export const TopSparksByAudience = () => {
    const {
-      topSparksByAudience,
-   }: SparkAnalyticsClientWithPastData[TimePeriodParams] = useSparksAnalytics(
-      group.id
-   )[timeFilter]
+      filteredAnalytics: { topSparksByAudience },
+      selectTimeFilter,
+   } = useSparksAnalytics()
 
    const [selectAudienceValue, setSelectAudienceValue] = useState<
       CompetitorAudienceSegments | "all"
@@ -70,21 +61,29 @@ export const TopSparksByAudience = ({
             setSelectedOption={setSelectAudienceValue}
             options={AUDIENCE_OPTIOMS}
          />
-         {topSparksByAudience[selectAudienceValue]?.length === 0 ? (
-            <EmptyDataCheckerForMostSomething />
-         ) : (
-            <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-               {topSparksByAudience[selectAudienceValue].map((data, index) => (
-                  <StaticSparkCard
-                     key={`top-sparks-by-audience-${selectAudienceValue}-${data.sparkId}-${index}`}
-                     sparkId={data.sparkId}
-                     plays={data.plays}
-                     avgWatchedTime={data.avgWatchedTime}
-                     engagement={data.engagement}
-                  />
-               ))}
-            </Stack>
-         )}
+         <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+            {topSparksByAudience[selectAudienceValue] &&
+            topSparksByAudience[selectAudienceValue].length > 0 ? (
+               <SparksCarousel>
+                  {topSparksByAudience[selectAudienceValue].map(
+                     (data: CompetitorSparkData, index) => (
+                        <CompetitorSparkStaticCard
+                           key={`top-sparks-by-audience-${selectAudienceValue}-${index}`}
+                           sparkData={data.sparkData}
+                           plays={data.plays}
+                           avg_watched_time={data.avg_watched_time}
+                           engagement={data.engagement}
+                        />
+                     )
+                  )}
+               </SparksCarousel>
+            ) : (
+               <EmptySparksList
+                  targetLabel="audience"
+                  timePeriod={selectTimeFilter}
+               />
+            )}
+         </Stack>
       </GroupSparkAnalyticsCardContainer>
    )
 }

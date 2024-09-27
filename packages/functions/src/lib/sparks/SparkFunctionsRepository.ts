@@ -33,6 +33,7 @@ import {
 } from "@careerfairy/shared-lib/src/commonTypes"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
+import { getArrayDifference } from "@careerfairy/shared-lib/utils"
 import { DocumentSnapshot } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
@@ -328,6 +329,17 @@ export interface ISparkFunctionsRepository {
       afterJob: CustomJob,
       beforeJob: CustomJob,
       changeType: ReturnType<typeof getChangeTypes>
+   ): Promise<void>
+
+   /**
+    * Synchronizes the 'hasJobs' flag for group sparks based on the changes in the custom job.
+    * This function updates the 'hasJobs' flag for sparks associated with the custom job.
+    * @param afterJob The custom job after the update.
+    * @param beforeJob The custom job before the update.
+    */
+   syncGroupSparksHasJobsFlag(
+      afterJob: CustomJob,
+      beforeJob: CustomJob
    ): Promise<void>
 }
 
@@ -1175,6 +1187,77 @@ export class SparkFunctionsRepository
       }
 
       functions.logger.log(`Updated sparks linked to customJob ${afterJob.id}`)
+   }
+
+   async syncGroupSparksHasJobsFlag(
+      afterJob: CustomJob,
+      beforeJob: CustomJob
+   ): Promise<void> {
+      // Compare the sparks in afterJob and beforeJob to determine if they are identical
+      const areSparksEqual = beforeJob
+         ? getArrayDifference(afterJob.sparks, beforeJob.sparks).length === 0 &&
+           getArrayDifference(beforeJob.sparks, afterJob.sparks).length === 0
+         : true
+
+      if (areSparksEqual) {
+         // If the sparks are the same, exit the function early
+         return
+      }
+
+      // Get the sparks that were added to afterJob
+      const addedSparks = beforeJob
+         ? (getArrayDifference(beforeJob.sparks, afterJob.sparks) as string[])
+         : afterJob.sparks
+
+      // Get the live streams that were removed from beforeJob
+      const removedSparks = beforeJob
+         ? (getArrayDifference(afterJob.sparks, beforeJob.sparks) as string[])
+         : []
+
+      // Get all customJobs from the group id
+      const customJobs = await customJobRepo.getCustomJobsByGroupId(
+         afterJob.groupId
+      )
+
+      // Remove the current job from the array
+      const filteredCustomJobs = customJobs.filter(
+         (job) => job.id !== afterJob.id
+      )
+
+      // Filter the sparks that have been removed from the jobs
+      const sparksWithoutJobs = removedSparks.filter((sparkId) => {
+         return filteredCustomJobs.every((job) => !job.sparks.includes(sparkId))
+      })
+
+      // Filter the sparks that have been added to the jobs
+      const sparksWithNewJobAssignment = addedSparks.filter((sparkId) => {
+         return !filteredCustomJobs.some((job) => job.sparks.includes(sparkId))
+      })
+
+      const batch = this.firestore.batch()
+
+      // Update the sparks without jobs to have hasJob: false
+      sparksWithoutJobs.forEach((sparkId) => {
+         functions.logger.log(
+            `Update spark ${sparkId} to be with hasJobs flag as false`
+         )
+         batch.update(this.firestore.collection("sparks").doc(sparkId), {
+            hasJobs: false,
+         })
+      })
+
+      // Update the sparks with new job assignment to have hasJob: true
+      sparksWithNewJobAssignment.forEach((sparkId) => {
+         functions.logger.log(
+            `Update spark ${sparkId} to be with hasJobs flag as true`
+         )
+
+         batch.update(this.firestore.collection("sparks").doc(sparkId), {
+            hasJobs: true,
+         })
+      })
+
+      await batch.commit()
    }
 }
 

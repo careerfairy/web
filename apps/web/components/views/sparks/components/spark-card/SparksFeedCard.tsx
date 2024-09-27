@@ -1,3 +1,4 @@
+import { transformCreatorNameIntoSlug } from "@careerfairy/shared-lib/groups/creators"
 import {
    SparkCardNotificationTypes,
    SparkPresenter,
@@ -7,13 +8,14 @@ import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { Button, Fade, Grow, Stack } from "@mui/material"
 import Box from "@mui/material/Box"
+import { useAuth } from "HOCs/AuthProvider"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
-import { useAuth } from "HOCs/AuthProvider"
 import {
    FC,
    SyntheticEvent,
@@ -23,6 +25,7 @@ import {
    useRef,
    useState,
 } from "react"
+import { isMobile } from "react-device-detect"
 import { useSelector } from "react-redux"
 import {
    eventDetailsDialogVisibilitySelector,
@@ -34,6 +37,7 @@ import { SparksPopUpNotificationManager } from "./Notifications/SparksPopUpNotif
 import { useLinkedInNotificationStateManagement } from "./Notifications/useLinkedInNotificationStateManagement"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
+import SparkJobButton from "./SparkJobButton"
 import SparkQuestion from "./SparkQuestion"
 import VideoPreview from "./VideoPreview"
 
@@ -82,6 +86,9 @@ const styles = sxStyles({
       pb: {
          xs: 3.25,
          sparksFullscreen: 4,
+      },
+      mx: {
+         xs: 1.5,
       },
    },
    eventCardContent: {
@@ -148,6 +155,15 @@ const styles = sxStyles({
    hideOverlay: {
       background: "transparent",
    },
+   jobButton: {
+      mt: { md: 1.5 },
+      mb: { xs: 2, md: "unset" },
+      mx: { xs: 1, md: "unset" },
+   },
+   desktopContentInner: {
+      justifyContent: "flex-end",
+      width: "100%",
+   },
 })
 
 type Props = {
@@ -195,11 +211,18 @@ const SparksFeedCard: FC<Props> = ({
       ? `/company/${companyNameSlugify(spark.group.universityName)}`
       : undefined
 
-   const onSparkDetailsClick = useCallback(() => {
-      if (companyPageLink) {
-         trackEvent(SparkEventActions.Click_CompanyPageCTA)
+   const mentorPageLink = `/company/${
+      spark.group.universityName
+   }/mentor/${transformCreatorNameIntoSlug(
+      spark.creator.firstName,
+      spark.creator.lastName
+   )}/${spark.creator.id}`
+
+   const onCreatorDetailsClick = useCallback(() => {
+      if (mentorPageLink) {
+         trackEvent(SparkEventActions.Click_MentorPageCTA)
       }
-   }, [companyPageLink, trackEvent])
+   }, [mentorPageLink, trackEvent])
 
    const onVideoPlay = useCallback(() => {
       trackEvent(SparkEventActions.Played_Spark)
@@ -303,22 +326,25 @@ const SparksFeedCard: FC<Props> = ({
                   {showCardNotification ? (
                      <FullCardNotification spark={spark} />
                   ) : isOverlayedOntop ? (
-                     <Stack justifyContent="flex-end">
+                     <Stack sx={styles.desktopContentInner}>
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
-                              spark.group.logoUrl,
+                              spark.creator.avatarUrl,
                               "md"
                            )}
-                           onClick={onSparkDetailsClick}
+                           onClick={onCreatorDetailsClick}
                            displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
                            companyName={spark.group.universityName}
                            creatorPosition={spark.creator.position}
-                           linkToCompanyPage={companyPageLink}
+                           linkToMentorPage={mentorPageLink}
                         />
                         <Box mt={2} />
                         <SparkCategoryChip categoryId={spark.category.id} />
                         <Box mt={1.5} />
                         <SparkQuestion question={spark.question} />
+                        {spark.hasJobs && !isMobile ? (
+                           <JobButton spark={spark} />
+                        ) : null}
                      </Stack>
                   ) : null}
                   {!showCardNotification && isFullScreen ? (
@@ -327,15 +353,21 @@ const SparksFeedCard: FC<Props> = ({
                         <FeedCardActions
                            hide={!isOverlayedOntop}
                            spark={spark}
+                           linkToCompanyPage={companyPageLink}
                         />
                      </>
                   ) : null}
                </Box>
+               {spark.hasJobs && isMobile ? <JobButton spark={spark} /> : null}
             </Box>
          </Box>
          {!showCardNotification && !isFullScreen ? (
             <Box sx={styles.outerActionsWrapper}>
-               <FeedCardActions hide={!isOverlayedOntop} spark={spark} />
+               <FeedCardActions
+                  hide={!isOverlayedOntop}
+                  spark={spark}
+                  linkToCompanyPage={companyPageLink}
+               />
             </Box>
          ) : null}
       </>
@@ -378,3 +410,15 @@ export const ClickToUnmuteOverlay = () => {
 }
 
 export default SparksFeedCard
+
+type JobButtonProps = {
+   spark: SparkPresenter
+}
+
+const JobButton = ({ spark }: JobButtonProps) => (
+   <Box sx={styles.jobButton}>
+      <SuspenseWithBoundary fallback={<></>}>
+         <SparkJobButton spark={spark} />
+      </SuspenseWithBoundary>
+   </Box>
+)

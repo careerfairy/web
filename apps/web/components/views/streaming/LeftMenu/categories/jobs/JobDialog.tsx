@@ -1,5 +1,8 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJobApplicationSourceTypes,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import CloseIcon from "@mui/icons-material/Close"
 import {
@@ -173,7 +176,10 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
          <Box>
             <CustomJobEntryApply
                job={job}
-               livestreamId={livestream.id}
+               applicationSource={{
+                  id: livestream.id,
+                  source: CustomJobApplicationSourceTypes.Livestream,
+               }}
                handleApplyClick={handleShowConfirmation}
             />
          </Box>
@@ -194,7 +200,10 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
             open={open}
             handleClose={handleClose}
             job={job}
-            livestreamId={livestream.id}
+            applicationSource={{
+               id: livestream.id,
+               source: CustomJobApplicationSourceTypes.Livestream,
+            }}
          />
       )
    }

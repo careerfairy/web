@@ -7,13 +7,44 @@ export class CustomJobService {
       private readonly firebaseFunctions: firebase.functions.Functions
    ) {}
 
-   async applyToAJob(
-      livestreamId: string,
+   async confirmJobApplication(
       jobId: string,
       userId: string
    ): Promise<HttpsCallableResult> {
-      return this.firebaseFunctions.httpsCallable("userApplyToCustomJob_v2")({
-         livestreamId,
+      return this.firebaseFunctions.httpsCallable("confirmUserJobApplication")({
+         authId: userId,
+         jobId,
+      })
+   }
+
+   async confirmAnonymousJobApplication(
+      jobId: string,
+      fingerPrintId: string
+   ): Promise<HttpsCallableResult> {
+      return this.firebaseFunctions.httpsCallable(
+         "confirmAnonymousJobApplication"
+      )({
+         authId: fingerPrintId,
+         jobId,
+      })
+   }
+
+   /**
+    * Removes the job application for the specified user and job via cloud function after a user confirms the removal of the job
+    * in the confirmation dialog.
+    *
+    * The removal only sets the property 'removed' to true, which will remove the job from being displayed on the user profile.
+    * The user job application is not actually removed, only a flag is set to true indicating the user wishing its removal from his profile.
+    * @param jobId Id of the job the user wishes the application not to appear anymore on the his profile.
+    * @param userId Id of the user.
+    */
+   async removeUserJobApplication(
+      jobId: string,
+      userId: string
+   ): Promise<HttpsCallableResult> {
+      return this.firebaseFunctions.httpsCallable(
+         "setRemoveUserJobApplication"
+      )({
          userId,
          jobId,
       })

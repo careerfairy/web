@@ -440,15 +440,17 @@ export const onWriteCustomJobs = functions
                newCustomJob,
                oldCustomJob,
                changeTypes
-            )
-         )
-
-         sideEffectPromises.push(
+            ),
             sparkRepo.syncCustomJobBusinessFunctionTagsToSparks(
                newCustomJob,
                oldCustomJob,
                changeTypes
-            )
+            ),
+            livestreamsRepo.syncGroupLivestreamsHasJobsFlag(
+               newCustomJob,
+               oldCustomJob
+            ),
+            sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob)
          )
       }
 

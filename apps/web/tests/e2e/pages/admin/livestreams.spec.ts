@@ -11,7 +11,6 @@ test.describe("Group Admin Livestreams", () => {
    test("Create a draft livestream from the main page", async ({
       groupPage,
    }) => {
-      // TODO-WG: Confirm cannot use in beforeAll
       await setupLivestreamData()
 
       // Some required fields will be missing
@@ -45,7 +44,6 @@ test.describe("Group Admin Livestreams", () => {
       fieldOfStudyIds,
       levelOfStudyIds,
    }) => {
-      // TODO-WG: Confirm cannot use in beforeAll
       await setupLivestreamData()
 
       const livestream = LivestreamSeed.randomDraft({})
@@ -104,7 +102,6 @@ test.describe("Group Admin Livestreams", () => {
       groupPage,
       customJobs,
    }) => {
-      // TODO-WG: Confirm cannot use in beforeAll
       await setupLivestreamData()
 
       const jobs = customJobs.slice(0, 2) // only select some

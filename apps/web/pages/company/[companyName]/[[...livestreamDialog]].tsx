@@ -1,3 +1,5 @@
+import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
+import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import {
    PublicCreator,
@@ -7,6 +9,11 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
+import {
+   CustomJobDialogData,
+   CustomJobDialogLayout,
+} from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
+import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import {
    GetStaticPaths,
    GetStaticProps,
@@ -27,8 +34,11 @@ import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
 import {
    deserializeGroupClient,
    getLivestreamsAndDialogData,
+   mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../util/serverUtil"
+
+const PARAMETER_SOURCE = "livestreamDialog"
 
 type TrackProps = {
    id: string
@@ -39,7 +49,9 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
+   serverSideCustomJobs,
    livestreamDialogData,
+   customJobDialogData,
    groupCreators,
 }) => {
    const { trackCompanyPageView } = useFirebaseService()
@@ -53,27 +65,38 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
-         <SEO
-            id={`CareerFairy | ${universityName}`}
-            title={`CareerFairy | ${universityName}`}
-         />
+         <CustomJobDialogLayout
+            customJobDialogData={customJobDialogData}
+            source={{ source: CustomJobApplicationSourceTypes.Group, id: id }}
+            dialogSource={PARAMETER_SOURCE}
+         >
+            <SEO
+               id={`CareerFairy | ${universityName}`}
+               title={`CareerFairy | ${universityName}`}
+            />
 
-         <GenericDashboardLayout pageDisplayName={""}>
-            <Box
-               sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
-               ref={viewRef}
-            >
-               <CompanyPageOverview
-                  group={serverSideGroup}
-                  groupCreators={groupCreators}
-                  upcomingLivestreams={mapFromServerSide(
-                     serverSideUpcomingLivestreams
-                  )}
-                  pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
-                  editMode={false}
-               />
-            </Box>
-         </GenericDashboardLayout>
+            <GenericDashboardLayout pageDisplayName={""}>
+               <Box
+                  sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
+                  ref={viewRef}
+               >
+                  <CompanyPageOverview
+                     group={serverSideGroup}
+                     groupCreators={groupCreators}
+                     upcomingLivestreams={mapFromServerSide(
+                        serverSideUpcomingLivestreams
+                     )}
+                     pastLivestreams={mapFromServerSide(
+                        serverSidePastLivestreams
+                     )}
+                     customJobs={mapCustomJobsFromServerSide(
+                        serverSideCustomJobs
+                     )}
+                     editMode={false}
+                  />
+               </Box>
+            </GenericDashboardLayout>
+         </CustomJobDialogLayout>
       </LivestreamDialogLayout>
    )
 }
@@ -84,7 +107,10 @@ export const getStaticProps: GetStaticProps<{
    serverSideUpcomingLivestreams: { [p: string]: any }[]
    // eslint-disable-next-line @typescript-eslint/no-explicit-any
    serverSidePastLivestreams: { [p: string]: any }[]
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   serverSideCustomJobs: { [p: string]: any }[]
    livestreamDialogData: LiveStreamDialogData
+   customJobDialogData: CustomJobDialogData
    groupCreators: PublicCreator[]
 }> = async (ctx) => {
    const { params } = ctx
@@ -96,22 +122,23 @@ export const getStaticProps: GetStaticProps<{
 
       if (serverSideGroup) {
          if (serverSideGroup.publicProfile) {
-            const {
-               serverSideUpcomingLivestreams,
-               serverSidePastLivestreams,
-               livestreamDialogData,
-            } = await getLivestreamsAndDialogData(
-               serverSideGroup?.groupId,
-               ctx,
+            const [
                {
+                  serverSideUpcomingLivestreams,
+                  serverSidePastLivestreams,
+                  serverSideGroupAvailableCustomJobs,
+                  livestreamDialogData,
+               },
+               customJobDialogData,
+               creators,
+            ] = await Promise.all([
+               getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx, {
                   hideHidden: true,
                   limit: undefined,
-               }
-            )
-
-            const creators = await groupRepo.getCreatorsWithPublicContent(
-               serverSideGroup
-            )
+               }),
+               getCustomJobDialogData(ctx, PARAMETER_SOURCE),
+               groupRepo.getCreatorsWithPublicContent(serverSideGroup),
+            ])
 
             return {
                props: {
@@ -125,7 +152,12 @@ export const getStaticProps: GetStaticProps<{
                      serverSidePastLivestreams?.map(
                         LivestreamPresenter.serializeDocument
                      ) || [],
+                  serverSideCustomJobs:
+                     serverSideGroupAvailableCustomJobs?.map(
+                        CustomJobsPresenter.serializeDocument
+                     ) || [],
                   livestreamDialogData,
+                  customJobDialogData,
                   groupCreators: creators?.map(pickPublicDataFromCreator) || [],
                },
                revalidate: 60,

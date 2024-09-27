@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react"
-import { alpha, darken, useTheme } from "@mui/material/styles"
+import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown"
+import LanguageIcon from "@mui/icons-material/Language"
 import {
    Avatar,
    Box,
@@ -11,27 +11,27 @@ import {
    Typography,
    useMediaQuery,
 } from "@mui/material"
-import CountDown from "./CountDown"
-import HeroSpeakers from "./HeroSpeakers"
+import { alpha, darken, useTheme } from "@mui/material/styles"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import Image from "next/legacy/image"
+import { useCallback, useEffect, useState } from "react"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import { SuspenseWithBoundary } from "../../../ErrorBoundary"
+import useCountTime from "../../../custom-hook/useCountTime"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import HeroHosts from "./HeroHosts"
 import {
    InPersonEventBadge,
    LimitedRegistrationsBadge,
 } from "../../common/NextLivestreams/GroupStreams/groupStreamCard/badges"
 import WhiteTagChip from "../../common/chips/TagChip"
-import LanguageIcon from "@mui/icons-material/Language"
-import Image from "next/legacy/image"
-import JobApply from "./JobApply"
-import { SuspenseWithBoundary } from "../../../ErrorBoundary"
-import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
-import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown"
-import useIsMobile from "../../../custom-hook/useIsMobile"
 import RecordingPlayer from "../RecordingPlayer"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import useCountTime from "../../../custom-hook/useCountTime"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import CountDown from "./CountDown"
+import HeroHosts from "./HeroHosts"
+import HeroSpeakers from "./HeroSpeakers"
+import JobApply from "./JobApply"
 
 const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
    if (showBigVideoPlayer) {
@@ -200,7 +200,6 @@ const HeroSection = ({
    showScrollButton = false,
    isPastEvent,
    showRecording = false,
-   userHasBoughtRecording = false,
    userEmailFromServer,
 }) => {
    const theme = useTheme()
@@ -273,18 +272,11 @@ const HeroSection = ({
          livestreamId: stream.id,
          userId: userData.userEmail,
          livestreamStartDate: stream.start,
-         usedCredits: Boolean(userHasBoughtRecording),
       })
 
       // play recording
       handleRecordingPlay()
-   }, [
-      handleRecordingPlay,
-      stream?.id,
-      stream?.start,
-      userData?.userEmail,
-      userHasBoughtRecording,
-   ])
+   }, [handleRecordingPlay, stream?.id, stream?.start, userData?.userEmail])
 
    const handleCloseRecordingPlayer = useCallback(() => {
       setShowBigVideoPlayer(false)
@@ -294,7 +286,6 @@ const HeroSection = ({
       () => (
          <Box pt={1}>
             <RecordingPlayer
-               boughtAccess={userHasBoughtRecording}
                handlePlay={handleRecordingPlay}
                handlePause={pauseCounting}
                handleClosePlayer={handleCloseRecordingPlayer}
@@ -307,7 +298,6 @@ const HeroSection = ({
       ),
       [
          streamPresenter,
-         userHasBoughtRecording,
          handleCloseRecordingPlayer,
          handlePreviewPlay,
          handleRecordingPlay,

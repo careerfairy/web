@@ -1,16 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import { useRouter } from "next/router"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
-import { formatLivestreamsEvents } from "./utils"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+import { useRouter } from "next/router"
+import { useEffect, useMemo, useState } from "react"
+import { sxStyles } from "types/commonTypes"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
    EventsTypes,
 } from "./EventsPreviewCarousel"
-import { sxStyles } from "types/commonTypes"
+import { formatLivestreamsEvents } from "./utils"
 
 const config = {
    suspense: false,
@@ -47,12 +47,8 @@ const styles = sxStyles({
       textDecoration: "underline",
    },
    eventTitle: {
-      fontFamily: "Poppins",
-      fontSize: "18px",
-      fontStyle: "normal",
       fontWeight: "600",
-      lineHeight: "27px",
-      color: "black",
+      color: (theme) => theme.palette.neutral[800],
    },
    viewport: {
       overflow: "hidden",
@@ -111,7 +107,7 @@ const defaultStyling: EventsCarouselStyling = {
    padding: true,
    slide: styles.slide,
    title: styles.eventTitle,
-   titleVariant: "h6",
+   titleVariant: "brandedH4",
    eventsHeader: styles.eventsHeader,
    mainWrapperBoxSx: styles.mainWrapperBox,
 }
