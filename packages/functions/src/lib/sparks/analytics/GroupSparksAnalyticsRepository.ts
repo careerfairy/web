@@ -488,6 +488,7 @@ class GroupSparksAnalyticsRepository
                ),
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
+               avg_watched_percentage: item.avg_watched_percentage,
                engagement: item.engagement,
             })
          }
@@ -506,6 +507,7 @@ class GroupSparksAnalyticsRepository
                ),
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
+               avg_watched_percentage: item.avg_watched_percentage,
                engagement: item.engagement,
             })
          }
@@ -577,6 +579,7 @@ class GroupSparksAnalyticsRepository
                ),
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
+               avg_watched_percentage: item.avg_watched_percentage,
                engagement: item.engagement,
             })
          }
@@ -595,6 +598,7 @@ class GroupSparksAnalyticsRepository
                ),
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
+               avg_watched_percentage: item.avg_watched_percentage,
                engagement: item.engagement,
             })
          }
