@@ -335,6 +335,7 @@ export class FirebaseCustomJobRepository
          job,
          applied: false,
          createdAt: this.fieldValue.serverTimestamp() as Timestamp,
+         removedFromUserProfile: false,
       }
 
       return this.firestore

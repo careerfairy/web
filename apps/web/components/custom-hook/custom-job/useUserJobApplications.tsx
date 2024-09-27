@@ -9,6 +9,7 @@ const useUserJobApplications = (userId: string, applied: boolean) => {
       where("user.id", "==", userId),
       where("applied", "==", applied),
       where("job.documentType", "==", "customJobs"),
+      where("removedFromUserProfile", "==", false),
       orderBy("job.deadline", "asc")
    )
 
@@ -16,10 +17,7 @@ const useUserJobApplications = (userId: string, applied: boolean) => {
       idField: "id", // this field will be added to the firestore object
    })
 
-   // Filter for removedFromUserProfile done in memory due to firestore limitations when handling optional params, can be moved to CF or backfilled if necessary
-   const customJobs = (data || [])
-      .filter((jobApplication) => !jobApplication.removedFromUserProfile)
-      .map((jobApplication) => jobApplication.job)
+   const customJobs = (data || []).map((jobApplication) => jobApplication.job)
 
    return customJobs
 }
