@@ -134,6 +134,7 @@ const JobCardDetails = ({
    let jobPostingUrl: string
    let jobPublished: boolean
    let jobBusinessTags: string
+
    let jobIsPermanentlyExpired: boolean
 
    if (isAtsJob) {
@@ -148,6 +149,7 @@ const JobCardDetails = ({
       jobBusinessTags = (job.businessFunctionsTagIds || [])
          .map((tagId) => TagValuesLookup[tagId])
          .join(", ")
+
       jobIsPermanentlyExpired = job.isPermanentlyExpired
    }
 
