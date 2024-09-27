@@ -1,6 +1,7 @@
 import { Stack, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { WarningIcon } from "../components/WarningIcon"
+import { timeFrameLabels } from "../util"
 
 const styles = sxStyles({
    root: {
@@ -13,7 +14,7 @@ const styles = sxStyles({
    container: {
       width: {
          xs: "100%",
-         md: "34%",
+         md: "50%",
       },
       alignItems: "center",
       textAlign: "center",
@@ -35,19 +36,28 @@ const styles = sxStyles({
    },
 })
 
-const EmptyDataCheckerForMostSomething = () => {
+type EmptySparksListProps = {
+   targetLabel: "industry" | "audience"
+   timePeriod: string
+}
+
+export const EmptySparksList = ({
+   targetLabel,
+   timePeriod,
+}: EmptySparksListProps) => {
    return (
       <Stack direction="row" sx={styles.root}>
          <Stack direction="column" spacing={3} sx={styles.container}>
             <WarningIcon sx={styles.icon} />
-            <Typography sx={styles.header}>Not enough content yet</Typography>
+            <Typography sx={styles.header}>
+               No Sparks data to show in this time period.
+            </Typography>
             <Typography sx={styles.body}>
-               More content is needed before displaying the top performing
-               Sparks from your company.
+               During the {timeFrameLabels[timePeriod].toLowerCase()} no Sparks
+               from the selected industry were public. Choose another{" "}
+               {targetLabel} or time range to see the top Sparks.
             </Typography>
          </Stack>
       </Stack>
    )
 }
-
-export default EmptyDataCheckerForMostSomething

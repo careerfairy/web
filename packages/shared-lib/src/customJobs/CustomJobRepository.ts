@@ -491,6 +491,7 @@ export class FirebaseCustomJobRepository
 
       return batch.commit()
    }
+
    async syncPermanentlyExpiredCustomJobs(): Promise<void> {
       const customJobRef = this.firestore
          .collection(this.COLLECTION_NAME)
