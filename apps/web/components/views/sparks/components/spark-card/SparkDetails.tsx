@@ -94,6 +94,7 @@ const SparkDetails: FC<Props> = ({
                src={companyLogoUrl}
                alt={companyName}
                size={isFullScreen ? 48 : 60}
+               objectFit="cover"
             />
          </span>
          <Box mr={0.75} />

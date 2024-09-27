@@ -275,11 +275,16 @@ class GroupSparksAnalyticsRepository
 
       const sparks = await this.sparksRepo.getSparksByIds(sparkIds)
 
-      const result = bigQueryResults.map<MostSomethingBase>(
-         (bigQueryResult) => {
+      const result = bigQueryResults
+         .map<MostSomethingBase>((bigQueryResult) => {
             const spark = sparks.find(
                (spark) => spark.id === bigQueryResult.sparkId
             )
+
+            if (!spark) {
+               return null
+            }
+
             return {
                sparkData: {
                   creator: {
@@ -302,8 +307,8 @@ class GroupSparksAnalyticsRepository
                num_shares: bigQueryResult.num_shares,
                num_clicks: bigQueryResult.num_clicks,
             }
-         }
-      )
+         })
+         .filter(Boolean)
 
       return result
    }
@@ -338,11 +343,16 @@ class GroupSparksAnalyticsRepository
 
       const sparks = await this.sparksRepo.getSparksByIds(sparkIds)
 
-      const result = bigQueryResults.map<MostSomethingBase>(
-         (bigQueryResult) => {
+      const result = bigQueryResults
+         .map<MostSomethingBase>((bigQueryResult) => {
             const spark = sparks.find(
                (spark) => spark.id === bigQueryResult.sparkId
             )
+
+            if (!spark) {
+               return null
+            }
+
             return {
                sparkData: {
                   creator: {
@@ -365,8 +375,8 @@ class GroupSparksAnalyticsRepository
                num_shares: bigQueryResult.num_shares,
                num_clicks: bigQueryResult.num_clicks,
             }
-         }
-      )
+         })
+         .filter(Boolean)
 
       return result
    }
