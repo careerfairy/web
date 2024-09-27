@@ -7,9 +7,9 @@ import { useState } from "react"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { SparksCarousel } from "../components/SparksCarousel"
 import { TitleWithSelect } from "../components/TitleWithSelect"
-import EmptyDataCheckerForMostSomething from "../overview-tab/EmptyDataCheckers"
 import { useSparksAnalytics } from "../SparksAnalyticsContext"
 import { CompetitorSparkStaticCard } from "./CompetitorSparkStaticCard"
+import { EmptySparksList } from "./EmptySparksList"
 
 type AudienceOption = {
    value: CompetitorAudienceSegments | "all"
@@ -46,6 +46,7 @@ const AUDIENCE_OPTIOMS: AudienceOption[] = [
 export const TopSparksByAudience = () => {
    const {
       filteredAnalytics: { topSparksByAudience },
+      selectTimeFilter,
    } = useSparksAnalytics()
 
    const [selectAudienceValue, setSelectAudienceValue] = useState<
@@ -60,10 +61,9 @@ export const TopSparksByAudience = () => {
             setSelectedOption={setSelectAudienceValue}
             options={AUDIENCE_OPTIOMS}
          />
-         {topSparksByAudience[selectAudienceValue]?.length === 0 ? (
-            <EmptyDataCheckerForMostSomething />
-         ) : (
-            <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+         <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+            {topSparksByAudience[selectAudienceValue] &&
+            topSparksByAudience[selectAudienceValue].length > 0 ? (
                <SparksCarousel>
                   {topSparksByAudience[selectAudienceValue].map(
                      (data: CompetitorSparkData, index) => (
@@ -77,8 +77,13 @@ export const TopSparksByAudience = () => {
                      )
                   )}
                </SparksCarousel>
-            </Stack>
-         )}
+            ) : (
+               <EmptySparksList
+                  targetLabel="audience"
+                  timePeriod={selectTimeFilter}
+               />
+            )}
+         </Stack>
       </GroupSparkAnalyticsCardContainer>
    )
 }
