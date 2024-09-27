@@ -1,3 +1,4 @@
+import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    SparkAnalyticsClient,
    TimePeriodParams,
@@ -5,6 +6,7 @@ import {
 import { useFetchSparksAnalytics } from "components/custom-hook/spark/analytics/useFetchSparksAnalytics"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import { timeFrameLabels } from "./util"
 
 interface SparksAnalyticsContextType {
    filteredAnalytics: SparkAnalyticsClient | null
@@ -14,6 +16,7 @@ interface SparksAnalyticsContextType {
    selectTimeFilter: TimePeriodParams
    setSelectTimeFilter: (selectTimeFilter: TimePeriodParams) => void
    updatedAtLabel: string
+   industriesOptions: { value: string; label: string }[]
 }
 
 const SparksAnalyticsContext = createContext<
@@ -45,6 +48,42 @@ export const SparksAnalyticsProvider = ({ children }) => {
       return analytics?.[selectTimeFilter]
    }, [analytics, selectTimeFilter])
 
+   const industriesOptions = useMemo(() => {
+      if (!analytics) return []
+
+      const timePeriods = Object.keys(timeFrameLabels)
+      const topSparksIndustries = Array.from(
+         new Set(
+            timePeriods.flatMap((timePeriod) => {
+               return Object.keys(analytics[timePeriod].topSparksByIndustry)
+            })
+         )
+      )
+
+      const allOptions = [
+         {
+            id: "all",
+            name: "All Industries",
+         },
+         ...CompanyIndustryValues,
+      ].map((industry) => ({
+         value: industry.id,
+         label: industry.name,
+      }))
+
+      const groupIndustriesById = group.companyIndustries.map(
+         (industry) => industry.id
+      )
+
+      const result = allOptions.filter(
+         (option) =>
+            groupIndustriesById.includes(option.value) ||
+            topSparksIndustries.includes(option.value)
+      )
+
+      return result
+   }, [analytics, group?.companyIndustries])
+
    const value = useMemo(() => {
       return {
          filteredAnalytics,
@@ -54,6 +93,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
          selectTimeFilter,
          setSelectTimeFilter,
          updatedAtLabel,
+         industriesOptions,
       }
    }, [
       filteredAnalytics,
@@ -62,6 +102,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
       updateAnalytics,
       selectTimeFilter,
       updatedAtLabel,
+      industriesOptions,
    ])
 
    useEffect(() => {

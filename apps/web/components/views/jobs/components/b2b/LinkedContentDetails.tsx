@@ -113,7 +113,7 @@ const LinkedContentDetails = ({ job }: Props) => {
                   Sparks related to this job
                </Typography>
                <Box sx={styles.linkedContentWrapper}>
-                  <SparksCarousel sparks={jobSparks} />
+                  <SparksCarousel sparks={jobSparks} disableClick />
                </Box>
             </Box>
          ) : null}

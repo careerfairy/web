@@ -1,11 +1,31 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box } from "@mui/material"
+import { Box, Stack } from "@mui/material"
+import Typography from "@mui/material/Typography"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import JobHeader from "components/views/livestream-dialog/views/job-details/main-content/JobHeader"
 import { sxStyles } from "../../../../../types/commonTypes"
-import CustomJobDetailsView from "../custom-jobs/CustomJobDetailsView"
+import DateUtil from "../../../../../util/DateUtil"
+import SanitizedHTML from "../../../../util/SanitizedHTML"
+import LinkedContentDetails from "./LinkedContentDetails"
 
 const styles = sxStyles({
    wrapper: {
       p: 2,
+   },
+   subTitle: {
+      fontSize: "18px",
+      fontWeight: 600,
+   },
+   jobValues: {
+      fontSize: "16px",
+   },
+   content: {
+      mt: 4,
+   },
+   description: {
+      fontSize: "16px",
+      fontWeight: 400,
+      color: (theme) => theme.palette.text.secondary,
    },
 })
 
@@ -21,15 +41,62 @@ const CustomJobAdminDetails = ({
    companyName,
    companyLogoUrl,
 }: Props) => {
+   const { description, salary, deadline } = job
+
+   const jobDeadline = deadline
+      ? DateUtil.formatDateToString(deadline.toDate())
+      : ""
+
+
    return (
       <Box sx={styles.wrapper}>
-         <CustomJobDetailsView
+         <JobHeader
             job={job}
             companyName={companyName}
             companyLogoUrl={companyLogoUrl}
-            handleEdit={handleEdit}
-            disabledLinkedContentClick
+            editMode={!!handleEdit}
+            handleClick={handleEdit}
          />
+
+         <Box sx={styles.content}>
+            <Stack spacing={2}>
+               <Box>
+                  <Typography variant={"subtitle1"} sx={styles.subTitle}>
+                     Job description
+                  </Typography>
+                  <SanitizedHTML
+                     sx={styles.description}
+                     htmlString={description}
+                  />
+               </Box>
+
+               {salary ? (
+                  <Box>
+                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
+                        Salary
+                     </Typography>
+                     <Typography variant={"body1"} sx={styles.jobValues}>
+                        {salary}
+                     </Typography>
+                  </Box>
+               ) : null}
+
+               {jobDeadline ? (
+                  <Box>
+                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
+                        Application deadline
+                     </Typography>
+                     <Typography variant={"body1"} sx={styles.jobValues}>
+                        {jobDeadline}
+                     </Typography>
+                  </Box>
+               ) : null}
+
+               <SuspenseWithBoundary fallback={<></>}>
+                  <LinkedContentDetails job={job} />
+               </SuspenseWithBoundary>
+            </Stack>
+         </Box>
       </Box>
    )
 }
