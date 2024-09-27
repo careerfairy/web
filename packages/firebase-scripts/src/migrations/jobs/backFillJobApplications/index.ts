@@ -1,7 +1,7 @@
 import {
    CustomJobApplicant,
    CustomJobApplicationSourceTypes,
-} from "@careerfairy/shared-lib/src/customJobs/customJobs"
+} from "@careerfairy/shared-lib/dist/customJobs/customJobs"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { customJobRepo } from "../../../repositories"
@@ -23,11 +23,15 @@ export async function run() {
          "Fetching all Job Applications"
       )
 
-      Counter.log(`Fetched ${allJobApplications.length} Job Applications`)
+      const jobApplicationsToUpdate = (allJobApplications || []).filter(
+         (jobApplication) => jobApplication.livestreamId
+      )
 
-      counter.addToReadCount(allJobApplications.length)
+      Counter.log(`Fetched ${jobApplicationsToUpdate.length} Job Applications`)
 
-      await backfillJobApplications(allJobApplications)
+      counter.addToReadCount(jobApplicationsToUpdate.length)
+
+      await backfillJobApplications(jobApplicationsToUpdate)
    } catch (error) {
       console.error(error)
       throwMigrationError(error.message)
@@ -52,25 +56,28 @@ const backfillJobApplications = async (
       const customJobsApplicantsChunk = totalDocs.slice(i, i + batchSize) // Slice the data into batches
 
       customJobsApplicantsChunk.forEach((customJobApplicant) => {
-         writeProgressBar.increment() // Increment progress bar
+         if (customJobApplicant.livestreamId) {
+            writeProgressBar.increment() // Increment progress bar
 
-         const jobApplicationRef = firestore
-            .collection("jobApplications")
-            .doc(customJobApplicant.id)
+            const jobApplicationRef = firestore
+               .collection("jobApplications")
+               .doc(customJobApplicant.id)
 
-         const toUpdate: CustomJobApplicant = {
-            ...customJobApplicant,
-            applied: true,
-            applicationSource: {
-               source: CustomJobApplicationSourceTypes.Livestream,
-               id: customJobApplicant.livestreamId,
-            },
+            const toUpdate: CustomJobApplicant = {
+               ...customJobApplicant,
+               applied: true,
+               applicationSource: {
+                  source: CustomJobApplicationSourceTypes.Livestream,
+                  id: customJobApplicant.livestreamId,
+               },
+            }
+
+            delete toUpdate["livestreamId"]
+
+            batch.set(jobApplicationRef, toUpdate)
+
+            counter.writeIncrement() // Increment write counter
          }
-
-         delete toUpdate["livestreamId"]
-
-         batch.set(jobApplicationRef, toUpdate)
-         counter.writeIncrement() // Increment write counter
       })
 
       await batch.commit() // Wait for batch to commit
