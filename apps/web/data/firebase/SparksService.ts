@@ -59,7 +59,7 @@ export class SparksService {
    async createSpark(data: AddSparkSparkData) {
       return httpsCallable<AddSparkSparkData, void>(
          this.functions,
-         "createSpark_v4"
+         "createSpark_v5"
       )(data)
    }
 
