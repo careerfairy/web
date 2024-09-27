@@ -21,6 +21,7 @@ const CustomJobAdminDetails = ({
    companyName,
    companyLogoUrl,
 }: Props) => {
+
    return (
       <Box sx={styles.wrapper}>
          <CustomJobDetailsView

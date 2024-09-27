@@ -182,7 +182,7 @@ export class NewsletterService {
    async fetchRequiredData() {
       // start fetching in parallel
       const promises = [
-         this.userRepo.getSubscribedUsers(),
+         this.userRepo.getSubscribedUsers(null, LOCATION_FILTERS),
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
          this.userRepo.getAllUserRegisteredLivestreams(null, LOCATION_FILTERS),
