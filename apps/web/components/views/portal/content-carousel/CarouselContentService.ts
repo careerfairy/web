@@ -36,6 +36,7 @@ export type LivestreamEventWithType = LivestreamEvent & {
 export const CTASlideTopics = {
    CareerCoins: "CareerCoins",
    Sparks: "Sparks",
+   Jobs: "Jobs",
 } as const
 
 export type CTASlideTopic = (typeof CTASlideTopics)[keyof typeof CTASlideTopics]
@@ -196,12 +197,33 @@ export class CarouselContentService {
          this.options.userData,
          CTASlideTopics.Sparks
       )
-      const userHasSeenASpark = await this.userHasSeenASpark()
+
+      const [userHasSeenASpark, userHasAppliedToAJob] = await Promise.all([
+         this.userHasSeenASpark(),
+         this.userHasAppliedToAJob(),
+      ])
+
       if (!userHasSeenASpark && shouldSeeSparksCTABanner) {
          content = [
             {
                contentType: "CTASlide",
                topic: CTASlideTopics.Sparks,
+            },
+            ...content,
+         ]
+      }
+
+      // check whether to add Jobs CTA
+      const shouldSeeJobsCTABanner = userShouldSeeCTABannerToday(
+         this.options.userData,
+         CTASlideTopics.Jobs
+      )
+
+      if (!userHasAppliedToAJob && shouldSeeJobsCTABanner) {
+         content = [
+            {
+               contentType: "CTASlide",
+               topic: CTASlideTopics.Jobs,
             },
             ...content,
          ]
@@ -228,6 +250,10 @@ export class CarouselContentService {
    private async userHasSeenASpark(): Promise<boolean> {
       const userId = this.options.userData?.authId
       return userId ? sparkService.hasUserSeenAnySpark(userId) : false
+   }
+
+   private async userHasAppliedToAJob(): Promise<boolean> {
+      return false
    }
 
    static serializeContent(content: CarouselContent[]): SerializedContent[] {
@@ -285,6 +311,10 @@ export class CarouselContentService {
                   userDates = userData.sparksBannerCTADates
                   break
                }
+               case CTASlideTopics.Jobs: {
+                  userDates = userData.jobsBannerCTADates
+                  break
+               }
             }
          }
          userDates = userDates ? userDates : []
@@ -307,6 +337,13 @@ export class CarouselContentService {
                   break
                }
                case CTASlideTopics.Sparks: {
+                  addDatePromise =
+                     firebaseServiceInstance.addDateUserHasSeenSparksCTABanner(
+                        userData.userEmail
+                     )
+                  break
+               }
+               case CTASlideTopics.Jobs: {
                   addDatePromise =
                      firebaseServiceInstance.addDateUserHasSeenSparksCTABanner(
                         userData.userEmail
@@ -379,6 +416,10 @@ const userShouldSeeCTABannerToday = (
          }
          case CTASlideTopics.Sparks: {
             bannerCTADates = userData.sparksBannerCTADates
+            break
+         }
+         case CTASlideTopics.Jobs: {
+            bannerCTADates = userData.jobsBannerCTADates
             break
          }
       }

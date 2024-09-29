@@ -103,6 +103,11 @@ export interface UserData extends Identifiable {
    sparksBannerCTADates?: string[]
 
    /**
+    * Dates of days when the user has seen the jobs CTA banner
+    */
+   jobsBannerCTADates?: string[]
+
+   /**
     * User has already seen the first onboarding video
     */
    welcomeDialogComplete?: boolean
