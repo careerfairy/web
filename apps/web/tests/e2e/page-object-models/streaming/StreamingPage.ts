@@ -12,4 +12,25 @@ export class StreamingPage extends CommonPage {
       expect(this.exactText(streamerName)).toBeVisible()
       return expect(this.exactText(streamer.position)).toBeVisible()
    }
+
+   public async assertConnectionInterruptedDialogOpens() {
+      return await expect(
+         this.page.locator("text=Your connection got interrupted")
+      ).toBeVisible()
+   }
+
+   public async assertConnectionInterruptedDialogIsClosed() {
+      return await expect(
+         this.page.locator("text=Your connection got interrupted")
+      ).not.toBeVisible()
+   }
+
+   public async assertStreamIsOpenOnOtherBrowserDialogOpen() {
+      await expect(
+         this.page.locator("text=Session conflict detected")
+      ).toBeVisible()
+      await expect(
+         this.page.locator("text=Click here to force connection")
+      ).toBeVisible()
+   }
 }

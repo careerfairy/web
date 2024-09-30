@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test"
+import { streaming } from "tests/constants"
 import { StreamingPage } from "./StreamingPage"
 
 /**
@@ -33,6 +34,39 @@ export class StreamerPage extends StreamingPage {
    ) {
       await this.open(livestreamId, options)
       await this.page.locator(`text=${name}`).click()
+      await this.page.locator('button:has-text("Join live stream")').click()
+   }
+
+   public async createAndJoinWithAdHocSpeaker(
+      livestreamId: string,
+      options?: {
+         secureToken?: string
+      }
+   ) {
+      await this.open(livestreamId, options)
+      await this.page.locator('text="Add speaker"').click()
+      await this.page.locator('input[name="firstName"]').click()
+      await this.page
+         .locator('input[name="firstName"]')
+         .fill(streaming.streamer.firstName)
+      await this.page.locator('input[name="lastName"]').click()
+      await this.page
+         .locator('input[name="lastName"]')
+         .fill(streaming.streamer.lastName)
+      await this.page.locator('input[name="position"]').click()
+      await this.page
+         .locator('input[name="position"]')
+         .fill(streaming.streamer.position)
+      await this.page.locator('input[name="email"]').click()
+      await this.page
+         .locator('input[name="email"]')
+         .fill(streaming.streamer.email)
+
+      const fileChooserPromise = this.page.waitForEvent("filechooser")
+      await this.page.getByText("Upload speaker picture").click()
+      const fileChooser = await fileChooserPromise
+      await fileChooser.setFiles(streaming.streamer.avatar)
+
       await this.page.locator('button:has-text("Join live stream")').click()
    }
 
