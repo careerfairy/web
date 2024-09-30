@@ -345,7 +345,7 @@ export class CarouselContentService {
                }
                case CTASlideTopics.Jobs: {
                   addDatePromise =
-                     firebaseServiceInstance.addDateUserHasSeenSparksCTABanner(
+                     firebaseServiceInstance.addDateUserHasSeenJobsCTABanner(
                         userData.userEmail
                      )
                   break
