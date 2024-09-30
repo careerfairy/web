@@ -1,16 +1,18 @@
 import {
    Box,
    Container,
+   SxProps,
    Typography,
    TypographyProps,
    darken,
    styled,
 } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import Image from "next/legacy/image"
-import React, { FC, Fragment } from "react"
-import { sxStyles } from "../../../../types/commonTypes"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import Image from "next/legacy/image"
+import React, { Fragment } from "react"
+import { combineStyles, sxStyles } from "../../../../types/commonTypes"
 
 const COMPANY_LOGO_SIZE = 63
 
@@ -71,6 +73,9 @@ const styles = sxStyles({
          backgroundColor: (theme) => darken(theme.palette.navyBlue.main, 0.5),
       },
    },
+   actionItem: {
+      mt: 2,
+   },
 })
 
 type ContentProps = {
@@ -80,6 +85,7 @@ type ContentProps = {
    title?: string | React.ReactNode
    subtitle?: string | React.ReactNode
    actionItem?: React.ReactNode
+   actionItemSx?: SxProps<DefaultTheme>
    backgroundImageUrl?: string
    backgroundImageAlt?: string
    withBackgroundOverlay?: boolean
@@ -97,6 +103,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
          backgroundImageUrl,
          backgroundImageAlt,
          withBackgroundOverlay = true,
+         actionItemSx,
       },
       ref
    ) => {
@@ -148,14 +155,22 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
                            ) : null}
                         </Stack>
                      ) : null}
-                     <ContentTitle sx={styles.title} component="h2">
-                        {title}
-                     </ContentTitle>
-                     <ContentSubtitle component="h3">
-                        {subtitle}
-                     </ContentSubtitle>
+                     {title ? (
+                        <ContentTitle sx={styles.title} component="h2">
+                           {title}
+                        </ContentTitle>
+                     ) : null}
+                     {subtitle ? (
+                        <ContentSubtitle component="h3">
+                           {subtitle}
+                        </ContentSubtitle>
+                     ) : null}
                   </Stack>
-                  {actionItem ? <Box mt={2}>{actionItem}</Box> : null}
+                  {actionItem ? (
+                     <Box sx={combineStyles(styles.actionItem, actionItemSx)}>
+                        {actionItem}
+                     </Box>
+                  ) : null}
                </Box>
             </Container>
          </Fragment>

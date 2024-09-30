@@ -1,4 +1,4 @@
-import { Box, Stack } from "@mui/material"
+import { Box, Stack, SvgIcon, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import Image from "next/legacy/image"
@@ -22,6 +22,7 @@ const styles = sxStyles({
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
+      fontWeight: 700,
    },
    illustrationWrapper: {
       position: "absolute",
@@ -39,6 +40,27 @@ const styles = sxStyles({
          },
       },
    },
+   title: {
+      fontWeight: 700,
+   },
+   descriptions: {
+      fontSize: "20px !important",
+      fontWeight: "400 !important",
+   },
+   easyApply: {
+      fontSize: "18px !important",
+      fontWeight: "400 !important",
+   },
+   easyApplyWrapper: {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "4px 8px",
+      transform: "rotate(-1deg)",
+      gap: "10px",
+      borderRadius: "8px",
+      background: "rgba(120, 214, 255, 0.30)",
+   },
 })
 
 type DiscoverJobsCTAContentProps = {
@@ -48,7 +70,7 @@ type DiscoverJobsCTAContentProps = {
 export const DiscoverJobsCTAContent = ({
    cta,
 }: DiscoverJobsCTAContentProps) => {
-   console.log("🚀 ~ DiscoverJobsCTAContent ~ cta:", cta)
+   console.log("🚀 ~ cta:", cta)
    const isMobile = useIsMobile()
    const { userData, isLoadingAuth, isLoadingUserData } = useAuth()
 
@@ -72,13 +94,16 @@ export const DiscoverJobsCTAContent = ({
             headerTitle={
                <ContentHeaderTitle
                   component="span"
-                  maxWidth={"60% !important"}
+                  maxWidth={"80% !important"}
                   color="black"
+                  sx={styles.title}
+                  fontSize={isMobile ? "32px !important" : "42px !important"}
                >
                   {"CareerFairy "}
                   <ContentHeaderTitle
                      sx={styles.centeredHeaderTitle}
-                     color="secondary.main"
+                     color="primary"
+                     fontSize={isMobile ? "32px !important" : "42px !important"}
                   >
                      Jobs
                   </ContentHeaderTitle>
@@ -91,15 +116,113 @@ export const DiscoverJobsCTAContent = ({
             backgroundImageAlt="backgroundImageAlt"
             actionItem={
                <Stack>
-                  <ContentButton
-                     variant="contained"
-                     href={"/sparks"}
-                     color={"secondary"}
-                  >
-                     Discover now
-                  </ContentButton>
+                  <Stack spacing={1.5}>
+                     <Stack
+                        direction={"row"}
+                        alignItems={"center"}
+                        spacing={0.5}
+                     >
+                        <SvgIcon>
+                           <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                           >
+                              <g clip-path="url(#clip0_14168_173034)">
+                                 <path
+                                    d="M17.5 0.626465L5.875 13.4077L2.5 10.8452H0.625L5.875 19.3765L19.375 0.626465H17.5Z"
+                                    fill="black"
+                                    fill-opacity="0.19"
+                                 />
+                              </g>
+                              <defs>
+                                 <clipPath id="clip0_14168_173034">
+                                    <rect
+                                       width="20"
+                                       height="20"
+                                       fill="white"
+                                       transform="translate(0 0.00146484)"
+                                    />
+                                 </clipPath>
+                              </defs>
+                           </svg>
+                        </SvgIcon>
+                        <Typography
+                           variant="brandedH3"
+                           color={"neutral.800"}
+                           sx={styles.descriptions}
+                        >
+                           Escape the{" "}
+                           {
+                              <Box sx={styles.easyApplyWrapper}>
+                                 <Typography
+                                    variant="brandedH3"
+                                    sx={styles.easyApply}
+                                 >
+                                    easy apply
+                                 </Typography>
+                              </Box>
+                           }{" "}
+                           trap
+                        </Typography>
+                     </Stack>
+                     <Stack
+                        direction={"row"}
+                        alignItems={"center"}
+                        spacing={0.5}
+                     >
+                        <SvgIcon>
+                           <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                           >
+                              <g clip-path="url(#clip0_14168_173034)">
+                                 <path
+                                    d="M17.5 0.626465L5.875 13.4077L2.5 10.8452H0.625L5.875 19.3765L19.375 0.626465H17.5Z"
+                                    fill="black"
+                                    fill-opacity="0.19"
+                                 />
+                              </g>
+                              <defs>
+                                 <clipPath id="clip0_14168_173034">
+                                    <rect
+                                       width="20"
+                                       height="20"
+                                       fill="white"
+                                       transform="translate(0 0.00146484)"
+                                    />
+                                 </clipPath>
+                              </defs>
+                           </svg>
+                        </SvgIcon>
+                        <Typography
+                           variant="brandedH3"
+                           color={"neutral.800"}
+                           sx={styles.descriptions}
+                        >
+                           Discover your ideal job with rich content.
+                        </Typography>
+                     </Stack>
+                  </Stack>
+                  <Box mt={3}>
+                     <ContentButton
+                        variant="contained"
+                        href={
+                           "/sparks/QJhyftocyWRPoIEaH5W7?interaction_source=portal-banner"
+                        }
+                        color={"primary"}
+                     >
+                        Discover now
+                     </ContentButton>
+                  </Box>
                </Stack>
             }
+            actionItemSx={{ mt: 1.5 }}
             withBackgroundOverlay={false}
          />
          <Box sx={styles.illustrationWrapper}>

@@ -218,7 +218,10 @@ export class CarouselContentService {
          this.options.userData,
          CTASlideTopics.Jobs
       )
-
+      console.log(
+         "🚀 ~ CarouselContentService ~ getCarouselContent ~ userHasAppliedToAJob:",
+         userHasAppliedToAJob
+      )
       if (!userHasAppliedToAJob && shouldSeeJobsCTABanner) {
          content = [
             {
@@ -253,7 +256,7 @@ export class CarouselContentService {
    }
 
    private async userHasAppliedToAJob(): Promise<boolean> {
-      return false
+      return this.options.userData?.hasJobApplications
    }
 
    static serializeContent(content: CarouselContent[]): SerializedContent[] {
