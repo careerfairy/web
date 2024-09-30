@@ -1,3 +1,4 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    EventRatingAnswer,
    UserLivestreamData,
@@ -6,7 +7,12 @@ import { PopularityEventData } from "@careerfairy/shared-lib/livestreams/popular
 import { RewardDoc } from "@careerfairy/shared-lib/rewards"
 import { UserData, pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import * as functions from "firebase-functions"
-import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
+import {
+   customJobRepo,
+   livestreamsRepo,
+   sparkRepo,
+   userRepo,
+} from "./api/repositories"
 import config from "./config"
 import { rewardApply, rewardLivestreamRegistrant } from "./lib/reward"
 import {
@@ -209,6 +215,29 @@ export const onCreateSparkStats = functions
 
       sideEffectPromises.push(
          sparkRepo.addSparkToSparkStatsDocument(sparkId, snapShot)
+      )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onCreateCustomJob = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("customJobs/{customJobId}")
+   .onCreate(async (snapshot, context) => {
+      functions.logger.info(context.params)
+
+      const customJob: CustomJob = {
+         ...(snapshot.data() as CustomJob),
+         id: snapshot.id,
+      }
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for every new userData doc
+      sideEffectPromises.push(
+         customJobRepo.createNewCustomJobUserNotifications(customJob)
       )
 
       return handleSideEffects(sideEffectPromises)

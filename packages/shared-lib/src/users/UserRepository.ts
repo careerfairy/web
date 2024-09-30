@@ -30,6 +30,7 @@ import {
    UserPublicData,
    UserReminderType,
    UserStats,
+   ValidUserTagFields,
 } from "./users"
 
 export interface IUserRepository {
@@ -221,6 +222,11 @@ export interface IUserRepository {
    getUserRegisteredLivestreams(
       userEmail: string
    ): Promise<RegisteredLivestreams>
+
+   getUsersWithTags(
+      tagField: ValidUserTagFields,
+      tagIds: string[]
+   ): Promise<UserData[]>
 }
 
 export class FirebaseUserRepository
@@ -1049,6 +1055,21 @@ export class FirebaseUserRepository
       }
 
       return snap.docs[0].data()
+   }
+
+   async getUsersWithTags(
+      tagField: ValidUserTagFields,
+      tagIds: string[]
+   ): Promise<UserData[]> {
+      if (!tagIds?.length) return []
+
+      const query = this.firestore
+         .collection("userData")
+         .where(tagField, "array-contains-any", tagIds)
+
+      const data = await query.get()
+
+      return this.addIdToDocs<UserData>(data.docs)
    }
 }
 

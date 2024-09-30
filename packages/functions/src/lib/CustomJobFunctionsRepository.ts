@@ -9,10 +9,16 @@ import {
 import { Group } from "@careerfairy/shared-lib/groups"
 import { CustomJobMetaData } from "@careerfairy/shared-lib/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import { Timestamp } from "../api/firestoreAdmin"
-import { livestreamsRepo, sparkRepo } from "../api/repositories"
+import {
+   groupRepo,
+   livestreamsRepo,
+   sparkRepo,
+   userRepo,
+} from "../api/repositories"
 
 export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    /**
@@ -85,6 +91,8 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    syncDeletedCustomJobToLinkedSparks(
       deletedCustomJob: CustomJob
    ): Promise<void>
+
+   createNewCustomJobUserNotifications(customJob: CustomJob): Promise<void>
 }
 
 export class CustomJobFunctionsRepository
@@ -401,6 +409,67 @@ export class CustomJobFunctionsRepository
             hasJobs: false,
          })
       })
+
+      return batch.commit()
+   }
+
+   async createNewCustomJobUserNotifications(
+      customJob: CustomJob
+   ): Promise<void> {
+      functions.logger.log(
+         `Started creating custom job created notifications for custom job ${customJob.id}`
+      )
+      if (!customJob.businessFunctionsTagIds?.length) {
+         functions.logger.log(
+            `Custom job ${customJob.id} has not business function tags, ignoring creation of notifications`
+         )
+         return
+      }
+
+      const usersWithMatchingTags = await userRepo.getUsersWithTags(
+         "businessFunctionsTagIds",
+         customJob.businessFunctionsTagIds
+      )
+
+      if (!usersWithMatchingTags?.length) {
+         functions.logger.log(
+            `No users found with matching tags for custom job ${customJob.id}, ignoring creation of notifications`
+         )
+         return
+      }
+
+      functions.logger.log(
+         `Creating notifications for ${usersWithMatchingTags.length} users for new custom job ${customJob.id} (by matching businessFunctionsTagIds tags)`
+      )
+
+      const jobGroup = await groupRepo.getGroupById(customJob.groupId)
+
+      const batch = this.firestore.batch()
+
+      usersWithMatchingTags?.forEach((user) => {
+         const ref = this.firestore
+            .collection("userData")
+            .doc(user.id)
+            .collection("userNotifications")
+            .doc()
+
+         const newNotification: UserNotification = {
+            documentType: "userNotification",
+            actionUrl: `/company/${jobGroup.universityName}/jobs/${customJob.id}`,
+            companyId: jobGroup.groupId,
+            imageFormat: "circular",
+            imageUrl: jobGroup.logoUrl,
+            message: `<strong>${jobGroup.universityName}</strong> just posted a job that matches your profile: ${customJob.title}`,
+            createdAt: Timestamp.now(),
+            id: ref.id,
+         }
+
+         batch.set(ref, newNotification)
+      })
+
+      functions.logger.log(
+         `Notified ${usersWithMatchingTags.length} users of new job ${customJob.id}-${customJob.title}`
+      )
 
       return batch.commit()
    }
