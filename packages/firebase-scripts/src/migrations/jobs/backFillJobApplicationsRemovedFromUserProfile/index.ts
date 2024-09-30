@@ -21,7 +21,9 @@ export async function run() {
       )
 
       const jobApplicationsToUpdate = (allJobApplications || []).filter(
-         (jobApplication) => jobApplication.removedFromUserProfile === undefined
+         (jobApplication) =>
+            jobApplication.removedFromUserProfile != true &&
+            jobApplication.removedFromUserProfile != false
       )
 
       Counter.log(`Fetched ${jobApplicationsToUpdate.length} Job Applications`)
