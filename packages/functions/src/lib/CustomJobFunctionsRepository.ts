@@ -459,7 +459,7 @@ export class CustomJobFunctionsRepository
             companyId: jobGroup.groupId,
             imageFormat: "circular",
             imageUrl: jobGroup.logoUrl,
-            message: `<strong>${jobGroup.universityName}</strong> just posted a job that matches your profile: ${customJob.title}`,
+            message: `<strong>${jobGroup.universityName}</strong> just posted a job that matches your profile: <strong>${customJob.title}</strong>`,
             createdAt: Timestamp.now(),
             id: ref.id,
          }
