@@ -346,7 +346,6 @@ const moduleExports = {
    images: {
       domains: [
          "firebasestorage.googleapis.com",
-         "storage.cloud.google.com",
          "media.graphcms.com",
          "media.graphassets.com",
          "localhost",

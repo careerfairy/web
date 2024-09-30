@@ -2,7 +2,7 @@ import { Box, Stack, SvgIcon, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import Image from "next/legacy/image"
-import { Fragment } from "react"
+import { FC, Fragment } from "react"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
 import CarouselContentService, {
@@ -13,9 +13,9 @@ import Content, { ContentHeaderTitle } from "./Content"
 import ContentButton from "./ContentButton"
 
 const mobileJobsBackGroundUrl =
-   "https://storage.cloud.google.com/careerfairy-e1fd9.appspot.com/misc/jobs-background-mobile-24b06f289b4557de7eeeb5182a6496f7.png"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2FMobileFullJobsBanner_v2.png?alt=media&token=8f9b3d3f-389e-4499-a78f-b72ec08a7505"
 const desktopJobsBackGroundUrl =
-   "https://storage.cloud.google.com/careerfairy-e1fd9.appspot.com/misc/jobs-background-desktop-5208ad3aaf80c0f7c70f3151adab3405.png"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2FDesktopFullJobsBanner_v2.png?alt=media&token=b59724f7-fe83-4cf3-a74b-8eb1eca23d30"
 
 const styles = sxStyles({
    centeredHeaderTitle: {
@@ -24,27 +24,10 @@ const styles = sxStyles({
       justifyContent: "center",
       fontWeight: 700,
    },
-   illustrationWrapper: {
-      position: "absolute",
-      right: 0,
-      bottom: 0,
-      width: {
-         xs: "50%",
-         md: "40%",
-      },
-      height: "100%",
-      "& img": {
-         objectPosition: {
-            xs: "top 28px left 18px",
-            md: "top 0px left 0px",
-         },
-      },
-   },
    title: {
       fontWeight: 700,
    },
    descriptions: {
-      fontSize: "20px !important",
       fontWeight: "400 !important",
    },
    easyApply: {
@@ -61,16 +44,26 @@ const styles = sxStyles({
       borderRadius: "8px",
       background: "rgba(120, 214, 255, 0.30)",
    },
+   illustrationWrapper: {
+      position: "absolute",
+      right: 0,
+      bottom: 0,
+      width: "100%",
+      height: "100%",
+      "& img": {
+         objectPosition: {
+            xs: "top 200px left 0px",
+            md: "top 0px left 370px",
+         },
+      },
+   },
 })
 
 type DiscoverJobsCTAContentProps = {
    cta: CTASlide
 }
 
-export const DiscoverJobsCTAContent = ({
-   cta,
-}: DiscoverJobsCTAContentProps) => {
-   console.log("🚀 ~ cta:", cta)
+export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
    const isMobile = useIsMobile()
    const { userData, isLoadingAuth, isLoadingUserData } = useAuth()
 
@@ -110,13 +103,9 @@ export const DiscoverJobsCTAContent = ({
                   !
                </ContentHeaderTitle>
             }
-            backgroundImageUrl={
-               isMobile ? mobileJobsBackGroundUrl : desktopJobsBackGroundUrl
-            }
-            backgroundImageAlt="backgroundImageAlt"
             actionItem={
                <Stack>
-                  <Stack spacing={1.5}>
+                  <Stack spacing={isMobile ? 1 : 1.5}>
                      <Stack
                         direction={"row"}
                         alignItems={"center"}
@@ -153,6 +142,7 @@ export const DiscoverJobsCTAContent = ({
                            variant="brandedH3"
                            color={"neutral.800"}
                            sx={styles.descriptions}
+                           fontSize={isMobile ? "18px" : "20px"}
                         >
                            Escape the{" "}
                            {
@@ -204,12 +194,13 @@ export const DiscoverJobsCTAContent = ({
                            variant="brandedH3"
                            color={"neutral.800"}
                            sx={styles.descriptions}
+                           fontSize={isMobile ? "18px" : "20px"}
                         >
                            Discover your ideal job with rich content.
                         </Typography>
                      </Stack>
                   </Stack>
-                  <Box mt={3}>
+                  <Box mt={isMobile ? 1.5 : 3}>
                      <ContentButton
                         variant="contained"
                         href={
@@ -230,7 +221,7 @@ export const DiscoverJobsCTAContent = ({
                src={
                   isMobile ? mobileJobsBackGroundUrl : desktopJobsBackGroundUrl
                }
-               alt={"illustration"}
+               alt={"Jobs illustration"}
                layout="fill"
                objectFit="cover"
                quality={90}

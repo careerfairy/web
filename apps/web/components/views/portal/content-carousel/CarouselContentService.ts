@@ -218,10 +218,7 @@ export class CarouselContentService {
          this.options.userData,
          CTASlideTopics.Jobs
       )
-      console.log(
-         "🚀 ~ CarouselContentService ~ getCarouselContent ~ userHasAppliedToAJob:",
-         userHasAppliedToAJob
-      )
+
       if (!userHasAppliedToAJob && shouldSeeJobsCTABanner) {
          content = [
             {
