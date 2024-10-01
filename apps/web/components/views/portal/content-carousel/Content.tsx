@@ -86,8 +86,7 @@ type ContentProps = {
    subtitle?: string | React.ReactNode
    actionItem?: React.ReactNode
    actionItemSx?: SxProps<DefaultTheme>
-   backgroundImageWrapperSx?: SxProps<DefaultTheme>
-   objectFit?: "contain" | "cover" | "fill" | "none" | "scale-down"
+   infoSx?: SxProps<DefaultTheme>
    backgroundImageUrl?: string
    backgroundImageAlt?: string
    withBackgroundOverlay?: boolean
@@ -106,8 +105,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
          backgroundImageAlt,
          withBackgroundOverlay = true,
          actionItemSx,
-         backgroundImageWrapperSx,
-         objectFit = "cover",
+         infoSx,
       },
       ref
    ) => {
@@ -116,25 +114,24 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
             {backgroundImageUrl ? (
                <Box
                   ref={ref}
-                  sx={combineStyles(
+                  sx={[
                      styles.wrapper,
                      styles.image,
                      withBackgroundOverlay && styles.backgroundOverlay,
-                     backgroundImageWrapperSx
-                  )}
+                  ]}
                   position={"absolute"}
                >
                   <Image
                      src={backgroundImageUrl}
                      alt={backgroundImageAlt}
                      layout="fill"
-                     objectFit={objectFit}
+                     objectFit={"cover"}
                      quality={90}
                   />
                </Box>
             ) : null}
             <Container disableGutters sx={styles.content}>
-               <Box sx={styles.info}>
+               <Box sx={combineStyles(styles.info, infoSx)}>
                   <Stack spacing={1.5} mt={4}>
                      <ContentHeaderTitle>{headerTitle}</ContentHeaderTitle>
                      {logoUrl ? (

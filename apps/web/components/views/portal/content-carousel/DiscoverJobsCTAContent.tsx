@@ -1,7 +1,8 @@
 import { Box, Stack, SvgIcon, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { FC, Fragment } from "react"
+import Image from "next/legacy/image"
+import { FC } from "react"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
 import CarouselContentService, {
@@ -43,13 +44,32 @@ const styles = sxStyles({
       borderRadius: "8px",
       background: "rgba(120, 214, 255, 0.30)",
    },
+   info: {
+      mt: {
+         xs: 3,
+         sm: 1,
+      },
+   },
+   actionItem: {
+      mt: {
+         xs: 0.5,
+         md: 1.5,
+      },
+   },
    illustrationWrapper: {
+      position: "absolute",
+      right: 0,
+      top: 0,
+      width: {
+         xs: "100%",
+         md: "60%",
+      },
+      height: "100%",
       "& img": {
          objectPosition: {
-            xs: "bottom left",
-            sm: "bottom left",
-            md: "right top",
-            lg: "right top",
+            xs: "top 230px left 0px",
+            sm: "top 200px left 0px",
+            md: "top 50% left 20%",
          },
       },
    },
@@ -68,24 +88,26 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
    const { ref } = useInView({
       skip: isAuthLoading || !userData?.userEmail, // Only start counting when user is logged in
       triggerOnce: true,
-      onChange: (inView) =>
+      onChange: (inView) => {
          CarouselContentService.incrementCTABannerViewCount(
             inView,
             userData,
             CTASlideTopics.Jobs
-         ),
+         )
+      },
    })
 
    return (
-      <Fragment>
+      <Box ref={ref}>
          <Content
-            ref={ref}
             headerTitle={
                <ContentHeaderTitle
                   component="span"
-                  maxWidth={"80% !important"}
+                  maxWidth={isMobile ? "100%" : "60% !important"}
+                  // maxHeight={"120px !important"}
                   color="black"
                   sx={styles.title}
+                  // mt={"0px !important"}
                   fontSize={isMobile ? "32px !important" : "42px !important"}
                >
                   {"CareerFairy "}
@@ -99,14 +121,9 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                   !
                </ContentHeaderTitle>
             }
-            backgroundImageWrapperSx={styles.illustrationWrapper}
-            backgroundImageUrl={
-               isMobile ? mobileJobsBackGroundUrl : desktopJobsBackGroundUrl
-            }
-            objectFit="scale-down"
-            backgroundImageAlt="Jobs background"
+            infoSx={styles.info}
             actionItem={
-               <Stack>
+               <Stack maxWidth={isMobile ? "100%" : "50%"}>
                   <Stack spacing={isMobile ? 1 : 1.5}>
                      <Stack
                         direction={"row"}
@@ -215,20 +232,20 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                   </Box>
                </Stack>
             }
-            actionItemSx={{ mt: 1.5 }}
+            actionItemSx={styles.actionItem}
             withBackgroundOverlay={false}
          />
-         {/* <Box sx={styles.illustrationWrapper}>
+         <Box sx={styles.illustrationWrapper}>
             <Image
                src={
                   isMobile ? mobileJobsBackGroundUrl : desktopJobsBackGroundUrl
                }
                alt={"Jobs illustration"}
                layout="fill"
-               objectFit="cover"
+               objectFit={isMobile ? "none" : "cover"}
                quality={90}
             />
-         </Box> */}
-      </Fragment>
+         </Box>
+      </Box>
    )
 }
