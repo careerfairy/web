@@ -126,7 +126,7 @@ const RecordingPlayer: FC<Props> = (props) => {
    if (!isLoggedIn) {
       return (
          <Button color="primary" variant="contained" onClick={redirectToLogin}>
-            Sign In to Watch Recording
+            Sign Up to Watch
          </Button>
       )
    }
