@@ -5,9 +5,10 @@ import {
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
-import { Box, Skeleton, Typography } from "@mui/material"
+import { Box, Button, Skeleton, Typography } from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
 import { alpha } from "@mui/material/styles"
+import { useRouter } from "next/router"
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import ReactPlayer from "react-player"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
@@ -110,6 +111,26 @@ type Props = {
 }
 
 const RecordingPlayer: FC<Props> = (props) => {
+   const { isLoggedIn } = useAuth()
+   const router = useRouter()
+
+   const redirectToLogin = useCallback(() => {
+      return router.push({
+         pathname: `/login`,
+         query: {
+            ...router.query,
+         },
+      })
+   }, [router])
+
+   if (!isLoggedIn) {
+      return (
+         <Button color="primary" variant="contained" onClick={redirectToLogin}>
+            Sign In to Watch Recording
+         </Button>
+      )
+   }
+
    return (
       <SuspenseWithBoundary fallback={<PlayerSkeleton />}>
          <Player {...props} />

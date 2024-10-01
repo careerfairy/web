@@ -2,9 +2,10 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import PlayIcon from "@mui/icons-material/PlayCircleOutline"
+import { useAuth } from "HOCs/AuthProvider"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import { useRouter } from "next/router"
-import { FC, ReactNode, useMemo } from "react"
+import { FC, ReactNode, useCallback, useMemo } from "react"
 import DateUtil from "../../../../util/DateUtil"
 import useLivestream from "../../../custom-hook/live-stream/useLivestream"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
@@ -32,8 +33,19 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
    handleBannerPlayRecording,
    userStats,
 }) => {
+   const { isLoggedIn } = useAuth()
    const router = useRouter()
    const { data } = useLivestream(livestreamData.id, livestreamData)
+
+   const redirectToLogin = useCallback(() => {
+      return router.push({
+         pathname: `/login`,
+         query: {
+            ...router.query,
+         },
+      })
+   }, [router])
+
    const livestream = data || livestreamData
 
    const livestreamPresenter = useMemo(
@@ -90,6 +102,18 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
          )
       }
 
+      if (showRecording && !isLoggedIn) {
+         return (
+            <ContentButton
+               color={"primary"}
+               onClick={redirectToLogin}
+               endIcon={<PlayIcon />}
+            >
+               Sign In to Watch Recording
+            </ContentButton>
+         )
+      }
+
       if (showRecording) {
          return (
             <ContentButton
@@ -125,6 +149,8 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
       hasRegistered,
       livestream,
       showRecording,
+      isLoggedIn,
+      redirectToLogin,
    ])
 
    return (
