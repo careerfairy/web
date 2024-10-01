@@ -469,6 +469,7 @@ export class CustomJobFunctionsRepository
                   "simone@careerfairy.io",
                   "matilde.ramos@careerfairy.io",
                   "carlos.rijo@careerfairy.io",
+                  "lucas@careerfairy.io",
                ].includes(user.id)
             )
                return
