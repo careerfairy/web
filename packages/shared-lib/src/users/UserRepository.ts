@@ -223,6 +223,12 @@ export interface IUserRepository {
       userEmail: string
    ): Promise<RegisteredLivestreams>
 
+   /**
+    * Retrieves all users where the tags match any values in @param tagIds. The field to be compared against is defined
+    * by @param tagField.
+    * @param tagField UserData property to filter the tags by.
+    * @param tagIds Ids of the tags to use when filtering the @param tagField.
+    */
    getUsersWithTags(
       tagField: ValidUserTagFields,
       tagIds: string[]

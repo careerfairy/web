@@ -92,6 +92,10 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
       deletedCustomJob: CustomJob
    ): Promise<void>
 
+   /**
+    * Notifies users with matching business functions tags according to the Custom Job (created).
+    * @param customJob Newly created custom job.
+    */
    createNewCustomJobUserNotifications(customJob: CustomJob): Promise<void>
 }
 
