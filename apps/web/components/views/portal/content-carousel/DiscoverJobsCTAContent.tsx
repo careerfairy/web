@@ -1,7 +1,6 @@
 import { Box, Stack, SvgIcon, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import Image from "next/legacy/image"
 import { FC, Fragment } from "react"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
@@ -45,15 +44,12 @@ const styles = sxStyles({
       background: "rgba(120, 214, 255, 0.30)",
    },
    illustrationWrapper: {
-      position: "absolute",
-      right: 0,
-      bottom: 0,
-      width: "100%",
-      height: "100%",
       "& img": {
          objectPosition: {
-            xs: "top 200px left 0px",
-            md: "top 0px left 370px",
+            xs: "bottom left",
+            sm: "bottom left",
+            md: "right top",
+            lg: "right top",
          },
       },
    },
@@ -103,6 +99,12 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                   !
                </ContentHeaderTitle>
             }
+            backgroundImageWrapperSx={styles.illustrationWrapper}
+            backgroundImageUrl={
+               isMobile ? mobileJobsBackGroundUrl : desktopJobsBackGroundUrl
+            }
+            objectFit="scale-down"
+            backgroundImageAlt="Jobs background"
             actionItem={
                <Stack>
                   <Stack spacing={isMobile ? 1 : 1.5}>
@@ -196,7 +198,7 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                            sx={styles.descriptions}
                            fontSize={isMobile ? "18px" : "20px"}
                         >
-                           Discover your ideal job with rich content.
+                           Discover your ideal job with rich content
                         </Typography>
                      </Stack>
                   </Stack>
@@ -216,7 +218,7 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
             actionItemSx={{ mt: 1.5 }}
             withBackgroundOverlay={false}
          />
-         <Box sx={styles.illustrationWrapper}>
+         {/* <Box sx={styles.illustrationWrapper}>
             <Image
                src={
                   isMobile ? mobileJobsBackGroundUrl : desktopJobsBackGroundUrl
@@ -226,7 +228,7 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                objectFit="cover"
                quality={90}
             />
-         </Box>
+         </Box> */}
       </Fragment>
    )
 }
