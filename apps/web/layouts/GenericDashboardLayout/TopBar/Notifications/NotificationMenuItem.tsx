@@ -58,9 +58,7 @@ const NotificationMenuItem = ({ notification, handleClick }: Props) => {
          id={notification.id}
          component={Link}
          sx={[styles.item, Boolean(notification.readAt) && styles.readItem]}
-         onClick={() =>
-            !notification.buttonText && handleClick(notification.id)
-         }
+         onClick={() => handleClick(notification.id)}
          href={notification.actionUrl}
       >
          <Grid container sx={styles.itemContent}>

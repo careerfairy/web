@@ -12,6 +12,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
+import { chunk } from "lodash"
 import { Timestamp } from "../api/firestoreAdmin"
 import {
    groupRepo,
@@ -420,6 +421,7 @@ export class CustomJobFunctionsRepository
    async createNewCustomJobUserNotifications(
       customJob: CustomJob
    ): Promise<void> {
+      const BATCH_SIZE = 200
       functions.logger.log(
          `Started creating custom job created notifications for custom job ${customJob.id}`
       )
@@ -456,32 +458,46 @@ export class CustomJobFunctionsRepository
 
       const batch = this.firestore.batch()
 
-      usersWithMatchingTags?.forEach((user) => {
-         const ref = this.firestore
-            .collection("userData")
-            .doc(user.id)
-            .collection("userNotifications")
-            .doc()
+      const batchedUsers = chunk(usersWithMatchingTags, BATCH_SIZE)
 
-         const newNotification: UserNotification = {
-            documentType: "userNotification",
-            actionUrl: `/company/${jobGroup.universityName}/jobs/${customJob.id}`,
-            companyId: jobGroup.groupId,
-            imageFormat: "circular",
-            imageUrl: jobGroup.logoUrl,
-            message: `<strong>${jobGroup.universityName}</strong> just posted a job that matches your profile: <strong>${customJob.title}</strong>`,
-            buttonText: "Discover now",
-            createdAt: Timestamp.now(),
-            id: ref.id,
-         }
+      batchedUsers?.forEach(async (chunk) => {
+         chunk.forEach((user) => {
+            if (
+               ![
+                  "edujorge13@gmail.com",
+                  "habib@careerfairy.io",
+                  "simone@careerfairy.io",
+                  "matilde.ramos@careerfairy.io",
+                  "carlos.rijo@careerfairy.io",
+               ].includes(user.id)
+            )
+               return
+            const ref = this.firestore
+               .collection("userData")
+               .doc(user.id)
+               .collection("userNotifications")
+               .doc()
 
-         batch.set(ref, newNotification)
+            const newNotification: UserNotification = {
+               documentType: "userNotification",
+               actionUrl: `/company/${jobGroup.universityName}/jobs/${customJob.id}`,
+               companyId: jobGroup.groupId,
+               imageFormat: "circular",
+               imageUrl: jobGroup.logoUrl,
+               message: `<strong>${jobGroup.universityName}</strong> just posted a job that matches your profile: <strong>${customJob.title}</strong>`,
+               buttonText: "Discover now",
+               createdAt: Timestamp.now(),
+               id: ref.id,
+            }
+
+            batch.set(ref, newNotification)
+         })
+
+         await batch.commit()
       })
 
       functions.logger.log(
          `Notified ${usersWithMatchingTags.length} users of new job ${customJob.id}-${customJob.title}`
       )
-
-      return batch.commit()
    }
 }
