@@ -460,8 +460,8 @@ export class CustomJobFunctionsRepository
 
       const batchedUsers = chunk(usersWithMatchingTags, BATCH_SIZE)
 
-      batchedUsers?.forEach(async (chunk) => {
-         chunk.forEach((user) => {
+      for (const userBatch of batchedUsers) {
+         userBatch.forEach((user) => {
             if (
                ![
                   "edujorge13@gmail.com",
@@ -495,7 +495,7 @@ export class CustomJobFunctionsRepository
          })
 
          await batch.commit()
-      })
+      }
 
       functions.logger.log(
          `Notified ${usersWithMatchingTags.length} users of new job ${customJob.id}-${customJob.title}`
