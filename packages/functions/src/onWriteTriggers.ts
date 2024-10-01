@@ -450,7 +450,8 @@ export const onWriteCustomJobs = functions
                newCustomJob,
                oldCustomJob
             ),
-            sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob)
+            sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob),
+            customJobRepo.createNewCustomJobUserNotifications(newCustomJob)
          )
       }
 

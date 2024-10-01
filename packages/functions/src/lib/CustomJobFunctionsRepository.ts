@@ -423,6 +423,12 @@ export class CustomJobFunctionsRepository
       functions.logger.log(
          `Started creating custom job created notifications for custom job ${customJob.id}`
       )
+      if (!customJob.published || customJob.isPermanentlyExpired) {
+         functions.logger.log(
+            `Custom job ${customJob.id} is not published or is expired. published: ${customJob.published}, expired: ${customJob.isPermanentlyExpired}`
+         )
+         return
+      }
       if (!customJob.businessFunctionsTagIds?.length) {
          functions.logger.log(
             `Custom job ${customJob.id} has not business function tags, ignoring creation of notifications`
