@@ -460,6 +460,7 @@ export class CustomJobFunctionsRepository
             imageFormat: "circular",
             imageUrl: jobGroup.logoUrl,
             message: `<strong>${jobGroup.universityName}</strong> just posted a job that matches your profile: <strong>${customJob.title}</strong>`,
+            buttonText: "Discover now",
             createdAt: Timestamp.now(),
             id: ref.id,
          }

@@ -1,6 +1,7 @@
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { Circle as CircleIcon } from "@mui/icons-material"
 import { Box, Button, Grid, MenuItem, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import SanitizedHTML from "components/util/SanitizedHTML"
 import Link from "components/views/common/Link"
 import Image from "next/image"
@@ -49,11 +50,13 @@ type Props = {
 }
 
 const NotificationMenuItem = ({ notification, handleClick }: Props) => {
+   const isMobile = useIsMobile()
+
    return (
       <MenuItem
          key={notification.id}
          id={notification.id}
-         component={!notification.buttonText ? Link : null}
+         component={Link}
          sx={[styles.item, Boolean(notification.readAt) && styles.readItem]}
          onClick={() =>
             !notification.buttonText && handleClick(notification.id)
@@ -95,13 +98,22 @@ const NotificationMenuItem = ({ notification, handleClick }: Props) => {
          </Grid>
          {notification.buttonText ? (
             <Grid container>
-               <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => handleClick(notification.id)}
+               <Grid
+                  item
+                  xs={1}
+                  md={0.5}
+                  ml={isMobile ? 4 : 2}
+                  mb={1.5}
+                  mt={isMobile ? 1.5 : 1}
                >
-                  {notification.buttonText}
-               </Button>
+                  <Button
+                     variant="outlined"
+                     color="primary"
+                     onClick={() => handleClick(notification.id)}
+                  >
+                     {notification.buttonText}
+                  </Button>
+               </Grid>
             </Grid>
          ) : null}
          <Grid container>
