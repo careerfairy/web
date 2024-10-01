@@ -5,7 +5,14 @@ import {
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
-import { Box, Button, Skeleton, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   ButtonBase,
+   Skeleton,
+   Stack,
+   Typography,
+} from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
 import { alpha } from "@mui/material/styles"
 import { useRouter } from "next/router"
@@ -111,26 +118,6 @@ type Props = {
 }
 
 const RecordingPlayer: FC<Props> = (props) => {
-   const { isLoggedIn } = useAuth()
-   const router = useRouter()
-
-   const redirectToLogin = useCallback(() => {
-      return router.push({
-         pathname: `/login`,
-         query: {
-            ...router.query,
-         },
-      })
-   }, [router])
-
-   if (!isLoggedIn) {
-      return (
-         <Button color="primary" variant="contained" onClick={redirectToLogin}>
-            Sign Up to Watch
-         </Button>
-      )
-   }
-
    return (
       <SuspenseWithBoundary fallback={<PlayerSkeleton />}>
          <Player {...props} />
@@ -156,28 +143,73 @@ export const PlayerSkeleton: FC = () => {
 }
 
 const Player = ({ stream, livestreamPresenter }: Props) => {
+   const { isLoggedIn } = useAuth()
+   const router = useRouter()
+
    const { handlePreviewPlay, handlePause, handlePlay } =
       useRecordingControls(stream)
 
    const { data: recordingToken } = useRecordingToken(stream.id)
-   // Updated recording title - WG
+
+   const redirectToLogin = useCallback(() => {
+      return router.push({
+         pathname: `/login`,
+         query: {
+            ...router.query,
+         },
+      })
+   }, [router])
+
+   const handleClickPlay = useCallback(() => {
+      if (!isLoggedIn) {
+         redirectToLogin()
+      } else {
+         handlePlay()
+      }
+   }, [handlePlay, isLoggedIn, redirectToLogin])
+
+   const SignUpButton = () => {
+      return (
+         <Button
+            color={"primary"}
+            variant="contained"
+            onClick={redirectToLogin}
+         >
+            Sign up to watch
+         </Button>
+      )
+   }
+
+   const PlayIconElement = () => {
+      if (isLoggedIn) return <PlayIcon sx={styles.icon} />
+
+      return (
+         <ButtonBase onClick={handleClickPlay}>
+            <Stack alignItems={"center"} spacing={3}>
+               <PlayIcon sx={styles.icon} />
+               <SignUpButton />
+            </Stack>
+         </ButtonBase>
+      )
+   }
+
    return (
       <Box sx={styles.root}>
          <Box sx={styles.playerWrapper} mt={1}>
             <ReactPlayer
                className="react-player"
-               playIcon={<PlayIcon sx={styles.icon} />}
+               playIcon={<PlayIconElement />}
                width="100%"
                height="100%"
-               controls={true}
+               controls={isLoggedIn}
                url={downloadLinkWithDate(
                   livestreamPresenter.start,
                   livestreamPresenter.id,
                   recordingToken.sid
                )}
-               onPlay={handlePlay}
+               onPlay={handleClickPlay}
                onPause={handlePause}
-               playing={true}
+               playing={isLoggedIn}
                config={{ file: { attributes: { controlsList: "nodownload" } } }}
                light={livestreamPresenter.backgroundImageUrl}
                onClickPreview={handlePreviewPlay}
@@ -241,7 +273,7 @@ export const useRecordingControls = (
    stream: LivestreamEvent
 ): UseRecordingControls => {
    const isMobile = useIsMobile()
-   const { userData } = useAuth()
+   const { userData, isLoggedIn } = useAuth()
 
    const {
       timeWatched: minutesWatched,
@@ -284,6 +316,8 @@ export const useRecordingControls = (
 
    // handle preview play icon click
    const handlePreviewPlay = useCallback(() => {
+      if (isLoggedIn) return
+
       // update recording stats
       void livestreamRepo.updateRecordingStats({
          livestreamId: stream.id,
@@ -293,7 +327,13 @@ export const useRecordingControls = (
 
       // play recording
       handleRecordingPlay()
-   }, [handleRecordingPlay, stream?.id, stream?.start, userData?.userEmail])
+   }, [
+      handleRecordingPlay,
+      stream?.id,
+      stream?.start,
+      userData?.userEmail,
+      isLoggedIn,
+   ])
 
    const handlePause = useCallback(() => {
       pauseCounting()

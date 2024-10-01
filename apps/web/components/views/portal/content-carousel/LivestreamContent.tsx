@@ -109,7 +109,7 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
                onClick={redirectToLogin}
                endIcon={<PlayIcon />}
             >
-               Sign Up to Watch
+               Sign up to watch
             </ContentButton>
          )
       }

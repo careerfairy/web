@@ -64,7 +64,7 @@ const WatchNowButton = ({ fullWidth }: WatchNowButtonProps) => {
             data-testid="livestream-watch-now-button"
             size={isFixedToBottom ? "medium" : "large"}
          >
-            {!isLoggedIn ? "Sign Up to Watch" : null}
+            {!isLoggedIn ? "Sign up to watch" : null}
             {isLoggedIn ? buttonText : null}
          </Button>
       </ActionButtonWrapper>
