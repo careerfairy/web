@@ -443,7 +443,18 @@ export class CustomJobFunctionsRepository
          customJob.businessFunctionsTagIds
       )
 
-      if (!usersWithMatchingTags?.length) {
+      const users = (usersWithMatchingTags || []).filter((user) =>
+         [
+            "edujorge13@gmail.com",
+            "habib@careerfairy.io",
+            "simone@careerfairy.io",
+            "matilde.ramos@careerfairy.io",
+            "carlos.rijo@careerfairy.io",
+            "lucas@careerfairy.io",
+         ].includes(user.id)
+      )
+
+      if (!users?.length) {
          functions.logger.log(
             `No users found with matching tags for custom job ${customJob.id}, ignoring creation of notifications`
          )
@@ -451,28 +462,17 @@ export class CustomJobFunctionsRepository
       }
 
       functions.logger.log(
-         `Creating notifications for ${usersWithMatchingTags.length} users for new custom job ${customJob.id} (by matching businessFunctionsTagIds tags)`
+         `Creating notifications for ${users.length} users for new custom job ${customJob.id} (by matching businessFunctionsTagIds tags)`
       )
 
       const jobGroup = await groupRepo.getGroupById(customJob.groupId)
 
       const batch = this.firestore.batch()
 
-      const batchedUsers = chunk(usersWithMatchingTags, BATCH_SIZE)
+      const batchedUsers = chunk(users, BATCH_SIZE)
 
       for (const userBatch of batchedUsers) {
-         userBatch.forEach((user) => {
-            if (
-               ![
-                  "edujorge13@gmail.com",
-                  "habib@careerfairy.io",
-                  "simone@careerfairy.io",
-                  "matilde.ramos@careerfairy.io",
-                  "carlos.rijo@careerfairy.io",
-                  "lucas@careerfairy.io",
-               ].includes(user.id)
-            )
-               return
+         for (const user of userBatch) {
             const ref = this.firestore
                .collection("userData")
                .doc(user.id)
@@ -492,13 +492,13 @@ export class CustomJobFunctionsRepository
             }
 
             batch.set(ref, newNotification)
-         })
+         }
 
          await batch.commit()
       }
 
       functions.logger.log(
-         `Notified ${usersWithMatchingTags.length} users of new job ${customJob.id}-${customJob.title}`
+         `Notified ${users.length} users of new job ${customJob.id}-${customJob.title}`
       )
    }
 }
