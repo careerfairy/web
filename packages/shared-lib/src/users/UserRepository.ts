@@ -22,9 +22,9 @@ import {
    RegisteredLivestreams,
    RegistrationStep,
    SavedRecruiter,
-   UserActivity,
    UserATSDocument,
    UserATSRelations,
+   UserActivity,
    UserData,
    UserJobApplicationDocument,
    UserPublicData,
@@ -783,6 +783,8 @@ export class FirebaseUserRepository
    }
 
    async migrateAnonymousJobApplications(userData: UserData): Promise<void> {
+      if (!userData?.id) return
+
       const batch = this.firestore.batch()
 
       const ref = this.firestore
