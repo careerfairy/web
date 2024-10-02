@@ -50,17 +50,26 @@ const styles = sxStyles({
       background: "rgba(120, 214, 255, 0.30)",
    },
    info: {
-      // alignItems: {
-      //    md: "center !important"
-      // },
       mt: {
          xs: 4,
          sm: 1,
-         md: 7,
+      },
+   },
+   content: {
+      alignItems: "flex-start !important",
+      height: "100% !important",
+      mt: {
+         md: 4.5,
+         xl: 5,
       },
    },
    actionItem: {
-      // height: "100%",
+      maxWidth: {
+         xs: "100%",
+         md: "70%",
+         lg: "90%",
+         xl: "100%",
+      },
       mt: {
          xs: 0.5,
          md: 1.5,
@@ -141,8 +150,9 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                </ContentHeaderTitle>
             }
             infoSx={styles.info}
+            contentSx={styles.content}
             actionItem={
-               <Stack maxWidth={isMobile ? "100%" : "50%"}>
+               <Stack>
                   <Stack spacing={isMobile ? 1 : 1.5}>
                      <Stack
                         direction={"row"}

@@ -87,6 +87,7 @@ type ContentProps = {
    actionItem?: React.ReactNode
    actionItemSx?: SxProps<DefaultTheme>
    infoSx?: SxProps<DefaultTheme>
+   contentSx?: SxProps<DefaultTheme>
    backgroundImageUrl?: string
    backgroundImageAlt?: string
    withBackgroundOverlay?: boolean
@@ -106,6 +107,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
          withBackgroundOverlay = true,
          actionItemSx,
          infoSx,
+         contentSx,
       },
       ref
    ) => {
@@ -130,7 +132,10 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
                   />
                </Box>
             ) : null}
-            <Container disableGutters sx={styles.content}>
+            <Container
+               disableGutters
+               sx={combineStyles(styles.content, contentSx)}
+            >
                <Box sx={combineStyles(styles.info, infoSx)}>
                   <Stack spacing={1.5} mt={4}>
                      <ContentHeaderTitle>{headerTitle}</ContentHeaderTitle>
