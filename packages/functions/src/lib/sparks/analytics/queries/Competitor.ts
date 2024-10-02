@@ -28,6 +28,36 @@ export function topSparksByIndustry(timePeriod: string) {
          GROUP BY sparkId
       ),
 
+      Likes AS (
+         SELECT 
+            sparkId, 
+            COUNT(sparkId) as value
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+         WHERE actionType = "Like"
+           AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+         GROUP BY sparkId
+      ),
+
+      Shares AS (
+         SELECT 
+            sparkId, 
+            COUNT(sparkId) as value
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+         WHERE actionType LIKE "Share_%"
+           AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+         GROUP BY sparkId
+      ),
+
+      Clicks AS (
+         SELECT 
+            sparkId, 
+            COUNT(sparkId) as value
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+         WHERE actionType LIKE "Click_%"
+           AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+         GROUP BY sparkId
+      ),
+
       Views AS (
          SELECT 
             sparkId, 
@@ -36,36 +66,54 @@ export function topSparksByIndustry(timePeriod: string) {
          WHERE actionType = "Played_Spark"
            AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
          GROUP BY sparkId
+      ),
+
+      rankedSparks AS (
+         SELECT 
+            DISTINCT se.sparkId,
+            rank() OVER (PARTITION BY 1 ORDER BY avgwt.seconds DESC) AS watched_rank,
+            rank() OVER (PARTITION BY 1 ORDER BY avgwp.value DESC) AS percentage_rank,
+            rank() OVER (PARTITION BY 1 ORDER BY Likes.value DESC) AS like_rank,
+            rank() OVER (PARTITION BY 1 ORDER BY Shares.value DESC) AS share_rank,
+            rank() OVER (PARTITION BY 1 ORDER BY Clicks.value DESC) AS CTR_rank,
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents se
+         LEFT JOIN AvgWatchedTime avgwt ON avgwt.sparkId = se.sparkId
+         LEFT JOIN AvgWatchedPercentage avgwp ON avgwp.sparkId = se.sparkId
+         LEFT JOIN Likes ON se.sparkId = likes.sparkId
+         LEFT JOIN Shares ON se.sparkId = shares.sparkId
+         LEFT JOIN Clicks ON se.sparkId = Clicks.sparkId
+         WHERE se.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+      ),
+
+      weightedRank AS (
+         SELECT 
+            sparkId,
+            (watched_rank + 0.1) + (percentage_rank * 0.3) + (like_rank * 0.15) + (share_rank * 0.225) + (CTR_rank * 0.225) AS weighted_rank
+         FROM rankedSparks
+         WHERE sparkId IS NOT NULL
+         ORDER BY weighted_rank ASC
       )
 
       SELECT 
          SparkEvents.sparkId,
          GroupByIndustry.industry,
+         weightedRank.weighted_rank as rank,
          Views.value as plays,
          AvgWatchedTime.seconds as avg_watched_time,
          AvgWatchedPercentage.value as avg_watched_percentage,
          ROUND(SUM(
-         CASE 
-            WHEN SparkEvents.actionType = "Watched_CompleteSpark" THEN 0.05
-            WHEN SparkEvents.actionType = "Like" THEN 0.4
-            WHEN SparkEvents.actionType LIKE "Share_%" THEN 0.5
-            WHEN SparkEvents.actionType LIKE "Click_%" THEN 0.5
-            ELSE 0.0
-         END
-         ), 2) AS engagement,
-         ROUND(SUM(
-         CASE 
-            WHEN SparkEvents.actionType = "Played_Spark" THEN 0.02
-            WHEN SparkEvents.actionType = "Watched_CompleteSpark" THEN 0.05
-            WHEN SparkEvents.actionType = "Like" THEN 0.4
-            WHEN SparkEvents.actionType LIKE "Share_%" THEN 0.5
-            WHEN SparkEvents.actionType LIKE "Click_%" THEN 0.5
-            ELSE 0.0
-         END
-         ), 2) AS rank
+            CASE 
+               WHEN SparkEvents.actionType = "Like" THEN 0.8
+               WHEN SparkEvents.actionType LIKE "Share_%" THEN 1.2
+               WHEN SparkEvents.actionType LIKE "Click_%" THEN 1.2
+               ELSE 0.0
+            END
+         ), 2) AS engagement
       FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
       INNER JOIN GroupByIndustry
          ON SparkEvents.groupId = GroupByIndustry.groupId
+      LEFT JOIN weightedRank
+         ON SparkEvents.sparkId = weightedRank.sparkId
       LEFT JOIN AvgWatchedTime
          ON SparkEvents.sparkId = AvgWatchedTime.sparkId
       LEFT JOIN AvgWatchedPercentage
@@ -73,12 +121,12 @@ export function topSparksByIndustry(timePeriod: string) {
       LEFT JOIN Views
          ON SparkEvents.sparkId = Views.sparkId
       WHERE SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
-      GROUP BY SparkEvents.sparkId, GroupByIndustry.industry, Views.value, AvgWatchedTime.seconds, AvgWatchedPercentage.value
+      GROUP BY SparkEvents.sparkId, GroupByIndustry.industry, weightedRank.weighted_rank, Views.value, AvgWatchedTime.seconds, AvgWatchedPercentage.value
       HAVING plays IS NOT NULL
          AND avg_watched_time IS NOT NULL
          AND engagement IS NOT NULL
          AND engagement > 0.0
-      ORDER BY rank DESC;
+      ORDER BY rank DESC;  
   `
 }
 
@@ -112,7 +160,63 @@ export function topSparksByAudience(timePeriod: string) {
          WHERE actionType = "Played_Spark"
            AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
          GROUP BY sparkId
-      )
+      ),
+
+      Likes AS (
+         SELECT 
+            sparkId, 
+            COUNT(sparkId) as value
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+         WHERE actionType = "Like"
+           AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+         GROUP BY sparkId
+      ),
+
+      Shares AS (
+         SELECT 
+            sparkId, 
+            COUNT(sparkId) as value
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+         WHERE actionType LIKE "Share_%"
+           AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+         GROUP BY sparkId
+      ),
+
+      Clicks AS (
+         SELECT 
+            sparkId, 
+            COUNT(sparkId) as value
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+         WHERE actionType LIKE "Click_%"
+           AND SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+         GROUP BY sparkId
+      ),
+
+      rankedSparks AS (
+         SELECT 
+            DISTINCT se.sparkId,
+            rank() OVER (PARTITION BY 1 ORDER BY avgwt.seconds DESC) AS watched_rank,
+            rank() OVER (PARTITION BY 1 ORDER BY avgwp.value DESC) AS percentage_rank,
+            rank() OVER (PARTITION BY 1 ORDER BY Likes.value DESC) AS like_rank,
+            rank() OVER (PARTITION BY 1 ORDER BY Shares.value DESC) AS share_rank,
+            rank() OVER (PARTITION BY 1 ORDER BY Clicks.value DESC) AS CTR_rank,
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents se
+         LEFT JOIN AvgWatchedTime avgwt ON avgwt.sparkId = se.sparkId
+         LEFT JOIN AvgWatchedPercentage avgwp ON avgwp.sparkId = se.sparkId
+         LEFT JOIN Likes ON se.sparkId = likes.sparkId
+         LEFT JOIN Shares ON se.sparkId = shares.sparkId
+         LEFT JOIN Clicks ON se.sparkId = Clicks.sparkId
+         WHERE se.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+      ),
+
+      weightedRank AS (
+         SELECT 
+            sparkId,
+            (watched_rank + 0.1) + (percentage_rank * 0.3) + (like_rank * 0.15) + (share_rank * 0.225) + (CTR_rank * 0.225) AS weighted_rank
+         FROM rankedSparks
+         WHERE sparkId IS NOT NULL
+         ORDER BY weighted_rank ASC
+      ) 
 
       SELECT 
          SparkEvents.sparkId,
@@ -134,31 +238,23 @@ export function topSparksByAudience(timePeriod: string) {
                THEN "social-sciences"
             ELSE "other"
          END as audience,
+         weightedRank.weighted_rank as rank,
          Views.value as plays,
          AvgWatchedTime.seconds as avg_watched_time,
          AvgWatchedPercentage.value as avg_watched_percentage,
          ROUND(SUM(
             CASE 
-               WHEN SparkEvents.actionType = "Watched_CompleteSpark" THEN 0.05
-               WHEN SparkEvents.actionType = "Like" THEN 0.4
-               WHEN SparkEvents.actionType LIKE "Share_%" THEN 0.5
-               WHEN SparkEvents.actionType LIKE "Click_%" THEN 0.5
+               WHEN SparkEvents.actionType = "Like" THEN 0.8
+               WHEN SparkEvents.actionType LIKE "Share_%" THEN 1.2
+               WHEN SparkEvents.actionType LIKE "Click_%" THEN 1.2
                ELSE 0.0
             END
-         ), 2) AS engagement,
-         ROUND(SUM(
-            CASE 
-               WHEN SparkEvents.actionType = "Played_Spark" THEN 0.02
-               WHEN SparkEvents.actionType = "Watched_CompleteSpark" THEN 0.05
-               WHEN SparkEvents.actionType = "Like" THEN 0.4
-               WHEN SparkEvents.actionType LIKE "Share_%" THEN 0.5
-               WHEN SparkEvents.actionType LIKE "Click_%" THEN 0.5
-               ELSE 0.0
-            END
-         ), 2) AS rank
+         ), 2) AS engagement
       FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents as SparkEvents
       INNER JOIN careerfairy-e1fd9.firestore_export.userData_schema_userData_latest as userData
          ON SparkEvents.userId = userData.authId
+      LEFT JOIN weightedRank
+         ON SparkEvents.sparkId = weightedRank.sparkId
       LEFT JOIN AvgWatchedTime
          ON SparkEvents.sparkId = AvgWatchedTime.sparkId
       LEFT JOIN AvgWatchedPercentage
@@ -167,8 +263,8 @@ export function topSparksByAudience(timePeriod: string) {
          ON SparkEvents.sparkId = Views.sparkId
       WHERE SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
          AND userData.fieldOfStudy_id IS NOT NULL
-      GROUP BY SparkEvents.sparkId, Views.value, AvgWatchedTime.seconds, AvgWatchedPercentage.value, audience
+      GROUP BY SparkEvents.sparkId, Views.value, weightedRank.weighted_rank, AvgWatchedTime.seconds, AvgWatchedPercentage.value, audience
       HAVING engagement > 0.0
-      ORDER BY rank DESC;
+      ORDER BY rank ASC;
    `
 }
