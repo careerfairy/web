@@ -18,7 +18,8 @@ const swrOptions: SWRConfiguration = {
 
 const useLivestreamCategoryDataSWR = (
    firebase: FirebaseService,
-   options: CategoryDataOption
+   options: CategoryDataOption,
+   onSuccess: (data: boolean) => void
 ) => {
    const key = useMemo(
       () => (options ? JSON.stringify(options) : null),
@@ -32,7 +33,7 @@ const useLivestreamCategoryDataSWR = (
       )
    }
 
-   return useSWR(key, swrFetcher, swrOptions)
+   return useSWR(key, swrFetcher, { ...swrOptions, onSuccess })
 }
 
 export default useLivestreamCategoryDataSWR
