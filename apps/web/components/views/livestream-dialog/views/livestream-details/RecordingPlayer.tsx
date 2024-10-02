@@ -154,9 +154,7 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
    const redirectToLogin = useCallback(() => {
       return router.push({
          pathname: `/login`,
-         query: {
-            ...router.query,
-         },
+         query: `absolutePath=${router.asPath}`,
       })
    }, [router])
 
