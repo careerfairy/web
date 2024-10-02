@@ -40,6 +40,7 @@ export const ShareActionButton = forwardRef<
                   title={enableTooltip ? ActionTooltips.Share : null}
                >
                   <ActionBarButtonStyled
+                     id="share-content-button"
                      color={getDeviceButtonColor(
                         true,
                         isLoadingScreenShare,

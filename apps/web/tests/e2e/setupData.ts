@@ -71,7 +71,9 @@ export async function setupLivestreamData(
       FieldsOfStudySeed.createCollection("levelsOfStudy"),
    ])
 
-   return { group, livestream }
+   const secureToken = await LivestreamSeed.generateSecureToken(livestream.id)
+
+   return { group, livestream, secureToken }
 }
 
 /**
