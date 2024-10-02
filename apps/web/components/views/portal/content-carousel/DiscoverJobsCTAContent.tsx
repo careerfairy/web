@@ -1,7 +1,10 @@
-import { Box, Stack, SvgIcon, Typography } from "@mui/material"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
+import { Box, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { HeavyCheckMarkIcon } from "components/views/common/icons/HeavyCheckMarkIcon"
 import Image from "next/legacy/image"
+import { useRouter } from "next/router"
 import { FC } from "react"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
@@ -11,6 +14,8 @@ import CarouselContentService, {
 } from "./CarouselContentService"
 import Content, { ContentHeaderTitle } from "./Content"
 import ContentButton from "./ContentButton"
+
+const SPARK_TO_NAVIGATE_TO_ID = "QJhyftocyWRPoIEaH5W7"
 
 const mobileJobsBackGroundUrl =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2FMobileFullJobsBanner_v2.png?alt=media&token=8f9b3d3f-389e-4499-a78f-b72ec08a7505"
@@ -82,6 +87,17 @@ type DiscoverJobsCTAContentProps = {
 export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
    const isMobile = useIsMobile()
    const { userData, isLoadingAuth, isLoadingUserData } = useAuth()
+   const router = useRouter()
+
+   const handleDiscoverNowClick = () => {
+      return router.push({
+         pathname: `/sparks/${SPARK_TO_NAVIGATE_TO_ID}`,
+         query: {
+            ...router.query,
+            interactionSource: SparkInteractionSources.PortalBanner,
+         },
+      })
+   }
 
    const isAuthLoading = isLoadingAuth || isLoadingUserData
 
@@ -128,33 +144,7 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                         alignItems={"center"}
                         spacing={0.5}
                      >
-                        <SvgIcon>
-                           <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="20"
-                              height="20"
-                              viewBox="0 0 20 20"
-                              fill="none"
-                           >
-                              <g clip-path="url(#clip0_14168_173034)">
-                                 <path
-                                    d="M17.5 0.626465L5.875 13.4077L2.5 10.8452H0.625L5.875 19.3765L19.375 0.626465H17.5Z"
-                                    fill="black"
-                                    fill-opacity="0.19"
-                                 />
-                              </g>
-                              <defs>
-                                 <clipPath id="clip0_14168_173034">
-                                    <rect
-                                       width="20"
-                                       height="20"
-                                       fill="white"
-                                       transform="translate(0 0.00146484)"
-                                    />
-                                 </clipPath>
-                              </defs>
-                           </svg>
-                        </SvgIcon>
+                        <HeavyCheckMarkIcon />
                         <Typography
                            variant="brandedH3"
                            color={"neutral.800"}
@@ -180,33 +170,7 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                         alignItems={"center"}
                         spacing={0.5}
                      >
-                        <SvgIcon>
-                           <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="20"
-                              height="20"
-                              viewBox="0 0 20 20"
-                              fill="none"
-                           >
-                              <g clip-path="url(#clip0_14168_173034)">
-                                 <path
-                                    d="M17.5 0.626465L5.875 13.4077L2.5 10.8452H0.625L5.875 19.3765L19.375 0.626465H17.5Z"
-                                    fill="black"
-                                    fill-opacity="0.19"
-                                 />
-                              </g>
-                              <defs>
-                                 <clipPath id="clip0_14168_173034">
-                                    <rect
-                                       width="20"
-                                       height="20"
-                                       fill="white"
-                                       transform="translate(0 0.00146484)"
-                                    />
-                                 </clipPath>
-                              </defs>
-                           </svg>
-                        </SvgIcon>
+                        <HeavyCheckMarkIcon />
                         <Typography
                            variant="brandedH3"
                            color={"neutral.800"}
@@ -220,9 +184,7 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                   <Box mt={isMobile ? 1.5 : 3}>
                      <ContentButton
                         variant="contained"
-                        href={
-                           "/sparks/QJhyftocyWRPoIEaH5W7?interaction_source=portal-banner"
-                        }
+                        onClick={handleDiscoverNowClick}
                         color={"primary"}
                      >
                         Discover now
