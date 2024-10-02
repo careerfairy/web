@@ -140,13 +140,18 @@ const StatContainer = ({ icon, value }: StatContainerProps) => {
    )
 }
 
+type CompetitorSparkStaticCardProps = {
+   turnOffHighlighting?: boolean
+} & CompetitorSparkData
+
 export const CompetitorSparkStaticCard = ({
    sparkData,
    plays,
    avg_watched_time,
    avg_watched_percentage,
    engagement,
-}: CompetitorSparkData) => {
+   turnOffHighlighting = false,
+}: CompetitorSparkStaticCardProps) => {
    const { group } = useGroup()
 
    const isSparkFromGroup = sparkData?.group.id === group?.groupId
@@ -156,7 +161,10 @@ export const CompetitorSparkStaticCard = ({
    return (
       <Card
          variant="outlined"
-         sx={[styles.card, isSparkFromGroup && styles.cardWithBorder]}
+         sx={[
+            styles.card,
+            isSparkFromGroup && !turnOffHighlighting && styles.cardWithBorder,
+         ]}
       >
          <CardHeader
             avatar={
