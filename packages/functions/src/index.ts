@@ -297,7 +297,6 @@ exports.syncPermanentlyExpiredCustomJobs =
    customJobs.syncPermanentlyExpiredCustomJobs
 exports.fetchCustomJobGroupNames = customJobs.getCustomJobGroupNames
 exports.setRemoveUserJobApplication = customJobs.setRemoveUserJobApplication
-exports.onCreateCustomJob = onCreateTriggers.onCreateCustomJob
 
 // Group Subscription Plan Functions
 exports.startPlan_v3 = groupPlans.startPlan

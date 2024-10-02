@@ -433,7 +433,7 @@ export class CustomJobFunctionsRepository
       }
       if (!customJob.businessFunctionsTagIds?.length) {
          functions.logger.log(
-            `Custom job ${customJob.id} has not business function tags, ignoring creation of notifications`
+            `Custom job ${customJob.id} has no business function tags, ignoring creation of notifications`
          )
          return
       }

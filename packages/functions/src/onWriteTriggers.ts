@@ -358,7 +358,7 @@ export const onWriteSpark = functions
    })
 
 export const onWriteCustomJobs = functions
-   .runWith({ ...defaultTriggerRunTimeConfig, memory: "512MB" })
+   .runWith(defaultTriggerRunTimeConfig)
    .region(config.region)
    .firestore.document("customJobs/{jobId}")
    .onWrite(async (change, context) => {
@@ -450,8 +450,7 @@ export const onWriteCustomJobs = functions
                newCustomJob,
                oldCustomJob
             ),
-            sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob),
-            customJobRepo.createNewCustomJobUserNotifications(newCustomJob)
+            sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob)
          )
       }
 
