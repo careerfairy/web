@@ -43,6 +43,30 @@
       {
          "name": "deleted",
          "type": "boolean"
+      },
+      {
+         "name": "documentType",
+         "type": "string"
+      },
+      {
+         "name": "postingUrl",
+         "type": "string"
+      },
+      {
+         "name": "sparks",
+         "type": "stringified_map"
+      },
+      {
+         "name": "published",
+         "type": "boolean"
+      },
+      {
+         "name": "businessFunctionsTagIds",
+         "type": "stringified_map"
+      },
+      {
+         "name": "isPermanentlyExpired",
+         "type": "boolean"
       }
    ]
 }
