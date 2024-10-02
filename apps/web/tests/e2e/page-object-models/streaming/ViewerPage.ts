@@ -10,4 +10,8 @@ export class ViewerPage extends StreamingPage {
          waitUntil: "commit",
       })
    }
+
+   public assertWaitingRoomText() {
+      return this.assertTextIsVisible("The live stream is about to start!")
+   }
 }

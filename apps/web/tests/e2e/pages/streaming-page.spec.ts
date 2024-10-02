@@ -12,7 +12,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { test as base } from "@playwright/test"
 import { getFormattedName } from "components/views/streaming-page/util"
-import { credentials } from "../../constants"
+import { credentials, streaming } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"
 import { StreamerPage } from "../page-object-models/streaming/StreamerPage"
 import { ViewerPage } from "../page-object-models/streaming/ViewerPage"
@@ -51,7 +51,7 @@ const test = base.extend<{
    },
 })
 
-test.describe("Streaming Journey", () => {
+test.describe("New Streaming Journey", () => {
    // Only run those tests on chromium
    // Firefox headless (macos) doesn't seem to load the camera/mic
    // webkit (safari) has an open issue: https://github.com/microsoft/playwright/issues/2973
@@ -74,41 +74,122 @@ test.describe("Streaming Journey", () => {
       await viewerPage.open(livestream.id)
       await viewerPage.assertStreamerDetailsExist(speaker)
    })
+
+   test("connection breaks, reconnect dialog shows up", async ({
+      streamerPage,
+      viewerPage,
+   }) => {
+      const { livestream, speaker } = await setupStreamer(streamerPage)
+
+      await viewerPage.open(livestream.id)
+      await viewerPage.assertStreamerDetailsExist(speaker)
+
+      await streamerPage.page.context().setOffline(true)
+
+      // dialog with a loading spinner should show up
+      await viewerPage.assertConnectionInterruptedDialogOpens()
+      await streamerPage.assertConnectionInterruptedDialogOpens()
+
+      // re-connect the browser, the dialog should disappear
+      await streamerPage.page.context().setOffline(false)
+      await viewerPage.assertConnectionInterruptedDialogIsClosed()
+      await streamerPage.assertConnectionInterruptedDialogIsClosed()
+   })
+
+   test("duplicate tab should open a dialog to close it", async ({
+      streamerPage,
+      viewerPage,
+   }) => {
+      const { livestream, speaker } = await setupStreamer(streamerPage)
+
+      await viewerPage.open(livestream.id)
+      await viewerPage.assertStreamerDetailsExist(speaker)
+
+      // Open a duplicated viewer tab
+      const duplicateViewerPage = new ViewerPage(
+         await viewerPage.page.context().newPage()
+      )
+      await duplicateViewerPage.open(livestream.id)
+      await duplicateViewerPage.assertStreamerDetailsExist(speaker)
+
+      // first viewer tab should open a dialog to close it since its duplicated
+      viewerPage.assertStreamIsOpenOnOtherBrowserDialogOpen()
+   })
+
+   test("viewer is redirected to waiting room", async ({ viewerPage }) => {
+      const { livestream } = await setupLivestream()
+      await viewerPage.open(livestream.id)
+      await viewerPage.assertWaitingRoomText()
+   })
+
+   test("streamer joins with ad-hoc speaker", async ({
+      streamerPage,
+      viewerPage,
+   }) => {
+      const { livestream } = await setupStreamer(streamerPage, {
+         adHoc: true,
+      })
+
+      // Confirm the livestream is live and the streamer card is present
+      await streamerPage.assertIsLive()
+      await streamerPage.assertStreamerDetailsExist(streaming.streamer)
+
+      // Streamer card should also be visible on the viewer page
+      await viewerPage.open(livestream.id)
+      await viewerPage.assertStreamerDetailsExist(streaming.streamer)
+   })
 })
 
 type SetupStreamerOptions = {
-   setupGroup?: boolean
+   adHoc?: boolean
 }
 
 async function setupStreamer(
    streamerPage: StreamerPage,
    options: SetupStreamerOptions = {
-      setupGroup: false,
+      adHoc: false,
    }
 ) {
-   const { livestream, secureToken, group } = await setupData(
-      options.setupGroup
-   )
+   const { livestream, secureToken, group } = await setupLivestream({
+      livestreamType: "live",
+   })
 
    const speaker = livestream.speakers[0]
 
-   await streamerPage.selectAndJoinWithSpeaker(
-      livestream.id,
-      getFormattedName(speaker.firstName, speaker.lastName),
-      {
+   if (options.adHoc) {
+      await streamerPage.createAndJoinWithAdHocSpeaker(livestream.id, {
          secureToken,
-      }
-   )
+      })
+   } else {
+      await streamerPage.selectAndJoinWithSpeaker(
+         livestream.id,
+         getFormattedName(speaker.firstName, speaker.lastName),
+         {
+            secureToken,
+         }
+      )
+   }
+
    await streamerPage.joinWithCameraAndMicrophone()
 
    return { livestream, secureToken, group, speaker }
 }
 
-async function setupData(setupGroup: boolean = false) {
+type SetupLivestreamOptions = {
+   setupGroup?: boolean
+   livestreamType: "upcoming" | "live"
+}
+
+async function setupLivestream(
+   options: SetupLivestreamOptions = {
+      setupGroup: false,
+      livestreamType: "upcoming",
+   }
+) {
    let group: Group
    let overrideLivestreamDetails: Partial<LivestreamEvent> = {}
 
-   if (setupGroup) {
+   if (options.setupGroup) {
       group = await GroupSeed.createGroup(Object.assign({}))
       const groupQuestions = createLivestreamGroupQuestions(group.id)
 
@@ -121,10 +202,19 @@ async function setupData(setupGroup: boolean = false) {
       }
    }
 
-   const livestream = await LivestreamSeed.createLive({
-      ...overrideLivestreamDetails,
-      useNewUI: true,
-   })
+   let livestream: LivestreamEvent
+
+   if (options.livestreamType == "live") {
+      livestream = await LivestreamSeed.createLive({
+         ...overrideLivestreamDetails,
+         useNewUI: true,
+      })
+   } else if (options.livestreamType == "upcoming") {
+      livestream = await LivestreamSeed.createUpcoming({
+         ...overrideLivestreamDetails,
+         useNewUI: true,
+      })
+   }
 
    const secureToken = await LivestreamSeed.generateSecureToken(livestream.id)
 
