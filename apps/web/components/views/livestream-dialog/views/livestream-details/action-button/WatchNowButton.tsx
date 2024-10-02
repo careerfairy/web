@@ -1,5 +1,6 @@
 import PlayIcon from "@mui/icons-material/PlayCircleOutlineRounded"
 import { Button } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
 import { ActionButtonWrapper } from "./ActionButton"
 import { useActionButtonContext } from "./ActionButtonProvider"
@@ -19,6 +20,7 @@ type WatchNowButtonProps = {
    fullWidth?: boolean
 }
 const WatchNowButton = ({ fullWidth }: WatchNowButtonProps) => {
+   const { isLoggedIn } = useAuth()
    const {
       isFloating,
       heroVisible,
@@ -37,6 +39,8 @@ const WatchNowButton = ({ fullWidth }: WatchNowButtonProps) => {
          goToView("livestream-details")
       }
    }
+
+   const buttonText = isFixedToBottom ? "Watch recording" : "Watch now"
 
    return (
       <ActionButtonWrapper
@@ -60,7 +64,8 @@ const WatchNowButton = ({ fullWidth }: WatchNowButtonProps) => {
             data-testid="livestream-watch-now-button"
             size={isFixedToBottom ? "medium" : "large"}
          >
-            {isFixedToBottom ? "Watch recording" : "Watch now"}
+            {!isLoggedIn ? "Sign up to watch" : null}
+            {isLoggedIn ? buttonText : null}
          </Button>
       </ActionButtonWrapper>
    )
