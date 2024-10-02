@@ -221,7 +221,7 @@ export const onCreateSparkStats = functions
    })
 
 export const onCreateCustomJob = functions
-   .runWith(defaultTriggerRunTimeConfig)
+   .runWith({ ...defaultTriggerRunTimeConfig, memory: "512MB" })
    .region(config.region)
    .firestore.document("customJobs/{customJobId}")
    .onCreate(async (snapshot, context) => {
