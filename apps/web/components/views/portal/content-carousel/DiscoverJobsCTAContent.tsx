@@ -104,10 +104,8 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                <ContentHeaderTitle
                   component="span"
                   maxWidth={isMobile ? "100%" : "60% !important"}
-                  // maxHeight={"120px !important"}
                   color="black"
                   sx={styles.title}
-                  // mt={"0px !important"}
                   fontSize={isMobile ? "32px !important" : "42px !important"}
                >
                   {"CareerFairy "}
