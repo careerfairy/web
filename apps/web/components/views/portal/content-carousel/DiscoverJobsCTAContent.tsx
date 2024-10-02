@@ -50,12 +50,17 @@ const styles = sxStyles({
       background: "rgba(120, 214, 255, 0.30)",
    },
    info: {
+      // alignItems: {
+      //    md: "center !important"
+      // },
       mt: {
-         xs: 3,
+         xs: 4,
          sm: 1,
+         md: 7,
       },
    },
    actionItem: {
+      // height: "100%",
       mt: {
          xs: 0.5,
          md: 1.5,

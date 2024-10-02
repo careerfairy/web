@@ -225,7 +225,7 @@ export class CarouselContentService {
                contentType: "CTASlide",
                topic: CTASlideTopics.Jobs,
             },
-            ...content,
+            // ...content,
          ]
       }
 
