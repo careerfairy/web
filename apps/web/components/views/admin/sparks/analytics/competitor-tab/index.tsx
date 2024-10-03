@@ -5,6 +5,7 @@ import { SectionsWrapper } from "../components/SectionsWrapper"
 import { useSparksAnalytics } from "../SparksAnalyticsContext"
 import { BannerForCompetitorTable } from "./banner-competitor-table/BannerForCompetitorTable"
 import { SparksCompetitorTabSkeleton } from "./SparksCompetitorTabSkeleton"
+import { TopCompaniesByIndustry } from "./TopCompaniesByIndustry"
 import { TopSparksByAudience } from "./TopSparksByAudience"
 import { TopSparksByIndustry } from "./TopSparksByIndustry"
 
@@ -23,6 +24,7 @@ export const SparksCompetitorTab = () => {
    return (
       <SuspenseWithBoundary fallback={<SparksCompetitorTabSkeleton />}>
          <SectionsWrapper>
+            <TopCompaniesByIndustry />
             <TopSparksByIndustry />
             <TopSparksByAudience />
             <BannerForCompetitorTable />
