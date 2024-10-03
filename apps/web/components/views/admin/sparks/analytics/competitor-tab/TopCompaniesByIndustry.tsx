@@ -26,6 +26,12 @@ import { CompetitorSparkStaticCard } from "./CompetitorSparkStaticCard"
 import { EmptySparksList } from "./EmptySparksList"
 
 const styles = sxStyles({
+   collapsibleTableRoot: {
+      overflow: "scroll",
+   },
+   collapsibleTableContainer: {
+      minWidth: "850px",
+   },
    normalText: {
       fontSize: "13px",
       fontWeight: 400,
@@ -216,12 +222,8 @@ const CollapsibleTable = ({ rows }: CollapsibleTableProps) => {
    )
 
    return (
-      <Box
-         sx={{
-            overflow: "scroll",
-         }}
-      >
-         <Stack rowGap={2} sx={{ minWidth: "700px" }}>
+      <Box sx={styles.collapsibleTableRoot}>
+         <Stack rowGap={2} sx={styles.collapsibleTableContainer}>
             <GridContainer sx={styles.normalText}>
                <Grid item xs={GRID_SIZES[0]} />
                <Grid item xs={GRID_SIZES[1]} sx={{ textAlign: "left" }}>
