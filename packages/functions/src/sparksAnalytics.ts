@@ -217,53 +217,58 @@ async function fetchAnalyticsFromBigQuery(
    return SparksAnalyticsPayload
 }
 
-export const getSparksAnalytics = functions.region(config.region).https.onCall(
-   middlewares(
-      dataValidation({
-         groupId: string().required(),
-         forceUpdate: boolean().required(),
-      }),
-      userShouldBeGroupAdmin(),
-      async (data, context) => {
-         try {
-            const { groupId, forceUpdate } = data
-            const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
-               groupId,
-               sparkRepo
-            )
-
-            functions.logger.info(
-               `Fetching sparks analytics for group ${groupId}...`
-            )
-            const cachedAnalyticsData =
-               await sparksAnalyticsRepo.getAnalyticsFromFirestore()
-
-            if (forceUpdate || !cachedAnalyticsData) {
-               const bigQueryAnalyticsData = await fetchAnalyticsFromBigQuery(
-                  sparksAnalyticsRepo
+export const getSparksAnalytics = functions
+   .region(config.region)
+   .runWith({
+      timeoutSeconds: 180, // 3 minutes
+      memory: "512MB",
+   })
+   .https.onCall(
+      middlewares(
+         dataValidation({
+            groupId: string().required(),
+            forceUpdate: boolean().required(),
+         }),
+         userShouldBeGroupAdmin(),
+         async (data, context) => {
+            try {
+               const { groupId, forceUpdate } = data
+               const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
+                  groupId,
+                  sparkRepo
                )
-
-               await sparksAnalyticsRepo.updateAnalyticsInFirestore({
-                  ...bigQueryAnalyticsData,
-                  id: groupId,
-               })
 
                functions.logger.info(
-                  "Sparks analytics cache updated in Firestore."
+                  `Fetching sparks analytics for group ${groupId}...`
                )
+               const cachedAnalyticsData =
+                  await sparksAnalyticsRepo.getAnalyticsFromFirestore()
 
-               return bigQueryAnalyticsData
+               if (forceUpdate || !cachedAnalyticsData) {
+                  const bigQueryAnalyticsData =
+                     await fetchAnalyticsFromBigQuery(sparksAnalyticsRepo)
+
+                  await sparksAnalyticsRepo.updateAnalyticsInFirestore({
+                     ...bigQueryAnalyticsData,
+                     id: groupId,
+                  })
+
+                  functions.logger.info(
+                     "Sparks analytics cache updated in Firestore."
+                  )
+
+                  return bigQueryAnalyticsData
+               }
+
+               return cachedAnalyticsData
+            } catch (error) {
+               console.log("🚀 ~ error:", error)
+               logAndThrow("Error fetching sparks analytics", {
+                  data,
+                  error,
+                  context,
+               })
             }
-
-            return cachedAnalyticsData
-         } catch (error) {
-            console.log("🚀 ~ error:", error)
-            logAndThrow("Error fetching sparks analytics", {
-               data,
-               error,
-               context,
-            })
          }
-      }
+      )
    )
-)
