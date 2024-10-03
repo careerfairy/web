@@ -20,6 +20,7 @@ import {
    CarouselContent,
 } from "./CarouselContentService"
 import ContentCarouselPagination from "./ContentCarouselPagination"
+import { DiscoverJobsCTAContent } from "./DiscoverJobsCTAContent"
 import LivestreamContent from "./LivestreamContent"
 import WatchSparksCTAContent from "./WatchSparksCTAContent"
 
@@ -198,6 +199,9 @@ const getCTASlide = (contentItem: CTASlide) => {
       }
       case CTASlideTopics.Sparks: {
          return <WatchSparksCTAContent cta={contentItem} />
+      }
+      case CTASlideTopics.Jobs: {
+         return <DiscoverJobsCTAContent cta={contentItem} />
       }
       default: {
          return null
