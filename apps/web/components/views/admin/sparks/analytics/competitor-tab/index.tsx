@@ -3,7 +3,6 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { LockedSparksCompetitorTab } from "../components/locking/LockedSparksCompetitorTab"
 import { SectionsWrapper } from "../components/SectionsWrapper"
 import { useSparksAnalytics } from "../SparksAnalyticsContext"
-import { BannerForCompetitorTable } from "./banner-competitor-table/BannerForCompetitorTable"
 import { SparksCompetitorTabSkeleton } from "./SparksCompetitorTabSkeleton"
 import { TopCompaniesByIndustry } from "./TopCompaniesByIndustry"
 import { TopSparksByAudience } from "./TopSparksByAudience"
@@ -27,7 +26,6 @@ export const SparksCompetitorTab = () => {
             <TopCompaniesByIndustry />
             <TopSparksByIndustry />
             <TopSparksByAudience />
-            <BannerForCompetitorTable />
          </SectionsWrapper>
       </SuspenseWithBoundary>
    )
