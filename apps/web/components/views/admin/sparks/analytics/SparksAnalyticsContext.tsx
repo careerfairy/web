@@ -108,9 +108,9 @@ export const SparksAnalyticsProvider = ({ children }) => {
          label: industry.name,
       }))
 
-      const groupIndustriesById = group.companyIndustries.map(
-         (industry) => industry.id
-      )
+      const groupIndustriesById = group.companyIndustries
+         .map((industry) => industry.id)
+         .filter((id) => topCompaniesIndustries.includes(id))
 
       const result = allOptions.filter(
          (option) =>
