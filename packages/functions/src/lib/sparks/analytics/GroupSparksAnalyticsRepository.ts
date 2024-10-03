@@ -864,10 +864,14 @@ class GroupSparksAnalyticsRepository
                INDUSTRY_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
+            const sparkData = this.convertSparkToCompetitorStaticCardData(
+               sparksLookup[item.sparkId]
+            )
+            sparkData.creator.avatarUrl =
+               sparksLookup[item.sparkId].group.logoUrl
+
             industrySegmentsMap[item.industry].push({
-               sparkData: this.convertSparkToCompetitorStaticCardData(
-                  sparksLookup[item.sparkId]
-               ),
+               sparkData: sparkData,
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
                avg_watched_percentage: item.avg_watched_percentage,
@@ -883,10 +887,14 @@ class GroupSparksAnalyticsRepository
             auxAllSet.size < INDUSTRY_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
+            const sparkData = this.convertSparkToCompetitorStaticCardData(
+               sparksLookup[item.sparkId]
+            )
+            sparkData.creator.avatarUrl =
+               sparksLookup[item.sparkId].group.logoUrl
+
             auxAllSet.add({
-               sparkData: this.convertSparkToCompetitorStaticCardData(
-                  sparksLookup[item.sparkId]
-               ),
+               sparkData: sparkData,
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
                avg_watched_percentage: item.avg_watched_percentage,
@@ -955,10 +963,14 @@ class GroupSparksAnalyticsRepository
                AUDIENCE_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
+            const sparkData = this.convertSparkToCompetitorStaticCardData(
+               sparksLookup[item.sparkId]
+            )
+            sparkData.creator.avatarUrl =
+               sparksLookup[item.sparkId].group.logoUrl
+
             audienceSegmentsMap[item.audience].push({
-               sparkData: this.convertSparkToCompetitorStaticCardData(
-                  sparksLookup[item.sparkId]
-               ),
+               sparkData: sparkData,
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
                avg_watched_percentage: item.avg_watched_percentage,
@@ -974,10 +986,14 @@ class GroupSparksAnalyticsRepository
             auxAllSet.size < INDUSTRY_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
+            const sparkData = this.convertSparkToCompetitorStaticCardData(
+               sparksLookup[item.sparkId]
+            )
+            sparkData.creator.avatarUrl =
+               sparksLookup[item.sparkId].group.logoUrl
+
             auxAllSet.add({
-               sparkData: this.convertSparkToCompetitorStaticCardData(
-                  sparksLookup[item.sparkId]
-               ),
+               sparkData: sparkData,
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
                avg_watched_percentage: item.avg_watched_percentage,
