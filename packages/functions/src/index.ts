@@ -243,6 +243,8 @@ exports.onWriteCreator = onWriteTriggers.onWriteCreator
 exports.onWriteGroup = onWriteTriggers.onWriteGroup
 exports.onWriteSpark = onWriteTriggers.onWriteSpark
 exports.onWriteCustomJobs = onWriteTriggers.onWriteCustomJobs
+exports.onWriteCustomJobsSendNotifications =
+   onWriteTriggers.onWriteCustomJobsSendNotifications
 
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =

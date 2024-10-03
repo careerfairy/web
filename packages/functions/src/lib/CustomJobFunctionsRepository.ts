@@ -421,22 +421,31 @@ export class CustomJobFunctionsRepository
    async createNewCustomJobUserNotifications(
       customJob: CustomJob
    ): Promise<void> {
-      const BATCH_SIZE = 200
+      const jobEmoji = "💼"
+      const jobLogId = `${customJob.id}-${customJob.title}`
+
       functions.logger.log(
-         `Started creating custom job created notifications for custom job ${customJob.id}`
+         `${jobEmoji} Started creating custom job created notifications for custom job ${jobLogId}`
       )
+
+      const BATCH_SIZE = 200
+
       if (!customJob.published || customJob.isPermanentlyExpired) {
          functions.logger.log(
-            `Custom job ${customJob.id} is not published or is expired. published: ${customJob.published}, expired: ${customJob.isPermanentlyExpired}`
+            `${jobEmoji} Custom job ${jobLogId} is not published or is expired. published: ${customJob.published}, expired: ${customJob.isPermanentlyExpired}`
          )
          return
       }
       if (!customJob.businessFunctionsTagIds?.length) {
          functions.logger.log(
-            `Custom job ${customJob.id} has no business function tags, ignoring creation of notifications`
+            `${jobEmoji} Custom job ${jobLogId} has no business function tags, ignoring creation of notifications`
          )
          return
       }
+
+      functions.logger.log(
+         `${jobEmoji} Searching users with tags: ${customJob.businessFunctionsTagIds} from job ${jobLogId}`
+      )
 
       const usersWithMatchingTags = await userRepo.getUsersWithTags(
          "businessFunctionsTagIds",
@@ -451,18 +460,22 @@ export class CustomJobFunctionsRepository
             "matilde.ramos@careerfairy.io",
             "carlos.rijo@careerfairy.io",
             "lucas@careerfairy.io",
+            "goncalo@careerfairy.io",
+            "edujorge13@hotmail.com",
+            "maximilian@careerfairy.io",
+            "carlos@careerfairy.io",
          ].includes(user.id)
       )
 
       if (!users?.length) {
          functions.logger.log(
-            `No users found with matching tags for custom job ${customJob.id}, ignoring creation of notifications`
+            `${jobEmoji} No users found with matching tags for custom job ${jobLogId}, ignoring creation of notifications`
          )
          return
       }
 
       functions.logger.log(
-         `Creating notifications for ${users.length} users for new custom job ${customJob.id} (by matching businessFunctionsTagIds tags)`
+         `${jobEmoji} Creating notifications for ${users.length} users for new custom job ${jobLogId} (by matching businessFunctionsTagIds tags)`
       )
 
       const jobGroup = await groupRepo.getGroupById(customJob.groupId)
@@ -498,7 +511,9 @@ export class CustomJobFunctionsRepository
       }
 
       functions.logger.log(
-         `Notified ${users.length} users of new job ${customJob.id}-${customJob.title}`
+         `${jobEmoji} Notified ${users.length}(${users.map(
+            (u) => u.id
+         )}) users of new job ${jobLogId}`
       )
    }
 }
