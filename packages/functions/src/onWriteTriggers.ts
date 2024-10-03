@@ -458,7 +458,7 @@ export const onWriteCustomJobs = functions
    })
 
 export const onWriteCustomJobsSendNotifications = functions
-   .runWith(defaultTriggerRunTimeConfig)
+   .runWith({ ...defaultTriggerRunTimeConfig, memory: "512MB" })
    .region(config.region)
    .firestore.document("customJobs/{jobId}")
    .onWrite(async (change, context) => {

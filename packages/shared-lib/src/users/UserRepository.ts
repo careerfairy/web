@@ -1065,15 +1065,36 @@ export class FirebaseUserRepository
 
    async getUsersWithTags(
       tagField: ValidUserTagFields,
-      tagIds: string[]
+      tagIds: string[],
+      lastVisibleDoc?: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData> // Used for pagination
    ): Promise<UserData[]> {
+      const DOCUMENTS_LIMIT = 1000
       if (!tagIds?.length) return []
 
-      const query = this.firestore
+      let query = this.firestore
          .collection("userData")
          .where(tagField, "array-contains-any", tagIds)
+         .limit(DOCUMENTS_LIMIT)
+
+      if (lastVisibleDoc) {
+         // If we're paginating, start the query after the last document
+         query = query.startAfter(lastVisibleDoc)
+      }
 
       const data = await query.get()
+
+      // Get the last document for pagination
+      const lastVisible = data.docs[data.docs.length - 1]
+
+      // Recursive call if there are more documents to fetch
+      if (data.docs.length === DOCUMENTS_LIMIT) {
+         const nextPage = await this.getUsersWithTags(
+            tagField,
+            tagIds,
+            lastVisible
+         )
+         return [...this.addIdToDocs<UserData>(data.docs), ...nextPage]
+      }
 
       return this.addIdToDocs<UserData>(data.docs)
    }

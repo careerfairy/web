@@ -452,8 +452,8 @@ export class CustomJobFunctionsRepository
          customJob.businessFunctionsTagIds
       )
 
-      const users = (usersWithMatchingTags || []).filter((user) =>
-         [
+      const users = (usersWithMatchingTags || []).filter((user) => {
+         return [
             "edujorge13@gmail.com",
             "habib@careerfairy.io",
             "simone@careerfairy.io",
@@ -465,7 +465,7 @@ export class CustomJobFunctionsRepository
             "maximilian@careerfairy.io",
             "carlos@careerfairy.io",
          ].includes(user.id)
-      )
+      })
 
       if (!users?.length) {
          functions.logger.log(
