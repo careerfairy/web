@@ -3,9 +3,14 @@ import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    CompetitorAudienceBigQueryResult,
    CompetitorAudienceData,
+   CompetitorCompanyBigQueryResult,
+   CompetitorCompanyStats,
    CompetitorIndustryBigQueryResult,
    CompetitorIndustryData,
    CompetitorSparkData,
+   CompetitorStatsFromBigQuery,
+   CompetitorTopCompaniesBase,
+   CompetitorTopCompaniesData,
    LinearBarDataPoint,
    MostSomethingBase,
    MostSomethingBigQueryResult,
@@ -25,7 +30,11 @@ import {
    top10Universities,
    topLevelsOfStudy,
 } from "./queries/Audience"
-import { topSparksByAudience, topSparksByIndustry } from "./queries/Competitor"
+import {
+   topCompaniesByIndustry,
+   topSparksByAudience,
+   topSparksByIndustry,
+} from "./queries/Competitor"
 import {
    timeseriesLikesPastYear,
    timeseriesPageClicksPastYear,
@@ -42,6 +51,8 @@ import { totalViewsPastYear, uniqueViewersPastYear } from "./queries/Reach"
 
 const AUDIENCE_SPARKS_LIMIT = 4
 const INDUSTRY_SPARKS_LIMIT = 4
+const MIN_COMPANIES_PER_INDUSTRY = 3
+const MAX_COMPANIES_PER_INDUSTRY = 5
 
 /**
  * Interface for the GroupSparksAnalyticsRepository
@@ -150,6 +161,15 @@ interface IGroupSparksAnalyticsRepository {
     * @returns {Promise<PieChartDataPoint[]>} Promise object represents the levels of study for the given time period
     */
    getLevelsOfStudy(timeperiod: TimePeriodParams): Promise<PieChartDataPoint[]>
+
+   /**
+    * Get top companies by industry for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<CompetitorIndustryData>} Promise object represents the top companies by industry for the given time period
+    */
+   getTopCompaniesByIndustry(
+      timeperiod: TimePeriodParams
+   ): Promise<CompetitorTopCompaniesData>
 
    /**
     * Get group's top sparks by industry for a given time period
@@ -432,6 +452,315 @@ class GroupSparksAnalyticsRepository
             videoThumbnailUrl: spark.video.thumbnailUrl,
          },
       }
+   }
+
+   async getTopCompaniesByIndustry(
+      timeperiod: TimePeriodParams
+   ): Promise<CompetitorTopCompaniesData> {
+      const bigQueryResults =
+         await this.handleQueryPromiseWithTimePeriodValidation<
+            CompetitorCompanyBigQueryResult[]
+         >(topCompaniesByIndustry, timeperiod)
+
+      // Calculates company "total" data to avoid an extra query
+      const companyStatDataLookup: Record<string, CompetitorCompanyStats> =
+         bigQueryResults.reduce((acc, item) => {
+            acc[item.groupId] = {
+               totalViews: acc[item.groupId]?.totalViews + item.plays || 0,
+               uniqueViewers:
+                  acc[item.groupId]?.uniqueViewers + item.uniqueViewers || 0,
+               avg_watched_time:
+                  acc[item.groupId]?.avg_watched_time + item.avg_watched_time ||
+                  0,
+               avg_watched_percentage:
+                  acc[item.groupId]?.avg_watched_percentage +
+                     item.avg_watched_percentage || 0,
+               engagement: acc[item.groupId]?.engagement + item.engagement || 0,
+            }
+
+            return acc
+         }, {})
+
+      // Calculates company "total" data by industry to avoid an extra query
+      const companyStatDataByIndustryLookup: Record<
+         string,
+         Record<string, CompetitorCompanyStats>
+      > = bigQueryResults.reduce((acc, item) => {
+         if (!item) {
+            return acc
+         }
+
+         if (!acc[item.industry]) {
+            acc[item.industry] = {}
+         }
+
+         acc[item.industry][item.groupId] = {
+            totalViews:
+               acc[item.industry]?.[item.groupId]?.totalViews + item.plays || 0,
+            uniqueViewers:
+               acc[item.industry]?.[item.groupId]?.uniqueViewers +
+                  item.uniqueViewers || 0,
+            avg_watched_time:
+               acc[item.industry]?.[item.groupId]?.avg_watched_time +
+                  item.avg_watched_time || 0,
+            avg_watched_percentage:
+               acc[item.industry]?.[item.groupId]?.avg_watched_percentage +
+                  item.avg_watched_percentage || 0,
+            engagement:
+               acc[item.industry]?.[item.groupId]?.engagement +
+                  item.engagement || 0,
+         }
+
+         return acc
+      }, {})
+
+      const sparkStatDataLookup: Record<string, CompetitorStatsFromBigQuery> =
+         bigQueryResults.reduce((acc, item) => {
+            if (!item) {
+               return acc
+            }
+
+            acc[item.sparkId] = {
+               plays: item.plays,
+               avg_watched_time: item.avg_watched_time,
+               avg_watched_percentage: item.avg_watched_percentage,
+               engagement: item.engagement,
+            }
+
+            return acc
+         }, {})
+
+      const sparksIdsByIndustryAndCompany: Record<
+         string,
+         Record<string, Array<string>>
+      > = CompanyIndustryValues.reduce((acc, industry) => {
+         acc[industry.id] = {}
+         return acc
+      }, {})
+
+      const companyIndustriesLookup: Record<string, Set<string>> = {}
+
+      // Creates companyIndustryLookup and sparksIdsByIndustryAndCompany
+      // companyIndustryLookup is a lookup of all industries a company has sparks in
+      // sparksIdsByIndustryAndCompany is a lookup of all sparks ids in an industry and company
+      for (const item of bigQueryResults) {
+         if (!companyIndustriesLookup[item.groupId]) {
+            companyIndustriesLookup[item.groupId] = new Set<string>()
+         }
+
+         companyIndustriesLookup[item.groupId].add(item.industry)
+
+         const numOfSparkIdsAlreadyAdded =
+            sparksIdsByIndustryAndCompany?.[item.industry]?.[item.groupId]
+               ?.length || 0
+         if (numOfSparkIdsAlreadyAdded < INDUSTRY_SPARKS_LIMIT) {
+            if (!sparksIdsByIndustryAndCompany[item.industry][item.groupId]) {
+               sparksIdsByIndustryAndCompany[item.industry][item.groupId] = []
+            }
+
+            sparksIdsByIndustryAndCompany[item.industry][item.groupId].push(
+               item.sparkId
+            )
+         }
+      }
+
+      const companyRankingByIndustryLookup: Record<
+         string,
+         Record<string, number>
+      > = {}
+
+      for (const industry of Object.keys(sparksIdsByIndustryAndCompany)) {
+         let topCompanyCounter = 1
+         for (const groupId of Object.keys(
+            sparksIdsByIndustryAndCompany[industry]
+         )) {
+            if (topCompanyCounter > 5 && groupId !== this.groupId) {
+               delete sparksIdsByIndustryAndCompany[industry][groupId]
+            }
+            topCompanyCounter++
+         }
+
+         const hasEnoughCompanies =
+            Object.keys(sparksIdsByIndustryAndCompany[industry]).length >=
+            MIN_COMPANIES_PER_INDUSTRY
+
+         if (!hasEnoughCompanies) {
+            delete sparksIdsByIndustryAndCompany[industry]
+         }
+      }
+
+      // Populates companyRankingByIndustryLookup
+      for (const industry of Object.keys(sparksIdsByIndustryAndCompany)) {
+         const sparksIdsByCompany = Object.keys(
+            sparksIdsByIndustryAndCompany[industry]
+         )
+
+         for (let i = 0; i < sparksIdsByCompany.length; i++) {
+            const groupId = sparksIdsByCompany[i]
+
+            if (!companyRankingByIndustryLookup[groupId]) {
+               companyRankingByIndustryLookup[groupId] = {}
+            }
+            companyRankingByIndustryLookup[groupId][industry] = i + 1
+         }
+      }
+
+      // Get all sparks ids for "All Industries" companies
+
+      const auxAllCompanyIdsSet = new Set<string>()
+
+      for (const item of bigQueryResults) {
+         if (auxAllCompanyIdsSet.size < MAX_COMPANIES_PER_INDUSTRY) {
+            auxAllCompanyIdsSet.add(item.groupId)
+         }
+      }
+
+      const auxAllCompanySparksIds: Record<string, string[]> = {}
+
+      for (const item of bigQueryResults) {
+         if (!auxAllCompanyIdsSet.has(item.groupId)) {
+            continue
+         }
+
+         if (!auxAllCompanySparksIds[item.groupId]) {
+            auxAllCompanySparksIds[item.groupId] = []
+         }
+
+         if (
+            auxAllCompanySparksIds[item.groupId].length < INDUSTRY_SPARKS_LIMIT
+         ) {
+            auxAllCompanySparksIds[item.groupId].push(item.sparkId)
+         }
+      }
+
+      const allIndustrySparksIdsToFetch = Array.from(
+         new Set(Object.values(auxAllCompanySparksIds).flat())
+      )
+
+      let sparksIdsToFetch = Array.from(
+         new Set(
+            Object.values(sparksIdsByIndustryAndCompany) // Gets all top companies data e.g. [{ companyA: [id1, id2, id3] }, { companyB: [id2, id3, id4] }, ...]
+               .flatMap(Object.values) // Flattens the array of sparks ids e.g. [[id1, id2, id3], [id2, id3, id4]]
+               .flat() // Flattens the array of sparks ids e.g. [id1, id2, id3, id2, id3, id4]
+         ) // Removes duplicates e.g. [id1, id2, id3, id4]
+      ) // Converts to array
+
+      sparksIdsToFetch = [...sparksIdsToFetch, ...allIndustrySparksIdsToFetch]
+
+      const sparks = await this.sparksRepo.getSparksByIds(sparksIdsToFetch)
+
+      const sparksLookup: Record<string, Spark> = sparks.reduce(
+         (acc, spark) => {
+            acc[spark.id] = spark
+            return acc
+         },
+         {}
+      )
+
+      const result: CompetitorTopCompaniesData = {}
+
+      for (const industry of Object.keys(sparksIdsByIndustryAndCompany)) {
+         if (!result[industry]) {
+            result[industry] = []
+         }
+
+         for (const groupId of Object.keys(
+            sparksIdsByIndustryAndCompany[industry]
+         )) {
+            const group =
+               sparksLookup[sparksIdsByIndustryAndCompany[industry][groupId][0]]
+                  .group
+            const companyData = {
+               rank: companyRankingByIndustryLookup[groupId][industry],
+               logo: group.logoUrl,
+               name: group.universityName,
+               totalViews:
+                  companyStatDataByIndustryLookup[industry][groupId].totalViews,
+               uniqueViewers:
+                  companyStatDataByIndustryLookup[industry][groupId]
+                     .uniqueViewers,
+               avg_watched_time:
+                  companyStatDataByIndustryLookup[industry][groupId]
+                     .avg_watched_time,
+               avg_watched_percentage:
+                  companyStatDataByIndustryLookup[industry][groupId]
+                     .avg_watched_percentage,
+               engagement:
+                  companyStatDataByIndustryLookup[industry][groupId].engagement,
+            }
+
+            console.log(industry, groupId)
+
+            result[industry].push({
+               companyData,
+               sparks: sparksIdsByIndustryAndCompany[industry][groupId].map(
+                  (sparkId) => ({
+                     data: this.convertSparkToCompetitorStaticCardData(
+                        sparksLookup[sparkId]
+                     ),
+                     stats: {
+                        plays: sparkStatDataLookup[sparkId].plays,
+                        avg_watched_time:
+                           sparkStatDataLookup[sparkId].avg_watched_time,
+                        avg_watched_percentage:
+                           sparkStatDataLookup[sparkId].avg_watched_percentage,
+                        engagement: sparkStatDataLookup[sparkId].engagement,
+                     },
+                  })
+               ),
+            })
+         }
+      }
+
+      const auxResult: CompetitorTopCompaniesBase[] = []
+      const auxAllCompanyIdsSetArray = Array.from(auxAllCompanyIdsSet)
+
+      for (let i = 0; i < auxAllCompanyIdsSetArray.length; i++) {
+         const groupId = auxAllCompanyIdsSetArray[i]
+
+         const sparks = auxAllCompanySparksIds[groupId]
+            .filter((sparkId) => sparksLookup[sparkId])
+            .map((sparkId) => ({
+               data: this.convertSparkToCompetitorStaticCardData(
+                  sparksLookup[sparkId]
+               ),
+               stats: {
+                  plays: sparkStatDataLookup[sparkId].plays,
+                  avg_watched_time:
+                     sparkStatDataLookup[sparkId].avg_watched_time,
+                  avg_watched_percentage:
+                     sparkStatDataLookup[sparkId].avg_watched_percentage,
+                  engagement: sparkStatDataLookup[sparkId].engagement,
+               },
+            }))
+
+         if (sparks.length === 0) {
+            continue
+         }
+
+         const companyData =
+            sparksLookup[auxAllCompanySparksIds[groupId][0]].group
+
+         auxResult.push({
+            companyData: {
+               rank: i + 1,
+               logo: companyData.logoUrl,
+               name: companyData.universityName,
+               totalViews: companyStatDataLookup[groupId].totalViews,
+               uniqueViewers: companyStatDataLookup[groupId].uniqueViewers,
+               avg_watched_time:
+                  companyStatDataLookup[groupId].avg_watched_time,
+               avg_watched_percentage:
+                  companyStatDataLookup[groupId].avg_watched_percentage,
+               engagement: companyStatDataLookup[groupId].engagement,
+            },
+            sparks: sparks,
+         })
+      }
+
+      result["all"] = auxResult
+
+      return result
    }
 
    async getTopSparksByIndustry(
