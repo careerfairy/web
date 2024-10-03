@@ -464,133 +464,155 @@ class GroupSparksAnalyticsRepository
 
       // Calculates company "total" data to avoid an extra query
 
-      const numberOfDataPoints = bigQueryResults.reduce((acc, item) => {
-         if (!acc[item.groupId]) {
-            acc[item.groupId] = 0
+      const numberOfDataPoints = {}
+
+      for (const item of bigQueryResults) {
+         if (!numberOfDataPoints[item.groupId]) {
+            numberOfDataPoints[item.groupId] = 0
          }
 
-         acc[item.groupId] += 1
-         return acc
-      }, {})
+         numberOfDataPoints[item.groupId] += 1
+      }
 
-      const totalAvgerages = bigQueryResults.reduce((acc, item) => {
-         acc[item.groupId] = {
-            avg_watched_time:
-               acc[item.groupId]?.avg_watched_time + item.avg_watched_time || 0,
-            avg_watched_percentage:
-               acc[item.groupId]?.avg_watched_percentage +
-                  item.avg_watched_percentage || 0,
-         }
-         return acc
-      }, {})
+      const totalAvgerages = {}
 
-      const companyStatDataLookup: Record<string, CompetitorCompanyStats> =
-         bigQueryResults.reduce((acc, item) => {
-            acc[item.groupId] = {
-               totalViews: acc[item.groupId]?.totalViews + item.plays || 0,
-               uniqueViewers:
-                  acc[item.groupId]?.uniqueViewers + item.uniqueViewers || 0,
-               avg_watched_time:
-                  totalAvgerages[item.groupId]?.avg_watched_time /
-                     numberOfDataPoints[item.groupId] || 0,
-               avg_watched_percentage:
-                  totalAvgerages[item.groupId]?.avg_watched_percentage /
-                     numberOfDataPoints[item.groupId] || 0,
-               engagement: acc[item.groupId]?.engagement + item.engagement || 0,
+      for (const item of bigQueryResults) {
+         if (!totalAvgerages[item.groupId]) {
+            totalAvgerages[item.groupId] = {
+               avg_watched_time: 0,
+               avg_watched_percentage: 0,
             }
+         }
 
-            return acc
-         }, {})
+         totalAvgerages[item.groupId].avg_watched_time += item.avg_watched_time
+         totalAvgerages[item.groupId].avg_watched_percentage +=
+            item.avg_watched_percentage
+      }
+
+      const companyStatDataLookup: Record<string, CompetitorCompanyStats> = {}
+
+      for (const item of bigQueryResults) {
+         if (!companyStatDataLookup[item.groupId]) {
+            companyStatDataLookup[item.groupId] = {
+               totalViews: 0,
+               uniqueViewers: 0,
+               avg_watched_time: 0,
+               avg_watched_percentage: 0,
+               engagement: 0,
+            }
+         }
+
+         companyStatDataLookup[item.groupId].totalViews += item.plays || 0
+         companyStatDataLookup[item.groupId].uniqueViewers +=
+            item.uniqueViewers || 0
+         companyStatDataLookup[item.groupId].engagement += item.engagement || 0
+
+         // Calculate averages
+         const dataPoints = numberOfDataPoints[item.groupId] || 1
+         companyStatDataLookup[item.groupId].avg_watched_time =
+            (totalAvgerages[item.groupId]?.avg_watched_time || 0) / dataPoints
+         companyStatDataLookup[item.groupId].avg_watched_percentage =
+            (totalAvgerages[item.groupId]?.avg_watched_percentage || 0) /
+            dataPoints
+      }
 
       // Calculates company "total" data by industry to avoid an extra query
 
-      const numberOfDataPointsByIndustry = bigQueryResults.reduce(
-         (acc, item) => {
-            if (!acc[item.industry]) {
-               acc[item.industry] = {}
-            }
+      const numberOfDataPointsByIndustry = {}
 
-            if (!acc[item.industry][item.groupId]) {
-               acc[item.industry][item.groupId] = 0
-            }
-
-            acc[item.industry][item.groupId] += 1
-            return acc
-         },
-         {}
-      )
-
-      const totalAvgeragesByIndustry = bigQueryResults.reduce((acc, item) => {
-         if (!acc[item.industry]) {
-            acc[item.industry] = {}
+      for (const item of bigQueryResults) {
+         if (!numberOfDataPointsByIndustry[item.industry]) {
+            numberOfDataPointsByIndustry[item.industry] = {}
          }
 
-         acc[item.industry][item.groupId] = {
-            avg_watched_time:
-               acc[item.industry][item.groupId]?.avg_watched_time +
-                  item.avg_watched_time || 0,
-            avg_watched_percentage:
-               acc[item.industry][item.groupId]?.avg_watched_percentage +
-                  item.avg_watched_percentage || 0,
+         if (!numberOfDataPointsByIndustry[item.industry][item.groupId]) {
+            numberOfDataPointsByIndustry[item.industry][item.groupId] = 0
          }
-         return acc
-      }, {})
+
+         numberOfDataPointsByIndustry[item.industry][item.groupId] += 1
+      }
+
+      const totalAvgeragesByIndustry = {}
+
+      for (const item of bigQueryResults) {
+         if (!totalAvgeragesByIndustry[item.industry]) {
+            totalAvgeragesByIndustry[item.industry] = {}
+         }
+
+         if (!totalAvgeragesByIndustry[item.industry][item.groupId]) {
+            totalAvgeragesByIndustry[item.industry][item.groupId] = {
+               avg_watched_time: 0,
+               avg_watched_percentage: 0,
+            }
+         }
+
+         totalAvgeragesByIndustry[item.industry][
+            item.groupId
+         ].avg_watched_time += item.avg_watched_time
+         totalAvgeragesByIndustry[item.industry][
+            item.groupId
+         ].avg_watched_percentage += item.avg_watched_percentage
+      }
 
       const companyStatDataByIndustryLookup: Record<
          string,
          Record<string, CompetitorCompanyStats>
-      > = bigQueryResults.reduce((acc, item) => {
-         if (!acc[item.industry]) {
-            acc[item.industry] = {}
+      > = {}
+
+      for (const item of bigQueryResults) {
+         if (!companyStatDataByIndustryLookup[item.industry]) {
+            companyStatDataByIndustryLookup[item.industry] = {}
          }
 
-         acc[item.industry][item.groupId] = {
-            totalViews:
-               acc[item.industry]?.[item.groupId]?.totalViews + item.plays || 0,
-            uniqueViewers:
-               acc[item.industry]?.[item.groupId]?.uniqueViewers +
-                  item.uniqueViewers || 0,
-            avg_watched_time:
-               totalAvgeragesByIndustry[item.industry]?.[item.groupId]
-                  ?.avg_watched_time /
-                  numberOfDataPointsByIndustry[item.industry][item.groupId] ||
-               0,
-            avg_watched_percentage:
-               totalAvgeragesByIndustry[item.industry]?.[item.groupId]
-                  ?.avg_watched_percentage /
-                  numberOfDataPointsByIndustry[item.industry][item.groupId] ||
-               0,
-            engagement:
-               acc[item.industry]?.[item.groupId]?.engagement +
-                  item.engagement || 0,
+         if (!companyStatDataByIndustryLookup[item.industry][item.groupId]) {
+            companyStatDataByIndustryLookup[item.industry][item.groupId] = {
+               totalViews: 0,
+               uniqueViewers: 0,
+               avg_watched_time: 0,
+               avg_watched_percentage: 0,
+               engagement: 0,
+            }
          }
 
-         return acc
-      }, {})
+         const stats =
+            companyStatDataByIndustryLookup[item.industry][item.groupId]
+         stats.totalViews += item.plays || 0
+         stats.uniqueViewers += item.uniqueViewers || 0
+         stats.avg_watched_time =
+            totalAvgeragesByIndustry[item.industry]?.[item.groupId]
+               ?.avg_watched_time /
+               numberOfDataPointsByIndustry[item.industry][item.groupId] || 0
+         stats.avg_watched_percentage =
+            totalAvgeragesByIndustry[item.industry]?.[item.groupId]
+               ?.avg_watched_percentage /
+               numberOfDataPointsByIndustry[item.industry][item.groupId] || 0
+         stats.engagement += item.engagement || 0
+      }
 
       const sparkStatDataLookup: Record<string, CompetitorStatsFromBigQuery> =
-         bigQueryResults.reduce((acc, item) => {
-            if (!item) {
-               return acc
-            }
+         {}
 
-            acc[item.sparkId] = {
-               plays: item.plays,
-               avg_watched_time: item.avg_watched_time,
-               avg_watched_percentage: item.avg_watched_percentage,
-               engagement: item.engagement,
-            }
+      for (const item of bigQueryResults) {
+         if (!item) {
+            continue
+         }
 
-            return acc
-         }, {})
+         sparkStatDataLookup[item.sparkId] = {
+            plays: item.plays,
+            avg_watched_time: item.avg_watched_time,
+            avg_watched_percentage: item.avg_watched_percentage,
+            engagement: item.engagement,
+         }
+      }
 
       const sparksIdsByIndustryAndCompany: Record<
          string,
          Record<string, Array<string>>
-      > = CompanyIndustryValues.reduce((acc, industry) => {
-         acc[industry.id] = {}
-         return acc
-      }, {})
+      > = {}
+
+      for (const industry of CompanyIndustryValues) {
+         sparksIdsByIndustryAndCompany[industry.id] = {}
+      }
 
       const companyIndustriesLookup: Record<string, Set<string>> = {}
 
