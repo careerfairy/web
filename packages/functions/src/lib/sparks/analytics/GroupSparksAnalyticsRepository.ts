@@ -463,6 +463,27 @@ class GroupSparksAnalyticsRepository
          >(topCompaniesByIndustry, timeperiod)
 
       // Calculates company "total" data to avoid an extra query
+
+      const numberOfDataPoints = bigQueryResults.reduce((acc, item) => {
+         if (!acc[item.groupId]) {
+            acc[item.groupId] = 0
+         }
+
+         acc[item.groupId] += 1
+         return acc
+      }, {})
+
+      const totalAvgerages = bigQueryResults.reduce((acc, item) => {
+         acc[item.groupId] = {
+            avg_watched_time:
+               acc[item.groupId]?.avg_watched_time + item.avg_watched_time || 0,
+            avg_watched_percentage:
+               acc[item.groupId]?.avg_watched_percentage +
+                  item.avg_watched_percentage || 0,
+         }
+         return acc
+      }, {})
+
       const companyStatDataLookup: Record<string, CompetitorCompanyStats> =
          bigQueryResults.reduce((acc, item) => {
             acc[item.groupId] = {
@@ -470,11 +491,11 @@ class GroupSparksAnalyticsRepository
                uniqueViewers:
                   acc[item.groupId]?.uniqueViewers + item.uniqueViewers || 0,
                avg_watched_time:
-                  acc[item.groupId]?.avg_watched_time + item.avg_watched_time ||
-                  0,
+                  totalAvgerages[item.groupId]?.avg_watched_time /
+                     numberOfDataPoints[item.groupId] || 0,
                avg_watched_percentage:
-                  acc[item.groupId]?.avg_watched_percentage +
-                     item.avg_watched_percentage || 0,
+                  totalAvgerages[item.groupId]?.avg_watched_percentage /
+                     numberOfDataPoints[item.groupId] || 0,
                engagement: acc[item.groupId]?.engagement + item.engagement || 0,
             }
 
@@ -482,14 +503,43 @@ class GroupSparksAnalyticsRepository
          }, {})
 
       // Calculates company "total" data by industry to avoid an extra query
+
+      const numberOfDataPointsByIndustry = bigQueryResults.reduce(
+         (acc, item) => {
+            if (!acc[item.industry]) {
+               acc[item.industry] = {}
+            }
+
+            if (!acc[item.industry][item.groupId]) {
+               acc[item.industry][item.groupId] = 0
+            }
+
+            acc[item.industry][item.groupId] += 1
+            return acc
+         },
+         {}
+      )
+
+      const totalAvgeragesByIndustry = bigQueryResults.reduce((acc, item) => {
+         if (!acc[item.industry]) {
+            acc[item.industry] = {}
+         }
+
+         acc[item.industry][item.groupId] = {
+            avg_watched_time:
+               acc[item.industry][item.groupId]?.avg_watched_time +
+                  item.avg_watched_time || 0,
+            avg_watched_percentage:
+               acc[item.industry][item.groupId]?.avg_watched_percentage +
+                  item.avg_watched_percentage || 0,
+         }
+         return acc
+      }, {})
+
       const companyStatDataByIndustryLookup: Record<
          string,
          Record<string, CompetitorCompanyStats>
       > = bigQueryResults.reduce((acc, item) => {
-         if (!item) {
-            return acc
-         }
-
          if (!acc[item.industry]) {
             acc[item.industry] = {}
          }
@@ -501,11 +551,15 @@ class GroupSparksAnalyticsRepository
                acc[item.industry]?.[item.groupId]?.uniqueViewers +
                   item.uniqueViewers || 0,
             avg_watched_time:
-               acc[item.industry]?.[item.groupId]?.avg_watched_time +
-                  item.avg_watched_time || 0,
+               totalAvgeragesByIndustry[item.industry]?.[item.groupId]
+                  ?.avg_watched_time /
+                  numberOfDataPointsByIndustry[item.industry][item.groupId] ||
+               0,
             avg_watched_percentage:
-               acc[item.industry]?.[item.groupId]?.avg_watched_percentage +
-                  item.avg_watched_percentage || 0,
+               totalAvgeragesByIndustry[item.industry]?.[item.groupId]
+                  ?.avg_watched_percentage /
+                  numberOfDataPointsByIndustry[item.industry][item.groupId] ||
+               0,
             engagement:
                acc[item.industry]?.[item.groupId]?.engagement +
                   item.engagement || 0,
@@ -590,6 +644,7 @@ class GroupSparksAnalyticsRepository
       }
 
       // Populates companyRankingByIndustryLookup
+
       for (const industry of Object.keys(sparksIdsByIndustryAndCompany)) {
          const sparksIdsByCompany = Object.keys(
             sparksIdsByIndustryAndCompany[industry]
@@ -688,8 +743,6 @@ class GroupSparksAnalyticsRepository
                engagement:
                   companyStatDataByIndustryLookup[industry][groupId].engagement,
             }
-
-            console.log(industry, groupId)
 
             result[industry].push({
                companyData,
