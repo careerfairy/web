@@ -60,8 +60,21 @@ export type CompetitorStatsFromBigQuery = {
    engagement: number
 }
 
+export type CompetitorCompanyBigQueryResult = {
+   uniqueViewers: number
+} & CompetitorIndustryBigQueryResult
+
+export type CompetitorCompanyStats = {
+   totalViews: number
+   uniqueViewers: number
+   avg_watched_time: number
+   avg_watched_percentage: number
+   engagement: number
+}
+
 export type CompetitorIndustryBigQueryResult = {
    sparkId: string
+   groupId: string
    industry: string
 } & CompetitorStatsFromBigQuery
 
@@ -74,8 +87,36 @@ export type CompetitorIndustryData = {
    [key in string]: CompetitorIndustryBase[]
 }
 
+export type CompetitorCompaniesDataWithPastData =
+   WithPastData<CompetitorTopCompaniesData>
+
 export type CompetitorIndustryBaseWithPastData =
    WithPastData<CompetitorIndustryData>
+
+export type CompetitorCompanyData = {
+   rank: number
+   logo: string
+   name: string
+   totalViews: number
+   uniqueViewers: number
+   avg_watched_time: number
+   avg_watched_percentage: number
+   engagement: number
+}
+
+export type CompetitorTopCompaniesSparks = {
+   data: CompetitorSparkCard
+   stats: CompetitorStatsFromBigQuery
+}
+
+export type CompetitorTopCompaniesBase = {
+   companyData: CompetitorCompanyData
+   sparks: CompetitorTopCompaniesSparks[]
+}
+
+export type CompetitorTopCompaniesData = {
+   [key in string]: CompetitorTopCompaniesBase[]
+}
 
 export type CompetitorAudienceSegments =
    | "business-plus"
@@ -155,6 +196,7 @@ export type SparksAnalyticsDTO = {
    topUniversities: LinearBarWithPastData
    topFieldsOfStudy: PieChartWithPastData
    levelsOfStudy: PieChartWithPastData
+   topCompaniesByIndustry: CompetitorCompaniesDataWithPastData
    topSparksByIndustry: CompetitorIndustryBaseWithPastData
    topSparksByAudience: CompetitorAudienceBaseWithPastData
    updatedAt: Timestamp
@@ -193,6 +235,7 @@ export type SparkAnalyticsClientAudience = {
 }
 
 export type SparksAnalyticsClientCompetitor = {
+   topCompaniesByIndustry: CompetitorTopCompaniesData
    topSparksByIndustry: CompetitorIndustryData
    topSparksByAudience: CompetitorAudienceBase[]
 }
