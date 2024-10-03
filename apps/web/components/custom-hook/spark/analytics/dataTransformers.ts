@@ -128,6 +128,7 @@ export const convertToClientModel = (
       topUniversities,
       topFieldsOfStudy,
       levelsOfStudy,
+      topCompaniesByIndustry,
       topSparksByIndustry,
       topSparksByAudience,
    } = data
@@ -208,6 +209,7 @@ export const convertToClientModel = (
                levelsOfStudy[timeFrame],
                levelsOfStudyLookup
             ),
+            topCompaniesByIndustry: topCompaniesByIndustry[timeFrame],
             topSparksByIndustry: topSparksByIndustry[timeFrame],
             topSparksByAudience: topSparksByAudience[timeFrame],
          }
