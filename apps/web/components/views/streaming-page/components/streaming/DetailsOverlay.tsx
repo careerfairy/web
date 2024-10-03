@@ -44,7 +44,7 @@ export const DetailsOverlay = ({
    showIcons,
 }: Props) => {
    const [isStreamerInfoDialogOpen, handleDialogOpen, handleDialogClose] =
-      useDialogStateHandler()
+      useDialogStateHandler(false)
 
    const displayName = getStreamerDisplayName(
       streamerDetails.firstName,

@@ -52,7 +52,11 @@ const LivestreamValidationsComponent = ({
 
    const livestreamToken = useLivestreamSecureTokenSWR(livestream.id)
 
-   const { data: isUserRegistered, isLoading: isLoadingIsUserRegistered } =
+   const [livestreamDialogOpen, setLivestreamDialogOpen] = useState(
+      !isHost && !isRecordingWindow
+   )
+
+   const { isLoading: isLoadingIsUserRegistered } =
       useLivestreamCategoryDataSWR(
          firebase,
          {
@@ -64,10 +68,6 @@ const LivestreamValidationsComponent = ({
                !isHost && !hasRegistered && !isRecordingWindow
             )
       )
-
-   const [livestreamDialogOpen, setLivestreamDialogOpen] = useState(
-      !isHost && !isUserRegistered && !isRecordingWindow
-   )
 
    // Custom validations
 
