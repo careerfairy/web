@@ -33,7 +33,7 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[700],
       padding: 0,
       "& .MuiTableSortLabel-root": {
-         color: "inherit",
+         color: "inherit !important",
       },
    },
    rowBorderRadius: {
@@ -85,6 +85,7 @@ const styles = sxStyles({
       gap: 1,
    },
    collapse: {
+      overflow: "hidden",
       marginLeft: 1.5,
    },
 })
@@ -355,7 +356,9 @@ const Row = ({ row, tableIndex, highlight = false }: RowProps) => {
             </IconButton>
          </Grid>
          <Collapse in={open} timeout="auto" unmountOnExit sx={styles.collapse}>
-            <Typography variant="brandedH4">Top Sparks</Typography>
+            <Typography variant="brandedH4" fontWeight={600}>
+               Top Sparks
+            </Typography>
             <Stack
                direction={{ xs: "column", md: "row" }}
                sx={{ mt: 1, mb: 2 }}
