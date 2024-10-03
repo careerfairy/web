@@ -1,8 +1,8 @@
 import { CategoryDataOption } from "@careerfairy/shared-lib/livestreams"
 import FirebaseService from "data/firebase/FirebaseService"
 import { livestreamService } from "data/firebase/LivestreamService"
-import { useMemo } from "react"
-import useSWR, { SWRConfiguration } from "swr"
+import { SWRConfiguration } from "swr"
+import useSWRImmutable from "swr/immutable"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
@@ -21,11 +21,6 @@ const useLivestreamCategoryDataSWR = (
    options: CategoryDataOption,
    onSuccess: (data: boolean) => void
 ) => {
-   const key = useMemo(
-      () => (options ? JSON.stringify(options) : null),
-      [options]
-   )
-
    const swrFetcher = async () => {
       return livestreamService.checkCategoryData(
          firebase,
@@ -33,7 +28,10 @@ const useLivestreamCategoryDataSWR = (
       )
    }
 
-   return useSWR(key, swrFetcher, { ...swrOptions, onSuccess })
+   return useSWRImmutable("useLivestreamCategoryDataSWR", swrFetcher, {
+      ...swrOptions,
+      onSuccess,
+   })
 }
 
 export default useLivestreamCategoryDataSWR
