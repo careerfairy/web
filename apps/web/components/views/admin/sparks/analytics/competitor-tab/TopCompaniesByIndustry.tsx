@@ -132,6 +132,7 @@ export const TopCompaniesByIndustry = () => {
 
 type OrderingKey = keyof Pick<
    CompetitorTopCompaniesBase["companyData"],
+   | "rank"
    | "totalViews"
    | "uniqueViewers"
    | "avg_watched_time"
@@ -207,8 +208,8 @@ const GRID_SIZES = [0.5, 3]
 
 const CollapsibleTable = ({ rows }: CollapsibleTableProps) => {
    const { group } = useGroup()
-   const [order, setOrder] = useState<Order>("desc")
-   const [orderBy, setOrderBy] = useState<OrderingKey>("totalViews")
+   const [order, setOrder] = useState<Order>("asc")
+   const [orderBy, setOrderBy] = useState<OrderingKey>("rank")
 
    const handleRequestSort = (property: OrderingKey) => {
       const isAsc = orderBy === property && order === "asc"
@@ -265,7 +266,7 @@ const CollapsibleTable = ({ rows }: CollapsibleTableProps) => {
             {sortedRows.map((row, index) => (
                <Row
                   key={index}
-                  tableIndex={index + 1}
+                  tableIndex={row.companyData.rank}
                   row={row}
                   highlight={row.sparks[0].data.group.id === group.groupId}
                />
