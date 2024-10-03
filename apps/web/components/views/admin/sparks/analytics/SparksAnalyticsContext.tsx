@@ -17,6 +17,7 @@ interface SparksAnalyticsContextType {
    setSelectTimeFilter: (selectTimeFilter: TimePeriodParams) => void
    updatedAtLabel: string
    industriesOptions: { value: string; label: string }[]
+   industriesOptionsTopCompanies: { value: string; label: string }[]
 }
 
 const SparksAnalyticsContext = createContext<
@@ -84,6 +85,42 @@ export const SparksAnalyticsProvider = ({ children }) => {
       return result
    }, [analytics, group?.companyIndustries])
 
+   const industriesOptionsTopCompanies = useMemo(() => {
+      if (!analytics) return []
+
+      const timePeriods = Object.keys(timeFrameLabels)
+      const topCompaniesIndustries = Array.from(
+         new Set(
+            timePeriods.flatMap((timePeriod) => {
+               return Object.keys(analytics[timePeriod].topCompaniesByIndustry)
+            })
+         )
+      )
+
+      const allOptions = [
+         {
+            id: "all",
+            name: "All Industries",
+         },
+         ...CompanyIndustryValues,
+      ].map((industry) => ({
+         value: industry.id,
+         label: industry.name,
+      }))
+
+      const groupIndustriesById = group.companyIndustries.map(
+         (industry) => industry.id
+      )
+
+      const result = allOptions.filter(
+         (option) =>
+            groupIndustriesById.includes(option.value) ||
+            topCompaniesIndustries.includes(option.value)
+      )
+
+      return result
+   }, [analytics, group?.companyIndustries])
+
    const value = useMemo(() => {
       return {
          filteredAnalytics,
@@ -94,6 +131,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
          setSelectTimeFilter,
          updatedAtLabel,
          industriesOptions,
+         industriesOptionsTopCompanies,
       }
    }, [
       filteredAnalytics,
@@ -103,6 +141,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
       selectTimeFilter,
       updatedAtLabel,
       industriesOptions,
+      industriesOptionsTopCompanies,
    ])
 
    useEffect(() => {
