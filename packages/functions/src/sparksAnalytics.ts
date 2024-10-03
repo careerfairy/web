@@ -70,6 +70,12 @@ async function fetchAnalyticsFromBigQuery(
          levelsOfStudy1year,
       ],
       [
+         topCompaniesByIndustry7days,
+         topCompaniesByIndustry30days,
+         topCompaniesByIndustry6months,
+         topCompaniesByIndustry1year,
+      ],
+      [
          topSparksByIndustry7days,
          topSparksByIndustry30days,
          topSparksByIndustry6months,
@@ -112,6 +118,9 @@ async function fetchAnalyticsFromBigQuery(
       ),
       fetchTimePeriodData(
          sparksAnalyticsRepo.getLevelsOfStudy.bind(sparksAnalyticsRepo)
+      ),
+      fetchTimePeriodData(
+         sparksAnalyticsRepo.getTopCompaniesByIndustry.bind(sparksAnalyticsRepo)
       ),
       fetchTimePeriodData(
          sparksAnalyticsRepo.getTopSparksByIndustry.bind(sparksAnalyticsRepo)
@@ -181,6 +190,12 @@ async function fetchAnalyticsFromBigQuery(
          "30days": levelsOfStudy30days,
          "6months": levelsOfStudy6months,
          "1year": levelsOfStudy1year,
+      },
+      topCompaniesByIndustry: {
+         "7days": topCompaniesByIndustry7days,
+         "30days": topCompaniesByIndustry30days,
+         "6months": topCompaniesByIndustry6months,
+         "1year": topCompaniesByIndustry1year,
       },
       topSparksByIndustry: {
          "7days": topSparksByIndustry7days,
