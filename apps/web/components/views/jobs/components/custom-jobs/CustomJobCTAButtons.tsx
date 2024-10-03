@@ -96,6 +96,9 @@ const styles = sxStyles({
    },
 })
 
+const UTM_SOURCE = "careerfairy"
+const UTM_CAMPAIGN = "job"
+
 type Props = {
    applicationSource?: CustomJobApplicationSource
    job: PublicCustomJob
@@ -494,12 +497,14 @@ const VisitApplicationPageButton = ({
    alreadyApplied,
    job,
 }: VisitApplicationPageButtonProps) => {
+   const jobUrl = getJobUrl(job)
+
    return alreadyApplied ? (
       <Box width={"100%"}>
          <Button
             fullWidth
             sx={[styles.btn, styles.visitButton]}
-            href={job.postingUrl}
+            href={jobUrl}
             endIcon={<ExternalLink size={18} />}
             target="_blank"
          >
@@ -537,6 +542,7 @@ const CustomJobApplyButton = ({
    isSecondary,
    alreadyApplied,
 }: CustomJobCTAProps) => {
+   const jobUrl = getJobUrl(job)
    const jobExpired = useIsJobExpired(job)
    const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
@@ -552,7 +558,7 @@ const CustomJobApplyButton = ({
       <Button
          sx={styles.btn}
          component={"a"}
-         href={job.postingUrl}
+         href={jobUrl}
          target="_blank"
          rel="noopener noreferrer"
          variant={isSecondary ? "outlined" : "contained"}
@@ -570,6 +576,19 @@ const CustomJobApplyButton = ({
          {isClickingOnApplyBtn ? "Applying" : "Apply now"}
       </Button>
    ) : null
+}
+
+const getJobsUtmParams = (job: PublicCustomJob) => {
+   return `${
+      job.postingUrl.includes("?") ? "&" : "?"
+   }utm_source=${UTM_SOURCE}&utm_campaign=${UTM_CAMPAIGN}&utm_content=${
+      job.title
+   }`
+}
+
+const getJobUrl = (job: PublicCustomJob) => {
+   const utmParams = getJobsUtmParams(job)
+   return job.postingUrl.concat(utmParams)
 }
 
 export default CustomJobCTAButtons
