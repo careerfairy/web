@@ -688,11 +688,25 @@ class GroupSparksAnalyticsRepository
          }
       }
 
+      let topCompanySparksIds: string[] = []
+
+      if (!auxAllCompanyIdsSet.has(this.groupId)) {
+         const companyRanking =
+            bigQueryResults.findIndex((item) => item.groupId === this.groupId) +
+            1
+         if (companyRanking >= 0) {
+            topCompanySparksIds = bigQueryResults
+               .filter((item) => item.groupId === this.groupId)
+               .slice(0, INDUSTRY_SPARKS_LIMIT)
+               .map((item) => item.sparkId)
+         }
+      }
+
       const allIndustrySparksIdsToFetch = Array.from(
          new Set(Object.values(auxAllCompanySparksIds).flat())
       )
 
-      let sparksIdsToFetch = Array.from(
+      const sparksIdsToFetchByIndustry = Array.from(
          new Set(
             Object.values(sparksIdsByIndustryAndCompany) // Gets all top companies data e.g. [{ companyA: [id1, id2, id3] }, { companyB: [id2, id3, id4] }, ...]
                .flatMap(Object.values) // Flattens the array of sparks ids e.g. [[id1, id2, id3], [id2, id3, id4]]
@@ -700,7 +714,13 @@ class GroupSparksAnalyticsRepository
          ) // Removes duplicates e.g. [id1, id2, id3, id4]
       ) // Converts to array
 
-      sparksIdsToFetch = [...sparksIdsToFetch, ...allIndustrySparksIdsToFetch]
+      const sparksIdsToFetch = Array.from(
+         new Set([
+            ...sparksIdsToFetchByIndustry,
+            ...allIndustrySparksIdsToFetch,
+            ...topCompanySparksIds,
+         ])
+      )
 
       const sparks = await this.sparksRepo.getSparksByIds(sparksIdsToFetch)
 
@@ -771,6 +791,10 @@ class GroupSparksAnalyticsRepository
       for (let i = 0; i < auxAllCompanyIdsSetArray.length; i++) {
          const groupId = auxAllCompanyIdsSetArray[i]
 
+         if (!auxAllCompanySparksIds[groupId]) {
+            continue
+         }
+
          const sparks = auxAllCompanySparksIds[groupId]
             .filter((sparkId) => sparksLookup[sparkId])
             .map((sparkId) => ({
@@ -809,6 +833,62 @@ class GroupSparksAnalyticsRepository
             },
             sparks: sparks,
          })
+      }
+
+      if (!auxAllCompanyIdsSet.has(this.groupId)) {
+         const companyRanking =
+            bigQueryResults.findIndex((item) => item.groupId === this.groupId) +
+            1
+         if (companyRanking >= 0) {
+            const topCompanySparks = bigQueryResults.filter(
+               (item) => item.groupId === this.groupId
+            )
+
+            if (topCompanySparks.length > 0) {
+               const sparks = topCompanySparks
+                  .slice(0, INDUSTRY_SPARKS_LIMIT)
+                  .map((item) => {
+                     const spark = sparksLookup[item.sparkId]
+                     return {
+                        data: this.convertSparkToCompetitorStaticCardData(
+                           spark
+                        ),
+                        stats: {
+                           plays: sparkStatDataLookup[item.sparkId].plays,
+                           avg_watched_time:
+                              sparkStatDataLookup[item.sparkId]
+                                 .avg_watched_time,
+                           avg_watched_percentage:
+                              sparkStatDataLookup[item.sparkId]
+                                 .avg_watched_percentage,
+                           engagement:
+                              sparkStatDataLookup[item.sparkId].engagement,
+                        },
+                     }
+                  })
+
+               const companyData =
+                  sparksLookup[topCompanySparks[0].sparkId].group
+
+               auxResult.push({
+                  companyData: {
+                     rank: companyRanking,
+                     logo: companyData.logoUrl,
+                     name: companyData.universityName,
+                     totalViews: companyStatDataLookup[this.groupId].totalViews,
+                     uniqueViewers:
+                        companyStatDataLookup[this.groupId].uniqueViewers,
+                     avg_watched_time:
+                        companyStatDataLookup[this.groupId].avg_watched_time,
+                     avg_watched_percentage:
+                        companyStatDataLookup[this.groupId]
+                           .avg_watched_percentage,
+                     engagement: companyStatDataLookup[this.groupId].engagement,
+                  },
+                  sparks: sparks,
+               })
+            }
+         }
       }
 
       result["all"] = auxResult
