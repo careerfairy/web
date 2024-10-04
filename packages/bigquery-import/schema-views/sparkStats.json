@@ -111,6 +111,10 @@
                   {
                      "name": "thumbnailUrl",
                      "type": "string"
+                  },
+                  {
+                     "name": "duration",
+                     "type": "number"
                   }
                ]
             }

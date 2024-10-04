@@ -8,6 +8,17 @@ export function topSparksByIndustry(timePeriod: string) {
          UNNEST(JSON_EXTRACT_ARRAY(companyIndustries)) AS item
       ),
 
+      AvgWatchedPercentage AS (
+         SELECT
+            sparkId,
+            ROUND(AVG(videoEventPositionInSeconds) / sl.video_duration, 2) as value
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkSecondsWatched ssw
+         INNER JOIN careerfairy-e1fd9.firestore_export.sparks_schema_sparks_latest sl
+            ON ssw.sparkId = sl.document_id
+         WHERE ssw.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+         GROUP BY sparkId, sl.video_duration
+      ),
+
       AvgWatchedTime AS (
          SELECT
             sparkId,
@@ -32,6 +43,7 @@ export function topSparksByIndustry(timePeriod: string) {
          GroupByIndustry.industry,
          Views.value as plays,
          AvgWatchedTime.seconds as avg_watched_time,
+         AvgWatchedPercentage.value as avg_watched_percentage,
          ROUND(SUM(
          CASE 
             WHEN SparkEvents.actionType = "Watched_CompleteSpark" THEN 0.05
@@ -56,10 +68,12 @@ export function topSparksByIndustry(timePeriod: string) {
          ON SparkEvents.groupId = GroupByIndustry.groupId
       LEFT JOIN AvgWatchedTime
          ON SparkEvents.sparkId = AvgWatchedTime.sparkId
+      LEFT JOIN AvgWatchedPercentage
+         ON SparkEvents.sparkId = AvgWatchedPercentage.sparkId
       LEFT JOIN Views
          ON SparkEvents.sparkId = Views.sparkId
       WHERE SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
-      GROUP BY SparkEvents.sparkId, GroupByIndustry.industry, Views.value, AvgWatchedTime.seconds
+      GROUP BY SparkEvents.sparkId, GroupByIndustry.industry, Views.value, AvgWatchedTime.seconds, AvgWatchedPercentage.value
       HAVING plays IS NOT NULL
          AND avg_watched_time IS NOT NULL
          AND engagement IS NOT NULL
@@ -70,7 +84,18 @@ export function topSparksByIndustry(timePeriod: string) {
 
 export function topSparksByAudience(timePeriod: string) {
    return `
-      WITH AvgWatchedTime AS (
+      WITH AvgWatchedPercentage AS (
+         SELECT
+            sparkId,
+            ROUND(AVG(videoEventPositionInSeconds) / sl.video_duration, 2) as value
+         FROM careerfairy-e1fd9.SparkAnalytics.SparkSecondsWatched ssw
+         INNER JOIN careerfairy-e1fd9.firestore_export.sparks_schema_sparks_latest sl
+            ON ssw.sparkId = sl.document_id
+         WHERE ssw.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+         GROUP BY sparkId, sl.video_duration
+      ),
+      
+      AvgWatchedTime AS (
          SELECT
             sparkId,
             ROUND(AVG(videoEventPositionInSeconds), 2) as seconds
@@ -111,6 +136,7 @@ export function topSparksByAudience(timePeriod: string) {
          END as audience,
          Views.value as plays,
          AvgWatchedTime.seconds as avg_watched_time,
+         AvgWatchedPercentage.value as avg_watched_percentage,
          ROUND(SUM(
             CASE 
                WHEN SparkEvents.actionType = "Watched_CompleteSpark" THEN 0.05
@@ -135,11 +161,13 @@ export function topSparksByAudience(timePeriod: string) {
          ON SparkEvents.userId = userData.authId
       LEFT JOIN AvgWatchedTime
          ON SparkEvents.sparkId = AvgWatchedTime.sparkId
+      LEFT JOIN AvgWatchedPercentage
+         ON SparkEvents.sparkId = AvgWatchedPercentage.sparkId
       LEFT JOIN Views
          ON SparkEvents.sparkId = Views.sparkId
       WHERE SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
          AND userData.fieldOfStudy_id IS NOT NULL
-      GROUP BY SparkEvents.sparkId, Views.value, AvgWatchedTime.seconds, audience
+      GROUP BY SparkEvents.sparkId, Views.value, AvgWatchedTime.seconds, AvgWatchedPercentage.value, audience
       HAVING engagement > 0.0
       ORDER BY rank DESC;
    `
