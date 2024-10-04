@@ -499,7 +499,6 @@ const VisitApplicationPageButton = ({
    job,
 }: VisitApplicationPageButtonProps) => {
    const jobUrl = getJobUrl(job)
-   console.log("🚀 ~ jobUrl:", jobUrl)
 
    return alreadyApplied ? (
       <Box width={"100%"}>
@@ -545,7 +544,6 @@ const CustomJobApplyButton = ({
    alreadyApplied,
 }: CustomJobCTAProps) => {
    const jobUrl = getJobUrl(job)
-   console.log("🚀 ~ jobUrl:", jobUrl)
    const jobExpired = useIsJobExpired(job)
    const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
