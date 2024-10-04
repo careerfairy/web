@@ -98,6 +98,7 @@ const styles = sxStyles({
 })
 
 const UTM_CAMPAIGN = "job"
+const UTM_MEDIUM = "job"
 
 type Props = {
    applicationSource?: CustomJobApplicationSource
@@ -585,7 +586,7 @@ const getJobUrl = (job: PublicCustomJob) => {
       link: job.postingUrl,
       campaign: UTM_CAMPAIGN,
       content: job.title,
-      medium: "job",
+      medium: UTM_MEDIUM,
    })
 }
 
