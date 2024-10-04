@@ -46,6 +46,7 @@ import {
 } from "./queries/MostSomething"
 import { totalViewsPastYear, uniqueViewersPastYear } from "./queries/Reach"
 import { TopCompaniesBuilder } from "./TopCompaniesBuilder"
+import { convertSparkToCompetitorStaticCardData } from "./utils"
 
 const AUDIENCE_SPARKS_LIMIT = 4
 const INDUSTRY_SPARKS_LIMIT = 4
@@ -429,27 +430,6 @@ class GroupSparksAnalyticsRepository
       >(topLevelsOfStudy, timeperiod)
    }
 
-   private convertSparkToCompetitorStaticCardData(
-      spark: Spark
-   ): CompetitorSparkData["sparkData"] {
-      return {
-         creator: {
-            avatarUrl: spark.creator.avatarUrl,
-            firstName: spark.creator.firstName,
-            lastName: spark.creator.lastName,
-         },
-         group: {
-            id: spark.group.id,
-            name: spark.group.universityName,
-         },
-         spark: {
-            question: spark.question,
-            categoryId: spark.category.id,
-            videoThumbnailUrl: spark.video.thumbnailUrl,
-         },
-      }
-   }
-
    async getTopCompaniesByIndustry(
       timeperiod: TimePeriodParams
    ): Promise<CompetitorTopCompaniesData> {
@@ -525,7 +505,7 @@ class GroupSparksAnalyticsRepository
                INDUSTRY_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
-            const sparkData = this.convertSparkToCompetitorStaticCardData(
+            const sparkData = convertSparkToCompetitorStaticCardData(
                sparksLookup[item.sparkId]
             )
             sparkData.creator.avatarUrl =
@@ -550,7 +530,7 @@ class GroupSparksAnalyticsRepository
             auxAll.length < INDUSTRY_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
-            const sparkData = this.convertSparkToCompetitorStaticCardData(
+            const sparkData = convertSparkToCompetitorStaticCardData(
                sparksLookup[item.sparkId]
             )
             sparkData.creator.avatarUrl =
@@ -628,7 +608,7 @@ class GroupSparksAnalyticsRepository
                AUDIENCE_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
-            const sparkData = this.convertSparkToCompetitorStaticCardData(
+            const sparkData = convertSparkToCompetitorStaticCardData(
                sparksLookup[item.sparkId]
             )
             sparkData.creator.avatarUrl =
@@ -653,7 +633,7 @@ class GroupSparksAnalyticsRepository
             auxAll.length < INDUSTRY_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
-            const sparkData = this.convertSparkToCompetitorStaticCardData(
+            const sparkData = convertSparkToCompetitorStaticCardData(
                sparksLookup[item.sparkId]
             )
             sparkData.creator.avatarUrl =
