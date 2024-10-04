@@ -982,11 +982,13 @@ class GroupSparksAnalyticsRepository
          }
       }
 
-      const auxAllSet = new Set<CompetitorSparkData>()
+      const auxAllUnique = new Set<string>()
+      const auxAll: CompetitorSparkData[] = []
 
       for (const item of bigQueryResults) {
          if (
-            auxAllSet.size < INDUSTRY_SPARKS_LIMIT &&
+            !auxAllUnique.has(item.sparkId) &&
+            auxAll.length < INDUSTRY_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
             const sparkData = this.convertSparkToCompetitorStaticCardData(
@@ -995,17 +997,19 @@ class GroupSparksAnalyticsRepository
             sparkData.creator.avatarUrl =
                sparksLookup[item.sparkId].group.logoUrl
 
-            auxAllSet.add({
+            auxAll.push({
                sparkData: sparkData,
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
                avg_watched_percentage: item.avg_watched_percentage,
                engagement: item.engagement,
             })
+
+            auxAllUnique.add(item.sparkId)
          }
       }
 
-      industrySegmentsMap["all"] = Array.from(auxAllSet)
+      industrySegmentsMap["all"] = auxAll
 
       const result = Object.entries(industrySegmentsMap).reduce(
          (acc, [key, value]) => {
@@ -1081,11 +1085,13 @@ class GroupSparksAnalyticsRepository
          }
       }
 
-      const auxAllSet = new Set<CompetitorSparkData>()
+      const auxAllUnique = new Set<string>()
+      const auxAll: CompetitorSparkData[] = []
 
       for (const item of bigQueryResults) {
          if (
-            auxAllSet.size < INDUSTRY_SPARKS_LIMIT &&
+            !auxAllUnique.has(item.sparkId) &&
+            auxAll.length < INDUSTRY_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
             const sparkData = this.convertSparkToCompetitorStaticCardData(
@@ -1094,17 +1100,19 @@ class GroupSparksAnalyticsRepository
             sparkData.creator.avatarUrl =
                sparksLookup[item.sparkId].group.logoUrl
 
-            auxAllSet.add({
+            auxAll.push({
                sparkData: sparkData,
                plays: item.plays,
                avg_watched_time: item.avg_watched_time,
                avg_watched_percentage: item.avg_watched_percentage,
                engagement: item.engagement,
             })
+
+            auxAllUnique.add(item.sparkId)
          }
       }
 
-      audienceSegmentsMap["all"] = Array.from(auxAllSet)
+      audienceSegmentsMap["all"] = auxAll
 
       const result = Object.entries(audienceSegmentsMap).reduce(
          (acc, [key, value]) => {
