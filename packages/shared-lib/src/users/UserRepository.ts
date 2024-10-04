@@ -30,6 +30,7 @@ import {
    UserPublicData,
    UserReminderType,
    UserStats,
+   ValidUserTagFields,
 } from "./users"
 
 export interface IUserRepository {
@@ -221,6 +222,17 @@ export interface IUserRepository {
    getUserRegisteredLivestreams(
       userEmail: string
    ): Promise<RegisteredLivestreams>
+
+   /**
+    * Retrieves all users where the tags match any values in @param tagIds. The field to be compared against is defined
+    * by @param tagField.
+    * @param tagField UserData property to filter the tags by.
+    * @param tagIds Ids of the tags to use when filtering the @param tagField.
+    */
+   getUsersWithTags(
+      tagField: ValidUserTagFields,
+      tagIds: string[]
+   ): Promise<UserData[]>
 }
 
 export class FirebaseUserRepository
@@ -1049,6 +1061,42 @@ export class FirebaseUserRepository
       }
 
       return snap.docs[0].data()
+   }
+
+   async getUsersWithTags(
+      tagField: ValidUserTagFields,
+      tagIds: string[],
+      lastVisibleDoc?: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData> // Used for pagination
+   ): Promise<UserData[]> {
+      const DOCUMENTS_LIMIT = 1000
+      if (!tagIds?.length) return []
+
+      let query = this.firestore
+         .collection("userData")
+         .where(tagField, "array-contains-any", tagIds)
+         .limit(DOCUMENTS_LIMIT)
+
+      if (lastVisibleDoc) {
+         // If we're paginating, start the query after the last document
+         query = query.startAfter(lastVisibleDoc)
+      }
+
+      const data = await query.get()
+
+      // Get the last document for pagination
+      const lastVisible = data.docs[data.docs.length - 1]
+
+      // Recursive call if there are more documents to fetch
+      if (data.docs.length === DOCUMENTS_LIMIT) {
+         const nextPage = await this.getUsersWithTags(
+            tagField,
+            tagIds,
+            lastVisible
+         )
+         return [...this.addIdToDocs<UserData>(data.docs), ...nextPage]
+      }
+
+      return this.addIdToDocs<UserData>(data.docs)
    }
 }
 

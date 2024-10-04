@@ -118,6 +118,9 @@ export interface UserData extends Identifiable {
    hasCompletedSparksB2BOnboarding?: boolean
 }
 
+export type ValidUserTagFields =
+   | "businessFunctionsTagIds"
+   | "contentTopicsTagIds"
 /*
  * Key is the questionId and value is the answerId
  * */
