@@ -1,13 +1,13 @@
 import {
    CompetitorCompanyBigQueryResult,
    CompetitorCompanyStats,
-   CompetitorSparkData,
    CompetitorStatsFromBigQuery,
    CompetitorTopCompaniesBase,
    CompetitorTopCompaniesData,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { ISparkFunctionsRepository } from "../SparkFunctionsRepository"
+import { convertSparkToCompetitorStaticCardData } from "./utils"
 
 interface ITopCompaniesBuilder {
    buildTopCompaniesByIndustrySparksIdsLookup(): ITopCompaniesBuilder
@@ -430,27 +430,6 @@ export class TopCompaniesBuilder implements ITopCompaniesBuilder {
       return this
    }
 
-   private convertSparkToCompetitorStaticCardData(
-      spark: Spark
-   ): CompetitorSparkData["sparkData"] {
-      return {
-         creator: {
-            avatarUrl: spark.creator.avatarUrl,
-            firstName: spark.creator.firstName,
-            lastName: spark.creator.lastName,
-         },
-         group: {
-            id: spark.group.id,
-            name: spark.group.universityName,
-         },
-         spark: {
-            question: spark.question,
-            categoryId: spark.category.id,
-            videoThumbnailUrl: spark.video.thumbnailUrl,
-         },
-      }
-   }
-
    buildTopCompaniesByIndustry() {
       for (const industry of Object.keys(
          this.sparksIdsByIndustryAndCompanyLookup
@@ -492,7 +471,7 @@ export class TopCompaniesBuilder implements ITopCompaniesBuilder {
                sparks: this.sparksIdsByIndustryAndCompanyLookup[industry][
                   groupId
                ].map((sparkId) => ({
-                  data: this.convertSparkToCompetitorStaticCardData(
+                  data: convertSparkToCompetitorStaticCardData(
                      this.sparksLookup[sparkId]
                   ),
                   stats: {
@@ -528,7 +507,7 @@ export class TopCompaniesBuilder implements ITopCompaniesBuilder {
          const sparks = topCompaniesSparksIds[groupId]
             .filter((sparkId) => this.sparksLookup[sparkId])
             .map((sparkId) => ({
-               data: this.convertSparkToCompetitorStaticCardData(
+               data: convertSparkToCompetitorStaticCardData(
                   this.sparksLookup[sparkId]
                ),
                stats: {
@@ -581,9 +560,7 @@ export class TopCompaniesBuilder implements ITopCompaniesBuilder {
                   .map((item) => {
                      const spark = this.sparksLookup[item.sparkId]
                      return {
-                        data: this.convertSparkToCompetitorStaticCardData(
-                           spark
-                        ),
+                        data: convertSparkToCompetitorStaticCardData(spark),
                         stats: {
                            plays: this.sparkStatsLookup[item.sparkId].plays,
                            avg_watched_time:
