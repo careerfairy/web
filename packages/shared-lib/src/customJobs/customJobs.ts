@@ -185,6 +185,14 @@ export const getMaxDaysAfterDeadline = (): Date => {
 }
 
 /**
+ * Checks if a job has no linked content (live streams or sparks) and if its deadline has not expired.
+ *
+ */
+export const jobHasContent = (job: CustomJob): boolean => {
+   return job.livestreams.length != 0 || job.sparks.length != 0
+}
+
+/**
  * Sorts an array of jobs or job statistics based on their deadline.
  *
  * This function prioritizes jobs that are still active (not expired) and then sorts them by their deadline proximity to the current date.
@@ -211,6 +219,13 @@ export const sortCustomJobs = <T extends CustomJob | CustomJobStats>(
 
       if (aDeadlineValid && !bDeadlineValid) return -1 // 'a' is active, 'b' is not
       if (!aDeadlineValid && bDeadlineValid) return 1 // 'a' is not active, 'b' is
+
+      // Second, prioritize if jobs is valid based on job content
+      const jobAHasContent = jobHasContent(jobA)
+      const jobBHasContent = jobHasContent(jobB)
+
+      if (jobAHasContent && !jobBHasContent) return -1
+      if (!jobAHasContent && jobBHasContent) return 1
 
       // For jobs with the same expiration status, sort by deadline proximity to the current date
       const aDeadline = jobA.deadline.toDate()
