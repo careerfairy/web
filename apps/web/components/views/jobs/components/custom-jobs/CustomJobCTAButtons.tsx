@@ -98,7 +98,7 @@ const styles = sxStyles({
 })
 
 const UTM_CAMPAIGN = "job"
-const UTM_MEDIUM = "job"
+const UTM_MEDIUM = "paid"
 
 type Props = {
    applicationSource?: CustomJobApplicationSource
