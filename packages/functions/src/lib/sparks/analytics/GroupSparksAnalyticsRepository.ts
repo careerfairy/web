@@ -464,25 +464,41 @@ class GroupSparksAnalyticsRepository
 
       // Calculates company "total" data to avoid an extra query
 
+      let isSparkAlreadyProcessed: Record<string, boolean> = {}
+
       const numberOfDataPoints = {}
 
       for (const item of bigQueryResults) {
+         if (isSparkAlreadyProcessed[item.sparkId]) {
+            continue
+         }
+
          if (!numberOfDataPoints[item.groupId]) {
             numberOfDataPoints[item.groupId] = 0
          }
+
+         isSparkAlreadyProcessed[item.sparkId] = true
 
          numberOfDataPoints[item.groupId] += 1
       }
 
       const totalAvgerages = {}
 
+      isSparkAlreadyProcessed = {}
+
       for (const item of bigQueryResults) {
+         if (isSparkAlreadyProcessed[item.sparkId]) {
+            continue
+         }
+
          if (!totalAvgerages[item.groupId]) {
             totalAvgerages[item.groupId] = {
                avg_watched_time: 0,
                avg_watched_percentage: 0,
             }
          }
+
+         isSparkAlreadyProcessed[item.sparkId] = true
 
          totalAvgerages[item.groupId].avg_watched_time += item.avg_watched_time
          totalAvgerages[item.groupId].avg_watched_percentage +=
@@ -491,7 +507,13 @@ class GroupSparksAnalyticsRepository
 
       const companyStatDataLookup: Record<string, CompetitorCompanyStats> = {}
 
+      isSparkAlreadyProcessed = {}
+
       for (const item of bigQueryResults) {
+         if (isSparkAlreadyProcessed[item.sparkId]) {
+            continue
+         }
+
          if (!companyStatDataLookup[item.groupId]) {
             companyStatDataLookup[item.groupId] = {
                totalViews: 0,
@@ -501,6 +523,8 @@ class GroupSparksAnalyticsRepository
                engagement: 0,
             }
          }
+
+         isSparkAlreadyProcessed[item.sparkId] = true
 
          companyStatDataLookup[item.groupId].totalViews += item.plays || 0
          companyStatDataLookup[item.groupId].uniqueViewers +=
@@ -692,12 +716,20 @@ class GroupSparksAnalyticsRepository
          }
       }
 
+      isSparkAlreadyProcessed = {}
+
       const auxAllCompanySparksIds: Record<string, string[]> = {}
 
       for (const item of bigQueryResults) {
          if (!auxAllCompanyIdsSet.has(item.groupId)) {
             continue
          }
+
+         if (isSparkAlreadyProcessed[item.sparkId]) {
+            continue
+         }
+
+         isSparkAlreadyProcessed[item.sparkId] = true
 
          if (!auxAllCompanySparksIds[item.groupId]) {
             auxAllCompanySparksIds[item.groupId] = []
