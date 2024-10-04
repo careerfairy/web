@@ -168,7 +168,7 @@ export class TopCompaniesBuilder implements ITopCompaniesBuilder {
       // Get all sparks ids for "All Industries" companies
       const companyIdsSet = new Set<string>()
 
-      for (const item of this.bigQueryResults) {
+      for (const item of this.bigQueryResultsNoDuplicateSparks) {
          if (companyIdsSet.size < this.MAX_COMPANIES_PER_INDUSTRY) {
             companyIdsSet.add(item.groupId)
          }
@@ -182,7 +182,7 @@ export class TopCompaniesBuilder implements ITopCompaniesBuilder {
    ): Record<string, string[]> {
       const companySparksIds: Record<string, string[]> = {}
 
-      for (const item of this.bigQueryResults) {
+      for (const item of this.bigQueryResultsNoDuplicateSparks) {
          if (!topCompanyIds.has(item.groupId)) {
             continue
          }
@@ -272,7 +272,7 @@ export class TopCompaniesBuilder implements ITopCompaniesBuilder {
 
       const lookup: Record<string, CompetitorCompanyStats> = {}
 
-      for (const item of this.bigQueryResults) {
+      for (const item of this.bigQueryResultsNoDuplicateSparks) {
          if (!lookup[item.groupId]) {
             lookup[item.groupId] = {
                totalViews: 0,
