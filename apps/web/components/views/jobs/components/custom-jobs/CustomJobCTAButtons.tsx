@@ -17,6 +17,7 @@ import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils/utils"
 import ActionButton from "components/views/livestream-dialog/views/livestream-details/action-button/ActionButton"
 import ActionButtonProvider, {
    useActionButtonContext,
@@ -96,7 +97,6 @@ const styles = sxStyles({
    },
 })
 
-const UTM_SOURCE = "careerfairy"
 const UTM_CAMPAIGN = "job"
 
 type Props = {
@@ -498,6 +498,7 @@ const VisitApplicationPageButton = ({
    job,
 }: VisitApplicationPageButtonProps) => {
    const jobUrl = getJobUrl(job)
+   console.log("🚀 ~ jobUrl:", jobUrl)
 
    return alreadyApplied ? (
       <Box width={"100%"}>
@@ -543,6 +544,7 @@ const CustomJobApplyButton = ({
    alreadyApplied,
 }: CustomJobCTAProps) => {
    const jobUrl = getJobUrl(job)
+   console.log("🚀 ~ jobUrl:", jobUrl)
    const jobExpired = useIsJobExpired(job)
    const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
@@ -578,17 +580,13 @@ const CustomJobApplyButton = ({
    ) : null
 }
 
-const getJobsUtmParams = (job: PublicCustomJob) => {
-   return `${
-      job.postingUrl.includes("?") ? "&" : "?"
-   }utm_source=${UTM_SOURCE}&utm_campaign=${UTM_CAMPAIGN}&utm_content=${
-      job.title
-   }`
-}
-
 const getJobUrl = (job: PublicCustomJob) => {
-   const utmParams = getJobsUtmParams(job)
-   return job.postingUrl.concat(utmParams)
+   return addUtmTagsToLink({
+      link: job.postingUrl,
+      campaign: UTM_CAMPAIGN,
+      content: job.title,
+      medium: "job",
+   })
 }
 
 export default CustomJobCTAButtons
