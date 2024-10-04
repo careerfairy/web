@@ -425,7 +425,7 @@ export class CustomJobFunctionsRepository
       const jobLogId = `${customJob.id}-${customJob.title}`
 
       functions.logger.log(
-         `${jobEmoji} Started creating custom job created notifications for custom job ${jobLogId}`
+         `${jobEmoji} Started creating custom job notifications for custom job ${jobLogId}`
       )
 
       const BATCH_SIZE = 200
@@ -452,22 +452,7 @@ export class CustomJobFunctionsRepository
          customJob.businessFunctionsTagIds
       )
 
-      const users = (usersWithMatchingTags || []).filter((user) => {
-         return [
-            "edujorge13@gmail.com",
-            "habib@careerfairy.io",
-            "simone@careerfairy.io",
-            "matilde.ramos@careerfairy.io",
-            "carlos.rijo@careerfairy.io",
-            "lucas@careerfairy.io",
-            "goncalo@careerfairy.io",
-            "edujorge13@hotmail.com",
-            "maximilian@careerfairy.io",
-            "carlos@careerfairy.io",
-         ].includes(user.id)
-      })
-
-      if (!users?.length) {
+      if (!usersWithMatchingTags?.length) {
          functions.logger.log(
             `${jobEmoji} No users found with matching tags for custom job ${jobLogId}, ignoring creation of notifications`
          )
@@ -475,14 +460,14 @@ export class CustomJobFunctionsRepository
       }
 
       functions.logger.log(
-         `${jobEmoji} Creating notifications for ${users.length} users for new custom job ${jobLogId} (by matching businessFunctionsTagIds tags)`
+         `${jobEmoji} Creating notifications for ${usersWithMatchingTags.length} users for custom job ${jobLogId} (by matching businessFunctionsTagIds tags)`
       )
 
       const jobGroup = await groupRepo.getGroupById(customJob.groupId)
 
       const batch = this.firestore.batch()
 
-      const batchedUsers = chunk(users, BATCH_SIZE)
+      const batchedUsers = chunk(usersWithMatchingTags, BATCH_SIZE)
 
       for (const userBatch of batchedUsers) {
          for (const user of userBatch) {
@@ -511,9 +496,7 @@ export class CustomJobFunctionsRepository
       }
 
       functions.logger.log(
-         `${jobEmoji} Notified ${users.length}(${users.map(
-            (u) => u.id
-         )}) users of new job ${jobLogId}`
+         `${jobEmoji} Notified ${usersWithMatchingTags.length} users of job ${jobLogId} publication`
       )
    }
 }
