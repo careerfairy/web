@@ -93,6 +93,8 @@ export class TopCompaniesBuilder implements ITopCompaniesBuilder {
    }
 
    buildTopCompaniesByIndustrySparksIdsLookup() {
+      this.sparksIdsByIndustryAndCompanyLookup = {}
+
       // Creates lookup for sparks ids by industry and company
       for (const item of this.bigQueryResults) {
          if (!this.sparksIdsByIndustryAndCompanyLookup[item.industry]) {
