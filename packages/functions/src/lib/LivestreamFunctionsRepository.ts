@@ -925,10 +925,14 @@ export class LivestreamFunctionsRepository
    ): Promise<void> {
       // Check if the livestreams in afterJob and beforeJob are the same, regardless of order
       const areLivestreamsEqual =
-         getArrayDifference(afterJob.livestreams, beforeJob.livestreams)
-            .length === 0 &&
-         getArrayDifference(beforeJob.livestreams, afterJob.livestreams)
-            .length === 0
+         getArrayDifference(
+            afterJob?.livestreams ?? [],
+            beforeJob?.livestreams ?? []
+         ).length === 0 &&
+         getArrayDifference(
+            beforeJob?.livestreams ?? [],
+            afterJob?.livestreams ?? []
+         ).length === 0
 
       if (areLivestreamsEqual) {
          // If the livestreams are the same, exit the function early
@@ -938,16 +942,16 @@ export class LivestreamFunctionsRepository
       // Get the livestreams that were added to afterJob
       const addedLivestreams = beforeJob
          ? (getArrayDifference(
-              beforeJob.livestreams,
-              afterJob.livestreams
+              beforeJob?.livestreams ?? [],
+              afterJob?.livestreams ?? []
            ) as string[])
          : afterJob.livestreams
 
       // Get the livestreams that were removed from beforeJob
       const removedLivestreams = beforeJob
          ? (getArrayDifference(
-              afterJob.livestreams,
-              beforeJob.livestreams
+              afterJob?.livestreams ?? [],
+              beforeJob?.livestreams ?? []
            ) as string[])
          : []
 
