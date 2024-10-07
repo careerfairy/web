@@ -36,6 +36,9 @@ export const TopSparksByIndustry = () => {
                               sparkData={data.sparkData}
                               plays={data.plays}
                               avg_watched_time={data.avg_watched_time}
+                              avg_watched_percentage={
+                                 data.avg_watched_percentage
+                              }
                               engagement={data.engagement}
                            />
                         )

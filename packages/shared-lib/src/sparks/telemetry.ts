@@ -154,4 +154,5 @@ export const SparkInteractionSources = {
    Livestream_End_Screen: "livestream_end_screen",
    Mentor_Page: "mentor_page",
    CustomJob: "custom_job",
+   PortalBanner: "portal_banner",
 } as const

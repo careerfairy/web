@@ -17,6 +17,7 @@ import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils/utils"
 import ActionButton from "components/views/livestream-dialog/views/livestream-details/action-button/ActionButton"
 import ActionButtonProvider, {
    useActionButtonContext,
@@ -95,6 +96,9 @@ const styles = sxStyles({
       whiteSpace: "nowrap",
    },
 })
+
+const UTM_CAMPAIGN = "job"
+const UTM_MEDIUM = "paid"
 
 type Props = {
    applicationSource?: CustomJobApplicationSource
@@ -494,12 +498,14 @@ const VisitApplicationPageButton = ({
    alreadyApplied,
    job,
 }: VisitApplicationPageButtonProps) => {
+   const jobUrl = getJobUrl(job)
+
    return alreadyApplied ? (
       <Box width={"100%"}>
          <Button
             fullWidth
             sx={[styles.btn, styles.visitButton]}
-            href={job.postingUrl}
+            href={jobUrl}
             endIcon={<ExternalLink size={18} />}
             target="_blank"
          >
@@ -537,6 +543,7 @@ const CustomJobApplyButton = ({
    isSecondary,
    alreadyApplied,
 }: CustomJobCTAProps) => {
+   const jobUrl = getJobUrl(job)
    const jobExpired = useIsJobExpired(job)
    const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
@@ -552,7 +559,7 @@ const CustomJobApplyButton = ({
       <Button
          sx={styles.btn}
          component={"a"}
-         href={job.postingUrl}
+         href={jobUrl}
          target="_blank"
          rel="noopener noreferrer"
          variant={isSecondary ? "outlined" : "contained"}
@@ -570,6 +577,15 @@ const CustomJobApplyButton = ({
          {isClickingOnApplyBtn ? "Applying" : "Apply now"}
       </Button>
    ) : null
+}
+
+const getJobUrl = (job: PublicCustomJob) => {
+   return addUtmTagsToLink({
+      link: job.postingUrl,
+      campaign: UTM_CAMPAIGN,
+      content: job.title,
+      medium: UTM_MEDIUM,
+   })
 }
 
 export default CustomJobCTAButtons

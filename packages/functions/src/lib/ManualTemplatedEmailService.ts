@@ -1,7 +1,6 @@
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { Timestamp } from "firebase-admin/firestore"
 import { ManualTemplatedEmailBuilder } from "./ManualTemplatedEmailBuilder"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
 
@@ -25,24 +24,13 @@ export class ManualTemplatedEmailService {
     * Fetches the required data for generating the email
     */
    async fetchRequiredData(overrideUsers: string[]) {
-      const dateFrom = new Date("2023-01-01")
-      const lastActivityTimestamp = Timestamp.fromDate(dateFrom)
-
       // start fetching
-      const swissSubscribedUsers =
-         await this.userRepo.getSubscribedUsersByCountryCode(
-            "CH",
-            overrideUsers
-         )
-
-      const users = (swissSubscribedUsers || []).filter(
-         (user) => user.lastActivityAt >= lastActivityTimestamp
-      )
+      const users = await this.userRepo.getSubscribedUsers(overrideUsers)
 
       this.subscribedUsers = convertDocArrayToDict(users)
 
       this.logger.info(
-         "Total Users subscribed to the release email for B2C content tagging launch announcement",
+         "Total Users subscribed to the release email for Job Hub launch announcement",
          Object.keys(this.subscribedUsers || {}).length
       )
 

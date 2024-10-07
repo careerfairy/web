@@ -1,4 +1,5 @@
 import { CompetitorSparkData } from "@careerfairy/shared-lib/sparks/analytics"
+import { Percent } from "@mui/icons-material"
 import {
    Box,
    Card,
@@ -143,6 +144,7 @@ export const CompetitorSparkStaticCard = ({
    sparkData,
    plays,
    avg_watched_time,
+   avg_watched_percentage,
    engagement,
 }: CompetitorSparkData) => {
    const { group } = useGroup()
@@ -199,6 +201,10 @@ export const CompetitorSparkStaticCard = ({
             <StatContainer
                icon={<ClockIcon />}
                value={Math.ceil(avg_watched_time) + "s"}
+            />
+            <StatContainer
+               icon={<Percent />}
+               value={Math.ceil(avg_watched_percentage * 100) + "%"}
             />
             <StatContainer
                icon={<EngagementIcon />}

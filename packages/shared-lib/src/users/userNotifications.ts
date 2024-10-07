@@ -14,4 +14,5 @@ export interface UserNotification extends Identifiable {
    sparkId?: string
    imageUrl?: string
    imageFormat?: "circular" | "contain"
+   buttonText?: string
 }

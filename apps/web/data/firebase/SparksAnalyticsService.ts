@@ -17,7 +17,7 @@ export class SparksAnalyticsService {
          SparksAnalyticsDTO
       >(
          this.functions,
-         "getSparksAnalytics_v4"
+         "getSparksAnalytics_v5"
       )({ groupId, forceUpdate })
 
       return analytics

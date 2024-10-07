@@ -56,6 +56,7 @@ export type MostSomethingWithPastData = WithPastData<MostSomethingBase[]>
 export type CompetitorStatsFromBigQuery = {
    plays: number
    avg_watched_time: number
+   avg_watched_percentage: number
    engagement: number
 }
 
