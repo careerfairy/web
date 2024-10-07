@@ -243,6 +243,8 @@ exports.onWriteCreator = onWriteTriggers.onWriteCreator
 exports.onWriteGroup = onWriteTriggers.onWriteGroup
 exports.onWriteSpark = onWriteTriggers.onWriteSpark
 exports.onWriteCustomJobs = onWriteTriggers.onWriteCustomJobs
+exports.onWriteCustomJobsSendNotifications =
+   onWriteTriggers.onWriteCustomJobsSendNotifications
 
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
@@ -282,7 +284,7 @@ exports.markSparkAsSeenByUser_v4 = userSparks.markSparkAsSeenByUser
 // Spark Analytics Functions
 exports.trackSparkEvents_v6 = userSparks.trackSparkEvents
 exports.trackSparkSecondsWatched_v4 = userSparks.trackSparkSecondsWatched
-exports.getSparksAnalytics_v4 = sparksAnalytics.getSparksAnalytics
+exports.getSparksAnalytics_v5 = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.confirmUserJobApplication = customJobs.confirmUserApplyToCustomJob

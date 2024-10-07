@@ -9,10 +9,17 @@ import {
 import { Group } from "@careerfairy/shared-lib/groups"
 import { CustomJobMetaData } from "@careerfairy/shared-lib/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
+import { chunk } from "lodash"
 import { Timestamp } from "../api/firestoreAdmin"
-import { livestreamsRepo, sparkRepo } from "../api/repositories"
+import {
+   groupRepo,
+   livestreamsRepo,
+   sparkRepo,
+   userRepo,
+} from "../api/repositories"
 
 export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    /**
@@ -85,6 +92,12 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    syncDeletedCustomJobToLinkedSparks(
       deletedCustomJob: CustomJob
    ): Promise<void>
+
+   /**
+    * Notifies users with matching business functions tags according to the Custom Job (created).
+    * @param customJob Newly created custom job.
+    */
+   createNewCustomJobUserNotifications(customJob: CustomJob): Promise<void>
 }
 
 export class CustomJobFunctionsRepository
@@ -403,5 +416,87 @@ export class CustomJobFunctionsRepository
       })
 
       return batch.commit()
+   }
+
+   async createNewCustomJobUserNotifications(
+      customJob: CustomJob
+   ): Promise<void> {
+      const jobEmoji = "💼"
+      const jobLogId = `${customJob.id}-${customJob.title}`
+
+      functions.logger.log(
+         `${jobEmoji} Started creating custom job notifications for custom job ${jobLogId}`
+      )
+
+      const BATCH_SIZE = 200
+
+      if (!customJob.published || customJob.isPermanentlyExpired) {
+         functions.logger.log(
+            `${jobEmoji} Custom job ${jobLogId} is not published or is expired. published: ${customJob.published}, expired: ${customJob.isPermanentlyExpired}`
+         )
+         return
+      }
+      if (!customJob.businessFunctionsTagIds?.length) {
+         functions.logger.log(
+            `${jobEmoji} Custom job ${jobLogId} has no business function tags, ignoring creation of notifications`
+         )
+         return
+      }
+
+      functions.logger.log(
+         `${jobEmoji} Searching users with tags: ${customJob.businessFunctionsTagIds} from job ${jobLogId}`
+      )
+
+      const usersWithMatchingTags = await userRepo.getUsersWithTags(
+         "businessFunctionsTagIds",
+         customJob.businessFunctionsTagIds
+      )
+
+      if (!usersWithMatchingTags?.length) {
+         functions.logger.log(
+            `${jobEmoji} No users found with matching tags for custom job ${jobLogId}, ignoring creation of notifications`
+         )
+         return
+      }
+
+      functions.logger.log(
+         `${jobEmoji} Creating notifications for ${usersWithMatchingTags.length} users for custom job ${jobLogId} (by matching businessFunctionsTagIds tags)`
+      )
+
+      const jobGroup = await groupRepo.getGroupById(customJob.groupId)
+
+      const batch = this.firestore.batch()
+
+      const batchedUsers = chunk(usersWithMatchingTags, BATCH_SIZE)
+
+      for (const userBatch of batchedUsers) {
+         for (const user of userBatch) {
+            const ref = this.firestore
+               .collection("userData")
+               .doc(user.id)
+               .collection("userNotifications")
+               .doc()
+
+            const newNotification: UserNotification = {
+               documentType: "userNotification",
+               actionUrl: `/company/${jobGroup.universityName}/jobs/${customJob.id}`,
+               companyId: jobGroup.groupId,
+               imageFormat: "circular",
+               imageUrl: jobGroup.logoUrl,
+               message: `<strong>${jobGroup.universityName}</strong> just posted a job that matches your profile: <strong>${customJob.title}</strong>`,
+               buttonText: "Discover now",
+               createdAt: Timestamp.now(),
+               id: ref.id,
+            }
+
+            batch.set(ref, newNotification)
+         }
+
+         await batch.commit()
+      }
+
+      functions.logger.log(
+         `${jobEmoji} Notified ${usersWithMatchingTags.length} users of job ${jobLogId} publication`
+      )
    }
 }

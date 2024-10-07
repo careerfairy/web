@@ -1,0 +1,272 @@
+{
+   "fields": [
+      {
+         "name": "documentType",
+         "type": "string"
+      },
+      {
+         "name": "jobId",
+         "type": "string"
+      },
+      {
+         "name": "user",
+         "type": "map",
+         "fields": [
+            {
+               "name": "firstName",
+               "type": "string"
+            },
+            {
+               "name": "lastName",
+               "type": "string"
+            },
+            {
+               "name": "userEmail",
+               "type": "string"
+            },
+            {
+               "name": "authId",
+               "type": "string"
+            },
+            {
+               "name": "linkedinUrl",
+               "type": "string"
+            },
+            {
+               "name": "referralCode",
+               "type": "string"
+            },
+            {
+               "name": "userResume",
+               "type": "string"
+            },
+            {
+               "name": "universityCountryCode",
+               "type": "string"
+            },
+            {
+               "name": "badges",
+               "type": "stringified_map"
+            },
+            {
+               "name": "interestsIds",
+               "type": "stringified_map"
+            },
+            {
+               "name": "businessFunctionsTagIds",
+               "type": "stringified_map"
+            },
+            {
+               "name": "contentTopicsTagIds",
+               "type": "stringified_map"
+            },
+            {
+               "name": "groupIds",
+               "type": "stringified_map"
+            },
+            {
+               "name": "countriesOfInterest",
+               "type": "stringified_map"
+            },
+            {
+               "name": "isAdmin",
+               "type": "boolean"
+            },
+            {
+               "name": "unsubscribed",
+               "type": "boolean"
+            },
+            {
+               "name": "lastActivityAt",
+               "type": "timestamp"
+            },
+            {
+               "name": "createdAt",
+               "type": "timestamp"
+            },
+            {
+               "fields": [
+                  {
+                     "name": "code",
+                     "type": "string"
+                  },
+                  {
+                     "name": "name",
+                     "type": "string"
+                  }
+               ],
+               "name": "university",
+               "type": "map"
+            },
+            {
+               "fields": [
+                  {
+                     "name": "id",
+                     "type": "string"
+                  },
+                  {
+                     "name": "name",
+                     "type": "string"
+                  }
+               ],
+               "name": "fieldOfStudy",
+               "type": "map"
+            },
+            {
+               "fields": [
+                  {
+                     "name": "id",
+                     "type": "string"
+                  },
+                  {
+                     "name": "name",
+                     "type": "string"
+                  }
+               ],
+               "name": "levelOfStudy",
+               "type": "map"
+            },
+            {
+               "fields": [
+                  {
+                     "name": "name",
+                     "type": "string"
+                  },
+                  {
+                     "name": "uid",
+                     "type": "string"
+                  },
+                  {
+                     "name": "referralCode",
+                     "type": "string"
+                  }
+               ],
+               "name": "referredBy",
+               "type": "map"
+            },
+            {
+               "fields": [
+                  {
+                     "name": "utm_source",
+                     "type": "string"
+                  },
+                  {
+                     "name": "utm_medium",
+                     "type": "string"
+                  },
+                  {
+                     "name": "utm_campaign",
+                     "type": "string"
+                  },
+                  {
+                     "name": "utm_term",
+                     "type": "string"
+                  },
+                  {
+                     "name": "utm_content",
+                     "type": "string"
+                  }
+               ],
+               "name": "accountCreationUTMParams",
+               "type": "map"
+            },
+            {
+               "name": "spokenLanguages",
+               "type": "stringified_map"
+            }
+         ]
+      },
+      {
+         "name": "groupId",
+         "type": "string"
+      },
+      {
+         "name": "appliedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "applicationSource",
+         "type": "map",
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "source",
+               "type": "string"
+            }
+         ]
+      },
+      {
+         "name": "job",
+         "type": "map",
+         "fields": [
+            {
+               "name": "groupId",
+               "type": "string"
+            },
+            {
+               "name": "title",
+               "type": "string"
+            },
+            {
+               "name": "description",
+               "type": "string"
+            },
+            {
+               "name": "jobType",
+               "type": "string"
+            },
+            {
+               "name": "deadline",
+               "type": "timestamp"
+            },
+            {
+               "name": "createdAt",
+               "type": "timestamp"
+            },
+            {
+               "name": "updatedAt",
+               "type": "timestamp"
+            },
+            {
+               "name": "salary",
+               "type": "string"
+            },
+            {
+               "name": "livestreams",
+               "type": "stringified_map"
+            },
+            {
+               "name": "deleted",
+               "type": "boolean"
+            }
+         ]
+      },
+      {
+         "name": "applied",
+         "type": "boolean"
+      },
+      {
+         "name": "createdAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "companyCountry",
+         "type": "string"
+      },
+      {
+         "name": "companyIndustries",
+         "type": "stringified_map"
+      },
+      {
+         "name": "companySize",
+         "type": "string"
+      },
+      {
+         "name": "removedFromUserProfile",
+         "type": "boolean"
+      }
+   ]
+}

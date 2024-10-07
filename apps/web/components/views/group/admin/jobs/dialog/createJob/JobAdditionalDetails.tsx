@@ -73,6 +73,9 @@ const styles = sxStyles({
    dateWrapper: {
       zIndex: (theme) => theme.zIndex.tooltip,
       mt: "unset",
+      "& .react-datepicker-popper": {
+         height: "220px",
+      },
    },
 })
 
