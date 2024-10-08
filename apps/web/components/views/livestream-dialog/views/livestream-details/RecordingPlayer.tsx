@@ -314,7 +314,7 @@ export const useRecordingControls = (
 
    // handle preview play icon click
    const handlePreviewPlay = useCallback(() => {
-      if (isLoggedIn) return
+      if (!isLoggedIn) return
 
       // update recording stats
       void livestreamRepo.updateRecordingStats({
