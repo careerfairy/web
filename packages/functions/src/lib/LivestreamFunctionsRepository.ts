@@ -845,7 +845,11 @@ export class LivestreamFunctionsRepository
                functions.logger.log(
                   `Updating speaker data for livestream ID: ${livestream.id}, speaker ID: ${speaker.id}`
                )
-               return mapCreatorToSpeaker(creator)
+               // Merge existing speaker data with new creator data
+               return {
+                  ...speaker,
+                  ...mapCreatorToSpeaker(creator),
+               }
             }
             return speaker
          })
