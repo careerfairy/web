@@ -1,21 +1,27 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
-import { useCombinedJobs } from "components/custom-hook/streaming/useCombinedJobs"
+import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import JobCard from "components/views/common/jobs/JobCard"
 import { useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { dataLayerEvent } from "util/analyticsUtils"
 import { useStreamingContext } from "../../context"
-import JobDialog from "../jobs/JobDialog"
 import { EmptyJobsView } from "./EmptyJobsView"
 import { JobCardSkeleton, JobListSkeleton } from "./JobListSkeleton"
 
 const styles = sxStyles({
    jobList: {
       gap: 1.5,
+   },
+   heroSx: {
+      pb: "8px !important",
    },
 })
 
@@ -43,20 +49,21 @@ const ContentWrapper = () => {
 }
 
 const Content = ({ livestreamId, isHost, hostCompanyId }) => {
-   const [selectedJob, setSelectedJob] = useState(null)
+   const [selectedJob, setSelectedJob] = useState<CustomJob>(null)
 
-   const jobsToShow = useCombinedJobs(livestreamId, hostCompanyId)
+   const jobsToShow = useGroupCustomJobs(hostCompanyId, {
+      livestreamId: livestreamId,
+   })
 
    const onCloseDialog = useCallback(() => {
       setSelectedJob(null)
    }, [])
 
-   const handleJobClick = useCallback((job: Job | CustomJob) => {
-      const jobName = (job as Job)?.name ?? (job as CustomJob)?.title
+   const handleJobClick = useCallback((job: CustomJob) => {
       setSelectedJob(job)
       dataLayerEvent("livestream_job_open", {
          jobId: job.id,
-         jobName: jobName,
+         jobName: job.title,
       })
    }, [])
 
@@ -81,11 +88,19 @@ const Content = ({ livestreamId, isHost, hostCompanyId }) => {
             ))}
          </Stack>
          {selectedJob ? (
-            <JobDialog
-               livestreamId={livestreamId}
-               job={selectedJob}
-               handleDialogClose={onCloseDialog}
-               open={Boolean(selectedJob)}
+            <CustomJobDetailsDialog
+               customJobId={selectedJob.id}
+               isOpen={Boolean(selectedJob)}
+               onClose={onCloseDialog}
+               source={{
+                  source: CustomJobApplicationSourceTypes.Livestream,
+                  id: livestreamId,
+               }}
+               heroContent={
+                  <CustomJobDetailsDialog.CloseButton onClose={onCloseDialog} />
+               }
+               hideLinkedLivestreams
+               heroSx={styles.heroSx}
             />
          ) : null}
       </>
