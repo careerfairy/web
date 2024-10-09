@@ -1,5 +1,5 @@
 import { CompetitorSparkData } from "@careerfairy/shared-lib/sparks/analytics"
-import { Percent } from "@mui/icons-material"
+import { CheckCircleRounded } from "@mui/icons-material"
 import {
    Box,
    Card,
@@ -209,7 +209,7 @@ export const CompetitorSparkStaticCard = ({
                value={Math.ceil(avg_watched_time) + "s"}
             />
             <StatContainer
-               icon={<Percent />}
+               icon={<CheckCircleRounded />}
                value={Math.ceil(avg_watched_percentage * 100) + "%"}
             />
             <StatContainer
