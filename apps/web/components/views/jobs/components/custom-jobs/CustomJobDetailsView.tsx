@@ -9,6 +9,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useCustomJobDetailsDialog } from "components/views/common/jobs/CustomJobDetailsProvider"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import { props } from "lodash/fp"
 import { ReactNode, forwardRef } from "react"
@@ -107,6 +108,9 @@ export const CustomJobDetails = ({
    const isMobile = useIsMobile()
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
+   const { hideLinkedLivestreams, hideLinkedSparks } =
+      useCustomJobDetailsDialog()
+
    return (
       <>
          <Box sx={combineStyles(customStyles.root, heroSx)}>{heroContent}</Box>
@@ -126,6 +130,8 @@ export const CustomJobDetails = ({
                      <CustomJobLinkedContents
                         job={job}
                         disableEventClick={disabledLinkedContentClick}
+                        hideLinkedLivestreams={hideLinkedLivestreams}
+                        hideLinkedSparks={hideLinkedSparks}
                      />
                   </Stack>
                </Box>
