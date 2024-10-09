@@ -99,8 +99,6 @@ const styles = sxStyles({
    },
 })
 
-// const data = createTopCompaniesByIndustryWithPastData()
-
 export const TopCompaniesByIndustry = () => {
    const {
       filteredAnalytics: { topCompaniesByIndustry },
@@ -220,10 +218,39 @@ const CollapsibleTable = ({ rows }: CollapsibleTableProps) => {
       setOrderBy(property)
    }
 
-   const sortedRows = useMemo(
-      () => [...rows].sort(getComparator(order, orderBy)),
-      [order, orderBy, rows]
-   )
+   const sortedRows = useMemo(() => {
+      const hasGroup = rows.some(
+         (row) => row.sparks[0].sparkData.group.id === group.groupId
+      )
+      const sortedRows = [...rows].sort(getComparator(order, orderBy))
+
+      if (hasGroup) {
+         return sortedRows
+      } else {
+         const emptyGroupRow: CompetitorTopCompaniesBase = {
+            sparks: [],
+            groupLogo: group.logoUrl,
+            groupName: group.universityName,
+            // @ts-ignore
+            rank: "⏤",
+            highlight: true,
+            totalViews: 0,
+            unique_viewers: 0,
+            avg_watched_time: 0,
+            avg_watched_percentage: 0,
+            engagement: 0,
+         }
+
+         return [...sortedRows, emptyGroupRow]
+      }
+   }, [
+      group.groupId,
+      group.logoUrl,
+      group.universityName,
+      order,
+      orderBy,
+      rows,
+   ])
 
    return (
       <Box sx={styles.collapsibleTableRoot}>
@@ -271,7 +298,10 @@ const CollapsibleTable = ({ rows }: CollapsibleTableProps) => {
                   key={index}
                   tableIndex={row.rank}
                   row={row}
-                  highlight={row.sparks[0].sparkData.group.id === group.groupId}
+                  highlight={
+                     row.groupLogo === group.logoUrl ||
+                     row.sparks[0]?.sparkData?.group?.id === group.groupId
+                  }
                />
             ))}
          </Stack>
@@ -315,7 +345,7 @@ const Row = ({ row, tableIndex, highlight = false }: RowProps) => {
          ]}
       >
          <Grid item xs={GRID_SIZES[0]} sx={styles.rankCell}>
-            #{tableIndex}
+            {typeof tableIndex === "number" ? `#${tableIndex}` : tableIndex}
          </Grid>
          <Grid item xs={GRID_SIZES[1]}>
             <Box sx={styles.companyDataContainer}>
@@ -348,38 +378,47 @@ const Row = ({ row, tableIndex, highlight = false }: RowProps) => {
             value={Math.ceil(row.engagement)}
          />
          <Grid item xs={GRID_SIZES[0]} sx={styles.textAlignCenter}>
-            <IconButton
-               aria-label="expand row"
-               size="small"
-               onClick={() => setOpen(!open)}
-            >
-               {open ? <ChevronUp /> : <ChevronDown />}
-            </IconButton>
+            {row.sparks.length > 0 && (
+               <IconButton
+                  aria-label="expand row"
+                  size="small"
+                  onClick={() => setOpen(!open)}
+               >
+                  {open ? <ChevronUp /> : <ChevronDown />}
+               </IconButton>
+            )}
          </Grid>
-         <Collapse in={open} timeout="auto" unmountOnExit sx={styles.collapse}>
-            <Typography variant="brandedH4" fontWeight={600}>
-               Top Sparks
-            </Typography>
-            <Stack
-               direction={{ xs: "column", md: "row" }}
-               sx={{ mt: 1, mb: 2 }}
-               spacing={1.5}
+         {row.sparks.length > 0 && (
+            <Collapse
+               in={open}
+               timeout="auto"
+               unmountOnExit
+               sx={styles.collapse}
             >
-               <SparksCarousel>
-                  {row.sparks.map((spark, index) => (
-                     <CompetitorSparkStaticCard
-                        key={`top-sparks-by-industry-${row.groupName}-${index}`}
-                        sparkData={spark.sparkData}
-                        num_views={spark.num_views}
-                        avg_watched_time={spark.avg_watched_time}
-                        avg_watched_percentage={spark.avg_watched_percentage}
-                        engagement={spark.engagement}
-                        turnOffHighlighting={true}
-                     />
-                  ))}
-               </SparksCarousel>
-            </Stack>
-         </Collapse>
+               <Typography variant="brandedH4" fontWeight={600}>
+                  Top Sparks
+               </Typography>
+               <Stack
+                  direction={{ xs: "column", md: "row" }}
+                  sx={{ mt: 1, mb: 2 }}
+                  spacing={1.5}
+               >
+                  <SparksCarousel>
+                     {row.sparks.map((spark, index) => (
+                        <CompetitorSparkStaticCard
+                           key={`top-sparks-by-industry-${row.groupName}-${index}`}
+                           sparkData={spark.sparkData}
+                           num_views={spark.num_views}
+                           avg_watched_time={spark.avg_watched_time}
+                           avg_watched_percentage={spark.avg_watched_percentage}
+                           engagement={spark.engagement}
+                           turnOffHighlighting={true}
+                        />
+                     ))}
+                  </SparksCarousel>
+               </Stack>
+            </Collapse>
+         )}
       </GridContainer>
    )
 }
