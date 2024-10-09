@@ -1,4 +1,7 @@
-import { CompetitorTopCompaniesBase } from "@careerfairy/shared-lib/sparks/analytics"
+import {
+   CompetitorCompanyData,
+   CompetitorTopCompaniesBase,
+} from "@careerfairy/shared-lib/sparks/analytics"
 import { sxStyles } from "@careerfairy/shared-ui"
 import {
    Box,
@@ -131,10 +134,10 @@ export const TopCompaniesByIndustry = () => {
 }
 
 type OrderingKey = keyof Pick<
-   CompetitorTopCompaniesBase["companyData"],
+   CompetitorCompanyData,
    | "rank"
    | "totalViews"
-   | "uniqueViewers"
+   | "unique_viewers"
    | "avg_watched_time"
    | "avg_watched_percentage"
    | "engagement"
@@ -161,8 +164,8 @@ function getComparator(
    orderBy: OrderingKey
 ): (a: CompetitorTopCompaniesBase, b: CompetitorTopCompaniesBase) => number {
    return order === "desc"
-      ? (a, b) => descendingComparator(a.companyData, b.companyData, orderBy)
-      : (a, b) => ascendingComparator(a.companyData, b.companyData, orderBy)
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => ascendingComparator(a, b, orderBy)
 }
 
 type SortableHeadCell = {
@@ -173,15 +176,11 @@ type SortableHeadCell = {
 
 const sortableHeadCells: SortableHeadCell[] = [
    { id: "totalViews", label: "Total Views", size: 1.3 },
-   { id: "uniqueViewers", label: "Unique Viewers", size: 1.6 },
+   { id: "unique_viewers", label: "Unique Viewers", size: 1.6 },
    { id: "avg_watched_time", label: "Avg. watch time", size: 1.7 },
    { id: "avg_watched_percentage", label: "Avg. completion", size: 1.6 },
    { id: "engagement", label: "Total engagement", size: 1.8 },
 ]
-
-type CollapsibleTableProps = {
-   rows: CompetitorTopCompaniesBase[]
-}
 
 const GridContainer = ({
    children,
@@ -205,6 +204,10 @@ const GridContainer = ({
 }
 
 const GRID_SIZES = [0.5, 3]
+
+type CollapsibleTableProps = {
+   rows: CompetitorTopCompaniesBase[]
+}
 
 const CollapsibleTable = ({ rows }: CollapsibleTableProps) => {
    const { group } = useGroup()
@@ -266,20 +269,14 @@ const CollapsibleTable = ({ rows }: CollapsibleTableProps) => {
             {sortedRows.map((row, index) => (
                <Row
                   key={index}
-                  tableIndex={row.companyData.rank}
+                  tableIndex={row.rank}
                   row={row}
-                  highlight={row.sparks[0].data.group.id === group.groupId}
+                  highlight={row.sparks[0].sparkData.group.id === group.groupId}
                />
             ))}
          </Stack>
       </Box>
    )
-}
-
-type RowProps = {
-   row: CompetitorTopCompaniesBase
-   tableIndex: number
-   highlight?: boolean
 }
 
 const StatCell = ({
@@ -294,6 +291,12 @@ const StatCell = ({
          {typeof value === "number" ? numberToString(value) : value}
       </Grid>
    )
+}
+
+type RowProps = {
+   row: CompetitorTopCompaniesBase
+   tableIndex: number
+   highlight?: boolean
 }
 
 const Row = ({ row, tableIndex, highlight = false }: RowProps) => {
@@ -317,37 +320,32 @@ const Row = ({ row, tableIndex, highlight = false }: RowProps) => {
          <Grid item xs={GRID_SIZES[1]}>
             <Box sx={styles.companyDataContainer}>
                <CircularLogo
-                  src={row.companyData.logo}
-                  alt={`${row.companyData.name} logo`}
+                  src={row.groupLogo}
+                  alt={`${row.groupName} logo`}
                   size={46}
                   objectFit="cover"
                />
                <Typography sx={styles.companyNameCell}>
-                  {row.companyData.name}
+                  {row.groupName}
                </Typography>
             </Box>
          </Grid>
-         <StatCell
-            size={sortableHeadCells[0].size}
-            value={row.companyData.totalViews}
-         />
+         <StatCell size={sortableHeadCells[0].size} value={row.totalViews} />
          <StatCell
             size={sortableHeadCells[1].size}
-            value={row.companyData.uniqueViewers}
+            value={row.unique_viewers}
          />
          <StatCell
             size={sortableHeadCells[2].size}
-            value={Math.ceil(row.companyData.avg_watched_time) + "s"}
+            value={Math.ceil(row.avg_watched_time) + "s"}
          />
          <StatCell
             size={sortableHeadCells[3].size}
-            value={
-               Math.ceil(row.companyData.avg_watched_percentage * 100) + "%"
-            }
+            value={Math.ceil(row.avg_watched_percentage * 100) + "%"}
          />
          <StatCell
             size={sortableHeadCells[4].size}
-            value={Math.ceil(row.companyData.engagement)}
+            value={Math.ceil(row.engagement)}
          />
          <Grid item xs={GRID_SIZES[0]} sx={styles.textAlignCenter}>
             <IconButton
@@ -370,14 +368,12 @@ const Row = ({ row, tableIndex, highlight = false }: RowProps) => {
                <SparksCarousel>
                   {row.sparks.map((spark, index) => (
                      <CompetitorSparkStaticCard
-                        key={`top-sparks-by-industry-${row.companyData.name}-${index}`}
-                        sparkData={spark.data}
-                        plays={spark.stats.plays}
-                        avg_watched_time={spark.stats.avg_watched_time}
-                        avg_watched_percentage={
-                           spark.stats.avg_watched_percentage
-                        }
-                        engagement={spark.stats.engagement}
+                        key={`top-sparks-by-industry-${row.groupName}-${index}`}
+                        sparkData={spark.sparkData}
+                        num_views={spark.num_views}
+                        avg_watched_time={spark.avg_watched_time}
+                        avg_watched_percentage={spark.avg_watched_percentage}
+                        engagement={spark.engagement}
                         turnOffHighlighting={true}
                      />
                   ))}
