@@ -2,20 +2,15 @@ import {
    clearAuthData,
    clearFirestoreData,
 } from "@careerfairy/seed-data/emulators"
-import GroupSeed from "@careerfairy/seed-data/groups"
-import LivestreamSeed, {
-   createLivestreamGroupQuestions,
-} from "@careerfairy/seed-data/livestreams"
 import UserSeed from "@careerfairy/seed-data/users"
-import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { test as base } from "@playwright/test"
-import { getFormattedName } from "components/views/streaming-page/util"
-import { credentials, streaming } from "../../constants"
-import { LoginPage } from "../page-object-models/LoginPage"
-import { StreamerPage } from "../page-object-models/streaming/StreamerPage"
-import { ViewerPage } from "../page-object-models/streaming/ViewerPage"
+import { credentials, streaming } from "tests/constants"
+import { StreamerPage } from "tests/e2e/page-object-models/streaming/StreamerPage"
+import { setupLivestreamData } from "tests/e2e/setupData"
+import { LoginPage } from "../../page-object-models/LoginPage"
+import { ViewerPage } from "../../page-object-models/streaming/ViewerPage"
 
 /**
  * Test Fixture
@@ -64,25 +59,24 @@ test.describe("New Streaming Journey", () => {
       streamerPage,
       viewerPage,
    }) => {
-      const { livestream, speaker } = await setupStreamer(streamerPage)
+      const { livestream } = await setupEnvironment(streamerPage, viewerPage)
 
       // Confirm the livestream is live and the streamer card is present
       await streamerPage.assertIsLive()
-      await streamerPage.assertStreamerDetailsExist(speaker)
+      await streamerPage.assertStreamerDetailsExist(livestream.speakers[0])
 
       // Streamer card should also be visible on the viewer page
       await viewerPage.open(livestream.id)
-      await viewerPage.assertStreamerDetailsExist(speaker)
+      await viewerPage.assertStreamerDetailsExist(livestream.speakers[0])
    })
 
    test("connection breaks, reconnect dialog shows up", async ({
       streamerPage,
       viewerPage,
    }) => {
-      const { livestream, speaker } = await setupStreamer(streamerPage)
+      const { livestream } = await setupEnvironment(streamerPage, viewerPage)
 
-      await viewerPage.open(livestream.id)
-      await viewerPage.assertStreamerDetailsExist(speaker)
+      await viewerPage.assertStreamerDetailsExist(livestream.speakers[0])
 
       await streamerPage.page.context().setOffline(true)
 
@@ -100,25 +94,28 @@ test.describe("New Streaming Journey", () => {
       streamerPage,
       viewerPage,
    }) => {
-      const { livestream, speaker } = await setupStreamer(streamerPage)
+      const { livestream } = await setupEnvironment(streamerPage, viewerPage)
 
-      await viewerPage.open(livestream.id)
-      await viewerPage.assertStreamerDetailsExist(speaker)
+      await viewerPage.assertStreamerDetailsExist(livestream.speakers[0])
 
       // Open a duplicated viewer tab
       const duplicateViewerPage = new ViewerPage(
          await viewerPage.page.context().newPage()
       )
       await duplicateViewerPage.open(livestream.id)
-      await duplicateViewerPage.assertStreamerDetailsExist(speaker)
+      await duplicateViewerPage.assertStreamerDetailsExist(
+         livestream.speakers[0]
+      )
 
       // first viewer tab should open a dialog to close it since its duplicated
       viewerPage.assertStreamIsOpenOnOtherBrowserDialogOpen()
    })
 
    test("viewer is redirected to waiting room", async ({ viewerPage }) => {
-      const { livestream } = await setupLivestream()
-      await viewerPage.open(livestream.id)
+      await setupEnvironment(null, viewerPage, {
+         livestreamType: "create",
+      })
+
       await viewerPage.assertWaitingRoomText()
    })
 
@@ -126,8 +123,8 @@ test.describe("New Streaming Journey", () => {
       streamerPage,
       viewerPage,
    }) => {
-      const { livestream } = await setupStreamer(streamerPage, {
-         adHoc: true,
+      await setupEnvironment(streamerPage, viewerPage, {
+         streamerType: "adHoc",
       })
 
       // Confirm the livestream is live and the streamer card is present
@@ -135,90 +132,70 @@ test.describe("New Streaming Journey", () => {
       await streamerPage.assertStreamerDetailsExist(streaming.streamer)
 
       // Streamer card should also be visible on the viewer page
-      await viewerPage.open(livestream.id)
       await viewerPage.assertStreamerDetailsExist(streaming.streamer)
+   })
+
+   test("livestream requires filling some questions on registration", async ({
+      viewerPage,
+   }) => {
+      const { livestream } = await setupLivestreamData(null, {
+         livestreamType: "createLive",
+         overrideLivestreamDetails: {
+            useNewUI: true,
+         },
+      })
+
+      await viewerPage.open(livestream.id)
+
+      await viewerPage.selectRandomCategoriesFromEvent(livestream)
+
+      await viewerPage.page
+         .locator(`button:has-text("Answer & Proceed")`)
+         .click()
+      await viewerPage.assertIsLive()
    })
 })
 
-type SetupStreamerOptions = {
-   adHoc?: boolean
+type SetupEnvironmentOptions = {
+   streamerType?: "adHoc" | "none"
+   livestreamType?: "create" | "createLive" | "createPast"
+   overrideLivestreamDetails?: Partial<LivestreamEvent>
 }
 
-async function setupStreamer(
+async function setupEnvironment(
    streamerPage: StreamerPage,
-   options: SetupStreamerOptions = {
-      adHoc: false,
-   }
+   viewerPage: ViewerPage,
+   options: SetupEnvironmentOptions = {}
 ) {
-   const { livestream, secureToken, group } = await setupLivestream({
-      livestreamType: "live",
+   const defaultOptions: SetupEnvironmentOptions = {
+      livestreamType: "createLive",
+      overrideLivestreamDetails: {
+         groupQuestionsMap: null,
+         useNewUI: true,
+      },
+      ...options,
+   }
+
+   const { livestream, secureToken } = await setupLivestreamData(null, {
+      livestreamType: defaultOptions.livestreamType,
+      overrideLivestreamDetails: defaultOptions.overrideLivestreamDetails,
    })
 
+   viewerPage.open(livestream.id)
+
    const speaker = livestream.speakers[0]
-
-   if (options.adHoc) {
-      await streamerPage.createAndJoinWithAdHocSpeaker(livestream.id, {
-         secureToken,
-      })
-   } else {
-      await streamerPage.selectAndJoinWithSpeaker(
-         livestream.id,
-         getFormattedName(speaker.firstName, speaker.lastName),
-         {
+   if (streamerPage) {
+      if (defaultOptions.streamerType === "adHoc") {
+         await streamerPage.createAndJoinWithAdHocSpeaker(livestream.id, {
             secureToken,
-         }
-      )
-   }
-
-   await streamerPage.joinWithCameraAndMicrophone()
-
-   return { livestream, secureToken, group, speaker }
-}
-
-type SetupLivestreamOptions = {
-   setupGroup?: boolean
-   livestreamType: "upcoming" | "live"
-}
-
-async function setupLivestream(
-   options: SetupLivestreamOptions = {
-      setupGroup: false,
-      livestreamType: "upcoming",
-   }
-) {
-   let group: Group
-   let overrideLivestreamDetails: Partial<LivestreamEvent> = {}
-
-   if (options.setupGroup) {
-      group = await GroupSeed.createGroup(Object.assign({}))
-      const groupQuestions = createLivestreamGroupQuestions(group.id)
-
-      // associate the group with the livestream
-      overrideLivestreamDetails = {
-         groupIds: [group.id],
-         groupQuestionsMap: {
-            [group.id]: groupQuestions,
-         },
+         })
+      } else {
+         await streamerPage.selectAndJoinWithSpeaker(livestream.id, speaker, {
+            secureToken,
+         })
       }
+      await streamerPage.joinWithCameraAndMicrophone()
    }
 
-   let livestream: LivestreamEvent
-
-   if (options.livestreamType == "live") {
-      livestream = await LivestreamSeed.createLive({
-         ...overrideLivestreamDetails,
-         useNewUI: true,
-      })
-   } else if (options.livestreamType == "upcoming") {
-      livestream = await LivestreamSeed.createUpcoming({
-         ...overrideLivestreamDetails,
-         useNewUI: true,
-      })
-   }
-
-   const secureToken = await LivestreamSeed.generateSecureToken(livestream.id)
-
-   await LivestreamSeed.addSpeakerToLivestream(livestream.id)
-
-   return { livestream, secureToken, group }
+   return { livestream, secureToken, speaker }
 }
