@@ -1,10 +1,10 @@
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { collection, query, where } from "firebase/firestore"
+import { useMemo } from "react"
+import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import usePaginatedCollection, {
    UsePaginatedCollection,
 } from "../utils/usePaginatedCollection"
-import { useMemo } from "react"
-import { collection, query, where } from "firebase/firestore"
-import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 
 const usePaginatedJobApplicants = (
    jobId: string,
@@ -16,7 +16,8 @@ const usePaginatedJobApplicants = (
          query: query<CustomJobApplicant>(
             // @ts-ignore
             collection(FirestoreInstance, "jobApplications"),
-            where("jobId", "==", jobId)
+            where("jobId", "==", jobId),
+            where("applied", "==", true)
          ),
          limit,
          orderBy: {
