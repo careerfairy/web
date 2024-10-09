@@ -41,6 +41,10 @@ export const getRecommendedEvents = functions
                   await UserEventRecommendationService.create(dataFetcher)
                return await recommendationService.getRecommendations(data.limit)
             } catch (error) {
+               functions.logger.error(
+                  "Error in getting recommended events:",
+                  error
+               )
                logAndThrow("Error in getting recommended events", {
                   data,
                   error,
