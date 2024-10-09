@@ -30,7 +30,7 @@ import { EmptySparksList } from "./EmptySparksList"
 
 const styles = sxStyles({
    collapsibleTableRoot: {
-      overflow: "scroll",
+      overflow: "auto",
    },
    collapsibleTableContainer: {
       minWidth: "850px",
