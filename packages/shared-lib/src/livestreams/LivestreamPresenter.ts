@@ -72,7 +72,7 @@ export class LivestreamPresenter extends BaseModel {
       public readonly address: string,
       public readonly denyRecordingAccess: boolean,
       public readonly hasJobs: boolean,
-      public readonly useNewUI: boolean,
+      public readonly useOldUI: boolean,
 
       // ATS Jobs
       /**
@@ -147,7 +147,7 @@ export class LivestreamPresenter extends BaseModel {
     * @returns {boolean} True if the user should enter the waiting room, false otherwise.
     */
    waitingRoomIsOpen(): boolean {
-      if (!this.useNewUI || this.hasEnded || this.isPast()) {
+      if (this.useOldUI || this.hasEnded || this.isPast()) {
          return false
       }
 
@@ -271,10 +271,10 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    getViewerEventRoomLink(): string {
-      if (this.useNewUI) {
-         return `/streaming/viewer/${this.id}`
+      if (this.useOldUI) {
+         return `/streaming/${this.id}/viewer`
       }
-      return `/streaming/${this.id}/viewer`
+      return `/streaming/viewer/${this.id}`
    }
 
    static createFromDocument(livestream: LivestreamEvent) {
@@ -320,7 +320,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.address ?? "",
          livestream.denyRecordingAccess ?? false,
          livestream.hasJobs ?? false,
-         livestream.useNewUI ?? false,
+         livestream.useOldUI ?? false,
          livestream.jobs ?? [],
          livestream.targetCountries ?? [],
          livestream.targetUniversities ?? [],
@@ -386,7 +386,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.address,
          livestream.denyRecordingAccess,
          livestream.hasJobs,
-         livestream.useNewUI,
+         livestream.useOldUI,
          livestream.jobs,
          livestream.targetCountries,
          livestream.targetUniversities,
