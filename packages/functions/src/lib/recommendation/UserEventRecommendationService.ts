@@ -115,7 +115,7 @@ export default class UserEventRecommendationService
       // Get only the events the user has previously registered
       const livestreamsUserRegistered = this.pastLivestreams.filter(
          (livestream) =>
-            this.registeredLivestreams?.registeredLivestreams[livestream.id]
+            this.registeredLivestreams?.registeredLivestreams?.[livestream.id]
       )
 
       const livestreamBasedRecommendations =
