@@ -220,7 +220,7 @@ async function fetchAnalyticsFromBigQuery(
 export const getSparksAnalytics = functions
    .region(config.region)
    .runWith({
-      timeoutSeconds: 180, // 3 minutes
+      timeoutSeconds: 60,
       memory: "512MB",
    })
    .https.onCall(
