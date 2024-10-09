@@ -30,7 +30,7 @@ export const getServerSideProps = async (context) => {
 
    const livestreamData = await livestreamRepo.getById(livestreamId)
 
-   if (livestreamData?.useNewUI) {
+   if (!livestreamData?.useOldUI) {
       return {
          redirect: {
             permanent: false,

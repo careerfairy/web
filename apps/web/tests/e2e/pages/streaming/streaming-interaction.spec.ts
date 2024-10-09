@@ -207,7 +207,6 @@ async function setupEnvironment(
 ) {
    const defaultLivestreamDetails: Partial<LivestreamEvent> = {
       groupQuestionsMap: null,
-      useNewUI: true,
    }
 
    const { livestream, secureToken } = await setupLivestreamData(null, {

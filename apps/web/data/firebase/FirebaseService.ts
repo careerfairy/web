@@ -829,7 +829,6 @@ class FirebaseService {
          ),
          hidden: true,
          triGrams: {},
-         useNewUI: true,
          title: "Test live stream",
       }
 

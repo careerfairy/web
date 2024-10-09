@@ -140,9 +140,6 @@ test.describe("New Streaming Journey", () => {
    }) => {
       const { livestream } = await setupLivestreamData(null, {
          livestreamType: "createLive",
-         overrideLivestreamDetails: {
-            useNewUI: true,
-         },
       })
 
       await viewerPage.open(livestream.id)
@@ -171,7 +168,6 @@ async function setupEnvironment(
       livestreamType: "createLive",
       overrideLivestreamDetails: {
          groupQuestionsMap: null,
-         useNewUI: true,
       },
       ...options,
    }

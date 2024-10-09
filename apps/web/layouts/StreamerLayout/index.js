@@ -258,7 +258,7 @@ const StreamerLayout = (props) => {
        * - The token has been verified OR it's a test stream
        */
       !isBreakout && (tokenChecked || currentLivestream?.test)
-         ? currentLivestream?.useNewUI
+         ? !currentLivestream?.useOldUI
          : false,
       appendCurrentQueryParams(`/streaming/host/${livestreamId}`)
    )
