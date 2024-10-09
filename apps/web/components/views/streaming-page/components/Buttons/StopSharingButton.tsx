@@ -33,6 +33,7 @@ export const StopSharingButton = forwardRef<
    return (
       <BrandedTooltip title={enableTooltip ? ActionTooltips.StopShare : null}>
          <ActionBarButtonStyled
+            id="stop-sharing-button"
             {...props}
             disabled={isMutating}
             sx={styles.root}
