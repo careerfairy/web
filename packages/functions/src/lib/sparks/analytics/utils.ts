@@ -1,9 +1,12 @@
-import { CompetitorSparkData } from "@careerfairy/shared-lib/sparks/analytics"
+import { CompetitorSparkCard } from "@careerfairy/shared-lib/sparks/analytics"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
-export function convertSparkToCompetitorStaticCardData(
+export const NUM_SPARKS_LIMIT = 4
+export const MIN_NUM_COMPANIES = 3
+
+export function convertSparkToCompetitorSparkCardData(
    spark: Spark
-): CompetitorSparkData["sparkData"] {
+): CompetitorSparkCard {
    return {
       creator: {
          avatarUrl: spark.creator.avatarUrl,
@@ -15,6 +18,7 @@ export function convertSparkToCompetitorStaticCardData(
          name: spark.group.universityName,
       },
       spark: {
+         id: spark.id,
          question: spark.question,
          categoryId: spark.category.id,
          videoThumbnailUrl: spark.video.thumbnailUrl,
