@@ -10,7 +10,6 @@ import {
    TimeseriesDataPoint,
 } from "@careerfairy/shared-lib/src/sparks/analytics"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
-import { Timestamp } from "data/firebase/FirebaseInstance"
 
 type FilterTimeSeriesDataByTimeFrame = (
    data: TimeseriesDataPoint[],
@@ -218,10 +217,7 @@ export const convertToClientModel = (
       {} as SparkAnalyticsClientWithPastData
    )
 
-   analytics.updatedAt = new Timestamp(
-      data.updatedAt["_seconds"],
-      data.updatedAt["_nanoseconds"]
-   ).toDate()
+   analytics.updatedAt = data.updatedAt.toDate()
 
    return analytics
 }
