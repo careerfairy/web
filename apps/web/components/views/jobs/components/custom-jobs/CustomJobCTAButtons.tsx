@@ -9,14 +9,13 @@ import { useLiveStreamDialog } from "components/views/livestream-dialog"
 import useRegistrationHandler from "components/views/livestream-dialog/useRegistrationHandler"
 import { FC, useCallback } from "react"
 
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-
 import { useAuth } from "HOCs/AuthProvider"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils/utils"
 import ActionButton from "components/views/livestream-dialog/views/livestream-details/action-button/ActionButton"
 import ActionButtonProvider, {
@@ -153,8 +152,8 @@ type LivestreamCustomJobCTAProps = CustomJobCTAProps & {
 
 const LivestreamJobCTA = (props: LivestreamCustomJobCTAProps) => {
    const { livestreamPresenter } = useLiveStreamDialog()
-   const isUserRegisteredToEvent = useUserIsRegistered(livestreamPresenter.id)
-   const isPast = (livestreamPresenter as LivestreamPresenter).isPast()
+   const isUserRegisteredToEvent = useUserIsRegistered(livestreamPresenter?.id)
+   const isPast = (livestreamPresenter as LivestreamPresenter)?.isPast()
 
    return isPast ? (
       <PastLivestreamJobCTA
@@ -231,7 +230,7 @@ const PastLivestreamJobCTA = ({
                alreadyApplied={alreadyApplied}
             />
 
-            {recordingAvailable.showRecording ? (
+            {recordingAvailable.showRecording && livestreamPresenter ? (
                <Box width={isMobile ? "100%" : "auto"}>
                   <ActionButtonProvider
                      isFixedToBottom
@@ -261,6 +260,7 @@ const UpcomingLivestreamJobCTA = ({
    isUserRegistered,
 }: LivestreamCustomJobCTAProps) => {
    const isMobile = useIsMobile()
+   const { livestreamPresenter } = useLiveStreamDialog()
 
    return (
       <Stack sx={[styles.ctaWrapper]}>
@@ -271,7 +271,9 @@ const UpcomingLivestreamJobCTA = ({
             width={isMobile ? "100%" : "auto"}
             spacing={2}
          >
-            {!isUserRegistered ? <LiveStreamButton /> : null}
+            {!isUserRegistered && livestreamPresenter ? (
+               <LiveStreamButton />
+            ) : null}
             <CustomJobApplyButton
                job={job as PublicCustomJob}
                applicationSource={applicationSource}
