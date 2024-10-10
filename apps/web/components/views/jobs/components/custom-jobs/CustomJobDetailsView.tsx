@@ -9,7 +9,6 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { useCustomJobDetailsDialog } from "components/views/common/jobs/CustomJobDetailsProvider"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import { props } from "lodash/fp"
 import { ReactNode, forwardRef } from "react"
@@ -64,6 +63,8 @@ type Props = {
    hideCTAButtons?: boolean
    companyName?: string
    companyLogoUrl?: string
+   hideLinkedLivestreams?: boolean
+   hideLinkedSparks?: boolean
 }
 
 const CustomJobDetailsView = (props: Props) => {
@@ -92,6 +93,8 @@ export const CustomJobDetails = ({
    hideBottomDivider,
    hideCTAButtons,
    onApply,
+   hideLinkedLivestreams,
+   hideLinkedSparks,
 }: Props) => {
    const { applicationInitiatedOnly: applicationInitiated } = useCustomJobApply(
       job as PublicCustomJob,
@@ -107,9 +110,6 @@ export const CustomJobDetails = ({
    const autoActionType = useSelector(autoAction)
    const isMobile = useIsMobile()
    const isAutoApply = autoActionType === AutomaticActions.APPLY
-
-   const { hideLinkedLivestreams, hideLinkedSparks } =
-      useCustomJobDetailsDialog()
 
    return (
       <>

@@ -112,17 +112,14 @@ const DialogDetailsContent = ({
    if (!customJob) return null
 
    return (
-      <CustomJobDetailsProvider
-         hideLinkedLivestreams={hideLinkedLivestreams}
-         hideLinkedSparks={hideLinkedSparks}
-         customJob={customJob}
-         source={source}
-      >
+      <CustomJobDetailsProvider customJob={customJob} source={source}>
          <DialogContent sx={styles.dialogContent}>
             <Content
                heroContent={heroContent}
                heroSx={heroSx}
                hideApplicationConfirmation={hideApplicationConfirmation}
+               hideLinkedLivestreams={hideLinkedLivestreams}
+               hideLinkedSparks={hideLinkedSparks}
             />
          </DialogContent>
          <DialogActions sx={styles.fixedBottomContent}>
@@ -136,12 +133,16 @@ type ContentProps = {
    heroContent?: ReactNode
    heroSx?: SxProps<DefaultTheme>
    hideApplicationConfirmation?: boolean
+   hideLinkedLivestreams?: boolean
+   hideLinkedSparks?: boolean
 }
 
 export const Content = ({
    heroContent,
    heroSx,
    hideApplicationConfirmation,
+   hideLinkedLivestreams,
+   hideLinkedSparks,
 }: ContentProps) => {
    const {
       customJob,
@@ -169,6 +170,8 @@ export const Content = ({
             sx={styles.customJobDetailsView}
             companyLogoUrl={group.logoUrl}
             companyName={group.universityName}
+            hideLinkedLivestreams={hideLinkedLivestreams}
+            hideLinkedSparks={hideLinkedSparks}
          />
 
          {!hideApplicationConfirmation && isApplyConfirmationOpen ? (

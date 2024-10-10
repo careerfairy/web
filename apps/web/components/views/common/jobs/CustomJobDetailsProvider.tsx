@@ -32,8 +32,6 @@ interface CustomJobDetailsContextType {
    handleRemoveJobClose: () => void
    handleClickApplyBtn: () => void
    handleConfirmApply: () => void
-   hideLinkedLivestreams?: boolean
-   hideLinkedSparks?: boolean
 }
 
 const CustomJobDetailsContext = createContext<
@@ -44,19 +42,11 @@ interface CustomJobDetailsProviderProps {
    children: ReactNode
    customJob: CustomJob
    source: CustomJobApplicationSource
-   hideLinkedLivestreams?: boolean
-   hideLinkedSparks?: boolean
 }
 
 export const CustomJobDetailsProvider: React.FC<
    CustomJobDetailsProviderProps
-> = ({
-   children,
-   customJob,
-   source,
-   hideLinkedLivestreams,
-   hideLinkedSparks,
-}) => {
+> = ({ children, customJob, source }) => {
    const { data: fingerPrintId } = useFingerPrint()
 
    const { userData } = useAuth()
@@ -97,8 +87,6 @@ export const CustomJobDetailsProvider: React.FC<
          handleRemoveJobClose,
          handleClickApplyBtn,
          handleConfirmApply,
-         hideLinkedLivestreams,
-         hideLinkedSparks,
       }),
       [
          customJob,
@@ -113,8 +101,6 @@ export const CustomJobDetailsProvider: React.FC<
          handleRemoveJobClose,
          handleClickApplyBtn,
          handleConfirmApply,
-         hideLinkedLivestreams,
-         hideLinkedSparks,
       ]
    )
 
