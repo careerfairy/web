@@ -4,7 +4,7 @@ import {
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { Timestamp } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
-import { boolean, string } from "yup"
+import { string } from "yup"
 import { getSparksAnalyticsRepoInstance, sparkRepo } from "./api/repositories"
 import config from "./config"
 import GroupSparksAnalyticsRepository from "./lib/sparks/analytics/GroupSparksAnalyticsRepository"
@@ -227,12 +227,11 @@ export const getSparksAnalytics = functions
       middlewares(
          dataValidation({
             groupId: string().required(),
-            forceUpdate: boolean().required(),
          }),
          userShouldBeGroupAdmin(),
          async (data, context) => {
             try {
-               const { groupId, forceUpdate } = data
+               const { groupId } = data
                const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
                   groupId,
                   sparkRepo
@@ -241,28 +240,27 @@ export const getSparksAnalytics = functions
                functions.logger.info(
                   `Fetching sparks analytics for group ${groupId}...`
                )
-               const cachedAnalyticsData =
-                  await sparksAnalyticsRepo.getAnalyticsFromFirestore()
 
-               if (forceUpdate || !cachedAnalyticsData) {
-                  const bigQueryAnalyticsData =
-                     await fetchAnalyticsFromBigQuery(sparksAnalyticsRepo)
+               const bigQueryAnalyticsData = await fetchAnalyticsFromBigQuery(
+                  sparksAnalyticsRepo
+               )
 
-                  await sparksAnalyticsRepo.updateAnalyticsInFirestore({
-                     ...bigQueryAnalyticsData,
-                     id: groupId,
-                  })
+               await sparksAnalyticsRepo.updateAnalyticsInFirestore({
+                  ...bigQueryAnalyticsData,
+                  id: groupId,
+               })
 
-                  functions.logger.info(
-                     "Sparks analytics cache updated in Firestore."
-                  )
+               functions.logger.info(
+                  "Sparks analytics cache updated in Firestore."
+               )
 
-                  return bigQueryAnalyticsData
-               }
-
-               return cachedAnalyticsData
+               return bigQueryAnalyticsData
             } catch (error) {
-               console.log("🚀 ~ error:", error)
+               functions.logger.error("Error fetching sparks analytics", {
+                  data,
+                  error,
+                  context,
+               })
                logAndThrow("Error fetching sparks analytics", {
                   data,
                   error,
