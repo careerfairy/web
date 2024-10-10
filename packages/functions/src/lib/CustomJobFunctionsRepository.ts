@@ -465,11 +465,11 @@ export class CustomJobFunctionsRepository
 
       const jobGroup = await groupRepo.getGroupById(customJob.groupId)
 
-      const batch = this.firestore.batch()
-
       const batchedUsers = chunk(usersWithMatchingTags, BATCH_SIZE)
 
       for (const userBatch of batchedUsers) {
+         const batch = this.firestore.batch()
+
          for (const user of userBatch) {
             const ref = this.firestore
                .collection("userData")
