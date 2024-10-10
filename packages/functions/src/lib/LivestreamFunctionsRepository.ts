@@ -599,7 +599,14 @@ export class LivestreamFunctionsRepository
 
       const users = await this.getLivestreamUsers(livestream.id, "registered")
 
-      users?.forEach((user) => {
+      if (!users || users.length === 0) {
+         functions.logger.log(
+            `No registered users found for livestream ${livestream.id}`
+         )
+         return
+      }
+
+      users.forEach((user) => {
          const ref = firestoreAdmin
             .collection("userData")
             .doc(user.id)
