@@ -1,38 +1,46 @@
-import { Box, Chip, Stack, Typography } from "@mui/material"
-import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import CheckIcon from "@mui/icons-material/CheckCircle"
-import { Briefcase, CheckCircle } from "react-feather"
+import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
-import React from "react"
+import { Box, Chip, Stack, Typography } from "@mui/material"
+import { Briefcase, CheckCircle } from "react-feather"
 import { sxStyles } from "../../../../types/commonTypes"
 
 const styles = sxStyles({
    wrapper: {
       position: "absolute",
       display: "flex",
-      padding: 2,
+      padding: 1.5,
       justifyContent: "space-between",
       width: "100%",
    },
-   badge: {
-      pl: 1,
-      "& .MuiBadge-dot": {
-         minWidth: 10,
-         height: 10,
-         borderRadius: "50%",
-      },
-   },
    liveLeftChip: {
-      width: {
-         xs: "fit-content",
-         md: "auto",
+      "& .MuiChip-icon": {
+         width: "16px",
+         height: "16px",
+         mr: 0.5,
       },
    },
    leftChip: {
-      pl: 0.5,
-      pr: 0,
+      color: (theme) => theme.palette.neutral[700],
+   },
+   tag: {
+      padding: "4px 8px",
+      display: "flex",
+      justifyContent: "center",
       alignItems: "center",
-      width: { xs: "fit-content", md: "auto" },
+      gap: "4px",
+      height: "unset",
+      "& .MuiChip-label, p": {
+         fontSize: "12px",
+         fontWeight: 400,
+         lineHeight: "16px",
+         padding: 0,
+      },
+      "& .MuiChip-icon": {
+         margin: 0,
+         width: "14px",
+         height: "14px",
+      },
    },
 })
 
@@ -63,6 +71,7 @@ const EventPreviewCardChipLabels = ({
             icon={<CheckIcon />}
             color="primary"
             label={"Attended"}
+            sx={[styles.tag, styles.liveLeftChip]}
          />
       )
    }
@@ -74,7 +83,7 @@ const EventPreviewCardChipLabels = ({
             icon={<LiveIcon />}
             color="error"
             label={"Live"}
-            sx={styles.liveLeftChip}
+            sx={[styles.tag, styles.liveLeftChip]}
          />
       )
    }
@@ -83,22 +92,23 @@ const EventPreviewCardChipLabels = ({
       leftChips.push(
          <Chip
             key={"booked-chip"}
-            icon={<CheckCircle color="#00D247" width={18} height={18} />}
-            sx={styles.leftChip}
+            icon={<CheckCircle color="#00D247" width={14} height={14} />}
+            sx={[styles.tag, styles.leftChip]}
             color="info"
-            label={<Typography fontWeight={400}>{REGISTERED_LABEL}</Typography>}
+            label={<Typography>{REGISTERED_LABEL}</Typography>}
          />
       )
    }
 
-   if (hasJobToApply) {
+   if (hasJobToApply && !(isLive && hasRegistered)) {
+      // registered tag takes precedence over hiring tag if it's live
       leftChips.push(
          <Chip
             key={"hiring-now-chip"}
-            icon={<Briefcase color={"#3A70E2"} width={18} height={18} />}
-            sx={styles.leftChip}
+            icon={<Briefcase color={"#3A70E2"} width={14} height={14} />}
+            sx={[styles.tag, styles.leftChip]}
             color={"info"}
-            label={<Typography fontWeight={400}>Hiring now</Typography>}
+            label={<Typography>Hiring now</Typography>}
          />
       )
    }
@@ -143,7 +153,7 @@ const EventPreviewCardChipLabels = ({
 
    return leftChips.length > 0 || rightChip ? (
       <Box className="hideOnHoverContent" sx={styles.wrapper}>
-         <Stack spacing={1} direction={{ xs: "column", md: "row" }}>
+         <Stack spacing={1} direction={"row"}>
             {leftChips.map((chip, index) => ({
                ...chip,
                key: `chip-${index}`,

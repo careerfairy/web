@@ -198,6 +198,7 @@ const ResponsiveCarousel = ({
          sx={styles.showCardBoxShadows}
          emblaRef={emblaRef}
          emblaApi={emblaApi}
+         preventEdgeTouch
       >
          {React.Children.map(children, (child) => (
             <GenericCarousel.Slide slideWidth={slideWidth}>
