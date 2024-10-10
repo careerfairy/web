@@ -31,36 +31,33 @@ export const useFetchSparksAnalytics = (groupId: string) => {
 
    const fetcher = useCallback(
       async (groupId: string, updateCache: boolean) => {
-         if (updateCache) {
-            const fetchedAnalytics =
-               await sparksAnalyticsService.fetchSparksAnalytics(groupId)
-            return convertToClientModel(
-               fetchedAnalytics,
-               fieldsOfStudyLookup,
-               levelsOfStudyLookup
+         const fetchFromFirestore = async () => {
+            const collectionRef = collection(
+               FirestoreInstance,
+               "sparksAnalytics"
             )
-         } else {
-            const fetchFromFirestore = async () => {
-               const collectionRef = collection(
-                  FirestoreInstance,
-                  "sparksAnalytics"
-               )
-               const docRef = doc(collectionRef, groupId).withConverter(
-                  createGenericConverter<SparksAnalyticsDTO>()
-               )
-               const docSnap = await getDoc(docRef)
-               const data = docSnap.data()
-               return data
+            const docRef = doc(collectionRef, groupId).withConverter(
+               createGenericConverter<SparksAnalyticsDTO>()
+            )
+            const docSnap = await getDoc(docRef)
+
+            if (!docSnap.exists() || updateCache) {
+               const fetchedAnalytics =
+                  await sparksAnalyticsService.fetchSparksAnalytics(groupId)
+               return fetchedAnalytics
             }
 
-            const firestoreData = await fetchFromFirestore()
-
-            return convertToClientModel(
-               firestoreData,
-               fieldsOfStudyLookup,
-               levelsOfStudyLookup
-            )
+            const data = docSnap.data()
+            return data
          }
+
+         const firestoreData = await fetchFromFirestore()
+
+         return convertToClientModel(
+            firestoreData,
+            fieldsOfStudyLookup,
+            levelsOfStudyLookup
+         )
       },
       [fieldsOfStudyLookup, levelsOfStudyLookup]
    )
