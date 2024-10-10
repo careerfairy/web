@@ -8,7 +8,6 @@ import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import EventsPreviewCarousel, {
-   EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
@@ -22,38 +21,9 @@ const styles = sxStyles({
       fontWeight: 600,
    },
    linkedContentWrapper: {
-      mt: 2,
-   },
-   viewport: {
-      overflow: "hidden",
-   },
-   slide: {
-      flex: {
-         xs: `0 0 90%`,
-         sm: `0 0 60%`,
-         md: "0 0 60%",
-         xl: "0 0 60%",
-      },
-      maxWidth: { md: 360 },
-      minWidth: 0,
-      height: {
-         xs: 355,
-         md: 355,
-      },
-      "&:not(:first-of-type)": {
-         ml: `15px`,
-      },
-      "&:first-of-type": {
-         ml: 0.3,
-      },
+      my: 2,
    },
 })
-
-const defaultStyling: EventsCarouselStyling = {
-   compact: true,
-   viewportSx: styles.viewport,
-   slide: styles.slide,
-}
 
 const sparksCarouselEmblaOptions: EmblaOptionsType = {
    align: "start",
@@ -124,7 +94,7 @@ const CustomJobLinkedLivestreams = ({
                events={livestreams}
                isEmbedded
                disableClick={disableClick}
-               styling={defaultStyling}
+               styling={{ padding: false }}
             />
          </Box>
       </Box>

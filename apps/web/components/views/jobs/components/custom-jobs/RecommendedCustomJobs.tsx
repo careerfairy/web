@@ -28,7 +28,6 @@ const styles = sxStyles({
    heading: {
       fontWeight: 600,
       m: 2,
-      mt: 4,
    },
    jobsWrapper: {
       width: "100%",

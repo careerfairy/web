@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Box } from "@mui/material"
-import GroupStreams from "../GroupStreams/GroupStreams"
 import { useRouter } from "next/router"
+import GroupStreams from "../GroupStreams/GroupStreams"
 
 const MobileFeed = ({
    groupData,
@@ -37,7 +37,6 @@ const MobileFeed = ({
    return (
       <Box p={2}>
          <GroupStreams
-            mobile
             listenToUpcoming={listenToUpcoming}
             careerCenterId={careerCenterId}
             isPastLivestreams={isPastLivestreams}

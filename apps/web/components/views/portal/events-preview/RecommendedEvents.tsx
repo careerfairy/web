@@ -1,7 +1,6 @@
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { useMemo } from "react"
-import { sxStyles } from "types/commonTypes"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
 import EventsPreviewCarousel, {
@@ -9,96 +8,7 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "./EventsPreviewCarousel"
 
-const slideSpacing = 21
-
-const styles = sxStyles({
-   arrowIcon: {
-      padding: 0,
-      minHeight: { xs: "25px", md: "30px" },
-      minWidth: { xs: "25px", md: "30px" },
-      ml: 2,
-   },
-   eventsHeader: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      pr: 2,
-      pb: 1,
-   },
-   description: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingTop: 2,
-   },
-   seeMoreText: {
-      color: "text.secondary",
-      textDecoration: "underline",
-      pr: 1,
-   },
-   underlined: {
-      textDecoration: "underline",
-   },
-   eventTitle: {
-      fontWeight: "600",
-      color: (theme) => theme.palette.neutral[800],
-   },
-   viewport: {
-      overflow: "hidden",
-   },
-   container: {
-      backfaceVisibility: "hidden",
-      display: "flex",
-      touchAction: "pan-y",
-   },
-   slide: {
-      flex: {
-         xs: `0 0 90%`,
-         sm: `0 0 45%`,
-         md: `0 0 40%`,
-         lg: `0 0 30%`,
-      },
-      minWidth: 0,
-      position: "relative",
-      height: {
-         xs: 363,
-         md: 363,
-      },
-      "&:not(:first-of-type)": {
-         paddingLeft: `calc(${slideSpacing}px - 5px)`,
-      },
-      "&:first-of-type": {
-         ml: 0.3,
-      },
-   },
-   paddingSlide: {
-      flex: `0 0 ${slideSpacing}px`,
-   },
-   previewContent: {
-      position: "relative",
-   },
-   mainBox: {
-      paddingLeft: 2,
-   },
-   titleLink: {
-      color: "#000",
-      "&:hover": {
-         color: "#000",
-      },
-   },
-})
 const defaultStyling: EventsCarouselStyling = {
-   compact: true,
-   seeMoreSx: styles.seeMoreText,
-   eventTitleSx: styles.eventTitle,
-   viewportSx: styles.viewport,
-   showArrows: true,
-   headerAsLink: false,
-   padding: true,
-   slide: styles.slide,
-   title: styles.eventTitle,
-   titleVariant: "brandedH4",
-   eventsHeader: styles.eventsHeader,
    mainWrapperBoxSx: {
       mt: 2,
    },

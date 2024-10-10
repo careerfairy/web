@@ -6,7 +6,6 @@ import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
 import { SparksCarousel } from "components/views/mentor-page/SparksCarousel"
 import EventsPreviewCarousel, {
-   EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { useMemo } from "react"
@@ -20,39 +19,10 @@ const styles = sxStyles({
    linkedContentWrapper: {
       mt: 2,
    },
-   viewport: {
-      overflow: "hidden",
-   },
-   slide: {
-      flex: {
-         xs: `0 0 90%`,
-         sm: `0 0 60%`,
-         md: "0 0 60%",
-         xl: "0 0 60%",
-      },
-      maxWidth: { md: 360 },
-      minWidth: 0,
-      height: {
-         xs: 355,
-         md: 355,
-      },
-      "&:not(:first-of-type)": {
-         ml: `15px`,
-      },
-      "&:first-of-type": {
-         ml: 0.3,
-      },
-   },
 })
 
 type Props = {
    job: CustomJob
-}
-
-const defaultStyling: EventsCarouselStyling = {
-   compact: true,
-   viewportSx: styles.viewport,
-   slide: styles.slide,
 }
 
 const LinkedContentDetails = ({ job }: Props) => {
@@ -101,7 +71,6 @@ const LinkedContentDetails = ({ job }: Props) => {
                      events={jobLivestreams}
                      isEmbedded
                      disableClick
-                     styling={defaultStyling}
                   />
                </Box>
             </Box>
