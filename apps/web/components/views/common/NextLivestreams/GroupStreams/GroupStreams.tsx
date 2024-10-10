@@ -41,7 +41,6 @@ type GroupStreamsProps = {
 const GroupStreams = ({
    groupData,
    livestreams,
-   mobile,
    searching,
    listenToUpcoming,
    isPastLivestreams,
@@ -90,7 +89,14 @@ const GroupStreams = ({
          slicedLivestreams?.map((livestream, index, arr) => {
             if (livestream) {
                return (
-                  <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={3} item>
+                  <Grid
+                     key={livestream.id}
+                     xs={12}
+                     lsCardsGallery={6}
+                     lg={4}
+                     xl={3}
+                     item
+                  >
                      <InView triggerOnce>
                         {({ inView, ref }) =>
                            inView ? (
@@ -116,7 +122,7 @@ const GroupStreams = ({
    return (
       <>
          <Box sx={{ p: { xs: 0, md: 2 }, width: "100%" }}>
-            <Grid container spacing={mobile ? 2 : 3}>
+            <Grid container spacing={2}>
                {groupData.id || listenToUpcoming ? (
                   searching ? (
                      <Grid xs={12} item sx={styles.loaderWrapper}>

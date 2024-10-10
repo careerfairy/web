@@ -9,6 +9,7 @@ export const breakpoints = {
       lg: 1280,
       xl: 1920,
       // added
+      lsCardsGallery: 648,
       mobile: 768,
       tablet: 1023,
       desktop: 1920,
