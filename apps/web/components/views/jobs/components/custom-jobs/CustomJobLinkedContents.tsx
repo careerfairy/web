@@ -62,11 +62,15 @@ const sparksCarouselEmblaOptions: EmblaOptionsType = {
 type CustomJobLinkedContentsProps = {
    job: CustomJob
    disableEventClick?: boolean
+   hideLinkedLivestreams?: boolean
+   hideLinkedSparks?: boolean
 }
 
 const CustomJobLinkedContents = ({
    job,
    disableEventClick,
+   hideLinkedLivestreams,
+   hideLinkedSparks,
 }: CustomJobLinkedContentsProps) => {
    const { jobHubV1 } = useFeatureFlags()
    const { sparks, groupId } = job
@@ -83,11 +87,13 @@ const CustomJobLinkedContents = ({
 
    return (
       <Stack>
-         <CustomJobLinkedLivestreams
-            livestreams={jobLivestreams}
-            disableEventClick={disableEventClick}
-         />
-         {jobHubV1 ? (
+         {hideLinkedLivestreams ? null : (
+            <CustomJobLinkedLivestreams
+               livestreams={jobLivestreams}
+               disableEventClick={disableEventClick}
+            />
+         )}
+         {jobHubV1 && !hideLinkedSparks ? (
             <CustomJobLinkedSparks
                disableSparkClick={disableEventClick}
                sparks={jobSparks}

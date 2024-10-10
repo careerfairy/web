@@ -103,6 +103,11 @@ export interface UserData extends Identifiable {
    sparksBannerCTADates?: string[]
 
    /**
+    * Dates of days when the user has seen the jobs CTA banner
+    */
+   jobsBannerCTADates?: string[]
+
+   /**
     * User has already seen the first onboarding video
     */
    welcomeDialogComplete?: boolean
@@ -113,6 +118,9 @@ export interface UserData extends Identifiable {
    hasCompletedSparksB2BOnboarding?: boolean
 }
 
+export type ValidUserTagFields =
+   | "businessFunctionsTagIds"
+   | "contentTopicsTagIds"
 /*
  * Key is the questionId and value is the answerId
  * */

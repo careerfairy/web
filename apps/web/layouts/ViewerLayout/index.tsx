@@ -319,7 +319,7 @@ const ViewerLayout = (props) => {
 
    useConditionalRedirect(
       // Do not redirect to new UI if the current stream is a breakout room, as we don't support the new UI for breakout rooms
-      isBreakout ? false : currentLivestream?.useNewUI,
+      isBreakout ? false : currentLivestream && !currentLivestream?.useOldUI,
       appendCurrentQueryParams(`/streaming/viewer/${livestreamId}`)
    )
 

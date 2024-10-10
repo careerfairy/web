@@ -5,6 +5,7 @@ import {
 
 export const credentials = {
    correctEmail: "john@careerfairy.io",
+   correctUserEmail: "john@test.io",
    unregisteredEmail: "unregistered@careerfairy.io",
    correctPassword: "Correct@Password420",
    wrongPassword: "wrongpassword",
@@ -26,12 +27,19 @@ export const credentials = {
    correctLevelOfStudyName: dummyLevelsOfStudy[0].name,
 }
 
+export const imageLogoPath = "tests/e2e/assets/logo.png"
+export const pdfSamplePath = "tests/e2e/assets/sample.pdf"
+export const creatorAvatarImagePath = "tests/e2e/assets/creatorAvatar.png"
+
 export const streaming = {
    streamer: {
-      firstName: "John",
-      lastName: "Smith",
-      occupation: "Software Engineer",
-      linkedin: "https://linkedin.com/in/your-profile",
+      firstName: credentials.correctFirstName,
+      lastName: credentials.correctLastName,
+      occupation: "Software Engineer", //TODO: remove this when old room tests are removed
+      linkedin: credentials.linkedinUrl,
+      position: "Software Engineer",
+      email: credentials.correctEmail,
+      avatar: creatorAvatarImagePath,
    },
 }
 
@@ -42,10 +50,6 @@ export const correctRegistrationAnalyticsSteps = {
       "Thu Jul 14 2022 22:47:56 GMT+0100 (Western European Summer Time)\n",
    userId: "john@careerfairy.io",
 }
-
-export const imageLogoPath = "tests/e2e/assets/logo.png"
-export const pdfSamplePath = "tests/e2e/assets/sample.pdf"
-export const creatorAvatarImagePath = "tests/e2e/assets/creatorAvatar.png"
 
 export const correctCompany = {
    industry: "Technology & IT",

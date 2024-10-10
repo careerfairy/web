@@ -1201,7 +1201,7 @@ export class LivestreamService {
       const livestreamDoc = await getDoc(livestreamRef)
       if (livestreamDoc.exists) {
          return updateDoc(livestreamRef, {
-            useNewUI: !livestreamDoc.data().useNewUI,
+            useOldUI: !livestreamDoc.data().useOldUI,
          })
       }
    }

@@ -829,7 +829,6 @@ class FirebaseService {
          ),
          hidden: true,
          triGrams: {},
-         useNewUI: true,
          title: "Test live stream",
       }
 
@@ -3214,6 +3213,20 @@ class FirebaseService {
 
       const toUpdate: Pick<UserData, "sparksBannerCTADates"> = {
          sparksBannerCTADates: firebase.firestore.FieldValue.arrayUnion(
+            today
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         ) as any,
+      }
+
+      return docRef.update(toUpdate)
+   }
+
+   addDateUserHasSeenJobsCTABanner(userEmail: string): Promise<void> {
+      const docRef = this.firestore.collection("userData").doc(userEmail)
+      const today = DateUtil.formatDateToString(new Date()) // formatDate should return a string formatted as "dd/mm/yyyy"
+
+      const toUpdate: Pick<UserData, "jobsBannerCTADates"> = {
+         jobsBannerCTADates: firebase.firestore.FieldValue.arrayUnion(
             today
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
          ) as any,
