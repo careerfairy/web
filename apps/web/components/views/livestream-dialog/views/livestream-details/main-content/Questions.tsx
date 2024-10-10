@@ -1,24 +1,24 @@
-import { FC, useCallback, useMemo } from "react"
-import Box from "@mui/material/Box"
-import SectionTitle from "./SectionTitle"
 import {
    LivestreamEvent,
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
-import Stack from "@mui/material/Stack"
-import useInfiniteLivestreamQuestions from "../../../../../custom-hook/live-stream/useInfiniteLivestreamQuestions"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import { CircularProgress, Grid, Typography } from "@mui/material"
 import ThumbUpIcon from "@mui/icons-material/ThumbUpOffAlt"
-import useLivestreamQuestionHandlers from "../../../../../custom-hook/live-stream/useLivestreamQuestionHandlers"
 import LoadingButton from "@mui/lab/LoadingButton"
-import useCountQuery from "../../../../../custom-hook/useCountQuery"
-import DateUtil from "../../../../../../util/DateUtil"
-import { alpha } from "@mui/material/styles"
+import { CircularProgress, Grid, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
-import CustomInfiniteScroll from "../../../../common/CustomInfiniteScroll"
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import Stack from "@mui/material/Stack"
+import { alpha } from "@mui/material/styles"
 import QuestionIcon from "components/views/common/icons/QuestionIcon"
+import { FC, useCallback, useMemo } from "react"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import DateUtil from "../../../../../../util/DateUtil"
+import useInfiniteLivestreamQuestions from "../../../../../custom-hook/live-stream/useInfiniteLivestreamQuestions"
+import useLivestreamQuestionHandlers from "../../../../../custom-hook/live-stream/useLivestreamQuestionHandlers"
+import useCountQuery from "../../../../../custom-hook/useCountQuery"
+import CustomInfiniteScroll from "../../../../common/CustomInfiniteScroll"
+import SectionTitle from "./SectionTitle"
 
 const styles = sxStyles({
    greyBorder: {
@@ -120,7 +120,7 @@ const Questions: FC<Props> = ({ livestream }) => {
    return (
       <Box>
          <SectionTitle>Upcoming questions</SectionTitle>
-         <QuestionsComponent livestream={livestream} />
+         <QuestionsComponent livestream={livestream} hideQuestionsText />
       </Box>
    )
 }
@@ -130,6 +130,7 @@ type QuestionsComponentProps = {
    livestream: LivestreamEvent
    infiniteScroll?: boolean
    responsive?: boolean
+   hideQuestionsText?: boolean
 }
 
 export const QuestionsComponent: FC<QuestionsComponentProps> = ({
@@ -137,6 +138,7 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
    userAddedQuestions,
    infiniteScroll = false,
    responsive,
+   hideQuestionsText,
 }) => {
    const {
       loading,
@@ -167,9 +169,14 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
          <>
             {questions?.length || userAddedQuestions?.length ? (
                <Box sx={styles.questionsContainer} gap={1.5}>
-                  <Typography variant="brandedH5" sx={styles.questionListTitle}>
-                     {"Other users' questions"}
-                  </Typography>
+                  {!hideQuestionsText ? (
+                     <Typography
+                        variant="brandedH5"
+                        sx={styles.questionListTitle}
+                     >
+                        {"Other users' questions"}
+                     </Typography>
+                  ) : null}
                   <Grid container rowSpacing={1.25} columnSpacing={3}>
                      {userAddedQuestions?.length ? (
                         <>
@@ -271,6 +278,7 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
          userAddedQuestions,
          questions,
          infiniteScroll,
+         hideQuestionsText,
       ]
    )
 

@@ -37,8 +37,8 @@ export const AddNewSpeakerButton = () => {
    const { goToCreateNewSpeaker } = useHostProfileSelection()
 
    return (
-      <Box sx={styles.root}>
-         <Fab sx={styles.addButton} onClick={goToCreateNewSpeaker}>
+      <Box sx={styles.root} onClick={goToCreateNewSpeaker}>
+         <Fab sx={styles.addButton}>
             <Plus />
          </Fab>
          <Typography sx={styles.text} variant="medium">

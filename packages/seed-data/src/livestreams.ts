@@ -351,7 +351,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          company,
          companyId: uuidv4(),
          companyLogoUrl: faker.image.business(),
-         duration: faker.random.arrayElement([30, 60, 90, 120]),
+         duration: faker.helpers.arrayElement([30, 60, 90, 120]),
          summary: faker.lorem.paragraph(),
          reasonsToJoinLivestream: faker.lorem.paragraphs(),
          reasonsToJoinLivestream_v2: [
@@ -459,7 +459,7 @@ export const generateLiveStreamUserQuestion = (
 })
 
 const generateSpeaker = (): Speaker => ({
-   id: uuidv4(),
+   id: uuidv4().replace(/-/g, ""),
    avatar: faker.image.people(),
    background: faker.lorem.paragraph(),
    firstName: faker.name.firstName(),

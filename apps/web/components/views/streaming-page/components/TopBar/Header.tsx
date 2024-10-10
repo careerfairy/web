@@ -47,7 +47,7 @@ export const Header = ({ children }: Props) => {
       >
          <Container
             maxWidth={false}
-            sx={Boolean(streamIsMobile) && styles.mobileContainer}
+            sx={streamIsMobile ? styles.mobileContainer : {}}
          >
             <Toolbar sx={styles.toolbar} disableGutters>
                {children}
