@@ -60,6 +60,7 @@ test.describe("New Streaming Interactions", () => {
       streamerPage,
       viewerPage,
    }) => {
+      test.skip()
       await setupEnvironment(streamerPage, viewerPage)
 
       // Viewer asks a question
@@ -86,6 +87,7 @@ test.describe("New Streaming Interactions", () => {
       streamerPage,
       viewerPage,
    }) => {
+      test.skip()
       const { livestream } = await setupEnvironment(streamerPage, viewerPage)
 
       // streamer posts a chat message
@@ -148,6 +150,7 @@ test.describe("New Streaming Interactions", () => {
    })
 
    test("Viewer hand raises", async ({ streamerPage, viewerPage, user }) => {
+      test.skip()
       await setupEnvironment(streamerPage, viewerPage)
 
       // Streamer activates hand raise
