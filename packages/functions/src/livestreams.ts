@@ -80,6 +80,43 @@ export const getLivestreamICalendarEvent = functions
 export const sendLivestreamRegistrationConfirmationEmail = functions
    .region(config.region)
    .https.onCall(async (data) => {
+      // Fetch the live stream data
+      const livestreamDoc = await firestore
+         .collection("livestreams")
+         .doc(data.livestream_id)
+         .get()
+      const livestream = livestreamDoc.data() as LivestreamEvent
+
+      // Generate ICS file content
+      const cal = ical()
+      const livestreamTimeZone = livestream.timezone || "Europe/Zurich"
+      const livestreamStartDate = DateTime.fromJSDate(
+         livestream.start.toDate(),
+         { zone: livestreamTimeZone }
+      )
+      const livestreamUrl = makeLivestreamEventDetailsUrl(data.livestream_id)
+      const linkWithUTM = addUtmTagsToLink({
+         link: livestreamUrl,
+         campaign: "fromCalendarEvent",
+      })
+
+      cal.createEvent({
+         start: livestreamStartDate.toJSDate(),
+         end: livestreamStartDate
+            .plus({ minutes: livestream.duration || 60 })
+            .toJSDate(),
+         summary: livestream.title,
+         description: "Join the event now!",
+         location: linkWithUTM,
+         url: linkWithUTM,
+         organizer: {
+            name: "CareerFairy",
+            email: "noreply@careerfairy.io",
+         },
+      })
+
+      const icsContent = cal.toString()
+
       const email: any = {
          TemplateId:
             process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
@@ -109,6 +146,14 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
             calendar_event_outlook: data.eventCalendarUrls.outlook,
             calendar_event_yahoo: data.eventCalendarUrls.yahoo,
          },
+         Attachments: [
+            {
+               // Replace any character that is not alphanumeric with an underscore
+               Name: `${livestream.title.replace(/[^a-z0-9]/gi, "_")}.ics`,
+               Content: Buffer.from(icsContent).toString("base64"),
+               ContentType: "text/calendar",
+            },
+         ],
       }
 
       client.sendEmailWithTemplate(email).then(

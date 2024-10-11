@@ -298,7 +298,7 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail_v2"
+            "sendLivestreamRegistrationConfirmationEmail_v3"
          )
 
       const livestreamStartDate = livestream.start.toDate()
