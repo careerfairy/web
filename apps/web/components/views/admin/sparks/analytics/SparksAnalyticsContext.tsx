@@ -11,6 +11,7 @@ import { timeFrameLabels } from "./util"
 interface SparksAnalyticsContextType {
    filteredAnalytics: SparkAnalyticsClient | null
    isLoading: boolean
+   isMutating: boolean
    error: string | null
    updateAnalytics: () => void
    selectTimeFilter: TimePeriodParams
@@ -42,7 +43,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
    const [selectTimeFilter, setSelectTimeFilter] =
       useState<TimePeriodParams>("30days")
 
-   const { analytics, error, isLoading, updateAnalytics } =
+   const { analytics, error, isLoading, updateAnalytics, isMutating } =
       useFetchSparksAnalytics(group.id)
 
    const filteredAnalytics = useMemo<SparkAnalyticsClient>(() => {
@@ -125,6 +126,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
       return {
          filteredAnalytics,
          isLoading,
+         isMutating,
          error,
          updateAnalytics,
          selectTimeFilter,
@@ -136,6 +138,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
    }, [
       filteredAnalytics,
       isLoading,
+      isMutating,
       error,
       updateAnalytics,
       selectTimeFilter,
