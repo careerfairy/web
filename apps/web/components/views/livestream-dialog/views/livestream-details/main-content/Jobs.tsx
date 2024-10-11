@@ -7,6 +7,7 @@ import Button from "@mui/material/Button"
 import Stack from "@mui/material/Stack"
 import { alpha } from "@mui/material/styles"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import JobCard from "components/views/common/jobs/JobCard"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
@@ -79,7 +80,8 @@ const Jobs: FC<Props> = (props) => {
 }
 
 const JobsComponent: FC<Props> = ({ presenter }) => {
-   const livestreamCustomJobs = useGroupCustomJobs(presenter.groupIds[0], {
+   const { data: livestreamHost } = useLivestreamCompanyHostSWR(presenter.id)
+   const livestreamCustomJobs = useGroupCustomJobs(livestreamHost.id, {
       livestreamId: presenter.id,
    })?.filter((job) => job.published)
 

@@ -1,6 +1,6 @@
-import { PaletteOptions, ThemeOptions } from "@mui/material/styles"
-import { grey } from "@mui/material/colors"
 import { PaletteMode } from "@mui/material"
+import { grey } from "@mui/material/colors"
+import { PaletteOptions, ThemeOptions } from "@mui/material/styles"
 
 export const common = {
    black: "#1F1F1F", // our default black
@@ -101,6 +101,7 @@ export const brand = {
    tq: primary,
    purple: secondary,
    info: {
+      // blue
       main: "#3A70E2",
       "50": "#EBF1FC",
       "100": "#D8E2F9",

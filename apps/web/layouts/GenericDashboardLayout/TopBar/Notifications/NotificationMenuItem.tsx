@@ -1,11 +1,12 @@
-import { Box, Grid, MenuItem, Typography } from "@mui/material"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import { sxStyles } from "../../../../types/commonTypes"
 import { Circle as CircleIcon } from "@mui/icons-material"
-import Image from "next/image"
-import CircularLogo from "../../../../components/views/common/logos/CircularLogo"
+import { Box, Button, Grid, MenuItem, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import SanitizedHTML from "components/util/SanitizedHTML"
 import Link from "components/views/common/Link"
+import Image from "next/image"
+import CircularLogo from "../../../../components/views/common/logos/CircularLogo"
+import { sxStyles } from "../../../../types/commonTypes"
 import DateUtil from "../../../../util/DateUtil"
 
 const styles = sxStyles({
@@ -49,6 +50,8 @@ type Props = {
 }
 
 const NotificationMenuItem = ({ notification, handleClick }: Props) => {
+   const isMobile = useIsMobile()
+
    return (
       <MenuItem
          key={notification.id}
@@ -60,7 +63,7 @@ const NotificationMenuItem = ({ notification, handleClick }: Props) => {
       >
          <Grid container sx={styles.itemContent}>
             <Grid xs={1} md={0.5} item>
-               {Boolean(notification.readAt) ? null : (
+               {notification.readAt ? null : (
                   <CircleIcon color="primary" sx={styles.circle} />
                )}
             </Grid>
@@ -91,6 +94,26 @@ const NotificationMenuItem = ({ notification, handleClick }: Props) => {
                </Grid>
             ) : null}
          </Grid>
+         {notification.buttonText ? (
+            <Grid container>
+               <Grid
+                  item
+                  xs={1}
+                  md={0.5}
+                  ml={isMobile ? 4 : 2}
+                  mb={1.5}
+                  mt={isMobile ? 1.5 : 1}
+               >
+                  <Button
+                     variant="outlined"
+                     color="primary"
+                     onClick={() => handleClick(notification.id)}
+                  >
+                     {notification.buttonText}
+                  </Button>
+               </Grid>
+            </Grid>
+         ) : null}
          <Grid container>
             <Grid item xs={1} md={0.5} />
             <Grid item {...getGridItemProps(notification)}>

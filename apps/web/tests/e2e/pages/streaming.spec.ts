@@ -1,20 +1,20 @@
-import { expect, test as base } from "@playwright/test"
-import LivestreamSeed, {
-   createLivestreamGroupQuestions,
-} from "@careerfairy/seed-data/dist/livestreams"
-import { LoginPage } from "../page-object-models/LoginPage"
-import UserSeed from "@careerfairy/seed-data/dist/users"
 import {
    clearAuthData,
    clearFirestoreData,
 } from "@careerfairy/seed-data/dist/emulators"
-import { StreamerPage, ViewerPage } from "../page-object-models/StreamingPage"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { sleep } from "../utils"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
+import LivestreamSeed, {
+   createLivestreamGroupQuestions,
+} from "@careerfairy/seed-data/dist/livestreams"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { test as base, expect } from "@playwright/test"
 import { credentials } from "../../constants"
+import { LoginPage } from "../page-object-models/LoginPage"
+import { StreamerPage, ViewerPage } from "../page-object-models/StreamingPage"
+import { sleep } from "../utils"
 
 /**
  * Test Fixture
@@ -389,7 +389,7 @@ async function setupStreamer(
 
 async function setupData(setupGroup: boolean = false) {
    let group: Group
-   let overrideLivestreamDetails: Partial<LivestreamEvent> = {}
+   let overrideLivestreamDetails: Partial<LivestreamEvent> = { useOldUI: true }
 
    if (setupGroup) {
       group = await GroupSeed.createGroup(Object.assign({}))
@@ -401,6 +401,7 @@ async function setupData(setupGroup: boolean = false) {
          groupQuestionsMap: {
             [group.id]: groupQuestions,
          },
+         ...overrideLivestreamDetails,
       }
    }
 

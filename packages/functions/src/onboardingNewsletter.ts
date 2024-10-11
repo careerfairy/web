@@ -18,7 +18,9 @@ import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcher
  */
 const runtimeOptions = {
    // may take a while
-   timeoutSeconds: 60 * 9,
+   // TODO: function was changed to http trigger to allow for more time. In the future, optimize fetchRequiredData function
+   // as it's being called for each batch, taking up a lot of time
+   timeoutSeconds: 60 * 60,
    // we may load lots of data into memory
    memory: "8GiB",
 } as const
