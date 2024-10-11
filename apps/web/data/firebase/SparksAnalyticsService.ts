@@ -8,17 +8,14 @@ import { FunctionsInstance } from "./FirebaseInstance"
 export class SparksAnalyticsService {
    constructor(private readonly functions: Functions) {}
 
-   async fetchSparksAnalytics(
-      groupId: string,
-      forceUpdate: boolean
-   ): Promise<SparksAnalyticsDTO> {
+   async fetchSparksAnalytics(groupId: string): Promise<SparksAnalyticsDTO> {
       const { data: analytics } = await httpsCallable<
          FunctionSignature,
          SparksAnalyticsDTO
       >(
          this.functions,
-         "getSparksAnalytics_v5"
-      )({ groupId, forceUpdate })
+         "getSparksAnalytics_v6"
+      )({ groupId })
 
       return analytics
    }

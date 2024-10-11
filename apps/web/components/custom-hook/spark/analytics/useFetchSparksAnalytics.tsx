@@ -1,10 +1,14 @@
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
+import { SparksAnalyticsDTO } from "@careerfairy/shared-lib/sparks/analytics"
 import { createLookup } from "@careerfairy/shared-lib/utils"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { sparksAnalyticsService } from "data/firebase/SparksAnalyticsService"
+import { collection, doc, getDoc } from "firebase/firestore"
 import { useCallback, useMemo } from "react"
 import useSWR from "swr"
 import useSWRMutation from "swr/mutation"
@@ -27,13 +31,30 @@ export const useFetchSparksAnalytics = (groupId: string) => {
 
    const fetcher = useCallback(
       async (groupId: string, updateCache: boolean) => {
-         const fetchedAnalytics =
-            await sparksAnalyticsService.fetchSparksAnalytics(
-               groupId,
-               updateCache
+         const fetchFromFirestore = async () => {
+            const collectionRef = collection(
+               FirestoreInstance,
+               "sparksAnalytics"
             )
+            const docRef = doc(collectionRef, groupId).withConverter(
+               createGenericConverter<SparksAnalyticsDTO>()
+            )
+            const docSnap = await getDoc(docRef)
+
+            if (!docSnap.exists() || updateCache) {
+               const fetchedAnalytics =
+                  await sparksAnalyticsService.fetchSparksAnalytics(groupId)
+               return fetchedAnalytics
+            }
+
+            const data = docSnap.data()
+            return data
+         }
+
+         const firestoreData = await fetchFromFirestore()
+
          return convertToClientModel(
-            fetchedAnalytics,
+            firestoreData,
             fieldsOfStudyLookup,
             levelsOfStudyLookup
          )
