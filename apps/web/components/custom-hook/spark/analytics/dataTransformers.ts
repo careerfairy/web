@@ -217,7 +217,7 @@ export const convertToClientModel = (
       {} as SparkAnalyticsClientWithPastData
    )
 
-   analytics.updatedAt = data.updatedAt.toDate()
+   analytics.updatedAt = data.updatedAt?.toDate?.()
 
    return analytics
 }
