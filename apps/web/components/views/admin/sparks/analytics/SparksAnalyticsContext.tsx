@@ -11,12 +11,14 @@ import { timeFrameLabels } from "./util"
 interface SparksAnalyticsContextType {
    filteredAnalytics: SparkAnalyticsClient | null
    isLoading: boolean
+   isMutating: boolean
    error: string | null
    updateAnalytics: () => void
    selectTimeFilter: TimePeriodParams
    setSelectTimeFilter: (selectTimeFilter: TimePeriodParams) => void
    updatedAtLabel: string
    industriesOptions: { value: string; label: string }[]
+   industriesOptionsTopCompanies: { value: string; label: string }[]
 }
 
 const SparksAnalyticsContext = createContext<
@@ -41,7 +43,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
    const [selectTimeFilter, setSelectTimeFilter] =
       useState<TimePeriodParams>("30days")
 
-   const { analytics, error, isLoading, updateAnalytics } =
+   const { analytics, error, isLoading, updateAnalytics, isMutating } =
       useFetchSparksAnalytics(group.id)
 
    const filteredAnalytics = useMemo<SparkAnalyticsClient>(() => {
@@ -84,25 +86,65 @@ export const SparksAnalyticsProvider = ({ children }) => {
       return result
    }, [analytics, group?.companyIndustries])
 
+   const industriesOptionsTopCompanies = useMemo(() => {
+      if (!analytics) return []
+
+      const timePeriods = Object.keys(timeFrameLabels)
+      const topCompaniesIndustries = Array.from(
+         new Set(
+            timePeriods.flatMap((timePeriod) => {
+               return Object.keys(analytics[timePeriod].topCompaniesByIndustry)
+            })
+         )
+      )
+
+      const allOptions = [
+         {
+            id: "all",
+            name: "All Industries",
+         },
+         ...CompanyIndustryValues,
+      ].map((industry) => ({
+         value: industry.id,
+         label: industry.name,
+      }))
+
+      const groupIndustriesById = group.companyIndustries
+         .map((industry) => industry.id)
+         .filter((id) => topCompaniesIndustries.includes(id))
+
+      const result = allOptions.filter(
+         (option) =>
+            groupIndustriesById.includes(option.value) ||
+            topCompaniesIndustries.includes(option.value)
+      )
+
+      return result
+   }, [analytics, group?.companyIndustries])
+
    const value = useMemo(() => {
       return {
          filteredAnalytics,
          isLoading,
+         isMutating,
          error,
          updateAnalytics,
          selectTimeFilter,
          setSelectTimeFilter,
          updatedAtLabel,
          industriesOptions,
+         industriesOptionsTopCompanies,
       }
    }, [
       filteredAnalytics,
       isLoading,
+      isMutating,
       error,
       updateAnalytics,
       selectTimeFilter,
       updatedAtLabel,
       industriesOptions,
+      industriesOptionsTopCompanies,
    ])
 
    useEffect(() => {

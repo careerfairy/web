@@ -1,13 +1,15 @@
 import { SectionsWrapper } from "../components/SectionsWrapper"
-import { CompetitorSkeleton } from "../overview-tab/SparksAnalyticsCompetitorTabSkeletons"
-import { BannerForCompetitorTable } from "./banner-competitor-table/BannerForCompetitorTable"
+import {
+   CompetitorSparksCarouselSkeleton,
+   CompetitorTableSkeleton,
+} from "./SparksAnalyticsCompetitorTabSkeletons"
 
 export const SparksCompetitorTabSkeleton = () => {
    return (
       <SectionsWrapper>
-         <CompetitorSkeleton />
-         <CompetitorSkeleton />
-         <BannerForCompetitorTable />
+         <CompetitorTableSkeleton />
+         <CompetitorSparksCarouselSkeleton />
+         <CompetitorSparksCarouselSkeleton />
       </SectionsWrapper>
    )
 }
