@@ -10,13 +10,13 @@ import { TopSparksByIndustry } from "./TopSparksByIndustry"
 
 export const SparksCompetitorTab = () => {
    const { isLocked } = useAnalyticsLocking("competitor")
-   const { isLoading } = useSparksAnalytics()
+   const { isLoading, isMutating } = useSparksAnalytics()
 
    if (isLocked) {
       return <LockedSparksCompetitorTab />
    }
 
-   if (isLoading) {
+   if (isLoading && !isMutating) {
       return <SparksCompetitorTabSkeleton />
    }
 
