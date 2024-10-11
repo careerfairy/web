@@ -2146,15 +2146,14 @@ class FirebaseService {
          (group) => group.id
       )
 
-      const livestreamRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-
       const userLivestreamDataRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("userLivestreamData")
          .doc(userData.userEmail)
+
+      const existingUserLivestreamDataSnap = await userLivestreamDataRef.get()
+      const existingUserLivestreamData = existingUserLivestreamDataSnap.data()
 
       const data: UserLivestreamData = {
          livestreamId,
@@ -2167,8 +2166,10 @@ class FirebaseService {
             // We store the referral info so that it can be used by a cloud function
             // that applies the rewards
             referral: getReferralInformation(),
-            // Store the utm params if they exist
-            utm: CookiesUtil.getUTMParams(),
+            // Only store utm params only if they don't already exist to avoid overriding
+            ...(existingUserLivestreamData?.registered?.utm
+               ? {}
+               : { utm: CookiesUtil.getUTMParams() }),
             referrer: SessionStorageUtil.getReferrer(),
             // @ts-ignore
             date: this.getServerTimestamp(),
