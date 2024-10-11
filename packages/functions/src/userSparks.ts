@@ -111,7 +111,7 @@ export const getSparksFeed = functions
                   "No userId or groupId provided"
                )
             } catch (error) {
-               console.log("🚀 ~ error:", error)
+               functions.logger.error("Error in generating user feed:", error)
                logAndThrow("Error in generating user feed", {
                   data,
                   error,

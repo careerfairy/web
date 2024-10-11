@@ -1,8 +1,8 @@
 import { CategoryDataOption } from "@careerfairy/shared-lib/livestreams"
 import FirebaseService from "data/firebase/FirebaseService"
 import { livestreamService } from "data/firebase/LivestreamService"
-import { useMemo } from "react"
-import useSWR, { SWRConfiguration } from "swr"
+import { SWRConfiguration } from "swr"
+import useSWRImmutable from "swr/immutable"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
@@ -18,13 +18,9 @@ const swrOptions: SWRConfiguration = {
 
 const useLivestreamCategoryDataSWR = (
    firebase: FirebaseService,
-   options: CategoryDataOption
+   options: CategoryDataOption,
+   onSuccess: (data: boolean) => void
 ) => {
-   const key = useMemo(
-      () => (options ? JSON.stringify(options) : null),
-      [options]
-   )
-
    const swrFetcher = async () => {
       return livestreamService.checkCategoryData(
          firebase,
@@ -32,7 +28,11 @@ const useLivestreamCategoryDataSWR = (
       )
    }
 
-   return useSWR(key, swrFetcher, swrOptions)
+   return useSWRImmutable(`useLivestreamCategoryDataSWR-${options.livestream.id}`, swrFetcher, {
+      ...swrOptions,
+      onSuccess,
+      revalidateOnMount: true, // refetch the registratioin data when the hook mounts for the first time only. This will ensure that if we navigate out of the live stream room to a different page, then we return back to the room, we re-fetch your reg status 
+   })
 }
 
 export default useLivestreamCategoryDataSWR

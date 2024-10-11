@@ -456,3 +456,30 @@ export const onWriteCustomJobs = functions
 
       return handleSideEffects(sideEffectPromises)
    })
+
+export const onWriteCustomJobsSendNotifications = functions
+   .runWith({ ...defaultTriggerRunTimeConfig, memory: "512MB" })
+   .region(config.region)
+   .firestore.document("customJobs/{jobId}")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      logStart({
+         changeTypes,
+         context,
+         message: "syncCustomJobsNotificationsOnWrite",
+      })
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      if (changeTypes.isCreate || changeTypes.isUpdate) {
+         const newCustomJob = change.after.data() as CustomJob
+
+         sideEffectPromises.push(
+            customJobRepo.createNewCustomJobUserNotifications(newCustomJob)
+         )
+      }
+
+      return handleSideEffects(sideEffectPromises)
+   })

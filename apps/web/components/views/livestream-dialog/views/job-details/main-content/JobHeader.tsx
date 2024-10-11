@@ -1,4 +1,5 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -103,7 +104,9 @@ const JobHeader = ({
    } else {
       jobName = job.title
       jobType = job.jobType
-      jobBusinessFunctionsTagIds = job.businessFunctionsTagIds || []
+      jobBusinessFunctionsTagIds = (job.businessFunctionsTagIds || []).map(
+         (tagId) => TagValuesLookup[tagId]
+      )
    }
 
    return (

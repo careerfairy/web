@@ -63,6 +63,8 @@ type Props = {
    hideCTAButtons?: boolean
    companyName?: string
    companyLogoUrl?: string
+   hideLinkedLivestreams?: boolean
+   hideLinkedSparks?: boolean
 }
 
 const CustomJobDetailsView = (props: Props) => {
@@ -91,6 +93,8 @@ export const CustomJobDetails = ({
    hideBottomDivider,
    hideCTAButtons,
    onApply,
+   hideLinkedLivestreams,
+   hideLinkedSparks,
 }: Props) => {
    const { applicationInitiatedOnly: applicationInitiated } = useCustomJobApply(
       job as PublicCustomJob,
@@ -126,6 +130,8 @@ export const CustomJobDetails = ({
                      <CustomJobLinkedContents
                         job={job}
                         disableEventClick={disabledLinkedContentClick}
+                        hideLinkedLivestreams={hideLinkedLivestreams}
+                        hideLinkedSparks={hideLinkedSparks}
                      />
                   </Stack>
                </Box>
