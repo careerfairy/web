@@ -18,6 +18,10 @@ export const getLivestreamICalendarEvent = functions
       setCORSHeaders(req, res)
       const livestreamId = req.query.eventId as string
       const userTimezone = (req.query.timezone as string) || "Europe/Zurich"
+      functions.logger.log(
+         "🚀 ~ file: livestreams.ts:21 ~ .https.onRequest ~ userTimezone:",
+         userTimezone
+      )
 
       if (livestreamId) {
          try {
@@ -36,6 +40,10 @@ export const getLivestreamICalendarEvent = functions
                   {
                      userTimezone,
                   }
+               )
+               functions.logger.log(
+                  "🚀 v2 ~ file: livestreams.ts:40 ~ .https.onRequest ~ calendarEventProperties:",
+                  calendarEventProperties
                )
 
                const cal = ical({
@@ -76,6 +84,10 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
          {
             userTimezone: livestreamTimeZone,
          }
+      )
+      functions.logger.log(
+         "🚀 v2 ~ file: livestreams.ts:88 ~ .https.onCall ~ calendarEventProperties:",
+         calendarEventProperties
       )
 
       cal.createEvent(calendarEventProperties)
