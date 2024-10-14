@@ -1,5 +1,5 @@
 import { CompetitorSparkData } from "@careerfairy/shared-lib/sparks/analytics"
-import { Percent } from "@mui/icons-material"
+import { CheckCircleRounded } from "@mui/icons-material"
 import {
    Box,
    Card,
@@ -140,23 +140,29 @@ const StatContainer = ({ icon, value }: StatContainerProps) => {
    )
 }
 
+type CompetitorSparkStaticCardProps = {
+   turnOffHighlighting?: boolean
+} & Omit<CompetitorSparkData, "rank">
+
 export const CompetitorSparkStaticCard = ({
    sparkData,
-   plays,
+   num_views,
    avg_watched_time,
    avg_watched_percentage,
    engagement,
-}: CompetitorSparkData) => {
+   turnOffHighlighting = false,
+}: CompetitorSparkStaticCardProps) => {
    const { group } = useGroup()
 
-   const isSparkFromGroup = sparkData?.group.id === group?.groupId
+   const highlight =
+      !turnOffHighlighting && sparkData?.group.id === group?.groupId
 
    if (!sparkData) return null
 
    return (
       <Card
          variant="outlined"
-         sx={[styles.card, isSparkFromGroup && styles.cardWithBorder]}
+         sx={[styles.card, highlight && styles.cardWithBorder]}
       >
          <CardHeader
             avatar={
@@ -196,14 +202,14 @@ export const CompetitorSparkStaticCard = ({
          <CardActions sx={styles.cardActions}>
             <StatContainer
                icon={<ImpressionsIcon sx={styles.impressionsIcon} />}
-               value={plays}
+               value={num_views}
             />
             <StatContainer
                icon={<ClockIcon />}
                value={Math.ceil(avg_watched_time) + "s"}
             />
             <StatContainer
-               icon={<Percent />}
+               icon={<CheckCircleRounded />}
                value={Math.ceil(avg_watched_percentage * 100) + "%"}
             />
             <StatContainer

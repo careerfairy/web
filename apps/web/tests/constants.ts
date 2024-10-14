@@ -5,6 +5,7 @@ import {
 
 export const credentials = {
    correctEmail: "john@careerfairy.io",
+   correctUserEmail: "john@test.io",
    unregisteredEmail: "unregistered@careerfairy.io",
    correctPassword: "Correct@Password420",
    wrongPassword: "wrongpassword",

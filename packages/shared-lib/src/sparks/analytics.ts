@@ -23,23 +23,24 @@ export type SparkStatsFromBigQuery = {
 }
 
 export type CompetitorSparkCard = {
+   rank?: number
    creator: {
       avatarUrl: string
       firstName: string
       lastName: string
    }
    group: {
-      id: string
+      id?: string
       name: string
+      logoUrl?: string
    }
    spark: {
+      id?: string
       question: Spark["question"]
       categoryId: Spark["category"]["id"]
       videoThumbnailUrl: string
    }
 }
-
-export type MostSomethingSparkCard = Omit<CompetitorSparkCard, "group.id">
 
 export type MostSomethingStatsKeys = keyof SparkStatsFromBigQuery
 
@@ -48,34 +49,72 @@ export type MostSomethingBigQueryResult = {
 } & SparkStatsFromBigQuery
 
 export type MostSomethingBase = {
-   sparkData: MostSomethingSparkCard
+   sparkData: CompetitorSparkCard
 } & SparkStatsFromBigQuery
 
 export type MostSomethingWithPastData = WithPastData<MostSomethingBase[]>
 
 export type CompetitorStatsFromBigQuery = {
-   plays: number
+   rank: number
+   num_views: number
    avg_watched_time: number
    avg_watched_percentage: number
    engagement: number
 }
+
+export type CompetitorCompanyBigQueryResult = {
+   groupId: string
+   industry: string
+   unique_viewers: number
+} & CompetitorStatsFromBigQuery
 
 export type CompetitorIndustryBigQueryResult = {
    sparkId: string
    industry: string
 } & CompetitorStatsFromBigQuery
 
-export type CompetitorIndustryBase = {
-   sparkData: CompetitorSparkCard
-   industry: string
-} & CompetitorStatsFromBigQuery
+export type CompetitorIndustryDataBase = {
+   groupData: {
+      id: string
+      name: string
+      logoUrl: string
+   }
+} & CompetitorSparkData
+
+export type CompetitorCompanyIndustryData = {
+   [key in string]: CompetitorTopCompaniesBase[]
+}
 
 export type CompetitorIndustryData = {
-   [key in string]: CompetitorIndustryBase[]
+   [key in string]: CompetitorIndustryDataBase[]
 }
+
+export type CompetitorCompaniesDataWithPastData =
+   WithPastData<CompetitorCompanyIndustryData>
 
 export type CompetitorIndustryBaseWithPastData =
    WithPastData<CompetitorIndustryData>
+
+export type CompetitorCompanyData = {
+   rank: number
+   groupLogo: string
+   groupName: string
+   totalViews: number
+   unique_viewers: number
+   avg_watched_time: number
+   avg_watched_percentage: number
+   engagement: number
+}
+
+export type CompetitorTopCompaniesBase = {
+   sparks: CompetitorSparkData[]
+} & CompetitorCompanyData
+
+export type CompetitorTopCompaniesData = {
+   [key in string]: {
+      [key in string]: CompetitorTopCompaniesBase
+   }
+}
 
 export type CompetitorAudienceSegments =
    | "business-plus"
@@ -103,8 +142,8 @@ export type CompetitorAudienceBaseWithPastData = WithPastData<
    CompetitorAudienceBase[]
 >
 
-export type CompetitorAudienceData<T> = {
-   [key in CompetitorAudienceSegments]: T[]
+export type CompetitorAudienceData = {
+   [key in CompetitorAudienceSegments]: CompetitorSparkData[]
 }
 
 export type LinearBarDataPoint = {
@@ -123,7 +162,6 @@ export type PieChartWithPastData = WithPastData<PieChartDataPoint[]>
 
 export type FunctionSignature = {
    groupId: string
-   forceUpdate: boolean
 }
 
 // DTO data types
@@ -155,6 +193,7 @@ export type SparksAnalyticsDTO = {
    topUniversities: LinearBarWithPastData
    topFieldsOfStudy: PieChartWithPastData
    levelsOfStudy: PieChartWithPastData
+   topCompaniesByIndustry: CompetitorCompaniesDataWithPastData
    topSparksByIndustry: CompetitorIndustryBaseWithPastData
    topSparksByAudience: CompetitorAudienceBaseWithPastData
    updatedAt: Timestamp
@@ -193,6 +232,7 @@ export type SparkAnalyticsClientAudience = {
 }
 
 export type SparksAnalyticsClientCompetitor = {
+   topCompaniesByIndustry: CompetitorCompanyIndustryData
    topSparksByIndustry: CompetitorIndustryData
    topSparksByAudience: CompetitorAudienceBase[]
 }

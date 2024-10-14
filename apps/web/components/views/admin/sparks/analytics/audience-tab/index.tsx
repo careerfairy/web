@@ -11,13 +11,13 @@ import { TopUniversities } from "./TopUniversities"
 
 export const SparksAudienceTab = () => {
    const { isLocked } = useAnalyticsLocking("audience")
-   const { isLoading } = useSparksAnalytics()
+   const { isLoading, isMutating } = useSparksAnalytics()
 
    if (isLocked) {
       return <LockedSparksAudienceTab />
    }
 
-   if (isLoading) {
+   if (isLoading && !isMutating) {
       return <SparksAudienceTabSkeleton />
    }
 

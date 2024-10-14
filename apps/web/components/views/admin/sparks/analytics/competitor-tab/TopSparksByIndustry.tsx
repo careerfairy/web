@@ -34,7 +34,7 @@ export const TopSparksByIndustry = () => {
                            <CompetitorSparkStaticCard
                               key={`top-sparks-by-industry-${selectIndustryValue}-${index}`}
                               sparkData={data.sparkData}
-                              plays={data.plays}
+                              num_views={data.num_views}
                               avg_watched_time={data.avg_watched_time}
                               avg_watched_percentage={
                                  data.avg_watched_percentage
