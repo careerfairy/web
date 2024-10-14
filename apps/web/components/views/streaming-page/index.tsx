@@ -243,7 +243,7 @@ const Component = ({ isHost }: Props) => {
    const speakerId = useSpeakerId()
 
    useConditionalRedirect(
-      !livestream.useNewUI,
+      livestream.useOldUI,
       appendCurrentQueryParams(
          `/streaming/${livestream.id}/${isHost ? "main-streamer" : "viewer"}`
       )

@@ -89,11 +89,6 @@ interface LivestreamSeed {
       livestreamId: string,
       ratings: string[]
    ): Promise<void>
-
-   /**
-    * Add randomly generated speakers to a livestream/id/speakers sub-collection
-    **/
-   addSpeakerToLivestream(livestreamId: string): Promise<void>
 }
 
 class LivestreamFirebaseSeed implements LivestreamSeed {
@@ -318,24 +313,6 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       return
    }
 
-   async addSpeakerToLivestream(livestreamId: string): Promise<void> {
-      const batch = firestore.batch()
-
-      const newSpeaker = generateSpeaker()
-      batch.set(
-         firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("speakers")
-            .doc(newSpeaker.id),
-         newSpeaker
-      )
-
-      await batch.commit()
-
-      return
-   }
-
    async setRecordingSid(livestreamId: string) {
       const livestreamRef = firestore
          .collection("livestreams")
@@ -374,7 +351,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          company,
          companyId: uuidv4(),
          companyLogoUrl: faker.image.business(),
-         duration: faker.random.arrayElement([30, 60, 90, 120]),
+         duration: faker.helpers.arrayElement([30, 60, 90, 120]),
          summary: faker.lorem.paragraph(),
          reasonsToJoinLivestream: faker.lorem.paragraphs(),
          reasonsToJoinLivestream_v2: [

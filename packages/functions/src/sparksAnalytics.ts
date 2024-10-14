@@ -4,7 +4,7 @@ import {
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { Timestamp } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
-import { boolean, string } from "yup"
+import { string } from "yup"
 import { getSparksAnalyticsRepoInstance, sparkRepo } from "./api/repositories"
 import config from "./config"
 import GroupSparksAnalyticsRepository from "./lib/sparks/analytics/GroupSparksAnalyticsRepository"
@@ -70,6 +70,12 @@ async function fetchAnalyticsFromBigQuery(
          levelsOfStudy1year,
       ],
       [
+         topCompaniesByIndustry7days,
+         topCompaniesByIndustry30days,
+         topCompaniesByIndustry6months,
+         topCompaniesByIndustry1year,
+      ],
+      [
          topSparksByIndustry7days,
          topSparksByIndustry30days,
          topSparksByIndustry6months,
@@ -112,6 +118,9 @@ async function fetchAnalyticsFromBigQuery(
       ),
       fetchTimePeriodData(
          sparksAnalyticsRepo.getLevelsOfStudy.bind(sparksAnalyticsRepo)
+      ),
+      fetchTimePeriodData(
+         sparksAnalyticsRepo.getTopCompaniesByIndustry.bind(sparksAnalyticsRepo)
       ),
       fetchTimePeriodData(
          sparksAnalyticsRepo.getTopSparksByIndustry.bind(sparksAnalyticsRepo)
@@ -182,6 +191,12 @@ async function fetchAnalyticsFromBigQuery(
          "6months": levelsOfStudy6months,
          "1year": levelsOfStudy1year,
       },
+      topCompaniesByIndustry: {
+         "7days": topCompaniesByIndustry7days,
+         "30days": topCompaniesByIndustry30days,
+         "6months": topCompaniesByIndustry6months,
+         "1year": topCompaniesByIndustry1year,
+      },
       topSparksByIndustry: {
          "7days": topSparksByIndustry7days,
          "30days": topSparksByIndustry30days,
@@ -202,28 +217,30 @@ async function fetchAnalyticsFromBigQuery(
    return SparksAnalyticsPayload
 }
 
-export const getSparksAnalytics = functions.region(config.region).https.onCall(
-   middlewares(
-      dataValidation({
-         groupId: string().required(),
-         forceUpdate: boolean().required(),
-      }),
-      userShouldBeGroupAdmin(),
-      async (data, context) => {
-         try {
-            const { groupId, forceUpdate } = data
-            const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
-               groupId,
-               sparkRepo
-            )
+export const getSparksAnalytics = functions
+   .region(config.region)
+   .runWith({
+      timeoutSeconds: 60,
+      memory: "512MB",
+   })
+   .https.onCall(
+      middlewares(
+         dataValidation({
+            groupId: string().required(),
+         }),
+         userShouldBeGroupAdmin(),
+         async (data, context) => {
+            try {
+               const { groupId } = data
+               const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
+                  groupId,
+                  sparkRepo
+               )
 
-            functions.logger.info(
-               `Fetching sparks analytics for group ${groupId}...`
-            )
-            const cachedAnalyticsData =
-               await sparksAnalyticsRepo.getAnalyticsFromFirestore()
+               functions.logger.info(
+                  `Fetching sparks analytics for group ${groupId}...`
+               )
 
-            if (forceUpdate || !cachedAnalyticsData) {
                const bigQueryAnalyticsData = await fetchAnalyticsFromBigQuery(
                   sparksAnalyticsRepo
                )
@@ -238,17 +255,18 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                )
 
                return bigQueryAnalyticsData
+            } catch (error) {
+               functions.logger.error("Error fetching sparks analytics", {
+                  data,
+                  error,
+                  context,
+               })
+               logAndThrow("Error fetching sparks analytics", {
+                  data,
+                  error,
+                  context,
+               })
             }
-
-            return cachedAnalyticsData
-         } catch (error) {
-            console.log("🚀 ~ error:", error)
-            logAndThrow("Error fetching sparks analytics", {
-               data,
-               error,
-               context,
-            })
          }
-      }
+      )
    )
-)
