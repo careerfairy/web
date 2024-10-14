@@ -17,11 +17,6 @@ export const getLivestreamICalendarEvent = functions
    .https.onRequest(async (req, res) => {
       setCORSHeaders(req, res)
       const livestreamId = req.query.eventId as string
-      const userTimezone = (req.query.timezone as string) || "Europe/Zurich"
-      functions.logger.log(
-         "🚀 ~ file: livestreams.ts:21 ~ .https.onRequest ~ userTimezone:",
-         userTimezone
-      )
 
       if (livestreamId) {
          try {
@@ -35,16 +30,8 @@ export const getLivestreamICalendarEvent = functions
                const livestream = querySnapshot.data() as LivestreamEvent
 
                // create calendar event
-               const calendarEventProperties = generateCalendarEventProperties(
-                  livestream,
-                  {
-                     userTimezone,
-                  }
-               )
-               functions.logger.log(
-                  "🚀 v2 ~ file: livestreams.ts:40 ~ .https.onRequest ~ calendarEventProperties:",
-                  calendarEventProperties
-               )
+               const calendarEventProperties =
+                  generateCalendarEventProperties(livestream)
 
                const cal = ical({
                   events: [calendarEventProperties],
@@ -77,18 +64,9 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
 
       // Generate ICS file content
       const cal = ical()
-      const livestreamTimeZone = data.timezone || "Europe/Zurich"
 
-      const calendarEventProperties = generateCalendarEventProperties(
-         livestream,
-         {
-            userTimezone: livestreamTimeZone,
-         }
-      )
-      functions.logger.log(
-         "🚀 v2 ~ file: livestreams.ts:88 ~ .https.onCall ~ calendarEventProperties:",
-         calendarEventProperties
-      )
+      const calendarEventProperties =
+         generateCalendarEventProperties(livestream)
 
       cal.createEvent(calendarEventProperties)
 
@@ -117,8 +95,8 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
                content: data.livestream_title,
             }),
             calendar_event_i_calendar: isLocalEnvironment()
-               ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}&timezone=${livestreamTimeZone}`
-               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}&timezone=${livestreamTimeZone}`,
+               ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}`
+               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}`,
             calendar_event_google: data.eventCalendarUrls.google,
             calendar_event_outlook: data.eventCalendarUrls.outlook,
             calendar_event_yahoo: data.eventCalendarUrls.yahoo,

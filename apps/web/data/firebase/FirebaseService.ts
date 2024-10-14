@@ -299,7 +299,7 @@ class FirebaseService {
             "sendLivestreamRegistrationConfirmationEmail_v3"
          )
 
-      const calendarEvent = createCalendarEvent(livestream, userData.timezone)
+      const calendarEvent = createCalendarEvent(livestream)
 
       const urls = makeUrls(calendarEvent)
 

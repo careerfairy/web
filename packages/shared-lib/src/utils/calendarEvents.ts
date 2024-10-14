@@ -4,19 +4,6 @@ import { UPCOMING_STREAM_THRESHOLD_MINUTES } from "../livestreams/constants"
 import { makeLivestreamEventDetailsUrl } from "../utils/urls"
 import { addUtmTagsToLink } from "../utils/utils"
 
-type Options = {
-   userTimezone: string
-}
-
-const getBrowserTimeZone = () => {
-   try {
-      return Intl.DateTimeFormat().resolvedOptions().timeZone || ""
-   } catch (error) {
-      console.warn("Error getting browser timezone:", error)
-      return ""
-   }
-}
-
 const MAX_DESCRIPTION_LENGTH = 1000
 const EVENT_LINK_PLACEHOLDER = "[EVENT_LINK]"
 
@@ -33,15 +20,9 @@ const buildDescription = (parts: string[], eventLink: string): string => {
 }
 
 export const generateCalendarEventProperties = (
-   livestream: LivestreamEvent,
-   { userTimezone }: Options
+   livestream: LivestreamEvent
 ) => {
-   const browserTimeZone = getBrowserTimeZone()
-   const livestreamTimeZone = userTimezone || browserTimeZone || "Europe/Zurich"
-
-   const livestreamStartDate = DateTime.fromJSDate(livestream.start.toDate(), {
-      zone: livestreamTimeZone,
-   })
+   const livestreamStartDate = DateTime.fromJSDate(livestream.start.toDate())
    const livestreamUrl = makeLivestreamEventDetailsUrl(livestream.id)
    const linkWithUTM = addUtmTagsToLink({
       link: livestreamUrl,
@@ -76,6 +57,5 @@ export const generateCalendarEventProperties = (
          name: `CareerFairy - ${livestream.company}`,
          email: "noreply@careerfairy.io",
       },
-      timezone: livestreamTimeZone,
    }
 }
