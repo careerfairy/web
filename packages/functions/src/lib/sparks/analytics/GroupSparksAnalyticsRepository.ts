@@ -1,11 +1,13 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    CompetitorAudienceBigQueryResult,
    CompetitorAudienceData,
+   CompetitorCompanyBigQueryResult,
+   CompetitorCompanyIndustryData,
    CompetitorIndustryBigQueryResult,
    CompetitorIndustryData,
-   CompetitorSparkData,
+   CompetitorIndustryDataBase,
+   CompetitorTopCompaniesData,
    LinearBarDataPoint,
    MostSomethingBase,
    MostSomethingBigQueryResult,
@@ -25,7 +27,11 @@ import {
    top10Universities,
    topLevelsOfStudy,
 } from "./queries/Audience"
-import { topSparksByAudience, topSparksByIndustry } from "./queries/Competitor"
+import {
+   topCompaniesByIndustry,
+   topSparksByAudience,
+   topSparksByIndustry,
+} from "./queries/Competitor"
 import {
    timeseriesLikesPastYear,
    timeseriesPageClicksPastYear,
@@ -39,9 +45,11 @@ import {
    mostWatched,
 } from "./queries/MostSomething"
 import { totalViewsPastYear, uniqueViewersPastYear } from "./queries/Reach"
-
-const AUDIENCE_SPARKS_LIMIT = 4
-const INDUSTRY_SPARKS_LIMIT = 4
+import {
+   convertSparkToCompetitorSparkCardData,
+   MIN_NUM_COMPANIES,
+   NUM_SPARKS_LIMIT,
+} from "./utils"
 
 /**
  * Interface for the GroupSparksAnalyticsRepository
@@ -152,6 +160,15 @@ interface IGroupSparksAnalyticsRepository {
    getLevelsOfStudy(timeperiod: TimePeriodParams): Promise<PieChartDataPoint[]>
 
    /**
+    * Get top companies by industry for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<CompetitorIndustryData>} Promise object represents the top companies by industry for the given time period
+    */
+   getTopCompaniesByIndustry(
+      timeperiod: TimePeriodParams
+   ): Promise<CompetitorCompanyIndustryData>
+
+   /**
     * Get group's top sparks by industry for a given time period
     * @param {TimePeriodParams} timeperiod - The time period to consider
     * @returns {Promise<MostSomethingBase>} Promise object represents the top sparks by industry for the given time period
@@ -167,7 +184,7 @@ interface IGroupSparksAnalyticsRepository {
     */
    getTopSparksByAudience(
       timeperiod: TimePeriodParams
-   ): Promise<CompetitorAudienceData<CompetitorSparkData[]>>
+   ): Promise<CompetitorAudienceData>
 
    /**
     * Retrieves the cached analytics data for the group.
@@ -361,7 +378,6 @@ class GroupSparksAnalyticsRepository
                      lastName: spark.creator.lastName,
                   },
                   group: {
-                     id: spark.group.id,
                      name: spark.group.universityName,
                   },
                   spark: {
@@ -413,25 +429,119 @@ class GroupSparksAnalyticsRepository
       >(topLevelsOfStudy, timeperiod)
    }
 
-   private convertSparkToCompetitorStaticCardData(
-      spark: Spark
-   ): CompetitorSparkData["sparkData"] {
-      return {
-         creator: {
-            avatarUrl: spark.creator.avatarUrl,
-            firstName: spark.creator.firstName,
-            lastName: spark.creator.lastName,
-         },
-         group: {
-            id: spark.group.id,
-            name: spark.group.universityName,
-         },
-         spark: {
-            question: spark.question,
-            categoryId: spark.category.id,
-            videoThumbnailUrl: spark.video.thumbnailUrl,
-         },
+   async getTopCompaniesByIndustry(
+      timeperiod: TimePeriodParams
+   ): Promise<CompetitorCompanyIndustryData> {
+      const companyRankingBigQueryPromise =
+         this.handleQueryPromiseWithTimePeriodValidation<
+            CompetitorCompanyBigQueryResult[]
+         >(topCompaniesByIndustry, timeperiod)
+
+      const sparksByIndustryRankingBigQueryPromise =
+         this.handleQueryPromiseWithTimePeriodValidation<
+            CompetitorIndustryBigQueryResult[]
+         >(topSparksByIndustry, timeperiod)
+
+      const [
+         companyRankingBigQueryResults,
+         sparksByIndustryRankingBigQueryResults,
+      ] = await Promise.all([
+         companyRankingBigQueryPromise,
+         sparksByIndustryRankingBigQueryPromise,
+      ])
+
+      const sparkIdsToFetch = new Set<string>()
+
+      for (const item of sparksByIndustryRankingBigQueryResults) {
+         sparkIdsToFetch.add(item.sparkId)
       }
+
+      const sparks = await this.sparksRepo.getSparksByIds(
+         Array.from(sparkIdsToFetch)
+      )
+
+      const sparksLookup: Record<string, Spark> = {}
+
+      for (const spark of sparks) {
+         if (!sparksLookup[spark.id]) {
+            sparksLookup[spark.id] = spark
+         }
+      }
+
+      const industryCompanyIndex: CompetitorTopCompaniesData = {}
+
+      for (const item of companyRankingBigQueryResults) {
+         if (!industryCompanyIndex[item.industry]) {
+            industryCompanyIndex[item.industry] = {}
+         }
+
+         industryCompanyIndex[item.industry][item.groupId] = {
+            sparks: [],
+            rank: item.rank,
+            groupLogo: null,
+            groupName: null,
+            totalViews: item.num_views,
+            unique_viewers: item.unique_viewers,
+            avg_watched_time: item.avg_watched_time,
+            avg_watched_percentage: item.avg_watched_percentage,
+            engagement: item.engagement,
+         }
+      }
+
+      for (const item of sparksByIndustryRankingBigQueryResults) {
+         const sparkData = sparksLookup[item.sparkId]
+
+         if (
+            !sparkData ||
+            !industryCompanyIndex[item.industry] ||
+            !industryCompanyIndex[item.industry][sparkData.group.id]
+         ) {
+            continue
+         }
+
+         if (
+            industryCompanyIndex[item.industry][sparkData.group.id].sparks
+               .length < NUM_SPARKS_LIMIT
+         ) {
+            industryCompanyIndex[item.industry][sparkData.group.id].sparks.push(
+               {
+                  sparkData: convertSparkToCompetitorSparkCardData(sparkData),
+                  rank: item.rank,
+                  num_views: item.num_views,
+                  avg_watched_time: item.avg_watched_time,
+                  avg_watched_percentage: item.avg_watched_percentage,
+                  engagement: item.engagement,
+               }
+            )
+         }
+         industryCompanyIndex[item.industry][sparkData.group.id].groupLogo =
+            sparkData.group.logoUrl
+         industryCompanyIndex[item.industry][sparkData.group.id].groupName =
+            sparkData.group.universityName
+      }
+
+      const result: CompetitorCompanyIndustryData = {}
+
+      for (const industry of Object.keys(industryCompanyIndex)) {
+         const groupRankInIndustry =
+            industryCompanyIndex[industry]?.[this.groupId]?.rank
+
+         const top5Companies = Object.values(
+            industryCompanyIndex[industry]
+         ).slice(0, 5)
+         const groupData =
+            groupRankInIndustry > 5
+               ? industryCompanyIndex[industry]?.[this.groupId]
+               : null
+
+         const values = [...top5Companies, groupData].filter(Boolean)
+
+         if (values.length >= MIN_NUM_COMPANIES) {
+            result[industry] = values
+         }
+      }
+
+      return result
    }
 
    async getTopSparksByIndustry(
@@ -444,18 +554,14 @@ class GroupSparksAnalyticsRepository
 
       const sparkIdsToFetch = []
 
-      const industrySegmentsSparksCount = CompanyIndustryValues.reduce(
-         (acc, industry) => {
-            acc[industry.id] = 0
-            return acc
-         },
-         {} as Record<string, number>
-      )
+      const industrySegmentsSparksCount: Record<string, number> = {}
 
       for (const item of bigQueryResults) {
-         if (
-            industrySegmentsSparksCount[item.industry] < INDUSTRY_SPARKS_LIMIT
-         ) {
+         if (!industrySegmentsSparksCount[item.industry]) {
+            industrySegmentsSparksCount[item.industry] = 0
+         }
+
+         if (industrySegmentsSparksCount[item.industry] < NUM_SPARKS_LIMIT) {
             industrySegmentsSparksCount[item.industry] += 1
             sparkIdsToFetch.push(item.sparkId)
          }
@@ -463,74 +569,53 @@ class GroupSparksAnalyticsRepository
 
       const sparks = await this.sparksRepo.getSparksByIds(sparkIdsToFetch)
 
-      const sparksLookup = sparks.reduce((acc, spark) => {
-         acc[spark.id] = spark
-         return acc
-      }, {} as Record<string, Spark>)
+      const sparksLookup: Record<string, Spark> = {}
 
-      const industrySegmentsMap = CompanyIndustryValues.reduce(
-         (acc, industry) => {
-            acc[industry.id] = []
-            return acc
-         },
-         {} as Record<string, CompetitorSparkData[]>
-      )
+      for (const spark of sparks) {
+         if (!sparksLookup[spark.id]) {
+            sparksLookup[spark.id] = spark
+         }
+      }
+
+      const result: Record<string, CompetitorIndustryDataBase[]> = {}
 
       for (const item of bigQueryResults) {
+         if (!result[item.industry]) {
+            result[item.industry] = []
+         }
+
          if (
-            industrySegmentsMap[item.industry]?.length <
-               INDUSTRY_SPARKS_LIMIT &&
+            result[item.industry]?.length < NUM_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
-            industrySegmentsMap[item.industry].push({
-               sparkData: this.convertSparkToCompetitorStaticCardData(
-                  sparksLookup[item.sparkId]
-               ),
-               plays: item.plays,
+            const sparkData = convertSparkToCompetitorSparkCardData(
+               sparksLookup[item.sparkId]
+            )
+            sparkData.creator.avatarUrl =
+               sparksLookup[item.sparkId].group.logoUrl
+
+            result[item.industry].push({
+               groupData: {
+                  id: sparksLookup[item.sparkId].group.id,
+                  name: sparksLookup[item.sparkId].group.universityName,
+                  logoUrl: sparksLookup[item.sparkId].group.logoUrl,
+               },
+               sparkData: sparkData,
+               rank: item.rank,
+               num_views: item.num_views,
                avg_watched_time: item.avg_watched_time,
                avg_watched_percentage: item.avg_watched_percentage,
                engagement: item.engagement,
             })
          }
       }
-
-      const auxAllSet = new Set<CompetitorSparkData>()
-
-      for (const item of bigQueryResults) {
-         if (
-            auxAllSet.size < INDUSTRY_SPARKS_LIMIT &&
-            sparksLookup[item.sparkId]
-         ) {
-            auxAllSet.add({
-               sparkData: this.convertSparkToCompetitorStaticCardData(
-                  sparksLookup[item.sparkId]
-               ),
-               plays: item.plays,
-               avg_watched_time: item.avg_watched_time,
-               avg_watched_percentage: item.avg_watched_percentage,
-               engagement: item.engagement,
-            })
-         }
-      }
-
-      industrySegmentsMap["all"] = Array.from(auxAllSet)
-
-      const result = Object.entries(industrySegmentsMap).reduce(
-         (acc, [key, value]) => {
-            if (value.length > 0) {
-               acc[key] = value
-            }
-            return acc
-         },
-         {}
-      )
 
       return result
    }
 
    async getTopSparksByAudience(
       timeperiod: TimePeriodParams
-   ): Promise<CompetitorAudienceData<CompetitorSparkData[]>> {
+   ): Promise<CompetitorAudienceData> {
       const bigQueryResults =
          await this.handleQueryPromiseWithTimePeriodValidation<
             CompetitorAudienceBigQueryResult[]
@@ -538,18 +623,14 @@ class GroupSparksAnalyticsRepository
 
       const sparkIdsToFetch = []
 
-      const audienceSegmentsSparksCount = bigQueryResults.reduce(
-         (acc, item) => {
-            acc[item.audience] = 0
-            return acc
-         },
-         {} as Record<string, number>
-      )
+      const audienceSegmentsSparksCount: Record<string, number> = {}
 
       for (const item of bigQueryResults) {
-         if (
-            audienceSegmentsSparksCount[item.audience] < AUDIENCE_SPARKS_LIMIT
-         ) {
+         if (!audienceSegmentsSparksCount[item.audience]) {
+            audienceSegmentsSparksCount[item.audience] = 0
+         }
+
+         if (audienceSegmentsSparksCount[item.audience] < NUM_SPARKS_LIMIT) {
             audienceSegmentsSparksCount[item.audience] += 1
             sparkIdsToFetch.push(item.sparkId)
          }
@@ -557,64 +638,50 @@ class GroupSparksAnalyticsRepository
 
       const sparks = await this.sparksRepo.getSparksByIds(sparkIdsToFetch)
 
-      const sparksLookup = sparks.reduce((acc, spark) => {
-         acc[spark.id] = spark
-         return acc
-      }, {} as Record<string, Spark>)
+      const sparksLookup: Record<string, Spark> = {}
 
-      const audienceSegmentsMap = bigQueryResults.reduce((acc, item) => {
-         acc[item.audience] = []
-         return acc
-      }, {} as Record<string, CompetitorSparkData[]>)
+      for (const spark of sparks) {
+         if (!sparksLookup[spark.id]) {
+            sparksLookup[spark.id] = spark
+         }
+      }
+
+      const result: CompetitorAudienceData = {
+         "business-plus": [],
+         engineering: [],
+         "it-and-mathematics": [],
+         "natural-sciences": [],
+         "social-sciences": [],
+         other: [],
+      }
 
       for (const item of bigQueryResults) {
+         if (!result[item.audience]) {
+            result[item.audience] = []
+         }
+
          if (
-            audienceSegmentsMap[item.audience]?.length <
-               AUDIENCE_SPARKS_LIMIT &&
+            result[item.audience]?.length < NUM_SPARKS_LIMIT &&
             sparksLookup[item.sparkId]
          ) {
-            audienceSegmentsMap[item.audience].push({
-               sparkData: this.convertSparkToCompetitorStaticCardData(
-                  sparksLookup[item.sparkId]
-               ),
-               plays: item.plays,
+            const sparkData = convertSparkToCompetitorSparkCardData(
+               sparksLookup[item.sparkId]
+            )
+            sparkData.creator.avatarUrl =
+               sparksLookup[item.sparkId].group.logoUrl
+
+            delete sparkData.spark.id // to save some memory on firestore
+
+            result[item.audience].push({
+               sparkData: sparkData,
+               rank: item.rank,
+               num_views: item.num_views,
                avg_watched_time: item.avg_watched_time,
                avg_watched_percentage: item.avg_watched_percentage,
                engagement: item.engagement,
             })
          }
       }
-
-      const auxAllSet = new Set<CompetitorSparkData>()
-
-      for (const item of bigQueryResults) {
-         if (
-            auxAllSet.size < INDUSTRY_SPARKS_LIMIT &&
-            sparksLookup[item.sparkId]
-         ) {
-            auxAllSet.add({
-               sparkData: this.convertSparkToCompetitorStaticCardData(
-                  sparksLookup[item.sparkId]
-               ),
-               plays: item.plays,
-               avg_watched_time: item.avg_watched_time,
-               avg_watched_percentage: item.avg_watched_percentage,
-               engagement: item.engagement,
-            })
-         }
-      }
-
-      audienceSegmentsMap["all"] = Array.from(auxAllSet)
-
-      const result = Object.entries(audienceSegmentsMap).reduce(
-         (acc, [key, value]) => {
-            if (value.length > 0) {
-               acc[key] = value
-            }
-            return acc
-         },
-         {} as CompetitorAudienceData<CompetitorSparkData[]>
-      )
 
       return result
    }

@@ -70,7 +70,7 @@ export const TopSparksByAudience = () => {
                         <CompetitorSparkStaticCard
                            key={`top-sparks-by-audience-${selectAudienceValue}-${index}`}
                            sparkData={data.sparkData}
-                           plays={data.plays}
+                           num_views={data.num_views}
                            avg_watched_time={data.avg_watched_time}
                            avg_watched_percentage={data.avg_watched_percentage}
                            engagement={data.engagement}

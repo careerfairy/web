@@ -224,10 +224,10 @@ export interface LivestreamEvent extends Identifiable {
    triGrams: Record<string, true>
 
    /**
-    * If true, Redirects to the new streaming page at: /streaming/(viewer|host)/{livestreamId}
-    * If false, Redirects to the old streaming page at /streaming/{livestreamId}/(viewer|joining/main-streamer)
+    * If false, Redirects to the new streaming page at: /streaming/(viewer|host)/{livestreamId}
+    * If true, Redirects to the old streaming page at /streaming/{livestreamId}/(viewer|joining/main-streamer)
     */
-   useNewUI?: boolean
+   useOldUI?: boolean
 }
 
 export const LivestreamModes = {

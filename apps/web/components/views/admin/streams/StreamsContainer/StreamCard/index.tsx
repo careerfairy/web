@@ -276,9 +276,9 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
                            disabled={isMutating}
                            onClick={() => toggleLivestreamNewUI()}
                         >
-                           {stream.useNewUI
-                              ? "Disable new stream room"
-                              : "Enable new stream room"}
+                           {stream.useOldUI
+                              ? "Enable new stream room"
+                              : "Disable new stream room"}
                         </MenuItem>
                         {isUpcoming ? (
                            <>
