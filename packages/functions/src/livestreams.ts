@@ -1,17 +1,15 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { UPCOMING_STREAM_THRESHOLD_MINUTES } from "@careerfairy/shared-lib/livestreams/constants"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import * as functions from "firebase-functions"
 import { client } from "./api/postmark"
 import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
 import { isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
+import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import { logger } from "firebase-functions/v2"
 import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import ical from "ical-generator"
-import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
 
 export const getLivestreamICalendarEvent = functions
@@ -19,10 +17,11 @@ export const getLivestreamICalendarEvent = functions
    .https.onRequest(async (req, res) => {
       setCORSHeaders(req, res)
       const livestreamId = req.query.eventId as string
+      const userTimezone = (req.query.timezone as string) || "Europe/Zurich"
 
       if (livestreamId) {
          try {
-            // get the livestream
+            // get the live stream
             const querySnapshot = await firestore
                .collection("livestreams")
                .doc(livestreamId)
@@ -31,49 +30,30 @@ export const getLivestreamICalendarEvent = functions
             if (querySnapshot.exists) {
                const livestream = querySnapshot.data() as LivestreamEvent
 
-               const livestreamTimeZone = livestream.timezone || "Europe/Zurich"
-
                // create calendar event
-               const livestreamStartDate = DateTime.fromJSDate(
-                  livestream.start.toDate(),
-                  { zone: livestreamTimeZone }
+               const calendarEventProperties = generateCalendarEventProperties(
+                  livestream,
+                  {
+                     userTimezone,
+                  }
                )
 
-               const livestreamUrl = makeLivestreamEventDetailsUrl(livestreamId)
-               const linkWithUTM = addUtmTagsToLink({
-                  link: livestreamUrl,
-                  campaign: "fromCalendarEvent",
-               })
-
                const cal = ical({
-                  events: [
-                     {
-                        start: livestreamStartDate,
-                        end: livestreamStartDate.plus({
-                           minutes:
-                              livestream.duration ||
-                              UPCOMING_STREAM_THRESHOLD_MINUTES,
-                        }),
-                        location: `${linkWithUTM}`,
-                        summary: livestream.title,
-                        description: "Join the event now!",
-                        organizer: {
-                           name: "CareerFairy",
-                           email: "noreply@careerfairy.io",
-                        },
-                        url: linkWithUTM,
-                        timezone: livestreamTimeZone,
-                     },
-                  ],
+                  events: [calendarEventProperties],
                })
                cal.serve(res)
+            } else {
+               res.status(404).send("Live stream not found")
             }
          } catch (e) {
             functions.logger.warn(
-               `An error has occurred creating the ICalendar event from the livestream ${livestreamId}`
+               `An error has occurred creating the ICalendar event from the live stream ${livestreamId}`,
+               e
             )
             res.sendStatus(500)
          }
+      } else {
+         res.status(400).send("Missing eventId parameter")
       }
    })
 
@@ -89,50 +69,16 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
 
       // Generate ICS file content
       const cal = ical()
-      const livestreamTimeZone = livestream.timezone || "Europe/Zurich"
-      const livestreamStartDate = DateTime.fromJSDate(
-         livestream.start.toDate(),
-         { zone: livestreamTimeZone }
+      const livestreamTimeZone = data.timezone || "Europe/Zurich"
+
+      const calendarEventProperties = generateCalendarEventProperties(
+         livestream,
+         {
+            userTimezone: livestreamTimeZone,
+         }
       )
-      const livestreamUrl = makeLivestreamEventDetailsUrl(data.livestream_id)
-      const linkWithUTM = addUtmTagsToLink({
-         link: livestreamUrl,
-         campaign: "fromCalendarEvent",
-         content: livestream.title,
-      })
 
-      let description = "Join the event now!\n\n"
-      if (livestream.summary) {
-         description += `Summary: ${livestream.summary}\n\n`
-      }
-      if (
-         livestream.reasonsToJoinLivestream_v2 &&
-         livestream.reasonsToJoinLivestream_v2.length > 0
-      ) {
-         description += `Reasons to join:\n${livestream.reasonsToJoinLivestream_v2
-            .map((reason) => `- ${reason}`)
-            .join("\n")}\n\n`
-      }
-      description += `Event link: ${linkWithUTM}`
-
-      cal.createEvent({
-         start: livestreamStartDate.toJSDate(),
-         end: livestreamStartDate
-            .plus({
-               minutes:
-                  livestream.duration || UPCOMING_STREAM_THRESHOLD_MINUTES,
-            })
-            .toJSDate(),
-         summary: livestream.title,
-         description: description,
-         location: livestream.isHybrid ? livestream.address : linkWithUTM,
-         url: linkWithUTM,
-         organizer: {
-            name: `CareerFairy - ${livestream.company}`,
-            email: "noreply@careerfairy.io",
-         },
-         timezone: livestreamTimeZone,
-      })
+      cal.createEvent(calendarEventProperties)
 
       const icsContent = cal.toString()
 
@@ -159,8 +105,8 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
                content: data.livestream_title,
             }),
             calendar_event_i_calendar: isLocalEnvironment()
-               ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v2?eventId=${data.livestream_id}`
-               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v2?eventId=${data.livestream_id}`,
+               ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}&timezone=${livestreamTimeZone}`
+               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}&timezone=${livestreamTimeZone}`,
             calendar_event_google: data.eventCalendarUrls.google,
             calendar_event_outlook: data.eventCalendarUrls.outlook,
             calendar_event_yahoo: data.eventCalendarUrls.yahoo,

@@ -31,10 +31,7 @@ import {
    UserLivestreamData,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
-import {
-   UPCOMING_STREAM_THRESHOLD_MILLISECONDS,
-   UPCOMING_STREAM_THRESHOLD_MINUTES,
-} from "@careerfairy/shared-lib/livestreams/constants"
+import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import {
@@ -44,6 +41,7 @@ import {
    UserStats,
    getLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/users"
+import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
@@ -301,25 +299,17 @@ class FirebaseService {
             "sendLivestreamRegistrationConfirmationEmail_v3"
          )
 
-      const livestreamStartDate = livestream.start.toDate()
-      const linkToLivestream = makeLivestreamEventDetailsUrl(livestream.id)
-      const linkWithUTM = `${linkToLivestream}?utm_campaign=fromCalendarEvent`
+      const calendarEvent = generateCalendarEventProperties(livestream, {
+         userTimezone: userData.timezone,
+      })
 
-      const calendarEvent = {
-         name: livestream.title,
-         // eslint-disable-next-line no-useless-escape
-         details: `<p style=\"font-style:italic;display:inline-block\">Join the event now!</p> Click <a href=\"${linkWithUTM}\">here</a>`,
-         location: linkWithUTM,
-         startsAt: livestreamStartDate.toISOString(),
-         endsAt: new Date(
-            livestreamStartDate.getTime() +
-               (livestream.duration || UPCOMING_STREAM_THRESHOLD_MINUTES) *
-                  60 *
-                  1000
-         ).toISOString(),
-      }
-
-      const urls = makeUrls(calendarEvent)
+      const urls = makeUrls({
+         name: calendarEvent.summary,
+         details: calendarEvent.description,
+         location: calendarEvent.location,
+         startsAt: calendarEvent.start.toISOString(),
+         endsAt: calendarEvent.end.toISOString(),
+      })
 
       return sendLivestreamRegistrationConfirmationEmail({
          eventCalendarUrls: urls,
@@ -336,7 +326,7 @@ class FirebaseService {
          company_logo_url: livestream.companyLogoUrl,
          company_background_image_url: livestream.backgroundImageUrl,
          livestream_title: livestream.title,
-         livestream_link: linkToLivestream,
+         livestream_link: calendarEvent.url,
       })
    }
 
