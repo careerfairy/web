@@ -75,6 +75,7 @@ import {
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
 import { errorLogAndNotify } from "util/CommonUtil"
+import CookiesUtil from "util/CookiesUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
 
@@ -470,6 +471,7 @@ export class LivestreamService {
                           userStats: userStats || null,
                           date: Timestamp.now(),
                        },
+                       utm: CookiesUtil.getUTMParams(),
                     }
                   : {}),
             },
