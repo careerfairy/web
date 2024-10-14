@@ -98,21 +98,40 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
       const linkWithUTM = addUtmTagsToLink({
          link: livestreamUrl,
          campaign: "fromCalendarEvent",
+         content: livestream.title,
       })
+
+      let description = "Join the event now!\n\n"
+      if (livestream.summary) {
+         description += `Summary: ${livestream.summary}\n\n`
+      }
+      if (
+         livestream.reasonsToJoinLivestream_v2 &&
+         livestream.reasonsToJoinLivestream_v2.length > 0
+      ) {
+         description += `Reasons to join:\n${livestream.reasonsToJoinLivestream_v2
+            .map((reason) => `- ${reason}`)
+            .join("\n")}\n\n`
+      }
+      description += `Event link: ${linkWithUTM}`
 
       cal.createEvent({
          start: livestreamStartDate.toJSDate(),
          end: livestreamStartDate
-            .plus({ minutes: livestream.duration || 60 })
+            .plus({
+               minutes:
+                  livestream.duration || UPCOMING_STREAM_THRESHOLD_MINUTES,
+            })
             .toJSDate(),
          summary: livestream.title,
-         description: "Join the event now!",
-         location: linkWithUTM,
+         description: description,
+         location: livestream.isHybrid ? livestream.address : linkWithUTM,
          url: linkWithUTM,
          organizer: {
-            name: "CareerFairy",
+            name: `CareerFairy - ${livestream.company}`,
             email: "noreply@careerfairy.io",
          },
+         timezone: livestreamTimeZone,
       })
 
       const icsContent = cal.toString()

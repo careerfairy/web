@@ -2154,6 +2154,7 @@ class FirebaseService {
 
       const existingUserLivestreamDataSnap = await userLivestreamDataRef.get()
       const existingUserLivestreamData = existingUserLivestreamDataSnap.data()
+      const isFirstRegistration = !existingUserLivestreamData?.registered?.date
 
       const data: UserLivestreamData = {
          livestreamId,
@@ -2167,9 +2168,7 @@ class FirebaseService {
             // that applies the rewards
             referral: getReferralInformation(),
             // Only store utm params only if they don't already exist to avoid overriding
-            ...(existingUserLivestreamData?.registered?.utm
-               ? {}
-               : { utm: CookiesUtil.getUTMParams() }),
+            ...(isFirstRegistration ? { utm: CookiesUtil.getUTMParams() } : {}),
             referrer: SessionStorageUtil.getReferrer(),
             // @ts-ignore
             date: this.getServerTimestamp(),
@@ -2443,6 +2442,7 @@ class FirebaseService {
                // @ts-ignore
                date: this.getServerTimestamp(),
             }
+            data.participated.utm = CookiesUtil.getUTMParams()
          }
 
          const batch = this.firestore.batch()

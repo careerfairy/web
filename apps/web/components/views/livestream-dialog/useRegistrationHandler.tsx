@@ -214,19 +214,18 @@ export default function useRegistrationHandler() {
                   }
                )
 
-               try {
-                  await sendRegistrationConfirmationEmail(
-                     authenticatedUser,
-                     userData,
-                     livestream
-                  )
-               } catch (e) {
+               // Do not await this call, it is not critical for the user experience
+               sendRegistrationConfirmationEmail(
+                  authenticatedUser,
+                  userData,
+                  livestream
+               ).catch((e) => {
                   errorLogAndNotify(e, {
                      message: "Failed to send confirmation email",
                      user: authenticatedUser,
                      livestream,
                   })
-               }
+               })
 
                // Increase livestream popularity
                recommendationServiceInstance.registerEvent(livestream, userData)
@@ -238,19 +237,20 @@ export default function useRegistrationHandler() {
             }
 
             // after registration, remove from this user's sparks notification the existing notification related to this event
-            try {
-               await sparkService.removeAndSyncUserSparkNotification({
+            // Not critical for user experience, so we don't await this
+            sparkService
+               .removeAndSyncUserSparkNotification({
                   userId: userData.userEmail,
                   groupId:
                      livestream.groupIds?.[0] || livestream.author?.groupId,
                })
-            } catch (e) {
-               errorLogAndNotify(e, {
-                  message: "Failed to remove spark notification",
-                  user: authenticatedUser,
-                  livestream,
+               .catch((e) => {
+                  errorLogAndNotify(e, {
+                     message: "Failed to remove spark notification",
+                     user: authenticatedUser,
+                     livestream,
+                  })
                })
-            }
 
             refetchRegisteredStreams()
          } catch (e) {
