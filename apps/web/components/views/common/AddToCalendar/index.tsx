@@ -7,7 +7,6 @@ import {
    Menu,
    MenuItem,
 } from "@mui/material"
-import { useAuth } from "HOCs/AuthProvider"
 import { memo, useCallback, useMemo, useState } from "react"
 import {
    appleIcon,
@@ -105,15 +104,10 @@ type Props = {
    onCalendarClick?: () => void
 }
 
-export const createCalendarEvent = (
-   livestream: LivestreamEvent,
-   userTimezone: string
-) => {
+export const createCalendarEvent = (livestream: LivestreamEvent) => {
    if (!livestream) return null
 
-   const calendarEventProps = generateCalendarEventProperties(livestream, {
-      userTimezone,
-   })
+   const calendarEventProps = generateCalendarEventProperties(livestream)
 
    return {
       name: calendarEventProps.summary,
@@ -130,16 +124,9 @@ export const AddToCalendar = memo(function AddToCalendar({
    filename = "download",
    onCalendarClick,
 }: Props) {
-   const { userData } = useAuth()
    const [anchorEl, setAnchorEl] = useState(null)
 
-   const urls = useMemo(
-      () =>
-         makeUrls(
-            createCalendarEvent(event, userData?.timezone || "Europe/Zurich")
-         ),
-      [event, userData?.timezone]
-   )
+   const urls = useMemo(() => makeUrls(createCalendarEvent(event)), [event])
 
    const handleClick = useCallback((event) => {
       dataLayerEvent("event_add_to_calendar")
