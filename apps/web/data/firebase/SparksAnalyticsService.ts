@@ -1,6 +1,7 @@
 import {
    FunctionSignature,
    SparksAnalyticsDTO,
+   SparkStatsFromBigQuery,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"
@@ -18,6 +19,21 @@ export class SparksAnalyticsService {
       )({ groupId })
 
       return analytics
+   }
+
+   async fetchSparkStats(
+      groupId: string,
+      sparkId: string
+   ): Promise<SparkStatsFromBigQuery> {
+      const { data: stats } = await httpsCallable<
+         { groupId: string; sparkId: string },
+         SparkStatsFromBigQuery
+      >(
+         this.functions,
+         "getSparkStats_v1"
+      )({ groupId, sparkId })
+
+      return stats
    }
 }
 
