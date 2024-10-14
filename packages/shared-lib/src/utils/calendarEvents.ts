@@ -17,6 +17,21 @@ const getBrowserTimeZone = () => {
    }
 }
 
+const MAX_DESCRIPTION_LENGTH = 1000
+const EVENT_LINK_PLACEHOLDER = "[EVENT_LINK]"
+
+const buildDescription = (parts: string[], eventLink: string): string => {
+   let description = parts.join("\n\n")
+   description += `\n\n${EVENT_LINK_PLACEHOLDER}`
+
+   if (description.length > MAX_DESCRIPTION_LENGTH) {
+      const availableSpace = MAX_DESCRIPTION_LENGTH - eventLink.length
+      description = description.slice(0, availableSpace - 3) + "..."
+   }
+
+   return description.replace(EVENT_LINK_PLACEHOLDER, eventLink)
+}
+
 export const generateCalendarEventProperties = (
    livestream: LivestreamEvent,
    { userTimezone }: Options
@@ -34,19 +49,17 @@ export const generateCalendarEventProperties = (
       content: livestream.title,
    })
 
-   let description = "Join the event now!\n\n"
-   if (livestream.summary) {
-      description += `Summary: ${livestream.summary}\n\n`
-   }
-   if (
-      livestream.reasonsToJoinLivestream_v2 &&
-      livestream.reasonsToJoinLivestream_v2.length > 0
-   ) {
-      description += `Reasons to join:\n${livestream.reasonsToJoinLivestream_v2
-         .map((reason) => `- ${reason}`)
-         .join("\n")}\n\n`
-   }
-   description += `Event link: ${linkWithUTM}`
+   const eventLink = `Event link: ${linkWithUTM}`
+   const descriptionParts = [
+      "Join the live stream!",
+      livestream.summary,
+      "Reasons to join:",
+      ...(livestream.reasonsToJoinLivestream_v2 || [])
+         .slice(0, 3)
+         .map((reason) => `• ${reason}`),
+   ].filter(Boolean)
+
+   const description = buildDescription(descriptionParts, eventLink)
 
    return {
       start: livestreamStartDate.toJSDate(),
@@ -56,7 +69,7 @@ export const generateCalendarEventProperties = (
          })
          .toJSDate(),
       summary: livestream.title,
-      description: description,
+      description,
       location: livestream.isHybrid ? livestream.address : linkWithUTM,
       url: linkWithUTM,
       organizer: {
