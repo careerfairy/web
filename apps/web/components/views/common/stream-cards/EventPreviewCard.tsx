@@ -345,7 +345,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          undefined
       )
       const { getPartnerEventLink } = usePartnership()
-      //const {data: hostCompany} = useLivestreamCompanyHostSWR(event?.id)
 
       useEffect(() => {
          // This code only runs on the client side
