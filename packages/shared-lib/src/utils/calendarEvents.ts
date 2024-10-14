@@ -4,17 +4,29 @@ import { UPCOMING_STREAM_THRESHOLD_MINUTES } from "../livestreams/constants"
 import { makeLivestreamEventDetailsUrl } from "../utils/urls"
 import { addUtmTagsToLink } from "../utils/utils"
 
+type Options = {
+   userTimezone: string
+}
+
+const getBrowserTimeZone = () => {
+   try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+   } catch (error) {
+      console.warn("Error getting browser timezone:", error)
+      return ""
+   }
+}
+
 export const generateCalendarEventProperties = (
    livestream: LivestreamEvent,
-   { userTimezone }: { userTimezone: string }
+   { userTimezone }: Options
 ) => {
-   const livestreamTimeZone = userTimezone || "Europe/Zurich"
-   const livestreamStartDate = DateTime.fromISO(
-      livestream.start.toDate().toISOString(),
-      {
-         zone: livestreamTimeZone,
-      }
-   )
+   const browserTimeZone = getBrowserTimeZone()
+   const livestreamTimeZone = userTimezone || browserTimeZone || "Europe/Zurich"
+
+   const livestreamStartDate = DateTime.fromJSDate(livestream.start.toDate(), {
+      zone: livestreamTimeZone,
+   })
    const livestreamUrl = makeLivestreamEventDetailsUrl(livestream.id)
    const linkWithUTM = addUtmTagsToLink({
       link: livestreamUrl,

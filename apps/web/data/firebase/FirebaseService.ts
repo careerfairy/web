@@ -41,10 +41,10 @@ import {
    UserStats,
    getLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/users"
-import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
+import { createCalendarEvent } from "components/views/common/AddToCalendar"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
 import { DateTime } from "luxon"
@@ -299,17 +299,9 @@ class FirebaseService {
             "sendLivestreamRegistrationConfirmationEmail_v3"
          )
 
-      const calendarEvent = generateCalendarEventProperties(livestream, {
-         userTimezone: userData.timezone,
-      })
+      const calendarEvent = createCalendarEvent(livestream, userData.timezone)
 
-      const urls = makeUrls({
-         name: calendarEvent.summary,
-         details: calendarEvent.description,
-         location: calendarEvent.location,
-         startsAt: calendarEvent.start.toISOString(),
-         endsAt: calendarEvent.end.toISOString(),
-      })
+      const urls = makeUrls(calendarEvent)
 
       return sendLivestreamRegistrationConfirmationEmail({
          eventCalendarUrls: urls,
@@ -326,7 +318,7 @@ class FirebaseService {
          company_logo_url: livestream.companyLogoUrl,
          company_background_image_url: livestream.backgroundImageUrl,
          livestream_title: livestream.title,
-         livestream_link: calendarEvent.url,
+         livestream_link: calendarEvent.location,
       })
    }
 
