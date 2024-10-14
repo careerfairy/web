@@ -5,6 +5,7 @@ import {
    makeLivestreamEventDetailsUrl,
 } from "@careerfairy/shared-lib/utils/urls"
 import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 
 export type CalendarEvent = {
    startsAt: string
@@ -130,4 +131,35 @@ export const makeLivestreamEventDetailsInviteUrl = (
 
 export const makeReferralUrl = (userReferralCode) => {
    return `${getHost()}/?${queryReferralCode}=${userReferralCode}`
+}
+
+type LivestreamURLOptions = {
+   type: "host" | "viewer"
+   token?: string
+   referralCode?: string
+   inviteCode?: string
+}
+
+export const makeLivestreamUrl = (
+   livestreamId: string,
+   options?: LivestreamURLOptions
+) => {
+   const url = new URL(
+      `${getBaseUrl()}/streaming/${options.type}/${livestreamId}`
+   )
+   const params = new URLSearchParams(url.search)
+
+   if (options.token) {
+      params.set("token", options.token)
+   }
+   if (options.referralCode) {
+      params.set("referral", options.referralCode)
+   }
+   if (options.inviteCode) {
+      params.set("invite", options.inviteCode)
+   }
+
+   url.search = params.toString()
+
+   return url.toString()
 }
