@@ -31,10 +31,7 @@ import {
    UserLivestreamData,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
-import {
-   UPCOMING_STREAM_THRESHOLD_MILLISECONDS,
-   UPCOMING_STREAM_THRESHOLD_MINUTES,
-} from "@careerfairy/shared-lib/livestreams/constants"
+import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import {
@@ -47,6 +44,7 @@ import {
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
+import { createCalendarEvent } from "components/views/common/AddToCalendar"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
 import { DateTime } from "luxon"
@@ -298,26 +296,10 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail_v2"
+            "sendLivestreamRegistrationConfirmationEmail_v3"
          )
 
-      const livestreamStartDate = livestream.start.toDate()
-      const linkToLivestream = makeLivestreamEventDetailsUrl(livestream.id)
-      const linkWithUTM = `${linkToLivestream}?utm_campaign=fromCalendarEvent`
-
-      const calendarEvent = {
-         name: livestream.title,
-         // eslint-disable-next-line no-useless-escape
-         details: `<p style=\"font-style:italic;display:inline-block\">Join the event now!</p> Click <a href=\"${linkWithUTM}\">here</a>`,
-         location: linkWithUTM,
-         startsAt: livestreamStartDate.toISOString(),
-         endsAt: new Date(
-            livestreamStartDate.getTime() +
-               (livestream.duration || UPCOMING_STREAM_THRESHOLD_MINUTES) *
-                  60 *
-                  1000
-         ).toISOString(),
-      }
+      const calendarEvent = createCalendarEvent(livestream)
 
       const urls = makeUrls(calendarEvent)
 
@@ -336,7 +318,7 @@ class FirebaseService {
          company_logo_url: livestream.companyLogoUrl,
          company_background_image_url: livestream.backgroundImageUrl,
          livestream_title: livestream.title,
-         livestream_link: linkToLivestream,
+         livestream_link: calendarEvent.location,
       })
    }
 
@@ -2145,15 +2127,15 @@ class FirebaseService {
          (group) => group.id
       )
 
-      const livestreamRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-
       const userLivestreamDataRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("userLivestreamData")
          .doc(userData.userEmail)
+
+      const existingUserLivestreamDataSnap = await userLivestreamDataRef.get()
+      const existingUserLivestreamData = existingUserLivestreamDataSnap.data()
+      const isFirstRegistration = !existingUserLivestreamData?.registered?.date
 
       const data: UserLivestreamData = {
          livestreamId,
@@ -2166,8 +2148,8 @@ class FirebaseService {
             // We store the referral info so that it can be used by a cloud function
             // that applies the rewards
             referral: getReferralInformation(),
-            // Store the utm params if they exist
-            utm: CookiesUtil.getUTMParams(),
+            // Only store utm params only if they don't already exist to avoid overriding
+            ...(isFirstRegistration ? { utm: CookiesUtil.getUTMParams() } : {}),
             referrer: SessionStorageUtil.getReferrer(),
             // @ts-ignore
             date: this.getServerTimestamp(),
@@ -2441,6 +2423,7 @@ class FirebaseService {
                // @ts-ignore
                date: this.getServerTimestamp(),
             }
+            data.participated.utm = CookiesUtil.getUTMParams()
          }
 
          const batch = this.firestore.batch()

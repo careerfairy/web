@@ -1,5 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { UPCOMING_STREAM_THRESHOLD_MINUTES } from "@careerfairy/shared-lib/livestreams/constants"
+import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
+import { AddUtmTagsToLinkProps } from "@careerfairy/shared-lib/utils/utils"
 import {
    Avatar,
    ListItemIcon,
@@ -17,7 +18,6 @@ import {
 } from "../../../../constants/svgs"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
 import { makeUrls } from "../../../../util/makeUrls"
-import { buildExternalDialogLink } from "../../livestream-dialog"
 
 const styles = {
    avatar: {
@@ -94,14 +94,6 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls, onItemClick }) => {
    )
 }
 
-type EventProps = {
-   name: string
-   details: string
-   location: string
-   startsAt: string
-   endsAt: string
-}
-
 type Props = {
    children: (handler: (event: any) => void) => void
    event: LivestreamEvent
@@ -114,28 +106,22 @@ type Props = {
 }
 
 export const createCalendarEvent = (
-   livestream: LivestreamEvent
-): EventProps => {
+   livestream: LivestreamEvent,
+   customUtm?: Partial<AddUtmTagsToLinkProps>
+) => {
    if (!livestream) return null
 
-   const time = livestream.start?.toDate?.() || null
-   const linkToStream = buildExternalDialogLink({
-      type: "livestreamDetails",
-      livestreamId: livestream.id,
-      targetPage: "/portal",
-   })
+   const calendarEventProps = generateCalendarEventProperties(
+      livestream,
+      customUtm
+   )
 
    return {
-      name: livestream.title,
-      details: `Here is your Link: ${linkToStream}`,
-      location: "Hosted virtually on CareerFairy (link in the description)",
-      startsAt: new Date(time).toISOString(),
-      endsAt: new Date(
-         new Date(time).getTime() +
-            (livestream.duration || UPCOMING_STREAM_THRESHOLD_MINUTES) *
-               60 *
-               1000
-      ).toISOString(),
+      name: calendarEventProps.summary,
+      details: calendarEventProps.description,
+      location: calendarEventProps.location,
+      startsAt: calendarEventProps.start.toISOString(),
+      endsAt: calendarEventProps.end.toISOString(),
    }
 }
 
@@ -147,7 +133,15 @@ export const AddToCalendar = memo(function AddToCalendar({
 }: Props) {
    const [anchorEl, setAnchorEl] = useState(null)
 
-   const urls = useMemo(() => makeUrls(createCalendarEvent(event)), [event])
+   const urls = useMemo(
+      () =>
+         makeUrls(
+            createCalendarEvent(event, {
+               medium: "add-to-calendar-register-confirmation",
+            })
+         ),
+      [event]
+   )
 
    const handleClick = useCallback((event) => {
       dataLayerEvent("event_add_to_calendar")
