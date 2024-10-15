@@ -24,8 +24,8 @@ export function topCompaniesByIndustry(timePeriod: string) {
             GBI.industry,
             COUNT(CASE WHEN SparkEvents.actionType = "Played_Spark" THEN 1 END) as num_views,
             COUNT(CASE WHEN SparkEvents.actionType = "Like" THEN 1 END) as num_likes,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_clicks,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_shares,
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_shares,
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_clicks,
             COUNT(DISTINCT CASE WHEN SparkEvents.actionType = "Played_Spark" THEN IFNULL(userId, visitorId) END) AS unique_viewers,
          FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents as SparkEvents 
          INNER JOIN GroupByIndustry GBI ON SparkEvents.groupId = GBI.groupId AND SparkEvents.sparkId = GBI.sparkId
@@ -46,8 +46,8 @@ export function topCompaniesByIndustry(timePeriod: string) {
             "all" as industry,
             COUNT(CASE WHEN SparkEvents.actionType = "Played_Spark" THEN 1 END) as num_views,
             COUNT(CASE WHEN SparkEvents.actionType = "Like" THEN 1 END) as num_likes,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_clicks,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_shares,
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_shares,
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_clicks,
             COUNT(DISTINCT CASE WHEN SparkEvents.actionType = "Played_Spark" THEN IFNULL(userId, visitorId) END) AS unique_viewers,
          FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents as SparkEvents 
          WHERE timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
@@ -153,8 +153,8 @@ export function topSparksByIndustry(timePeriod: string) {
             SparkEvents.sparkId,
             COUNT(CASE WHEN SparkEvents.actionType = "Played_Spark" THEN 1 END) as num_views,
             COUNT(CASE WHEN SparkEvents.actionType = "Like" THEN 1 END) as num_likes,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_clicks,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_shares
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_shares,
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_clicks
          FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents as SparkEvents 
          WHERE SparkEvents.timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
             AND (
@@ -290,8 +290,8 @@ export function topSparksByAudience(timePeriod: string) {
             END as audience,
             COUNT(CASE WHEN SparkEvents.actionType = "Played_Spark" THEN 1 END) as num_views,
             COUNT(CASE WHEN SparkEvents.actionType = "Like" THEN 1 END) as num_likes,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_clicks,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_shares,
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_shares,
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_clicks,
          FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents as SparkEvents
          INNER JOIN careerfairy-e1fd9.firestore_export.userData_schema_userData_latest as userData
             ON SparkEvents.userId = userData.authId
@@ -312,8 +312,8 @@ export function topSparksByAudience(timePeriod: string) {
             "all" as audience,
             COUNT(CASE WHEN SparkEvents.actionType = "Played_Spark" THEN 1 END) as num_views,
             COUNT(CASE WHEN SparkEvents.actionType = "Like" THEN 1 END) as num_likes,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_clicks,
-            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_shares,
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Share_%" THEN 1 END) as num_shares,
+            COUNT(CASE WHEN SparkEvents.actionType LIKE "Click_%" THEN 1 END) as num_clicks,
          FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents as SparkEvents
          INNER JOIN careerfairy-e1fd9.firestore_export.userData_schema_userData_latest as userData
             ON SparkEvents.userId = userData.authId
