@@ -159,7 +159,7 @@ export const companyNameUnSlugify = (text: string): string => {
    )
 }
 
-type AddUtmTagsToLinkProps = {
+export type AddUtmTagsToLinkProps = {
    link: string
    source?: string
    medium?: string

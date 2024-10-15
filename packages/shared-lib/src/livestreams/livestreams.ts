@@ -330,6 +330,7 @@ export interface UserLivestreamData extends Identifiable {
          userStats: UserStats
          date: firebase.firestore.Timestamp
       }
+      utm?: UTMParams
    }
    jobApplications?: {
       [jobId: string]: LivestreamJobApplicationDetails
