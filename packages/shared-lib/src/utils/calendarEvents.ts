@@ -2,7 +2,7 @@ import { DateTime } from "luxon"
 import { LivestreamEvent } from "../livestreams"
 import { UPCOMING_STREAM_THRESHOLD_MINUTES } from "../livestreams/constants"
 import { makeLivestreamEventDetailsUrl } from "../utils/urls"
-import { addUtmTagsToLink } from "../utils/utils"
+import { addUtmTagsToLink, AddUtmTagsToLinkProps } from "../utils/utils"
 
 const MAX_DESCRIPTION_LENGTH = 1000
 const EVENT_LINK_PLACEHOLDER = "[EVENT_LINK]"
@@ -20,7 +20,8 @@ const buildDescription = (parts: string[], eventLink: string): string => {
 }
 
 export const generateCalendarEventProperties = (
-   livestream: LivestreamEvent
+   livestream: LivestreamEvent,
+   customUtm?: Partial<AddUtmTagsToLinkProps>
 ) => {
    const livestreamStartDate = DateTime.fromJSDate(livestream.start.toDate())
    const livestreamUrl = makeLivestreamEventDetailsUrl(livestream.id)
@@ -28,6 +29,7 @@ export const generateCalendarEventProperties = (
       link: livestreamUrl,
       campaign: "fromCalendarEvent",
       content: livestream.title,
+      ...customUtm, // Override default UTM parameters
    })
 
    const eventLink = `Event link: ${linkWithUTM}`

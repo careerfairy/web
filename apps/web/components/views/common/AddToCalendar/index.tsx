@@ -1,5 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
+import { AddUtmTagsToLinkProps } from "@careerfairy/shared-lib/utils/utils"
 import {
    Avatar,
    ListItemIcon,
@@ -104,10 +105,16 @@ type Props = {
    onCalendarClick?: () => void
 }
 
-export const createCalendarEvent = (livestream: LivestreamEvent) => {
+export const createCalendarEvent = (
+   livestream: LivestreamEvent,
+   customUtm?: Partial<AddUtmTagsToLinkProps>
+) => {
    if (!livestream) return null
 
-   const calendarEventProps = generateCalendarEventProperties(livestream)
+   const calendarEventProps = generateCalendarEventProperties(
+      livestream,
+      customUtm
+   )
 
    return {
       name: calendarEventProps.summary,
@@ -126,7 +133,15 @@ export const AddToCalendar = memo(function AddToCalendar({
 }: Props) {
    const [anchorEl, setAnchorEl] = useState(null)
 
-   const urls = useMemo(() => makeUrls(createCalendarEvent(event)), [event])
+   const urls = useMemo(
+      () =>
+         makeUrls(
+            createCalendarEvent(event, {
+               medium: "add-to-calendar-register-confirmation",
+            })
+         ),
+      [event]
+   )
 
    const handleClick = useCallback((event) => {
       dataLayerEvent("event_add_to_calendar")
