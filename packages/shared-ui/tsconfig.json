@@ -1,11 +1,6 @@
 {
    "extends": "@careerfairy/config-tsconfig/tsconfig.base.json",
-   "include": [
-      "src",
-      ".eslintrc.js",
-      ".storybook/**/*",
-      "../config-mui/mui-theme.d.ts"
-   ],
+   "include": ["src", ".eslintrc.js", "../config-mui/mui-theme.d.ts"],
    "exclude": [
       "node_modules",
       ".next",
@@ -13,7 +8,6 @@
       "coverage",
       "dist",
       "compiled",
-      "build-next-static",
-      "build-storybook-static"
+      "build-next-static"
    ]
 }
