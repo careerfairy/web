@@ -13,6 +13,7 @@ import {
    MostSomethingBigQueryResult,
    PieChartDataPoint,
    SparksAnalyticsDTO,
+   SparkStatsFromBigQuery,
    TimePeriodParams,
    TimeseriesDataPoint,
 } from "@careerfairy/shared-lib/sparks/analytics"
@@ -45,6 +46,7 @@ import {
    mostWatched,
 } from "./queries/MostSomething"
 import { totalViewsPastYear, uniqueViewersPastYear } from "./queries/Reach"
+import { sparkStats } from "./queries/SparkStats"
 import {
    convertSparkToCompetitorSparkCardData,
    MIN_NUM_COMPANIES,
@@ -198,6 +200,13 @@ interface IGroupSparksAnalyticsRepository {
     * @returns {Promise<void>} A promise that resolves when the cache has been updated.
     */
    updateAnalyticsInFirestore(analytics: SparksAnalyticsDTO): Promise<void>
+
+   /**
+    * Retrieves statistics for a specific spark from BigQuery.
+    * @param {string} sparkId - The unique identifier of the spark.
+    * @returns {Promise<SparkStatsFromBigQuery>} A promise that resolves to the statistics for the specified spark.
+    */
+   getSparkStats(sparkId: string): Promise<SparkStatsFromBigQuery>
 }
 
 class GroupSparksAnalyticsRepository
@@ -684,6 +693,15 @@ class GroupSparksAnalyticsRepository
       }
 
       return result
+   }
+
+   async getSparkStats(sparkId: string): Promise<SparkStatsFromBigQuery> {
+      const params = { sparkId }
+      const rows = await this.handleQueryPromise<SparkStatsFromBigQuery>(
+         sparkStats,
+         params
+      )
+      return rows[0]
    }
 
    private async handleQueryPromise<T>(

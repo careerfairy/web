@@ -217,6 +217,46 @@ async function fetchAnalyticsFromBigQuery(
    return SparksAnalyticsPayload
 }
 
+export const getSparkStats = functions.region(config.region).https.onCall(
+   middlewares(
+      dataValidation({
+         groupId: string().required(),
+         sparkId: string().required(),
+      }),
+      userShouldBeGroupAdmin(),
+      async (data, context) => {
+         try {
+            const { groupId, sparkId } = data
+            const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
+               groupId,
+               sparkRepo
+            )
+
+            functions.logger.info(
+               `Fetching spark stats of ${sparkId} from group ${groupId}...`
+            )
+
+            const sparkStatsData = await sparksAnalyticsRepo.getSparkStats(
+               sparkId
+            )
+
+            return sparkStatsData
+         } catch (error) {
+            functions.logger.error("Error fetching sparks stats", {
+               data,
+               error,
+               context,
+            })
+            logAndThrow("Error fetching sparks stats", {
+               data,
+               error,
+               context,
+            })
+         }
+      }
+   )
+)
+
 export const getSparksAnalytics = functions
    .region(config.region)
    .runWith({

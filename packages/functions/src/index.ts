@@ -285,6 +285,7 @@ exports.markSparkAsSeenByUser_v4 = userSparks.markSparkAsSeenByUser
 exports.trackSparkEvents_v6 = userSparks.trackSparkEvents
 exports.trackSparkSecondsWatched_v4 = userSparks.trackSparkSecondsWatched
 exports.getSparksAnalytics_v6 = sparksAnalytics.getSparksAnalytics
+exports.getSparkStats_v1 = sparksAnalytics.getSparkStats
 
 // Custom Jobs
 exports.confirmUserJobApplication = customJobs.confirmUserApplyToCustomJob
