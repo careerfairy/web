@@ -1,4 +1,3 @@
-import React from "react"
 import { Container, Grid, Grow } from "@mui/material"
 import GroupStreams from "../GroupStreams/GroupStreams"
 
@@ -29,7 +28,6 @@ const DesktopFeed = ({
                sx={{ margin: (theme) => theme.spacing(1) }}
             >
                <GroupStreams
-                  mobile={false}
                   isPastLivestreams={isPastLivestreams}
                   listenToUpcoming={listenToUpcoming}
                   careerCenterId={careerCenterId}

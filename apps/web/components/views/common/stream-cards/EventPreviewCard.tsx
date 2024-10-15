@@ -5,7 +5,6 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
-import LanguageIcon from "@mui/icons-material/Language"
 import { CardActionArea } from "@mui/material"
 import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
@@ -32,6 +31,7 @@ import React, {
    useMemo,
    useState,
 } from "react"
+import { Globe } from "react-feather"
 import { useInView } from "react-intersection-observer"
 import { checkIfPast } from "util/streamUtil"
 import { placeholderBanner } from "../../../../constants/images"
@@ -55,20 +55,10 @@ const bottomContentHeight = 50
 const cardAvatarSize = 65
 
 const styles = sxStyles({
-   hideOnHoverContent: {
-      position: "absolute",
-      paddingX: 2,
-      marginTop: "100px",
-      width: "100%",
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-between",
-      transition: (theme: Theme) => theme.transitions.create(["opacity"]),
-   },
    backgroundImageWrapper: {
       filter: "brightness(75%)",
       display: "flex",
-      height: "40%",
+      height: "112px",
       width: "100%",
       position: "relative",
       transition: (theme: Theme) => theme.transitions.create(["transform"]),
@@ -80,39 +70,68 @@ const styles = sxStyles({
          )}, ${alpha(theme.palette.common.black, 0.1)})`,
    },
    backgroundImageWrapperWithBottomContent: {
-      height: `calc(40% + ${bottomContentHeight / 2}px)`,
+      height: `calc(112px + ${bottomContentHeight / 2}px)`,
    },
    backgroundImageLoader: {
       position: "absolute",
       inset: 0,
       height: "auto",
    },
-   flippedCardContent: {
-      position: "absolute",
-      opacity: "0",
-   },
    contentWrapper: {
       display: "flex",
       width: "100%",
-      height: "60%",
       flexDirection: "column",
-      padding: 2,
-      paddingTop: 5,
+      marginTop: "-12px",
+      padding: "0px 16px 16px 16px",
       transition: (theme: Theme) => theme.transitions.create("transform"),
-      background: (theme) =>
-         theme.palette.mode === "dark" ? "background.paper" : "white",
+      justifyContent: "flex-end",
+      alignItems: "flex-start",
+      gap: "16px",
+   },
+   headerWrapper: {
+      display: "flex",
+      width: "100%",
+      gap: "8px",
+   },
+   companyNameWrapper: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "flex-start",
+      flex: "1 0 0",
+      flexDirection: "column",
+      color: (theme) => theme.palette.neutral[700],
+      fontWeight: 600,
+      overflow: "hidden",
+   },
+   companyName: {
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      width: "100%",
    },
    title: {
-      fontWeight: 700,
+      fontWeight: 600,
       ...getMaxLineStyles(2),
    },
    summary: {
-      fontWeight: 500,
+      fontWeight: 400,
+      lineHeight: "20px",
       ...getMaxLineStyles(2),
+   },
+   descriptionWrapper: {
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      alignSelf: "stretch",
+      height: "136px",
+   },
+   chipsWrapper: {
+      display: "flex",
+      alignItems: "flex-start",
+      alignSelf: "stretch",
+      mt: "auto",
    },
    mainAndLowerContentWrapper: {
       borderRadius: (theme) => theme.spacing(2),
-      boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
    },
    selectedWrapper: {
@@ -125,13 +144,11 @@ const styles = sxStyles({
    },
    mainContentWrapper: {
       position: "relative",
-      height: (theme) => theme.spacing(43),
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-end",
       overflow: "hidden",
       width: "100%",
-      color: "white",
       "&:before": {},
 
       "&:after": {
@@ -173,11 +190,16 @@ const styles = sxStyles({
       textAlign: "center",
       justifyContent: "center",
       backgroundColor: "white",
-      boxShadow: "0px 10px 15px -10px rgba(0,0,0,0.1)",
       border: "none !important",
-      width: 58,
-      height: 60,
-      borderRadius: 3,
+      width: "56px",
+      height: "64px",
+      padding: "12px",
+      gap: "-4px",
+      flexShrink: 0,
+      borderRadius: "0px 0px 6px 6px",
+      boxShadow: "0px 0px 12px 0px rgba(20, 20, 20, 0.08)",
+      position: "absolute",
+      marginRight: "12px",
    },
    nextImageWrapper: {
       position: "relative",
@@ -192,28 +214,64 @@ const styles = sxStyles({
    cursorPointer: {
       cursor: "pointer",
    },
-   cardWrapper: {
-      borderRadius: (theme) => theme.spacing(2),
+   cardWrapper: (theme) => ({
+      minWidth: "300px",
+      borderRadius: theme.spacing(2),
+      border: `1px solid ${theme.palette.secondary[50]}`,
+      background: theme.brand.white[50],
       "& .backgroundImage": {
-         transition: (theme: Theme) => theme.transitions.create(["transform"]),
+         transition: theme.transitions.create(["transform"]),
       },
       "&:hover, &:focus-within": {
          "& .backgroundImage": {
             transform: "scale(1.1)",
          },
+         background: theme.brand.white[100],
+         borderColor: theme.palette.secondary[100],
+         boxShadow: "0px 0px 12px 0px rgba(20, 20, 20, 0.08)",
       },
+      ".MuiCardActionArea-focusHighlight": {
+         background: "transparent",
+      },
+   }),
+   startDay: {
+      color: (theme) => theme.palette.primary.main,
+      fontWeight: 700,
    },
    startMonth: {
       textAlign: "center",
-      fontSize: "12px",
-      fontStyle: "normal",
       fontWeight: "400",
-      lineHeight: "20px",
+      marginTop: "-4px",
+      color: (theme) => theme.palette.neutral[900],
+      "&::first-letter": {
+         textTransform: "uppercase",
+      },
    },
    eventDateWrapper: {
       display: "flex",
       marginY: 1,
       justifyContent: "space-between",
+   },
+   chip: {
+      color: (theme) => theme.palette.neutral[500],
+      border: (theme) => `1px solid ${theme.palette.neutral[400]}`,
+      height: "unset",
+      padding: "4px 8px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: "4px",
+      "& .MuiChip-label": {
+         fontSize: 12,
+         fontWeight: 400,
+         lineHeight: "16px",
+         padding: 0,
+      },
+      "& .MuiChip-icon": {
+         margin: 0,
+         width: "14px",
+         height: "14px",
+      },
    },
 })
 type EventPreviewCardProps = {
@@ -327,7 +385,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       }, [startDate])
 
       const getStartMonth = useMemo<string>(() => {
-         return DateUtil.getMonth(new Date(startDate).getMonth(), true)
+         return DateUtil.getMonth(
+            new Date(startDate).getMonth(),
+            true
+         ).toLowerCase()
       }, [startDate])
 
       const getPastEventDate = useMemo<string>(
@@ -433,7 +494,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                   target={targetValue}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
-                  disabled={disableClick}
+                  disabled={disableClick || loading}
                   disableRipple={!event}
                >
                   <Box
@@ -480,7 +541,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                            )}
                         </Box>
 
-                        {hideChipLabels ? null : (
+                        {hideChipLabels || loading ? null : (
                            <EventPreviewCardChipLabels
                               hasParticipated={hasParticipated}
                               isPast={isPast}
@@ -490,11 +551,27 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                            />
                         )}
 
+                        {isPlaceholderEvent || isPast || loading ? null : (
+                           <Box sx={styles.calendarDate}>
+                              <Typography
+                                 variant={"brandedH3"}
+                                 sx={styles.startDay}
+                              >
+                                 {getStartDay}
+                              </Typography>
+                              <Typography
+                                 variant={"xsmall"}
+                                 sx={styles.startMonth}
+                              >
+                                 {getStartMonth}
+                              </Typography>
+                           </Box>
+                        )}
                         <Box
-                           className="hideOnHoverContent"
-                           sx={[styles.hideOnHoverContent, { zIndex: 1 }]}
+                           className="contentWrapper"
+                           sx={[styles.contentWrapper]}
                         >
-                           <Box sx={{ display: "flex" }}>
+                           <Box sx={styles.headerWrapper}>
                               {loading ? (
                                  <Skeleton
                                     animation={animation ?? "wave"}
@@ -509,188 +586,150 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                     size={cardAvatarSize}
                                  />
                               )}
-                           </Box>
-                           {isPlaceholderEvent || isPast ? null : (
-                              <Box sx={{ display: "flex" }}>
-                                 {loading ? (
-                                    <Skeleton
-                                       animation={animation ?? "wave"}
-                                       variant="rectangular"
-                                       sx={{ borderRadius: 3 }}
-                                       width={58}
-                                       height={60}
-                                    />
-                                 ) : (
-                                    <Box sx={styles.calendarDate}>
-                                       <Typography
-                                          variant={"h5"}
-                                          color={"#2ABAA5"}
-                                          fontWeight={600}
-                                       >
-                                          {getStartDay}
-                                       </Typography>
-                                       <Typography
-                                          variant={"body1"}
-                                          color={"black !important"}
-                                          fontWeight={500}
-                                          sx={styles.startMonth}
-                                       >
-                                          {getStartMonth}
-                                       </Typography>
-                                    </Box>
-                                 )}
-                              </Box>
-                           )}
-                        </Box>
-                        <Box
-                           className="contentWrapper"
-                           sx={[
-                              styles.contentWrapper,
-                              isPast ? { paddingTop: 4 } : null,
-                           ]}
-                        >
-                           {isPast ? (
-                              <Box
-                                 className="hidePastDateOnHover"
-                                 sx={styles.eventDateWrapper}
-                              >
+                              <Box sx={styles.companyNameWrapper}>
                                  <Typography
-                                    sx={{
-                                       display: "flex",
-                                       alignItems: "center",
-                                    }}
-                                    fontSize={12}
-                                    color={"text.secondary"}
+                                    variant="small"
+                                    sx={styles.companyName}
                                  >
-                                    <CalendarIcon
-                                       fontSize={"inherit"}
-                                       sx={{ mr: 0.5 }}
-                                    />
-                                    {getPastEventDate}
-                                 </Typography>
-
-                                 <Typography
-                                    sx={{
-                                       display: "flex",
-                                       alignItems: "center",
-                                    }}
-                                    fontSize={12}
-                                    color={"text.secondary"}
-                                 >
-                                    {event?.duration} min
+                                    {event?.company}
                                  </Typography>
                               </Box>
-                           ) : null}
-
-                           <Box sx={{ display: "flex" }}>
-                              <Typography
-                                 variant={"body1"}
-                                 color="text.primary"
-                                 sx={styles.title}
-                              >
-                                 {loading ? (
-                                    <Skeleton
-                                       animation={animation}
-                                       variant="rectangular"
-                                       sx={{ mt: 5, borderRadius: 3 }}
-                                       width={300}
-                                       height={16}
-                                    />
-                                 ) : (
-                                    event?.title
-                                 )}
-                              </Typography>
                            </Box>
-
-                           <Box display={"flex"} mt={1}>
-                              <Typography
-                                 variant={"body2"}
-                                 color="text.secondary"
-                                 sx={styles.summary}
-                                 className="summary"
-                              >
-                                 {loading ? (
-                                    <Skeleton
-                                       animation={animation}
-                                       variant="rectangular"
-                                       sx={{ borderRadius: 3 }}
-                                       width={300}
-                                       height={16}
-                                    />
-                                 ) : (
-                                    event?.summary
-                                 )}
-                              </Typography>
-                           </Box>
-
-                           <Box
-                              className="flippedCardContent"
-                              sx={styles.flippedCardContent}
-                           ></Box>
-
-                           <Box
-                              className="chipsWrapper"
-                              sx={{
-                                 display: "flex",
-                                 height: 32,
-                                 alignItems: "end",
-                                 mt: "auto",
-                              }}
-                           >
-                              <Stack spacing={1} direction={"row"}>
-                                 {loading ? (
-                                    <>
-                                       <Skeleton
-                                          animation={animation}
-                                          sx={styles.chipLoader}
+                           <Box>
+                              {isPast ? (
+                                 <Box
+                                    className="hidePastDateOnHover"
+                                    sx={styles.eventDateWrapper}
+                                 >
+                                    <Typography
+                                       sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                       }}
+                                       fontSize={12}
+                                       color={"text.secondary"}
+                                    >
+                                       <CalendarIcon
+                                          fontSize={"inherit"}
+                                          sx={{ mr: 0.5 }}
                                        />
-                                       <Skeleton
-                                          animation={animation}
-                                          sx={styles.chipLoader}
-                                       />
-                                    </>
-                                 ) : (
-                                    <>
-                                       {event?.language?.code ? (
-                                          <WhiteTagChip
-                                             icon={<LanguageIcon />}
-                                             variant="filled"
-                                             tooltipText={`This event is in ${event?.language.name}`}
-                                             label={event?.language.code.toUpperCase()}
-                                             sx={{ border: "1px solid black" }}
+                                       {getPastEventDate}
+                                    </Typography>
+
+                                    <Typography
+                                       sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                       }}
+                                       fontSize={12}
+                                       color={"text.secondary"}
+                                    >
+                                       {event?.duration} min
+                                    </Typography>
+                                 </Box>
+                              ) : null}
+                              <Stack sx={styles.descriptionWrapper}>
+                                 <Stack spacing={1}>
+                                    <Typography
+                                       variant={"brandedBody"}
+                                       color="text.primary"
+                                       sx={styles.title}
+                                    >
+                                       {loading ? (
+                                          <Skeleton
+                                             animation={animation}
+                                             variant="rectangular"
+                                             sx={{ mt: 5, borderRadius: 3 }}
+                                             width={300}
+                                             height={16}
                                           />
-                                       ) : null}
-                                       {event?.businessFunctionsTagIds
-                                          ?.slice(0, 1)
-                                          ?.map((tagId) => (
+                                       ) : (
+                                          event?.title
+                                       )}
+                                    </Typography>
+
+                                    <Typography
+                                       variant={"small"}
+                                       color="text.secondary"
+                                       sx={styles.summary}
+                                       className="summary"
+                                    >
+                                       {loading ? (
+                                          <Skeleton
+                                             animation={animation}
+                                             variant="rectangular"
+                                             sx={{ borderRadius: 3 }}
+                                             width={300}
+                                             height={16}
+                                          />
+                                       ) : (
+                                          event?.summary
+                                       )}
+                                    </Typography>
+                                 </Stack>
+
+                                 <Stack
+                                    className="chipsWrapper"
+                                    spacing={1}
+                                    direction={"row"}
+                                    sx={styles.chipsWrapper}
+                                 >
+                                    {loading ? (
+                                       <>
+                                          <Skeleton
+                                             animation={animation}
+                                             sx={styles.chipLoader}
+                                          />
+                                          <Skeleton
+                                             animation={animation}
+                                             sx={styles.chipLoader}
+                                          />
+                                       </>
+                                    ) : (
+                                       <>
+                                          {event?.language?.code ? (
                                              <WhiteTagChip
-                                                key={tagId}
+                                                icon={<Globe />}
                                                 variant="filled"
-                                                sx={{
-                                                   maxWidth:
-                                                      event
-                                                         ?.businessFunctionsTagIds
-                                                         .length > 2
-                                                         ? "50%"
-                                                         : "80%",
-                                                   border: "1px solid black",
-                                                }}
-                                                label={TagValuesLookup[tagId]}
+                                                tooltipText={`This event is in ${event?.language.name}`}
+                                                label={event?.language.code.toUpperCase()}
+                                                sx={styles.chip}
                                              />
-                                          ))}
-                                       {event?.businessFunctionsTagIds?.length >
-                                       2 ? (
-                                          <WhiteTagChip
-                                             variant="filled"
-                                             sx={{ border: "1px solid black" }}
-                                             label={`+ ${
-                                                event.businessFunctionsTagIds
-                                                   .length - 1
-                                             }`}
-                                          />
-                                       ) : null}
-                                    </>
-                                 )}
+                                          ) : null}
+                                          {event?.businessFunctionsTagIds
+                                             ?.slice(0, 1)
+                                             ?.map((tagId) => (
+                                                <WhiteTagChip
+                                                   key={tagId}
+                                                   variant="filled"
+                                                   sx={{
+                                                      maxWidth:
+                                                         event
+                                                            ?.businessFunctionsTagIds
+                                                            .length > 2
+                                                            ? "50%"
+                                                            : "80%",
+                                                      ...styles.chip,
+                                                   }}
+                                                   label={
+                                                      TagValuesLookup[tagId]
+                                                   }
+                                                />
+                                             ))}
+                                          {event?.businessFunctionsTagIds
+                                             ?.length > 2 ? (
+                                             <WhiteTagChip
+                                                variant="filled"
+                                                sx={styles.chip}
+                                                label={`+ ${
+                                                   event.businessFunctionsTagIds
+                                                      .length - 1
+                                                }`}
+                                             />
+                                          ) : null}
+                                       </>
+                                    )}
+                                 </Stack>
                               </Stack>
                            </Box>
                         </Box>

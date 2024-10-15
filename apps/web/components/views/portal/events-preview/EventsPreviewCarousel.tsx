@@ -69,19 +69,16 @@ const styles = sxStyles({
    slide: {
       flex: {
          xs: `0 0 90%`,
-         sm: `0 0 45%`,
-         md: `0 0 40%`,
-         lg: `0 0 30%`,
+         sm: `0 0 55%`,
+         md: `0 0 45%`,
+         lg: `0 0 35%`,
       },
-
-      minWidth: 0,
+      maxWidth: "368px",
+      minWidth: "300px",
       position: "relative",
-      height: {
-         xs: 363,
-         md: 363,
-      },
+
       "&:not(:first-of-type)": {
-         paddingLeft: `calc(${slideSpacing}px - 5px)`,
+         ml: `calc(${slideSpacing}px - 5px)`,
       },
       "&:first-of-type": {
          ml: 0.3,
@@ -95,6 +92,7 @@ const styles = sxStyles({
    },
    mainBox: {
       paddingLeft: 2,
+      mb: 3,
    },
    titleLink: {
       color: "#000",
@@ -224,6 +222,9 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          disableClick,
          onCardClick,
       } = props
+
+      const allStyles = { ...defaultStyling, ...styling }
+
       const emblaPlugins = []
       if (events?.length)
          emblaPlugins.push(WheelGesturesPlugin(wheelGesturesOptions))
@@ -259,7 +260,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             condition={events?.length > 1 && seeMoreLink !== undefined}
          >
             <Link href={seeMoreLink}>
-               <Typography sx={styling.seeMoreSx} color="grey">
+               <Typography sx={allStyles.seeMoreSx} color="grey">
                   See all
                </Typography>
             </Link>
@@ -296,7 +297,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          return (
             <>
                {[...Array(numLoadingSlides)].map((_, i) => (
-                  <Box key={i} sx={styling.slide}>
+                  <Box key={i} sx={allStyles.slide}>
                      <EventPreviewCard
                         animation={isEmpty ? false : undefined}
                         loading
@@ -321,32 +322,32 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             </Typography>
          )
       }
-      const mainBoxSxStyles = [styling.mainWrapperBoxSx]
-      styling.padding && mainBoxSxStyles.push(styles.mainBox)
+      const mainBoxSxStyles = [allStyles.mainWrapperBoxSx]
+      allStyles.padding && mainBoxSxStyles.push(styles.mainBox)
 
       return (
          <>
             <ConditionalWrapper condition={!hidePreview}>
                <Box sx={mainBoxSxStyles}>
                   <ConditionalWrapper
-                     condition={!isEmbedded && styling.compact}
+                     condition={!isEmbedded && allStyles.compact}
                   >
-                     <Box sx={styling.eventsHeader}>
+                     <Box sx={allStyles.eventsHeader}>
                         <Box>
                            <ConditionalWrapper
                               condition={
                                  seeMoreLink !== undefined &&
-                                 (styling.headerAsLink || isMobile)
+                                 (allStyles.headerAsLink || isMobile)
                               }
                               fallback={getHeading(
-                                 [styling.title],
-                                 styling.titleVariant
+                                 [allStyles.title],
+                                 allStyles.titleVariant
                               )}
                            >
                               <Link href={seeMoreLink} style={styles.titleLink}>
                                  {getHeading(
-                                    [styling.title, styles.underlined],
-                                    styling.titleVariant
+                                    [allStyles.title, styles.underlined],
+                                    allStyles.titleVariant
                                  )}
                               </Link>
                            </ConditionalWrapper>
@@ -358,7 +359,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            alignItems="center"
                         >
                            <ConditionalWrapper
-                              condition={!styling.headerAsLink && !isMobile}
+                              condition={!allStyles.headerAsLink && !isMobile}
                            >
                               {seeMoreComponent}
                            </ConditionalWrapper>
@@ -368,12 +369,12 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                   </ConditionalWrapper>
 
                   <ConditionalWrapper
-                     condition={!isEmbedded && !styling.compact}
+                     condition={!isEmbedded && !allStyles.compact}
                   >
-                     <Box sx={styling.eventsHeader}>
+                     <Box sx={allStyles.eventsHeader}>
                         <Typography
-                           variant={styling.titleVariant}
-                           sx={styling.title}
+                           variant={allStyles.titleVariant}
+                           sx={allStyles.title}
                            fontWeight={"600"}
                            color="black"
                         >
@@ -402,7 +403,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         </Stack>
                      </ConditionalWrapper>
                      <ConditionalWrapper
-                        condition={!isEmbedded && !styling.compact}
+                        condition={!isEmbedded && !allStyles.compact}
                      >
                         <Stack
                            direction="row"
@@ -416,7 +417,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            {arrowsComponent}
                         </Stack>
                      </ConditionalWrapper>
-                     <Box id={id} sx={styling.viewportSx} ref={emblaRef}>
+                     <Box id={id} sx={allStyles.viewportSx} ref={emblaRef}>
                         <Box sx={[styles.container]}>
                            <ConditionalWrapper
                               condition={!loading}
@@ -427,7 +428,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                  fallback={children}
                               >
                                  {events?.map((event, index, arr) => (
-                                    <Box sx={styling.slide} key={event.id}>
+                                    <Box sx={allStyles.slide} key={event.id}>
                                        <EventPreviewCard
                                           key={event.id}
                                           loading={loading}
