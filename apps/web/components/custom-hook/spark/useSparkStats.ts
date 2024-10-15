@@ -1,6 +1,5 @@
-import { SparkStats } from "@careerfairy/shared-lib/sparks/sparks"
-
-import { useFirestoreDocument } from "../utils/useFirestoreDocument"
+import { sparksAnalyticsService } from "data/firebase/SparksAnalyticsService"
+import useSWR from "swr"
 
 /**
  * Custom hook to fetch the stats of a Spark from Firestore.
@@ -9,8 +8,20 @@ import { useFirestoreDocument } from "../utils/useFirestoreDocument"
  * @returns {SparkStats} The SparkStats object from Firestore.
  */
 
-const useSparkStats = (sparkId: string) => {
-   return useFirestoreDocument<SparkStats>("sparkStats", [sparkId])
+const useSparkStats = (groupId: string, sparkId: string) => {
+   const fetcher = async (sparkId: string) => {
+      return await sparksAnalyticsService.fetchSparkStats(groupId, sparkId)
+   }
+
+   const { data, error, isLoading } = useSWR(
+      ["spark-stats", sparkId],
+      () => fetcher(sparkId),
+      {
+         revalidateOnFocus: false,
+      }
+   )
+
+   return { data, error, isLoading }
 }
 
 export default useSparkStats
