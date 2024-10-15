@@ -10,7 +10,6 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import EventsPreviewCarousel, {
-   EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
@@ -39,32 +38,8 @@ const styles = sxStyles({
    linkedContentWrapper: {
       mt: 2,
    },
-   viewport: {
-      overflow: "hidden",
-   },
-   slide: {
-      flex: {
-         xs: `0 0 90%`,
-         sm: `0 0 60%`,
-         md: "0 0 60%",
-         xl: "0 0 60%",
-      },
-      maxWidth: { md: 360 },
-      minWidth: 0,
-      height: {
-         xs: 355,
-         md: 355,
-      },
-
-      "&:not(:first-of-type)": {
-         ml: `15px`,
-      },
-      "&:first-of-type": {
-         ml: 0.3,
-      },
-   },
    wrapper: {
-      p: 3,
+      p: 2,
       borderRadius: "15px",
       background: "white",
    },
@@ -103,12 +78,6 @@ const styles = sxStyles({
       fontWeight: 400,
    },
 })
-
-const defaultStyling: EventsCarouselStyling = {
-   compact: true,
-   viewportSx: styles.viewport,
-   slide: styles.slide,
-}
 
 const sparksCarouselEmblaOptions: EmblaOptionsType = {
    align: "start",
@@ -263,8 +232,8 @@ const LiveStreamsContent = ({
                   type={EventsTypes.JOB_EVENTS}
                   events={linkedLivestreams}
                   isEmbedded
-                  styling={defaultStyling}
                   onCardClick={handleCardClick}
+                  styling={{ padding: false }}
                />
             ) : (
                <MissingContent

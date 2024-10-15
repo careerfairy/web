@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-interface */
-import { PaletteColor, PaletteColorOptions } from "@mui/material"
-import { ColorPartial } from "@mui/material/styles/createPalette"
-import { CSSProperties } from "react"
+import { PaletteColorOptions } from "@mui/material"
 import { Theme } from "@mui/material/styles"
+import { ColorPartial } from "@mui/material/styles/createPalette"
 
 // Define custom theme props to reduce duplication below
 interface CustomThemeProps {
@@ -140,6 +139,7 @@ declare module "@mui/material/styles" {
       tablet: true
       desktop: true
       sparksFullscreen: true // adds the breakpoint for the sparks feed
+      lsCardsGallery: true
    }
 }
 

@@ -1,22 +1,21 @@
 import { Box, Link, Stack, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
+import EventsPreviewCarousel, {
+   EventsCarouselStyling,
+   EventsTypes,
+} from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useCallback, useMemo, useState } from "react"
 import { useMountedState } from "react-use"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
-import EventsPreviewCarousel, {
-   EventsCarouselStyling,
-   EventsTypes,
-} from "components/views/portal/events-preview/EventsPreviewCarousel"
-import useIsMobile from "components/custom-hook/useIsMobile"
 
-import StayUpToDateBanner from "./StayUpToDateBanner"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import StayUpToDateBanner from "./StayUpToDateBanner"
 
-const slideSpacing = 21
 const styles = sxStyles({
    root: {
       position: "relative",
@@ -43,33 +42,6 @@ const styles = sxStyles({
          border: "dashed",
       },
    },
-   arrowIcon: {
-      padding: 0,
-      minHeight: { xs: "25px", md: "30px" },
-      minWidth: { xs: "25px", md: "30px" },
-      ml: 2,
-   },
-   slide: {
-      flex: {
-         xs: `0 0 80%`,
-         sm: `0 0 45%`,
-         md: `0 0 65%`,
-         lg: `0 0 47%`,
-      },
-      minWidth: 0,
-      position: "relative",
-      height: {
-         xs: 355,
-         md: 355,
-      },
-      "&:not(:first-of-type)": {
-         paddingLeft: `calc(${slideSpacing}px - 5px)`,
-      },
-      "&:first-of-type": {
-         ml: 0.3,
-      },
-   },
-
    eventTitle: {
       fontFamily: "Poppins",
       fontStyle: "normal",
@@ -87,9 +59,6 @@ const styles = sxStyles({
    seeMoreText: {
       textDecoration: "underline",
       color: "#2ABAA5",
-   },
-   viewportSx: {
-      overflow: "hidden",
    },
    description: {
       display: "flex",
@@ -151,13 +120,11 @@ const EventSection = () => {
    const eventsCarouselStyling: EventsCarouselStyling = {
       compact: isMobile,
       seeMoreSx: styles.seeMoreText,
-      viewportSx: styles.viewportSx,
       showArrows: isMobile,
       headerAsLink: isMobile,
-      slide: styles.slide,
       title: styles.eventTitle,
-      titleVariant: "h4",
       eventsHeader: styles.eventsHeader,
+      padding: false,
    }
 
    return isMounted() ? (

@@ -7,32 +7,7 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import Heading from "../common/Heading"
 import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
 
-const slideSpacing = 21
-
 const styles = sxStyles({
-   slide: {
-      flex: {
-         xs: `0 0 90%`,
-         sm: `0 0 45%`,
-         md: `0 0 40%`,
-         lg: `0 0 30%`,
-      },
-      minWidth: 0,
-      position: "relative",
-      height: {
-         xs: 355,
-         md: 355,
-      },
-      "&:not(:first-of-type)": {
-         paddingLeft: `calc(${slideSpacing}px - 5px)`,
-      },
-      "&:first-of-type": {
-         ml: 0.3,
-      },
-   },
-   eventsBackground: {
-      background: "black",
-   },
    contentWrapper: {
       pl: 2,
    },
@@ -110,38 +85,6 @@ const styles = sxStyles({
          },
       },
    },
-   eventsHeader: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      pr: 2,
-      pb: 0,
-   },
-   seeMoreText: {
-      color: "text.secondary",
-      textDecoration: "underline",
-      pr: 1,
-   },
-   eventTitle: {
-      fontFamily: "Poppins",
-      fontSize: "18px",
-      fontStyle: "normal",
-      fontWeight: "600",
-      lineHeight: "27px",
-      color: "black",
-      pb: 1,
-   },
-   eventTitleEmpty: {
-      fontFamily: "Poppins",
-      fontSize: "18px",
-      fontStyle: "normal",
-      fontWeight: "600",
-      lineHeight: "27px",
-      color: "black",
-   },
-   viewportSx: {
-      overflow: "hidden",
-   },
    boxContainerEmpty: {
       pr: {
          xs: 2,
@@ -178,21 +121,6 @@ const MyNextEvents = () => {
                title={MY_NEXT_EVENTS_TITLE}
                loading={isLoading}
                seeMoreLink="/next-livestreams/my-registrations"
-               styling={{
-                  compact: true,
-                  seeMoreSx: styles.seeMoreText,
-                  showArrows: true,
-                  headerAsLink: false,
-                  slide: styles.slide,
-                  viewportSx: styles.viewportSx,
-                  title:
-                     registeredStreams?.length > 0
-                        ? styles.eventTitle
-                        : styles.eventTitleEmpty,
-                  eventsHeader: styles.eventsHeader,
-                  titleVariant: "h6",
-                  padding: true,
-               }}
             />
          </ConditionalWrapper>
       </Box>
