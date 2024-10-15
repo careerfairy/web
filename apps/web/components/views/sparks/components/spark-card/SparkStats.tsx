@@ -48,12 +48,12 @@ const SparkStats: FC<Props> = ({ spark }) => {
 }
 
 const Component: FC<Props> = ({ spark }) => {
-   const { data: sparkStats } = useSparkStats(spark.id)
+   const { data: sparkStats } = useSparkStats(spark.group.id, spark.id)
 
-   const plays = sparkStats?.plays || 0
-   const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || 0
-   const likes = sparkStats?.likes || 0
-   const shareCTA = sparkStats?.shareCTA || 0
+   const plays = sparkStats?.num_views || 0
+   const clicks = sparkStats?.num_clicks || 0
+   const likes = sparkStats?.num_likes || 0
+   const shareCTA = sparkStats?.num_shares || 0
 
    return (
       <Stack spacing={1.5}>
@@ -61,11 +61,6 @@ const Component: FC<Props> = ({ spark }) => {
             icon={<ImpressionsIcon />}
             value={plays}
             tooltip={`This Spark has been seen ${plays} times.`}
-         />
-         <StatChip
-            icon={<TotalPlaysIcon />}
-            value={numberOfCareerPageClicks}
-            tooltip={`Your Career Page has been viewed ${numberOfCareerPageClicks} times from this Spark.`}
          />
          <StatChip
             icon={<LikeIcon />}
@@ -76,6 +71,11 @@ const Component: FC<Props> = ({ spark }) => {
             icon={<ShareIcon />}
             value={shareCTA}
             tooltip={`This Spark has been shared ${shareCTA} times.`}
+         />
+         <StatChip
+            icon={<TotalPlaysIcon />}
+            value={clicks}
+            tooltip={`Your Career Page has been viewed ${clicks} times from this Spark.`}
          />
       </Stack>
    )
