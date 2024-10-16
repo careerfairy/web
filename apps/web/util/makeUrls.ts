@@ -4,10 +4,18 @@ import {
    getHost,
    makeLivestreamEventDetailsUrl,
 } from "@careerfairy/shared-lib/utils/urls"
-import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 
-const makeDuration = function (event) {
+export type CalendarEvent = {
+   startsAt: string
+   endsAt: string
+   name: string
+   details: string
+   location: string
+}
+
+const makeDuration = function (event: CalendarEvent): string {
    const minutes = Math.floor(
       (+new Date(event.endsAt) - +new Date(event.startsAt)) / 60 / 1000
    )
@@ -17,10 +25,13 @@ const makeDuration = function (event) {
       ("0" + (minutes % 60)).slice(-2)
    )
 }
-const makeTime = function (time) {
+const makeTime = function (time: string): string {
    return new Date(time).toISOString().replace(/[-:]|\.\d{3}/g, "")
 }
-const makeUrl = function (base, query) {
+const makeUrl = function (
+   base: string,
+   query: Record<string, string | null | number | boolean>
+): string {
    return Object.keys(query).reduce(function (accum, key, index) {
       const value = query[key]
       if (value !== null) {
@@ -36,7 +47,7 @@ const makeUrl = function (base, query) {
       return accum
    }, base)
 }
-const makeGoogleCalendarUrl = function (event) {
+const makeGoogleCalendarUrl = function (event: CalendarEvent): string {
    return makeUrl("https://calendar.google.com/calendar/render", {
       action: "TEMPLATE",
       dates: makeTime(event.startsAt) + "/" + makeTime(event.endsAt),
@@ -45,7 +56,7 @@ const makeGoogleCalendarUrl = function (event) {
       details: event.details,
    })
 }
-const makeOutlookCalendarUrl = function (event) {
+const makeOutlookCalendarUrl = function (event: CalendarEvent): string {
    return makeUrl("https://outlook.live.com/owa", {
       rru: "addevent",
       startdt: event.startsAt,
@@ -58,7 +69,7 @@ const makeOutlookCalendarUrl = function (event) {
       path: "/calendar/view/Month",
    })
 }
-const makeYahooCalendarUrl = function (event) {
+const makeYahooCalendarUrl = function (event: CalendarEvent): string {
    return makeUrl("https://calendar.yahoo.com", {
       v: 60,
       view: "d",
@@ -70,7 +81,7 @@ const makeYahooCalendarUrl = function (event) {
       in_loc: event.location,
    })
 }
-const makeICSCalendarUrl = function (event) {
+const makeICSCalendarUrl = function (event: CalendarEvent): string {
    const components = ["BEGIN:VCALENDAR", "VERSION:2.0", "BEGIN:VEVENT"]
    // In case of SSR, document won't be defined
    if (typeof document !== "undefined") {
@@ -90,7 +101,12 @@ const makeICSCalendarUrl = function (event) {
    return encodeURI("data:text/calendar;charset=utf8," + components.join("\n"))
 }
 
-export const makeUrls = function (event) {
+export const makeUrls = function (event: CalendarEvent): {
+   google: string
+   outlook: string
+   yahoo: string
+   ics: string
+} {
    return {
       google: makeGoogleCalendarUrl(event),
       outlook: makeOutlookCalendarUrl(event),
