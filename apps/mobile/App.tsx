@@ -1,9 +1,25 @@
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
-import { firestore } from "./firebase"
 import WebViewComponent from "./components/WebView"
+import { initializeApp } from "firebase/app"
+import { getFirestore } from "firebase/firestore"
+import { environment } from "./environments/environment"
+import { useEffect } from "react"
+
+const app = initializeApp(environment.firebaseConfig)
+
+// Initialize Firestore
+const firestore = getFirestore(app)
 
 export default function Native() {
+   // Log Firebase connection status
+   useEffect(() => {
+      if (app) {
+         console.log("Firebase connected successfully!")
+      } else {
+         console.log("Firebase connection failed.")
+      }
+   }, [])
    const getPushToken = async () => {
       try {
          const { status: existingStatus } =
@@ -19,12 +35,14 @@ export default function Native() {
          }
 
          const token = (await Notifications.getExpoPushTokenAsync()).data
+         const userId = 1
+         const dummyData = {
+            age: 30,
+            email: "test@email.com",
+         }
+
          // Saving the data to Firestore with all relevant data we will use to filter out notification queue
-         return saveUserDataToFirestore(
-            1,
-            { age: 25, email: "email@email.com" },
-            token
-         )
+         return saveUserDataToFirestore(userId, dummyData, token)
       } catch (e) {
          console.log(e)
       }
