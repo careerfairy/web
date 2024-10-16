@@ -14,9 +14,7 @@
       "test:coverage": "jest --coverage",
       "test:e2e-webapp": "playwright test",
       "test:e2e-webapp-debug": "cross-env PWDEBUG=console DEBUG=pw:webserver playwright test --debug",
-      "prepare": "copy-files-from-to",
-      "storybook": "storybook dev -p 6006",
-      "build-storybook": "storybook build"
+      "prepare": "copy-files-from-to"
    },
    "dependencies": {
       "@algolia/client-search": "^4.22.1",
@@ -57,8 +55,8 @@
       "filefy": "^0.1.10",
       "firebase": "^9.23.0",
       "formik": "^2.1.2",
-      "geoip-lite": "^1.4.10",
       "framer-motion": "^11.2.6",
+      "geoip-lite": "^1.4.10",
       "global": "^4.4.0",
       "graphql": "^16.6.0",
       "graphql-request": "^5.0.0",

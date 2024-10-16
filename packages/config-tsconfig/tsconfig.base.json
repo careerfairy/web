@@ -21,11 +21,5 @@
       "declarationMap": true,
       "jsx": "react-jsx",
       "target": "ES6"
-   },
-   // Storybook
-   "ts-node": {
-      "compilerOptions": {
-         "module": "CommonJS"
-      }
    }
 }
