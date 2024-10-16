@@ -31,7 +31,8 @@ const LinkedContentDetails = ({ job }: Props) => {
    const { livestreams, sparks, groupId } = job
 
    const upcomingLiveStreams = useListenToStreams({ filterByGroupId: groupId })
-   const linkedLiveStreams = useCustomJobLinkedLivestreams(job)
+   const { allLivestreams: linkedLiveStreams } =
+      useCustomJobLinkedLivestreams(job)
    const { data: publishedSparks } = useGroupSparks(groupId, {
       isPublished: true,
    })

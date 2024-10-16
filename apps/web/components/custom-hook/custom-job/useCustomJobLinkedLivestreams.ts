@@ -32,7 +32,11 @@ const useCustomJobLinkedLivestreams = (job: CustomJob) => {
       }
    )
 
-   return [...livestreamData, ...draftData]
+   return {
+      publishedLivestreams: livestreamData,
+      draftLivestreams: draftData,
+      allLivestreams: [...livestreamData, ...draftData],
+   }
 }
 
 export default useCustomJobLinkedLivestreams
