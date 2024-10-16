@@ -9,7 +9,6 @@ import {
 import { WebView } from "react-native-webview"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
-import { app } from "../firebase"
 
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
@@ -124,15 +123,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
       return true // Allow WebView to load internal links
    }
-
-   // Log Firebase connection status
-   useEffect(() => {
-      if (app) {
-         console.log("Firebase connected successfully!")
-      } else {
-         console.log("Firebase connection failed.")
-      }
-   }, [])
 
    return (
       <SafeAreaView style={{ flex: 1, paddingTop: 30 }}>
