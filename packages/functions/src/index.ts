@@ -138,7 +138,7 @@ exports.fetchStripePrice = stripe.fetchStripePrice
 exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
 
 // Livestreams
-exports.sendLivestreamRegistrationConfirmationEmail_v2 =
+exports.sendLivestreamRegistrationConfirmationEmail_v3 =
    livestreams.sendLivestreamRegistrationConfirmationEmail
 exports.sendPhysicalEventRegistrationConfirmationEmail_eu =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail
@@ -148,7 +148,7 @@ exports.notifySlackWhenALivestreamStarts =
    livestreams.notifySlackWhenALivestreamStarts
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
-exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
+exports.getLivestreamICalendarEvent_v3 = livestreams.getLivestreamICalendarEvent
 
 exports.upsertLivestreamSpeaker = streaming.upsertLivestreamSpeaker
 

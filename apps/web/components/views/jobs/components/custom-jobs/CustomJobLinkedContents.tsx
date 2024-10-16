@@ -44,7 +44,8 @@ const CustomJobLinkedContents = ({
 }: CustomJobLinkedContentsProps) => {
    const { jobHubV1 } = useFeatureFlags()
    const { sparks, groupId } = job
-   const jobLivestreams = useCustomJobLinkedLivestreams(job)
+   const { publishedLivestreams: jobLivestreams } =
+      useCustomJobLinkedLivestreams(job)
 
    const { data: publishedSparks } = useGroupSparks(groupId, {
       isPublished: true,

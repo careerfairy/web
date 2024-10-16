@@ -65,6 +65,10 @@
             {
                "name": "date",
                "type": "timestamp"
+            },
+            {
+               "name": "utm",
+               "type": "stringified_map"
             }
          ],
          "name": "participated",

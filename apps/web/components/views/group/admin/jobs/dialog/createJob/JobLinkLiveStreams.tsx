@@ -73,7 +73,8 @@ const JobLinkLiveStreams = ({
    const upcomingLiveStreams = useListenToStreams({
       filterByGroupId: group.groupId,
    })
-   const linkedLiveStreams = useCustomJobLinkedLivestreams(job)
+   const { allLivestreams: linkedLiveStreams } =
+      useCustomJobLinkedLivestreams(job)
    const { isSubmitting } = useCustomJobForm()
 
    const allLivesStreams = useMemo(

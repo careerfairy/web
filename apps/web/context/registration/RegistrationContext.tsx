@@ -1,3 +1,12 @@
+import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestionsMap,
+   LivestreamQuestion,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { livestreamRepo, userRepo } from "data/RepositoryInstances"
+import { livestreamService } from "data/firebase/LivestreamService"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import React, {
    createContext,
    useCallback,
@@ -6,22 +15,14 @@ import React, {
    useReducer,
    useState,
 } from "react"
-import GroupsUtil from "../../data/util/GroupsUtil"
-import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 import { useAuth } from "../../HOCs/AuthProvider"
-import StatsUtil from "../../data/util/StatsUtil"
 import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer"
-import {
-   LivestreamEvent,
-   LivestreamGroupQuestionsMap,
-   LivestreamQuestion,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
-import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import { errorLogAndNotify } from "../../util/CommonUtil"
-import { livestreamRepo, userRepo } from "data/RepositoryInstances"
-import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import { sparkService } from "../../data/firebase/SparksService"
+import GroupsUtil from "../../data/util/GroupsUtil"
+import StatsUtil from "../../data/util/StatsUtil"
+import { errorLogAndNotify } from "../../util/CommonUtil"
+import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -177,12 +178,14 @@ export function RegistrationContextProvider({
    targetGroupId,
    isRecommended = false,
 }: Props) {
+   const firebase = useFirebaseService()
+
    const {
       checkIfUserAgreedToGroupPolicy,
       sendRegistrationConfirmationEmail,
       registerToLivestream,
       livestreamQuestionsQuery,
-   } = useFirebaseService()
+   } = firebase
    const { authenticatedUser, userData, userStats } = useAuth()
    const [sliding, setSliding] = useState(false)
    const [gettingPolicyStatus, setGettingPolicyStatus] = useState(false)
@@ -362,29 +365,49 @@ export function RegistrationContextProvider({
       ) => {
          try {
             if (livestream) {
-               await registerToLivestream(
-                  livestream.id,
-                  userData,
-                  groupsWithPolicies,
-                  userAnsweredLivestreamGroupQuestions,
-                  {
-                     isRecommended,
-                  }
-               )
-               dataLayerLivestreamEvent(
-                  "event_registration_complete",
-                  livestream
-               )
+               const hasAlreadyRegistered =
+                  await livestreamService.checkCategoryData(firebase, {
+                     livestream,
+                     userData,
+                  })
 
-               // after registration, remove from this user's sparks notification the existing notification related to this event
-               await sparkService.removeAndSyncUserSparkNotification({
-                  userId: userData.userEmail,
-                  groupId:
-                     livestream.groupIds?.[0] || livestream.author?.groupId,
-               })
+               if (!hasAlreadyRegistered) {
+                  await registerToLivestream(
+                     livestream.id,
+                     userData,
+                     groupsWithPolicies,
+                     userAnsweredLivestreamGroupQuestions,
+                     {
+                        isRecommended,
+                     }
+                  )
+                  dataLayerLivestreamEvent(
+                     "event_registration_complete",
+                     livestream
+                  )
+                  // after registration, remove from this user's sparks notification the existing notification related to this event
+                  // Not critical for user experience, so we don't await this
+                  sparkService
+                     .removeAndSyncUserSparkNotification({
+                        userId: userData.userEmail,
+                        groupId:
+                           livestream.groupIds?.[0] ||
+                           livestream.author?.groupId,
+                     })
+                     .catch((e) => {
+                        errorLogAndNotify(e, {
+                           message: "Failed to remove spark notification",
+                           user: authenticatedUser,
+                           livestream,
+                        })
+                     })
 
-               // Increase livestream popularity
-               recommendationServiceInstance.registerEvent(livestream, userData)
+                  // Increase livestream popularity
+                  recommendationServiceInstance.registerEvent(
+                     livestream,
+                     userData
+                  )
+               }
             }
             handleSendConfirmEmail().catch((e) =>
                errorLogAndNotify(e, {
@@ -407,6 +430,7 @@ export function RegistrationContextProvider({
             return handleClose()
          }
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [
          authenticatedUser,
          groupsWithPolicies,

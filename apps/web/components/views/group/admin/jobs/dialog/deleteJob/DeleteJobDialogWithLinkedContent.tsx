@@ -73,7 +73,8 @@ type ListContentProps = {
 }
 
 const ListContent: FC<ListContentProps> = ({ job }) => {
-   const linkedLivestreams = useCustomJobLinkedLivestreams(job)
+   const { allLivestreams: linkedLivestreams } =
+      useCustomJobLinkedLivestreams(job)
    const linkedSparks = useCustomJobLinkedSparks(job)
 
    const contentToShow: { id: string; message: ReactElement }[] = []

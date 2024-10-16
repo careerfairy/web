@@ -6,6 +6,7 @@ import {
 import { UserReminderType } from "@careerfairy/shared-lib/src/users"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import { useRefetchRegisteredStreams } from "components/custom-hook/useRegisteredStreams"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -29,11 +30,13 @@ export default function useRegistrationHandler() {
    const { forceShowReminder } = useUserReminders()
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
+
+   const firebase = useFirebaseService()
    const {
       registerToLivestream,
       deregisterFromLivestream,
       sendRegistrationConfirmationEmail,
-   } = useFirebaseService()
+   } = firebase
 
    const refetchRegisteredStreams = useRefetchRegisteredStreams()
    const isAlreadyRegistered = useUserIsRegistered(livestream.id)
@@ -192,62 +195,73 @@ export default function useRegistrationHandler() {
          groupsWithPolicies: GroupWithPolicy[],
          userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
       ) => {
-         registerToLivestream(
-            livestream.id,
-            userData,
-            groupsWithPolicies,
-            userAnsweredLivestreamGroupQuestions,
-            {
-               isRecommended,
-               ...(currentSparkId && { sparkId: currentSparkId }),
-            }
-         )
-            .then(() => {
-               // after registration, remove from this user's sparks notification the existing notification related to this event
-               sparkService
-                  .removeAndSyncUserSparkNotification({
-                     userId: userData.userEmail,
-                     groupId:
-                        livestream.groupIds?.[0] || livestream.author?.groupId,
-                  })
-                  .catch((e) =>
-                     errorLogAndNotify(e, {
-                        message: "Failed to remove spark notification",
-                        user: authenticatedUser,
-                        livestream,
-                     })
-                  )
-            })
-            .then(() => {
+         try {
+            const hasAlreadyRegistered =
+               await livestreamService.checkCategoryData(firebase, {
+                  livestream,
+                  userData,
+               })
+
+            if (!hasAlreadyRegistered) {
+               await registerToLivestream(
+                  livestream.id,
+                  userData,
+                  groupsWithPolicies,
+                  userAnsweredLivestreamGroupQuestions,
+                  {
+                     isRecommended,
+                     ...(currentSparkId && { sparkId: currentSparkId }),
+                  }
+               )
+
+               // Do not await this call, it is not critical for the user experience
                sendRegistrationConfirmationEmail(
                   authenticatedUser,
                   userData,
                   livestream
-               ).catch((e) =>
+               ).catch((e) => {
                   errorLogAndNotify(e, {
                      message: "Failed to send confirmation email",
                      user: authenticatedUser,
                      livestream,
                   })
-               )
+               })
 
                // Increase livestream popularity
                recommendationServiceInstance.registerEvent(livestream, userData)
-               refetchRegisteredStreams()
 
                dataLayerLivestreamEvent(
                   "event_registration_complete",
                   livestream
                )
-            })
-            .catch((e) => {
-               errorLogAndNotify(e, {
-                  message: "Error registering to livestream",
-                  user: authenticatedUser,
-                  livestream,
+            }
+
+            // after registration, remove from this user's sparks notification the existing notification related to this event
+            // Not critical for user experience, so we don't await this
+            sparkService
+               .removeAndSyncUserSparkNotification({
+                  userId: userData.userEmail,
+                  groupId:
+                     livestream.groupIds?.[0] || livestream.author?.groupId,
                })
+               .catch((e) => {
+                  errorLogAndNotify(e, {
+                     message: "Failed to remove spark notification",
+                     user: authenticatedUser,
+                     livestream,
+                  })
+               })
+
+            refetchRegisteredStreams()
+         } catch (e) {
+            errorLogAndNotify(e, {
+               message: "Error registering to livestream",
+               user: authenticatedUser,
+               livestream,
             })
+         }
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [
          currentSparkId,
          isRecommended,
