@@ -312,36 +312,6 @@ const moduleExports = {
       externalDir: true,
       esmExternals: false, // fixes issue with [firebase](https://github.com/FirebaseExtended/reactfire/issues/491)
       outputFileTracingRoot: path.join(__dirname, "../../"),
-      outputFileTracingIgnores: [
-         // fixes issue with nextjs [serverless functions max size](https://github.com/vercel/next.js/issues/42641)
-         "../../node_modules/@swc/core-linux-x64-gnu",
-         "../../node_modules/@swc/core-linux-x64-musl",
-         "./node_modules/@swc/core-linux-x64-gnu",
-         "./node_modules/@swc/core-linux-x64-musl",
-         "/node_modules/@swc/core-linux-x64-gnu",
-         "/node_modules/@swc/core-linux-x64-musl",
-         "node_modules/@swc/core-linux-x64-gnu",
-         "node_modules/@swc/core-linux-x64-musl",
-         "**/node_modules/@swc/core-linux-x64-gnu",
-         "**/node_modules/@swc/core-linux-x64-musl",
-         "**/@swc/*",
-      ],
-      // fixes issue with nextjs [serverless functions max size](https://github.com/vercel/next.js/issues/42641)
-      outputFileTracingExcludes: {
-         "**/*": [
-            "../../node_modules/@swc/core-linux-x64-gnu",
-            "../../node_modules/@swc/core-linux-x64-musl",
-            "./node_modules/@swc/core-linux-x64-gnu",
-            "./node_modules/@swc/core-linux-x64-musl",
-            "/node_modules/@swc/core-linux-x64-gnu",
-            "/node_modules/@swc/core-linux-x64-musl",
-            "node_modules/@swc/core-linux-x64-gnu",
-            "node_modules/@swc/core-linux-x64-musl",
-            "**/node_modules/@swc/core-linux-x64-gnu",
-            "**/node_modules/@swc/core-linux-x64-musl",
-            "**/@swc/*",
-         ],
-      },
    },
    images: {
       domains: [
@@ -361,11 +331,6 @@ const moduleExports = {
          test: /\.svg$/,
          use: ["@svgr/webpack"],
       })
-
-      // config.module.rules.push({
-      //    test: /\.(woff(2)?|ttf)(\?v=\d+\.\d+\.\d+)?$/,
-      //    loader: "file-loader",
-      // });
 
       return config
    },

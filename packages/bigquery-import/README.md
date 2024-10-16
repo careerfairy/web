@@ -39,6 +39,28 @@ npx @firebaseextensions/fs-bq-schema-views \
                   --schema-files=./packages/bigquery-import/schema-views/livestreams.json
 ```
 
+## Troubleshooting: Lacking Credentials
+
+If you encounter issues related to lacking credentials when running the schema update command, follow these steps:
+
+1. Identify the caller (authenticated user or service account) that needs permissions.
+
+2. Grant the Required Permissions:
+
+   -  Go to the [IAM & Admin page for the CareerFairy project](https://console.cloud.google.com/iam-admin/iam?project=careerfairy-e1fd9).
+   -  Find the service account or user identified in step 1.
+   -  Click on the edit (pencil) icon for that user or service account.
+   -  In the "Add another role" dropdown, search for and select "Service Usage Admin". This role provides the ability to enable, disable, and inspect service states, inspect operations, and consume quota and billing for a consumer project.
+   -  Save the changes.
+
+3. Login with the following command:
+
+```sh
+gcloud auth application-default login
+```
+
+4. After completing these steps, try running the schema update command again.
+
 # Synchronize new data into BigQuery
 
 1. Install a new instance of the extension `Stream Collections to BigQuery` https://firebase.google.com/products/extensions/firebase-firestore-bigquery-export
