@@ -185,7 +185,8 @@ const LiveStreamsContent = ({
    setLiveStreamDialog,
    hasUpcomingLiveStreams,
 }: ContentProps) => {
-   const linkedLivestreams = useCustomJobLinkedLivestreams(job)
+   const { allLivestreams: linkedLivestreams } =
+      useCustomJobLinkedLivestreams(job)
    const isMobile = useIsMobile()
 
    const handleEditLiveStreams = useCallback(() => {
