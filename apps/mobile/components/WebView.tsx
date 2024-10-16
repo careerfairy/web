@@ -26,7 +26,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
 }) => {
    const [loading, setLoading] = useState(true)
-   const [initialUrl, setInitialUrl] = useState("https://careerfairy.io/portal") // Default WebView URL
+   const [initialUrl, setInitialUrl] = useState(
+      "https://www.careerfairy.io/portal"
+   ) // Default WebView URL
    const webViewRef: any = useRef(null)
 
    // When we implement of event sending on client side on login or logout, we will be calling the method to handle it
@@ -51,7 +53,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       `
          try {
             webViewRef.current.injectJavaScript(injectScript)
-            webViewRef.current.loadUrl("https://careerfairy.io/portal")
+            webViewRef.current.loadUrl("https://www.careerfairy.io/portal")
          } catch (e) {
             console.log("Error with loading the url")
          }
@@ -65,20 +67,22 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          if (token) {
             injectToken(token)
             setLoading(false)
-            setInitialUrl("https://careerfairy.io/portal")
+            setInitialUrl("https://www.careerfairy.io/portal")
             if (webViewRef.current) {
                try {
-                  webViewRef.current.loadUrl("https://careerfairy.io/portal")
+                  webViewRef.current.loadUrl(
+                     "https://www.careerfairy.io/portal"
+                  )
                } catch (e) {
                   console.log("Error with loading the url")
                }
             }
          } else {
             setLoading(false)
-            setInitialUrl("https://careerfairy.io/login")
+            setInitialUrl("https://www.careerfairy.io/login")
             if (webViewRef.current) {
                try {
-                  webViewRef.current.loadUrl("https://careerfairy.io/login")
+                  webViewRef.current.loadUrl("https://www.careerfairy.io/login")
                } catch (e) {
                   console.log("Error with loading the url")
                }
