@@ -49,8 +49,12 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
         })();
         true;
       `
-         webViewRef.current.injectJavaScript(injectScript)
-         webViewRef.current.loadUrl("https://careerfairy.io/portal")
+         try {
+            webViewRef.current.injectJavaScript(injectScript)
+            webViewRef.current.loadUrl("https://careerfairy.io/portal")
+         } catch (e) {
+            console.log("Error with loading the url")
+         }
          setLoading(false)
          onTokenInjected() // Notify the App component
       }
@@ -63,13 +67,21 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             setLoading(false)
             setInitialUrl("https://careerfairy.io/portal")
             if (webViewRef.current) {
-               webViewRef.current.loadUrl("https://careerfairy.io/portal")
+               try {
+                  webViewRef.current.loadUrl("https://careerfairy.io/portal")
+               } catch (e) {
+                  console.log("Error with loading the url")
+               }
             }
          } else {
             setLoading(false)
             setInitialUrl("https://careerfairy.io/login")
             if (webViewRef.current) {
-               webViewRef.current.loadUrl("https://careerfairy.io/login")
+               try {
+                  webViewRef.current.loadUrl("https://careerfairy.io/login")
+               } catch (e) {
+                  console.log("Error with loading the url")
+               }
             }
          }
       }
@@ -139,7 +151,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                onShouldStartLoadWithRequest={handleNavigation}
                domStorageEnabled={true} // Enable DOM storage if needed
                startInLoadingState={true} // Show loading indicator
-               scalesPageToFit={true} // Fit the webpage to the WebView
                onLoadEnd={() => setLoading(false)}
             />
          )}
