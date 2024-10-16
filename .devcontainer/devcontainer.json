@@ -15,8 +15,8 @@
    // "features": {},
    // Use 'forwardPorts' to make a list of ports inside the container available locally.
    "forwardPorts": [
-      // Application and Storybook
-      3000, 6006,
+      // Application
+      3000,
       // Local Firebase Emulator Suite
       4000, 4400, 4500, 5000, 5001, 8080, 9099, 9150, 9199
    ],
