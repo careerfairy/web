@@ -1,50 +1,67 @@
-# Welcome to your Expo app 👋
+# CareerFairy Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a React Native app built using Expo. Follow the steps below to get started and run the app on your device or a simulator.
 
-## Get started
+## Setup Instructions
 
-1. Install dependencies
+### 1. Install Dependencies
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
--  [development build](https://docs.expo.dev/develop/development-builds/introduction/)
--  [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
--  [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
--  [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+First, install the required dependencies using npm inside mobile (apps/mobile) folder:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Running the App
 
-## Learn more
+You have two options to run the app, either from the project root or from the \`mobile\` folder.
 
-To learn more about developing your project with Expo, look at the following resources:
+#### Option 1: From the Project Root
 
--  [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
--  [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Run the following command from the root of your project:
 
-## Join the community
+```bash
+npm run native
+```
 
-Join our community of developers creating universal apps.
+#### Option 2: From the \`mobile\` Folder
 
--  [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
--  [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Navigate to the mobile folder and then start the app:
+
+```bash
+cd apps/mobile
+npm run start
+```
+
+### 3. QR Code Launch
+
+After running the app, a QR code will be displayed in your terminal.
+
+### 4. Install Expo Go on Your Phone
+
+-  Download and install **Expo Go** from the [Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent) (for Android) or the [Apple App Store](https://apps.apple.com/us/app/expo-go/id982107779) (for iPhone).
+
+### 5. Scan the QR Code
+
+-  Open **Expo Go** on your phone.
+-  Use the app to scan the QR code displayed in the terminal, and the app will launch on your device.
+
+## Running on Simulators
+
+If you'd like to run the app on a simulator instead of a physical device, follow the instructions below.
+
+### For Android Simulator
+
+1. Install and configure [Android Studio](https://developer.android.com/studio).
+2. Run the initial command (\`npm run native\` or \`npm run start\`).
+3. Press \`a\` in the terminal to launch the Android simulator.
+
+### For iPhone Simulator
+
+1. Install [Xcode](https://apps.apple.com/us/app/xcode/id497799835) and set up the Xcode simulator.
+2. Run the initial command (\`npm run native\` or \`npm run start\`).
+3. Press \`i\` in the terminal to launch the iPhone simulator.
+
+---
+
+Happy coding! 🎉
