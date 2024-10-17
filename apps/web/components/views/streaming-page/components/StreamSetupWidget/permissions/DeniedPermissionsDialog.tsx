@@ -32,6 +32,46 @@ const styles = sxStyles({
       textAlign: "center",
       padding: "12px 12px 24px 12px",
    },
+   imageWrapper: {
+      display: "flex",
+      background:
+         "linear-gradient(0deg, #F3F3F5, #F3F3F5), linear-gradient(180deg, rgba(243, 243, 245, 0) 0%, rgba(192, 192, 194, 0.1) 100%)",
+      alignItems: "center",
+      justifyContent: "center",
+   },
+   contentWrapper: {
+      direction: "column",
+      gap: "16px",
+      justifyContent: "center",
+      width: "100%",
+      paddingLeft: {
+         xs: "20px",
+         md: "0px",
+      },
+      paddingRight: {
+         xs: "20px",
+         md: "0px",
+      },
+   },
+   actions: {
+      display: "flex",
+      flexDirection: {
+         xs: "column",
+         md: "row",
+      },
+      gap: "20px",
+      justifyContent: {
+         xs: "center",
+         md: "flex-start",
+      },
+   },
+   noSupportButton: {
+      padding: 0,
+      "&:hover": {
+         backgroundColor: "transparent",
+         textDecoration: "underline",
+      },
+   },
 })
 
 export const DeniedPermissionsDialog = () => {
@@ -86,15 +126,7 @@ const Content = () => {
 
    return (
       <Stack sx={isMobile ? styles.containerMobile : styles.container}>
-         <Box
-            sx={{
-               display: "flex",
-               background:
-                  "linear-gradient(0deg, #F3F3F5, #F3F3F5), linear-gradient(180deg, rgba(243, 243, 245, 0) 0%, rgba(192, 192, 194, 0.1) 100%)",
-               alignItems: "center",
-               justifyContent: "center",
-            }}
-         >
+         <Box sx={styles.imageWrapper}>
             <Image
                src="/livestream/mic-camera-frowning-face.png"
                alt="mic and camera frowning face"
@@ -102,12 +134,7 @@ const Content = () => {
                height={isMobile ? 118 : 168}
             />
          </Box>
-         <Stack
-            direction="column"
-            gap="16px"
-            justifyContent="center"
-            width="100%"
-         >
+         <Stack sx={styles.contentWrapper}>
             <Stack gap={1}>
                <Typography
                   variant="brandedH4"
@@ -121,11 +148,7 @@ const Content = () => {
                   just a few steps.
                </Typography>
             </Stack>
-            <Stack
-               direction="row"
-               gap="20px"
-               justifyContent={isMobile ? "center" : "flex-start"}
-            >
+            <Stack sx={styles.actions}>
                <Button
                   variant="contained"
                   onClick={() => {
@@ -141,13 +164,7 @@ const Content = () => {
                <Button
                   variant="text"
                   color="grey"
-                  sx={{
-                     padding: 0,
-                     "&:hover": {
-                        backgroundColor: "transparent",
-                        textDecoration: "underline",
-                     },
-                  }}
+                  sx={styles.noSupportButton}
                   onClick={handleClose}
                >
                   No support needed
