@@ -33,7 +33,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    // When we implement of event sending on client side on login or logout, we will be calling the method to handle it
    const handleMessage = (event: any) => {
-      const receivedToken = event.nativeEvent.data // Token received from WebView
+      const receivedToken = event.nativeEvent.data // Token and potential data received from WebView
       setToken(receivedToken)
    }
 
