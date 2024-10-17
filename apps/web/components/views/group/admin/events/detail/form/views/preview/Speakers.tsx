@@ -2,6 +2,7 @@ import { sxStyles } from "@careerfairy/shared-ui"
 import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
+import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import { speakerPlaceholder } from "components/util/constants"
 import HorizontalScroll from "components/views/common/HorizontalScroll"
 import SectionTitle from "components/views/livestream-dialog/views/livestream-details/main-content/SectionTitle"
@@ -14,30 +15,40 @@ const styles = sxStyles({
    root: {
       ...NICE_SCROLLBAR_STYLES,
    },
-   speakerAvatar: {
+   speakerWrapper: (theme) => ({
+      padding: 1.5,
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: "8px",
+      border: `1px solid ${theme.palette.secondary[50]}`,
+      background: theme.brand.white[200],
+      mb: 0.5,
       "& .avatar": {
-         borderRadius: "50%",
-         minWidth: "56px !important",
-         minHeight: "56px !important",
+         borderRadius: "70px",
+         minWidth: "48px !important",
+         minHeight: "48px !important",
+         border: `1.5px solid ${theme.brand.white[400]} !important`,
       },
+   }),
+   speakerNameWrapper: {
+      justifyContent: "center",
+      alignItems: "flex-start",
+      gap: 0.5,
+      userSelect: "none",
    },
    displayName: {
-      fontSize: "1.14rem",
+      fontWeight: 600,
    },
    position: {
-      color: "text.secondary",
-      fontSize: "1rem",
+      color: (theme) => theme.palette.neutral[500],
+      lineHeight: "20px",
    },
    speakersWrapper: {
       overflowX: "auto",
       flexWrap: "nowrap",
       display: "flex",
       flexDirection: "row",
-      "& > *": {
-         "&:not(:last-child)": {
-            mr: 3,
-         },
-      },
+      gap: 1,
    },
 })
 
@@ -70,29 +81,31 @@ const SpeakerAvatar = ({ speaker }: SpeakerAvatarProps) => {
    const displayName = `${speaker.firstName ?? ""} ${speaker.lastName ?? ""}`
 
    return (
-      <Stack spacing={0.75} direction="row" sx={styles.speakerAvatar}>
-         <Box minWidth={56} minHeight={56}>
+      <Stack spacing={1} direction="row" sx={styles.speakerWrapper}>
+         <Box minWidth={48} minHeight={48}>
             <Image
                className="avatar"
-               width={56}
-               height={56}
-               src={speaker.avatarUrl}
+               width={48}
+               height={48}
+               src={
+                  getResizedUrl(speaker.avatarUrl, "lg") || speakerPlaceholder
+               }
                objectFit="cover"
                alt={displayName}
             />
          </Box>
-         <Stack>
+         <Stack sx={styles.speakerNameWrapper}>
             <Typography
                sx={styles.displayName}
                whiteSpace="nowrap"
-               variant="h6"
+               variant="brandedBody"
             >
                {displayName}
             </Typography>
             <Typography
                sx={styles.position}
                whiteSpace="nowrap"
-               variant="body2"
+               variant="small"
             >
                {speaker.position}
             </Typography>
@@ -103,12 +116,12 @@ const SpeakerAvatar = ({ speaker }: SpeakerAvatarProps) => {
 
 const SpeakerAvatarSkeleton = () => {
    return (
-      <Stack spacing={0.75} direction="row" sx={styles.speakerAvatar}>
-         <Box minWidth={56} minHeight={56}>
+      <Stack spacing={1} direction="row" sx={styles.speakerWrapper}>
+         <Box minWidth={48} minHeight={48}>
             <Image
                className="avatar"
-               width={56}
-               height={56}
+               width={48}
+               height={48}
                src={speakerPlaceholder}
                objectFit="cover"
                alt={"Speaker Placeholder"}
@@ -118,14 +131,14 @@ const SpeakerAvatarSkeleton = () => {
             <Typography
                sx={styles.displayName}
                whiteSpace="nowrap"
-               variant="h6"
+               variant="brandedBody"
             >
                <StaticSkeleton width={160} />
             </Typography>
             <Typography
                sx={styles.position}
                whiteSpace="nowrap"
-               variant="body2"
+               variant="small"
             >
                <StaticSkeleton width={100} />
             </Typography>

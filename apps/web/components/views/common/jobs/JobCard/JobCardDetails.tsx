@@ -19,6 +19,7 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "space-between",
       alignItems: "end",
+      mb: 0.5,
    },
    title: {
       color: "text.primary",
@@ -51,7 +52,7 @@ const styles = sxStyles({
       flexDirection: "column",
 
       fontSize: "14px",
-      color: "text.secondary",
+      color: (theme) => theme.palette.neutral[500],
       fontWeight: 400,
 
       whiteSpace: "nowrap",

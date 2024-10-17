@@ -1,11 +1,11 @@
-import { FC, ReactNode } from "react"
-import Typography from "@mui/material/Typography"
-import { sxStyles } from "../../../../../types/commonTypes"
 import Skeleton from "@mui/material/Skeleton"
+import Typography from "@mui/material/Typography"
+import { FC, ReactNode } from "react"
+import { sxStyles } from "../../../../../types/commonTypes"
 
 const styles = sxStyles({
    eventTitle: {
-      fontWeight: 600,
+      fontWeight: 700,
       textAlign: "center",
       maxWidth: 750,
       width: "100%",
@@ -21,12 +21,7 @@ type Props = {
 
 const LivestreamTitle: FC<Props> = (props) => {
    return (
-      <Typography
-         align="center"
-         variant={"h3"}
-         component="h1"
-         sx={styles.eventTitle}
-      >
+      <Typography align="center" variant={"brandedH1"} sx={styles.eventTitle}>
          {props.text}
       </Typography>
    )

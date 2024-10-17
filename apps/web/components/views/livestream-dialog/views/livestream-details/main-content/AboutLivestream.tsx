@@ -1,21 +1,24 @@
-import React, { FC } from "react"
-import Box from "@mui/material/Box"
-import SectionTitle from "./SectionTitle"
-import LinkifyText from "../../../../../util/LinkifyText"
-import { Typography } from "@mui/material"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import Stack from "@mui/material/Stack"
+import { Typography } from "@mui/material"
+import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
+import { FC } from "react"
 import { Check } from "react-feather"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import LinkifyText from "../../../../../util/LinkifyText"
+import SectionTitle from "./SectionTitle"
 
 const styles = sxStyles({
    companyName: {
-      fontSize: "2.28rem",
+      fontWeight: 600,
+      display: "block",
+      mb: 1,
+      color: (theme) => theme.palette.neutral[900],
    },
    summary: {
-      fontSize: "1.285rem",
       whiteSpace: "pre-line",
+      color: (theme) => theme.palette.neutral[800],
    },
    reasonsContainer: {
       display: "flex",
@@ -23,10 +26,11 @@ const styles = sxStyles({
    },
    reasons: {
       whiteSpace: "pre-line",
-      fontSize: "1.1428rem",
+      color: (theme) => theme.palette.neutral[800],
    },
    reasonsCheck: {
       marginRight: 10,
+      flexShrink: 0,
    },
 })
 
@@ -38,12 +42,14 @@ const AboutLivestream: FC<Props> = ({ presenter }) => {
    return (
       <Box>
          <SectionTitle>About the live stream</SectionTitle>
-         <Typography sx={styles.companyName} component="h3">
+         <Typography sx={styles.companyName} variant="brandedH3">
             {presenter.company}
          </Typography>
          <Stack spacing={6}>
             <LinkifyText>
-               <Typography sx={styles.summary}>{presenter.summary}</Typography>
+               <Typography sx={styles.summary} variant="brandedBody">
+                  {presenter.summary}
+               </Typography>
             </LinkifyText>
             <ReasonsToJoin presenter={presenter} />
          </Stack>
@@ -81,6 +87,7 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
                {reasonsToJoinLivestream.map((reason) => (
                   <Typography
                      key={reason}
+                     variant="brandedBody"
                      sx={[
                         styles.reasons,
                         Boolean(hasReasonsToJoinLivestream_v2) &&
@@ -88,7 +95,11 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
                      ]}
                   >
                      {Boolean(hasReasonsToJoinLivestream_v2) && (
-                        <Check color="#29BAA5" style={styles.reasonsCheck} />
+                        <Check
+                           strokeWidth={3}
+                           color="#29BAA5"
+                           style={styles.reasonsCheck}
+                        />
                      )}{" "}
                      {reason}
                   </Typography>

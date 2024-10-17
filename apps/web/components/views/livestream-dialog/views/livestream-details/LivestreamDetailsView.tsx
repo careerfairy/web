@@ -111,18 +111,18 @@ const LivestreamDetailsView = () => {
                   questionsRef,
                }) => (
                   <MainContent>
+                     <Section ref={aboutLivestreamRef}>
+                        {/* Speakers are part of the about live stream section */}
+                        <Speakers speakers={livestream.speakers} />
+                        <Section navOffset={50}>
+                           <AboutLivestream presenter={livestreamPresenter} />
+                        </Section>
+                     </Section>
                      {hasJobs ? (
                         <Section navOffset={44} ref={jobsRef}>
                            <Jobs presenter={livestreamPresenter} />
                         </Section>
                      ) : null}
-                     <Section ref={aboutLivestreamRef}>
-                        {/* Speakers are part of the about live stream section */}
-                        <Speakers speakers={livestream.speakers} />
-                        <Section>
-                           <AboutLivestream presenter={livestreamPresenter} />
-                        </Section>
-                     </Section>
                      <AboutCompany
                         sectionRef={aboutCompanyRef}
                         presenter={livestreamPresenter}
