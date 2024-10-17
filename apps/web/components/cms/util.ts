@@ -25,7 +25,7 @@ export const GraphCMSImageLoader = ({
    src,
    width,
 }: GraphCMSImageLoaderProps) => {
-   const relativeSrc = (src) => src.split("/").pop()
+   const relativeSrc = (src: string) => src.split("/").pop()
    return `https://media.graphcms.com/resize=width:${width}/${relativeSrc(src)}`
 }
 
