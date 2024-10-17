@@ -1,6 +1,6 @@
 export const environment = {
-   basePageUrl: "https://www.careerfairy.io",
-   searchCriteria: "careerfairy.io",
+   basePageUrl: "http://localhost:3000",
+   searchCriteria: "localhost:3000",
    firebaseConfig: {
       apiKey: "AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0",
       authDomain: "careerfairy-e1fd9.firebaseapp.com",
