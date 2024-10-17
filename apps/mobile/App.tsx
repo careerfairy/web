@@ -1,10 +1,12 @@
+import { useEffect } from "react"
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
 import WebViewComponent from "./components/WebView"
 import { initializeApp } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
 import { environment } from "./environments/environment"
-import { useEffect } from "react"
+import { Camera } from "expo-camera"
+import { Audio } from "expo-av"
 
 const app = initializeApp(environment.firebaseConfig)
 
@@ -14,12 +16,27 @@ const firestore = getFirestore(app)
 export default function Native() {
    // Log Firebase connection status
    useEffect(() => {
+      // Request camera and audio permissions when the component mounts
+      ;(async () => {
+         const { status: cameraStatus } =
+            await Camera.getCameraPermissionsAsync()
+         if (cameraStatus !== "granted") {
+            await Camera.requestCameraPermissionsAsync()
+         }
+         const { status: audioStatus } = await Audio.getPermissionsAsync()
+         if (audioStatus !== "granted") {
+            await Audio.requestPermissionsAsync()
+         }
+      })()
+
       if (app) {
          console.log("Firebase connected successfully!")
       } else {
          console.log("Firebase connection failed.")
       }
    }, [])
+
+   useEffect(() => {}, [])
    const getPushToken = async () => {
       try {
          const { status: existingStatus } =
@@ -30,7 +47,6 @@ export default function Native() {
             finalStatus = status
          }
          if (finalStatus !== "granted") {
-            alert("Failed to get push token for push notification!")
             return
          }
 
