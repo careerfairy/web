@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs"
+import { ModuleStepContentRenderer } from "components/views/talent-guide/components/RichTextRenderer"
 import { FORCE_GERMAN_LOCALE } from "data/hygraph/constants"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
@@ -21,7 +22,12 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ locale, data }) => {
          {/* Implement your page content here using the props */}
          <h1>Talent Guide</h1>
          <p>Current locale: {locale}</p>
-         <pre>{JSON.stringify(data, null, 2)}</pre>
+         {data.content.moduleSteps.map((step) => (
+            <div key={step.id}>
+               <h2>{step.stepTitle}</h2>
+               <ModuleStepContentRenderer content={step.content} />
+            </div>
+         ))}
       </div>
    )
 }

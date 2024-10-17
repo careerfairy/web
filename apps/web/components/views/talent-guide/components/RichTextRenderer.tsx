@@ -28,7 +28,7 @@ import {
    SparksCarouselBlock,
 } from "../blocks"
 
-type RichTextRendererProps = ModuleStepType
+type RichTextRendererProps = Pick<ModuleStepType, "content">
 
 export const ModuleStepContentRenderer = ({
    content,
