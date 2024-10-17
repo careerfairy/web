@@ -165,6 +165,7 @@ const csp = {
       "careerfairy-e1fd9.firebaseapp.com",
       "*.youtube.com",
       "*.googleapis.com",
+      "*.graphassets.com",
    ],
    "worker-src": [
       "'self'", // For Sentry Replay
@@ -321,6 +322,7 @@ const moduleExports = {
          "media.graphassets.com",
          "localhost",
          "127.0.0.1",
+         "eu-west-2.graphassets.com",
       ],
    },
    webpack: (config) => {
