@@ -32,5 +32,16 @@ export const useMediaPermissions = () => {
       camera: getPermission(activeCameraId, fetchCamerasError),
    }
 
-   return permissions
+   return {
+      permissions,
+      hasDeniedPermissions:
+         permissions.microphone === PermissionType.Denied ||
+         permissions.camera === PermissionType.Denied,
+      isPromptingForPermissions:
+         permissions.microphone === PermissionType.Prompting ||
+         permissions.camera === PermissionType.Prompting,
+      hasAcceptedPermissions:
+         permissions.microphone === PermissionType.Accepted &&
+         permissions.camera === PermissionType.Accepted,
+   }
 }
