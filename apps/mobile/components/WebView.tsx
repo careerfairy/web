@@ -9,6 +9,7 @@ import {
 import { WebView } from "react-native-webview"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
+import { environment } from "../environments/environment"
 
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
@@ -26,7 +27,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 }) => {
    const [loading, setLoading] = useState(true)
    const [initialUrl, setInitialUrl] = useState(
-      "https://www.careerfairy.io/portal"
+      environment.basePageUrl + "/portal"
    ) // Default WebView URL
    const webViewRef: any = useRef(null)
 
@@ -52,7 +53,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       `
          try {
             webViewRef.current.injectJavaScript(injectScript)
-            webViewRef.current.loadUrl("https://www.careerfairy.io/portal")
+            webViewRef.current.loadUrl(environment.basePageUrl + "/portal")
          } catch (e) {
             console.log("Error with loading the url")
          }
@@ -66,11 +67,11 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          if (token) {
             injectToken(token)
             setLoading(false)
-            setInitialUrl("https://www.careerfairy.io/portal")
+            setInitialUrl(environment.basePageUrl + "/portal")
             if (webViewRef.current) {
                try {
                   webViewRef.current.loadUrl(
-                     "https://www.careerfairy.io/portal"
+                     environment.basePageUrl + "/portal"
                   )
                } catch (e) {
                   console.log("Error with loading the url")
@@ -78,10 +79,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             }
          } else {
             setLoading(false)
-            setInitialUrl("https://www.careerfairy.io/login")
+            setInitialUrl(environment.basePageUrl + "/login")
             if (webViewRef.current) {
                try {
-                  webViewRef.current.loadUrl("https://www.careerfairy.io/login")
+                  webViewRef.current.loadUrl(environment.basePageUrl + "/login")
                } catch (e) {
                   console.log("Error with loading the url")
                }
@@ -117,7 +118,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    // Handling opening of external links in default mobile browser
    const handleNavigation = (request: any) => {
-      if (!request.url.includes("careerfairy.io")) {
+      if (!request.url.includes(environment.searchCriteria)) {
          Linking.openURL(request.url)
          return false // Prevent WebView from loading the external link
       }
@@ -138,7 +139,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                ref={webViewRef}
                source={{ uri: initialUrl }}
                javaScriptEnabled={true}
-               allowsInlineMediaPlayback
                incognito={true}
                mediaPlaybackRequiresUserAction={false}
                onMessage={handleMessage}
@@ -146,6 +146,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                domStorageEnabled={true} // Enable DOM storage if needed
                startInLoadingState={true} // Show loading indicator
                onLoadEnd={() => setLoading(false)}
+               allowsInlineMediaPlayback={true} // Required for iOS
             />
          )}
       </SafeAreaView>

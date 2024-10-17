@@ -18,10 +18,22 @@ You have two options to run the app, either from the project root or from the \`
 
 #### Option 1: From the Project Root
 
-Run the following command from the root of your project:
+Run the following command from the root of your project for development environment (Webview with localhost:3000):
 
 ```bash
 npm run native
+```
+
+or
+
+```bash
+npm run native:dev
+```
+
+Run the following command from the root of your project for production environment (Webview with careerfairy.io):
+
+```bash
+npm run native:prod
 ```
 
 #### Option 2: From the \`mobile\` Folder
