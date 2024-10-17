@@ -1,11 +1,16 @@
-import React, { useRef, useState, FC, useCallback, useMemo } from "react"
 import { Box, SxProps } from "@mui/material"
-import { combineStyles, sxStyles } from "../../../types/commonTypes"
 import { BoxProps } from "@mui/material/Box"
+import React, { FC, useCallback, useMemo, useRef, useState } from "react"
+import { combineStyles, sxStyles } from "../../../types/commonTypes"
 
 const styles = sxStyles({
    root: {
       overflowX: "auto",
+   },
+   rootDragging: {
+      "> *": {
+         pointerEvents: "none",
+      },
    },
 })
 type Props = BoxProps
@@ -21,34 +26,38 @@ type Props = BoxProps
  */
 const HorizontalScroll: FC<Props> = ({ children, sx, ...boxProps }) => {
    const [isDragging, setIsDragging] = useState(false)
+   const [shouldDrag, setShouldDrag] = useState(false)
    const [startX, setStartX] = useState(0)
    const [scrollLeft, setScrollLeft] = useState(0)
 
    const ref = useRef<HTMLDivElement>(null)
 
    const mouseDownHandler = useCallback((e: React.MouseEvent) => {
-      setIsDragging(true)
+      setShouldDrag(true)
       setStartX(e.pageX - ref.current!.offsetLeft)
       setScrollLeft(ref.current!.scrollLeft)
    }, [])
 
    const mouseLeaveHandler = useCallback(() => {
       setIsDragging(false)
+      setShouldDrag(false)
    }, [])
 
    const mouseUpHandler = useCallback(() => {
       setIsDragging(false)
+      setShouldDrag(false)
    }, [])
 
    const mouseMoveHandler = useCallback(
       (e: React.MouseEvent) => {
-         if (!isDragging) return
+         if (!shouldDrag) return
+         setIsDragging(true)
          e.preventDefault()
          const x = e.pageX - ref.current!.offsetLeft
          const walk = x - startX
          ref.current!.scrollLeft = scrollLeft - walk
       },
-      [isDragging, startX, scrollLeft]
+      [shouldDrag, startX, scrollLeft]
    )
 
    const baseStyles = useMemo<BoxProps["sx"]>(
@@ -58,6 +67,7 @@ const HorizontalScroll: FC<Props> = ({ children, sx, ...boxProps }) => {
             {
                cursor: isDragging ? "grabbing" : "grab",
             },
+            isDragging ? styles.rootDragging : null,
             sx
          ),
       [isDragging, sx]

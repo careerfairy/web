@@ -86,7 +86,7 @@ const PreviewContent = forwardRef<HTMLDivElement, PreviewContentProps>(
             sx={isInDialog ? { padding: 0 } : [styles.root, scaledStyles]}
             ref={ref}
          >
-            <Stack spacing={4.75}>
+            <Stack spacing={2}>
                <HeroContent
                   isInDialog={isInDialog}
                   backgroundImage={general.backgroundImageUrl}
@@ -128,35 +128,30 @@ const PreviewContent = forwardRef<HTMLDivElement, PreviewContentProps>(
                      variant={centeredNav ? "standard" : "scrollable"}
                      value={Boolean(isInDialog) && 0}
                   >
+                     <Tab
+                        disableRipple
+                        sx={styles.tab}
+                        label={"About The live stream"}
+                        value={!hasJobs && isInDialog ? 0 : null}
+                     />
                      {Boolean(hasJobs) && (
                         <Tab
                            disableRipple
                            sx={styles.tab}
-                           label={"Linked jobs"}
+                           label={"Jobs in focus"}
                            value={0}
                         />
                      )}
                      <Tab
                         disableRipple
                         sx={styles.tab}
-                        label={"About The Live Stream"}
-                        value={!hasJobs && isInDialog ? 0 : null}
-                     />
-                     <Tab
-                        disableRipple
-                        sx={styles.tab}
-                        label={"About The Company"}
+                        label={"About the company"}
                      />
                      <Tab disableRipple sx={styles.tab} label={"Questions"} />
                   </Tabs>
                </Box>
                <Box sx={styles.mainContent}>
-                  {hasJobs ? (
-                     <Section navOffset={6}>
-                        <Jobs jobs={isAtsJobs ? jobs.jobs : jobs.customJobs} />
-                     </Section>
-                  ) : null}
-                  <Section navOffset={!hasJobs ? 6 : undefined}>
+                  <Section>
                      <Speakers speakers={speakers.values} />
                      <Section>
                         <AboutLivestream
@@ -166,6 +161,11 @@ const PreviewContent = forwardRef<HTMLDivElement, PreviewContentProps>(
                         />
                      </Section>
                   </Section>
+                  {hasJobs ? (
+                     <Section navOffset={44}>
+                        <Jobs jobs={isAtsJobs ? jobs.jobs : jobs.customJobs} />
+                     </Section>
+                  ) : null}
                   <Section>
                      <AboutCompany
                         company={group}
