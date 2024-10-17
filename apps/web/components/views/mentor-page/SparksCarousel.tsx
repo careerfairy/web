@@ -4,6 +4,7 @@ import { Box } from "@mui/material"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import { useRouter } from "next/router"
+import { ReactNode } from "react"
 import { useDispatch } from "react-redux"
 import {
    setCameFromPageLink,
@@ -38,9 +39,14 @@ const styles = sxStyles({
 type SparksCarousel = {
    sparks: Spark[]
    disableClick?: boolean
+   title?: ReactNode | string
 }
 
-export const SparksCarousel = ({ sparks, disableClick }: SparksCarousel) => {
+export const SparksCarousel = ({
+   sparks,
+   disableClick,
+   title = "",
+}: SparksCarousel) => {
    const router = useRouter()
    const dispatch = useDispatch()
 
@@ -71,7 +77,7 @@ export const SparksCarousel = ({ sparks, disableClick }: SparksCarousel) => {
    return (
       <ContentCarousel
          slideWidth={SPARK_CARD_WIDTH}
-         headerTitle="My Sparks"
+         headerTitle={title}
          emblaProps={{
             emblaRef,
             emblaApi,

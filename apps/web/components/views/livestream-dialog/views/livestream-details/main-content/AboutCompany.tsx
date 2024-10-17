@@ -1,32 +1,32 @@
-import React, { FC, useMemo } from "react"
-import Box from "@mui/material/Box"
-import SectionTitle from "./SectionTitle"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { CardContent, CardMedia, Typography } from "@mui/material"
-import Card from "@mui/material/Card"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import Image from "next/legacy/image"
-import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
-import Stack from "@mui/material/Stack"
-import FollowButton from "../../../../common/company/FollowButton"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import { CardContent, CardMedia, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
+import Card from "@mui/material/Card"
+import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
+import SanitizedHTML from "components/util/SanitizedHTML"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import Image from "next/legacy/image"
+import { FC, useMemo } from "react"
+import { ChevronRight as MoreIcon } from "react-feather"
+import { sxStyles } from "../../../../../../types/commonTypes"
 import useGroupsByIds from "../../../../../custom-hook/useGroupsByIds"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
-import Skeleton from "@mui/material/Skeleton"
+import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 import {
    CompanyCountryTag,
    CompanyIndustryTag,
    CompanySizeTag,
 } from "../../../../common/company/company-tags"
-import Link from "../../../../common/Link"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
-import { ChevronRight as MoreIcon } from "react-feather"
-import Section from "./Section"
-import { InViewRef } from "../MainContentNavigation"
-import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import FollowButton from "../../../../common/company/FollowButton"
 import PublicSparksBadge from "../../../../common/icons/PublicSparksBadge"
-import CircularLogo from "components/views/common/logos/CircularLogo"
-import SanitizedHTML from "components/util/SanitizedHTML"
+import Link from "../../../../common/Link"
+import { InViewRef } from "../MainContentNavigation"
+import Section from "./Section"
+import SectionTitle from "./SectionTitle"
 
 const styles = sxStyles({
    root: {
@@ -72,7 +72,6 @@ const styles = sxStyles({
       height: "fit-content",
    },
    followButton: {
-      borderRadius: 1,
       py: 0.5,
       px: 2.25,
       textTransform: "none",
@@ -84,13 +83,14 @@ const styles = sxStyles({
       borderRadius: 1,
    },
    companyName: {
-      fontSize: "1.285rem",
       fontWeight: 600,
+      color: (theme) => theme.palette.neutral[800],
    },
    companyDescription: {
-      fontSize: "1.071rem",
+      fontSize: "1.14rem",
       fontWeight: 400,
       mt: 1.875,
+      color: (theme) => theme.palette.neutral[800],
    },
    companyCta: {
       fontSize: "1.142rem",
@@ -131,7 +131,13 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
       [company]
    )
 
-   const showCompanyPageCta = Boolean(companyPresenter?.publicProfile)
+   const isCompanyPagePublic = Boolean(companyPresenter?.publicProfile)
+
+   const companyName = (
+      <Typography variant="brandedH4" sx={styles.companyName}>
+         {presenter.company}
+      </Typography>
+   )
 
    if (!companyPresenter || !companyPresenter.hasMinimumData()) {
       return null
@@ -167,9 +173,20 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                   alignItems="center"
                >
                   <Stack flexDirection={"row"} alignItems={"center"}>
-                     <Typography component="h5" sx={styles.companyName}>
-                        {presenter.company}
-                     </Typography>
+                     {isCompanyPagePublic ? (
+                        <Box
+                           component={Link}
+                           noLinkStyle
+                           href={`/company/${companyNameSlugify(
+                              company.universityName
+                           )}`}
+                           sx={{ color: "white" }}
+                        >
+                           {companyName}
+                        </Box>
+                     ) : (
+                        companyName
+                     )}
 
                      {company.publicSparks ? (
                         <PublicSparksBadge sx={styles.badge} />
@@ -187,31 +204,24 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                   spacing={2}
                >
                   {company.companyCountry ? (
-                     <CompanyCountryTag
-                        fontSize={"1.07rem"}
-                        text={company.companyCountry.name}
-                     />
+                     <CompanyCountryTag text={company.companyCountry?.name} />
                   ) : null}
                   {company.companyIndustries?.length ? (
                      <CompanyIndustryTag
-                        fontSize={"1.07rem"}
                         text={company.companyIndustries
                            .map(({ name }) => name)
                            .join(", ")}
                      />
                   ) : null}
                   {company.companySize ? (
-                     <CompanySizeTag
-                        fontSize={"1.07rem"}
-                        text={company.companySize}
-                     />
+                     <CompanySizeTag text={company.companySize} />
                   ) : null}
                </Stack>
                <SanitizedHTML
                   htmlString={company.extraInfo}
                   sx={styles.companyDescription}
                />
-               {showCompanyPageCta ? (
+               {isCompanyPagePublic ? (
                   <Box
                      display="flex"
                      component={Link}

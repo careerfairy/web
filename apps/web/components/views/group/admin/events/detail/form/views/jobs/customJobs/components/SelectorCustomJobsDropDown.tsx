@@ -50,14 +50,17 @@ const styles = sxStyles({
       },
    },
    optionElementContainer: {
-      width: { xs: "85%", md: "100%" },
+      width: "85%",
       padding: "16px",
+      flexGrow: 1,
    },
    optionTitle: {
       fontSize: { xs: "14px", md: "16px" },
       width: "600",
       fontWeight: "bold",
       marginBottom: 1,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
    },
    optionInfo: {
       fontSize: { xs: "12px", md: "14px" },
