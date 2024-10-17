@@ -1,41 +1,36 @@
 import { Box, Button, Dialog, Stack, Typography } from "@mui/material"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import Image from "next/image"
-import { useState } from "react"
-import { PermissionType, useMediaPermissions } from "./useMediaPermissions"
+import { useEffect } from "react"
+import { useDispatch } from "react-redux"
+import { setDeniedPermissionsDialogOpen } from "store/reducers/streamingAppReducer"
+import { useDeniedPermissionsDialogOpen } from "store/selectors/streamingAppSelectors"
+import { useMediaPermissions } from "./useMediaPermissions"
 
 export const DeniedPermissionsDialog = () => {
-   const [hasInteracted, setHasInteracted] = useState(false)
-   const permissions = useMediaPermissions()
+   const { hasDeniedPermissions, hasAcceptedPermissions } =
+      useMediaPermissions()
 
-   const [
-      promptingForPermissionsOpen,
-      setPromptingForPermissionsOpen,
-      closePromptingForPermissions,
-   ] = useDialogStateHandler()
+   const deniedPermissionsDialogOpen = useDeniedPermissionsDialogOpen()
+
+   const dispatch = useDispatch()
 
    const handleClose = () => {
-      setHasInteracted(true)
-      closePromptingForPermissions()
+      dispatch(setDeniedPermissionsDialogOpen(false))
    }
 
-   const isDenied =
-      permissions.microphone === PermissionType.Denied ||
-      permissions.camera === PermissionType.Denied
+   useEffect(() => {
+      if (hasDeniedPermissions && !deniedPermissionsDialogOpen) {
+         dispatch(setDeniedPermissionsDialogOpen(true))
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [hasDeniedPermissions])
 
-   if (
-      permissions.microphone === PermissionType.Accepted &&
-      permissions.camera === PermissionType.Accepted
-   ) {
+   if (hasAcceptedPermissions) {
       return null
    }
 
-   if (isDenied && !promptingForPermissionsOpen && !hasInteracted) {
-      setPromptingForPermissionsOpen()
-   }
-
    return (
-      <Dialog open={promptingForPermissionsOpen} maxWidth="desktop">
+      <Dialog open={deniedPermissionsDialogOpen} maxWidth="desktop">
          <Stack
             direction="row"
             sx={{
