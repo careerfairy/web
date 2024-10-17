@@ -98,8 +98,8 @@ const Content = () => {
             <Image
                src="/livestream/mic-camera-frowning-face.png"
                alt="mic and camera frowning face"
-               width={141}
-               height={168}
+               width={isMobile ? 99 : 141}
+               height={isMobile ? 118 : 168}
             />
          </Box>
          <Stack
