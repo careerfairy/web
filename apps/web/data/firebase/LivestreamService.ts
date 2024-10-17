@@ -931,7 +931,7 @@ export class LivestreamService {
     * Gets the company host of a live stream.
     * @param livestreamId - Livestream id.
     * @returns A promise resolved with the company Group or null if there are
-    * multiple hosts or the host is a university.
+    * multiple hosts.
     */
    async getLivestreamHost(livestreamId: string) {
       const livestreamRef = this.getLivestreamRef(livestreamId)
@@ -945,10 +945,16 @@ export class LivestreamService {
       const groups = await groupRepo.getGroupsByIds(livestreamData.groupIds)
       const companyGroups = groups.filter((group) => !group.universityCode)
 
-      const isSingleCompany = companyGroups?.length === 1
+      const isHostedBySingleCompany = companyGroups?.length === 1
+      const isHostedBySingleUniversity =
+         companyGroups.length === 0 && groups.length === 1
 
-      if (isSingleCompany) {
+      if (isHostedBySingleCompany) {
          return companyGroups[0]
+      }
+
+      if (isHostedBySingleUniversity) {
+         return groups[0]
       }
 
       return null
