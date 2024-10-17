@@ -1,6 +1,7 @@
 import { Timestamp } from "firebase/firestore"
 import { Identifiable } from "../commonTypes"
-import { Speaker } from "../livestreams"
+import { LivestreamEvent, Speaker } from "../livestreams"
+import { Spark } from "../sparks/sparks"
 
 export const CreatorRoles = {
    Spark: "Spark",
@@ -131,4 +132,10 @@ export function transformCreatorNameIntoSlug(
    lastName: string
 ) {
    return `${firstName}-${lastName}`.toLowerCase()
+}
+
+export type CreatorPublicContent = {
+   livestreams: LivestreamEvent[]
+   sparks: Spark[]
+   hasJobs: boolean
 }

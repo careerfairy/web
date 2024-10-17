@@ -1,12 +1,12 @@
+import { useMediaQuery } from "@mui/material"
+import Box from "@mui/material/Box"
+import { useTheme } from "@mui/material/styles"
+import Tab from "@mui/material/Tab"
+import Tabs from "@mui/material/Tabs"
 import * as React from "react"
 import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from "react"
 import { IntersectionOptions, useInView } from "react-intersection-observer"
-import Box from "@mui/material/Box"
-import Tabs from "@mui/material/Tabs"
-import Tab from "@mui/material/Tab"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { useTheme } from "@mui/material/styles"
-import { useMediaQuery } from "@mui/material"
 
 const styles = sxStyles({
    tabs: {
@@ -44,7 +44,7 @@ type TabElement = {
 }
 
 const options: IntersectionOptions = {
-   threshold: 0.8,
+   threshold: 0.5,
 }
 
 const MainContentNavigation: FC<Props> = ({
@@ -55,7 +55,7 @@ const MainContentNavigation: FC<Props> = ({
    const theme = useTheme()
    const centeredNav = !useMediaQuery(theme.breakpoints.down("sm"))
 
-   const [value, setValue] = useState(hasJobs ? "jobs" : "aboutLivestream")
+   const [value, setValue] = useState("aboutLivestream")
    const [isManualTabChange, setIsManualTabChange] = useState(false)
 
    const [jobsRef, jobsInView, jobSection] = useInView(options)
@@ -67,26 +67,25 @@ const MainContentNavigation: FC<Props> = ({
 
    const tabs = useMemo<TabElement[]>(() => {
       const newTabs: TabElement[] = [
-         // If there are jobs, make sure they are first in the list
+         {
+            value: "aboutLivestream",
+            label: "About the live stream",
+            inView: aboutLivestreamsInView,
+         },
          ...(hasJobs
             ? [
                  {
                     value: "jobs",
-                    label: "Linked Jobs",
+                    label: "Jobs in focus",
                     inView: jobsInView,
                  },
               ]
             : []),
-         {
-            value: "aboutLivestream",
-            label: "About The Live Stream",
-            inView: aboutLivestreamsInView,
-         },
          ...(aboutCompanySection
             ? [
                  {
                     value: "aboutCompany",
-                    label: "About The Company",
+                    label: "About the company",
                     inView: aboutCompanyInView,
                  },
               ]

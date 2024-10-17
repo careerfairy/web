@@ -216,6 +216,7 @@ const styles = sxStyles({
    },
    cardWrapper: (theme) => ({
       minWidth: "300px",
+      height: "100%",
       borderRadius: theme.spacing(2),
       border: `1px solid ${theme.palette.secondary[50]}`,
       background: theme.brand.white[50],

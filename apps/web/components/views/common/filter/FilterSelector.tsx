@@ -52,12 +52,12 @@ const styles = sxStyles({
    filterBadge: {
       width: 25,
       height: 25,
-      fontSize: '14px',
+      fontSize: "14px",
       fontWeight: 500,
       ml: 1,
-      bgcolor: 'primary.main',
-      color: 'text.primary',
-    },
+      bgcolor: "primary.main",
+      color: "text.primary",
+   },
 })
 
 const FilterSelector = () => {
@@ -166,7 +166,9 @@ const FilterSelector = () => {
                      Filters
                   </Typography>
                   {numberOfActiveFilters > 0 && (
-                     <Avatar sx={styles.filterBadge}>{numberOfActiveFilters}</Avatar>
+                     <Avatar sx={styles.filterBadge}>
+                        {numberOfActiveFilters}
+                     </Avatar>
                   )}
                </Button>
             )}

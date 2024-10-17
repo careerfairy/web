@@ -20,6 +20,7 @@ import { containsAny } from "../utils/utils"
 import {
    AddCreatorData,
    Creator,
+   CreatorPublicContent,
    CreatorRole,
    UpdateCreatorData,
 } from "./creators"
@@ -275,6 +276,14 @@ export interface IGroupRepository {
     * @returns A Promise that resolves with an array of creators.
     */
    getCreatorsWithPublicContent(group: Group): Promise<Creator[]>
+
+   /**
+    * Gets all public content from a given creator
+    * @param creator the creator to get the content from
+    * @returns A Promise that resolves with an object containing the live streams and sparks
+    * associated, as well as if the group the creator belongs to has any jobs.
+    */
+   getCreatorPublicContent(creator: Creator): Promise<CreatorPublicContent>
 
    /**
     * Updates the publicSparks flag in a group.
@@ -1179,6 +1188,63 @@ export class FirebaseGroupRepository
       )
 
       return resultWithNoDuplicates
+   }
+
+   async getCreatorPublicContent(
+      creator: Creator
+   ): Promise<CreatorPublicContent> {
+      if (!creator.groupId)
+         return { sparks: [], livestreams: [], hasJobs: false }
+
+      const group = await this.getGroupById(creator.groupId)
+
+      const [groupLivestreamsSnaps, sparksSnaps, groupJobs] = await Promise.all(
+         [
+            this.firestore
+               .collection("livestreams")
+               .where("groupIds", "array-contains", group.id)
+               .where("test", "==", false)
+               .where("hidden", "==", false)
+               .where("denyRecordingAccess", "==", false)
+               .orderBy("start", "desc")
+               .get(),
+            group.publicSparks
+               ? this.firestore
+                    .collection("sparks")
+                    .where("published", "==", true)
+                    .where("creator.id", "==", creator.id)
+                    .get()
+               : null,
+            this.firestore
+               .collection("customJobs")
+               .where("groupId", "==", group.id)
+               .where("deleted", "==", false)
+               .where("published", "==", true)
+               .where("deadline", ">=", new Date())
+               .limit(1)
+               .get(),
+         ]
+      )
+
+      const creatorsSparks =
+         sparksSnaps && mapFirestoreDocuments<Spark>(sparksSnaps)
+
+      const groupLivestreams = mapFirestoreDocuments<LivestreamEvent>(
+         groupLivestreamsSnaps
+      )
+
+      const creatorLivestreams = groupLivestreams.filter((livestream) =>
+         // filter by email for backwards compatibility
+         livestream.speakers.find((speaker) => speaker.email == creator.email)
+      )
+
+      const hasJobs = !groupJobs.empty
+
+      return {
+         sparks: creatorsSparks || [],
+         livestreams: creatorLivestreams || [],
+         hasJobs,
+      }
    }
 
    async updatePublicSparks(groupId: string, isPublic: boolean): Promise<void> {
