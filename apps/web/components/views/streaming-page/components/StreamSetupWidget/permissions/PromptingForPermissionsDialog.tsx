@@ -1,10 +1,11 @@
 import { Box, Dialog, Stack, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import Image from "next/image"
-import { PermissionType, useMediaPermissions } from "./useMediaPermissions"
+import { useMediaPermissions } from "./useMediaPermissions"
 
 export const PromptingForPermissionsDialog = () => {
-   const permissions = useMediaPermissions()
+   const { isPromptingForPermissions, hasAcceptedPermissions } =
+      useMediaPermissions()
 
    const [
       promptingForPermissionsOpen,
@@ -12,20 +13,13 @@ export const PromptingForPermissionsDialog = () => {
       closePromptingForPermissions,
    ] = useDialogStateHandler()
 
-   const isPrompting =
-      permissions.microphone === PermissionType.Prompting ||
-      permissions.camera === PermissionType.Prompting
-
-   if (isPrompting && !promptingForPermissionsOpen) {
+   if (isPromptingForPermissions && !promptingForPermissionsOpen) {
       setPromptingForPermissionsOpen()
-   } else if (!isPrompting && promptingForPermissionsOpen) {
+   } else if (!isPromptingForPermissions && promptingForPermissionsOpen) {
       closePromptingForPermissions()
    }
 
-   if (
-      permissions.microphone === PermissionType.Accepted ||
-      permissions.camera === PermissionType.Accepted
-   ) {
+   if (hasAcceptedPermissions) {
       return null
    }
 
