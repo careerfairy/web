@@ -121,7 +121,11 @@ const Content = () => {
                   just a few steps.
                </Typography>
             </Stack>
-            <Stack direction="row" gap="20px">
+            <Stack
+               direction="row"
+               gap="20px"
+               justifyContent={isMobile ? "center" : "flex-start"}
+            >
                <Button
                   variant="contained"
                   onClick={() => {
