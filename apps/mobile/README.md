@@ -25,7 +25,7 @@ You have two options to run the app, either from the project root or from the \`
 
 #### Option 1: From the Project Root
 
-Run the following command from the root of your project for development environment (Webview with localhost:3000):
+Run the following command from the root of project
 
 ```bash
 npm run native
