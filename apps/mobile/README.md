@@ -12,7 +12,14 @@ First, install the required dependencies using npm inside mobile (apps/mobile) f
 npm install
 ```
 
-### 2. Running the App
+### 2. Setup of base url and search criteria
+
+For setup of base webview url, go to .env file and change the data. For any new variable added, please add the type inside .env.d.ts file.
+When testing on branch and created a PR, use the PR preview url that should be in patter: https://.[PR-name].careerfairy.io
+
+Go to this link to see how to get current preview url: https://github.com/careerfairy/web/pull/1340
+
+### 3. Running the App
 
 You have two options to run the app, either from the project root or from the \`mobile\` folder.
 
@@ -24,18 +31,6 @@ Run the following command from the root of your project for development environm
 npm run native
 ```
 
-or
-
-```bash
-npm run native:dev
-```
-
-Run the following command from the root of your project for production environment (Webview with careerfairy.io):
-
-```bash
-npm run native:prod
-```
-
 #### Option 2: From the \`mobile\` Folder
 
 Navigate to the mobile folder and then start the app:
@@ -45,7 +40,7 @@ cd apps/mobile
 npm run start
 ```
 
-### 3. QR Code Launch
+### 4. QR Code Launch
 
 After running the app, a QR code will be displayed in your terminal.
 
