@@ -2,6 +2,7 @@ import { Box, Dialog, Drawer, Stack, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import Image from "next/image"
+import { useEffect } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useMediaPermissions } from "./useMediaPermissions"
 
@@ -36,11 +37,18 @@ export const PromptingForPermissionsDialog = () => {
       closePromptingForPermissions,
    ] = useDialogStateHandler()
 
-   if (isPromptingForPermissions && !promptingForPermissionsOpen) {
-      setPromptingForPermissionsOpen()
-   } else if (!isPromptingForPermissions && promptingForPermissionsOpen) {
-      closePromptingForPermissions()
-   }
+   useEffect(() => {
+      if (isPromptingForPermissions && !promptingForPermissionsOpen) {
+         setPromptingForPermissionsOpen()
+      } else if (!isPromptingForPermissions && promptingForPermissionsOpen) {
+         closePromptingForPermissions()
+      }
+   }, [
+      closePromptingForPermissions,
+      isPromptingForPermissions,
+      promptingForPermissionsOpen,
+      setPromptingForPermissionsOpen,
+   ])
 
    if (hasAcceptedPermissions) {
       return null
