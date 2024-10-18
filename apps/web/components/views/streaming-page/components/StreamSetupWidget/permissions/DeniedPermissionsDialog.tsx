@@ -156,7 +156,6 @@ const Content = () => {
                         "https://support.careerfairy.io/en/article/camera-and-microphone-issues-1oxpag9/",
                         "_blank"
                      )
-                     handleClose()
                   }}
                >
                   Open support guide
