@@ -22,17 +22,12 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const baseUrl = environment.basePageUrl + "/portal"
    const webViewRef: any = useRef(null)
 
-   // When we implement of event sending on client side on login or logout, we will be calling the method to handle it
+   // When we implement of event sending on client side on any event, we will be calling the method to handle it
    const handleMessage = (event: any) => {
       const receivedToken = event.nativeEvent.data // Token and potential data received from WebView
+      // If we have token (user is logged in), we will be connecting to firebase and storing data to firestore
       setToken(receivedToken)
    }
-
-   const injectedJavaScript = `
-    (function() {
-      window.ReactNativeWebView.postMessage(document.cookie);
-    })();
-  `
 
    const setToken = async (token: string) => {
       await SecureStore.setItemAsync("authToken", token)
@@ -54,6 +49,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
    }, [])
 
+   // Handling of back button press inside the webview for natural native behavior
    const handleBackButtonPress = () => {
       if (webViewRef.current) {
          webViewRef.current.goBack()
@@ -84,7 +80,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             onShouldStartLoadWithRequest={handleNavigation}
             domStorageEnabled={true} // Enable DOM storage if needed
             startInLoadingState={true} // Show loading indicator
-            injectedJavaScript={injectedJavaScript}
             allowsInlineMediaPlayback={true} // Required for iOS
          />
       </SafeAreaView>

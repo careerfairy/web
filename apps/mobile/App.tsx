@@ -50,6 +50,8 @@ export default function Native() {
             return
          }
 
+         // Warning: Calling getExpoPushTokenAsync without specifying a projectId is deprecated and will no longer be supported in SDK 49+
+         // Will be removed when we connect to expo dashboard and get project id from there
          const token = (await Notifications.getExpoPushTokenAsync()).data
          const userId = 1
          const dummyData = {
