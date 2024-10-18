@@ -4,11 +4,11 @@ import * as Notifications from "expo-notifications"
 import WebViewComponent from "./components/WebView"
 import { initializeApp } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
-import { environment } from "./environments/environment"
 import { Camera } from "expo-camera"
 import { Audio } from "expo-av"
+import { firebaseConfig } from "./constants/constants"
 
-const app = initializeApp(environment.firebaseConfig)
+const app = initializeApp(firebaseConfig)
 
 // Initialize Firestore
 const firestore = getFirestore(app)

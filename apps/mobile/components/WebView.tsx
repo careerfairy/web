@@ -3,7 +3,7 @@ import { BackHandler, Linking, Platform, SafeAreaView } from "react-native"
 import { WebView } from "react-native-webview"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
-import { environment } from "../environments/environment"
+import { BASE_URL, SEARCH_CRITERIA } from "@env"
 
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
@@ -19,7 +19,7 @@ interface WebViewScreenProps {
 const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
 }) => {
-   const baseUrl = environment.basePageUrl + "/portal"
+   const baseUrl = BASE_URL + "/portal"
    const webViewRef: any = useRef(null)
 
    // When we implement of event sending on client side on any event, we will be calling the method to handle it
@@ -60,7 +60,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    // Handling opening of external links in default mobile browser
    const handleNavigation = (request: any) => {
-      if (!request.url.includes(environment.searchCriteria)) {
+      if (!request.url.includes(SEARCH_CRITERIA)) {
          Linking.openURL(request.url)
          return false // Prevent WebView from loading the external link
       }
