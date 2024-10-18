@@ -38,7 +38,7 @@ export const useMediaPermissions = () => {
          permissions.microphone === PermissionType.Denied ||
          permissions.camera === PermissionType.Denied,
       isPromptingForPermissions:
-         permissions.microphone === PermissionType.Prompting ||
+         permissions.microphone === PermissionType.Prompting &&
          permissions.camera === PermissionType.Prompting,
       hasAcceptedPermissions:
          permissions.microphone === PermissionType.Accepted &&
