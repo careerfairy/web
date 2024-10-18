@@ -38,6 +38,10 @@ const styles = sxStyles({
          "linear-gradient(0deg, #F3F3F5, #F3F3F5), linear-gradient(180deg, rgba(243, 243, 245, 0) 0%, rgba(192, 192, 194, 0.1) 100%)",
       alignItems: "center",
       justifyContent: "center",
+      borderRadius: {
+         xs: "8px",
+         md: "initial",
+      },
    },
    contentWrapper: {
       direction: "column",
