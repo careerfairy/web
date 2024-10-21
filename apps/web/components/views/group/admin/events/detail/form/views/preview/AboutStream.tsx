@@ -26,6 +26,7 @@ const styles = sxStyles({
    },
    reasonsCheck: {
       marginRight: 10,
+      minWidth: "24px",
    },
 })
 
