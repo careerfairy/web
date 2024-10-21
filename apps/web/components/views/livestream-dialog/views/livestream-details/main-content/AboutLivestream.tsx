@@ -1,13 +1,13 @@
-import React, { FC } from "react"
-import Box from "@mui/material/Box"
-import SectionTitle from "./SectionTitle"
-import LinkifyText from "../../../../../util/LinkifyText"
-import { Typography } from "@mui/material"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import Stack from "@mui/material/Stack"
+import { Typography } from "@mui/material"
+import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
+import { FC } from "react"
 import { Check } from "react-feather"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import LinkifyText from "../../../../../util/LinkifyText"
+import SectionTitle from "./SectionTitle"
 
 const styles = sxStyles({
    companyName: {
@@ -27,6 +27,7 @@ const styles = sxStyles({
    },
    reasonsCheck: {
       marginRight: 10,
+      minWidth: "24px",
    },
 })
 
@@ -79,19 +80,24 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
          <LinkifyText>
             <Stack spacing={2.25} sx={styles}>
                {reasonsToJoinLivestream.map((reason) => (
-                  <Typography
-                     key={reason}
-                     sx={[
-                        styles.reasons,
-                        Boolean(hasReasonsToJoinLivestream_v2) &&
-                           styles.reasonsContainer,
-                     ]}
-                  >
+                  <Stack direction={"row"} alignItems={"center"} key={reason}>
                      {Boolean(hasReasonsToJoinLivestream_v2) && (
-                        <Check color="#29BAA5" style={styles.reasonsCheck} />
+                        <Check
+                           color="#29BAA5"
+                           style={styles.reasonsCheck}
+                           size={24}
+                        />
                      )}{" "}
-                     {reason}
-                  </Typography>
+                     <Typography
+                        sx={[
+                           styles.reasons,
+                           Boolean(hasReasonsToJoinLivestream_v2) &&
+                              styles.reasonsContainer,
+                        ]}
+                     >
+                        {reason}
+                     </Typography>
+                  </Stack>
                ))}
             </Stack>
          </LinkifyText>
