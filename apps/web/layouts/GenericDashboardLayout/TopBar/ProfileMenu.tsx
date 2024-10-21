@@ -6,16 +6,25 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined"
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined"
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
 import StarOutlineIcon from "@mui/icons-material/StarOutline"
-import { Box, ListItemIcon, Menu, MenuItem, Typography } from "@mui/material"
+import {
+   Box,
+   ListItemIcon,
+   Menu,
+   MenuItem,
+   SxProps,
+   Typography,
+} from "@mui/material"
 import IconButton from "@mui/material/IconButton"
 import Stack from "@mui/material/Stack"
 import Tooltip from "@mui/material/Tooltip"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 // project imports
 import Divider from "@mui/material/Divider"
 import { alpha } from "@mui/material/styles"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { CompanyIcon } from "components/views/common/icons"
 import { supportPageLink } from "constants/links"
 import Link from "next/link"
@@ -25,7 +34,7 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import useMenuState from "../../../components/custom-hook/useMenuState"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
-import { sxStyles } from "../../../types/commonTypes"
+import { combineStyles, sxStyles } from "../../../types/commonTypes"
 
 const styles = sxStyles({
    ava: {
@@ -96,10 +105,32 @@ const styles = sxStyles({
       p: "12px",
       pt: "20px",
    },
+   desktopProfileMenuRoot: {
+      p: "12px",
+      pt: 2,
+   },
    menuItem: {
       p: "12px 8px",
    },
+   desktopMenuItem: {
+      py: 0.5,
+   },
+   desktopLogoutMenuItem: {
+      py: 0.5,
+      mt: "8px !important",
+   },
+   desktopFollowingCompaniesMenuItem: {
+      mt: "8px !important",
+   },
+   avatarMenuItem: { p: 1 },
+   desktopAvatarMenuItem: {
+      pt: 0,
+   },
 })
+
+type CustomMenuItemProps = {
+   sx?: SxProps<DefaultTheme>
+}
 
 const ProfileMenu = () => {
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
@@ -125,14 +156,20 @@ const ProfileMenu = () => {
       void push("/profile")
    }, [adminGroups, push])
 
+   const disableHoverListener = fieldOfStudyDisplayName
+      ? fieldOfStudyDisplayName?.length <= 15
+      : true
+
    if (!userData || !userData.id) {
       return null
    }
 
-   /*
-   const AvatarMenuItem = () => {
+   const AvatarMenuItem = ({ sx }: CustomMenuItemProps) => {
       return (
-         <MenuItem sx={{ p: 1 }} onClick={handleProfileClick}>
+         <MenuItem
+            sx={combineStyles(styles.avatarMenuItem, sx)}
+            onClick={handleProfileClick}
+         >
             <ColorizedAvatar
                imageUrl={userData?.avatar}
                lastName={userData?.lastName}
@@ -141,11 +178,7 @@ const ProfileMenu = () => {
             />
             <Tooltip
                title={fieldOfStudyDisplayName}
-               disableHoverListener={
-                  fieldOfStudyDisplayName
-                     ? fieldOfStudyDisplayName?.length <= 15
-                     : true
-               }
+               disableHoverListener={disableHoverListener}
             >
                <Box sx={styles.details}>
                   <Typography
@@ -156,7 +189,11 @@ const ProfileMenu = () => {
                   </Typography>
 
                   <Typography
-                     sx={[styles.maxOneLine, styles.companyText, styles.userFieldOfStudy]}
+                     sx={[
+                        styles.maxOneLine,
+                        styles.companyText,
+                        styles.userFieldOfStudy,
+                     ]}
                      color={"neutral.500"}
                   >
                      {fieldOfStudyDisplayName}
@@ -166,9 +203,12 @@ const ProfileMenu = () => {
          </MenuItem>
       )
    }
-   const ProfileMenuItem = () => {
+   const ProfileMenuItem = ({ sx }: CustomMenuItemProps) => {
       return (
-         <MenuItem onClick={handleProfileClick} sx={styles.menuItem}>
+         <MenuItem
+            onClick={handleProfileClick}
+            sx={combineStyles(styles.menuItem, sx)}
+         >
             <ListItemIcon>
                <User width={"20px"} height={"20px"} />
             </ListItemIcon>
@@ -177,11 +217,13 @@ const ProfileMenu = () => {
       )
    }
 
-   const MyJobsMenuItem = () => {
-      if (!jobHubV1)
-         return null
+   const MyJobsMenuItem = ({ sx }: CustomMenuItemProps) => {
+      if (!jobHubV1) return null
       return (
-         <MenuItem onClick={() => push("/profile/my-jobs")} sx={styles.menuItem}>
+         <MenuItem
+            onClick={() => push("/profile/my-jobs")}
+            sx={combineStyles(styles.menuItem, sx)}
+         >
             <ListItemIcon>
                <Briefcase width={"20px"} height={"20px"} />
             </ListItemIcon>
@@ -190,20 +232,38 @@ const ProfileMenu = () => {
       )
    }
 
-   const FollowingCompaniesMenuItem = () => {
+   const FollowingCompaniesMenuItem = ({ sx }: CustomMenuItemProps) => {
       return (
-         <MenuItem onClick={() => push("/profile/following-companies")} sx={styles.menuItem}>
+         <MenuItem
+            onClick={() => push("/profile/following-companies")}
+            sx={combineStyles(styles.menuItem, sx)}
+         >
             <ListItemIcon sx={{ width: "20px", height: "20px" }}>
                <CompanyIcon />
             </ListItemIcon>
-            <Typography color={"text.secondary"}>Following Companies</Typography>
+            <Typography color={"text.secondary"}>
+               Following Companies
+            </Typography>
          </MenuItem>
       )
    }
 
-   const LogOutMenuItem = () => {
+   const SupportLinkMenuItem = ({ sx }: CustomMenuItemProps) => {
       return (
-         <MenuItem onClick={signOut} sx={styles.menuItem}>
+         <Link href={supportPageLink} target="_blank">
+            <MenuItem sx={combineStyles(styles.menuItem, sx)}>
+               <ListItemIcon>
+                  <HelpCircle width={"20px"} height={"20px"} />
+               </ListItemIcon>
+               <Typography color={"text.secondary"}>Support</Typography>
+            </MenuItem>
+         </Link>
+      )
+   }
+
+   const LogOutMenuItem = ({ sx }: CustomMenuItemProps) => {
+      return (
+         <MenuItem onClick={signOut} sx={combineStyles(styles.menuItem, sx)}>
             <ListItemIcon>
                <LogOut width={"20px"} height={"20px"} />
             </ListItemIcon>
@@ -211,101 +271,23 @@ const ProfileMenu = () => {
          </MenuItem>
       )
    }
-   */
 
    const TalentProfileMenuItems = () => {
       return (
          <Stack spacing={2} sx={styles.profileMenuRoot}>
             <Stack spacing={3}>
-               <MenuItem sx={{ p: 1 }} onClick={handleProfileClick}>
-                  <ColorizedAvatar
-                     imageUrl={userData?.avatar}
-                     lastName={userData?.lastName}
-                     firstName={userData?.firstName}
-                     sx={[styles.ava, { border: "none" }]}
-                  />
-                  <Tooltip
-                     title={fieldOfStudyDisplayName}
-                     disableHoverListener={
-                        fieldOfStudyDisplayName
-                           ? fieldOfStudyDisplayName?.length <= 15
-                           : true
-                     }
-                  >
-                     <Box sx={styles.details}>
-                        <Typography
-                           sx={[styles.maxOneLine, styles.userName]}
-                           color={"neutral.800"}
-                        >
-                           {userPresenter?.getDisplayName()}
-                        </Typography>
-
-                        <Typography
-                           sx={[
-                              styles.maxOneLine,
-                              styles.companyText,
-                              styles.userFieldOfStudy,
-                           ]}
-                           color={"neutral.500"}
-                        >
-                           {fieldOfStudyDisplayName}
-                        </Typography>
-                     </Box>
-                  </Tooltip>
-               </MenuItem>
+               <AvatarMenuItem />
                <Stack spacing={1}>
-                  <MenuItem onClick={handleProfileClick} sx={styles.menuItem}>
-                     <ListItemIcon>
-                        <User width={"20px"} height={"20px"} />
-                     </ListItemIcon>
-                     <Typography color={"text.secondary"}>Profile</Typography>
-                  </MenuItem>
-                  {jobHubV1 ? (
-                     <MenuItem
-                        onClick={() => push("/profile/my-jobs")}
-                        sx={styles.menuItem}
-                     >
-                        <ListItemIcon>
-                           <Briefcase width={"20px"} height={"20px"} />
-                        </ListItemIcon>
-                        <Typography color={"text.secondary"}>
-                           My Jobs
-                        </Typography>
-                     </MenuItem>
-                  ) : null}
-
-                  <MenuItem
-                     onClick={() => push("/profile/following-companies")}
-                     sx={styles.menuItem}
-                  >
-                     <ListItemIcon sx={{ width: "20px", height: "20px" }}>
-                        <CompanyIcon />
-                     </ListItemIcon>
-                     <Typography color={"text.secondary"}>
-                        Following Companies
-                     </Typography>
-                  </MenuItem>
+                  <ProfileMenuItem />
+                  <MyJobsMenuItem />
+                  <FollowingCompaniesMenuItem />
                </Stack>
             </Stack>
 
             <Stack spacing={2}>
-               <Link href={supportPageLink} target="_blank">
-                  <MenuItem sx={styles.menuItem}>
-                     <ListItemIcon>
-                        <HelpCircle width={"20px"} height={"20px"} />
-                     </ListItemIcon>
-                     <Typography color={"text.secondary"}>Support</Typography>
-                  </MenuItem>
-               </Link>
-
+               <SupportLinkMenuItem />
                <Divider sx={{ width: "100%", alignSelf: "center" }} />
-
-               <MenuItem onClick={signOut} sx={styles.menuItem}>
-                  <ListItemIcon>
-                     <LogOut width={"20px"} height={"20px"} />
-                  </ListItemIcon>
-                  <Typography color={"text.secondary"}>Log out</Typography>
-               </MenuItem>
+               <LogOutMenuItem />
             </Stack>
          </Stack>
       )
@@ -345,97 +327,139 @@ const ProfileMenu = () => {
             {useNewMenu ? (
                <TalentProfileMenuItems />
             ) : (
-               <Stack spacing={2}>
-                  <MenuItem sx={{ mb: 1 }} onClick={handleProfileClick}>
-                     <ColorizedAvatar
-                        imageUrl={userData?.avatar}
-                        lastName={userData?.lastName}
-                        firstName={userData?.firstName}
-                        sx={[styles.ava, { border: "none" }]}
-                     />
-                     <Tooltip
-                        title={fieldOfStudyDisplayName}
-                        disableHoverListener={
-                           fieldOfStudyDisplayName
-                              ? fieldOfStudyDisplayName?.length <= 15
-                              : true
-                        }
-                     >
-                        <Box sx={styles.details}>
-                           <Typography
-                              sx={[
-                                 styles.maxOneLine,
-                                 talentProfileV1 ? styles.userName : null,
-                              ]}
-                              variant={talentProfileV1 ? undefined : "h6"}
-                              fontWeight={talentProfileV1 ? undefined : 500}
-                              color={
-                                 talentProfileV1 ? "neutral.800" : undefined
-                              }
-                           >
-                              {userPresenter?.getDisplayName()}
-                           </Typography>
+               <Stack
+                  spacing={2}
+                  sx={talentProfileV1 ? styles.desktopProfileMenuRoot : null}
+               >
+                  <ConditionalWrapper
+                     condition={!talentProfileV1}
+                     fallback={
+                        <AvatarMenuItem sx={styles.desktopAvatarMenuItem} />
+                     }
+                  >
+                     <MenuItem sx={{ mb: 1 }} onClick={handleProfileClick}>
+                        <ColorizedAvatar
+                           imageUrl={userData?.avatar}
+                           lastName={userData?.lastName}
+                           firstName={userData?.firstName}
+                           sx={[styles.ava, { border: "none" }]}
+                        />
+                        <Tooltip
+                           title={fieldOfStudyDisplayName}
+                           disableHoverListener={disableHoverListener}
+                        >
+                           <Box sx={styles.details}>
+                              <Typography
+                                 sx={styles.maxOneLine}
+                                 variant={"h6"}
+                                 fontWeight={500}
+                              >
+                                 {userPresenter?.getDisplayName()}
+                              </Typography>
 
-                           <Typography
-                              sx={[styles.maxOneLine, styles.companyText]}
-                              color={"text.secondary"}
-                              variant={"subtitle1"}
-                           >
-                              {fieldOfStudyDisplayName}
-                           </Typography>
-                        </Box>
-                     </Tooltip>
-                  </MenuItem>
-                  <MenuItem onClick={handleProfileClick}>
-                     <ListItemIcon>
-                        <PersonOutlineOutlinedIcon fontSize="small" />
-                     </ListItemIcon>
-                     <Typography color={"text.secondary"}>Profile</Typography>
-                  </MenuItem>
-                  {jobHubV1 ? (
-                     <MenuItem onClick={() => push("/profile/my-jobs")}>
+                              <Typography
+                                 sx={[styles.maxOneLine, styles.companyText]}
+                                 color={"text.secondary"}
+                                 variant={"subtitle1"}
+                              >
+                                 {fieldOfStudyDisplayName}
+                              </Typography>
+                           </Box>
+                        </Tooltip>
+                     </MenuItem>
+                  </ConditionalWrapper>
+
+                  <ConditionalWrapper
+                     condition={!talentProfileV1}
+                     fallback={<ProfileMenuItem sx={styles.desktopMenuItem} />}
+                  >
+                     <MenuItem onClick={handleProfileClick}>
                         <ListItemIcon>
-                           <Briefcase width={"17.5px"} height={"17.5px"} />
+                           <PersonOutlineOutlinedIcon fontSize="small" />
                         </ListItemIcon>
                         <Typography color={"text.secondary"}>
-                           My Jobs
+                           Profile
                         </Typography>
                      </MenuItem>
+                  </ConditionalWrapper>
+
+                  {jobHubV1 ? (
+                     <ConditionalWrapper
+                        condition={!talentProfileV1}
+                        fallback={
+                           <MyJobsMenuItem sx={styles.desktopMenuItem} />
+                        }
+                     >
+                        <MenuItem onClick={() => push("/profile/my-jobs")}>
+                           <ListItemIcon>
+                              <Briefcase width={"17.5px"} height={"17.5px"} />
+                           </ListItemIcon>
+                           <Typography color={"text.secondary"}>
+                              My Jobs
+                           </Typography>
+                        </MenuItem>
+                     </ConditionalWrapper>
                   ) : null}
-                  <MenuItem onClick={() => push("/profile/career-skills")}>
-                     <ListItemIcon>
-                        <StarOutlineIcon fontSize="small" />
-                     </ListItemIcon>
-                     <Typography color={"text.secondary"}>
-                        My career skills
-                     </Typography>
-                  </MenuItem>
-                  <MenuItem onClick={() => push("/profile/referrals")}>
-                     <ListItemIcon>
-                        <PeopleOutlinedIcon fontSize="small" />
-                     </ListItemIcon>
-                     <Typography color={"text.secondary"}>Referrals</Typography>
-                  </MenuItem>
-                  <MenuItem onClick={() => push("/profile/saved-recruiters")}>
-                     <ListItemIcon>
-                        <ContentPasteOutlinedIcon fontSize="small" />
-                     </ListItemIcon>
-                     <Typography color={"text.secondary"}>
-                        My Recruiters
-                     </Typography>
-                  </MenuItem>
 
-                  <Divider sx={{ width: "80%", alignSelf: "center" }} />
+                  {talentProfileV1 ? (
+                     <FollowingCompaniesMenuItem
+                        sx={styles.desktopFollowingCompaniesMenuItem}
+                     />
+                  ) : null}
 
-                  <MenuItem
-                     onClick={signOut}
-                     sx={{ marginTop: "0 !important" }}
+                  <ConditionalWrapper condition={!talentProfileV1}>
+                     <MenuItem onClick={() => push("/profile/career-skills")}>
+                        <ListItemIcon>
+                           <StarOutlineIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography color={"text.secondary"}>
+                           My career skills
+                        </Typography>
+                     </MenuItem>
+
+                     <MenuItem onClick={() => push("/profile/referrals")}>
+                        <ListItemIcon>
+                           <PeopleOutlinedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography color={"text.secondary"}>
+                           Referrals
+                        </Typography>
+                     </MenuItem>
+                     <MenuItem
+                        onClick={() => push("/profile/saved-recruiters")}
+                     >
+                        <ListItemIcon>
+                           <ContentPasteOutlinedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography color={"text.secondary"}>
+                           My Recruiters
+                        </Typography>
+                     </MenuItem>
+                  </ConditionalWrapper>
+
+                  <Divider
+                     sx={{
+                        width: talentProfileV1 ? "100%" : "80%",
+                        alignSelf: "center",
+                     }}
+                  />
+
+                  <ConditionalWrapper
+                     condition={!talentProfileV1}
+                     fallback={
+                        <LogOutMenuItem sx={styles.desktopLogoutMenuItem} />
+                     }
                   >
-                     <ListItemIcon>
-                        <LogoutOutlinedIcon fontSize="small" />
-                     </ListItemIcon>
-                     <Typography color={"text.secondary"}>Logout</Typography>
-                  </MenuItem>
+                     <MenuItem
+                        onClick={signOut}
+                        sx={{ marginTop: "0 !important" }}
+                     >
+                        <ListItemIcon>
+                           <LogoutOutlinedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography color={"text.secondary"}>Logout</Typography>
+                     </MenuItem>
+                  </ConditionalWrapper>
                </Stack>
             )}
          </Menu>
