@@ -80,24 +80,19 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
          <LinkifyText>
             <Stack spacing={2.25} sx={styles}>
                {reasonsToJoinLivestream.map((reason) => (
-                  <Stack direction={"row"} alignItems={"center"} key={reason}>
+                  <Typography
+                     key={reason}
+                     sx={[
+                        styles.reasons,
+                        Boolean(hasReasonsToJoinLivestream_v2) &&
+                           styles.reasonsContainer,
+                     ]}
+                  >
                      {Boolean(hasReasonsToJoinLivestream_v2) && (
-                        <Check
-                           color="#29BAA5"
-                           style={styles.reasonsCheck}
-                           size={24}
-                        />
+                        <Check color="#29BAA5" style={styles.reasonsCheck} />
                      )}{" "}
-                     <Typography
-                        sx={[
-                           styles.reasons,
-                           Boolean(hasReasonsToJoinLivestream_v2) &&
-                              styles.reasonsContainer,
-                        ]}
-                     >
-                        {reason}
-                     </Typography>
-                  </Stack>
+                     {reason}
+                  </Typography>
                ))}
             </Stack>
          </LinkifyText>
