@@ -82,8 +82,9 @@ const styles = sxStyles({
    },
    profileMenu: {
       "& .MuiPaper-root": {
-         minWidth: "auto",
-         maxWidth: "85vw",
+         minWidth: "65vw",
+         maxWidth: "80vw",
+         left: "unset !important",
          top: "0 !important",
          right: "0 !important",
          minHeight: "100%",
@@ -120,7 +121,9 @@ const styles = sxStyles({
    desktopFollowingCompaniesMenuItem: {
       mt: "8px !important",
    },
-   avatarMenuItem: { p: 1 },
+   avatarMenuItem: {
+      p: 1,
+   },
    desktopAvatarMenuItem: {
       pt: 0,
    },
@@ -179,10 +182,7 @@ const ProfileMenu = () => {
                disableHoverListener={disableHoverListener}
             >
                <Box sx={styles.details}>
-                  <Typography
-                     sx={[styles.maxOneLine, styles.userName]}
-                     color={"neutral.800"}
-                  >
+                  <Typography sx={[styles.userName]} color={"neutral.800"}>
                      {userPresenter?.getDisplayName()}
                   </Typography>
 
