@@ -1,14 +1,14 @@
 {
    "expo": {
-      "name": "mobile",
-      "slug": "mobile",
-      "version": "1.0.0",
+      "name": "CareerFairy",
+      "slug": "careerfairy-mobile-app",
+      "version": "0.0.0",
       "orientation": "portrait",
-      "icon": "./assets/images/icon.png",
+      "icon": "./assets/images/careerfairy.png",
       "scheme": "myapp",
       "userInterfaceStyle": "automatic",
       "splash": {
-         "image": "./assets/images/splash.png",
+         "image": "./assets/images/careersplash.jpg",
          "resizeMode": "contain",
          "backgroundColor": "#ffffff"
       },
@@ -28,18 +28,25 @@
             "VIBRATE"
          ],
          "adaptiveIcon": {
-            "foregroundImage": "./assets/images/adaptive-icon.png",
+            "foregroundImage": "./assets/images/careerfairy.png",
             "backgroundColor": "#ffffff"
-         }
+         },
+         "package": "com.admin_product_team.careerfairymobileapp"
       },
       "web": {
          "bundler": "metro",
          "output": "static",
-         "favicon": "./assets/images/favicon.png"
+         "favicon": "./assets/images/careerfairy.png"
       },
       "plugins": ["expo-router", "expo-secure-store"],
       "experiments": {
          "typedRoutes": true
-      }
+      },
+      "extra": {
+         "eas": {
+            "projectId": "52368a9d-be31-4ef9-be0a-3e9e1de4e098"
+         }
+      },
+      "owner": "admin_product_team"
    }
 }

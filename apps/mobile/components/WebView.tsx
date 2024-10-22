@@ -68,7 +68,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    return (
-      <SafeAreaView style={{ flex: 1, paddingTop: 30 }}>
+      <SafeAreaView style={{ flex: 1 }}>
          <WebView
             style={{ flex: 1 }}
             ref={webViewRef}
