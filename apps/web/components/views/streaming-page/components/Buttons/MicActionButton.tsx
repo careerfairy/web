@@ -33,6 +33,7 @@ export const MicActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
       const active = micOn && !micMuted
 
       const { hasDeniedPermissions } = useMediaPermissions()
+
       const dispatch = useDispatch()
 
       const onClickHandler = useCallback(() => {
@@ -49,7 +50,7 @@ export const MicActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
          >
             <BrandedTooltip
                title={
-                  enableTooltip
+                  enableTooltip && !hasDeniedPermissions
                      ? active
                         ? ActionTooltips.MicMute
                         : ActionTooltips.MicUnmute

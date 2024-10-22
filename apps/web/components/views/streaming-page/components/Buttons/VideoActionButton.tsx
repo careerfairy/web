@@ -48,7 +48,7 @@ export const VideoActionButton = forwardRef<
       >
          <BrandedTooltip
             title={
-               enableTooltip
+               enableTooltip && !hasDeniedPermissions
                   ? cameraOn
                      ? ActionTooltips.VideoTurnOff
                      : ActionTooltips.VideoTurnOn
