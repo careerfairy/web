@@ -3,15 +3,16 @@ import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
 import WebViewComponent from "./components/WebView"
 import { initializeApp } from "firebase/app"
+import { getAuth } from "firebase/auth"
 import { getFirestore } from "firebase/firestore"
 import { Camera } from "expo-camera"
 import { Audio } from "expo-av"
 import { firebaseConfig } from "./constants/constants"
+import { PROJECT_ID } from "@env"
 
 const app = initializeApp(firebaseConfig)
-
-// Initialize Firestore
-const firestore = getFirestore(app)
+export const auth = getAuth(app)
+export const db = getFirestore(app)
 
 export default function Native() {
    // Log Firebase connection status
@@ -52,7 +53,9 @@ export default function Native() {
 
          // Warning: Calling getExpoPushTokenAsync without specifying a projectId is deprecated and will no longer be supported in SDK 49+
          // Will be removed when we connect to expo dashboard and get project id from there
-         const token = (await Notifications.getExpoPushTokenAsync()).data
+         const token = (
+            await Notifications.getExpoPushTokenAsync({ projectId: PROJECT_ID })
+         ).data
          const userId = 1
          const dummyData = {
             age: 30,
@@ -74,7 +77,7 @@ export default function Native() {
       const token = await SecureStore.getItemAsync("authToken")
 
       // @ts-ignore
-      firestore().collection("users").doc(userId).set(
+      db().collection("users").doc(userId).set(
          {
             age: userData.age,
             token,
