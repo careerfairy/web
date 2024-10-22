@@ -71,4 +71,51 @@ If you'd like to run the app on a simulator instead of a physical device, follow
 
 ---
 
+## Application build
+
+### 1. Install Dependencies
+
+First, install the required dependencies using npm inside mobile (apps/mobile) folder:
+
+```bash
+npm install -g eas-cli
+```
+
+### 2. Login to expo account
+
+Run the command and then enter credentials.
+
+1. Email: accounts@careerfairy.io
+2. Password: Ask Matilde Ramos
+
+```bash
+eas login
+```
+
+### 3. Build the app
+
+Run following commands for environments:
+
+1. Preview (apk): After running the command, choose which platforms, Android, iOS or both
+
+```bash
+eas build --profile preview
+```
+
+2. Development (dev build): After running the command, choose which platforms, Android, iOS or both
+
+```bash
+eas build --profile development
+```
+
+3. Production (app/play store build): After running the command, choose which platforms, Android, iOS or both
+
+```bash
+eas build --profile production
+```
+
+After build, starts, you will get a link of current build process, or just go to https://expo.dev/, login to the account, go to dashboard and click on latest build.
+
+---
+
 Happy coding! 🎉
