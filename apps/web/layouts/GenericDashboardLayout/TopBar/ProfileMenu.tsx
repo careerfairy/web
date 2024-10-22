@@ -28,7 +28,7 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { CompanyIcon } from "components/views/common/icons"
 import { supportPageLink } from "constants/links"
 import Link from "next/link"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import { Briefcase, HelpCircle, LogOut, User } from "react-feather"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import useMenuState from "../../../components/custom-hook/useMenuState"
@@ -97,7 +97,7 @@ const styles = sxStyles({
          backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black
       },
       "& .MuiList-root": {
-         height: "100vh",
+         height: "100dvh",
       },
    },
    profileMenuRoot: {
@@ -158,28 +158,6 @@ const ProfileMenu = () => {
 
       void push("/profile")
    }, [adminGroups, push])
-
-   const [menuHeight, setMenuHeight] = useState("100vh")
-
-   // Function to handle correct mobile viewport height
-   const handleResize = () => {
-      const vh = (window.visualViewport?.height || window.innerHeight) * 0.01
-      setMenuHeight(`${vh * 100}px`)
-   }
-
-   useEffect(() => {
-      // Set the initial height when component mounts
-      handleResize()
-
-      // Add event listener to handle viewport resizing
-      window.visualViewport?.addEventListener("resize", handleResize)
-      window.addEventListener("resize", handleResize)
-
-      return () => {
-         window.visualViewport?.removeEventListener("resize", handleResize)
-         window.removeEventListener("resize", handleResize)
-      }
-   }, [])
 
    const disableHoverListener = fieldOfStudyDisplayName
       ? fieldOfStudyDisplayName?.length <= 15
@@ -352,11 +330,11 @@ const ProfileMenu = () => {
                useNewMenu
                   ? [
                        styles.profileMenu,
-                       {
-                          "& .MuiList-root": {
-                             height: menuHeight,
-                          },
-                       },
+                       //   {
+                       //      "& .MuiList-root": {
+                       //         height: menuHeight,
+                       //      },
+                       //   },
                     ]
                   : null
             }
