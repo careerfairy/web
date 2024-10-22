@@ -74,6 +74,8 @@ const styles = sxStyles({
       fontWeight: 600,
       fontSize: "16px",
       lineHeight: "24px",
+      wordBreak: "break-word", // Allow breaking long words
+      whiteSpace: "normal", // Allow text to wrap naturally
    },
    userFieldOfStudy: {
       fontWeight: 400,
@@ -182,7 +184,11 @@ const ProfileMenu = () => {
                disableHoverListener={disableHoverListener}
             >
                <Box sx={styles.details}>
-                  <Typography sx={[styles.userName]} color={"neutral.800"}>
+                  <Typography
+                     sx={[styles.userName]}
+                     color={"neutral.800"}
+                     component={"span"}
+                  >
                      {userPresenter?.getDisplayName()}
                   </Typography>
 
