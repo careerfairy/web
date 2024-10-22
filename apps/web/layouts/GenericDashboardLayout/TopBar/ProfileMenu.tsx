@@ -82,10 +82,8 @@ const styles = sxStyles({
    },
    profileMenu: {
       "& .MuiPaper-root": {
-         minWidth: {
-            xs: "65vw",
-            sm: "40vw",
-         },
+         minWidth: "auto",
+         maxWidth: "85vw",
          top: "0 !important",
          right: "0 !important",
          minHeight: "100%",
