@@ -96,7 +96,9 @@ export const manualNewsletter = onRequest(runtimeSettings, async (req, res) => {
 export const manualTemplatedEmail = onRequest(
    runtimeSettings,
    async (req, res) => {
-      logger.info("manualTemplatedEmail: v6.0 - Job Hub Launch")
+      logger.info(
+         "manualTemplatedEmail: v7.0 - Follow up event: Jkb23QaWsbNC1pQWgLpG"
+      )
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -117,11 +119,11 @@ export const manualTemplatedEmail = onRequest(
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("Job Hub launch email email sent to everyone")
+         res.status(200).send("Follow up email email sent to everyone")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "Job Hub email email sent to " + receivedEmails.join(", ")
+            "Follow up email email sent to " + receivedEmails.join(", ")
          )
       }
    }
@@ -168,7 +170,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      logger.info("Job Hub email already sent, skipping")
+      logger.info("Follow up email already sent, skipping")
       return
    }
 
@@ -179,7 +181,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
 
    const newsletterService = new ManualTemplatedEmailService(
       userRepo,
-      // livestreamsRepo,
+      livestreamsRepo,
       emailBuilder,
       logger
    )
@@ -193,7 +195,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   logger.info("Job Hub announcement execution done")
+   logger.info("Follow up execution done")
 }
 
 /**
