@@ -28,7 +28,7 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { CompanyIcon } from "components/views/common/icons"
 import { supportPageLink } from "constants/links"
 import Link from "next/link"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Briefcase, HelpCircle, LogOut, User } from "react-feather"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import useMenuState from "../../../components/custom-hook/useMenuState"
@@ -158,6 +158,25 @@ const ProfileMenu = () => {
 
       void push("/profile")
    }, [adminGroups, push])
+
+   const [menuHeight, setMenuHeight] = useState("100vh")
+
+   // Function to handle correct mobile viewport height
+   const handleResize = () => {
+      const vh = window.innerHeight * 0.01
+      setMenuHeight(`${vh * 100}px`)
+   }
+
+   useEffect(() => {
+      // Set the initial height when component mounts
+      handleResize()
+      // Add event listener to handle viewport resizing (e.g. mobile UI showing/hiding)
+      window.addEventListener("resize", handleResize)
+
+      return () => {
+         window.removeEventListener("resize", handleResize)
+      }
+   }, [])
 
    const disableHoverListener = fieldOfStudyDisplayName
       ? fieldOfStudyDisplayName?.length <= 15
@@ -326,7 +345,18 @@ const ProfileMenu = () => {
             transformOrigin={transformOrigin}
             anchorOrigin={anchorOrigin}
             disableScrollLock={true}
-            sx={useNewMenu ? styles.profileMenu : null}
+            sx={
+               useNewMenu
+                  ? [
+                       styles.profileMenu,
+                       {
+                          "& .MuiList-root": {
+                             height: menuHeight,
+                          },
+                       },
+                    ]
+                  : null
+            }
          >
             {useNewMenu ? (
                <TalentProfileMenuItems />
