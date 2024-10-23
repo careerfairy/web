@@ -326,18 +326,7 @@ const ProfileMenu = () => {
             transformOrigin={transformOrigin}
             anchorOrigin={anchorOrigin}
             disableScrollLock={!talentProfileV1}
-            sx={
-               useNewMenu
-                  ? [
-                       styles.profileMenu,
-                       //   {
-                       //      "& .MuiList-root": {
-                       //         height: menuHeight,
-                       //      },
-                       //   },
-                    ]
-                  : null
-            }
+            sx={useNewMenu ? styles.profileMenu : null}
          >
             {useNewMenu ? (
                <TalentProfileMenuItems />
