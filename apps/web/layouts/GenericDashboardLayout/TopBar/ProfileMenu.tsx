@@ -26,6 +26,7 @@ import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { CompanyIcon } from "components/views/common/icons"
+import { SlideLeftTransition } from "components/views/common/transitions"
 import { supportPageLink } from "constants/links"
 import Link from "next/link"
 import { useCallback, useMemo } from "react"
@@ -74,8 +75,8 @@ const styles = sxStyles({
       fontWeight: 600,
       fontSize: "16px",
       lineHeight: "24px",
-      wordBreak: "break-word", // Allow breaking long words
-      whiteSpace: "normal", // Allow text to wrap naturally
+      wordBreak: "break-word",
+      whiteSpace: "normal",
    },
    userFieldOfStudy: {
       fontWeight: 400,
@@ -320,13 +321,14 @@ const ProfileMenu = () => {
             </Tooltip>
          </Stack>
          <Menu
-            anchorEl={anchorEl}
+            anchorEl={useNewMenu ? null : anchorEl}
             id="account-menu"
             open={open}
             onClose={handleClose}
             onClick={handleClose}
             transformOrigin={transformOrigin}
             anchorOrigin={anchorOrigin}
+            TransitionComponent={useNewMenu ? SlideLeftTransition : undefined}
             disableScrollLock={disableScrollLock}
             sx={useNewMenu ? styles.profileMenu : null}
          >
