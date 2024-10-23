@@ -3,6 +3,7 @@ import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import Image from "next/image"
 import { useEffect } from "react"
+import { useIsSpyMode } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useMediaPermissions } from "./useMediaPermissions"
 
@@ -28,6 +29,7 @@ const styles = sxStyles({
 
 export const PromptingForPermissionsDialog = () => {
    const isMobile = useIsMobile()
+   const isSpyMode = useIsSpyMode()
    const { isPromptingForPermissions, hasAcceptedPermissions } =
       useMediaPermissions()
 
@@ -50,7 +52,7 @@ export const PromptingForPermissionsDialog = () => {
       setPromptingForPermissionsOpen,
    ])
 
-   if (hasAcceptedPermissions) {
+   if (hasAcceptedPermissions || isSpyMode) {
       return null
    }
 
