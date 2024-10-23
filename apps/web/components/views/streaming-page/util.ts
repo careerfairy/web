@@ -42,7 +42,7 @@ const getTempId = (streamId: string) => {
 export const getDeviceButtonColor = (
    active: boolean,
    isLoading: boolean,
-   error: Error
+   error: boolean
 ) => {
    if (error) return "warning"
    if (isLoading) return undefined

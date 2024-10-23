@@ -24,6 +24,7 @@ import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { VideoEffectsButtons } from "../VideoEffectsButtons"
 import { SetupCameraVideo } from "./SetupCameraVideo"
+import { CheckPermissions } from "./permissions/CheckPermissions"
 
 const styles = sxStyles({
    dialog: {
@@ -115,6 +116,7 @@ const Content = () => {
             dividers
          >
             <Box>
+               <CheckPermissions />
                <SetupCameraVideo />
                <Box pb={1.5} />
                <VideoEffectsButtons />
