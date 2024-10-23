@@ -16,12 +16,46 @@ export enum MESSAGING_TYPE {
 }
 
 type USER_DATA = {
-   id: number | string
+   id: string
    firstName: string
    lastName: string
-   age: number
-   experience: number
-   skills: string[]
+   fieldOfStudy?: {
+      id: string
+      name: string
+   }
+   gender?: string
+   university?: {
+      code: string
+      name: string
+   }
+   levelOfStudy?: {
+      id: string
+      name: string
+   }
+   authId: string
+   unsubscribed: boolean
+   credits?: number
+   validationPin?: number
+   referralCode?: string
+   userEmail: string
+   universityCountryCode?: string
+   isStudent: boolean
+   createdAt: {
+      seconds: number
+      nanoseconds: number
+   }
+   lastActivityAt: {
+      seconds: number
+      nanoseconds: number
+   }
+   timezone?: string
+   linkedinUrl?: string
+   isAdmin: boolean
+   contentTopicsTagIds?: string[]
+   businessFunctionsTagIds: string[]
+   welcomeDialogComplete: boolean
+   jobsBannerCTADates: string[]
+   sparksBannerCTADates: string[]
 }
 
 export type USER_AUTH = {

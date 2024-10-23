@@ -7,9 +7,6 @@
       },
       "android": {
          "package": "com.admin_product_team.careerfairymonorepo"
-      },
-      "ios": {
-         "bundleIdentifier": "career-fairy"
       }
    }
 }
