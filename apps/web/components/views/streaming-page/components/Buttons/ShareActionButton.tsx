@@ -44,7 +44,7 @@ export const ShareActionButton = forwardRef<
                      color={getDeviceButtonColor(
                         true,
                         isLoadingScreenShare,
-                        screenShareError
+                        Boolean(screenShareError)
                      )}
                      active={open}
                      disabled={isLoadingScreenShare}
