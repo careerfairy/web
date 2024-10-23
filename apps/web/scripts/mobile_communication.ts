@@ -72,7 +72,6 @@ export const mobileCommunication = <T>(type: MESSAGING_TYPE, data: T): void => {
       return
    }
    // Send a message to the React Native WebView
-   alert("HERE")
    mobileWindow.ReactNativeWebView.postMessage(JSON.stringify(body))
 }
 
