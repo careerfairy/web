@@ -23,6 +23,13 @@ import { BLACKLISTED_ABSOLUTE_PATHS } from "../../../constants/routes"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
+import {
+   isInWebView,
+   MESSAGING_TYPE,
+   mobileCommunication,
+   USER_AUTH,
+   USER_DATA,
+} from "../../../scripts/mobile_communication"
 
 const styles = {
    box: {
@@ -113,7 +120,11 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                Object.keys(adminGroups).length > 1
             ) {
                // open manage company dialog
-               setOpenManageCompaniesDialog(true)
+               if (isInWebView()) {
+                  void replace("/portal")
+               } else {
+                  setOpenManageCompaniesDialog(true)
+               }
             } else if (Object.keys(adminGroups).length === 1) {
                // redirect to the group admin page
                const groupId = Object.keys(adminGroups)[0]
@@ -140,7 +151,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
    const handleSubmit = useCallback(
       async (values: FormikValues, helpers: FormikHelpers<FormikValues>) => {
          try {
-            await firebase.signInWithEmailAndPassword(
+            const userCred = await firebase.signInWithEmailAndPassword(
                values.email,
                values.password
             )
@@ -149,6 +160,15 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                fingerPrintId
             )
             helpers.setErrors({})
+            const userSnap = await firebase.getUserData(values.email)
+            if (userSnap.exists) {
+               const userData: USER_DATA = userSnap.data() as USER_DATA
+               const token = userCred.user.multiFactor["user"].accessToken || ""
+               mobileCommunication<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
+                  token,
+                  userData,
+               })
+            }
             dataLayerEvent("login_complete")
          } catch (error) {
             switch (error.code) {
