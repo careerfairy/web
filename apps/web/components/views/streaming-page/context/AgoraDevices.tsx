@@ -1,14 +1,14 @@
-import React, {
+import AgoraRTC, { DeviceInfo, IAgoraRTCError } from "agora-rtc-react"
+import {
    createContext,
+   ReactNode,
+   useCallback,
    useContext,
    useEffect,
-   useState,
-   useRef,
-   ReactNode,
    useMemo,
-   useCallback,
+   useRef,
+   useState,
 } from "react"
-import AgoraRTC, { DeviceInfo, IAgoraRTCError } from "agora-rtc-react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "./Streaming"
 
@@ -63,33 +63,22 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
    const microphoneChangedCallback = useRef<CallbackType[]>([])
 
    const fetchAndSetDevices = useCallback(async () => {
-      const [camerasResult, microphonesResult] = await Promise.allSettled([
-         AgoraRTC.getCameras(),
-         AgoraRTC.getMicrophones(),
-      ])
-
-      setCameras(
-         camerasResult.status === "fulfilled"
-            ? removeDefaultDevices(camerasResult.value)
-            : []
-      )
-      setMicrophones(
-         microphonesResult.status === "fulfilled"
-            ? removeDefaultDevices(microphonesResult.value)
-            : []
-      )
-
-      if (camerasResult.status === "rejected") {
-         const fetchCamerasError = camerasResult.reason as IAgoraRTCError
-         setFetchCamerasError(fetchCamerasError)
-         errorLogAndNotify(fetchCamerasError)
-      }
-
-      if (microphonesResult.status === "rejected") {
-         const fetchMicsError = microphonesResult.reason as IAgoraRTCError
-         setFetchMicsError(fetchMicsError)
-         errorLogAndNotify(fetchMicsError)
-      }
+      AgoraRTC.getDevices()
+         .then((devices) => {
+            const cameras = devices.filter(
+               (device) => device.kind === "videoinput"
+            )
+            const microphones = devices.filter(
+               (device) => device.kind === "audioinput"
+            )
+            setCameras(removeDefaultDevices(cameras))
+            setMicrophones(removeDefaultDevices(microphones))
+         })
+         .catch((error) => {
+            setFetchCamerasError(error)
+            setFetchMicsError(error)
+            errorLogAndNotify(error)
+         })
    }, [])
 
    /**

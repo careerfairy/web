@@ -12,6 +12,7 @@ import {
    useStreamHandRaiseEnabled,
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
+import { CheckPermissions } from "../StreamSetupWidget/permissions/CheckPermissions"
 import { ActionsSpeedDial } from "./ActionsSpeedDial"
 import { AllActions } from "./AllActionComponents"
 
@@ -88,6 +89,7 @@ const HostView = () => {
 
    return (
       <ActionsBar>
+         <CheckPermissions />
          {getHostActionNames(isMobile, userData?.isAdmin, isSpyMode).map(
             (action, index) => {
                const Component = BottomBarActions[action]
@@ -167,6 +169,7 @@ const ViewerView = () => {
 
    return (
       <ActionsBar>
+         {Boolean(userCanJoinPanel) && <CheckPermissions />}
          {filteredActions.map((action, index) => {
             const Component = BottomBarActions[action]
             return <Component enableTooltip key={index} />

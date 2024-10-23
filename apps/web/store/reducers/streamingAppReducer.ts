@@ -59,6 +59,7 @@ export interface StreamingAppState {
    }
    uploadPDFPresentationDialogOpen: boolean
    shareVideoDialogOpen: boolean
+   deniedPermissionsDialogOpen: boolean
    /**
     * A mapping from user IDs to objects containing their current audio levels and the timestamp when their audio level was last above 60.
     * Audio levels are represented as integers ranging from 0 to 100.
@@ -134,6 +135,7 @@ const initialState: StreamingAppState = {
    },
    uploadPDFPresentationDialogOpen: false,
    shareVideoDialogOpen: false,
+   deniedPermissionsDialogOpen: false,
    audioLevels: {},
    livestreamState: {
       mode: LivestreamModes.DEFAULT,
@@ -372,6 +374,9 @@ const streamingAppSlice = createSlice({
       setShareVideoDialogOpen(state, action: PayloadAction<boolean>) {
          state.shareVideoDialogOpen = action.payload
       },
+      setDeniedPermissionsDialogOpen(state, action: PayloadAction<boolean>) {
+         state.deniedPermissionsDialogOpen = action.payload
+      },
       addEmote(state, action: PayloadAction<EmoteType>) {
          if (state.emotes.length >= MAX_EMOTES_TO_RENDER) {
             state.emotes.shift()
@@ -454,6 +459,7 @@ export const {
       resetNumberOfHandRaiseNotifications,
       setUploadPDFPresentationDialogOpen,
       setShareVideoDialogOpen,
+      setDeniedPermissionsDialogOpen,
       addEmote,
       removeEmote,
       clearEmotes,
