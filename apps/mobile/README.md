@@ -127,6 +127,8 @@ eas build --profile development
 eas build --profile production
 ```
 
+NOTE: For iOS build, you need apple credentials
+
 After build, starts, you will get a link of current build process, or just go to https://expo.dev/, login to the account, go to dashboard and click on latest build.
 
 ---
