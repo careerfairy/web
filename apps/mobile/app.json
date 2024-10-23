@@ -4,11 +4,11 @@
       "slug": "careerfairy-mobile-app",
       "version": "0.0.0",
       "orientation": "portrait",
-      "icon": "./assets/images/careerfairy.png",
+      "icon": "./assets/images/AppIcon.png",
       "scheme": "myapp",
       "userInterfaceStyle": "automatic",
       "splash": {
-         "image": "./assets/images/careersplash.jpg",
+         "image": "./assets/images/SplashScreen.svg",
          "resizeMode": "contain",
          "backgroundColor": "#ffffff"
       },
@@ -28,7 +28,7 @@
             "VIBRATE"
          ],
          "adaptiveIcon": {
-            "foregroundImage": "./assets/images/careerfairy.png",
+            "foregroundImage": "./assets/images/AppIcon.png",
             "backgroundColor": "#ffffff"
          },
          "package": "com.admin_product_team.careerfairymobileapp"
@@ -36,7 +36,7 @@
       "web": {
          "bundler": "metro",
          "output": "static",
-         "favicon": "./assets/images/careerfairy.png"
+         "favicon": "./assets/images/AppIcon.png"
       },
       "plugins": ["expo-router", "expo-secure-store"],
       "experiments": {
