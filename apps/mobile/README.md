@@ -75,10 +75,23 @@ If you'd like to run the app on a simulator instead of a physical device, follow
 
 ### 1. Install Dependencies
 
-First, install the required dependencies using npm inside mobile (apps/mobile) folder:
+First, install the required dependencies using npm globally for eas support:
 
 ```bash
 npm install -g eas-cli
+```
+
+and
+
+```bash
+npm install -g expo-cli
+```
+
+Also, add this line of code to .zshrc file if you get error: zsh: command not found: eas.
+Then, restart the terminal and go to next steps
+
+```
+export PATH="$PATH:$(npm get prefix)/bin"
 ```
 
 ### 2. Login to expo account
