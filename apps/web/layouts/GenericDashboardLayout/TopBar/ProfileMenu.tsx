@@ -163,6 +163,8 @@ const ProfileMenu = () => {
       ? fieldOfStudyDisplayName?.length <= 15
       : true
 
+   const disableScrollLock = talentProfileV1 ? !isMobile : true
+
    if (!userData || !userData.id) {
       return null
    }
@@ -325,7 +327,7 @@ const ProfileMenu = () => {
             onClick={handleClose}
             transformOrigin={transformOrigin}
             anchorOrigin={anchorOrigin}
-            disableScrollLock={!talentProfileV1}
+            disableScrollLock={disableScrollLock}
             sx={useNewMenu ? styles.profileMenu : null}
          >
             {useNewMenu ? (
