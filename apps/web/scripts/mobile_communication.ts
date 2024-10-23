@@ -2,16 +2,50 @@ export enum MESSAGING_TYPE {
    "USER_AUTH" = "USER_AUTH",
    "HAPTIC" = "HAPTIC",
    "PERMISSIONS" = "PERMISSIONS",
-   LOGOUT = "LOGOUT",
+   "LOGOUT" = "LOGOUT",
 }
 
-type USER_DATA = {
-   id: number | string
+export type USER_DATA = {
+   id: string
    firstName: string
    lastName: string
-   age: number
-   experience: number
-   skills: string[]
+   fieldOfStudy?: {
+      id: string
+      name: string
+   }
+   gender?: string
+   university?: {
+      code: string
+      name: string
+   }
+   levelOfStudy?: {
+      id: string
+      name: string
+   }
+   authId: string
+   unsubscribed: boolean
+   credits?: number
+   validationPin?: number
+   referralCode?: string
+   userEmail: string
+   universityCountryCode?: string
+   isStudent: boolean
+   createdAt: {
+      seconds: number
+      nanoseconds: number
+   }
+   lastActivityAt: {
+      seconds: number
+      nanoseconds: number
+   }
+   timezone?: string
+   linkedinUrl?: string
+   isAdmin: boolean
+   contentTopicsTagIds?: string[]
+   businessFunctionsTagIds: string[]
+   welcomeDialogComplete: boolean
+   jobsBannerCTADates: string[]
+   sparksBannerCTADates: string[]
 }
 
 export type USER_AUTH = {
@@ -38,5 +72,14 @@ export const mobileCommunication = <T>(type: MESSAGING_TYPE, data: T): void => {
       return
    }
    // Send a message to the React Native WebView
+   alert("HERE")
    mobileWindow.ReactNativeWebView.postMessage(JSON.stringify(body))
+}
+
+export const isInWebView = (): boolean => {
+   const webViewWindow: any = window as any
+   return !(
+      !webViewWindow.ReactNativeWebView ||
+      typeof webViewWindow.ReactNativeWebView.postMessage !== "function"
+   )
 }

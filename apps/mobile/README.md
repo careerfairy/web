@@ -107,6 +107,12 @@ eas login
 
 ### 3. Build the app
 
+Move to apps/mobile folder:
+
+```bash
+cd apps/mobile
+```
+
 Run following commands for environments:
 
 1. Preview (apk): After running the command, choose which platforms, Android, iOS or both
