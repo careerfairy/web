@@ -113,6 +113,9 @@ export const useUploadPDFPresentationDialogOpen = () =>
 export const useShareVideoDialogOpen = () =>
    useAppSelector((state) => state.streamingApp.shareVideoDialogOpen)
 
+export const useDeniedPermissionsDialogOpen = () =>
+   useAppSelector((state) => state.streamingApp.deniedPermissionsDialogOpen)
+
 export const useEmotes = () =>
    useAppSelector((state) => state.streamingApp.emotes)
 

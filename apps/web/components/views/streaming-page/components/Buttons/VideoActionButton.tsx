@@ -1,11 +1,14 @@
-import { forwardRef } from "react"
+import { forwardRef, useCallback } from "react"
 import { Video, VideoOff } from "react-feather"
+import { useDispatch } from "react-redux"
+import { setDeniedPermissionsDialogOpen } from "store/reducers/streamingAppReducer"
 import { sxStyles } from "types/commonTypes"
 import { useLocalTracks } from "../../context/LocalTracks"
 import { getCameraErrorMessage, getDeviceButtonColor } from "../../util"
 import { ActionTooltips } from "../BottomBar/AllActionComponents"
 import { BrandedTooltip } from "../BrandedTooltip"
 import { DeviceErrorWrapper } from "../DeviceErrorWrapper"
+import { useMediaPermissions } from "../StreamSetupWidget/permissions/useMediaPermissions"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
 const styles = sxStyles({
@@ -28,13 +31,24 @@ export const VideoActionButton = forwardRef<
       fetchCamerasError,
    } = useLocalTracks()
 
+   const { hasDeniedPermissions } = useMediaPermissions()
+   const dispatch = useDispatch()
+
+   const onClickHandler = useCallback(() => {
+      if (hasDeniedPermissions) {
+         dispatch(setDeniedPermissionsDialogOpen(true))
+      } else {
+         toggleCamera()
+      }
+   }, [dispatch, hasDeniedPermissions, toggleCamera])
+
    return (
       <DeviceErrorWrapper
          errorMessage={getCameraErrorMessage(cameraError || fetchCamerasError)}
       >
          <BrandedTooltip
             title={
-               enableTooltip
+               enableTooltip && !hasDeniedPermissions
                   ? cameraOn
                      ? ActionTooltips.VideoTurnOff
                      : ActionTooltips.VideoTurnOn
@@ -42,9 +56,13 @@ export const VideoActionButton = forwardRef<
             }
          >
             <ActionBarButtonStyled
-               color={getDeviceButtonColor(cameraOn, isLoading, cameraError)}
+               color={getDeviceButtonColor(
+                  cameraOn,
+                  isLoading,
+                  Boolean(cameraError) || hasDeniedPermissions
+               )}
                ref={ref}
-               onClick={toggleCamera}
+               onClick={onClickHandler}
                sx={cameraOn ? undefined : styles.off}
                disabled={Boolean(cameraError) || isLoading}
                {...props}
