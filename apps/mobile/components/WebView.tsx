@@ -1,9 +1,23 @@
-import React, { useEffect, useRef } from "react"
-import { BackHandler, Linking, Platform, SafeAreaView } from "react-native"
+import React, { useEffect, useRef, useState } from "react"
+import {
+   Alert,
+   BackHandler,
+   Linking,
+   Platform,
+   SafeAreaView,
+} from "react-native"
 import { WebView } from "react-native-webview"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
 import { BASE_URL, SEARCH_CRITERIA } from "@env"
+import { USER_AUTH } from "@careerfairy/webapp/scripts/mobile_communication"
+import {
+   HAPTIC,
+   MESSAGING_TYPE,
+   NativeEvent,
+   NativeEventStringified,
+   PERMISSIONS,
+} from "../constants/constants"
 
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
@@ -14,24 +28,98 @@ Notifications.setNotificationHandler({
 })
 interface WebViewScreenProps {
    onTokenInjected: () => void // Callback prop
+   onPermissionsNeeded: (permissions: string[]) => void // Callback prop
 }
 
 const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
+   onPermissionsNeeded,
 }) => {
    const baseUrl = BASE_URL + "/portal"
    const webViewRef: any = useRef(null)
+   const [subscriptionListener, setSubscriptionListener] = useState(null)
 
-   // When we implement of event sending on client side on any event, we will be calling the method to handle it
-   const handleMessage = (event: any) => {
-      const receivedToken = event.nativeEvent.data // Token and potential data received from WebView
-      // If we have token (user is logged in), we will be connecting to firebase and storing data to firestore
-      setToken(receivedToken)
+   useEffect(() => {
+      checkAuthentication()
+   }, [])
+
+   const checkAuthentication = () => {
+      const token = SecureStore.getItem("authToken")
+      if (token) {
+         subscribeToNotifications()
+      } else {
+         unsubscribeToNotifications()
+      }
    }
 
-   const setToken = async (token: string) => {
-      await SecureStore.setItemAsync("authToken", token)
+   const subscribeToNotifications = () => {
+      const subscription: any =
+         Notifications.addNotificationResponseReceivedListener((response) => {
+            const url = response.notification.request.content.data.url
+            if (url) {
+               if (webViewRef.current) {
+                  webViewRef.current.loadUrl(webViewRef, url)
+               }
+            }
+         })
+      setSubscriptionListener(subscription)
+   }
+
+   const unsubscribeToNotifications = () => {
+      if (subscriptionListener) {
+         Notifications.removeNotificationSubscription(subscriptionListener)
+         setSubscriptionListener(null)
+      }
+   }
+
+   const handleMessage = (event: NativeEventStringified) => {
+      try {
+         // Parse the received message
+         const receivedData = JSON.parse(event.nativeEvent.data)
+
+         // Access the `type` and `data` fields
+         const { type, data } = receivedData as NativeEvent
+
+         // Handling operations according to defined types
+         switch (type) {
+            case MESSAGING_TYPE.USER_AUTH:
+               return handleUserAuth(data as USER_AUTH)
+            case MESSAGING_TYPE.HAPTIC:
+               return handleHaptic(data as HAPTIC)
+            case MESSAGING_TYPE.PERMISSIONS:
+               return handlePermissions(data as PERMISSIONS)
+            case MESSAGING_TYPE.LOGOUT:
+               return handleLogout()
+            default:
+               break
+         }
+      } catch (error) {
+         console.error("Failed to parse message from WebView:", error)
+      }
+   }
+
+   const handleUserAuth = async (data: USER_AUTH) => {
+      await SecureStore.setItemAsync("authToken", data.token)
+      await SecureStore.setItemAsync("userData", JSON.stringify(data.userData))
+      subscribeToNotifications()
       onTokenInjected()
+   }
+
+   const handleHaptic = (data: HAPTIC) => {
+      // Handling the haptic on mobile device
+      Alert.alert("Haptic activating...")
+   }
+
+   const handlePermissions = (data: PERMISSIONS) => {
+      console.log("Handling permissions...")
+      onPermissionsNeeded(data.types)
+   }
+
+   const handleLogout = async () => {
+      console.log("Handling logout...")
+      await SecureStore.deleteItemAsync("authToken")
+      await SecureStore.deleteItemAsync("userData")
+      unsubscribeToNotifications()
    }
 
    // Handle back button in WebView
@@ -58,10 +146,18 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       return false
    }
 
+   const isValidUrl = (url: string) => {
+      const regex =
+         /^(https?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
+      return regex.test(url)
+   }
+
    // Handling opening of external links in default mobile browser
    const handleNavigation = (request: any) => {
       if (!request.url.includes(SEARCH_CRITERIA)) {
-         Linking.openURL(request.url)
+         if (isValidUrl(request.url)) {
+            Linking.openURL(request.url)
+         }
          return false // Prevent WebView from loading the external link
       }
       return true // Allow WebView to load internal links
@@ -74,10 +170,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             ref={webViewRef}
             source={{ uri: baseUrl }}
             javaScriptEnabled={true}
-            incognito={true}
             mediaPlaybackRequiresUserAction={false}
             onMessage={handleMessage}
             onShouldStartLoadWithRequest={handleNavigation}
+            cacheEnabled={true}
             domStorageEnabled={true} // Enable DOM storage if needed
             startInLoadingState={true} // Show loading indicator
             allowsInlineMediaPlayback={true} // Required for iOS
