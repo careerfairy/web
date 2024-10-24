@@ -18,6 +18,13 @@ For setup of base webview url, go to .env file and change the data. For any new 
 When testing on branch and created a PR, use the PR preview url that should be in patter: https://.[PR-name].careerfairy.io
 
 Go to this link to see how to get current preview url: https://github.com/careerfairy/web/pull/1340
+If you change base url, please go to apps/mobile and run command:
+
+```bash
+expo start -c
+```
+
+It will remove cache and update environment. Also, before launching a build, start the script once again when you want the build to use that url and after that script, run scripts below for running the build.
 
 ### 3. Running the App
 
@@ -56,6 +63,7 @@ After running the app, a QR code will be displayed in your terminal.
 ## Running on Simulators
 
 If you'd like to run the app on a simulator instead of a physical device, follow the instructions below.
+Also, before scanning the code or triggering the simulator, you can toggle development and local build by pressing key 's'
 
 ### For Android Simulator
 

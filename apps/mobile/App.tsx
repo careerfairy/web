@@ -3,7 +3,7 @@ import WebViewComponent from "./components/WebView"
 import { Camera } from "expo-camera"
 import { Audio } from "expo-av"
 import { PROJECT_ID } from "@env"
-import { USER_AUTH } from "@careerfairy/webapp/scripts/mobile_communication"
+import { USER_DATA } from "@careerfairy/webapp/scripts/mobile_communication"
 import { doc, setDoc } from "firebase/firestore"
 import { app, db } from "./firebase"
 import * as SecureStore from "expo-secure-store"
@@ -67,7 +67,7 @@ export default function Native() {
 
    async function saveUserDataToFirestore(pushToken: string) {
       try {
-         let data: USER_AUTH
+         let data: USER_DATA
          const token = await SecureStore.getItemAsync("authToken")
          const userData = await SecureStore.getItemAsync("userData")
 
@@ -75,7 +75,7 @@ export default function Native() {
             data = JSON.parse(userData)
 
             if (data) {
-               const userDocRef = doc(db, "users", data.userData.id.toString())
+               const userDocRef = doc(db, "users", data.id)
 
                // Use setDoc to update the document
                await setDoc(
@@ -83,7 +83,7 @@ export default function Native() {
                   {
                      pushToken: pushToken,
                      token: token,
-                     ...data.userData,
+                     ...data,
                   },
                   { merge: true } // Use merge to update without overwriting the entire document
                )
