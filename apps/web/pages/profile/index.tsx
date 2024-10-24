@@ -1,18 +1,24 @@
-import React from "react"
-import UserLayout from "../../layouts/UserLayout"
-import SEO from "../../components/util/SEO"
-import UserView from "../../layouts/UserLayout/UserView"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import TalentProfileView from "layouts/UserLayout/TalentProfile/TalentProfileView"
 import { useRouter } from "next/router"
+import SEO from "../../components/util/SEO"
+import UserLayout from "../../layouts/UserLayout"
+import UserView from "../../layouts/UserLayout/UserView"
 
 const UserProfile = () => {
    const { pathname } = useRouter()
+   const { talentProfileV1 } = useFeatureFlags()
    return (
-      <UserLayout>
+      <UserLayout backgroundColor="#FAFAFE">
          <SEO
             title="CareerFairy | My Profile"
             canonical={`https://www.careerfairy.io${pathname}`}
          />
-         <UserView currentPath="/profile" />
+         {talentProfileV1 ? (
+            <TalentProfileView />
+         ) : (
+            <UserView currentPath="/profile" />
+         )}
       </UserLayout>
    )
 }
