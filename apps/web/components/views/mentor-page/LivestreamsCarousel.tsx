@@ -5,8 +5,8 @@ import {
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box } from "@mui/material"
 import { ReactNode } from "react"
+import { ContentCarousel } from "../common/carousels/ContentCarousel"
 import EventPreviewCard from "../common/stream-cards/EventPreviewCard"
-import { ContentCarousel } from "./ContentCarousel"
 
 const CARD_WIDTH = 328
 const CARD_HEIGHT = 268
