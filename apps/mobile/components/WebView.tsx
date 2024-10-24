@@ -10,7 +10,10 @@ import { WebView } from "react-native-webview"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
 import { BASE_URL, SEARCH_CRITERIA } from "@env"
-import { USER_AUTH } from "@careerfairy/webapp/scripts/mobile_communication"
+import {
+   USER_AUTH,
+   USER_DATA,
+} from "@careerfairy/webapp/scripts/mobile_communication"
 import {
    HAPTIC,
    MESSAGING_TYPE,
@@ -29,11 +32,13 @@ Notifications.setNotificationHandler({
 interface WebViewScreenProps {
    onTokenInjected: () => void // Callback prop
    onPermissionsNeeded: (permissions: string[]) => void // Callback prop
+   onLogout: (userId: string) => void
 }
 
 const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
    onPermissionsNeeded,
+   onLogout,
 }) => {
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef: any = useRef(null)
@@ -119,11 +124,17 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const handleLogout = async () => {
-      console.log("Handling logout...")
-      await SecureStore.deleteItemAsync("authToken")
-      await SecureStore.deleteItemAsync("userData")
-      Alert.alert("Handling logout...")
-      unsubscribeToNotifications()
+      try {
+         const userData = await SecureStore.getItemAsync("userData")
+         if (userData) {
+            const user: USER_DATA = JSON.parse(userData)
+            onLogout(user.id)
+         }
+         await SecureStore.deleteItemAsync("authToken")
+         await SecureStore.deleteItemAsync("userData")
+         Alert.alert("Handling logout...")
+         unsubscribeToNotifications()
+      } catch (e) {}
    }
 
    // Handle back button in WebView
