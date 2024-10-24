@@ -1,4 +1,4 @@
-import { Box, BoxProps, IconButton, SxProps } from "@mui/material"
+import { Box, BoxProps, IconButton, Stack, SxProps } from "@mui/material"
 import {
    EmblaCarouselType,
    EmblaOptionsType,
@@ -6,7 +6,7 @@ import {
    UseEmblaCarouselType,
 } from "embla-carousel-react"
 import { ReactElement, createContext, useContext, useMemo } from "react"
-import { ArrowLeft, ArrowRight } from "react-feather"
+import { ChevronLeft, ChevronRight } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -24,12 +24,22 @@ const styles = sxStyles({
       minWidth: 0,
       maxWidth: "100%" /* Prevent from growing larger than viewport */,
    },
-   arrowIcon: {
-      padding: 0,
-      minHeight: { xs: "25px", md: "30px" },
-      minWidth: { xs: "25px", md: "30px" },
-      ml: 2,
-   },
+   arrowIcon: (theme) => ({
+      display: "inline-flex",
+      padding: 1,
+      alignItems: "center",
+      gap: "10px",
+      backgroundColor: theme.palette.neutral[50],
+      outline: "1px solid transparent",
+      ":hover": {
+         backgroundColor: theme.brand.black[500],
+      },
+      ":active": {
+         outline: `1px solid ${theme.palette.neutral[300]}`,
+         background: theme.brand.black[600],
+         transition: "all 0.15s ease-out",
+      },
+   }),
 })
 
 type GenericCarouselContextType = {
@@ -126,26 +136,28 @@ type ArrowsProps = {
 
 const Arrows = ({ emblaApi }: ArrowsProps) => {
    return (
-      <Box>
+      <Stack direction={"row"} spacing={1.2}>
          <IconButton
             color="inherit"
             sx={styles.arrowIcon}
+            disableRipple
             onClick={() => {
                if (emblaApi && emblaApi.canScrollPrev()) emblaApi.scrollPrev()
             }}
          >
-            <ArrowLeft fontSize={"large"} />
+            <ChevronLeft size={16} strokeWidth={3} />
          </IconButton>
          <IconButton
             color="inherit"
             sx={styles.arrowIcon}
+            disableRipple
             onClick={() => {
                if (emblaApi && emblaApi.canScrollNext()) emblaApi.scrollNext()
             }}
          >
-            <ArrowRight fontSize={"large"} />
+            <ChevronRight size={16} strokeWidth={3} />
          </IconButton>
-      </Box>
+      </Stack>
    )
 }
 

@@ -4,7 +4,7 @@ import {
 } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import { ContentCarousel } from "components/views/mentor-page/ContentCarousel"
+import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { useCallback, useEffect, useState } from "react"
 import { useMountedState } from "react-use"
 import { useCompanyPage } from ".."

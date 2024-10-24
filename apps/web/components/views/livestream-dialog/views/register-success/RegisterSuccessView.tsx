@@ -14,11 +14,8 @@ import Stack from "@mui/material/Stack"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import { GroupSparksCarousel } from "components/views/common/sparks/GroupSparksCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
-import {
-   GroupSparksCarousel,
-   MobileSparksArrows,
-} from "components/views/portal/sparks/SparksCarouselWithArrows"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import Image from "next/legacy/image"
 import { useRouter } from "next/router"
@@ -99,9 +96,7 @@ const styles = sxStyles({
    },
    mobileSparksCarousel: {
       py: "16px",
-   },
-   mobileSparksCarouselHeader: {
-      pr: 2,
+      ml: 2,
    },
    transition: {
       transition: "all 0.5s",
@@ -420,11 +415,8 @@ const SparksMobileCarousel = ({ livestream, handleSparkClick }) => {
             <GroupSparksCarousel
                handleSparksClicked={handleSparkClick}
                header={<CarouselHeader />}
-               headerSx={styles.mobileSparksCarouselHeader}
                groupId={livestream.groupIds[0]}
                sx={styles.mobileSparksCarousel}
-               showArrows
-               arrows={MobileSparksArrows}
             />
          </SuspenseWithBoundary>
       </Box>
