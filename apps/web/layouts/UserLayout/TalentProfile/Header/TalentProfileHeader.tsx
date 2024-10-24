@@ -1,0 +1,110 @@
+import { Settings } from "@mui/icons-material"
+import { Box, Button, Stack, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { universityCountriesMap } from "components/util/constants/universityCountries"
+import ColorizedAvatar from "components/views/common/ColorizedAvatar"
+import { useMemo } from "react"
+import { sxStyles } from "types/commonTypes"
+import ProfileBannerIllustration from "./ProfileBannerIllustration"
+
+const LOGO_SIZE = 104
+
+const styles = sxStyles({
+   root: {
+      borderRadius: "12px",
+      backgroundColor: "white",
+   },
+   avatar: {
+      ml: 2,
+      width: `${LOGO_SIZE}px`,
+      height: `${LOGO_SIZE}px`,
+      fontSize: "40px",
+      fontWeight: 600,
+      position: "absolute",
+      top: {
+         xs: "261px",
+         sm: "270px",
+         md: "320px",
+      },
+      border: "2px solid white",
+   },
+   settingsButton: {
+      alignSelf: "flex-end",
+      mt: 2,
+      color: (theme) => theme.palette.neutral[600],
+      borderColor: (theme) => theme.palette.neutral[300],
+      "&:hover": {
+         borderColor: (theme) => theme.palette.neutral[300],
+      },
+   },
+   userDetailsRoot: {
+      px: 2,
+      mb: 2,
+   },
+   userName: {
+      fontWeight: 600,
+      color: (theme) => theme.palette.neutral[900],
+   },
+   userFieldOfStudy: {
+      fontSize: "14px",
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[700],
+   },
+   userLocation: {
+      fontSize: "12px",
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[700],
+   },
+})
+
+const TalentProfileHeader = () => {
+   const { userData, userPresenter } = useAuth()
+   const { talentProfileV1 } = useFeatureFlags()
+
+   const fieldOfStudyDisplayName = useMemo(
+      () => userPresenter?.getFieldOfStudyDisplayName(talentProfileV1),
+      [userPresenter, talentProfileV1]
+   )
+
+   const userCountry = universityCountriesMap[userData.universityCountryCode]
+
+   return (
+      <Stack sx={styles.root}>
+         <ProfileBannerIllustration />
+         <Box>
+            <ColorizedAvatar
+               sx={styles.avatar}
+               imageUrl={userData?.avatar}
+               lastName={userData?.lastName}
+               firstName={userData?.firstName}
+            />
+         </Box>
+         <Stack sx={styles.userDetailsRoot}>
+            <Button
+               sx={styles.settingsButton}
+               variant="outlined"
+               startIcon={<Settings />}
+            >
+               Settings
+            </Button>
+            <Stack>
+               <Typography variant="brandedH4" sx={styles.userName}>
+                  {userPresenter?.getDisplayName()}
+               </Typography>
+               <Typography sx={styles.userFieldOfStudy}>
+                  {fieldOfStudyDisplayName}
+                  {userData?.university?.name
+                     ? ` at ${userData?.university?.name}`
+                     : null}
+               </Typography>
+               <Typography sx={styles.userLocation}>
+                  {`CityTBD, ${userCountry}.`}
+               </Typography>
+            </Stack>
+         </Stack>
+      </Stack>
+   )
+}
+
+export default TalentProfileHeader

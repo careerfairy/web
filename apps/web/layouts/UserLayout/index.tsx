@@ -1,17 +1,18 @@
+import { CircularProgress } from "@mui/material"
+import { useRouter } from "next/router"
 import React, { FC, useEffect } from "react"
+import { useAuth } from "../../HOCs/AuthProvider"
 import Page, {
    PageChildrenWrapper,
    PageContentWrapper,
 } from "../../components/views/common/Page"
-import { useAuth } from "../../HOCs/AuthProvider"
-import { useRouter } from "next/router"
-import { CircularProgress } from "@mui/material"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import GenericDashboardLayout from "../GenericDashboardLayout"
 
 const UserLayout: FC<{
    children: React.ReactNode
-}> = ({ children }) => {
+   backgroundColor?: string
+}> = ({ children, backgroundColor = "white" }) => {
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { push, asPath } = useRouter()
 
@@ -24,7 +25,7 @@ const UserLayout: FC<{
             },
          })
       }
-   }, [isLoggedOut])
+   }, [isLoggedOut, asPath, push])
 
    if (!authenticatedUser.isLoaded || isLoggedOut || !userData) {
       return (
@@ -51,7 +52,7 @@ const UserLayout: FC<{
 
    return (
       <>
-         <GenericDashboardLayout bgColor="white" pageDisplayName={""}>
+         <GenericDashboardLayout bgColor={backgroundColor} pageDisplayName={""}>
             <PageContentWrapper>
                <PageChildrenWrapper>{children}</PageChildrenWrapper>
             </PageContentWrapper>
