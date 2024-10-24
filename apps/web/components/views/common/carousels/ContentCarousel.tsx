@@ -1,5 +1,9 @@
 import { Stack, SxProps, Typography, TypographyProps } from "@mui/material"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
+import {
+   GenericCarousel,
+   GenericCarouselProps,
+} from "components/views/common/carousels/GenericCarousel"
 import useEmblaCarousel, {
    EmblaOptionsType,
    UseEmblaCarouselType,
@@ -7,10 +11,6 @@ import useEmblaCarousel, {
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import React, { ReactNode, useCallback, useRef } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
-import {
-   GenericCarousel,
-   GenericCarouselProps,
-} from "../common/carousels/GenericCarousel"
 
 const styles = sxStyles({
    container: {
@@ -19,9 +19,7 @@ const styles = sxStyles({
       gap: 2,
    },
    title: {
-      fontSize: "24px",
       fontWeight: 600,
-      lineHeight: "36px",
       color: "neutral.900",
    },
 })
@@ -31,6 +29,7 @@ type ContentCarouselProps = Pick<GenericCarouselProps, "children"> & {
    headerTitle: ReactNode | string
    viewportSx?: SxProps
    containerSx?: SxProps
+   headerSx?: SxProps
    emblaProps?: {
       emblaRef?: UseEmblaCarouselType[0]
       emblaApi?: UseEmblaCarouselType[1]
@@ -44,6 +43,7 @@ export const ContentCarousel = ({
    headerTitle,
    viewportSx,
    containerSx,
+   headerSx,
    emblaProps,
 }: ContentCarouselProps) => {
    const carouselContainerRef = useRef<HTMLDivElement>(null)
@@ -74,6 +74,7 @@ export const ContentCarousel = ({
             direction="row"
             justifyContent="space-between"
             alignItems="center"
+            sx={headerSx}
          >
             {typeof headerTitle === "string" ? (
                <HeaderTitle>{headerTitle}</HeaderTitle>
@@ -117,5 +118,3 @@ const HeaderTitle = ({ children, sx, ...props }: TypographyProps) => {
       </Typography>
    )
 }
-
-ContentCarousel.HeaderTitle = HeaderTitle
