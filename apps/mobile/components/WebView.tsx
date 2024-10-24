@@ -35,7 +35,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
    onPermissionsNeeded,
 }) => {
-   const baseUrl = BASE_URL + "/portal"
+   const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef: any = useRef(null)
    const [subscriptionListener, setSubscriptionListener] = useState(null)
 
@@ -58,17 +58,19 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             const url = response.notification.request.content.data.url
             if (url) {
                if (webViewRef.current) {
-                  webViewRef.current.loadUrl(webViewRef, url)
+                  setBaseUrl(url)
                }
             }
          })
       setSubscriptionListener(subscription)
+      Alert.alert("Subscribing to notifications...")
    }
 
    const unsubscribeToNotifications = () => {
       if (subscriptionListener) {
          Notifications.removeNotificationSubscription(subscriptionListener)
          setSubscriptionListener(null)
+         Alert.alert("Unsubscribing to notifications...")
       }
    }
 
@@ -101,6 +103,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const handleUserAuth = async (data: USER_AUTH) => {
       await SecureStore.setItemAsync("authToken", data.token)
       await SecureStore.setItemAsync("userData", JSON.stringify(data.userData))
+      Alert.alert("Saving data...")
       subscribeToNotifications()
       onTokenInjected()
    }
@@ -119,6 +122,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       console.log("Handling logout...")
       await SecureStore.deleteItemAsync("authToken")
       await SecureStore.deleteItemAsync("userData")
+      Alert.alert("Handling logout...")
       unsubscribeToNotifications()
    }
 

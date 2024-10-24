@@ -65,14 +65,10 @@ export type PERMISSIONS = {
 export const mobileCommunication = <T>(type: MESSAGING_TYPE, data: T): void => {
    const body: { type: MESSAGING_TYPE; data: T } = { type, data }
    const mobileWindow: any = window as any
-   if (
-      !mobileWindow.ReactNativeWebView ||
-      typeof mobileWindow.ReactNativeWebView.postMessage !== "function"
-   ) {
-      return
+   if (isInWebView()) {
+      // Send a message to the React Native WebView
+      mobileWindow.ReactNativeWebView.postMessage(JSON.stringify(body))
    }
-   // Send a message to the React Native WebView
-   mobileWindow.ReactNativeWebView.postMessage(JSON.stringify(body))
 }
 
 export const isInWebView = (): boolean => {

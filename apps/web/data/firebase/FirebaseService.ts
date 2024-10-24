@@ -65,6 +65,10 @@ import { recommendationServiceInstance } from "./RecommendationService"
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
+import {
+   MESSAGING_TYPE,
+   mobileCommunication,
+} from "../../scripts/mobile_communication"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -379,7 +383,10 @@ class FirebaseService {
       return this.auth.signInWithEmailAndPassword(email.trim(), password)
    }
 
-   doSignOut = () => this.auth.signOut().then(clearFirestoreCache)
+   doSignOut = () => {
+      mobileCommunication<null>(MESSAGING_TYPE.LOGOUT, null)
+      return this.auth.signOut().then(clearFirestoreCache)
+   }
 
    getUniversitiesFromCountryCode = (countryCode) => {
       const ref = this.firestore
