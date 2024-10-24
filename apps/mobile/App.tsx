@@ -65,26 +65,29 @@ export default function Native() {
       })
    }
 
+   const onLogout = async (userId: string) => {
+      try {
+         return ResetFireStoreData(userId)
+      } catch (e) {
+         console.log("Error with resetting firestore data", e)
+      }
+   }
+
    async function saveUserDataToFirestore(pushToken: string) {
       try {
          let data: USER_DATA
-         const token = await SecureStore.getItemAsync("authToken")
          const userData = await SecureStore.getItemAsync("userData")
 
          if (userData) {
             data = JSON.parse(userData)
 
             if (data) {
-               const userDocRef = doc(db, "users", data.id)
+               const userDocRef = doc(db, "userData", data.id)
 
                // Use setDoc to update the document
                await setDoc(
                   userDocRef,
-                  {
-                     pushToken: pushToken,
-                     token: token,
-                     ...data,
-                  },
+                  { pushToken: pushToken },
                   { merge: true } // Use merge to update without overwriting the entire document
                )
             }
@@ -94,10 +97,20 @@ export default function Native() {
       }
    }
 
+   async function ResetFireStoreData(userId: string) {
+      try {
+         const userDocRef = doc(db, "userData", userId)
+         await setDoc(userDocRef, { pushToken: "" }, { merge: true })
+      } catch (error) {
+         console.error("Failed to send data to the Firestore:", error)
+      }
+   }
+
    return (
       <WebViewComponent
          onTokenInjected={getPushToken}
          onPermissionsNeeded={onPermissions}
+         onLogout={onLogout}
       ></WebViewComponent>
    )
 }
