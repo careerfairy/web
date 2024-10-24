@@ -20,8 +20,9 @@ import Tooltip from "@mui/material/Tooltip"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 // project imports
+import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import Divider from "@mui/material/Divider"
-import { alpha } from "@mui/material/styles"
+import { alpha, useTheme } from "@mui/material/styles"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
@@ -29,7 +30,7 @@ import { CompanyIcon } from "components/views/common/icons"
 import { SlideLeftTransition } from "components/views/common/transitions"
 import { supportPageLink } from "constants/links"
 import Link from "next/link"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Briefcase, HelpCircle, LogOut, User } from "react-feather"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import useMenuState from "../../../components/custom-hook/useMenuState"
@@ -75,18 +76,15 @@ const styles = sxStyles({
       fontWeight: 600,
       fontSize: "16px",
       lineHeight: "24px",
-      wordBreak: "break-word",
-      whiteSpace: "normal",
    },
    userFieldOfStudy: {
       fontWeight: 400,
       fontSize: "12px",
       lineHeight: "16px",
+      color: (theme) => theme.palette.neutral[600],
    },
    profileMenu: {
       "& .MuiPaper-root": {
-         minWidth: "65vw",
-         maxWidth: "80vw",
          left: "unset !important",
          top: "0 !important",
          right: "0 !important",
@@ -102,17 +100,21 @@ const styles = sxStyles({
       },
    },
    profileMenuRoot: {
+      width: "280px",
       height: "100%",
       justifyContent: "space-between",
-      p: "12px",
       pt: "20px",
    },
    desktopProfileMenuRoot: {
-      p: "12px",
+      width: "280px",
       pt: 2,
    },
    menuItem: {
-      p: "12px 8px",
+      height: "40px",
+      p: "12px",
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.white[400],
+      },
    },
    desktopMenuItem: {
       py: 0.5,
@@ -122,13 +124,23 @@ const styles = sxStyles({
       mt: "8px !important",
    },
    desktopFollowingCompaniesMenuItem: {
-      mt: "8px !important",
+      mt: "12px !important",
    },
    avatarMenuItem: {
       p: 1,
+      px: 1.5,
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.white[400],
+      },
    },
    desktopAvatarMenuItem: {
-      pt: 0,
+      pt: 1,
+   },
+   menuItemText: {
+      fontSize: {
+         sm: "16px",
+         md: "14px",
+      },
    },
 })
 
@@ -141,9 +153,18 @@ const ProfileMenu = () => {
    const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { push } = useRouter()
 
-   const { jobHubV1, talentProfileV1 } = useFeatureFlags()
+   const theme = useTheme()
    const isMobile = useIsMobile()
-   const useNewMenu = talentProfileV1 && isMobile
+
+   const [menuAnimating, setMenuAnimating] = useState(false)
+
+   const { jobHubV1, talentProfileV1 } = useFeatureFlags()
+
+   const userDisplayName = userPresenter?.getDisplayName() || ""
+
+   const userName = useMemo(() => {
+      return getSubstringWithEllipsis(userDisplayName, 23)
+   }, [userDisplayName])
 
    const fieldOfStudyDisplayName = useMemo(
       () => userPresenter?.getFieldOfStudyDisplayName(talentProfileV1),
@@ -160,6 +181,8 @@ const ProfileMenu = () => {
       void push("/profile")
    }, [adminGroups, push])
 
+   const useNewMobileMenu = talentProfileV1 && isMobile
+
    const disableHoverListener = fieldOfStudyDisplayName
       ? fieldOfStudyDisplayName?.length <= 15
       : true
@@ -174,7 +197,8 @@ const ProfileMenu = () => {
       return (
          <MenuItem
             sx={combineStyles(styles.avatarMenuItem, sx)}
-            onClick={handleProfileClick}
+            // onClick={handleProfileClick}
+            onClick={!menuAnimating ? handleProfileClick : undefined} // Disable click when animating
          >
             <ColorizedAvatar
                imageUrl={userData?.avatar}
@@ -182,31 +206,26 @@ const ProfileMenu = () => {
                firstName={userData?.firstName}
                sx={[styles.ava, { border: "none" }]}
             />
-            <Tooltip
-               title={fieldOfStudyDisplayName}
-               disableHoverListener={disableHoverListener}
-            >
-               <Box sx={styles.details}>
-                  <Typography
-                     sx={[styles.userName]}
-                     color={"neutral.800"}
-                     component={"span"}
-                  >
-                     {userPresenter?.getDisplayName()}
-                  </Typography>
+            <Box sx={styles.details}>
+               <Typography
+                  sx={[styles.userName]}
+                  color={"neutral.800"}
+                  component={"span"}
+               >
+                  {userName}
+               </Typography>
 
-                  <Typography
-                     sx={[
-                        styles.maxOneLine,
-                        styles.companyText,
-                        styles.userFieldOfStudy,
-                     ]}
-                     color={"neutral.500"}
-                  >
-                     {fieldOfStudyDisplayName}
-                  </Typography>
-               </Box>
-            </Tooltip>
+               <Typography
+                  sx={[
+                     styles.maxOneLine,
+                     styles.companyText,
+                     styles.userFieldOfStudy,
+                  ]}
+                  color={"neutral.500"}
+               >
+                  {fieldOfStudyDisplayName}
+               </Typography>
+            </Box>
          </MenuItem>
       )
    }
@@ -217,9 +236,15 @@ const ProfileMenu = () => {
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
-               <User width={"20px"} height={"20px"} />
+               <User
+                  width={"20px"}
+                  height={"20px"}
+                  color={theme.palette.neutral[700]}
+               />
             </ListItemIcon>
-            <Typography color={"text.secondary"}>Profile</Typography>
+            <Typography color={"text.secondary"} sx={styles.menuItemText}>
+               Profile
+            </Typography>
          </MenuItem>
       )
    }
@@ -232,9 +257,15 @@ const ProfileMenu = () => {
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
-               <Briefcase width={"20px"} height={"20px"} />
+               <Briefcase
+                  width={"20px"}
+                  height={"20px"}
+                  color={theme.palette.neutral[700]}
+               />
             </ListItemIcon>
-            <Typography color={"text.secondary"}>My Jobs</Typography>
+            <Typography color={"text.secondary"} sx={styles.menuItemText}>
+               My Jobs
+            </Typography>
          </MenuItem>
       )
    }
@@ -245,10 +276,14 @@ const ProfileMenu = () => {
             onClick={() => push("/profile/following-companies")}
             sx={combineStyles(styles.menuItem, sx)}
          >
-            <ListItemIcon sx={{ width: "20px", height: "20px" }}>
-               <CompanyIcon />
+            <ListItemIcon>
+               <CompanyIcon
+                  width={"20px !important"}
+                  height={"20px !important"}
+                  sx={{ mr: 1, color: (theme) => theme.palette.neutral[700] }}
+               />
             </ListItemIcon>
-            <Typography color={"text.secondary"}>
+            <Typography color={"text.secondary"} sx={styles.menuItemText}>
                Following Companies
             </Typography>
          </MenuItem>
@@ -260,9 +295,15 @@ const ProfileMenu = () => {
          <Link href={supportPageLink} target="_blank">
             <MenuItem sx={combineStyles(styles.menuItem, sx)}>
                <ListItemIcon>
-                  <HelpCircle width={"20px"} height={"20px"} />
+                  <HelpCircle
+                     width={"20px"}
+                     height={"20px"}
+                     color={theme.palette.neutral[700]}
+                  />
                </ListItemIcon>
-               <Typography color={"text.secondary"}>Support</Typography>
+               <Typography color={"text.secondary"} sx={styles.menuItemText}>
+                  Support
+               </Typography>
             </MenuItem>
          </Link>
       )
@@ -272,9 +313,15 @@ const ProfileMenu = () => {
       return (
          <MenuItem onClick={signOut} sx={combineStyles(styles.menuItem, sx)}>
             <ListItemIcon>
-               <LogOut width={"20px"} height={"20px"} />
+               <LogOut
+                  width={"20px"}
+                  height={"20px"}
+                  color={theme.palette.neutral[700]}
+               />
             </ListItemIcon>
-            <Typography color={"text.secondary"}>Log out</Typography>
+            <Typography color={"text.secondary"} sx={styles.menuItemText}>
+               Log out
+            </Typography>
          </MenuItem>
       )
    }
@@ -321,18 +368,26 @@ const ProfileMenu = () => {
             </Tooltip>
          </Stack>
          <Menu
-            anchorEl={useNewMenu ? null : anchorEl}
+            anchorEl={useNewMobileMenu ? null : anchorEl}
             id="account-menu"
             open={open}
             onClose={handleClose}
             onClick={handleClose}
             transformOrigin={transformOrigin}
             anchorOrigin={anchorOrigin}
-            TransitionComponent={useNewMenu ? SlideLeftTransition : undefined}
+            TransitionComponent={
+               useNewMobileMenu ? SlideLeftTransition : undefined
+            }
             disableScrollLock={disableScrollLock}
-            sx={useNewMenu ? styles.profileMenu : null}
+            sx={useNewMobileMenu ? styles.profileMenu : null}
+            TransitionProps={{
+               onEntering: () => setMenuAnimating(true),
+               onEntered: () => setMenuAnimating(false),
+               onExit: () => setMenuAnimating(true),
+               onExited: () => setMenuAnimating(false),
+            }}
          >
-            {useNewMenu ? (
+            {useNewMobileMenu ? (
                <TalentProfileMenuItems />
             ) : (
                <Stack
