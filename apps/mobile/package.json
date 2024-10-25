@@ -10,7 +10,6 @@
       "ios": "expo start --ios",
       "web": "expo start --web",
       "test": "jest --passWithNoTests --watchAll",
-      "build": "npm run build:preview",
       "build:preview": "eas build --profile preview",
       "build:develop": "eas build --profile development",
       "build:prod": "eas build --profile production",

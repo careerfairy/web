@@ -33,7 +33,7 @@
       "native": "cd apps/mobile && npm run start",
       "native:cache": "cd apps/mobile && npm run start:cache",
       "native-build": "npm run native-build:preview",
-      "native-build:preview": "cd apps/mobile && npm run build",
+      "native-build:preview": "cd apps/mobile && npm run build:preview",
       "native-build:develop": "cd apps/mobile && npm run build:develop",
       "native-build:prod": "cd apps/mobile && npm run build:prod"
    },
