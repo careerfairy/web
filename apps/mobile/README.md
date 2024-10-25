@@ -14,8 +14,8 @@ npm install
 
 ### 2. Setup of base url and search criteria
 
-For setup of base webview url, go to .env file and change the data. For any new variable added, please add the type inside .env.d.ts file.
-When testing on branch and created a PR, use the PR preview url that should be in patter: https://.[PR-name].careerfairy.io
+For setup of base webview url, go to .env file and change the data. For any new variable added to the file (or removed), please update the types in .env.d.ts file.
+When testing on branch and created a PR, use the PR preview url that should be in pattern: https://.[PR-name].careerfairy.io
 
 Go to this link to see how to get current preview url: https://github.com/careerfairy/web/pull/1340
 If you change base url, please go to apps/mobile and run command:
@@ -23,6 +23,14 @@ If you change base url, please go to apps/mobile and run command:
 ```bash
 expo start -c
 ```
+
+or
+
+```bash
+npm run native:cache
+```
+
+from the root of the project.
 
 It will remove cache and update environment. Also, before launching a build, start the script once again when you want the build to use that url and after that script, run scripts below for running the build.
 
@@ -129,16 +137,34 @@ Run following commands for environments:
 eas build --profile preview
 ```
 
+or from the root
+
+```bash
+npm run native-build
+```
+
 2. Development (dev build): After running the command, choose which platforms, Android, iOS or both
 
 ```bash
 eas build --profile development
 ```
 
+or from the root
+
+```bash
+npm run native-build:develop
+```
+
 3. Production (app/play store build): After running the command, choose which platforms, Android, iOS or both
 
 ```bash
 eas build --profile production
+```
+
+or from the root
+
+```bash
+npm run native-build:prod
 ```
 
 NOTE: For iOS build, you need apple credentials

@@ -65,10 +65,8 @@ import { recommendationServiceInstance } from "./RecommendationService"
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
-import {
-   MESSAGING_TYPE,
-   mobileCommunication,
-} from "../../scripts/mobile_communication"
+import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
+import { MobileUtils } from "../../scripts/mobile.utils"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -384,7 +382,7 @@ class FirebaseService {
    }
 
    doSignOut = () => {
-      mobileCommunication<null>(MESSAGING_TYPE.LOGOUT, null)
+      MobileUtils.send<null>(MESSAGING_TYPE.LOGOUT, null)
       return this.auth.signOut().then(clearFirestoreCache)
    }
 

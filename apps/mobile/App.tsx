@@ -3,14 +3,13 @@ import WebViewComponent from "./components/WebView"
 import { Camera } from "expo-camera"
 import { Audio } from "expo-av"
 import { PROJECT_ID } from "@env"
-import { USER_DATA } from "@careerfairy/webapp/scripts/mobile_communication"
 import { doc, setDoc } from "firebase/firestore"
 import { app, db } from "./firebase"
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
+import { UserData } from "@careerfairy/shared-lib/src/users"
 
 export default function Native() {
-   // Log Firebase connection status
    useEffect(() => {
       if (app) {
          console.log("Firebase connected successfully!")
@@ -18,6 +17,7 @@ export default function Native() {
          console.log("Firebase connection failed.")
       }
    }, [])
+
    const askCameraPermissions = async () => {
       const { status: cameraStatus } = await Camera.getCameraPermissionsAsync()
       if (cameraStatus !== "granted") {
@@ -31,6 +31,7 @@ export default function Native() {
          await Audio.requestPermissionsAsync()
       }
    }
+
    const getPushToken = async () => {
       try {
          const { status: existingStatus } =
@@ -49,7 +50,7 @@ export default function Native() {
          ).data
 
          // Saving the data to Firestore with all relevant data we will use to filter out notification queue
-         return saveUserDataToFirestore(token)
+         return saveUserPushTokenToFirestore(token)
       } catch (e) {
          console.log(e)
       }
@@ -73,9 +74,9 @@ export default function Native() {
       }
    }
 
-   async function saveUserDataToFirestore(pushToken: string) {
+   async function saveUserPushTokenToFirestore(pushToken: string) {
       try {
-         let data: USER_DATA
+         let data: UserData
          const userData = await SecureStore.getItemAsync("userData")
 
          if (userData) {
