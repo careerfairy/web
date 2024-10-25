@@ -17,7 +17,7 @@ export type HAPTIC = {
 }
 
 export type PERMISSIONS = {
-   types: string[]
+   permissions: string[]
 }
 
 export type NativeEventStringified = { nativeEvent: { data: string } }
