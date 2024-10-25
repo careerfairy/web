@@ -1,4 +1,5 @@
 import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
+
 export class MobileUtils {
    public static send<T>(type: MESSAGING_TYPE, data: T): void {
       if (this.webViewPresence()) {
@@ -8,7 +9,6 @@ export class MobileUtils {
       }
    }
 
-   // Static method to check if in WebView
    public static webViewPresence(): boolean {
       const webViewWindow: any = window as any
       return !(
