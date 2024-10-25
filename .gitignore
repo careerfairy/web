@@ -8,6 +8,7 @@ firebase-export-*/
 .firebase/
 
 .turbo/
+.expo/
 .vercel/
 .idea/
 
