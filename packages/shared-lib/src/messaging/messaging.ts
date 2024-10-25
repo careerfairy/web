@@ -1,4 +1,3 @@
-import { UserData } from "../users"
 export enum MESSAGING_TYPE {
    "USER_AUTH" = "USER_AUTH",
    "HAPTIC" = "HAPTIC",
@@ -8,7 +7,7 @@ export enum MESSAGING_TYPE {
 
 export type USER_AUTH = {
    token: string
-   userData: UserData
+   userId: string
 }
 
 export type HAPTIC = {
