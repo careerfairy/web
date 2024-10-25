@@ -4,7 +4,9 @@ import {
    BackHandler,
    Linking,
    Platform,
+   RefreshControl,
    SafeAreaView,
+   ScrollView,
 } from "react-native"
 import { WebView } from "react-native-webview"
 import * as Notifications from "expo-notifications"
@@ -61,9 +63,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          Notifications.addNotificationResponseReceivedListener((response) => {
             const url = response.notification.request.content.data.url
             if (url) {
-               if (webViewRef.current) {
-                  setBaseUrl(url)
-               }
+               navigateToNewUrl(url)
             }
          })
       setSubscriptionListener(subscription)
@@ -155,6 +155,19 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       return false
    }
 
+   const onRefresh = () => {
+      if (webViewRef.current) {
+         webViewRef.current.reload()
+      }
+   }
+
+   const navigateToNewUrl = (newUrl: string) => {
+      if (webViewRef.current) {
+         const jsCode = `window.location.href = '${newUrl}';`
+         webViewRef.current.injectJavaScript(jsCode)
+      }
+   }
+
    const isValidUrl = (url: string) => {
       const regex =
          /^(https?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
@@ -173,19 +186,26 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    return (
       <SafeAreaView style={{ flex: 1 }}>
-         <WebView
-            style={{ flex: 1 }}
-            ref={webViewRef}
-            source={{ uri: baseUrl }}
-            javaScriptEnabled={true}
-            mediaPlaybackRequiresUserAction={false}
-            onMessage={handleMessage}
-            onShouldStartLoadWithRequest={handleNavigation}
-            cacheEnabled={true}
-            domStorageEnabled={true} // Enable DOM storage if needed
-            startInLoadingState={true} // Show loading indicator
-            allowsInlineMediaPlayback={true} // Required for iOS
-         />
+         <ScrollView
+            contentContainerStyle={{ flex: 1 }}
+            refreshControl={
+               <RefreshControl refreshing={false} onRefresh={onRefresh} />
+            }
+         >
+            <WebView
+               style={{ flex: 1 }}
+               ref={webViewRef}
+               source={{ uri: baseUrl }}
+               javaScriptEnabled={true}
+               mediaPlaybackRequiresUserAction={false}
+               onMessage={handleMessage}
+               onShouldStartLoadWithRequest={handleNavigation}
+               cacheEnabled={true}
+               domStorageEnabled={true}
+               startInLoadingState={true}
+               allowsInlineMediaPlayback={true}
+            />
+         </ScrollView>
       </SafeAreaView>
    )
 }
