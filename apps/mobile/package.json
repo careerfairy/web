@@ -4,12 +4,16 @@
    "version": "0.0.0",
    "scripts": {
       "start": "expo start",
-      "reset-project": "node ./scripts/reset-project.js",
+      "start:cache": "expo start -c",
       "android": "expo start --android",
       "dev": "expo start --web",
       "ios": "expo start --ios",
       "web": "expo start --web",
       "test": "jest --passWithNoTests --watchAll",
+      "build": "npm run build:preview",
+      "build:preview": "eas build --profile preview",
+      "build:develop": "eas build --profile development",
+      "build:prod": "eas build --profile production",
       "lint": "expo lint"
    },
    "jest": {
