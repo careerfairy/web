@@ -24,7 +24,6 @@ import { useFirebaseService } from "../../../context/firebase/FirebaseServiceCon
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
 import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
-import { UserData } from "@careerfairy/shared-lib/users"
 import { MobileUtils } from "../../../scripts/mobile.utils"
 
 const styles = {
@@ -156,15 +155,11 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                fingerPrintId
             )
             helpers.setErrors({})
-            const userSnap = await firebase.getUserData(values.email)
-            if (userSnap.exists) {
-               const userData: UserData = userSnap.data() as UserData
-               const token = userCred.user.multiFactor["user"].accessToken || ""
-               MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
-                  token,
-                  userData,
-               })
-            }
+            const token = userCred.user.multiFactor["user"].accessToken || ""
+            MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
+               token,
+               userId: values.email,
+            })
             dataLayerEvent("login_complete")
          } catch (error) {
             switch (error.code) {

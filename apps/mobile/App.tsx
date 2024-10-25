@@ -7,7 +7,6 @@ import { doc, setDoc } from "firebase/firestore"
 import { app, db } from "./firebase"
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
-import { UserData } from "@careerfairy/shared-lib/src/users"
 
 export default function Native() {
    useEffect(() => {
@@ -87,22 +86,17 @@ export default function Native() {
 
    async function saveUserPushTokenToFirestore(pushToken: string) {
       try {
-         let data: UserData
-         const userData = await SecureStore.getItemAsync("userData")
+         const userId = await SecureStore.getItemAsync("userId")
 
-         if (userData) {
-            data = JSON.parse(userData)
+         if (userId) {
+            const userDocRef = doc(db, "userData", userId)
 
-            if (data) {
-               const userDocRef = doc(db, "userData", data.id)
-
-               // Use setDoc to update the document
-               await setDoc(
-                  userDocRef,
-                  { pushToken: pushToken },
-                  { merge: true } // Use merge to update without overwriting the entire document
-               )
-            }
+            // Use setDoc to update the document
+            await setDoc(
+               userDocRef,
+               { pushToken: pushToken },
+               { merge: true } // Use merge to update without overwriting the entire document
+            )
          }
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
