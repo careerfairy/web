@@ -93,7 +93,7 @@ const styles = sxStyles({
          borderBottomRightRadius: "0px",
       },
       "& .MuiBackdrop-root": {
-         backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black
+         backgroundColor: "rgba(0, 0, 0, 0.5)",
       },
       "& .MuiList-root": {
          height: "100dvh",
@@ -197,8 +197,7 @@ const ProfileMenu = () => {
       return (
          <MenuItem
             sx={combineStyles(styles.avatarMenuItem, sx)}
-            // onClick={handleProfileClick}
-            onClick={!menuAnimating ? handleProfileClick : undefined} // Disable click when animating
+            onClick={!menuAnimating ? handleProfileClick : undefined}
          >
             <ColorizedAvatar
                imageUrl={userData?.avatar}
