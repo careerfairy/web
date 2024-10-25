@@ -177,7 +177,6 @@ const ProfileMenu = () => {
                   </ListItemIcon>
                   Livestream
                </MenuItem>
-               ,
                <MenuItem onClick={() => push("/profile/referrals")}>
                   <ListItemIcon>
                      <PeopleOutlinedIcon fontSize="small" />
