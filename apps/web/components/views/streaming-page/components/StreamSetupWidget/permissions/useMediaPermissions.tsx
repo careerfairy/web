@@ -1,4 +1,6 @@
 import { useLocalTracks } from "../../../context"
+import { MobileUtils } from "../../../../../../scripts/mobile.utils"
+import { MESSAGING_TYPE, PERMISSIONS } from "@careerfairy/shared-lib/messaging"
 
 export enum PermissionType {
    Accepted = "accepted",
@@ -26,6 +28,10 @@ export const useMediaPermissions = () => {
       activeCameraId,
       fetchCamerasError,
    } = useLocalTracks()
+
+   MobileUtils.send<PERMISSIONS>(MESSAGING_TYPE.PERMISSIONS, {
+      permissions: ["microphone", "camera"],
+   })
 
    const permissions = {
       microphone: getPermission(activeMicrophoneId, fetchMicsError),

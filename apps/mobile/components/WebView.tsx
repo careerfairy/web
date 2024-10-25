@@ -116,7 +116,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const handlePermissions = (data: PERMISSIONS) => {
       console.log("Handling permissions...")
-      onPermissionsNeeded(data.types)
+      onPermissionsNeeded(data.permissions)
    }
 
    const handleLogout = async () => {

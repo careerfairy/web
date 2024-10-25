@@ -19,16 +19,27 @@ export default function Native() {
    }, [])
 
    const askCameraPermissions = async () => {
-      const { status: cameraStatus } = await Camera.getCameraPermissionsAsync()
-      if (cameraStatus !== "granted") {
-         await Camera.requestCameraPermissionsAsync()
+      try {
+         const { status: cameraStatus } =
+            await Camera.getCameraPermissionsAsync()
+         if (cameraStatus !== "granted") {
+            await Camera.requestCameraPermissionsAsync()
+         }
+         return
+      } catch (e) {
+         console.log(e)
       }
    }
 
    const askAudioPermissions = async () => {
-      const { status: audioStatus } = await Audio.getPermissionsAsync()
-      if (audioStatus !== "granted") {
-         await Audio.requestPermissionsAsync()
+      try {
+         const { status: audioStatus } = await Audio.getPermissionsAsync()
+         if (audioStatus !== "granted") {
+            await Audio.requestPermissionsAsync()
+         }
+         return
+      } catch (e) {
+         console.log(e)
       }
    }
 
@@ -58,9 +69,9 @@ export default function Native() {
 
    const onPermissions = (permissions: string[]) => {
       permissions.forEach((permission) => {
-         if (permission === "Audio") {
+         if (permission === "microphone") {
             askAudioPermissions()
-         } else if (permission === "Video") {
+         } else if (permission === "camera") {
             askCameraPermissions()
          }
       })
