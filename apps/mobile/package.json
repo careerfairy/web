@@ -9,7 +9,7 @@
       "dev": "expo start --web",
       "ios": "expo start --ios",
       "web": "expo start --web",
-      "test": "jest --passWithNoTests --watchAll",
+      "test": "jest --passWithNoTests",
       "build:preview": "eas build --profile preview",
       "build:develop": "eas build --profile development",
       "build:prod": "eas build --profile production",
