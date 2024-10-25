@@ -30,7 +30,12 @@
       "deploy:rules": "firebase deploy --only firestore:rules",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
       "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions",
-      "native": "cd apps/mobile && npm run start"
+      "native": "cd apps/mobile && npm run start",
+      "native:cache": "cd apps/mobile && npm run start:cache",
+      "native-build": "npm run native-build:preview",
+      "native-build:preview": "cd apps/mobile && npm run build",
+      "native-build:develop": "cd apps/mobile && npm run build:develop",
+      "native-build:prod": "cd apps/mobile && npm run build:prod"
    },
    "dependencies": {
       "@emotion/cache": "^11.7.1",
