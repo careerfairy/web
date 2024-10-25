@@ -34,8 +34,12 @@ export const useMediaPermissions = () => {
    })
 
    const permissions = {
-      microphone: getPermission(activeMicrophoneId, fetchMicsError),
-      camera: getPermission(activeCameraId, fetchCamerasError),
+      microphone: MobileUtils.webViewPresence()
+         ? PermissionType.Unknown
+         : getPermission(activeMicrophoneId, fetchMicsError),
+      camera: MobileUtils.webViewPresence()
+         ? PermissionType.Unknown
+         : getPermission(activeCameraId, fetchCamerasError),
    }
 
    return {
