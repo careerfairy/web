@@ -115,7 +115,7 @@ export PATH="$PATH:$(npm get prefix)/bin"
 Run the command and then enter credentials.
 
 1. Email: accounts@careerfairy.io
-2. Password: Ask Matilde Ramos
+2. Password: Ask Matilde Ramos or Carlos Rijo
 
 ```bash
 eas login
@@ -140,7 +140,7 @@ eas build --profile preview
 or from the root
 
 ```bash
-npm run native-build
+npm run native-build:preview
 ```
 
 2. Development (dev build): After running the command, choose which platforms, Android, iOS or both
