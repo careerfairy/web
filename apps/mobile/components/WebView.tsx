@@ -103,7 +103,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const handleUserAuth = async (data: USER_AUTH) => {
       await SecureStore.setItemAsync("authToken", data.token)
-      await SecureStore.setItemAsync("userData", JSON.stringify(data.userData))
+      await SecureStore.setItemAsync("userId", data.userId)
       Alert.alert("Saving data...")
       subscribeToNotifications()
       onTokenInjected()
@@ -121,13 +121,12 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const handleLogout = async () => {
       try {
-         const userData = await SecureStore.getItemAsync("userData")
-         if (userData) {
-            const user: UserData = JSON.parse(userData)
-            onLogout(user.id)
+         const userId = await SecureStore.getItemAsync("userId")
+         if (userId) {
+            onLogout(userId)
          }
          await SecureStore.deleteItemAsync("authToken")
-         await SecureStore.deleteItemAsync("userData")
+         await SecureStore.deleteItemAsync("userId")
          Alert.alert("Handling logout...")
          unsubscribeToNotifications()
       } catch (e) {}
