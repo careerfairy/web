@@ -40,7 +40,7 @@ const TAB_VALUES = {
    },
 }
 
-const TalentProfileDetails = () => {
+export const TalentProfileDetails = () => {
    const [tabValue, setTabValue] = useState(TAB_VALUES.profile.value)
 
    const handleTabChange = (_, newValue) => {
@@ -69,5 +69,3 @@ const TalentProfileDetails = () => {
       </Box>
    )
 }
-
-export default TalentProfileDetails

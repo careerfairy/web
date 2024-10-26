@@ -1,12 +1,12 @@
 import { Settings } from "@mui/icons-material"
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
-import ColorizedAvatar from "components/views/common/ColorizedAvatar"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
-import ProfileBannerIllustration from "./ProfileBannerIllustration"
+import { ProfileAvatar } from "./ProfileAvatar"
+import { ProfileBannerIllustration } from "./ProfileBannerIllustration"
 
 const LOGO_SIZE = 104
 
@@ -31,7 +31,8 @@ const styles = sxStyles({
    },
    settingsButton: {
       alignSelf: "flex-end",
-      mt: 2,
+      mt: 1.5,
+      mb: "3px",
       color: (theme) => theme.palette.neutral[600],
       borderColor: (theme) => theme.palette.neutral[300],
       "&:hover": {
@@ -56,9 +57,14 @@ const styles = sxStyles({
       fontWeight: 400,
       color: (theme) => theme.palette.neutral[700],
    },
+   profileImageUploadButton: {
+      position: "absolute",
+      ml: 11,
+      mt: "6px",
+   },
 })
 
-const TalentProfileHeader = () => {
+export const TalentProfileHeader = () => {
    const { userData, userPresenter } = useAuth()
    const { talentProfileV1 } = useFeatureFlags()
 
@@ -72,14 +78,7 @@ const TalentProfileHeader = () => {
    return (
       <Stack sx={styles.root}>
          <ProfileBannerIllustration />
-         <Box>
-            <ColorizedAvatar
-               sx={styles.avatar}
-               imageUrl={userData?.avatar}
-               lastName={userData?.lastName}
-               firstName={userData?.firstName}
-            />
-         </Box>
+         <ProfileAvatar />
          <Stack sx={styles.userDetailsRoot}>
             <Button
                sx={styles.settingsButton}
@@ -106,5 +105,3 @@ const TalentProfileHeader = () => {
       </Stack>
    )
 }
-
-export default TalentProfileHeader

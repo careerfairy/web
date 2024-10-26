@@ -90,6 +90,10 @@ export const honestyShape =
 
 export const placeholderBanner =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
+
+export const profilePlaceholderBanner =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/banner-images%2FBanner%20profile.png?alt=media&token=999a43d9-32a2-4f41-b6de-d45e08d1ea9b"
+
 export const chromeLogo =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fchrome.svg?alt=media&token=516e705a-bafa-4a43-99f7-e184cc85b557"
 export const edgeLogo =
