@@ -4,12 +4,12 @@ import useFirebaseUpload from "components/custom-hook/useFirebaseUpload"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import BackgroundImage from "components/views/common/BackgroundImage"
-import { placeholderBanner } from "constants/images"
-import { groupRepo } from "data/RepositoryInstances"
+import { profilePlaceholderBanner } from "constants/images"
+import { userRepo } from "data/RepositoryInstances"
 import useSWRMutation from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
 import { v4 as uuid } from "uuid"
-import ProfileBannerUploadButton from "./ProfileBannerUploadButton"
+import { ProfileBannerUploadButton } from "./ProfileBannerUploadButton"
 
 const styles = sxStyles({
    imageWrapper: {
@@ -26,10 +26,12 @@ const styles = sxStyles({
    },
    progress: {
       zIndex: 1,
+      mt: 1,
    },
+   backgroundImage: { borderRadius: "12px 12px 0px 0px" },
 })
-const ProfileBannerIllustration = () => {
-   const { userData } = useAuth()
+export const ProfileBannerIllustration = () => {
+   const { userData, userPresenter } = useAuth()
 
    const [uploadFile, uploadProgress, isUploading] = useFirebaseUpload()
 
@@ -53,15 +55,12 @@ const ProfileBannerIllustration = () => {
 
    const handleUploadBannerPhoto = async (photo: File) => {
       const bannerImageId = uuid()
-      console.log(
-         "🚀 ~ handleUploadBannerPhoto ~ bannerImageId:",
-         bannerImageId
-      )
+
       const downloadURL = await uploadFile(
          photo,
-         "test"
-         //  groupPresenter.getGroupBannerStorageImagePath(bannerImageId)
+         userPresenter.getUserBannerImageStoragePath(bannerImageId)
       )
+
       return trigger({ userId: userData.id, bannerImageUrl: downloadURL })
    }
 
@@ -76,11 +75,12 @@ const ProfileBannerIllustration = () => {
          ) : null}
          <BackgroundImage
             image={
-               getResizedUrl(userData.bannerImageUrl, "lg") || placeholderBanner
+               getResizedUrl(userData.bannerImageUrl, "lg") ||
+               profilePlaceholderBanner
             }
             repeat={false}
             className={undefined}
-            backgroundImageSx={{ borderRadius: "12px 12px 0px 0px" }}
+            backgroundImageSx={styles.backgroundImage}
          />
          <Box sx={styles.buttonWrapper}>
             <ProfileBannerUploadButton
@@ -101,6 +101,4 @@ type Arguments = {
 const handleUpdateBannerImage = (
    _: string,
    { arg: { bannerImageUrl, userId } }: { arg: Arguments }
-) => groupRepo.updateGroupBannerPhoto(userId, bannerImageUrl)
-
-export default ProfileBannerIllustration
+) => userRepo.updateUserData(userId, { bannerImageUrl: bannerImageUrl })

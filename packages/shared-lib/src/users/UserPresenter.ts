@@ -3,8 +3,29 @@ import { EngageBadgeLevel2 } from "../badges/EngageBadges"
 import { NetworkerBadgeLevel2 } from "../badges/NetworkBadges"
 import { ResearchBadgeLevel2 } from "../badges/ResearchBadges"
 import BasePresenter from "../BasePresenter"
+import { IMAGE_CONSTANTS } from "../utils/image"
 import { getUserBadges, UserBadges } from "./UserBadges"
 import { UserData } from "./users"
+
+export const USER_BANNER_IMAGE_SPECS = {
+   minWidth: 800,
+   minHeight: 172,
+   maxWidth: 4300,
+   maxHeight: 900,
+   // In megabytes
+   maxSize: 5, // 5MB
+   allowedFormats: IMAGE_CONSTANTS.allowedFormats,
+}
+
+export const USER_AVATAR_IMAGE_SPECS = {
+   minWidth: 100,
+   minHeight: 100,
+   maxWidth: 2160,
+   maxHeight: 2160,
+   // In megabytes
+   maxSize: 10, // 10MB
+   allowedFormats: IMAGE_CONSTANTS.allowedFormats,
+}
 
 export default class UserPresenter extends BasePresenter<UserData> {
    public readonly badges: UserBadges
@@ -95,5 +116,13 @@ export default class UserPresenter extends BasePresenter<UserData> {
       // undefined => old users that didn't have the field
       // true => user has seen
       return this.model.welcomeDialogComplete === false
+   }
+
+   getUserAvatarImageStoragePath(imageId: string): string {
+      return `${this.model.authId}/avatar/${imageId}`
+   }
+
+   getUserBannerImageStoragePath(imageId: string): string {
+      return `${this.model.authId}/banner/${imageId}`
    }
 }

@@ -1,4 +1,4 @@
-import { USER_BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/users/UserPresenter"
+import { USER_AVATAR_IMAGE_SPECS } from "@careerfairy/shared-lib/users/UserPresenter"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { Box } from "@mui/material"
 import { darken, useTheme } from "@mui/material/styles"
@@ -10,24 +10,20 @@ import { Camera } from "react-feather"
 import { v4 as uuidv4 } from "uuid"
 import { sxStyles } from "../../../../types/commonTypes"
 
-type BannerPhotoUploadButtonProps = {
-   handleUploadBannerPhoto: (photos: File) => Promise<void>
+type ProfileImageUploadButtonProps = {
+   handleUploadAvatarPhoto: (photos: File) => Promise<void>
    loading: boolean
    disabled?: boolean
 }
 
 const styles = sxStyles({
    buttonWrapper: {
-      // bgcolor: "rgba(255, 255, 255, 0.50)",
-      // borderRadius: "18px",
-      // border: theme => `1px solid ${theme.palette.neutral[200]}`,
-      // width: "32px",
-      height: "32px",
+      height: "30px",
    },
    button: {
-      bgcolor: "rgba(255, 255, 255, 0.50)",
+      backgroundColor: (theme) => theme.palette.neutral[50],
       borderRadius: "18px",
-      border: (theme) => `1px solid ${theme.palette.neutral[200]}`,
+      border: (theme) => `1px solid ${theme.brand.white[100]}`,
       minWidth: "unset !important",
       boxShadow: "none",
       p: "8px 9px",
@@ -40,26 +36,26 @@ const styles = sxStyles({
       },
    },
 })
-export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
+export const ProfileImageUploadButton: FC<ProfileImageUploadButtonProps> = ({
    loading,
-   handleUploadBannerPhoto,
+   handleUploadAvatarPhoto,
    disabled,
 }) => {
    const { errorNotification } = useSnackbarNotifications()
    const theme = useTheme()
    return (
       <ImagePickerContainer
-         extensions={USER_BANNER_IMAGE_SPECS.allowedFormats}
-         maxSize={USER_BANNER_IMAGE_SPECS.maxSize}
+         extensions={USER_AVATAR_IMAGE_SPECS.allowedFormats}
+         maxSize={USER_AVATAR_IMAGE_SPECS.maxSize}
          dims={{
-            minWidth: USER_BANNER_IMAGE_SPECS.minWidth,
-            maxWidth: USER_BANNER_IMAGE_SPECS.maxWidth,
-            minHeight: USER_BANNER_IMAGE_SPECS.minHeight,
-            maxHeight: USER_BANNER_IMAGE_SPECS.maxHeight,
+            minWidth: USER_AVATAR_IMAGE_SPECS.minWidth,
+            maxWidth: USER_AVATAR_IMAGE_SPECS.maxWidth,
+            minHeight: USER_AVATAR_IMAGE_SPECS.minHeight,
+            maxHeight: USER_AVATAR_IMAGE_SPECS.maxHeight,
          }}
          onChange={(base64Img) => {
             const fileObject = dataURLtoFile(base64Img, uuidv4())
-            return handleUploadBannerPhoto(fileObject)
+            return handleUploadAvatarPhoto(fileObject)
          }}
          onError={(err) => errorNotification(err, err)}
       >
@@ -75,7 +71,7 @@ export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
                disabled={disabled}
                startIcon={
                   <Camera
-                     color={theme.brand.white[50]}
+                     color={theme.brand.black[700]}
                      width={"14px"}
                      height={"14px"}
                   />

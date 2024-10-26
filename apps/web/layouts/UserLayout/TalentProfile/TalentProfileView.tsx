@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
-import TalentProfileHeader from "./Header/TalentProfileHeader"
-import TalentProfileDetails from "./TalentProfileDetails"
+import { TalentProfileHeader } from "./Header/TalentProfileHeader"
+import { TalentProfileDetails } from "./TalentProfileDetails"
 
 const styles = sxStyles({
    wrapper: {
@@ -10,7 +10,7 @@ const styles = sxStyles({
    },
 })
 
-const TalentProfileView = () => {
+export const TalentProfileView = () => {
    return (
       <Stack spacing={2} sx={styles.wrapper}>
          <TalentProfileHeader />
@@ -18,5 +18,3 @@ const TalentProfileView = () => {
       </Stack>
    )
 }
-
-export default TalentProfileView
