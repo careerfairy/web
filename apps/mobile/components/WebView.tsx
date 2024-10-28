@@ -68,92 +68,55 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       setHasVideoPermissions(videoStatus === "granted")
    }
 
-   const requestPermissions = async (permissions: string[] = []) => {
-      const { status: audioStatus } = await Audio.getPermissionsAsync()
-      const { status: videoStatus } = await Camera.getCameraPermissionsAsync()
-      if (
-         (permissions.includes("microphone") &&
-            permissions.includes("camera")) ||
-         permissions.length === 0
-      ) {
-         Alert.alert("First case")
-         if (audioStatus !== "granted" && videoStatus !== "granted") {
-            const { status: finalAudioStatus } =
-               await Audio.requestPermissionsAsync()
-            const { status: finalVideoStatus } =
-               await Camera.requestCameraPermissionsAsync()
-            if (
-               finalAudioStatus === "granted" &&
-               finalVideoStatus === "granted"
-            ) {
-               setShowPermissionsBanner(false)
-               onRefresh()
-            } else {
-               setShowPermissionsBanner(true)
-            }
-         } else if (audioStatus === "granted" && videoStatus !== "granted") {
-            const { status: finalVideoStatus } =
-               await Camera.requestCameraPermissionsAsync()
-            if (finalVideoStatus === "granted") {
-               setShowPermissionsBanner(false)
-               onRefresh()
-            } else {
-               setShowPermissionsBanner(true)
-            }
-         } else if (audioStatus !== "granted" && videoStatus === "granted") {
-            const { status: finalAudioStatus } =
-               await Audio.requestPermissionsAsync()
-            if (finalAudioStatus === "granted") {
-               setShowPermissionsBanner(false)
-               onRefresh()
-            } else {
-               setShowPermissionsBanner(true)
-            }
-         } else {
+   const requestPermissions = async () => {
+      if (!hasAudioPermissions && !hasVideoPermissions) {
+         const { status: audioStatus } = await Audio.requestPermissionsAsync()
+         const { status: videoStatus } =
+            await Camera.requestCameraPermissionsAsync()
+         setHasAudioPermissions(audioStatus === "granted")
+         setHasVideoPermissions(videoStatus === "granted")
+         if (audioStatus === "granted" && videoStatus === "granted") {
             setShowPermissionsBanner(false)
+            onRefresh()
+         } else {
+            setShowPermissionsBanner(true)
          }
-      } else if (
-         permissions.includes("microphone") &&
-         !permissions.includes("camera")
-      ) {
-         if (audioStatus !== "granted") {
-            const { status: finalAudioStatus } =
-               await Audio.requestPermissionsAsync()
-            if (finalAudioStatus === "granted") {
-               setShowPermissionsBanner(false)
-               onRefresh()
-            } else {
-               setShowPermissionsBanner(true)
-            }
-         } else {
+      } else if (hasAudioPermissions && !hasVideoPermissions) {
+         const { status: videoStatus } =
+            await Camera.requestCameraPermissionsAsync()
+         setHasVideoPermissions(videoStatus === "granted")
+         if (videoStatus === "granted") {
             setShowPermissionsBanner(false)
+            onRefresh()
+         } else {
+            setShowPermissionsBanner(true)
+         }
+      } else if (!hasAudioPermissions && hasVideoPermissions) {
+         const { status: audioStatus } = await Audio.requestPermissionsAsync()
+         setHasAudioPermissions(audioStatus === "granted")
+         if (audioStatus === "granted") {
+            setShowPermissionsBanner(false)
+            onRefresh()
+         } else {
+            setShowPermissionsBanner(true)
          }
       } else {
-         if (videoStatus !== "granted") {
-            const { status: finalVideoStatus } =
-               await Camera.requestCameraPermissionsAsync()
-            if (finalVideoStatus === "granted") {
-               setShowPermissionsBanner(false)
-               onRefresh()
-            } else {
-               setShowPermissionsBanner(true)
-            }
-         } else {
-            setShowPermissionsBanner(false)
-         }
+         setShowPermissionsBanner(false)
+      }
+   }
+
+   const openAppSettings = () => {
+      if (Platform.OS === "ios") {
+         Linking.openURL("app-settings:")
+      } else {
+         Linking.openSettings()
       }
    }
 
    const onRefresh = () => {
-      setTimeout(() => {
-         Alert.alert("Will try reloading")
-         if (webViewRef.current) {
-            Alert.alert("I should reload")
-            setTimeout(() => {
-               webViewRef.current.reload()
-            }, 2000)
-         }
-      }, 2000)
+      if (webViewRef.current) {
+         webViewRef.current.reload()
+      }
    }
 
    const checkAuthentication = () => {
@@ -174,7 +137,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             }
          })
       setSubscriptionListener(subscription)
-      Alert.alert("Subscribing to notifications...")
    }
 
    const unsubscribeToNotifications = () => {
@@ -221,7 +183,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const handlePermissions = (data: PERMISSIONS) => {
-      onPermissions(data.permissions)
+      console.log("Permissions")
    }
 
    const handleLogout = async () => {
@@ -268,10 +230,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
    }
 
-   const onPermissions = (permissions: string[]) => {
-      requestPermissions(permissions)
-   }
-
    const isValidUrl = (url: string) => {
       const regex =
          /^(https?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
@@ -285,7 +243,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          !hasAudioPermissions &&
          !hasVideoPermissions
       ) {
-         checkPermissions()
+         return requestPermissions()
       } else {
          setShowPermissionsBanner(false)
       }
@@ -321,9 +279,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          {showPermissionsBanner && (
             <View style={styles.banner}>
                <Text style={styles.bannerText}>
-                  You don't have all permissions.
+                  Permissions not granted. Allow them in settings and restart
+                  the application
                </Text>
-               <TouchableOpacity onPress={() => requestPermissions()}>
+               <TouchableOpacity onPress={openAppSettings}>
                   <Text style={styles.bannerButton}>Click here to allow</Text>
                </TouchableOpacity>
             </View>
