@@ -4,8 +4,8 @@ import {
    getHost,
    makeLivestreamEventDetailsUrl,
 } from "@careerfairy/shared-lib/utils/urls"
-import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 
 export type CalendarEvent = {
    startsAt: string
@@ -35,27 +35,14 @@ const makeUrl = function (
    return Object.keys(query).reduce(function (accum, key, index) {
       const value = query[key]
       if (value !== null) {
-         const valueToEncode =
-            typeof value === "string"
-               ? value.replace(/(\r\n|\n|\r)/gm, "")
-               : value
-         try {
-            return (
-               "" +
-               accum +
-               (index === 0 ? "?" : "&") +
-               key +
-               "=" +
-               encodeURIComponent(valueToEncode)
-            )
-         } catch (err) {
-            console.log(
-               "🚀 ~ WG Cal Debug - Error encoding value -> ",
-               valueToEncode
-            )
-            console.log("🚀 ~ WG Cal Debug:", err)
-            throw err
-         }
+         return (
+            "" +
+            accum +
+            (index === 0 ? "?" : "&") +
+            key +
+            "=" +
+            encodeURIComponent(value)
+         )
       }
       return accum
    }, base)
