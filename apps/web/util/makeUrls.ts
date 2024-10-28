@@ -4,8 +4,8 @@ import {
    getHost,
    makeLivestreamEventDetailsUrl,
 } from "@careerfairy/shared-lib/utils/urls"
-import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
+import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
 
 export type CalendarEvent = {
    startsAt: string
@@ -32,8 +32,11 @@ const makeUrl = function (
    base: string,
    query: Record<string, string | null | number | boolean>
 ): string {
+   console.log("🚀 ~ WG: debug calendar error: query - ", query)
+   console.log("🚀 ~ WG: debug calendar error: base - ", base)
    return Object.keys(query).reduce(function (accum, key, index) {
       const value = query[key]
+      console.log("🚀 ~ WG: debug calendar error: value - ", value)
       if (value !== null) {
          return (
             "" +
