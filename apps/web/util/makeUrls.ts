@@ -6,6 +6,7 @@ import {
 } from "@careerfairy/shared-lib/utils/urls"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
+import { errorLogAndNotify } from "./CommonUtil"
 
 export type CalendarEvent = {
    startsAt: string
@@ -40,10 +41,7 @@ const makeUrl = function (
          try {
             encodedValue = encodeURIComponent(value)
          } catch (error) {
-            console.log(
-               "🚀 ~ makeUrl~encodeURIComponent error encoding URI component:",
-               value
-            )
+            errorLogAndNotify(error)
             throw error
          }
 
