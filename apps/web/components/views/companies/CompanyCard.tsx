@@ -1,5 +1,5 @@
-import { FC } from "react"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import {
    Box,
    Card,
@@ -8,27 +8,27 @@ import {
    CardMedia,
    Typography,
 } from "@mui/material"
-import { sxStyles } from "../../../types/commonTypes"
+import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
 import Image from "next/legacy/image"
+import { FC } from "react"
+import { useInView } from "react-intersection-observer"
+import { sxStyles } from "../../../types/commonTypes"
+import { SuspenseWithBoundary } from "../../ErrorBoundary"
 import {
    getMaxLineStyles,
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions"
-import Stack from "@mui/material/Stack"
 import {
    CompanyCountryTag,
    CompanyIndustryTag,
    CompanySizeTag,
 } from "../common/company/company-tags"
-import { useInView } from "react-intersection-observer"
-import Skeleton from "@mui/material/Skeleton"
-import { SuspenseWithBoundary } from "../../ErrorBoundary"
 import FollowButton from "../common/company/FollowButton"
-import Link from "../common/Link"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
-import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
 import PublicSparksBadge from "../common/icons/PublicSparksBadge"
+import Link from "../common/Link"
 import CircularLogo from "../common/logos/CircularLogo"
+import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
 
 const LOGO_SIZE = 75
 
@@ -162,20 +162,13 @@ const CompanyCard: FC<Props> = ({ company }) => {
                   ) : null}
                </Stack>
                <Stack spacing={1}>
-                  <CompanyCountryTag
-                     fontSize="1.07rem"
-                     text={company.companyCountry.name}
-                  />
+                  <CompanyCountryTag text={company.companyCountry?.name} />
                   <CompanyIndustryTag
-                     fontSize="1.07rem"
                      text={company.companyIndustries
                         ?.map(({ name }) => name)
                         .join(", ")}
                   />
-                  <CompanySizeTag
-                     fontSize="1.07rem"
-                     text={company.companySize}
-                  />
+                  <CompanySizeTag text={company.companySize} />
                </Stack>
                {inView ? ( // Only fetch the next livestreams when the card is in view
                   <SuspenseWithBoundary

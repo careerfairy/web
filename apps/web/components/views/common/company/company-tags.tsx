@@ -1,9 +1,9 @@
-import Box from "@mui/material/Box"
 import { Typography } from "@mui/material"
-import React, { FC, ReactNode } from "react"
+import Box from "@mui/material/Box"
+import { FC, ReactNode } from "react"
 import {
-   MapPin as CompanyLocationIcon,
    Tag as CompanyIndustryIcon,
+   MapPin as CompanyLocationIcon,
    Users as CompanySizeIcon,
 } from "react-feather"
 
@@ -14,9 +14,13 @@ type Props = {
 }
 const CompanyTag: FC<Props> = ({ icon, text, fontSize = "1rem" }) => {
    return (
-      <Box display="flex" alignItems="center">
+      <Box display="flex" alignItems="center" color="neutral.700">
          {icon}
-         <Typography variant="h6" fontSize={`${fontSize} !important`} ml={1.5}>
+         <Typography
+            variant="small"
+            fontSize={`${fontSize} !important`}
+            ml={"0.5rem"}
+         >
             {text}
          </Typography>
       </Box>

@@ -5,7 +5,7 @@ import StaticSkeleton from "./StaticSkeleton"
 
 const styles = sxStyles({
    eventTitle: {
-      fontWeight: 600,
+      fontWeight: 700,
       textAlign: "center",
       maxWidth: 750,
       width: "100%",
@@ -21,12 +21,7 @@ type Props = {
 
 const LivestreamTitle = ({ text }: Props) => {
    return text ? (
-      <Typography
-         align="center"
-         variant={"h3"}
-         component="h1"
-         sx={styles.eventTitle}
-      >
+      <Typography align="center" variant={"brandedH1"} sx={styles.eventTitle}>
          {text}
       </Typography>
    ) : (

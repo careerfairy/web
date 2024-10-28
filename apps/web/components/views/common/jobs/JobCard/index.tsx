@@ -14,14 +14,14 @@ import JobCardStats from "./JobCardStats"
 const styles = sxStyles({
    jobState: {
       display: "flex",
-      borderRadius: "16px 0 0 16px",
+      borderRadius: "8px 0 0 8px",
       width: "8px",
    },
    listItemContainer: {
       display: "flex",
       flexDirection: "row",
       width: "100%",
-      borderRadius: "12px 16px 16px 12px",
+      borderRadius: "8px",
       background: "white",
       border: "1px solid #ECECEC",
       borderLeft: "none",

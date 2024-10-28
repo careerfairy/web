@@ -1,14 +1,14 @@
-import React, { FC, useCallback, useMemo } from "react"
-import { useRouter } from "next/router"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { fromDate } from "../../../data/firebase/FirebaseInstance"
-import SEO from "../../util/SEO"
-import { getStreamMetaInfo } from "../../../util/SeoUtil"
-import EventSEOSchemaScriptTag from "../common/EventSEOSchemaScriptTag"
-import dynamic from "next/dynamic"
 import { UserStats } from "@careerfairy/shared-lib/users"
-import { useAuth } from "../../../HOCs/AuthProvider"
+import dynamic from "next/dynamic"
+import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
+import React, { FC, useCallback, useMemo } from "react"
+import { fromDate } from "../../../data/firebase/FirebaseInstance"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import { getStreamMetaInfo } from "../../../util/SeoUtil"
+import SEO from "../../util/SEO"
+import EventSEOSchemaScriptTag from "../common/EventSEOSchemaScriptTag"
 
 const LivestreamDialog = dynamic(() => import("./LivestreamDialog"))
 
@@ -23,7 +23,12 @@ type Props = {
    children: React.ReactNode
 }
 
-const validDialogPages = ["details", "register", "job-details"] as const
+const validDialogPages = [
+   "details",
+   "register",
+   "job-details",
+   "speaker-details",
+] as const
 type DialogPage = (typeof validDialogPages)[number]
 
 /**
