@@ -22,7 +22,7 @@ import { LinkedInIcon } from "../common/icons/LinkedInIcon"
 import CollapsibleText from "../common/inputs/CollapsibleText"
 import { useIsTargetedUser } from "../sparks/components/spark-card/Notifications/linkedin/useIsTargetedUser"
 import { LivestreamsCarousel } from "./LivestreamsCarousel"
-import { SparksCarousel } from "./SparksCarousel"
+import { MentorSparksCarousel } from "./MentorSparksCarousel"
 import { SpeakerAvatar } from "./SpeakersAvatar"
 
 const styles = sxStyles({
@@ -279,7 +279,7 @@ const Content = ({
    return (
       <Stack sx={combineStyles(styles.mentorContentContainer, sx)}>
          {Boolean(sparks.length) && (
-            <SparksCarousel
+            <MentorSparksCarousel
                sparks={sparks}
                title={
                   <Typography variant="brandedH5" sx={styles.contentTitle}>

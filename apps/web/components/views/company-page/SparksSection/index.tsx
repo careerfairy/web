@@ -2,10 +2,9 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { Box, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
+import { GroupSparksCarousel } from "components/views/common/sparks/GroupSparksCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
-import { GroupSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
@@ -30,7 +29,6 @@ const Loader = () => {
 
 const SparksSection: FC<Props> = ({ groupId }) => {
    const dispatch = useDispatch()
-   const isMobile = useIsMobile()
 
    const {
       group,
@@ -69,7 +67,6 @@ const SparksSection: FC<Props> = ({ groupId }) => {
                   header={<CarouselHeader />}
                   groupId={groupId}
                   handleSparksClicked={handleSparksClicked}
-                  showArrows={!isMobile}
                   sx={{ pl: 0 }}
                />
             </SuspenseWithBoundary>

@@ -30,7 +30,6 @@ import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJ
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
@@ -41,7 +40,7 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
-import { UserSparksCarousel } from "components/views/portal/sparks/SparksCarouselWithArrows"
+import { UserSparksCarousel } from "components/views/portal/sparks/UserSparksCarousel"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
 import dynamic from "next/dynamic"
 import { sxStyles } from "types/commonTypes"
@@ -52,8 +51,12 @@ import {
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
 
 const styles = sxStyles({
+   sparksCarousel: {
+      mb: 4,
+      ml: 2,
+   },
    sparksCarouselHeader: {
-      pr: 2,
+      mr: 2,
    },
 })
 
@@ -79,7 +82,6 @@ const PortalPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
-   const isMobile = useIsMobile()
    const isMounted = useIsMounted()
 
    const hasInterests = Boolean(
@@ -158,10 +160,9 @@ const PortalPage = ({
                                           Sparks
                                        </Typography>
                                     }
-                                    headerSx={styles.sparksCarouselHeader}
                                     handleSparksClicked={handleSparksClicked}
-                                    showArrows={!isMobile}
-                                    sx={{ mb: 4 }}
+                                    containerSx={styles.sparksCarousel}
+                                    headerSx={styles.sparksCarouselHeader}
                                  />
                               ) : (
                                  <FallbackComponent
