@@ -5,7 +5,6 @@ import { doc, setDoc } from "firebase/firestore"
 import { app, db, auth } from "./firebase"
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
-import { Alert } from "react-native"
 import { signInWithEmailAndPassword } from "firebase/auth"
 
 export default function Native() {
@@ -21,8 +20,11 @@ export default function Native() {
    const checkToken = async () => {
       const token = await SecureStore.getItemAsync("authToken")
       if (token) {
-         Alert.alert("Has token")
-         getPushToken()
+         const { status: existingStatus } =
+            await Notifications.getPermissionsAsync()
+         if (existingStatus !== "granted") {
+            getPushToken()
+         }
       }
    }
 
@@ -31,6 +33,7 @@ export default function Native() {
          const { status: existingStatus } =
             await Notifications.getPermissionsAsync()
          let finalStatus = existingStatus
+
          if (existingStatus !== "granted") {
             const { status } = await Notifications.requestPermissionsAsync()
             finalStatus = status
@@ -65,15 +68,15 @@ export default function Native() {
 
          if (userId && userPassword) {
             await signInWithEmailAndPassword(auth, userId, userPassword)
-            Alert.alert("User signed in")
-            const userDocRef = doc(db, "userData", userId)
+            if (auth.currentUser?.email) {
+               const userDocRef = doc(db, "userData", auth.currentUser.email)
 
-            // Use setDoc to update the document
-            await setDoc(
-               userDocRef,
-               { pushToken: pushToken },
-               { merge: true } // Use merge to update without overwriting the entire document
-            )
+               await setDoc(
+                  userDocRef,
+                  { pushToken: pushToken },
+                  { merge: true }
+               )
+            }
          }
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
@@ -82,10 +85,16 @@ export default function Native() {
 
    async function ResetFireStoreData(userId: string, userPassword: string) {
       try {
-         await signInWithEmailAndPassword(auth, userId, userPassword)
-         Alert.alert("User signed out")
-         const userDocRef = doc(db, "userData", userId)
-         await setDoc(userDocRef, { pushToken: "" }, { merge: true })
+         if (auth.currentUser?.email) {
+            const userDocRef = doc(db, "userData", auth.currentUser.email)
+            await setDoc(userDocRef, { pushToken: null }, { merge: true })
+         } else {
+            await signInWithEmailAndPassword(auth, userId, userPassword)
+            if (auth.currentUser?.email) {
+               const userDocRef = doc(db, "userData", auth.currentUser.email)
+               await setDoc(userDocRef, { pushToken: null }, { merge: true })
+            }
+         }
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
       }
