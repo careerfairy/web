@@ -20,7 +20,6 @@ import Tooltip from "@mui/material/Tooltip"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 // project imports
-import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import Divider from "@mui/material/Divider"
 import { alpha, useTheme } from "@mui/material/styles"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
@@ -51,6 +50,9 @@ const styles = sxStyles({
       lineHeight: 0,
       border: (theme) => `3px solid ${theme.palette.primary.main}`,
    },
+   newMenuAva: {
+      ml: "8px",
+   },
    details: {
       display: "flex",
       flexDirection: "column",
@@ -74,13 +76,12 @@ const styles = sxStyles({
    },
    userName: {
       fontWeight: 600,
-      fontSize: "16px",
-      lineHeight: "24px",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      width: "175px !important",
    },
    userFieldOfStudy: {
       fontWeight: 400,
-      fontSize: "12px",
-      lineHeight: "16px",
       color: (theme) => theme.palette.neutral[600],
    },
    profileMenu: {
@@ -112,19 +113,20 @@ const styles = sxStyles({
    menuItem: {
       height: "40px",
       p: "12px",
+      py: "26px",
+      pl: "20px",
       "&:hover": {
          backgroundColor: (theme) => theme.brand.white[400],
       },
    },
    desktopMenuItem: {
-      py: 0.5,
+      py: 3,
    },
    desktopLogoutMenuItem: {
-      py: 0.5,
-      mt: "8px !important",
+      py: 3,
    },
    desktopFollowingCompaniesMenuItem: {
-      mt: "12px !important",
+      py: 3,
    },
    avatarMenuItem: {
       p: 1,
@@ -135,12 +137,19 @@ const styles = sxStyles({
    },
    desktopAvatarMenuItem: {
       pt: 1,
+      mb: 1,
    },
    menuItemText: {
       fontSize: {
          sm: "16px",
          md: "14px",
       },
+   },
+   companyIcon: {
+      mr: 1,
+      color: (theme) => theme.palette.neutral[700],
+      width: "20px !important",
+      height: "20px !important",
    },
 })
 
@@ -158,13 +167,7 @@ const ProfileMenu = () => {
 
    const [menuAnimating, setMenuAnimating] = useState(false)
 
-   const { jobHubV1, talentProfileV1 } = useFeatureFlags()
-
-   const userDisplayName = userPresenter?.getDisplayName() || ""
-
-   const userName = useMemo(() => {
-      return getSubstringWithEllipsis(userDisplayName, 23)
-   }, [userDisplayName])
+   const { talentProfileV1 } = useFeatureFlags()
 
    const fieldOfStudyDisplayName = useMemo(
       () => userPresenter?.getFieldOfStudyDisplayName(talentProfileV1),
@@ -203,15 +206,16 @@ const ProfileMenu = () => {
                imageUrl={userData?.avatar}
                lastName={userData?.lastName}
                firstName={userData?.firstName}
-               sx={[styles.ava, { border: "none" }]}
+               sx={[styles.ava, { border: "none" }, styles.newMenuAva]}
             />
             <Box sx={styles.details}>
                <Typography
                   sx={[styles.userName]}
+                  variant="brandedBody"
                   color={"neutral.800"}
                   component={"span"}
                >
-                  {userName}
+                  {userPresenter?.getDisplayName()}
                </Typography>
 
                <Typography
@@ -220,6 +224,7 @@ const ProfileMenu = () => {
                      styles.companyText,
                      styles.userFieldOfStudy,
                   ]}
+                  variant="xsmall"
                   color={"neutral.500"}
                >
                   {fieldOfStudyDisplayName}
@@ -228,6 +233,7 @@ const ProfileMenu = () => {
          </MenuItem>
       )
    }
+
    const ProfileMenuItem = ({ sx }: CustomMenuItemProps) => {
       return (
          <MenuItem
@@ -249,7 +255,6 @@ const ProfileMenu = () => {
    }
 
    const MyJobsMenuItem = ({ sx }: CustomMenuItemProps) => {
-      if (!jobHubV1) return null
       return (
          <MenuItem
             onClick={() => push("/profile/my-jobs")}
@@ -276,11 +281,7 @@ const ProfileMenu = () => {
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
-               <CompanyIcon
-                  width={"20px !important"}
-                  height={"20px !important"}
-                  sx={{ mr: 1, color: (theme) => theme.palette.neutral[700] }}
-               />
+               <CompanyIcon sx={styles.companyIcon} />
             </ListItemIcon>
             <Typography color={"text.secondary"} sx={styles.menuItemText}>
                Following Companies
@@ -330,7 +331,7 @@ const ProfileMenu = () => {
          <Stack spacing={2} sx={styles.profileMenuRoot}>
             <Stack spacing={3}>
                <AvatarMenuItem />
-               <Stack spacing={1}>
+               <Stack>
                   <ProfileMenuItem />
                   <MyJobsMenuItem />
                   <FollowingCompaniesMenuItem />
@@ -339,7 +340,7 @@ const ProfileMenu = () => {
 
             <Stack spacing={2}>
                <SupportLinkMenuItem />
-               <Divider sx={{ width: "100%", alignSelf: "center" }} />
+               <Divider sx={{ width: "90%", alignSelf: "center" }} />
                <LogOutMenuItem />
             </Stack>
          </Stack>
@@ -390,7 +391,7 @@ const ProfileMenu = () => {
                <TalentProfileMenuItems />
             ) : (
                <Stack
-                  spacing={2}
+                  spacing={talentProfileV1 ? 0 : 2}
                   sx={talentProfileV1 ? styles.desktopProfileMenuRoot : null}
                >
                   <ConditionalWrapper
@@ -445,23 +446,19 @@ const ProfileMenu = () => {
                      </MenuItem>
                   </ConditionalWrapper>
 
-                  {jobHubV1 ? (
-                     <ConditionalWrapper
-                        condition={!talentProfileV1}
-                        fallback={
-                           <MyJobsMenuItem sx={styles.desktopMenuItem} />
-                        }
-                     >
-                        <MenuItem onClick={() => push("/profile/my-jobs")}>
-                           <ListItemIcon>
-                              <Briefcase width={"17.5px"} height={"17.5px"} />
-                           </ListItemIcon>
-                           <Typography color={"text.secondary"}>
-                              My Jobs
-                           </Typography>
-                        </MenuItem>
-                     </ConditionalWrapper>
-                  ) : null}
+                  <ConditionalWrapper
+                     condition={!talentProfileV1}
+                     fallback={<MyJobsMenuItem sx={styles.desktopMenuItem} />}
+                  >
+                     <MenuItem onClick={() => push("/profile/my-jobs")}>
+                        <ListItemIcon>
+                           <Briefcase width={"17.5px"} height={"17.5px"} />
+                        </ListItemIcon>
+                        <Typography color={"text.secondary"}>
+                           My Jobs
+                        </Typography>
+                     </MenuItem>
+                  </ConditionalWrapper>
 
                   {talentProfileV1 ? (
                      <FollowingCompaniesMenuItem
@@ -501,7 +498,7 @@ const ProfileMenu = () => {
 
                   <Divider
                      sx={{
-                        width: talentProfileV1 ? "100%" : "80%",
+                        width: talentProfileV1 ? "90%" : "80%",
                         alignSelf: "center",
                      }}
                   />
