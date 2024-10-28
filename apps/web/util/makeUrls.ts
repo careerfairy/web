@@ -32,20 +32,23 @@ const makeUrl = function (
    base: string,
    query: Record<string, string | null | number | boolean>
 ): string {
-   console.log("🚀 ~ WG: debug calendar error: query - ", query)
-   console.log("🚀 ~ WG: debug calendar error: base - ", base)
    return Object.keys(query).reduce(function (accum, key, index) {
       const value = query[key]
-      console.log("🚀 ~ WG: debug calendar error: value - ", value)
       if (value !== null) {
-         return (
-            "" +
-            accum +
-            (index === 0 ? "?" : "&") +
-            key +
-            "=" +
-            encodeURIComponent(value)
-         )
+         try {
+            return (
+               "" +
+               accum +
+               (index === 0 ? "?" : "&") +
+               key +
+               "=" +
+               encodeURIComponent(value)
+            )
+         } catch (err) {
+            console.log("🚀 ~ WG Cal Debug - Error encoding value -> ", value)
+            console.log("🚀 ~ WG Cal Debug:", err)
+            throw err
+         }
       }
       return accum
    }, base)
