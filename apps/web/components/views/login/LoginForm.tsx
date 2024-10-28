@@ -24,7 +24,7 @@ import { useFirebaseService } from "../../../context/firebase/FirebaseServiceCon
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
 import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
-import { MobileUtils } from "../../../scripts/mobile.utils"
+import { MobileUtils } from "../../../util/mobile.utils"
 
 const styles = {
    box: {
