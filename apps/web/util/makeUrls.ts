@@ -35,6 +35,10 @@ const makeUrl = function (
    return Object.keys(query).reduce(function (accum, key, index) {
       const value = query[key]
       if (value !== null) {
+         const valueToEncode =
+            typeof value === "string"
+               ? value.replace(/(\r\n|\n|\r)/gm, "")
+               : value
          try {
             return (
                "" +
@@ -42,10 +46,13 @@ const makeUrl = function (
                (index === 0 ? "?" : "&") +
                key +
                "=" +
-               encodeURIComponent(value)
+               encodeURIComponent(valueToEncode)
             )
          } catch (err) {
-            console.log("🚀 ~ WG Cal Debug - Error encoding value -> ", value)
+            console.log(
+               "🚀 ~ WG Cal Debug - Error encoding value -> ",
+               valueToEncode
+            )
             console.log("🚀 ~ WG Cal Debug:", err)
             throw err
          }
