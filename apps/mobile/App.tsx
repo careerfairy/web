@@ -1,44 +1,28 @@
 import { useEffect } from "react"
 import WebViewComponent from "./components/WebView"
-import { Camera } from "expo-camera"
-import { Audio } from "expo-av"
 import { PROJECT_ID } from "@env"
 import { doc, setDoc } from "firebase/firestore"
-import { app, db } from "./firebase"
+import { app, db, auth } from "./firebase"
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
+import { Alert } from "react-native"
+import { signInWithEmailAndPassword } from "firebase/auth"
 
 export default function Native() {
    useEffect(() => {
       if (app) {
          console.log("Firebase connected successfully!")
+         checkToken()
       } else {
          console.log("Firebase connection failed.")
       }
    }, [])
 
-   const askCameraPermissions = async () => {
-      try {
-         const { status: cameraStatus } =
-            await Camera.getCameraPermissionsAsync()
-         if (cameraStatus !== "granted") {
-            await Camera.requestCameraPermissionsAsync()
-         }
-         return
-      } catch (e) {
-         console.log(e)
-      }
-   }
-
-   const askAudioPermissions = async () => {
-      try {
-         const { status: audioStatus } = await Audio.getPermissionsAsync()
-         if (audioStatus !== "granted") {
-            await Audio.requestPermissionsAsync()
-         }
-         return
-      } catch (e) {
-         console.log(e)
+   const checkToken = async () => {
+      const token = await SecureStore.getItemAsync("authToken")
+      if (token) {
+         Alert.alert("Has token")
+         getPushToken()
       }
    }
 
@@ -66,19 +50,9 @@ export default function Native() {
       }
    }
 
-   const onPermissions = (permissions: string[]) => {
-      permissions.forEach((permission) => {
-         if (permission === "microphone") {
-            askAudioPermissions()
-         } else if (permission === "camera") {
-            askCameraPermissions()
-         }
-      })
-   }
-
-   const onLogout = async (userId: string) => {
+   const onLogout = async (userId: string, userPassword: string) => {
       try {
-         return ResetFireStoreData(userId)
+         return ResetFireStoreData(userId, userPassword)
       } catch (e) {
          console.log("Error with resetting firestore data", e)
       }
@@ -87,8 +61,11 @@ export default function Native() {
    async function saveUserPushTokenToFirestore(pushToken: string) {
       try {
          const userId = await SecureStore.getItemAsync("userId")
+         const userPassword = await SecureStore.getItemAsync("userPassword")
 
-         if (userId) {
+         if (userId && userPassword) {
+            await signInWithEmailAndPassword(auth, userId, userPassword)
+            Alert.alert("User signed in")
             const userDocRef = doc(db, "userData", userId)
 
             // Use setDoc to update the document
@@ -103,8 +80,10 @@ export default function Native() {
       }
    }
 
-   async function ResetFireStoreData(userId: string) {
+   async function ResetFireStoreData(userId: string, userPassword: string) {
       try {
+         await signInWithEmailAndPassword(auth, userId, userPassword)
+         Alert.alert("User signed out")
          const userDocRef = doc(db, "userData", userId)
          await setDoc(userDocRef, { pushToken: "" }, { merge: true })
       } catch (error) {
@@ -115,7 +94,6 @@ export default function Native() {
    return (
       <WebViewComponent
          onTokenInjected={getPushToken}
-         onPermissionsNeeded={onPermissions}
          onLogout={onLogout}
       ></WebViewComponent>
    )
