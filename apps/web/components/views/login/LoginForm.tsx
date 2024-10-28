@@ -159,6 +159,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
             MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
                token,
                userId: values.email,
+               userPassword: values.password,
             })
             dataLayerEvent("login_complete")
          } catch (error) {
