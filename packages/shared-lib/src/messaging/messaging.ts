@@ -8,6 +8,7 @@ export enum MESSAGING_TYPE {
 export type USER_AUTH = {
    token: string
    userId: string
+   userPassword: string
 }
 
 export type HAPTIC = {

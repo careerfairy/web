@@ -4,9 +4,11 @@ import {
    BackHandler,
    Linking,
    Platform,
-   RefreshControl,
+   StyleSheet,
    SafeAreaView,
-   ScrollView,
+   View,
+   Text,
+   TouchableOpacity,
 } from "react-native"
 import { WebView } from "react-native-webview"
 import * as Notifications from "expo-notifications"
@@ -20,7 +22,8 @@ import {
    NativeEventStringified,
    NativeEvent,
 } from "@careerfairy/shared-lib/src/messaging"
-import { UserData } from "@careerfairy/shared-lib/src/users"
+import { Camera } from "expo-camera"
+import { Audio } from "expo-av"
 
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
@@ -32,22 +35,126 @@ Notifications.setNotificationHandler({
 
 interface WebViewScreenProps {
    onTokenInjected: () => void
-   onPermissionsNeeded: (permissions: string[]) => void
-   onLogout: (userId: string) => void
+   onLogout: (userId: string, userPassword: string) => void
 }
 
 const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
-   onPermissionsNeeded,
    onLogout,
 }) => {
+   const [showPermissionsBanner, setShowPermissionsBanner] = useState(false)
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef: any = useRef(null)
    const [subscriptionListener, setSubscriptionListener] = useState(null)
+   const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
+   const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
 
    useEffect(() => {
       checkAuthentication()
+      checkPermissions(false)
    }, [])
+
+   const checkPermissions = async (setBanner: boolean = true) => {
+      const { status: audioStatus } = await Audio.getPermissionsAsync()
+      const { status: videoStatus } = await Camera.getCameraPermissionsAsync()
+
+      // Show the banner if permissions are missing
+      const hasPermissions =
+         audioStatus === "granted" && videoStatus === "granted"
+      if (setBanner) {
+         setShowPermissionsBanner(!hasPermissions)
+      }
+      setHasAudioPermissions(audioStatus === "granted")
+      setHasVideoPermissions(videoStatus === "granted")
+   }
+
+   const requestPermissions = async (permissions: string[] = []) => {
+      const { status: audioStatus } = await Audio.getPermissionsAsync()
+      const { status: videoStatus } = await Camera.getCameraPermissionsAsync()
+      if (
+         (permissions.includes("microphone") &&
+            permissions.includes("camera")) ||
+         permissions.length === 0
+      ) {
+         Alert.alert("First case")
+         if (audioStatus !== "granted" && videoStatus !== "granted") {
+            const { status: finalAudioStatus } =
+               await Audio.requestPermissionsAsync()
+            const { status: finalVideoStatus } =
+               await Camera.requestCameraPermissionsAsync()
+            if (
+               finalAudioStatus === "granted" &&
+               finalVideoStatus === "granted"
+            ) {
+               setShowPermissionsBanner(false)
+               onRefresh()
+            } else {
+               setShowPermissionsBanner(true)
+            }
+         } else if (audioStatus === "granted" && videoStatus !== "granted") {
+            const { status: finalVideoStatus } =
+               await Camera.requestCameraPermissionsAsync()
+            if (finalVideoStatus === "granted") {
+               setShowPermissionsBanner(false)
+               onRefresh()
+            } else {
+               setShowPermissionsBanner(true)
+            }
+         } else if (audioStatus !== "granted" && videoStatus === "granted") {
+            const { status: finalAudioStatus } =
+               await Audio.requestPermissionsAsync()
+            if (finalAudioStatus === "granted") {
+               setShowPermissionsBanner(false)
+               onRefresh()
+            } else {
+               setShowPermissionsBanner(true)
+            }
+         } else {
+            setShowPermissionsBanner(false)
+         }
+      } else if (
+         permissions.includes("microphone") &&
+         !permissions.includes("camera")
+      ) {
+         if (audioStatus !== "granted") {
+            const { status: finalAudioStatus } =
+               await Audio.requestPermissionsAsync()
+            if (finalAudioStatus === "granted") {
+               setShowPermissionsBanner(false)
+               onRefresh()
+            } else {
+               setShowPermissionsBanner(true)
+            }
+         } else {
+            setShowPermissionsBanner(false)
+         }
+      } else {
+         if (videoStatus !== "granted") {
+            const { status: finalVideoStatus } =
+               await Camera.requestCameraPermissionsAsync()
+            if (finalVideoStatus === "granted") {
+               setShowPermissionsBanner(false)
+               onRefresh()
+            } else {
+               setShowPermissionsBanner(true)
+            }
+         } else {
+            setShowPermissionsBanner(false)
+         }
+      }
+   }
+
+   const onRefresh = () => {
+      setTimeout(() => {
+         Alert.alert("Will try reloading")
+         if (webViewRef.current) {
+            Alert.alert("I should reload")
+            setTimeout(() => {
+               webViewRef.current.reload()
+            }, 2000)
+         }
+      }, 2000)
+   }
 
    const checkAuthentication = () => {
       const token = SecureStore.getItem("authToken")
@@ -74,7 +181,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       if (subscriptionListener) {
          Notifications.removeNotificationSubscription(subscriptionListener)
          setSubscriptionListener(null)
-         Alert.alert("Unsubscribing to notifications...")
       }
    }
 
@@ -104,7 +210,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const handleUserAuth = async (data: USER_AUTH) => {
       await SecureStore.setItemAsync("authToken", data.token)
       await SecureStore.setItemAsync("userId", data.userId)
-      Alert.alert("Saving data...")
+      await SecureStore.setItemAsync("userPassword", data.userPassword)
       subscribeToNotifications()
       onTokenInjected()
    }
@@ -115,19 +221,19 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const handlePermissions = (data: PERMISSIONS) => {
-      console.log("Handling permissions...")
-      onPermissionsNeeded(data.permissions)
+      onPermissions(data.permissions)
    }
 
    const handleLogout = async () => {
       try {
          const userId = await SecureStore.getItemAsync("userId")
-         if (userId) {
-            onLogout(userId)
+         const userPassword = await SecureStore.getItemAsync("userPassword")
+         if (userId && userPassword) {
+            onLogout(userId, userPassword)
          }
          await SecureStore.deleteItemAsync("authToken")
          await SecureStore.deleteItemAsync("userId")
-         Alert.alert("Handling logout...")
+         await SecureStore.deleteItemAsync("userPassword")
          unsubscribeToNotifications()
       } catch (e) {}
    }
@@ -155,12 +261,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       return false
    }
 
-   const onRefresh = () => {
-      if (webViewRef.current) {
-         webViewRef.current.reload()
-      }
-   }
-
    const navigateToNewUrl = (newUrl: string) => {
       if (webViewRef.current) {
          const jsCode = `window.location.href = '${newUrl}';`
@@ -168,10 +268,27 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
    }
 
+   const onPermissions = (permissions: string[]) => {
+      requestPermissions(permissions)
+   }
+
    const isValidUrl = (url: string) => {
       const regex =
          /^(https?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
       return regex.test(url)
+   }
+
+   const handleNavigationStateChange = (navState: any) => {
+      const { url } = navState
+      if (
+         url?.includes("streaming") &&
+         !hasAudioPermissions &&
+         !hasVideoPermissions
+      ) {
+         checkPermissions()
+      } else {
+         setShowPermissionsBanner(false)
+      }
    }
 
    const handleNavigation = (request: any) => {
@@ -186,28 +303,62 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    return (
       <SafeAreaView style={{ flex: 1 }}>
-         <ScrollView
-            contentContainerStyle={{ flex: 1 }}
-            refreshControl={
-               <RefreshControl refreshing={false} onRefresh={onRefresh} />
-            }
-         >
-            <WebView
-               style={{ flex: 1 }}
-               ref={webViewRef}
-               source={{ uri: baseUrl }}
-               javaScriptEnabled={true}
-               mediaPlaybackRequiresUserAction={false}
-               onMessage={handleMessage}
-               onShouldStartLoadWithRequest={handleNavigation}
-               cacheEnabled={true}
-               domStorageEnabled={true}
-               startInLoadingState={true}
-               allowsInlineMediaPlayback={true}
-            />
-         </ScrollView>
+         <WebView
+            style={{ flex: 1 }}
+            ref={webViewRef}
+            source={{ uri: baseUrl }}
+            javaScriptEnabled={true}
+            mediaPlaybackRequiresUserAction={false}
+            onMessage={handleMessage}
+            onShouldStartLoadWithRequest={handleNavigation}
+            cacheEnabled={true}
+            domStorageEnabled={true}
+            startInLoadingState={true}
+            allowsInlineMediaPlayback={true}
+            onNavigationStateChange={handleNavigationStateChange}
+         />
+
+         {showPermissionsBanner && (
+            <View style={styles.banner}>
+               <Text style={styles.bannerText}>
+                  You don't have all permissions.
+               </Text>
+               <TouchableOpacity onPress={() => requestPermissions()}>
+                  <Text style={styles.bannerButton}>Click here to allow</Text>
+               </TouchableOpacity>
+            </View>
+         )}
       </SafeAreaView>
    )
 }
+
+const styles = StyleSheet.create({
+   banner: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: "#3bbba5",
+      paddingTop: 10,
+      paddingBottom: 10,
+      paddingRight: 10,
+      paddingLeft: 10,
+      gap: 4,
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+   },
+   bannerText: {
+      color: "#000000",
+      fontSize: 14,
+      fontWeight: "bold",
+   },
+   bannerButton: {
+      color: "#ffffff",
+      fontWeight: "bold",
+      marginLeft: 5,
+   },
+})
 
 export default WebViewComponent
