@@ -594,27 +594,47 @@ export class SparkFunctionsRepository
       userId: string,
       limit = 10
    ): Promise<SerializedSpark[]> {
-      const query = this.firestore
+      const queryWithoutRUAG = this.firestore
          .collection("userData")
          .doc(userId)
          .collection("sparksFeed")
          .where("group.publicSparks", "==", true)
+         .where("group.id", "!=", "p4w9S3fBRrhB6936dhAb")
 
-      const userFeedRef = query
+      const queryWithRUAG = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("sparksFeed")
+         .where("group.publicSparks", "==", true)
+         .where("group.id", "==", "p4w9S3fBRrhB6936dhAb")
+
+      const userFeedRefWithoutRUAG = queryWithoutRUAG
          .orderBy("publishedAt", "desc")
          .limit(limit)
          .withConverter<Spark>(createGenericConverter())
 
-      const userFeedSnap = await userFeedRef.get()
+      const userFeedRefWithRUAG = queryWithRUAG
+         .orderBy("publishedAt", "desc")
+         .limit(limit)
+         .withConverter<Spark>(createGenericConverter())
+
+      const [userFeedSnapWithoutRUAG, userFeedSnapWithRUAG] = await Promise.all(
+         [userFeedRefWithoutRUAG.get(), userFeedRefWithRUAG.get()]
+      )
 
       // If the user doesn't have a feed, we will generate one
-      if (userFeedSnap.empty) {
+      if (userFeedSnapWithoutRUAG.empty && userFeedSnapWithRUAG.empty) {
          return this.generateSparksFeed(userId)
       }
 
-      return userFeedSnap.docs.map((doc) =>
+      const sparksWithRUAG = userFeedSnapWithRUAG.docs.map((doc) =>
          SparkPresenter.serialize(doc.data())
       )
+      const sparksWithoutRUAG = userFeedSnapWithoutRUAG.docs.map((doc) =>
+         SparkPresenter.serialize(doc.data())
+      )
+
+      return [...sparksWithRUAG, ...sparksWithoutRUAG]
    }
 
    async getPublicSparksFeed(
