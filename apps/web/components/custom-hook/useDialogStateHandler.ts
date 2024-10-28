@@ -10,7 +10,7 @@ import React, { useCallback } from "react"
  */
 const useDialogStateHandler: (
    initialValue?: boolean
-) => [boolean, () => void, () => void] = (initialValue?: boolean) => {
+) => [boolean, () => void, () => void] = (initialValue: boolean = false) => {
    //  create a use dialog hook with a default value of false
    const [isOpen, setIsOpen] = React.useState<boolean>(initialValue)
 

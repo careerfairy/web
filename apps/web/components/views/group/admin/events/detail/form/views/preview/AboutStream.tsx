@@ -10,11 +10,14 @@ import StaticSkeleton from "./StaticSkeleton"
 
 const styles = sxStyles({
    companyName: {
-      fontSize: "2.28rem",
+      fontWeight: 600,
+      display: "block",
+      mb: 1,
+      color: (theme) => theme.palette.neutral[900],
    },
    summary: {
-      fontSize: "1.285rem",
       whiteSpace: "pre-line",
+      color: (theme) => theme.palette.neutral[800],
    },
    reasonsContainer: {
       display: "flex",
@@ -22,10 +25,11 @@ const styles = sxStyles({
    },
    reasons: {
       whiteSpace: "pre-line",
-      fontSize: "1.1428rem",
+      color: (theme) => theme.palette.neutral[800],
    },
    reasonsCheck: {
       marginRight: 10,
+      flexShrink: 0,
    },
 })
 
@@ -39,7 +43,7 @@ const AboutLivestream = ({ companyName, summary, reasonsToJoin }: Props) => {
    return (
       <Box>
          <SectionTitle>About the live stream</SectionTitle>
-         <Typography sx={styles.companyName} component="h3">
+         <Typography sx={styles.companyName} variant="brandedH3">
             {companyName ? companyName : <StaticSkeleton width={130} />}
          </Typography>
          <Stack spacing={6}>
@@ -76,8 +80,13 @@ const ReasonsToJoin = ({ reasonsToJoin }: ReasonToJoinProps) => {
                         <Typography
                            key={index}
                            sx={(styles.reasons, styles.reasonsContainer)}
+                           variant="brandedBody"
                         >
-                           <Check color="#29BAA5" style={styles.reasonsCheck} />{" "}
+                           <Check
+                              strokeWidth={3}
+                              color="#29BAA5"
+                              style={styles.reasonsCheck}
+                           />{" "}
                            {reason}
                         </Typography>
                      )

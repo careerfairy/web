@@ -1,13 +1,13 @@
-import { FC } from "react"
 import { Typography } from "@mui/material"
+import { FC } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 
 const styles = sxStyles({
    root: {
-      fontSize: "1.428rem !important",
-      fontWeight: 500,
-      color: "#838383",
-      mb: 2.25,
+      fontWeight: 600,
+      color: (theme) => theme.palette.neutral[500],
+      mb: 2,
+      display: "inline-block",
    },
 })
 
@@ -17,7 +17,7 @@ type Props = {
 
 const SectionTitle: FC<Props> = (props) => {
    return (
-      <Typography sx={styles.root} component="h2">
+      <Typography sx={styles.root} variant="brandedH5">
          {props.children}
       </Typography>
    )

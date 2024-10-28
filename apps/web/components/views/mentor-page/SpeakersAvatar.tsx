@@ -4,6 +4,10 @@ import { Stack, Typography } from "@mui/material"
 import CircularLogo from "../common/logos/CircularLogo"
 
 const styles = sxStyles({
+   root: {
+      width: "100%",
+      alignItems: "center",
+   },
    displayName: {
       color: "neutral.900",
       fontSize: "24px",
@@ -11,7 +15,7 @@ const styles = sxStyles({
       lineHeight: "36px",
    },
    position: {
-      color: "neutral.500",
+      color: "neutral.600",
       fontSize: "14px",
       fontWeight: 400,
       lineHeight: "20px",
@@ -27,7 +31,7 @@ export const SpeakerAvatar = ({ mentor, companyName }: SpeakerAvatarProps) => {
    const mentorName = `${mentor.firstName ?? ""} ${mentor.lastName ?? ""}`
 
    return (
-      <Stack spacing={0.75} direction="row" width="100%">
+      <Stack spacing={0.75} direction="row" sx={styles.root}>
          <CircularLogo
             size={80}
             src={mentor?.avatarUrl}

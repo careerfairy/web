@@ -57,7 +57,7 @@ type JobsProps = {
 const Jobs = ({ jobs }: JobsProps) => {
    return (
       <Box>
-         <SectionTitle>Linked Jobs</SectionTitle>
+         <SectionTitle>Jobs in focus</SectionTitle>
          <Stack spacing={2}>
             {jobs ? (
                jobs.map((job, index) => {
