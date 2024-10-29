@@ -36,7 +36,8 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[600],
       borderColor: (theme) => theme.palette.neutral[300],
       "&:hover": {
-         borderColor: (theme) => theme.palette.neutral[300],
+         borderColor: (theme) => theme.palette.neutral[50],
+         backgroundColor: (theme) => theme.brand.black[400],
       },
    },
    userDetailsRoot: {
@@ -91,15 +92,17 @@ export const TalentProfileHeader = () => {
                <Typography variant="brandedH4" sx={styles.userName}>
                   {userPresenter?.getDisplayName()}
                </Typography>
-               <Typography sx={styles.userFieldOfStudy}>
-                  {fieldOfStudyDisplayName}
-                  {userData?.university?.name
-                     ? ` at ${userData?.university?.name}`
-                     : null}
-               </Typography>
-               <Typography sx={styles.userLocation}>
-                  {`CityTBD, ${userCountry}.`}
-               </Typography>
+               <Stack spacing={0.25}>
+                  <Typography sx={styles.userFieldOfStudy}>
+                     {fieldOfStudyDisplayName}
+                     {userData?.university?.name
+                        ? ` at ${userData?.university?.name}`
+                        : null}
+                  </Typography>
+                  <Typography sx={styles.userLocation}>
+                     {`CityTBD in Up Stack, ${userCountry}.`}
+                  </Typography>
+               </Stack>
             </Stack>
          </Stack>
       </Stack>
