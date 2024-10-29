@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab"
 import {
    Box,
    Button,
@@ -10,16 +11,15 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { dataURLtoFile } from "components/helperFunctions/HelperFunctions"
 import "cropperjs/dist/cropper.css"
-import React, { useCallback, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import Cropper, { ReactCropperElement, ReactCropperProps } from "react-cropper"
 import { Image as ImageIcon, X as XIcon } from "react-feather"
-import { sxStyles } from "types/commonTypes"
 import useSWRMutation from "swr/mutation"
-import { LoadingButton } from "@mui/lab"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    dialogTitle: {
@@ -38,6 +38,18 @@ const styles = sxStyles({
       },
       ".cropper-view-box": {
          borderRadius: "50% 50%",
+      },
+      "& img": {
+         display: "block",
+         maxWidth: "100%",
+      },
+   },
+   rectangleCropper: {
+      ".cropper-face": {
+         borderRadius: "0",
+      },
+      ".cropper-view-box": {
+         borderRadius: "0",
       },
       "& img": {
          display: "block",
@@ -72,6 +84,9 @@ type Props = {
     */
    onSubmit: (CroppedImageFile: File) => Promise<void>
    aspectRatio?: ReactCropperProps["aspectRatio"]
+   swrKey?: string
+   cropType?: "circle" | "rectangle"
+   cropBoxResizable?: boolean
 }
 
 const ImageCropperDialog = ({
@@ -82,6 +97,9 @@ const ImageCropperDialog = ({
    onSubmit,
    aspectRatio = 1,
    fileName = "croppedImage",
+   swrKey,
+   cropType = "circle",
+   cropBoxResizable = false,
 }: Props) => {
    const { errorNotification } = useSnackbarNotifications()
    const fullScreen = useIsMobile()
@@ -107,7 +125,7 @@ const ImageCropperDialog = ({
    }, [errorNotification, fileName, handleClose, onSubmit])
 
    const { trigger: mutateImage, isMutating } = useSWRMutation(
-      `update-group-${title}-logo`,
+      swrKey ? swrKey : `update-group-${title}-logo`,
       handleSubmit,
       {
          onError: (error) => {
@@ -140,6 +158,34 @@ const ImageCropperDialog = ({
       [scale]
    )
 
+   // Adjust crop box to maximum width on initial render
+   const handleReady = () => {
+      const cropper = cropperRef.current.cropper
+      if (!cropper) return
+
+      const containerData = cropper.getContainerData()
+      const aspectRatio = cropper.getImageData().aspectRatio
+      const maxWidth = containerData.width
+      const maxHeight = containerData.height
+
+      let cropBoxWidth = maxWidth
+      let cropBoxHeight = maxWidth / aspectRatio
+
+      if (cropBoxHeight > maxHeight) {
+         cropBoxHeight = maxHeight
+         cropBoxWidth = maxHeight * aspectRatio
+      }
+
+      cropper.setCropBoxData({
+         width: cropBoxWidth,
+         height: cropBoxHeight,
+         left: (containerData.width - cropBoxWidth) / 2,
+         top: (containerData.height - cropBoxHeight) / 2,
+      })
+
+      cropper.zoomTo(0)
+   }
+
    return (
       <Dialog open={open} fullScreen={fullScreen} onClose={handleClose}>
          <DialogTitle sx={styles.dialogHeader}>
@@ -156,7 +202,13 @@ const ImageCropperDialog = ({
             </span>
          </DialogTitle>
          <DialogContent dividers>
-            <Box sx={styles.cropper}>
+            <Box
+               sx={
+                  cropType === "circle"
+                     ? styles.cropper
+                     : styles.rectangleCropper
+               }
+            >
                <Cropper
                   viewMode={1}
                   dragMode={"none"}
@@ -171,7 +223,8 @@ const ImageCropperDialog = ({
                   movable={false}
                   minContainerWidth={300}
                   minContainerHeight={300}
-                  cropBoxResizable={false}
+                  cropBoxResizable={cropBoxResizable}
+                  ready={handleReady}
                />
             </Box>
             <Stack

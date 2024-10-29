@@ -1,13 +1,14 @@
 import { USER_BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/users/UserPresenter"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { Box } from "@mui/material"
-import { darken, useTheme } from "@mui/material/styles"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { dataURLtoFile } from "components/helperFunctions/HelperFunctions"
-import ImagePickerContainer from "components/ssr/ImagePickerContainer"
-import { FC } from "react"
+import { darken } from "@mui/material/styles"
+import { useAuth } from "HOCs/AuthProvider"
+import useFileUploader from "components/custom-hook/useFileUploader"
+import FileUploader from "components/views/common/FileUploader"
+import { getImageDimensionsValidator } from "components/views/common/FileUploader/validations"
+import ImageCropperDialog from "components/views/common/ImageCropperDialog"
+import { FC, useState } from "react"
 import { Camera } from "react-feather"
-import { v4 as uuidv4 } from "uuid"
 import { sxStyles } from "../../../../types/commonTypes"
 
 type BannerPhotoUploadButtonProps = {
@@ -35,6 +36,18 @@ const styles = sxStyles({
          margin: "unset",
       },
    },
+   cameraIcon: {
+      height: "14px",
+      width: "14px",
+      color: (theme) => theme.brand.white[50],
+   },
+})
+
+const userBannerImageValidator = getImageDimensionsValidator({
+   maxHeight: USER_BANNER_IMAGE_SPECS.maxHeight,
+   maxWidth: USER_BANNER_IMAGE_SPECS.maxWidth,
+   minHeight: USER_BANNER_IMAGE_SPECS.minHeight,
+   minWidth: USER_BANNER_IMAGE_SPECS.minWidth,
 })
 
 export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
@@ -42,47 +55,59 @@ export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
    handleUploadBannerPhoto,
    disabled,
 }) => {
-   const { errorNotification } = useSnackbarNotifications()
-   const theme = useTheme()
+   // const { handleClick, open, handleClose, anchorEl } = useMenuState()
+   const { userData } = useAuth()
+   const [logoObjectUrl, setLogoObjectUrl] = useState<string | null>(null)
+
+   const setLogo = (file, logoSetter) => {
+      const newFile = Array.isArray(file) ? file[0] : file
+      logoSetter(URL.createObjectURL(newFile))
+   }
+
+   const { fileUploaderProps: logoUploaderProps } = useFileUploader({
+      acceptedFileTypes: USER_BANNER_IMAGE_SPECS.allowedFormats,
+      maxFileSize: USER_BANNER_IMAGE_SPECS.maxSize,
+      multiple: false,
+      onValidated: (file) => setLogo(file, setLogoObjectUrl),
+      customValidations: [userBannerImageValidator],
+   })
+
+   const handleCloseCropImageDialog = () => {
+      setLogoObjectUrl(null)
+   }
 
    return (
-      <ImagePickerContainer
-         extensions={USER_BANNER_IMAGE_SPECS.allowedFormats}
-         maxSize={USER_BANNER_IMAGE_SPECS.maxSize}
-         dims={{
-            minWidth: USER_BANNER_IMAGE_SPECS.minWidth,
-            maxWidth: USER_BANNER_IMAGE_SPECS.maxWidth,
-            minHeight: USER_BANNER_IMAGE_SPECS.minHeight,
-            maxHeight: USER_BANNER_IMAGE_SPECS.maxHeight,
-         }}
-         onChange={(base64Img) => {
-            const fileObject = dataURLtoFile(base64Img, uuidv4())
-            return handleUploadBannerPhoto(fileObject)
-         }}
-         onError={(err) => errorNotification(err, err)}
+      <Box
+         flexDirection="column"
+         display="flex"
+         alignItems="center"
+         sx={styles.buttonWrapper}
       >
-         <Box
-            flexDirection="column"
-            display="flex"
-            alignItems="center"
-            sx={styles.buttonWrapper}
-         >
+         {logoObjectUrl ? (
+            <ImageCropperDialog
+               title={"Edit profile banner picture"}
+               fileName={undefined}
+               imageSrc={logoObjectUrl}
+               open={Boolean(logoObjectUrl)}
+               handleClose={handleCloseCropImageDialog}
+               onSubmit={handleUploadBannerPhoto}
+               key={`update-${userData.id}-profile-banner`}
+               cropType="rectangle"
+               cropBoxResizable
+               aspectRatio={4 / 1}
+            />
+         ) : null}
+         <FileUploader sx={{}} {...logoUploaderProps}>
             <LoadingButton
                sx={styles.button}
                loading={loading}
                disabled={disabled}
-               startIcon={
-                  <Camera
-                     color={theme.brand.white[50]}
-                     width={"14px"}
-                     height={"14px"}
-                  />
-               }
+               startIcon={<Box component={Camera} sx={styles.cameraIcon} />}
                variant="contained"
                color="grey"
                size="medium"
             />
-         </Box>
-      </ImagePickerContainer>
+         </FileUploader>
+      </Box>
    )
 }
