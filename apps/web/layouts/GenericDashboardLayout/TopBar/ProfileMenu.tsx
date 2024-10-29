@@ -169,14 +169,6 @@ const ProfileMenu = () => {
                      My career skills
                   </Typography>
                </MenuItem>
-               <MenuItem
-                  onClick={() => push(`/streaming/host/RjrqWmsgzq79CaDGDwrs`)}
-               >
-                  <ListItemIcon>
-                     <PersonOutlineOutlinedIcon fontSize="small" />
-                  </ListItemIcon>
-                  Livestream
-               </MenuItem>
                <MenuItem onClick={() => push("/profile/referrals")}>
                   <ListItemIcon>
                      <PeopleOutlinedIcon fontSize="small" />
