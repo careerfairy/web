@@ -4,6 +4,7 @@ import {
    getHost,
    makeLivestreamEventDetailsUrl,
 } from "@careerfairy/shared-lib/utils/urls"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
 import { errorLogAndNotify } from "./CommonUtil"
 
