@@ -21,7 +21,7 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 // project imports
 import Divider from "@mui/material/Divider"
-import { alpha, useTheme } from "@mui/material/styles"
+import { alpha } from "@mui/material/styles"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
@@ -147,7 +147,7 @@ const styles = sxStyles({
          md: "14px",
       },
    },
-   companyIcon: {
+   icon: {
       mr: 1,
       color: (theme) => theme.palette.neutral[700],
       width: "20px !important",
@@ -164,7 +164,6 @@ const ProfileMenu = () => {
    const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { push } = useRouter()
 
-   const theme = useTheme()
    const isMobile = useIsMobile()
 
    const [menuAnimating, setMenuAnimating] = useState(false)
@@ -243,11 +242,7 @@ const ProfileMenu = () => {
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
-               <User
-                  width={"20px"}
-                  height={"20px"}
-                  color={theme.palette.neutral[700]}
-               />
+               <Box component={User} sx={styles.icon} />
             </ListItemIcon>
             <Typography color={"text.secondary"} sx={styles.menuItemText}>
                Profile
@@ -263,11 +258,7 @@ const ProfileMenu = () => {
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
-               <Briefcase
-                  width={"20px"}
-                  height={"20px"}
-                  color={theme.palette.neutral[700]}
-               />
+               <Box component={Briefcase} sx={styles.icon} />
             </ListItemIcon>
             <Typography color={"text.secondary"} sx={styles.menuItemText}>
                My Jobs
@@ -283,7 +274,7 @@ const ProfileMenu = () => {
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
-               <CompanyIcon sx={styles.companyIcon} />
+               <CompanyIcon sx={styles.icon} />
             </ListItemIcon>
             <Typography color={"text.secondary"} sx={styles.menuItemText}>
                Following Companies
@@ -297,11 +288,7 @@ const ProfileMenu = () => {
          <Link href={supportPageLink} target="_blank">
             <MenuItem sx={combineStyles(styles.menuItem, sx)}>
                <ListItemIcon>
-                  <HelpCircle
-                     width={"20px"}
-                     height={"20px"}
-                     color={theme.palette.neutral[700]}
-                  />
+                  <Box component={HelpCircle} sx={styles.icon} />
                </ListItemIcon>
                <Typography color={"text.secondary"} sx={styles.menuItemText}>
                   Support
@@ -315,11 +302,7 @@ const ProfileMenu = () => {
       return (
          <MenuItem onClick={signOut} sx={combineStyles(styles.menuItem, sx)}>
             <ListItemIcon>
-               <LogOut
-                  width={"20px"}
-                  height={"20px"}
-                  color={theme.palette.neutral[700]}
-               />
+               <Box component={LogOut} sx={styles.icon} />
             </ListItemIcon>
             <Typography color={"text.secondary"} sx={styles.menuItemText}>
                Log out
