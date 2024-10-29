@@ -183,7 +183,9 @@ const ProfileMenu = () => {
                      My Recruiters
                   </Typography>
                </MenuItem>
+
                <Divider sx={{ width: "80%", alignSelf: "center" }} />
+
                <MenuItem onClick={signOut} sx={{ marginTop: "0 !important" }}>
                   <ListItemIcon>
                      <LogoutOutlinedIcon fontSize="small" />
