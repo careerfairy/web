@@ -1,6 +1,7 @@
 declare module "@env" {
    export const BASE_URL: string
    export const SEARCH_CRITERIA: string
+   export const INCLUDES_PERMISSIONS: string
    export const PROJECT_ID: string
    export const API_KEY: string
    export const AUTH_DOMAIN: string
