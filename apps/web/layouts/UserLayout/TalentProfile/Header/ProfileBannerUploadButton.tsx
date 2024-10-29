@@ -18,10 +18,6 @@ type BannerPhotoUploadButtonProps = {
 
 const styles = sxStyles({
    buttonWrapper: {
-      // bgcolor: "rgba(255, 255, 255, 0.50)",
-      // borderRadius: "18px",
-      // border: theme => `1px solid ${theme.palette.neutral[200]}`,
-      // width: "32px",
       height: "32px",
    },
    button: {
@@ -40,6 +36,7 @@ const styles = sxStyles({
       },
    },
 })
+
 export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
    loading,
    handleUploadBannerPhoto,
@@ -47,6 +44,7 @@ export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
 }) => {
    const { errorNotification } = useSnackbarNotifications()
    const theme = useTheme()
+
    return (
       <ImagePickerContainer
          extensions={USER_BANNER_IMAGE_SPECS.allowedFormats}
