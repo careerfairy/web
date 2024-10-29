@@ -20,9 +20,8 @@ export default function Native() {
    const checkToken = async () => {
       const token = await SecureStore.getItemAsync("authToken")
       if (token) {
-         const { status: existingStatus } =
-            await Notifications.getPermissionsAsync()
-         if (existingStatus !== "granted") {
+         const pushToken = await SecureStore.getItemAsync("pushToken")
+         if (!pushToken) {
             getPushToken()
          }
       }
@@ -77,6 +76,7 @@ export default function Native() {
                   { merge: true }
                )
             }
+            await SecureStore.setItemAsync("pushToken", pushToken)
          }
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
@@ -95,6 +95,7 @@ export default function Native() {
                await setDoc(userDocRef, { pushToken: null }, { merge: true })
             }
          }
+         await SecureStore.deleteItemAsync("pushToken")
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
       }

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
 import {
-   Alert,
    BackHandler,
    Linking,
    Platform,
@@ -52,18 +51,12 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    useEffect(() => {
       checkAuthentication()
-      checkPermissions(false)
+      checkPermissions()
    }, [])
 
-   const checkPermissions = async (setBanner: boolean = true) => {
+   const checkPermissions = async () => {
       const { status: audioStatus } = await Audio.getPermissionsAsync()
       const { status: videoStatus } = await Camera.getCameraPermissionsAsync()
-
-      const hasPermissions =
-         audioStatus === "granted" && videoStatus === "granted"
-      if (setBanner) {
-         setShowPermissionsBanner(!hasPermissions)
-      }
       setHasAudioPermissions(audioStatus === "granted")
       setHasVideoPermissions(videoStatus === "granted")
    }
@@ -180,7 +173,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const handleHaptic = (data: HAPTIC) => {
       // Handling the haptic on mobile device
-      Alert.alert("Haptic activating...")
    }
 
    const handlePermissions = (data: PERMISSIONS) => {
@@ -246,13 +238,11 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          return requestPermissions()
       } else {
          if (url?.includes(INCLUDES_PERMISSIONS) && !mediaStarted) {
-            Alert.alert("Starting media")
             setMediaStarted(true)
             webViewRef.current?.injectJavaScript(startMediaStreamScript)
          } else {
             if (mediaStarted) {
                setMediaStarted(false)
-               Alert.alert("Stopping media")
                webViewRef.current?.injectJavaScript(stopMediaStreamScript)
             }
             setShowPermissionsBanner(false)
