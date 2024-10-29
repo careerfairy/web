@@ -44,6 +44,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [showPermissionsBanner, setShowPermissionsBanner] = useState(false)
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef: any = useRef(null)
+   const cameraRef: any = useRef(null)
+   const audioRef: any = useRef(null)
    const [subscriptionListener, setSubscriptionListener] = useState(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
@@ -62,26 +64,32 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const requestPermissions = async () => {
-      const audioGranted =
-         hasAudioPermissions ??
-         (await Audio.requestPermissionsAsync()).status === "granted"
-      const videoGranted =
-         hasVideoPermissions ??
-         (await Camera.requestCameraPermissionsAsync()).status === "granted"
-      const permissionsWereMissing =
-         !hasAudioPermissions || !hasVideoPermissions
+      try {
+         const audioGranted = hasAudioPermissions
+            ? hasAudioPermissions
+            : (await Audio.requestPermissionsAsync()).status === "granted"
+         const videoGranted = hasVideoPermissions
+            ? hasVideoPermissions
+            : (await Camera.requestCameraPermissionsAsync()).status ===
+              "granted"
+         const permissionsWereMissing =
+            !hasAudioPermissions || !hasVideoPermissions
 
-      if (audioGranted && videoGranted) {
-         setShowPermissionsBanner(false)
-         if (permissionsWereMissing) {
-            setHasAudioPermissions(true)
-            setHasVideoPermissions(true)
-            onRefresh()
+         if (audioGranted && videoGranted) {
+            setShowPermissionsBanner(false)
+            if (permissionsWereMissing) {
+               setHasAudioPermissions(true)
+               setHasVideoPermissions(true)
+               onRefresh()
+            }
+         } else {
+            setHasAudioPermissions(audioGranted)
+            setHasVideoPermissions(videoGranted)
+            setShowPermissionsBanner(true)
          }
-      } else {
-         setHasAudioPermissions(audioGranted)
-         setHasVideoPermissions(videoGranted)
-         setShowPermissionsBanner(true)
+      } catch (e) {
+         console.log("ERROR")
+         console.log(e)
       }
    }
 
@@ -148,20 +156,55 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          console.error("Failed to parse message from WebView:", error)
       }
    }
+   const startCamera = async () => {
+      if (hasVideoPermissions) {
+         // Open the camera using ref without rendering it in the UI
+         cameraRef.current = await Camera.requestCameraPermissionsAsync()
+      } else {
+         console.log("No permissions")
+      }
+   }
 
-   const stopMediaStreamScript = `
-    if (window.localStream) {
-      window.localStream.getTracks().forEach(track => track.stop());
-    }
-  `
+   const stopCamera = async () => {
+      if (cameraRef.current) {
+         console.log("There is camera ref")
+         cameraRef.current.stopRecording()
+         cameraRef.current = null // Release camera ref
+      }
+   }
 
-   const startMediaStreamScript = `
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        window.localStream = stream;
-      })
-      .catch(error => console.error("Error accessing media devices:", error));
-  `
+   // Functions to start and stop audio recording
+   const startAudio = async () => {
+      if (hasAudioPermissions) {
+         await Audio.setAudioModeAsync({
+            allowsRecordingIOS: true,
+            playsInSilentModeIOS: true,
+         })
+
+         const recording = new Audio.Recording()
+         try {
+            await recording.prepareToRecordAsync()
+            await recording.startAsync()
+            audioRef.current = recording
+         } catch (error) {
+            console.error("Failed to start recording:", error)
+         }
+      } else {
+         console.log("Audio permission is required.")
+      }
+   }
+
+   const stopAudio = async () => {
+      if (audioRef.current) {
+         console.log("THERE IS AUDIO REF")
+         try {
+            await audioRef.current.stopAndUnloadAsync()
+            audioRef.current = null // Release recording ref
+         } catch (error) {
+            console.error("Failed to stop recording:", error)
+         }
+      }
+   }
 
    const handleUserAuth = async (data: USER_AUTH) => {
       await SecureStore.setItemAsync("authToken", data.token)
@@ -175,9 +218,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       // Handling the haptic on mobile device
    }
 
-   const handlePermissions = (data: PERMISSIONS) => {
-      console.log("Permissions")
-   }
+   const handlePermissions = (data: PERMISSIONS) => {}
 
    const handleLogout = async () => {
       try {
@@ -239,11 +280,15 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       } else {
          if (url?.includes(INCLUDES_PERMISSIONS) && !mediaStarted) {
             setMediaStarted(true)
-            webViewRef.current?.injectJavaScript(startMediaStreamScript)
+            startCamera()
+            startAudio()
+            console.log("Starting media")
          } else {
             if (mediaStarted) {
+               console.log("Stop media")
                setMediaStarted(false)
-               webViewRef.current?.injectJavaScript(stopMediaStreamScript)
+               stopCamera()
+               stopAudio()
             }
             setShowPermissionsBanner(false)
          }
