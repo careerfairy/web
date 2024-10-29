@@ -111,7 +111,6 @@ export class ManualTemplatedEmailService {
          )
       }
 
-      // TODO-WG: Disable sending for now
-      // return this.emailBuilder.send()
+      return this.emailBuilder.send()
    }
 }
