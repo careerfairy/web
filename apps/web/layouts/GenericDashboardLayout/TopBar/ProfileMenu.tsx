@@ -100,15 +100,18 @@ const styles = sxStyles({
          height: "100dvh",
       },
    },
+   desktopProfileMenu: {
+      "& .MuiList-root": {
+         py: "0 !important",
+      },
+   },
    profileMenuRoot: {
       width: "280px",
       height: "100%",
       justifyContent: "space-between",
-      pt: "20px",
    },
    desktopProfileMenuRoot: {
       width: "280px",
-      pt: 2,
    },
    menuItem: {
       height: "40px",
@@ -129,15 +132,14 @@ const styles = sxStyles({
       py: 3,
    },
    avatarMenuItem: {
-      p: 1,
+      py: 3,
       px: 1.5,
       "&:hover": {
          backgroundColor: (theme) => theme.brand.white[400],
       },
    },
    desktopAvatarMenuItem: {
-      pt: 1,
-      mb: 1,
+      py: 2,
    },
    menuItemText: {
       fontSize: {
@@ -329,7 +331,7 @@ const ProfileMenu = () => {
    const TalentProfileMenuItems = () => {
       return (
          <Stack spacing={2} sx={styles.profileMenuRoot}>
-            <Stack spacing={3}>
+            <Stack>
                <AvatarMenuItem />
                <Stack>
                   <ProfileMenuItem />
@@ -350,7 +352,7 @@ const ProfileMenu = () => {
    return (
       <>
          <Stack direction={"row"} spacing={1}>
-            <Tooltip title="Account settings">
+            <Tooltip title="Account">
                <IconButton
                   onClick={handleClick}
                   size="small"
@@ -379,7 +381,10 @@ const ProfileMenu = () => {
                useNewMobileMenu ? SlideLeftTransition : undefined
             }
             disableScrollLock={disableScrollLock}
-            sx={useNewMobileMenu ? styles.profileMenu : null}
+            sx={[
+               useNewMobileMenu ? styles.profileMenu : null,
+               talentProfileV1 ? styles.desktopProfileMenu : null,
+            ]}
             TransitionProps={{
                onEntering: () => setMenuAnimating(true),
                onEntered: () => setMenuAnimating(false),
