@@ -13,7 +13,7 @@ import {
 import { WebView } from "react-native-webview"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
-import { BASE_URL, SEARCH_CRITERIA } from "@env"
+import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
 import {
    MESSAGING_TYPE,
    USER_AUTH,
@@ -48,6 +48,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [subscriptionListener, setSubscriptionListener] = useState(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
+   const [mediaStarted, setMediaStarted] = useState(false)
 
    useEffect(() => {
       checkAuthentication()
@@ -58,7 +59,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       const { status: audioStatus } = await Audio.getPermissionsAsync()
       const { status: videoStatus } = await Camera.getCameraPermissionsAsync()
 
-      // Show the banner if permissions are missing
       const hasPermissions =
          audioStatus === "granted" && videoStatus === "granted"
       if (setBanner) {
@@ -69,39 +69,26 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const requestPermissions = async () => {
-      if (!hasAudioPermissions && !hasVideoPermissions) {
-         const { status: audioStatus } = await Audio.requestPermissionsAsync()
-         const { status: videoStatus } =
-            await Camera.requestCameraPermissionsAsync()
-         setHasAudioPermissions(audioStatus === "granted")
-         setHasVideoPermissions(videoStatus === "granted")
-         if (audioStatus === "granted" && videoStatus === "granted") {
-            setShowPermissionsBanner(false)
+      const audioGranted =
+         hasAudioPermissions ??
+         (await Audio.requestPermissionsAsync()).status === "granted"
+      const videoGranted =
+         hasVideoPermissions ??
+         (await Camera.requestCameraPermissionsAsync()).status === "granted"
+      const permissionsWereMissing =
+         !hasAudioPermissions || !hasVideoPermissions
+
+      if (audioGranted && videoGranted) {
+         setShowPermissionsBanner(false)
+         if (permissionsWereMissing) {
+            setHasAudioPermissions(true)
+            setHasVideoPermissions(true)
             onRefresh()
-         } else {
-            setShowPermissionsBanner(true)
-         }
-      } else if (hasAudioPermissions && !hasVideoPermissions) {
-         const { status: videoStatus } =
-            await Camera.requestCameraPermissionsAsync()
-         setHasVideoPermissions(videoStatus === "granted")
-         if (videoStatus === "granted") {
-            setShowPermissionsBanner(false)
-            onRefresh()
-         } else {
-            setShowPermissionsBanner(true)
-         }
-      } else if (!hasAudioPermissions && hasVideoPermissions) {
-         const { status: audioStatus } = await Audio.requestPermissionsAsync()
-         setHasAudioPermissions(audioStatus === "granted")
-         if (audioStatus === "granted") {
-            setShowPermissionsBanner(false)
-            onRefresh()
-         } else {
-            setShowPermissionsBanner(true)
          }
       } else {
-         setShowPermissionsBanner(false)
+         setHasAudioPermissions(audioGranted)
+         setHasVideoPermissions(videoGranted)
+         setShowPermissionsBanner(true)
       }
    }
 
@@ -168,6 +155,20 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          console.error("Failed to parse message from WebView:", error)
       }
    }
+
+   const stopMediaStreamScript = `
+    if (window.localStream) {
+      window.localStream.getTracks().forEach(track => track.stop());
+    }
+  `
+
+   const startMediaStreamScript = `
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        window.localStream = stream;
+      })
+      .catch(error => console.error("Error accessing media devices:", error));
+  `
 
    const handleUserAuth = async (data: USER_AUTH) => {
       await SecureStore.setItemAsync("authToken", data.token)
@@ -239,13 +240,23 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const handleNavigationStateChange = (navState: any) => {
       const { url } = navState
       if (
-         url?.includes("streaming") &&
-         !hasAudioPermissions &&
-         !hasVideoPermissions
+         url?.includes(INCLUDES_PERMISSIONS) &&
+         (!hasAudioPermissions || !hasVideoPermissions)
       ) {
          return requestPermissions()
       } else {
-         setShowPermissionsBanner(false)
+         if (url?.includes(INCLUDES_PERMISSIONS) && !mediaStarted) {
+            Alert.alert("Starting media")
+            setMediaStarted(true)
+            webViewRef.current?.injectJavaScript(startMediaStreamScript)
+         } else {
+            if (mediaStarted) {
+               setMediaStarted(false)
+               Alert.alert("Stopping media")
+               webViewRef.current?.injectJavaScript(stopMediaStreamScript)
+            }
+            setShowPermissionsBanner(false)
+         }
       }
    }
 
