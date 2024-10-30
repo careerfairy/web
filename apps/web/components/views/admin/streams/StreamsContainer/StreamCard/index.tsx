@@ -1,10 +1,10 @@
-import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import {
    LivestreamEvent,
    LivestreamRecordingDetails,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
+import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import RegistrationsIcon from "@mui/icons-material/People"
 import PercentIcon from "@mui/icons-material/Percent"
@@ -22,6 +22,8 @@ import {
    CircularProgress,
    Dialog,
    DialogContent,
+   FormControlLabel,
+   FormGroup,
    Grid,
    IconButton,
    List,
@@ -30,8 +32,10 @@ import {
    ListItemText,
    Menu,
    MenuItem,
+   Switch,
    Typography,
 } from "@mui/material"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { format } from "date-fns"
 import Image from "next/legacy/image"
@@ -52,6 +56,7 @@ import {
 } from "../../../../../helperFunctions/HelperFunctions"
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog"
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog"
+import { PhoneNumbersDialog } from "./PhoneNumbersDialog"
 
 const styles = sxStyles({
    root: {
@@ -109,6 +114,12 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
       stream.id,
       "participated"
    )
+
+   const [
+      openPhoneNumbersDialog,
+      handleOpenPhoneNumbersDialog,
+      handleClosePhoneNumbersDialog,
+   ] = useDialogStateHandler()
 
    const registeredCount = registeredUsersCount ?? 0
    const participatingCount = participatingUsersCount ?? 0
@@ -234,6 +245,14 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
          })
    }, [stream.id, stream.start, stream.title])
 
+   const handleToggleSmsEnabled = useCallback(
+      async (event, value) => {
+         console.log(event, value)
+         await livestreamRepo.updateLivestreamSmsEnabled(stream.id, value)
+      },
+      [stream.id]
+   )
+
    return (
       <Card sx={styles.root}>
          <CardMedia sx={styles.media} title={stream.company}>
@@ -338,10 +357,18 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
                               onclose={handleCloseConfirmRecordingDialog}
                            />
                         )}
+                        <MenuItem onClick={handleOpenPhoneNumbersDialog}>
+                           View phone numbers
+                        </MenuItem>
                      </Menu>
                   }
                </React.Fragment>
             }
+         />
+         <PhoneNumbersDialog
+            stream={stream}
+            onClose={handleClosePhoneNumbersDialog}
+            open={openPhoneNumbersDialog}
          />
          <CardContent>
             {stream.isRecording || recordingSid ? (
@@ -466,6 +493,18 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
                   </Button>
                </>
             ) : null}
+            <FormGroup>
+               <FormControlLabel
+                  control={
+                     <Switch
+                        defaultChecked={stream.smsEnabled}
+                        onChange={handleToggleSmsEnabled}
+                     />
+                  }
+                  label="SMS active"
+                  labelPlacement="start"
+               />
+            </FormGroup>
          </CardActions>
          <StreamerLinksDialog
             onClose={handleCloseStreamerLinksDialog}
