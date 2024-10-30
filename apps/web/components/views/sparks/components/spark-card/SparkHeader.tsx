@@ -8,8 +8,8 @@ import {
 import { DateTime } from "luxon"
 import { FC, Fragment } from "react"
 import { sxStyles } from "types/commonTypes"
-import SparkDetails from "./SparkDetails"
 import SparkOptionsButton from "./SparkOptionsButton"
+import SparkPreviewDetails from "./SparkPreviewDetails"
 
 const styles = sxStyles({
    root: {
@@ -55,7 +55,7 @@ const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
    return (
       <Fragment>
          <Box sx={styles.root}>
-            <SparkDetails
+            <SparkPreviewDetails
                companyLogoUrl={getResizedUrl(spark.group.logoUrl, "md")}
                displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
                companyName={spark.group.universityName}
