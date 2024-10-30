@@ -19,7 +19,8 @@ import { FallbackComponent } from "components/views/portal/sparks/FallbackCompon
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import Image from "next/legacy/image"
 import { useRouter } from "next/router"
-import { FC, useCallback, useEffect, useState } from "react"
+import { FC, useCallback, useEffect } from "react"
+import { MessageSquare } from "react-feather"
 import { useSelector } from "react-redux"
 import { confetti } from "../../../../../constants/images"
 import { eventDetailsDialogVisibilitySelector } from "../../../../../store/selectors/sparksFeedSelectors"
@@ -122,13 +123,13 @@ const styles = sxStyles({
 })
 
 const RegisterSuccessView: FC = () => {
-   const { closeDialog, activeView } = useLiveStreamDialog()
+   const {
+      closeDialog,
+      activeView,
+      isDiscoverCompanySparksOpen,
+      handleDiscoverCompanySparks,
+   } = useLiveStreamDialog()
    const isMobile = useIsMobile()
-   const [isSparksOpen, setIsSparksOpen] = useState(false)
-
-   const handleDiscoverSparks = () => {
-      setIsSparksOpen(true)
-   }
 
    useEffect(() => {
       if (activeView !== "register-success") return
@@ -145,15 +146,15 @@ const RegisterSuccessView: FC = () => {
                onBackClick={closeDialog}
                onBackPosition="top-right"
             >
-               {isMobile && isSparksOpen ? (
+               {isMobile && isDiscoverCompanySparksOpen ? (
                   <MobileSparksTransition
-                     isSparksOpen={isSparksOpen}
-                     handleDiscoverSparks={handleDiscoverSparks}
+                     isSparksOpen={isDiscoverCompanySparksOpen}
+                     handleDiscoverSparks={handleDiscoverCompanySparks}
                   />
                ) : (
                   <Component
-                     isSparksOpen={isSparksOpen}
-                     handleDiscoverSparks={handleDiscoverSparks}
+                     isSparksOpen={isDiscoverCompanySparksOpen}
+                     handleDiscoverSparks={handleDiscoverCompanySparks}
                   />
                )}
             </MainContent>
@@ -311,7 +312,8 @@ const Header = ({ isSparksOpen }) => {
 
 const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
    const route = useRouter()
-   const { closeDialog, livestream } = useLiveStreamDialog()
+   const { closeDialog, livestream, goToView, isDiscoverCompanySparksOpen } =
+      useLiveStreamDialog()
    const groupHasSparks = useGroupHasSparks(livestream.groupIds[0])
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
@@ -328,6 +330,19 @@ const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
    return (
       <Box sx={styles.buttonsWrapper}>
          <Stack spacing={1.2} sx={styles.buttons}>
+            {Boolean(livestream.smsEnabled) && !isDiscoverCompanySparksOpen && (
+               <Button
+                  variant="contained"
+                  size="large"
+                  color="secondary"
+                  fullWidth
+                  startIcon={<MessageSquare />}
+                  onClick={() => goToView("ask-phone-number")}
+               >
+                  Get SMS Reminder
+               </Button>
+            )}
+
             <AddToCalendar
                event={livestream}
                filename={`${livestream.company}-event`}
