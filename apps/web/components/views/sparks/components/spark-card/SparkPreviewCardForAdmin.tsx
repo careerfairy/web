@@ -1,17 +1,19 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { Stack } from "@mui/material"
 import Box from "@mui/material/Box"
+import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import HiddenStatus from "./HiddenStatus"
-import SparkHeader from "./SparkHeader"
-import SparkStats from "./SparkStats"
 import SparkCategoryChip from "./SparkCategoryChip"
+import SparkHeader from "./SparkHeader"
+import SparkPreviewCardContainer, {
+   SparkPreviewCardType,
+} from "./SparkPreviewCardContainer"
 import SparkQuestion from "./SparkQuestion"
-import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
-import { Stack } from "@mui/material"
-import SparkCarouselCardContainer from "./SparkCarouselCardContainer"
+import SparkStats from "./SparkStats"
 
-const cardPadding = 2
+const cardPadding = 1.5
 
 const styles = sxStyles({
    cardDetails: {
@@ -21,18 +23,21 @@ const styles = sxStyles({
 
 type Props = {
    spark: Spark
+   type?: SparkPreviewCardType
    preview?: boolean
    onClick?: () => void
 }
 
-const SparkCarouselCardForAdmin: FC<Props> = ({
+const SparkPreviewCardForAdmin: FC<Props> = ({
    spark,
    onClick,
+   type = "carousel",
    preview = true,
 }) => {
    return (
-      <SparkCarouselCardContainer
+      <SparkPreviewCardContainer
          componentHeader={<HiddenStatus sparkPublished={spark.published} />}
+         type={type}
          video={{
             thumbnailUrl: getResizedUrl(spark.video.thumbnailUrl, "lg"),
             url: spark.video.url,
@@ -55,8 +60,8 @@ const SparkCarouselCardForAdmin: FC<Props> = ({
             <Box mt={1.5} />
             <SparkQuestion limitLines={preview} question={spark.question} />
          </Stack>
-      </SparkCarouselCardContainer>
+      </SparkPreviewCardContainer>
    )
 }
 
-export default SparkCarouselCardForAdmin
+export default SparkPreviewCardForAdmin

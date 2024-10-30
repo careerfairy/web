@@ -21,8 +21,9 @@ const styles = sxStyles({
          "pan-y pinch-zoom" /* Allow vertical panning and pinch-zoom */,
    },
    slide: {
-      minWidth: 0,
+      minWidth: "auto",
       maxWidth: "100%" /* Prevent from growing larger than viewport */,
+      display: "flex",
    },
    arrowIcon: (theme) => ({
       display: "inline-flex",
@@ -120,7 +121,7 @@ const Slide = ({ children, slideWidth, sx, ...props }: SlideProps) => {
          id="generic-embla-carousel-slide"
          paddingLeft={gap}
          sx={combineStyles(styles.slide, sx)}
-         flex={slideWidth ? `0 0 ${slideWidth}` : "0 0 auto"}
+         flex={slideWidth ? `0 0 ${slideWidth}` : null}
          {...props}
       >
          {children}

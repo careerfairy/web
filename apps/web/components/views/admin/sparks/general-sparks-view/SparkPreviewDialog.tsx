@@ -4,7 +4,7 @@ import Dialog from "@mui/material/Dialog"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
 import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
-import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCardForAdmin"
+import SparkPreviewCardForAdmin from "components/views/sparks/components/spark-card/SparkPreviewCardForAdmin"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { FC, useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -95,7 +95,11 @@ const Component: FC<Props> = ({ sparkId, onClose }) => {
          </IconButton>
          <Box>
             <SparkAspectRatioBox sx={styles.aspectRoot}>
-               <SparkCarouselCardForAdmin preview={false} spark={spark} />
+               <SparkPreviewCardForAdmin
+                  type="fullScreen"
+                  preview={false}
+                  spark={spark}
+               />
             </SparkAspectRatioBox>
          </Box>
       </>

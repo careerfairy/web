@@ -12,20 +12,19 @@ import { SparksCarousel } from "../sparks/components/SparksCarousel"
 
 type MentorSparksCarouselProps = {
    sparks: Spark[]
-   disableClick?: boolean
    title?: ReactNode | string
 }
 
 export const MentorSparksCarousel = ({
    sparks,
-   disableClick,
+
    title = "",
 }: MentorSparksCarouselProps) => {
    const router = useRouter()
    const dispatch = useDispatch()
 
    const handleSparksClicked = (spark: Spark) => {
-      if (!spark || disableClick) return
+      if (!spark) return
 
       dispatch(setCameFromPageLink(router.asPath))
       dispatch(setCreatorId(spark.creator.id))
