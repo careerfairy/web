@@ -228,6 +228,11 @@ export interface LivestreamEvent extends Identifiable {
     * If true, Redirects to the old streaming page at /streaming/{livestreamId}/(viewer|joining/main-streamer)
     */
    useOldUI?: boolean
+
+   /**
+    * If true, SMS notifications are enabled for the live stream
+    */
+   smsEnabled?: boolean
 }
 
 export const LivestreamModes = {
@@ -295,6 +300,11 @@ export type LivestreamUserAction = keyof Pick<
  * were given this static date
  * */
 export const FALLBACK_DATE = "March 17, 2020 03:24:00"
+
+export type ParticipatingUser = Pick<
+   UserLivestreamData["user"],
+   "firstName" | "lastName" | "avatar"
+>
 
 /*
  * Sub-collection found on the livestream doc called userLivestreamData
