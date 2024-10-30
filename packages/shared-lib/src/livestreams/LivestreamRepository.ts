@@ -415,6 +415,11 @@ export interface ILivestreamRepository {
     * @param ctaId - The ID of the CTA
     */
    deleteCTA(livestreamId: string, ctaId: string): Promise<void>
+
+   updateLivestreamSmsEnabled(
+      livestreamId: string,
+      enabled: boolean
+   ): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -1715,6 +1720,16 @@ export class FirebaseLivestreamRepository
          .doc(ctaId)
 
       return docRef.delete()
+   }
+
+   async updateLivestreamSmsEnabled(livestreamId: string, enabled: boolean) {
+      const livestreamRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      return livestreamRef.update({
+         smsEnabled: enabled,
+      })
    }
 }
 
