@@ -16,21 +16,18 @@ const styles = sxStyles({
       color: "inherit",
    },
    displayName: {
-      fontSize: "1.14286rem",
-      fontWeight: 500,
-      lineHeight: "117.5%",
-      letterSpacing: "-0.03121rem",
+      fontWeight: 600,
       ...getMaxLineStyles(1),
    },
    displayNameWithRole: {
       fontWeight: 600,
-      lineHeight: "168.75%",
    },
    companyName: {
-      fontSize: "0.85714rem",
-      fontWeight: 300,
-      lineHeight: "117.5%",
+      fontWeight: 400,
       ...getMaxLineStyles(1),
+   },
+   companyNameMobile: {
+      mt: "-4px",
    },
    creatorDetails: {
       display: "flex",
@@ -38,9 +35,7 @@ const styles = sxStyles({
       justifyContent: "center",
    },
    companyNameAndRole: {
-      fontSize: "1rem",
       fontWeight: 400,
-      lineHeight: "171.429%",
       ...getMaxLineStyles(2),
    },
 })
@@ -93,7 +88,7 @@ const SparkDetails: FC<Props> = ({
             <CircularLogo
                src={companyLogoUrl}
                alt={companyName}
-               size={isFullScreen ? 48 : 60}
+               size={isFullScreen ? 48 : 64}
                objectFit="cover"
             />
          </span>
@@ -105,7 +100,7 @@ const SparkDetails: FC<Props> = ({
                      styles.displayName,
                      showCreatorPosition && styles.displayNameWithRole,
                   ]}
-                  component={"h5"}
+                  variant={isFullScreen ? "brandedBody" : "brandedH5"}
                >
                   {displayName}
                </Typography>
@@ -120,8 +115,10 @@ const SparkDetails: FC<Props> = ({
                <Typography
                   sx={[
                      styles.companyName,
+                     isFullScreen && styles.companyNameMobile,
                      showCreatorPosition && styles.companyNameAndRole,
                   ]}
+                  variant={isFullScreen ? "xsmall" : "brandedBody"}
                >
                   {details}
                </Typography>

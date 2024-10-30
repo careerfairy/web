@@ -1,8 +1,6 @@
 import SparkCarouselCardSkeleton from "components/views/sparks/components/spark-card/SparkCarouselCardSkeleton"
-import Heading from "components/views/portal/common/Heading"
-import SparksCarousel from "./SparksCarousel"
-import { Stack } from "@mui/material"
 import { FC } from "react"
+import SparksCarousel from "./SparksCarousel"
 
 type Props = {
    numSlides?: number

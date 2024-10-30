@@ -16,7 +16,7 @@ import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import { GroupSparksCarousel } from "components/views/common/sparks/GroupSparksCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
-import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
+import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
 import Image from "next/legacy/image"
 import { useRouter } from "next/router"
 import { FC, useCallback, useEffect, useState } from "react"
@@ -382,14 +382,13 @@ const SparksGrid = ({ livestream, handleSparkClick }) => {
          >
             More content from this company
          </Typography>
-         <Grid container spacing={2}>
+         <Grid container spacing={1.5}>
             {publicSparks.map((spark: Spark) => (
-               <Grid key={spark.id} item sm={4} sx={styles.sparkGridItem}>
-                  <SparkCarouselCard
+               <Grid key={spark.id} item sm={3} sx={styles.sparkGridItem}>
+                  <SparkPreviewCard
                      spark={spark}
-                     onClick={() => {
-                        handleSparkClick(spark)
-                     }}
+                     onClick={handleSparkClick}
+                     type="gallery"
                   />
                </Grid>
             ))}
@@ -410,7 +409,12 @@ const SparksMobileCarousel = ({ livestream, handleSparkClick }) => {
    return (
       <Box sx={styles.mobileSparksWrapper}>
          <SuspenseWithBoundary
-            fallback={<FallbackComponent header={<CarouselHeader />} />}
+            fallback={
+               <FallbackComponent
+                  header={<CarouselHeader />}
+                  sx={styles.mobileSparksCarousel}
+               />
+            }
          >
             <GroupSparksCarousel
                handleSparksClicked={handleSparkClick}
