@@ -1,5 +1,5 @@
-import Skeleton from "@mui/material/Skeleton"
 import Box from "@mui/material/Box"
+import Skeleton from "@mui/material/Skeleton"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -7,8 +7,8 @@ const styles = sxStyles({
    root: {
       display: "flex",
       height: {
-         xs: 405,
-         md: 443,
+         xs: 370,
+         md: 410,
       },
       width: "100%",
       overflow: "hidden",

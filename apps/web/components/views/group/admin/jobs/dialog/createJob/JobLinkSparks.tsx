@@ -1,10 +1,11 @@
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, Grid } from "@mui/material"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CardTopCheckBox from "components/views/common/CardTopCheckBox"
-import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
+import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
@@ -41,7 +42,6 @@ const styles = sxStyles({
       justifyContent: "center",
    },
    card: {
-      height: { xs: "600px", md: "360px" },
       mx: { xs: 4, md: "unset" },
    },
    actions: {
@@ -80,18 +80,18 @@ const JobLinkSparks = ({
    const sparkIds = watch(FIELD_NAME)
 
    const handleCardClick = useCallback(
-      (sparkId: string) => {
+      (spark: Spark) => {
          if (isSubmitting) {
             return
          }
 
-         if (sparkIds.includes(sparkId)) {
+         if (sparkIds.includes(spark.id)) {
             setValue(
                FIELD_NAME,
-               sparkIds.filter((id: string) => id !== sparkId)
+               sparkIds.filter((id: string) => id !== spark.id)
             )
          } else {
-            setValue(FIELD_NAME, [...sparkIds, sparkId])
+            setValue(FIELD_NAME, [...sparkIds, spark.id])
          }
       },
       [isSubmitting, sparkIds, setValue]
@@ -198,9 +198,10 @@ const JobLinkSparks = ({
                         xs={isMobile ? 12 : adaptGrid ? 4 : 6}
                         sx={styles.card}
                      >
-                        <SparkCarouselCard
+                        <SparkPreviewCard
                            spark={spark}
-                           onClick={() => handleCardClick(spark.id)}
+                           type="gallery"
+                           onClick={handleCardClick}
                            selectInput={selectInput(spark.id)}
                            selected={sparkIds.includes(spark.id)}
                            disableAutoPlay

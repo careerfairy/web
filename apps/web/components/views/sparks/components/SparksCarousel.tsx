@@ -2,14 +2,11 @@ import { Box, SxProps, Theme } from "@mui/material"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
-import SparkCarouselCard from "./spark-card/SparkCarouselCard"
+import SparkPreviewCard from "./spark-card/SparkPreviewCard"
 
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
-
-const SPARK_CARD_WIDTH = 241
-const SPARK_CARD_HEIGHT = 350
 
 const styles = sxStyles({
    viewport: {
@@ -18,18 +15,15 @@ const styles = sxStyles({
       margin: "-16px",
       width: "calc(100% + 32px)",
    },
-   cardWrapper: {
-      width: SPARK_CARD_WIDTH,
-      height: SPARK_CARD_HEIGHT,
-   },
 })
 
 type SparksCarouselProps = {
-   header: ReactNode
-   handleSparksClicked: (spark: Spark) => void
+   header?: ReactNode
+   handleSparksClicked?: (spark: Spark) => void
    containerSx?: SxProps<Theme>
    headerSx?: SxProps<Theme>
    sparks: Spark[]
+   disableClick?: boolean
 }
 
 export const SparksCarousel = ({
@@ -38,6 +32,7 @@ export const SparksCarousel = ({
    handleSparksClicked,
    containerSx,
    headerSx,
+   disableClick = false,
 }: SparksCarouselProps) => {
    const [emblaRef, emblaApi] = useEmblaCarousel(
       {
@@ -50,7 +45,6 @@ export const SparksCarousel = ({
    return (
       <Box sx={containerSx}>
          <ContentCarousel
-            slideWidth={SPARK_CARD_WIDTH}
             headerTitle={header}
             emblaProps={{
                emblaRef,
@@ -60,14 +54,13 @@ export const SparksCarousel = ({
             headerSx={headerSx}
          >
             {sparks.map((spark) => (
-               <Box key={spark.id} sx={styles.cardWrapper}>
-                  <SparkCarouselCard
-                     spark={spark}
-                     onClick={() => handleSparksClicked(spark)}
-                     onGoNext={() => emblaApi?.scrollNext()}
-                     questionLimitLines={true}
-                  />
-               </Box>
+               <SparkPreviewCard
+                  key={spark.id}
+                  spark={spark}
+                  onClick={!disableClick && handleSparksClicked}
+                  onGoNext={() => emblaApi?.scrollNext()}
+                  questionLimitLines={true}
+               />
             ))}
          </ContentCarousel>
       </Box>

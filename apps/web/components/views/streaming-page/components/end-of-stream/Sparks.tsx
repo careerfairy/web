@@ -10,7 +10,7 @@ import {
    GenericCarouselProps,
    useGenericCarousel,
 } from "components/views/common/carousels/GenericCarousel"
-import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
+import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import React from "react"
@@ -120,7 +120,7 @@ const SparkCard = ({ spark }: SparkCardProps) => {
    const { emblaApi } = useGenericCarousel()
    return (
       <Box sx={styles.sparkCardWrapper}>
-         <SparkCarouselCard
+         <SparkPreviewCard
             spark={spark}
             onClick={() =>
                window.open(

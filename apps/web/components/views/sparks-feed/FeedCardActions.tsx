@@ -45,7 +45,7 @@ import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialo
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
 const actionWidth = 48
-const fullScreenActionWidth = 24
+const fullScreenActionWidth = 40
 
 const styles = sxStyles({
    hidden: {
@@ -53,6 +53,8 @@ const styles = sxStyles({
    },
    root: {
       alignItems: "center",
+      ml: 1,
+      mr: 0.5,
    },
    actionRoot: {
       color: "#5C5C5C",
@@ -380,7 +382,7 @@ const CompanyPageAction: FC<{
                src={companyLogoUrl}
                alt={"companyName"}
                size={isFullScreen ? 40 : 48}
-               sx={{ border: "none" }}
+               sx={{ border: isFullScreen ? "1.5px solid white" : "none" }}
             />
          }
          onClick={handleCompanyPageClick}
