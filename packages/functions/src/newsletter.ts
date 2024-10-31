@@ -97,7 +97,7 @@ export const manualNewsletter = onRequest(runtimeSettings, async (req, res) => {
 export const manualTemplatedEmail = onRequest(
    runtimeSettings,
    async (req, res) => {
-      logger.info("manualTemplatedEmail: v8.0 - Simple email template")
+      logger.info("manualTemplatedEmail: v9.0 - fill and win")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -118,11 +118,11 @@ export const manualTemplatedEmail = onRequest(
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("Simple email template email sent to everyone")
+         res.status(200).send("Fill and win email sent to everyone")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "Simple email template email sent to " + receivedEmails.join(", ")
+            "Fill and win email sent to " + receivedEmails.join(", ")
          )
       }
    }
@@ -169,7 +169,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      logger.info("Simple email template email already sent, skipping")
+      logger.info("Fill and win email already sent, skipping")
       return
    }
 
@@ -194,7 +194,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   logger.info("Simple email template execution done")
+   logger.info("Fill and win execution done")
 }
 
 /**

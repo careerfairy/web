@@ -5,6 +5,15 @@ import { ManualTemplatedEmailBuilder } from "./ManualTemplatedEmailBuilder"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
 import { ISparkFunctionsRepository } from "./sparks/SparkFunctionsRepository"
 
+const USERS_WHO_CLICKED_ON_SET = [
+   "suhuisn312@gmail.com",
+   "ujji0074u@gmail.com",
+   "nyembarumbidzai1@gmail.com",
+   "tiisanolekganyane@gmail.com",
+   "xetoja8586@losvtn.com",
+   "hermelan.kouaho@hec.edu",
+] // List of users who have already clicked on previous email for 'Simple email template'
+
 /**
  * Gathers all the required data to build the release email
  */
@@ -31,12 +40,16 @@ export class ManualTemplatedEmailService {
 
       let users = (
          await this.userRepo.getSubscribedUsers(overrideUsers, undefined, 6)
-      ).map((user) => {
-         return {
-            id: user.id,
-            firstName: user.firstName,
-         }
-      })
+      )
+         .filter((user) => {
+            return !USERS_WHO_CLICKED_ON_SET.includes(user.id)
+         })
+         .map((user) => {
+            return {
+               id: user.id,
+               firstName: user.firstName,
+            }
+         })
 
       const userStatsData: Record<
          string,
@@ -88,7 +101,7 @@ export class ManualTemplatedEmailService {
       this.subscribedUsers = convertDocArrayToDict(users)
 
       this.logger.info(
-         "Total Users registered for simple email template - ",
+         "Total Users registered for fill and win - ",
          Object.keys(this.subscribedUsers || {}).length
       )
 
