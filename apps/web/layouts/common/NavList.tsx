@@ -1,5 +1,5 @@
-import React, { useMemo } from "react"
 import { useRouter } from "next/router"
+import React, { useMemo } from "react"
 
 // material-ui
 import {
@@ -9,16 +9,15 @@ import {
    ListItemText,
    Typography,
 } from "@mui/material"
-import { alpha } from "@mui/material/styles"
-import Link from "../../components/views/common/Link"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
+import { alpha } from "@mui/material/styles"
+import Link from "../../components/views/common/Link"
 
 // project imports
+import Collapse from "@mui/material/Collapse"
 import { sxStyles } from "../../types/commonTypes"
 import type { INavLink } from "../types"
-import Collapse from "@mui/material/Collapse"
-import { useGroup } from "../GroupDashboardLayout"
 
 const leftPadding = 5
 const iconSize = 24
@@ -76,11 +75,13 @@ type NavListProps = {
 }
 const NavList = ({ links }: NavListProps) => {
    return (
-      <Stack sx={styles.list} spacing={2} component={List}>
-         {links.map((navItem) => (
-            <NavLink key={navItem.id} {...navItem} />
-         ))}
-      </Stack>
+      <Box component={"nav"} sx={styles.list}>
+         <Stack sx={styles.list} spacing={2} component={List}>
+            {links.map((navItem) => (
+               <NavLink key={navItem.id} {...navItem} />
+            ))}
+         </Stack>
+      </Box>
    )
 }
 
