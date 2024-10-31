@@ -670,6 +670,7 @@ export class FirebaseUserRepository
          lastName,
          businessFunctionsTagIds,
          contentTopicsTagIds,
+         phoneNumber,
       } = fields
 
       const genderToUpdate = gender ? { gender } : {}
@@ -700,7 +701,9 @@ export class FirebaseUserRepository
       const contentTopicsToUpdate = contentTopicsTagIds
          ? { contentTopicsTagIds }
          : {}
+      const phoneNumberToUpdate = phoneNumber ? { phoneNumber } : {}
 
+      // @ts-ignore
       const toUpdate = {
          ...genderToUpdate,
          ...spokenLanguagesToUpdate,
@@ -718,6 +721,7 @@ export class FirebaseUserRepository
          ...lastNameToUpdate,
          ...businessFunctionsToUpdate,
          ...contentTopicsToUpdate,
+         ...phoneNumberToUpdate,
       }
 
       return userRef.update(toUpdate)

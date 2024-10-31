@@ -9,9 +9,9 @@ import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import {
    ComponentType,
-   createContext,
    Dispatch,
    FC,
+   createContext,
    useCallback,
    useContext,
    useEffect,
@@ -30,9 +30,9 @@ import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import {
    RegistrationAction,
+   RegistrationState,
    registrationInitialState,
    registrationReducer,
-   RegistrationState,
 } from "./registrationReducer"
 import { buildDialogLink } from "./util"
 import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQuestionsViewSkeleton"
@@ -42,6 +42,7 @@ import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
 import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
+import { AskPhoneNumberViewSkeleton } from "./views/sms/AskPhoneNumberViewSkeleton"
 import SpeakerDetailsViewSkeleton from "./views/speaker-details/SpeakerDetailsViewSkeleton"
 
 const styles = sxStyles({
@@ -109,6 +110,8 @@ type Props = {
     * Note: This property is only available in the "stand-alone" mode.
     */
    speakerId?: string
+   isDiscoverCompanySparksOpen?: boolean
+   handleDiscoverCompanySparks?: () => void
 }
 
 export type ViewKey =
@@ -117,6 +120,7 @@ export type ViewKey =
    | "register-ask-questions"
    | "register-join-talent-pool"
    | "register-success"
+   | "ask-phone-number"
    | "job-details"
    | "speaker-details"
 
@@ -165,6 +169,11 @@ const views: View[] = [
       key: "register-success",
       viewPath: "register-success/RegisterSuccessView",
       loadingComponent: () => <RegisterSuccessViewSkeleton />,
+   }),
+   createView({
+      key: "ask-phone-number",
+      viewPath: "sms/AskPhoneNumberView",
+      loadingComponent: () => <AskPhoneNumberViewSkeleton />,
    }),
    createView({
       key: "job-details",
@@ -250,6 +259,13 @@ const Content: FC<ContentProps> = ({
    const [currentSpeakerId, setCurrentSpeakerId] = useState<string | null>(
       speakerId
    )
+
+   const [isDiscoverCompanySparksOpen, setIsDiscoverCompanySparksOpen] =
+      useState(false)
+
+   const handleDiscoverCompanySparks = useCallback(() => {
+      setIsDiscoverCompanySparksOpen(true)
+   }, [])
 
    const hasInitialData =
       serverSideLivestream && livestreamId === serverSideLivestream.id
@@ -408,6 +424,8 @@ const Content: FC<ContentProps> = ({
          mode,
          onRegisterSuccess,
          currentSparkId,
+         isDiscoverCompanySparksOpen,
+         handleDiscoverCompanySparks,
       }),
       [
          goToView,
@@ -427,6 +445,8 @@ const Content: FC<ContentProps> = ({
          mode,
          onRegisterSuccess,
          currentSparkId,
+         isDiscoverCompanySparksOpen,
+         handleDiscoverCompanySparks,
       ]
    )
 
@@ -520,6 +540,8 @@ type DialogContextType = {
     */
    onRegisterSuccess?: () => void
    currentSparkId?: string
+   isDiscoverCompanySparksOpen: boolean
+   handleDiscoverCompanySparks: () => void
 }
 
 const getPageIndex = (page: Props["page"]): number => {
@@ -553,6 +575,8 @@ const DialogContext = createContext<DialogContextType>({
    registrationDispatch: () => {},
    mode: "page",
    currentSparkId: null,
+   isDiscoverCompanySparksOpen: false,
+   handleDiscoverCompanySparks: () => {},
 })
 
 export const useLiveStreamDialog = () => {
