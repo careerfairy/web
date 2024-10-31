@@ -44,12 +44,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [showPermissionsBanner, setShowPermissionsBanner] = useState(false)
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef: any = useRef(null)
-   const cameraRef: any = useRef(null)
-   const audioRef: any = useRef(null)
    const [subscriptionListener, setSubscriptionListener] = useState(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
-   const [mediaStarted, setMediaStarted] = useState(false)
 
    useEffect(() => {
       checkAuthentication()
@@ -156,55 +153,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          console.error("Failed to parse message from WebView:", error)
       }
    }
-   const startCamera = async () => {
-      if (hasVideoPermissions) {
-         // Open the camera using ref without rendering it in the UI
-         cameraRef.current = await Camera.requestCameraPermissionsAsync()
-      } else {
-         console.log("No permissions")
-      }
-   }
-
-   const stopCamera = async () => {
-      if (cameraRef.current) {
-         console.log("There is camera ref")
-         cameraRef.current.stopRecording()
-         cameraRef.current = null // Release camera ref
-      }
-   }
-
-   // Functions to start and stop audio recording
-   const startAudio = async () => {
-      if (hasAudioPermissions) {
-         await Audio.setAudioModeAsync({
-            allowsRecordingIOS: true,
-            playsInSilentModeIOS: true,
-         })
-
-         const recording = new Audio.Recording()
-         try {
-            await recording.prepareToRecordAsync()
-            await recording.startAsync()
-            audioRef.current = recording
-         } catch (error) {
-            console.error("Failed to start recording:", error)
-         }
-      } else {
-         console.log("Audio permission is required.")
-      }
-   }
-
-   const stopAudio = async () => {
-      if (audioRef.current) {
-         console.log("THERE IS AUDIO REF")
-         try {
-            await audioRef.current.stopAndUnloadAsync()
-            audioRef.current = null // Release recording ref
-         } catch (error) {
-            console.error("Failed to stop recording:", error)
-         }
-      }
-   }
 
    const handleUserAuth = async (data: USER_AUTH) => {
       await SecureStore.setItemAsync("authToken", data.token)
@@ -278,20 +226,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       ) {
          return requestPermissions()
       } else {
-         if (url?.includes(INCLUDES_PERMISSIONS) && !mediaStarted) {
-            setMediaStarted(true)
-            startCamera()
-            startAudio()
-            console.log("Starting media")
-         } else {
-            if (mediaStarted) {
-               console.log("Stop media")
-               setMediaStarted(false)
-               stopCamera()
-               stopAudio()
-            }
-            setShowPermissionsBanner(false)
-         }
+         setShowPermissionsBanner(false)
       }
    }
 
