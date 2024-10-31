@@ -1,10 +1,12 @@
 import admin from "firebase-admin"
 import process from "node:process"
+import serviceAccount from "./config/service-account.json"
 
 // Initialize Firebase Admin SDK only if it hasn't been initialized already
 if (!admin.apps.length) {
+   const service: any = serviceAccount
    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
+      credential: admin.credential.cert(service),
       projectId: process.env.GOOGLE_CLOUD_PROJECT,
    })
 }
