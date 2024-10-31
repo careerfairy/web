@@ -301,11 +301,6 @@ export type LivestreamUserAction = keyof Pick<
  * */
 export const FALLBACK_DATE = "March 17, 2020 03:24:00"
 
-export type ParticipatingUser = Pick<
-   UserLivestreamData["user"],
-   "firstName" | "lastName" | "avatar"
->
-
 /*
  * Sub-collection found on the livestream doc called userLivestreamData
  * */
