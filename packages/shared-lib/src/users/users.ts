@@ -116,6 +116,11 @@ export interface UserData extends Identifiable {
     * Indicates if the user has completed the Sparks onboarding process
     */
    hasCompletedSparksB2BOnboarding?: boolean
+
+   /**
+    * User's phone number
+    */
+   phoneNumber?: string
 }
 
 export type ValidUserTagFields =

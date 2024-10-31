@@ -2247,6 +2247,27 @@ class FirebaseService {
       await batch.commit()
    }
 
+   updateLivestreamUserPhoneNumber = async (
+      livestreamId: string,
+      userEmail: string,
+      phoneNumber: string
+   ) => {
+      const userLivestreamDataRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("userLivestreamData")
+         .doc(userEmail)
+
+      return userLivestreamDataRef.set(
+         {
+            user: {
+               phoneNumber: phoneNumber,
+            },
+         },
+         { merge: true }
+      )
+   }
+
    joinCompanyTalentPool = (
       companyId: string,
       userData: UserData,
