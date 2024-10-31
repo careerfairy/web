@@ -2,11 +2,12 @@ import React, { memo, useEffect, useMemo } from "react"
 
 // material-ui
 import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
+import Drawer from "@mui/material/Drawer"
 import { alpha, useTheme } from "@mui/material/styles"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
-import Drawer from "@mui/material/Drawer"
 
 // project imports
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import useIsMobile from "../components/custom-hook/useIsMobile"
 import {
    DRAWER_WIDTH,
@@ -16,7 +17,6 @@ import {
 import { sxStyles } from "../types/commonTypes"
 import { useGenericDashboard } from "./GenericDashboardLayout"
 import { useGroup } from "./GroupDashboardLayout"
-import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 
 const baseStyles = (drawerWidth: number) => {
    return sxStyles({
@@ -180,14 +180,12 @@ const AdminGenericLayout: React.FC<Props> = ({
             {dropdownNav}
 
             {/* main content */}
-            <Box
-               component={"main"}
-               sx={styles.main}
-            >
+            <Box component={"main"} sx={styles.main}>
                {children}
             </Box>
             {/* Bottom navigation bar */}
-            {(isMobile || isFullScreen || showBottomNavContent) && bottomNavContent
+            {(isMobile || isFullScreen || showBottomNavContent) &&
+            bottomNavContent
                ? bottomNavContent
                : null}
          </Box>
@@ -210,7 +208,6 @@ const DrawerComponent = ({
 
    return (
       <Box
-         component="nav"
          sx={[
             styles.drawerWrapper,
             styles.animateWidth,
