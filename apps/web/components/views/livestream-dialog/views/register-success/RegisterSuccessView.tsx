@@ -218,6 +218,11 @@ const Component = ({ isSparksOpen, handleDiscoverSparks }) => {
                   <b>{livestream.company}</b> in their Sparks and add the live
                   stream to your calendar to ensure you won{"'"}t miss it.
                </Typography>
+            ) : livestream.smsEnabled ? (
+               <Typography variant="brandedBody" sx={styles.description}>
+                  Just one last step: Don{"’"}t miss the live event by signing
+                  up for a reminder via SMS or calendar now!
+               </Typography>
             ) : (
                <Typography variant="brandedBody" sx={styles.description}>
                   Feel free to continue exploring and browsing other content on
