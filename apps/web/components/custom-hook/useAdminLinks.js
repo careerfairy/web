@@ -96,6 +96,12 @@ const useAdminLinks = () => {
                basePath: `/admin/query-users`,
             },
             {
+               href: `/admin/saved-push-notifications`,
+               icon: CalendarIcon,
+               title: "Saved Push Notifications",
+               basePath: `/admin/saved-push-notifications`,
+            },
+            {
                href: `/admin/academic-calendar-manager`,
                icon: CalendarIcon,
                title: "Academic Calendar",
