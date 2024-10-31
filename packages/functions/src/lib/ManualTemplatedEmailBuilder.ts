@@ -28,7 +28,7 @@ export class ManualTemplatedEmailBuilder {
             },
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "simple-email-template",
+         Tag: "fill-and-win",
       })
    }
 
