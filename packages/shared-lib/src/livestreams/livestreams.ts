@@ -228,6 +228,11 @@ export interface LivestreamEvent extends Identifiable {
     * If true, Redirects to the old streaming page at /streaming/{livestreamId}/(viewer|joining/main-streamer)
     */
    useOldUI?: boolean
+
+   /**
+    * If true, SMS notifications are enabled for the live stream
+    */
+   smsEnabled?: boolean
 }
 
 export const LivestreamModes = {
