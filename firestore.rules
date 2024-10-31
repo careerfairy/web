@@ -46,6 +46,11 @@ service cloud.firestore {
             allow write: if isCFAdmin();
         }
 
+       match /savedNotifications/{savedNotification} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+       }
+
         match /levelsOfStudy/{levelOfStudy} {
             allow read: if true;
             allow write: if isCFAdmin();

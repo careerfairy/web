@@ -70,7 +70,8 @@ const getFirestoreSettings = (
 // Default instance that we can re-use, default settings for firestore, auth, etc
 // [DEFAULT] app name is required for redux-firestore 🤦
 const firebaseApp: firebase.app.App = createFirebaseInstance("[DEFAULT]")
-
+export const firestore = firebase.firestore()
+export const auth = firebase.auth()
 export const FirestoreInstance = firebaseApp.firestore()
 export const AuthInstance = firebaseApp.auth()
 export const FunctionsInstance = firebaseApp.functions(region)
