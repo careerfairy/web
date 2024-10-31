@@ -23,7 +23,10 @@ const styles = sxStyles({
       alignItems: "center",
    },
    contentWrapper: {
-      width: "70%",
+      width: {
+         xs: "100%",
+         md: "70%",
+      },
       margin: "0 auto",
    },
 })
@@ -90,8 +93,10 @@ const AskPhoneNumberView = () => {
                                  What’s your phone number?
                               </Typography>
                               <Typography variant="brandedBody">
-                                 Don’t worry, we’ll only notify you about this
-                                 livestream. You won’t receive any other texts.
+                                 We will only send you reminders about this live
+                                 stream. After the live stream your phone number
+                                 will be deleted. You <b>won{"’"}t</b> receive
+                                 any other texts.
                               </Typography>
                            </Stack>
                            <Stack direction="row" gap="4px">
@@ -124,7 +129,7 @@ const AskPhoneNumberView = () => {
                                        onlyCountries={["GB", "CH", "DE", "NL"]}
                                        helperText={
                                           fieldState.invalid
-                                             ? "Phone number is invalid"
+                                             ? "Insert a valid phone number"
                                              : ""
                                        }
                                        error={fieldState.invalid}
