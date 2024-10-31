@@ -328,7 +328,13 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          disabled: !cardInView, // Helps Reduce the number of listeners
       })
 
+      const router = useRouter()
+
+      const { pathname } = router
+
       const isPlaceholderEvent = event?.id.includes("placeholderEvent")
+
+      const isAdminJobs = pathname.includes("/admin/jobs")
 
       const trackImpressionsRef = useTrackLivestreamImpressions({
          event,
@@ -336,10 +342,9 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          positionInResults: index,
          numberOfResults: totalElements,
          location,
-         disableTracking: isPlaceholderEvent,
+         disableTracking: isPlaceholderEvent || isAdminJobs,
       })
-      const router = useRouter()
-      const { pathname } = router
+
       const { authenticatedUser } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
       const [targetValue, setTargetValue] = useState<string | undefined>(
