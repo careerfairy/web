@@ -246,8 +246,7 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
    }, [stream.id, stream.start, stream.title])
 
    const handleToggleSmsEnabled = useCallback(
-      async (event, value) => {
-         console.log(event, value)
+      async (_, value) => {
          await livestreamRepo.updateLivestreamSmsEnabled(stream.id, value)
       },
       [stream.id]
