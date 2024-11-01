@@ -1,53 +1,7 @@
 import { firestore } from "./FirebaseInstance"
-import axios from "axios"
+import { Expo } from "expo-server-sdk"
 
-function chunkArray<T>(array: T[], chunkSize: number): T[][] {
-   const result = []
-   for (let i = 0; i < array.length; i += chunkSize) {
-      result.push(array.slice(i, i + chunkSize))
-   }
-   return result
-}
-
-export const sendNotificationToFilteredUsers = async (
-   filters: any,
-   message: any
-) => {
-   const userRef = firestore.collection("userData")
-   const query = userRef.where("pushToken", "!=", null)
-
-   // Apply each filter to the query
-   // Object.keys(filters).forEach((field) => {
-   //     const value = filters[field];
-   //     query = query.where(field, '==', value);
-   // });
-
-   const usersSnapshot = await query.get()
-   const tokens: string[] = usersSnapshot.docs.map(
-      (doc) => doc.data().pushToken
-   )
-   console.log(tokens)
-
-   const tokenChunks = chunkArray(tokens, 500)
-
-   // Create an array of promises to send each batch
-   const sendPromises = tokenChunks.map((chunk) =>
-      sendMulticastNotification(
-         chunk,
-         message.title,
-         message.body,
-         "https://www.google.com"
-      )
-   )
-
-   // Send all batches concurrently and wait for all to finish
-   try {
-      const results = await Promise.all(sendPromises)
-      console.log("All notifications sent successfully:", results)
-   } catch (error) {
-      console.error("Error sending some notifications:", error)
-   }
-}
+const expo = new Expo()
 
 export const createSavedNotification = async (data: any) => {
    try {
@@ -99,40 +53,54 @@ export const deleteSavedNotification = async (id: string) => {
    }
 }
 
-async function sendMulticastNotification(
-   tokens: string[],
-   title: string,
-   body: string,
-   url?: string
-) {
-   const serverKey = process.env.FCM_KEY
+export async function sendExpoPushNotification(filters: any[], message: any) {
+   // Filter out invalid tokens
 
-   // Construct the notification payload
-   const payload = {
-      notification: {
-         title: title,
-         body: body,
-         click_action: url,
+   const userRef = firestore.collection("userData")
+   const query = userRef.where("pushToken", "!=", null)
+
+   // Apply each filter to the query
+   // Object.keys(filters).forEach((field) => {
+   //     const value = filters[field];
+   //     query = query.where(field, '==', value);
+   // });
+
+   const usersSnapshot = await query.get()
+   const tokens: string[] = usersSnapshot.docs.map(
+      (doc) => doc.data().pushToken
+   )
+
+   const validTokens = tokens.filter((token) => Expo.isExpoPushToken(token))
+   if (validTokens.length === 0) {
+      console.error("No valid Expo push tokens provided.")
+      return
+   }
+
+   // Create messages for each valid token
+   const messages: any = validTokens.map((token) => ({
+      to: token,
+      sound: "default",
+      title: message.title,
+      body: message.body,
+      data: {
+         url: "https://www.google.com",
       },
-      registration_ids: tokens,
-   }
+   }))
 
-   try {
-      const response = await axios.post(
-         "https://fcm.googleapis.com/fcm/send",
-         payload,
-         {
-            headers: {
-               "Content-Type": "application/json",
-               Authorization: `key=${serverKey}`,
-            },
-         }
-      )
-      console.log("Notification sent successfully:", response.data)
-   } catch (error) {
-      console.error(
-         "Error sending notification:",
-         error.response?.data || error.message
-      )
-   }
+   // Chunk messages in groups of 100 to match Expo's API limits
+   const chunks = expo.chunkPushNotifications(messages)
+
+   // Send each chunk through Expo's service
+   const ticketChunks = chunks.map(async (chunk) => {
+      try {
+         const tickets = await expo.sendPushNotificationsAsync(chunk)
+         console.log("Sent chunk", tickets)
+      } catch (error) {
+         console.error("Error sending chunk", error)
+      }
+   })
+
+   // Wait for all chunks to be sent
+   await Promise.all(ticketChunks)
+   console.log("All notifications sent.")
 }
