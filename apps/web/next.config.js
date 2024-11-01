@@ -248,6 +248,8 @@ const moduleExports = {
       REACT_APP_FIREBASE_STORAGE_BUCKET: "careerfairy-e1fd9.appspot.com",
       REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
       GOOGLE_CLOUD_PROJECT: "careerfairy-e1fd9",
+      FCM_KEY:
+         "AAAA52sKqn4:APA91bFNW55j7Q2ecGw0iOXrcGjlvDGIL8AB7I4GNMKZ4kFyd0OOuTnr_jNjar1_vmP7XiP8QoZC3PGXr2VIay7qksCXSVulfwwzcCfe_wBTpteKLK3ZOOGQWNEmbFQZKL5tIfh5c8Z5",
    },
 
    // Add publicRuntimeConfig for runtime environment variables
