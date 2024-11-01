@@ -27,8 +27,8 @@ import { Audio } from "expo-av"
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
       shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
    }),
 })
 
@@ -44,12 +44,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [showPermissionsBanner, setShowPermissionsBanner] = useState(false)
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef: any = useRef(null)
-   const [subscriptionListener, setSubscriptionListener] = useState(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
 
    useEffect(() => {
-      checkAuthentication()
       checkPermissions()
    }, [])
 
@@ -59,6 +57,26 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       setHasAudioPermissions(audioStatus === "granted")
       setHasVideoPermissions(videoStatus === "granted")
    }
+
+   useEffect(() => {
+      const notificationListener =
+         Notifications.addNotificationReceivedListener((notification) => {
+            console.log("Notification received:", notification)
+         })
+
+      const responseListener =
+         Notifications.addNotificationResponseReceivedListener((response) => {
+            const url = response.notification.request.content.data.url
+            if (url) {
+               navigateToNewUrl(url)
+            }
+         })
+
+      return () => {
+         Notifications.removeNotificationSubscription(notificationListener)
+         Notifications.removeNotificationSubscription(responseListener)
+      }
+   }, [])
 
    const requestPermissions = async () => {
       try {
@@ -104,33 +122,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
    }
 
-   const checkAuthentication = () => {
-      const token = SecureStore.getItem("authToken")
-      if (token) {
-         subscribeToNotifications()
-      } else {
-         unsubscribeToNotifications()
-      }
-   }
-
-   const subscribeToNotifications = () => {
-      const subscription: any =
-         Notifications.addNotificationResponseReceivedListener((response) => {
-            const url = response.notification.request.content.data.url
-            if (url) {
-               navigateToNewUrl(url)
-            }
-         })
-      setSubscriptionListener(subscription)
-   }
-
-   const unsubscribeToNotifications = () => {
-      if (subscriptionListener) {
-         Notifications.removeNotificationSubscription(subscriptionListener)
-         setSubscriptionListener(null)
-      }
-   }
-
    const handleMessage = (event: NativeEventStringified) => {
       try {
          const receivedData = JSON.parse(event.nativeEvent.data)
@@ -158,7 +149,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       await SecureStore.setItemAsync("authToken", data.token)
       await SecureStore.setItemAsync("userId", data.userId)
       await SecureStore.setItemAsync("userPassword", data.userPassword)
-      subscribeToNotifications()
       onTokenInjected()
    }
 
@@ -178,7 +168,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          await SecureStore.deleteItemAsync("authToken")
          await SecureStore.deleteItemAsync("userId")
          await SecureStore.deleteItemAsync("userPassword")
-         unsubscribeToNotifications()
       } catch (e) {}
    }
 
@@ -209,6 +198,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       if (webViewRef.current) {
          const jsCode = `window.location.href = '${newUrl}';`
          webViewRef.current.injectJavaScript(jsCode)
+      } else {
+         setBaseUrl(newUrl)
       }
    }
 
