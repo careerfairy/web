@@ -1,5 +1,4 @@
 import { firestore } from "./FirebaseInstance"
-import process from "node:process"
 import axios from "axios"
 
 function chunkArray<T>(array: T[], chunkSize: number): T[][] {
