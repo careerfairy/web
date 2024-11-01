@@ -52,7 +52,9 @@ export default async function handler(req, res) {
             notification: {
                title: notification.title,
                body: notification.body,
-               data: "www.google.com",
+            },
+            data: {
+               url: "https://www.google.com",
             },
          }
 
