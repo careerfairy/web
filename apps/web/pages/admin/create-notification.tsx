@@ -3,7 +3,6 @@ import { useRouter } from "next/router"
 import {
    createSavedNotification,
    updateSavedNotification,
-   sendNotificationToFilteredUsers,
 } from "../../data/firebase/FirestoreService"
 import Button from "@mui/material/Button"
 import Head from "next/head"
@@ -49,7 +48,16 @@ const CreateNotification = ({ notification }) => {
 
    const handleSendNotification = async () => {
       // Call sendNotificationToFilteredUsers with filters and message
-      await sendNotificationToFilteredUsers(filters, { title, body })
+      const response = await fetch("/api/send-notifications", {
+         method: "POST",
+         headers: {
+            "Content-Type": "application/json",
+         },
+         body: JSON.stringify({ filters, message: { title, body } }),
+      })
+
+      const data = await response.json()
+      console.log(data)
       alert("Notification sent")
    }
 
