@@ -54,7 +54,7 @@ export default function Native() {
 
    const onLogout = async (userId: string, userPassword: string) => {
       try {
-         return ResetFireStoreData(userId, userPassword)
+         return resetFireStoreData(userId, userPassword)
       } catch (e) {
          console.log("Error with resetting firestore data", e)
       }
@@ -83,7 +83,7 @@ export default function Native() {
       }
    }
 
-   async function ResetFireStoreData(userId: string, userPassword: string) {
+   async function resetFireStoreData(userId: string, userPassword: string) {
       try {
          if (auth.currentUser?.email) {
             const userDocRef = doc(db, "userData", auth.currentUser.email)
