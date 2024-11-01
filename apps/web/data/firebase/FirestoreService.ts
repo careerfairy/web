@@ -1,4 +1,15 @@
 import { firestore } from "./FirebaseInstance"
+import process from "node:process"
+import axios from "axios"
+
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+   const result = []
+   for (let i = 0; i < array.length; i += chunkSize) {
+      result.push(array.slice(i, i + chunkSize))
+   }
+   return result
+}
+
 export const sendNotificationToFilteredUsers = async (
    filters: any,
    message: any
@@ -18,23 +29,25 @@ export const sendNotificationToFilteredUsers = async (
    )
    console.log(tokens)
 
-   // Firebase FCM only allows max 500 tokens per request
-   const response = await fetch("/api/send-multicast", {
-      method: "POST",
-      headers: {
-         "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-         tokens: tokens, // Split tokens by comma and trim whitespace
-         notification: {
-            title: message.title,
-            body: message.body,
-         },
-      }),
-   })
+   const tokenChunks = chunkArray(tokens, 500)
 
-   const result = await response.json()
-   console.log(result)
+   // Create an array of promises to send each batch
+   const sendPromises = tokenChunks.map((chunk) =>
+      sendMulticastNotification(
+         chunk,
+         message.title,
+         message.body,
+         "https://www.google.com"
+      )
+   )
+
+   // Send all batches concurrently and wait for all to finish
+   try {
+      const results = await Promise.all(sendPromises)
+      console.log("All notifications sent successfully:", results)
+   } catch (error) {
+      console.error("Error sending some notifications:", error)
+   }
 }
 
 export const createSavedNotification = async (data: any) => {
@@ -84,5 +97,43 @@ export const deleteSavedNotification = async (id: string) => {
       await firestore.collection("savedNotifications").doc(id).delete()
    } catch (error) {
       console.error("Error deleting notification:", error)
+   }
+}
+
+async function sendMulticastNotification(
+   tokens: string[],
+   title: string,
+   body: string,
+   url?: string
+) {
+   const serverKey = process.env.FCM_KEY
+
+   // Construct the notification payload
+   const payload = {
+      notification: {
+         title: title,
+         body: body,
+         click_action: url,
+      },
+      registration_ids: tokens,
+   }
+
+   try {
+      const response = await axios.post(
+         "https://fcm.googleapis.com/fcm/send",
+         payload,
+         {
+            headers: {
+               "Content-Type": "application/json",
+               Authorization: `key=${serverKey}`,
+            },
+         }
+      )
+      console.log("Notification sent successfully:", response.data)
+   } catch (error) {
+      console.error(
+         "Error sending notification:",
+         error.response?.data || error.message
+      )
    }
 }
