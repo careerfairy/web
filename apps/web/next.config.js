@@ -341,7 +341,7 @@ const moduleExports = {
       ignoreDuringBuilds: true,
    },
    // this is an open issue on MUI's GitHub: https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
-   transpilePackages: ["@mui/x-charts"],
+   transpilePackages: ["@mui/x-charts", "mui-tel-input"],
 }
 
 // test or development environment
