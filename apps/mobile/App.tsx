@@ -1,20 +1,22 @@
 import { useEffect } from "react"
+import { Platform } from "react-native"
 import WebViewComponent from "./components/WebView"
-import { PROJECT_ID } from "@env"
 import { doc, setDoc } from "firebase/firestore"
 import { app, db, auth } from "./firebase"
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
 import { signInWithEmailAndPassword } from "firebase/auth"
+import { Alert } from "react-native"
+import { PROJECT_ID } from "@env"
 
 export default function Native() {
    useEffect(() => {
       if (app) {
          console.log("Firebase connected successfully!")
-         checkToken()
       } else {
          console.log("Firebase connection failed.")
       }
+      checkToken()
    }, [])
 
    const checkToken = async () => {
@@ -27,26 +29,35 @@ export default function Native() {
       }
    }
 
+   const getTokenAndSave = async () => {
+      try {
+         const tokenData = await Notifications.getExpoPushTokenAsync({
+            projectId: PROJECT_ID,
+         })
+         const token = tokenData.data
+         saveUserPushTokenToFirestore(token)
+      } catch (e) {
+         console.log(e)
+      }
+   }
+
    const getPushToken = async () => {
       try {
-         const { status: existingStatus } =
-            await Notifications.getPermissionsAsync()
-         let finalStatus = existingStatus
-
-         if (existingStatus !== "granted") {
-            const { status } = await Notifications.requestPermissionsAsync()
-            finalStatus = status
-         }
-         if (finalStatus !== "granted") {
-            return
+         if (Platform.OS === "android") {
+            Notifications.setNotificationChannelAsync("default", {
+               name: "default",
+               importance: Notifications.AndroidImportance.MAX,
+               vibrationPattern: [0, 250, 250, 250],
+               lightColor: "#FF231F7C",
+            })
          }
 
-         const token = (
-            await Notifications.getExpoPushTokenAsync({ projectId: PROJECT_ID })
-         ).data
-
-         // Saving the data to Firestore with all relevant data we will use to filter out notification queue
-         return saveUserPushTokenToFirestore(token)
+         const { status } = await Notifications.requestPermissionsAsync()
+         if (status === "granted") {
+            getTokenAndSave()
+         } else {
+            console.log("Notification permissions not granted")
+         }
       } catch (e) {
          console.log(e)
       }
