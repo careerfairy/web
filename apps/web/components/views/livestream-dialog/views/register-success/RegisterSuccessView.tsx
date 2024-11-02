@@ -14,15 +14,13 @@ import Stack from "@mui/material/Stack"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import { GroupSparksCarousel } from "components/views/common/sparks/GroupSparksCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
-import {
-   GroupSparksCarousel,
-   MobileSparksArrows,
-} from "components/views/portal/sparks/SparksCarouselWithArrows"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import Image from "next/legacy/image"
 import { useRouter } from "next/router"
-import { FC, useCallback, useEffect, useState } from "react"
+import { FC, useCallback, useEffect } from "react"
+import { MessageSquare } from "react-feather"
 import { useSelector } from "react-redux"
 import { confetti } from "../../../../../constants/images"
 import { eventDetailsDialogVisibilitySelector } from "../../../../../store/selectors/sparksFeedSelectors"
@@ -99,9 +97,7 @@ const styles = sxStyles({
    },
    mobileSparksCarousel: {
       py: "16px",
-   },
-   mobileSparksCarouselHeader: {
-      pr: 2,
+      ml: 2,
    },
    transition: {
       transition: "all 0.5s",
@@ -127,13 +123,13 @@ const styles = sxStyles({
 })
 
 const RegisterSuccessView: FC = () => {
-   const { closeDialog, activeView } = useLiveStreamDialog()
+   const {
+      closeDialog,
+      activeView,
+      isDiscoverCompanySparksOpen,
+      handleDiscoverCompanySparks,
+   } = useLiveStreamDialog()
    const isMobile = useIsMobile()
-   const [isSparksOpen, setIsSparksOpen] = useState(false)
-
-   const handleDiscoverSparks = () => {
-      setIsSparksOpen(true)
-   }
 
    useEffect(() => {
       if (activeView !== "register-success") return
@@ -150,15 +146,15 @@ const RegisterSuccessView: FC = () => {
                onBackClick={closeDialog}
                onBackPosition="top-right"
             >
-               {isMobile && isSparksOpen ? (
+               {isMobile && isDiscoverCompanySparksOpen ? (
                   <MobileSparksTransition
-                     isSparksOpen={isSparksOpen}
-                     handleDiscoverSparks={handleDiscoverSparks}
+                     isSparksOpen={isDiscoverCompanySparksOpen}
+                     handleDiscoverSparks={handleDiscoverCompanySparks}
                   />
                ) : (
                   <Component
-                     isSparksOpen={isSparksOpen}
-                     handleDiscoverSparks={handleDiscoverSparks}
+                     isSparksOpen={isDiscoverCompanySparksOpen}
+                     handleDiscoverSparks={handleDiscoverCompanySparks}
                   />
                )}
             </MainContent>
@@ -221,6 +217,11 @@ const Component = ({ isSparksOpen, handleDiscoverSparks }) => {
                   Your journey doesn{"'"}t stop here: discover more about{" "}
                   <b>{livestream.company}</b> in their Sparks and add the live
                   stream to your calendar to ensure you won{"'"}t miss it.
+               </Typography>
+            ) : livestream.smsEnabled ? (
+               <Typography variant="brandedBody" sx={styles.description}>
+                  Just one last step: Don{"’"}t miss the live event by signing
+                  up for a reminder via SMS or calendar now!
                </Typography>
             ) : (
                <Typography variant="brandedBody" sx={styles.description}>
@@ -316,7 +317,8 @@ const Header = ({ isSparksOpen }) => {
 
 const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
    const route = useRouter()
-   const { closeDialog, livestream } = useLiveStreamDialog()
+   const { closeDialog, livestream, goToView, isDiscoverCompanySparksOpen } =
+      useLiveStreamDialog()
    const groupHasSparks = useGroupHasSparks(livestream.groupIds[0])
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
@@ -333,6 +335,19 @@ const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
    return (
       <Box sx={styles.buttonsWrapper}>
          <Stack spacing={1.2} sx={styles.buttons}>
+            {Boolean(livestream.smsEnabled) && !isDiscoverCompanySparksOpen && (
+               <Button
+                  variant="contained"
+                  size="large"
+                  color="secondary"
+                  fullWidth
+                  startIcon={<MessageSquare />}
+                  onClick={() => goToView("ask-phone-number")}
+               >
+                  Get SMS Reminder
+               </Button>
+            )}
+
             <AddToCalendar
                event={livestream}
                filename={`${livestream.company}-event`}
@@ -420,11 +435,8 @@ const SparksMobileCarousel = ({ livestream, handleSparkClick }) => {
             <GroupSparksCarousel
                handleSparksClicked={handleSparkClick}
                header={<CarouselHeader />}
-               headerSx={styles.mobileSparksCarouselHeader}
                groupId={livestream.groupIds[0]}
                sx={styles.mobileSparksCarousel}
-               showArrows
-               arrows={MobileSparksArrows}
             />
          </SuspenseWithBoundary>
       </Box>

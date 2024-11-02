@@ -4,7 +4,7 @@ import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/use
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
-import { SparksCarousel } from "components/views/mentor-page/SparksCarousel"
+import { MentorSparksCarousel } from "components/views/mentor-page/MentorSparksCarousel"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
@@ -83,7 +83,7 @@ const LinkedContentDetails = ({ job }: Props) => {
                   Sparks related to this job
                </Typography>
                <Box sx={styles.linkedContentWrapper}>
-                  <SparksCarousel sparks={jobSparks} disableClick />
+                  <MentorSparksCarousel sparks={jobSparks} disableClick />
                </Box>
             </Box>
          ) : null}

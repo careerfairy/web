@@ -9,9 +9,9 @@ import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import {
    ComponentType,
-   createContext,
    Dispatch,
    FC,
+   createContext,
    useCallback,
    useContext,
    useEffect,
@@ -30,9 +30,9 @@ import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import {
    RegistrationAction,
+   RegistrationState,
    registrationInitialState,
    registrationReducer,
-   RegistrationState,
 } from "./registrationReducer"
 import { buildDialogLink } from "./util"
 import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQuestionsViewSkeleton"
@@ -42,6 +42,8 @@ import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
 import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
+import { AskPhoneNumberViewSkeleton } from "./views/sms/AskPhoneNumberViewSkeleton"
+import SpeakerDetailsViewSkeleton from "./views/speaker-details/SpeakerDetailsViewSkeleton"
 
 const styles = sxStyles({
    content: {
@@ -83,7 +85,7 @@ type Props = {
    livestreamId: string
    handleClose: () => void
    open: boolean
-   page: "details" | "register" | "job-details"
+   page: "details" | "register" | "job-details" | "speaker-details"
    updatedStats?: UserStats
    serverUserEmail: string
    /**
@@ -97,11 +99,19 @@ type Props = {
    onRegisterSuccess?: () => void
    currentSparkId?: string
    /**
-    * The ID of a job associated with the livestream.
+    * The ID of a job associated with the live stream.
     *
     * Note: This property is only available in the "stand-alone" mode.
     */
    jobId?: string
+   /**
+    * The ID of a speaker associated with the live stream.
+    *
+    * Note: This property is only available in the "stand-alone" mode.
+    */
+   speakerId?: string
+   isDiscoverCompanySparksOpen?: boolean
+   handleDiscoverCompanySparks?: () => void
 }
 
 export type ViewKey =
@@ -110,7 +120,9 @@ export type ViewKey =
    | "register-ask-questions"
    | "register-join-talent-pool"
    | "register-success"
+   | "ask-phone-number"
    | "job-details"
+   | "speaker-details"
 
 type ViewProps = {
    key: ViewKey
@@ -159,9 +171,19 @@ const views: View[] = [
       loadingComponent: () => <RegisterSuccessViewSkeleton />,
    }),
    createView({
+      key: "ask-phone-number",
+      viewPath: "sms/AskPhoneNumberView",
+      loadingComponent: () => <AskPhoneNumberViewSkeleton />,
+   }),
+   createView({
       key: "job-details",
       viewPath: "job-details/JobDetailsView",
       loadingComponent: () => <JobDetailsViewSkeleton />,
+   }),
+   createView({
+      key: "speaker-details",
+      viewPath: "speaker-details/SpeakerDetailsView",
+      loadingComponent: () => <SpeakerDetailsViewSkeleton />,
    }),
 ]
 
@@ -219,6 +241,7 @@ const Content: FC<ContentProps> = ({
    mode = "page",
    currentSparkId,
    jobId,
+   speakerId,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -233,6 +256,16 @@ const Content: FC<ContentProps> = ({
 
    const [value, setValue] = useState<number>(getPageIndex(page))
    const [currentJobId, setCurrentJobId] = useState<string | null>(jobId)
+   const [currentSpeakerId, setCurrentSpeakerId] = useState<string | null>(
+      speakerId
+   )
+
+   const [isDiscoverCompanySparksOpen, setIsDiscoverCompanySparksOpen] =
+      useState(false)
+
+   const handleDiscoverCompanySparks = useCallback(() => {
+      setIsDiscoverCompanySparksOpen(true)
+   }, [])
 
    const hasInitialData =
       serverSideLivestream && livestreamId === serverSideLivestream.id
@@ -314,6 +347,29 @@ const Content: FC<ContentProps> = ({
       [livestreamId, mode, push, router]
    )
 
+   const goToSpeakerDetails = useCallback(
+      (speakerId: string) => {
+         if (mode === "page") {
+            push(
+               buildDialogLink({
+                  router,
+                  link: {
+                     speakerId: speakerId,
+                     livestreamId,
+                     type: "speakerDetails",
+                  },
+               }),
+               undefined,
+               routerOptions
+            )
+         } else {
+            setCurrentSpeakerId(speakerId)
+            setValue(views.findIndex((v) => v.key === "speaker-details"))
+         }
+      },
+      [livestreamId, mode, push, router]
+   )
+
    const onClose = useCallback(() => {
       handleClose()
    }, [handleClose])
@@ -363,9 +419,13 @@ const Content: FC<ContentProps> = ({
          registrationDispatch,
          jobId: currentJobId,
          goToJobDetails,
+         goToSpeakerDetails: goToSpeakerDetails,
+         speakerId: currentSpeakerId,
          mode,
          onRegisterSuccess,
          currentSparkId,
+         isDiscoverCompanySparksOpen,
+         handleDiscoverCompanySparks,
       }),
       [
          goToView,
@@ -380,9 +440,13 @@ const Content: FC<ContentProps> = ({
          registrationState,
          currentJobId,
          goToJobDetails,
+         goToSpeakerDetails,
+         currentSpeakerId,
          mode,
          onRegisterSuccess,
          currentSparkId,
+         isDiscoverCompanySparksOpen,
+         handleDiscoverCompanySparks,
       ]
    )
 
@@ -422,7 +486,7 @@ type DialogContextType = {
    handleBack: () => void
    closeDialog: () => void
    /**
-    * The ID of a job associated with the livestream.
+    * The ID of a job associated with the live stream.
     *
     * Note: This property is only available in the "stand-alone" mode.
     */
@@ -434,6 +498,17 @@ type DialogContextType = {
     * Note: This method is only works in the "stand-alone" mode.
     */
    goToJobDetails: (jobId: string) => void
+   /**
+    * Method to navigate to the speaker details view.
+    */
+   goToSpeakerDetails: (speakerId: string) => void
+
+   /**
+    * The ID of a speaker associated with the live stream.
+    *
+    * Note: This property is only available in the "stand-alone" mode.
+    */
+   speakerId: string | null
    /*
     * Undefined -> loading
     * Null -> no livestream
@@ -465,6 +540,8 @@ type DialogContextType = {
     */
    onRegisterSuccess?: () => void
    currentSparkId?: string
+   isDiscoverCompanySparksOpen: boolean
+   handleDiscoverCompanySparks: () => void
 }
 
 const getPageIndex = (page: Props["page"]): number => {
@@ -475,6 +552,8 @@ const getPageIndex = (page: Props["page"]): number => {
          return views.findIndex((view) => view.key === "register-data-consent")
       case "job-details":
          return views.findIndex((view) => view.key === "job-details")
+      case "speaker-details":
+         return views.findIndex((view) => view.key === "speaker-details")
    }
 }
 
@@ -484,6 +563,8 @@ const DialogContext = createContext<DialogContextType>({
    goToView: () => {},
    jobId: null,
    goToJobDetails: () => {},
+   goToSpeakerDetails: () => {},
+   speakerId: null,
    livestream: undefined,
    livestreamPresenter: null,
    activeView: "livestream-details",
@@ -494,6 +575,8 @@ const DialogContext = createContext<DialogContextType>({
    registrationDispatch: () => {},
    mode: "page",
    currentSparkId: null,
+   isDiscoverCompanySparksOpen: false,
+   handleDiscoverCompanySparks: () => {},
 })
 
 export const useLiveStreamDialog = () => {

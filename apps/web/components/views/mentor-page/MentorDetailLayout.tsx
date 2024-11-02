@@ -1,15 +1,28 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Button, Stack, Typography, useTheme } from "@mui/material"
+import {
+   Button,
+   Skeleton,
+   Stack,
+   SxProps,
+   Typography,
+   useTheme,
+} from "@mui/material"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useCallback } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
+import { combineStyles } from "types/commonTypes"
 import { LinkedInIcon } from "../common/icons/LinkedInIcon"
 import CollapsibleText from "../common/inputs/CollapsibleText"
 import { useIsTargetedUser } from "../sparks/components/spark-card/Notifications/linkedin/useIsTargetedUser"
+import { LivestreamsCarousel } from "./LivestreamsCarousel"
+import { MentorSparksCarousel } from "./MentorSparksCarousel"
 import { SpeakerAvatar } from "./SpeakersAvatar"
 
 const styles = sxStyles({
@@ -35,6 +48,8 @@ const styles = sxStyles({
    linkedInButton: (theme) => ({
       color: `${theme.brand.info[700]}`,
       border: `1px solid ${theme.brand.info[400]}`,
+      flexShrink: 0,
+
       "&:hover": {
          border: `1px solid ${theme.brand.info[400]}`,
          backgroundColor: `${theme.brand.info[50]}`,
@@ -52,6 +67,21 @@ const styles = sxStyles({
       "& button": {
          width: "100%",
       },
+   },
+   mentorContentContainer: {
+      position: "relative",
+      display: "flex",
+      flexDirection: "column",
+      gap: "24px",
+      width: "100%",
+   },
+   header: {
+      alignItems: "center",
+      gap: 2,
+   },
+   contentTitle: {
+      fontWeight: 600,
+      color: (theme) => theme.palette.neutral[800],
    },
 })
 
@@ -109,7 +139,7 @@ const getMentorPlaceholderStory = ({
    const watchMessage = `Hi! Watch my ${availableContentMessage} to get to know me better and understand how it is to work at ${companyName}.`
 
    const noLinkedInNoJobs = `${watchMessage}`
-   const noLinkedInWithJobs = `${watchMessage} After that, visit ${companyName}’s company page to discover more career opportunities!`
+   const noLinkedInWithJobs = `${watchMessage} After that, visit ${companyName}'s company page to discover more career opportunities!`
 
    const notTargetedUserCountry = hasJobs
       ? noLinkedInWithJobs
@@ -125,6 +155,10 @@ const getMentorPlaceholderStory = ({
    return placeholder
 }
 
+export const MentorDetailLayout = ({ children }) => {
+   return <Stack sx={styles.root}>{children}</Stack>
+}
+
 type MentorDetailProps = {
    mentor: PublicCreator
    group: Group
@@ -133,17 +167,15 @@ type MentorDetailProps = {
    hasJobs: boolean
 }
 
-export const MentorDetail = ({
+const Header = ({
    mentor,
    group,
-   numSparks,
-   numLivestreams,
-   hasJobs,
-}: MentorDetailProps) => {
-   const isDesktop = useIsDesktop()
+   fullWidth = false,
+}: Pick<MentorDetailProps, "mentor" | "group"> & { fullWidth?: boolean }) => {
    const { data: visitorId } = useFingerPrint()
    const { trackMentorLinkedInReach } = useFirebaseService()
    const isUserFromTargetedCountry = useIsTargetedUser(group)
+   const isMobile = useIsMobile()
 
    const linkedInOnClick = useCallback(() => {
       trackMentorLinkedInReach(group.groupId, mentor.id, visitorId)
@@ -151,17 +183,12 @@ export const MentorDetail = ({
 
    if (!mentor) return null
 
-   const placeholderStory = getMentorPlaceholderStory({
-      mentor,
-      companyName: group.universityName,
-      numSparks,
-      numLivestreams,
-      isUserFromTargetedCountry,
-      hasJobs,
-   })
-
+   const isButtonFullWidth = fullWidth ? isMobile : true
    return (
-      <Stack sx={styles.root}>
+      <Stack
+         direction={fullWidth ? { s: "column", md: "row" } : "column"}
+         sx={styles.header}
+      >
          <SpeakerAvatar mentor={mentor} companyName={group.universityName} />
          {Boolean(isUserFromTargetedCountry && mentor?.linkedInUrl) && (
             <Button
@@ -171,10 +198,56 @@ export const MentorDetail = ({
                href={mentor.linkedInUrl}
                target="_blank"
                onClick={linkedInOnClick}
+               fullWidth={isButtonFullWidth}
             >
                <LinkedInButton />
             </Button>
          )}
+      </Stack>
+   )
+}
+
+const HeaderSkeleton = ({ fullWidth = false }: { fullWidth?: boolean }) => {
+   return (
+      <Stack
+         direction={fullWidth ? { s: "column", md: "row" } : "column"}
+         sx={styles.header}
+      >
+         <Stack spacing={0.75} direction="row" width="100%">
+            <Skeleton variant="circular" width={80} height={80} />
+            <Stack>
+               <Typography variant="h6">
+                  <Skeleton width="150px" />
+               </Typography>
+               <Typography variant="body2">
+                  <Skeleton width="250px" />
+               </Typography>
+            </Stack>
+         </Stack>
+      </Stack>
+   )
+}
+
+const Description = ({
+   mentor,
+   group,
+   numSparks,
+   numLivestreams,
+   hasJobs,
+}: MentorDetailProps) => {
+   const isDesktop = useIsDesktop()
+   const isUserFromTargetedCountry = useIsTargetedUser(group)
+
+   const placeholderStory = getMentorPlaceholderStory({
+      mentor,
+      companyName: group.universityName,
+      numSparks,
+      numLivestreams,
+      isUserFromTargetedCountry,
+      hasJobs,
+   })
+   return (
+      <>
          {isDesktop || !mentor.story ? (
             <Typography sx={styles.story}>
                {mentor.story ? mentor.story : placeholderStory}
@@ -190,6 +263,47 @@ export const MentorDetail = ({
                containerSx={styles.mobileCollapsibleContainer}
             />
          )}
+      </>
+   )
+}
+
+const Content = ({
+   livestreams,
+   sparks,
+   sx,
+}: {
+   livestreams: LivestreamEvent[]
+   sparks: Spark[]
+   sx?: SxProps
+}) => {
+   return (
+      <Stack sx={combineStyles(styles.mentorContentContainer, sx)}>
+         {Boolean(sparks.length) && (
+            <MentorSparksCarousel
+               sparks={sparks}
+               title={
+                  <Typography variant="brandedH5" sx={styles.contentTitle}>
+                     My Sparks
+                  </Typography>
+               }
+            />
+         )}
+         {Boolean(livestreams.length) && (
+            <LivestreamsCarousel
+               livestreams={livestreams}
+               title={
+                  <Typography variant="brandedH5" sx={styles.contentTitle}>
+                     Live streams
+                  </Typography>
+               }
+            />
+         )}
       </Stack>
    )
 }
+
+MentorDetailLayout.Header = Header
+MentorDetailLayout.Description = Description
+MentorDetailLayout.Content = Content
+
+MentorDetailLayout.HeaderSkeleton = HeaderSkeleton

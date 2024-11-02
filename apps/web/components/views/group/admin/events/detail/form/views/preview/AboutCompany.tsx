@@ -71,7 +71,6 @@ const styles = sxStyles({
       height: "fit-content",
    },
    followButton: {
-      borderRadius: 1,
       py: 0.5,
       px: 2.25,
       textTransform: "none",
@@ -88,13 +87,14 @@ const styles = sxStyles({
       borderRadius: 1,
    },
    companyName: {
-      fontSize: "1.285rem",
       fontWeight: 600,
+      color: (theme) => theme.palette.neutral[800],
    },
    companyDescription: {
-      fontSize: "1.071rem",
+      fontSize: "1.14rem",
       fontWeight: 400,
       mt: 1.875,
+      color: (theme) => theme.palette.neutral[800],
    },
    companyCtaWrapper: {
       display: "flex",
@@ -184,7 +184,7 @@ const AboutCompanyComponent = ({
                   alignItems="center"
                >
                   <Stack flexDirection={"row"} alignItems={"center"}>
-                     <Typography component="h5" sx={styles.companyName}>
+                     <Typography variant="brandedH4" sx={styles.companyName}>
                         {companyName}
                      </Typography>
 

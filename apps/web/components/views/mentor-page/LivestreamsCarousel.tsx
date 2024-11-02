@@ -4,8 +4,9 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box } from "@mui/material"
+import { ReactNode } from "react"
+import { ContentCarousel } from "../common/carousels/ContentCarousel"
 import EventPreviewCard from "../common/stream-cards/EventPreviewCard"
-import { ContentCarousel } from "./ContentCarousel"
 
 const CARD_WIDTH = 328
 const CARD_HEIGHT = 268
@@ -20,19 +21,22 @@ const styles = sxStyles({
    cardWrapper: {
       width: CARD_WIDTH,
       minHeight: CARD_HEIGHT,
+      height: "100%",
    },
 })
 
 type LivestreamsCarouselProps = {
    livestreams: LivestreamEvent[]
+   title?: string | ReactNode
 }
 
 export const LivestreamsCarousel = ({
    livestreams,
+   title = "Live streams",
 }: LivestreamsCarouselProps) => {
    return (
       <ContentCarousel
-         headerTitle="Live streams"
+         headerTitle={title}
          slideWidth={CARD_WIDTH}
          viewportSx={styles.viewport}
       >

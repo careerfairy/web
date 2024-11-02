@@ -1,7 +1,8 @@
-import React, { useState } from "react"
 import { Avatar, type AvatarProps, Box } from "@mui/material"
 import Image, { ImageProps } from "next/legacy/image"
+import React, { useState } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
+import Link from "../Link"
 
 const getStyles = (size: number) =>
    sxStyles({
@@ -25,6 +26,7 @@ type Props = {
    quality?: number
    children?: React.ReactNode
    sx?: AvatarProps["sx"]
+   href?: string
 }
 
 const CircularLogo = React.forwardRef<HTMLDivElement, Props>(
@@ -38,6 +40,7 @@ const CircularLogo = React.forwardRef<HTMLDivElement, Props>(
          quality = 70,
          children,
          sx,
+         href,
       },
       ref
    ) => {
@@ -51,7 +54,11 @@ const CircularLogo = React.forwardRef<HTMLDivElement, Props>(
             sx={combineStyles(styles.root, sx)}
             ref={ref}
          >
-            <Box borderRadius={borderRadius}>
+            <Box
+               borderRadius={borderRadius}
+               component={href ? Link : "div"}
+               href={href}
+            >
                {noLoadErrorOccurred ? (
                   <Image
                      src={src}

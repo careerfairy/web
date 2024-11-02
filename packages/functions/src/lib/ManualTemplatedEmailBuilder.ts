@@ -28,7 +28,7 @@ export class ManualTemplatedEmailBuilder {
             },
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "follow-up-vz-livestream",
+         Tag: "fill-and-win",
       })
    }
 

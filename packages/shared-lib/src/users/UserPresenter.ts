@@ -1,10 +1,10 @@
-import { UserData } from "./users"
+import { Badge } from "../badges/badges"
+import { EngageBadgeLevel2 } from "../badges/EngageBadges"
+import { NetworkerBadgeLevel2 } from "../badges/NetworkBadges"
+import { ResearchBadgeLevel2 } from "../badges/ResearchBadges"
 import BasePresenter from "../BasePresenter"
 import { getUserBadges, UserBadges } from "./UserBadges"
-import { Badge } from "../badges/badges"
-import { NetworkerBadgeLevel2 } from "../badges/NetworkBadges"
-import { EngageBadgeLevel2 } from "../badges/EngageBadges"
-import { ResearchBadgeLevel2 } from "../badges/ResearchBadges"
+import { UserData } from "./users"
 
 export default class UserPresenter extends BasePresenter<UserData> {
    public readonly badges: UserBadges
@@ -76,9 +76,11 @@ export default class UserPresenter extends BasePresenter<UserData> {
          .join(" - ")
    }
 
-   getFieldOfStudyDisplayName(): string {
+   getFieldOfStudyDisplayName(talentProfileV1?: boolean): string {
       const filedOfStudy = this.model?.fieldOfStudy?.name
-      return filedOfStudy ? `${filedOfStudy} Student` : null
+      return filedOfStudy
+         ? `${filedOfStudy} ${talentProfileV1 ? "" : "Student"}`
+         : null
    }
 
    getResumePath() {

@@ -5,9 +5,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack } from "@mui/material"
 import { BackButton } from "./BackButton"
-import { LivestreamsCarousel } from "./LivestreamsCarousel"
-import { MentorDetail } from "./MentorDetail"
-import { SparksCarousel } from "./SparksCarousel"
+import { MentorDetailLayout } from "./MentorDetailLayout"
 
 const SLIDE_WIDTH = 368
 
@@ -42,19 +40,9 @@ const styles = sxStyles({
       background: "#FFF",
    },
    mentorContentContainer: {
-      position: "relative",
-      display: "flex",
-      flexDirection: "column",
-      gap: "24px",
-      width: "100%",
       padding: {
          xs: "16px",
       },
-   },
-   rule: {
-      background: "#E4E4E4",
-      height: "1px",
-      width: "100%",
    },
 })
 
@@ -77,23 +65,22 @@ export const MentorDetailPage = ({
       <Stack sx={styles.root}>
          <Box sx={styles.mentorDetailsContainer}>
             <BackButton />
-            <MentorDetail
-               mentor={mentor}
-               group={group}
-               numSparks={sparks.length}
-               numLivestreams={livestreams.length}
-               hasJobs={hasJobs}
-            />
+            <MentorDetailLayout>
+               <MentorDetailLayout.Header mentor={mentor} group={group} />
+               <MentorDetailLayout.Description
+                  mentor={mentor}
+                  group={group}
+                  hasJobs={hasJobs}
+                  numLivestreams={livestreams.length}
+                  numSparks={sparks.length}
+               />
+            </MentorDetailLayout>
          </Box>
-         <Stack sx={styles.mentorContentContainer}>
-            {Boolean(sparks.length) && <SparksCarousel sparks={sparks} />}
-            {livestreams.length > 0 && sparks.length > 0 ? (
-               <Box sx={styles.rule} />
-            ) : null}
-            {Boolean(livestreams.length) && (
-               <LivestreamsCarousel livestreams={livestreams} />
-            )}
-         </Stack>
+         <MentorDetailLayout.Content
+            livestreams={livestreams}
+            sparks={sparks}
+            sx={styles.mentorContentContainer}
+         />
       </Stack>
    )
 }

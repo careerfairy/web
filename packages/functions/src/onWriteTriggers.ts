@@ -475,10 +475,17 @@ export const onWriteCustomJobsSendNotifications = functions
 
       if (changeTypes.isCreate || changeTypes.isUpdate) {
          const newCustomJob = change.after.data() as CustomJob
+         const oldCustomJob = change.before.data() as CustomJob
 
-         sideEffectPromises.push(
-            customJobRepo.createNewCustomJobUserNotifications(newCustomJob)
-         )
+         if (!oldCustomJob?.published && newCustomJob?.published) {
+            sideEffectPromises.push(
+               customJobRepo.createNewCustomJobUserNotifications(newCustomJob)
+            )
+         } else {
+            functions.logger.log(
+               `${newCustomJob.id} job update was not newly published. Skipping notifications.`
+            )
+         }
       }
 
       return handleSideEffects(sideEffectPromises)

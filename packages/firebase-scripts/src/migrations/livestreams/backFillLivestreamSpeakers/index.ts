@@ -16,21 +16,19 @@ const counter = new Counter()
 export async function run() {
    try {
       Counter.log(
-         `Fetching all upcoming live streams: Adding groupId to all of its speakers - v${RUNNING_VERSION}`
+         `Fetching all live streams: Adding groupId to all of its speakers - v${RUNNING_VERSION}`
       )
 
-      const allFutureLivestreams = await logAction(
-         () => livestreamRepo.getAllFutureLivestreams(true, false),
-         "Fetching all upcoming live streams"
+      const allLivestreams = await logAction(
+         () => livestreamRepo.getAllLivestreams(true, false),
+         "Fetching all live streams"
       )
 
-      Counter.log(
-         `Fetched ${allFutureLivestreams.length} Upcoming live streams`
-      )
+      Counter.log(`Fetched ${allLivestreams.length} live streams`)
 
-      counter.addToReadCount(allFutureLivestreams.length)
+      counter.addToReadCount(allLivestreams.length)
 
-      await backfillLivestreamsSpeakers(allFutureLivestreams, "livestreams")
+      await backfillLivestreamsSpeakers(allLivestreams, "livestreams")
 
       const allDraftLivestreams = await logAction(
          () => livestreamRepo.getAllDraftLivestreams(),

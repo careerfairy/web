@@ -4,7 +4,6 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import {
    Button,
-   IconButton,
    Stack,
    SxProps,
    Typography,
@@ -15,24 +14,18 @@ import {
 import Box from "@mui/material/Box"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
 import React, { ReactNode, useMemo } from "react"
-import { ArrowLeft, ArrowRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
 
 const styles = sxStyles({
-   arrowIcon: {
-      padding: 0,
-      minHeight: { xs: "25px", md: "30px" },
-      minWidth: { xs: "25px", md: "30px" },
-      ml: 2,
-   },
    eventsHeader: {
       display: "flex",
       justifyContent: "space-between",
@@ -46,11 +39,14 @@ const styles = sxStyles({
       alignItems: "center",
       paddingTop: 2,
    },
-   seeMoreText: {
-      color: "text.secondary",
+   seeMoreText: (theme) => ({
+      color: theme.palette.neutral[600],
       textDecoration: "underline",
       pr: 1,
-   },
+      ":hover": {
+         color: theme.palette.neutral[800],
+      },
+   }),
    underlined: {
       textDecoration: "underline",
    },
@@ -260,9 +256,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             condition={events?.length > 1 && seeMoreLink !== undefined}
          >
             <Link href={seeMoreLink}>
-               <Typography sx={allStyles.seeMoreSx} color="grey">
-                  See all
-               </Typography>
+               <Typography sx={allStyles.seeMoreSx}>See all</Typography>
             </Link>
          </ConditionalWrapper>
       )
@@ -270,26 +264,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          <ConditionalWrapper
             condition={emblaApi !== undefined && events?.length > 1}
          >
-            <Stack direction={"row"}>
-               <IconButton
-                  color="inherit"
-                  sx={styles.arrowIcon}
-                  onClick={() => {
-                     if (emblaApi.canScrollPrev()) emblaApi.scrollPrev()
-                  }}
-               >
-                  <ArrowLeft fontSize={"large"} />
-               </IconButton>
-               <IconButton
-                  color="inherit"
-                  sx={styles.arrowIcon}
-                  onClick={() => {
-                     if (emblaApi.canScrollNext()) emblaApi.scrollNext()
-                  }}
-               >
-                  <ArrowRight fontSize={"large"} />
-               </IconButton>
-            </Stack>
+            <GenericCarousel.Arrows emblaApi={emblaApi} />
          </ConditionalWrapper>
       )
 
@@ -356,7 +331,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            spacing={1}
                            direction={"row"}
                            justifyContent="space-between"
-                           alignItems="center"
+                           alignItems="flex-end"
                         >
                            <ConditionalWrapper
                               condition={!allStyles.headerAsLink && !isMobile}
@@ -409,7 +384,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            direction="row"
                            spacing={2}
                            justifyContent="space-between"
-                           alignItems="center"
+                           alignItems="flex-end"
                            mt={1}
                            mb={1}
                         >

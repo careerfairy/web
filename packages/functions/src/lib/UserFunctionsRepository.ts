@@ -19,7 +19,8 @@ const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(
       userEmails?: string[],
-      locationFilters?: string[]
+      locationFilters?: string[],
+      lastActivityMonths?: number
    ): Promise<UserData[]>
 
    getSubscribedUsersByCountryCode(
@@ -55,10 +56,16 @@ export class UserFunctionsRepository
 {
    async getSubscribedUsers(
       userEmails?: string[],
-      locationFilters?: string[]
+      locationFilters?: string[],
+      lastActivityMonths?: number
    ): Promise<UserData[]> {
       const earlierThan = DateTime.now()
-         .minus({ months: SUBSCRIBED_BEFORE_MONTHS_COUNT })
+         .minus({
+            months:
+               lastActivityMonths !== undefined
+                  ? lastActivityMonths
+                  : SUBSCRIBED_BEFORE_MONTHS_COUNT,
+         })
          .toJSDate()
 
       let query = this.firestore

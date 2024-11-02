@@ -72,6 +72,7 @@ type DialogPage = "/portal" | "/next-livestreams"
 
 type ValidLink =
    | ["livestream", string, "job-details", string]
+   | ["livestream", string, "speaker-details", string]
    | ["livestream", string]
    | ["livestream", string, "register"]
 
@@ -85,6 +86,12 @@ type LinkType =
         type: "jobDetails"
         livestreamId: string
         jobId: string
+        targetPage?: DialogPage
+     }
+   | {
+        type: "speakerDetails"
+        livestreamId: string
+        speakerId: string
         targetPage?: DialogPage
      }
    | {
@@ -110,6 +117,14 @@ export const buildDialogLink = ({
          break
       case "jobDetails":
          query = ["livestream", link.livestreamId, "job-details", link.jobId]
+         break
+      case "speakerDetails":
+         query = [
+            "livestream",
+            link.livestreamId,
+            "speaker-details",
+            link.speakerId,
+         ]
          break
       case "registerToLivestream":
          query = ["livestream", link.livestreamId, "register"]

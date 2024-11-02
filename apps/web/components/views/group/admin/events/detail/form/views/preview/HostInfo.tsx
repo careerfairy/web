@@ -40,7 +40,7 @@ const HostInfo = ({ companyName, companyLogoUrl }: HostInfoProps) => {
                <Typography fontWeight={300} variant={"body1"}>
                   Hosted by
                </Typography>
-               <Typography fontWeight={600} variant={"h5"}>
+               <Typography fontWeight={600} variant={"brandedH4"}>
                   {companyName}
                </Typography>
             </Box>
