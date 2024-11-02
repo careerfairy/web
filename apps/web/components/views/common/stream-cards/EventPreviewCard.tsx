@@ -13,6 +13,7 @@ import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
 import { usePartnership } from "HOCs/PartnershipProvider"
+import { useIsDraftLivestreams } from "components/custom-hook/live-stream/useIsDraftLivestream"
 import { useUserHasParticipated } from "components/custom-hook/live-stream/useUserHasParticipated"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
@@ -334,7 +335,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
-      const isAdminJobs = pathname.includes("/admin/jobs")
+      const isDraftEvent = useIsDraftLivestreams(event?.id)
 
       const trackImpressionsRef = useTrackLivestreamImpressions({
          event,
@@ -342,7 +343,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          positionInResults: index,
          numberOfResults: totalElements,
          location,
-         disableTracking: isPlaceholderEvent || isAdminJobs,
+         disableTracking: isPlaceholderEvent || isDraftEvent,
       })
 
       const { authenticatedUser } = useAuth()
@@ -500,7 +501,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                   target={targetValue}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
-                  disabled={disableClick || loading}
+                  disabled={disableClick || loading || isDraftEvent}
                   disableRipple={!event}
                >
                   <Box
