@@ -18,6 +18,8 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import FileUploader from "components/views/common/FileUploader"
 import { getImageDimensionsValidator } from "components/views/common/FileUploader/validations"
 import ImageCropperDialog from "components/views/common/ImageCropperDialog"
+import { LineIcon } from "components/views/common/icons/LineIcon"
+import { SlideUpTransition } from "components/views/common/transitions"
 import { FC, useCallback, useState } from "react"
 import { Camera, Image, Trash2, Upload } from "react-feather"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -65,7 +67,12 @@ const styles = sxStyles({
          top: "unset !important",
          right: "unset !important",
          bottom: "0",
-         maxHeight: "138px",
+         // maxHeight: "138px",
+         maxHeight: {
+            xs: "170px",
+            sm: "160px",
+         },
+         overflow: "hidden", // Prevent scrolling within menu
          width: "100dvw !important",
          maxWidth: "unset",
          borderBottomRightRadius: "0px",
@@ -175,11 +182,14 @@ export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
             onClick={handleClose}
             // transformOrigin={transformOrigin}
             // anchorOrigin={anchorOrigin}
-            disableScrollLock={false}
+            TransitionComponent={isMobile ? SlideUpTransition : undefined}
+            disableScrollLock={!isMobile}
             sx={[styles.menu, isMobile ? styles.mobileMenu : null]}
          >
             <ConditionalWrapper condition={isMobile}>
-               line icon here
+               <Stack alignItems={"center"}>
+                  <LineIcon sx={{ width: "94px" }} />
+               </Stack>
             </ConditionalWrapper>
             <Stack divider={<Divider sx={{ my: "0 !important" }} />}>
                <FileUploader {...logoUploaderProps}>
