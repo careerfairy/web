@@ -274,8 +274,6 @@ const SparksPage: NextPage<
          {mounted() ? (
             <GenericDashboardLayout
                hideDrawer={isFullScreen}
-               topBarFixed
-               topBarTransparent
                hideFooter
                headerWidth="auto"
                hideHeader={isFullScreen}
