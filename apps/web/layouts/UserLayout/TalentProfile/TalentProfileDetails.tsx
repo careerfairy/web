@@ -2,6 +2,7 @@ import { Box, Tab, Tabs } from "@mui/material"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 
+// TODO-WG: Move to own /Details folders
 const styles = sxStyles({
    root: {
       backgroundColor: "white",

@@ -1,15 +1,27 @@
 import { USER_BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/users/UserPresenter"
 import LoadingButton from "@mui/lab/LoadingButton"
-import { Box } from "@mui/material"
+import {
+   Box,
+   Divider,
+   ListItemIcon,
+   Menu,
+   MenuItem,
+   Stack,
+   Typography,
+} from "@mui/material"
 import { darken } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
 import useFileUploader from "components/custom-hook/useFileUploader"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import useMenuState from "components/custom-hook/useMenuState"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import FileUploader from "components/views/common/FileUploader"
 import { getImageDimensionsValidator } from "components/views/common/FileUploader/validations"
 import ImageCropperDialog from "components/views/common/ImageCropperDialog"
-import { FC, useState } from "react"
-import { Camera } from "react-feather"
+import { FC, useCallback, useState } from "react"
+import { Camera, Image, Trash2, Upload } from "react-feather"
 import { sxStyles } from "../../../../types/commonTypes"
+import { ConfirmDeleteUserBannerDialog } from "./ConfirmDeleteUserBannerDialog"
 
 type BannerPhotoUploadButtonProps = {
    handleUploadBannerPhoto: (photos: File) => Promise<void>
@@ -41,6 +53,39 @@ const styles = sxStyles({
       width: "14px",
       color: (theme) => theme.brand.white[50],
    },
+   menu: {
+      mt: 1,
+      "& .MuiList-root": {
+         py: "0 !important",
+      },
+   },
+   mobileMenu: {
+      "& .MuiPaper-root": {
+         left: "unset !important",
+         top: "unset !important",
+         right: "unset !important",
+         bottom: "0",
+         maxHeight: "138px",
+         width: "100dvw !important",
+         maxWidth: "unset",
+         borderBottomRightRadius: "0px",
+         borderBottomLeftRadius: "0px",
+      },
+      "& .MuiBackdrop-root": {
+         backgroundColor: "rgba(0, 0, 0, 0.5)",
+      },
+      "& .MuiList-root": {
+         height: "100dvh",
+      },
+   },
+   standardMenuItemIcon: {
+      color: (theme) => theme.palette.neutral[600],
+      width: "16px",
+      height: "16px",
+   },
+   menuItem: {
+      p: "12px 16px",
+   },
 })
 
 const userBannerImageValidator = getImageDimensionsValidator({
@@ -55,8 +100,13 @@ export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
    handleUploadBannerPhoto,
    disabled,
 }) => {
-   // const { handleClick, open, handleClose, anchorEl } = useMenuState()
+   const isMobile = useIsMobile()
+   const { handleClick, open, handleClose, anchorEl } = useMenuState()
+
    const { userData } = useAuth()
+   const [showUserBannerDelete, setShowUserBannerDelete] =
+      useState<boolean>(false)
+
    const [logoObjectUrl, setLogoObjectUrl] = useState<string | null>(null)
 
    const setLogo = (file, logoSetter) => {
@@ -70,11 +120,21 @@ export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
       multiple: false,
       onValidated: (file) => setLogo(file, setLogoObjectUrl),
       customValidations: [userBannerImageValidator],
+      onCancel: handleClose,
    })
 
    const handleCloseCropImageDialog = () => {
+      handleClose()
       setLogoObjectUrl(null)
    }
+
+   const handleCropperImageSubmit = useCallback(
+      async (image: File) => {
+         handleClose()
+         handleUploadBannerPhoto(image)
+      },
+      [handleUploadBannerPhoto, handleClose]
+   )
 
    return (
       <Box
@@ -90,24 +150,84 @@ export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
                imageSrc={logoObjectUrl}
                open={Boolean(logoObjectUrl)}
                handleClose={handleCloseCropImageDialog}
-               onSubmit={handleUploadBannerPhoto}
+               onSubmit={handleCropperImageSubmit}
                key={`update-${userData.id}-profile-banner`}
                cropType="rectangle"
                cropBoxResizable
                aspectRatio={4 / 1}
             />
          ) : null}
-         <FileUploader sx={{}} {...logoUploaderProps}>
-            <LoadingButton
-               sx={styles.button}
-               loading={loading}
-               disabled={disabled}
-               startIcon={<Box component={Camera} sx={styles.cameraIcon} />}
-               variant="contained"
-               color="grey"
-               size="medium"
-            />
-         </FileUploader>
+         <LoadingButton
+            sx={styles.button}
+            onClick={handleClick}
+            loading={loading}
+            disabled={disabled}
+            startIcon={<Box component={Camera} sx={styles.cameraIcon} />}
+            variant="contained"
+            color="grey"
+            size="medium"
+         />
+         <Menu
+            anchorEl={isMobile ? null : anchorEl}
+            id="profile-banner-upload-menu"
+            open={open}
+            onClose={handleClose}
+            onClick={handleClose}
+            // transformOrigin={transformOrigin}
+            // anchorOrigin={anchorOrigin}
+            disableScrollLock={false}
+            sx={[styles.menu, isMobile ? styles.mobileMenu : null]}
+         >
+            <ConditionalWrapper condition={isMobile}>
+               line icon here
+            </ConditionalWrapper>
+            <Stack divider={<Divider sx={{ my: "0 !important" }} />}>
+               <FileUploader {...logoUploaderProps}>
+                  <MenuItem sx={styles.menuItem}>
+                     <ListItemIcon>
+                        <Box
+                           component={Upload}
+                           sx={styles.standardMenuItemIcon}
+                        />
+                     </ListItemIcon>
+                     <Typography color={"neutral.600"}>
+                        Upload new banner image
+                     </Typography>
+                  </MenuItem>
+               </FileUploader>
+               <MenuItem sx={styles.menuItem}>
+                  <ListItemIcon>
+                     <Box component={Image} sx={styles.standardMenuItemIcon} />
+                  </ListItemIcon>
+                  <Typography color={"neutral.600"}>
+                     View current banner image
+                  </Typography>
+               </MenuItem>
+               <ConditionalWrapper condition={userData.bannerImageUrl}>
+                  <MenuItem
+                     sx={styles.menuItem}
+                     onClick={() => setShowUserBannerDelete(true)}
+                  >
+                     <ListItemIcon>
+                        <Box
+                           component={Trash2}
+                           color="error.600"
+                           width={"16px"}
+                           height={"16px"}
+                        />
+                     </ListItemIcon>
+                     <Typography color="error.600">
+                        Remove banner image
+                     </Typography>
+                  </MenuItem>
+               </ConditionalWrapper>
+            </Stack>
+         </Menu>
+         <ConfirmDeleteUserBannerDialog
+            onClose={() => setShowUserBannerDelete(false)}
+            open={showUserBannerDelete}
+            userId={userData.id}
+         />
       </Box>
    )
 }

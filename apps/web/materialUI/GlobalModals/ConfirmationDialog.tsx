@@ -210,6 +210,7 @@ const MobileDrawer = ({
    icon,
    primaryAction,
    secondaryAction,
+   sx,
 }: Props) => {
    const isSwipeable = Boolean(handleClose)
    const DrawerComponent = isSwipeable ? SwipeableDrawer : Drawer
@@ -223,6 +224,7 @@ const MobileDrawer = ({
             sx: styles.paper,
          }}
          {...(isSwipeable && { onOpen: () => {} })}
+         sx={sx}
       >
          <Stack
             alignItems="center"
