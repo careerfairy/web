@@ -20,8 +20,8 @@ const styles = sxStyles({
       fontWeight: 600,
       position: "absolute",
       top: {
-         xs: "261px",
-         sm: "270px",
+         xs: "111px",
+         sm: "120px",
          md: "320px",
       },
       border: "2px solid white",
