@@ -193,6 +193,7 @@ export type EventsProps = {
    handleOpenEvent?: (event: LivestreamEvent) => void
    disableClick?: boolean
    onCardClick?: (event) => void
+   disableTracking?: boolean
 }
 
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
@@ -217,6 +218,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          handleOpenEvent,
          disableClick,
          onCardClick,
+         disableTracking,
       } = props
 
       const allStyles = { ...defaultStyling, ...styling }
@@ -414,6 +416,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                           isRecommended={isRecommended}
                                           hideChipLabels={hideChipLabels}
                                           disableClick={disableClick}
+                                          disableTracking={disableTracking}
                                           onCardClick={
                                              onCardClick
                                                 ? () => onCardClick(event)

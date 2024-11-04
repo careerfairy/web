@@ -72,6 +72,7 @@ const LinkedContentDetails = ({ job }: Props) => {
                      events={jobLivestreams}
                      isEmbedded
                      disableClick
+                     disableTracking
                   />
                </Box>
             </Box>

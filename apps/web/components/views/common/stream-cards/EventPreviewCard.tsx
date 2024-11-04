@@ -295,6 +295,7 @@ type EventPreviewCardProps = {
    onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
    selectInput?: React.ReactNode
    selected?: boolean
+   disableTracking?: boolean
 }
 
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
@@ -313,6 +314,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          onCardClick,
          selectInput,
          selected,
+         disableTracking,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -328,6 +330,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          disabled: !cardInView, // Helps Reduce the number of listeners
       })
 
+      const router = useRouter()
+
+      const { pathname } = router
+
       const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
       const trackImpressionsRef = useTrackLivestreamImpressions({
@@ -336,10 +342,9 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          positionInResults: index,
          numberOfResults: totalElements,
          location,
-         disableTracking: isPlaceholderEvent,
+         disableTracking: isPlaceholderEvent || disableTracking,
       })
-      const router = useRouter()
-      const { pathname } = router
+
       const { authenticatedUser } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
       const [targetValue, setTargetValue] = useState<string | undefined>(
