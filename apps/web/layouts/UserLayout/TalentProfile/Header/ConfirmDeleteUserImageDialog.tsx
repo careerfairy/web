@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
-import { useDeleteUserBannerImage } from "components/custom-hook/user/useDeleteUserBannerImage"
 import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
 import { Trash2 as DeleteIcon } from "react-feather"
+import { TriggerWithoutArgs } from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -11,38 +11,39 @@ const styles = sxStyles({
 })
 
 type Props = {
-   userId: string
+   title: string
+   description: string
+   triggerDeleteImage: TriggerWithoutArgs<void, any, string, never>
+   isDeleting: boolean
    open: boolean
    onClose: () => void
 }
 
-export const ConfirmDeleteUserBannerDialog = ({
-   userId,
+export const ConfirmDeleteUserImageDialog = ({
+   title,
+   description,
+   triggerDeleteImage,
+   isDeleting,
    open,
    onClose,
 }: Props) => {
-   const {
-      trigger: triggerDeleteUserBanner,
-      isMutating: isDeletingUserBanner,
-   } = useDeleteUserBannerImage(userId)
-
    const handleDelete = async () => {
-      await triggerDeleteUserBanner()
+      await triggerDeleteImage()
       onClose()
    }
 
    return (
       <ConfirmationDialog
          open={open}
-         title="Remove banner image?"
-         description={`Are you sure you want to remove your banner image?`}
+         title={title}
+         description={description}
          icon={<Box component={DeleteIcon} color="error.main" />}
          primaryAction={{
             text: "Remove",
             color: "error",
             callback: handleDelete,
             variant: "contained",
-            loading: isDeletingUserBanner,
+            loading: isDeleting,
          }}
          secondaryAction={{
             text: "Cancel",

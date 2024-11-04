@@ -73,6 +73,8 @@ const styles = sxStyles({
    },
 })
 
+export type CropType = "circle" | "rectangle"
+
 type Props = {
    title?: string
    imageSrc: string
@@ -85,7 +87,7 @@ type Props = {
    onSubmit: (CroppedImageFile: File) => Promise<void>
    aspectRatio?: ReactCropperProps["aspectRatio"]
    swrKey?: string
-   cropType?: "circle" | "rectangle"
+   cropType?: CropType
    cropBoxResizable?: boolean
 }
 
