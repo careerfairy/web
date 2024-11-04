@@ -235,6 +235,7 @@ const LiveStreamsContent = ({
                   isEmbedded
                   onCardClick={handleCardClick}
                   styling={{ padding: false }}
+                  disableTracking
                />
             ) : (
                <MissingContent

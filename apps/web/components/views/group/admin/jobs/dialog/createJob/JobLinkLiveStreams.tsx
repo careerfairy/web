@@ -210,6 +210,7 @@ const JobLinkLiveStreams = ({
                            selectInput={selectInput(event.id)}
                            selected={livestreamIds.includes(event.id)}
                            disableClick={isSubmitting}
+                           disableTracking
                         />
                      </Grid>
                   ))}

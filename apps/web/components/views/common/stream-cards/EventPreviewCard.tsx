@@ -13,7 +13,6 @@ import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
 import { usePartnership } from "HOCs/PartnershipProvider"
-import { useIsDraftLivestreams } from "components/custom-hook/live-stream/useIsDraftLivestream"
 import { useUserHasParticipated } from "components/custom-hook/live-stream/useUserHasParticipated"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import {
@@ -296,6 +295,7 @@ type EventPreviewCardProps = {
    onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
    selectInput?: React.ReactNode
    selected?: boolean
+   disableTracking?: boolean
 }
 
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
@@ -314,6 +314,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          onCardClick,
          selectInput,
          selected,
+         disableTracking,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -335,15 +336,13 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
-      const isDraftEvent = useIsDraftLivestreams(event?.id)
-
       const trackImpressionsRef = useTrackLivestreamImpressions({
          event,
          isRecommended,
          positionInResults: index,
          numberOfResults: totalElements,
          location,
-         disableTracking: isPlaceholderEvent || isDraftEvent,
+         disableTracking: isPlaceholderEvent || disableTracking,
       })
 
       const { authenticatedUser } = useAuth()
@@ -501,7 +500,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                   target={targetValue}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
-                  disabled={disableClick || loading || isDraftEvent}
+                  disabled={disableClick || loading}
                   disableRipple={!event}
                >
                   <Box
