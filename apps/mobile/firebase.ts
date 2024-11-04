@@ -4,23 +4,23 @@ import { getFirestore } from "firebase/firestore"
 import "firebase/messaging" // Import only if using Firebase web version for notifications
 
 import {
-   API_KEY,
-   APPS_ID,
-   AUTH_DOMAIN,
-   DATABASE_URL,
-   FB_PROJECT_ID,
-   MESSAGING_SENDER_ID,
-   STORAGE_BUCKET,
+   FIREBASE_API_KEY,
+   FIREBASE_APPS_ID,
+   FIREBASE_AUTH_DOMAIN,
+   FIREBASE_DATABASE_URL,
+   FIREBASE_PROJECT_ID,
+   FIREBASE_MESSAGING_SENDER_ID,
+   FIREBASE_STORAGE_BUCKET,
 } from "@env"
 
 const firebaseConfig = {
-   apiKey: API_KEY,
-   authDomain: AUTH_DOMAIN,
-   databaseURL: DATABASE_URL,
-   projectId: FB_PROJECT_ID,
-   storageBucket: STORAGE_BUCKET,
-   messagingSenderId: MESSAGING_SENDER_ID,
-   appId: APPS_ID,
+   apiKey: FIREBASE_API_KEY,
+   authDomain: FIREBASE_AUTH_DOMAIN,
+   databaseURL: FIREBASE_DATABASE_URL,
+   projectId: FIREBASE_PROJECT_ID,
+   storageBucket: FIREBASE_STORAGE_BUCKET,
+   messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+   appId: FIREBASE_APPS_ID,
 }
 
 const app = initializeApp(firebaseConfig)
