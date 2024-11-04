@@ -15,42 +15,53 @@ import { useRouter } from "next/navigation"
 import Button from "@mui/material/Button"
 import Head from "next/head"
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout"
+import { deleteSavedNotification } from "../../data/firebase/FirestoreService"
 
 const SavedPushNotifications = () => {
-   const [notifications, setNotifications] = useState([])
    const [loading, setLoading] = useState(false)
    const [page, setPage] = useState(1)
    const [totalPages, setTotalPages] = useState(1)
    const router = useRouter()
    const pageSize = 10 // Number of rows per page
+   const [allItems, setAllItems] = useState([]) // Store all documents
+   const [items, setItems] = useState([]) // Items to display on current page
 
    useEffect(() => {
-      const fetchNotifications = async () => {
-         setLoading(true)
-         try {
-            const snapshot = await firestore
-               .collection("savedNotifications")
-               .limit(pageSize)
-               .get()
+      fetchAllData()
+   }, [])
 
-            console.log(snapshot)
+   const fetchAllData = async () => {
+      setLoading(true)
+      try {
+         const snapshot = await firestore.collection("savedNotifications").get()
 
-            const data = snapshot.docs.map((doc) => ({
-               id: doc.id,
-               ...doc.data(),
-            }))
+         const allData = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }))
 
-            setNotifications(data)
-            setTotalPages(Math.ceil(data.length / pageSize)) // Adjust this based on total documents
-         } catch (error) {
-            console.error("Error fetching notifications:", error)
-         } finally {
-            setLoading(false)
-         }
+         setAllItems(allData) // Store all fetched data
+         setTotalPages(Math.ceil(allData.length / pageSize))
+         setPage(1) // Start on page 1
+      } catch (error) {
+         console.error("Error fetching all data:", error)
       }
+      setLoading(false)
+   }
 
-      fetchNotifications()
-   }, [page])
+   // Update displayed items when `allItems` or `currentPage` changes
+   useEffect(() => {
+      const startIndex = (page - 1) * pageSize
+      const endIndex = startIndex + pageSize
+      setItems(allItems.slice(startIndex, endIndex)) // Slice the items for the current page
+   }, [allItems, page])
+
+   const deleteNotification = (id: string) => {
+      deleteSavedNotification(id).then(() => {
+         setPage(1)
+         fetchAllData()
+      })
+   }
 
    const handlePageChange = (event, value) => {
       setPage(value)
@@ -62,9 +73,11 @@ const SavedPushNotifications = () => {
             <title>CareerFairy | Admin Saved Notifications Table</title>
          </Head>
          <AdminDashboardLayout>
-            <div>
-               <h1>Saved Notifications</h1>
+            <div style={{ padding: 10 }}>
+               <h1>Push Notifications</h1>
                <Button
+                  variant={"contained"}
+                  style={{ marginBottom: 20 }}
                   onClick={() => router.push("/admin/create-notification")}
                >
                   Create New Notification
@@ -83,7 +96,7 @@ const SavedPushNotifications = () => {
                            </TableRow>
                         </TableHead>
                         <TableBody>
-                           {notifications.map((notification) => (
+                           {items.map((notification) => (
                               <TableRow key={notification.id}>
                                  <TableCell>{notification.title}</TableCell>
                                  <TableCell>{notification.body}</TableCell>
@@ -93,7 +106,6 @@ const SavedPushNotifications = () => {
                                        .toLocaleString()}
                                  </TableCell>
                                  <TableCell>
-                                    {/* Add action buttons like Edit or Delete */}
                                     <Button
                                        onClick={() =>
                                           router.push(
@@ -102,6 +114,13 @@ const SavedPushNotifications = () => {
                                        }
                                     >
                                        Edit
+                                    </Button>
+                                    <Button
+                                       onClick={() =>
+                                          deleteNotification(notification.id)
+                                       }
+                                    >
+                                       Delete
                                     </Button>
                                  </TableCell>
                               </TableRow>

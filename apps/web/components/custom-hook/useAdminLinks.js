@@ -98,7 +98,7 @@ const useAdminLinks = () => {
             {
                href: `/admin/saved-push-notifications`,
                icon: CalendarIcon,
-               title: "Saved Push Notifications",
+               title: "Push Notifications",
                basePath: `/admin/saved-push-notifications`,
             },
             {

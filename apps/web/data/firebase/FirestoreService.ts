@@ -37,6 +37,22 @@ export const getSavedNotifications = async (
    }
 }
 
+export const getSavedNotification = async (id: string) => {
+   try {
+      const notificationRef = firestore.collection("savedNotifications").doc(id)
+      const doc = await notificationRef.get()
+      if (doc.exists) {
+         return { id: doc.id, ...doc.data() }
+      } else {
+         // Document does not exist
+         console.error("No such document!")
+         return null
+      }
+   } catch (error) {
+      console.log(error)
+   }
+}
+
 export const updateSavedNotification = async (id: string, data: any) => {
    try {
       await firestore.collection("savedNotifications").doc(id).update(data)
@@ -53,22 +69,39 @@ export const deleteSavedNotification = async (id: string) => {
    }
 }
 
-export async function sendExpoPushNotification(filters: any[], message: any) {
+export async function sendExpoPushNotification(filters: any, message: any) {
    // Filter out invalid tokens
 
    const userRef = firestore.collection("userData")
-   const query = userRef.where("pushToken", "!=", null)
+   let query = userRef.where("pushToken", "!=", null)
 
-   // Apply each filter to the query
-   // Object.keys(filters).forEach((field) => {
-   //     const value = filters[field];
-   //     query = query.where(field, '==', value);
-   // });
+   if (filters.university?.code) {
+      query = query.where("university.code", "==", filters.university.code)
+   }
+   if (filters.universityCountryCode) {
+      query = query.where(
+         "universityCountryCode",
+         "==",
+         filters.universityCountryCode
+      )
+   }
+   if (filters.gender) {
+      query = query.where("gender", "==", filters.gender)
+   }
+   if (filters.fieldOfStudy?.id) {
+      query = query.where("fieldOfStudy.id", "==", filters.fieldOfStudy.id)
+   }
+   if (filters.levelOfStudy?.id) {
+      query = query.where("levelOfStudy.id", "==", filters.levelOfStudy.id)
+   }
+
+   console.log(query)
 
    const usersSnapshot = await query.get()
    const tokens: string[] = usersSnapshot.docs.map(
       (doc) => doc.data().pushToken
    )
+   console.log(tokens)
 
    const validTokens = tokens.filter((token) => Expo.isExpoPushToken(token))
    if (validTokens.length === 0) {
@@ -83,7 +116,7 @@ export async function sendExpoPushNotification(filters: any[], message: any) {
       title: message.title,
       body: message.body,
       data: {
-         url: "https://www.google.com",
+         url: message.url,
       },
    }))
 
