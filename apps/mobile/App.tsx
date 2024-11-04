@@ -1,12 +1,11 @@
 import { useEffect } from "react"
 import { Platform } from "react-native"
 import WebViewComponent from "./components/WebView"
-import { doc, setDoc } from "firebase/firestore"
+import { doc, updateDoc } from "firebase/firestore"
 import { app, db, auth } from "./firebase"
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
 import { signInWithEmailAndPassword } from "firebase/auth"
-import { Alert } from "react-native"
 import { PROJECT_ID } from "@env"
 
 export default function Native() {
@@ -81,11 +80,7 @@ export default function Native() {
             if (auth.currentUser?.email) {
                const userDocRef = doc(db, "userData", auth.currentUser.email)
 
-               await setDoc(
-                  userDocRef,
-                  { pushToken: pushToken },
-                  { merge: true }
-               )
+               await updateDoc(userDocRef, { pushToken: pushToken })
             }
             await SecureStore.setItemAsync("pushToken", pushToken)
          }
@@ -98,12 +93,12 @@ export default function Native() {
       try {
          if (auth.currentUser?.email) {
             const userDocRef = doc(db, "userData", auth.currentUser.email)
-            await setDoc(userDocRef, { pushToken: null }, { merge: true })
+            await updateDoc(userDocRef, { pushToken: null })
          } else {
             await signInWithEmailAndPassword(auth, userId, userPassword)
             if (auth.currentUser?.email) {
                const userDocRef = doc(db, "userData", auth.currentUser.email)
-               await setDoc(userDocRef, { pushToken: null }, { merge: true })
+               await updateDoc(userDocRef, { pushToken: null })
             }
          }
          await SecureStore.deleteItemAsync("pushToken")
@@ -113,9 +108,6 @@ export default function Native() {
    }
 
    return (
-      <WebViewComponent
-         onTokenInjected={getPushToken}
-         onLogout={onLogout}
-      ></WebViewComponent>
+      <WebViewComponent onTokenInjected={getPushToken} onLogout={onLogout} />
    )
 }
