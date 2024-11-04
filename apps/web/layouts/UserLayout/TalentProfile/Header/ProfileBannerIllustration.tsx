@@ -14,7 +14,7 @@ import { ProfileBannerUploadButton } from "./ProfileBannerUploadButton"
 const styles = sxStyles({
    imageWrapper: {
       width: "100%",
-      height: { xs: "250px", md: "300px" },
+      height: { xs: "94px", md: "300px" },
       position: "relative",
    },
    buttonWrapper: {
@@ -28,7 +28,9 @@ const styles = sxStyles({
       zIndex: 1,
       mt: 1,
    },
-   backgroundImage: { borderRadius: "12px 12px 0px 0px" },
+   backgroundImage: {
+      borderRadius: "12px 12px 0px 0px",
+   },
 })
 export const ProfileBannerIllustration = () => {
    const { userData, userPresenter } = useAuth()
