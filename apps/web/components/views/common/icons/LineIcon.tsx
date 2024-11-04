@@ -1,6 +1,6 @@
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon"
-import ReactComponent from "public/sparks/like-icon.svg"
+import ReactComponent from "public/icons/line-icon.svg"
 
 export const LineIcon = (props: SvgIconProps) => {
-   return <SvgIcon component={ReactComponent} viewBox="0 0 12 12" {...props} />
+   return <SvgIcon component={ReactComponent} viewBox="0 0 95 4" {...props} />
 }
