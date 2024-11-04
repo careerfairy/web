@@ -1,12 +1,12 @@
 import { CircularProgress } from "@mui/material"
-import UserNotificationsButton from "./UserNotificationsButton"
+import { useCallback } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "../../../../components/ErrorBoundary"
 import useMenuState from "../../../../components/custom-hook/useMenuState"
 import useUserNotifications from "../../../../components/custom-hook/useUserNotifications"
-import NotificationsMenu from "./NotificationsMenu"
-import { useCallback } from "react"
 import { userRepo } from "../../../../data/RepositoryInstances"
+import NotificationsMenu from "./NotificationsMenu"
+import UserNotificationsButton from "./UserNotificationsButton"
 
 const Notifications = () => {
    const { userData } = useAuth()
@@ -49,7 +49,6 @@ const Component = ({ userEmail }: ComponentProps) => {
          <UserNotificationsButton
             notifications={notifications}
             handleClick={handleClick}
-            anchorEl={anchorEl}
          />
 
          <NotificationsMenu

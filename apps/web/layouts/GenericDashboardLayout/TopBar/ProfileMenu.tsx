@@ -27,6 +27,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { CompanyIcon } from "components/views/common/icons"
 import { SlideLeftTransition } from "components/views/common/transitions"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { supportPageLink } from "constants/links"
 import Link from "next/link"
 import { useCallback, useMemo, useState } from "react"
@@ -39,20 +40,18 @@ import { combineStyles, sxStyles } from "../../../types/commonTypes"
 
 const styles = sxStyles({
    ava: {
-      width: {
-         xs: 43,
-         sm: 53,
-      },
-      height: {
-         xs: 43,
-         sm: 53,
-      },
+      width: 40,
+      height: 40,
       lineHeight: 0,
-      border: (theme) => `3px solid ${theme.palette.primary.main}`,
+      border: "2px solid #00D2AA",
    },
    newMenuAva: {
       ml: "8px",
    },
+   profileButton: {
+      ml: "16px !important",
+   },
+   iconButton: { padding: 0 },
    details: {
       display: "flex",
       flexDirection: "column",
@@ -334,11 +333,11 @@ const ProfileMenu = () => {
 
    return (
       <>
-         <Stack direction={"row"} spacing={1}>
-            <Tooltip title="Account">
+         <Stack direction={"row"} spacing={1} sx={styles.profileButton}>
+            <BrandedTooltip title="Account">
                <IconButton
                   onClick={handleClick}
-                  size="small"
+                  sx={styles.iconButton}
                   aria-controls={open ? "account-menu" : undefined}
                   aria-haspopup="true"
                   aria-expanded={open ? "true" : undefined}
@@ -350,7 +349,7 @@ const ProfileMenu = () => {
                      sx={styles.ava}
                   />
                </IconButton>
-            </Tooltip>
+            </BrandedTooltip>
          </Stack>
          <Menu
             anchorEl={useNewMobileMenu ? null : anchorEl}

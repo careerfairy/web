@@ -1,70 +1,42 @@
-import { Badge, Fab, Tooltip } from "@mui/material"
-import { sxStyles } from "../../../../types/commonTypes"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
+import { Badge, IconButton } from "@mui/material"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { MouseEvent, useMemo } from "react"
 import { Bell } from "react-feather"
-import useScrollTrigger from "@mui/material/useScrollTrigger"
-import { useGenericDashboard } from "../../index"
+import { sxStyles } from "../../../../types/commonTypes"
 
-const useStyles = () => {
-   const { headerScrollThreshold, isPortalPage } = useGenericDashboard()
+const styles = sxStyles({
+   notificationBtn: {
+      background: "unset",
 
-   const isOutsideBanner = useScrollTrigger({
-      disableHysteresis: true,
-      threshold: headerScrollThreshold,
-   })
+      "&:hover": {
+         background: "unset",
+      },
+      "& svg": {
+         color: (theme) => theme.palette.neutral[800],
+      },
+   },
+   badge: {
+      "& .MuiBadge-dot": {
+         minWidth: 12,
+         height: 12,
+         borderRadius: "50%",
+      },
+   },
+})
 
-   const isOnPortalBanner = !isOutsideBanner && isPortalPage
-
-   return useMemo(
-      () =>
-         sxStyles({
-            notificationBtn: {
-               background: "unset",
-
-               "&:hover": {
-                  background: "unset",
-               },
-               "& svg": {
-                  color: isOnPortalBanner ? "white" : "#4F4F4F",
-               },
-            },
-            notificationBtnFilled: {
-               "& svg": {
-                  fill: isOnPortalBanner ? "white" : "#4F4F4F",
-               },
-            },
-            badge: {
-               "& .MuiBadge-dot": {
-                  minWidth: 12,
-                  height: 12,
-                  borderRadius: "50%",
-               },
-            },
-         }),
-      [isOnPortalBanner]
-   )
-}
 type Props = {
    notifications: UserNotification[]
    handleClick: (event: MouseEvent<HTMLElement>) => void
-   anchorEl: HTMLElement
 }
-const UserNotificationsButton = ({
-   notifications,
-   handleClick,
-   anchorEl,
-}: Props) => {
-   const styles = useStyles()
-
+const UserNotificationsButton = ({ notifications, handleClick }: Props) => {
    const unReadNotifications = useMemo(
-      () =>
-         notifications.filter((notification) => !Boolean(notification.readAt)),
+      () => notifications.filter((notification) => !notification?.readAt),
       [notifications]
    )
 
    return (
-      <Tooltip title="Notifications">
+      <BrandedTooltip title="Notifications">
          <Badge
             sx={styles.badge}
             color="error"
@@ -72,19 +44,16 @@ const UserNotificationsButton = ({
             invisible={unReadNotifications?.length === 0}
             badgeContent={`${unReadNotifications?.length}`}
          >
-            <Fab
+            <IconButton
                onClick={handleClick}
-               sx={[
-                  styles.notificationBtn,
-                  Boolean(anchorEl) ? styles.notificationBtnFilled : null,
-               ]}
+               sx={styles.notificationBtn}
                size="small"
                aria-label="user-notifications"
             >
                <Bell fontSize={"large"} />
-            </Fab>
+            </IconButton>
          </Badge>
-      </Tooltip>
+      </BrandedTooltip>
    )
 }
 
