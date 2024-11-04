@@ -1,5 +1,5 @@
 import createEmotionServer from "@emotion/server/create-instance"
-import { brandedLightTheme, poppins } from "materialUI"
+import { poppins } from "materialUI"
 import createEmotionCache from "materialUI/createEmotionCache"
 import Document, {
    DocumentContext,
@@ -185,10 +185,7 @@ export default function MyDocument(props: DocumentProps) {
                name="google-site-verification"
                content="Do13x1vDwIZFd0puN68OuSW1fZGMnvJlBBfTFwpdMII"
             />
-            <meta
-               name="theme-color"
-               content={brandedLightTheme.palette.primary.main}
-            />
+            <meta name="theme-color" content="#F7F8FC" />
             <meta name="application-name" content="&nbsp;" />
             <meta name="msapplication-TileColor" content="#FFFFFF" />
             <meta

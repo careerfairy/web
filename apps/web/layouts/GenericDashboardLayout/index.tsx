@@ -22,17 +22,17 @@ import TopBar from "./TopBar"
 type IGenericDashboardContext = {
    isPortalPage: boolean
    handleOpenCreditsDialog: () => void
-   topBarFixed: boolean
    // The number of pixels the user has to scroll before the header is hidden. Default is 10
    headerScrollThreshold: number
+   headerFixed?: boolean
    navLinks: INavLink[]
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
    isPortalPage: false,
    handleOpenCreditsDialog: () => {},
-   topBarFixed: false,
    headerScrollThreshold: 10,
+   headerFixed: false,
    navLinks: [],
 })
 
@@ -62,10 +62,9 @@ type Props = {
    pageDisplayName?: string
    bgColor?: string
    isPortalPage?: boolean
-   topBarFixed?: boolean
+   headerFixed?: boolean
    // The number of pixels the user has to scroll before the header is hidden
    headerScrollThreshold?: number
-   topBarTransparent?: boolean
    /**
     * If true, the footer will be hidden
     */
@@ -97,9 +96,8 @@ const GenericDashboardLayout = ({
    pageDisplayName,
    bgColor,
    isPortalPage,
-   topBarFixed,
-   headerScrollThreshold = 10,
-   topBarTransparent,
+   headerFixed,
+   headerScrollThreshold = 65,
    hideFooter,
    hideDrawer,
    headerWidth = "100%",
@@ -170,7 +168,7 @@ const GenericDashboardLayout = ({
          isPortalPage,
          handleOpenCreditsDialog,
          headerScrollThreshold,
-         topBarFixed: Boolean(topBarFixed),
+         headerFixed: Boolean(headerFixed),
          navLinks,
       }),
       [
@@ -178,7 +176,7 @@ const GenericDashboardLayout = ({
          headerScrollThreshold,
          isPortalPage,
          navLinks,
-         topBarFixed,
+         headerFixed,
       ]
    )
 
@@ -187,6 +185,7 @@ const GenericDashboardLayout = ({
          <CreditsDialogLayout>
             <AdminGenericLayout
                bgColor={bgColor || "#F7F8FC"}
+               hideHeader={hideHeader}
                headerContent={
                   hideHeader ? null : <TopBar title={pageDisplayName} />
                }
@@ -199,7 +198,6 @@ const GenericDashboardLayout = ({
                }
                drawerOpen={!isMobile}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
-               topBarTransparent={topBarTransparent}
                headerWidth={headerWidth}
             >
                {children}
