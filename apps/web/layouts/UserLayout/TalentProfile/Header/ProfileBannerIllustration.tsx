@@ -6,6 +6,7 @@ import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import BackgroundImage from "components/views/common/BackgroundImage"
 import { profilePlaceholderBanner } from "constants/images"
 import { userRepo } from "data/RepositoryInstances"
+import { useMemo } from "react"
 import useSWRMutation from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
 import { v4 as uuid } from "uuid"
@@ -41,6 +42,10 @@ const styles = sxStyles({
 })
 export const ProfileBannerIllustration = () => {
    const { userData, userPresenter } = useAuth()
+
+   const backgroundImageUrl = useMemo(() => {
+      return getResizedUrl(userData.bannerImageUrl, "lg")
+   }, [userData.bannerImageUrl])
 
    const [uploadFile, uploadProgress, isUploading] = useFirebaseUpload()
 
@@ -83,10 +88,7 @@ export const ProfileBannerIllustration = () => {
             />
          ) : null}
          <BackgroundImage
-            image={
-               getResizedUrl(userData.bannerImageUrl, "lg") ||
-               profilePlaceholderBanner
-            }
+            image={backgroundImageUrl || profilePlaceholderBanner}
             repeat={false}
             className={undefined}
             backgroundImageSx={styles.backgroundImage}
