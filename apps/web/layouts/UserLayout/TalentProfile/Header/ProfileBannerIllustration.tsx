@@ -41,6 +41,25 @@ const styles = sxStyles({
       height: "100%",
       objectFit: "cover",
    },
+   backgroundImageWrapper: {
+      borderRadius: "12px 12px 0px 0px",
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      overflow: "hidden",
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         top: 0,
+         left: 0,
+         width: "100%",
+         height: "100%",
+         backgroundColor: "rgba(0, 0, 0, 0.3)", // Adjust opacity for darkness
+         zIndex: 1,
+      },
+   },
 })
 export const ProfileBannerIllustration = () => {
    const { userData, userPresenter } = useAuth()
@@ -85,12 +104,14 @@ export const ProfileBannerIllustration = () => {
                value={uploadProgress}
             />
          ) : null}
-         <BackgroundImage
-            image={userData.bannerImageUrl || profilePlaceholderBanner}
-            repeat={false}
-            className={undefined}
-            backgroundImageSx={styles.backgroundImage}
-         />
+         <Box sx={styles.backgroundImageWrapper}>
+            <BackgroundImage
+               image={userData.bannerImageUrl || profilePlaceholderBanner}
+               repeat={false}
+               className={undefined}
+               backgroundImageSx={styles.backgroundImage}
+            />
+         </Box>
          <Box sx={styles.buttonWrapper}>
             <ProfileBannerUploadButton
                disabled={isUploading || isMutating}
