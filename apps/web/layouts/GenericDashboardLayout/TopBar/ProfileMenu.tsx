@@ -277,7 +277,7 @@ const ProfileMenu = () => {
                <CompanyIcon sx={styles.icon} />
             </ListItemIcon>
             <Typography color={"text.secondary"} sx={styles.menuItemText}>
-               Following Companies
+               Followed Companies
             </Typography>
          </MenuItem>
       )
