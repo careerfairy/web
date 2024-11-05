@@ -67,7 +67,7 @@ export const ProfileImageUploadButton: FC<ProfileImageUploadButtonProps> = ({
       maxSize: USER_AVATAR_IMAGE_SPECS.maxSize,
       imageSrc: userData?.avatar,
       cropper: {
-         title: "Edit profile avatar picture",
+         title: "Upload profile picture",
          type: "circle",
          key: `update-${userData.id}-profile-avatar`,
          aspectRatio: 1,
