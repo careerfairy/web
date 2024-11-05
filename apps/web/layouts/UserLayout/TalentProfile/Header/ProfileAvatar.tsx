@@ -12,32 +12,36 @@ import { ProfileImageUploadButton } from "./ProfileImageUploadButton"
 const LOGO_SIZE = 104
 
 const styles = sxStyles({
-   avatar: {
+   root: {
+      display: "flex",
+      flexDirection: "column",
+      mt: -6,
       ml: 2,
+   },
+   avatarContainer: {
+      position: "relative",
       width: `${LOGO_SIZE}px`,
       height: `${LOGO_SIZE}px`,
+   },
+   avatar: {
+      width: "100%",
+      height: "100%",
       fontSize: "40px",
       fontWeight: 600,
-      position: "absolute",
-      top: {
-         xs: "111px",
-         sm: "120px",
-         md: "320px",
-      },
       border: "2px solid white",
    },
    profileImageUploadButton: {
       position: "absolute",
-      ml: 11,
-      mt: "6px",
+      bottom: 0,
+      right: 0,
+      transform: "translate(20%, 20%)",
+      mb: 2,
    },
 })
 
 export const ProfileAvatar = () => {
    const { userData, userPresenter } = useAuth()
-
    const [uploadFile, , isUploading] = useFirebaseUpload()
-
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const { trigger, isMutating } = useSWRMutation(
@@ -52,13 +56,12 @@ export const ProfileAvatar = () => {
          onError: (err) => {
             errorNotification(err.message)
          },
-         throwOnError: false, // We don't want to throw an error, we want to handle it ourselves in the onError callback above.
+         throwOnError: false,
       }
    )
 
    const handleUploadAvatarPhoto = async (photo: File) => {
       const avatarImageId = uuid()
-
       const downloadURL = await uploadFile(
          photo,
          userPresenter.getUserAvatarImageStoragePath(avatarImageId)
@@ -68,19 +71,21 @@ export const ProfileAvatar = () => {
    }
 
    return (
-      <Box>
-         <ColorizedAvatar
-            sx={styles.avatar}
-            imageUrl={userData?.avatar}
-            lastName={userData?.lastName}
-            firstName={userData?.firstName}
-         />
-         <Box sx={styles.profileImageUploadButton}>
-            <ProfileImageUploadButton
-               disabled={isUploading || isMutating}
-               handleUploadAvatarPhoto={handleUploadAvatarPhoto}
-               loading={isUploading || isMutating}
+      <Box sx={styles.root}>
+         <Box sx={styles.avatarContainer}>
+            <ColorizedAvatar
+               sx={styles.avatar}
+               imageUrl={userData?.avatar}
+               lastName={userData?.lastName}
+               firstName={userData?.firstName}
             />
+            <Box sx={styles.profileImageUploadButton}>
+               <ProfileImageUploadButton
+                  disabled={isUploading || isMutating}
+                  handleUploadAvatarPhoto={handleUploadAvatarPhoto}
+                  loading={isUploading || isMutating}
+               />
+            </Box>
          </Box>
       </Box>
    )
