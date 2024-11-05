@@ -38,7 +38,7 @@ const styles = sxStyles({
       border: (theme) => `1px solid ${theme.palette.neutral[200]}`,
       minWidth: "unset !important",
       boxShadow: "none",
-      p: "8px 9px",
+      p: "9px 9px",
       "&:hover": {
          boxShadow: "none",
          bgcolor: (theme) => darken(theme.palette.common.white, 0.1),

@@ -2,11 +2,9 @@ import { Box, LinearProgress } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFirebaseUpload from "components/custom-hook/useFirebaseUpload"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import BackgroundImage from "components/views/common/BackgroundImage"
 import { profilePlaceholderBanner } from "constants/images"
 import { userRepo } from "data/RepositoryInstances"
-import { useMemo } from "react"
 import useSWRMutation from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
 import { v4 as uuid } from "uuid"
@@ -28,7 +26,11 @@ const styles = sxStyles({
    },
    progress: {
       zIndex: 1,
-      mt: 1,
+      mt: {
+         xs: "90px",
+         sm: "90px",
+         md: 1,
+      },
    },
    backgroundImage: {
       borderRadius: "12px 12px 0px 0px",
@@ -42,10 +44,6 @@ const styles = sxStyles({
 })
 export const ProfileBannerIllustration = () => {
    const { userData, userPresenter } = useAuth()
-
-   const backgroundImageUrl = useMemo(() => {
-      return getResizedUrl(userData.bannerImageUrl, "lg")
-   }, [userData.bannerImageUrl])
 
    const [uploadFile, uploadProgress, isUploading] = useFirebaseUpload()
 
@@ -88,7 +86,7 @@ export const ProfileBannerIllustration = () => {
             />
          ) : null}
          <BackgroundImage
-            image={backgroundImageUrl || profilePlaceholderBanner}
+            image={userData.bannerImageUrl || profilePlaceholderBanner}
             repeat={false}
             className={undefined}
             backgroundImageSx={styles.backgroundImage}

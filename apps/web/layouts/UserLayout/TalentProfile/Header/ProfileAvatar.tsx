@@ -24,6 +24,7 @@ const styles = sxStyles({
       height: `${LOGO_SIZE}px`,
    },
    avatar: {
+      zIndex: 2,
       width: "100%",
       height: "100%",
       fontSize: "40px",
@@ -31,6 +32,7 @@ const styles = sxStyles({
       border: "2px solid white",
    },
    profileImageUploadButton: {
+      zIndex: 2,
       position: "absolute",
       bottom: 0,
       right: -3,
