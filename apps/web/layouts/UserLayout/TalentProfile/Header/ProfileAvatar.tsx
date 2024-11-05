@@ -33,9 +33,8 @@ const styles = sxStyles({
    profileImageUploadButton: {
       position: "absolute",
       bottom: 0,
-      right: 0,
-      transform: "translate(20%, 20%)",
-      mb: 2,
+      right: -3,
+      mb: 1.5,
    },
 })
 
