@@ -8,6 +8,10 @@ const styles = sxStyles({
    dialog: {
       zIndex: 1300,
    },
+   deleteIcon: {
+      width: "48px !important",
+      height: "48px !important",
+   },
 })
 
 type Props = {
@@ -37,7 +41,13 @@ export const ConfirmDeleteUserImageDialog = ({
          open={open}
          title={title}
          description={description}
-         icon={<Box component={DeleteIcon} color="error.main" />}
+         icon={
+            <Box
+               component={DeleteIcon}
+               color="error.main"
+               sx={styles.deleteIcon}
+            />
+         }
          primaryAction={{
             text: "Remove",
             color: "error",
