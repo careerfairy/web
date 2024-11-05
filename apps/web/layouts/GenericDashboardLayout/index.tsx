@@ -107,7 +107,7 @@ const GenericDashboardLayout = ({
    isBottomNavDark = false,
    hideHeader,
 }: Props) => {
-   const isMobile = useIsMobile(989)
+   const isMobile = useIsMobile(989, { defaultMatches: true })
 
    const { isLoggedIn } = useAuth()
 
