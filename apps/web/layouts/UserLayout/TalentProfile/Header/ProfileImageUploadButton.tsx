@@ -27,6 +27,11 @@ const styles = sxStyles({
          margin: "unset",
       },
    },
+   cameraIcon: {
+      color: (theme) => theme.brand.black[700],
+      width: "14px",
+      height: "14px",
+   },
 })
 
 const userAvatarImageValidator = getImageDimensionsValidator({
@@ -84,6 +89,7 @@ export const ProfileImageUploadButton: FC<ProfileImageUploadButtonProps> = ({
             disabled={disabled}
             options={options}
             buttonSx={styles.button}
+            cameraSx={styles.cameraIcon}
          />
          <ConfirmDeleteUserImageDialog
             title="Remove profile picture?"

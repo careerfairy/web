@@ -133,6 +133,7 @@ type ImageUploadButtonProps = {
    disabled?: boolean
    options: ProfileImageUploadOptions
    buttonSx?: SxProps
+   cameraSx?: SxProps
 }
 
 export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
@@ -141,11 +142,10 @@ export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
    disabled,
    options,
    buttonSx,
+   cameraSx,
 }) => {
    const { imageValidator, allowedFormats, maxSize, imageSrc, cropper, menu } =
       options
-
-   // const imageSrcUrl = useMemo( () => imageSrc, [imageSrc])
 
    const isMobile = useIsMobile()
 
@@ -219,7 +219,12 @@ export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
             onClick={handleClick}
             loading={loading}
             disabled={disabled}
-            startIcon={<Box component={Camera} sx={styles.cameraIcon} />}
+            startIcon={
+               <Box
+                  component={Camera}
+                  sx={cameraSx ? cameraSx : styles.cameraIcon}
+               />
+            }
             variant="contained"
             color="grey"
             size="medium"
