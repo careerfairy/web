@@ -14,8 +14,9 @@ import { ProfileBannerUploadButton } from "./ProfileBannerUploadButton"
 const styles = sxStyles({
    imageWrapper: {
       width: "100%",
-      height: { xs: "94px", md: "300px" },
+      height: { xs: "94px", md: "auto" },
       position: "relative",
+      paddingTop: { md: "25%" },
    },
    buttonWrapper: {
       position: "absolute",
@@ -30,6 +31,12 @@ const styles = sxStyles({
    },
    backgroundImage: {
       borderRadius: "12px 12px 0px 0px",
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
    },
 })
 export const ProfileBannerIllustration = () => {
