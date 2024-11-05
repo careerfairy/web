@@ -126,6 +126,9 @@ const styles = sxStyles({
    },
    cropperApplyButton: {
       backgroundColor: (theme) => theme.palette.primary[600],
+      "&:hover": {
+         backgroundColor: (theme) => theme.palette.primary[700],
+      },
    },
 })
 
