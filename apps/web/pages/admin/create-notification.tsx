@@ -21,8 +21,42 @@ import * as yup from "yup"
 import { sxStyles } from "../../types/commonTypes"
 
 const styles = sxStyles({
-   submit: {
-      margin: (theme) => theme.spacing(3, 0, 2),
+   mainWrapper: {
+      padding: 10,
+      width: "100%",
+      maxWidth: 1000,
+      margin: "0 auto",
+   },
+   rowWrapper: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 4,
+   },
+   inputField: {
+      width: "50%",
+      height: "40px",
+      borderRadius: 6,
+      padding: 10,
+      outline: 0,
+   },
+   textAreaField: {
+      width: "100%",
+      minWidth: "100%",
+      minHeight: 200,
+      maxHeight: 400,
+      padding: 10,
+      borderRadius: 6,
+      borderWidth: 2,
+      outline: 0,
+   },
+   buttonWrapper: {
+      width: "100%",
+      display: "flex",
+      justifyContent: "flex-end",
+      alignItems: "center",
+      gap: 6,
+      marginTop: 20,
    },
    subtitle: {
       textTransform: "uppercase",
@@ -72,11 +106,6 @@ const CreateNotification = ({ notification }) => {
       }
    }, [notificationId])
 
-   const handleSaveNotification = async () => {
-      setUpdate(true)
-      formikRef?.current.submitForm()
-   }
-
    const handleClose = () => {
       setOpen(false)
    }
@@ -85,6 +114,10 @@ const CreateNotification = ({ notification }) => {
       setOpen(true)
    }
 
+   const handleSaveNotification = async () => {
+      setUpdate(true)
+      formikRef?.current.submitForm()
+   }
    const handleSendNotification = async () => {
       try {
          setUpdate(false)
@@ -131,35 +164,15 @@ const CreateNotification = ({ notification }) => {
             <title>CareerFairy | Admin Manage Notification</title>
          </Head>
          <AdminDashboardLayout>
-            <div
-               style={{
-                  padding: 10,
-                  width: "100%",
-                  maxWidth: 1000,
-                  margin: "0 auto",
-               }}
-            >
+            <div style={styles.mainWrapper}>
                <h1>
                   {notificationId
                      ? "Edit Notification"
                      : "Create New Notification"}
                </h1>
-               <div
-                  style={{
-                     display: "flex",
-                     alignItems: "center",
-                     justifyContent: "space-between",
-                     gap: 4,
-                  }}
-               >
+               <div style={styles.rowWrapper}>
                   <input
-                     style={{
-                        width: "50%",
-                        height: "40px",
-                        borderRadius: 6,
-                        padding: 10,
-                        outline: 0,
-                     }}
+                     style={styles.inputField}
                      type="text"
                      placeholder="Title"
                      value={title}
@@ -167,13 +180,7 @@ const CreateNotification = ({ notification }) => {
                   />
 
                   <input
-                     style={{
-                        width: "50%",
-                        height: "40px",
-                        borderRadius: 6,
-                        padding: 10,
-                        outline: 0,
-                     }}
+                     style={styles.inputField}
                      type="text"
                      placeholder="URL"
                      value={url}
@@ -182,21 +189,13 @@ const CreateNotification = ({ notification }) => {
                </div>
                <div style={{ width: "100%", marginTop: 10 }}>
                   <textarea
-                     style={{
-                        width: "100%",
-                        minWidth: "100%",
-                        minHeight: 200,
-                        maxHeight: 400,
-                        padding: 10,
-                        borderRadius: 6,
-                        borderWidth: 2,
-                        outline: 0,
-                     }}
+                     style={styles.textAreaField}
                      placeholder="Body"
                      value={body}
                      onChange={(e) => setBody(e.target.value)}
                   />
                </div>
+
                <h3>Filters</h3>
 
                <Fragment>
@@ -300,16 +299,7 @@ const CreateNotification = ({ notification }) => {
                   </Formik>
                </Fragment>
 
-               <div
-                  style={{
-                     width: "100%",
-                     display: "flex",
-                     justifyContent: "flex-end",
-                     alignItems: "center",
-                     gap: 6,
-                     marginTop: 20,
-                  }}
-               >
+               <div style={styles.buttonWrapper}>
                   <Button
                      onClick={handleSaveNotification}
                      color={"primary"}
