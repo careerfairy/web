@@ -42,7 +42,7 @@ export const ProfileBannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
       maxSize: USER_BANNER_IMAGE_SPECS.maxSize,
       imageSrc: userData?.bannerImageUrl,
       cropper: {
-         title: "Edit profile banner picture",
+         title: "Upload banner image",
          type: "rectangle",
          key: `update-${userData.id}-profile-banner`,
          aspectRatio: 4 / 1,

@@ -21,6 +21,7 @@ import ImageCropperDialog, {
 } from "components/views/common/ImageCropperDialog"
 import ImagePreview from "components/views/common/ImagePreview"
 import { LineIcon } from "components/views/common/icons/LineIcon"
+import { UploadIcon } from "components/views/common/icons/UploadIcon"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { FC, useCallback, useMemo, useState } from "react"
 import { Camera, Image, Trash2, Upload } from "react-feather"
@@ -100,6 +101,30 @@ const styles = sxStyles({
    },
    menuItem: {
       p: "12px 16px",
+   },
+   uploadIcon: {
+      fill: "none",
+   },
+   cropperSlider: {
+      color: (theme) => theme.palette.primary[600],
+      "& .MuiSlider-rail": {
+         opacity: 0.5,
+         boxShadow: "inset 0px 0px 4px -2px #000",
+         backgroundColor: (theme) => theme.palette.neutral[100],
+      },
+      "& .MuiSlider-thumb": {
+         backgroundColor: (theme) => theme.brand.white[50],
+         border: "2px solid currentColor",
+         "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
+            boxShadow: "inherit",
+         },
+         "&::before": {
+            display: "none",
+         },
+      },
+   },
+   cropperApplyButton: {
+      backgroundColor: (theme) => theme.palette.primary[600],
    },
 })
 
@@ -212,6 +237,10 @@ export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
                cropType={cropper.type}
                cropBoxResizable
                aspectRatio={cropper.aspectRatio}
+               titleIcon={<UploadIcon sx={styles.uploadIcon} />}
+               backButtonText="Cancel"
+               cropperSlideSx={styles.cropperSlider}
+               applyButtonSx={styles.cropperApplyButton}
             />
          ) : null}
          <LoadingButton
