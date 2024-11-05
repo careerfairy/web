@@ -33,6 +33,7 @@ const styles = sxStyles({
       height: "32px",
    },
    button: {
+      zIndex: 2,
       bgcolor: "rgba(255, 255, 255, 0.50)",
       borderRadius: "18px",
       border: (theme) => `1px solid ${theme.palette.neutral[200]}`,
