@@ -1,7 +1,8 @@
 import { Box, Tab, Tabs } from "@mui/material"
+import { useRouter } from "next/router"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { TAB_VALUES, TabValue } from "../TalentProfileView"
+import { TAB_VALUES, TalentProfileTabValues } from "../TalentProfileView"
 import { ProfileFollowingCompaniesDetailsView } from "./FollowingCompanies/ProfileFollowingCompaniesDetailsView"
 import { ProfileJobsDetailsView } from "./Jobs/ProfileJobsDetailsView"
 import { ProfileDetailsView } from "./Profile/ProfileDetailsView"
@@ -30,14 +31,16 @@ const styles = sxStyles({
 })
 
 type Props = {
-   currentPath: TabValue
+   currentPath: TalentProfileTabValues
 }
 
 export const TalentProfileDetails = ({ currentPath }: Props) => {
    const [tabValue, setTabValue] = useState(currentPath)
+   const router = useRouter()
 
    const handleTabChange = (_, newValue) => {
       setTabValue(newValue)
+      router.push(newValue, undefined, { shallow: true })
    }
 
    return (

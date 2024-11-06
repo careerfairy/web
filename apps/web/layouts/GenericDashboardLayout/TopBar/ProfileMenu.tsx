@@ -254,7 +254,7 @@ const ProfileMenu = () => {
    const MyJobsMenuItem = ({ sx }: CustomMenuItemProps) => {
       return (
          <MenuItem
-            onClick={() => push("/profile/my-jobs")}
+            onClick={() => push("/profile/jobs")}
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
@@ -270,7 +270,7 @@ const ProfileMenu = () => {
    const FollowingCompaniesMenuItem = ({ sx }: CustomMenuItemProps) => {
       return (
          <MenuItem
-            onClick={() => push("/profile/following-companies")}
+            onClick={() => push("/profile/companies")}
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
