@@ -168,7 +168,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          await SecureStore.deleteItemAsync("authToken")
          await SecureStore.deleteItemAsync("userId")
          await SecureStore.deleteItemAsync("userPassword")
-      } catch (e) {}
+      } catch (error) {
+         console.log(error)
+      }
    }
 
    // Handle back button in WebView
