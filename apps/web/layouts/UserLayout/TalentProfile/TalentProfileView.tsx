@@ -21,7 +21,7 @@ export const TAB_VALUES = {
    },
    jobs: {
       value: "/profile/jobs",
-      label: "Jobs",
+      label: "My Jobs",
    },
    company: {
       value: "/profile/companies",
