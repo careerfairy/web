@@ -25,7 +25,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ locale, data }) => {
          {data.content.moduleSteps.map((step) => (
             <div key={step.id}>
                <h2>{step.stepTitle}</h2>
-               <ModuleStepContentRenderer content={step.content} />
+               <ModuleStepContentRenderer step={step} />
             </div>
          ))}
       </div>
