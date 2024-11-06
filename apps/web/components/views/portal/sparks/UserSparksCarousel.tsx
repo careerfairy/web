@@ -22,7 +22,8 @@ export const UserSparksCarousel = ({
    const { data: userSparks } = useUserSparks()
    const { isLoadingAuth } = useAuth()
 
-   if (isLoadingAuth) return <FallbackComponent header={header} />
+   if (isLoadingAuth)
+      return <FallbackComponent header={header} sx={containerSx} />
 
    return (
       <SparksCarousel

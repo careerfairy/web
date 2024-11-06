@@ -1,15 +1,13 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
-import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
-import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCardForAdmin"
+import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
+import SparkPreviewCardForAdmin from "components/views/sparks/components/spark-card/SparkPreviewCardForAdmin"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import React, { ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
-const desktopSlideWidth = 306 + slideSpacing
-const mobileSlideWidth = 280 + slideSpacing
 
 const styles = sxStyles({
    viewport: {
@@ -22,17 +20,8 @@ const styles = sxStyles({
       marginLeft: `calc(${slideSpacing}px * -1)`,
    },
    slide: {
-      flex: {
-         xs: `0 0 ${mobileSlideWidth}px`,
-         md: `0 0 ${desktopSlideWidth}px`,
-      },
-      minWidth: 0,
       paddingLeft: `${slideSpacing}px`,
       position: "relative",
-      height: {
-         xs: 405,
-         md: 443,
-      },
    },
    paddingSlide: {
       flex: `0 0 ${slideSpacing}px`,
@@ -75,12 +64,12 @@ const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
                   ? sparks.map((spark) => (
                        <Box key={spark.id} sx={styles.slide}>
                           {isAdmin ? (
-                             <SparkCarouselCardForAdmin
+                             <SparkPreviewCardForAdmin
                                 onClick={() => onSparkClick?.(spark)}
                                 spark={spark}
                              />
                           ) : (
-                             <SparkCarouselCard
+                             <SparkPreviewCard
                                 onClick={() => onSparkClick?.(spark)}
                                 spark={spark}
                                 onGoNext={() => emblaApi.scrollNext()}

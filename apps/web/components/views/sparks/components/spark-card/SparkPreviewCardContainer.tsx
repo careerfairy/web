@@ -1,19 +1,22 @@
 import Box from "@mui/material/Box"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import React, { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import VideoPreview from "./VideoPreview"
+
+export const SPARK_DESKTOP_WIDTH = 232
+export const SPARK_MOBILE_WIDTH = 200
 
 const styles = sxStyles({
    root: {
       color: "white",
       display: "flex",
-      height: "100%",
-      width: "100%",
       objectFit: "cover",
       borderRadius: 3,
       position: "relative",
       flexDirection: "column",
       overflow: "hidden",
+      aspectRatio: "9/16",
    },
    cardContent: {
       "&::after": {
@@ -39,7 +42,18 @@ const styles = sxStyles({
    cardSelected: {
       opacity: 0.5,
    },
+   carouselCard: {
+      width: SPARK_DESKTOP_WIDTH,
+   },
+   carouselCardMobile: {
+      width: SPARK_MOBILE_WIDTH,
+   },
+   galleryCard: {
+      minWidth: SPARK_MOBILE_WIDTH,
+   },
 })
+
+export type SparkPreviewCardType = "carousel" | "gallery" | "fullScreen"
 
 type Props = {
    componentHeader?: React.ReactNode
@@ -50,9 +64,10 @@ type Props = {
    autoPlaying?: boolean
    containerRef?: React.RefObject<HTMLDivElement>
    selected?: boolean
+   type?: SparkPreviewCardType
 }
 
-const SparkCarouselCardContainer: FC<Props> = ({
+const SparkPreviewCardContainer: FC<Props> = ({
    componentHeader,
    children,
    video,
@@ -61,13 +76,26 @@ const SparkCarouselCardContainer: FC<Props> = ({
    autoPlaying,
    containerRef,
    selected,
+   type = "carousel",
 }) => {
+   const isMobile = useIsMobile()
    const autoPlayEnabled = autoPlaying !== undefined
+
+   const getCardStyles = (type: SparkPreviewCardType) => {
+      if (type == "carousel") {
+         return isMobile ? styles.carouselCardMobile : styles.carouselCard
+      } else if (type == "gallery") {
+         return styles.galleryCard
+      }
+      return null
+   }
+
+   const cardStyles = getCardStyles(type)
 
    return (
       <Box
          ref={containerRef}
-         sx={[styles.root, selected && styles.cardSelected]}
+         sx={[styles.root, selected && styles.cardSelected, cardStyles]}
          onMouseEnter={onMouseEnter}
          onMouseLeave={onMouseLeave}
       >
@@ -88,4 +116,4 @@ const SparkCarouselCardContainer: FC<Props> = ({
    )
 }
 
-export default SparkCarouselCardContainer
+export default SparkPreviewCardContainer

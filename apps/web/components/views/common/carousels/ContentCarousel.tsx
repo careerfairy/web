@@ -25,7 +25,7 @@ const styles = sxStyles({
 })
 
 type ContentCarouselProps = Pick<GenericCarouselProps, "children"> & {
-   slideWidth: number
+   slideWidth?: number
    headerTitle: ReactNode | string
    viewportSx?: SxProps
    containerSx?: SxProps
@@ -93,10 +93,11 @@ export const ContentCarousel = ({
             containerSx={combineStyles(styles.container, containerSx)}
             sx={viewportSx}
             containerRef={carouselContainerRef}
+            preventEdgeTouch
          >
             {React.Children.map(children, (child) => (
                <GenericCarousel.Slide
-                  slideWidth={`${slideWidth}px`}
+                  slideWidth={slideWidth ? `${slideWidth}px` : null}
                   key={child.key}
                >
                   {child}
