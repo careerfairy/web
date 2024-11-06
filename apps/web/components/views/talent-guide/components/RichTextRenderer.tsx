@@ -1,4 +1,8 @@
-import { NodeRendererType, RichText } from "@graphcms/rich-text-react-renderer"
+import {
+   NodeRendererType,
+   RichText,
+   RichTextProps,
+} from "@graphcms/rich-text-react-renderer"
 import { EmbedProps } from "@graphcms/rich-text-types"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import {
@@ -10,7 +14,7 @@ import {
    LivestreamsCarouselBlockType,
    MentorsCarouselBlockType,
    ModuleStepType,
-   QuizBlockType,
+   RichTextReferenceType,
    SparksCarouselBlockType,
 } from "data/hygraph/types"
 import { useMemo } from "react"
@@ -27,14 +31,48 @@ import {
 } from "../blocks"
 import { createDefaultRichTextComponents } from "./default-rich-text-components"
 
-type RichTextRendererProps = Pick<ModuleStepType, "content">
+type RichTextRendererProps = {
+   step: ModuleStepType
+}
 
-export const ModuleStepContentRenderer = ({
-   content,
-}: RichTextRendererProps) => {
+export const ModuleStepContentRenderer = ({ step }: RichTextRendererProps) => {
+   if (!step.content) {
+      return null
+   }
+
+   if (step.content.__typename === "QuizBlock") {
+      return <QuizBlock {...step.content} />
+   }
+
+   if (step.content.__typename === "RichTextBlock") {
+      return (
+         <RichTextRenderer
+            content={step.content.content.raw}
+            references={step.content.content.references}
+         />
+      )
+   }
+
+   console.warn(
+      `Unhandled content type: ${
+         (step.content as any).__typename
+      } returning null`
+   )
+
+   return null
+}
+
+type RendererProps = NodeRendererType & {
+   embed: Record<
+      RichTextReferenceType["__typename"],
+      (props: any) => JSX.Element
+   >
+}
+
+const RichTextRenderer = ({ content, references }: RichTextProps) => {
    const isMobile = useIsMobile()
 
-   const renderers = useMemo<NodeRendererType>(
+   const renderers = useMemo<RendererProps>(
       () => ({
          ...createDefaultRichTextComponents(isMobile),
          embed: {
@@ -62,9 +100,6 @@ export const ModuleStepContentRenderer = ({
             SparksCarouselBlock: (
                props: EmbedProps<SparksCarouselBlockType>
             ) => <SparksCarouselBlock {...props} />,
-            QuizBlock: (props: EmbedProps<QuizBlockType>) => (
-               <QuizBlock {...props} />
-            ),
          },
       }),
       [isMobile]
@@ -72,8 +107,8 @@ export const ModuleStepContentRenderer = ({
 
    return (
       <RichText
-         content={content.raw}
-         references={content.references}
+         content={content}
+         references={references}
          renderers={renderers}
       />
    )
