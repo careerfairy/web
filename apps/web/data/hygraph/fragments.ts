@@ -159,6 +159,8 @@ export const quizBlockFragment = gql`
 
 export const richTextBlockFragment = gql`
    {
+      __typename
+      id
       content {
          raw
          references {
