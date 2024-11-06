@@ -185,14 +185,9 @@ export type QuizBlockType = {
    quiz: QuizComponentType
 }
 
-export type ModuleStepType = {
-   __typename: "ModuleStep"
+export type RichTextBlockType = {
+   __typename: "RichTextBlock"
    id: string
-   stepTitle: string
-   /**
-    * The slug of the step, eg "networking" or "interviewing", could be used for url based navigation
-    */
-   stepSlug: string
    content: {
       raw: RichTextContent
       /**
@@ -207,7 +202,17 @@ export type ModuleStepType = {
          | HeaderBlockType
          | JobsBlockType
          | SparksCarouselBlockType
-         | QuizBlockType
       )[]
    }
+}
+
+export type ModuleStepType = {
+   __typename: "ModuleStep"
+   id: string
+   stepTitle: string
+   /**
+    * The slug of the step, eg "networking" or "interviewing", could be used for url based navigation
+    */
+   stepSlug: string
+   content: RichTextBlockType | QuizBlockType // Potential discover companies block and any other block that have their custom step cta button
 }

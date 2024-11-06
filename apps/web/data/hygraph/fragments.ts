@@ -157,13 +157,8 @@ export const quizBlockFragment = gql`
    }
 `
 
-// Model API ID: ModuleStep
-export const moduleStepFragment = gql`
+export const richTextBlockFragment = gql`
    {
-      __typename
-      id
-      stepTitle
-      stepSlug # incase we want page routing for each step
       content {
          raw
          references {
@@ -175,8 +170,21 @@ export const moduleStepFragment = gql`
             ... on HeaderBlock ${headerBlockFragment}
             ... on JobsBlock ${jobsBlockFragment}
             ... on SparksCarouselBlock ${sparksCarouselBlockFragment}
-            ... on QuizBlock ${quizBlockFragment}
          }
+      }
+   }
+`
+
+// Model API ID: ModuleStep
+export const moduleStepFragment = gql`
+   {
+      __typename
+      id
+      stepTitle
+      stepSlug # incase we want page routing for each step
+      content {
+         ... on RichTextBlock ${richTextBlockFragment}
+         ... on QuizBlock ${quizBlockFragment}
       }
    }
 `
