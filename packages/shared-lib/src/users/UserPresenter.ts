@@ -8,20 +8,20 @@ import { getUserBadges, UserBadges } from "./UserBadges"
 import { UserData } from "./users"
 
 export const USER_BANNER_IMAGE_SPECS = {
-   minWidth: 800,
-   minHeight: 172,
-   maxWidth: 4300,
-   maxHeight: 900,
+   minWidth: 320,
+   minHeight: 240,
+   maxWidth: 5000,
+   maxHeight: 3000,
    // In megabytes
-   maxSize: 5, // 5MB
+   maxSize: 10, // 5MB
    allowedFormats: IMAGE_CONSTANTS.allowedFormats,
 }
 
 export const USER_AVATAR_IMAGE_SPECS = {
-   minWidth: 100,
-   minHeight: 100,
-   maxWidth: 2160,
-   maxHeight: 2160,
+   minWidth: 320,
+   minHeight: 240,
+   maxWidth: 5000,
+   maxHeight: 3000,
    // In megabytes
    maxSize: 10, // 10MB
    allowedFormats: IMAGE_CONSTANTS.allowedFormats,
