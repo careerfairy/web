@@ -1,9 +1,13 @@
 import { NodeRendererType } from "@graphcms/rich-text-react-renderer"
 import { Box, Typography } from "@mui/material"
+import dynamic from "next/dynamic"
 import Image from "next/image"
 import Link from "next/link"
-import ReactPlayer from "react-player/lazy"
 import { sxStyles } from "types/commonTypes"
+
+const ReactPlayer = dynamic(() => import("react-player"), {
+   ssr: false,
+})
 
 const styles = sxStyles({
    link: {
