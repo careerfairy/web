@@ -20,9 +20,9 @@ const styles = sxStyles({
    emptyDetailsRoot: {
       alignItems: "center",
       width: {
-         xs: "250px",
-         sm: "250px",
-         md: "346px",
+         xs: "280px",
+         sm: "280px",
+         md: "390px",
       },
    },
    emptyTitle: {
