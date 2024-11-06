@@ -10,7 +10,7 @@ export const ModuleStepContentRenderer = ({ step }: RichTextRendererProps) => {
       return null
    }
 
-   if (step.content.__typename === "QuizBlock") {
+   if (step.content.__typename === "Quiz") {
       return <QuizBlock {...step.content} />
    }
 
