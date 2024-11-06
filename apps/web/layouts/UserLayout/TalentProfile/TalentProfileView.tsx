@@ -29,10 +29,11 @@ export const TAB_VALUES = {
    },
 } as const
 
-export type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES]["value"]
+export type TalentProfileTabValues =
+   (typeof TAB_VALUES)[keyof typeof TAB_VALUES]["value"]
 
 type Props = {
-   currentPath: TabValue
+   currentPath: TalentProfileTabValues
 }
 
 export const TalentProfileView = ({ currentPath }: Props) => {
