@@ -40,7 +40,7 @@ export const TalentProfileDetails = ({ currentPath }: Props) => {
 
    const handleTabChange = (_, newValue) => {
       setTabValue(newValue)
-      router.push(newValue, undefined, { shallow: true })
+      router.push(newValue, undefined, { shallow: true, scroll: false })
    }
 
    return (
