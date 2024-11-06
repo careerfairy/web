@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs"
-import { ModuleStepContentRenderer } from "components/views/talent-guide/components/RichTextRenderer"
+import { ModuleStepContentRenderer } from "components/views/talent-guide/components/ModuleStepContentRenderer"
 import { FORCE_GERMAN_LOCALE } from "data/hygraph/constants"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
