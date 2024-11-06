@@ -180,6 +180,16 @@ export type QuizModelType = {
    answers: QuizAnswerComponentType[]
 }
 
+export type RichTextReferenceType =
+   | ArticleBlockType
+   | MentorsCarouselBlockType
+   | LivestreamsCarouselBlockType
+   | HighlightsBlockType
+   | FollowCompaniesBlockType
+   | HeaderBlockType
+   | JobsBlockType
+   | SparksCarouselBlockType
+
 export type RichTextBlockType = {
    __typename: "RichTextBlock"
    id: string
@@ -188,16 +198,7 @@ export type RichTextBlockType = {
       /**
        * These are all the blocks that can be referenced inside the rich text content
        */
-      references: (
-         | ArticleBlockType
-         | MentorsCarouselBlockType
-         | LivestreamsCarouselBlockType
-         | HighlightsBlockType
-         | FollowCompaniesBlockType
-         | HeaderBlockType
-         | JobsBlockType
-         | SparksCarouselBlockType
-      )[]
+      references: RichTextReferenceType[]
    }
 }
 
