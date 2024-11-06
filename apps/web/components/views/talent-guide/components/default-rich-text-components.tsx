@@ -14,6 +14,10 @@ const styles = sxStyles({
       color: "primary.dark",
       cursor: "pointer",
    },
+   image: {
+      maxWidth: "100%",
+      height: "auto",
+   },
 })
 
 export const createDefaultRichTextComponents = (
@@ -69,6 +73,7 @@ export const createDefaultRichTextComponents = (
             width={width}
             // loader={HygraphImageLoader} TODO: fix this not working, see example in https://github.com/hygraph/hygraph-examples/blob/master/with-nextjs-image-loader/pages/index.js
             src={src}
+            style={styles.image}
          />
       ),
       a: ({ children, openInNewTab, href, rel, ...rest }) => {
