@@ -7,12 +7,14 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { debounce } from "lodash"
 import { FC, useEffect, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import SparkCarouselCardContainer from "./SparkCarouselCardContainer"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkHeader from "./SparkHeader"
+import SparkPreviewCardContainer, {
+   SparkPreviewCardType,
+} from "./SparkPreviewCardContainer"
 import SparkQuestion from "./SparkQuestion"
 
-const cardPadding = 2
+const cardPadding = 1.5
 
 const styles = sxStyles({
    cardDetails: {
@@ -25,15 +27,16 @@ const styles = sxStyles({
 type Props = {
    spark: Spark
    preview?: boolean
-   onClick?: () => void
+   onClick?: (spark: Spark) => void
    onGoNext?: () => void
    selectInput?: React.ReactNode
    selected?: boolean
    disableAutoPlay?: boolean
    questionLimitLines?: boolean
+   type?: SparkPreviewCardType
 }
 
-const SparkCarouselCard: FC<Props> = ({
+const SparkPreviewCard: FC<Props> = ({
    spark,
    onClick,
    preview = false,
@@ -42,6 +45,7 @@ const SparkCarouselCard: FC<Props> = ({
    selected,
    disableAutoPlay,
    questionLimitLines,
+   type = "carousel",
 }) => {
    const [autoPlaying, setAutoPlaying] = useState(false)
    const containerRef = useRef<HTMLDivElement>(null)
@@ -99,7 +103,8 @@ const SparkCarouselCard: FC<Props> = ({
    }, [autoPlaying, isMobile, onGoNext])
 
    return (
-      <SparkCarouselCardContainer
+      <SparkPreviewCardContainer
+         type={type}
          video={{
             thumbnailUrl: spark.video.thumbnailUrl,
             url: imageKitLoader({
@@ -129,7 +134,7 @@ const SparkCarouselCard: FC<Props> = ({
          <Stack
             sx={styles.cardDetails}
             p={cardPadding}
-            onClick={onClick}
+            onClick={() => onClick && onClick(spark)}
             flexGrow={1}
          >
             <SparkCategoryChip categoryId={spark.category.id} />
@@ -138,8 +143,8 @@ const SparkCarouselCard: FC<Props> = ({
                limitLines={questionLimitLines}
             />
          </Stack>
-      </SparkCarouselCardContainer>
+      </SparkPreviewCardContainer>
    )
 }
 
-export default SparkCarouselCard
+export default SparkPreviewCard

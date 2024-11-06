@@ -4,10 +4,10 @@ import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/use
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
-import { MentorSparksCarousel } from "components/views/mentor-page/MentorSparksCarousel"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { SparksCarousel } from "components/views/sparks/components/SparksCarousel"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -79,13 +79,16 @@ const LinkedContentDetails = ({ job }: Props) => {
          ) : null}
 
          {jobSparks.length > 0 && jobHubV1 ? (
-            <Box>
-               <Typography variant={"subtitle1"} sx={styles.subTitle}>
-                  Sparks related to this job
-               </Typography>
-               <Box sx={styles.linkedContentWrapper}>
-                  <MentorSparksCarousel sparks={jobSparks} disableClick />
-               </Box>
+            <Box sx={styles.linkedContentWrapper}>
+               <SparksCarousel
+                  sparks={jobSparks}
+                  disableClick
+                  header={
+                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
+                        Sparks related to this job
+                     </Typography>
+                  }
+               />
             </Box>
          ) : null}
       </>

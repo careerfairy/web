@@ -166,6 +166,7 @@ const PortalPage = ({
                                  />
                               ) : (
                                  <FallbackComponent
+                                    sx={styles.sparksCarousel}
                                     header={
                                        <Typography
                                           variant="brandedH4"

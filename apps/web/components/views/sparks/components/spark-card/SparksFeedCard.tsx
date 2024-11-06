@@ -63,6 +63,8 @@ const styles = sxStyles({
       flexDirection: "column",
       position: "relative",
       justifyContent: "flex-end",
+      background:
+         "linear-gradient(360deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.00) 105%)",
 
       "&::after": {
          content: '""',
@@ -86,9 +88,6 @@ const styles = sxStyles({
       pb: {
          xs: 3.25,
          sparksFullscreen: 4,
-      },
-      mx: {
-         xs: 1.5,
       },
    },
    eventCardContent: {

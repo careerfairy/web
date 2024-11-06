@@ -74,7 +74,7 @@ const LoggedOutNotificationMessage = ({ name }: NotificationMessageProps) => {
             {" "}
             {name}{" "}
          </Typography>
-         your own questions? Create an account to access her details.
+         your own questions? Create an account to access their details.
       </Typography>
    )
 }
