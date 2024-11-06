@@ -13,7 +13,6 @@ import {
    JobsBlockType,
    LivestreamsCarouselBlockType,
    MentorsCarouselBlockType,
-   ModuleStepType,
    RichTextReferenceType,
    SparksCarouselBlockType,
 } from "data/hygraph/types"
@@ -26,41 +25,9 @@ import {
    JobsBlock,
    LivestreamsCarouselBlock,
    MentorsCarouselBlock,
-   QuizBlock,
    SparksCarouselBlock,
 } from "../blocks"
 import { createDefaultRichTextComponents } from "./default-rich-text-components"
-
-type RichTextRendererProps = {
-   step: ModuleStepType
-}
-
-export const ModuleStepContentRenderer = ({ step }: RichTextRendererProps) => {
-   if (!step.content) {
-      return null
-   }
-
-   if (step.content.__typename === "QuizBlock") {
-      return <QuizBlock {...step.content} />
-   }
-
-   if (step.content.__typename === "RichTextBlock") {
-      return (
-         <RichTextRenderer
-            content={step.content.content.raw}
-            references={step.content.content.references}
-         />
-      )
-   }
-
-   console.warn(
-      `Unhandled content type: ${
-         (step.content as any).__typename
-      } returning null`
-   )
-
-   return null
-}
 
 type RendererProps = NodeRendererType & {
    embed: Record<
@@ -69,7 +36,7 @@ type RendererProps = NodeRendererType & {
    >
 }
 
-const RichTextRenderer = ({ content, references }: RichTextProps) => {
+export const RichTextRenderer = ({ content, references }: RichTextProps) => {
    const isMobile = useIsMobile()
 
    const renderers = useMemo<RendererProps>(
