@@ -16,9 +16,9 @@ const styles = sxStyles({
    emptyDetailsRoot: {
       alignItems: "center",
       width: {
-         xs: "250px",
-         sm: "250px",
-         md: "346px",
+         xs: "280px",
+         sm: "280px",
+         md: "390px",
       },
    },
    emptyTitle: {
@@ -76,7 +76,7 @@ const EmptyStudyBackground = () => {
                      variant="small"
                   >
                      Share your formal education background with us, including
-                     the school, program, and field of study.
+                     the school, programme, and field of study.
                   </Typography>
                </Stack>
                <Button
