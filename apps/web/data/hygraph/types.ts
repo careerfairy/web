@@ -173,16 +173,11 @@ export type QuizAnswerComponentType = {
      }
 )
 
-export type QuizComponentType = {
+export type QuizModelType = {
    __typename: "Quiz"
+   id: string
    question: string
    answers: QuizAnswerComponentType[]
-}
-
-export type QuizBlockType = {
-   __typename: "QuizBlock"
-   id: string
-   quiz: QuizComponentType
 }
 
 export type RichTextBlockType = {
@@ -214,5 +209,5 @@ export type ModuleStepType = {
     * The slug of the step, eg "networking" or "interviewing", could be used for url based navigation
     */
    stepSlug: string
-   content: RichTextBlockType | QuizBlockType // Potential discover companies block and any other block that have their custom step cta button
+   content: RichTextBlockType | QuizModelType // Potential discover companies block and any other block that have their custom step cta button
 }

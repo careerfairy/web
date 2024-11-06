@@ -142,17 +142,15 @@ export const sparksCarouselBlockFragment = gql`
    }
 `
 
-// Model API ID: QuizBlock
-export const quizBlockFragment = gql`
+// Model API ID: Quiz
+export const quizFragment = gql`
    {
       __typename
       id
-      quiz {
-         question
-         answers {
-            answer
-            isCorrect
-         }
+      question
+      answers {
+         answer
+         isCorrect
       }
    }
 `
@@ -186,7 +184,7 @@ export const moduleStepFragment = gql`
       stepSlug # incase we want page routing for each step
       content {
          ... on RichTextBlock ${richTextBlockFragment}
-         ... on QuizBlock ${quizBlockFragment}
+         ... on Quiz ${quizFragment}
       }
    }
 `
