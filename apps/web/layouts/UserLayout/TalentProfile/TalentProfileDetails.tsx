@@ -33,7 +33,7 @@ const TAB_VALUES = {
    },
    jobs: {
       value: "jobs",
-      label: "Jobs",
+      label: "My Jobs",
    },
    company: {
       value: "companies",

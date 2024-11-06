@@ -2,6 +2,7 @@ import { Box, LinearProgress } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFirebaseUpload from "components/custom-hook/useFirebaseUpload"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { profilePlaceholderBanner } from "constants/images"
 import { userRepo } from "data/RepositoryInstances"
 import Image from "next/image"
 import useSWRMutation from "swr/mutation"
@@ -104,16 +105,14 @@ export const ProfileBannerIllustration = () => {
             />
          ) : null}
          <Box sx={styles.backgroundImageWrapper}>
-            {userData.bannerImageUrl ? (
-               <Image
-                  src={userData.bannerImageUrl}
-                  alt="Profile banner image"
-                  fill
-                  style={{
-                     objectFit: "cover",
-                  }}
-               />
-            ) : null}
+            <Image
+               src={userData.bannerImageUrl || profilePlaceholderBanner}
+               alt="Profile banner image"
+               fill
+               style={{
+                  objectFit: "cover",
+               }}
+            />
          </Box>
          <Box sx={styles.buttonWrapper}>
             <ProfileBannerUploadButton
