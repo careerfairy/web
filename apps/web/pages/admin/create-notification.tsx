@@ -5,7 +5,6 @@ import {
    createSavedNotification,
    updateSavedNotification,
    getSavedNotification,
-   sendExpoPushNotification,
 } from "../../data/firebase/FirestoreService"
 import Button from "@mui/material/Button"
 import Head from "next/head"
@@ -144,8 +143,19 @@ const CreateNotification = ({ notification }) => {
          }
       } else {
          try {
-            await sendExpoPushNotification(values, { title, body, url })
-            alert("Notification successfully sent")
+            const response = await fetch("/api/send-notifications", {
+               method: "POST",
+               headers: {
+                  "Content-Type": "application/json",
+               },
+               body: JSON.stringify({
+                  filters: values,
+                  message: { title, body, url },
+               }),
+            })
+
+            await response.json()
+            alert("Notification successfully sent!")
          } catch (e) {
             console.log("Error: ", e)
          }

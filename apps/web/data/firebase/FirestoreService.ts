@@ -125,6 +125,8 @@ export async function sendExpoPushNotification(filters: any, message: any) {
          console.log(tokens)
       }
 
+      console.log(tokens)
+
       const validTokens = tokens.filter((token) => Expo.isExpoPushToken(token))
       if (validTokens.length === 0) {
          console.error("No valid Expo push tokens provided.")
