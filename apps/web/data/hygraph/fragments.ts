@@ -142,6 +142,19 @@ export const sparksCarouselBlockFragment = gql`
    }
 `
 
+// Model API ID: VideoBlock
+export const videoBlockFragment = gql`
+   {
+      __typename
+      id
+      video ${videoAssetFragment}
+      videoThumbnail ${imageAssetFragment}
+      avatar ${imageAssetFragment}
+      videoTitle: title
+      label
+   }
+`
+
 // Model API ID: Quiz
 export const quizFragment = gql`
    {
@@ -170,6 +183,7 @@ export const richTextBlockFragment = gql`
             ... on HeaderBlock ${headerBlockFragment}
             ... on JobsBlock ${jobsBlockFragment}
             ... on SparksCarouselBlock ${sparksCarouselBlockFragment}
+            ... on VideoBlock ${videoBlockFragment}
          }
       }
    }
