@@ -5,6 +5,7 @@ import {
    createSavedNotification,
    updateSavedNotification,
    getSavedNotification,
+   sendExpoPushNotification,
 } from "../../data/firebase/FirestoreService"
 import Button from "@mui/material/Button"
 import Head from "next/head"
@@ -19,6 +20,7 @@ import { LevelOfStudySelector } from "../../components/views/signup/userInformat
 import { UserData } from "@careerfairy/shared-lib/users"
 import * as yup from "yup"
 import { sxStyles } from "../../types/commonTypes"
+import TextField from "@mui/material/TextField"
 
 const styles = sxStyles({
    mainWrapper: {
@@ -65,13 +67,16 @@ const styles = sxStyles({
    },
 })
 interface IFormValues
-   extends Pick<UserData, "levelOfStudy" | "universityCountryCode" | "gender"> {
+   extends Pick<
+      UserData,
+      "fieldOfStudy" | "levelOfStudy" | "universityCountryCode" | "gender"
+   > {
    gender?: string
    university: {
       name: string
       code: string
    }
-   fieldOfStudy: FieldOfStudy
+   livestream?: string
 }
 
 const schema: yup.SchemaOf<IFormValues> = yup.object()
@@ -86,6 +91,7 @@ const CreateNotification = ({ notification }) => {
       university: null,
       universityCountryCode: "",
       gender: "",
+      livestream: "",
       fieldOfStudy: null,
       levelOfStudy: null,
    })
@@ -130,6 +136,7 @@ const CreateNotification = ({ notification }) => {
          const data = { title, body, url, filters: values }
          if (notificationId) {
             await updateSavedNotification(notificationId, data)
+            alert("Notification successfully updated!")
          } else {
             alert("Notification successfully created!")
             const itemId = await createSavedNotification(data)
@@ -137,19 +144,8 @@ const CreateNotification = ({ notification }) => {
          }
       } else {
          try {
-            const response = await fetch("/api/send-notifications", {
-               method: "POST",
-               headers: {
-                  "Content-Type": "application/json",
-               },
-               body: JSON.stringify({
-                  filters: values,
-                  message: { title, body, url },
-               }),
-            })
-
-            await response.json()
-            alert("Notification successfully sent!")
+            await sendExpoPushNotification(values, { title, body, url })
+            alert("Notification successfully sent")
          } catch (e) {
             console.log("Error: ", e)
          }
@@ -168,31 +164,44 @@ const CreateNotification = ({ notification }) => {
                      ? "Edit Notification"
                      : "Create New Notification"}
                </h1>
-               <div style={styles.rowWrapper}>
-                  <input
-                     style={styles.inputField}
-                     type="text"
-                     placeholder="Title"
-                     value={title}
-                     onChange={(e) => setTitle(e.target.value)}
-                  />
 
-                  <input
-                     style={styles.inputField}
-                     type="text"
-                     placeholder="URL"
-                     value={url}
-                     onChange={(e) => setUrl(e.target.value)}
-                  />
-               </div>
-               <div style={{ width: "100%", marginTop: 10 }}>
-                  <textarea
-                     style={styles.textAreaField}
-                     placeholder="Body"
-                     value={body}
-                     onChange={(e) => setBody(e.target.value)}
-                  />
-               </div>
+               <Grid container spacing={2}>
+                  <Grid item xs={12} sm={12} md={6}>
+                     <TextField
+                        style={{ width: "100%" }}
+                        id="title-field"
+                        name="title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        label="Notification title"
+                        className="notificationTitle"
+                     />
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={6}>
+                     <TextField
+                        style={{ width: "100%" }}
+                        id="url-field"
+                        name="url"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        label="Notification URL"
+                        className="notificationUrl"
+                     />
+                  </Grid>
+               </Grid>
+               <Grid container spacing={2}>
+                  <Grid style={{ marginTop: 20 }} item xs={12} sm={12} md={12}>
+                     <TextField
+                        style={{ width: "100%" }}
+                        id="body-field"
+                        name="body"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        label="Notification body"
+                        className="notificationBody"
+                     />
+                  </Grid>
+               </Grid>
 
                <h3>Filters</h3>
 
@@ -214,7 +223,18 @@ const CreateNotification = ({ notification }) => {
                      }) => (
                         <form id="signUpForm" onSubmit={handleSubmit}>
                            <Grid container spacing={2}>
-                              <Grid item xs={12} sm={12} md={4}>
+                              <Grid item xs={12} sm={12} md={6}>
+                                 <TextField
+                                    style={{ width: "100%" }}
+                                    id="livestream-field"
+                                    name="livestream"
+                                    onChange={handleChange}
+                                    value={values.livestream}
+                                    label="Livestream ID"
+                                    className="livestreamField"
+                                 />
+                              </Grid>
+                              <Grid item xs={12} sm={12} md={6}>
                                  <GenericDropdown
                                     id="gender-dropdown"
                                     name="gender"
