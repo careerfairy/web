@@ -23,7 +23,7 @@ export const BaseProfileDialog = (props: Props) => {
    const isMobile = useIsMobile()
 
    return (
-      <Dialog open={open} fullScreen={isMobile}>
+      <Dialog open={open} fullScreen={isMobile} closeAfterTransition={false}>
          <DialogContent>{children}</DialogContent>
 
          <DialogActions>
