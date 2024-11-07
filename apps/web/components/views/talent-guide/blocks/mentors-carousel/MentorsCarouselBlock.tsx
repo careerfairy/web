@@ -3,7 +3,19 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { MentorsCarouselBlockType } from "data/hygraph/types"
+import { sxStyles } from "types/commonTypes"
 import { MentorCard } from "./MentorCard"
+
+const styles = sxStyles({
+   title: {
+      fontWeight: "700",
+      color: (theme) => theme.palette.neutral["800"],
+   },
+   subHeader: {
+      fontWeight: "400",
+      color: (theme) => theme.palette.neutral["800"],
+   },
+})
 
 type Props = MentorsCarouselBlockType
 
@@ -12,22 +24,10 @@ export const MentorsCarouselBlock = ({ title, subHeader }: Props) => {
       <SuspenseWithBoundary fallback={"Loading..."}>
          <Stack gap="12px">
             <Stack gap="4px">
-               <Typography
-                  variant="brandedH4"
-                  sx={{
-                     fontWeight: "700",
-                     color: "#3D3D47",
-                  }}
-               >
+               <Typography variant="brandedH4" sx={styles.title}>
                   {title}
                </Typography>
-               <Typography
-                  variant="brandedBody"
-                  sx={{
-                     fontWeight: "400",
-                     color: "#3D3D47",
-                  }}
-               >
+               <Typography variant="brandedBody" sx={styles.subHeader}>
                   {subHeader}
                </Typography>
             </Stack>
