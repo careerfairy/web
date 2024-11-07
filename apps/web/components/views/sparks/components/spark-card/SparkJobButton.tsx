@@ -30,7 +30,9 @@ const styles = sxStyles({
 const SparkJobButton = ({ spark }: Props) => {
    const jobs: CustomJob[] = useGroupCustomJobs(spark.group.id, {
       sparkId: spark.id,
+      excludeExpired: true,
    })
+
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
    const dispatch = useDispatch()
