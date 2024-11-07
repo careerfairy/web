@@ -1,7 +1,10 @@
 import { useTheme } from "@mui/styles"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import NotFoundView from "components/views/livestream-dialog/views/common/NotFoundView"
-import { TalentProfileView } from "layouts/UserLayout/TalentProfile/TalentProfileView"
+import {
+   TAB_VALUES,
+   TalentProfileView,
+} from "layouts/UserLayout/TalentProfile/TalentProfileView"
 import { useRouter } from "next/router"
 import SEO from "../../components/util/SEO"
 import UserLayout from "../../layouts/UserLayout"
@@ -25,7 +28,7 @@ const CompaniesPage = () => {
             title="CareerFairy | My Profile"
             canonical={`https://www.careerfairy.io${pathname}`}
          />
-         <TalentProfileView currentPath="/profile/companies" />
+         <TalentProfileView currentPath={TAB_VALUES.company.value} />
       </UserLayout>
    )
 }

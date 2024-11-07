@@ -1,6 +1,9 @@
 import { useTheme } from "@mui/styles"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import { TalentProfileView } from "layouts/UserLayout/TalentProfile/TalentProfileView"
+import {
+   TAB_VALUES,
+   TalentProfileView,
+} from "layouts/UserLayout/TalentProfile/TalentProfileView"
 import { useRouter } from "next/router"
 import SEO from "../../components/util/SEO"
 import UserLayout from "../../layouts/UserLayout"
@@ -20,7 +23,7 @@ const UserProfile = () => {
             canonical={`https://www.careerfairy.io${pathname}`}
          />
          {talentProfileV1 ? (
-            <TalentProfileView currentPath="/profile" />
+            <TalentProfileView currentPath={TAB_VALUES.profile.value} />
          ) : (
             <UserView currentPath="/profile" />
          )}
