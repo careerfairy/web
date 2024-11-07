@@ -4,7 +4,6 @@ export default async function handler(req: any, res: any) {
    if (req.method === "POST") {
       const { filters, message } = req.body
       try {
-         console.log(filters)
          await sendExpoPushNotification(filters, message)
          res.status(200).json({
             success: true,
