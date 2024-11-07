@@ -157,6 +157,16 @@ export type SparksCarouselBlockType = {
    id: string
 }
 
+export type VideoBlockType = {
+   __typename: "VideoBlock"
+   id: string
+   video: VideoAssetType
+   videoThumbnail: ImageAssetType
+   avatar: ImageAssetType
+   label: string
+   videoTitle: string
+}
+
 export type QuizAnswerComponentType = {
    __typename: "QuizAnswer"
    answer: string
