@@ -91,8 +91,8 @@ const CreateNotification = ({ notification }) => {
       universityCountryCode: "",
       gender: "",
       livestream: "",
-      fieldOfStudy: null,
-      levelOfStudy: null,
+      fieldOfStudy: "",
+      levelOfStudy: "",
    })
    const formikRef = useRef(null)
    const router = useRouter()
@@ -205,8 +205,8 @@ const CreateNotification = ({ notification }) => {
                         style={{ width: "100%" }}
                         id="body-field"
                         name="body"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        value={body}
+                        onChange={(e) => setBody(e.target.value)}
                         label="Notification body"
                         className="notificationBody"
                      />
