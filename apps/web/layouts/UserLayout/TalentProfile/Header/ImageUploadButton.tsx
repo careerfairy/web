@@ -31,6 +31,9 @@ import { sxStyles } from "../../../../types/commonTypes"
 const styles = sxStyles({
    buttonWrapper: {
       height: "32px",
+      flexDirection: "column",
+      display: "flex",
+      alignItems: "center",
    },
    button: {
       zIndex: 2,
@@ -223,12 +226,7 @@ export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
    )
 
    return (
-      <Box
-         flexDirection="column"
-         display="flex"
-         alignItems="center"
-         sx={styles.buttonWrapper}
-      >
+      <Box sx={styles.buttonWrapper}>
          {objectUrl ? (
             <ImageCropperDialog
                title={cropper.title}

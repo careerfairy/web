@@ -6,7 +6,7 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    dialog: {
-      zIndex: 1300,
+      zIndex: (theme) => theme.zIndex.modal,
    },
    deleteIcon: {
       width: "48px !important",
