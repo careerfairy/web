@@ -174,6 +174,7 @@ const csp = {
       "'self'", // For Sentry Replay
       "blob:", // For Sentry Replay
    ],
+   "frame-ancestors": ["'self'", "https://*.hygraph.com"],
 }
 
 if (notProduction) {
@@ -339,6 +340,10 @@ const moduleExports = {
    },
    // this is an open issue on MUI's GitHub: https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
    transpilePackages: ["@mui/x-charts", "mui-tel-input"],
+   i18n: {
+      locales: ["en", "de"],
+      defaultLocale: "en",
+   },
 }
 
 // test or development environment
