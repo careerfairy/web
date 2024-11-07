@@ -15,6 +15,7 @@ import {
    MentorsCarouselBlockType,
    RichTextReferenceType,
    SparksCarouselBlockType,
+   VideoBlockType,
 } from "data/hygraph/types"
 import { useMemo } from "react"
 import {
@@ -26,6 +27,7 @@ import {
    LivestreamsCarouselBlock,
    MentorsCarouselBlock,
    SparksCarouselBlock,
+   VideoBlock,
 } from "../blocks"
 import { createDefaultRichTextComponents } from "./default-rich-text-components"
 
@@ -67,6 +69,9 @@ export const RichTextRenderer = ({ content, references }: RichTextProps) => {
             SparksCarouselBlock: (
                props: EmbedProps<SparksCarouselBlockType>
             ) => <SparksCarouselBlock {...props} />,
+            VideoBlock: (props: EmbedProps<VideoBlockType>) => (
+               <VideoBlock {...props} />
+            ),
          },
       }),
       [isMobile]
