@@ -1,10 +1,14 @@
 import { StudyBackground } from "@careerfairy/shared-lib/users"
 import { Box, Button, Stack, Typography } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { SchoolIcon } from "components/views/common/icons/SchoolIcon"
-import { Fragment, useState } from "react"
+import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
-import { StudyBackgroundFormProvider } from "./forms/StudyBackgroundForm"
+import {
+   StudyBackgroundFormFields,
+   StudyBackgroundFormProvider,
+} from "./forms/StudyBackgroundForm"
 
 const styles = sxStyles({
    title: {
@@ -41,32 +45,37 @@ const styles = sxStyles({
       height: "36px",
    },
 })
+
 export const ProfileStudyBackground = () => {
    return (
-      <StudyBackgroundFormProvider>
-         <Stack spacing={1.5}>
-            <Typography variant="brandedBody" sx={styles.title}>
-               Study background
-            </Typography>
+      <Stack spacing={1.5}>
+         <Typography variant="brandedBody" sx={styles.title}>
+            Study background
+         </Typography>
+         <SuspenseWithBoundary>
             <StudyBackgroundDetails />
-         </Stack>
-      </StudyBackgroundFormProvider>
+         </SuspenseWithBoundary>
+      </Stack>
    )
 }
 
-// type StudyBackgroundDetailsProps = {
-//    studyBackgroundToEdit?: StudyBackground
-// }
-
 const StudyBackgroundDetails = () => {
    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+   const [studyBackgroundToEdit, setStudyBackgroundToEdit] =
+      useState<StudyBackground>(null)
+   const [studyBackgroundToDelete, setStudyBackgroundToDelete] =
+      useState<StudyBackground>(null)
+   console.log(
+      "🚀 ~ StudyBackgroundDetails ~ studyBackgroundToDelete:",
+      studyBackgroundToDelete
+   )
 
    const handleClose = () => setIsDialogOpen(false)
 
    const handleSave = () => setIsDialogOpen(false)
 
    return (
-      <Fragment>
+      <StudyBackgroundFormProvider studyBackground={studyBackgroundToEdit}>
          <Box
             sx={styles.studiesRoot}
             display={"flex"}
@@ -76,6 +85,8 @@ const StudyBackgroundDetails = () => {
          >
             <StudyBackgroundsListView
                handleAddBackground={() => setIsDialogOpen(true)}
+               handleEdit={setStudyBackgroundToEdit}
+               handleDelete={setStudyBackgroundToDelete}
             />
          </Box>
          <BaseProfileDialog
@@ -83,9 +94,9 @@ const StudyBackgroundDetails = () => {
             handleClose={handleClose}
             handleSave={handleSave}
          >
-            <Box>yode</Box>
+            <StudyBackgroundFormFields />
          </BaseProfileDialog>
-      </Fragment>
+      </StudyBackgroundFormProvider>
    )
 }
 
@@ -138,7 +149,7 @@ const EmptyStudyBackgroundView = ({
                   variant="small"
                >
                   Share your formal education background with us, including the
-                  school, program, and field of study.
+                  school, programme, and field of study.
                </Typography>
             </Stack>
             <Button

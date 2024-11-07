@@ -1,22 +1,21 @@
 import { StudyBackground } from "@careerfairy/shared-lib/users"
 import { Stack } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
-import { universityCountriesMap } from "components/util/constants/universityCountries"
-import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
+import { UniversityCountrySelector } from "components/views/profile/userData/personal-info/UniversityCountrySelector"
+import SelectUniversitiesDropDown from "components/views/universitySelect/SelectUniversitiesDropDown"
 import { ReactNode } from "react"
 import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
-import { getInitialValues } from "./CreateOrEditStudyBackgroundForm"
 import {
    CreateStudyBackgroundSchema,
    CreateStudyBackgroundSchemaType,
+   getInitialStudyBackgroundValues,
 } from "./schemas"
-
-const countryKeys = Object.keys(universityCountriesMap)
 
 const styles = sxStyles({
    formRoot: {
       p: 1,
+      minWidth: "500px",
    },
 })
 
@@ -33,7 +32,7 @@ export const StudyBackgroundFormProvider = ({
 }: StudyBackgroundFormProviderProps) => {
    const methods = useYupForm({
       schema: CreateStudyBackgroundSchema,
-      defaultValues: getInitialValues(studyBackground),
+      defaultValues: getInitialStudyBackgroundValues(studyBackground),
       mode: "onChange",
       reValidateMode: "onChange",
    })
@@ -50,21 +49,21 @@ export const StudyBackgroundFormFields = () => {
       formState: { defaultValues, isSubmitting },
    } = useFormContext<CreateStudyBackgroundSchemaType>()
 
+   console.log("🚀 ~ StudyBackgroundFormFields ~ isSubmitting:", isSubmitting)
    const isEditing = Boolean(defaultValues.id)
    console.log("🚀 ~ StudyBackgroundFormFields ~ isEditing:", isEditing)
 
    return (
-      <Stack sx={styles.formRoot}>
-         <ControlledBrandedAutoComplete
+      <Stack sx={styles.formRoot} spacing={2}>
+         <UniversityCountrySelector
+            name="universityCountryCode"
+            universityFieldName="universityId"
+         />
+         <SelectUniversitiesDropDown
             label="School"
+            placeholder="E.g., ETH Zurich"
+            countryCodeFieldName="universityCountryCode"
             name="universityId"
-            options={countryKeys}
-            autocompleteProps={{
-               id: "universityId",
-               disabled: isSubmitting,
-               autoHighlight: true,
-               disableClearable: true,
-            }}
          />
       </Stack>
    )

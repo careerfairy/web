@@ -7,6 +7,7 @@ import { useCallback, useMemo } from "react"
 
 export type StudyBackgroundFormValues = {
    id?: string
+   universityCountryCode: string
    universityId: string
    fieldOfStudy: FieldOfStudy
    levelOfStudy: LevelOfStudy
