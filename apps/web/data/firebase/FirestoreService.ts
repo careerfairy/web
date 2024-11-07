@@ -75,7 +75,6 @@ export async function sendExpoPushNotification(filters: any, message: any) {
       let tokens: string[] = []
 
       if (filters.livestream) {
-         console.log("Has livestream")
          tokens = await retrieveTokensFromLivestream(filters.livestream)
       } else {
          const userRef = firestore.collection("userData")
@@ -92,8 +91,6 @@ export async function sendExpoPushNotification(filters: any, message: any) {
             filters.universityCountryCode &&
             filters.universityCountryCode !== "OTHER"
          ) {
-            console.log("university")
-            console.log(filters.universityCountryCode)
             query = query.where(
                "universityCountryCode",
                "==",
@@ -118,14 +115,9 @@ export async function sendExpoPushNotification(filters: any, message: any) {
             )
          }
 
-         console.log(query)
-
          const usersSnapshot = await query.get()
          tokens = usersSnapshot.docs.map((doc) => doc.data().pushToken)
-         console.log(tokens)
       }
-
-      console.log(tokens)
 
       const validTokens = tokens.filter((token) => Expo.isExpoPushToken(token))
       if (validTokens.length === 0) {
@@ -149,13 +141,11 @@ export async function sendExpoPushNotification(filters: any, message: any) {
 
       // Send each chunk through Expo's service
       const ticketChunks = chunks.map(async (chunk) => {
-         const tickets = await expo.sendPushNotificationsAsync(chunk)
-         console.log("Sent chunk", tickets)
+         await expo.sendPushNotificationsAsync(chunk)
       })
 
       // Wait for all chunks to be sent
       await Promise.all(ticketChunks)
-      console.log("All notifications sent.")
    } catch (error) {
       console.error("Error sending chunk", error)
    }
@@ -170,7 +160,6 @@ async function retrieveTokensFromLivestream(
          .doc(livestreamId)
       const livestreamDocSnap = await livestreamDocRef.get()
       if (!livestreamDocSnap.exists) {
-         console.log("Livestream document does not exist.")
          return []
       }
 
@@ -183,10 +172,8 @@ async function retrieveTokensFromLivestream(
 
       // Collect eligible users with push tokens
       const eligibleUsers = []
-      console.log(userLiveStreamDataSnap.docs)
       for (const userDoc of userLiveStreamDataSnap.docs) {
-         const userId = userDoc.id // Assume this is the email or unique ID of the user
-         console.log(userId)
+         const userId = userDoc.id
 
          const query = userRef
             .where("id", "==", userId)
@@ -197,8 +184,6 @@ async function retrieveTokensFromLivestream(
             eligibleUsers.push(doc.data().pushToken)
          })
       }
-
-      console.log("Eligible users with push tokens:", eligibleUsers)
       return eligibleUsers
    } catch (error) {
       console.error("Error retrieving eligible users:", error)
