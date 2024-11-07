@@ -138,8 +138,8 @@ const CreateNotification = ({ notification }) => {
             await updateSavedNotification(notificationId, data)
             alert("Notification successfully updated!")
          } else {
-            alert("Notification successfully created!")
             const itemId = await createSavedNotification(data)
+            alert("Notification successfully created!")
             router.push(`/admin/create-notification?id=${itemId}`)
          }
       } else {
