@@ -1,5 +1,13 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { collection, orderBy, query, where } from "firebase/firestore"
+import {
+   collection,
+   orderBy,
+   query,
+   QueryConstraint,
+   where,
+} from "firebase/firestore"
+import { DateTime } from "luxon"
+import { useMemo } from "react"
 import { useFirestore } from "reactfire"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
@@ -7,7 +15,11 @@ type Options = {
    livestreamId?: string
    sparkId?: string
    includePermanentlyExpired?: boolean
+   excludeExpired?: boolean
 }
+
+// Create end of day date for comparison using Luxon
+const startOfToday = DateTime.now().startOf("day").toJSDate()
 
 /**
  * Retrieves custom jobs associated with a specific group ID
@@ -20,24 +32,48 @@ const useGroupCustomJobs = (groupId: string, options: Options = {}) => {
       livestreamId = "",
       sparkId = "",
       includePermanentlyExpired,
+      excludeExpired,
    } = options
 
-   const collectionRef = query(
-      collection(useFirestore(), "customJobs"),
-      where("groupId", "==", groupId),
-      ...(livestreamId
-         ? [where("livestreams", "array-contains", livestreamId)]
-         : []),
-      ...(sparkId ? [where("sparks", "array-contains", sparkId)] : []),
-      ...(includePermanentlyExpired
-         ? []
-         : [where("isPermanentlyExpired", "==", false)]),
-      orderBy("createdAt", "desc")
-   )
+   const firestore = useFirestore()
 
-   const { data } = useFirestoreCollection<CustomJob>(collectionRef, {
-      idField: "id", // this field will be added to the firestore object
-   })
+   const collectionRef = useMemo(() => {
+      const queryConditions: QueryConstraint[] = [
+         where("groupId", "==", groupId),
+      ]
+
+      if (livestreamId) {
+         queryConditions.push(
+            where("livestreams", "array-contains", livestreamId)
+         )
+      }
+
+      if (sparkId) {
+         queryConditions.push(where("sparks", "array-contains", sparkId))
+      }
+
+      if (!includePermanentlyExpired) {
+         queryConditions.push(where("isPermanentlyExpired", "==", false))
+      }
+
+      if (excludeExpired) {
+         queryConditions.push(where("deadline", ">", startOfToday))
+         queryConditions.push(orderBy("deadline", "desc")) // sort by deadline
+      } else {
+         queryConditions.push(orderBy("createdAt", "desc")) // sort by createdAt
+      }
+
+      return query(collection(firestore, "customJobs"), ...queryConditions)
+   }, [
+      groupId,
+      livestreamId,
+      sparkId,
+      includePermanentlyExpired,
+      excludeExpired,
+      firestore,
+   ])
+
+   const { data } = useFirestoreCollection<CustomJob>(collectionRef)
 
    return data
 }
