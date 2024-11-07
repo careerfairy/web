@@ -65,15 +65,13 @@ const styles = sxStyles({
    },
 })
 interface IFormValues
-   extends Pick<
-      UserData,
-      "fieldOfStudy" | "levelOfStudy" | "universityCountryCode" | "gender"
-   > {
+   extends Pick<UserData, "levelOfStudy" | "universityCountryCode" | "gender"> {
    gender?: string
    university: {
       name: string
       code: string
    }
+   fieldOfStudy: FieldOfStudy
 }
 
 const schema: yup.SchemaOf<IFormValues> = yup.object()
@@ -267,6 +265,7 @@ const CreateNotification = ({ notification }) => {
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                  <FieldOfStudySelector
+                                    // @ts-ignore
                                     setFieldValue={setFieldValue}
                                     value={values.fieldOfStudy}
                                     className="registrationInput"
