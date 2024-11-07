@@ -26,7 +26,7 @@ const styles = sxStyles({
 
 type ContentCarouselProps = Pick<GenericCarouselProps, "children"> & {
    slideWidth?: number
-   headerTitle: ReactNode | string
+   headerTitle?: ReactNode | string
    viewportSx?: SxProps
    containerSx?: SxProps
    headerSx?: SxProps
