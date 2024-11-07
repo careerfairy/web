@@ -19,10 +19,10 @@ import {
 } from "./lib/livestream"
 import { logAndThrow } from "./lib/validations"
 import {
+   IGenerateEmailDataProps,
    addMinutesDate,
    generateNonAttendeesReminder,
    generateReminderEmailData,
-   IGenerateEmailDataProps,
    setCORSHeaders,
 } from "./util"
 
@@ -43,7 +43,9 @@ export const sendReminderEmailToRegistrants = functions
                TemplateId: req.body.templateId,
                From: "CareerFairy <noreply@careerfairy.io>",
                To: recipient.id,
-               TemplateModel: {},
+               TemplateModel: {
+                  firstName: recipient.user.firstName,
+               },
             }
             templates.push(email)
          })
