@@ -28,6 +28,7 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { CompanyIcon } from "components/views/common/icons"
 import { SlideLeftTransition } from "components/views/common/transitions"
 import { supportPageLink } from "constants/links"
+import { TAB_VALUES } from "layouts/UserLayout/TalentProfile/TalentProfileView"
 import Link from "next/link"
 import { useCallback, useMemo, useState } from "react"
 import { Briefcase, HelpCircle, LogOut, User } from "react-feather"
@@ -254,7 +255,7 @@ const ProfileMenu = () => {
    const MyJobsMenuItem = ({ sx }: CustomMenuItemProps) => {
       return (
          <MenuItem
-            onClick={() => push("/profile/jobs")}
+            onClick={() => push(TAB_VALUES.jobs.value)}
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
@@ -270,7 +271,7 @@ const ProfileMenu = () => {
    const FollowingCompaniesMenuItem = ({ sx }: CustomMenuItemProps) => {
       return (
          <MenuItem
-            onClick={() => push("/profile/companies")}
+            onClick={() => push(TAB_VALUES.company.value)}
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
