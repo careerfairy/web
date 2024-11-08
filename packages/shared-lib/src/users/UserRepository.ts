@@ -22,6 +22,7 @@ import {
    RegisteredLivestreams,
    RegistrationStep,
    SavedRecruiter,
+   StudyBackground,
    UserATSDocument,
    UserATSRelations,
    UserActivity,
@@ -233,6 +234,16 @@ export interface IUserRepository {
       tagField: ValidUserTagFields,
       tagIds: string[]
    ): Promise<UserData[]>
+
+   /**
+    *
+    * @param userId
+    * @param studyBackground
+    */
+   createUserStudyBackground(
+      userId: string,
+      studyBackground: StudyBackground
+   ): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -1101,6 +1112,24 @@ export class FirebaseUserRepository
       }
 
       return this.addIdToDocs<UserData>(data.docs)
+   }
+
+   async createUserStudyBackground(
+      userId: string,
+      studyBackground: StudyBackground
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("studyBackgrounds")
+         .doc()
+
+      const data: StudyBackground = {
+         ...studyBackground,
+         id: ref.id,
+      }
+
+      await ref.set(data)
    }
 }
 

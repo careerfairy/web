@@ -5,6 +5,9 @@ import { useFormContext } from "react-hook-form"
 type Props = {
    name: string
    universityFieldName: string
+   label?: string
+   placeholder?: string
+   requiredText?: string
 }
 
 const countryKeys = Object.keys(universityCountriesMap)
@@ -12,6 +15,9 @@ const countryKeys = Object.keys(universityCountriesMap)
 export const UniversityCountrySelector = ({
    name,
    universityFieldName,
+   label = "Select Country of University",
+   placeholder,
+   requiredText,
 }: Props) => {
    const {
       setValue,
@@ -20,9 +26,13 @@ export const UniversityCountrySelector = ({
 
    return (
       <ControlledBrandedAutoComplete
-         label="Select Country of University"
+         label={label}
          name={name}
          options={countryKeys}
+         textFieldProps={{
+            requiredText: requiredText,
+            placeholder: placeholder,
+         }}
          autocompleteProps={{
             id: "universityCountryCode",
             disabled: isSubmitting,

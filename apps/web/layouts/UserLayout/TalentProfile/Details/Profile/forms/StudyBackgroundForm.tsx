@@ -1,21 +1,27 @@
 import { StudyBackground } from "@careerfairy/shared-lib/users"
 import { Stack } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { UniversityCountrySelector } from "components/views/profile/userData/personal-info/UniversityCountrySelector"
 import SelectUniversitiesDropDown from "components/views/universitySelect/SelectUniversitiesDropDown"
 import { ReactNode } from "react"
-import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
+import { FormProvider, UseFormReturn } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import {
    CreateStudyBackgroundSchema,
    CreateStudyBackgroundSchemaType,
    getInitialStudyBackgroundValues,
 } from "./schemas"
+import { AcademicDatePicker } from "./selectors/AcademicDatePicker"
+import {
+   FieldsOfStudySelector,
+   LevelsOfStudySelector,
+} from "./selectors/StudyDomainSelector"
 
 const styles = sxStyles({
    formRoot: {
-      p: 1,
-      minWidth: "500px",
+      // p: 1,
+      // minWidth: "500px",
    },
 })
 
@@ -45,19 +51,16 @@ export const StudyBackgroundFormProvider = ({
 }
 
 export const StudyBackgroundFormFields = () => {
-   const {
-      formState: { defaultValues, isSubmitting },
-   } = useFormContext<CreateStudyBackgroundSchemaType>()
-
-   console.log("🚀 ~ StudyBackgroundFormFields ~ isSubmitting:", isSubmitting)
-   const isEditing = Boolean(defaultValues.id)
-   console.log("🚀 ~ StudyBackgroundFormFields ~ isEditing:", isEditing)
+   const isMobile = useIsMobile()
 
    return (
       <Stack sx={styles.formRoot} spacing={2}>
          <UniversityCountrySelector
             name="universityCountryCode"
             universityFieldName="universityId"
+            placeholder="E.g., Switzerland"
+            label="Country"
+            requiredText="(required)"
          />
          <SelectUniversitiesDropDown
             label="School"
@@ -65,6 +68,20 @@ export const StudyBackgroundFormFields = () => {
             countryCodeFieldName="universityCountryCode"
             name="universityId"
          />
+         <FieldsOfStudySelector fieldName="fieldOfStudy" />
+         <LevelsOfStudySelector fieldName="levelOfStudy" />
+         <Stack
+            direction={isMobile ? "column" : "row"}
+            width={"100%"}
+            spacing={2}
+            justifyContent={"space-between"}
+         >
+            <AcademicDatePicker fieldName="startedAt" label="Start Date" />
+            <AcademicDatePicker
+               fieldName="endedAt"
+               label="End Date (or expected)"
+            />
+         </Stack>
       </Stack>
    )
 }
