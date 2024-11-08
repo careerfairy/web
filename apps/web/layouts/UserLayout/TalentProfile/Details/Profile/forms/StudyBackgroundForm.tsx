@@ -4,8 +4,9 @@ import { useYupForm } from "components/custom-hook/form/useYupForm"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { UniversityCountrySelector } from "components/views/profile/userData/personal-info/UniversityCountrySelector"
 import SelectUniversitiesDropDown from "components/views/universitySelect/SelectUniversitiesDropDown"
+import { DateTime } from "luxon"
 import { ReactNode } from "react"
-import { FormProvider, UseFormReturn } from "react-hook-form"
+import { FormProvider, UseFormReturn, useWatch } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import {
    CreateStudyBackgroundSchema,
@@ -53,6 +54,14 @@ export const StudyBackgroundFormProvider = ({
 export const StudyBackgroundFormFields = () => {
    const isMobile = useIsMobile()
 
+   const startDateValue = useWatch({
+      name: "startedAt",
+   })
+
+   const minEndedAtDate = startDateValue
+      ? DateTime.fromJSDate(startDateValue).plus({ month: 1 }).toJSDate()
+      : null
+
    return (
       <Stack sx={styles.formRoot} spacing={2}>
          <UniversityCountrySelector
@@ -80,6 +89,7 @@ export const StudyBackgroundFormFields = () => {
             <AcademicDatePicker
                fieldName="endedAt"
                label="End Date (or expected)"
+               minDate={minEndedAtDate}
             />
          </Stack>
       </Stack>
