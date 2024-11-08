@@ -236,9 +236,9 @@ export interface IUserRepository {
    ): Promise<UserData[]>
 
    /**
-    *
-    * @param userId
-    * @param studyBackground
+    * Creates a given study background in the /userData/studyBackgrounds sub collection.
+    * @param userId ID of the user for which the study background shall be created.
+    * @param studyBackground Study background data.
     */
    createUserStudyBackground(
       userId: string,
