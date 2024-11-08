@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { Platform } from "react-native"
 import WebViewComponent from "./components/WebView"
-import { doc, updateDoc } from "firebase/firestore"
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
 import { app, db, auth } from "./firebase"
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
@@ -62,9 +62,13 @@ export default function Native() {
       }
    }
 
-   const onLogout = async (userId: string, userPassword: string) => {
+   const onLogout = async (
+      userId: string,
+      userPassword: string,
+      userToken: string | null
+   ) => {
       try {
-         return resetFireStoreData(userId, userPassword)
+         return resetFireStoreData(userId, userPassword, userToken)
       } catch (e) {
          console.log("Error with resetting firestore data", e)
       }
@@ -80,7 +84,7 @@ export default function Native() {
             if (auth.currentUser?.email) {
                const userDocRef = doc(db, "userData", auth.currentUser.email)
 
-               await updateDoc(userDocRef, { pushToken: pushToken })
+               await updateDoc(userDocRef, { fcmTokens: arrayUnion(pushToken) })
             }
             await SecureStore.setItemAsync("pushToken", pushToken)
          }
@@ -89,18 +93,26 @@ export default function Native() {
       }
    }
 
-   async function resetFireStoreData(userId: string, userPassword: string) {
+   async function resetFireStoreData(
+      userId: string,
+      userPassword: string,
+      userToken: string | null
+   ) {
       try {
-         if (auth.currentUser?.email) {
-            const userDocRef = doc(db, "userData", auth.currentUser.email)
-            await updateDoc(userDocRef, { pushToken: null })
-         } else {
+         if (!userToken) {
+            return
+         }
+         if (!auth.currentUser?.email) {
             await signInWithEmailAndPassword(auth, userId, userPassword)
-            if (auth.currentUser?.email) {
-               const userDocRef = doc(db, "userData", auth.currentUser.email)
-               await updateDoc(userDocRef, { pushToken: null })
+            // If there is still no current user after authentication, we are exiting the method
+            if (!auth.currentUser?.email) {
+               return
             }
          }
+
+         const userDocRef = doc(db, "userData", auth.currentUser.email)
+         await updateDoc(userDocRef, { fcmTokens: arrayRemove(userToken) })
+
          await SecureStore.deleteItemAsync("pushToken")
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)

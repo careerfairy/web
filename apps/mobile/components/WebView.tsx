@@ -34,7 +34,11 @@ Notifications.setNotificationHandler({
 
 interface WebViewScreenProps {
    onTokenInjected: () => void
-   onLogout: (userId: string, userPassword: string) => void
+   onLogout: (
+      userId: string,
+      userPassword: string,
+      userToken: string | null
+   ) => void
 }
 
 const WebViewComponent: React.FC<WebViewScreenProps> = ({
@@ -162,8 +166,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       try {
          const userId = await SecureStore.getItemAsync("userId")
          const userPassword = await SecureStore.getItemAsync("userPassword")
+         const userToken = await SecureStore.getItemAsync("authToken")
          if (userId && userPassword) {
-            onLogout(userId, userPassword)
+            onLogout(userId, userPassword, userToken)
          }
          await SecureStore.deleteItemAsync("authToken")
          await SecureStore.deleteItemAsync("userId")
