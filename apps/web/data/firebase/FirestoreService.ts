@@ -141,7 +141,8 @@ export async function sendExpoPushNotification(filters: any, message: any) {
 
       // Send each chunk through Expo's service
       const ticketChunks = chunks.map(async (chunk) => {
-         await expo.sendPushNotificationsAsync(chunk)
+         const tickets = await expo.sendPushNotificationsAsync(chunk)
+         console.log("Sent chunk", tickets)
       })
 
       // Wait for all chunks to be sent
