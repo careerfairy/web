@@ -166,7 +166,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       try {
          const userId = await SecureStore.getItemAsync("userId")
          const userPassword = await SecureStore.getItemAsync("userPassword")
-         const userToken = await SecureStore.getItemAsync("authToken")
+         const userToken = await SecureStore.getItemAsync("pushToken")
          if (userId && userPassword) {
             onLogout(userId, userPassword, userToken)
          }
