@@ -16,7 +16,7 @@ const styles = sxStyles({
       width: "100%",
       height: { xs: "94px", md: "auto" },
       position: "relative",
-      paddingTop: { md: "25%" },
+      paddingTop: "25%",
    },
    buttonWrapper: {
       position: "absolute",
