@@ -1,5 +1,6 @@
-import { Box, Stack, Typography } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import useUniversitiesByCountryCodes from "components/custom-hook/useUniversities"
+import { universityCountriesMap } from "components/util/constants/universityCountries"
 import { SyntheticEvent, useMemo } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
@@ -9,8 +10,31 @@ import { ControlledBrandedAutoComplete } from "../common/inputs/ControlledBrande
 const styles = sxStyles({
    listBox: {
       py: 0,
+      maxHeight: {
+         xs: "100dvh",
+         sm: "100dvh",
+         md: "228px",
+      },
    },
-   schoolIcon: {},
+   schoolIcon: {
+      width: "40px",
+      height: "40px",
+      padding: "5px 5.833px 5px 5px",
+      borderRadius: "70px",
+      color: (theme) => theme.palette.neutral[200],
+      backgroundColor: (theme) => theme.palette.neutral[50],
+   },
+   universityOption: {
+      py: "12px",
+   },
+   universityOptionName: {
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[800],
+   },
+   universityOptionCountry: {
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[500],
+   },
 })
 
 type Props = {
@@ -27,26 +51,19 @@ const SelectUniversitiesDropDown = ({
    countryCodeFieldName,
 }: Props) => {
    const {
-      formState: { isSubmitting, errors },
+      formState: { isSubmitting },
       setValue,
    } = useFormContext()
-
-   console.log("🚀 ~ errors:", errors)
 
    const selectedCountryCode = useWatch({
       name: countryCodeFieldName,
    })
 
-   const selectedUni = useWatch({
-      name: name,
-   })
-   console.log("🚀 ~ selectedUni:", selectedUni)
-
-   const countryCodes = useMemo(() => {
+   const countryCode = useMemo(() => {
       return [selectedCountryCode]
    }, [selectedCountryCode])
 
-   const universities = useUniversitiesByCountryCodes(countryCodes)
+   const universities = useUniversitiesByCountryCodes(countryCode)
 
    const options = useMemo(() => {
       return (
@@ -82,18 +99,24 @@ const SelectUniversitiesDropDown = ({
          }}
          autocompleteProps={{
             id: "selectUniversity",
-            disabled: isSubmitting,
+            disabled:
+               isSubmitting ||
+               !selectedCountryCode ||
+               universityCountriesMap[selectedCountryCode] === "None",
             autoHighlight: true,
             disableClearable: false,
             renderOption: (props, option) => {
-               return getOptionEl(props, option)
+               return getOptionEl(props, option, selectedCountryCode)
             },
             ListboxProps: {
                sx: styles.listBox,
             },
             getOptionLabel: (option: string) =>
                getLabelFunction(option, universitiesMap),
-            isOptionEqualToValue: (option, value) => option.id == value,
+            isOptionEqualToValue: (option, value) => {
+               const optionValue = value as any as string
+               return option.id == optionValue
+            },
             onChange: onChangeHandler,
          }}
       />
@@ -102,16 +125,19 @@ const SelectUniversitiesDropDown = ({
 
 const getOptionEl = (
    props: React.HTMLAttributes<HTMLLIElement>,
-   option: { id: string; value: string }
+   option: { id: string; value: string },
+   selectedCountryCode: string
 ) => (
    <li {...props} key={option.id}>
-      <Stack direction="row" py={0}>
-         <Box>
-            <SchoolIcon sx={styles.schoolIcon} />
-         </Box>
+      <Stack direction="row" spacing={1} sx={styles.universityOption}>
+         <SchoolIcon sx={styles.schoolIcon} />
          <Stack>
-            <Typography>{option.value}</Typography>
-            <Typography>{option.id}</Typography>
+            <Typography variant="small" sx={styles.universityOptionName}>
+               {option.value}
+            </Typography>
+            <Typography variant="xsmall" sx={styles.universityOptionCountry}>
+               {universityCountriesMap[selectedCountryCode]}
+            </Typography>
          </Stack>
       </Stack>
    </li>

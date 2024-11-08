@@ -1,14 +1,23 @@
 import { StudyBackground } from "@careerfairy/shared-lib/users"
 import { Box, Button, Stack, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { SchoolIcon } from "components/views/common/icons/SchoolIcon"
-import { useState } from "react"
+import { userRepo } from "data/RepositoryInstances"
+import { Timestamp } from "data/firebase/FirebaseInstance"
+import { Fragment, useState } from "react"
+import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import {
    StudyBackgroundFormFields,
    StudyBackgroundFormProvider,
 } from "./forms/StudyBackgroundForm"
+import {
+   StudyBackgroundFormValues,
+   getInitialStudyBackgroundValues,
+} from "./forms/schemas"
 
 const styles = sxStyles({
    title: {
@@ -16,6 +25,10 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[900],
    },
    studiesRoot: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
       p: "16px 12px",
       backgroundColor: (theme) => theme.brand.white[300],
       border: (theme) => `1px solid ${theme.brand.white[400]}`,
@@ -52,15 +65,12 @@ export const ProfileStudyBackground = () => {
          <Typography variant="brandedBody" sx={styles.title}>
             Study background
          </Typography>
-         <SuspenseWithBoundary>
-            <StudyBackgroundDetails />
-         </SuspenseWithBoundary>
+         <StudyBackgroundDetails />
       </Stack>
    )
 }
 
 const StudyBackgroundDetails = () => {
-   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
    const [studyBackgroundToEdit, setStudyBackgroundToEdit] =
       useState<StudyBackground>(null)
    const [studyBackgroundToDelete, setStudyBackgroundToDelete] =
@@ -70,19 +80,69 @@ const StudyBackgroundDetails = () => {
       studyBackgroundToDelete
    )
 
-   const handleClose = () => setIsDialogOpen(false)
-
-   const handleSave = () => setIsDialogOpen(false)
-
    return (
       <StudyBackgroundFormProvider studyBackground={studyBackgroundToEdit}>
-         <Box
-            sx={styles.studiesRoot}
-            display={"flex"}
-            flexDirection="column"
-            alignItems={"center"}
-            justifyContent={"center"}
-         >
+         <FormDialogWrapper
+            handleEdit={setStudyBackgroundToEdit}
+            handleDelete={setStudyBackgroundToDelete}
+         />
+      </StudyBackgroundFormProvider>
+   )
+}
+
+type FormDialogWrapperProps = {
+   handleEdit?: (studyBackground: StudyBackground) => void
+   handleDelete?: (studyBackground: StudyBackground) => void
+}
+
+const FormDialogWrapper = ({
+   handleDelete: setStudyBackgroundToDelete,
+   handleEdit: setStudyBackgroundToEdit,
+}: FormDialogWrapperProps) => {
+   const { userData } = useAuth()
+   const { errorNotification, successNotification } = useSnackbarNotifications()
+   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+
+   const {
+      formState: { isValid },
+      reset,
+      handleSubmit,
+   } = useFormContext()
+
+   const handleClose = () => setIsDialogOpen(false)
+
+   const onSubmit = async (data: StudyBackgroundFormValues) => {
+      try {
+         const newStudyBackground: StudyBackground = {
+            ...data,
+            id: null,
+            startedAt: data.startedAt
+               ? Timestamp.fromDate(data.startedAt)
+               : null,
+            endedAt: data.endedAt ? Timestamp.fromDate(data.endedAt) : null,
+         }
+
+         await userRepo.createUserStudyBackground(
+            userData.id,
+            newStudyBackground
+         )
+
+         handleClose()
+         reset(getInitialStudyBackgroundValues())
+         successNotification("Added a study background")
+      } catch (error) {
+         errorNotification(
+            error,
+            "We encountered a problem while adding your study background. Rest assured, we're on it!"
+         )
+      }
+   }
+
+   const handleSave = () => handleSubmit(onSubmit)()
+
+   return (
+      <Fragment>
+         <Box sx={styles.studiesRoot}>
             <StudyBackgroundsListView
                handleAddBackground={() => setIsDialogOpen(true)}
                handleEdit={setStudyBackgroundToEdit}
@@ -90,13 +150,17 @@ const StudyBackgroundDetails = () => {
             />
          </Box>
          <BaseProfileDialog
+            title="Study Background"
             open={isDialogOpen}
             handleClose={handleClose}
             handleSave={handleSave}
+            saveDisabled={!isValid}
          >
-            <StudyBackgroundFormFields />
+            <SuspenseWithBoundary>
+               <StudyBackgroundFormFields />
+            </SuspenseWithBoundary>
          </BaseProfileDialog>
-      </StudyBackgroundFormProvider>
+      </Fragment>
    )
 }
 
