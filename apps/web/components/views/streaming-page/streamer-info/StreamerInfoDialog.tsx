@@ -20,6 +20,7 @@ import { sxStyles } from "types/commonTypes"
 import { getStreamerDisplayName } from "../util"
 import { LinkedInButton, LinkedinButtonWithTracker } from "./LinkedinButton"
 import { ProfileButton } from "./ProfileButton"
+import { useIsLivestreamTargetedUser } from "./useIsLivestreamTargetedUser"
 
 const styles = sxStyles({
    dialogTitle: {
@@ -229,6 +230,7 @@ const StreamerAvatar = ({ streamerDetails }: StreamerDetailsProps) => {
 const StreamerActions = ({ streamerDetails }: StreamerDetailsProps) => {
    const isMobile = useIsMobile()
    const livestream = useLivestreamData()
+   const isUserFromTargetedCountry = useIsLivestreamTargetedUser(livestream)
 
    const isCreator =
       livestream?.creatorsIds?.includes(streamerDetails.id) &&
@@ -240,14 +242,20 @@ const StreamerActions = ({ streamerDetails }: StreamerDetailsProps) => {
          sx={styles.actionsWrapper}
       >
          {Boolean(isCreator) && (
-            <ProfileButton streamerDetails={streamerDetails} />
+            <ProfileButton
+               streamerDetails={streamerDetails}
+               isPrimary={
+                  !isUserFromTargetedCountry || !streamerDetails.linkedInUrl
+               }
+            />
          )}
-         {Boolean(streamerDetails.linkedInUrl) &&
-            (streamerDetails.groupId ? (
+         {Boolean(streamerDetails.linkedInUrl) && isUserFromTargetedCountry ? (
+            streamerDetails.groupId ? (
                <LinkedinButtonWithTracker streamerDetails={streamerDetails} />
             ) : (
                <LinkedInButton streamerDetails={streamerDetails} />
-            ))}
+            )
+         ) : null}
       </Stack>
    )
 }
