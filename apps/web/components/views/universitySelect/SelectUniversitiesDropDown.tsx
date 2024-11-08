@@ -111,8 +111,10 @@ const SelectUniversitiesDropDown = ({
             ListboxProps: {
                sx: styles.listBox,
             },
-            getOptionLabel: (option: string) =>
-               getLabelFunction(option, universitiesMap),
+            getOptionLabel: (option: { id: string; value: string }) => {
+               const optionId = typeof option === "string" ? option : option.id
+               return universitiesMap[optionId] || ""
+            },
             isOptionEqualToValue: (option, value) => {
                const optionValue = value as any as string
                return option.id == optionValue
@@ -142,10 +144,5 @@ const getOptionEl = (
       </Stack>
    </li>
 )
-
-const getLabelFunction = (
-   option: string,
-   universitiesMap: Record<string, string>
-) => universitiesMap[option] || ""
 
 export default SelectUniversitiesDropDown

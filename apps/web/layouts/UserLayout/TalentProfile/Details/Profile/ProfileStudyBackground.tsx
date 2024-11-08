@@ -75,6 +75,7 @@ const StudyBackgroundDetails = () => {
       useState<StudyBackground>(null)
    const [studyBackgroundToDelete, setStudyBackgroundToDelete] =
       useState<StudyBackground>(null)
+   // Leaving this here to prevent unused var, will be used in next stack
    console.log(
       "🚀 ~ StudyBackgroundDetails ~ studyBackgroundToDelete:",
       studyBackgroundToDelete

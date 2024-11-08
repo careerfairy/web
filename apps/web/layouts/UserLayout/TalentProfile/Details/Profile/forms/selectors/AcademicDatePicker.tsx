@@ -16,9 +16,10 @@ const styles = sxStyles({
 type Props = {
    fieldName: string
    label: string
+   minDate?: Date
 }
 
-export const AcademicDatePicker = ({ fieldName, label }: Props) => {
+export const AcademicDatePicker = ({ fieldName, label, minDate }: Props) => {
    const [isOpen, setIsOpen] = useState(false)
 
    const { setValue } = useFormContext()
@@ -41,12 +42,13 @@ export const AcademicDatePicker = ({ fieldName, label }: Props) => {
             },
          }}
          disableOpenPicker
-         views={["month", "year"]}
+         views={["year", "month"]}
          value={fieldValue}
          onChange={(value) => {
-            setValue(fieldName, value)
+            setValue(fieldName, value, { shouldValidate: true })
          }}
          sx={styles.datePicker}
+         minDate={minDate}
       />
    )
 }
