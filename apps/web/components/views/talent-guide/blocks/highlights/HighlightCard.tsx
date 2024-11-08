@@ -141,7 +141,7 @@ export const HighlightCard = ({
                sx={styles.highlightTitle}
                onClick={(event) => {
                   event.stopPropagation()
-                  event.preventDefault
+                  event.preventDefault()
                }}
             >
                {isFullscreen ? (
