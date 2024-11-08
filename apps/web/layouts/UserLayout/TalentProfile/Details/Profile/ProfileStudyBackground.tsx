@@ -1,14 +1,17 @@
 import { StudyBackground } from "@careerfairy/shared-lib/users"
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { useUserStudyBackgroundsSWR } from "components/custom-hook/user/useUserStudyBackgroundsSWR"
 import { SchoolIcon } from "components/views/common/icons/SchoolIcon"
 import { userRepo } from "data/RepositoryInstances"
 import { Timestamp } from "data/firebase/FirebaseInstance"
 import { Fragment, useState } from "react"
-import { useFormContext } from "react-hook-form"
+import { useFormContext, useWatch } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
+import { ConfirmEmptyStudyDatesDialog } from "../ConfirmEmptyStudyDatesDialog"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import {
    StudyBackgroundFormFields,
@@ -103,12 +106,22 @@ const FormDialogWrapper = ({
    const { userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+   const [isConfirmEmptyDatesOpen, setIsConfirmEmptyDatesOpen] =
+      useState<boolean>(false)
 
    const {
-      formState: { isValid },
+      formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
    } = useFormContext()
+
+   const startedAt = useWatch({
+      name: "startedAt",
+   })
+
+   const endedAt = useWatch({
+      name: "endedAt",
+   })
 
    const handleClose = () => setIsDialogOpen(false)
 
@@ -130,7 +143,7 @@ const FormDialogWrapper = ({
 
          handleClose()
          reset(getInitialStudyBackgroundValues())
-         successNotification("Added a study background")
+         successNotification("Added a new study background 🎓")
       } catch (error) {
          errorNotification(
             error,
@@ -141,23 +154,36 @@ const FormDialogWrapper = ({
 
    const handleSave = () => handleSubmit(onSubmit)()
 
+   const handleSaveButtonClick = () => {
+      if (!startedAt && !endedAt) setIsConfirmEmptyDatesOpen(true)
+      else handleSave()
+   }
+
    return (
       <Fragment>
          <Box sx={styles.studiesRoot}>
-            <StudyBackgroundsListView
-               handleAddBackground={() => setIsDialogOpen(true)}
-               handleEdit={setStudyBackgroundToEdit}
-               handleDelete={setStudyBackgroundToDelete}
-            />
+            <SuspenseWithBoundary>
+               <StudyBackgroundsList
+                  handleAddBackground={() => setIsDialogOpen(true)}
+                  handleEdit={setStudyBackgroundToEdit}
+                  handleDelete={setStudyBackgroundToDelete}
+               />
+            </SuspenseWithBoundary>
          </Box>
          <BaseProfileDialog
             title="Study Background"
             open={isDialogOpen}
             handleClose={handleClose}
-            handleSave={handleSave}
+            handleSave={handleSaveButtonClick}
             saveDisabled={!isValid}
          >
-            <SuspenseWithBoundary>
+            <ConfirmEmptyStudyDatesDialog
+               open={isConfirmEmptyDatesOpen}
+               maybeLater={handleSave}
+               onClose={() => setIsConfirmEmptyDatesOpen(false)}
+               isSubmitting={isSubmitting}
+            />
+            <SuspenseWithBoundary fallback={<StudyBackgroundFormSkeleton />}>
                <StudyBackgroundFormFields />
             </SuspenseWithBoundary>
          </BaseProfileDialog>
@@ -165,11 +191,26 @@ const FormDialogWrapper = ({
    )
 }
 
-type StudyBackgroundsListViewProps = {
-   studyBackgrounds?: StudyBackground[]
+type StudyBackgroundsListProps = {
    handleEdit?: (studyBackground: StudyBackground) => void
    handleDelete?: (studyBackground: StudyBackground) => void
    handleAddBackground?: () => void
+}
+
+const StudyBackgroundsList = (props: StudyBackgroundsListProps) => {
+   const { data: studyBackgrounds } = useUserStudyBackgroundsSWR()
+   // TODO-WG: Remove
+   console.log(
+      "🚀 ~ StudyBackgroundsList ~ studyBackgrounds:",
+      studyBackgrounds
+   )
+
+   // TODO-WG: Pass study backgrounds, not passing for easier testing while creating
+   return <StudyBackgroundsListView {...props} />
+}
+
+type StudyBackgroundsListViewProps = StudyBackgroundsListProps & {
+   studyBackgrounds?: StudyBackground[]
 }
 
 const StudyBackgroundsListView = (props: StudyBackgroundsListViewProps) => {
@@ -184,7 +225,7 @@ const StudyBackgroundsListView = (props: StudyBackgroundsListViewProps) => {
          />
       )
 
-   return <Box>{`${studyBackgrounds.length} all study backgrounds`}</Box>
+   return <Box>{`${studyBackgrounds.length} study background(s)`}</Box>
 }
 
 type EmptyStudyBackgroundViewProps = {
@@ -225,6 +266,28 @@ const EmptyStudyBackgroundView = ({
             >
                Add study background
             </Button>
+         </Stack>
+      </Stack>
+   )
+}
+
+const StudyBackgroundFormSkeleton = () => {
+   const isMobile = useIsMobile()
+
+   return (
+      <Stack spacing={2} minWidth={isMobile ? "300px" : "500px"}>
+         <Skeleton width={"100%"} height={"60px"} />
+         <Skeleton width={"100%"} height={"60px"} />
+         <Skeleton width={"100%"} height={"60px"} />
+         <Skeleton width={"100%"} height={"60px"} />
+         <Stack
+            direction={isMobile ? "row" : "column"}
+            width={"100%"}
+            spacing={2}
+            justifyContent={"space-between"}
+         >
+            <Skeleton width={"100%"} height={"60px"} />
+            <Skeleton width={"100%"} height={"60px"} />
          </Stack>
       </Stack>
    )

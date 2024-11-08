@@ -7,7 +7,6 @@ import SelectUniversitiesDropDown from "components/views/universitySelect/Select
 import { DateTime } from "luxon"
 import { ReactNode } from "react"
 import { FormProvider, UseFormReturn, useWatch } from "react-hook-form"
-import { sxStyles } from "types/commonTypes"
 import {
    CreateStudyBackgroundSchema,
    CreateStudyBackgroundSchemaType,
@@ -18,13 +17,6 @@ import {
    FieldsOfStudySelector,
    LevelsOfStudySelector,
 } from "./selectors/StudyDomainSelector"
-
-const styles = sxStyles({
-   formRoot: {
-      // p: 1,
-      // minWidth: "500px",
-   },
-})
 
 type StudyBackgroundFormProviderProps = {
    studyBackground?: StudyBackground
@@ -63,7 +55,7 @@ export const StudyBackgroundFormFields = () => {
       : null
 
    return (
-      <Stack sx={styles.formRoot} spacing={2}>
+      <Stack spacing={2}>
          <UniversityCountrySelector
             name="universityCountryCode"
             universityFieldName="universityId"
