@@ -32,7 +32,7 @@ export interface UserData extends Identifiable {
    }
    badges?: string[]
    groupIds: string[]
-
+   fcmTokens?: string[]
    linkedinUrl: string
    isAdmin?: boolean
    userResume: string
