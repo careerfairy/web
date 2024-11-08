@@ -1,4 +1,3 @@
-import { Typography } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
 import { useAppDispatch } from "components/custom-hook/store"
 import { AnimatedStepContent } from "components/views/talent-guide/animations/AnimatedStepContent"
@@ -6,6 +5,7 @@ import { StepActionButton } from "components/views/talent-guide/components/float
 import { ModuleStepContentRenderer } from "components/views/talent-guide/components/ModuleStepContentRenderer"
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
 import { TalentGuideLayout } from "components/views/talent-guide/components/TalentGuideLayout"
+import { TalentGuideProgress } from "components/views/talent-guide/components/TalentGuideProgress"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
@@ -27,7 +27,7 @@ interface TalentGuidePageProps {
 
 const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const dispatch = useAppDispatch()
-   const { isPreview, locale } = useRouter()
+   const { isPreview } = useRouter()
 
    useEffect(() => {
       dispatch(setModuleData(data))
@@ -42,9 +42,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const visibleSteps = useVisibleSteps()
 
    return (
-      <TalentGuideLayout>
-         <Typography variant="h1">Talent Guide</Typography>
-         <Typography variant="body1">Current locale: {locale}</Typography>
+      <TalentGuideLayout header={<TalentGuideProgress />}>
          <AnimatedStepContent>
             {visibleSteps.map((step) => (
                <ModuleStepContentRenderer key={step.id} step={step} />
