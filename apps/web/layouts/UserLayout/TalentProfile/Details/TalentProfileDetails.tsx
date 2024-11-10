@@ -1,6 +1,5 @@
 import { Box, Tab, Tabs } from "@mui/material"
 import { useRouter } from "next/router"
-import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { TAB_VALUES, TalentProfileTabValues } from "../TalentProfileView"
 import { ProfileFollowingCompaniesDetailsView } from "./FollowingCompanies/ProfileFollowingCompaniesDetailsView"
@@ -35,20 +34,27 @@ type Props = {
 }
 
 export const TalentProfileDetails = ({ currentPath }: Props) => {
-   const [tabValue, setTabValue] = useState(currentPath)
    const router = useRouter()
 
    const handleTabChange = (_, newValue) => {
-      setTabValue(newValue)
-      router.push(newValue, undefined, { shallow: true, scroll: false })
+      router.push(
+         {
+            pathname: newValue,
+            query: {
+               ...router.query,
+            },
+         },
+         undefined,
+         { shallow: true, scroll: false }
+      )
    }
 
    return (
       <Box sx={styles.root}>
          <Tabs
-            value={tabValue}
+            value={currentPath}
             onChange={handleTabChange}
-            aria-label="Job tabs"
+            aria-label="Talent profile tabs"
             sx={styles.tabs}
          >
             <Tab
@@ -62,13 +68,13 @@ export const TalentProfileDetails = ({ currentPath }: Props) => {
             />
          </Tabs>
          <Box>
-            {tabValue === TAB_VALUES.profile.value ? (
+            {currentPath === TAB_VALUES.profile.value ? (
                <ProfileDetailsView />
             ) : null}
-            {tabValue === TAB_VALUES.jobs.value ? (
+            {currentPath === TAB_VALUES.jobs.value ? (
                <ProfileJobsDetailsView />
             ) : null}
-            {tabValue === TAB_VALUES.company.value ? (
+            {currentPath === TAB_VALUES.company.value ? (
                <ProfileFollowingCompaniesDetailsView />
             ) : null}
          </Box>
