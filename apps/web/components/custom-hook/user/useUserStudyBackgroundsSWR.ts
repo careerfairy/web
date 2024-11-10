@@ -5,6 +5,7 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 export const useUserStudyBackgroundsSWR = () => {
    const { userData } = useAuth()
@@ -23,7 +24,7 @@ export const useUserStudyBackgroundsSWR = () => {
          return querySnapshot.docs.map((doc) => doc.data()) || []
       },
       {
-         suspense: true,
+         ...reducedRemoteCallsOptions,
          onError: (error) =>
             errorLogAndNotify(
                error,
