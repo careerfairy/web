@@ -44,7 +44,8 @@ export const StudyBackgroundFormProvider = ({
       return () => {
          methods.reset({})
       }
-   }, [studyBackground, methods, defaultValues])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [studyBackground])
 
    return (
       <FormProvider {...methods}>
