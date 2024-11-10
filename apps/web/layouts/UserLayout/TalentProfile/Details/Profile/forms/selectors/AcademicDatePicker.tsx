@@ -24,7 +24,7 @@ export const AcademicDatePicker = ({ fieldName, label, minDate }: Props) => {
 
    const { setValue } = useFormContext()
 
-   const fieldValue = useWatch({
+   const fieldValue: Date = useWatch({
       name: fieldName,
    })
 

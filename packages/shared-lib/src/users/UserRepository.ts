@@ -237,12 +237,32 @@ export interface IUserRepository {
 
    /**
     * Creates a given study background in the /userData/studyBackgrounds sub collection.
-    * @param userId ID of the user for which the study background shall be created.
+    * @param userId Id of the user.
     * @param studyBackground Study background data.
     */
    createUserStudyBackground(
       userId: string,
       studyBackground: StudyBackground
+   ): Promise<void>
+
+   /**
+    * Updates the given study background (@param studyBackground) for the user with id defined by @param userId.
+    * @param userId Id of the user.
+    * @param studyBackground Study background to be updated.
+    */
+   updateUserStudyBackground(
+      userId: string,
+      studyBackground: StudyBackground
+   ): Promise<void>
+
+   /**
+    * Deletes the given study background by @param studyBackgroundId for user @param userId.
+    * @param id Id of the user.
+    * @param studyBackgroundId Id of the study background to delete.
+    */
+   deleteStudyBackground(
+      userId: string,
+      studyBackgroundId: string
    ): Promise<void>
 }
 
@@ -1130,6 +1150,32 @@ export class FirebaseUserRepository
       }
 
       await ref.set(data)
+   }
+
+   async updateUserStudyBackground(
+      userId: string,
+      studyBackground: StudyBackground
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("studyBackgrounds")
+         .doc(studyBackground.id)
+
+      return ref.set(studyBackground)
+   }
+
+   async deleteStudyBackground(
+      userId: string,
+      studyBackgroundId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("studyBackgrounds")
+         .doc(studyBackgroundId)
+
+      return ref.delete()
    }
 }
 
