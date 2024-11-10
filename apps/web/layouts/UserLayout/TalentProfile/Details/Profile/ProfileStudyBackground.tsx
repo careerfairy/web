@@ -4,6 +4,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { useUniversityById } from "components/custom-hook/useUniversityById"
 import { useUserStudyBackgroundsSWR } from "components/custom-hook/user/useUserStudyBackgroundsSWR"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { SchoolIcon } from "components/views/common/icons/SchoolIcon"
@@ -194,6 +195,7 @@ const FormDialogWrapper = () => {
    const handleCloseStudyBackgroundDialog = useCallback(() => {
       dispatch(closeCreateStudyBackgroundDialog())
       reset(getInitialStudyBackgroundValues())
+      setIsConfirmEmptyDatesOpen(false)
    }, [dispatch, reset])
 
    const startedAt = useWatch({
@@ -230,7 +232,9 @@ const FormDialogWrapper = () => {
 
          handleCloseStudyBackgroundDialog()
          refreshStudyBackgrounds()
-         successNotification("Added a new study background 🎓")
+         successNotification(
+            `${data.id ? "Updated" : "Added a new"} study background 🎓`
+         )
       } catch (error) {
          errorNotification(
             error,
@@ -329,12 +333,19 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
       refreshStudyBackgrounds()
    }, [studyBackground, userData, refreshStudyBackgrounds])
 
+   const university = useUniversityById(
+      studyBackground.universityCountryCode,
+      studyBackground.universityId
+   )
+
    const startedAtYear = studyBackground.startedAt
       ? DateTime.fromJSDate(studyBackground.startedAt.toDate()).year
       : 0
+
    const endedAtYear = studyBackground.endedAt
       ? DateTime.fromJSDate(studyBackground.endedAt.toDate()).year
       : 0
+
    const hasStartedAtYear = Boolean(startedAtYear)
    const hasEndedAtYear = Boolean(endedAtYear)
    const hasBothYears = hasStartedAtYear && hasEndedAtYear
@@ -360,7 +371,7 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             <SchoolIcon sx={styles.studyBackgroundSchoolIcon} />
             <Stack spacing={0.5}>
                <Typography variant="brandedBody" sx={styles.universityName}>
-                  TBD fetch university by ID
+                  {university?.name}
                </Typography>
                <Typography
                   variant="small"
