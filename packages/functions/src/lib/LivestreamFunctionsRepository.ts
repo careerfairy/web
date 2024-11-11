@@ -415,7 +415,7 @@ export class LivestreamFunctionsRepository
          tickets.forEach((ticket, index) => {
             if (ticket.status === "error") {
                functions.logger.error(
-                  `Error sending to token ${tokens[index]}: ${ticket.message}`
+                  `Error sending to token chunk ${index}: ${ticket.message}`
                )
             }
          })
