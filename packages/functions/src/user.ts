@@ -5,9 +5,11 @@ import { UserData } from "@careerfairy/shared-lib/users"
 import * as functions from "firebase-functions"
 
 /**
- * Sends push notifications to registered users when a live stream starts
+ * Triggered on Firestore user document updates to synchronize and update
+ * the user's livestream data with the latest information.
+ * Skips processing if no new data is provided.
  */
-export const syncUserLivestreamData = onDocumentUpdated(
+export const updateUserLiveStreamDataOnUserChange = onDocumentUpdated(
    {
       document: "userData/{userEmail}",
    },
@@ -17,13 +19,15 @@ export const syncUserLivestreamData = onDocumentUpdated(
 
          // Skip if it's a test live stream
          if (!newValue) {
-            functions.logger.log("Skipping because no user data is provided...")
+            functions.logger.log(
+               `Skipping because user ${event.params.userEmail} has been deleted`
+            )
             return null
          }
          functions.logger.log(
             `Fetching all all userLivestreamDatas for user ${newValue.authId}...`
          )
-         // Fetch all user livestream data
+         // Fetch all user live stream data
          const userLivestreamDatas =
             await livestreamsRepo.getUserLivestreamData(newValue.authId)
 
@@ -31,7 +35,7 @@ export const syncUserLivestreamData = onDocumentUpdated(
             `Successfully got ${userLivestreamDatas.length} userLivestreamDatas for user ${newValue.authId}, now updating...`
          )
 
-         // Update all new user livestream data with fresh user data
+         // Update all new user live stream data with fresh user data
          await livestreamsRepo.updateUserLivestreamData(
             newValue,
             userLivestreamDatas
@@ -44,7 +48,7 @@ export const syncUserLivestreamData = onDocumentUpdated(
          return null
       } catch (error) {
          logAndThrow(
-            "Error sending push notifications for live stream start",
+            `Error synchronizing livestream data for user: ${event.params.userEmail}`,
             error,
             event.data
          )
