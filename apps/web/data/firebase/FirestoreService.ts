@@ -123,8 +123,6 @@ export async function sendExpoPushNotification(filters: any, message: any) {
             .map((user) => user?.fcmTokens || [])
             .flat()
             .filter((token) => Expo.isExpoPushToken(token))
-
-         tokens = usersSnapshot.docs.map((doc) => doc.data().pushToken)
       }
 
       if (tokens.length === 0) {
