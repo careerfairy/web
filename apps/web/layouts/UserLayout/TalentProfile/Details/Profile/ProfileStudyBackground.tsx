@@ -5,7 +5,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useUniversityById } from "components/custom-hook/useUniversityById"
-import { useUserStudyBackgroundsSWR } from "components/custom-hook/user/useUserStudyBackgroundsSWR"
+import { useUserStudyBackgrounds } from "components/custom-hook/user/useUserStudyBackgrounds"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { SchoolIcon } from "components/views/common/icons/SchoolIcon"
 import { userRepo } from "data/RepositoryInstances"
@@ -125,10 +125,10 @@ const styles = sxStyles({
 })
 
 type Props = {
-   studyBackgrounds: StudyBackground[]
+   hasItems: boolean
 }
 
-export const ProfileStudyBackground = ({ studyBackgrounds }: Props) => {
+export const ProfileStudyBackground = ({ hasItems }: Props) => {
    const dispatch = useDispatch()
 
    const handleAddClick = useCallback(() => {
@@ -141,7 +141,7 @@ export const ProfileStudyBackground = ({ studyBackgrounds }: Props) => {
             <Typography variant="brandedBody" sx={styles.title}>
                Study background
             </Typography>
-            <ConditionalWrapper condition={Boolean(studyBackgrounds?.length)}>
+            <ConditionalWrapper condition={hasItems}>
                <Box
                   component={PlusCircle}
                   sx={styles.plusCircle}
@@ -161,9 +161,7 @@ const StudyBackgroundDetails = () => {
 
    return (
       <StudyBackgroundFormProvider studyBackground={studyBackgroundToEdit}>
-         <SuspenseWithBoundary>
-            <FormDialogWrapper />
-         </SuspenseWithBoundary>
+         <FormDialogWrapper />
       </StudyBackgroundFormProvider>
    )
 }
@@ -173,15 +171,13 @@ const FormDialogWrapper = () => {
    const { userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
-   const { data: userStudyBackgrounds, mutate: refreshStudyBackgrounds } =
-      useUserStudyBackgroundsSWR()
-
    const [isConfirmEmptyDatesOpen, setIsConfirmEmptyDatesOpen] =
       useState<boolean>(false)
 
    const createStudyBackgroundDialogOpen = useSelector(
       talentProfileCreateStudyBackgroundOpenSelector
    )
+
    const isEditingStudyBackground = useSelector(
       talentProfileIsEditingStudyBackgroundSelector
    )
@@ -208,6 +204,8 @@ const FormDialogWrapper = () => {
 
    const onSubmit = async (data: StudyBackgroundFormValues) => {
       try {
+         handleCloseStudyBackgroundDialog()
+
          const newStudyBackground: StudyBackground = {
             ...data,
             id: data?.id,
@@ -230,8 +228,6 @@ const FormDialogWrapper = () => {
             )
          }
 
-         handleCloseStudyBackgroundDialog()
-         refreshStudyBackgrounds()
          successNotification(
             `${data.id ? "Updated" : "Added a new"} study background 🎓`
          )
@@ -243,7 +239,7 @@ const FormDialogWrapper = () => {
       }
    }
 
-   const handleSave = () => handleSubmit(onSubmit)()
+   const handleSave = async () => handleSubmit(onSubmit)()
 
    const handleSaveButtonClick = () => {
       if (!startedAt && !endedAt) setIsConfirmEmptyDatesOpen(true)
@@ -254,16 +250,7 @@ const FormDialogWrapper = () => {
 
    return (
       <Fragment>
-         <ConditionalWrapper
-            condition={Boolean(!userStudyBackgrounds?.length)}
-            fallback={
-               <StudyBackgroundsList studyBackgrounds={userStudyBackgrounds} />
-            }
-         >
-            <Box sx={styles.emptyStudiesRoot}>
-               <EmptyStudyBackgroundView />
-            </Box>
-         </ConditionalWrapper>
+         <StudyBackgroundsList />
          <BaseProfileDialog
             title="Study Background"
             open={createStudyBackgroundDialogOpen}
@@ -286,13 +273,15 @@ const FormDialogWrapper = () => {
    )
 }
 
-type StudyBackgroundsListProps = {
-   studyBackgrounds: StudyBackground[]
-}
+const StudyBackgroundsList = () => {
+   const { data: studyBackgrounds } = useUserStudyBackgrounds()
+   if (!studyBackgrounds?.length)
+      return (
+         <Box sx={styles.emptyStudiesRoot}>
+            <EmptyStudyBackgroundView />
+         </Box>
+      )
 
-const StudyBackgroundsList = ({
-   studyBackgrounds,
-}: StudyBackgroundsListProps) => {
    return (
       <Stack spacing={1.5} width={"100%"}>
          {studyBackgrounds?.map((studyBackground) => (
@@ -314,7 +303,6 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
    const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
       useState<boolean>(false)
    const [isDeleting, setIsDeleting] = useState<boolean>(false)
-   const { mutate: refreshStudyBackgrounds } = useUserStudyBackgroundsSWR()
    const dispatch = useDispatch()
    const { reset } = useFormContext()
 
@@ -330,8 +318,7 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
 
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
-      refreshStudyBackgrounds()
-   }, [studyBackground, userData, refreshStudyBackgrounds])
+   }, [studyBackground, userData.id])
 
    const university = useUniversityById(
       studyBackground.universityCountryCode,

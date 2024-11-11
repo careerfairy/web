@@ -1,6 +1,5 @@
 import { Stack } from "@mui/material"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useUserStudyBackgroundsSWR } from "components/custom-hook/user/useUserStudyBackgroundsSWR"
+import { useUserStudyBackgrounds } from "components/custom-hook/user/useUserStudyBackgrounds"
 import { sxStyles } from "types/commonTypes"
 import { ProfileStudyBackground } from "./ProfileStudyBackground"
 
@@ -10,20 +9,12 @@ const styles = sxStyles({
       px: 2,
    },
 })
-export const ProfileDetails = () => {
-   return (
-      <SuspenseWithBoundary>
-         <ProfileDetailsView />
-      </SuspenseWithBoundary>
-   )
-}
-
 export const ProfileDetailsView = () => {
-   const { data: studyBackgrounds } = useUserStudyBackgroundsSWR()
+   const { hasItems } = useUserStudyBackgrounds()
 
    return (
       <Stack sx={styles.wrapper}>
-         <ProfileStudyBackground studyBackgrounds={studyBackgrounds} />
+         <ProfileStudyBackground hasItems={hasItems} />
       </Stack>
    )
 }

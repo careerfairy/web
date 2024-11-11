@@ -1,7 +1,6 @@
 import { Box } from "@mui/material"
 import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
 import { Calendar } from "react-feather"
-import { TriggerWithoutArgs } from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -25,7 +24,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   maybeLater: TriggerWithoutArgs<void, any, string, never>
+   maybeLater: () => Promise<void>
    isSubmitting: boolean
    open: boolean
    onClose: () => void
