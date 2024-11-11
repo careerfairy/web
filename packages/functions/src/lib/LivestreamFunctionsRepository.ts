@@ -321,7 +321,7 @@ export class LivestreamFunctionsRepository
 
       for (const userLivestreamData of userLivestreamDatas) {
          if (!userLivestreamData.id || !userLivestreamData.livestreamId) {
-            functions.logger.error("Missing required fields for update", {
+            functions.logger.warn("Missing required fields for update", {
                userLivestreamData,
             })
             continue
