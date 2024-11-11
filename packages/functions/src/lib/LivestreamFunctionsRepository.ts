@@ -197,7 +197,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
 
    /**
     * Notifies registered users of a starting live stream.
-    * Iterates over the array of registered users associated with the livestream, creates a new UserNotification object for each,
+    * Iterates over the array of registered users associated with the live stream, creates a new UserNotification object for each,
     * and inserts it in the database.
     *
     * @param {LivestreamEvent} livestream
@@ -209,7 +209,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
 
    /**
     * Notifies registered users of a starting live stream.
-    * Iterates over the array of registered users associated with the livestream, creates a new UserNotification object for each,
+    * Iterates over the array of registered users associated with the live stream, creates a new UserNotification object for each,
     * and sends it to users that have pushToken.
     *
     * @param {LivestreamEvent} livestream
