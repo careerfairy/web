@@ -139,7 +139,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     */
    updateUserLivestreamData(
       updateUserData: UserData,
-      userLivestreamDatas: Partial<UserLivestreamData>[]
+      userLivestreamDatas: UserLivestreamData[]
    ): Promise<void>
 
    syncLiveStreamStatsWithLivestream(
@@ -196,7 +196,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    ): Promise<GroupAdminNewEventEmailInfo[]>
 
    /**
-    * Notifies registered users of a starting livestream.
+    * Notifies registered users of a starting live stream.
     * Iterates over the array of registered users associated with the livestream, creates a new UserNotification object for each,
     * and inserts it in the database.
     *
@@ -208,13 +208,14 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    ): Promise<void>
 
    /**
-    * Notifies registered users of a starting livestream.
+    * Notifies registered users of a starting live stream.
     * Iterates over the array of registered users associated with the livestream, creates a new UserNotification object for each,
     * and sends it to users that have pushToken.
     *
     * @param {LivestreamEvent} livestream
     * @returns {Promise<void>}
     */
+
    createLivestreamStartPushNotifications(
       livestream: LivestreamEvent
    ): Promise<void>
@@ -380,7 +381,7 @@ export class LivestreamFunctionsRepository
                livestreamId: livestream.id,
                type: "livestream_start",
                url: addUtmTagsToLink({
-                  link: `${getHost()}/portal/${livestream.id}`,
+                  link: `${getHost()}/portal/livestream/${livestream.id}`,
                   source: "careerfairy",
                   medium: "push",
                   content: livestream.title,

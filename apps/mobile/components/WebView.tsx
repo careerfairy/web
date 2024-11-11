@@ -55,6 +55,19 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       checkPermissions()
    }, [])
 
+   useEffect(() => {
+      const getInitialUrl = async () => {
+         const response = await Notifications.getLastNotificationResponseAsync()
+         if (response && response.notification.request.content.data.url) {
+            setBaseUrl(response.notification.request.content.data.url)
+         } else {
+            setBaseUrl(BASE_URL + "/portal")
+         }
+      }
+
+      getInitialUrl()
+   }, [])
+
    const checkPermissions = async () => {
       const { status: audioStatus } = await Audio.getPermissionsAsync()
       const { status: videoStatus } = await Camera.getCameraPermissionsAsync()
