@@ -29,6 +29,7 @@ export const UserClientProvider = ({ children }: Props) => {
          }),
       []
    )
+   screenShareClient.disableDualStream()
 
    return (
       <AgoraRTCProvider client={client}>
