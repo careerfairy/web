@@ -116,17 +116,24 @@ export async function sendExpoPushNotification(filters: any, message: any) {
          }
 
          const usersSnapshot = await query.get()
+
+         const users: any = usersSnapshot.docs
+
+         tokens = users
+            .map((user) => user?.fcmTokens || [])
+            .flat()
+            .filter((token) => Expo.isExpoPushToken(token))
+
          tokens = usersSnapshot.docs.map((doc) => doc.data().pushToken)
       }
 
-      const validTokens = tokens.filter((token) => Expo.isExpoPushToken(token))
-      if (validTokens.length === 0) {
+      if (tokens.length === 0) {
          console.error("No valid Expo push tokens provided.")
          return
       }
 
       // Create messages for each valid token
-      const messages: any = validTokens.map((token) => ({
+      const messages: any = tokens.map((token) => ({
          to: token,
          sound: "default",
          title: message.title,
@@ -159,6 +166,7 @@ async function retrieveTokensFromLivestream(
       const livestreamDocRef = firestore
          .collection("livestreams")
          .doc(livestreamId)
+
       const livestreamDocSnap = await livestreamDocRef.get()
       if (!livestreamDocSnap.exists) {
          return []
@@ -166,26 +174,15 @@ async function retrieveTokensFromLivestream(
 
       const userLiveStreamDataRef =
          livestreamDocRef.collection("userLivestreamData")
-      const userRef = firestore.collection("userData")
 
-      // Fetch all users from the userLiveStreamData sub-collection
       const userLiveStreamDataSnap = await userLiveStreamDataRef.get()
 
-      // Collect eligible users with push tokens
-      const eligibleUsers = []
-      for (const userDoc of userLiveStreamDataSnap.docs) {
-         const userId = userDoc.id
+      const users: any = userLiveStreamDataSnap.docs
 
-         const query = userRef
-            .where("id", "==", userId)
-            .where("pushToken", "!=", null)
-         const userQuerySnap = await query.get()
-
-         userQuerySnap.forEach((doc) => {
-            eligibleUsers.push(doc.data().pushToken)
-         })
-      }
-      return eligibleUsers
+      return users
+         .map((user) => user?.user?.fcmTokens || [])
+         .flat()
+         .filter((token) => Expo.isExpoPushToken(token))
    } catch (error) {
       console.error("Error retrieving eligible users:", error)
       return []
