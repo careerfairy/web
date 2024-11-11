@@ -136,6 +136,7 @@ export type UserReadableGroupQuestionsWithAnswerMap = Record<
 
 // Collection /userData/:id/studyBackgrounds/:id
 export interface StudyBackground extends Identifiable {
+   authId: string
    universityCountryCode: string
    universityId: string
    fieldOfStudy: FieldOfStudy
