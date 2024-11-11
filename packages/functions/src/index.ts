@@ -138,7 +138,8 @@ exports.notifyUsersWhenLivestreamStarts =
    notificationLivestreams.notifyUsersWhenLivestreamStarts
 
 // User
-exports.syncUserLivestreamData = user.syncUserLivestreamData
+exports.updateUserLiveStreamDataOnUserChange =
+   user.updateUserLiveStreamDataOnUserChange
 
 // Stripe
 exports.stripeWebHook = stripe.stripeWebHook
