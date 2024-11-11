@@ -97,12 +97,6 @@ export const HighlightCard = ({
       setIsFullscreen((prev) => !prev)
    }, [])
 
-   const handleHeaderClick = useCallback((event: SyntheticEvent) => {
-      event.stopPropagation()
-      event.preventDefault()
-      alert("clicked header")
-   }, [])
-
    return (
       <Box
          sx={[
@@ -118,23 +112,13 @@ export const HighlightCard = ({
                   : styles.highlightCardHeader,
             ]}
          >
-            <Box
-               sx={styles.highlightCardHeaderLogoContainer}
-               onClick={handleHeaderClick}
-            >
+            <Box sx={styles.highlightCardHeaderLogoContainer}>
                <CircularLogo
                   src={highlight.logo.url}
                   alt={highlight.logo.alt}
                />
             </Box>
-            <Typography
-               variant="small"
-               sx={styles.highlightTitle}
-               onClick={(event) => {
-                  event.stopPropagation()
-                  event.preventDefault()
-               }}
-            >
+            <Typography variant="small" sx={styles.highlightTitle}>
                {highlight.title}
             </Typography>
          </Box>
