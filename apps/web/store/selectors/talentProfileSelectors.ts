@@ -11,3 +11,7 @@ export const talentProfileEditingStudyBackgroundOpenSelector = (
 export const talentProfileIsEditingStudyBackgroundSelector = (
    state: RootState
 ) => state.talentProfile.isEditingStudyBackground
+
+export const talentProfileIsDeleteStudyBackgroundDialogSelector = (
+   state: RootState
+) => state.talentProfile.isDeleteStudyBackgroundDialogOpen
