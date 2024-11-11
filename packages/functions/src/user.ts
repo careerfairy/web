@@ -17,7 +17,7 @@ export const updateUserLiveStreamDataOnUserChange = onDocumentUpdated(
       try {
          const newValue = event.data.after.data() as UserData
 
-         // Skip if it's a test live stream
+         // Skip because user has been deleted
          if (!newValue) {
             functions.logger.log(
                `Skipping because user ${event.params.userEmail} has been deleted`
