@@ -1,4 +1,4 @@
-import { Box, Collapse, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { HighlightComponentType } from "data/hygraph/types"
 import { SyntheticEvent, useCallback, useState } from "react"
@@ -46,7 +46,6 @@ const styles = sxStyles({
       bottom: "12px",
       left: 0,
       width: "100%",
-      transition: "all 0.3s ease-in-out",
    },
    highlightCardHeaderFullScreen: {
       display: "flex",
@@ -54,12 +53,6 @@ const styles = sxStyles({
       justifyContent: "center",
       gap: 1,
       zIndex: 2,
-      transition: "all 0.3s ease-in-out",
-   },
-   highlightCardHeaderMoved: {
-      transform: "scale(0.7)",
-      left: "30%",
-      bottom: 0,
    },
    highlightCardHeaderLogoContainer: {
       cursor: "pointer",
@@ -80,7 +73,6 @@ const styles = sxStyles({
       top: 0,
       left: 0,
       zIndex: 0,
-      transition: "opacity 0.3s ease-in-out",
    },
 })
 
@@ -124,7 +116,6 @@ export const HighlightCard = ({
                isFullscreen
                   ? styles.highlightCardHeaderFullScreen
                   : styles.highlightCardHeader,
-               isPlaying && !isFullscreen && styles.highlightCardHeaderMoved,
             ]}
          >
             <Box
@@ -144,13 +135,7 @@ export const HighlightCard = ({
                   event.preventDefault()
                }}
             >
-               {isFullscreen ? (
-                  highlight.title
-               ) : (
-                  <Collapse in={!isPlaying} timeout={300}>
-                     {highlight.title}
-                  </Collapse>
-               )}
+               {highlight.title}
             </Typography>
          </Box>
          <ReactPlayer
@@ -164,9 +149,7 @@ export const HighlightCard = ({
          {isFullscreen ? (
             <HighlightVideoOverlay hide={false} />
          ) : (
-            <Collapse in={!isPlaying} timeout={300}>
-               <HighlightVideoOverlay hide={isPlaying} />
-            </Collapse>
+            <HighlightVideoOverlay hide={false} />
          )}
       </Box>
    )
