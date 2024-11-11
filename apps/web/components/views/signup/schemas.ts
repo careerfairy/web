@@ -72,3 +72,21 @@ export const signupSchema = {
    position: yup.string().max(50, "Cannot be longer than 50 characters"),
    avatar: yup.string(),
 }
+
+export const pushNotificationsFilteringSchema = {
+   universityCountryCode: yup.string(),
+   livestream: yup.string(),
+   gender: yup.string(),
+   university: yup.object().shape({
+      code: yup.string(),
+      name: yup.string(),
+   }),
+   fieldOfStudy: yup.object().nullable().shape({
+      id: yup.string(),
+      name: yup.string(),
+   }),
+   levelOfStudy: yup.object().nullable().shape({
+      id: yup.string(),
+      name: yup.string(),
+   }),
+}

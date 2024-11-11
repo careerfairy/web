@@ -16,10 +16,10 @@ import UniversityCountrySelector from "../../components/views/universitySelect/U
 import UniversitySelector from "../../components/views/universitySelect/UniversitySelector"
 import { FieldOfStudySelector } from "../../components/views/signup/userInformation/FieldOfStudySelector"
 import { LevelOfStudySelector } from "../../components/views/signup/userInformation/LevelOfStudySelector"
-import { UserData } from "@careerfairy/shared-lib/users"
 import * as yup from "yup"
 import { sxStyles } from "../../types/commonTypes"
 import TextField from "@mui/material/TextField"
+import { pushNotificationsFilteringSchema } from "../../components/views/signup/schemas"
 
 const styles = sxStyles({
    mainWrapper: {
@@ -65,20 +65,26 @@ const styles = sxStyles({
       fontWeight: "bold",
    },
 })
-interface IFormValues
-   extends Pick<
-      UserData,
-      "fieldOfStudy" | "levelOfStudy" | "universityCountryCode" | "gender"
-   > {
+interface IFormValues {
    gender?: string
-   university: {
+   university?: {
       name: string
       code: string
+   }
+   fieldOfStudy?: {
+      name: string
+      id: string
+   }
+   levelOfStudy?: {
+      name: string
+      id: string
    }
    livestream?: string
 }
 
-const schema: yup.SchemaOf<IFormValues> = yup.object()
+const schema: yup.SchemaOf<IFormValues> = yup
+   .object()
+   .shape(pushNotificationsFilteringSchema)
 
 const CreateNotification = ({ notification }) => {
    const [title, setTitle] = useState(notification?.title || "")
@@ -91,8 +97,8 @@ const CreateNotification = ({ notification }) => {
       universityCountryCode: "",
       gender: "",
       livestream: "",
-      fieldOfStudy: "",
-      levelOfStudy: "",
+      fieldOfStudy: null,
+      levelOfStudy: null,
    })
    const formikRef = useRef(null)
    const router = useRouter()
@@ -297,6 +303,7 @@ const CreateNotification = ({ notification }) => {
                                  <FieldOfStudySelector
                                     // @ts-ignore
                                     setFieldValue={setFieldValue}
+                                    // @ts-ignore
                                     value={values.fieldOfStudy}
                                     className="registrationInput"
                                     disabled={false}
