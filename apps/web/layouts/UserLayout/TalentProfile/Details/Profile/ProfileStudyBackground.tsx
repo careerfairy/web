@@ -134,6 +134,7 @@ const FormDialogWrapper = ({
                ? Timestamp.fromDate(data.startedAt)
                : null,
             endedAt: data.endedAt ? Timestamp.fromDate(data.endedAt) : null,
+            authId: userData.authId,
          }
 
          await userRepo.createUserStudyBackground(
