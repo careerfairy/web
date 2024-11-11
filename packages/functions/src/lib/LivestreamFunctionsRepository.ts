@@ -341,6 +341,7 @@ export class LivestreamFunctionsRepository
 
       await bulkWriter.close()
    }
+
    async createLivestreamStartPushNotifications(
       livestream: LivestreamEvent
    ): Promise<void> {
