@@ -315,7 +315,7 @@ export class LivestreamFunctionsRepository
    }
    async updateUserLivestreamData(
       updateUserData: UserData,
-      userLivestreamDatas: Partial<UserLivestreamData>[]
+      userLivestreamDatas: UserLivestreamData[]
    ): Promise<void> {
       const bulkWriter = firestoreAdmin.bulkWriter()
 
