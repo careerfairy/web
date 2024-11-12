@@ -105,7 +105,7 @@ const FormDialogWrapper = () => {
          if (!data?.id) {
             await userRepo.createUserLink(userData.id, newLink)
          } else {
-            userRepo.updateUserLink(userData.id, newLink)
+            await userRepo.updateUserLink(userData.id, newLink)
          }
 
          successNotification(`${data.id ? "Updated" : "Added a new"} link 🔗`)
