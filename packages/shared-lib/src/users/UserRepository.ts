@@ -1212,7 +1212,7 @@ export class FirebaseUserRepository
       const ref = this.firestore
          .collection("userData")
          .doc(userId)
-         .collection("studyBackgrounds")
+         .collection("links")
          .doc(link.id)
 
       return ref.set(link)

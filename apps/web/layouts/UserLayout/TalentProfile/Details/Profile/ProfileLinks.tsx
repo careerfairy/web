@@ -112,7 +112,7 @@ const FormDialogWrapper = () => {
       } catch (error) {
          errorNotification(
             error,
-            "We encountered a problem while adding your study background. Rest assured, we're on it!"
+            "We encountered a problem while adding your link. Rest assured, we're on it!"
          )
       }
    }
