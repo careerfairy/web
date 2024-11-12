@@ -68,7 +68,6 @@ export interface UserData extends Identifiable {
    regionsOfInterest?: string[]
    isLookingForJob?: boolean
    accountCreationUTMParams?: UTMParams
-
    // temporary to hide the jobs tabs from the user profile
    // should be removed in the future
    hasJobApplications?: boolean
@@ -121,7 +120,6 @@ export interface UserData extends Identifiable {
     * User's phone number
     */
    phoneNumber?: string
-   
    bannerImageUrl?: string
 }
 
@@ -136,6 +134,14 @@ export type UserReadableGroupQuestionsWithAnswerMap = Record<
    ReadableQuestionAndAnswer
 >
 
+// /userData/:id/studyBackground/:id
+export interface StudyBackground extends Identifiable {
+   school: string
+   fieldOfStudy: FieldOfStudy
+   levelOfStudy: LevelOfStudy
+   startedAt?: Timestamp
+   endedAt?: Timestamp
+}
 export interface ReadableQuestionAndAnswer {
    questionName: GroupQuestion["name"]
    questionId: GroupQuestion["id"]

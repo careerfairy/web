@@ -2,8 +2,8 @@ import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
-import { SettingsIcon } from "components/views/common/icons/SettingsIcon"
 import { useMemo } from "react"
+import { Settings } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { ProfileAvatar } from "./ProfileAvatar"
 import { ProfileBannerIllustration } from "./ProfileBannerIllustration"
@@ -41,7 +41,8 @@ const styles = sxStyles({
          backgroundColor: (theme) => theme.brand.black[400],
       },
       "& svg": {
-         fill: "none",
+         width: "14px",
+         height: "14px",
       },
    },
    userDetailsRoot: {
@@ -89,7 +90,7 @@ export const TalentProfileHeader = () => {
             <Button
                sx={styles.settingsButton}
                variant="outlined"
-               startIcon={<SettingsIcon />}
+               startIcon={<Settings />}
             >
                Settings
             </Button>
