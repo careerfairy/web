@@ -19,6 +19,7 @@ import { SeenSparks } from "../sparks/sparks"
 import {
    CompanyFollowed,
    IUserReminder,
+   ProfileLink,
    RegisteredLivestreams,
    RegistrationStep,
    SavedRecruiter,
@@ -264,6 +265,20 @@ export interface IUserRepository {
       userId: string,
       studyBackgroundId: string
    ): Promise<void>
+
+   /**
+    * Creates a new profile link for the user identified by @param userId, user links live in a sub collection of /userData.
+    * @param userId Id of the user.
+    * @param link Link data to be created.
+    */
+   createUserLink(userId: string, link: ProfileLink): Promise<void>
+
+   /**
+    * Updates a given profile link for the user identified by @param userId.
+    * @param userId Id of the user.
+    * @param link Link data to be updated.
+    */
+   updateUserLink(userId: string, link: ProfileLink): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -1176,6 +1191,31 @@ export class FirebaseUserRepository
          .doc(studyBackgroundId)
 
       return ref.delete()
+   }
+
+   async createUserLink(userId: string, link: ProfileLink): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("links")
+         .doc()
+
+      const data: ProfileLink = {
+         ...link,
+         id: ref.id,
+      }
+
+      await ref.set(data)
+   }
+
+   async updateUserLink(userId: string, link: ProfileLink): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("studyBackgrounds")
+         .doc(link.id)
+
+      return ref.set(link)
    }
 }
 

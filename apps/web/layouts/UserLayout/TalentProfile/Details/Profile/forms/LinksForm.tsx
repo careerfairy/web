@@ -1,14 +1,25 @@
 import { ProfileLink } from "@careerfairy/shared-lib/users"
 import { Stack } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import { ReactNode, useEffect } from "react"
-import { FormProvider, UseFormReturn } from "react-hook-form"
+import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
+import { sxStyles } from "types/commonTypes"
 import {
    CreateLinkSchema,
    CreateLinkSchemaType,
    getInitialLinkValues,
 } from "./schemas"
+
+const styles = sxStyles({
+   formRoot: {
+      minWidth: {
+         xs: "313px",
+         sm: "343px",
+         md: "500px",
+      },
+   },
+})
 
 type LinkFormProviderProps = {
    link?: ProfileLink
@@ -44,8 +55,27 @@ export const LinkFormProvider = ({ children, link }: LinkFormProviderProps) => {
 }
 
 export const LinkFormFields = () => {
-   const isMobile = useIsMobile()
-   console.log("🚀 ~ LinkFormFields ~ isMobile:", isMobile)
-
-   return <Stack spacing={2}></Stack>
+   const {
+      formState: { isSubmitting },
+   } = useFormContext()
+   return (
+      <Stack spacing={2} sx={styles.formRoot}>
+         <ControlledBrandedTextField
+            id="title"
+            name="title"
+            label="Link title (required)"
+            placeholder="E.g., Portfolio"
+            disabled={isSubmitting}
+            fullWidth
+         />
+         <ControlledBrandedTextField
+            id="url"
+            name="url"
+            label="URL (required)"
+            placeholder="E.g., behance.net/user"
+            disabled={isSubmitting}
+            fullWidth
+         />
+      </Stack>
+   )
 }

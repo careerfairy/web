@@ -3,6 +3,8 @@ import {
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
 import { ProfileLink, StudyBackground } from "@careerfairy/shared-lib/users"
+import { URL_REGEX } from "components/util/constants"
+import { ERROR_MESSAGES } from "util/form"
 import * as Yup from "yup"
 
 export const baseStudyBackgroundShape = {
@@ -39,7 +41,10 @@ export const baseStudyBackgroundShape = {
 export const baseLinkShape = {
    id: Yup.string(),
    title: Yup.string().required("Title is required"),
-   url: Yup.string().required("Url is required"),
+   url: Yup.string().matches(URL_REGEX, {
+      excludeEmptyString: true,
+      message: ERROR_MESSAGES.VALID_URL,
+   }), // Yup.string().required("Url is required"),
 }
 
 export const CreateStudyBackgroundSchema = Yup.object(baseStudyBackgroundShape)

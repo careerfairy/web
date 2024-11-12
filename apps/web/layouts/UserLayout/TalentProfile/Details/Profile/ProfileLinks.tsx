@@ -8,6 +8,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { userRepo } from "data/RepositoryInstances"
 import { Fragment, useCallback } from "react"
 import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
@@ -102,9 +103,9 @@ const FormDialogWrapper = () => {
          }
 
          if (!data?.id) {
-            alert("todo create link: " + newLink.title)
+            await userRepo.createUserLink(userData.id, newLink)
          } else {
-            alert("todo update link: " + newLink.title)
+            userRepo.updateUserLink(userData.id, newLink)
          }
 
          successNotification(`${data.id ? "Updated" : "Added a new"} link 🔗`)
