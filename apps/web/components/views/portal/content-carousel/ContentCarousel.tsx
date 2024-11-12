@@ -3,6 +3,9 @@ import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/r
 import { UserStats } from "@careerfairy/shared-lib/users"
 import { Box } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { isLivestreamDialogOpen } from "components/views/livestream-dialog"
+import { useRouter } from "next/router"
 import { FC, useCallback, useEffect, useState } from "react"
 import SwipeableViews from "react-swipeable-views"
 import { autoPlay } from "react-swipeable-views-utils"
@@ -25,21 +28,38 @@ import LivestreamContent from "./LivestreamContent"
 import WatchSparksCTAContent from "./WatchSparksCTAContent"
 
 const styles = sxStyles({
-   wrapper: {
-      width: "100%",
-      height: { xs: "55vh", md: "40vh" },
-      minHeight: "470px",
+   root: {
       position: "relative",
+      mb: 3,
+      mx: 0,
+      mt: 2,
+   },
+   slide: {
+      display: "flex",
+      alignItems: "flex-end",
+      width: "100%",
+      paddingRight: "16px",
+      paddingLeft: "16px",
+      margin: 0,
+      overflow: "visible",
+   },
+   slideMobile: {
+      paddingRight: "8px",
+      paddingLeft: "8px",
+   },
+   contentWrapper: {
+      background: "white",
+      width: "100%",
+      height: { xs: "368px", md: "384px" },
+      position: "relative",
+      borderRadius: "12px",
    },
    paginationWrapper: (theme) => ({
       mx: "auto",
       display: "flex",
       justifyContent: "center",
       position: "absolute",
-      bottom: {
-         xs: theme.spacing(2.5),
-         sm: theme.spacing(2.75),
-      },
+      bottom: theme.spacing(1.5),
       left: "50%",
       transform: "translateX(-50%)",
    }),
@@ -56,6 +76,7 @@ type Props = {
 const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
    const theme = useTheme()
    const { userData, userStats } = useAuth()
+   const isMobile = useIsMobile()
    const [activeStep, setActiveStep] = useState(0)
    const [videoUrl, setVideoUrl] = useState(null)
    const {
@@ -67,6 +88,9 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
 
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal()
+   const { query } = useRouter()
+
+   const isLSDialogOpen = isLivestreamDialogOpen(query)
 
    /**
     * Each minute watched the field minutesWatched will be increased, and we need to increment it on our DB
@@ -124,25 +148,27 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
       resetMinutes()
    }, [resetMinutes])
 
+   const slideStyles = isMobile
+      ? { ...styles.slide, ...styles.slideMobile }
+      : styles.slide
+
    return (
-      <>
+      <Box sx={styles.root}>
          <AutoPlaySwipeableViews
-            autoplay={!videoUrl || !joinGroupModalData} // do not auto scroll if video is being played
+            autoplay={!(videoUrl || isLSDialogOpen)} // do not auto scroll if dialog is open
             axis={theme.direction === "rtl" ? "x-reverse" : "x"}
             index={activeStep}
             onChangeIndex={handleStepChange}
-            slideStyle={{
-               display: "flex",
-               alignItems: "flex-end",
-            }}
+            slideStyle={slideStyles}
             enableMouseEvents
             interval={CAROUSEL_SLIDE_DELAY}
+            style={{ overflow: "visible" }}
          >
             {content.map((contentItem, index) => {
                // Check if contentItem is a CTASlide
                if (contentItem.contentType === "CTASlide") {
                   return (
-                     <Box sx={styles.wrapper} key={index}>
+                     <Box sx={styles.contentWrapper} key={index}>
                         {getCTASlide(contentItem)}
                      </Box>
                   )
@@ -150,7 +176,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
 
                // Default rendering for LivestreamEvent
                return (
-                  <Box sx={styles.wrapper} key={contentItem.id}>
+                  <Box sx={styles.contentWrapper} key={contentItem.id}>
                      <LivestreamContent
                         handleBannerPlayRecording={handleBannerPlayRecording}
                         livestreamData={contentItem}
@@ -188,7 +214,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
                handleClose={handleCloseJoinModal}
             />
          ) : null}
-      </>
+      </Box>
    )
 }
 

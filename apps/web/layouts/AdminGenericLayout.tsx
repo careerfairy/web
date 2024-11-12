@@ -47,8 +47,8 @@ const baseStyles = (drawerWidth: number) => {
       animateWidth: {
          transition: (theme) => theme.transitions.create("width"),
       },
-      toolbar: {
-         backgroundColor: "none",
+      header: {
+         backgroundColor: "unset",
       },
       drawerWrapper: {
          flexShrink: { md: 0 },
@@ -239,9 +239,9 @@ const HeaderComponent = ({ children, width }: HeaderProps) => {
             position="sticky"
             color="inherit"
             elevation={0}
-            sx={[width && { width }]}
+            sx={[width && { width }, styles.header]}
          >
-            <Toolbar sx={styles.toolbar} disableGutters>
+            <Toolbar sx={styles.header} disableGutters>
                {children}
             </Toolbar>
          </AppBar>
