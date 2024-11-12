@@ -21,13 +21,11 @@ import ImageCropperDialog, {
 } from "components/views/common/ImageCropperDialog"
 import ImagePreview from "components/views/common/ImagePreview"
 import { LineIcon } from "components/views/common/icons/LineIcon"
-import { UploadIcon } from "components/views/common/icons/UploadIcon"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { FC, useCallback, useMemo, useState } from "react"
 import { Camera, Image, Trash2, Upload } from "react-feather"
 import { SlideImage } from "yet-another-react-lightbox"
 import { sxStyles } from "../../../../types/commonTypes"
-
 const styles = sxStyles({
    buttonWrapper: {
       height: "32px",
@@ -239,7 +237,7 @@ export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
                cropType={cropper.type}
                cropBoxResizable
                aspectRatio={cropper.aspectRatio}
-               titleIcon={<UploadIcon sx={styles.uploadIcon} />}
+               titleIcon={<Upload />}
                backButtonText="Cancel"
                cropperSlideSx={styles.cropperSlider}
                applyButtonSx={styles.cropperApplyButton}

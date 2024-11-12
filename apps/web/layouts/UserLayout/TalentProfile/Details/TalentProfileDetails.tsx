@@ -1,8 +1,12 @@
 import { Box, Tab, Tabs } from "@mui/material"
+import { useRouter } from "next/router"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
+import { TAB_VALUES, TalentProfileTabValues } from "../TalentProfileView"
+import { ProfileFollowingCompaniesDetailsView } from "./FollowingCompanies/ProfileFollowingCompaniesDetailsView"
+import { ProfileJobsDetailsView } from "./Jobs/ProfileJobsDetailsView"
+import { ProfileDetailsView } from "./Profile/ProfileDetailsView"
 
-// TODO-WG: Move to own /Details folders
 const styles = sxStyles({
    root: {
       backgroundColor: "white",
@@ -26,26 +30,17 @@ const styles = sxStyles({
    },
 })
 
-const TAB_VALUES = {
-   profile: {
-      value: "profile",
-      label: "Profile",
-   },
-   jobs: {
-      value: "jobs",
-      label: "My Jobs",
-   },
-   company: {
-      value: "companies",
-      label: "Companies",
-   },
+type Props = {
+   currentPath: TalentProfileTabValues
 }
 
-export const TalentProfileDetails = () => {
-   const [tabValue, setTabValue] = useState(TAB_VALUES.profile.value)
+export const TalentProfileDetails = ({ currentPath }: Props) => {
+   const [tabValue, setTabValue] = useState(currentPath)
+   const router = useRouter()
 
    const handleTabChange = (_, newValue) => {
       setTabValue(newValue)
+      router.push(newValue, undefined, { shallow: true, scroll: false })
    }
 
    return (
@@ -66,7 +61,17 @@ export const TalentProfileDetails = () => {
                value={TAB_VALUES.company.value}
             />
          </Tabs>
-         <Box>{`${tabValue} content here`}</Box>
+         <Box>
+            {tabValue === TAB_VALUES.profile.value ? (
+               <ProfileDetailsView />
+            ) : null}
+            {tabValue === TAB_VALUES.jobs.value ? (
+               <ProfileJobsDetailsView />
+            ) : null}
+            {tabValue === TAB_VALUES.company.value ? (
+               <ProfileFollowingCompaniesDetailsView />
+            ) : null}
+         </Box>
       </Box>
    )
 }
