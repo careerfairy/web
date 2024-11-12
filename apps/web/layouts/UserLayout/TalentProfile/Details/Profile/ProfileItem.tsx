@@ -24,26 +24,26 @@ const styles = sxStyles({
    },
 })
 
-type Props<T> = {
+type Props = {
    title: string
-   items: T[]
+   hasItems?: boolean
    handleAdd: () => void
    children: ReactElement
 }
 
-export const ProfileItem = <T,>({
-   items,
+export const ProfileItem = ({
+   hasItems,
    title,
    children,
    handleAdd,
-}: Props<T>) => {
+}: Props) => {
    return (
       <Stack spacing={1.5}>
          <Stack direction={"row"} sx={styles.titleRoot}>
             <Typography variant="brandedBody" sx={styles.title}>
                {title}
             </Typography>
-            <ConditionalWrapper condition={Boolean(items?.length)}>
+            <ConditionalWrapper condition={hasItems}>
                <Box
                   component={PlusCircle}
                   sx={styles.plusCircle}

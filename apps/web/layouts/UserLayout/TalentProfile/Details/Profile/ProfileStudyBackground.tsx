@@ -1,5 +1,5 @@
 import { StudyBackground } from "@careerfairy/shared-lib/users"
-import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
+import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -12,22 +12,27 @@ import { userRepo } from "data/RepositoryInstances"
 import { Timestamp } from "data/firebase/FirebaseInstance"
 import { DateTime } from "luxon"
 import { Fragment, useCallback, useState } from "react"
-import { PlusCircle } from "react-feather"
 import { useFormContext, useWatch } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import {
-   closeCreateStudyBackgroundDialog,
-   openCreateStudyBackgroundDialog,
-   setEditingStudyBackground,
+   TalentProfileItemTypes,
+   closeCreateDialog,
+   closeDeleteConfirmationDialog,
+   openCreateDialog,
+   openDeleteConfirmationDialog,
+   setEditing,
 } from "store/reducers/talentProfileReducer"
 import {
    talentProfileCreateStudyBackgroundOpenSelector,
    talentProfileEditingStudyBackgroundOpenSelector,
+   talentProfileIsDeleteStudyBackgroundDialogSelector,
    talentProfileIsEditingStudyBackgroundSelector,
 } from "store/selectors/talentProfileSelectors"
 import { sxStyles } from "types/commonTypes"
 import { ConfirmDeleteItemDialog } from "../ConfirmDeleteItemDialog"
 import { ConfirmEmptyStudyDatesDialog } from "../ConfirmEmptyStudyDatesDialog"
+import { EmptyItemView } from "./EmptyItemView"
+import { ProfileItem } from "./ProfileItem"
 import { ProfileItemCard } from "./ProfileItemCard"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import {
@@ -40,15 +45,6 @@ import {
 } from "./forms/schemas"
 
 const styles = sxStyles({
-   titleRoot: {
-      pr: "12px",
-      alignItems: "center",
-      justifyContent: "space-between",
-   },
-   title: {
-      fontWeight: 600,
-      color: (theme) => theme.palette.neutral[900],
-   },
    emptyStudiesRoot: {
       display: "flex",
       flexDirection: "column",
@@ -59,36 +55,9 @@ const styles = sxStyles({
       border: (theme) => `1px solid ${theme.brand.white[400]}`,
       borderRadius: "8px",
    },
-   emptyDetailsRoot: {
-      alignItems: "center",
-      width: {
-         xs: "280px",
-         sm: "280px",
-         md: "390px",
-      },
-   },
-   emptyTitle: {
-      fontWeight: 600,
-      textAlign: "center",
-   },
-   emptyDescription: {
-      fontWeight: 400,
-      textAlign: "center",
-   },
-   addButton: {
-      p: "8px 16px",
-   },
    schoolIcon: {
       width: "36px",
       height: "36px",
-   },
-   plusCircle: {
-      width: "20px",
-      height: "20px",
-      color: (theme) => theme.palette.neutral[600],
-      "&:hover": {
-         cursor: "pointer",
-      },
    },
    studyBackgroundSchoolIcon: {
       width: "40px",
@@ -97,18 +66,6 @@ const styles = sxStyles({
       borderRadius: "70px",
       color: (theme) => theme.palette.neutral[200],
       backgroundColor: (theme) => theme.palette.neutral[50],
-   },
-   moreVerticalIcon: {
-      color: (theme) => theme.palette.neutral[800],
-      width: "20px",
-      height: "20px",
-   },
-   studyBackgroundCard: {
-      justifyContent: "space-between",
-      p: "16px 10px 12px 12px",
-      borderRadius: "8px",
-      border: (theme) => `1px solid ${theme.brand.white[500]}`,
-      backgroundColor: (theme) => theme.brand.white[100],
    },
    universityName: {
       fontWeight: 600,
@@ -132,25 +89,19 @@ export const ProfileStudyBackground = ({ hasItems }: Props) => {
    const dispatch = useDispatch()
 
    const handleAddClick = useCallback(() => {
-      dispatch(openCreateStudyBackgroundDialog())
+      dispatch(
+         openCreateDialog({ type: TalentProfileItemTypes.StudyBackground })
+      )
    }, [dispatch])
 
    return (
-      <Stack spacing={1.5}>
-         <Stack direction={"row"} sx={styles.titleRoot}>
-            <Typography variant="brandedBody" sx={styles.title}>
-               Study background
-            </Typography>
-            <ConditionalWrapper condition={hasItems}>
-               <Box
-                  component={PlusCircle}
-                  sx={styles.plusCircle}
-                  onClick={handleAddClick}
-               />
-            </ConditionalWrapper>
-         </Stack>
+      <ProfileItem
+         title={"Study background"}
+         hasItems={hasItems}
+         handleAdd={handleAddClick}
+      >
          <StudyBackgroundDetails />
-      </Stack>
+      </ProfileItem>
    )
 }
 
@@ -189,7 +140,9 @@ const FormDialogWrapper = () => {
    } = useFormContext()
 
    const handleCloseStudyBackgroundDialog = useCallback(() => {
-      dispatch(closeCreateStudyBackgroundDialog())
+      dispatch(
+         closeCreateDialog({ type: TalentProfileItemTypes.StudyBackground })
+      )
       reset(getInitialStudyBackgroundValues())
       setIsConfirmEmptyDatesOpen(false)
    }, [dispatch, reset])
@@ -275,10 +228,26 @@ const FormDialogWrapper = () => {
 
 const StudyBackgroundsList = () => {
    const { data: studyBackgrounds } = useUserStudyBackgrounds()
+   const dispatch = useDispatch()
+
+   const handleAdd = useCallback(() => {
+      dispatch(
+         openCreateDialog({ type: TalentProfileItemTypes.StudyBackground })
+      )
+   }, [dispatch])
+
    if (!studyBackgrounds?.length)
       return (
          <Box sx={styles.emptyStudiesRoot}>
-            <EmptyStudyBackgroundView />
+            <EmptyItemView
+               title={"What did you study?"}
+               description={
+                  "Share your formal education background with us, including the school, programme, and field of study."
+               }
+               addButtonText={"Add study background"}
+               handleAdd={handleAdd}
+               icon={<SchoolIcon sx={styles.schoolIcon} />}
+            />
          </Box>
       )
 
@@ -300,14 +269,32 @@ type StudyBackgroundCardProps = {
 
 const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
    const { userData } = useAuth()
-   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
-      useState<boolean>(false)
+
+   const isConfirmDeleteDialogOpen = useSelector(
+      talentProfileIsDeleteStudyBackgroundDialogSelector
+   )
    const [isDeleting, setIsDeleting] = useState<boolean>(false)
    const dispatch = useDispatch()
    const { reset } = useFormContext()
 
+   const setDeleteDialog = useCallback(
+      (open: boolean) => {
+         const arg = { type: TalentProfileItemTypes.StudyBackground }
+         const action = open
+            ? () => openDeleteConfirmationDialog(arg)
+            : () => closeDeleteConfirmationDialog(arg)
+         dispatch(action())
+      },
+      [dispatch]
+   )
+
    const handleEdit = useCallback(() => {
-      dispatch(setEditingStudyBackground(studyBackground))
+      dispatch(
+         setEditing({
+            type: TalentProfileItemTypes.StudyBackground,
+            data: studyBackground,
+         })
+      )
       reset(studyBackground)
    }, [dispatch, studyBackground, reset])
 
@@ -317,8 +304,8 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
       await userRepo.deleteStudyBackground(userData.id, studyBackground.id)
 
       setIsDeleting(false)
-      setIsConfirmDeleteDialogOpen(false)
-   }, [studyBackground, userData.id])
+      setDeleteDialog(false)
+   }, [studyBackground, userData.id, setDeleteDialog])
 
    const university = useUniversityById(
       studyBackground.universityCountryCode,
@@ -345,7 +332,7 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             description="Are you sure you want to delete your study background?"
             handleDelete={handleDelete}
             isDeleting={isDeleting}
-            onClose={() => setIsConfirmDeleteDialogOpen(false)}
+            onClose={() => setDeleteDialog(false)}
          />
          <ProfileItemCard
             dataTypeId="study-background"
@@ -353,7 +340,7 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             editText="Edit study background details"
             deleteText="Delete study background"
             handleEdit={handleEdit}
-            handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
+            handleDelete={() => setDeleteDialog(true)}
          >
             <SchoolIcon sx={styles.studyBackgroundSchoolIcon} />
             <Stack spacing={0.5}>
@@ -373,49 +360,6 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             </Stack>
          </ProfileItemCard>
       </Fragment>
-   )
-}
-
-const EmptyStudyBackgroundView = () => {
-   const dispatch = useDispatch()
-
-   const handleAddBackground = useCallback(() => {
-      dispatch(openCreateStudyBackgroundDialog())
-   }, [dispatch])
-
-   return (
-      <Stack alignItems={"center"} spacing={2}>
-         <Box color={"primary.main"}>
-            <SchoolIcon sx={styles.schoolIcon} />
-         </Box>
-         <Stack spacing={2} sx={styles.emptyDetailsRoot}>
-            <Stack alignItems={"center"}>
-               <Typography
-                  sx={styles.emptyTitle}
-                  color="neutral.800"
-                  variant="brandedBody"
-               >
-                  What did you study?
-               </Typography>
-               <Typography
-                  sx={styles.emptyDescription}
-                  color={"neutral.700"}
-                  variant="small"
-               >
-                  Share your formal education background with us, including the
-                  school, programme, and field of study.
-               </Typography>
-            </Stack>
-            <Button
-               variant="contained"
-               color="primary"
-               sx={styles.addButton}
-               onClick={handleAddBackground}
-            >
-               Add study background
-            </Button>
-         </Stack>
-      </Stack>
    )
 }
 

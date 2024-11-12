@@ -11,12 +11,12 @@ const styles = sxStyles({
    },
 })
 export const ProfileDetailsView = () => {
-   const { hasItems } = useUserStudyBackgrounds()
+   const { hasItems: userHasStudyBackgrounds } = useUserStudyBackgrounds()
 
    return (
       <Stack sx={styles.wrapper} spacing={3}>
-         <ProfileStudyBackground hasItems={hasItems} />
-         <ProfileLinks links={[]} />
+         <ProfileStudyBackground hasItems={userHasStudyBackgrounds} />
+         <ProfileLinks hasItems={false} />
       </Stack>
    )
 }

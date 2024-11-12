@@ -1,4 +1,3 @@
-import { ProfileLink } from "@careerfairy/shared-lib/users"
 import { Box } from "@mui/material"
 import { Link } from "react-feather"
 import { EmptyItemView } from "./EmptyItemView"
@@ -24,14 +23,14 @@ const styles = sxStyles({
 })
 
 type Props = {
-   links: ProfileLink[]
+   hasItems?: boolean
 }
 
-export const ProfileLinks = ({ links }: Props) => {
+export const ProfileLinks = ({ hasItems }: Props) => {
    const handleAdd = () => alert("Todo add")
 
    return (
-      <ProfileItem items={links} title="Links" handleAdd={handleAdd}>
+      <ProfileItem hasItems={hasItems} title="Links" handleAdd={handleAdd}>
          <Box sx={styles.emptyLinksRoot}>
             <EmptyItemView
                title={"Share your links"}
