@@ -55,6 +55,27 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       checkPermissions()
    }, [])
 
+   const handleDeepLink = (event: { url: string }) => {
+      setBaseUrl(event.url)
+   }
+
+   useEffect(() => {
+      // Listen for incoming URLs
+      const subscription = Linking.addEventListener("url", handleDeepLink)
+
+      // Handle the initial launch URL, if the app was opened from a deep link
+      ;(async () => {
+         const initialUrl = await Linking.getInitialURL()
+         if (initialUrl) {
+            handleDeepLink({ url: initialUrl })
+         }
+      })()
+
+      return () => {
+         subscription.remove()
+      }
+   }, [])
+
    useEffect(() => {
       const getInitialUrl = async () => {
          const response = await Notifications.getLastNotificationResponseAsync()

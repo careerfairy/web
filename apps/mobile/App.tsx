@@ -1,5 +1,11 @@
-import { useEffect } from "react"
-import { Platform } from "react-native"
+import { useEffect, useState } from "react"
+import {
+   Platform,
+   SafeAreaView,
+   Text,
+   TouchableOpacity,
+   Image,
+} from "react-native"
 import WebViewComponent from "./components/WebView"
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
 import { app, db, auth } from "./firebase"
@@ -7,8 +13,62 @@ import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { PROJECT_ID } from "@env"
+import NetInfo from "@react-native-community/netinfo"
+import React from "react"
+import {
+   useFonts,
+   Poppins_400Regular,
+   Poppins_600SemiBold,
+} from "@expo-google-fonts/poppins"
+
+const styles: any = {
+   image: {
+      width: 100,
+      height: 100,
+      resizeMode: "contain",
+   },
+   title: {
+      fontFamily: "PoppinsSemiBold",
+      fontSize: "16px",
+      color: "#3D3D47",
+      marginTop: 20,
+      marginBottom: 14,
+   },
+   description: {
+      fontFamily: "PoppinsRegular",
+      fontSize: "16px",
+      color: "#5C5C6A",
+      textAlign: "center",
+      marginBottom: 20,
+   },
+   button: {
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: "#2ABAA5",
+      backgroundColor: "#FCFCFE",
+      width: 285,
+      paddingVertical: 8,
+      paddingHorizontal: 24,
+      justifyContent: "center",
+      alignItems: "center",
+      display: "flex",
+   },
+   buttonText: {
+      fontFamily: "PoppinsRegular",
+      color: "#2ABAA5",
+      fontSize: "16px",
+   },
+}
 
 export default function Native() {
+   const [connectedToInternet, setConnectedToInternet] = useState<
+      boolean | null
+   >(true)
+   const [fontsLoaded] = useFonts({
+      PoppinsRegular: Poppins_400Regular,
+      PoppinsSemiBold: Poppins_600SemiBold,
+   })
+
    useEffect(() => {
       if (app) {
          console.log("Firebase connected successfully!")
@@ -16,6 +76,16 @@ export default function Native() {
          console.log("Firebase connection failed.")
       }
       checkToken()
+   }, [])
+
+   useEffect(() => {
+      // Subscribe to network status updates
+      const unsubscribe = NetInfo.addEventListener((state) => {
+         setConnectedToInternet(state.isConnected)
+      })
+
+      // Clean up the listener when the component unmounts
+      return () => unsubscribe()
    }, [])
 
    const checkToken = async () => {
@@ -119,7 +189,41 @@ export default function Native() {
       }
    }
 
+   if (!fontsLoaded) {
+      return <></>
+   }
+
    return (
-      <WebViewComponent onTokenInjected={getPushToken} onLogout={onLogout} />
+      <>
+         {!connectedToInternet ? (
+            <SafeAreaView
+               style={{
+                  flex: 1,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "#f7f8fc",
+               }}
+            >
+               <Image
+                  source={require("./assets/images/internet_icon.png")}
+                  style={styles.icon}
+               />
+               <Text style={styles.title}>Whoops, no internet!</Text>
+               <Text style={styles.description}>
+                  We can't load anything right now. Connect to the web, and
+                  you'll be good to go!
+               </Text>
+               <TouchableOpacity style={styles.button}>
+                  <Text style={styles.buttonText}>Try again</Text>
+               </TouchableOpacity>
+            </SafeAreaView>
+         ) : (
+            <WebViewComponent
+               onTokenInjected={getPushToken}
+               onLogout={onLogout}
+            />
+         )}
+      </>
    )
 }
