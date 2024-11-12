@@ -104,7 +104,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 
    const config = useClientConfig(client, {
       hostCondition: shouldStream && isReady && (isHost || viewerCanJoinPanel),
-      enableDualStream: isHost,
+      enableDualStream: true,
    })
 
    const shouldJoinChannel =
