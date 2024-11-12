@@ -2,6 +2,7 @@ import { Box, Tab, Tabs } from "@mui/material"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 
+// TODO-WG: Move to own /Details folders
 const styles = sxStyles({
    root: {
       backgroundColor: "white",
@@ -32,7 +33,7 @@ const TAB_VALUES = {
    },
    jobs: {
       value: "jobs",
-      label: "Jobs",
+      label: "My Jobs",
    },
    company: {
       value: "companies",
