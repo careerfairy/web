@@ -1,5 +1,6 @@
 import { RootState } from "../"
 
+// Study background
 export const talentProfileCreateStudyBackgroundOpenSelector = (
    state: RootState
 ) => state.talentProfile.createStudyBackgroundDialogOpen
