@@ -8,6 +8,7 @@ import { useRouter } from "next/router"
 import { FC } from "react"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
+
 import CarouselContentService, {
    CTASlide,
    CTASlideTopics,
@@ -18,7 +19,7 @@ import ContentButton from "./ContentButton"
 const SPARK_TO_NAVIGATE_TO_ID = "QJhyftocyWRPoIEaH5W7"
 
 const mobileJobsBackGroundUrl =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2FMobileFullJobsBanner_v2.png?alt=media&token=8f9b3d3f-389e-4499-a78f-b72ec08a7505"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2FMobileFullJobsBanner_v3.png?alt=media&token=8f9b3d3f-389e-4499-a78f-b72ec08a7505"
 const desktopJobsBackGroundUrl =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2FDesktopFullJobsBanner_v2.png?alt=media&token=b59724f7-fe83-4cf3-a74b-8eb1eca23d30"
 
@@ -31,6 +32,7 @@ const styles = sxStyles({
    },
    title: {
       fontWeight: 700,
+      textWrap: "nowrap",
    },
    descriptions: {
       fontWeight: "400 !important",
@@ -51,17 +53,13 @@ const styles = sxStyles({
    },
    info: {
       mt: {
-         xs: 4,
-         sm: 1,
+         xs: 2,
+         md: 0,
       },
    },
    content: {
-      alignItems: "flex-start !important",
+      justifyContent: { xs: "flex-start !important", md: "center !important" },
       height: "100% !important",
-      mt: {
-         md: 4.5,
-         xl: 5,
-      },
    },
    actionItem: {
       maxWidth: {
@@ -81,14 +79,14 @@ const styles = sxStyles({
       top: 0,
       width: {
          xs: "100%",
-         md: "60%",
+         sm: "60%",
       },
       height: "100%",
       "& img": {
+         borderRadius: "12px",
          objectPosition: {
-            xs: "top 230px left 0px",
-            sm: "top 200px left 0px",
-            md: "top 50% left 20%",
+            xs: "top 180px left 0px",
+            sm: "top 50% left 20%",
          },
       },
    },
@@ -99,7 +97,7 @@ type DiscoverJobsCTAContentProps = {
 }
 
 export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
-   const isMobile = useIsMobile()
+   const isMobile = useIsMobile("sm")
    const { userData, isLoadingAuth, isLoadingUserData } = useAuth()
    const router = useRouter()
 
@@ -128,7 +126,7 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
    })
 
    return (
-      <Box ref={ref}>
+      <Box ref={ref} height={"100%"} width={"100%"}>
          <Content
             headerTitle={
                <ContentHeaderTitle
@@ -149,6 +147,10 @@ export const DiscoverJobsCTAContent: FC<DiscoverJobsCTAContentProps> = () => {
                   !
                </ContentHeaderTitle>
             }
+            backgroundImageUrl={
+               isMobile ? mobileJobsBackGroundUrl : desktopJobsBackGroundUrl
+            }
+            hideBackground={true}
             infoSx={styles.info}
             contentSx={styles.content}
             actionItem={
