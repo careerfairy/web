@@ -121,6 +121,8 @@ export interface UserData extends Identifiable {
     * User's phone number
     */
    phoneNumber?: string
+   
+   bannerImageUrl?: string
 }
 
 export type ValidUserTagFields =
