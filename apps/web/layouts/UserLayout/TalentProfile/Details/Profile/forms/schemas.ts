@@ -95,6 +95,7 @@ export const getInitialStudyBackgroundValues = (
 
 export const getInitialLinkValues = (link?: ProfileLink): LinkFormValues => {
    return {
+      id: link?.id || "",
       title: link?.title || "",
       url: link?.url || "",
    }
