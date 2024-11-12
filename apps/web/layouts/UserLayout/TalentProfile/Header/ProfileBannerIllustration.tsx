@@ -2,10 +2,9 @@ import { Box, LinearProgress } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFirebaseUpload from "components/custom-hook/useFirebaseUpload"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
-import BackgroundImage from "components/views/common/BackgroundImage"
 import { profilePlaceholderBanner } from "constants/images"
 import { userRepo } from "data/RepositoryInstances"
+import Image from "next/image"
 import useSWRMutation from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
 import { v4 as uuid } from "uuid"
@@ -27,7 +26,11 @@ const styles = sxStyles({
    },
    progress: {
       zIndex: 1,
-      mt: 1,
+      mt: {
+         xs: "90px",
+         sm: "90px",
+         md: 1,
+      },
    },
    backgroundImage: {
       borderRadius: "12px 12px 0px 0px",
@@ -37,6 +40,25 @@ const styles = sxStyles({
       width: "100%",
       height: "100%",
       objectFit: "cover",
+   },
+   backgroundImageWrapper: {
+      borderRadius: "12px 12px 0px 0px",
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      overflow: "hidden",
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         top: 0,
+         left: 0,
+         width: "100%",
+         height: "100%",
+         backgroundColor: "rgba(0, 0, 0, 0.3)", // Adjust opacity for darkness
+         zIndex: 1,
+      },
    },
 })
 export const ProfileBannerIllustration = () => {
@@ -82,15 +104,16 @@ export const ProfileBannerIllustration = () => {
                value={uploadProgress}
             />
          ) : null}
-         <BackgroundImage
-            image={
-               getResizedUrl(userData.bannerImageUrl, "lg") ||
-               profilePlaceholderBanner
-            }
-            repeat={false}
-            className={undefined}
-            backgroundImageSx={styles.backgroundImage}
-         />
+         <Box sx={styles.backgroundImageWrapper}>
+            <Image
+               src={userData.bannerImageUrl || profilePlaceholderBanner}
+               alt="Profile banner image"
+               fill
+               style={{
+                  objectFit: "cover",
+               }}
+            />
+         </Box>
          <Box sx={styles.buttonWrapper}>
             <ProfileBannerUploadButton
                disabled={isUploading || isMutating}
