@@ -168,6 +168,12 @@ const FullscreenHeader = ({
 
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
 
+   // Prevents exiting the fullscreen view when clicking on the dialog
+   const handleDialogClick = useCallback((event: SyntheticEvent) => {
+      event.stopPropagation()
+      event.preventDefault()
+   }, [])
+
    const handleLivestreamTitleClick = useCallback(
       (event: SyntheticEvent) => {
          event.stopPropagation()
@@ -215,12 +221,7 @@ const FullscreenHeader = ({
                </Typography>
             </Box>
          </Stack>
-         <Box
-            onClick={(event) => {
-               event.stopPropagation()
-               event.preventDefault()
-            }}
-         >
+         <Box onClick={handleDialogClick}>
             <LivestreamDialog
                open={isOpen}
                livestreamId={highlight.liveStreamIdentifier.identifier}
