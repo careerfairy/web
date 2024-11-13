@@ -1,5 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { HighlightComponentType } from "data/hygraph/types"
 import {
    RefObject,
@@ -164,11 +166,16 @@ const FullscreenHeader = ({
    const parentRef = useRef<HTMLDivElement>(null)
    const [animationStyle, setAnimationStyle] = useState([])
 
-   const handleLivestreamTitleClick = useCallback((event: SyntheticEvent) => {
-      event.stopPropagation()
-      event.preventDefault()
-      alert("clicked")
-   }, [])
+   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
+
+   const handleLivestreamTitleClick = useCallback(
+      (event: SyntheticEvent) => {
+         event.stopPropagation()
+         event.preventDefault()
+         handleOpen()
+      },
+      [handleOpen]
+   )
 
    useEffect(() => {
       if (titleRef.current || parentRef.current) {
@@ -208,6 +215,20 @@ const FullscreenHeader = ({
                </Typography>
             </Box>
          </Stack>
+         <Box
+            onClick={(event) => {
+               event.stopPropagation()
+               event.preventDefault()
+            }}
+         >
+            <LivestreamDialog
+               open={isOpen}
+               livestreamId={highlight.liveStreamIdentifier.identifier}
+               handleClose={handleClose}
+               page={"details"}
+               serverUserEmail={""}
+            />
+         </Box>
       </Box>
    )
 }
