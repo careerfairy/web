@@ -8,7 +8,7 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    profileButton: (theme) => ({
-      color: `${theme.palette.neutral[200]}`,
+      color: `${theme.palette.neutral[600]}`,
       backgroundColor: `${theme.brand.white[100]}`,
       textAlign: "center",
       "&:hover": {
@@ -25,9 +25,13 @@ const styles = sxStyles({
 
 type ProfileButtonProps = {
    streamerDetails: StreamerDetails
+   isPrimary?: boolean
 }
 
-export const ProfileButton = ({ streamerDetails }: ProfileButtonProps) => {
+export const ProfileButton = ({
+   streamerDetails,
+   isPrimary = false,
+}: ProfileButtonProps) => {
    const isMobile = useIsMobile()
    const { data: streamerGroup } = useGroup(streamerDetails.groupId)
 
@@ -36,11 +40,8 @@ export const ProfileButton = ({ streamerDetails }: ProfileButtonProps) => {
    return (
       <Button
          target="_blank"
-         variant={streamerDetails.linkedInUrl ? "text" : "outlined"}
-         sx={[
-            styles.profileButton,
-            !streamerDetails.linkedInUrl && styles.profileButtonPrimary,
-         ]}
+         variant={isPrimary ? "text" : "outlined"}
+         sx={[styles.profileButton, isPrimary && styles.profileButtonPrimary]}
          href={`/company/${companyNameSlugify(
             streamerGroup.universityName
          )}/mentor/${transformCreatorNameIntoSlug(
