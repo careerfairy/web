@@ -1,7 +1,15 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { HighlightComponentType } from "data/hygraph/types"
-import { SyntheticEvent, useCallback, useState } from "react"
+import {
+   RefObject,
+   SyntheticEvent,
+   useCallback,
+   useEffect,
+   useRef,
+   useState,
+} from "react"
+import { Video } from "react-feather"
 import ReactPlayer from "react-player"
 import { sxStyles } from "types/commonTypes"
 
@@ -55,16 +63,22 @@ const styles = sxStyles({
       left: 0,
       width: "100%",
    },
+   highlightCardHeaderContainerFullScreen: {
+      display: "flex",
+      flexDirection: "column",
+      zIndex: 2,
+      gap: "12px",
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      width: "100%",
+      padding: "0 16px 16px 16px",
+      color: "#FEFEFE",
+   },
    highlightCardHeaderFullScreen: {
       display: "flex",
       alignItems: "center",
-      justifyContent: "center",
       gap: 1,
-      zIndex: 2,
-      position: "absolute",
-      bottom: "12px",
-      left: 0,
-      width: "100%",
    },
    highlightCardHeaderLogoContainer: {
       cursor: "pointer",
@@ -76,6 +90,13 @@ const styles = sxStyles({
       fontWeight: 600,
       lineHeight: "20px",
    },
+   highlightTitleFullScreen: {
+      fontSize: 16,
+      fontWeight: 600,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+   },
    highlightVideoOverlay: {
       width: "100%",
       height: "100%",
@@ -86,10 +107,126 @@ const styles = sxStyles({
       left: 0,
       zIndex: 0,
    },
+   livestreamTitle: {
+      overflowX: "hidden",
+      display: "flex",
+   },
 })
 
-const HighlightVideoOverlay = ({ hide }: { hide: boolean }) => {
-   return <Box sx={[styles.highlightVideoOverlay, hide && { opacity: 0 }]} />
+const getScrollAnimationStyle = (
+   titleRef: RefObject<HTMLDivElement>,
+   parentRef: RefObject<HTMLDivElement>
+) => {
+   if (!titleRef.current || !parentRef.current) return []
+
+   const isOverflowing =
+      titleRef.current.clientWidth > parentRef.current.clientWidth
+
+   if (!isOverflowing) return []
+
+   const overflownWidth =
+      titleRef.current.clientWidth - parentRef.current.clientWidth + 10
+
+   return [
+      {
+         animationName: "scrollToEnd",
+         animationTimingFunction: "linear",
+         animationIterationCount: "infinite",
+         animationDuration: "5s",
+         animationDelay: "1s",
+      },
+      {
+         "@keyframes scrollToEnd": {
+            "0%": {
+               transform: "translateX(0)",
+            },
+            "40%, 50%": {
+               transform: `translateX(-${overflownWidth}px)`,
+            },
+            "90%, 100%": {
+               transform: "translateX(0)",
+            },
+         },
+      },
+   ]
+}
+
+const HighlightVideoOverlay = () => {
+   return <Box sx={styles.highlightVideoOverlay} />
+}
+
+const FullscreenHeader = ({
+   highlight,
+}: {
+   highlight: HighlightComponentType
+}) => {
+   const titleRef = useRef<HTMLDivElement>(null)
+   const parentRef = useRef<HTMLDivElement>(null)
+   const [animationStyle, setAnimationStyle] = useState([])
+
+   const handleLivestreamTitleClick = useCallback((event: SyntheticEvent) => {
+      event.stopPropagation()
+      event.preventDefault()
+      alert("clicked")
+   }, [])
+
+   useEffect(() => {
+      if (titleRef.current || parentRef.current) {
+         setAnimationStyle(getScrollAnimationStyle(titleRef, parentRef))
+      }
+   }, [titleRef, parentRef])
+
+   return (
+      <Box sx={styles.highlightCardHeaderContainerFullScreen}>
+         <Box sx={styles.highlightCardHeaderFullScreen}>
+            <Box sx={styles.highlightCardHeaderLogoContainer}>
+               <CircularLogo
+                  src={highlight.logo.url}
+                  alt={highlight.logo.alt}
+               />
+            </Box>
+            <Typography variant="small" sx={styles.highlightTitleFullScreen}>
+               {highlight.title}
+            </Typography>
+         </Box>
+         <Stack
+            direction="row"
+            gap={1}
+            alignItems="center"
+            onClick={handleLivestreamTitleClick}
+         >
+            <Video size={16} />
+            <Box sx={styles.livestreamTitle} ref={parentRef}>
+               <Typography
+                  ref={titleRef}
+                  variant="small"
+                  sx={[{ whiteSpace: "nowrap" }, ...animationStyle]}
+               >
+                  {highlight.liveStreamIdentifier.identifier}{" "}
+                  {highlight.liveStreamIdentifier.identifier}{" "}
+                  {highlight.liveStreamIdentifier.identifier} THE END.
+               </Typography>
+            </Box>
+         </Stack>
+      </Box>
+   )
+}
+
+const NonFullscreenHeader = ({
+   highlight,
+}: {
+   highlight: HighlightComponentType
+}) => {
+   return (
+      <Box sx={styles.highlightCardHeader}>
+         <Box sx={styles.highlightCardHeaderLogoContainer}>
+            <CircularLogo src={highlight.logo.url} alt={highlight.logo.alt} />
+         </Box>
+         <Typography variant="small" sx={styles.highlightTitle}>
+            {highlight.title}
+         </Typography>
+      </Box>
+   )
 }
 
 export const HighlightCard = ({
@@ -117,23 +254,11 @@ export const HighlightCard = ({
          ]}
          onClick={handleFullscreenClick}
       >
-         <Box
-            sx={[
-               isFullscreen
-                  ? styles.highlightCardHeaderFullScreen
-                  : styles.highlightCardHeader,
-            ]}
-         >
-            <Box sx={styles.highlightCardHeaderLogoContainer}>
-               <CircularLogo
-                  src={highlight.logo.url}
-                  alt={highlight.logo.alt}
-               />
-            </Box>
-            <Typography variant="small" sx={styles.highlightTitle}>
-               {highlight.title}
-            </Typography>
-         </Box>
+         {isFullscreen ? (
+            <FullscreenHeader highlight={highlight} />
+         ) : (
+            <NonFullscreenHeader highlight={highlight} />
+         )}
          <ReactPlayer
             url={highlight.videoClip.url}
             className="react-player"
@@ -142,11 +267,7 @@ export const HighlightCard = ({
             playing={isPlaying}
             onEnded={onEnded}
          />
-         {isFullscreen ? (
-            <HighlightVideoOverlay hide={false} />
-         ) : (
-            <HighlightVideoOverlay hide={false} />
-         )}
+         <HighlightVideoOverlay />
       </Box>
    )
 }
