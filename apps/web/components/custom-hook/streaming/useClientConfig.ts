@@ -10,6 +10,7 @@ import { useForcedProxyMode } from "./useForcedProxyMode"
 
 type Options = {
    hostCondition: boolean
+   enableDualStream?: boolean
 }
 
 export const useClientConfig = (client: IAgoraRTCClient, options: Options) => {
@@ -43,8 +44,10 @@ export const useClientConfig = (client: IAgoraRTCClient, options: Options) => {
    }, [client, isConnected, options.hostCondition])
 
    useEffect(() => {
-      client.enableDualStream().catch(errorLogAndNotify)
-   }, [client])
+      if (options.enableDualStream) {
+         client.enableDualStream().catch(errorLogAndNotify)
+      }
+   }, [client, currentRole, options.enableDualStream])
 
    useEffect(() => {
       if (isConnected) {
