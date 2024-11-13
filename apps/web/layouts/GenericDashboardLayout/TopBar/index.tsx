@@ -1,8 +1,9 @@
 // material-ui
-import { Box, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 
 // project imports
+import { useRouter } from "next/router"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import {
@@ -24,13 +25,22 @@ const styles = sxStyles({
       alignItems: "center",
       px: {
          xs: 2,
-         sm: 5,
+         sm: 4,
       },
-      py: 1,
-      minHeight: "70px",
+      py: 1.5,
+      background: "#F7F8FC",
    },
    leftSection: {
       display: "flex",
+   },
+   rightSection: {
+      alignItems: "center",
+   },
+   loginButton: {
+      color: (theme) => `${theme.palette.neutral[500]} !important`,
+   },
+   signUpButton: {
+      textWrap: "noWrap",
    },
    title: {
       fontSize: {
@@ -43,18 +53,30 @@ const styles = sxStyles({
 
 type Props = {
    title: string
-   bgColor?: string
 }
 
-const TopBar = ({ title, bgColor }: Props) => {
+const TopBar = ({ title }: Props) => {
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
+   const { asPath } = useRouter()
+
+   const SignUpButton = () => (
+      <Button
+         variant="contained"
+         href={`/signup?absolutePath=${asPath}`}
+         color="primary"
+         sx={styles.signUpButton}
+         fullWidth
+      >
+         Sign up
+      </Button>
+   )
 
    return (
-      <Box bgcolor={bgColor} sx={styles.root}>
+      <Box sx={styles.root}>
          <Box sx={styles.leftSection}>
             {isMobile ? (
-               <MainLogo sx={{ maxWidth: "100%" }} />
+               <MainLogo sx={{ maxWidth: "120px" }} />
             ) : (
                <Typography variant={"h1"} fontWeight={600} sx={styles.title}>
                   {title}
@@ -62,23 +84,17 @@ const TopBar = ({ title, bgColor }: Props) => {
             )}
          </Box>
          <Box sx={{ flexGrow: 1 }} />
-         <Stack
-            direction="row"
-            alignItems="center"
-            spacing={{
-               xs: 1,
-               md: 3,
-            }}
-         >
+         <Stack spacing={1} direction={"row"} sx={styles.rightSection}>
             <MissingDataButton />
 
             {/* profile avatar */}
             {authenticatedUser.isLoaded &&
             authenticatedUser.isEmpty &&
             !isServer() ? ( // fixes nextjs ssr hydration client error
-               <div>
-                  <LoginButton />
-               </div>
+               <Stack direction={"row"} spacing={0.5}>
+                  <LoginButton variant="text" sx={styles.loginButton} />
+                  <SignUpButton />
+               </Stack>
             ) : (
                <>
                   <Notifications />
