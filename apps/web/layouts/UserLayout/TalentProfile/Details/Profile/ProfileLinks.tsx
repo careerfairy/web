@@ -2,7 +2,6 @@ import { ProfileLink } from "@careerfairy/shared-lib/users"
 import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import { Box, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useUserLinks } from "components/custom-hook/user/useUserLinks"
@@ -150,9 +149,7 @@ const FormDialogWrapper = () => {
             saveDisabled={!isValid}
             saveText={saveText}
          >
-            <SuspenseWithBoundary fallback={<LinkFormSkeleton />}>
-               <LinkFormFields />
-            </SuspenseWithBoundary>
+            <LinkFormFields />
          </BaseProfileDialog>
       </Fragment>
    )
@@ -281,12 +278,6 @@ const LinkCard = ({ link }: LinkCardProps) => {
          </ProfileItemCard>
       </Fragment>
    )
-}
-
-const LinkFormSkeleton = () => {
-   const isMobile = useIsMobile()
-
-   return <Stack spacing={2} minWidth={isMobile ? "300px" : "500px"}></Stack>
 }
 
 const isLinkedInUrl = (url: string) => url.includes("linkedin.")
