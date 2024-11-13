@@ -230,7 +230,12 @@ const LinkCard = ({ link }: LinkCardProps) => {
       ),
       { stripProtocol: true }
    )
-   const linkHref = normalizeUrl(link.url, { forceHttps: true })
+
+   const normalizedLink = normalizeUrl(link.url, { forceHttps: true })
+
+   const faviconSrc = isLinkedInUrl(normalizedLink)
+      ? "/linkedin-favicon2.png"
+      : getIconUrl(normalizedLink)
 
    return (
       <Fragment>
@@ -251,10 +256,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
             handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
          >
             <CircularLogo
-               src={
-                  getIconUrl(normalizeUrl(link.url, { forceHttp: true })) ||
-                  "/fallback-icon.png"
-               }
+               src={faviconSrc}
                alt={`${link.title} icon`}
                sx={{ width: "48px", height: "48px" }}
             />
@@ -266,7 +268,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
                   <Typography variant="xsmall" sx={styles.linkUrl}>
                      {linkUrlValue}
                   </Typography>
-                  <Link href={linkHref} target="_blank">
+                  <Link href={normalizedLink} target="_blank">
                      <Box
                         component={ExternalLink}
                         width={"12px"}
@@ -286,3 +288,5 @@ const LinkFormSkeleton = () => {
 
    return <Stack spacing={2} minWidth={isMobile ? "300px" : "500px"}></Stack>
 }
+
+const isLinkedInUrl = (url: string) => url.includes("linkedin.")

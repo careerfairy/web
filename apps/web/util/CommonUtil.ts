@@ -385,8 +385,5 @@ export const generateUniqueId = () => {
 }
 
 export function getIconUrl(siteUrl: string): string {
-   // TODO-WG: Decide which one of these options can be used for favicons retrieval
-   // return `https://www.faviconextractor.com/favicon/${siteUrl}?larger=true`
    return `https://icon.horse/icon/?uri=${siteUrl}`
-   // return `https://s2.googleusercontent.com/s2/favicons?domain_url=${siteUrl}`
 }
