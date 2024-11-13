@@ -12,6 +12,10 @@
          "resizeMode": "contain",
          "backgroundColor": "#ffffff"
       },
+      "androidStatusBar": {
+         "barStyle": "dark-content",
+         "translucent": true
+      },
       "ios": {
          "supportsTablet": true,
          "infoPlist": {
@@ -42,6 +46,7 @@
          "intentFilters": [
             {
                "action": "VIEW",
+               "autoVerify": true,
                "data": [
                   {
                      "scheme": "https",
