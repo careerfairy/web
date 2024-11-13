@@ -3,7 +3,7 @@ import AgoraRTC, {
    AgoraRTCScreenShareProvider,
 } from "agora-rtc-react"
 import { agoraVirtualBackgroundExtension } from "data/agora/AgoraService"
-import { ReactNode, useMemo } from "react"
+import { ReactNode, useEffect, useMemo } from "react"
 
 type Props = {
    children: ReactNode
@@ -29,6 +29,10 @@ export const UserClientProvider = ({ children }: Props) => {
          }),
       []
    )
+
+   useEffect(() => {
+      screenShareClient.disableDualStream()
+   }, [screenShareClient])
 
    return (
       <AgoraRTCProvider client={client}>
