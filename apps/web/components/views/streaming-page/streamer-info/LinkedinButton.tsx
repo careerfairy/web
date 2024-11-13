@@ -1,6 +1,5 @@
 import { Button, Stack, Typography, useTheme } from "@mui/material"
 import useGroup from "components/custom-hook/group/useGroup"
-import { useLivestreamData } from "components/custom-hook/streaming"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -8,7 +7,6 @@ import { LinkedInIcon } from "components/views/common/icons/LinkedInIcon"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
-import { useIsLivestreamTargetedUser } from "./useIsLivestreamTargetedUser"
 
 const styles = sxStyles({
    linkedInButtonInnerContainer: {
@@ -66,29 +64,23 @@ export const LinkedInButton = ({
 }: LinkedinButtonProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
-   const livestream = useLivestreamData()
-   const isUserFromTargetedCountry = useIsLivestreamTargetedUser(livestream)
 
    return (
-      <>
-         {Boolean(isUserFromTargetedCountry) && (
-            <Button
-               sx={styles.linkedInButton}
-               variant="outlined"
-               LinkComponent="a"
-               href={streamerDetails.linkedInUrl}
-               target="_blank"
-               fullWidth={isMobile}
-               onClick={() => {
-                  onClick?.()
-               }}
-            >
-               <Stack sx={styles.linkedInButtonInnerContainer}>
-                  <LinkedInIcon fill={theme.brand.info[700]} />
-                  <Typography variant="small">Reach out on LinkedIn</Typography>
-               </Stack>
-            </Button>
-         )}
-      </>
+      <Button
+         sx={styles.linkedInButton}
+         variant="outlined"
+         LinkComponent="a"
+         href={streamerDetails.linkedInUrl}
+         target="_blank"
+         fullWidth={isMobile}
+         onClick={() => {
+            onClick?.()
+         }}
+      >
+         <Stack sx={styles.linkedInButtonInnerContainer}>
+            <LinkedInIcon fill={theme.brand.info[700]} />
+            <Typography variant="small">Reach out on LinkedIn</Typography>
+         </Stack>
+      </Button>
    )
 }
