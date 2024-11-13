@@ -1,0 +1,12 @@
+[
+   {
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+         "namespace": "android_app",
+         "package_name": "com.admin_product_team.careerfairymobileapp",
+         "sha256_cert_fingerprints": [
+            "7F:5D:73:3D:15:91:CD:EA:C5:5B:73:6E:AB:88:8E:77:C5:12:06:22:80:24:69:EE:4A:5F:60:03:EF:72:E1:F8"
+         ]
+      }
+   }
+]

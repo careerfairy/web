@@ -7,6 +7,7 @@ import {
    SafeAreaView,
    View,
    Text,
+   StatusBar,
    TouchableOpacity,
 } from "react-native"
 import { WebView } from "react-native-webview"
@@ -55,21 +56,23 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       checkPermissions()
    }, [])
 
-   const handleDeepLink = (event: { url: string }) => {
-      setBaseUrl(event.url)
-   }
-
    useEffect(() => {
-      // Listen for incoming URLs
+      const handleDeepLink = (event: { url: string }) => {
+         const deepLinkUrl = event.url
+         if (deepLinkUrl.includes("careerfairy")) {
+            setBaseUrl(deepLinkUrl)
+         }
+      }
+
+      // Listen for deep links
       const subscription = Linking.addEventListener("url", handleDeepLink)
 
-      // Handle the initial launch URL, if the app was opened from a deep link
-      ;(async () => {
-         const initialUrl = await Linking.getInitialURL()
-         if (initialUrl) {
-            handleDeepLink({ url: initialUrl })
+      // Check if the app was opened via a deep link
+      Linking.getInitialURL().then((initialUrl) => {
+         if (initialUrl && initialUrl.includes("careerfairy")) {
+            setBaseUrl(initialUrl)
          }
-      })()
+      })
 
       return () => {
          subscription.remove()
@@ -273,7 +276,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
          <WebView
             style={{ flex: 1 }}
             ref={webViewRef}
@@ -286,6 +289,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             domStorageEnabled={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
+            originWhitelist={["https://*", "http://*", "file://*", "sms://*"]}
             onNavigationStateChange={handleNavigationStateChange}
          />
 
