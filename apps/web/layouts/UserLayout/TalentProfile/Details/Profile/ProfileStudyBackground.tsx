@@ -17,15 +17,12 @@ import { useDispatch, useSelector } from "react-redux"
 import {
    TalentProfileItemTypes,
    closeCreateDialog,
-   closeDeleteConfirmationDialog,
    openCreateDialog,
-   openDeleteConfirmationDialog,
    setEditing,
 } from "store/reducers/talentProfileReducer"
 import {
    talentProfileCreateStudyBackgroundOpenSelector,
    talentProfileEditingStudyBackgroundOpenSelector,
-   talentProfileIsDeleteStudyBackgroundDialogSelector,
    talentProfileIsEditingStudyBackgroundSelector,
 } from "store/selectors/talentProfileSelectors"
 import { sxStyles } from "types/commonTypes"
@@ -269,24 +266,11 @@ type StudyBackgroundCardProps = {
 
 const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
    const { userData } = useAuth()
-
-   const isConfirmDeleteDialogOpen = useSelector(
-      talentProfileIsDeleteStudyBackgroundDialogSelector
-   )
+   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
+      useState<boolean>(false)
    const [isDeleting, setIsDeleting] = useState<boolean>(false)
    const dispatch = useDispatch()
    const { reset } = useFormContext()
-
-   const setDeleteDialog = useCallback(
-      (open: boolean) => {
-         const arg = { type: TalentProfileItemTypes.StudyBackground }
-         const action = open
-            ? () => openDeleteConfirmationDialog(arg)
-            : () => closeDeleteConfirmationDialog(arg)
-         dispatch(action())
-      },
-      [dispatch]
-   )
 
    const handleEdit = useCallback(() => {
       dispatch(
@@ -304,8 +288,8 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
       await userRepo.deleteStudyBackground(userData.id, studyBackground.id)
 
       setIsDeleting(false)
-      setDeleteDialog(false)
-   }, [studyBackground, userData.id, setDeleteDialog])
+      setIsConfirmDeleteDialogOpen(false)
+   }, [studyBackground, userData.id])
 
    const university = useUniversityById(
       studyBackground.universityCountryCode,
@@ -332,7 +316,7 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             description="Are you sure you want to delete your study background?"
             handleDelete={handleDelete}
             isDeleting={isDeleting}
-            onClose={() => setDeleteDialog(false)}
+            onClose={() => setIsConfirmDeleteDialogOpen(false)}
          />
          <ProfileItemCard
             dataTypeId="study-background"
@@ -340,7 +324,7 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             editText="Edit study background details"
             deleteText="Delete study background"
             handleEdit={handleEdit}
-            handleDelete={() => setDeleteDialog(true)}
+            handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
          >
             <SchoolIcon sx={styles.studyBackgroundSchoolIcon} />
             <Stack spacing={0.5}>

@@ -6,7 +6,6 @@ interface ITalentProfileState {
    createStudyBackgroundDialogOpen: boolean
    editingStudyBackground: StudyBackground
    isEditingStudyBackground: boolean
-   isDeleteStudyBackgroundDialogOpen: boolean
 
    // Links
    createLinkDialogOpen: boolean
@@ -19,7 +18,6 @@ const initialState: ITalentProfileState = {
    createStudyBackgroundDialogOpen: false,
    editingStudyBackground: null,
    isEditingStudyBackground: false,
-   isDeleteStudyBackgroundDialogOpen: false,
 
    // Links
    createLinkDialogOpen: false,
@@ -38,10 +36,6 @@ export type TalentProfileItemType =
    (typeof TalentProfileItemTypes)[keyof typeof TalentProfileItemTypes]
 
 type OpenCreateDialogPayload = {
-   type: TalentProfileItemType
-}
-
-type OpenDeleteConfirmationDialogPayload = {
    type: TalentProfileItemType
 }
 
@@ -95,35 +89,10 @@ export const talentProfileSlice = createSlice({
             }
          }
       },
-      openDeleteConfirmationDialog: (
-         state,
-         action: PayloadAction<OpenDeleteConfirmationDialogPayload>
-      ) => {
-         switch (action.payload.type) {
-            case TalentProfileItemTypes.StudyBackground: {
-               state.isDeleteStudyBackgroundDialogOpen = true
-            }
-         }
-      },
-      closeDeleteConfirmationDialog: (
-         state,
-         action: PayloadAction<OpenDeleteConfirmationDialogPayload>
-      ) => {
-         switch (action.payload.type) {
-            case TalentProfileItemTypes.StudyBackground: {
-               state.isDeleteStudyBackgroundDialogOpen = false
-            }
-         }
-      },
    },
 })
 
-export const {
-   openCreateDialog,
-   closeCreateDialog,
-   setEditing,
-   openDeleteConfirmationDialog,
-   closeDeleteConfirmationDialog,
-} = talentProfileSlice.actions
+export const { openCreateDialog, closeCreateDialog, setEditing } =
+   talentProfileSlice.actions
 
 export default talentProfileSlice.reducer
