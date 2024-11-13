@@ -70,7 +70,7 @@ const styles = sxStyles({
       position: "fixed",
       top: 5,
       left: 0,
-      zIndex: (theme) => theme.zIndex.appBar,
+      zIndex: (theme) => theme.zIndex.appBar - 1,
       width: "100%",
    },
    navigatorInfoWrapper: {
@@ -85,7 +85,7 @@ const styles = sxStyles({
    },
    companyNameSticky: {
       height: {
-         xs: "60px",
+         xs: "70px",
          md: "100px",
       },
    },
@@ -164,7 +164,7 @@ const styles = sxStyles({
    },
 })
 
-const ToolbarOffset = styled("div")(({ theme }) => theme.mixins.toolbar)
+const ToolbarOffset = styled("div")({ minHeight: "49px" })
 
 const Header = () => {
    const isMobile = useIsMobile()

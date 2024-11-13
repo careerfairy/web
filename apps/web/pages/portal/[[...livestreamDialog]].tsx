@@ -122,12 +122,7 @@ const PortalPage = ({
             }
             title={"CareerFairy | Portal"}
          />
-         <GenericDashboardLayout
-            pageDisplayName={""}
-            topBarFixed={carouselContent?.length > 0}
-            headerScrollThreshold={carouselContent?.length ? 250 : 10}
-            isPortalPage={true}
-         >
+         <GenericDashboardLayout pageDisplayName={""} isPortalPage={true}>
             <>
                <LivestreamDialogLayout
                   livestreamDialogData={livestreamDialogData}
