@@ -41,10 +41,12 @@ export const baseStudyBackgroundShape = {
 export const baseLinkShape = {
    id: Yup.string(),
    title: Yup.string().required("Title is required"),
-   url: Yup.string().matches(URL_REGEX, {
-      excludeEmptyString: true,
-      message: ERROR_MESSAGES.VALID_URL,
-   }), // Yup.string().required("Url is required"),
+   url: Yup.string()
+      .matches(URL_REGEX, {
+         excludeEmptyString: true,
+         message: ERROR_MESSAGES.VALID_URL,
+      })
+      .required("URL is required"), // Yup.string().required("Url is required"),
 }
 
 export const CreateStudyBackgroundSchema = Yup.object(baseStudyBackgroundShape)
