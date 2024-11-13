@@ -1,7 +1,6 @@
 /* eslint-disable no-var */
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import * as Sentry from "@sentry/nextjs"
-import axios from "axios"
 import getConfig from "next/config"
 import { v4 as uuid } from "uuid"
 import LocalStorageUtil from "./LocalStorageUtil"
@@ -385,27 +384,9 @@ export const generateUniqueId = () => {
    return uuid().replace(/-/g, "") // remove dashes
 }
 
-export async function getIconUrl(siteUrl: string): Promise<string> {
-   try {
-      // Check for apple-touch-icon
-      const response = await axios.get(siteUrl)
-      const html = response.data as string
-
-      const appleTouchIconMatch = html.match(
-         /<link[^>]+rel=["']apple-touch-icon["'][^>]+href=["']([^"']+)["']/i
-      )
-      if (appleTouchIconMatch && appleTouchIconMatch[1]) {
-         const appleTouchIconUrl = new URL(
-            appleTouchIconMatch[1],
-            siteUrl
-         ).toString()
-         return appleTouchIconUrl
-      }
-
-      // Fallback to favicon.ico
-      return new URL("/favicon.ico", siteUrl).toString()
-   } catch (error) {
-      console.error("Error fetching icon:", error)
-      return ""
-   }
+export function getIconUrl(siteUrl: string): string {
+   // TODO-WG: Decide which one of these options can be used for favicons retrieval
+   // return `https://www.faviconextractor.com/favicon/${siteUrl}?larger=true`
+   return `https://icon.horse/icon/?uri=${siteUrl}`
+   // return `https://s2.googleusercontent.com/s2/favicons?domain_url=${siteUrl}`
 }

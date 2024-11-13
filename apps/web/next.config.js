@@ -323,6 +323,9 @@ const moduleExports = {
          "localhost",
          "127.0.0.1",
          "eu-west-2.graphassets.com",
+         "icon.horse", // TODO-WG: Only 1 of these 3 (this and below) shall be used for the retrieval of favicons
+         // "www.faviconextractor.com",
+         // "s2.googleusercontent.com"
       ],
    },
    webpack: (config) => {

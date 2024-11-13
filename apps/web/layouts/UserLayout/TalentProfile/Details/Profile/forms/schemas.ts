@@ -46,7 +46,7 @@ export const baseLinkShape = {
          excludeEmptyString: true,
          message: ERROR_MESSAGES.VALID_URL,
       })
-      .required("URL is required"), // Yup.string().required("Url is required"),
+      .required("URL is required"),
 }
 
 export const CreateStudyBackgroundSchema = Yup.object(baseStudyBackgroundShape)
