@@ -29,14 +29,14 @@ const styles: any = {
    },
    title: {
       fontFamily: "PoppinsSemiBold",
-      fontSize: "16px",
+      fontSize: 16,
       color: "#3D3D47",
       marginTop: 20,
       marginBottom: 14,
    },
    description: {
       fontFamily: "PoppinsRegular",
-      fontSize: "16px",
+      fontSize: 16,
       color: "#5C5C6A",
       textAlign: "center",
       marginBottom: 20,
@@ -56,18 +56,39 @@ const styles: any = {
    buttonText: {
       fontFamily: "PoppinsRegular",
       color: "#2ABAA5",
-      fontSize: "16px",
+      fontSize: 16,
    },
 }
 
 export default function Native() {
-   const [connectedToInternet, setConnectedToInternet] = useState<
-      boolean | null
-   >(true)
+   const [isConnected, setIsConnected] = useState<boolean | null>(true)
    const [fontsLoaded] = useFonts({
       PoppinsRegular: Poppins_400Regular,
       PoppinsSemiBold: Poppins_600SemiBold,
    })
+
+   useEffect(() => {
+      const unsubscribe = NetInfo.addEventListener((state) => {
+         setIsConnected(state.isConnected)
+      })
+
+      // Check initial connectivity
+      NetInfo.fetch()
+         .then((state) => setIsConnected(state.isConnected))
+         .catch((error) => {
+            console.error("NetInfo fetch error: ", error)
+            setIsConnected(false)
+         })
+
+      return () => unsubscribe()
+   }, [])
+
+   // Retry button action to check connectivity again
+   const handleRetry = () => {
+      NetInfo.fetch().then((state) => {
+         setIsConnected(state.isConnected)
+      })
+   }
 
    useEffect(() => {
       if (app) {
@@ -76,16 +97,6 @@ export default function Native() {
          console.log("Firebase connection failed.")
       }
       checkToken()
-   }, [])
-
-   useEffect(() => {
-      // Subscribe to network status updates
-      const unsubscribe = NetInfo.addEventListener((state) => {
-         setConnectedToInternet(state.isConnected)
-      })
-
-      // Clean up the listener when the component unmounts
-      return () => unsubscribe()
    }, [])
 
    const checkToken = async () => {
@@ -193,37 +204,37 @@ export default function Native() {
       return <></>
    }
 
-   return (
-      <>
-         {!connectedToInternet ? (
-            <SafeAreaView
-               style={{
-                  flex: 1,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#f7f8fc",
-               }}
-            >
-               <Image
-                  source={require("./assets/images/internet_icon.png")}
-                  style={styles.icon}
-               />
-               <Text style={styles.title}>Whoops, no internet!</Text>
-               <Text style={styles.description}>
-                  We can't load anything right now. Connect to the web, and
-                  you'll be good to go!
-               </Text>
-               <TouchableOpacity style={styles.button}>
-                  <Text style={styles.buttonText}>Try again</Text>
-               </TouchableOpacity>
-            </SafeAreaView>
-         ) : (
-            <WebViewComponent
-               onTokenInjected={getPushToken}
-               onLogout={onLogout}
+   if (!isConnected) {
+      return (
+         <SafeAreaView
+            style={{
+               flex: 1,
+               display: "flex",
+               justifyContent: "center",
+               alignItems: "center",
+               backgroundColor: "#f7f8fc",
+            }}
+         >
+            <Image
+               source={require("./assets/images/internet_icon.png")}
+               style={styles.icon}
             />
-         )}
-      </>
+            <Text style={styles.title}>Whoops, no internet!</Text>
+            <Text style={styles.description}>
+               We can't load anything right now. Connect to the web, and you'll
+               be good to go!
+            </Text>
+            <TouchableOpacity
+               style={styles.button}
+               onPress={() => handleRetry()}
+            >
+               <Text style={styles.buttonText}>Try again</Text>
+            </TouchableOpacity>
+         </SafeAreaView>
+      )
+   }
+
+   return (
+      <WebViewComponent onTokenInjected={getPushToken} onLogout={onLogout} />
    )
 }
