@@ -29,8 +29,8 @@ import { sxStyles } from "types/commonTypes"
 import { ConfirmDeleteItemDialog } from "../ConfirmDeleteItemDialog"
 import { ConfirmEmptyStudyDatesDialog } from "../ConfirmEmptyStudyDatesDialog"
 import { EmptyItemView } from "./EmptyItemView"
-import { ProfileSection } from "./ProfileItem"
 import { ProfileItemCard } from "./ProfileItemCard"
+import { ProfileSection } from "./ProfileSection"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import {
    StudyBackgroundFormFields,
