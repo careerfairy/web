@@ -1,22 +1,15 @@
-import { Box, Stack, Typography } from "@mui/material"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { Box, Typography } from "@mui/material"
+import useGroup from "components/custom-hook/group/useGroup"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { HighlightComponentType } from "data/hygraph/types"
-import {
-   RefObject,
-   SyntheticEvent,
-   useCallback,
-   useEffect,
-   useRef,
-   useState,
-} from "react"
-import { Video } from "react-feather"
+import { SyntheticEvent, useCallback, useState } from "react"
 import ReactPlayer from "react-player"
 import { sxStyles } from "types/commonTypes"
+import { FullScreenHeader } from "./FullScreenHeader"
 
 const styles = sxStyles({
-   highlightCard: {
+   card: {
       position: "relative",
       width: 168,
       height: 298,
@@ -36,7 +29,7 @@ const styles = sxStyles({
          zIndex: -1,
       },
    },
-   highlightCardFullScreen: {
+   cardFullScreen: {
       width: "100dvw",
       height: "100dvh",
       position: "fixed",
@@ -54,7 +47,7 @@ const styles = sxStyles({
          height: "max(100dvh, 177.78dvw) !important",
       },
    },
-   highlightCardHeader: {
+   cardHeader: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -64,23 +57,6 @@ const styles = sxStyles({
       bottom: "12px",
       left: 0,
       width: "100%",
-   },
-   highlightCardHeaderContainerFullScreen: {
-      display: "flex",
-      flexDirection: "column",
-      zIndex: 2,
-      gap: "12px",
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      width: "100%",
-      padding: "0 16px 16px 16px",
-      color: "#FEFEFE",
-   },
-   highlightCardHeaderFullScreen: {
-      display: "flex",
-      alignItems: "center",
-      gap: 1,
    },
    highlightCardHeaderLogoContainer: {
       cursor: "pointer",
@@ -92,14 +68,7 @@ const styles = sxStyles({
       fontWeight: 600,
       lineHeight: "20px",
    },
-   highlightTitleFullScreen: {
-      fontSize: 16,
-      fontWeight: 600,
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-   },
-   highlightVideoOverlay: {
+   videoOverlay: {
       width: "100%",
       height: "100%",
       background:
@@ -109,140 +78,26 @@ const styles = sxStyles({
       left: 0,
       zIndex: 0,
    },
-   livestreamTitle: {
-      overflowX: "hidden",
-      display: "flex",
-   },
 })
 
-const getScrollAnimationStyle = (
-   titleRef: RefObject<HTMLDivElement>,
-   parentRef: RefObject<HTMLDivElement>
-) => {
-   if (!titleRef.current || !parentRef.current) return []
-
-   const isOverflowing =
-      titleRef.current.clientWidth > parentRef.current.clientWidth
-
-   if (!isOverflowing) return []
-
-   const overflownWidth =
-      titleRef.current.clientWidth - parentRef.current.clientWidth + 10
-
-   return [
-      {
-         animationName: "scrollToEnd",
-         animationTimingFunction: "linear",
-         animationIterationCount: "infinite",
-         animationDuration: "5s",
-         animationDelay: "1s",
-      },
-      {
-         "@keyframes scrollToEnd": {
-            "0%": {
-               transform: "translateX(0)",
-            },
-            "40%, 50%": {
-               transform: `translateX(-${overflownWidth}px)`,
-            },
-            "90%, 100%": {
-               transform: "translateX(0)",
-            },
-         },
-      },
-   ]
-}
-
 const HighlightVideoOverlay = () => {
-   return <Box sx={styles.highlightVideoOverlay} />
-}
-
-const FullscreenHeader = ({
-   highlight,
-}: {
-   highlight: HighlightComponentType
-}) => {
-   const titleRef = useRef<HTMLDivElement>(null)
-   const parentRef = useRef<HTMLDivElement>(null)
-   const [animationStyle, setAnimationStyle] = useState([])
-
-   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
-
-   // Prevents exiting the fullscreen view when clicking on the dialog
-   const handleDialogClick = useCallback((event: SyntheticEvent) => {
-      event.stopPropagation()
-      event.preventDefault()
-   }, [])
-
-   const handleLivestreamTitleClick = useCallback(
-      (event: SyntheticEvent) => {
-         event.stopPropagation()
-         event.preventDefault()
-         handleOpen()
-      },
-      [handleOpen]
-   )
-
-   useEffect(() => {
-      if (titleRef.current || parentRef.current) {
-         setAnimationStyle(getScrollAnimationStyle(titleRef, parentRef))
-      }
-   }, [titleRef, parentRef])
-
-   return (
-      <Box sx={styles.highlightCardHeaderContainerFullScreen}>
-         <Box sx={styles.highlightCardHeaderFullScreen}>
-            <Box sx={styles.highlightCardHeaderLogoContainer}>
-               <CircularLogo
-                  src={highlight.logo.url}
-                  alt={highlight.logo.alt}
-               />
-            </Box>
-            <Typography variant="small" sx={styles.highlightTitleFullScreen}>
-               {highlight.title}
-            </Typography>
-         </Box>
-         <Stack
-            direction="row"
-            gap={1}
-            alignItems="center"
-            onClick={handleLivestreamTitleClick}
-         >
-            <Video size={16} />
-            <Box sx={styles.livestreamTitle} ref={parentRef}>
-               <Typography
-                  ref={titleRef}
-                  variant="small"
-                  sx={[{ whiteSpace: "nowrap" }, ...animationStyle]}
-               >
-                  {highlight.liveStreamIdentifier.identifier}{" "}
-                  {highlight.liveStreamIdentifier.identifier}{" "}
-                  {highlight.liveStreamIdentifier.identifier} THE END.
-               </Typography>
-            </Box>
-         </Stack>
-         <Box onClick={handleDialogClick}>
-            <LivestreamDialog
-               open={isOpen}
-               livestreamId={highlight.liveStreamIdentifier.identifier}
-               handleClose={handleClose}
-               page={"details"}
-               serverUserEmail={""}
-            />
-         </Box>
-      </Box>
-   )
+   return <Box sx={styles.videoOverlay} />
 }
 
 const NonFullscreenHeader = ({
+   group,
    highlight,
 }: {
+   group: Group
    highlight: HighlightComponentType
 }) => {
    return (
-      <Box sx={styles.highlightCardHeader}>
+      <Box sx={styles.cardHeader}>
          <Box sx={styles.highlightCardHeaderLogoContainer}>
-            <CircularLogo src={highlight.logo.url} alt={highlight.logo.alt} />
+            <CircularLogo
+               src={group?.logoUrl}
+               alt={`${group?.universityName} logo`}
+            />
          </Box>
          <Typography variant="small" sx={styles.highlightTitle}>
             {highlight.title}
@@ -262,24 +117,27 @@ export const HighlightCard = ({
 }) => {
    const [isFullscreen, setIsFullscreen] = useState(false)
 
+   const { data: group, status } = useGroup(
+      highlight.companyIdentifier.identifier
+   )
+
    const handleFullscreenClick = useCallback((event: SyntheticEvent) => {
       event.stopPropagation()
       event.preventDefault()
       setIsFullscreen((prev) => !prev)
    }, [])
 
+   if (status === "error" || status === "loading") return null
+
    return (
       <Box
-         sx={[
-            styles.highlightCard,
-            isFullscreen && styles.highlightCardFullScreen,
-         ]}
+         sx={[styles.card, isFullscreen && styles.cardFullScreen]}
          onClick={handleFullscreenClick}
       >
          {isFullscreen ? (
-            <FullscreenHeader highlight={highlight} />
+            <FullScreenHeader highlight={highlight} group={group} />
          ) : (
-            <NonFullscreenHeader highlight={highlight} />
+            <NonFullscreenHeader highlight={highlight} group={group} />
          )}
          <ReactPlayer
             url={highlight.videoClip.url}
