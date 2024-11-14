@@ -20,6 +20,7 @@ import { Expo, ExpoPushMessage } from "expo-server-sdk"
 import firebase from "firebase/compat"
 import * as functions from "firebase-functions"
 import { getHost } from "@careerfairy/shared-lib/utils/urls"
+import { livestreamsRepo } from "../api/repositories"
 
 const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 
@@ -53,6 +54,12 @@ export interface IUserFunctionsRepository extends IUserRepository {
     * And sends push notifications
     */
    getRegisteredUsersWithinTwoDaysAndSendNotifications(): Promise<void>
+
+   /**
+    * Retrieves the registered users, which were created earlier than 5 days and older than 4 days.
+    * And sends push notifications if they have not registered for any livestream
+    */
+   getRegisteredUsersWithinFourDaysAndSendNotifications(): Promise<void>
 
    /**
     * Retrieves all the registered live streams for users
@@ -220,6 +227,105 @@ export class UserFunctionsRepository
                      source: "careerfairy",
                      medium: "push",
                      content: "sparks",
+                     campaign: "onboarding",
+                  }),
+               },
+            }))
+
+            // Chunk the messages to avoid rate limiting
+
+            const chunks = this.expo.chunkPushNotifications(messages)
+            const tickets = []
+
+            for (const chunk of chunks) {
+               try {
+                  const ticketChunk =
+                     await this.expo.sendPushNotificationsAsync(chunk)
+                  tickets.push(...ticketChunk)
+                  functions.logger.log(
+                     "Push notifications sent:",
+                     ticketChunk.length
+                  )
+               } catch (error) {
+                  functions.logger.error("Error sending chunk:", error)
+               }
+            }
+
+            // Handle any errors
+            tickets.forEach((ticket, index) => {
+               if (ticket.status === "error") {
+                  functions.logger.error(
+                     `Error sending to token chunk ${index}: ${ticket.message}`
+                  )
+               }
+            })
+         } catch (error) {
+            functions.logger.error("Error sending push notifications:", error)
+         }
+      } catch (error) {
+         console.error("Error fetching users:", error)
+      }
+   }
+
+   async getRegisteredUsersWithinFourDaysAndSendNotifications(): Promise<void> {
+      const earlierThan = DateTime.now().minus({ days: 4 }).toJSDate()
+      const thirdDay = DateTime.now().minus({ days: 5 }).toJSDate()
+
+      try {
+         const query = this.firestore
+            .collection("userData")
+            .where("createdAt", "<=", earlierThan)
+            .where("createdAt", ">=", thirdDay)
+
+         const usersSnapshot = await query.get()
+
+         const users = []
+
+         for (const doc of usersSnapshot.docs) {
+            const userData = doc.data() as UserData
+
+            const userLivestreamDatas =
+               await livestreamsRepo.getUserLivestreamData(userData.authId)
+
+            if (!userLivestreamDatas || userLivestreamDatas.length === 0) {
+               users.push({ id: doc.id, ...userData })
+            }
+         }
+
+         if (!users || users.length === 0) {
+            functions.logger.log(
+               "No registered users that were created and not registered for livestream found"
+            )
+            return
+         }
+
+         // Get all Expo push tokens
+         const tokens = users
+            .map((user) => user.fcmTokens || [])
+            .flat()
+            .filter((token) => Expo.isExpoPushToken(token))
+
+         if (tokens.length === 0) {
+            functions.logger.log(
+               "No valid Expo push tokens found for registered users"
+            )
+            return
+         }
+
+         try {
+            // Create the messages that you want to send to clients
+            const messages = tokens.map<ExpoPushMessage>((pushToken) => ({
+               to: pushToken,
+               sound: "default",
+               title: "Did you know?",
+               body: "<N> live streams in the next 30 days. Register to find your ideal first job.",
+               data: {
+                  type: "onboarding_start",
+                  url: addUtmTagsToLink({
+                     link: `${getHost()}/next-livestreams`,
+                     source: "careerfairy",
+                     medium: "push",
+                     content: "livestream",
                      campaign: "onboarding",
                   }),
                },
