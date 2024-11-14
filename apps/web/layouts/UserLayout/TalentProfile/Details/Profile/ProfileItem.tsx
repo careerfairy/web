@@ -26,13 +26,13 @@ const styles = sxStyles({
 
 type Props = {
    title: string
-   hasItems?: boolean
+   showAddIcon?: boolean
    handleAdd: () => void
    children: ReactElement
 }
 
-export const ProfileItem = ({
-   hasItems,
+export const ProfileSection = ({
+   showAddIcon,
    title,
    children,
    handleAdd,
@@ -43,7 +43,7 @@ export const ProfileItem = ({
             <Typography variant="brandedBody" sx={styles.title}>
                {title}
             </Typography>
-            <ConditionalWrapper condition={hasItems}>
+            <ConditionalWrapper condition={showAddIcon}>
                <Box
                   component={PlusCircle}
                   sx={styles.plusCircle}

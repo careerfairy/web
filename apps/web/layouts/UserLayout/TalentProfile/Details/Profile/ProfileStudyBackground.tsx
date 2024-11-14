@@ -29,7 +29,7 @@ import { sxStyles } from "types/commonTypes"
 import { ConfirmDeleteItemDialog } from "../ConfirmDeleteItemDialog"
 import { ConfirmEmptyStudyDatesDialog } from "../ConfirmEmptyStudyDatesDialog"
 import { EmptyItemView } from "./EmptyItemView"
-import { ProfileItem } from "./ProfileItem"
+import { ProfileSection } from "./ProfileItem"
 import { ProfileItemCard } from "./ProfileItemCard"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import {
@@ -79,10 +79,10 @@ const styles = sxStyles({
 })
 
 type Props = {
-   hasItems: boolean
+   showAddIcon: boolean
 }
 
-export const ProfileStudyBackground = ({ hasItems }: Props) => {
+export const ProfileStudyBackground = ({ showAddIcon }: Props) => {
    const dispatch = useDispatch()
 
    const handleAddClick = useCallback(() => {
@@ -92,13 +92,13 @@ export const ProfileStudyBackground = ({ hasItems }: Props) => {
    }, [dispatch])
 
    return (
-      <ProfileItem
+      <ProfileSection
          title={"Study background"}
-         hasItems={hasItems}
+         showAddIcon={showAddIcon}
          handleAdd={handleAddClick}
       >
          <StudyBackgroundDetails />
-      </ProfileItem>
+      </ProfileSection>
    )
 }
 
