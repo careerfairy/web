@@ -11,8 +11,15 @@ import {
    FirebaseUserRepository,
    IUserRepository,
 } from "@careerfairy/shared-lib/users/UserRepository"
-import { isWithinNormalizationLimit } from "@careerfairy/shared-lib/utils"
+import {
+   addUtmTagsToLink,
+   isWithinNormalizationLimit,
+} from "@careerfairy/shared-lib/utils"
 import { DateTime } from "luxon"
+import { Expo, ExpoPushMessage } from "expo-server-sdk"
+import firebase from "firebase/compat"
+import * as functions from "firebase-functions"
+import { getHost } from "@careerfairy/shared-lib/utils/urls"
 
 const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 
@@ -38,7 +45,14 @@ export interface IUserFunctionsRepository extends IUserRepository {
       userEmails?: string[],
       earlierThanDays?: number
    ): Promise<UserData[]>
+
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
+
+   /**
+    * Retrieves the registered users, which were created earlier than 3 days and older than 2 days.
+    * And sends push notifications
+    */
+   getRegisteredUsersWithingTwoDaysAndSendNotifications(): Promise<void>
 
    /**
     * Retrieves all the registered live streams for users
@@ -54,6 +68,16 @@ export class UserFunctionsRepository
    extends FirebaseUserRepository
    implements IUserFunctionsRepository
 {
+   private expo: Expo
+   constructor(
+      readonly firestore: firebase.firestore.Firestore,
+      readonly fieldValue: typeof firebase.firestore.FieldValue,
+      readonly timestamp: typeof firebase.firestore.Timestamp
+   ) {
+      super(firestore, fieldValue, timestamp)
+      this.expo = new Expo()
+   }
+
    async getSubscribedUsers(
       userEmails?: string[],
       locationFilters?: string[],
@@ -133,6 +157,114 @@ export class UserFunctionsRepository
 
       return mapFirestoreDocuments(data)
    }
+
+   async getRegisteredUsersWithingTwoDaysAndSendNotifications(): Promise<void> {
+      const earlierThan = DateTime.now().minus({ days: 2 }).toJSDate()
+      const threeDays = DateTime.now().minus({ days: 3 }).toJSDate()
+      const threeDaysMidnight = new Date(
+         threeDays.getFullYear(),
+         threeDays.getMonth(),
+         threeDays.getDay()
+      )
+
+      try {
+         const query = this.firestore
+            .collection("userData")
+            .where("createdAt", ">=", earlierThan)
+            .where("createdAt", "<=", threeDaysMidnight)
+
+         const usersSnapshot = await query.get()
+
+         const users = []
+
+         for (const doc of usersSnapshot.docs) {
+            const userData = doc.data()
+            const seenSparksSnapshot = await this.firestore
+               .collection("userData")
+               .doc(doc.id)
+               .collection("seenSparks")
+               .limit(1)
+               .get()
+
+            if (seenSparksSnapshot.empty) {
+               users.push({ id: doc.id, ...userData })
+            }
+         }
+
+         if (!users || users.length === 0) {
+            functions.logger.log(
+               "No registered users that were created and not watched sparks found"
+            )
+            return
+         }
+
+         // Get all Expo push tokens
+         const tokens = users
+            .map((user) => user.fcmTokens || [])
+            .flat()
+            .filter((token) => Expo.isExpoPushToken(token))
+
+         if (tokens.length === 0) {
+            functions.logger.log(
+               "No valid Expo push tokens found for registered users"
+            )
+            return
+         }
+
+         try {
+            // Create the messages that you want to send to clients
+            const messages = tokens.map<ExpoPushMessage>((pushToken) => ({
+               to: pushToken,
+               sound: "default",
+               title: "Inside scoop for you!",
+               body: "Want a behind-the-scenes look at top companies? Swipe through Sparks videos.",
+               data: {
+                  type: "onboarding_start",
+                  url: addUtmTagsToLink({
+                     link: `${getHost()}/sparks`,
+                     source: "careerfairy",
+                     medium: "push",
+                     content: "sparks",
+                     campaign: "onboarding",
+                  }),
+               },
+            }))
+
+            // Chunk the messages to avoid rate limiting
+
+            const chunks = this.expo.chunkPushNotifications(messages)
+            const tickets = []
+
+            for (const chunk of chunks) {
+               try {
+                  const ticketChunk =
+                     await this.expo.sendPushNotificationsAsync(chunk)
+                  tickets.push(...ticketChunk)
+                  functions.logger.log(
+                     "Push notifications sent:",
+                     ticketChunk.length
+                  )
+               } catch (error) {
+                  functions.logger.error("Error sending chunk:", error)
+               }
+            }
+
+            // Handle any errors
+            tickets.forEach((ticket, index) => {
+               if (ticket.status === "error") {
+                  functions.logger.error(
+                     `Error sending to token chunk ${index}: ${ticket.message}`
+                  )
+               }
+            })
+         } catch (error) {
+            functions.logger.error("Error sending push notifications:", error)
+         }
+      } catch (error) {
+         console.error("Error fetching users:", error)
+      }
+   }
+
    async getGroupFollowers(groupId: string): Promise<CompanyFollowed[]> {
       const querySnapshot = await this.firestore
          .collectionGroup("companiesUserFollows")
