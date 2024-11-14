@@ -1628,6 +1628,29 @@ export const RelevantCompanyCountryValues: OptionGroup[] = [
    },
 ]
 
+export const LanguageProficiencies = {
+   Beginner: "beginner",
+   Intermediate: "intermediate",
+   Advanced: "advanced",
+   Proficient: "proficient",
+   Native: "native",
+} as const
+
+export type LanguageProficiency =
+   (typeof LanguageProficiencies)[keyof typeof LanguageProficiencies]
+
+export const LanguageProficiencyValues: LanguageProficiency[] = Object.values(
+   LanguageProficiencies
+)
+
+export const LanguageProficiencyLabels: Record<LanguageProficiency, string> = {
+   beginner: "Beginner",
+   intermediate: "Intermediate",
+   advanced: "Advanced",
+   proficient: "Proficient",
+   native: "Native Speaker",
+}
+
 export const CompanyCountryValues: OptionGroup[] = countriesOptionCodes.map(
    (country) => ({
       id: country.id,

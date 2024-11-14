@@ -1,4 +1,8 @@
-import { ProfileLink, StudyBackground } from "@careerfairy/shared-lib/users"
+import {
+   ProfileLanguage,
+   ProfileLink,
+   StudyBackground,
+} from "@careerfairy/shared-lib/users"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 interface ITalentProfileState {
@@ -11,6 +15,11 @@ interface ITalentProfileState {
    createLinkDialogOpen: boolean
    editingLink: ProfileLink
    isEditingLink: boolean
+
+   // Languages
+   createLanguageDialogOpen: boolean
+   editingLanguage: ProfileLanguage
+   isEditingLanguage: boolean
 }
 
 const initialState: ITalentProfileState = {
@@ -23,6 +32,11 @@ const initialState: ITalentProfileState = {
    createLinkDialogOpen: false,
    editingLink: null,
    isEditingLink: false,
+
+   // Languages
+   createLanguageDialogOpen: false,
+   editingLanguage: null,
+   isEditingLanguage: false,
 }
 
 export const TalentProfileItemTypes = {
@@ -69,6 +83,12 @@ export const talentProfileSlice = createSlice({
                state.createLinkDialogOpen = true
                break
             }
+            case TalentProfileItemTypes.Language: {
+               state.editingLanguage = null
+               state.isEditingLanguage = false
+               state.createLanguageDialogOpen = true
+               break
+            }
             default: {
                return
             }
@@ -91,6 +111,12 @@ export const talentProfileSlice = createSlice({
                state.isEditingLink = false
                break
             }
+            case TalentProfileItemTypes.Language: {
+               state.createLanguageDialogOpen = false
+               state.editingLanguage = null
+               state.isEditingLanguage = false
+               break
+            }
             default: {
                return
             }
@@ -98,7 +124,9 @@ export const talentProfileSlice = createSlice({
       },
       setEditing: (
          state,
-         action: PayloadAction<EditingPayload<StudyBackground | ProfileLink>> // TODO-WG: Add interests and language types when existing
+         action: PayloadAction<
+            EditingPayload<StudyBackground | ProfileLink | ProfileLanguage>
+         > // TODO-WG: Add interests and language types when existing
       ) => {
          switch (action.payload.type) {
             case TalentProfileItemTypes.StudyBackground: {
@@ -114,6 +142,12 @@ export const talentProfileSlice = createSlice({
                state.createLinkDialogOpen = true
                break
             }
+            case TalentProfileItemTypes.Language: {
+               state.isEditingLanguage = true
+               state.editingLanguage = action.payload.data as ProfileLanguage
+               state.createLanguageDialogOpen = true
+               break
+            }
             default: {
                return
             }
@@ -122,10 +156,7 @@ export const talentProfileSlice = createSlice({
    },
 })
 
-export const {
-   openCreateDialog,
-   closeCreateDialog,
-   setEditing,
-} = talentProfileSlice.actions
+export const { openCreateDialog, closeCreateDialog, setEditing } =
+   talentProfileSlice.actions
 
 export default talentProfileSlice.reducer

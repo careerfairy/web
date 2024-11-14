@@ -110,7 +110,7 @@ const FormDialogWrapper = () => {
    const isEditingLink = useSelector(talentProfileIsEditingLinkSelector)
 
    const {
-      formState: { isValid },
+      formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
    } = useFormContext()
@@ -122,8 +122,6 @@ const FormDialogWrapper = () => {
 
    const onSubmit = async (data: LinkFormValues) => {
       try {
-         handleCloseLinkDialog()
-
          const newLink: ProfileLink = {
             ...data,
             id: data?.id,
@@ -137,6 +135,7 @@ const FormDialogWrapper = () => {
             await userRepo.updateUserLink(userData.id, newLink)
          }
 
+         handleCloseLinkDialog()
          successNotification(`${data.id ? "Updated" : "Added a new"} link 🔗`)
       } catch (error) {
          errorNotification(
@@ -159,6 +158,7 @@ const FormDialogWrapper = () => {
             handleClose={handleCloseLinkDialog}
             handleSave={handleSave}
             saveDisabled={!isValid}
+            isSubmitting={isSubmitting}
             saveText={saveText}
          >
             <LinkFormFields />
