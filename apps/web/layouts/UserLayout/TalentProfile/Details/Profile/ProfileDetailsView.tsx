@@ -3,6 +3,7 @@ import { useUserLanguages } from "components/custom-hook/user/useUserLanguages"
 import { useUserLinks } from "components/custom-hook/user/useUserLinks"
 import { useUserStudyBackgrounds } from "components/custom-hook/user/useUserStudyBackgrounds"
 import { sxStyles } from "types/commonTypes"
+import { ProfileInterests } from "./ProfileInterests"
 import { ProfileLanguages } from "./ProfileLanguages"
 import { ProfileLinks } from "./ProfileLinks"
 import { ProfileStudyBackground } from "./ProfileStudyBackground"
@@ -23,6 +24,7 @@ export const ProfileDetailsView = () => {
          <ProfileStudyBackground showAddIcon={userHasStudyBackgrounds} />
          <ProfileLinks showAddIcon={userHasLinks} />
          <ProfileLanguages showAddIcon={userHasLanguages} />
+         <ProfileInterests />
       </Stack>
    )
 }

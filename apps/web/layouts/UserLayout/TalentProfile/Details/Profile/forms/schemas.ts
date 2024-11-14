@@ -3,10 +3,15 @@ import {
    LanguageProficiencyValues,
 } from "@careerfairy/shared-lib/constants/forms"
 import {
+   BusinessFunctionsTags,
+   ContentTopicsTags,
+} from "@careerfairy/shared-lib/constants/tags"
+import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
 import {
+   ProfileInterest,
    ProfileLanguage,
    ProfileLink,
    StudyBackground,
@@ -14,6 +19,13 @@ import {
 import { URL_REGEX } from "components/util/constants"
 import { ERROR_MESSAGES } from "util/form"
 import * as Yup from "yup"
+
+const validBusinessFunctionTagIds = Object.values(BusinessFunctionsTags).map(
+   (tag) => tag.id
+)
+const validContentTopicTagIds = Object.values(ContentTopicsTags).map(
+   (tag) => tag.id
+)
 
 export const baseStudyBackgroundShape = {
    id: Yup.string(),
@@ -73,11 +85,22 @@ export const baseLanguageShape = {
       .required("Proficiency is required"),
 }
 
+export const baseInterestShape = {
+   businessFunctionsTagIds: Yup.array()
+      .of(Yup.string().oneOf(validBusinessFunctionTagIds, "Invalid job area"))
+      .nullable(),
+   contentTopicsTagIds: Yup.array()
+      .of(Yup.string().oneOf(validContentTopicTagIds, "Invalid content topic"))
+      .nullable(),
+}
+
 export const CreateStudyBackgroundSchema = Yup.object(baseStudyBackgroundShape)
 
 export const CreateLinkSchema = Yup.object(baseLinkShape)
 
 export const CreateLanguageSchema = Yup.object(baseLanguageShape)
+
+export const CreateInterestSchema = Yup.object(baseInterestShape)
 
 export type CreateStudyBackgroundSchemaType = Yup.InferType<
    typeof CreateStudyBackgroundSchema
@@ -87,6 +110,10 @@ export type CreateLinkSchemaType = Yup.InferType<typeof CreateLinkSchema>
 
 export type CreateLanguageSchemaType = Yup.InferType<
    typeof CreateLanguageSchema
+>
+
+export type CreateInterestSchemaType = Yup.InferType<
+   typeof CreateInterestSchema
 >
 
 export type StudyBackgroundFormValues = {
@@ -109,6 +136,11 @@ export type LanguageFormValues = {
    id?: string
    languageId: string
    proficiency: string
+}
+
+export type InterestFormValues = {
+   businessFunctionsTagIds?: string[]
+   contentTopicsTagIds: string[]
 }
 
 export const getInitialStudyBackgroundValues = (
@@ -150,5 +182,18 @@ export const getInitialLanguageValues = (
       id: language?.id || "",
       languageId: language?.languageId || "",
       proficiency: proficiency,
+   }
+}
+
+export const getInitialInterestValues = (
+   interest?: ProfileInterest
+): InterestFormValues => {
+   return {
+      businessFunctionsTagIds: interest?.businessFunctionsTagIds?.length
+         ? interest?.businessFunctionsTagIds
+         : [],
+      contentTopicsTagIds: interest?.contentTopicsTagIds?.length
+         ? interest?.contentTopicsTagIds
+         : [],
    }
 }
