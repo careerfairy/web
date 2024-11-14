@@ -1,0 +1,176 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { Box, Stack, Typography } from "@mui/material"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
+import { HighlightComponentType } from "data/hygraph/types"
+import {
+   RefObject,
+   SyntheticEvent,
+   useCallback,
+   useEffect,
+   useRef,
+   useState,
+} from "react"
+import { Video } from "react-feather"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   root: {
+      display: "flex",
+      flexDirection: "column",
+      zIndex: 2,
+      gap: "12px",
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      width: "100%",
+      padding: "0 16px 16px 16px",
+      color: "#FEFEFE",
+   },
+   companyData: {
+      display: "flex",
+      alignItems: "center",
+      gap: 1,
+   },
+   companyLogoContainer: {
+      cursor: "pointer",
+   },
+   companyName: {
+      fontSize: 16,
+      fontWeight: 600,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+   },
+   highlightTitle: {
+      fontSize: "16px",
+   },
+   liveStreamTitleContainer: {
+      overflowX: "hidden",
+      display: "flex",
+   },
+   liveStreamTitle: {
+      whiteSpace: "nowrap",
+   },
+})
+
+const getScrollAnimationStyle = (
+   titleRef: RefObject<HTMLDivElement>,
+   parentRef: RefObject<HTMLDivElement>
+) => {
+   if (!titleRef.current || !parentRef.current) return []
+
+   const isOverflowing =
+      titleRef.current.clientWidth > parentRef.current.clientWidth
+
+   if (!isOverflowing) return []
+
+   const overflownWidth =
+      titleRef.current.clientWidth - parentRef.current.clientWidth + 10
+
+   return [
+      {
+         animationName: "scrollToEnd",
+         animationTimingFunction: "linear",
+         animationIterationCount: "infinite",
+         animationDuration: "5s",
+         animationDelay: "1s",
+      },
+      {
+         "@keyframes scrollToEnd": {
+            "0%": {
+               transform: "translateX(0)",
+            },
+            "40%, 50%": {
+               transform: `translateX(-${overflownWidth}px)`,
+            },
+            "90%, 100%": {
+               transform: "translateX(0)",
+            },
+         },
+      },
+   ]
+}
+
+export const FullScreenHeader = ({
+   group,
+   highlight,
+}: {
+   group: Group
+   highlight: HighlightComponentType
+}) => {
+   const titleRef = useRef<HTMLDivElement>(null)
+   const parentRef = useRef<HTMLDivElement>(null)
+   const [animationStyle, setAnimationStyle] = useState([])
+
+   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
+
+   // Prevents exiting the fullscreen view when interacting with the dialog
+   const handleDialogClick = useCallback((event: SyntheticEvent) => {
+      event.stopPropagation()
+      event.preventDefault()
+   }, [])
+
+   const handleLivestreamTitleClick = useCallback(
+      (event: SyntheticEvent) => {
+         event.stopPropagation()
+         event.preventDefault()
+         handleOpen()
+      },
+      [handleOpen]
+   )
+
+   useEffect(() => {
+      if (titleRef.current || parentRef.current) {
+         setAnimationStyle(getScrollAnimationStyle(titleRef, parentRef))
+      }
+   }, [titleRef, parentRef])
+
+   return (
+      <Box sx={styles.root}>
+         <Box sx={styles.companyData}>
+            <Box sx={styles.companyLogoContainer}>
+               <CircularLogo
+                  src={group?.logoUrl}
+                  alt={`${group?.universityName} logo`}
+               />
+            </Box>
+            <Typography variant="small" sx={styles.companyName}>
+               {group?.universityName}
+            </Typography>
+         </Box>
+         <Typography variant="small" sx={styles.highlightTitle}>
+            {highlight.title}
+         </Typography>
+         <Stack
+            direction="row"
+            gap={1}
+            alignItems="center"
+            onClick={handleLivestreamTitleClick}
+         >
+            <Video size={16} />
+            <Box sx={styles.liveStreamTitleContainer} ref={parentRef}>
+               <Typography
+                  ref={titleRef}
+                  variant="small"
+                  sx={[styles.liveStreamTitle, ...animationStyle]}
+               >
+                  {highlight.liveStreamIdentifier.identifier}{" "}
+                  {highlight.liveStreamIdentifier.identifier}{" "}
+                  {highlight.liveStreamIdentifier.identifier} THE END.
+               </Typography>
+            </Box>
+         </Stack>
+         <Box onClick={handleDialogClick}>
+            <LivestreamDialog
+               open={isOpen}
+               livestreamId={highlight.liveStreamIdentifier.identifier}
+               handleClose={handleClose}
+               page={"details"}
+               serverUserEmail={""}
+            />
+         </Box>
+      </Box>
+   )
+}
