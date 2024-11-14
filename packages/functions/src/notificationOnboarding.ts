@@ -3,7 +3,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler"
 import { userRepo } from "./api/repositories"
 
 /**
- * OnboardingNewsletter functions runtime settings
+ * OnboardingNotifications functions runtime settings
  */
 const runtimeOptions = {
    // may take a while
@@ -21,12 +21,12 @@ export const notificationOnboarding = onSchedule(
       ...runtimeOptions,
    },
    async () => {
-      logger.info("Starting execution of OnboardingNewsletterService")
+      logger.info("Starting execution of OnboardingPushNotificationService")
       await sendOnboardingPushNotification()
    }
 )
 
 async function sendOnboardingPushNotification() {
    logger.info("sendOnboardingPushNotification ~ V3 ")
-   return userRepo.getRegisteredUsersWithingTwoDaysAndSendNotifications()
+   return userRepo.getRegisteredUsersWithinTwoDaysAndSendNotifications()
 }

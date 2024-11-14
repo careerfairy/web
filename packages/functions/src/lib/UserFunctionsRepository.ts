@@ -52,7 +52,7 @@ export interface IUserFunctionsRepository extends IUserRepository {
     * Retrieves the registered users, which were created earlier than 3 days and older than 2 days.
     * And sends push notifications
     */
-   getRegisteredUsersWithingTwoDaysAndSendNotifications(): Promise<void>
+   getRegisteredUsersWithinTwoDaysAndSendNotifications(): Promise<void>
 
    /**
     * Retrieves all the registered live streams for users
@@ -158,20 +158,20 @@ export class UserFunctionsRepository
       return mapFirestoreDocuments(data)
    }
 
-   async getRegisteredUsersWithingTwoDaysAndSendNotifications(): Promise<void> {
+   async getRegisteredUsersWithinTwoDaysAndSendNotifications(): Promise<void> {
       const earlierThan = DateTime.now().minus({ days: 2 }).toJSDate()
-      const threeDays = DateTime.now().minus({ days: 3 }).toJSDate()
-      const threeDaysMidnight = new Date(
-         threeDays.getFullYear(),
-         threeDays.getMonth(),
-         threeDays.getDate()
+      const thirdDay = DateTime.now().minus({ days: 3 }).toJSDate()
+      const thirdDayMidnight = new Date(
+         thirdDay.getFullYear(),
+         thirdDay.getMonth(),
+         thirdDay.getDate()
       )
 
       try {
          const query = this.firestore
             .collection("userData")
             .where("createdAt", ">=", earlierThan)
-            .where("createdAt", "<=", threeDaysMidnight)
+            .where("createdAt", "<=", thirdDayMidnight)
 
          const usersSnapshot = await query.get()
 
