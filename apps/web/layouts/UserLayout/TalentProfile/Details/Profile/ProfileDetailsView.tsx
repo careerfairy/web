@@ -1,4 +1,5 @@
 import { Stack } from "@mui/material"
+import { useUserLanguages } from "components/custom-hook/user/useUserLanguages"
 import { useUserLinks } from "components/custom-hook/user/useUserLinks"
 import { useUserStudyBackgrounds } from "components/custom-hook/user/useUserStudyBackgrounds"
 import { sxStyles } from "types/commonTypes"
@@ -15,12 +16,13 @@ const styles = sxStyles({
 export const ProfileDetailsView = () => {
    const { hasItems: userHasStudyBackgrounds } = useUserStudyBackgrounds()
    const { hasItems: userHasLinks } = useUserLinks()
+   const { hasItems: userHasLanguages } = useUserLanguages()
 
    return (
       <Stack sx={styles.wrapper} spacing={3}>
-         <ProfileStudyBackground hasItems={userHasStudyBackgrounds} />
-         <ProfileLinks hasItems={userHasLinks} />
-         <ProfileLanguages hasItems={false} />
+         <ProfileStudyBackground showAddIcon={userHasStudyBackgrounds} />
+         <ProfileLinks showAddIcon={userHasLinks} />
+         <ProfileLanguages showAddIcon={userHasLanguages} />
       </Stack>
    )
 }
