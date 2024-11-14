@@ -17,16 +17,24 @@ type Props = {
    fieldName: string
    label: string
    minDate?: Date
+   disabled?: boolean
 }
 
-export const AcademicDatePicker = ({ fieldName, label, minDate }: Props) => {
+export const AcademicDatePicker = ({
+   fieldName,
+   label,
+   minDate,
+   disabled,
+}: Props) => {
    const [isOpen, setIsOpen] = useState(false)
 
-   const { setValue } = useFormContext()
+   const { setValue, getFieldState } = useFormContext()
 
    const fieldValue: Date = useWatch({
       name: fieldName,
    })
+
+   const fieldState = getFieldState(fieldName)
 
    return (
       <DatePicker
@@ -36,12 +44,18 @@ export const AcademicDatePicker = ({ fieldName, label, minDate }: Props) => {
             textField: {
                onClick: () => setIsOpen(true),
                placeholder: label,
+               error: Boolean(fieldState.error),
+               helperText:
+                  fieldState.error?.type == "typeError"
+                     ? `${label} is required`
+                     : undefined,
             },
             actionBar: {
                actions: ["clear"],
             },
          }}
          disableOpenPicker
+         disabled={disabled}
          views={["year", "month"]}
          value={fieldValue}
          onChange={(value) => {

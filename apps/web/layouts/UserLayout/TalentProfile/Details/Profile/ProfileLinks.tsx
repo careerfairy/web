@@ -1,6 +1,6 @@
 import { ProfileLink } from "@careerfairy/shared-lib/users"
 import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
@@ -57,6 +57,18 @@ const styles = sxStyles({
    linkUrl: {
       fontWeight: 400,
       color: (theme) => theme.palette.neutral[600],
+   },
+   buttonLink: {
+      p: 0,
+      m: 0,
+      "&:hover": {
+         backgroundColor: "unset",
+      },
+   },
+   circularLogo: {
+      width: "48px",
+      height: "48px",
+      mr: 1.5,
    },
 })
 
@@ -230,6 +242,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
 
    const normalizedLink = normalizeUrl(link.url, { forceHttps: true })
 
+   // Treat linkedin url's as an exception due to bad favicon quality
    const faviconSrc = isLinkedInUrl(normalizedLink)
       ? "/linkedin-favicon2.png"
       : getIconUrl(normalizedLink)
@@ -252,29 +265,36 @@ const LinkCard = ({ link }: LinkCardProps) => {
             handleEdit={handleEdit}
             handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
          >
-            <CircularLogo
-               src={faviconSrc}
-               alt={`${link.title} icon`}
-               sx={{ width: "48px", height: "48px" }}
-            />
-            <Stack>
-               <Typography variant="brandedBody" sx={styles.linkTitle}>
-                  {link.title}
-               </Typography>
-               <Stack spacing={0.5} direction={"row"} alignItems={"center"}>
-                  <Typography variant="xsmall" sx={styles.linkUrl}>
-                     {linkUrlValue}
+            <Button // MUI Button
+               href={normalizedLink}
+               target="_blank"
+               LinkComponent={Link} // NextJS Link
+               sx={styles.buttonLink}
+            >
+               <CircularLogo
+                  src={faviconSrc}
+                  alt={`${link.title} icon`}
+                  sx={styles.circularLogo}
+               />
+               <Stack>
+                  <Typography variant="brandedBody" sx={styles.linkTitle}>
+                     {link.title}
                   </Typography>
-                  <Link href={normalizedLink} target="_blank">
-                     <Box
-                        component={ExternalLink}
-                        width={"12px"}
-                        height={"12px"}
-                        color="neutral.600"
-                     />
-                  </Link>
+                  <Stack spacing={0.5} direction={"row"} alignItems={"center"}>
+                     <Typography variant="xsmall" sx={styles.linkUrl}>
+                        {linkUrlValue}
+                     </Typography>
+                     <Link href={normalizedLink} target="_blank">
+                        <Box
+                           component={ExternalLink}
+                           width={"12px"}
+                           height={"12px"}
+                           color="neutral.600"
+                        />
+                     </Link>
+                  </Stack>
                </Stack>
-            </Stack>
+            </Button>
          </ProfileItemCard>
       </Fragment>
    )
