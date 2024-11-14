@@ -22,7 +22,7 @@ export const useUserStudyBackgrounds = () => {
                   userData.id,
                   "studyBackgrounds"
                ),
-               orderBy("startedAt", "asc")
+               orderBy("startedAt", "desc")
             ).withConverter(createGenericConverter<StudyBackground>()),
             (doc) => {
                // doc.docs
