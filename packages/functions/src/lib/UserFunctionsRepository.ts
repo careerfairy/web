@@ -164,7 +164,7 @@ export class UserFunctionsRepository
       const threeDaysMidnight = new Date(
          threeDays.getFullYear(),
          threeDays.getMonth(),
-         threeDays.getDay()
+         threeDays.getDate()
       )
 
       try {
