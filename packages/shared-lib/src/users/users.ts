@@ -159,6 +159,11 @@ export interface ProfileLanguage extends Identifiable {
    proficiency: number
 }
 
+export interface ProfileInterest {
+   businessFunctionsTagIds?: string[]
+   contentTopicsTagIds?: string[]
+}
+
 export interface ReadableQuestionAndAnswer {
    questionName: GroupQuestion["name"]
    questionId: GroupQuestion["id"]
