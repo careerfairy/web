@@ -26,7 +26,26 @@ export const notificationOnboarding = onSchedule(
    }
 )
 
+export const notificationOnboardingLivestream = onSchedule(
+   {
+      schedule: "0 16 * * *", // everyday at 16:00
+      timeZone: "Europe/Zurich",
+      ...runtimeOptions,
+   },
+   async () => {
+      logger.info(
+         "Starting execution of OnboardingPushNotificationLivestreamService"
+      )
+      await sendOnboardingLivestreamPushNotification()
+   }
+)
+
 async function sendOnboardingPushNotification() {
    logger.info("sendOnboardingPushNotification ~ V3 ")
    return userRepo.getRegisteredUsersWithinTwoDaysAndSendNotifications()
+}
+
+async function sendOnboardingLivestreamPushNotification() {
+   logger.info("sendOnboardingLivestreamPushNotification ~ V3 ")
+   return userRepo.getRegisteredUsersWithinFourDaysAndSendNotifications()
 }
