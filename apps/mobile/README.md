@@ -173,4 +173,11 @@ After build, starts, you will get a link of current build process, or just go to
 
 ---
 
+NOTE for iOS for deep linking to work:
+
+in file apple-app-site-association
+
+1. Replace <TEAM_ID> with your Apple Developer Team ID (found in your Apple Developer account).
+2. Replace <BUNDLE_ID> with your app's bundle identifier.
+
 Happy coding! 🎉
