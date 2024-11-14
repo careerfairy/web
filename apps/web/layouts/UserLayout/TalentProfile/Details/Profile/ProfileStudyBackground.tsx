@@ -318,8 +318,6 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             onClose={() => setIsConfirmDeleteDialogOpen(false)}
          />
          <ProfileItemCard
-            dataTypeId="study-background"
-            data={studyBackground}
             editText="Edit study background details"
             deleteText="Delete study background"
             handleEdit={handleEdit}

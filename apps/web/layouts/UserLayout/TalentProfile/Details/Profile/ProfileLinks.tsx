@@ -235,7 +235,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
    const linkUrlValue = normalizeUrl(
       getSubstringWithEllipsis(
          link.url,
-         isMobile ? (isExtraSmall ? 20 : 35) : 80
+         isMobile ? (isExtraSmall ? 20 : 30) : 80
       ),
       { stripProtocol: true }
    )
@@ -258,8 +258,6 @@ const LinkCard = ({ link }: LinkCardProps) => {
             onClose={() => setIsConfirmDeleteDialogOpen(false)}
          />
          <ProfileItemCard
-            dataTypeId={"link"}
-            data={link}
             editText={"Edit link"}
             deleteText={"Delete link"}
             handleEdit={handleEdit}
