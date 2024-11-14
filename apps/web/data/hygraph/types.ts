@@ -84,8 +84,8 @@ export type HighlightComponentType = {
    id: string
    videoClip: VideoAssetType
    title: string
-   logo: ImageAssetType
    liveStreamIdentifier: IdentifierType
+   companyIdentifier: IdentifierType
 }
 
 export type SparkComponentType = {
