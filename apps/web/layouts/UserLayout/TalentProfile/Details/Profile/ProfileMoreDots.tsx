@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material"
+import { Box } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useMenuState from "components/custom-hook/useMenuState"
 import BrandedResponsiveMenu, {
@@ -84,18 +84,12 @@ export const ProfileMoreDots = (props: ProfileMoreDotsOptions) => {
          label: editText,
          icon: <Box component={Edit2} sx={styles.editIcon} />,
          handleClick: handleEditClick,
-         wrapperComponent: ({ children, ...props }) => (
-            <Typography {...props}>{children}</Typography>
-         ),
          color: "neutral.600",
       },
       {
          label: deleteText,
          icon: <Box component={Trash2} sx={styles.deleteIcon} />,
          handleClick: handleDeleteClick,
-         wrapperComponent: ({ children, ...props }) => (
-            <Typography {...props}>{children}</Typography>
-         ),
          color: "error.600",
       },
    ]
