@@ -161,17 +161,12 @@ export class UserFunctionsRepository
    async getRegisteredUsersWithinTwoDaysAndSendNotifications(): Promise<void> {
       const earlierThan = DateTime.now().minus({ days: 2 }).toJSDate()
       const thirdDay = DateTime.now().minus({ days: 3 }).toJSDate()
-      const thirdDayMidnight = new Date(
-         thirdDay.getFullYear(),
-         thirdDay.getMonth(),
-         thirdDay.getDate()
-      )
 
       try {
          const query = this.firestore
             .collection("userData")
-            .where("createdAt", ">=", earlierThan)
-            .where("createdAt", "<=", thirdDayMidnight)
+            .where("createdAt", "<=", earlierThan)
+            .where("createdAt", ">=", thirdDay)
 
          const usersSnapshot = await query.get()
 

@@ -16,7 +16,7 @@ const runtimeOptions = {
 
 export const notificationOnboarding = onSchedule(
    {
-      schedule: "0 16 * * *", // everyday at 16:00
+      schedule: "0 17 * * *", // everyday at 17:00
       timeZone: "Europe/Zurich",
       ...runtimeOptions,
    },
