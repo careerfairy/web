@@ -166,6 +166,7 @@ async function retrieveTokensFromLivestream(
          .doc(livestreamId)
 
       const livestreamDocSnap = await livestreamDocRef.get()
+
       if (!livestreamDocSnap.exists) {
          return []
       }
@@ -175,12 +176,16 @@ async function retrieveTokensFromLivestream(
 
       const userLiveStreamDataSnap = await userLiveStreamDataRef.get()
 
-      const users: any = userLiveStreamDataSnap.docs
+      const fcmTokensArray = []
 
-      return users
-         .map((user) => user?.user?.fcmTokens || [])
-         .flat()
-         .filter((token) => Expo.isExpoPushToken(token))
+      userLiveStreamDataSnap.forEach((doc) => {
+         const userData = doc.data().user
+         if (userData && userData.fcmTokens) {
+            fcmTokensArray.push(...userData.fcmTokens) // Spread the tokens array into fcmTokensArray
+         }
+      })
+
+      return fcmTokensArray
    } catch (error) {
       console.error("Error retrieving eligible users:", error)
       return []
