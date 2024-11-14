@@ -1,0 +1,106 @@
+import {
+   LanguageProficiencyLabels,
+   LanguageProficiencyValues,
+   languageOptionCodes,
+} from "@careerfairy/shared-lib/constants/forms"
+import { ProfileLanguage } from "@careerfairy/shared-lib/users"
+import { Stack } from "@mui/material"
+import { useYupForm } from "components/custom-hook/form/useYupForm"
+import { languageCodesDict } from "components/helperFunctions/streamFormFunctions"
+import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
+import { mapOptions } from "components/views/signup/utils"
+import { ReactNode } from "react"
+import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
+import { sxStyles } from "types/commonTypes"
+import {
+   CreateLanguageSchema,
+   CreateLanguageSchemaType,
+   getInitialLanguageValues,
+} from "./schemas"
+
+const styles = sxStyles({
+   formRoot: {
+      minWidth: {
+         xs: "313px",
+         sm: "343px",
+         md: "500px",
+      },
+   },
+})
+
+type LanguageFormProviderProps = {
+   language?: ProfileLanguage
+   children:
+      | ((methods: UseFormReturn<CreateLanguageSchemaType>) => ReactNode)
+      | ReactNode
+}
+
+export const LanguageFormProvider = ({
+   children,
+   language,
+}: LanguageFormProviderProps) => {
+   const defaultValues = getInitialLanguageValues(language)
+
+   const methods = useYupForm({
+      schema: CreateLanguageSchema,
+      defaultValues: defaultValues,
+      mode: "onChange",
+      reValidateMode: "onChange",
+   })
+
+   return (
+      <FormProvider {...methods}>
+         {typeof children === "function" ? children(methods) : children}
+      </FormProvider>
+   )
+}
+
+export const LanguageFormFields = () => {
+   const {
+      formState: { isSubmitting },
+   } = useFormContext()
+
+   return (
+      <Stack spacing={2} sx={styles.formRoot}>
+         <ControlledBrandedAutoComplete
+            label={"Language"}
+            name={"languageId"}
+            options={mapOptions(languageOptionCodes)}
+            textFieldProps={{
+               requiredText: "(required)",
+               placeholder: "E.g., English",
+            }}
+            autocompleteProps={{
+               id: "spokenLanguage",
+               disabled: isSubmitting,
+               disableClearable: false,
+               autoHighlight: true,
+               getOptionLabel: (option) => {
+                  return (option && languageCodesDict[option]["name"]) || ""
+               },
+               isOptionEqualToValue: (option, value) => option === value,
+            }}
+         />
+
+         <ControlledBrandedAutoComplete
+            label={"Proficiency"}
+            name={"proficiency"}
+            options={LanguageProficiencyValues}
+            textFieldProps={{
+               requiredText: "(required)",
+               placeholder: "E.g., Advanced",
+            }}
+            autocompleteProps={{
+               id: "languageProficiency",
+               disabled: isSubmitting,
+               disableClearable: false,
+               autoHighlight: true,
+               getOptionLabel: (option) => {
+                  return (option && LanguageProficiencyLabels[option]) || ""
+               },
+               isOptionEqualToValue: (option, value) => option === value,
+            }}
+         />
+      </Stack>
+   )
+}

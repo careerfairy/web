@@ -22,3 +22,13 @@ export const talentProfileEditingLinkOpenSelector = (state: RootState) =>
 
 export const talentProfileIsEditingLinkSelector = (state: RootState) =>
    state.talentProfile.isEditingLink
+
+// Language
+export const talentProfileCreateLanguageOpenSelector = (state: RootState) =>
+   state.talentProfile.createLanguageDialogOpen
+
+export const talentProfileEditingLanguageOpenSelector = (state: RootState) =>
+   state.talentProfile.editingLanguage
+
+export const talentProfileIsEditingLanguageSelector = (state: RootState) =>
+   state.talentProfile.isEditingLanguage
