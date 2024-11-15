@@ -1,17 +1,9 @@
-import {
-   Box,
-   Divider,
-   ListItemIcon,
-   Menu,
-   MenuItem,
-   Stack,
-   Typography,
-} from "@mui/material"
+import { Box } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useMenuState from "components/custom-hook/useMenuState"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
-import { LineIcon } from "components/views/common/icons/LineIcon"
-import { SlideUpTransition } from "components/views/common/transitions"
+import BrandedResponsiveMenu, {
+   MenuOption,
+} from "components/views/common/inputs/BrandedResponsiveMenu"
 import { Fragment } from "react"
 import { Edit2, MoreVertical, Trash2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -21,6 +13,8 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[800],
       width: "20px",
       height: "20px",
+      minWidth: "20px !important",
+      minHeight: "20px !important",
       "&:hover": {
          cursor: "pointer",
       },
@@ -71,8 +65,8 @@ const styles = sxStyles({
       height: "16px",
    },
 })
+
 type ProfileMoreDotsOptions = {
-   id: string
    editText: string
    deleteText: string
    handleEditClick: () => void
@@ -80,11 +74,25 @@ type ProfileMoreDotsOptions = {
 }
 
 export const ProfileMoreDots = (props: ProfileMoreDotsOptions) => {
-   const { id, editText, deleteText, handleEditClick, handleDeleteClick } =
-      props
+   const { editText, deleteText, handleEditClick, handleDeleteClick } = props
 
    const isMobile = useIsMobile()
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
+
+   const options: MenuOption[] = [
+      {
+         label: editText,
+         icon: <Box component={Edit2} sx={styles.editIcon} />,
+         handleClick: handleEditClick,
+         color: "neutral.600",
+      },
+      {
+         label: deleteText,
+         icon: <Box component={Trash2} sx={styles.deleteIcon} />,
+         handleClick: handleDeleteClick,
+         color: "error.600",
+      },
+   ]
 
    return (
       <Fragment>
@@ -93,37 +101,12 @@ export const ProfileMoreDots = (props: ProfileMoreDotsOptions) => {
             sx={styles.moreVerticalIcon}
             onClick={handleClick}
          />
-         <Menu
-            anchorEl={isMobile ? null : anchorEl}
-            id={id}
+         <BrandedResponsiveMenu
+            options={options}
             open={open}
-            onClose={handleClose}
-            onClick={handleClose}
-            TransitionComponent={isMobile ? SlideUpTransition : undefined}
-            disableScrollLock={!isMobile}
-            sx={[styles.menu, isMobile ? styles.mobileMenu : null]}
-         >
-            <ConditionalWrapper condition={isMobile}>
-               <Stack alignItems={"center"}>
-                  <LineIcon sx={{ width: "94px" }} />
-               </Stack>
-            </ConditionalWrapper>
-            <Stack divider={<Divider sx={{ my: "0 !important" }} />}>
-               <MenuItem sx={styles.menuItem} onClick={handleEditClick}>
-                  <ListItemIcon sx={styles.listItemIcon}>
-                     <Box component={Edit2} sx={styles.editIcon} />
-                  </ListItemIcon>
-                  <Typography color="neutral.600">{editText}</Typography>
-               </MenuItem>
-
-               <MenuItem sx={styles.menuItem} onClick={handleDeleteClick}>
-                  <ListItemIcon sx={styles.listItemIcon}>
-                     <Box component={Trash2} sx={styles.deleteIcon} />
-                  </ListItemIcon>
-                  <Typography color="error.600">{deleteText}</Typography>
-               </MenuItem>
-            </Stack>
-         </Menu>
+            anchorEl={isMobile ? null : anchorEl}
+            handleClose={handleClose}
+         />
       </Fragment>
    )
 }
