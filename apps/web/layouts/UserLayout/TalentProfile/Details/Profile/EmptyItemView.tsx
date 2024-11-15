@@ -7,7 +7,7 @@ const styles = sxStyles({
       width: {
          xs: "280px",
          sm: "280px",
-         md: "390px",
+         md: "400px",
       },
    },
    emptyTitle: {
