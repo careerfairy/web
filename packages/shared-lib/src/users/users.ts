@@ -145,6 +145,12 @@ export interface StudyBackground extends Identifiable {
    endedAt?: Timestamp
 }
 
+// Collection /userData/:id/links/:id
+export interface ProfileLink extends Identifiable {
+   url: string
+   title: string
+}
+
 export interface ReadableQuestionAndAnswer {
    questionName: GroupQuestion["name"]
    questionId: GroupQuestion["id"]
