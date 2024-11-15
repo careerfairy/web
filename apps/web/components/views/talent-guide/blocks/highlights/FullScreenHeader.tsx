@@ -4,6 +4,7 @@ import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { HighlightComponentType } from "data/hygraph/types"
+import Link from "next/link"
 import {
    RefObject,
    SyntheticEvent,
@@ -14,6 +15,7 @@ import {
 } from "react"
 import { Video } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 
 const styles = sxStyles({
    root: {
@@ -125,6 +127,10 @@ export const FullScreenHeader = ({
       [handleOpen]
    )
 
+   const handleGroupClick = useCallback((event: SyntheticEvent) => {
+      event.stopPropagation()
+   }, [])
+
    useEffect(() => {
       if (titleRef.current && parentRef.current) {
          // hack needed to ensure elements are rendered and we have access to the correct dimensions
@@ -137,7 +143,13 @@ export const FullScreenHeader = ({
    return (
       <Box sx={styles.root}>
          <Box sx={styles.companyData}>
-            <Box sx={styles.companyLogoContainer}>
+            <Box
+               component={Link}
+               onClick={handleGroupClick}
+               href={makeGroupCompanyPageUrl(group)}
+               target="_blank"
+               sx={styles.companyLogoContainer}
+            >
                <CircularLogo
                   src={group?.logoUrl}
                   alt={`${group?.universityName} logo`}
