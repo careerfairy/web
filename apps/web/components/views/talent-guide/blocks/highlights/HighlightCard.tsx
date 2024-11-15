@@ -11,8 +11,11 @@ import { FullScreenHeader } from "./FullScreenHeader"
 const styles = sxStyles({
    card: {
       position: "relative",
-      width: 168,
-      height: 298,
+      width: {
+         xs: 168,
+         md: 220,
+      },
+      aspectRatio: 9 / 16,
       display: "flex",
       padding: "12px 8px",
       flexDirection: "column",
@@ -30,12 +33,14 @@ const styles = sxStyles({
       },
    },
    cardFullScreen: {
-      width: "100dvw",
-      height: "100dvh",
+      display: "flex",
+      flexDirection: "column",
       position: "fixed",
       top: 0,
       left: 0,
       zIndex: 1000,
+      width: "100dvw",
+      height: "100dvh",
       borderRadius: 0,
       right: "12px !important",
       overflow: "hidden",
@@ -131,7 +136,7 @@ export const HighlightCard = ({
 
    return (
       <Box
-         sx={[styles.card, isFullscreen && styles.cardFullScreen]}
+         sx={[isFullscreen ? styles.cardFullScreen : styles.card]}
          onClick={handleFullscreenClick}
       >
          {isFullscreen ? (
