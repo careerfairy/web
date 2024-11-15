@@ -13,7 +13,10 @@ import { SparkCard } from "./SparkCard"
 const styles = sxStyles({
    root: {
       display: "grid",
-      gridTemplateColumns: "repeat(2, 168px)",
+      gridTemplateColumns: {
+         xs: "repeat(2, 168px)",
+         md: "repeat(2, 220px)",
+      },
       gap: 1,
    },
 })
