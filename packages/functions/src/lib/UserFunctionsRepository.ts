@@ -270,6 +270,8 @@ export class UserFunctionsRepository
    async getRegisteredUsersWithinFourDaysAndSendNotifications(): Promise<void> {
       const earlierThan = DateTime.now().minus({ days: 4 }).toJSDate()
       const thirdDay = DateTime.now().minus({ days: 5 }).toJSDate()
+      const today = DateTime.now().toJSDate()
+      const oneMonth = DateTime.now().plus({ days: 30 }).toJSDate()
 
       try {
          const query = this.firestore
@@ -277,7 +279,13 @@ export class UserFunctionsRepository
             .where("createdAt", "<=", earlierThan)
             .where("createdAt", ">=", thirdDay)
 
+         const livestreamQuery = this.firestore
+            .collection("livestreams")
+            .where("start", ">=", today)
+            .where("start", "<=", oneMonth)
+
          const usersSnapshot = await query.get()
+         const livestreamSnapshot = await livestreamQuery.get()
 
          const users = []
 
@@ -318,7 +326,7 @@ export class UserFunctionsRepository
                to: pushToken,
                sound: "default",
                title: "Did you know?",
-               body: "<N> live streams in the next 30 days. Register to find your ideal first job.",
+               body: `${livestreamSnapshot.size} live streams in the next 30 days. Register to find your ideal first job.`,
                data: {
                   type: "onboarding_start",
                   url: addUtmTagsToLink({
