@@ -7,7 +7,10 @@ import { sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    sparkContainer: {
       ".spark-preview-card-container": {
-         width: "168px",
+         width: {
+            xs: 168,
+            md: 220,
+         },
       },
    },
 })
