@@ -61,6 +61,16 @@ export const talentProfileSlice = createSlice({
                state.editingStudyBackground = null
                state.isEditingStudyBackground = false
                state.createStudyBackgroundDialogOpen = true
+               break
+            }
+            case TalentProfileItemTypes.Link: {
+               state.editingLink = null
+               state.isEditingLink = false
+               state.createLinkDialogOpen = true
+               break
+            }
+            default: {
+               return
             }
          }
       },
@@ -73,6 +83,16 @@ export const talentProfileSlice = createSlice({
                state.createStudyBackgroundDialogOpen = false
                state.editingStudyBackground = null
                state.isEditingStudyBackground = false
+               break
+            }
+            case TalentProfileItemTypes.Link: {
+               state.createLinkDialogOpen = false
+               state.editingLink = null
+               state.isEditingLink = false
+               break
+            }
+            default: {
+               return
             }
          }
       },
@@ -86,13 +106,26 @@ export const talentProfileSlice = createSlice({
                state.editingStudyBackground = action.payload
                   .data as StudyBackground
                state.createStudyBackgroundDialogOpen = true
+               break
+            }
+            case TalentProfileItemTypes.Link: {
+               state.isEditingLink = true
+               state.editingLink = action.payload.data as ProfileLink
+               state.createLinkDialogOpen = true
+               break
+            }
+            default: {
+               return
             }
          }
       },
    },
 })
 
-export const { openCreateDialog, closeCreateDialog, setEditing } =
-   talentProfileSlice.actions
+export const {
+   openCreateDialog,
+   closeCreateDialog,
+   setEditing,
+} = talentProfileSlice.actions
 
 export default talentProfileSlice.reducer
