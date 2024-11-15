@@ -4,14 +4,31 @@ import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { useUserStudyBackgroundsSWR } from "components/custom-hook/user/useUserStudyBackgroundsSWR"
+import { useUniversityById } from "components/custom-hook/useUniversityById"
+import { useUserStudyBackgrounds } from "components/custom-hook/user/useUserStudyBackgrounds"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { SchoolIcon } from "components/views/common/icons/SchoolIcon"
 import { userRepo } from "data/RepositoryInstances"
 import { Timestamp } from "data/firebase/FirebaseInstance"
-import { Fragment, useState } from "react"
+import { DateTime } from "luxon"
+import { Fragment, useCallback, useState } from "react"
+import { PlusCircle } from "react-feather"
 import { useFormContext, useWatch } from "react-hook-form"
+import { useDispatch, useSelector } from "react-redux"
+import {
+   closeCreateStudyBackgroundDialog,
+   openCreateStudyBackgroundDialog,
+   setEditingStudyBackground,
+} from "store/reducers/talentProfileReducer"
+import {
+   talentProfileCreateStudyBackgroundOpenSelector,
+   talentProfileEditingStudyBackgroundOpenSelector,
+   talentProfileIsEditingStudyBackgroundSelector,
+} from "store/selectors/talentProfileSelectors"
 import { sxStyles } from "types/commonTypes"
+import { ConfirmDeleteItemDialog } from "../ConfirmDeleteItemDialog"
 import { ConfirmEmptyStudyDatesDialog } from "../ConfirmEmptyStudyDatesDialog"
+import { ProfileItemCard } from "./ProfileItemCard"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import {
    StudyBackgroundFormFields,
@@ -23,11 +40,16 @@ import {
 } from "./forms/schemas"
 
 const styles = sxStyles({
+   titleRoot: {
+      pr: "12px",
+      alignItems: "center",
+      justifyContent: "space-between",
+   },
    title: {
       fontWeight: 600,
       color: (theme) => theme.palette.neutral[900],
    },
-   studiesRoot: {
+   emptyStudiesRoot: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -60,60 +82,117 @@ const styles = sxStyles({
       width: "36px",
       height: "36px",
    },
+   plusCircle: {
+      width: "20px",
+      height: "20px",
+      color: (theme) => theme.palette.neutral[600],
+      "&:hover": {
+         cursor: "pointer",
+      },
+   },
+   studyBackgroundSchoolIcon: {
+      width: "40px",
+      height: "40px",
+      padding: "5px 5.833px 5px 5px",
+      borderRadius: "70px",
+      color: (theme) => theme.palette.neutral[200],
+      backgroundColor: (theme) => theme.palette.neutral[50],
+   },
+   moreVerticalIcon: {
+      color: (theme) => theme.palette.neutral[800],
+      width: "20px",
+      height: "20px",
+   },
+   studyBackgroundCard: {
+      justifyContent: "space-between",
+      p: "16px 10px 12px 12px",
+      borderRadius: "8px",
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
+      backgroundColor: (theme) => theme.brand.white[100],
+   },
+   universityName: {
+      fontWeight: 600,
+      color: (theme) => theme.palette.neutral[800],
+   },
+   studyDomains: {
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[700],
+   },
+   studyDates: {
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[500],
+   },
 })
 
-export const ProfileStudyBackground = () => {
+type Props = {
+   hasItems: boolean
+}
+
+export const ProfileStudyBackground = ({ hasItems }: Props) => {
+   const dispatch = useDispatch()
+
+   const handleAddClick = useCallback(() => {
+      dispatch(openCreateStudyBackgroundDialog())
+   }, [dispatch])
+
    return (
       <Stack spacing={1.5}>
-         <Typography variant="brandedBody" sx={styles.title}>
-            Study background
-         </Typography>
+         <Stack direction={"row"} sx={styles.titleRoot}>
+            <Typography variant="brandedBody" sx={styles.title}>
+               Study background
+            </Typography>
+            <ConditionalWrapper condition={hasItems}>
+               <Box
+                  component={PlusCircle}
+                  sx={styles.plusCircle}
+                  onClick={handleAddClick}
+               />
+            </ConditionalWrapper>
+         </Stack>
          <StudyBackgroundDetails />
       </Stack>
    )
 }
 
 const StudyBackgroundDetails = () => {
-   const [studyBackgroundToEdit, setStudyBackgroundToEdit] =
-      useState<StudyBackground>(null)
-   const [studyBackgroundToDelete, setStudyBackgroundToDelete] =
-      useState<StudyBackground>(null)
-   // Leaving this here to prevent unused var, will be used in next stack
-   console.log(
-      "🚀 ~ StudyBackgroundDetails ~ studyBackgroundToDelete:",
-      studyBackgroundToDelete
+   const studyBackgroundToEdit = useSelector(
+      talentProfileEditingStudyBackgroundOpenSelector
    )
 
    return (
       <StudyBackgroundFormProvider studyBackground={studyBackgroundToEdit}>
-         <FormDialogWrapper
-            handleEdit={setStudyBackgroundToEdit}
-            handleDelete={setStudyBackgroundToDelete}
-         />
+         <FormDialogWrapper />
       </StudyBackgroundFormProvider>
    )
 }
 
-type FormDialogWrapperProps = {
-   handleEdit?: (studyBackground: StudyBackground) => void
-   handleDelete?: (studyBackground: StudyBackground) => void
-}
-
-const FormDialogWrapper = ({
-   handleDelete: setStudyBackgroundToDelete,
-   handleEdit: setStudyBackgroundToEdit,
-}: FormDialogWrapperProps) => {
+const FormDialogWrapper = () => {
+   const dispatch = useDispatch()
    const { userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
-   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+
    const [isConfirmEmptyDatesOpen, setIsConfirmEmptyDatesOpen] =
       useState<boolean>(false)
+
+   const createStudyBackgroundDialogOpen = useSelector(
+      talentProfileCreateStudyBackgroundOpenSelector
+   )
+
+   const isEditingStudyBackground = useSelector(
+      talentProfileIsEditingStudyBackgroundSelector
+   )
 
    const {
       formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
    } = useFormContext()
+
+   const handleCloseStudyBackgroundDialog = useCallback(() => {
+      dispatch(closeCreateStudyBackgroundDialog())
+      reset(getInitialStudyBackgroundValues())
+      setIsConfirmEmptyDatesOpen(false)
+   }, [dispatch, reset])
 
    const startedAt = useWatch({
       name: "startedAt",
@@ -123,13 +202,13 @@ const FormDialogWrapper = ({
       name: "endedAt",
    })
 
-   const handleClose = () => setIsDialogOpen(false)
-
    const onSubmit = async (data: StudyBackgroundFormValues) => {
       try {
+         handleCloseStudyBackgroundDialog()
+
          const newStudyBackground: StudyBackground = {
             ...data,
-            id: null,
+            id: data?.id,
             startedAt: data.startedAt
                ? Timestamp.fromDate(data.startedAt)
                : null,
@@ -137,14 +216,21 @@ const FormDialogWrapper = ({
             authId: userData.authId,
          }
 
-         await userRepo.createUserStudyBackground(
-            userData.id,
-            newStudyBackground
-         )
+         if (!data?.id) {
+            await userRepo.createUserStudyBackground(
+               userData.id,
+               newStudyBackground
+            )
+         } else {
+            await userRepo.updateUserStudyBackground(
+               userData.id,
+               newStudyBackground
+            )
+         }
 
-         handleClose()
-         reset(getInitialStudyBackgroundValues())
-         successNotification("Added a new study background 🎓")
+         successNotification(
+            `${data.id ? "Updated" : "Added a new"} study background 🎓`
+         )
       } catch (error) {
          errorNotification(
             error,
@@ -153,30 +239,25 @@ const FormDialogWrapper = ({
       }
    }
 
-   const handleSave = () => handleSubmit(onSubmit)()
+   const handleSave = async () => handleSubmit(onSubmit)()
 
    const handleSaveButtonClick = () => {
       if (!startedAt && !endedAt) setIsConfirmEmptyDatesOpen(true)
       else handleSave()
    }
 
+   const saveText = isEditingStudyBackground ? "Save" : "Add"
+
    return (
       <Fragment>
-         <Box sx={styles.studiesRoot}>
-            <SuspenseWithBoundary>
-               <StudyBackgroundsList
-                  handleAddBackground={() => setIsDialogOpen(true)}
-                  handleEdit={setStudyBackgroundToEdit}
-                  handleDelete={setStudyBackgroundToDelete}
-               />
-            </SuspenseWithBoundary>
-         </Box>
+         <StudyBackgroundsList />
          <BaseProfileDialog
             title="Study Background"
-            open={isDialogOpen}
-            handleClose={handleClose}
+            open={createStudyBackgroundDialogOpen}
+            handleClose={handleCloseStudyBackgroundDialog}
             handleSave={handleSaveButtonClick}
             saveDisabled={!isValid}
+            saveText={saveText}
          >
             <ConfirmEmptyStudyDatesDialog
                open={isConfirmEmptyDatesOpen}
@@ -192,50 +273,116 @@ const FormDialogWrapper = ({
    )
 }
 
-type StudyBackgroundsListProps = {
-   handleEdit?: (studyBackground: StudyBackground) => void
-   handleDelete?: (studyBackground: StudyBackground) => void
-   handleAddBackground?: () => void
-}
-
-const StudyBackgroundsList = (props: StudyBackgroundsListProps) => {
-   const { data: studyBackgrounds } = useUserStudyBackgroundsSWR()
-   // TODO-WG: Remove
-   console.log(
-      "🚀 ~ StudyBackgroundsList ~ studyBackgrounds:",
-      studyBackgrounds
-   )
-
-   // TODO-WG: Pass study backgrounds, not passing for easier testing while creating
-   return <StudyBackgroundsListView {...props} />
-}
-
-type StudyBackgroundsListViewProps = StudyBackgroundsListProps & {
-   studyBackgrounds?: StudyBackground[]
-}
-
-const StudyBackgroundsListView = (props: StudyBackgroundsListViewProps) => {
-   const { studyBackgrounds = [], handleAddBackground } = props
-
-   if (!studyBackgrounds.length)
+const StudyBackgroundsList = () => {
+   const { data: studyBackgrounds } = useUserStudyBackgrounds()
+   if (!studyBackgrounds?.length)
       return (
-         <EmptyStudyBackgroundView
-            handleAddBackground={() =>
-               handleAddBackground && handleAddBackground()
-            }
-         />
+         <Box sx={styles.emptyStudiesRoot}>
+            <EmptyStudyBackgroundView />
+         </Box>
       )
 
-   return <Box>{`${studyBackgrounds.length} study background(s)`}</Box>
+   return (
+      <Stack spacing={1.5} width={"100%"}>
+         {studyBackgrounds?.map((studyBackground) => (
+            <StudyBackgroundCard
+               studyBackground={studyBackground}
+               key={studyBackground.id}
+            />
+         ))}
+      </Stack>
+   )
 }
 
-type EmptyStudyBackgroundViewProps = {
-   handleAddBackground: () => void
+type StudyBackgroundCardProps = {
+   studyBackground: StudyBackground
 }
 
-const EmptyStudyBackgroundView = ({
-   handleAddBackground,
-}: EmptyStudyBackgroundViewProps) => {
+const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
+   const { userData } = useAuth()
+   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
+      useState<boolean>(false)
+   const [isDeleting, setIsDeleting] = useState<boolean>(false)
+   const dispatch = useDispatch()
+   const { reset } = useFormContext()
+
+   const handleEdit = useCallback(() => {
+      dispatch(setEditingStudyBackground(studyBackground))
+      reset(studyBackground)
+   }, [dispatch, studyBackground, reset])
+
+   const handleDelete = useCallback(async () => {
+      setIsDeleting(true)
+
+      await userRepo.deleteStudyBackground(userData.id, studyBackground.id)
+
+      setIsDeleting(false)
+      setIsConfirmDeleteDialogOpen(false)
+   }, [studyBackground, userData.id])
+
+   const university = useUniversityById(
+      studyBackground.universityCountryCode,
+      studyBackground.universityId
+   )
+
+   const startedAtYear = studyBackground.startedAt
+      ? DateTime.fromJSDate(studyBackground.startedAt.toDate()).year
+      : 0
+
+   const endedAtYear = studyBackground.endedAt
+      ? DateTime.fromJSDate(studyBackground.endedAt.toDate()).year
+      : 0
+
+   const hasStartedAtYear = Boolean(startedAtYear)
+   const hasEndedAtYear = Boolean(endedAtYear)
+   const hasBothYears = hasStartedAtYear && hasEndedAtYear
+
+   return (
+      <Fragment>
+         <ConfirmDeleteItemDialog
+            open={isConfirmDeleteDialogOpen}
+            title="Delete study background?"
+            description="Are you sure you want to delete your study background?"
+            handleDelete={handleDelete}
+            isDeleting={isDeleting}
+            onClose={() => setIsConfirmDeleteDialogOpen(false)}
+         />
+         <ProfileItemCard
+            dataTypeId="study-background"
+            data={studyBackground}
+            editText="Edit study background details"
+            deleteText="Delete study background"
+            handleEdit={handleEdit}
+            handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
+         >
+            <SchoolIcon sx={styles.studyBackgroundSchoolIcon} />
+            <Stack spacing={0.5}>
+               <Typography variant="brandedBody" sx={styles.universityName}>
+                  {university?.name}
+               </Typography>
+               <Typography
+                  variant="small"
+                  sx={styles.studyDomains}
+               >{`${studyBackground.levelOfStudy.name} degree, ${studyBackground.fieldOfStudy.name}`}</Typography>
+               <ConditionalWrapper condition={hasBothYears}>
+                  <Typography
+                     variant="xsmall"
+                     sx={styles.studyDates}
+                  >{`${startedAtYear}${" - "}${endedAtYear}`}</Typography>
+               </ConditionalWrapper>
+            </Stack>
+         </ProfileItemCard>
+      </Fragment>
+   )
+}
+
+const EmptyStudyBackgroundView = () => {
+   const dispatch = useDispatch()
+
+   const handleAddBackground = useCallback(() => {
+      dispatch(openCreateStudyBackgroundDialog())
+   }, [dispatch])
+
    return (
       <Stack alignItems={"center"} spacing={2}>
          <Box color={"primary.main"}>
