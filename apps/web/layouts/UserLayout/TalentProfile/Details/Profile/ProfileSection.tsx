@@ -27,12 +27,14 @@ const styles = sxStyles({
 type Props = {
    title: string
    showAddIcon?: boolean
+   addIcon?: ReactElement
    handleAdd: () => void
    children: ReactElement
 }
 
 export const ProfileSection = ({
    showAddIcon,
+   addIcon,
    title,
    children,
    handleAdd,
@@ -44,11 +46,15 @@ export const ProfileSection = ({
                {title}
             </Typography>
             <ConditionalWrapper condition={showAddIcon}>
-               <Box
-                  component={PlusCircle}
-                  sx={styles.plusCircle}
-                  onClick={handleAdd}
-               />
+               {addIcon ? (
+                  addIcon
+               ) : (
+                  <Box
+                     component={PlusCircle}
+                     sx={styles.plusCircle}
+                     onClick={handleAdd}
+                  />
+               )}
             </ConditionalWrapper>
          </Stack>
          {children}
