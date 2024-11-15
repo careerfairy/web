@@ -55,17 +55,27 @@ export const LanguageFormProvider = ({
    )
 }
 
-export const LanguageFormFields = () => {
+type LanguageFormFieldsProps = {
+   filterLanguageIds?: string[]
+}
+
+export const LanguageFormFields = ({
+   filterLanguageIds,
+}: LanguageFormFieldsProps) => {
    const {
       formState: { isSubmitting },
    } = useFormContext()
+
+   const options = mapOptions(languageOptionCodes).filter(
+      (id) => !filterLanguageIds?.includes(id)
+   )
 
    return (
       <Stack spacing={2} sx={styles.formRoot}>
          <ControlledBrandedAutoComplete
             label={"Language"}
             name={"languageId"}
-            options={mapOptions(languageOptionCodes)}
+            options={options}
             textFieldProps={{
                requiredText: "(required)",
                placeholder: "E.g., English",
