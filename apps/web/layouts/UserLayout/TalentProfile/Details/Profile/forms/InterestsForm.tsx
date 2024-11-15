@@ -1,8 +1,8 @@
 import { ProfileInterest } from "@careerfairy/shared-lib/users"
-import { Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { ReactNode } from "react"
-import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
+import { FormProvider, UseFormReturn, useWatch } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import {
    CreateInterestSchema,
@@ -48,9 +48,22 @@ export const InterestFormProvider = ({
 }
 
 export const InterestFormFields = () => {
-   const {
-      formState: { isSubmitting },
-   } = useFormContext()
-   console.log("🚀 ~ InterestFormFields ~ isSubmitting:", isSubmitting)
-   return <Stack spacing={2} sx={styles.formRoot}></Stack>
+   // const {
+   //    formState: { isSubmitting }
+   // } = useFormContext()
+
+   const bts: string[] = useWatch({
+      name: "businessFunctionsTagIds",
+   })
+
+   const cts: string[] = useWatch({
+      name: "contentTopicsTagIds",
+   })
+
+   return (
+      <Stack spacing={2} sx={styles.formRoot}>
+         <Box>{bts}</Box>
+         <Box>{cts}</Box>
+      </Stack>
+   )
 }
