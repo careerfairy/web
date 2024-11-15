@@ -93,6 +93,7 @@ export const StudyBackgroundFormFields = () => {
                fieldName="endedAt"
                label="End Date (or expected)"
                minDate={minEndedAtDate}
+               disabled={!startedAtDateValue}
             />
          </Stack>
       </Stack>

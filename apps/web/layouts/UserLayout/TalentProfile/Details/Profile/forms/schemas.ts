@@ -23,7 +23,14 @@ export const baseStudyBackgroundShape = {
    })
       .nullable()
       .required("Field of study is required"),
-   startedAt: Yup.date().nullable(),
+   startedAt: Yup.date()
+      .nullable()
+      .when("endedAt", {
+         is: (val) => val != null, // Check if endedAt has a value
+         then: Yup.date().required(
+            "Start date is required when end date is provided"
+         ),
+      }),
    endedAt: Yup.date()
       .nullable()
       .test(
@@ -46,7 +53,7 @@ export const baseLinkShape = {
          excludeEmptyString: true,
          message: ERROR_MESSAGES.VALID_URL,
       })
-      .required("URL is required"), // Yup.string().required("Url is required"),
+      .required("URL is required"),
 }
 
 export const CreateStudyBackgroundSchema = Yup.object(baseStudyBackgroundShape)

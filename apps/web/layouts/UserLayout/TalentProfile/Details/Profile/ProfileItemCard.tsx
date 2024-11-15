@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material"
 import { ReactNode } from "react"
-import { Identifiable, sxStyles } from "types/commonTypes"
+import { sxStyles } from "types/commonTypes"
 import { ProfileMoreDots } from "./ProfileMoreDots"
 
 const styles = sxStyles({
@@ -13,9 +13,7 @@ const styles = sxStyles({
    },
 })
 
-type ProfileCardProps<T extends Identifiable> = {
-   dataTypeId: "study-background" | "link" | "language"
-   data: T
+type ProfileCardProps = {
    children: ReactNode
    editText: string
    deleteText: string
@@ -23,18 +21,8 @@ type ProfileCardProps<T extends Identifiable> = {
    handleDelete: () => void
 }
 
-export const ProfileItemCard = <T extends Identifiable>(
-   props: ProfileCardProps<T>
-) => {
-   const {
-      dataTypeId,
-      data,
-      children,
-      editText,
-      deleteText,
-      handleDelete,
-      handleEdit,
-   } = props
+export const ProfileItemCard = (props: ProfileCardProps) => {
+   const { children, editText, deleteText, handleDelete, handleEdit } = props
 
    return (
       <Stack direction={"row"} sx={styles.cardRoot}>
@@ -42,7 +30,6 @@ export const ProfileItemCard = <T extends Identifiable>(
             {children}
          </Stack>
          <ProfileMoreDots
-            id={`profile-${dataTypeId}-${data.id}-more-dots`}
             editText={editText}
             deleteText={deleteText}
             handleEditClick={handleEdit}

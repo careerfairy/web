@@ -279,6 +279,13 @@ export interface IUserRepository {
     * @param link Link data to be updated.
     */
    updateUserLink(userId: string, link: ProfileLink): Promise<void>
+
+   /**
+    * Deletes a given link (@param linkId) for the user (@param userId).
+    * @param userId User id.
+    * @param linkId Link id.
+    */
+   deleteLink(userId: string, linkId: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -1216,6 +1223,16 @@ export class FirebaseUserRepository
          .doc(link.id)
 
       return ref.set(link)
+   }
+
+   async deleteLink(userId: string, linkId: string): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("links")
+         .doc(linkId)
+
+      return ref.delete()
    }
 }
 

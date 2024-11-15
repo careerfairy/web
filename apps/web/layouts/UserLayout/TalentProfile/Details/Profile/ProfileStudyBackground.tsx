@@ -306,7 +306,6 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
 
    const hasStartedAtYear = Boolean(startedAtYear)
    const hasEndedAtYear = Boolean(endedAtYear)
-   const hasBothYears = hasStartedAtYear && hasEndedAtYear
 
    return (
       <Fragment>
@@ -319,8 +318,6 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             onClose={() => setIsConfirmDeleteDialogOpen(false)}
          />
          <ProfileItemCard
-            dataTypeId="study-background"
-            data={studyBackground}
             editText="Edit study background details"
             deleteText="Delete study background"
             handleEdit={handleEdit}
@@ -335,11 +332,11 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
                   variant="small"
                   sx={styles.studyDomains}
                >{`${studyBackground.levelOfStudy.name} degree, ${studyBackground.fieldOfStudy.name}`}</Typography>
-               <ConditionalWrapper condition={hasBothYears}>
-                  <Typography
-                     variant="xsmall"
-                     sx={styles.studyDates}
-                  >{`${startedAtYear}${" - "}${endedAtYear}`}</Typography>
+               <ConditionalWrapper condition={hasStartedAtYear}>
+                  <Typography variant="xsmall" sx={styles.studyDates}>
+                     {startedAtYear}
+                     {hasEndedAtYear ? `${" - "}${endedAtYear}` : null}
+                  </Typography>
                </ConditionalWrapper>
             </Stack>
          </ProfileItemCard>
