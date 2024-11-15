@@ -1,6 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close"
 import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton"
 import {
+   ButtonProps,
    DialogContentText,
    Drawer,
    Stack,
@@ -99,6 +100,7 @@ export type ConfirmationDialogAction = {
    autoFocus?: boolean
    fullWidth?: boolean
    disabled?: LoadingButtonProps["disabled"]
+   sx?: ButtonProps["sx"]
 }
 
 type Props = {
