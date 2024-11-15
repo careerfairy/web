@@ -136,12 +136,12 @@ const PortalPage = ({
                      dialogSource={DIALOG_SOURCE}
                   >
                      <>
-                        <Box position="relative" mb={4}>
+                        <Container disableGutters sx={{ overflow: "hidden" }}>
                            <ContentCarousel
                               content={carouselContent}
                               serverUserStats={serverUserStats}
                            />
-                        </Box>
+                        </Container>
                         <Container disableGutters>
                            <PortalTagsContent>
                               {isMounted ? (

@@ -1,19 +1,11 @@
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
-import { Box, Skeleton } from "@mui/material"
+import { Skeleton } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useUserSparks } from "components/custom-hook/spark/useUserSparks"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
-import {
-   GenericCarousel,
-   GenericCarouselProps,
-   useGenericCarousel,
-} from "components/views/common/carousels/GenericCarousel"
-import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
-import useEmblaCarousel from "embla-carousel-react"
-import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
-import React from "react"
+import SparksCarouselSkeleton from "components/views/admin/sparks/general-sparks-view/SparksCarouselSkeleton"
+import { SparksCarousel } from "components/views/sparks/components/SparksCarousel"
 import { sxStyles } from "types/commonTypes"
 import { EndOfStreamContainer } from "./Container"
 import { Heading } from "./Heading"
@@ -60,69 +52,12 @@ const Content = () => {
       <EndOfStreamContainer
          sx={Boolean(streamIsMobile) && styles.noRightPadding}
       >
-         <Heading>Discover more interesting topics with Sparks!</Heading>
-
-         <ResponsiveCarousel>
-            {sparks.map((spark) => (
-               <SparkCard key={spark.id} spark={spark} />
-            ))}
-         </ResponsiveCarousel>
-      </EndOfStreamContainer>
-   )
-}
-
-type ResponsiveCarouselProps = {
-   children: GenericCarouselProps["children"]
-   disableSwipe?: boolean
-}
-
-const plugins = [WheelGesturesPlugin()]
-
-const ResponsiveCarousel = ({
-   children,
-   disableSwipe,
-}: ResponsiveCarouselProps) => {
-   const streamIsMobile = useStreamIsMobile()
-
-   const [emblaRef, emblaApi] = useEmblaCarousel(
-      {
-         active: !disableSwipe,
-      },
-      plugins
-   )
-
-   const gap = streamIsMobile ? 12 : 16
-   const slideWidth = (streamIsMobile ? 241 : 272) + gap
-
-   return (
-      <GenericCarousel
-         gap={`${gap}px`}
-         emblaRef={emblaRef}
-         emblaApi={emblaApi}
-         preventEdgeTouch
-      >
-         {React.Children.map(children, (child) => (
-            <GenericCarousel.Slide
-               slideWidth={`${slideWidth}px`}
-               key={child.key}
-            >
-               {child}
-            </GenericCarousel.Slide>
-         ))}
-      </GenericCarousel>
-   )
-}
-
-type SparkCardProps = {
-   spark: Spark
-}
-const SparkCard = ({ spark }: SparkCardProps) => {
-   const { emblaApi } = useGenericCarousel()
-   return (
-      <Box sx={styles.sparkCardWrapper}>
-         <SparkPreviewCard
-            spark={spark}
-            onClick={() =>
+         <SparksCarousel
+            sparks={sparks}
+            header={
+               <Heading>Discover more interesting topics with Sparks!</Heading>
+            }
+            handleSparksClicked={(spark) =>
                window.open(
                   `${getBaseUrl()}/sparks/${spark.id}?interactionSource=${
                      SparkInteractionSources.Livestream_End_Screen
@@ -130,17 +65,8 @@ const SparkCard = ({ spark }: SparkCardProps) => {
                   "_blank"
                )
             }
-            onGoNext={() => emblaApi.scrollNext()}
          />
-      </Box>
-   )
-}
-
-const SparkCardSkeleton = () => {
-   return (
-      <Box sx={styles.sparkCardWrapper}>
-         <Skeleton sx={styles.skeleton} variant="rectangular" />
-      </Box>
+      </EndOfStreamContainer>
    )
 }
 
@@ -150,12 +76,7 @@ const Loader = () => {
          <Heading>
             <Skeleton width={280} />
          </Heading>
-         <ResponsiveCarousel disableSwipe>
-            <SparkCardSkeleton />
-            <SparkCardSkeleton />
-            <SparkCardSkeleton />
-            <SparkCardSkeleton />
-         </ResponsiveCarousel>
+         <SparksCarouselSkeleton />
       </EndOfStreamContainer>
    )
 }

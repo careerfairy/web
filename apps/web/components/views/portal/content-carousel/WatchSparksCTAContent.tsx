@@ -18,6 +18,15 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
    },
+   content: {
+      justifyContent: { xs: "flex-start !important", md: "center !important" },
+   },
+   info: {
+      mt: {
+         xs: 2,
+         md: 0,
+      },
+   },
    illustrationWrapper: {
       position: "absolute",
       right: 0,
@@ -28,6 +37,7 @@ const styles = sxStyles({
       },
       height: "100%",
       "& img": {
+         borderRadius: "12px",
          objectPosition: {
             xs: "top 28px left 18px",
             md: "top 0px left 0px",
@@ -66,11 +76,15 @@ const WatchSparksCTAContent: FC<Props> = () => {
                   component="span"
                   maxWidth={"60% !important"}
                   color="black"
+                  fontSize={isMobile ? "32px !important" : "48px !important"}
+                  fontWeight={"700 !important"}
                >
                   {"Discover "}
                   <ContentHeaderTitle
                      sx={styles.centeredHeaderTitle}
                      color="secondary.main"
+                     fontSize={isMobile ? "32px !important" : "48px !important"}
+                     fontWeight={"700 !important"}
                   >
                      Sparks
                   </ContentHeaderTitle>
@@ -81,6 +95,8 @@ const WatchSparksCTAContent: FC<Props> = () => {
                <ContentTitle
                   maxWidth={isMobile ? "50%!important" : "70%!important"}
                   color="black"
+                  fontSize={isMobile ? "16px !important" : "24px !important"}
+                  fontWeight={isMobile ? "400 !important" : "600 !important"}
                >
                   Short videos answering your questions and showing great
                   opportunities for you.
@@ -98,10 +114,12 @@ const WatchSparksCTAContent: FC<Props> = () => {
                   href={"/sparks"}
                   color={"secondary"}
                >
-                  {isMobile ? "Discover Sparks " : "Watch Sparks"}
+                  {"Watch Sparks"}
                </ContentButton>
             }
             withBackgroundOverlay={false}
+            contentSx={styles.content}
+            infoSx={styles.info}
          />
          <Box sx={styles.illustrationWrapper}>
             <Image
@@ -121,9 +139,9 @@ const WatchSparksCTAContent: FC<Props> = () => {
 }
 
 const desktopCreditsCTABackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-background-desktop.png?alt=media&token=28d768f0-4c24-44fb-82ba-db42ff19017e"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-background-desktop-2.png?alt=media&token=28d768f0-4c24-44fb-82ba-db42ff19017e"
 const mobileCreditsCTABackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-background-mobile.png?alt=media&token=6ef9779e-7539-4d6f-98a5-fdc864ca81db"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-background-mobile-2.png?alt=media&token=6ef9779e-7539-4d6f-98a5-fdc864ca81db"
 const desktopCreditsCTAIllustration =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-mockup-desktop.png?alt=media&token=4298c1bb-e4ee-4f0c-9dfb-6faacec3310a"
 const mobileCreditsCTAIllustration =
