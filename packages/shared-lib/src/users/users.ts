@@ -134,14 +134,17 @@ export type UserReadableGroupQuestionsWithAnswerMap = Record<
    ReadableQuestionAndAnswer
 >
 
-// /userData/:id/studyBackground/:id
+// Collection /userData/:id/studyBackgrounds/:id
 export interface StudyBackground extends Identifiable {
-   school: string
+   authId: string
+   universityCountryCode: string
+   universityId: string
    fieldOfStudy: FieldOfStudy
    levelOfStudy: LevelOfStudy
    startedAt?: Timestamp
    endedAt?: Timestamp
 }
+
 export interface ReadableQuestionAndAnswer {
    questionName: GroupQuestion["name"]
    questionId: GroupQuestion["id"]
