@@ -32,7 +32,7 @@ export interface UserData extends Identifiable {
    }
    badges?: string[]
    groupIds: string[]
-
+   fcmTokens?: string[]
    linkedinUrl: string
    isAdmin?: boolean
    userResume: string
@@ -68,7 +68,6 @@ export interface UserData extends Identifiable {
    regionsOfInterest?: string[]
    isLookingForJob?: boolean
    accountCreationUTMParams?: UTMParams
-
    // temporary to hide the jobs tabs from the user profile
    // should be removed in the future
    hasJobApplications?: boolean
@@ -121,6 +120,7 @@ export interface UserData extends Identifiable {
     * User's phone number
     */
    phoneNumber?: string
+   bannerImageUrl?: string
 }
 
 export type ValidUserTagFields =
@@ -133,6 +133,24 @@ export type UserReadableGroupQuestionsWithAnswerMap = Record<
    GroupQuestion["id"],
    ReadableQuestionAndAnswer
 >
+
+// Collection /userData/:id/studyBackgrounds/:id
+export interface StudyBackground extends Identifiable {
+   authId: string
+   universityCountryCode: string
+   universityId: string
+   fieldOfStudy: FieldOfStudy
+   levelOfStudy: LevelOfStudy
+   startedAt?: Timestamp
+   endedAt?: Timestamp
+}
+
+// Collection /userData/:id/links/:id
+export interface ProfileLink extends Identifiable {
+   authId: string
+   url: string
+   title: string
+}
 
 export interface ReadableQuestionAndAnswer {
    questionName: GroupQuestion["name"]

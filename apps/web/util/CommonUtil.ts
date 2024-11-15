@@ -383,3 +383,7 @@ export const convertBytesToMB = (bytes: number) =>
 export const generateUniqueId = () => {
    return uuid().replace(/-/g, "") // remove dashes
 }
+
+export function getIconUrl(siteUrl: string): string {
+   return `https://icon.horse/icon/?uri=${siteUrl}`
+}

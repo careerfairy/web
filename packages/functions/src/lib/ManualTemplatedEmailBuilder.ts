@@ -28,7 +28,7 @@ export class ManualTemplatedEmailBuilder {
             },
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "job-hub-launch",
+         Tag: "fill-and-win",
       })
    }
 

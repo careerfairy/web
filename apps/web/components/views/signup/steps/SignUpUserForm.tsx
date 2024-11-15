@@ -40,6 +40,8 @@ import HelperHint from "../common/HelperHint"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import CookiesUtil from "../../../../util/CookiesUtil"
+import { MobileUtils } from "../../../../util/mobile.utils"
+import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
 
 const styles = sxStyles({
    submit: {
@@ -132,7 +134,7 @@ function SignUpUserForm() {
          .then(() => {
             firebase
                .signInWithEmailAndPassword(values.email, values.password)
-               .then(async () => {
+               .then(async (userCred) => {
                   // To create a newsletter reminder for 7 days in the future
                   // in case the subscribed input is not checked
                   try {
@@ -154,6 +156,13 @@ function SignUpUserForm() {
                         isFirstReminder: true,
                      } as IUserReminder
 
+                     const token =
+                        userCred.user.multiFactor["user"].accessToken || ""
+                     MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
+                        token,
+                        userId: values.email,
+                        userPassword: values.password,
+                     })
                      await userRepo.updateUserReminder(values.email, reminder)
                   } catch (e) {
                      console.error(e)
@@ -168,7 +177,6 @@ function SignUpUserForm() {
                   // the useEffect moves to the step 1 because the user is logged in but not confirmed
                   // if we would do nextStep() here, it would move to step 2 instead of 1
                   setCurrentStep(1)
-
                   dataLayerEvent("signup_credentials_completed")
                })
                .catch((e) => {

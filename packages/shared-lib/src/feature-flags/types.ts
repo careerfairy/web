@@ -7,6 +7,7 @@ export type FlagKeys =
    | "livestreamCreationFlowV2"
    | "jobHubV1"
    | "mentorsV1"
+   | "talentProfileV1"
 
 export type FeatureFlag = {
    /**

@@ -77,6 +77,9 @@ export const flagsInitialState = {
    mentorsV1: {
       enabled: true,
    },
+   talentProfileV1: {
+      enabled: false,
+   },
 } satisfies FeatureFlagsDetails
 
 /**

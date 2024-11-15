@@ -1,7 +1,9 @@
-import React, { useCallback, useMemo, useState } from "react"
 import { useRouter } from "next/router"
+import { useCallback, useMemo, useState } from "react"
 
 // material-ui
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
+import LogoutIcon from "@mui/icons-material/PowerSettingsNewOutlined"
 import {
    Box,
    Divider,
@@ -10,23 +12,21 @@ import {
    MenuItem,
    Typography,
 } from "@mui/material"
-import Tooltip from "@mui/material/Tooltip"
-import Stack from "@mui/material/Stack"
 import IconButton from "@mui/material/IconButton"
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
-import LogoutIcon from "@mui/icons-material/PowerSettingsNewOutlined"
+import Stack from "@mui/material/Stack"
+import Tooltip from "@mui/material/Tooltip"
 import { Home as HomeIcon, Repeat as SyncIcon } from "react-feather"
 
 // project imports
-import { sxStyles } from "../../../types/commonTypes"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
-import useMenuState from "../../../components/custom-hook/useMenuState"
-import useIsMobile from "../../../components/custom-hook/useIsMobile"
-import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
-import { useGroup } from "../index"
 import { alpha } from "@mui/material/styles"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import useIsMobile from "../../../components/custom-hook/useIsMobile"
+import useMenuState from "../../../components/custom-hook/useMenuState"
+import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
+import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
 import ManageCompaniesDialog from "../../../components/views/profile/my-groups/ManageCompaniesDialog"
+import { sxStyles } from "../../../types/commonTypes"
+import { useGroup } from "../index"
 
 const styles = sxStyles({
    root: {
@@ -87,7 +87,7 @@ const UserAvatarWithDetails = () => {
    return (
       <>
          <Stack direction={"row"} spacing={1}>
-            <Tooltip title="Account settings">
+            <Tooltip title="Account">
                <IconButton
                   onClick={handleClick}
                   size="small"

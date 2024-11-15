@@ -77,6 +77,9 @@ import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
 import stripe = require("./stripe")
 import tags = require("./lib/tagging/tags")
+import notificationLivestreams = require("./notificationLivestreams")
+import notificationOnboardings = require("./notificationOnboarding")
+import user = require("./user")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -130,6 +133,17 @@ exports.manualEndOfSparksTrialEmails =
    endOfSparksTrials.manualEndOfSparksTrialEmails
 exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
 exports.manualTemplatedEmail = newsletter.manualTemplatedEmail
+
+// Notification Livestreams
+exports.notifyUsersWhenLivestreamStarts =
+   notificationLivestreams.notifyUsersWhenLivestreamStarts
+
+// Notification Onboarding
+exports.notificationOnboarding = notificationOnboardings.notificationOnboarding
+
+// User
+exports.updateUserLiveStreamDataOnUserChange =
+   user.updateUserLiveStreamDataOnUserChange
 
 // Stripe
 exports.stripeWebHook = stripe.stripeWebHook

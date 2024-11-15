@@ -13,7 +13,7 @@ const styles = sxStyles({
       // hack to ensure overflow visibility with parent padding
       padding: "16px",
       margin: "-16px",
-      width: "calc(100% + 32px)",
+      width: "calc(100% + 16px)",
    },
 })
 

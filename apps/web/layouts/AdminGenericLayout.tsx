@@ -1,9 +1,15 @@
 import React, { memo, useEffect, useMemo } from "react"
 
 // material-ui
-import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
-import Drawer from "@mui/material/Drawer"
-import { alpha, useTheme } from "@mui/material/styles"
+import {
+   AppBar,
+   Box,
+   Drawer,
+   Slide,
+   Toolbar,
+   useMediaQuery,
+} from "@mui/material"
+import { useTheme } from "@mui/material/styles"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
 
 // project imports
@@ -41,17 +47,8 @@ const baseStyles = (drawerWidth: number) => {
       animateWidth: {
          transition: (theme) => theme.transitions.create("width"),
       },
-      appBar: {
-         backdropFilter: "blur(8px)",
-         transition: (theme) =>
-            theme.transitions.create([
-               "backdrop-filter",
-               "background-color",
-               "width",
-            ]),
-      },
-      toolbar: {
-         backgroundColor: "none",
+      header: {
+         backgroundColor: "unset",
       },
       drawerWrapper: {
          flexShrink: { md: 0 },
@@ -72,17 +69,6 @@ const baseStyles = (drawerWidth: number) => {
       },
       drawerWrapperClosed: {
          width: 0,
-      },
-      noBackdrop: {
-         backdropFilter: "none",
-         backgroundColor: "transparent",
-      },
-      topBarFixed: {
-         position: "fixed",
-      },
-      borderBottom: {
-         borderBottom: "2px solid rgba(0, 0, 0, 0.03)",
-         backdropFilter: "blur(8px)",
       },
    })
 }
@@ -111,7 +97,7 @@ type Props = {
    setDrawer?: (open: boolean) => void
    toggleDrawer?: () => void
    bgColor?: string
-   topBarTransparent?: boolean
+   hideHeader?: boolean
    hideDrawer?: boolean
    headerWidth?: string
 }
@@ -127,7 +113,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    setDrawer,
    toggleDrawer,
    bgColor,
-   topBarTransparent = false,
+   hideHeader = false,
    hideDrawer,
    headerWidth,
 }) => {
@@ -169,12 +155,11 @@ const AdminGenericLayout: React.FC<Props> = ({
             ]}
          >
             {/* header */}
-            <HeaderComponent
-               width={headerWidth}
-               topBarTransparent={topBarTransparent}
-            >
-               {headerContent}
-            </HeaderComponent>
+            {hideHeader ? null : (
+               <HeaderComponent width={headerWidth}>
+                  {headerContent}
+               </HeaderComponent>
+            )}
 
             {/* mobile dropdown navigation content*/}
             {dropdownNav}
@@ -232,48 +217,35 @@ const DrawerComponent = ({
 type HeaderProps = {
    children: React.ReactNode
    headerBgColor?: string
-   topBarTransparent?: boolean
    width?: string
 }
-const HeaderComponent = ({
-   children,
-   headerBgColor = "#F7F8FC",
-   topBarTransparent = false,
-   width,
-}: HeaderProps) => {
-   const { topBarFixed, headerScrollThreshold } = useGenericDashboard()
+const HeaderComponent = ({ children, width }: HeaderProps) => {
+   const { headerScrollThreshold, headerFixed } = useGenericDashboard()
+   const isMobile = useIsMobile()
    const styles = useStyles()
 
    const isScrolling = useScrollTrigger({
-      disableHysteresis: true,
       threshold: headerScrollThreshold,
    })
 
    return (
-      <AppBar
-         enableColorOnDark
-         position="sticky"
-         color="inherit"
-         elevation={0}
-         sx={[
-            styles.appBar,
-            isScrolling ? styles.borderBottom : styles.noBackdrop,
-            topBarFixed && styles.topBarFixed,
-            isScrolling && {
-               backgroundColor: alpha(headerBgColor, 0.9),
-            },
-            topBarTransparent && {
-               backgroundColor: "transparent",
-               borderBottom: "none",
-               backdropFilter: "none",
-            },
-            width && { width },
-         ]}
+      <Slide
+         appear={false}
+         direction="down"
+         in={isMobile ? headerFixed || !isScrolling : true}
       >
-         <Toolbar sx={styles.toolbar} disableGutters>
-            {children}
-         </Toolbar>
-      </AppBar>
+         <AppBar
+            enableColorOnDark
+            position="sticky"
+            color="inherit"
+            elevation={0}
+            sx={[width && { width }, styles.header]}
+         >
+            <Toolbar sx={styles.header} disableGutters>
+               {children}
+            </Toolbar>
+         </AppBar>
+      </Slide>
    )
 }
 

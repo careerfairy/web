@@ -1,6 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close"
 import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton"
 import {
+   ButtonProps,
    DialogContentText,
    Drawer,
    Stack,
@@ -99,6 +100,7 @@ export type ConfirmationDialogAction = {
    autoFocus?: boolean
    fullWidth?: boolean
    disabled?: LoadingButtonProps["disabled"]
+   sx?: ButtonProps["sx"]
 }
 
 type Props = {
@@ -210,6 +212,7 @@ const MobileDrawer = ({
    icon,
    primaryAction,
    secondaryAction,
+   sx,
 }: Props) => {
    const isSwipeable = Boolean(handleClose)
    const DrawerComponent = isSwipeable ? SwipeableDrawer : Drawer
@@ -223,6 +226,7 @@ const MobileDrawer = ({
             sx: styles.paper,
          }}
          {...(isSwipeable && { onOpen: () => {} })}
+         sx={sx}
       >
          <Stack
             alignItems="center"

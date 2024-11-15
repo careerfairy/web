@@ -1,14 +1,14 @@
-import { GetStaticProps, NextPage } from "next"
-import Head from "next/head"
-import Link from "next/link"
+import MenuBurger from "components/webflow/MenuBurger"
 import parseHtml, {
    domToReact,
    Element,
    HTMLReactParserOptions,
 } from "html-react-parser"
 import get from "lodash/get"
-import React, { ReactElement } from "react"
-import MenuBurger from "components/webflow/MenuBurger"
+import { GetStaticProps, NextPage } from "next"
+import Head from "next/head"
+import Link from "next/link"
+import { ReactElement } from "react"
 
 // Determines if URL is internal or external
 function isUrlInternal(link: string): boolean {
@@ -121,7 +121,10 @@ const getStaticProps: GetStaticProps = async (ctx) => {
    })
 
    if (!res) {
-      throw new Error("Failed to fetch data")
+      console.error(`Failed to fetch data`)
+      return {
+         notFound: true,
+      }
    }
 
    const html = res.data

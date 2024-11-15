@@ -60,7 +60,7 @@ export const BusinessFunctionsTags = {
       id: "SupplyChainLogistics",
       name: "Supply chain & logistics",
    },
-}
+} as const
 
 export const BusinessFunctionsTagValues = Object.entries(
    BusinessFunctionsTags
@@ -91,7 +91,13 @@ export const ContentTopicsTags = {
       id: "Role",
       name: "Role",
    },
-}
+} as const
+
+export type ContentTopicTagId =
+   (typeof ContentTopicsTags)[keyof typeof ContentTopicsTags]["id"]
+
+export type BusinessFunctionTagId =
+   (typeof BusinessFunctionsTags)[keyof typeof BusinessFunctionsTags]["id"]
 
 export const ContentTopicsTagValues = Object.entries(ContentTopicsTags).map(
    ([, entry]) => entry

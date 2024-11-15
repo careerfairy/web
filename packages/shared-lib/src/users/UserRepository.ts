@@ -19,9 +19,11 @@ import { SeenSparks } from "../sparks/sparks"
 import {
    CompanyFollowed,
    IUserReminder,
+   ProfileLink,
    RegisteredLivestreams,
    RegistrationStep,
    SavedRecruiter,
+   StudyBackground,
    UserATSDocument,
    UserATSRelations,
    UserActivity,
@@ -233,6 +235,57 @@ export interface IUserRepository {
       tagField: ValidUserTagFields,
       tagIds: string[]
    ): Promise<UserData[]>
+
+   /**
+    * Creates a given study background in the /userData/studyBackgrounds sub collection.
+    * @param userId Id of the user.
+    * @param studyBackground Study background data.
+    */
+   createUserStudyBackground(
+      userId: string,
+      studyBackground: StudyBackground
+   ): Promise<void>
+
+   /**
+    * Updates the given study background (@param studyBackground) for the user with id defined by @param userId.
+    * @param userId Id of the user.
+    * @param studyBackground Study background to be updated.
+    */
+   updateUserStudyBackground(
+      userId: string,
+      studyBackground: StudyBackground
+   ): Promise<void>
+
+   /**
+    * Deletes the given study background by @param studyBackgroundId for user @param userId.
+    * @param id Id of the user.
+    * @param studyBackgroundId Id of the study background to delete.
+    */
+   deleteStudyBackground(
+      userId: string,
+      studyBackgroundId: string
+   ): Promise<void>
+
+   /**
+    * Creates a new profile link for the user identified by @param userId, user links live in a sub collection of /userData.
+    * @param userId Id of the user.
+    * @param link Link data to be created.
+    */
+   createUserLink(userId: string, link: ProfileLink): Promise<void>
+
+   /**
+    * Updates a given profile link for the user identified by @param userId.
+    * @param userId Id of the user.
+    * @param link Link data to be updated.
+    */
+   updateUserLink(userId: string, link: ProfileLink): Promise<void>
+
+   /**
+    * Deletes a given link (@param linkId) for the user (@param userId).
+    * @param userId User id.
+    * @param linkId Link id.
+    */
+   deleteLink(userId: string, linkId: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -1101,6 +1154,85 @@ export class FirebaseUserRepository
       }
 
       return this.addIdToDocs<UserData>(data.docs)
+   }
+
+   async createUserStudyBackground(
+      userId: string,
+      studyBackground: StudyBackground
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("studyBackgrounds")
+         .doc()
+
+      const data: StudyBackground = {
+         ...studyBackground,
+         id: ref.id,
+      }
+
+      await ref.set(data)
+   }
+
+   async updateUserStudyBackground(
+      userId: string,
+      studyBackground: StudyBackground
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("studyBackgrounds")
+         .doc(studyBackground.id)
+
+      return ref.set(studyBackground)
+   }
+
+   async deleteStudyBackground(
+      userId: string,
+      studyBackgroundId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("studyBackgrounds")
+         .doc(studyBackgroundId)
+
+      return ref.delete()
+   }
+
+   async createUserLink(userId: string, link: ProfileLink): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("links")
+         .doc()
+
+      const data: ProfileLink = {
+         ...link,
+         id: ref.id,
+      }
+
+      await ref.set(data)
+   }
+
+   async updateUserLink(userId: string, link: ProfileLink): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("links")
+         .doc(link.id)
+
+      return ref.set(link)
+   }
+
+   async deleteLink(userId: string, linkId: string): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("links")
+         .doc(linkId)
+
+      return ref.delete()
    }
 }
 
