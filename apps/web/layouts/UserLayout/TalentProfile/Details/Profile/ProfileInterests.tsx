@@ -2,6 +2,7 @@ import { ProfileInterest } from "@careerfairy/shared-lib/users"
 import { Box } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { userRepo } from "data/RepositoryInstances"
 import { Fragment, useCallback, useMemo } from "react"
 import { Heart } from "react-feather"
 import { useFormContext } from "react-hook-form"
@@ -69,10 +70,8 @@ const FormDialogWrapper = () => {
       talentProfileCreateInterestOpenSelector
    )
 
-   // const isEditingInterest = useSelector(talentProfileIsEditingInterestSelector)
-
    const {
-      formState: { isValid },
+      formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
    } = useFormContext()
@@ -91,15 +90,11 @@ const FormDialogWrapper = () => {
    }, [dispatch])
 
    const onSubmit = async (data: InterestFormValues) => {
-      console.log("🚀 ~ onSubmit ~ data:", data)
       try {
-         // TODO: update interests
-
-         // if (!data?.id) {
-         //     alert("Todo create interests")
-         // } else {
-         //     alert("Todo update interests")
-         // }
+         await userRepo.updateUserData(userData.id, {
+            businessFunctionsTagIds: data.businessFunctionsTagIds,
+            contentTopicsTagIds: data.contentTopicsTagIds,
+         })
 
          handleCloseInterestDialog()
          successNotification(`Saved interests 👓`)
@@ -122,6 +117,7 @@ const FormDialogWrapper = () => {
             handleClose={handleCloseInterestDialog}
             handleSave={handleSave}
             saveDisabled={!isValid}
+            isSubmitting={isSubmitting}
             saveText={"Save"}
          >
             <InterestFormFields />
@@ -131,8 +127,6 @@ const FormDialogWrapper = () => {
 }
 
 const InterestsList = () => {
-   // TODO-WG: Create hook in upper stack
-   // const { data: userLinks } = useUserInterests()
    const dispatch = useDispatch()
 
    const handleEdit = useCallback(() => {
