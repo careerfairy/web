@@ -5,7 +5,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { UniversityCountrySelector } from "components/views/profile/userData/personal-info/UniversityCountrySelector"
 import SelectUniversitiesDropDown from "components/views/universitySelect/SelectUniversitiesDropDown"
 import { DateTime } from "luxon"
-import { ReactNode } from "react"
+import { ReactNode, useEffect } from "react"
 import { FormProvider, UseFormReturn, useWatch } from "react-hook-form"
 import {
    CreateStudyBackgroundSchema,
@@ -29,12 +29,23 @@ export const StudyBackgroundFormProvider = ({
    children,
    studyBackground,
 }: StudyBackgroundFormProviderProps) => {
+   const defaultValues = getInitialStudyBackgroundValues(studyBackground)
+
    const methods = useYupForm({
       schema: CreateStudyBackgroundSchema,
-      defaultValues: getInitialStudyBackgroundValues(studyBackground),
+      defaultValues: defaultValues,
       mode: "onChange",
       reValidateMode: "onChange",
    })
+
+   // Explicitly reset form values after initialization if they change
+   useEffect(() => {
+      methods.reset(defaultValues)
+      return () => {
+         methods.reset({})
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [studyBackground])
 
    return (
       <FormProvider {...methods}>
@@ -46,12 +57,12 @@ export const StudyBackgroundFormProvider = ({
 export const StudyBackgroundFormFields = () => {
    const isMobile = useIsMobile()
 
-   const startDateValue = useWatch({
+   const startedAtDateValue: Date = useWatch({
       name: "startedAt",
    })
 
-   const minEndedAtDate = startDateValue
-      ? DateTime.fromJSDate(startDateValue).plus({ month: 1 }).toJSDate()
+   const minEndedAtDate = startedAtDateValue
+      ? DateTime.fromJSDate(startedAtDateValue).plus({ month: 1 }).toJSDate()
       : null
 
    return (
