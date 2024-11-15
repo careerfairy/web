@@ -1,6 +1,7 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { Box, Typography } from "@mui/material"
+import { Box, Dialog, Typography } from "@mui/material"
 import useGroup from "components/custom-hook/group/useGroup"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { HighlightComponentType } from "data/hygraph/types"
 import { SyntheticEvent, useCallback, useState } from "react"
@@ -32,7 +33,19 @@ const styles = sxStyles({
          zIndex: -1,
       },
    },
-   cardFullScreen: {
+   fullScreenDialog: {
+      width: "100%",
+      "& .MuiDialog-paper": {
+         overflow: "hidden !important",
+         alignItems: "center",
+         justifyContent: "center",
+         height: "80vh",
+      },
+      "& .react-player": {
+         display: "flex",
+      },
+   },
+   cardFullScreenMobile: {
       display: "flex",
       flexDirection: "column",
       position: "fixed",
@@ -120,6 +133,7 @@ export const HighlightCard = ({
    isPlaying: boolean
    onEnded: () => void
 }) => {
+   const isMobile = useIsMobile()
    const [isFullscreen, setIsFullscreen] = useState(false)
 
    const { data: group, status } = useGroup(
@@ -136,22 +150,57 @@ export const HighlightCard = ({
 
    return (
       <Box
-         sx={[isFullscreen ? styles.cardFullScreen : styles.card]}
+         sx={[
+            isFullscreen && isMobile
+               ? styles.cardFullScreenMobile
+               : styles.card,
+         ]}
          onClick={handleFullscreenClick}
       >
-         {isFullscreen ? (
+         {isFullscreen && isMobile ? (
             <FullScreenHeader highlight={highlight} group={group} />
          ) : (
             <NonFullscreenHeader highlight={highlight} group={group} />
          )}
-         <ReactPlayer
-            url={highlight.videoClip.url}
-            className="react-player"
-            width="100%"
-            height="100%"
-            playing={isPlaying}
-            onEnded={onEnded}
-         />
+         {isFullscreen && !isMobile ? (
+            <>
+               <ReactPlayer
+                  url={highlight.videoClip.url}
+                  className="react-player"
+                  width="100%"
+                  height="100%"
+                  playing={false}
+                  onEnded={onEnded}
+               />
+               <Dialog
+                  open={isFullscreen}
+                  sx={styles.fullScreenDialog}
+                  maxWidth="desktop"
+               >
+                  <ReactPlayer
+                     url={highlight.videoClip.url}
+                     className="react-player"
+                     width="100%"
+                     height="100%"
+                     playing={isPlaying}
+                     onEnded={onEnded}
+                  />
+                  <Box sx={{ width: "100%" }}>
+                     <FullScreenHeader highlight={highlight} group={group} />
+                     <HighlightVideoOverlay />
+                  </Box>
+               </Dialog>
+            </>
+         ) : (
+            <ReactPlayer
+               url={highlight.videoClip.url}
+               className="react-player"
+               width="100%"
+               height="100%"
+               playing={Boolean(isPlaying && !isFullscreen)}
+               onEnded={onEnded}
+            />
+         )}
          <HighlightVideoOverlay />
       </Box>
    )
