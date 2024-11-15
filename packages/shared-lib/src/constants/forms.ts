@@ -1651,6 +1651,15 @@ export const LanguageProficiencyLabels: Record<LanguageProficiency, string> = {
    native: "Native Speaker",
 }
 
+export const LanguageProficiencyOrderMap: Record<LanguageProficiency, number> =
+   {
+      beginner: 1,
+      intermediate: 2,
+      advanced: 3,
+      proficient: 4,
+      native: 5,
+   }
+
 export const CompanyCountryValues: OptionGroup[] = countriesOptionCodes.map(
    (country) => ({
       id: country.id,
