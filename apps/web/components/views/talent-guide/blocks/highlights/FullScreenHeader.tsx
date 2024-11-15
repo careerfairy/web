@@ -27,6 +27,8 @@ const styles = sxStyles({
       width: "100%",
       padding: "0 16px 16px 16px",
       color: "#FEFEFE",
+      userSelect: "none",
+      cursor: "default",
    },
    companyData: {
       display: "flex",
@@ -48,6 +50,7 @@ const styles = sxStyles({
    },
    liveStreamTitleContainer: {
       overflowX: "hidden",
+      cursor: "pointer",
       display: "flex",
    },
    liveStreamTitle: {
@@ -61,13 +64,14 @@ const getScrollAnimationStyle = (
 ) => {
    if (!titleRef.current || !parentRef.current) return []
 
-   const isOverflowing =
-      titleRef.current.clientWidth > parentRef.current.clientWidth
+   const titleWidth = titleRef.current.getBoundingClientRect().width
+   const parentWidth = parentRef.current.getBoundingClientRect().width
+
+   const isOverflowing = titleWidth > parentWidth
 
    if (!isOverflowing) return []
 
-   const overflownWidth =
-      titleRef.current.clientWidth - parentRef.current.clientWidth + 10
+   const overflownWidth = titleWidth - parentWidth + 10
 
    return [
       {
@@ -122,8 +126,11 @@ export const FullScreenHeader = ({
    )
 
    useEffect(() => {
-      if (titleRef.current || parentRef.current) {
-         setAnimationStyle(getScrollAnimationStyle(titleRef, parentRef))
+      if (titleRef.current && parentRef.current) {
+         // hack needed to ensure elements are rendered and we have access to the correct dimensions
+         setTimeout(() => {
+            setAnimationStyle(getScrollAnimationStyle(titleRef, parentRef))
+         }, 50)
       }
    }, [titleRef, parentRef])
 
