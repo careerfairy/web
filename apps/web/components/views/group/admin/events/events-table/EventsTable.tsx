@@ -32,9 +32,7 @@ import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDial
 import CompanyLogo from "./CompanyLogo"
 import DeleteEventDialog from "./DeleteEventDialog"
 import GroupLogos from "./GroupLogos"
-import ManageEndOfEventDialog from "./ManageEndOfEventDialog"
 import ManageStreamActions from "./ManageStreamActions"
-import MoreOptionsMenu from "./MoreOptionsMenu"
 import Speakers from "./Speakers"
 import ToolbarDialogAction from "./ToolbarDialogAction"
 
@@ -76,7 +74,6 @@ const EventsTable = ({
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null)
    const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] =
       useState(false)
-   const [endOfEventDialogData, setEndOfEventDialogData] = useState(null)
    const [targetStream, setTargetStream] = useState<LivestreamEvent>(null)
 
    const {
@@ -132,13 +129,6 @@ const EventsTable = ({
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [streams])
-
-   const handleCloseEndOfEventDialog = () => {
-      setEndOfEventDialogData(null)
-   }
-   const handleOpenEndOfEventDialog = ({ rowData }) => {
-      setEndOfEventDialogData(rowData)
-   }
 
    const handleSpeakerSearch = useCallback(
       (term, rowData) =>
@@ -274,17 +264,6 @@ const EventsTable = ({
                hintTitle: "Publish Stream",
                hintDescription:
                   "Once you are happy with the contents of the drafted event, you can then make it live so that users can now register.",
-            },
-            {
-               loadedButton: (
-                  <MoreOptionsMenu
-                     handleOpenEndOfEventDialog={handleOpenEndOfEventDialog}
-                     rowData={rowData}
-                     hintTitle="More options"
-                  />
-               ),
-               tooltip: "More options",
-               hidden: isDraft || !userData?.isAdmin,
             },
          ]
 
@@ -516,12 +495,6 @@ const EventsTable = ({
             onClose={handleCloseToolbarActionsDialog}
             openDialog={toolbarActionsDialogOpen}
             handleOpenNewStreamModal={handleOpenNewStreamModal}
-         />
-         <ManageEndOfEventDialog
-            open={Boolean(endOfEventDialogData)}
-            eventData={endOfEventDialogData}
-            group={group}
-            handleClose={handleCloseEndOfEventDialog}
          />
       </>
    )

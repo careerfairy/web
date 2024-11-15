@@ -31,7 +31,6 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 2,
-      pb: 1,
    },
    description: {
       display: "flex",
@@ -56,6 +55,10 @@ const styles = sxStyles({
    },
    viewport: {
       overflow: "hidden",
+      // hack to ensure overflow visibility with parent padding
+      padding: "16px",
+      marginX: "-16px",
+      width: "calc(100% + 16px)",
    },
    container: {
       backfaceVisibility: "hidden",
