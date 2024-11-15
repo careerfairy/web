@@ -323,21 +323,23 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             handleEdit={handleEdit}
             handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
          >
-            <SchoolIcon sx={styles.studyBackgroundSchoolIcon} />
-            <Stack spacing={0.5}>
-               <Typography variant="brandedBody" sx={styles.universityName}>
-                  {university?.name}
-               </Typography>
-               <Typography
-                  variant="small"
-                  sx={styles.studyDomains}
-               >{`${studyBackground.levelOfStudy.name} degree, ${studyBackground.fieldOfStudy.name}`}</Typography>
-               <ConditionalWrapper condition={hasStartedAtYear}>
-                  <Typography variant="xsmall" sx={styles.studyDates}>
-                     {startedAtYear}
-                     {hasEndedAtYear ? `${" - "}${endedAtYear}` : null}
+            <Stack direction={"row"} alignItems={"center"} spacing={1.5}>
+               <SchoolIcon sx={styles.studyBackgroundSchoolIcon} />
+               <Stack spacing={0.5}>
+                  <Typography variant="brandedBody" sx={styles.universityName}>
+                     {university?.name}
                   </Typography>
-               </ConditionalWrapper>
+                  <Typography
+                     variant="small"
+                     sx={styles.studyDomains}
+                  >{`${studyBackground.levelOfStudy.name} degree, ${studyBackground.fieldOfStudy.name}`}</Typography>
+                  <ConditionalWrapper condition={hasStartedAtYear}>
+                     <Typography variant="xsmall" sx={styles.studyDates}>
+                        {startedAtYear}
+                        {hasEndedAtYear ? `${" - "}${endedAtYear}` : null}
+                     </Typography>
+                  </ConditionalWrapper>
+               </Stack>
             </Stack>
          </ProfileItemCard>
       </Fragment>

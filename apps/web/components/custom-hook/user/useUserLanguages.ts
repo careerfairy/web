@@ -1,6 +1,8 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { LanguageProficiencyOrderMap } from "@careerfairy/shared-lib/constants/forms"
 import { ProfileLanguage } from "@careerfairy/shared-lib/users"
 import { useAuth } from "HOCs/AuthProvider"
+import { languageCodesDict } from "components/helperFunctions/streamFormFunctions"
 import { collection, onSnapshot, query } from "firebase/firestore"
 import { useEffect, useState } from "react"
 import { useFirestore } from "reactfire"
@@ -18,7 +20,7 @@ export const useUserLanguages = () => {
             ).withConverter(createGenericConverter<ProfileLanguage>()),
             (doc) => {
                const newData = doc.docs?.map((doc) => doc.data()) || []
-               setLanguages(newData)
+               setLanguages(sortLanguages(newData))
             }
          )
 
@@ -30,4 +32,23 @@ export const useUserLanguages = () => {
       data: languages,
       hasItems: Boolean(languages?.length),
    }
+}
+
+const sortLanguages = (languages: ProfileLanguage[]) => {
+   return languages.sort((langA, langB) => {
+      // Compare by proficiency level first
+      const proficiencyComparison =
+         LanguageProficiencyOrderMap[langB.proficiency] -
+         LanguageProficiencyOrderMap[langA.proficiency]
+
+      if (proficiencyComparison !== 0) {
+         return proficiencyComparison
+      }
+
+      // If proficiency is the same, compare alphabetically by name
+      const nameA = languageCodesDict[langA.languageId]["name"]
+      const nameB = languageCodesDict[langB.languageId]["name"]
+
+      return nameA.localeCompare(nameB)
+   })
 }

@@ -91,6 +91,7 @@ const ProfileLanguagesDetails = () => {
 }
 
 const FormDialogWrapper = () => {
+   const { data: languages } = useUserLanguages()
    const dispatch = useDispatch()
    const { userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
@@ -141,6 +142,9 @@ const FormDialogWrapper = () => {
 
    const handleSave = async () => handleSubmit(onSubmit)()
 
+   const alreadyExistingLanguages =
+      languages?.map((language) => language.languageId) || []
+
    const saveText = isEditingLanguage ? "Save" : "Add"
 
    return (
@@ -155,7 +159,7 @@ const FormDialogWrapper = () => {
             isSubmitting={isSubmitting}
             saveText={saveText}
          >
-            <LanguageFormFields />
+            <LanguageFormFields filterLanguageIds={alreadyExistingLanguages} />
          </BaseProfileDialog>
       </Fragment>
    )
