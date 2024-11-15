@@ -149,7 +149,7 @@ const EmptyRegistrationsBanner: FC = () => {
                >
                   <Box>
                      <Heading sx={styles.noRegistrations.title}>
-                        No registrations Yet!
+                        No registrations yet!
                      </Heading>
                   </Box>
                   <Box sx={styles.noRegistrations.descriptionWrapper}>

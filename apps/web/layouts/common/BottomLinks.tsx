@@ -1,18 +1,16 @@
-import React from "react"
-
 // material-ui
-import Stack from "@mui/material/Stack"
 import { Box, Divider } from "@mui/material"
+import Stack from "@mui/material/Stack"
 
 // react feather
 import { HelpCircle } from "react-feather"
 
 // project imports
-import { NavLink } from "./NavList"
-import { sxStyles } from "../../types/commonTypes"
+import { MainLogo, MiniLogoGreenBg } from "../../components/logos"
 import { supportPageLink } from "../../constants/links"
-import { MainLogo, MiniLogo, MiniLogoGreenBg } from "../../components/logos"
+import { sxStyles } from "../../types/commonTypes"
 import { useGroup } from "../GroupDashboardLayout"
+import { NavLink } from "./NavList"
 
 const styles = sxStyles({
    logo: {

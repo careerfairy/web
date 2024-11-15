@@ -1,3 +1,4 @@
+import { MobileUtils } from "../../../../../../util/mobile.utils"
 import { useLocalTracks } from "../../../context"
 
 export enum PermissionType {
@@ -28,8 +29,12 @@ export const useMediaPermissions = () => {
    } = useLocalTracks()
 
    const permissions = {
-      microphone: getPermission(activeMicrophoneId, fetchMicsError),
-      camera: getPermission(activeCameraId, fetchCamerasError),
+      microphone: MobileUtils.webViewPresence()
+         ? PermissionType.Unknown
+         : getPermission(activeMicrophoneId, fetchMicsError),
+      camera: MobileUtils.webViewPresence()
+         ? PermissionType.Unknown
+         : getPermission(activeCameraId, fetchCamerasError),
    }
 
    return {

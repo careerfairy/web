@@ -122,12 +122,7 @@ const PortalPage = ({
             }
             title={"CareerFairy | Portal"}
          />
-         <GenericDashboardLayout
-            pageDisplayName={""}
-            topBarFixed={carouselContent?.length > 0}
-            headerScrollThreshold={carouselContent?.length ? 250 : 10}
-            isPortalPage={true}
-         >
+         <GenericDashboardLayout pageDisplayName={""} isPortalPage={true}>
             <>
                <LivestreamDialogLayout
                   livestreamDialogData={livestreamDialogData}
@@ -141,12 +136,12 @@ const PortalPage = ({
                      dialogSource={DIALOG_SOURCE}
                   >
                      <>
-                        <Box position="relative" mb={4}>
+                        <Container disableGutters sx={{ overflow: "hidden" }}>
                            <ContentCarousel
                               content={carouselContent}
                               serverUserStats={serverUserStats}
                            />
-                        </Box>
+                        </Container>
                         <Container disableGutters>
                            <PortalTagsContent>
                               {isMounted ? (

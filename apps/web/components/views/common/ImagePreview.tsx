@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import { FC } from "react"
 import Lightbox, { SlideImage } from "yet-another-react-lightbox"
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen"
 import "yet-another-react-lightbox/styles.css"
@@ -19,6 +19,10 @@ const ImagePreview: FC<Props> = ({ photos, photoIndex, close }) => {
          close={close}
          // enable optional lightbox plugins
          plugins={[Fullscreen]}
+         render={{
+            buttonPrev: photos?.length <= 1 ? () => null : undefined,
+            buttonNext: photos?.length <= 1 ? () => null : undefined,
+         }}
       />
    )
 }

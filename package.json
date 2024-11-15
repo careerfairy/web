@@ -29,7 +29,13 @@
       "lint:functions": "turbo run lint --filter=@careerfairy/functions",
       "deploy:rules": "firebase deploy --only firestore:rules",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
-      "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions"
+      "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions",
+      "native": "cd apps/mobile && npm run start",
+      "native:cache": "cd apps/mobile && npm run start:cache",
+      "native-build": "npm run native-build:preview",
+      "native-build:preview": "cd apps/mobile && npm run build:preview",
+      "native-build:develop": "cd apps/mobile && npm run build:develop",
+      "native-build:prod": "cd apps/mobile && npm run build:prod"
    },
    "dependencies": {
       "@emotion/cache": "^11.7.1",
@@ -41,7 +47,9 @@
       "@mui/x-charts": "^6.18.3",
       "@stripe/react-stripe-js": "^2.5.1",
       "@stripe/stripe-js": "^3.0.7",
+      "color-thief-react": "^2.1.0",
       "next": "^13.5.6",
+      "normalize-url": "^8.0.1",
       "react": "^18.2.0",
       "react-dom": "^18.2.0",
       "react-joyride": "^2.8.2",

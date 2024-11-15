@@ -1,14 +1,14 @@
-import IconButton from "@mui/material/IconButton"
 import BadgeOutlined from "@mui/icons-material/BadgeOutlined"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Tooltip from "@mui/material/Tooltip"
-import React, { useCallback, useEffect, useRef, useState } from "react"
-import usePulseStyles from "../../../materialUI/Misc/pulse"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import UserDataModal, { missingDataFields } from "./UserDataModal"
+import IconButton from "@mui/material/IconButton"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useLocalStorage } from "react-use"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import usePulseStyles from "../../../materialUI/Misc/pulse"
 import useIsMobile from "../../custom-hook/useIsMobile"
+import { BrandedTooltip } from "../streaming-page/components/BrandedTooltip"
+import UserDataModal, { missingDataFields } from "./UserDataModal"
 
 const styles = {
    containerIcon: {
@@ -112,7 +112,7 @@ const MissingDataButton = ({
 
    return (
       <Box>
-         <Tooltip title={`You have missing data in your profile`}>
+         <BrandedTooltip title={`You have missing data in your profile`}>
             {showLargeButton && !isMobile ? (
                <Button
                   variant="contained"
@@ -127,7 +127,7 @@ const MissingDataButton = ({
                <IconButton
                   ref={buttonRef}
                   color="primary"
-                  size="large"
+                  size="small"
                   onClick={handleModalOpen}
                >
                   <Box
@@ -139,7 +139,7 @@ const MissingDataButton = ({
                   </Box>
                </IconButton>
             )}
-         </Tooltip>
+         </BrandedTooltip>
 
          {isModalOpen ? (
             <UserDataModal

@@ -1,30 +1,26 @@
 import {
    Box,
-   Container,
    SxProps,
    Typography,
    TypographyProps,
-   darken,
    styled,
 } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { useColor } from "color-thief-react"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/legacy/image"
-import React, { Fragment } from "react"
+import React, { useMemo } from "react"
 import { combineStyles, sxStyles } from "../../../../types/commonTypes"
 
 const COMPANY_LOGO_SIZE = 63
 
 const styles = sxStyles({
    info: {
-      marginTop: 4,
       display: "flex",
       flexDirection: "column",
-   },
-   logoContainer: {
-      marginTop: "1.5vh !important",
-      marginBottom: "0.5vh !important",
    },
    logoCaptionWrapper: {
       display: "flex",
@@ -47,34 +43,43 @@ const styles = sxStyles({
    },
    content: {
       position: "relative",
-      paddingX: { xs: 2.62, md: 6.25 },
+      paddingX: { xs: 1.5, md: 3.5 },
       display: "flex",
       flexDirection: "column",
-      justifyContent: "space-between",
-      height: "100%",
+      justifyContent: "center",
+      height: "calc(100% - 35px)", // account for pagination component
       zIndex: 1,
    },
-   wrapper: {
+   backdrop: {
       width: "100%",
-      height: { xs: "55vh", md: "40vh" },
-      minHeight: "470px",
+      height: "100%",
    },
-   image: {
+   background: {
+      width: "100%",
+      height: "100%",
       "&:after": {
          position: "absolute",
          height: "100%",
          width: "100%",
          content: '" "',
-         opacity: 0.7,
+         borderRadius: "12px",
+         overflow: "hidden",
+      },
+      "&:before": {
+         position: "absolute",
+         height: "100%",
+         width: "100%",
+         content: '" "',
+         opacity: 0.15,
+         filter: "blur(10px)",
       },
    },
-   backgroundOverlay: {
-      "&:after": {
-         backgroundColor: (theme) => darken(theme.palette.navyBlue.main, 0.5),
-      },
+   image: {
+      borderRadius: "12px",
+      backgroundColor: "white",
    },
    actionItem: {
-      mt: 2,
+      mt: 2.5,
    },
 })
 
@@ -91,6 +96,7 @@ type ContentProps = {
    backgroundImageUrl?: string
    backgroundImageAlt?: string
    withBackgroundOverlay?: boolean
+   hideBackground?: boolean
 }
 
 const Content = React.forwardRef<HTMLDivElement, ContentProps>(
@@ -108,79 +114,123 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
          actionItemSx,
          infoSx,
          contentSx,
+         hideBackground = false,
       },
       ref
    ) => {
+      const isMobile = useIsMobile()
+
+      const { data } = useColor(backgroundImageUrl, "rgbArray", {
+         crossOrigin: "anonymous",
+      })
+      const gradientMobile = useMemo(
+         () =>
+            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${data?.join(
+               ","
+            )}, 0.00) 10.49%, rgba(${data?.join(",")}, 0.85) 52.63%)`,
+         [data]
+      )
+
+      const gradientDesktop = useMemo(
+         () =>
+            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${data?.join(
+               ","
+            )}, 0.00) 10.49%, rgba(${data?.join(",")}, 0.80) 70.32%)`,
+         [data]
+      )
+
+      const gradient = isMobile ? gradientMobile : gradientDesktop
+
       return (
-         <Fragment>
+         <>
             {backgroundImageUrl ? (
                <Box
                   ref={ref}
                   sx={[
-                     styles.wrapper,
-                     styles.image,
-                     withBackgroundOverlay && styles.backgroundOverlay,
+                     styles.background,
+                     withBackgroundOverlay &&
+                        data && {
+                           "&:after": {
+                              background: gradient,
+                           },
+                        },
+                     backgroundImageUrl &&
+                        data && {
+                           "&:before": {
+                              background: `${gradient}, url(${backgroundImageUrl})`,
+                              backgroundSize: "cover",
+                           },
+                        },
                   ]}
                   position={"absolute"}
                >
-                  <Image
-                     src={backgroundImageUrl}
-                     alt={backgroundImageAlt}
-                     layout="fill"
-                     objectFit={"cover"}
-                     quality={90}
-                  />
+                  {hideBackground ? (
+                     <Box
+                        position={"absolute"}
+                        width={"100%"}
+                        height={"100%"}
+                        sx={styles.image}
+                     />
+                  ) : (
+                     <Image
+                        src={backgroundImageUrl}
+                        alt={backgroundImageAlt}
+                        layout="fill"
+                        objectFit={"cover"}
+                        quality={90}
+                        style={styles.image}
+                     />
+                  )}
                </Box>
             ) : null}
-            <Container
-               disableGutters
-               sx={combineStyles(styles.content, contentSx)}
-            >
-               <Box sx={combineStyles(styles.info, infoSx)}>
-                  <Stack spacing={1.5} mt={4}>
-                     <ContentHeaderTitle>{headerTitle}</ContentHeaderTitle>
-                     {logoUrl ? (
-                        <Stack
-                           spacing={1.5}
-                           direction="row"
-                           sx={styles.logoContainer}
-                        >
-                           <CircularLogo
-                              src={logoUrl}
-                              alt={"company logo"}
-                              size={COMPANY_LOGO_SIZE}
-                           />
-                           {logoCaption ? (
-                              <Box sx={styles.logoCaptionWrapper}>
-                                 <Typography fontWeight={300} variant={"body1"}>
-                                    Hosted by
-                                 </Typography>
-                                 <Typography fontWeight={600} variant={"body1"}>
-                                    {logoCaption}
-                                 </Typography>
-                              </Box>
-                           ) : null}
-                        </Stack>
-                     ) : null}
-                     {title ? (
-                        <ContentTitle sx={styles.title} component="h2">
-                           {title}
-                        </ContentTitle>
-                     ) : null}
-                     {subtitle ? (
-                        <ContentSubtitle component="h3">
-                           {subtitle}
-                        </ContentSubtitle>
-                     ) : null}
-                  </Stack>
+            <Box sx={combineStyles(styles.content, contentSx)}>
+               <Stack
+                  spacing={{ xs: 2, md: 2.5 }}
+                  sx={combineStyles(styles.info, infoSx)}
+               >
+                  <ContentHeaderTitle>{headerTitle}</ContentHeaderTitle>
+                  {logoUrl ? (
+                     <Stack spacing={1} direction="row" marginBottom={1.5}>
+                        <CircularLogo
+                           src={logoUrl}
+                           alt={"company logo"}
+                           size={COMPANY_LOGO_SIZE}
+                        />
+                        {logoCaption ? (
+                           <Box sx={styles.logoCaptionWrapper}>
+                              <Typography fontWeight={400} variant={"xsmall"}>
+                                 Hosted by
+                              </Typography>
+                              <Typography
+                                 fontWeight={600}
+                                 variant={"brandedBody"}
+                                 sx={{ ...getMaxLineStyles(1) }}
+                              >
+                                 {logoCaption}
+                              </Typography>
+                           </Box>
+                        ) : null}
+                     </Stack>
+                  ) : null}
+                  {title ? (
+                     <Stack mt={"12px !important"}>
+                        <ContentTitle sx={styles.title}>{title}</ContentTitle>
+                     </Stack>
+                  ) : null}
+                  {subtitle ? (
+                     <ContentSubtitle sx={{ mb: 1.5, mt: "12px !important" }}>
+                        {subtitle}
+                     </ContentSubtitle>
+                  ) : null}
+
                   {actionItem ? (
                      <Box sx={combineStyles(styles.actionItem, actionItemSx)}>
                         {actionItem}
                      </Box>
                   ) : null}
-               </Box>
-            </Container>
-         </Fragment>
+               </Stack>
+            </Box>
+         </>
       )
    }
 )
@@ -188,35 +238,27 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
 Content.displayName = "Content"
 
 export const ContentSubtitle = styled((props: TypographyProps) => (
-   <Typography variant={"h6"} {...props} />
+   <Typography variant={"small"} {...props} />
 ))(() => ({
    fontWeight: "400",
    mt: 1,
 })) as typeof Typography
 
 export const ContentHeaderTitle = styled((props: TypographyProps) => (
-   <Typography variant={"h1"} {...props} />
-))(({ theme }) => ({
+   <Typography variant={"brandedH4"} {...props} />
+))(() => ({
    fontWeight: 600,
    position: "relative",
    display: "inline-block",
    mb: 0.5,
-   fontSize: "2.375rem",
-   [theme.breakpoints.up("md")]: {
-      fontSize: "3.6rem !important",
-   },
 })) as typeof Typography
 
 export const ContentTitle = styled((props: TypographyProps) => (
-   <Typography {...props} />
-))(({ theme }) => ({
+   <Typography variant={"brandedH3"} {...props} />
+))(() => ({
    display: "inline-block",
    fontWeight: "bold",
    whiteSpace: "pre-line",
-   fontSize: "1.28rem",
-   [theme.breakpoints.up("md")]: {
-      fontSize: "2rem",
-   },
 })) as typeof Typography
 
 export default Content

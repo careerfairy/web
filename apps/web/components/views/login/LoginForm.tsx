@@ -23,6 +23,8 @@ import { BLACKLISTED_ABSOLUTE_PATHS } from "../../../constants/routes"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
+import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
+import { MobileUtils } from "../../../util/mobile.utils"
 
 const styles = {
    box: {
@@ -113,7 +115,11 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                Object.keys(adminGroups).length > 1
             ) {
                // open manage company dialog
-               setOpenManageCompaniesDialog(true)
+               if (MobileUtils.webViewPresence()) {
+                  void replace("/portal")
+               } else {
+                  setOpenManageCompaniesDialog(true)
+               }
             } else if (Object.keys(adminGroups).length === 1) {
                // redirect to the group admin page
                const groupId = Object.keys(adminGroups)[0]
@@ -140,7 +146,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
    const handleSubmit = useCallback(
       async (values: FormikValues, helpers: FormikHelpers<FormikValues>) => {
          try {
-            await firebase.signInWithEmailAndPassword(
+            const userCred = await firebase.signInWithEmailAndPassword(
                values.email,
                values.password
             )
@@ -149,6 +155,12 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                fingerPrintId
             )
             helpers.setErrors({})
+            const token = userCred.user.multiFactor["user"].accessToken || ""
+            MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
+               token,
+               userId: values.email,
+               userPassword: values.password,
+            })
             dataLayerEvent("login_complete")
          } catch (error) {
             switch (error.code) {

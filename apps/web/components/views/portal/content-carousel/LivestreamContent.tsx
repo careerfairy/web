@@ -9,7 +9,10 @@ import { FC, ReactNode, useCallback, useMemo } from "react"
 import DateUtil from "../../../../util/DateUtil"
 import useLivestream from "../../../custom-hook/live-stream/useLivestream"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import {
+   getMaxLineStyles,
+   getResizedUrl,
+} from "../../../helperFunctions/HelperFunctions"
 import { buildDialogLink } from "../../livestream-dialog"
 import useRecordingAccess from "../../upcoming-livestream/HeroSection/useRecordingAccess"
 import { LivestreamEventWithType } from "./CarouselContentService"
@@ -151,13 +154,23 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
       redirectToLogin,
    ])
 
+   console.log(subtitle)
+
    return (
       <Content
          headerTitle={
             <ContentHeaderTitle color="white">{headerTitle}</ContentHeaderTitle>
          }
-         title={<ContentTitle color="white">{livestream.title}</ContentTitle>}
-         subtitle={<ContentSubtitle color="white">{subtitle}</ContentSubtitle>}
+         title={
+            <ContentTitle color="white" sx={{ ...getMaxLineStyles(3) }}>
+               {livestream.title}
+            </ContentTitle>
+         }
+         subtitle={
+            subtitle ? (
+               <ContentSubtitle color="white">{subtitle}</ContentSubtitle>
+            ) : null
+         }
          logoUrl={livestream.companyLogoUrl}
          logoCaption={livestream.company}
          actionItem={actionItem}

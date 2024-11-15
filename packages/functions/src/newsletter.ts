@@ -7,6 +7,7 @@ import {
    emailNotificationsRepo,
    groupRepo,
    livestreamsRepo,
+   sparkRepo,
    userRepo,
 } from "./api/repositories"
 import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
@@ -96,7 +97,7 @@ export const manualNewsletter = onRequest(runtimeSettings, async (req, res) => {
 export const manualTemplatedEmail = onRequest(
    runtimeSettings,
    async (req, res) => {
-      logger.info("manualTemplatedEmail: v6.0 - Job Hub Launch")
+      logger.info("manualTemplatedEmail: v9.0 - fill and win")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -117,11 +118,11 @@ export const manualTemplatedEmail = onRequest(
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("Job Hub launch email email sent to everyone")
+         res.status(200).send("Fill and win email sent to everyone")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "Job Hub email email sent to " + receivedEmails.join(", ")
+            "Fill and win email sent to " + receivedEmails.join(", ")
          )
       }
    }
@@ -168,7 +169,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      logger.info("Job Hub email already sent, skipping")
+      logger.info("Fill and win email already sent, skipping")
       return
    }
 
@@ -179,7 +180,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
 
    const newsletterService = new ManualTemplatedEmailService(
       userRepo,
-      // livestreamsRepo,
+      sparkRepo,
       emailBuilder,
       logger
    )
@@ -193,7 +194,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   logger.info("Job Hub announcement execution done")
+   logger.info("Fill and win execution done")
 }
 
 /**

@@ -1,0 +1,90 @@
+{
+   "expo": {
+      "name": "CareerFairy",
+      "slug": "careerfairy-mobile-app",
+      "version": "0.0.0",
+      "orientation": "portrait",
+      "icon": "./assets/images/AppIcon.png",
+      "scheme": "career.fairy",
+      "userInterfaceStyle": "automatic",
+      "splash": {
+         "image": "./assets/images/MainSplashScreen.png",
+         "resizeMode": "contain",
+         "backgroundColor": "#ffffff"
+      },
+      "androidStatusBar": {
+         "barStyle": "dark-content",
+         "translucent": true
+      },
+      "ios": {
+         "supportsTablet": true,
+         "infoPlist": {
+            "NSCameraUsageDescription": "This app uses the camera to take photos and record videos.",
+            "NSMicrophoneUsageDescription": "This app uses the microphone to record audio.",
+            "NSUserNotificationUsageDescription": "This app uses notifications to inform you about important updates and messages."
+         },
+         "associatedDomains": [
+            "applinks:careerfairy.io",
+            "applinks:www.careerfairy.io",
+            "applinks:staging.careerfairy.io"
+         ]
+      },
+      "android": {
+         "package": "com.admin_product_team.careerfairymobileapp",
+         "googleServicesFile": "./google-services.json",
+         "permissions": [
+            "NOTIFICATIONS",
+            "CAMERA",
+            "RECORD_AUDIO",
+            "RECEIVE_BOOT_COMPLETED",
+            "VIBRATE"
+         ],
+         "adaptiveIcon": {
+            "foregroundImage": "./assets/images/AppIcon.png",
+            "backgroundColor": "#ffffff"
+         },
+         "intentFilters": [
+            {
+               "action": "VIEW",
+               "autoVerify": true,
+               "data": [
+                  {
+                     "scheme": "https",
+                     "host": "careerfairy.io"
+                  },
+                  {
+                     "scheme": "https",
+                     "host": "www.careerfairy.io"
+                  },
+                  {
+                     "scheme": "https",
+                     "host": "staging.careerfairy.io"
+                  }
+               ],
+               "category": ["BROWSABLE", "DEFAULT"]
+            }
+         ]
+      },
+      "notification": {
+         "icon": "./assets/images/icon.png",
+         "color": "#ffffff",
+         "androidMode": "default",
+         "androidCollapsedTitle": "New notifications"
+      },
+      "web": {
+         "bundler": "metro",
+         "output": "static",
+         "favicon": "./assets/images/AppIcon.png"
+      },
+      "plugins": ["expo-router", "expo-secure-store", "expo-font"],
+      "experiments": {
+         "typedRoutes": true
+      },
+      "extra": {
+         "eas": {
+            "projectId": "52368a9d-be31-4ef9-be0a-3e9e1de4e098"
+         }
+      },
+      "owner": "admin_product_team"
+   }
+}

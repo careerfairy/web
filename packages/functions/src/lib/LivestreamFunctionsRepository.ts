@@ -41,7 +41,11 @@ import {
    createLiveStreamStatsDoc,
 } from "@careerfairy/shared-lib/livestreams/stats"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import { chunkArray, getArrayDifference } from "@careerfairy/shared-lib/utils"
+import {
+   addUtmTagsToLink,
+   chunkArray,
+   getArrayDifference,
+} from "@careerfairy/shared-lib/utils"
 import type { Change } from "firebase-functions"
 import * as functions from "firebase-functions"
 import { isEmpty } from "lodash"
@@ -59,6 +63,10 @@ import { addOperations } from "./stats/livestream"
 import type { OperationsToMake } from "./stats/util"
 import { syncCustomJobLinkedContentTags } from "./tagging/tags"
 import { logAndThrow } from "./validations"
+import { Expo, ExpoPushMessage } from "expo-server-sdk"
+import firebase from "firebase/compat"
+import { getHost } from "@careerfairy/shared-lib/utils/urls"
+import { UserData } from "@careerfairy/shared-lib/users"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -117,6 +125,23 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     */
    hasMoreThanNLivestreamsInNextNDays(n: number, days: number): Promise<boolean>
 
+   /**
+    * Gets all live stream data for a specific user
+    * @param userAuthId - The user's auth ID
+    * @returns Promise containing array of UserLivestreamData
+    */
+   getUserLivestreamData(userAuthId: string): Promise<UserLivestreamData[]>
+
+   /**
+    * Updates multiple UserLivestreamData documents in bulk
+    * @param updateUserData - UserData objects used for update
+    * @param userLivestreamDatas - Array of partial UserLivestreamData objects to update (must include id and livestreamId)
+    */
+   updateUserLivestreamData(
+      updateUserData: UserData,
+      userLivestreamDatas: UserLivestreamData[]
+   ): Promise<void>
+
    syncLiveStreamStatsWithLivestream(
       snapshotChange: Change<DocumentSnapshot>
    ): Promise<void>
@@ -171,14 +196,27 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    ): Promise<GroupAdminNewEventEmailInfo[]>
 
    /**
-    * Notifies registered users of a starting livestream.
-    * Iterates over the array of registered users associated with the livestream, creates a new UserNotification object for each,
+    * Notifies registered users of a starting live stream.
+    * Iterates over the array of registered users associated with the live stream, creates a new UserNotification object for each,
     * and inserts it in the database.
     *
     * @param {LivestreamEvent} livestream
     * @returns {Promise<void>}
     */
    createLivestreamStartUserNotifications(
+      livestream: LivestreamEvent
+   ): Promise<void>
+
+   /**
+    * Notifies registered users of a starting live stream.
+    * Iterates over the array of registered users associated with the live stream, creates a new UserNotification object for each,
+    * and sends it to users that have pushToken.
+    *
+    * @param {LivestreamEvent} livestream
+    * @returns {Promise<void>}
+    */
+
+   createLivestreamStartPushNotifications(
       livestream: LivestreamEvent
    ): Promise<void>
 
@@ -251,6 +289,142 @@ export class LivestreamFunctionsRepository
    extends FirebaseLivestreamRepository
    implements ILivestreamFunctionsRepository
 {
+   private expo: Expo
+   constructor(
+      readonly firestore: firebase.firestore.Firestore,
+      readonly fieldValue: typeof firebase.firestore.FieldValue
+   ) {
+      super(firestore, fieldValue)
+      this.expo = new Expo()
+   }
+
+   async getUserLivestreamData(
+      userAuthId: string
+   ): Promise<UserLivestreamData[]> {
+      const querySnapshot = await this.firestore
+         .collectionGroup("userLivestreamData")
+         .withConverter(createCompatGenericConverter<UserLivestreamData>())
+         .where("userId", "==", userAuthId)
+         .get()
+
+      if (!querySnapshot.empty) {
+         return querySnapshot.docs.map((doc) => doc.data())
+      }
+
+      return []
+   }
+   async updateUserLivestreamData(
+      updateUserData: UserData,
+      userLivestreamDatas: UserLivestreamData[]
+   ): Promise<void> {
+      const bulkWriter = firestoreAdmin.bulkWriter()
+
+      for (const userLivestreamData of userLivestreamDatas) {
+         if (!userLivestreamData.id || !userLivestreamData.livestreamId) {
+            functions.logger.warn("Missing required fields for update", {
+               userLivestreamData,
+            })
+            continue
+         }
+
+         const toUpdate: Partial<UserLivestreamData> = { user: updateUserData }
+
+         const ref = this.firestore
+            .collection("livestreams")
+            .doc(userLivestreamData.livestreamId)
+            .collection("userLivestreamData")
+            .doc(userLivestreamData.id)
+
+         // @ts-ignore
+         void bulkWriter.update(ref, toUpdate)
+      }
+
+      await bulkWriter.close()
+   }
+
+   async createLivestreamStartPushNotifications(
+      livestream: LivestreamEvent
+   ): Promise<void> {
+      functions.logger.log(
+         `Started creating live stream start push notifications for live stream ${livestream.id}`
+      )
+
+      const users = await this.getLivestreamUsers(livestream.id, "registered")
+
+      if (!users || users.length === 0) {
+         functions.logger.log(
+            `No registered users found for live stream ${livestream.id}`
+         )
+         return
+      }
+
+      // Get all Expo push tokens
+      const tokens = users
+         .map((user) => user.user.fcmTokens || [])
+         .flat()
+         .filter((token) => Expo.isExpoPushToken(token))
+
+      if (tokens.length === 0) {
+         functions.logger.log(
+            "No valid Expo push tokens found for registered users"
+         )
+         return
+      }
+
+      try {
+         // Create the messages that you want to send to clients
+         const messages = tokens.map<ExpoPushMessage>((pushToken) => ({
+            to: pushToken,
+            sound: "default",
+            title: "Live Stream Starting",
+            body: `${livestream.title} is starting now: Join before it ends!`,
+            data: {
+               livestreamId: livestream.id,
+               type: "livestream_start",
+               url: addUtmTagsToLink({
+                  link: `${getHost()}/portal/livestream/${livestream.id}`,
+                  source: "careerfairy",
+                  medium: "push",
+                  content: livestream.title,
+                  campaign: "livestream_start",
+               }),
+            },
+         }))
+
+         // Chunk the messages to avoid rate limiting
+
+         const chunks = this.expo.chunkPushNotifications(messages)
+         const tickets = []
+
+         for (const chunk of chunks) {
+            try {
+               const ticketChunk = await this.expo.sendPushNotificationsAsync(
+                  chunk
+               )
+               tickets.push(...ticketChunk)
+               functions.logger.log(
+                  "Push notifications sent:",
+                  ticketChunk.length
+               )
+            } catch (error) {
+               functions.logger.error("Error sending chunk:", error)
+            }
+         }
+
+         // Handle any errors
+         tickets.forEach((ticket, index) => {
+            if (ticket.status === "error") {
+               functions.logger.error(
+                  `Error sending to token chunk ${index}: ${ticket.message}`
+               )
+            }
+         })
+      } catch (error) {
+         functions.logger.error("Error sending push notifications:", error)
+         throw error
+      }
+   }
+
    async syncLiveStreamStatsNewRating(
       livestreamId: string,
       ratingName: string,

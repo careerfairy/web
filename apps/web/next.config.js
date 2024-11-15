@@ -165,6 +165,7 @@ const csp = {
       "careerfairy-e1fd9.firebaseapp.com",
       "*.youtube.com",
       "*.googleapis.com",
+      "*.graphassets.com",
    ],
    "worker-src": [
       "'self'", // For Sentry Replay
@@ -174,6 +175,7 @@ const csp = {
       "'self'", // For Sentry Replay
       "blob:", // For Sentry Replay
    ],
+   "frame-ancestors": ["'self'", "https://*.hygraph.com"],
 }
 
 if (notProduction) {
@@ -320,6 +322,8 @@ const moduleExports = {
          "media.graphassets.com",
          "localhost",
          "127.0.0.1",
+         "eu-west-2.graphassets.com",
+         "icon.horse", // for fetching favicons
       ],
    },
    webpack: (config) => {
@@ -339,6 +343,10 @@ const moduleExports = {
    },
    // this is an open issue on MUI's GitHub: https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
    transpilePackages: ["@mui/x-charts", "mui-tel-input"],
+   i18n: {
+      locales: ["en", "de"],
+      defaultLocale: "en",
+   },
 }
 
 // test or development environment

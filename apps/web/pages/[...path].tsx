@@ -11,20 +11,20 @@ export { getStaticProps }
 export const getStaticPaths: GetStaticPaths<{ path: string[] }> = async () => {
    // Fetch links from Webflow sitemap
    const sitemapLink = process.env.WEBFLOW_URL + `/sitemap.xml`
-   const links = await GetSitemapLinks(sitemapLink).catch((err) => {
+   const links = await GetSitemapLinks(sitemapLink).catch((err: any) => {
       console.error(err)
-      throw err
+      return []
    })
 
    // Extract paths from absolute links
    const paths = []
-   for (let link of links) {
-      let url = new URL(link)
+   for (const link of links) {
+      const url = new URL(link)
       const path = url.pathname.replace(`/`, ``).split(`/`)
 
       if (!path.length || !path[0]) continue
       paths.push({
-         params: { path },
+         params: { path, locale: "" }, // prevent localization
       })
    }
 
