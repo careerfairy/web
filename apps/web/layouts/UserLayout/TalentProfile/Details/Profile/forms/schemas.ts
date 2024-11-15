@@ -2,7 +2,9 @@ import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
-import { StudyBackground } from "@careerfairy/shared-lib/users"
+import { ProfileLink, StudyBackground } from "@careerfairy/shared-lib/users"
+import { URL_REGEX } from "components/util/constants"
+import { ERROR_MESSAGES } from "util/form"
 import * as Yup from "yup"
 
 export const baseStudyBackgroundShape = {
@@ -36,11 +38,26 @@ export const baseStudyBackgroundShape = {
       .typeError("Please enter a valid end date"),
 }
 
+export const baseLinkShape = {
+   id: Yup.string(),
+   title: Yup.string().required("Title is required"),
+   url: Yup.string()
+      .matches(URL_REGEX, {
+         excludeEmptyString: true,
+         message: ERROR_MESSAGES.VALID_URL,
+      })
+      .required("URL is required"), // Yup.string().required("Url is required"),
+}
+
 export const CreateStudyBackgroundSchema = Yup.object(baseStudyBackgroundShape)
+
+export const CreateLinkSchema = Yup.object(baseLinkShape)
 
 export type CreateStudyBackgroundSchemaType = Yup.InferType<
    typeof CreateStudyBackgroundSchema
 >
+
+export type CreateLinkSchemaType = Yup.InferType<typeof CreateLinkSchema>
 
 export type StudyBackgroundFormValues = {
    id?: string
@@ -50,6 +67,12 @@ export type StudyBackgroundFormValues = {
    levelOfStudy: LevelOfStudy
    startedAt?: Date
    endedAt?: Date
+}
+
+export type LinkFormValues = {
+   id?: string
+   title: string
+   url: string
 }
 
 export const getInitialStudyBackgroundValues = (
@@ -69,5 +92,13 @@ export const getInitialStudyBackgroundValues = (
       },
       startedAt: studyBackground?.startedAt?.toDate() || null,
       endedAt: studyBackground?.endedAt?.toDate() || null,
+   }
+}
+
+export const getInitialLinkValues = (link?: ProfileLink): LinkFormValues => {
+   return {
+      id: link?.id || "",
+      title: link?.title || "",
+      url: link?.url || "",
    }
 }

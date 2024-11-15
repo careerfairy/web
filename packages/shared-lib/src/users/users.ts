@@ -147,6 +147,7 @@ export interface StudyBackground extends Identifiable {
 
 // Collection /userData/:id/links/:id
 export interface ProfileLink extends Identifiable {
+   authId: string
    url: string
    title: string
 }
