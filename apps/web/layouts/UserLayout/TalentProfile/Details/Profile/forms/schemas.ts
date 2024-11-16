@@ -88,10 +88,12 @@ export const baseLanguageShape = {
 export const baseInterestShape = {
    businessFunctionsTagIds: Yup.array()
       .of(Yup.string().oneOf(validBusinessFunctionTagIds, "Invalid job area"))
-      .nullable(),
+      .nullable()
+      .min(1, "At least one job area is required"),
    contentTopicsTagIds: Yup.array()
       .of(Yup.string().oneOf(validContentTopicTagIds, "Invalid content topic"))
-      .nullable(),
+      .nullable()
+      .min(1, "At least one content topic is required"),
 }
 
 export const CreateStudyBackgroundSchema = Yup.object(baseStudyBackgroundShape)
