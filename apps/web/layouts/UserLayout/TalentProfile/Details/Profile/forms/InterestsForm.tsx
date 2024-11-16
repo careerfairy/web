@@ -13,6 +13,7 @@ import {
    useFormContext,
    useWatch,
 } from "react-hook-form"
+import { useEffectOnce } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import {
    CreateInterestSchema,
@@ -36,6 +37,11 @@ const styles = sxStyles({
    tagName: {
       color: (theme) => theme.palette.neutral[800],
       fontWeight: 400,
+      pl: {
+         xs: "7px",
+         sm: "7px",
+         md: 0,
+      },
    },
    checkBoxWrapper: {
       alignItems: "center",
@@ -45,7 +51,11 @@ const styles = sxStyles({
    },
    checkBoxBtnBase: {
       height: "56px",
-      mx: "-24px !important",
+      mx: {
+         xs: "-23px !important",
+         sm: "-23px !important",
+         md: "-24px !important",
+      },
       "&:hover": {
          backgroundColor: (theme) => theme.brand.black[100],
          "& .MuiBox-root": {
@@ -92,14 +102,20 @@ export const InterestFormProvider = ({
 }
 
 export const InterestFormFields = () => {
-   const { setValue } = useFormContext()
+   const businessFunctionsFieldName = "businessFunctionsTagIds"
+   const contentTopicsFieldName = "contentTopicsTagIds"
+
+   const { setValue, getFieldState, trigger } = useFormContext()
+
+   const businessFunctionsState = getFieldState(businessFunctionsFieldName)
+   const contentTopicsState = getFieldState(contentTopicsFieldName)
 
    const formBusinessFunctionTagIds: string[] = useWatch({
-      name: "businessFunctionsTagIds",
+      name: businessFunctionsFieldName,
    })
 
    const formContentTopicTagIds: string[] = useWatch({
-      name: "contentTopicsTagIds",
+      name: contentTopicsFieldName,
    })
 
    const checkedBusinessFunctionsMap: Record<string, boolean> = useMemo(() => {
@@ -130,12 +146,11 @@ export const InterestFormFields = () => {
    ) => {
       const isChecked = checkMap[tagId]
 
-      if (isChecked)
-         setValue(
-            fieldName,
-            currentValues.filter((id) => id !== tagId)
-         )
-      else setValue(fieldName, [...currentValues, tagId])
+      const newValue = isChecked
+         ? currentValues.filter((id) => id !== tagId)
+         : [...currentValues, tagId]
+
+      setValue(fieldName, newValue, { shouldValidate: true })
    }
 
    const onClickBusinessFunction = (tagId: string) =>
@@ -143,7 +158,7 @@ export const InterestFormFields = () => {
          checkedBusinessFunctionsMap,
          tagId,
          formBusinessFunctionTagIds,
-         "businessFunctionsTagIds"
+         businessFunctionsFieldName
       )
 
    const onClickContentTopic = (tagId: string) =>
@@ -151,15 +166,24 @@ export const InterestFormFields = () => {
          checkedContentTopicsMap,
          tagId,
          formContentTopicTagIds,
-         "contentTopicsTagIds"
+         contentTopicsFieldName
       )
 
+   useEffectOnce(() => {
+      trigger()
+   })
+
    return (
-      <Stack spacing={2} sx={styles.formRoot}>
+      <Stack spacing={0} sx={styles.formRoot}>
          <Stack>
             <Typography variant="medium" sx={styles.tagTitle}>
                Job areas
             </Typography>
+            {businessFunctionsState.invalid ? (
+               <Typography variant="xsmall" color={"error.500"}>
+                  {businessFunctionsState.error.message}
+               </Typography>
+            ) : null}
             {BusinessFunctionsTagValues.map((tag) => (
                <TagCheckbox
                   key={tag.id}
@@ -173,6 +197,11 @@ export const InterestFormFields = () => {
             <Typography variant="medium" sx={styles.tagTitle}>
                Content topics
             </Typography>
+            {contentTopicsState.invalid ? (
+               <Typography variant="xsmall" color={"error.500"}>
+                  {contentTopicsState.error.message}
+               </Typography>
+            ) : null}
             {ContentTopicsTagValues.map((tag) => (
                <TagCheckbox
                   key={tag.id}
