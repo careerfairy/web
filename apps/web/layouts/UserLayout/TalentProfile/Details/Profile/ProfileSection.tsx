@@ -39,7 +39,6 @@ export const ProfileSection = ({
    children,
    handleAdd,
 }: Props) => {
-   console.log("🚀 ~ addIcon:", addIcon)
    return (
       <Stack spacing={1.5}>
          <Stack direction={"row"} sx={styles.titleRoot}>
