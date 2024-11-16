@@ -1,10 +1,11 @@
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { ProfileInterest } from "@careerfairy/shared-lib/users"
-import { Box } from "@mui/material"
+import { Box, Chip, Grid } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { userRepo } from "data/RepositoryInstances"
 import { Fragment, useCallback, useMemo } from "react"
-import { Heart } from "react-feather"
+import { Edit3, Heart } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -35,6 +36,20 @@ const styles = sxStyles({
       width: "36px",
       height: "36px",
    },
+   editIcon: {
+      width: "20px",
+      height: "20px",
+      color: (theme) => theme.palette.neutral[700],
+   },
+   chip: {
+      mr: 1,
+      mb: 1,
+      fontSize: "14px",
+      fontWeight: 400,
+      borderRadius: "60px",
+      backgroundColor: (theme) => theme.palette.black[400],
+      color: (theme) => theme.palette.neutral[800],
+   },
 })
 
 type Props = {
@@ -58,9 +73,10 @@ export const ProfileInterests = ({ showAddIcon }: Props) => {
 
    return (
       <ProfileSection
-         showAddIcon={showAddIcon}
          title="Interests"
          handleAdd={handleEdit}
+         showAddIcon={showAddIcon}
+         addIcon={Edit3}
       >
          <InterestFormProvider interest={interests}>
             <FormDialogWrapper />
@@ -150,21 +166,49 @@ const FormDialogWrapper = () => {
 }
 
 const InterestsList = () => {
+   const { userData } = useAuth()
    const dispatch = useDispatch()
 
    const handleEdit = useCallback(() => {
       dispatch(openCreateDialog({ type: TalentProfileItemTypes.Interest }))
    }, [dispatch])
 
+   const userBusinessFunctionsTagIds: string[] =
+      userData.businessFunctionsTagIds ?? []
+   const userContentTopicsTagIds: string[] = userData.contentTopicsTagIds ?? []
+
+   // TODO-WG: Probably sorted
+   const allTagIds = [
+      ...userBusinessFunctionsTagIds,
+      ...userContentTopicsTagIds,
+   ]
+
+   if (!allTagIds.length)
+      return (
+         <Box sx={styles.emptyInterestsRoot}>
+            <EmptyItemView
+               title={"Interest check"}
+               description={
+                  "Select the tags that best represent your interests."
+               }
+               addButtonText={"Select interests"}
+               handleAdd={handleEdit}
+               icon={<Box component={Heart} sx={styles.icon} />}
+            />
+         </Box>
+      )
+
    return (
-      <Box sx={styles.emptyInterestsRoot}>
-         <EmptyItemView
-            title={"Interest check"}
-            description={"Select the tags that best represent your interests."}
-            addButtonText={"Select interests"}
-            handleAdd={handleEdit}
-            icon={<Box component={Heart} sx={styles.icon} />}
-         />
-      </Box>
+      <Grid container>
+         {allTagIds.map((tagId) => {
+            return (
+               <Chip
+                  sx={styles.chip}
+                  key={tagId}
+                  label={TagValuesLookup[tagId]}
+               />
+            )
+         })}
+      </Grid>
    )
 }
