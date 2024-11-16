@@ -18,7 +18,7 @@ import { EmptyItemView } from "./EmptyItemView"
 import { ProfileSection } from "./ProfileSection"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import { InterestFormFields, InterestFormProvider } from "./forms/InterestsForm"
-import { InterestFormValues } from "./forms/schemas"
+import { InterestFormValues, getInitialInterestValues } from "./forms/schemas"
 
 const styles = sxStyles({
    emptyInterestsRoot: {
@@ -42,7 +42,15 @@ type Props = {
 }
 
 export const ProfileInterests = ({ showAddIcon }: Props) => {
+   const { userData } = useAuth()
    const dispatch = useDispatch()
+
+   const interests: ProfileInterest = useMemo(() => {
+      return {
+         businessFunctionsTagIds: userData.businessFunctionsTagIds ?? [],
+         contentTopicsTagIds: userData.contentTopicsTagIds ?? [],
+      }
+   }, [userData.businessFunctionsTagIds, userData.contentTopicsTagIds])
 
    const handleEdit = useCallback(() => {
       dispatch(openCreateDialog({ type: TalentProfileItemTypes.Interest }))
@@ -54,7 +62,7 @@ export const ProfileInterests = ({ showAddIcon }: Props) => {
          title="Interests"
          handleAdd={handleEdit}
       >
-         <InterestFormProvider>
+         <InterestFormProvider interest={interests}>
             <FormDialogWrapper />
          </InterestFormProvider>
       </ProfileSection>
@@ -82,12 +90,26 @@ const FormDialogWrapper = () => {
          contentTopicsTagIds: userData.contentTopicsTagIds ?? [],
       }
 
-      reset(interest)
+      reset(getInitialInterestValues(interest))
    }, [userData.businessFunctionsTagIds, userData.contentTopicsTagIds, reset])
 
    const handleCloseInterestDialog = useCallback(() => {
       dispatch(closeCreateDialog({ type: TalentProfileItemTypes.Interest }))
-   }, [dispatch])
+      if (!isValid) {
+         const interest: ProfileInterest = {
+            businessFunctionsTagIds: userData.businessFunctionsTagIds ?? [],
+            contentTopicsTagIds: userData.contentTopicsTagIds ?? [],
+         }
+
+         reset(getInitialInterestValues(interest))
+      }
+   }, [
+      dispatch,
+      reset,
+      isValid,
+      userData.businessFunctionsTagIds,
+      userData.contentTopicsTagIds,
+   ])
 
    const onSubmit = async (data: InterestFormValues) => {
       try {
@@ -97,6 +119,7 @@ const FormDialogWrapper = () => {
          })
 
          handleCloseInterestDialog()
+         reset(data)
          successNotification(`Saved interests 👓`)
       } catch (error) {
          errorNotification(
