@@ -4,7 +4,7 @@ import { Box, Chip, Grid } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { userRepo } from "data/RepositoryInstances"
-import { Fragment, useCallback, useEffect, useMemo } from "react"
+import { Fragment, useCallback, useMemo } from "react"
 import { Edit3, Heart } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
@@ -127,7 +127,7 @@ const FormDialogWrapper = () => {
 
          handleCloseInterestDialog()
          reset(data)
-         successNotification(`Saved interests 👓`)
+         successNotification(`Saved interests 👁️`)
       } catch (error) {
          errorNotification(
             error,
@@ -137,14 +137,6 @@ const FormDialogWrapper = () => {
    }
 
    const handleSave = async () => handleSubmit(onSubmit)()
-
-   useEffect(() => {
-      const interest: ProfileInterest = {
-         businessFunctionsTagIds: userData.businessFunctionsTagIds ?? [],
-         contentTopicsTagIds: userData.contentTopicsTagIds ?? [],
-      }
-      reset(getInitialInterestValues(interest))
-   }, [userData.businessFunctionsTagIds, userData.contentTopicsTagIds, reset])
 
    return (
       <Fragment>
@@ -199,15 +191,9 @@ const InterestsList = () => {
 
    return (
       <Grid container>
-         {allTagIds.map((tagId) => {
-            return (
-               <Chip
-                  sx={styles.chip}
-                  key={tagId}
-                  label={TagValuesLookup[tagId]}
-               />
-            )
-         })}
+         {allTagIds.map((tagId) => (
+            <Chip sx={styles.chip} key={tagId} label={TagValuesLookup[tagId]} />
+         ))}
       </Grid>
    )
 }
