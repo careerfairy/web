@@ -4,7 +4,7 @@ import { Box, Chip, Grid } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { userRepo } from "data/RepositoryInstances"
-import { Fragment, useCallback, useMemo } from "react"
+import { Fragment, useCallback, useEffect, useMemo } from "react"
 import { Edit3, Heart } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
@@ -100,15 +100,6 @@ const FormDialogWrapper = () => {
       handleSubmit,
    } = useFormContext()
 
-   useMemo(() => {
-      const interest: ProfileInterest = {
-         businessFunctionsTagIds: userData.businessFunctionsTagIds ?? [],
-         contentTopicsTagIds: userData.contentTopicsTagIds ?? [],
-      }
-
-      reset(getInitialInterestValues(interest))
-   }, [userData.businessFunctionsTagIds, userData.contentTopicsTagIds, reset])
-
    const handleCloseInterestDialog = useCallback(() => {
       dispatch(closeCreateDialog({ type: TalentProfileItemTypes.Interest }))
       if (!isValid) {
@@ -146,6 +137,14 @@ const FormDialogWrapper = () => {
    }
 
    const handleSave = async () => handleSubmit(onSubmit)()
+
+   useEffect(() => {
+      const interest: ProfileInterest = {
+         businessFunctionsTagIds: userData.businessFunctionsTagIds ?? [],
+         contentTopicsTagIds: userData.contentTopicsTagIds ?? [],
+      }
+      reset(getInitialInterestValues(interest))
+   }, [userData.businessFunctionsTagIds, userData.contentTopicsTagIds, reset])
 
    return (
       <Fragment>
