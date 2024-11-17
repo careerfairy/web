@@ -141,7 +141,7 @@ export type LanguageFormValues = {
 }
 
 export type InterestFormValues = {
-   businessFunctionsTagIds?: string[]
+   businessFunctionsTagIds: string[]
    contentTopicsTagIds: string[]
 }
 
