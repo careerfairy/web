@@ -175,7 +175,11 @@ const csp = {
       "'self'", // For Sentry Replay
       "blob:", // For Sentry Replay
    ],
-   "frame-ancestors": ["'self'", "https://*.hygraph.com"],
+   "frame-ancestors": [
+      "'self'",
+      "https://*.careerfairy.io",
+      "https://*.hygraph.com",
+   ],
 }
 
 if (notProduction) {
