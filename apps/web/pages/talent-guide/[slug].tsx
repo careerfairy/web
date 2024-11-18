@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/nextjs"
 import { ModuleStepContentRenderer } from "components/views/talent-guide/components/ModuleStepContentRenderer"
 import { FORCE_GERMAN_LOCALE } from "data/hygraph/constants"
 import { Page, TalentGuideModule } from "data/hygraph/types"
-import { GetStaticPaths, GetStaticProps, NextPage } from "next"
+import { GetStaticProps, NextPage } from "next"
 import Link from "next/link"
 import {
    tgPreviewService,
@@ -30,23 +30,6 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ locale, data }) => {
          ))}
       </div>
    )
-}
-
-export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
-   let paths = []
-
-   for (const locale of locales) {
-      const slugs = await tgService.getAllTalentGuideModulePageSlugs()
-      paths = [
-         ...paths,
-         ...slugs.map((slug) => ({
-            params: { slug },
-            locale,
-         })),
-      ]
-   }
-
-   return { paths, fallback: false }
 }
 
 export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
