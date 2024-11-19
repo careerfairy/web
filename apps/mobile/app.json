@@ -27,7 +27,8 @@
             "applinks:careerfairy.io",
             "applinks:www.careerfairy.io",
             "applinks:staging.careerfairy.io"
-         ]
+         ],
+         "bundleIdentifier": "io.careerfairy"
       },
       "android": {
          "package": "com.admin_product_team.careerfairymobileapp",
