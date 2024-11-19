@@ -155,4 +155,5 @@ export const SparkInteractionSources = {
    Mentor_Page: "mentor_page",
    CustomJob: "custom_job",
    PortalBanner: "portal_banner",
+   RegistrationEmail: "registration-email",
 } as const

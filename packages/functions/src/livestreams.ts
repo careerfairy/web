@@ -1,16 +1,22 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import {
+   addUtmTagsToLink,
+   companyNameSlugify,
+} from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import { client } from "./api/postmark"
 import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
 import { isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import { logger } from "firebase-functions/v2"
 import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import ical from "ical-generator"
 import { firestore } from "./api/firestoreAdmin"
+import { customJobRepo, groupRepo, sparkRepo } from "./api/repositories"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)
@@ -117,6 +123,156 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
          },
          (error) => {
             console.log("error:" + error)
+            return { status: 500, error: error }
+         }
+      )
+   })
+
+export const livestreamRegistrationConfirmationEmail = functions
+   .region(config.region)
+   .https.onCall(async (data) => {
+      logger.info("🚀 ~ Livestream registration confirmation email: v4.0")
+
+      const host = isLocalEnvironment()
+         ? "http://localhost:3000"
+         : "https://careerfairy.io"
+      // Fetch the live stream data
+      const livestreamDoc = await firestore
+         .collection("livestreams")
+         .doc(data.livestream_id)
+         .get()
+      const livestream = livestreamDoc.data() as LivestreamEvent
+
+      const group = await groupRepo.getGroupById(livestream.groupIds.at(0))
+
+      const livestreamSpeakers = livestream.speakers ?? []
+      const livestreamJobs = livestream.hasJobs
+         ? (await customJobRepo.getCustomJobsByLivestreamId(livestream.id)) ??
+           []
+         : []
+      const groupSparks = group.publicSparks
+         ? (await sparkRepo.getSparksByGroupId(livestream.groupIds.at(0))) ?? []
+         : []
+
+      const emailSpeakers = livestreamSpeakers.slice(0, 4).map((speaker) => {
+         return {
+            name: speaker.firstName,
+            role: speaker.roles?.join(", "),
+            avatarUrl: speaker.avatar,
+            url: addUtmTagsToLink({
+               link: `${host}/portal/livestream/${livestream.id}/speaker-details/${speaker.id}`,
+               source: "careerfairy",
+               medium: "email",
+               campaign: "eventRegistration",
+               content: data.livestream_title,
+            }),
+         }
+      })
+
+      const emailJobs = livestreamJobs.slice(0, 5).map((job) => {
+         return {
+            title: job.title,
+            jobType: job.jobType,
+            businessFunctionsTagIds:
+               job.businessFunctionsTagIds?.map(
+                  (tag) => TagValuesLookup[tag]
+               ) ?? [],
+            deadline: job.deadline.toDate().toDateString(),
+            url: addUtmTagsToLink({
+               link: `${host}/portal/livestream/${livestream.id}/job-details/${job.id}`,
+               source: "careerfairy",
+               medium: "email",
+               campaign: "eventRegistration",
+               content: data.livestream_title,
+            }),
+         }
+      })
+
+      const emailSparks = groupSparks
+         .sort((sparkA, sparkB) => {
+            return sparkB.publishedAt.toMillis() - sparkA.publishedAt.toMillis()
+         })
+         .slice(0, 3)
+         .map((spark) => {
+            return {
+               question: spark.question,
+               category_id: spark.category.name,
+               thumbnailUrl: spark.video.thumbnailUrl,
+               url: addUtmTagsToLink({
+                  link: `${host}/sparks/${
+                     spark.id
+                  }?companyName=${companyNameSlugify(
+                     group.universityName
+                  )}&groupId=${group.id}&interactionSource=${
+                     SparkInteractionSources.RegistrationEmail
+                  }`,
+                  source: "careerfairy",
+                  medium: "email",
+                  campaign: "eventRegistration",
+                  content: data.livestream_title,
+               }),
+            }
+         })
+
+      // Generate ICS file content
+      const cal = ical()
+
+      const calendarEventProperties =
+         generateCalendarEventProperties(livestream)
+
+      cal.createEvent(calendarEventProperties)
+
+      const icsContent = cal.toString()
+
+      const emailCalendar = {
+         google: data.eventCalendarUrls.google,
+         outlook: data.eventCalendarUrls.outlook,
+         apple: isLocalEnvironment()
+            ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}`
+            : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}`,
+      }
+
+      const email: any = {
+         TemplateId:
+            process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
+         From: "CareerFairy <noreply@careerfairy.io>",
+         To: data.recipientEmail,
+         TemplateModel: {
+            livestream: {
+               title: livestream.title,
+               company: group.universityName,
+               start: livestream.start.toDate().toUTCString() ?? "",
+               companyBannerImageUrl: group.bannerImageUrl,
+            },
+            user: {
+               firstName: data.user_first_name,
+            },
+            jobs: emailJobs,
+            speakers: emailSpeakers,
+            sparks: emailSparks,
+            calendar: emailCalendar,
+         },
+         Attachments: [
+            {
+               // Replace any character that is not alphanumeric with an underscore
+               Name: `${livestream.title.replace(/[^a-z0-9]/gi, "_")}.ics`,
+               Content: Buffer.from(icsContent).toString("base64"),
+               ContentType: "text/calendar",
+            },
+         ],
+      }
+
+      // Not awaiting on purpose, as it was this way and I believe to make the registration dialog go by quicker
+      client.sendEmailWithTemplate(email).then(
+         () => {
+            logger.info("🚀 ~ Livestream registration confirmation email sent")
+            return {
+               status: 200,
+               data: "Livestream registration confirmation email sent",
+            }
+         },
+         (error) => {
+            logger.error("Error sending registration confirmation email", error)
             return { status: 500, error: error }
          }
       )
