@@ -5,9 +5,9 @@ import {
    HighlightsBlockType,
    SparkComponentType,
 } from "data/hygraph/types"
+import dynamic from "next/dynamic"
 import { useCallback, useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { HighlightCard } from "./HighlightCard"
 import { SparkCard } from "./SparkCard"
 
 const styles = sxStyles({
@@ -22,6 +22,10 @@ const styles = sxStyles({
 })
 
 type Props = HighlightsBlockType
+
+const HighlightCardComponent = dynamic(() => import("./HighlightCard"), {
+   ssr: false,
+})
 
 export const HighlightsBlock = ({ highlights }: Props) => {
    const [currentPlayingIndex, setCurrentPlayingIndex] = useState<number>(0)
@@ -55,7 +59,7 @@ export const HighlightsBlock = ({ highlights }: Props) => {
                         isPlaying={currentPlayingIndex === index}
                      />
                   ) : (
-                     <HighlightCard
+                     <HighlightCardComponent
                         highlight={highlight as HighlightComponentType}
                         isPlaying={currentPlayingIndex === index}
                         onEnded={handleEndedPlaying}
