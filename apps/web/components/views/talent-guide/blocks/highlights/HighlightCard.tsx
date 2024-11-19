@@ -5,7 +5,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { HighlightComponentType } from "data/hygraph/types"
 import { SyntheticEvent, useCallback, useState } from "react"
-import { X } from "react-feather"
+import { X as CloseIcon } from "react-feather"
 import ReactPlayer from "react-player"
 import { sxStyles } from "types/commonTypes"
 import { FullScreenHeader } from "./FullScreenHeader"
@@ -99,9 +99,15 @@ const styles = sxStyles({
    },
    fullScreenCloseButton: {
       position: "absolute",
-      top: 10,
-      right: 25,
-      zIndex: 2,
+      top: {
+         xs: 10,
+         md: 20,
+      },
+      right: {
+         xs: 25,
+         md: 20,
+      },
+      zIndex: 3000,
       color: "#FFF",
    },
 })
@@ -109,6 +115,78 @@ const styles = sxStyles({
 const HighlightVideoOverlay = () => {
    return <Box sx={styles.videoOverlay} key="video-overlay" />
 }
+
+const DEFAULT_PLAYER_PROPS = {
+   className: "react-player",
+   width: "100%",
+   height: "100%",
+}
+
+type FullScreenProps = {
+   highlight: HighlightComponentType
+   group: Group
+   isPlaying: boolean
+   onEnded: () => void
+   onClose: (event: SyntheticEvent) => void
+}
+
+const FullscreenMobileView = ({
+   highlight,
+   group,
+   isPlaying,
+   onEnded,
+   onClose,
+}: FullScreenProps) => (
+   <Box sx={styles.cardFullScreenMobile} onClick={onClose}>
+      <IconButton onClick={onClose} sx={styles.fullScreenCloseButton}>
+         <CloseIcon size={24} />
+      </IconButton>
+      <FullScreenHeader highlight={highlight} group={group} />
+      <ReactPlayer
+         {...DEFAULT_PLAYER_PROPS}
+         url={highlight.videoClip.url}
+         playing={isPlaying}
+         onEnded={onEnded}
+      />
+      <HighlightVideoOverlay />
+   </Box>
+)
+
+const FullscreenDesktopView = ({
+   highlight,
+   group,
+   isPlaying,
+   onEnded,
+   onClose,
+}: FullScreenProps) => (
+   <Box sx={styles.card} onClick={onClose}>
+      <ReactPlayer
+         url={highlight.videoClip.url}
+         {...DEFAULT_PLAYER_PROPS}
+         playing={false}
+         onEnded={onEnded}
+      />
+      <Dialog open sx={styles.fullScreenDialog} maxWidth="desktop">
+         <ReactPlayer
+            url={highlight.videoClip.url}
+            {...DEFAULT_PLAYER_PROPS}
+            playing={isPlaying}
+            onEnded={onEnded}
+         />
+         <Box sx={{ width: "100%" }}>
+            <FullScreenHeader highlight={highlight} group={group} />
+            <HighlightVideoOverlay />
+         </Box>
+         <IconButton
+            onClick={onClose}
+            sx={styles.fullScreenCloseButton}
+            key="full-screen-close-button"
+         >
+            <CloseIcon size={24} />
+         </IconButton>
+      </Dialog>
+   </Box>
+)
 
 const NonFullscreenHeader = ({
    group,
@@ -156,67 +234,38 @@ export const HighlightCard = ({
 
    if (status === "error" || status === "loading") return null
 
+   if (isFullscreen && isMobile) {
+      return (
+         <FullscreenMobileView
+            highlight={highlight}
+            group={group}
+            isPlaying={isPlaying}
+            onEnded={onEnded}
+            onClose={handleFullscreenClick}
+         />
+      )
+   } else if (isFullscreen && !isMobile) {
+      return (
+         <FullscreenDesktopView
+            highlight={highlight}
+            group={group}
+            isPlaying={isPlaying}
+            onEnded={onEnded}
+            onClose={handleFullscreenClick}
+         />
+      )
+   }
+
+   // Thumbnail view
    return (
-      <Box
-         sx={[
-            isFullscreen && isMobile
-               ? styles.cardFullScreenMobile
-               : styles.card,
-         ]}
-         onClick={handleFullscreenClick}
-      >
-         {isFullscreen && isMobile ? (
-            <>
-               <IconButton
-                  onClick={handleFullscreenClick}
-                  sx={styles.fullScreenCloseButton}
-               >
-                  <X size={24} />
-               </IconButton>
-               <FullScreenHeader highlight={highlight} group={group} />
-            </>
-         ) : (
-            <NonFullscreenHeader highlight={highlight} group={group} />
-         )}
-         {isFullscreen && !isMobile ? (
-            <>
-               <ReactPlayer
-                  url={highlight.videoClip.url}
-                  className="react-player"
-                  width="100%"
-                  height="100%"
-                  playing={false}
-                  onEnded={onEnded}
-               />
-               <Dialog
-                  open={isFullscreen}
-                  sx={styles.fullScreenDialog}
-                  maxWidth="desktop"
-               >
-                  <ReactPlayer
-                     url={highlight.videoClip.url}
-                     className="react-player"
-                     width="100%"
-                     height="100%"
-                     playing={isPlaying}
-                     onEnded={onEnded}
-                  />
-                  <Box sx={{ width: "100%" }}>
-                     <FullScreenHeader highlight={highlight} group={group} />
-                     <HighlightVideoOverlay />
-                  </Box>
-               </Dialog>
-            </>
-         ) : (
-            <ReactPlayer
-               url={highlight.videoClip.url}
-               className="react-player"
-               width="100%"
-               height="100%"
-               playing={Boolean(isPlaying && !isFullscreen)}
-               onEnded={onEnded}
-            />
-         )}
+      <Box sx={styles.card} onClick={handleFullscreenClick}>
+         <NonFullscreenHeader highlight={highlight} group={group} />
+         <ReactPlayer
+            url={highlight.videoClip.url}
+            {...DEFAULT_PLAYER_PROPS}
+            playing={Boolean(isPlaying && !isFullscreen)}
+            onEnded={onEnded}
+         />
          <HighlightVideoOverlay />
       </Box>
    )
