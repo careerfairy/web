@@ -210,7 +210,7 @@ const NonFullscreenHeader = ({
    )
 }
 
-export const HighlightCard = ({
+const HighlightCard = ({
    highlight,
    isPlaying,
    onEnded,
@@ -270,3 +270,5 @@ export const HighlightCard = ({
       </Box>
    )
 }
+
+export default HighlightCard
