@@ -1,10 +1,11 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { Box, Dialog, Typography } from "@mui/material"
+import { Box, Dialog, IconButton, Typography } from "@mui/material"
 import useGroup from "components/custom-hook/group/useGroup"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { HighlightComponentType } from "data/hygraph/types"
 import { SyntheticEvent, useCallback, useState } from "react"
+import { X } from "react-feather"
 import ReactPlayer from "react-player"
 import { sxStyles } from "types/commonTypes"
 import { FullScreenHeader } from "./FullScreenHeader"
@@ -51,7 +52,7 @@ const styles = sxStyles({
       position: "fixed",
       top: 0,
       left: 0,
-      zIndex: 1000,
+      zIndex: 1300,
       width: "100dvw",
       height: "100dvh",
       borderRadius: 0,
@@ -90,16 +91,23 @@ const styles = sxStyles({
       width: "100%",
       height: "100%",
       background:
-         "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 40%, rgba(0, 0, 0, 0.60) 100%), transparent",
+         "linear-gradient(180deg, rgba(0, 0, 0, 0) 78.12%, rgba(0, 0, 0, 0.6) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 17.71%)",
       position: "absolute",
       top: 0,
       left: 0,
-      zIndex: 0,
+      zIndex: 1,
+   },
+   fullScreenCloseButton: {
+      position: "absolute",
+      top: 10,
+      right: 25,
+      zIndex: 2,
+      color: "#FFF",
    },
 })
 
 const HighlightVideoOverlay = () => {
-   return <Box sx={styles.videoOverlay} />
+   return <Box sx={styles.videoOverlay} key="video-overlay" />
 }
 
 const NonFullscreenHeader = ({
@@ -158,7 +166,15 @@ export const HighlightCard = ({
          onClick={handleFullscreenClick}
       >
          {isFullscreen && isMobile ? (
-            <FullScreenHeader highlight={highlight} group={group} />
+            <>
+               <IconButton
+                  onClick={handleFullscreenClick}
+                  sx={styles.fullScreenCloseButton}
+               >
+                  <X size={24} />
+               </IconButton>
+               <FullScreenHeader highlight={highlight} group={group} />
+            </>
          ) : (
             <NonFullscreenHeader highlight={highlight} group={group} />
          )}
