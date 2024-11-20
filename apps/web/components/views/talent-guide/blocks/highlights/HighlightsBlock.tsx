@@ -1,5 +1,6 @@
 import { Box } from "@mui/material"
 
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import {
    HighlightComponentType,
    HighlightsBlockType,
@@ -8,6 +9,7 @@ import {
 import dynamic from "next/dynamic"
 import { useCallback, useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
+import { HighlightCardSkeleton } from "./HighlightCardSkeleton"
 import { SparkCard } from "./SparkCard"
 
 const styles = sxStyles({
@@ -48,26 +50,28 @@ export const HighlightsBlock = ({ highlights }: Props) => {
    }, [highlights.length])
 
    return (
-      <Box sx={styles.root}>
-         {highlights.map((highlight, index) => {
-            const isSpark = highlight.__typename === "Spark"
-            return (
-               <Box key={index}>
-                  {isSpark ? (
-                     <SparkCard
-                        spark={highlight as SparkComponentType}
-                        isPlaying={currentPlayingIndex === index}
-                     />
-                  ) : (
-                     <HighlightCardComponent
-                        highlight={highlight as HighlightComponentType}
-                        isPlaying={currentPlayingIndex === index}
-                        onEnded={handleEndedPlaying}
-                     />
-                  )}
-               </Box>
-            )
-         })}
-      </Box>
+      <SuspenseWithBoundary fallback={<HighlightCardSkeleton />}>
+         <Box sx={styles.root}>
+            {highlights.map((highlight, index) => {
+               const isSpark = highlight.__typename === "Spark"
+               return (
+                  <Box key={index}>
+                     {isSpark ? (
+                        <SparkCard
+                           spark={highlight as SparkComponentType}
+                           isPlaying={currentPlayingIndex === index}
+                        />
+                     ) : (
+                        <HighlightCardComponent
+                           highlight={highlight as HighlightComponentType}
+                           isPlaying={currentPlayingIndex === index}
+                           onEnded={handleEndedPlaying}
+                        />
+                     )}
+                  </Box>
+               )
+            })}
+         </Box>
+      </SuspenseWithBoundary>
    )
 }
