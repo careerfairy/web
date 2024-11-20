@@ -1,16 +1,27 @@
 import { ATSPaginatedResults } from "@careerfairy/shared-lib/ats/Functions"
 import { BaseModel } from "@careerfairy/shared-lib/BaseModel"
+import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import {
+   addUtmTagsToLink,
+   companyNameSlugify,
+   createCalendarEvent,
+   makeUrls,
+} from "@careerfairy/shared-lib/utils"
+import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
+import {
+   getHost,
+   makeLivestreamEventDetailsUrl,
+} from "@careerfairy/shared-lib/utils/urls"
 import * as crypto from "crypto"
 import { firestore } from "firebase-admin"
 import type { Change } from "firebase-functions"
 import { https, Request, Response } from "firebase-functions"
 import { ClientError } from "graphql-request"
+import ical from "ical-generator"
 import { DateTime } from "luxon"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { customAlphabet } from "nanoid"
@@ -36,9 +47,12 @@ export const setCORSHeaders = (req: Request, res: Response): void => {
 
 export type IGenerateEmailDataProps = {
    stream: LiveStreamEventWithUsersLivestreamData
+   streamGroup: Group
    reminder?: ReminderData
    emailMaxChunkSize: number
    minutesToRemindBefore?: number
+   reminderKey?: ReminderData["key"]
+   reminderCampaign?: string
 }
 
 /**
@@ -47,9 +61,11 @@ export type IGenerateEmailDataProps = {
  */
 export const generateReminderEmailData = ({
    stream,
+   streamGroup,
    reminder,
    minutesToRemindBefore,
    emailMaxChunkSize,
+   reminderCampaign,
 }: IGenerateEmailDataProps): MailgunMessageData[] => {
    const { company, start, usersLivestreamData, timezone } = stream
 
@@ -71,8 +87,26 @@ export const generateReminderEmailData = ({
    const templateData = createRecipientVariables(
       stream,
       start.toDate(),
-      reminder.timeMessage
+      streamGroup,
+      reminderCampaign
    )
+
+   if (reminder.key === "reminder24Hours") {
+      // Generate ICS file content
+      const cal = ical()
+
+      const calendarEventProperties = generateCalendarEventProperties(stream)
+
+      cal.createEvent(calendarEventProperties)
+
+      const icsContent = cal.toString()
+
+      templateData["attachment"] = {
+         // Replace any character that is not alphanumeric with an underscore
+         name: `${stream.title.replace(/[^a-z0-9]/gi, "_")}.ics`,
+         content: icsContent,
+      }
+   }
 
    const registeredUserEmails = usersLivestreamData.map(
       ({ user }) => user.userEmail
@@ -174,28 +208,25 @@ const getRegisteredUsersIntoChunks = (
 const createRecipientVariables = (
    stream: LiveStreamEventWithUsersLivestreamData,
    startDate: Date,
-   timeMessage: string
+   streamGroup: Group,
+   reminderCampaign: string
 ) => {
    const {
-      company,
       title,
       externalEventLink,
-      speakers: [firstSpeaker],
       usersLivestreamData,
       id: streamId,
-      language,
    } = stream
 
-   const {
-      firstName: speakerFirstName,
-      lastName: speakerLastName,
-      position: speakerPosition,
-   } = firstSpeaker
+   // calendar
+   const calendarEvent = createCalendarEvent(stream)
+
+   const urls = makeUrls(calendarEvent)
 
    // Reduce over usersLivestreamData to be possible to get registered information and add it to the stream data
    return usersLivestreamData.reduce((acc, userLivestreamData) => {
       const { user } = userLivestreamData
-      const { id: studentEmail, firstName, timezone } = user
+      const { id: studentEmail, timezone } = user
 
       const luxonStartDate = DateTime.fromJSDate(startDate, {
          zone: timezone || "Europe/Zurich",
@@ -207,19 +238,42 @@ const createRecipientVariables = (
          ? externalEventLink
          : makeLivestreamEventDetailsUrl(streamId)
 
+      const companyPageUrl = streamGroup.publicProfile
+         ? `${getHost()}/company/${companyNameSlugify(
+              streamGroup.universityName
+           )}`
+         : ""
+
       const emailData = {
-         timeMessage: timeMessage,
-         companyName: company,
-         userFirstName: firstName,
-         streamTitle: title,
-         formattedDateTime: formattedDate,
-         formattedSpeaker: `${speakerFirstName} ${speakerLastName}, ${speakerPosition}`,
-         upcomingStreamLink: addUtmTagsToLink({
-            link: upcomingStreamLink,
-            campaign: "eventReminders",
-            content: title,
-         }),
-         german: language?.code === "DE",
+         livestream: {
+            title: title,
+            company: streamGroup.universityName,
+            companyBannerImageUrl: streamGroup.bannerImageUrl,
+            companyProfileUrl: companyPageUrl
+               ? addUtmTagsToLink({
+                    link: companyPageUrl,
+                    source: "careerfairy",
+                    medium: "email",
+                    campaign: reminderCampaign,
+                    content: title,
+                 })
+               : "",
+            start: formattedDate,
+            url: addUtmTagsToLink({
+               link: upcomingStreamLink,
+               source: "careerfairy",
+               medium: "email",
+               campaign: reminderCampaign,
+               content: title,
+            }),
+         },
+         calendar: {
+            google: urls.google,
+            apple: isLocalEnvironment()
+               ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${streamId}`
+               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${streamId}`,
+            outlook: urls.outlook,
+         },
       }
 
       return {
@@ -681,4 +735,10 @@ export const processInBatches = async <T, R>(
    }
 
    return results
+}
+
+export const getLivestreamICSDownloadUrl = (streamId: string) => {
+   isLocalEnvironment()
+      ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${streamId}`
+      : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${streamId}`
 }

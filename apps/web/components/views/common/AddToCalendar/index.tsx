@@ -1,6 +1,8 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
-import { AddUtmTagsToLinkProps } from "@careerfairy/shared-lib/utils/utils"
+import {
+   createCalendarEvent,
+   makeUrls,
+} from "@careerfairy/shared-lib/utils/utils"
 import {
    Avatar,
    ListItemIcon,
@@ -17,7 +19,6 @@ import {
    yahooIcon,
 } from "../../../../constants/svgs"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { makeUrls } from "../../../../util/makeUrls"
 
 const styles = {
    avatar: {
@@ -103,26 +104,6 @@ type Props = {
     * Action to take when clicking on a menu item of the calendar dropdown.
     */
    onCalendarClick?: () => void
-}
-
-export const createCalendarEvent = (
-   livestream: LivestreamEvent,
-   customUtm?: Partial<AddUtmTagsToLinkProps>
-) => {
-   if (!livestream) return null
-
-   const calendarEventProps = generateCalendarEventProperties(
-      livestream,
-      customUtm
-   )
-
-   return {
-      name: calendarEventProps.summary,
-      details: calendarEventProps.description,
-      location: calendarEventProps.location,
-      startsAt: calendarEventProps.start.toISOString(),
-      endsAt: calendarEventProps.end.toISOString(),
-   }
 }
 
 export const AddToCalendar = memo(function AddToCalendar({

@@ -7,7 +7,7 @@ import * as functions from "firebase-functions"
 import { client } from "./api/postmark"
 import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
-import { isLocalEnvironment, setCORSHeaders } from "./util"
+import { getLivestreamICSDownloadUrl, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
@@ -101,9 +101,9 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
                campaign: "eventRegistration",
                content: data.livestream_title,
             }),
-            calendar_event_i_calendar: isLocalEnvironment()
-               ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}`
-               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}`,
+            calendar_event_i_calendar: getLivestreamICSDownloadUrl(
+               data.livestream_id
+            ),
             calendar_event_google: data.eventCalendarUrls.google,
             calendar_event_outlook: data.eventCalendarUrls.outlook,
             calendar_event_yahoo: data.eventCalendarUrls.yahoo,
@@ -229,9 +229,7 @@ export const livestreamRegistrationConfirmationEmail = functions
       const emailCalendar = {
          google: data.eventCalendarUrls.google,
          outlook: data.eventCalendarUrls.outlook,
-         apple: isLocalEnvironment()
-            ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}`
-            : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}`,
+         apple: getLivestreamICSDownloadUrl(data.livestream_id),
       }
 
       const livestreamStartDate = DateTime.fromJSDate(
