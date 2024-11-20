@@ -1233,10 +1233,13 @@ export class FirebaseGroupRepository
          groupLivestreamsSnaps
       )
 
-      const creatorLivestreams = groupLivestreams.filter((livestream) =>
-         // filter by email for backwards compatibility
-         livestream.speakers.find((speaker) => speaker.email == creator.email)
-      )
+      const creatorLivestreams =
+         groupLivestreams?.filter((livestream) =>
+            // filter by email for backwards compatibility
+            livestream.speakers.find(
+               (speaker) => speaker.email == creator.email
+            )
+         ) ?? []
 
       const hasJobs = !groupJobs.empty
 
