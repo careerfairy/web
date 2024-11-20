@@ -7,7 +7,7 @@ import * as functions from "firebase-functions"
 import { client } from "./api/postmark"
 import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
-import { isLocalEnvironment, setCORSHeaders } from "./util"
+import { dateFormatOffset, isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
@@ -15,6 +15,7 @@ import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/c
 import { logger } from "firebase-functions/v2"
 import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import ical from "ical-generator"
+import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
 import { customJobRepo, groupRepo, sparkRepo } from "./api/repositories"
 
@@ -156,8 +157,8 @@ export const livestreamRegistrationConfirmationEmail = functions
 
       const emailSpeakers = livestreamSpeakers.slice(0, 4).map((speaker) => {
          return {
-            name: speaker.firstName,
-            role: speaker.roles?.join(", "),
+            name: `${speaker.firstName} ${speaker.lastName}`,
+            position: speaker.position,
             avatarUrl: speaker.avatar,
             url: addUtmTagsToLink({
                link: `${host}/portal/livestream/${livestream.id}/speaker-details/${speaker.id}`,
@@ -173,11 +174,14 @@ export const livestreamRegistrationConfirmationEmail = functions
          return {
             title: job.title,
             jobType: job.jobType,
-            businessFunctionsTagIds:
+            businessFunctionsTags: (
                job.businessFunctionsTagIds?.map(
                   (tag) => TagValuesLookup[tag]
-               ) ?? [],
-            deadline: job.deadline.toDate().toDateString(),
+               ) ?? []
+            ).join(", "),
+            deadline: DateTime.fromJSDate(job.deadline.toDate()).toFormat(
+               "dd LLL yyyy"
+            ),
             url: addUtmTagsToLink({
                link: `${host}/portal/livestream/${livestream.id}/job-details/${job.id}`,
                source: "careerfairy",
@@ -232,6 +236,17 @@ export const livestreamRegistrationConfirmationEmail = functions
             : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${data.livestream_id}`,
       }
 
+      const livestreamStartDate = DateTime.fromJSDate(
+         livestream.start.toDate(),
+         {
+            zone: data.user_time_zone || "Europe/Zurich",
+         }
+      )
+
+      const formattedStartDate = dateFormatOffset(
+         livestreamStartDate.toLocaleString(DateTime.DATETIME_FULL)
+      )
+
       const email: any = {
          TemplateId:
             process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
@@ -241,7 +256,7 @@ export const livestreamRegistrationConfirmationEmail = functions
             livestream: {
                title: livestream.title,
                company: group.universityName,
-               start: livestream.start.toDate().toUTCString() ?? "",
+               start: formattedStartDate,
                companyBannerImageUrl: group.bannerImageUrl,
             },
             user: {

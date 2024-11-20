@@ -310,6 +310,7 @@ class FirebaseService {
          livestream_id: livestream.id,
          recipientEmail: user.email,
          user_first_name: userData.firstName,
+         user_time_zone: userData.timezone,
          timezone: userData.timezone,
          regular_date: livestream.start.toDate().toString(),
          duration_date: livestream.duration,
