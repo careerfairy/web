@@ -1,4 +1,5 @@
 import functions = require("firebase-functions")
+import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LiveStreamEventWithUsersLivestreamData,
    UserLivestreamData,
@@ -6,12 +7,14 @@ import {
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { WriteBatch } from "firebase-admin/firestore"
+import { onRequest } from "firebase-functions/v2/https"
+import { DateTime } from "luxon"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { TemplatedMessage } from "postmark"
 import { firestore } from "./api/firestoreAdmin"
-import { sendMessage } from "./api/mailgun"
+import { sendIndividualMessages } from "./api/mailgun"
 import { client } from "./api/postmark"
-import { livestreamsRepo } from "./api/repositories"
+import { groupRepo, livestreamsRepo } from "./api/repositories"
 import config from "./config"
 import {
    getStreamsByDateWithRegisteredStudents,
@@ -130,22 +133,30 @@ export type ReminderData = {
    template: string
 }
 
+export const ReminderCampaignMap: Record<ReminderData["key"], string> = {
+   reminder5Minutes: "reminder-5min",
+   reminder1Hour: "reminder-1h",
+   reminder24Hours: "reminder-24h",
+   reminderRecordingNow: "reminder-recording-now",
+   reminderTodayMorning: "reminder-today-morning",
+}
+
 const Reminder5Min: ReminderData = {
-   template: "5-min-reminder",
+   template: "lsreminder5min",
    timeMessage: "NOW",
    minutesBefore: 5,
    key: "reminder5Minutes",
 }
 
 const Reminder1Hour: ReminderData = {
-   template: "1-h-reminder",
+   template: "lsreminder1h",
    timeMessage: "in 1 hour",
    minutesBefore: 60,
    key: "reminder1Hour",
 }
 
 const Reminder24Hours: ReminderData = {
-   template: "24-h-reminder",
+   template: "lsreminder24h",
    timeMessage: "TOMORROW",
    minutesBefore: 1440,
    key: "reminder24Hours",
@@ -237,6 +248,85 @@ export const scheduleReminderEmails = functions
          }
       })
    })
+
+/**
+ * For manual testing only.
+ * Easier way to test is to update the reminder{time}HoursPromise with a date in the future to ensure live streams are fetched.
+ * Also beware you might get 405, see @file packages/functions/src/api/mailgun.ts which has additional comments, the check can be disabled
+ * and so use the production domain, BUT BEWARE IF THE TEST EVENTS have other users data which would result in them receiving emails, for this
+ * would suggest creating locally test events and be the only one registered to them so your user would be the only one receiving them.
+ * Disregard disabling the check if you can receive emails from the sandbox server.
+ *
+ * Also to be able to retest, you will have to delete the reminder which have been sent for the live stream id, just delete the
+ * property for the testing reminder in field `reminderEmailsSent` on collection `/livestream/{stream_id}`, i.e: deleting field reminder1Hour to
+ * re test the 1 hour reminder.
+ */
+export const manualReminderEmails = onRequest(async () => {
+   const batch = firestore.batch()
+
+   const dateStart = addMinutesDate(new Date(), reminderDateDelay)
+   const dateEndFor5Minutes = addMinutesDate(dateStart, reminderScheduleRange)
+
+   console.log(
+      "🚀 ~ manualReminderEmails - dateEndFor5Minutes.:",
+      dateEndFor5Minutes
+   )
+
+   // const reminder5MinutesPromise = handleReminder(
+   //    batch,
+   //    dateStart,
+   //    DateTime.now().plus({ month: 5 }).toJSDate(),
+   //    Reminder5Min
+   // )
+
+   // const dateStartFor1Hour = addMinutesDate(
+   //    dateStart,
+   //    Reminder1Hour.minutesBefore
+   // )
+   // const dateEndFor1Hour = addMinutesDate(
+   //    dateStartFor1Hour,
+   //    reminderScheduleRange
+   // )
+   // const reminder1HourPromise = handleReminder(
+   //    batch,
+   //    dateStartFor1Hour,
+   //    DateTime.now().plus({ month: 5 }).toJSDate(),
+   //    Reminder1Hour
+   // )
+
+   const dateStartFor24Hours = addMinutesDate(
+      dateStart,
+      Reminder24Hours.minutesBefore
+   )
+   // const dateEndFor24Hours = addMinutesDate(
+   //    dateStartFor24Hours,
+   //    reminderScheduleRange
+   // )
+   const reminder24HoursPromise = handleReminder(
+      batch,
+      dateStartFor24Hours,
+      DateTime.now().plus({ month: 5 }).toJSDate(),
+      Reminder24Hours
+   )
+
+   return Promise.allSettled([
+      // reminder5MinutesPromise,
+      // reminder1HourPromise,
+      reminder24HoursPromise,
+   ]).then(async (results) => {
+      await batch.commit()
+
+      const rejectedPromises = results.filter(
+         ({ status }) => status === "rejected"
+      )
+      if (rejectedPromises.length > 0) {
+         const errorMessage = `${rejectedPromises.length} reminders were not sent`
+         functions.logger.error(errorMessage)
+         // Google Cloud monitoring should create an incident
+         throw new Error(errorMessage)
+      }
+   })
+})
 
 /**
  * Every day at 9 AM, check all the livestreams that ended the day before and send a reminder to all the non-attendees at 11 AM.
@@ -400,11 +490,34 @@ const handleReminder = async (
             reminder.timeMessage
          }`
       )
+      const allGroups = await Promise.all(
+         streams.map((stream) =>
+            groupRepo.getGroupById(stream.groupIds.at(0)).then((group) => {
+               return {
+                  streamId: stream.id,
+                  group: group,
+               }
+            })
+         )
+      )
+
+      const streamGroups: Record<string, Group> = {}
+
+      allGroups.forEach((groupData) => {
+         streamGroups[groupData.streamId] = groupData.group
+      })
 
       const emailsToSave = await handleSendEmail(
          streams,
          reminder,
-         generateReminderEmailData
+         (params) => {
+            return generateReminderEmailData({
+               ...params,
+               streamGroup: streamGroups[params.stream.id],
+               reminderKey: reminder.key,
+               reminderCampaign: ReminderCampaignMap[reminder.key],
+            })
+         }
       )
 
       functions.logger.log(
@@ -434,7 +547,7 @@ const handleSendEmail = (
    streams: LiveStreamEventWithUsersLivestreamData[],
    reminder: ReminderData,
    handleGenerateEmailData: (
-      props: IGenerateEmailDataProps
+      props: Omit<IGenerateEmailDataProps, "streamGroup">
    ) => MailgunMessageData[]
 ) => {
    const promiseArrayToSendMessages = []
@@ -526,7 +639,7 @@ const createSendEmailPromise = (
    const { id } = stream
    const { key } = reminder
 
-   return sendMessage(emailData)
+   return sendIndividualMessages(emailData)
       .then(() => {
          functions.logger.log(
             `Email ${key} with chunk ${currentChunk} was sent for stream ${id}`
