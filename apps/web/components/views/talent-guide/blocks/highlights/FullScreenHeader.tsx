@@ -1,5 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Box, Stack, Typography } from "@mui/material"
+import useLivestream from "components/custom-hook/live-stream/useLivestream"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
@@ -112,6 +113,10 @@ export const FullScreenHeader = ({
 
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
 
+   const { data: livestream } = useLivestream(
+      highlight.liveStreamIdentifier.identifier
+   )
+
    // Prevents exiting the fullscreen view when interacting with the dialog
    const handleDialogClick = useCallback((event: SyntheticEvent) => {
       event.stopPropagation()
@@ -175,9 +180,7 @@ export const FullScreenHeader = ({
                   variant="small"
                   sx={[styles.liveStreamTitle, ...animationStyle]}
                >
-                  {highlight.liveStreamIdentifier.identifier}{" "}
-                  {highlight.liveStreamIdentifier.identifier}{" "}
-                  {highlight.liveStreamIdentifier.identifier} THE END.
+                  {livestream?.title}
                </Typography>
             </Box>
          </Stack>
@@ -185,6 +188,7 @@ export const FullScreenHeader = ({
             <LivestreamDialog
                open={isOpen}
                livestreamId={highlight.liveStreamIdentifier.identifier}
+               serverSideLivestream={livestream}
                handleClose={handleClose}
                page={"details"}
                serverUserEmail={""}
