@@ -1,17 +1,8 @@
-import { FC, useEffect, useMemo } from "react"
-import { FilterCompanyOptions, Group } from "@careerfairy/shared-lib/groups"
+import { Group } from "@careerfairy/shared-lib/groups"
 import { Grid } from "@mui/material"
+import { FC } from "react"
 import { sxStyles } from "../../../types/commonTypes"
 import CompanyCard from "./CompanyCard"
-import { useRouter } from "next/router"
-import { ParsedUrlQuery } from "querystring"
-import { useMountedState } from "react-use"
-import useCompaniesSWR from "components/custom-hook/group/useCompaniesSWR"
-import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
-import {
-   queryParamToArr,
-   queryParamToBool,
-} from "@careerfairy/shared-lib/utils"
 
 const styles = sxStyles({
    flexItem: {
@@ -23,26 +14,13 @@ const styles = sxStyles({
 })
 
 type Props = {
-   initialData?: Group[]
-   setResults?: (counter: number) => void
+   companies?: Partial<Group>[]
 }
 
-const Companies: FC<Props> = ({ initialData, setResults }) => {
-   const isMounted = useMountedState()
-   const { query } = useRouter()
-
-   const filterOptions = useMemo(() => getQueryVariables(query), [query])
-   const { companies } = useCompaniesSWR(filterOptions)
-
-   const renderCompanies = isMounted() ? companies : initialData
-
-   useEffect(() => {
-      setResults(companies.length)
-   }, [setResults, companies])
-
+const Companies: FC<Props> = ({ companies }) => {
    return (
       <Grid sx={styles.root} container spacing={2}>
-         {renderCompanies.map((company) => (
+         {companies?.map((company: Group) => (
             <Grid
                sx={styles.flexItem}
                key={company.id}
@@ -57,21 +35,6 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
          ))}
       </Grid>
    )
-}
-
-/**
- *
- * @param query Query string object, all aplied filters are passed by query string parameters.
- * @returns @type FilterCompanyOptions mapped from the query string object
- */
-const getQueryVariables = (query: ParsedUrlQuery): FilterCompanyOptions => {
-   return {
-      companyCountries: queryParamToArr(query.companyCountries),
-      companyIndustries: queryParamToArr(query.companyIndustries),
-      publicSparks: queryParamToBool(query.companySparks as string),
-      companySize: queryParamToArr(query.companySizes),
-      allCompanyIndustries: CompanyIndustryValues,
-   }
 }
 
 export default Companies
