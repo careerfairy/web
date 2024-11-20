@@ -7,7 +7,7 @@ import * as functions from "firebase-functions"
 import { client } from "./api/postmark"
 import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
-import { dateFormatOffset, isLocalEnvironment, setCORSHeaders } from "./util"
+import { isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
@@ -243,8 +243,8 @@ export const livestreamRegistrationConfirmationEmail = functions
          }
       )
 
-      const formattedStartDate = dateFormatOffset(
-         livestreamStartDate.toLocaleString(DateTime.DATETIME_FULL)
+      const formattedStartDate = livestreamStartDate.toFormat(
+         "dd LLLL yyyy 'at' hh:mm a '(GMT' Z')'"
       )
 
       const email: any = {
