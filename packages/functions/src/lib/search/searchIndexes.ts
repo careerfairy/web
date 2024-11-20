@@ -8,6 +8,14 @@ import {
    TransformedLivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams/search"
 
+import { Group } from "@careerfairy/shared-lib/groups"
+import {
+   COMPANY_FIELDS_TO_INDEX,
+   COMPANY_FILTERING_FIELDS,
+   COMPANY_REPLICAS,
+   COMPANY_SEARCHABLE_ATTRIBUTES,
+   TransformedGroup,
+} from "@careerfairy/shared-lib/groups/search"
 import {
    SPARK_FIELDS_TO_INDEX,
    SPARK_FILTERING_FIELDS,
@@ -74,9 +82,31 @@ const sparkIndex = {
    },
 } satisfies Index<Spark, TransformedSpark>
 
+const companyIndex = {
+   collectionPath: "careerCenterData",
+   indexName: "companies" as const, // To allow inferring the type of the index name
+   fields: removeDuplicates(COMPANY_FIELDS_TO_INDEX),
+   // Leaving these as undefined as the CI does not build
+   shouldIndex: (doc) => !doc.test, // Don't index test groups,
+   fullIndexSyncQueryConstraints: (collectionRef) =>
+      collectionRef.where("test", "==", false),
+   transformData: (data) => ({
+      ...data,
+      companyCountryId: data.companyCountry?.id ?? null,
+      companyIndustriesIdTags:
+         data.companyIndustries?.map((industry) => industry.id) ?? [],
+   }),
+   settings: {
+      attributesForFaceting: COMPANY_FILTERING_FIELDS,
+      searchableAttributes: COMPANY_SEARCHABLE_ATTRIBUTES,
+      replicas: [COMPANY_REPLICAS.NAME_ASC],
+   },
+} satisfies Index<Group, TransformedGroup>
+
 export const knownIndexes = {
    [livestreamIndex.indexName]: livestreamIndex,
    [sparkIndex.indexName]: sparkIndex,
+   [companyIndex.indexName]: companyIndex,
 } as const satisfies Record<string, Index>
 
 export type IndexName = keyof typeof knownIndexes
