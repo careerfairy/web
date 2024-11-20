@@ -23,6 +23,8 @@ const styles = sxStyles({
    },
    avatarLabel: {
       textOverflow: "ellipsis",
+      overflow: "hidden",
+      whiteSpace: "nowrap",
    },
    videoTitle: {
       color: (theme) => theme.palette.neutral["800"],
