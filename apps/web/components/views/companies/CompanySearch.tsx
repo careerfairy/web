@@ -230,7 +230,7 @@ const CompanySearch = () => {
             </Box>
          </Stack>
          <Grid item xs={12}>
-            <Companies companies={infiniteCompanies as Partial<Group>[]} />
+            <Companies companies={infiniteCompanies} />
          </Grid>
 
          {Boolean(isValidating) && (

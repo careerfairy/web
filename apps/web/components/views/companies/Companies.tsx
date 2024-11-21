@@ -1,6 +1,7 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Grid } from "@mui/material"
 import { FC } from "react"
+import { CompanySearchResult } from "types/algolia"
 import { sxStyles } from "../../../types/commonTypes"
 import CompanyCard from "./CompanyCard"
 
@@ -14,13 +15,13 @@ const styles = sxStyles({
 })
 
 type Props = {
-   companies?: Partial<Group>[]
+   companies?: (Group | CompanySearchResult)[]
 }
 
 const Companies: FC<Props> = ({ companies }) => {
    return (
       <Grid sx={styles.root} container spacing={2}>
-         {companies?.map((company: Group) => (
+         {companies?.map((company) => (
             <Grid
                sx={styles.flexItem}
                key={company.id}
