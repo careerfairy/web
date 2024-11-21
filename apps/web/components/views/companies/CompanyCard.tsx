@@ -13,6 +13,7 @@ import Stack from "@mui/material/Stack"
 import Image from "next/legacy/image"
 import { FC } from "react"
 import { useInView } from "react-intersection-observer"
+import { CompanyAlgoliaHit } from "types/algolia"
 import { sxStyles } from "../../../types/commonTypes"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
 import {
@@ -105,7 +106,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   company: Group
+   company: Group | CompanyAlgoliaHit
 }
 
 const CompanyCard: FC<Props> = ({ company }) => {
