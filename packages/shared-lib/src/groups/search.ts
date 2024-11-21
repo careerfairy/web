@@ -45,7 +45,7 @@ export const COMPANY_FIELDS_TO_INDEX = [
 export type CompanyFieldToIndexType = (typeof COMPANY_FIELDS_TO_INDEX)[number]
 
 /**
- * Searchable attributes for livestream events to enhance search functionality:
+ * Searchable attributes for live stream events to enhance search functionality:
  * The position of attributes in the list determines their priority in the search.
  * They must be a subset of the fields defined in COMPANY_FIELDS_TO_INDEX.
  */

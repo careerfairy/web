@@ -8,7 +8,7 @@ import { useRouter } from "next/router"
 import { FC, useMemo } from "react"
 import { useMountedState } from "react-use"
 import useSWRMutation from "swr/mutation"
-import { CompanyAlgoliaHit } from "types/algolia"
+import { CompanySearchResult } from "types/algolia"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
@@ -39,7 +39,7 @@ const toggleFollowCompany = async (
 }
 
 type Props = {
-   group: Group | CompanyAlgoliaHit
+   group: Group | CompanySearchResult
 } & Omit<ButtonProps, "onClick">
 const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
    const { userData, authenticatedUser } = useAuth()

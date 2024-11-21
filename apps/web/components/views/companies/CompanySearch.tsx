@@ -93,6 +93,7 @@ const CompanySearch = () => {
    const { push, query } = useRouter()
    const { companyCountries, companyIndustries, companySize, publicSparks } =
       useMemo(() => getQueryVariables(query), [query])
+
    const { inView, ref } = useInView({
       rootMargin: "0px 0px 200px 0px",
    })
