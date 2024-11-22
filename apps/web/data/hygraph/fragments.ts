@@ -23,6 +23,13 @@ export const videoAssetFragment = gql`
 //       Components
 // ==================
 
+// Component API ID: Identifier
+export const identifierFragment = gql`
+   {
+      identifier
+   }
+`
+
 // Component API ID: Highlight
 export const highlightComponentFragment = gql`
    {
@@ -30,7 +37,12 @@ export const highlightComponentFragment = gql`
       id
       videoClip ${videoAssetFragment}
       title
-      logo ${imageAssetFragment}
+      liveStreamIdentifier {
+         ... on Identifier ${identifierFragment}
+      }
+      companyIdentifier {
+         ... on Identifier ${identifierFragment}
+      }
    }
 `
 
