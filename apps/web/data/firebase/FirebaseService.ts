@@ -33,6 +33,7 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
+import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
 import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import {
    TalentProfile,
@@ -58,6 +59,7 @@ import {
 import CookiesUtil from "../../util/CookiesUtil"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import { makeUrls } from "../../util/makeUrls"
+import { MobileUtils } from "../../util/mobile.utils"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../constants/streamContants"
 import { clearFirestoreCache } from "../util/authUtil"
 import firebaseApp, { FunctionsInstance } from "./FirebaseInstance"
@@ -65,8 +67,6 @@ import { recommendationServiceInstance } from "./RecommendationService"
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
-import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
-import { MobileUtils } from "../../util/mobile.utils"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -298,7 +298,7 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail_v3"
+            "sendLivestreamRegistrationConfirmationEmail_v4"
          )
 
       const calendarEvent = createCalendarEvent(livestream)
@@ -310,6 +310,7 @@ class FirebaseService {
          livestream_id: livestream.id,
          recipientEmail: user.email,
          user_first_name: userData.firstName,
+         user_time_zone: userData.timezone,
          timezone: userData.timezone,
          regular_date: livestream.start.toDate().toString(),
          duration_date: livestream.duration,
