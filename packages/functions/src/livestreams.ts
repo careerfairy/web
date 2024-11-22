@@ -131,12 +131,10 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
 
 export const livestreamRegistrationConfirmationEmail = functions
    .region(config.region)
-   .https.onCall(async (data) => {
+   .https.onCall(async (data, context) => {
       logger.info("🚀 ~ Livestream registration confirmation email: v4.0")
-
-      const host = isLocalEnvironment()
-         ? "http://localhost:3000"
-         : "https://careerfairy.io"
+      const host =
+         context?.rawRequest?.headers?.origin || "https://careerfairy.io"
       // Fetch the live stream data
       const livestreamDoc = await firestore
          .collection("livestreams")
