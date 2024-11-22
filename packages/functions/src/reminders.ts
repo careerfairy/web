@@ -856,11 +856,6 @@ const sendAttendeesReminder = async (
             },
          }
 
-         console.log(
-            "🚀 ~ sendAttendeesReminder ~ additionalData:",
-            additionalData
-         )
-
          const emailTemplates: TemplatedMessage[] =
             await getPostmarkTemplateMessages(
                BASE_TEMPLATE_MESSAGE,
