@@ -141,7 +141,7 @@ export const FullScreenHeader = ({
          // hack needed to ensure elements are rendered and we have access to the correct dimensions
          setTimeout(() => {
             setAnimationStyle(getScrollAnimationStyle(titleRef, parentRef))
-         }, 50)
+         }, 100)
       }
    }, [titleRef, parentRef])
 
