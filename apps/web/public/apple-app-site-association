@@ -1,13 +1,13 @@
 {
-  "applinks": {
-    "apps": [],
-    "details": [
-      {
-        "appID": "<TEAM_ID>.<BUNDLE_ID>",
-        "paths": [
-          "*"
-        ]
-      }
-    ]
-  }
+   "applinks": {
+      "apps": [],
+      "details": [
+         {
+            "appID": "BX2MH4WSBD.io.careerfairy>",
+            "paths": [
+               "*"
+            ]
+         }
+      ]
+   }
 }

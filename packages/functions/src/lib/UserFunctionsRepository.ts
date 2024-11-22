@@ -15,11 +15,11 @@ import {
    addUtmTagsToLink,
    isWithinNormalizationLimit,
 } from "@careerfairy/shared-lib/utils"
-import { DateTime } from "luxon"
-import { Expo, ExpoPushMessage } from "expo-server-sdk"
-import firebase from "firebase/compat"
-import * as functions from "firebase-functions"
 import { getHost } from "@careerfairy/shared-lib/utils/urls"
+import { Expo, ExpoPushMessage } from "expo-server-sdk"
+import * as functions from "firebase-functions"
+import firebase from "firebase/compat"
+import { DateTime } from "luxon"
 import { livestreamsRepo } from "../api/repositories"
 
 const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
@@ -269,7 +269,7 @@ export class UserFunctionsRepository
 
    async getRegisteredUsersWithinFourDaysAndSendNotifications(): Promise<void> {
       const earlierThan = DateTime.now().minus({ days: 4 }).toJSDate()
-      const thirdDay = DateTime.now().minus({ days: 5 }).toJSDate()
+      const fifthDay = DateTime.now().minus({ days: 5 }).toJSDate()
       const today = DateTime.now().toJSDate()
       const oneMonth = DateTime.now().plus({ days: 30 }).toJSDate()
 
@@ -277,7 +277,7 @@ export class UserFunctionsRepository
          const query = this.firestore
             .collection("userData")
             .where("createdAt", "<=", earlierThan)
-            .where("createdAt", ">=", thirdDay)
+            .where("createdAt", ">=", fifthDay)
 
          const livestreamQuery = this.firestore
             .collection("livestreams")
@@ -288,6 +288,13 @@ export class UserFunctionsRepository
          const livestreamSnapshot = await livestreamQuery.get()
 
          const users = []
+
+         if (livestreamSnapshot.size < 8) {
+            functions.logger.log(
+               "Fewer than 8 live streams in the next 30 days, skipping"
+            )
+            return
+         }
 
          for (const doc of usersSnapshot.docs) {
             const userData = doc.data() as UserData
