@@ -156,4 +156,5 @@ export const SparkInteractionSources = {
    CustomJob: "custom_job",
    PortalBanner: "portal_banner",
    RegistrationEmail: "registration-email",
+   Livestream_Follow_Up: "livestream_follow_up",
 } as const
