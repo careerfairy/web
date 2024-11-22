@@ -736,7 +736,7 @@ export const processInBatches = async <T, R>(
 }
 
 export const getLivestreamICSDownloadUrl = (streamId: string) => {
-   isLocalEnvironment()
+   return isLocalEnvironment()
       ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${streamId}`
       : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${streamId}`
 }
