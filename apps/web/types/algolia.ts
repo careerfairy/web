@@ -1,5 +1,9 @@
 import { Hit } from "@algolia/client-search"
 import {
+   CompanyFieldToIndexType,
+   TransformedGroup,
+} from "@careerfairy/shared-lib/groups/search"
+import {
    FieldToIndexType,
    TransformedLivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams/search"
@@ -55,6 +59,17 @@ export type SparkAlgoliaHit = Hit<AlgoliaSparkResponse>
 
 // The search result type with deserialized timestamps.
 export type SparkSearchResult = DeserializeTimestamps<SparkAlgoliaHit>
+
+// The company data type stored in the Algolia index.
+export type AlgoliaCompanyResponse = SerializeTimestamps<
+   Pick<TransformedGroup, CompanyFieldToIndexType>
+>
+
+// The data type with additional Algolia metadata like `objectID`, '_highlightResult', '_rankingInfo' etc.
+export type CompanyAlgoliaHit = Hit<AlgoliaCompanyResponse>
+
+// The search result type with deserialized timestamps.
+export type CompanySearchResult = DeserializeTimestamps<CompanyAlgoliaHit>
 
 // Filters
 export type DateFilterFieldType<T> = {

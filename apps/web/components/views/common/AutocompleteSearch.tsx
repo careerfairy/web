@@ -23,6 +23,7 @@ const styles = sxStyles({
       "& .MuiInputBase-input::placeholder": {
          color: "black",
       },
+      pr: "9px !important",
    },
 })
 
@@ -106,13 +107,14 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
          value: string,
          reason: AutocompleteInputChangeReason
       ) => {
-         if (reason === "reset") {
+         if (reason === "clear") {
             if (!freeSolo) {
                setInputValue("") // reset input value when user clicks on clear button/esacpe/outside
             }
             return
+         } else if (reason === "input") {
+            setInputValue(value)
          }
-         setInputValue(value)
       },
       [freeSolo, setInputValue]
    )
@@ -132,7 +134,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
          forcePopupIcon={inputTooSmall ? false : undefined}
          blurOnSelect
          includeInputInList
-         clearOnBlur
+         clearOnBlur={false}
          PaperComponent={StyledPaper}
          ListboxComponent={StyledListbox}
          ListboxProps={listBoxProps}
