@@ -1,19 +1,30 @@
-import React, { FC, useCallback, useMemo, useState } from "react"
-import { Box, Grid, Stack } from "@mui/material"
-import { getParts } from "../../util/search"
-import { sxStyles } from "../../../types/commonTypes"
+import { FilterCompanyOptions, Group } from "@careerfairy/shared-lib/groups"
+import { COMPANY_REPLICAS } from "@careerfairy/shared-lib/groups/search"
+import {
+   companyNameSlugify,
+   queryParamToArr,
+   queryParamToBool,
+} from "@careerfairy/shared-lib/utils"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import { Box, CircularProgress, Grid, Stack } from "@mui/material"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
-import RenderParts from "../common/search/RenderParts"
-import { companyNameSlugify, dynamicSort } from "@careerfairy/shared-lib/utils"
-import useGroupSearch from "../../custom-hook/group/useGroupSearch"
-import { UseSearchOptions } from "../../custom-hook/utils/useSearch"
-import { where } from "firebase/firestore"
-import { Group } from "@careerfairy/shared-lib/groups"
-import AutocompleteSearch from "../common/AutocompleteSearch"
+import {
+   FilterOptions,
+   useCompanySearchAlgolia,
+} from "components/custom-hook/group/useGroupSearchAlgolia"
 import { useRouter } from "next/router"
+import { ParsedUrlQuery } from "querystring"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Search as FindIcon } from "react-feather"
+import { useInView } from "react-intersection-observer"
+import { useDebounce } from "react-use"
+import { CompanySearchResult } from "types/algolia"
+import { sxStyles } from "../../../types/commonTypes"
+import { getParts } from "../../util/search"
+import AutocompleteSearch from "../common/AutocompleteSearch"
 import Filter, { FilterEnum } from "../common/filter/Filter"
+import RenderParts from "../common/search/RenderParts"
+import Companies from "./Companies"
 
 const styles = sxStyles({
    boxWrapper: {
@@ -56,31 +67,45 @@ const styles = sxStyles({
       borderRadius: "8px",
       boxShadow: "0px 12px 32px 0px rgba(0, 0, 0, 0.04)",
    },
+   loader: {
+      display: "flex",
+      justifyContent: "center",
+   },
 })
 
-export type CompanySearchProps = {
-   filterResults?: number
+/**
+ *
+ * @param query Query string object, all applied filters are passed by query string parameters.
+ * @returns @type FilterCompanyOptions mapped from the query string object
+ */
+const getQueryVariables = (query: ParsedUrlQuery): FilterCompanyOptions => {
+   return {
+      companyCountries: queryParamToArr(query.companyCountries),
+      companyIndustries: queryParamToArr(query.companyIndustries),
+      publicSparks: queryParamToBool(query.companySparks as string),
+      companySize: queryParamToArr(query.companySizes),
+   }
 }
-const CompanySearch: FC<CompanySearchProps> = ({ filterResults }) => {
-   const [inputValue, setInputValue] = useState("")
-   const { push } = useRouter()
 
-   const options = useMemo<UseSearchOptions<Group>>(
-      () => ({
-         maxResults: 7,
-         additionalConstraints: [
-            where("publicProfile", "==", true),
-            where("test", "==", false),
-         ],
-         emptyOrderBy: {
-            field: "universityName",
-            direction: "asc",
-         },
-      }),
-      []
+const CompanySearch = () => {
+   const [inputValue, setInputValue] = useState("")
+   const [debouncedInputValue, setDebouncedInputValue] = useState("")
+   const { push, query } = useRouter()
+   const { companyCountries, companyIndustries, companySize, publicSparks } =
+      useMemo(() => getQueryVariables(query), [query])
+
+   const { inView, ref } = useInView({
+      rootMargin: "0px 0px 200px 0px",
+   })
+
+   useDebounce(
+      () => {
+         setDebouncedInputValue(inputValue)
+      },
+      250,
+      [inputValue]
    )
 
-   const { data: companyHits, status } = useGroupSearch(inputValue, options)
    /**
     * Filter by Company: location, industry, sparks(y/n) or size.
     */
@@ -94,7 +119,33 @@ const CompanySearch: FC<CompanySearchProps> = ({ filterResults }) => {
       ],
       []
    )
-   const loading = status === "loading"
+
+   const filterOptions = useMemo<FilterOptions>(
+      () => ({
+         arrayFilters: {
+            companyCountryId: companyCountries,
+            companyIndustriesIdTags: companyIndustries,
+            companySize,
+         },
+
+         booleanFilters: {
+            ...(publicSparks && {
+               publicSparks,
+            }),
+            test: false,
+            publicProfile: true,
+         },
+      }),
+      [companyCountries, companyIndustries, companySize, publicSparks]
+   )
+
+   const { data, setSize, isValidating } = useCompanySearchAlgolia(
+      debouncedInputValue,
+      filterOptions,
+      COMPANY_REPLICAS.NAME_ASC
+   )
+
+   const numberOfResults = data?.[0]?.nbHits || 0
 
    const handleChange = useCallback(
       (newValue: Group | null) =>
@@ -133,38 +184,62 @@ const CompanySearch: FC<CompanySearchProps> = ({ filterResults }) => {
       [inputValue]
    )
 
-   const sortedGroups = useMemo(
-      () => companyHits?.sort(dynamicSort("universityName", "asc")) || [],
-      [companyHits]
-   )
+   const infiniteCompanies = useMemo(() => {
+      return data?.flatMap((page) => page.deserializedHits)
+   }, [data])
+
+   const firstPage = data?.[0].deserializedHits
+
+   const isValidatingRef = useRef(isValidating)
+   isValidatingRef.current = isValidating
+
+   useEffect(() => {
+      if (isValidatingRef.current) return
+
+      if (inView) {
+         setSize((prevSize) => prevSize + 1)
+      }
+   }, [inView, setSize])
 
    return (
-      <Stack direction={"row"}>
-         <Box sx={styles.searchWrapper}>
-            <AutocompleteSearch
-               id="company-search"
-               minCharacters={3}
-               loading={loading}
-               inputValue={inputValue}
-               handleChange={handleChange}
-               options={sortedGroups}
-               renderOption={renderOption}
-               isOptionEqualToValue={isOptionEqualToValue}
-               getOptionLabel={getOptionLabel}
-               setInputValue={setInputValue}
-               noOptionsText="No companies found"
-               placeholderText="Search for a company"
-               inputEndIcon={<FindIcon />}
-            />
-         </Box>
-         <Box sx={styles.filter}>
-            <Stack direction={"row"} sx={styles.filterWrapper}>
-               <Filter
-                  filtersToShow={filtersToShow}
-                  numberOfResults={filterResults}
+      <Stack spacing={2}>
+         <Stack direction={"row"}>
+            <Box sx={styles.searchWrapper}>
+               <AutocompleteSearch
+                  id="company-search"
+                  loading={isValidating}
+                  inputValue={inputValue}
+                  handleChange={handleChange}
+                  options={firstPage}
+                  renderOption={renderOption}
+                  isOptionEqualToValue={isOptionEqualToValue}
+                  getOptionLabel={getOptionLabel}
+                  setInputValue={setInputValue}
+                  noOptionsText="No companies found"
+                  placeholderText="Search for a company"
+                  inputEndIcon={<FindIcon color={"black"} />}
+                  disableFiltering // Filtering is now done by Algolia, not by the component
                />
-            </Stack>
-         </Box>
+            </Box>
+            <Box sx={styles.filter}>
+               <Stack direction={"row"} sx={styles.filterWrapper}>
+                  <Filter
+                     filtersToShow={filtersToShow}
+                     numberOfResults={numberOfResults}
+                  />
+               </Stack>
+            </Box>
+         </Stack>
+         <Grid item xs={12}>
+            <Companies companies={infiniteCompanies} />
+         </Grid>
+
+         {Boolean(isValidating) && (
+            <Box sx={styles.loader}>
+               <CircularProgress />
+            </Box>
+         )}
+         <Box ref={ref} />
       </Stack>
    )
 }
@@ -172,5 +247,6 @@ const CompanySearch: FC<CompanySearchProps> = ({ filterResults }) => {
 const isOptionEqualToValue = (option: Group, value: Group) =>
    option.id === value.id
 
-const getOptionLabel = (option: Group) => option.universityName
+const getOptionLabel = (option: CompanySearchResult) =>
+   typeof option === "string" ? option : option.universityName
 export default CompanySearch

@@ -8,6 +8,7 @@ import { useRouter } from "next/router"
 import { FC, useMemo } from "react"
 import { useMountedState } from "react-use"
 import useSWRMutation from "swr/mutation"
+import { CompanySearchResult } from "types/algolia"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
@@ -17,27 +18,28 @@ import Link from "../Link"
 type Arguments = {
    arg: {
       userData: UserData
-      group: Group
+      groupId: string
       type: "follow" | "unfollow"
    }
 }
-const toggleFollowCompany = (
+const toggleFollowCompany = async (
    key: string,
-   { arg: { userData, type, group } }: Arguments
+   { arg: { userData, type, groupId } }: Arguments
 ) => {
    if (type === "follow") {
+      const latestGroup = await groupRepo.getGroupById(groupId)
       return groupRepo
-         .followCompany(userData, group)
+         .followCompany(userData, latestGroup)
          .then(() => "followed" as const)
    } else {
       return groupRepo
-         .unfollowCompany(userData.id, group.id)
+         .unfollowCompany(userData.id, groupId)
          .then(() => "unfollowed" as const)
    }
 }
 
 type Props = {
-   group: Group
+   group: Group | CompanySearchResult
 } & Omit<ButtonProps, "onClick">
 const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
    const { userData, authenticatedUser } = useAuth()
@@ -77,7 +79,7 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
       if (authenticatedUser) {
          return trigger({
             userData,
-            group,
+            groupId: group.id,
             type: companyFollowedData ? "unfollow" : "follow",
          })
       }
