@@ -1,9 +1,15 @@
 import { SearchResponse } from "@algolia/client-search"
+import { CompanyReplicaType } from "@careerfairy/shared-lib/groups/search"
 import { LivestreamReplicaType } from "@careerfairy/shared-lib/livestreams/search"
+
 import { SparkReplicaType } from "@careerfairy/shared-lib/sparks/search"
 import { Wish } from "@careerfairy/shared-lib/wishes"
 import { SearchClient, SearchIndex } from "algoliasearch"
-import { AlgoliaLivestreamResponse, AlgoliaSparkResponse } from "types/algolia"
+import {
+   AlgoliaCompanyResponse,
+   AlgoliaLivestreamResponse,
+   AlgoliaSparkResponse,
+} from "types/algolia"
 import { getWorkflowId, isTestEnvironment } from "util/CommonUtil"
 import { SortType } from "../../components/views/common/filter/FilterMenu"
 import algoliaSearchClient from "./AlgoliaInstance"
@@ -29,6 +35,13 @@ export interface IAlgoliaRepository {
       targetReplica?: SparkReplicaType,
       itemsPerPage?: number
    ): Promise<SearchResponse<AlgoliaSparkResponse>>
+   searchCompanies(
+      query: string,
+      filters: string,
+      page: number,
+      targetReplica?: CompanyReplicaType,
+      itemsPerPage?: number
+   ): Promise<SearchResponse<AlgoliaCompanyResponse>>
 }
 interface SearchWishesOptions {
    sortType?: SortType
@@ -105,6 +118,26 @@ class AlgoliaRepository implements IAlgoliaRepository {
       const index = initAlgoliaIndex(targetReplica ? targetReplica : "sparks")
 
       return handleSearch<AlgoliaSparkResponse>(
+         index,
+         query,
+         filters,
+         page,
+         itemsPerPage
+      )
+   }
+
+   async searchCompanies(
+      query: string,
+      filters: string,
+      page: number,
+      targetReplica?: CompanyReplicaType,
+      itemsPerPage?: number
+   ) {
+      const index = initAlgoliaIndex(
+         targetReplica ? targetReplica : "companies"
+      )
+
+      return handleSearch<AlgoliaCompanyResponse>(
          index,
          query,
          filters,
