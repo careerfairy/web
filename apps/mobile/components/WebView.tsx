@@ -1,29 +1,29 @@
+import {
+   HAPTIC,
+   MESSAGING_TYPE,
+   NativeEvent,
+   NativeEventStringified,
+   PERMISSIONS,
+   USER_AUTH,
+} from "@careerfairy/shared-lib/src/messaging"
+import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
+import { Audio } from "expo-av"
+import { Camera } from "expo-camera"
+import * as Notifications from "expo-notifications"
+import * as SecureStore from "expo-secure-store"
 import React, { useEffect, useRef, useState } from "react"
 import {
    BackHandler,
    Linking,
    Platform,
-   StyleSheet,
    SafeAreaView,
-   View,
-   Text,
    StatusBar,
+   StyleSheet,
+   Text,
    TouchableOpacity,
+   View,
 } from "react-native"
 import { WebView } from "react-native-webview"
-import * as Notifications from "expo-notifications"
-import * as SecureStore from "expo-secure-store"
-import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
-import {
-   MESSAGING_TYPE,
-   USER_AUTH,
-   HAPTIC,
-   PERMISSIONS,
-   NativeEventStringified,
-   NativeEvent,
-} from "@careerfairy/shared-lib/src/messaging"
-import { Camera } from "expo-camera"
-import { Audio } from "expo-av"
 
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
@@ -268,6 +268,11 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const handleNavigation = (request: any) => {
       if (!request.url.includes(SEARCH_CRITERIA)) {
          if (isValidUrl(request.url)) {
+            // iOS calls for all types of navigation (including the non-restrictive
+            // "other", which causes issues for internal links like cookies).
+            if (Platform.OS === "ios" && request.navigationType !== "click") {
+               return false
+            }
             Linking.openURL(request.url)
          }
          return false // Prevent WebView from loading the external link
@@ -289,7 +294,13 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             domStorageEnabled={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
-            originWhitelist={["https://*", "http://*", "file://*", "sms://*"]}
+            originWhitelist={[
+               "https://*",
+               "http://*",
+               "file://*",
+               "sms://*",
+               "about:",
+            ]}
             onNavigationStateChange={handleNavigationStateChange}
          />
 
