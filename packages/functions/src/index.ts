@@ -123,6 +123,7 @@ exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
 // Not to be deployed
 exports.manualReminderEmails = reminders.manualReminderEmails
 exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
+exports.sendReminderToAttendees = reminders.sendReminderToAttendees
 // Not to be deployed
 exports.testSendReminderToNonAttendees =
    reminders.testSendReminderToNonAttendees
