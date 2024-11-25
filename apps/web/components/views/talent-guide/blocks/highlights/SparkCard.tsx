@@ -3,6 +3,7 @@ import useSpark from "components/views/admin/sparks/analytics/competitor-tab/use
 import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
 import { SparkComponentType } from "data/hygraph/types"
 import { sxStyles } from "types/commonTypes"
+import { useHighlights } from "./HighlightsBlockContext"
 
 const styles = sxStyles({
    sparkContainer: {
@@ -15,14 +16,14 @@ const styles = sxStyles({
    },
 })
 
-export const SparkCard = ({
-   spark,
-   isPlaying,
-}: {
+type SparkCardProps = {
    spark: SparkComponentType
-   isPlaying: boolean
-}) => {
+   index: number
+}
+
+export const SparkCard = ({ spark, index }: SparkCardProps) => {
    const sparkData = useSpark(spark.sparkId)
+   const { shouldAutoPlay } = useHighlights()
 
    if (!sparkData) return null
 
@@ -31,7 +32,7 @@ export const SparkCard = ({
          <SparkPreviewCard
             spark={sparkData}
             onClick={() => alert("Wololo. Will do something in the future.")}
-            preview={isPlaying}
+            preview={shouldAutoPlay(index)}
             disableAutoPlay={false}
          />
       </Box>
