@@ -190,6 +190,7 @@ const ReminderTodayMorning: ReminderData = {
    template: "reminder_for_recording",
    key: "reminderTodayMorning",
 }
+
 const ReminderRecordingNow: ReminderData = {
    template: "reminder_for_recording",
    key: "reminderRecordingNow",
@@ -369,13 +370,27 @@ export const sendReminderToNonAttendees = functions
       await sendAttendeesReminder(ReminderTodayMorning)
    })
 
+export const sendReminderToAttendees = functions
+   .region(config.region)
+   .runWith({
+      // when sending large batches, this function can take a while to finish
+      timeoutSeconds: 300,
+   })
+   .pubsub.schedule("0 11 * * *")
+   .timeZone("Europe/Zurich")
+   .onRun(async () => {
+      await sendAttendeesReminder(ReminderTodayMorning, true)
+   })
+
 export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
    // Update ids according to testing data
    const testEvents = await livestreamsRepo.getLivestreamsByIds([
       "LQTy4JdeRBqGUtULeNir",
-      "6UX9IBp6otoVwGwis8EJ",
+      // "6UX9IBp6otoVwGwis8EJ",
    ])
-   await sendAttendeesReminder(ReminderTodayMorning, testEvents)
+
+   // Toggle between attendees or non-attendees
+   await sendAttendeesReminder(ReminderTodayMorning, true, testEvents)
 
    res.status(200).send("Test non attendees done")
 })
@@ -749,6 +764,7 @@ const wasEmailChunkNotYetSent = (
 
 const sendAttendeesReminder = async (
    reminderData: ReminderData,
+   attendees?: boolean,
    events?: LivestreamEvent[]
 ) => {
    try {
@@ -772,25 +788,25 @@ const sendAttendeesReminder = async (
                      `Detected livestream ${livestreamPresenter.title} has ended yesterday`
                   )
 
-                  const nonAttendees = await livestreamsRepo.getNonAttendees(
-                     livestream.id
-                  )
+                  const attendeesData = attendees
+                     ? await livestreamsRepo.getAttendees(livestream.id)
+                     : await livestreamsRepo.getNonAttendees(livestream.id)
 
-                  if (nonAttendees.length) {
-                     const livestreamWithNonAttendees = {
+                  if (attendeesData.length) {
+                     const livestreamAttendees = {
                         ...livestream,
                         usersLivestreamData:
-                           nonAttendees as UserLivestreamData[],
+                           attendeesData as UserLivestreamData[],
                      } as LiveStreamEventWithUsersLivestreamData
 
                      functions.logger.log(
-                        `Will send the reminder to ${nonAttendees.length} users related to the Livestream ${livestreamPresenter.title}`
+                        `Will send the reminder to ${attendeesData.length} users related to the Livestream ${livestreamPresenter.title}`
                      )
 
-                     return [...(await acc), livestreamWithNonAttendees]
+                     return [...(await acc), livestreamAttendees]
                   } else {
                      functions.logger.log(
-                        `No nonAttendees were found on ${livestreamPresenter.title}`
+                        `Attendees were found on ${livestreamPresenter.title}`
                      )
                   }
                } else {
@@ -803,12 +819,14 @@ const sendAttendeesReminder = async (
             Promise.resolve([] as LiveStreamEventWithUsersLivestreamData[])
          )
 
+         const templateId = attendees
+            ? Number(process.env.POSTMARK_TEMPLATE_ATTENDEES_REMINDER)
+            : Number(process.env.POSTMARK_TEMPLATE_NON_ATTENDEES_REMINDER)
+
          const BASE_TEMPLATE_MESSAGE: TemplatedMessage = {
             From: "CareerFairy <noreply@careerfairy.io>",
             To: null,
-            TemplateId: Number(
-               process.env.POSTMARK_TEMPLATE_NON_ATTENDEES_REMINDER
-            ),
+            TemplateId: templateId,
             TemplateModel: null,
             MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
             Tag: null,
@@ -869,7 +887,7 @@ const sendAttendeesReminder = async (
          await client.sendEmailBatchWithTemplates(emailTemplates, (err) => {
             if (err) {
                functions.logger.error(
-                  "Unable to send reminder to non attendees with Postmark",
+                  "Unable to send reminder to attendees with Postmark",
                   {
                      error: err,
                   }
@@ -878,13 +896,13 @@ const sendAttendeesReminder = async (
             }
          })
 
-         functions.logger.log("Non attendees reminders sent")
+         functions.logger.log("attendees reminders sent")
       } else {
          functions.logger.log("No livestream has ended yesterday")
       }
    } catch (error) {
       functions.logger.error(
-         "error in sending reminder to non attendees when livestreams ends",
+         "error in sending reminder to attendees when livestreams ends",
          error
       )
       throw new functions.https.HttpsError("unknown", error)
