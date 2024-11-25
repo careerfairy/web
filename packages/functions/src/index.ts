@@ -140,6 +140,8 @@ exports.notifyUsersWhenLivestreamStarts =
 
 // Notification Onboarding
 exports.notificationOnboarding = notificationOnboardings.notificationOnboarding
+exports.notificationOnboardingLivestream =
+   notificationOnboardings.notificationOnboardingLivestream
 
 // User
 exports.updateUserLiveStreamDataOnUserChange =
