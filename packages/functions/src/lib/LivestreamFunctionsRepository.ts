@@ -553,7 +553,7 @@ export class LivestreamFunctionsRepository
       const querySnapshot = await this.firestore
          .collectionGroup("userLivestreamData")
          .where("livestreamId", "==", livestreamId)
-         .where("participated", "!=", null)
+         .where("participated.date", "!=", null)
          .get()
 
       if (!querySnapshot.empty) {
