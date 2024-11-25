@@ -46,6 +46,9 @@ export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
       ]
    }
 
+   // TODO: remove later
+   paths = []
+
    return { paths, fallback: false }
 }
 
