@@ -40,14 +40,18 @@ import {
    LiveStreamStats,
    createLiveStreamStatsDoc,
 } from "@careerfairy/shared-lib/livestreams/stats"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import {
    addUtmTagsToLink,
    chunkArray,
    getArrayDifference,
 } from "@careerfairy/shared-lib/utils"
+import { getHost } from "@careerfairy/shared-lib/utils/urls"
+import { Expo, ExpoPushMessage } from "expo-server-sdk"
 import type { Change } from "firebase-functions"
 import * as functions from "firebase-functions"
+import firebase from "firebase/compat"
 import { isEmpty } from "lodash"
 import { DateTime } from "luxon"
 import uuid from "uuid-random"
@@ -63,10 +67,6 @@ import { addOperations } from "./stats/livestream"
 import type { OperationsToMake } from "./stats/util"
 import { syncCustomJobLinkedContentTags } from "./tagging/tags"
 import { logAndThrow } from "./validations"
-import { Expo, ExpoPushMessage } from "expo-server-sdk"
-import firebase from "firebase/compat"
-import { getHost } from "@careerfairy/shared-lib/utils/urls"
-import { UserData } from "@careerfairy/shared-lib/users"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -112,6 +112,8 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @param livestreamId
     */
    getNonAttendees(livestreamId: string): Promise<UserLivestreamData[]>
+
+   getAttendees(livestreamId: string): Promise<UserLivestreamData[]>
 
    getYesterdayLivestreams(): Promise<LivestreamEvent[]>
 
@@ -536,6 +538,22 @@ export class LivestreamFunctionsRepository
          .where("livestreamId", "==", livestreamId)
          .where("registered", "!=", null)
          .where("participated", "==", null)
+         .get()
+
+      if (!querySnapshot.empty) {
+         return querySnapshot.docs?.map(
+            (doc) => doc.data() as UserLivestreamData
+         )
+      }
+
+      return []
+   }
+
+   async getAttendees(livestreamId: string): Promise<UserLivestreamData[]> {
+      const querySnapshot = await this.firestore
+         .collectionGroup("userLivestreamData")
+         .where("livestreamId", "==", livestreamId)
+         .where("participated", "!=", null)
          .get()
 
       if (!querySnapshot.empty) {
