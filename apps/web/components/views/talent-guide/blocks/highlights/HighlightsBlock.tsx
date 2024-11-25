@@ -7,9 +7,9 @@ import {
    SparkComponentType,
 } from "data/hygraph/types"
 import dynamic from "next/dynamic"
-import { useCallback, useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { HighlightCardSkeleton } from "./HighlightCardSkeleton"
+import { HighlightsProvider } from "./HighlightsBlockContext"
 import { SparkCard } from "./SparkCard"
 
 const styles = sxStyles({
@@ -30,48 +30,42 @@ const HighlightCardComponent = dynamic(() => import("./HighlightCard"), {
 })
 
 export const HighlightsBlock = ({ highlights }: Props) => {
-   const [currentPlayingIndex, setCurrentPlayingIndex] = useState<number>(0)
+   // // Leaving this just for testing purposes so its easier for you to see
+   // useEffect(() => {
+   //    const interval = setInterval(() => {
+   //       setCurrentPlayingIndex((prevIndex) => {
+   //          return (prevIndex + 1) % highlights.length
+   //       })
+   //    }, 1000)
 
-   const handleEndedPlaying = useCallback(() => {
-      setCurrentPlayingIndex((prevIndex) => {
-         return (prevIndex + 1) % highlights.length
-      })
-   }, [highlights.length])
-
-   // Leaving this just for testing purposes so its easier for you to see
-   useEffect(() => {
-      const interval = setInterval(() => {
-         setCurrentPlayingIndex((prevIndex) => {
-            return (prevIndex + 1) % highlights.length
-         })
-      }, 1000)
-
-      return () => clearInterval(interval)
-   }, [highlights.length])
+   //    return () => clearInterval(interval)
+   // }, [highlights.length])
 
    return (
-      <SuspenseWithBoundary fallback={<HighlightCardSkeleton />}>
+      <HighlightsProvider totalHighlights={highlights.length}>
          <Box sx={styles.root}>
             {highlights.map((highlight, index) => {
                const isSpark = highlight.__typename === "Spark"
                return (
-                  <Box key={index}>
+                  <SuspenseWithBoundary
+                     fallback={<HighlightCardSkeleton />}
+                     key={index}
+                  >
                      {isSpark ? (
                         <SparkCard
                            spark={highlight as SparkComponentType}
-                           isPlaying={currentPlayingIndex === index}
+                           index={index}
                         />
                      ) : (
                         <HighlightCardComponent
                            highlight={highlight as HighlightComponentType}
-                           isPlaying={currentPlayingIndex === index}
-                           onEnded={handleEndedPlaying}
+                           index={index}
                         />
                      )}
-                  </Box>
+                  </SuspenseWithBoundary>
                )
             })}
          </Box>
-      </SuspenseWithBoundary>
+      </HighlightsProvider>
    )
 }

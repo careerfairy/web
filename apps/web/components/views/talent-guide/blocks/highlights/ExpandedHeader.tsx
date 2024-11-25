@@ -29,7 +29,7 @@ const styles = sxStyles({
       left: 0,
       width: "100%",
       padding: "0 16px 16px 16px",
-      color: "#FEFEFE",
+      color: (theme) => theme.brand.white["100"],
       userSelect: "none",
       cursor: "default",
    },
@@ -100,7 +100,7 @@ const getScrollAnimationStyle = (
    ]
 }
 
-export const FullScreenHeader = ({
+export const ExpandedHeader = ({
    group,
    highlight,
 }: {
