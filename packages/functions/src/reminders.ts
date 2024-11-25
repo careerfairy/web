@@ -806,7 +806,7 @@ const sendAttendeesReminder = async (
                      return [...(await acc), livestreamAttendees]
                   } else {
                      functions.logger.log(
-                        `Attendees were found on ${livestreamPresenter.title}`
+                        `No Attendees were found on ${livestreamPresenter.title}`
                      )
                   }
                } else {
