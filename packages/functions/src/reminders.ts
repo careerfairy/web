@@ -190,6 +190,7 @@ const ReminderTodayMorning: ReminderData = {
    template: "reminder_for_recording",
    key: "reminderTodayMorning",
 }
+
 const ReminderRecordingNow: ReminderData = {
    template: "reminder_for_recording",
    key: "reminderRecordingNow",
@@ -298,12 +299,12 @@ export const manualReminderEmails = onRequest(async () => {
       dateEndFor5Minutes
    )
 
-   // const reminder5MinutesPromise = handleReminder(
-   //    batch,
-   //    dateStart,
-   //    DateTime.now().plus({ month: 5 }).toJSDate(),
-   //    Reminder5Min
-   // )
+   const reminder5MinutesPromise = handleReminder(
+      batch,
+      dateStart,
+      DateTime.now().plus({ month: 5 }).toJSDate(),
+      Reminder5Min
+   )
 
    // const dateStartFor1Hour = addMinutesDate(
    //    dateStart,
@@ -320,25 +321,25 @@ export const manualReminderEmails = onRequest(async () => {
    //    Reminder1Hour
    // )
 
-   const dateStartFor24Hours = addMinutesDate(
-      dateStart,
-      Reminder24Hours.minutesBefore
-   )
+   // const dateStartFor24Hours = addMinutesDate(
+   //    dateStart,
+   //    Reminder24Hours.minutesBefore
+   // )
    // const dateEndFor24Hours = addMinutesDate(
    //    dateStartFor24Hours,
    //    reminderScheduleRange
    // )
-   const reminder24HoursPromise = handleReminder(
-      batch,
-      dateStartFor24Hours,
-      DateTime.now().plus({ month: 5 }).toJSDate(),
-      Reminder24Hours
-   )
+   // const reminder24HoursPromise = handleReminder(
+   //    batch,
+   //    dateStartFor24Hours,
+   //    DateTime.now().plus({ month: 5 }).toJSDate(),
+   //    Reminder24Hours
+   // )
 
    return Promise.allSettled([
-      // reminder5MinutesPromise,
+      reminder5MinutesPromise,
       // reminder1HourPromise,
-      reminder24HoursPromise,
+      // reminder24HoursPromise,
    ]).then(async (results) => {
       await batch.commit()
 
@@ -369,13 +370,27 @@ export const sendReminderToNonAttendees = functions
       await sendAttendeesReminder(ReminderTodayMorning)
    })
 
+export const sendReminderToAttendees = functions
+   .region(config.region)
+   .runWith({
+      // when sending large batches, this function can take a while to finish
+      timeoutSeconds: 300,
+   })
+   .pubsub.schedule("0 11 * * *")
+   .timeZone("Europe/Zurich")
+   .onRun(async () => {
+      await sendAttendeesReminder(ReminderTodayMorning, true)
+   })
+
 export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
    // Update ids according to testing data
    const testEvents = await livestreamsRepo.getLivestreamsByIds([
       "LQTy4JdeRBqGUtULeNir",
-      "6UX9IBp6otoVwGwis8EJ",
+      // "6UX9IBp6otoVwGwis8EJ",
    ])
-   await sendAttendeesReminder(ReminderTodayMorning, testEvents)
+
+   // Toggle between attendees or non-attendees
+   await sendAttendeesReminder(ReminderTodayMorning, false, testEvents)
 
    res.status(200).send("Test non attendees done")
 })
@@ -695,6 +710,7 @@ const getPostmarkTemplateMessages = (
                jobs: streamJobs,
                speakers: streamSpeakers,
                sparks: groupSparks,
+               allowsRecording: !stream.denyRecordingAccess,
             },
             Tag: reminder.key,
          })
@@ -749,6 +765,7 @@ const wasEmailChunkNotYetSent = (
 
 const sendAttendeesReminder = async (
    reminderData: ReminderData,
+   attendees?: boolean,
    events?: LivestreamEvent[]
 ) => {
    try {
@@ -757,58 +774,57 @@ const sendAttendeesReminder = async (
          : await livestreamsRepo.getYesterdayLivestreams()
 
       if (yesterdayLivestreams.length) {
-         const livestreamsToRemind = await yesterdayLivestreams.reduce(
-            async (acc, livestream) => {
-               const livestreamPresenter =
-                  LivestreamPresenter.createFromDocument(livestream)
+         const livestreamsToRemind = await yesterdayLivestreams.reduce<
+            Promise<LiveStreamEventWithUsersLivestreamData[]>
+         >(async (acc, livestream) => {
+            const livestreamPresenter =
+               LivestreamPresenter.createFromDocument(livestream)
 
-               if (
-                  livestreamPresenter.isAbleToAccessRecording() &&
-                  !livestreamPresenter.isTest() &&
-                  !livestreamPresenter.isLive() &&
-                  livestreamPresenter.streamHasFinished()
-               ) {
-                  functions.logger.log(
-                     `Detected livestream ${livestreamPresenter.title} has ended yesterday`
-                  )
+            if (
+               !livestreamPresenter.isTest() &&
+               !livestreamPresenter.isLive() &&
+               livestreamPresenter.streamHasFinished()
+            ) {
+               functions.logger.log(
+                  `Detected livestream ${livestreamPresenter.title} has ended yesterday`
+               )
 
-                  const nonAttendees = await livestreamsRepo.getNonAttendees(
-                     livestream.id
-                  )
+               const attendeesData = attendees
+                  ? await livestreamsRepo.getAttendees(livestream.id)
+                  : await livestreamsRepo.getNonAttendees(livestream.id)
 
-                  if (nonAttendees.length) {
-                     const livestreamWithNonAttendees = {
-                        ...livestream,
-                        usersLivestreamData:
-                           nonAttendees as UserLivestreamData[],
-                     } as LiveStreamEventWithUsersLivestreamData
-
-                     functions.logger.log(
-                        `Will send the reminder to ${nonAttendees.length} users related to the Livestream ${livestreamPresenter.title}`
-                     )
-
-                     return [...(await acc), livestreamWithNonAttendees]
-                  } else {
-                     functions.logger.log(
-                        `No nonAttendees were found on ${livestreamPresenter.title}`
-                     )
+               if (attendeesData.length) {
+                  const livestreamAttendees = {
+                     ...livestream,
+                     usersLivestreamData: attendeesData,
                   }
+
+                  functions.logger.log(
+                     `Will send the reminder to ${attendeesData.length} users related to the Livestream ${livestreamPresenter.title}`
+                  )
+
+                  return [...(await acc), livestreamAttendees]
                } else {
                   functions.logger.log(
-                     `The livestream ${livestreamPresenter.title} has not ended yet`
+                     `No Attendees were found on ${livestreamPresenter.title}`
                   )
                }
-               return await acc
-            },
-            Promise.resolve([] as LiveStreamEventWithUsersLivestreamData[])
-         )
+            } else {
+               functions.logger.log(
+                  `The livestream ${livestreamPresenter.title} has not ended yet`
+               )
+            }
+            return await acc
+         }, Promise.resolve([]))
+
+         const templateId = attendees
+            ? Number(process.env.POSTMARK_TEMPLATE_ATTENDEES_REMINDER)
+            : Number(process.env.POSTMARK_TEMPLATE_NON_ATTENDEES_REMINDER)
 
          const BASE_TEMPLATE_MESSAGE: TemplatedMessage = {
             From: "CareerFairy <noreply@careerfairy.io>",
             To: null,
-            TemplateId: Number(
-               process.env.POSTMARK_TEMPLATE_NON_ATTENDEES_REMINDER
-            ),
+            TemplateId: templateId,
             TemplateModel: null,
             MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
             Tag: null,
@@ -869,7 +885,7 @@ const sendAttendeesReminder = async (
          await client.sendEmailBatchWithTemplates(emailTemplates, (err) => {
             if (err) {
                functions.logger.error(
-                  "Unable to send reminder to non attendees with Postmark",
+                  "Unable to send reminder to attendees with Postmark",
                   {
                      error: err,
                   }
@@ -878,13 +894,13 @@ const sendAttendeesReminder = async (
             }
          })
 
-         functions.logger.log("Non attendees reminders sent")
+         functions.logger.log("attendees reminders sent")
       } else {
          functions.logger.log("No livestream has ended yesterday")
       }
    } catch (error) {
       functions.logger.error(
-         "error in sending reminder to non attendees when livestreams ends",
+         "error in sending reminder to attendees when livestreams ends",
          error
       )
       throw new functions.https.HttpsError("unknown", error)
