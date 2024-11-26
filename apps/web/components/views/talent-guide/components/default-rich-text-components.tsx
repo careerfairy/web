@@ -9,6 +9,14 @@ const ReactPlayer = dynamic(() => import("react-player"), {
    ssr: false,
 })
 
+const VIDEO_CONFIG = {
+   file: {
+      attributes: {
+         playsInline: true,
+      },
+   },
+}
+
 const styles = sxStyles({
    link: {
       color: "primary.dark",
@@ -17,6 +25,16 @@ const styles = sxStyles({
    image: {
       maxWidth: "100%",
       height: "auto",
+   },
+   player: {
+      maxHeight: "calc(100vh - 150px)",
+      display: "flex",
+      justifyContent: "center",
+      width: "100% !important",
+      "& video": {
+         width: "auto !important",
+         borderRadius: 2,
+      },
    },
 })
 
@@ -98,21 +116,15 @@ export const createDefaultRichTextComponents = (
             </Box>
          )
       },
-      video: ({
-         src,
-         height,
-         width,
-         // mimeType,
-         // title
-      }) => (
+      video: ({ src }) => (
          <Box
+            id="react-player-rich-text"
             component={ReactPlayer}
             url={src}
-            width={width || undefined}
-            height={height || undefined}
-            controls={true}
-            light={false}
-            pip={true}
+            controls
+            playsinline
+            sx={styles.player}
+            config={VIDEO_CONFIG}
          />
       ),
    }
