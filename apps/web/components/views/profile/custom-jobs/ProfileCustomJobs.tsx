@@ -57,6 +57,14 @@ const styles = sxStyles({
    },
    stateButton: {
       width: "100%",
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.white[500],
+      },
+   },
+   selectedButton: {
+      "&:hover": {
+         backgroundColor: (theme) => theme.palette.primary.main,
+      },
    },
    selectedTabButtonText: {
       color: (theme) => theme.brand.white[100],
@@ -121,7 +129,10 @@ const ProfileCustomJobs = () => {
             >
                <Button
                   variant={isInitiatedSelected ? "contained" : "text"}
-                  sx={styles.stateButton}
+                  sx={[
+                     styles.stateButton,
+                     isInitiatedSelected ? styles.selectedButton : null,
+                  ]}
                   onClick={onClickInitiated}
                >
                   <Typography
@@ -137,7 +148,10 @@ const ProfileCustomJobs = () => {
                </Button>
                <Button
                   variant={isAppliedSelected ? "contained" : "text"}
-                  sx={styles.stateButton}
+                  sx={[
+                     styles.stateButton,
+                     isAppliedSelected ? styles.selectedButton : null,
+                  ]}
                   onClick={onClickApplied}
                >
                   <Typography
