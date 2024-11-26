@@ -42,10 +42,10 @@ import {
    UserStats,
    getLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/users"
+import { createCalendarEvent, makeUrls } from "@careerfairy/shared-lib/utils"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
-import { createCalendarEvent } from "components/views/common/AddToCalendar"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
 import { DateTime } from "luxon"
@@ -53,12 +53,12 @@ import DateUtil from "util/DateUtil"
 import { v4 as uuidv4 } from "uuid"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import {
+   errorLogAndNotify,
    getReferralInformation,
    shouldUseEmulators,
 } from "../../util/CommonUtil"
 import CookiesUtil from "../../util/CookiesUtil"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
-import { makeUrls } from "../../util/makeUrls"
 import { MobileUtils } from "../../util/mobile.utils"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../constants/streamContants"
 import { clearFirestoreCache } from "../util/authUtil"
@@ -303,7 +303,7 @@ class FirebaseService {
 
       const calendarEvent = createCalendarEvent(livestream)
 
-      const urls = makeUrls(calendarEvent)
+      const urls = makeUrls(calendarEvent, errorLogAndNotify)
 
       return sendLivestreamRegistrationConfirmationEmail({
          eventCalendarUrls: urls,
