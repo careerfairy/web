@@ -1,9 +1,10 @@
-import { Box, Stack, Tab, Tabs, Typography } from "@mui/material"
+import { Box, Button, Stack, Tab, Tabs, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import { useUserAppliedJobs } from "components/custom-hook/custom-job/useUserAppliedJobs"
 import { useUserInitiatedJobs } from "components/custom-hook/custom-job/useUserInitiatedJobs"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"
 import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
 import { useState } from "react"
@@ -39,9 +40,40 @@ const styles = sxStyles({
       },
       borderBottom: "1px solid #EAEAEA",
    },
+   talentProfileTabsBtnWrapper: {
+      justifyContent: "center",
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
+      borderRadius: "66px",
+      backgroundColor: (theme) => theme.brand.white[300],
+      p: "5px",
+      width: {
+         xs: "100%",
+         sm: "100%",
+         md: "550px",
+      },
+   },
+   talentProfileTabsContentWrapper: {
+      mt: 2,
+   },
+   stateButton: {
+      width: "100%",
+   },
+   selectedTabButtonText: {
+      color: (theme) => theme.brand.white[100],
+      fontWeight: 400,
+   },
+   tabButtonText: {
+      color: (theme) => theme.palette.neutral[400],
+      fontWeight: 400,
+   },
    tabsContentWrapper: {
       mt: 3,
       mx: 2,
+      mb: {
+         xs: 3,
+         sm: 3,
+         md: 0,
+      },
    },
    emptyApplications: {
       p: "20px",
@@ -69,24 +101,88 @@ const ProfileCustomJobs = () => {
       setTabValue(newValue)
    }
 
+   const { talentProfileV1 } = useFeatureFlags()
+
+   const TalentProfileTabsButtons = () => {
+      const isInitiatedSelected = tabValue === TAB_VALUES.initiated.value
+      const isAppliedSelected = tabValue === TAB_VALUES.applied.value
+
+      const onClickInitiated = (event) =>
+         handleTabChange(event, TAB_VALUES.initiated.value)
+      const onClickApplied = (event) =>
+         handleTabChange(event, TAB_VALUES.applied.value)
+
+      return (
+         <Stack direction={"row"} justifyContent={"center"} mt={"20px"} mx={2}>
+            <Stack
+               direction={"row"}
+               sx={styles.talentProfileTabsBtnWrapper}
+               spacing={"9px"}
+            >
+               <Button
+                  variant={isInitiatedSelected ? "contained" : "text"}
+                  sx={styles.stateButton}
+                  onClick={onClickInitiated}
+               >
+                  <Typography
+                     variant="brandedBody"
+                     sx={
+                        isInitiatedSelected
+                           ? styles.selectedTabButtonText
+                           : styles.tabButtonText
+                     }
+                  >
+                     Initiated
+                  </Typography>
+               </Button>
+               <Button
+                  variant={isAppliedSelected ? "contained" : "text"}
+                  sx={styles.stateButton}
+                  onClick={onClickApplied}
+               >
+                  <Typography
+                     variant="brandedBody"
+                     sx={
+                        isAppliedSelected
+                           ? styles.selectedTabButtonText
+                           : styles.tabButtonText
+                     }
+                  >
+                     Applied
+                  </Typography>
+               </Button>
+            </Stack>
+         </Stack>
+      )
+   }
+
    return (
       <Box>
-         <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            aria-label="Job tabs"
-            sx={styles.tabs}
+         {talentProfileV1 ? (
+            <TalentProfileTabsButtons />
+         ) : (
+            <Tabs
+               value={tabValue}
+               onChange={handleTabChange}
+               aria-label="Job tabs"
+               sx={styles.tabs}
+            >
+               <Tab
+                  label={TAB_VALUES.initiated.label}
+                  value={TAB_VALUES.initiated.value}
+               />
+               <Tab
+                  label={TAB_VALUES.applied.label}
+                  value={TAB_VALUES.applied.value}
+               />
+            </Tabs>
+         )}
+         <Box
+            sx={[
+               styles.tabsContentWrapper,
+               talentProfileV1 ? styles.talentProfileTabsContentWrapper : null,
+            ]}
          >
-            <Tab
-               label={TAB_VALUES.initiated.label}
-               value={TAB_VALUES.initiated.value}
-            />
-            <Tab
-               label={TAB_VALUES.applied.label}
-               value={TAB_VALUES.applied.value}
-            />
-         </Tabs>
-         <Box sx={styles.tabsContentWrapper}>
             {tabValue === TAB_VALUES.initiated.value && (
                <UserInitiatedCustomJobs />
             )}
