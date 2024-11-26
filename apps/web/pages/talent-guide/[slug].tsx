@@ -32,21 +32,21 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ locale, data }) => {
    )
 }
 
-export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
-   let paths = []
+export const getStaticPaths: GetStaticPaths = async () => {
+   const paths = []
 
-   for (const locale of locales) {
-      const slugs = await tgService.getAllTalentGuideModulePageSlugs()
-      paths = [
-         ...paths,
-         ...slugs.map((slug) => ({
-            params: { slug },
-            locale,
-         })),
-      ]
-   }
+   // for (const locale of locales) {
+   //    const slugs = await tgService.getAllTalentGuideModulePageSlugs()
+   //    paths = [
+   //       ...paths,
+   //       ...slugs.map((slug) => ({
+   //          params: { slug },
+   //          locale,
+   //       })),
+   //    ]
+   // }
 
-   return { paths, fallback: false }
+   return { paths, fallback: "blocking" }
 }
 
 export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
