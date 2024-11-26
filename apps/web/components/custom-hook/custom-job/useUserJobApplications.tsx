@@ -1,4 +1,7 @@
-import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJobApplicant,
+   sortCustomJobs,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
@@ -19,7 +22,8 @@ const useUserJobApplications = (userId: string, applied: boolean) => {
 
    const customJobs = (data || []).map((jobApplication) => jobApplication.job)
 
-   return customJobs
+   const sortedJobs = sortCustomJobs(customJobs)
+   return sortedJobs
 }
 
 export default useUserJobApplications
