@@ -250,16 +250,18 @@ export const scheduleReminderEmails = functions
    })
 
 /**
- * For manual testing only.
- * Easier way to test is to update the reminder{time}HoursPromise with a date in the future to ensure live streams are fetched.
- * Also beware you might get 405, see @file packages/functions/src/api/mailgun.ts which has additional comments, the check can be disabled
- * and so use the production domain, BUT BEWARE IF THE TEST EVENTS have other users data which would result in them receiving emails, for this
- * would suggest creating locally test events and be the only one registered to them so your user would be the only one receiving them.
- * Disregard disabling the check if you can receive emails from the sandbox server.
+ * Manual testing instructions:
  *
- * Also to be able to retest, you will have to delete the reminder which have been sent for the live stream id, just delete the
- * property for the testing reminder in field `reminderEmailsSent` on collection `/livestream/{stream_id}`, i.e: deleting field reminder1Hour to
- * re test the 1 hour reminder.
+ * 1. To test reminders: Update reminder{time}HoursPromise with a future date to ensure live streams are fetched
+ *
+ * 2. Email sending options:
+ *    - Use sandbox server if possible
+ *    - If using production domain (405 error case, see mailgun.ts):
+ *      WARNING: Create test events where you are the only registrant to avoid sending emails to real users
+ *
+ * 3. To retest a reminder:
+ *    Delete the specific reminder field (e.g. reminder1Hour) from `reminderEmailsSent`
+ *    in `/livestream/{stream_id}` collection
  */
 export const manualReminderEmails = onRequest(async () => {
    const batch = firestore.batch()
