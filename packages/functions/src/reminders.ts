@@ -773,51 +773,49 @@ const sendAttendeesReminder = async (
          : await livestreamsRepo.getYesterdayLivestreams()
 
       if (yesterdayLivestreams.length) {
-         const livestreamsToRemind = await yesterdayLivestreams.reduce(
-            async (acc, livestream) => {
-               const livestreamPresenter =
-                  LivestreamPresenter.createFromDocument(livestream)
+         const livestreamsToRemind = await yesterdayLivestreams.reduce<
+            Promise<LiveStreamEventWithUsersLivestreamData[]>
+         >(async (acc, livestream) => {
+            const livestreamPresenter =
+               LivestreamPresenter.createFromDocument(livestream)
 
-               if (
-                  livestreamPresenter.isAbleToAccessRecording() &&
-                  !livestreamPresenter.isTest() &&
-                  !livestreamPresenter.isLive() &&
-                  livestreamPresenter.streamHasFinished()
-               ) {
+            if (
+               livestreamPresenter.isAbleToAccessRecording() &&
+               !livestreamPresenter.isTest() &&
+               !livestreamPresenter.isLive() &&
+               livestreamPresenter.streamHasFinished()
+            ) {
+               functions.logger.log(
+                  `Detected livestream ${livestreamPresenter.title} has ended yesterday`
+               )
+
+               const attendeesData = attendees
+                  ? await livestreamsRepo.getAttendees(livestream.id)
+                  : await livestreamsRepo.getNonAttendees(livestream.id)
+
+               if (attendeesData.length) {
+                  const livestreamAttendees = {
+                     ...livestream,
+                     usersLivestreamData: attendeesData,
+                  }
+
                   functions.logger.log(
-                     `Detected livestream ${livestreamPresenter.title} has ended yesterday`
+                     `Will send the reminder to ${attendeesData.length} users related to the Livestream ${livestreamPresenter.title}`
                   )
 
-                  const attendeesData = attendees
-                     ? await livestreamsRepo.getAttendees(livestream.id)
-                     : await livestreamsRepo.getNonAttendees(livestream.id)
-
-                  if (attendeesData.length) {
-                     const livestreamAttendees = {
-                        ...livestream,
-                        usersLivestreamData:
-                           attendeesData as UserLivestreamData[],
-                     } as LiveStreamEventWithUsersLivestreamData
-
-                     functions.logger.log(
-                        `Will send the reminder to ${attendeesData.length} users related to the Livestream ${livestreamPresenter.title}`
-                     )
-
-                     return [...(await acc), livestreamAttendees]
-                  } else {
-                     functions.logger.log(
-                        `No Attendees were found on ${livestreamPresenter.title}`
-                     )
-                  }
+                  return [...(await acc), livestreamAttendees]
                } else {
                   functions.logger.log(
-                     `The livestream ${livestreamPresenter.title} has not ended yet`
+                     `No Attendees were found on ${livestreamPresenter.title}`
                   )
                }
-               return await acc
-            },
-            Promise.resolve([] as LiveStreamEventWithUsersLivestreamData[])
-         )
+            } else {
+               functions.logger.log(
+                  `The livestream ${livestreamPresenter.title} has not ended yet`
+               )
+            }
+            return await acc
+         }, Promise.resolve([]))
 
          const templateId = attendees
             ? Number(process.env.POSTMARK_TEMPLATE_ATTENDEES_REMINDER)
