@@ -120,6 +120,8 @@ exports.sendReminderEmailToRegistrants =
 exports.sendReminderEmailAboutApplicationLink_eu =
    reminders.sendReminderEmailAboutApplicationLink
 exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
+// Not to be deployed
+exports.manualReminderEmails = reminders.manualReminderEmails
 exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
 exports.sendReminderForNonAttendeesByStreamId =
    reminders.sendReminderForNonAttendeesByStreamId
