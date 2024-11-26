@@ -65,6 +65,17 @@ export const getComponents = (theme: Theme): Components => ({
                backgroundColor: theme.brand.white[400],
                color: theme.brand.black[600],
                borderColor: "transparent",
+               "&:hover,&:focus": {
+                  backgroundColor: `${theme.brand.white[400]} !important`,
+               },
+            },
+         },
+         {
+            props: { variant: "outlined" },
+            style: {
+               "&:hover,&:focus": {
+                  backgroundColor: theme.brand.white[300],
+               },
             },
          },
          /**
