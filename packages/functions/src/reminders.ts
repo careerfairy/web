@@ -1,11 +1,19 @@
 import functions = require("firebase-functions")
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LiveStreamEventWithUsersLivestreamData,
+   LivestreamEvent,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
+import {
+   addUtmTagsToLink,
+   companyNameSlugify,
+} from "@careerfairy/shared-lib/utils"
 import { WriteBatch } from "firebase-admin/firestore"
 import { onRequest } from "firebase-functions/v2/https"
 import { DateTime } from "luxon"
@@ -14,7 +22,12 @@ import { TemplatedMessage } from "postmark"
 import { firestore } from "./api/firestoreAdmin"
 import { sendIndividualMessages } from "./api/mailgun"
 import { client } from "./api/postmark"
-import { groupRepo, livestreamsRepo } from "./api/repositories"
+import {
+   customJobRepo,
+   groupRepo,
+   livestreamsRepo,
+   sparkRepo,
+} from "./api/repositories"
 import config from "./config"
 import {
    getStreamsByDateWithRegisteredStudents,
@@ -26,6 +39,7 @@ import {
    addMinutesDate,
    generateNonAttendeesReminder,
    generateReminderEmailData,
+   isLocalEnvironment,
    setCORSHeaders,
 } from "./util"
 
@@ -131,6 +145,16 @@ export type ReminderData = {
       | "reminderTodayMorning"
       | "reminderRecordingNow"
    template: string
+}
+
+type LivestreamFollowUpAdditionalData = {
+   groups: {
+      groupsByLivestreamId: Record<string, Group>
+      groupSparks: Record<string, Spark[]>
+   }
+   livestream: {
+      jobsByLivestreamId: Record<string, CustomJob[]>
+   }
 }
 
 export const ReminderCampaignMap: Record<ReminderData["key"], string> = {
@@ -339,76 +363,22 @@ export const sendReminderToNonAttendees = functions
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
    })
-   .pubsub.schedule("0 9 * * *")
+   .pubsub.schedule("0 11 * * *")
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      try {
-         const yesterdayLivestreams =
-            await livestreamsRepo.getYesterdayLivestreams()
-
-         if (yesterdayLivestreams.length) {
-            const livestreamsToRemind = await yesterdayLivestreams.reduce(
-               async (acc, livestream) => {
-                  const livestreamPresenter =
-                     LivestreamPresenter.createFromDocument(livestream)
-
-                  if (
-                     livestreamPresenter.isAbleToAccessRecording() &&
-                     !livestreamPresenter.isTest() &&
-                     !livestreamPresenter.isLive() &&
-                     livestreamPresenter.streamHasFinished()
-                  ) {
-                     functions.logger.log(
-                        `Detected livestream ${livestreamPresenter.title} has ended yesterday`
-                     )
-
-                     const nonAttendees = await livestreamsRepo.getNonAttendees(
-                        livestream.id
-                     )
-
-                     if (nonAttendees.length) {
-                        const livestreamWithNonAttendees = {
-                           ...livestream,
-                           usersLivestreamData:
-                              nonAttendees as UserLivestreamData[],
-                        } as LiveStreamEventWithUsersLivestreamData
-
-                        functions.logger.log(
-                           `Will send the reminder to ${nonAttendees.length} users related to the Livestream ${livestreamPresenter.title}`
-                        )
-
-                        return [...(await acc), livestreamWithNonAttendees]
-                     } else {
-                        functions.logger.log(
-                           `No nonAttendees were found on ${livestreamPresenter.title}`
-                        )
-                     }
-                  } else {
-                     functions.logger.log(
-                        `The livestream ${livestreamPresenter.title} has not ended yet`
-                     )
-                  }
-                  return await acc
-               },
-               Promise.resolve([] as LiveStreamEventWithUsersLivestreamData[])
-            )
-
-            await handleSendEmail(
-               livestreamsToRemind,
-               ReminderTodayMorning,
-               generateNonAttendeesReminder
-            )
-         } else {
-            functions.logger.log("No livestream has ended yesterday")
-         }
-      } catch (error) {
-         functions.logger.error(
-            "error in sending reminder to non attendees when livestreams ends",
-            error
-         )
-         throw new functions.https.HttpsError("unknown", error)
-      }
+      await sendAttendeesReminder(ReminderTodayMorning)
    })
+
+export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
+   // Update ids according to testing data
+   const testEvents = await livestreamsRepo.getLivestreamsByIds([
+      "LQTy4JdeRBqGUtULeNir",
+      "6UX9IBp6otoVwGwis8EJ",
+   ])
+   await sendAttendeesReminder(ReminderTodayMorning, testEvents)
+
+   res.status(200).send("Test non attendees done")
+})
 
 /**
  * Trigger to send reminders for all the nonAttendees by stream id
@@ -628,6 +598,111 @@ const handleSendEmail = (
    })
 }
 
+const getPostmarkTemplateMessages = (
+   baseMessage: TemplatedMessage,
+   streams: LiveStreamEventWithUsersLivestreamData[],
+   reminder: ReminderData,
+   additionalData: LivestreamFollowUpAdditionalData
+): TemplatedMessage[] => {
+   const host = isLocalEnvironment()
+      ? "http://localhost:3000"
+      : "https://careerfairy.io"
+
+   const templateMessages: TemplatedMessage[] = []
+
+   streams.forEach((stream) => {
+      const streamGroup = additionalData.groups.groupsByLivestreamId[stream.id]
+      const speakers = stream.speakers ?? []
+
+      const groupSparks = additionalData.groups.groupSparks[streamGroup.id]
+         .sort((sparkA, sparkB) => {
+            return sparkB.publishedAt.toMillis() - sparkA.publishedAt.toMillis()
+         })
+         .slice(0, 3)
+         .map((spark) => {
+            return {
+               question: spark.question,
+               category_id: spark.category.name,
+               thumbnailUrl: spark.video.thumbnailUrl,
+               url: addUtmTagsToLink({
+                  link: `${host}/sparks/${
+                     spark.id
+                  }?companyName=${companyNameSlugify(
+                     streamGroup.universityName
+                  )}&groupId=${streamGroup.id}&interactionSource=${
+                     SparkInteractionSources.Livestream_Follow_Up
+                  }`,
+                  source: "careerfairy",
+                  medium: "email",
+                  campaign: "event-followup",
+                  content: stream.title,
+               }),
+            }
+         })
+
+      const streamSpeakers = speakers.slice(0, 4).map((speaker) => {
+         return {
+            name: `${speaker.firstName} ${speaker.lastName}`,
+            position: speaker.position,
+            avatarUrl: speaker.avatar,
+            url: addUtmTagsToLink({
+               link: `${host}/portal/livestream/${stream.id}/speaker-details/${speaker.id}`,
+               source: "careerfairy",
+               medium: "email",
+               campaign: "event-followup",
+               content: stream.title,
+            }),
+         }
+      })
+
+      const streamJobs = additionalData.livestream.jobsByLivestreamId[
+         stream.id
+      ].map((job) => {
+         return {
+            title: job.title,
+            jobType: job.jobType,
+            businessFunctionsTags: (
+               job.businessFunctionsTagIds?.map(
+                  (tag) => TagValuesLookup[tag]
+               ) ?? []
+            ).join(", "),
+            deadline: DateTime.fromJSDate(job.deadline.toDate()).toFormat(
+               "dd LLL yyyy"
+            ),
+            url: addUtmTagsToLink({
+               link: `${host}/portal/livestream/${stream.id}/job-details/${job.id}`,
+               source: "careerfairy",
+               medium: "email",
+               campaign: "event-followup",
+               content: stream.title,
+            }),
+         }
+      })
+
+      stream.usersLivestreamData.forEach((streamUserData) => {
+         templateMessages.push({
+            ...baseMessage,
+            To: streamUserData.user.userEmail,
+            TemplateModel: {
+               livestream: {
+                  document_id: stream.id,
+                  company: streamGroup.universityName,
+                  companyBannerImageUrl: streamGroup.bannerImageUrl,
+               },
+               user: {
+                  firstName: streamUserData.user.firstName,
+               },
+               jobs: streamJobs,
+               speakers: streamSpeakers,
+               sparks: groupSparks,
+            },
+            Tag: reminder.key,
+         })
+      })
+   })
+
+   return templateMessages
+}
 /**
  * To create sendEmail promise and handling the possible error
  *
@@ -670,4 +745,148 @@ const wasEmailChunkNotYetSent = (
    }
 
    return true
+}
+
+const sendAttendeesReminder = async (
+   reminderData: ReminderData,
+   events?: LivestreamEvent[]
+) => {
+   try {
+      const yesterdayLivestreams = events?.length
+         ? events
+         : await livestreamsRepo.getYesterdayLivestreams()
+
+      if (yesterdayLivestreams.length) {
+         const livestreamsToRemind = await yesterdayLivestreams.reduce(
+            async (acc, livestream) => {
+               const livestreamPresenter =
+                  LivestreamPresenter.createFromDocument(livestream)
+
+               if (
+                  livestreamPresenter.isAbleToAccessRecording() &&
+                  !livestreamPresenter.isTest() &&
+                  !livestreamPresenter.isLive() &&
+                  livestreamPresenter.streamHasFinished()
+               ) {
+                  functions.logger.log(
+                     `Detected livestream ${livestreamPresenter.title} has ended yesterday`
+                  )
+
+                  const nonAttendees = await livestreamsRepo.getNonAttendees(
+                     livestream.id
+                  )
+
+                  if (nonAttendees.length) {
+                     const livestreamWithNonAttendees = {
+                        ...livestream,
+                        usersLivestreamData:
+                           nonAttendees as UserLivestreamData[],
+                     } as LiveStreamEventWithUsersLivestreamData
+
+                     functions.logger.log(
+                        `Will send the reminder to ${nonAttendees.length} users related to the Livestream ${livestreamPresenter.title}`
+                     )
+
+                     return [...(await acc), livestreamWithNonAttendees]
+                  } else {
+                     functions.logger.log(
+                        `No nonAttendees were found on ${livestreamPresenter.title}`
+                     )
+                  }
+               } else {
+                  functions.logger.log(
+                     `The livestream ${livestreamPresenter.title} has not ended yet`
+                  )
+               }
+               return await acc
+            },
+            Promise.resolve([] as LiveStreamEventWithUsersLivestreamData[])
+         )
+
+         const BASE_TEMPLATE_MESSAGE: TemplatedMessage = {
+            From: "CareerFairy <noreply@careerfairy.io>",
+            To: null,
+            TemplateId: Number(
+               process.env.POSTMARK_TEMPLATE_NON_ATTENDEES_REMINDER
+            ),
+            TemplateModel: null,
+            MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+            Tag: null,
+         }
+
+         const groupsByEventIds: Record<string, Group> = {}
+
+         const groupSparks: Record<string, Spark[]> = {}
+
+         const livestreamJobs: Record<string, CustomJob[]> = {}
+
+         await Promise.all(
+            livestreamsToRemind.map((event) =>
+               groupRepo
+                  .getGroupById(event.groupIds.at(0))
+                  .then((group) => (groupsByEventIds[event.id] = group))
+            )
+         )
+
+         const groupSparksPromises = Object.values(groupsByEventIds).map(
+            async (group) => {
+               groupSparks[group.id] = group.publicSparks
+                  ? (await sparkRepo.getSparksByGroupId(group.id)) ?? []
+                  : []
+            }
+         )
+
+         const livestreamJobsPromises = livestreamsToRemind.map(
+            async (event) => {
+               livestreamJobs[event.id] = event.hasJobs
+                  ? (await customJobRepo.getCustomJobsByLivestreamId(
+                       event.id
+                    )) ?? []
+                  : []
+            }
+         )
+
+         await Promise.all([...groupSparksPromises, ...livestreamJobsPromises])
+
+         const additionalData: LivestreamFollowUpAdditionalData = {
+            groups: {
+               groupsByLivestreamId: groupsByEventIds,
+               groupSparks: groupSparks,
+            },
+            livestream: {
+               jobsByLivestreamId: livestreamJobs,
+            },
+         }
+
+         const emailTemplates: TemplatedMessage[] =
+            await getPostmarkTemplateMessages(
+               BASE_TEMPLATE_MESSAGE,
+               livestreamsToRemind,
+               reminderData,
+               additionalData
+            )
+
+         await client.sendEmailBatchWithTemplates(emailTemplates, (err) => {
+            if (err) {
+               functions.logger.error(
+                  "Unable to send reminder to non attendees with Postmark",
+                  {
+                     error: err,
+                  }
+               )
+               return
+            }
+         })
+
+         functions.logger.log("Non attendees reminders sent")
+      } else {
+         functions.logger.log("No livestream has ended yesterday")
+      }
+   } catch (error) {
+      functions.logger.error(
+         "error in sending reminder to non attendees when livestreams ends",
+         error
+      )
+      throw new functions.https.HttpsError("unknown", error)
+   }
 }
