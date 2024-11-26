@@ -1,5 +1,6 @@
 import { gql, GraphQLClient } from "graphql-request"
 import { createTalentGuideClient } from "./client"
+import { FORCE_GERMAN_LOCALE } from "./constants"
 import { moduleStepFragment, seoComponentFragment } from "./fragments"
 import {
    Page,
@@ -66,6 +67,8 @@ export class TalentGuideService {
       slug: string,
       locale: string = "en"
    ): Promise<Page> {
+      const forcedLocale = FORCE_GERMAN_LOCALE ? "de" : locale // TODO: remove when other languages for talent guide are available
+
       const query = gql`
          query GetTalentGuideBySlug($slug: String!, $locale: Locale!) {
             page(where: { slug: $slug }, locales: [$locale]) {
@@ -88,7 +91,7 @@ export class TalentGuideService {
          query,
          {
             slug,
-            locale,
+            locale: forcedLocale,
          }
       )
 

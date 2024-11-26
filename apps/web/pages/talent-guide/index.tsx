@@ -1,24 +1,20 @@
-import { FORCE_GERMAN_LOCALE } from "data/hygraph/constants"
+import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
 import { GetStaticProps, NextPage } from "next"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import {
    tgPreviewService,
    tgService,
 } from "../../data/hygraph/TalentGuideService"
 interface TalentGuidePageProps {
    slugs: string[]
-   preview: boolean
-   locale: string
 }
 
-const TalentGuidePage: NextPage<TalentGuidePageProps> = ({
-   slugs,
-   preview,
-   locale,
-}) => {
+const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ slugs }) => {
+   const { isPreview, locale } = useRouter()
    return (
       <div>
-         <h1>Talent Guide: {preview ? "Preview" : "Published"}</h1>
+         <h1>Talent Guide: {isPreview ? "Preview" : "Published"}</h1>
          <p>Locale: {locale}</p>
          <ul>
             {slugs.map((slug) => (
@@ -29,12 +25,12 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({
                </li>
             ))}
          </ul>
+         {Boolean(isPreview) && <PreviewModeAlert />}
       </div>
    )
 }
 
 export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
-   locale,
    preview = false,
 }) => {
    const service = preview ? tgPreviewService : tgService
@@ -44,8 +40,6 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
    return {
       props: {
          slugs,
-         locale: FORCE_GERMAN_LOCALE ? "de" : locale ?? null,
-         preview,
       },
       revalidate: 60, // Revalidate every 60 seconds
    }
