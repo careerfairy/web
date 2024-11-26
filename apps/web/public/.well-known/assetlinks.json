@@ -5,7 +5,8 @@
          "namespace": "android_app",
          "package_name": "com.admin_product_team.careerfairymobileapp",
          "sha256_cert_fingerprints": [
-            "7F:5D:73:3D:15:91:CD:EA:C5:5B:73:6E:AB:88:8E:77:C5:12:06:22:80:24:69:EE:4A:5F:60:03:EF:72:E1:F8"
+            "7F:5D:73:3D:15:91:CD:EA:C5:5B:73:6E:AB:88:8E:77:C5:12:06:22:80:24:69:EE:4A:5F:60:03:EF:72:E1:F8",
+            "B1:B6:B7:9B:69:4B:44:69:C7:00:82:C0:86:42:0B:2D:38:93:98:A4:4D:2C:55:77:6B:D6:93:F8:13:51:41:7F"
          ]
       }
    }
