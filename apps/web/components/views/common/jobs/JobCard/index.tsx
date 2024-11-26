@@ -1,7 +1,11 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, ButtonBase, Grid, SxProps, useTheme } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
+import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -74,6 +78,8 @@ const JobCard = ({
    typographySx,
    companyName,
 }: Props) => {
+   const isJobExpired = useIsJobExpired(job as PublicCustomJob)
+
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const theme = useTheme()
@@ -82,6 +88,10 @@ const JobCard = ({
 
    const getStateColor = useCallback(
       (job: CustomJob): string => {
+         if (isJobExpired) {
+            return theme.brand.black[500]
+         }
+
          if (job.published) {
             return theme.palette.primary[300]
          }
@@ -93,7 +103,7 @@ const JobCard = ({
 
          return theme.brand.black[500]
       },
-      [theme]
+      [theme, isJobExpired]
    )
 
    return (
