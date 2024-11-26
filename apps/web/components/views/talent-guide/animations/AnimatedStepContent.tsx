@@ -27,7 +27,7 @@ const stepVariants: Variants = {
    },
 }
 
-interface AnimatedStepContentProps {
+type AnimatedStepContentProps = {
    children: ReactElement[]
 }
 

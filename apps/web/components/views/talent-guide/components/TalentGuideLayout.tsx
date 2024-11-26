@@ -15,6 +15,7 @@ const styles = sxStyles({
       bgcolor: theme.brand.white[200],
       borderBottom: "1px solid",
       borderColor: theme.brand.white[500],
+      zIndex: 1,
    }),
 })
 
