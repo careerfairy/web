@@ -299,12 +299,12 @@ export const manualReminderEmails = onRequest(async () => {
       dateEndFor5Minutes
    )
 
-   // const reminder5MinutesPromise = handleReminder(
-   //    batch,
-   //    dateStart,
-   //    DateTime.now().plus({ month: 5 }).toJSDate(),
-   //    Reminder5Min
-   // )
+   const reminder5MinutesPromise = handleReminder(
+      batch,
+      dateStart,
+      DateTime.now().plus({ month: 5 }).toJSDate(),
+      Reminder5Min
+   )
 
    // const dateStartFor1Hour = addMinutesDate(
    //    dateStart,
@@ -321,25 +321,25 @@ export const manualReminderEmails = onRequest(async () => {
    //    Reminder1Hour
    // )
 
-   const dateStartFor24Hours = addMinutesDate(
-      dateStart,
-      Reminder24Hours.minutesBefore
-   )
+   // const dateStartFor24Hours = addMinutesDate(
+   //    dateStart,
+   //    Reminder24Hours.minutesBefore
+   // )
    // const dateEndFor24Hours = addMinutesDate(
    //    dateStartFor24Hours,
    //    reminderScheduleRange
    // )
-   const reminder24HoursPromise = handleReminder(
-      batch,
-      dateStartFor24Hours,
-      DateTime.now().plus({ month: 5 }).toJSDate(),
-      Reminder24Hours
-   )
+   // const reminder24HoursPromise = handleReminder(
+   //    batch,
+   //    dateStartFor24Hours,
+   //    DateTime.now().plus({ month: 5 }).toJSDate(),
+   //    Reminder24Hours
+   // )
 
    return Promise.allSettled([
-      // reminder5MinutesPromise,
+      reminder5MinutesPromise,
       // reminder1HourPromise,
-      reminder24HoursPromise,
+      // reminder24HoursPromise,
    ]).then(async (results) => {
       await batch.commit()
 
@@ -390,7 +390,7 @@ export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
    ])
 
    // Toggle between attendees or non-attendees
-   await sendAttendeesReminder(ReminderTodayMorning, true, testEvents)
+   await sendAttendeesReminder(ReminderTodayMorning, false, testEvents)
 
    res.status(200).send("Test non attendees done")
 })
@@ -710,6 +710,7 @@ const getPostmarkTemplateMessages = (
                jobs: streamJobs,
                speakers: streamSpeakers,
                sparks: groupSparks,
+               allowsRecording: !stream.denyRecordingAccess,
             },
             Tag: reminder.key,
          })
@@ -780,7 +781,6 @@ const sendAttendeesReminder = async (
                LivestreamPresenter.createFromDocument(livestream)
 
             if (
-               livestreamPresenter.isAbleToAccessRecording() &&
                !livestreamPresenter.isTest() &&
                !livestreamPresenter.isLive() &&
                livestreamPresenter.streamHasFinished()
