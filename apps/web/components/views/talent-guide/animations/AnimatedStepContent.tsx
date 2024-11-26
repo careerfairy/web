@@ -1,6 +1,7 @@
+import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import { AnimatePresence, Variants } from "framer-motion"
-import React, { ReactElement, useRef } from "react"
+import React, { ReactElement, useCallback, useRef } from "react"
 
 const containerVariants: Variants = {
    hidden: { opacity: 0 },
@@ -26,7 +27,7 @@ const stepVariants: Variants = {
    },
 }
 
-interface AnimatedStepContentProps {
+type AnimatedStepContentProps = {
    children: ReactElement[]
 }
 
@@ -41,6 +42,29 @@ interface AnimatedStepContentProps {
  */
 export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
    const lastStepRef = useRef<HTMLDivElement>(null)
+   const isMobile = useIsMobile()
+
+   const scrollOffset = isMobile ? 88 : 120 // This is the estimated height of the sticky progress bar, we need to account for it when scrolling to the last step
+   const scrollPadding = 15 // Give a little space between the last step and the sticky progress bar
+
+   const handleAnimationComplete = useCallback(
+      (isLastStep: boolean) => {
+         if (!isLastStep) return
+
+         const element = lastStepRef.current
+         if (!element) return
+
+         const elementPosition = element.getBoundingClientRect().top
+         const offsetPosition =
+            elementPosition + window.scrollY - scrollOffset - scrollPadding
+
+         window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+         })
+      },
+      [scrollOffset]
+   )
 
    return (
       <FramerBox
@@ -59,13 +83,9 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
                      initial="hidden"
                      animate="visible"
                      exit="exit"
-                     onAnimationComplete={() => {
-                        if (isLastStep) {
-                           lastStepRef.current?.scrollIntoView({
-                              behavior: "smooth",
-                           })
-                        }
-                     }}
+                     onAnimationComplete={() =>
+                        handleAnimationComplete(isLastStep)
+                     }
                   >
                      {child}
                   </FramerBox>
