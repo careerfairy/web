@@ -25,6 +25,7 @@ type IGenericDashboardContext = {
    // The number of pixels the user has to scroll before the header is hidden. Default is 10
    headerScrollThreshold: number
    headerFixed?: boolean
+   headerType?: "sticky" | "fixed"
    navLinks: INavLink[]
 }
 
@@ -63,6 +64,7 @@ type Props = {
    bgColor?: string
    isPortalPage?: boolean
    headerFixed?: boolean
+   headerType?: "sticky" | "fixed"
    // The number of pixels the user has to scroll before the header is hidden
    headerScrollThreshold?: number
    /**
@@ -97,6 +99,7 @@ const GenericDashboardLayout = ({
    bgColor,
    isPortalPage,
    headerFixed,
+   headerType = "sticky",
    headerScrollThreshold = 65,
    hideFooter,
    hideDrawer,
@@ -169,6 +172,7 @@ const GenericDashboardLayout = ({
          handleOpenCreditsDialog,
          headerScrollThreshold,
          headerFixed: Boolean(headerFixed),
+         headerType: headerType,
          navLinks,
       }),
       [
@@ -177,6 +181,7 @@ const GenericDashboardLayout = ({
          isPortalPage,
          navLinks,
          headerFixed,
+         headerType,
       ]
    )
 

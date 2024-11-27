@@ -220,7 +220,8 @@ type HeaderProps = {
    width?: string
 }
 const HeaderComponent = ({ children, width }: HeaderProps) => {
-   const { headerScrollThreshold, headerFixed } = useGenericDashboard()
+   const { headerScrollThreshold, headerFixed, headerType } =
+      useGenericDashboard()
    const isMobile = useIsMobile()
    const styles = useStyles()
 
@@ -236,7 +237,7 @@ const HeaderComponent = ({ children, width }: HeaderProps) => {
       >
          <AppBar
             enableColorOnDark
-            position="sticky"
+            position={headerType || "sticky"}
             color="inherit"
             elevation={0}
             sx={[width && { width }, styles.header]}

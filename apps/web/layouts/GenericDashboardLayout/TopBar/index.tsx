@@ -4,6 +4,7 @@ import Stack from "@mui/material/Stack"
 
 // project imports
 import { useRouter } from "next/router"
+import { useGenericDashboard } from ".."
 import { useAuth } from "../../../HOCs/AuthProvider"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import {
@@ -59,6 +60,7 @@ const TopBar = ({ title }: Props) => {
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
    const { asPath } = useRouter()
+   const { headerType } = useGenericDashboard()
 
    const SignUpButton = () => (
       <Button
@@ -73,7 +75,7 @@ const TopBar = ({ title }: Props) => {
    )
 
    return (
-      <Box sx={styles.root}>
+      <Box sx={[styles.root, headerType == "fixed" && { background: "unset" }]}>
          <Box sx={styles.leftSection}>
             {isMobile ? (
                <MainLogo sx={{ maxWidth: "120px" }} />
