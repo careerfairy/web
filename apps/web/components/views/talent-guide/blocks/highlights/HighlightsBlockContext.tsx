@@ -1,3 +1,4 @@
+import useIsMobile from "components/custom-hook/useIsMobile"
 import {
    ReactNode,
    createContext,
@@ -15,6 +16,7 @@ type HighlightsContextType = {
    handleExpandCardClick: (index: number) => () => void
    handleCloseCardClick: () => void
    handleEndedPlaying: () => void
+   setAutoPlayingIndex: (index: number) => void
 }
 
 const HighlightsContext = createContext<HighlightsContextType | undefined>(
@@ -28,7 +30,11 @@ export const HighlightsProvider = ({
    children: ReactNode
    totalHighlights: number
 }) => {
-   const [autoPlayingIndex, setAutoPlayingIndex] = useState<number>(0)
+   const isMobile = useIsMobile()
+
+   const [autoPlayingIndex, setAutoPlayingIndex] = useState<number>(
+      isMobile ? 0 : undefined
+   )
    const [expandedPlayingIndex, setExpandedPlayingIndex] =
       useState<number>(undefined)
 
@@ -57,10 +63,12 @@ export const HighlightsProvider = ({
    }, [])
 
    const handleEndedPlaying = useCallback(() => {
+      if (!isMobile) return
+
       setAutoPlayingIndex((prevIndex) => {
          return (prevIndex + 1) % totalHighlights
       })
-   }, [totalHighlights])
+   }, [isMobile, totalHighlights])
 
    const contextValue = useMemo(
       () => ({
@@ -71,6 +79,7 @@ export const HighlightsProvider = ({
          handleExpandCardClick,
          handleCloseCardClick,
          handleEndedPlaying,
+         setAutoPlayingIndex,
       }),
       [
          autoPlayingIndex,
@@ -80,6 +89,7 @@ export const HighlightsProvider = ({
          handleExpandCardClick,
          handleCloseCardClick,
          handleEndedPlaying,
+         setAutoPlayingIndex,
       ]
    )
 
