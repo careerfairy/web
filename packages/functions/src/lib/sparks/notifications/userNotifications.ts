@@ -74,7 +74,9 @@ export const handleCreateUsersSparksNotifications = async (
 
    // to get all the upcoming events that will start on the next X days
    const upcomingEventsWithRegisteredStudents =
-      await getStreamsByDateWithRegisteredStudents(startDate, endDate)
+      await getStreamsByDateWithRegisteredStudents(startDate, endDate, {
+         excludeHidden: true,
+      })
 
    logger(
       `In next ${SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS} days, ${upcomingEventsWithRegisteredStudents.length} events will take place`
