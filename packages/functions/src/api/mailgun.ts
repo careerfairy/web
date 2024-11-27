@@ -1,7 +1,8 @@
 import Mailgun from "mailgun.js"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
-import { isLocalEnvironment } from "../util"
+import { isLocalEnvironment, processInBatches } from "../util"
 import formData = require("form-data")
+import functions = require("firebase-functions")
 
 const apiKey = "13db35c5779d693ddad243d21e9d5cba-e566273b-b2967fc4"
 const host = "https://api.eu.mailgun.net"
@@ -46,14 +47,21 @@ export const sendIndividualMessages = (emailData: MailgunMessageData) => {
    delete recipientVariables.attachment
    const recipients = Object.keys(recipientVariables)
 
-   const promises = recipients.map(async (userEmail) => {
-      return client.messages.create(domain, {
-         ...emailData,
-         to: userEmail,
-         "h:X-Mailgun-Variables": JSON.stringify(recipientVariables[userEmail]),
-         attachment: attach,
-      })
+   return processInBatches(
+      recipients,
+      50,
+      (userEmail) => {
+         return client.messages.create(domain, {
+            ...emailData,
+            to: userEmail,
+            "h:X-Mailgun-Variables": JSON.stringify(
+               recipientVariables[userEmail]
+            ),
+            attachment: attach,
+         })
+      },
+      functions.logger
+   ).catch((err) => {
+      functions.logger.error("Error processing mailgun email in", err)
    })
-
-   return Promise.all(promises)
 }
