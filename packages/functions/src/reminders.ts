@@ -40,6 +40,7 @@ import {
    generateNonAttendeesReminder,
    generateReminderEmailData,
    isLocalEnvironment,
+   processInBatches,
    setCORSHeaders,
 } from "./util"
 
@@ -882,17 +883,24 @@ const sendAttendeesReminder = async (
                additionalData
             )
 
-         await client.sendEmailBatchWithTemplates(emailTemplates, (err) => {
-            if (err) {
-               functions.logger.error(
-                  "Unable to send reminder to attendees with Postmark",
-                  {
-                     error: err,
+         await processInBatches(
+            emailTemplates,
+            499,
+            (template) => {
+               return client.sendEmailWithTemplate(template, (err) => {
+                  if (err) {
+                     functions.logger.error(
+                        "Unable to send reminder to attendees with Postmark",
+                        {
+                           error: err,
+                        }
+                     )
+                     return
                   }
-               )
-               return
-            }
-         })
+               })
+            },
+            functions.logger
+         )
 
          functions.logger.log("attendees reminders sent")
       } else {
