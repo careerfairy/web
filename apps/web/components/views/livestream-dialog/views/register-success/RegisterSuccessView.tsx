@@ -12,7 +12,7 @@ import {
 } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
+import useGroup from "components/custom-hook/group/useGroup"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import { GroupSparksCarousel } from "components/views/common/sparks/GroupSparksCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
@@ -319,7 +319,8 @@ const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
    const route = useRouter()
    const { closeDialog, livestream, goToView, isDiscoverCompanySparksOpen } =
       useLiveStreamDialog()
-   const groupHasSparks = useGroupHasSparks(livestream.groupIds[0])
+   const { data: group } = useGroup(livestream.groupIds[0])
+   const groupHasSparks = group?.publicSparks
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
