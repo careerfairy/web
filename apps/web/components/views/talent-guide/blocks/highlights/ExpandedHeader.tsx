@@ -76,12 +76,19 @@ const getScrollAnimationStyle = (
 
    const overflownWidth = titleWidth - parentWidth + 10
 
+   // Define pixels per second (adjust this value to control the speed)
+   const PIXELS_PER_SECOND = 22
+   // Calculate duration based on distance and desired speed
+   const duration = overflownWidth / PIXELS_PER_SECOND
+
+   console.log("overflownWidth animation duration", duration)
+
    return [
       {
          animationName: "scrollToEnd",
          animationTimingFunction: "linear",
          animationIterationCount: "infinite",
-         animationDuration: "5s",
+         animationDuration: `${duration}s`,
          animationDelay: "1s",
       },
       {
@@ -180,6 +187,14 @@ export const ExpandedHeader = ({
                   variant="small"
                   sx={[styles.liveStreamTitle, ...animationStyle]}
                >
+                  {livestream?.title}
+                  {livestream?.title}
+                  {livestream?.title}
+                  {livestream?.title}
+                  {livestream?.title}
+                  {livestream?.title}
+                  {livestream?.title}
+                  {livestream?.title}
                   {livestream?.title}
                </Typography>
             </Box>
