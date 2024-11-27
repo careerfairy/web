@@ -175,7 +175,7 @@ const Reminder5Min: ReminderData = {
 const Reminder1Hour: ReminderData = {
    template: "lsreminder1h",
    timeMessage: "in 1 hour",
-   minutesBefore: 60,
+   minutesBefore: 120,
    key: "reminder1Hour",
 }
 
@@ -207,6 +207,7 @@ export const scheduleReminderEmails = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
+      memory: "8GB",
    })
    .pubsub.schedule("every 15 minutes")
    .timeZone("Europe/Zurich")
