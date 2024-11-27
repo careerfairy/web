@@ -119,7 +119,7 @@ export const ExpandedDesktop = ({
    onEnded,
    onClose,
 }: FullScreenProps) => (
-   <Box sx={styles.desktopRoot} onClick={onClose}>
+   <Box sx={styles.desktopRoot}>
       <ReactPlayer
          url={highlight.videoClip.url}
          className="react-player"
@@ -128,7 +128,12 @@ export const ExpandedDesktop = ({
          playing={false}
          onEnded={onEnded}
       />
-      <Dialog open sx={styles.desktopDialog} maxWidth="desktop">
+      <Dialog
+         open
+         sx={styles.desktopDialog}
+         maxWidth="desktop"
+         onClose={onClose}
+      >
          <ReactPlayer
             url={highlight.videoClip.url}
             className="react-player"
