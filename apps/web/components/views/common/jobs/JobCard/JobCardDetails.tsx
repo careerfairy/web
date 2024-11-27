@@ -4,9 +4,12 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import { Box, Grid, SxProps, Tooltip, Typography } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { useAuth } from "HOCs/AuthProvider"
+import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { DateTime } from "luxon"
 import { useMemo } from "react"
 import { AlertCircle, Briefcase, Globe, Zap } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
@@ -125,9 +128,12 @@ const JobCardDetails = ({
    typographySx,
    companyName,
 }: Props) => {
+   const { userData } = useAuth()
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
-   const { jobHubV1 } = useFeatureFlags()
+   const { jobHubV1, talentProfileV1 } = useFeatureFlags()
+
+   const jobApplication = useUserJobApplication(userData?.id, job.id)
 
    let jobName: string
    let jobType: string
@@ -263,7 +269,11 @@ const JobCardDetails = ({
                         smallCard ? styles.smallExpiredDate : null,
                      ]}
                   >
-                     {getDeadLineMessage(jobDeadline, previewMode)}
+                     {talentProfileV1 && jobApplication.alreadyApplied
+                        ? getJobApplicationDateText(
+                             jobApplication.job.appliedAt.toDate()
+                          )
+                        : getDeadLineMessage(jobDeadline, previewMode)}
                   </Typography>
                ) : null}
 
@@ -277,6 +287,43 @@ const JobCardDetails = ({
          </Box>
       </>
    )
+}
+
+const getJobApplicationDateText = (applicationDate: Date): string => {
+   if (!applicationDate) return ""
+
+   const deadline = DateTime.fromJSDate(applicationDate)
+   const now = DateTime.now()
+
+   const diff = now
+      .diff(deadline, ["days", "weeks", "months", "years"])
+      .toObject()
+
+   if (diff.years > 0) {
+      return `Applied ${Math.floor(diff.years)} year${
+         Math.floor(diff.years) > 1 ? "s" : ""
+      } ago`
+   }
+
+   if (diff.months > 0) {
+      return `Applied ${Math.floor(diff.months)} month${
+         Math.floor(diff.months) > 1 ? "s" : ""
+      } ago`
+   }
+
+   if (diff.weeks > 0 && diff.months < 1) {
+      return `Applied ${Math.floor(diff.weeks)} week${
+         Math.floor(diff.weeks) > 1 ? "s" : ""
+      } ago`
+   }
+
+   if (diff.days > 1 && diff.weeks < 1) {
+      return `Applied ${Math.floor(diff.days)} day${
+         Math.floor(diff.days) > 1 ? "s" : ""
+      } ago`
+   }
+
+   return "Applied Today"
 }
 
 const getDeadLineMessage = (jobDeadline: Timestamp, previewMode: boolean) => {
