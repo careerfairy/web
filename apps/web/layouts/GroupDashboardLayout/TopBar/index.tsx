@@ -37,6 +37,8 @@ const getStyles = (hasNavigationBar?: boolean) =>
             md: 3.2,
          },
          paddingBottom: hasNavigationBar ? "0 !important" : "initial",
+         backdropFilter: "blur(8px)",
+         backgroundColor: "rgba(247, 248, 252, 0.9)",
       },
       leftSection: {
          display: "flex",
