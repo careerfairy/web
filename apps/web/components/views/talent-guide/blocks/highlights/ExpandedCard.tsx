@@ -107,6 +107,7 @@ export const ExpandedMobile = ({
          url={highlight.videoClip.url}
          playing
          onEnded={onEnded}
+         playsinline
       />
       <HighlightVideoOverlay />
    </Box>
@@ -135,6 +136,7 @@ export const ExpandedDesktop = ({
             height="100%"
             playing
             onEnded={onEnded}
+            playsinline
          />
          <Box sx={styles.desktopHeaderContainer}>
             <ExpandedHeader highlight={highlight} group={group} />
