@@ -126,6 +126,12 @@ export const getStreamsByDate = async (
          )
       })
 }
+type GetStreamsByDateWithRegisteredStudentsOptions = {
+   /**
+    * If true, hidden streams will be excluded.
+    */
+   excludeHidden?: boolean
+}
 
 /**
  * Get all the streams filtered by starting date and with all the registered students for each stream.
@@ -133,25 +139,30 @@ export const getStreamsByDate = async (
  */
 export const getStreamsByDateWithRegisteredStudents = async (
    filterStartDate: Date,
-   filterEndDate: Date
+   filterEndDate: Date,
+   options?: GetStreamsByDateWithRegisteredStudentsOptions
 ): Promise<LiveStreamEventWithUsersLivestreamData[]> => {
-   return firestore
+   let query = firestore
       .collection("livestreams")
       .where("start", ">=", filterStartDate)
       .where("start", "<=", filterEndDate)
       .where("test", "==", false)
-      .get()
-      .then((querySnapshot) => {
-         const streams = querySnapshot.docs?.map(
-            (doc) =>
-               ({
-                  id: doc.id,
-                  ...doc.data(),
-               } as LivestreamEvent)
-         )
 
-         return addUsersDataOnStreams(streams)
-      })
+   if (options?.excludeHidden) {
+      query = query.where("hidden", "==", false)
+   }
+
+   return query.get().then((querySnapshot) => {
+      const streams = querySnapshot.docs?.map(
+         (doc) =>
+            ({
+               id: doc.id,
+               ...doc.data(),
+            } as LivestreamEvent)
+      )
+
+      return addUsersDataOnStreams(streams)
+   })
 }
 
 /**
