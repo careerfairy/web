@@ -19,6 +19,7 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
       isExpanded,
       handleCloseCardClick,
       handleExpandCardClick,
+      setAutoPlayingIndex,
    } = useHighlights()
 
    const { data: group, status } = useGroup(
@@ -29,7 +30,11 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
 
    return (
       <>
-         <Box onClick={handleExpandCardClick(index)}>
+         <Box
+            onClick={handleExpandCardClick(index)}
+            onMouseEnter={() => setAutoPlayingIndex(index)}
+            onMouseLeave={() => setAutoPlayingIndex(null)}
+         >
             <ThumbnailCard
                highlight={highlight}
                isPlaying={shouldAutoPlay(index)}
