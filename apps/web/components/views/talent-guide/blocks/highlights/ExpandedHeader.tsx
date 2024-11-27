@@ -188,14 +188,6 @@ export const ExpandedHeader = ({
                   sx={[styles.liveStreamTitle, ...animationStyle]}
                >
                   {livestream?.title}
-                  {livestream?.title}
-                  {livestream?.title}
-                  {livestream?.title}
-                  {livestream?.title}
-                  {livestream?.title}
-                  {livestream?.title}
-                  {livestream?.title}
-                  {livestream?.title}
                </Typography>
             </Box>
          </Stack>
