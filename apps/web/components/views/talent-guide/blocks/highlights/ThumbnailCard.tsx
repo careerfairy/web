@@ -3,6 +3,7 @@ import { Box, Typography } from "@mui/material"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { companyLogoPlaceholder } from "constants/images"
 import { HighlightComponentType } from "data/hygraph/types"
+import { useEffect, useRef } from "react"
 import ReactPlayer from "react-player"
 import { sxStyles } from "types/commonTypes"
 import { HighlightVideoOverlay } from "./VideoOverlay"
@@ -89,10 +90,19 @@ export const ThumbnailCard = ({
    onEnded,
    group,
 }: ThumbnailCardProps) => {
+   const playerRef = useRef<ReactPlayer>(null)
+
+   useEffect(() => {
+      if (!isPlaying && playerRef.current) {
+         playerRef.current.seekTo(0)
+      }
+   }, [isPlaying])
+
    return (
       <Box sx={styles.card}>
          <ThumbnailHeader highlight={highlight} group={group} />
          <ReactPlayer
+            ref={playerRef}
             url={highlight.videoClip.url}
             className="react-player"
             width="100%"
