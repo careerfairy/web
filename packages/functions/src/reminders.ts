@@ -176,7 +176,7 @@ const Reminder5Min: ReminderData = {
 const Reminder1Hour: ReminderData = {
    template: "lsreminder1h",
    timeMessage: "in 1 hour",
-   minutesBefore: 120,
+   minutesBefore: 60,
    key: "reminder1Hour",
 }
 
