@@ -1,5 +1,8 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { LanguageProficiencyOrderMap } from "@careerfairy/shared-lib/constants/forms"
+import {
+   LanguageProficiencyOrderMap,
+   LanguageProficiencyValues,
+} from "@careerfairy/shared-lib/constants/forms"
 import { ProfileLanguage } from "@careerfairy/shared-lib/users"
 import { useAuth } from "HOCs/AuthProvider"
 import { languageCodesDict } from "components/helperFunctions/streamFormFunctions"
@@ -38,8 +41,12 @@ const sortLanguages = (languages: ProfileLanguage[]) => {
    return languages.sort((langA, langB) => {
       // Compare by proficiency level first
       const proficiencyComparison =
-         LanguageProficiencyOrderMap[langB.proficiency] -
-         LanguageProficiencyOrderMap[langA.proficiency]
+         LanguageProficiencyOrderMap[
+            LanguageProficiencyValues[langB.proficiency]
+         ] -
+         LanguageProficiencyOrderMap[
+            LanguageProficiencyValues[langA.proficiency]
+         ]
 
       if (proficiencyComparison !== 0) {
          return proficiencyComparison
