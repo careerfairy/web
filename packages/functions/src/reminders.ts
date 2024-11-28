@@ -214,6 +214,9 @@ export const scheduleReminderEmails = functions
    .timeZone("Europe/Zurich")
    .onRun(() => {
       const batch = firestore.batch()
+      functions.logger.log(
+         `Running reminder check at ${new Date().toLocaleString()}`
+      )
 
       const dateStart = addMinutesDate(new Date(), reminderDateDelay)
       const dateEndFor5Minutes = addMinutesDate(
