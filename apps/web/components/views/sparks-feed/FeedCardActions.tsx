@@ -171,23 +171,41 @@ const styles = sxStyles({
    },
 })
 
+type ActionType = "company" | "like" | "share" | "filter"
+
 type Props = {
    spark: Spark | SparkPresenter
    hide?: boolean
    linkToCompanyPage: string
+   hideActions?: ActionType[]
 }
 
-const FeedCardActions: FC<Props> = ({ spark, hide, linkToCompanyPage }) => {
+const DEFAULT_HIDE_ACTIONS: ActionType[] = []
+
+const FeedCardActions: FC<Props> = ({
+   spark,
+   hide,
+   linkToCompanyPage,
+   hideActions = DEFAULT_HIDE_ACTIONS,
+}) => {
    return (
-      <Stack spacing={3} sx={[styles.root, hide && styles.hidden]}>
-         <CompanyPageAction
-            sparkId={spark.id}
-            href={linkToCompanyPage}
-            companyLogoUrl={spark.group.logoUrl}
-         />
-         <LikeAction sparkId={spark.id} />
-         <ShareAction sparkId={spark.id} />
-         <FilterAction sparkId={spark.id} />
+      <Stack
+         spacing={3}
+         sx={[styles.root, hide && styles.hidden]}
+         className="FeedCardActions-root"
+      >
+         {!hideActions.includes("company") && (
+            <CompanyPageAction
+               sparkId={spark.id}
+               href={linkToCompanyPage}
+               companyLogoUrl={spark.group.logoUrl}
+            />
+         )}
+         {!hideActions.includes("like") && <LikeAction sparkId={spark.id} />}
+         {!hideActions.includes("share") && <ShareAction sparkId={spark.id} />}
+         {!hideActions.includes("filter") && (
+            <FilterAction sparkId={spark.id} />
+         )}
       </Stack>
    )
 }

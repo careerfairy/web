@@ -19,7 +19,8 @@ import ReferralWidget from "components/views/common/ReferralWidget"
 import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { DRAWER_WIDTH } from "constants/layout"
-import { FC, useCallback, useState } from "react"
+import { useRouter } from "next/router"
+import { FC, useCallback, useMemo, useState } from "react"
 import {
    CheckCircle as CheckIcon,
    X as CloseIcon,
@@ -104,6 +105,11 @@ const SparksShareDialog: FC<Props> = ({
    const theme = useTheme()
    const isFullScreen = useSparksFeedIsFullScreen()
 
+   const router = useRouter()
+   const isTalentGuide = useMemo(() => {
+      return router.pathname.includes("/talent-guide")
+   }, [router.pathname])
+
    const handleCloseDialog = useCallback(() => {
       handleClose()
       setIsCopied(false)
@@ -139,7 +145,7 @@ const SparksShareDialog: FC<Props> = ({
          onClose={handleCloseDialog}
          PaperProps={{
             style: {
-               left: isFullScreen ? "0%" : DRAWER_WIDTH - 120,
+               left: isFullScreen || isTalentGuide ? "0%" : DRAWER_WIDTH - 120,
             },
             sx: styles.dialogPaper,
          }}
