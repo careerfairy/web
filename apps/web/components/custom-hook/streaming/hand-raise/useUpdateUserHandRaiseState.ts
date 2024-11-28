@@ -32,6 +32,7 @@ export const useUpdateUserHandRaiseState = (livestreamId: string) => {
       const streamerDetails = await livestreamService.getParticipantDetails(
          options.arg.handRaiseId
       )
+
       return livestreamService.setUserHandRaiseState(
          livestreamId,
          options.arg.handRaiseId,
