@@ -1,5 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Box, Typography } from "@mui/material"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { companyLogoPlaceholder } from "constants/images"
 import { HighlightComponentType } from "data/hygraph/types"
@@ -42,6 +43,7 @@ const styles = sxStyles({
       bottom: "12px",
       left: 0,
       width: "100%",
+      paddingX: 1,
    },
    logoContainer: {
       cursor: "pointer",
@@ -52,6 +54,7 @@ const styles = sxStyles({
       fontSize: 14,
       fontWeight: 600,
       lineHeight: "20px",
+      ...getMaxLineStyles(2),
    },
 })
 
