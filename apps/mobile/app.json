@@ -5,7 +5,7 @@
       "version": "0.0.0",
       "orientation": "portrait",
       "icon": "./assets/images/AppIcon.png",
-      "scheme": "career.fairy",
+      "scheme": "careerfairy",
       "userInterfaceStyle": "automatic",
       "splash": {
          "image": "./assets/images/MainSplashScreen.png",
@@ -24,7 +24,6 @@
             "NSUserNotificationUsageDescription": "CareerFairy uses notifications to keep you up-to-date with your live streams."
          },
          "associatedDomains": [
-            "applinks:careerfairy.io",
             "applinks:www.careerfairy.io",
             "applinks:staging.careerfairy.io"
          ],
@@ -49,10 +48,6 @@
                "action": "VIEW",
                "autoVerify": true,
                "data": [
-                  {
-                     "scheme": "https",
-                     "host": "careerfairy.io"
-                  },
                   {
                      "scheme": "https",
                      "host": "www.careerfairy.io"
