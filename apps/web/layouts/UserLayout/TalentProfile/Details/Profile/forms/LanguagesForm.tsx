@@ -9,7 +9,7 @@ import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { languageCodesDict } from "components/helperFunctions/streamFormFunctions"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { mapOptions } from "components/views/signup/utils"
-import { ReactNode } from "react"
+import { ReactNode, useEffect } from "react"
 import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import {
@@ -47,6 +47,15 @@ export const LanguageFormProvider = ({
       mode: "onChange",
       reValidateMode: "onChange",
    })
+
+   // Explicitly reset form values after initialization if they change
+   useEffect(() => {
+      methods.reset(defaultValues)
+      return () => {
+         methods.reset({})
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [language])
 
    return (
       <FormProvider {...methods}>

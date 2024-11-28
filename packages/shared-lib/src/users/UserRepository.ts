@@ -1265,7 +1265,7 @@ export class FirebaseUserRepository
          .collection("userData")
          .doc(userId)
          .collection("languages")
-         .doc()
+         .doc(language.languageId)
 
       const data: ProfileLanguage = {
          ...language,
