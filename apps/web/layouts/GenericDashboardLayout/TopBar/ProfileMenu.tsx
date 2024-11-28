@@ -419,7 +419,6 @@ const ProfileMenu = () => {
                         </Tooltip>
                      </MenuItem>
                   </ConditionalWrapper>
-
                   <ConditionalWrapper
                      condition={!talentProfileV1}
                      fallback={<ProfileMenuItem sx={styles.desktopMenuItem} />}
