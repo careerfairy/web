@@ -1,10 +1,11 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import useLivestream from "components/custom-hook/live-stream/useLivestream"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { HighlightComponentType } from "data/hygraph/types"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import {
    RefObject,
    SyntheticEvent,
@@ -17,6 +18,7 @@ import { Video } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { useHighlights } from "./HighlightsBlockContext"
+import { LiveStreamDialogExtended } from "./LiveStreamDialogExtended"
 
 const styles = sxStyles({
    root: {
@@ -81,8 +83,6 @@ const getScrollAnimationStyle = (
    // Calculate duration based on distance and desired speed
    const duration = overflownWidth / PIXELS_PER_SECOND
 
-   console.log("overflownWidth animation duration", duration)
-
    return [
       {
          animationName: "scrollToEnd",
@@ -114,6 +114,8 @@ export const ExpandedHeader = ({
    group: Group
    highlight: HighlightComponentType
 }) => {
+   const router = useRouter()
+   const isMobile = useIsMobile()
    const titleRef = useRef<HTMLDivElement>(null)
    const parentRef = useRef<HTMLDivElement>(null)
    const [animationStyle, setAnimationStyle] = useState([])
@@ -122,25 +124,34 @@ export const ExpandedHeader = ({
       highlight.liveStreamIdentifier.identifier
    )
 
-   const {
-      isLiveStreamDialogOpen,
-      handleLiveStreamDialogOpen,
-      handleLiveStreamDialogClose,
-   } = useHighlights()
-
-   // Prevents exiting the fullscreen view when interacting with the dialog
-   const handleDialogClick = useCallback((event: SyntheticEvent) => {
-      event.stopPropagation()
-      event.preventDefault()
-   }, [])
+   const { handleLiveStreamDialogOpen } = useHighlights()
 
    const handleLivestreamTitleClick = useCallback(
       (event: SyntheticEvent) => {
          event.stopPropagation()
          event.preventDefault()
+
+         if (!livestream) return
+
          handleLiveStreamDialogOpen()
+
+         void router.push(
+            {
+               pathname: router.pathname,
+               query: {
+                  ...router.query,
+                  highlightId: highlight.id,
+                  livestreamId: livestream.id,
+               },
+            },
+            undefined,
+            {
+               scroll: false,
+               shallow: true,
+            }
+         )
       },
-      [handleLiveStreamDialogOpen]
+      [livestream, handleLiveStreamDialogOpen, router, highlight.id]
    )
 
    const handleGroupClick = useCallback((event: SyntheticEvent) => {
@@ -184,28 +195,24 @@ export const ExpandedHeader = ({
             alignItems="center"
             onClick={handleLivestreamTitleClick}
          >
-            <Video size={16} />
-            <Box sx={styles.liveStreamTitleContainer} ref={parentRef}>
-               <Typography
-                  ref={titleRef}
-                  variant="small"
-                  sx={[styles.liveStreamTitle, ...animationStyle]}
-               >
-                  {livestream?.title}
-               </Typography>
-            </Box>
+            <Video size={isMobile ? 22 : 16} />
+            {livestream ? (
+               <Box sx={styles.liveStreamTitleContainer} ref={parentRef}>
+                  <Typography
+                     ref={titleRef}
+                     variant="small"
+                     sx={[styles.liveStreamTitle, ...animationStyle]}
+                  >
+                     {livestream?.title}
+                  </Typography>
+               </Box>
+            ) : (
+               <Skeleton variant="text" width="100%" height={14} />
+            )}
          </Stack>
-         <Box onClick={handleDialogClick}>
-            <LivestreamDialog
-               open={isLiveStreamDialogOpen}
-               livestreamId={highlight.liveStreamIdentifier.identifier}
-               serverSideLivestream={livestream}
-               handleClose={handleLiveStreamDialogClose}
-               page={"details"}
-               mode="stand-alone"
-               serverUserEmail={""}
-            />
-         </Box>
+         {Boolean(livestream) && (
+            <LiveStreamDialogExtended livestream={livestream} />
+         )}
       </Box>
    )
 }

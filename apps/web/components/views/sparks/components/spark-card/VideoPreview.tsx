@@ -225,7 +225,6 @@ const VideoPreview: FC<Props> = ({
                   ref={playerRef}
                   playing={playingVideo}
                   playsinline
-                  playsInline
                   loop={playing}
                   width="100%"
                   height="100%"
