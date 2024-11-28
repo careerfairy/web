@@ -1,6 +1,7 @@
 import {
-   LanguageProficiency,
    LanguageProficiencyLabels,
+   LanguageProficiencyOrderMap,
+   LanguageProficiencyValues,
 } from "@careerfairy/shared-lib/constants/forms"
 import { ProfileLanguage } from "@careerfairy/shared-lib/users"
 import { Box, Stack, Typography } from "@mui/material"
@@ -118,7 +119,7 @@ const FormDialogWrapper = () => {
          const newLanguage: ProfileLanguage = {
             ...data,
             id: data?.id,
-            proficiency: data.proficiency as LanguageProficiency,
+            proficiency: LanguageProficiencyOrderMap[data.proficiency],
             authId: userData.authId,
          }
 
@@ -207,6 +208,7 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
       useState<boolean>(false)
    const dispatch = useDispatch()
    const { reset } = useFormContext()
+   const { successNotification } = useSnackbarNotifications()
 
    const handleEdit = useCallback(() => {
       dispatch(
@@ -225,7 +227,10 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
 
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
-   }, [language, userData.id])
+      successNotification(
+         `Deleted language: ${languageCodesDict[language.languageId].name} 🗣️`
+      )
+   }, [language, userData.id, successNotification])
 
    return (
       <Fragment>
@@ -248,7 +253,11 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
                   {languageCodesDict[language.languageId].name}
                </Typography>
                <Typography variant="xsmall" sx={styles.proficiency}>
-                  {`(${LanguageProficiencyLabels[language.proficiency]})`}
+                  {`(${
+                     LanguageProficiencyLabels[
+                        LanguageProficiencyValues[language.proficiency]
+                     ]
+                  })`}
                </Typography>
             </Stack>
          </ProfileItemCard>

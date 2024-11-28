@@ -1653,11 +1653,11 @@ export const LanguageProficiencyLabels: Record<LanguageProficiency, string> = {
 
 export const LanguageProficiencyOrderMap: Record<LanguageProficiency, number> =
    {
-      beginner: 1,
-      intermediate: 2,
-      advanced: 3,
-      proficient: 4,
-      native: 5,
+      beginner: 0,
+      intermediate: 1,
+      advanced: 2,
+      proficient: 3,
+      native: 4,
    }
 
 export const CompanyCountryValues: OptionGroup[] = countriesOptionCodes.map(

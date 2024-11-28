@@ -1,4 +1,7 @@
-import { LanguageProficiencies } from "@careerfairy/shared-lib/constants/forms"
+import {
+   LanguageProficiencies,
+   LanguageProficiencyValues,
+} from "@careerfairy/shared-lib/constants/forms"
 import {
    FieldOfStudy,
    LevelOfStudy,
@@ -139,9 +142,13 @@ export const getInitialLinkValues = (link?: ProfileLink): LinkFormValues => {
 export const getInitialLanguageValues = (
    language?: ProfileLanguage
 ): LanguageFormValues => {
+   const proficiency = language?.proficiency
+      ? LanguageProficiencyValues[language.proficiency]
+      : null
+
    return {
       id: language?.id || "",
       languageId: language?.languageId || "",
-      proficiency: language?.proficiency || "",
+      proficiency: proficiency,
    }
 }
