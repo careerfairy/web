@@ -74,6 +74,14 @@ export const MiddleContent = () => {
    )
 }
 
+export const MiddleContentLoader = () => {
+   return (
+      <Container sx={[styles.root, styles.fullHeight]} maxWidth="xl">
+         <Stack sx={[styles.fullHeight, styles.inner]} spacing={0.75}></Stack>
+      </Container>
+   )
+}
+
 type TopPaddingProps = {
    isSpotlightMode: boolean
    isMobile: boolean

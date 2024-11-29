@@ -11,6 +11,7 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import { useSpeakerId } from "store/selectors/streamingAppSelectors"
+import { MiddleContentLoader } from "./components/MiddleContent"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/waiting-room/WaitingRoom"
 
@@ -161,6 +162,7 @@ const MiddleContent = dynamic(
    () => import("./components/MiddleContent").then((mod) => mod.MiddleContent),
    {
       ssr: false,
+      loading: () => <MiddleContentLoader />,
    }
 )
 const BottomBar = dynamic(

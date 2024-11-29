@@ -6,7 +6,14 @@ import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { HandRaiseIcon } from "components/views/common/icons"
 import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
 import { useStreamingContext } from "components/views/streaming-page/context"
-import { Fragment, forwardRef } from "react"
+import {
+   Fragment,
+   forwardRef,
+   useCallback,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
 import {
    useNumberOfHandRaiseNotifications,
@@ -54,6 +61,32 @@ export const HandRaiseActionButton = forwardRef<
       handleCloseHandRaiseDialog,
    ] = useDialogStateHandler()
 
+   const [
+      viewerHandRaiseActiveTooltipInfoOpen,
+      setViewerHandRaiseActiveTooltipInfoOpen,
+   ] = useState(false)
+
+   // Open tooltip for 7 seconds whenever handRaiseIsActiveForViewer changes to true
+   useEffect(() => {
+      if (handRaiseIsActiveForViewer) {
+         setViewerHandRaiseActiveTooltipInfoOpen(true)
+         const timer = setTimeout(() => {
+            setViewerHandRaiseActiveTooltipInfoOpen(false)
+         }, 7000)
+
+         return () => clearTimeout(timer)
+      }
+   }, [handRaiseIsActiveForViewer])
+
+   const closeViewerTooltip = useCallback(() => {
+      viewerHandRaiseActiveTooltipInfoOpen &&
+         setViewerHandRaiseActiveTooltipInfoOpen(false)
+   }, [viewerHandRaiseActiveTooltipInfoOpen])
+
+   const isViewerHandRaiseActiveTooltipInfoOpen = useMemo(() => {
+      return viewerHandRaiseActiveTooltipInfoOpen && !isHost
+   }, [viewerHandRaiseActiveTooltipInfoOpen, isHost])
+
    const handleClick = () => {
       if (isHost) {
          handleSetActive()
@@ -75,27 +108,35 @@ export const HandRaiseActionButton = forwardRef<
    return (
       <Fragment>
          <BrandedTooltip
-            title={enableTooltip ? ActionTooltips["Hand raise"] : null}
+            title={"Join the talk! The hand raise option is now active!"}
+            open={isViewerHandRaiseActiveTooltipInfoOpen}
+            onClick={closeViewerTooltip}
+            onMouseEnter={closeViewerTooltip}
+            sx={{ maxWidth: "200px" }}
          >
-            <BrandedBadge
-               color="error"
-               badgeContent={numberOfHandRaiseNotifications || null}
+            <BrandedTooltip
+               title={enableTooltip ? ActionTooltips["Hand raise"] : null}
             >
-               <ActionBarButtonStyled
-                  id="hand-raise-button"
-                  active={isActive}
-                  onClick={handleClick}
-                  ref={ref}
-                  {...props}
-                  sx={combineStyles(
-                     props.sx,
-                     userHandRaiseActive && !isHost && styles.handRaiseActive
-                  )}
-                  color="primary"
+               <BrandedBadge
+                  color="error"
+                  badgeContent={numberOfHandRaiseNotifications || null}
                >
-                  <HandRaiseIcon />
-               </ActionBarButtonStyled>
-            </BrandedBadge>
+                  <ActionBarButtonStyled
+                     id="hand-raise-button"
+                     active={isActive}
+                     onClick={handleClick}
+                     ref={ref}
+                     {...props}
+                     sx={combineStyles(
+                        props.sx,
+                        userHandRaiseActive && !isHost && styles.handRaiseActive
+                     )}
+                     color="primary"
+                  >
+                     <HandRaiseIcon />
+                  </ActionBarButtonStyled>
+               </BrandedBadge>
+            </BrandedTooltip>
          </BrandedTooltip>
          <ConfirmHandRaiseDialog
             handleClose={handleCloseHandRaiseDialog}
