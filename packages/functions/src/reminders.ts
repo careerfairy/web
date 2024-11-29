@@ -176,7 +176,7 @@ const Reminder5Min: ReminderData = {
 const Reminder1Hour: ReminderData = {
    template: "lsreminder1h",
    timeMessage: "in 1 hour",
-   minutesBefore: 120,
+   minutesBefore: 60,
    key: "reminder1Hour",
 }
 
@@ -214,6 +214,9 @@ export const scheduleReminderEmails = functions
    .timeZone("Europe/Zurich")
    .onRun(() => {
       const batch = firestore.batch()
+      functions.logger.log(
+         `Running reminder check at ${new Date().toLocaleString()}`
+      )
 
       const dateStart = addMinutesDate(new Date(), reminderDateDelay)
       const dateEndFor5Minutes = addMinutesDate(
