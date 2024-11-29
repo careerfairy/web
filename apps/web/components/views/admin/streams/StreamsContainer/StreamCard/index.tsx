@@ -364,11 +364,13 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
                </React.Fragment>
             }
          />
-         <PhoneNumbersDialog
-            stream={stream}
-            onClose={handleClosePhoneNumbersDialog}
-            open={openPhoneNumbersDialog}
-         />
+         {Boolean(openPhoneNumbersDialog) && (
+            <PhoneNumbersDialog
+               stream={stream}
+               onClose={handleClosePhoneNumbersDialog}
+               open
+            />
+         )}
          <CardContent>
             {stream.isRecording || recordingSid ? (
                <Typography sx={styles.recording}>
