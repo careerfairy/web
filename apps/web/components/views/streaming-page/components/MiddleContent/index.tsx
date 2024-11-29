@@ -13,6 +13,7 @@ import { useStreamingContext } from "../../context"
 import { SidePanel } from "../SidePanel"
 import { StreamingGrid } from "../StreamingGrid"
 import { HandRaiseActiveBanner } from "../hand-raise/HandRaiseActiveBanner"
+import { MiddleContentLayout } from "./utils"
 
 const styles = sxStyles({
    root: {
@@ -47,18 +48,22 @@ export const MiddleContent = () => {
 
    return (
       <Container sx={[styles.root, styles.fullHeight]} maxWidth="xl">
-         <Stack
-            sx={[styles.fullHeight, styles.inner]}
-            pt={getTopPadding({
-               isSpotlightMode,
-               isMobile,
-               isLandscape,
-               bannerActive: handRaiseEnabled && isHost,
-            })}
-            pb={
-               isLandscape ? 3.125 : isMobile ? 2 : isSpotlightMode ? 2 : 5.875
-            }
-            spacing={0.75}
+         <MiddleContentLayout
+            sxProps={{
+               pt: getTopPadding({
+                  isSpotlightMode,
+                  isMobile,
+                  isLandscape,
+                  bannerActive: handRaiseEnabled && isHost,
+               }),
+               pb: isLandscape
+                  ? 3.125
+                  : isMobile
+                  ? 2
+                  : isSpotlightMode
+                  ? 2
+                  : 5.875,
+            }}
          >
             <HandRaiseActiveBanner />
             <Stack
@@ -69,15 +74,7 @@ export const MiddleContent = () => {
                <StreamingGrid />
                <SidePanel />
             </Stack>
-         </Stack>
-      </Container>
-   )
-}
-
-export const MiddleContentLoader = () => {
-   return (
-      <Container sx={[styles.root, styles.fullHeight]} maxWidth="xl">
-         <Stack sx={[styles.fullHeight, styles.inner]} spacing={0.75}></Stack>
+         </MiddleContentLayout>
       </Container>
    )
 }
