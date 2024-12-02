@@ -75,11 +75,10 @@ const Container = ({ creator, children }: ContainerProps) => {
       <Box
          sx={styles.container}
          component={Link}
-         href={`/company/${
-            router.query.companyName
-         }/mentor/${transformCreatorNameIntoSlug(
-            creator.firstName,
-            creator.lastName
+         href={`/company/${encodeURIComponent(
+            router.query.companyName as string
+         )}/mentor/${encodeURIComponent(
+            transformCreatorNameIntoSlug(creator.firstName, creator.lastName)
          )}/${creator.id}`}
       >
          {children}

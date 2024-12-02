@@ -24,7 +24,9 @@ export const BackButton = () => {
          LinkComponent={Link}
          href={
             router.query.companyName
-               ? `/company/${router.query.companyName}`
+               ? `/company/${encodeURIComponent(
+                    router.query.companyName as string
+                 )}`
                : "/"
          }
          sx={styles.backButton}
