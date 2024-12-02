@@ -13,7 +13,7 @@ import { useStreamingContext } from "../../context"
 import { SidePanel } from "../SidePanel"
 import { StreamingGrid } from "../StreamingGrid"
 import { HandRaiseActiveBanner } from "../hand-raise/HandRaiseActiveBanner"
-import { MiddleContentLayout } from "./utils"
+import { MiddleContentLayout } from "./MiddleContentLayout"
 
 const styles = sxStyles({
    root: {
