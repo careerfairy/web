@@ -7,8 +7,9 @@ const MAX_ALLOWED_LENGTH = 15
 
 /**
  * Custom hook which checks if the current user has seen the hand raise notice (red icon on the menu item) and allows adding data.
- * The data is stored in localStorage, with key @constant USER_HAND_RAISE_NOTICE_MAP and stores a map of live stream ids
- * numerical value which is the date the notice was acknowledge in epoch seconds, allowing at maximum of @constant MAX_ALLOWED_LENGTH keys.
+ * The data is stored in localStorage, with key @constant USER_HAND_RAISE_NOTICE_MAP and stores an array of live stream ids, with
+ * first items allowing at maximum of @constant MAX_ALLOWED_LENGTH keys. The items are deleted upon reaching the limit in a
+ * LIFO manner (the last added items are removed first when above the limit).
  * @param eventId Id of the live stream to be checked and store if noticed.
  */
 export const useUserHasNoticedHandRaise = (eventId: string) => {
@@ -21,11 +22,11 @@ export const useUserHasNoticedHandRaise = (eventId: string) => {
    const setNoticed = useCallback(() => {
       let updatedNotices = [...notices]
 
-      if (notices.length > MAX_ALLOWED_LENGTH - 1) {
-         updatedNotices = updatedNotices.slice(0, MAX_ALLOWED_LENGTH - 1)
-      }
+      updatedNotices.unshift(eventId)
 
-      updatedNotices.push(eventId)
+      if (notices.length > MAX_ALLOWED_LENGTH) {
+         updatedNotices = updatedNotices.slice(0, MAX_ALLOWED_LENGTH)
+      }
 
       setNotices(updatedNotices)
       setHasNoticed(true)
