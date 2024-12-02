@@ -28,6 +28,17 @@ concurrency:
    cancel-in-progress: true
 
 jobs:
+   optimize_ci:
+      runs-on: "ubuntu-latest"
+      outputs:
+         skip: ${{ steps.check_skip.outputs.skip }}
+      steps:
+         - name: Optimize CI
+           id: check_skip
+           uses: withgraphite/graphite-ci-action@main
+           with:
+              graphite_token: ${{ secrets.GRAPHITE_TOKEN }}
+
    build_app_for_tests:
       name: "Pre-build cache for tests"
       runs-on: ubuntu-latest
@@ -89,14 +100,16 @@ jobs:
    # Run Unit Tests
    unit_tests:
       name: "Unit Tests"
-      needs: [build_app_for_tests]
+      needs: [optimize_ci, build_app_for_tests]
       # only run if there are changes on the webapp & shared lib
       if: |
-         needs.build_app_for_tests.outputs.webapp == 'true' ||
-         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
-         needs.build_app_for_tests.outputs.shared-ui == 'true' ||
-         needs.build_app_for_tests.outputs.config-mui == 'true' ||
-         needs.build_app_for_tests.outputs.workflow == 'true'
+         needs.optimize_ci.outputs.skip == 'false' && (
+           needs.build_app_for_tests.outputs.webapp == 'true' ||
+           needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+           needs.build_app_for_tests.outputs.shared-ui == 'true' ||
+           needs.build_app_for_tests.outputs.config-mui == 'true' ||
+           needs.build_app_for_tests.outputs.workflow == 'true'
+         )
       runs-on: ubuntu-latest
       timeout-minutes: 10
       env:
@@ -123,14 +136,16 @@ jobs:
    # Run E2E Tests
    e2e_tests:
       name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
-      needs: [build_app_for_tests]
+      needs: [optimize_ci, build_app_for_tests]
       # only run if there are changes on the webapp & shared lib
       if: |
-         needs.build_app_for_tests.outputs.webapp == 'true' ||
-         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
-         needs.build_app_for_tests.outputs.shared-ui == 'true' ||
-         needs.build_app_for_tests.outputs.config-mui == 'true' ||
-         needs.build_app_for_tests.outputs.workflow == 'true'
+         needs.optimize_ci.outputs.skip == 'false' && (
+           needs.build_app_for_tests.outputs.webapp == 'true' ||
+           needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+           needs.build_app_for_tests.outputs.shared-ui == 'true' ||
+           needs.build_app_for_tests.outputs.config-mui == 'true' ||
+           needs.build_app_for_tests.outputs.workflow == 'true'
+         )
       strategy:
          fail-fast: false
          matrix:
@@ -185,7 +200,8 @@ jobs:
    # Deploy
    deploy:
       name: "Deploy"
-      needs: [e2e_tests, unit_tests]
+      needs: [optimize_ci, e2e_tests, unit_tests]
+      if: needs.optimize_ci.outputs.skip == 'false'
       runs-on: ubuntu-latest
       timeout-minutes: 20
       steps:
