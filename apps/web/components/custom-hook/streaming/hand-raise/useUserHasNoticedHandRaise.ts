@@ -15,19 +15,17 @@ export const useUserHasNoticedHandRaise = (eventId: string) => {
 
    const setNoticed = useCallback(() => {
       const noticeKeys = Object.keys(notices)
+      const newNotices = { ...notices }
       if (noticeKeys.length > MAX_ALLOWED_LENGTH) {
          noticeKeys
-            .sort((keyA, keyB) => {
-               return notices[keyB] - notices[keyA]
-            })
-            .filter((_, idx) => idx >= MAX_ALLOWED_LENGTH - 1)
+            .sort((keyA, keyB) => notices[keyB] - notices[keyA])
+            .filter((_, idx) => idx >= MAX_ALLOWED_LENGTH)
             .forEach((eventKey) => {
-               delete notices[eventKey]
+               delete newNotices[eventKey]
             })
       }
-
-      notices[eventId] = DateTime.now().toUnixInteger()
-      setNotices(notices)
+      newNotices[eventId] = DateTime.now().toUnixInteger()
+      setNotices(newNotices)
       setHasNoticed(true)
    }, [notices, eventId, setNotices])
 
