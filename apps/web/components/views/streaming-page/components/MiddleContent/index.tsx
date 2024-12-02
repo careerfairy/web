@@ -1,4 +1,4 @@
-import { Container, Stack } from "@mui/material"
+import { Stack } from "@mui/material"
 import {
    useSideDrawer,
    useStreamIsLandscape,
@@ -47,35 +47,33 @@ export const MiddleContent = () => {
    const { isOpen } = useSideDrawer()
 
    return (
-      <Container sx={[styles.root, styles.fullHeight]} maxWidth="xl">
-         <MiddleContentLayout
-            sxProps={{
-               pt: getTopPadding({
-                  isSpotlightMode,
-                  isMobile,
-                  isLandscape,
-                  bannerActive: handRaiseEnabled && isHost,
-               }),
-               pb: isLandscape
-                  ? 3.125
-                  : isMobile
-                  ? 2
-                  : isSpotlightMode
-                  ? 2
-                  : 5.875,
-            }}
+      <MiddleContentLayout
+         sxProps={{
+            pt: getTopPadding({
+               isSpotlightMode,
+               isMobile,
+               isLandscape,
+               bannerActive: handRaiseEnabled && isHost,
+            }),
+            pb: isLandscape
+               ? 3.125
+               : isMobile
+               ? 2
+               : isSpotlightMode
+               ? 2
+               : 5.875,
+         }}
+      >
+         <HandRaiseActiveBanner />
+         <Stack
+            sx={styles.stack}
+            direction="row"
+            spacing={isMobile || !isOpen ? 0 : 2.5}
          >
-            <HandRaiseActiveBanner />
-            <Stack
-               sx={styles.stack}
-               direction="row"
-               spacing={isMobile || !isOpen ? 0 : 2.5}
-            >
-               <StreamingGrid />
-               <SidePanel />
-            </Stack>
-         </MiddleContentLayout>
-      </Container>
+            <StreamingGrid />
+            <SidePanel />
+         </Stack>
+      </MiddleContentLayout>
    )
 }
 
