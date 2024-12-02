@@ -24,7 +24,7 @@ export const useUserHasNoticedHandRaise = (eventId: string) => {
 
       updatedNotices.unshift(eventId)
 
-      if (notices.length > MAX_ALLOWED_LENGTH) {
+      if (updatedNotices.length > MAX_ALLOWED_LENGTH) {
          updatedNotices = updatedNotices.slice(0, MAX_ALLOWED_LENGTH)
       }
 
