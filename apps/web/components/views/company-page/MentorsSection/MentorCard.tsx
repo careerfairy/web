@@ -69,17 +69,19 @@ const Container = ({ creator, children }: ContainerProps) => {
    const router = useRouter()
    const { editMode } = useCompanyPage()
 
+   const companyName = encodeURIComponent(router.query.companyName as string)
+
+   const creatorSlug = encodeURIComponent(
+      transformCreatorNameIntoSlug(creator.firstName, creator.lastName)
+   )
+
    return editMode ? (
       <Box sx={[styles.container, { cursor: "auto" }]}>{children}</Box>
    ) : (
       <Box
          sx={styles.container}
          component={Link}
-         href={`/company/${encodeURIComponent(
-            router.query.companyName as string
-         )}/mentor/${encodeURIComponent(
-            transformCreatorNameIntoSlug(creator.firstName, creator.lastName)
-         )}/${creator.id}`}
+         href={`/company/${companyName}/mentor/${creatorSlug}/${creator.id}`}
       >
          {children}
       </Box>
