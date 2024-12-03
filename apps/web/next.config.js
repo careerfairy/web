@@ -180,7 +180,15 @@ const csp = {
       "'self'", // For Sentry Replay
       "blob:", // For Sentry Replay
    ],
-   "frame-ancestors": ["'self'", "*"],
+   "frame-ancestors": [
+      "'self'",
+      "https://*.hygraph.com",
+      "https://*.ost-sg.ch",
+      "https://*.unibas.ch",
+      "https://*.talentagent.de",
+      "https://*.uniwunder.com",
+      "*", // Temporarily keeping this while we gather more domains
+   ],
 }
 
 if (notProduction) {
