@@ -61,6 +61,8 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
             }
          },
          onError: (err) => {
+            console.error(err)
+            console.log(err.message)
             errorNotification(err.message)
          },
          throwOnError: false, // We don't want to throw an error, we want to handle it ourselves in the onError callback above
