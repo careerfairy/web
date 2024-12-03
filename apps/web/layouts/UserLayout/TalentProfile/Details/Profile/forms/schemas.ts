@@ -1,8 +1,13 @@
+import { LanguageProficiencies } from "@careerfairy/shared-lib/constants/forms"
 import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
-import { ProfileLink, StudyBackground } from "@careerfairy/shared-lib/users"
+import {
+   ProfileLanguage,
+   ProfileLink,
+   StudyBackground,
+} from "@careerfairy/shared-lib/users"
 import { URL_REGEX } from "components/util/constants"
 import { ERROR_MESSAGES } from "util/form"
 import * as Yup from "yup"
@@ -56,15 +61,30 @@ export const baseLinkShape = {
       .required("URL is required"),
 }
 
+export const baseLanguageShape = {
+   id: Yup.string(),
+   languageId: Yup.string().nullable().required("Language is required"),
+   proficiency: Yup.string()
+      .nullable()
+      .oneOf(Object.values(LanguageProficiencies), "Invalid proficiency level")
+      .required("Proficiency is required"),
+}
+
 export const CreateStudyBackgroundSchema = Yup.object(baseStudyBackgroundShape)
 
 export const CreateLinkSchema = Yup.object(baseLinkShape)
+
+export const CreateLanguageSchema = Yup.object(baseLanguageShape)
 
 export type CreateStudyBackgroundSchemaType = Yup.InferType<
    typeof CreateStudyBackgroundSchema
 >
 
 export type CreateLinkSchemaType = Yup.InferType<typeof CreateLinkSchema>
+
+export type CreateLanguageSchemaType = Yup.InferType<
+   typeof CreateLanguageSchema
+>
 
 export type StudyBackgroundFormValues = {
    id?: string
@@ -80,6 +100,12 @@ export type LinkFormValues = {
    id?: string
    title: string
    url: string
+}
+
+export type LanguageFormValues = {
+   id?: string
+   languageId: string
+   proficiency: string
 }
 
 export const getInitialStudyBackgroundValues = (
@@ -107,5 +133,15 @@ export const getInitialLinkValues = (link?: ProfileLink): LinkFormValues => {
       id: link?.id || "",
       title: link?.title || "",
       url: link?.url || "",
+   }
+}
+
+export const getInitialLanguageValues = (
+   language?: ProfileLanguage
+): LanguageFormValues => {
+   return {
+      id: language?.id || "",
+      languageId: language?.languageId || "",
+      proficiency: language?.proficiency || "",
    }
 }

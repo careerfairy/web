@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab"
 import {
    Box,
    Button,
@@ -48,6 +49,7 @@ type Props = {
    handleClose: () => void
    handleSave: () => void
    saveDisabled?: boolean
+   isSubmitting?: boolean
    saveText?: string
 }
 
@@ -60,6 +62,7 @@ export const BaseProfileDialog = (props: Props) => {
       handleSave,
       saveDisabled = true,
       saveText = "Add",
+      isSubmitting,
    } = props
 
    const isMobile = useIsMobile()
@@ -102,14 +105,15 @@ export const BaseProfileDialog = (props: Props) => {
                      Cancel
                   </Typography>
                </Button>
-               <Button
+               <LoadingButton
                   variant="contained"
                   color="primary"
                   disabled={saveDisabled}
                   onClick={handleSave}
+                  loading={isSubmitting}
                >
                   {saveText}
-               </Button>
+               </LoadingButton>
             </Stack>
          </DialogActions>
       </Dialog>
