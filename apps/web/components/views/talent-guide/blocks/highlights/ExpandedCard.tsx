@@ -87,6 +87,7 @@ type FullScreenProps = {
    group: Group
    onEnded: () => void
    onClose: (event: SyntheticEvent) => void
+   isPlaying: boolean
 }
 
 export const ExpandedMobile = ({
@@ -94,6 +95,7 @@ export const ExpandedMobile = ({
    group,
    onEnded,
    onClose,
+   isPlaying,
 }: FullScreenProps) => (
    <Box sx={styles.cardFullScreenMobile} onClick={onClose}>
       <IconButton onClick={onClose} sx={styles.closeDialog}>
@@ -105,7 +107,7 @@ export const ExpandedMobile = ({
          width="100%"
          height="100%"
          url={highlight.videoClip.url}
-         playing
+         playing={isPlaying}
          onEnded={onEnded}
          playsinline
       />
@@ -118,6 +120,7 @@ export const ExpandedDesktop = ({
    group,
    onEnded,
    onClose,
+   isPlaying,
 }: FullScreenProps) => (
    <Box sx={styles.desktopRoot}>
       <ReactPlayer
@@ -139,7 +142,7 @@ export const ExpandedDesktop = ({
             className="react-player"
             width="100%"
             height="100%"
-            playing
+            playing={isPlaying}
             onEnded={onEnded}
             playsinline
          />

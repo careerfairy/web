@@ -20,6 +20,7 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
       handleCloseCardClick,
       handleExpandCardClick,
       setAutoPlayingIndex,
+      isLiveStreamDialogOpen,
    } = useHighlights()
 
    const { data: group, status } = useGroup(
@@ -50,6 +51,7 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
                      group={group}
                      onEnded={handleEndedPlaying}
                      onClose={handleCloseCardClick}
+                     isPlaying={!isLiveStreamDialogOpen}
                   />
                )}
                {Boolean(!isMobile) && (
@@ -59,6 +61,7 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
                         group={group}
                         onEnded={handleEndedPlaying}
                         onClose={handleCloseCardClick}
+                        isPlaying={!isLiveStreamDialogOpen}
                      />
                   </Box>
                )}
