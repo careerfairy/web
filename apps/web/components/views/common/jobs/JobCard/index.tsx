@@ -64,6 +64,7 @@ type Props = {
    titleSx?: SxProps<DefaultTheme>
    typographySx?: SxProps<DefaultTheme>
    companyName?: string
+   applied?: boolean
 }
 
 const JobCard = ({
@@ -77,6 +78,7 @@ const JobCard = ({
    titleSx,
    typographySx,
    companyName,
+   applied,
 }: Props) => {
    const isJobExpired = useIsJobExpired(job as PublicCustomJob)
 
@@ -88,6 +90,10 @@ const JobCard = ({
 
    const getStateColor = useCallback(
       (job: CustomJob): string => {
+         if (applied) {
+            return theme.palette.primary[300]
+         }
+
          if (isJobExpired) {
             return theme.brand.black[500]
          }
@@ -103,7 +109,7 @@ const JobCard = ({
 
          return theme.brand.black[500]
       },
-      [theme, isJobExpired]
+      [theme, isJobExpired, applied]
    )
 
    return (

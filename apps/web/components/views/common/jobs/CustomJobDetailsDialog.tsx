@@ -7,6 +7,7 @@ import {
 import { CloseOutlined } from "@mui/icons-material"
 import {
    Box,
+   Button,
    Dialog,
    DialogActions,
    DialogContent,
@@ -23,13 +24,14 @@ import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/Cu
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import { ProfileRemoveCustomJobConfirmation } from "components/views/jobs/components/custom-jobs/ProfileRemoveCustomJobConfirmation"
 import CustomJobDetailsSkeleton from "components/views/jobs/components/custom-jobs/skeletons/CustomJobDetailsSkeleton"
-import { ReactNode } from "react"
+import { Fragment, ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
 import { SlideUpTransition } from "../transitions"
 import {
    CustomJobDetailsProvider,
    useCustomJobDetailsDialog,
 } from "./CustomJobDetailsProvider"
+import { CustomJobNotFoundView } from "./CustomJobNotFoundView"
 
 const styles = sxStyles({
    fixedBottomContent: {
@@ -100,6 +102,7 @@ const DialogDetailsContent = ({
    hideApplicationConfirmation,
    hideLinkedLivestreams,
    hideLinkedSparks,
+   onClose,
 }: Props) => {
    const hasInitialData =
       serverSideCustomJob && customJobId === serverSideCustomJob?.id
@@ -109,7 +112,7 @@ const DialogDetailsContent = ({
       hasInitialData ? serverSideCustomJob : undefined
    )
 
-   if (!customJob) return null
+   if (!customJob) return <CustomJobNotFound onClose={onClose} />
 
    return (
       <CustomJobDetailsProvider customJob={customJob} source={source}>
@@ -126,6 +129,34 @@ const DialogDetailsContent = ({
             <Actions />
          </DialogActions>
       </CustomJobDetailsProvider>
+   )
+}
+
+type CustomJobNotFoundProps = {
+   onClose: () => void
+}
+
+const CustomJobNotFound = ({ onClose }: CustomJobNotFoundProps) => {
+   return (
+      <Fragment>
+         <DialogContent sx={styles.dialogContent}>
+            <CustomJobNotFoundView
+               title="No job found"
+               description="The job you are looking for does not exist. It may have been deleted or closed or the link you followed may be broken."
+            />
+         </DialogContent>
+         <DialogActions sx={styles.fixedBottomContent}>
+            <Button
+               variant="contained"
+               onClick={onClose}
+               color="primary"
+               disableElevation
+               size="small"
+            >
+               Back
+            </Button>
+         </DialogActions>
+      </Fragment>
    )
 }
 
