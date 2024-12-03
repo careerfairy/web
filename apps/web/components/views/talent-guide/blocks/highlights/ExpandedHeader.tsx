@@ -202,6 +202,7 @@ export const ExpandedHeader = ({
                serverSideLivestream={livestream}
                handleClose={handleLiveStreamDialogClose}
                page={"details"}
+               mode="stand-alone"
                serverUserEmail={""}
             />
          </Box>
