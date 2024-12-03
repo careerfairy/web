@@ -1,7 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Box, Stack, Typography } from "@mui/material"
 import useLivestream from "components/custom-hook/live-stream/useLivestream"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { HighlightComponentType } from "data/hygraph/types"
@@ -17,6 +16,7 @@ import {
 import { Video } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
+import { useHighlights } from "./HighlightsBlockContext"
 
 const styles = sxStyles({
    root: {
@@ -118,11 +118,15 @@ export const ExpandedHeader = ({
    const parentRef = useRef<HTMLDivElement>(null)
    const [animationStyle, setAnimationStyle] = useState([])
 
-   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
-
    const { data: livestream } = useLivestream(
       highlight.liveStreamIdentifier.identifier
    )
+
+   const {
+      isLiveStreamDialogOpen,
+      handleLiveStreamDialogOpen,
+      handleLiveStreamDialogClose,
+   } = useHighlights()
 
    // Prevents exiting the fullscreen view when interacting with the dialog
    const handleDialogClick = useCallback((event: SyntheticEvent) => {
@@ -134,9 +138,9 @@ export const ExpandedHeader = ({
       (event: SyntheticEvent) => {
          event.stopPropagation()
          event.preventDefault()
-         handleOpen()
+         handleLiveStreamDialogOpen()
       },
-      [handleOpen]
+      [handleLiveStreamDialogOpen]
    )
 
    const handleGroupClick = useCallback((event: SyntheticEvent) => {
@@ -193,10 +197,10 @@ export const ExpandedHeader = ({
          </Stack>
          <Box onClick={handleDialogClick}>
             <LivestreamDialog
-               open={isOpen}
+               open={isLiveStreamDialogOpen}
                livestreamId={highlight.liveStreamIdentifier.identifier}
                serverSideLivestream={livestream}
-               handleClose={handleClose}
+               handleClose={handleLiveStreamDialogClose}
                page={"details"}
                serverUserEmail={""}
             />
