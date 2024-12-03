@@ -12,6 +12,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import {
    addUtmTagsToLink,
+   chunkArray,
    companyNameSlugify,
 } from "@careerfairy/shared-lib/utils"
 import { WriteBatch } from "firebase-admin/firestore"
@@ -368,6 +369,7 @@ export const sendReminderToNonAttendees = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
+      memory: "8GB",
    })
    .pubsub.schedule("0 11 * * *")
    .timeZone("Europe/Zurich")
@@ -380,6 +382,7 @@ export const sendReminderToAttendees = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
+      memory: "8GB",
    })
    .pubsub.schedule("0 11 * * *")
    .timeZone("Europe/Zurich")
@@ -879,19 +882,20 @@ const sendAttendeesReminder = async (
             },
          }
 
-         const emailTemplates: TemplatedMessage[] =
-            await getPostmarkTemplateMessages(
-               BASE_TEMPLATE_MESSAGE,
-               livestreamsToRemind,
-               reminderData,
-               additionalData
-            )
+         const emailTemplates: TemplatedMessage[] = getPostmarkTemplateMessages(
+            BASE_TEMPLATE_MESSAGE,
+            livestreamsToRemind,
+            reminderData,
+            additionalData
+         )
+
+         const chunks = chunkArray(emailTemplates, 499) || []
 
          await processInBatches(
-            emailTemplates,
-            499,
+            chunks,
+            chunks.length,
             (template) => {
-               return client.sendEmailWithTemplate(template, (err) => {
+               return client.sendEmailBatchWithTemplates(template, (err) => {
                   if (err) {
                      functions.logger.error(
                         "Unable to send reminder to attendees with Postmark",
