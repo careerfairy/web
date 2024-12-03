@@ -28,6 +28,7 @@ const toggleFollowCompany = async (
 ) => {
    if (type === "follow") {
       const latestGroup = await groupRepo.getGroupById(groupId)
+      console.log("🚀 latestGroup in toggleFollowCompany", latestGroup)
       return groupRepo
          .followCompany(userData, latestGroup)
          .then(() => "followed" as const)
@@ -42,6 +43,7 @@ type Props = {
    group: Group | CompanySearchResult
 } & Omit<ButtonProps, "onClick">
 const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
+   console.log("🚀 ~ group in AuthedFollowButton:", group)
    const { userData, authenticatedUser } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
@@ -77,6 +79,7 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
 
    const handleClick = () => {
       if (authenticatedUser) {
+         console.log("🚀 ~ handleClick ~ group:", group)
          return trigger({
             userData,
             groupId: group.id,
