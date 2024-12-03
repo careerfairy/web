@@ -69,10 +69,12 @@ const csp = {
       "https://d3e54v103j8qbb.cloudfront.net",
       "https://assets-global.website-files.com",
       "https://player.vimeo.com",
+      "https://f.vimeocdn.com",
       "https://js.stripe.com",
       "https://scripts.simpleanalyticscdn.com", // Google Ads services
       "https://www.googleadservices.com", // Google Ads services
       "https://cdn.prod.website-files.com", // Webflow
+      "https://infrd.com",
    ],
    "style-src": [
       "'self'",
@@ -123,6 +125,8 @@ const csp = {
       "https://capig.stape.tech", // Pixel Conversion API Gateway
       "https://www.googletagmanager.com",
       "https://pagead2.googlesyndication.com", // Google Ads
+      "https://vimeocdn.com",
+      "https://player.vimeo.com",
    ],
    "img-src": [
       "'self'",
@@ -149,6 +153,7 @@ const csp = {
       "https://js.stripe.com",
       "https://hooks.stripe.com",
       "https://td.doubleclick.net", // Google Ads services
+      "https://www.googletagmanager.com",
    ],
    "font-src": [
       "'self'",
