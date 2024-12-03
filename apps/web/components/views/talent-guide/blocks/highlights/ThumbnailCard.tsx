@@ -12,7 +12,7 @@ const styles = sxStyles({
    card: {
       position: "relative",
       width: {
-         xs: 168,
+         xs: "100%",
          md: 220,
       },
       aspectRatio: 9 / 16,

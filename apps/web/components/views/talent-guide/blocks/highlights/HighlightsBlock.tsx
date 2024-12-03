@@ -16,7 +16,7 @@ const styles = sxStyles({
    root: {
       display: "grid",
       gridTemplateColumns: {
-         xs: "repeat(2, 168px)",
+         xs: "repeat(2, minmax(0, 1fr))",
          md: "repeat(2, 220px)",
       },
       gap: 1,
@@ -42,7 +42,7 @@ export const HighlightsBlock = ({ highlights }: Props) => {
    // }, [highlights.length])
 
    return (
-      <HighlightsProvider totalHighlights={highlights.length}>
+      <HighlightsProvider highlights={highlights}>
          <Box sx={styles.root}>
             {highlights.map((highlight, index) => {
                const isSpark = highlight.__typename === "Spark"
