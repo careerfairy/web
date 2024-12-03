@@ -301,6 +301,13 @@ export interface IUserRepository {
     * @param language Language to be updated.
     */
    updateLanguage(userId: string, language: ProfileLanguage): Promise<void>
+
+   /**
+    * Deletes a given language (@param languageId) for the user (@param userId).
+    * @param userId User id.
+    * @param languageId Language id.
+    */
+   deleteLanguage(userId: string, languageId: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -1258,7 +1265,7 @@ export class FirebaseUserRepository
          .collection("userData")
          .doc(userId)
          .collection("languages")
-         .doc()
+         .doc(language.languageId)
 
       const data: ProfileLanguage = {
          ...language,
@@ -1279,6 +1286,16 @@ export class FirebaseUserRepository
          .doc(language.id)
 
       return ref.set(language)
+   }
+
+   async deleteLanguage(userId: string, languageId: string): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("languages")
+         .doc(languageId)
+
+      return ref.delete()
    }
 }
 
