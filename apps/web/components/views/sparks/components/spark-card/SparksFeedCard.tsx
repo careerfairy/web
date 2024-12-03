@@ -1,4 +1,3 @@
-import { transformCreatorNameIntoSlug } from "@careerfairy/shared-lib/groups/creators"
 import {
    SparkCardNotificationTypes,
    SparkPresenter,
@@ -32,6 +31,7 @@ import {
    videosMuttedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { sxStyles } from "types/commonTypes"
+import { buildMentorPageLink } from "utils/routes"
 import FullCardNotification from "./Notifications/FullCardNotification"
 import { SparksPopUpNotificationManager } from "./Notifications/SparksPopUpNotificationManager"
 import { useLinkedInNotificationStateManagement } from "./Notifications/useLinkedInNotificationStateManagement"
@@ -210,12 +210,12 @@ const SparksFeedCard: FC<Props> = ({
       ? `/company/${companyNameSlugify(spark.group.universityName)}`
       : undefined
 
-   const mentorPageLink = `/company/${
-      spark.group.universityName
-   }/mentor/${transformCreatorNameIntoSlug(
-      spark.creator.firstName,
-      spark.creator.lastName
-   )}/${spark.creator.id}`
+   const mentorPageLink = buildMentorPageLink({
+      universityName: spark.group.universityName,
+      firstName: spark.creator.firstName,
+      lastName: spark.creator.lastName,
+      creatorId: spark.creator.id,
+   })
 
    const onCreatorDetailsClick = useCallback(() => {
       if (mentorPageLink) {
