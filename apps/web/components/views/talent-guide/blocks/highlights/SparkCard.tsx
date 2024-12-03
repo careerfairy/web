@@ -9,7 +9,7 @@ const styles = sxStyles({
    sparkContainer: {
       ".spark-preview-card-container": {
          width: {
-            xs: 168,
+            xs: "100%",
             md: 220,
          },
       },
@@ -34,6 +34,7 @@ export const SparkCard = ({ spark, index }: SparkCardProps) => {
             onClick={() => alert("Wololo. Will do something in the future.")}
             preview={shouldAutoPlay(index)}
             disableAutoPlay={false}
+            questionLimitLines={true}
          />
       </Box>
    )
