@@ -10,9 +10,12 @@ if (!hygraphUrl || !hygraphToken || !hygraphPreviewToken) {
       !hygraphToken && "HYGRAPH_TALENT_GUIDE_PROD_TOKEN",
       !hygraphPreviewToken && "HYGRAPH_TALENT_GUIDE_PREVIEW_TOKEN",
    ].filter(Boolean)
-   throw new Error(
-      `Missing Hygraph environment variables: ${missingConfigs.join(", ")}`
-   )
+
+   if (process.env.APP_ENV !== "test") {
+      throw new Error(
+         `Missing Hygraph environment variables: ${missingConfigs.join(", ")}`
+      )
+   }
 }
 
 /**
