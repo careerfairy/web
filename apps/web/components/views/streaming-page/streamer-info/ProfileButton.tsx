@@ -1,10 +1,9 @@
-import { transformCreatorNameIntoSlug } from "@careerfairy/shared-lib/groups/creators"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { Button } from "@mui/material"
 import useGroup from "components/custom-hook/group/useGroup"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
+import { buildMentorPageLink } from "utils/routes"
 
 const styles = sxStyles({
    profileButton: (theme) => ({
@@ -42,12 +41,12 @@ export const ProfileButton = ({
          target="_blank"
          variant={isPrimary ? "text" : "outlined"}
          sx={[styles.profileButton, isPrimary && styles.profileButtonPrimary]}
-         href={`/company/${companyNameSlugify(
-            streamerGroup.universityName
-         )}/mentor/${transformCreatorNameIntoSlug(
-            streamerDetails.firstName,
-            streamerDetails.lastName
-         )}/${streamerDetails.id}`}
+         href={buildMentorPageLink({
+            universityName: streamerGroup.universityName,
+            firstName: streamerDetails.firstName,
+            lastName: streamerDetails.lastName,
+            creatorId: streamerDetails.id,
+         })}
          fullWidth={isMobile}
       >
          Visit speaker profile

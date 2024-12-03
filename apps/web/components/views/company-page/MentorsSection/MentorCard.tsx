@@ -1,7 +1,4 @@
-import {
-   PublicCreator,
-   transformCreatorNameIntoSlug,
-} from "@careerfairy/shared-lib/groups/creators"
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
@@ -10,6 +7,7 @@ import { useRouter } from "next/router"
 import { ReactNode, SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { buildMentorPageLink } from "utils/routes"
 import { useCompanyPage } from ".."
 
 const CARD_WIDTH = 214
@@ -69,19 +67,17 @@ const Container = ({ creator, children }: ContainerProps) => {
    const router = useRouter()
    const { editMode } = useCompanyPage()
 
+   const mentorPageLink = buildMentorPageLink({
+      universityName: router.query.companyName as string,
+      firstName: creator.firstName,
+      lastName: creator.lastName,
+      creatorId: creator.id,
+   })
+
    return editMode ? (
       <Box sx={[styles.container, { cursor: "auto" }]}>{children}</Box>
    ) : (
-      <Box
-         sx={styles.container}
-         component={Link}
-         href={`/company/${
-            router.query.companyName
-         }/mentor/${transformCreatorNameIntoSlug(
-            creator.firstName,
-            creator.lastName
-         )}/${creator.id}`}
-      >
+      <Box sx={styles.container} component={Link} href={mentorPageLink}>
          {children}
       </Box>
    )
