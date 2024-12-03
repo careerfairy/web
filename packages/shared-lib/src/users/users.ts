@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app"
 import { Job } from "../ats/Job"
 import { Identifiable, UTMParams } from "../commonTypes"
+import { LanguageProficiency } from "../constants/forms"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import {
    GROUP_DASHBOARD_ROLE,
@@ -150,6 +151,13 @@ export interface ProfileLink extends Identifiable {
    authId: string
    url: string
    title: string
+}
+
+// Collection /userData/:id/languages/:id
+export interface ProfileLanguage extends Identifiable {
+   authId: string
+   languageId: string
+   proficiency: LanguageProficiency
 }
 
 export interface ReadableQuestionAndAnswer {

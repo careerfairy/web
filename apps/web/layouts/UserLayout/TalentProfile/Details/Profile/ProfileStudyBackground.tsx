@@ -154,8 +154,6 @@ const FormDialogWrapper = () => {
 
    const onSubmit = async (data: StudyBackgroundFormValues) => {
       try {
-         handleCloseStudyBackgroundDialog()
-
          const newStudyBackground: StudyBackground = {
             ...data,
             id: data?.id,
@@ -178,6 +176,7 @@ const FormDialogWrapper = () => {
             )
          }
 
+         handleCloseStudyBackgroundDialog()
          successNotification(
             `${data.id ? "Updated" : "Added a new"} study background 🎓`
          )
@@ -207,6 +206,7 @@ const FormDialogWrapper = () => {
             handleClose={handleCloseStudyBackgroundDialog}
             handleSave={handleSaveButtonClick}
             saveDisabled={!isValid}
+            isSubmitting={isSubmitting}
             saveText={saveText}
          >
             <ConfirmEmptyStudyDatesDialog
