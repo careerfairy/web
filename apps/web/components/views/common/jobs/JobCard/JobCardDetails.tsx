@@ -323,7 +323,7 @@ const getJobApplicationDateText = (applicationDate: Date): string => {
       } ago`
    }
 
-   return "Applied Today"
+   return "Applied today"
 }
 
 const getDeadLineMessage = (jobDeadline: Timestamp, previewMode: boolean) => {

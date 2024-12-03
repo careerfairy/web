@@ -19,12 +19,14 @@ type Props = {
    hrefLink: string // example: /portal/jobs
    jobsGroupNamesMap: Record<string, string> // {"id_of_job1": "name_of_group", ... }
    jobWrapperSx?: SxProps<DefaultTheme>
+   applied?: boolean
 }
 const CustomJobsList = ({
    customJobs,
    hrefLink,
    jobWrapperSx,
    jobsGroupNamesMap,
+   applied,
 }: Props) => {
    const isMobile = useIsMobile()
 
@@ -52,6 +54,7 @@ const CustomJobsList = ({
                         hideJobUrl
                         smallCard={isMobile}
                         companyName={jobsGroupNamesMap[customJob.id]}
+                        applied={applied}
                      />
                   </ListItem>
                </Link>

@@ -54,6 +54,7 @@ const styles = sxStyles({
    },
    talentProfileTabsContentWrapper: {
       mt: 2,
+      mb: "40px !important",
    },
    stateButton: {
       width: "100%",
@@ -277,6 +278,7 @@ const UserAppliedCustomJobsView = () => {
          hrefLink={JOBS_DIALOG_LINK}
          jobWrapperSx={styles.jobWrapper}
          jobsGroupNamesMap={jobsGroupNamesMap}
+         applied
       />
    )
 }
