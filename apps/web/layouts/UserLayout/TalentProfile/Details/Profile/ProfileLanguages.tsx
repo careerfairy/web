@@ -1,10 +1,16 @@
-import { LanguageProficiency } from "@careerfairy/shared-lib/constants/forms"
+import {
+   LanguageProficiencyLabels,
+   LanguageProficiencyOrderMap,
+   LanguageProficiencyValues,
+} from "@careerfairy/shared-lib/constants/forms"
 import { ProfileLanguage } from "@careerfairy/shared-lib/users"
-import { Box } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { useUserLanguages } from "components/custom-hook/user/useUserLanguages"
+import { languageCodesDict } from "components/helperFunctions/streamFormFunctions"
 import { userRepo } from "data/RepositoryInstances"
-import { Fragment, useCallback } from "react"
+import { Fragment, useCallback, useState } from "react"
 import { Globe } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
@@ -12,6 +18,7 @@ import {
    TalentProfileItemTypes,
    closeCreateDialog,
    openCreateDialog,
+   setEditing,
 } from "store/reducers/talentProfileReducer"
 import {
    talentProfileCreateLanguageOpenSelector,
@@ -19,8 +26,10 @@ import {
    talentProfileIsEditingLanguageSelector,
 } from "store/selectors/talentProfileSelectors"
 import { sxStyles } from "types/commonTypes"
+import { ConfirmDeleteItemDialog } from "../ConfirmDeleteItemDialog"
 import { EmptyItemView } from "./EmptyItemView"
-import { ProfileItem } from "./ProfileItem"
+import { ProfileItemCard } from "./ProfileItemCard"
+import { ProfileSection } from "./ProfileSection"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import { LanguageFormFields, LanguageFormProvider } from "./forms/LanguagesForm"
 import { LanguageFormValues, getInitialLanguageValues } from "./forms/schemas"
@@ -40,13 +49,21 @@ const styles = sxStyles({
       width: "36px",
       height: "36px",
    },
+   language: {
+      color: (theme) => theme.palette.neutral[800],
+      fontWeight: 600,
+   },
+   proficiency: {
+      color: (theme) => theme.palette.neutral[600],
+      fontWeight: 400,
+   },
 })
 
 type Props = {
-   hasItems?: boolean
+   showAddIcon?: boolean
 }
 
-export const ProfileLanguages = ({ hasItems }: Props) => {
+export const ProfileLanguages = ({ showAddIcon }: Props) => {
    const dispatch = useDispatch()
 
    const handleAdd = useCallback(() => {
@@ -54,9 +71,13 @@ export const ProfileLanguages = ({ hasItems }: Props) => {
    }, [dispatch])
 
    return (
-      <ProfileItem hasItems={hasItems} title="Languages" handleAdd={handleAdd}>
+      <ProfileSection
+         showAddIcon={showAddIcon}
+         title="Languages"
+         handleAdd={handleAdd}
+      >
          <ProfileLanguagesDetails />
-      </ProfileItem>
+      </ProfileSection>
    )
 }
 
@@ -71,6 +92,7 @@ const ProfileLanguagesDetails = () => {
 }
 
 const FormDialogWrapper = () => {
+   const { data: languages } = useUserLanguages()
    const dispatch = useDispatch()
    const { userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
@@ -97,7 +119,7 @@ const FormDialogWrapper = () => {
          const newLanguage: ProfileLanguage = {
             ...data,
             id: data?.id,
-            proficiency: data.proficiency as LanguageProficiency,
+            proficiency: LanguageProficiencyOrderMap[data.proficiency],
             authId: userData.authId,
          }
 
@@ -121,6 +143,9 @@ const FormDialogWrapper = () => {
 
    const handleSave = async () => handleSubmit(onSubmit)()
 
+   const alreadyExistingLanguages =
+      languages?.map((language) => language.languageId) || []
+
    const saveText = isEditingLanguage ? "Save" : "Add"
 
    return (
@@ -135,28 +160,107 @@ const FormDialogWrapper = () => {
             isSubmitting={isSubmitting}
             saveText={saveText}
          >
-            <LanguageFormFields />
+            <LanguageFormFields filterLanguageIds={alreadyExistingLanguages} />
          </BaseProfileDialog>
       </Fragment>
    )
 }
 
 const LanguageList = () => {
+   const { data: languages, hasItems } = useUserLanguages()
+
    const dispatch = useDispatch()
 
    const handleAdd = useCallback(() => {
       dispatch(openCreateDialog({ type: TalentProfileItemTypes.Language }))
    }, [dispatch])
 
+   if (!hasItems)
+      return (
+         <Box sx={styles.emptyLinksRoot}>
+            <EmptyItemView
+               title="Language buffet"
+               description="What languages can you feast on? Select all that apply."
+               addButtonText={"Select languages"}
+               handleAdd={handleAdd}
+               icon={<Box component={Globe} sx={styles.icon} />}
+            />
+         </Box>
+      )
+
    return (
-      <Box sx={styles.emptyLinksRoot}>
-         <EmptyItemView
-            title="Language buffet"
-            description="What languages can you feast on? Select all that apply."
-            addButtonText={"Select languages"}
-            handleAdd={handleAdd}
-            icon={<Box component={Globe} sx={styles.icon} />}
+      <Stack spacing={1.5} width={"100%"}>
+         {languages?.map((language) => (
+            <LanguageCard language={language} key={language.id} />
+         ))}
+      </Stack>
+   )
+}
+
+type LanguageCardProps = {
+   language: ProfileLanguage
+}
+
+const LanguageCard = ({ language }: LanguageCardProps) => {
+   const { userData } = useAuth()
+   const [isDeleting, setIsDeleting] = useState<boolean>(false)
+   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
+      useState<boolean>(false)
+   const dispatch = useDispatch()
+   const { reset } = useFormContext()
+   const { successNotification } = useSnackbarNotifications()
+
+   const handleEdit = useCallback(() => {
+      dispatch(
+         setEditing({
+            type: TalentProfileItemTypes.Language,
+            data: language,
+         })
+      )
+      reset(language)
+   }, [dispatch, language, reset])
+
+   const handleDelete = useCallback(async () => {
+      setIsDeleting(true)
+
+      await userRepo.deleteLanguage(userData.id, language.id)
+
+      setIsDeleting(false)
+      setIsConfirmDeleteDialogOpen(false)
+      successNotification(
+         `Deleted language: ${languageCodesDict[language.languageId].name} 🗣️`
+      )
+   }, [language, userData.id, successNotification])
+
+   return (
+      <Fragment>
+         <ConfirmDeleteItemDialog
+            open={isConfirmDeleteDialogOpen}
+            title="Delete language?"
+            description="Are you sure you want to delete your language?"
+            handleDelete={handleDelete}
+            isDeleting={isDeleting}
+            onClose={() => setIsConfirmDeleteDialogOpen(false)}
          />
-      </Box>
+         <ProfileItemCard
+            editText={"Edit language"}
+            deleteText={"Delete language"}
+            handleEdit={handleEdit}
+            handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
+         >
+            <Stack direction={"row"} alignItems={"center"} spacing={0.5}>
+               <Typography variant="brandedBody" sx={styles.language}>
+                  {languageCodesDict[language.languageId].name}
+               </Typography>
+               <Typography variant="xsmall" sx={styles.proficiency}>
+                  {`(${
+                     LanguageProficiencyLabels[
+                        LanguageProficiencyValues[language.proficiency]
+                     ]
+                  })`}
+               </Typography>
+            </Stack>
+         </ProfileItemCard>
+      </Fragment>
    )
 }
