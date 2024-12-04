@@ -129,7 +129,7 @@
    ],
    "devDependencies": {
       "@careerfairy/seed-data": "*",
-      "@playwright/test": "^1.35.1",
+      "@playwright/test": "^1.49.0",
       "@svgr/webpack": "^5.5.0",
       "@types/luxon": "^3.3.0",
       "@types/pako": "^2.0.0",
