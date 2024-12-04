@@ -54,7 +54,7 @@ const styles = sxStyles({
    },
    talentProfileTabsContentWrapper: {
       mt: 2,
-      mb: "40px !important",
+      mb: "16px !important",
    },
    stateButton: {
       width: "100%",
@@ -81,7 +81,7 @@ const styles = sxStyles({
       mb: {
          xs: 3,
          sm: 3,
-         md: 0,
+         md: 40,
       },
    },
    emptyApplications: {
