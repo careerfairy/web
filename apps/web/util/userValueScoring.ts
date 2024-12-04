@@ -130,21 +130,23 @@ export const calculateUserValue = (
    let maxPossibleScore = 0
 
    // Education Level
-   if (userData.levelOfStudy) {
-      totalScore += VALUE_WEIGHTS.levelOfStudy[userData.levelOfStudy.id] || 0
+   if (userData.levelOfStudy?.id) {
+      totalScore += VALUE_WEIGHTS.levelOfStudy[userData.levelOfStudy.id] ?? 0
       maxPossibleScore += MAX_SCORES.LEVEL_OF_STUDY
    }
 
    // Field of Study
-   if (userData.fieldOfStudy) {
-      totalScore += VALUE_WEIGHTS.fieldOfStudy[userData.fieldOfStudy.id] || 0
+   if (userData.fieldOfStudy?.id) {
+      totalScore +=
+         VALUE_WEIGHTS.fieldOfStudy[userData.fieldOfStudy.id] ??
+         VALUE_WEIGHTS.fieldOfStudy.default
       maxPossibleScore += MAX_SCORES.FIELD_OF_STUDY
    }
 
    // Location
    if (userData.universityCountryCode) {
       totalScore +=
-         VALUE_WEIGHTS.universityCountryCode[userData.universityCountryCode] ||
+         VALUE_WEIGHTS.universityCountryCode[userData.universityCountryCode] ??
          VALUE_WEIGHTS.universityCountryCode.default
       maxPossibleScore += MAX_SCORES.UNIVERSITY_LOCATION
    }
@@ -152,11 +154,13 @@ export const calculateUserValue = (
    // Languages
    if (userData.spokenLanguages?.length > 0) {
       userData.spokenLanguages.forEach((lang) => {
-         totalScore +=
-            VALUE_WEIGHTS.spokenLanguages[lang.toLowerCase()] ||
-            VALUE_WEIGHTS.spokenLanguages.default
+         if (lang) {
+            totalScore +=
+               VALUE_WEIGHTS.spokenLanguages[lang.toLowerCase()] ??
+               VALUE_WEIGHTS.spokenLanguages.default
+         }
       })
-      maxPossibleScore += MAX_SCORES.LANGUAGE // Only add max language score once
+      maxPossibleScore += MAX_SCORES.LANGUAGE
    }
 
    // Job seeking status
@@ -180,7 +184,7 @@ export const calculateUserValue = (
    // Current Region Score
    if (currentCountry) {
       totalScore +=
-         VALUE_WEIGHTS.currentRegion[currentCountry.toUpperCase()] ||
+         VALUE_WEIGHTS.currentRegion[currentCountry.toUpperCase()] ??
          VALUE_WEIGHTS.currentRegion.default
       maxPossibleScore += MAX_SCORES.CURRENT_REGION
    }
