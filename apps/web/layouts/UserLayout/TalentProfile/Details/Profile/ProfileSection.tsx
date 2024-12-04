@@ -28,7 +28,7 @@ type Props = {
    title: string
    showAddIcon?: boolean
    addIcon?: Icon
-   handleAdd: () => void
+   handleAdd?: () => void
    children: ReactElement
 }
 
