@@ -2,11 +2,12 @@ import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { useActiveSidePanelView } from "components/custom-hook/streaming"
 import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
+import { useUserHasNoticedHandRaise } from "components/custom-hook/streaming/hand-raise/useUserHasNoticedHandRaise"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { HandRaiseIcon } from "components/views/common/icons"
 import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
 import { useStreamingContext } from "components/views/streaming-page/context"
-import { Fragment, forwardRef } from "react"
+import { Fragment, forwardRef, useMemo } from "react"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
 import {
    useNumberOfHandRaiseNotifications,
@@ -54,6 +55,21 @@ export const HandRaiseActionButton = forwardRef<
       handleCloseHandRaiseDialog,
    ] = useDialogStateHandler()
 
+   const { hasNoticed, setNoticed } = useUserHasNoticedHandRaise(livestreamId)
+
+   const showHandRaiseNotice = useMemo(() => {
+      return handRaiseIsActiveForViewer && !isHost && !hasNoticed
+   }, [handRaiseIsActiveForViewer, isHost, hasNoticed])
+
+   const badgeContent =
+      numberOfHandRaiseNotifications || showHandRaiseNotice ? "!" : null
+
+   const tooltipText = showHandRaiseNotice
+      ? "Join the talk! The hand raise option is now active!"
+      : enableTooltip
+      ? ActionTooltips["Hand raise"]
+      : null
+
    const handleClick = () => {
       if (isHost) {
          handleSetActive()
@@ -74,17 +90,17 @@ export const HandRaiseActionButton = forwardRef<
 
    return (
       <Fragment>
-         <BrandedTooltip
-            title={enableTooltip ? ActionTooltips["Hand raise"] : null}
-         >
-            <BrandedBadge
-               color="error"
-               badgeContent={numberOfHandRaiseNotifications || null}
-            >
+         <BrandedTooltip title={tooltipText}>
+            <BrandedBadge color="error" badgeContent={badgeContent}>
                <ActionBarButtonStyled
                   id="hand-raise-button"
                   active={isActive}
-                  onClick={handleClick}
+                  onClick={() => {
+                     if (showHandRaiseNotice) {
+                        setNoticed()
+                     }
+                     handleClick()
+                  }}
                   ref={ref}
                   {...props}
                   sx={combineStyles(

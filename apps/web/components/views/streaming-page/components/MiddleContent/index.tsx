@@ -1,4 +1,4 @@
-import { Container, Stack } from "@mui/material"
+import { Stack } from "@mui/material"
 import {
    useSideDrawer,
    useStreamIsLandscape,
@@ -13,6 +13,7 @@ import { useStreamingContext } from "../../context"
 import { SidePanel } from "../SidePanel"
 import { StreamingGrid } from "../StreamingGrid"
 import { HandRaiseActiveBanner } from "../hand-raise/HandRaiseActiveBanner"
+import { MiddleContentLayout } from "./MiddleContentLayout"
 
 const styles = sxStyles({
    root: {
@@ -46,31 +47,33 @@ export const MiddleContent = () => {
    const { isOpen } = useSideDrawer()
 
    return (
-      <Container sx={[styles.root, styles.fullHeight]} maxWidth="xl">
-         <Stack
-            sx={[styles.fullHeight, styles.inner]}
-            pt={getTopPadding({
+      <MiddleContentLayout
+         sxProps={{
+            pt: getTopPadding({
                isSpotlightMode,
                isMobile,
                isLandscape,
                bannerActive: handRaiseEnabled && isHost,
-            })}
-            pb={
-               isLandscape ? 3.125 : isMobile ? 2 : isSpotlightMode ? 2 : 5.875
-            }
-            spacing={0.75}
+            }),
+            pb: isLandscape
+               ? 3.125
+               : isMobile
+               ? 2
+               : isSpotlightMode
+               ? 2
+               : 5.875,
+         }}
+      >
+         <HandRaiseActiveBanner />
+         <Stack
+            sx={styles.stack}
+            direction="row"
+            spacing={isMobile || !isOpen ? 0 : 2.5}
          >
-            <HandRaiseActiveBanner />
-            <Stack
-               sx={styles.stack}
-               direction="row"
-               spacing={isMobile || !isOpen ? 0 : 2.5}
-            >
-               <StreamingGrid />
-               <SidePanel />
-            </Stack>
+            <StreamingGrid />
+            <SidePanel />
          </Stack>
-      </Container>
+      </MiddleContentLayout>
    )
 }
 
