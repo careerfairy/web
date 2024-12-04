@@ -10,11 +10,13 @@ import {
    Typography,
 } from "@mui/material"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { Formik } from "formik"
 import { Fragment, useContext, useState } from "react"
 import { useDispatch } from "react-redux"
 import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
+import { calculateUserValue } from "util/userValueScoring"
 import * as yup from "yup"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
@@ -39,10 +41,11 @@ const SignUpPinForm = () => {
    const [errorMessageShown] = useState(false)
    const [incorrectPin, setIncorrectPin] = useState(false)
    const [generalLoading, setGeneralLoading] = useState(false)
-   const { authenticatedUser: user } = useAuth()
+   const { authenticatedUser: user, userData } = useAuth()
    const { nextStep } = useContext<IMultiStepContext>(MultiStepContext)
    const dispatch = useDispatch()
    const { data: fingerPrintId } = useFingerPrint()
+   const { userCountryCode } = useUserCountryCode()
 
    async function resendVerificationEmail() {
       setGeneralLoading(true)
@@ -81,7 +84,12 @@ const SignUpPinForm = () => {
          await reloadAuth(dispatch, firebase.app) // redux action
 
          updateActiveStep()
-         dataLayerEvent("signup_pin_complete")
+
+         const value = calculateUserValue(userData, userCountryCode)
+         dataLayerEvent("signup_pin_complete", {
+            value,
+            currency: "CHF",
+         })
       } catch (error) {
          console.log("error", error)
          setIncorrectPin(true)
