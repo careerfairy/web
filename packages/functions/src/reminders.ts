@@ -664,17 +664,21 @@ const getPostmarkTemplateMessages = (
          })
 
       const streamSpeakers = speakers.slice(0, 4).map((speaker) => {
+         const speakerLink = speaker.linkedInUrl
+            ? speaker.linkedInUrl
+            : addUtmTagsToLink({
+                 link: `${host}/portal/livestream/${stream.id}/speaker-details/${speaker.id}`,
+                 source: "careerfairy",
+                 medium: "email",
+                 campaign: "event-followup",
+                 content: stream.title,
+              })
+
          return {
             name: `${speaker.firstName} ${speaker.lastName}`,
             position: speaker.position,
             avatarUrl: speaker.avatar,
-            url: addUtmTagsToLink({
-               link: `${host}/portal/livestream/${stream.id}/speaker-details/${speaker.id}`,
-               source: "careerfairy",
-               medium: "email",
-               campaign: "event-followup",
-               content: stream.title,
-            }),
+            url: speakerLink,
          }
       })
 
