@@ -3,7 +3,6 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Link from "next/link"
-import { useRouter } from "next/router"
 import { ReactNode, SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -64,11 +63,10 @@ type ContainerProps = Pick<MentorCardProps, "creator"> & {
 }
 
 const Container = ({ creator, children }: ContainerProps) => {
-   const router = useRouter()
-   const { editMode } = useCompanyPage()
+   const { editMode, group } = useCompanyPage()
 
    const mentorPageLink = buildMentorPageLink({
-      universityName: router.query.companyName as string,
+      universityName: group?.universityName || "",
       firstName: creator.firstName,
       lastName: creator.lastName,
       creatorId: creator.id,
