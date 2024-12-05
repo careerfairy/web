@@ -37,14 +37,21 @@ const styles = sxStyles({
       p: "12px 8px 12px 16px",
       justifyContent: "space-between",
       alignItems: "center",
+      width: "100%",
    },
    companyName: {
       color: (theme) => theme.palette.neutral[800],
       fontWeight: 600,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
    },
    companyInfoText: {
       color: (theme) => theme.palette.neutral[600],
       fontWeight: 400,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
    },
    companyInfoIcon: {
       color: (theme) => theme.palette.neutral[600],
@@ -128,10 +135,14 @@ const FollowingCompanyCard = ({ group }: FollowingCompanyCardProps) => {
 
    return (
       <Stack direction={"row"} sx={styles.companyCardRoot}>
-         <Link href={companyLink} target="_blank">
+         <Link
+            href={companyLink}
+            target="_blank"
+            style={{ maxWidth: "calc(100% - 100px)" }}
+         >
             <Stack direction={"row"} alignItems={"center"} spacing={1.5}>
                <CircularLogo src={group.logoUrl} alt="Company logo" size={48} />
-               <Stack>
+               <Stack sx={{ minWidth: 0 }}>
                   <Typography sx={styles.companyName} variant="small">
                      {group.universityName}
                   </Typography>
