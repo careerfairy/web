@@ -6,7 +6,7 @@ import { ProfileMoreDots } from "./ProfileMoreDots"
 const styles = sxStyles({
    cardRoot: {
       justifyContent: "space-between",
-      p: "16px 10px 12px 12px",
+      p: "16px 12px",
       borderRadius: "8px",
       border: (theme) => `1px solid ${theme.brand.white[500]}`,
       backgroundColor: (theme) => theme.brand.white[100],

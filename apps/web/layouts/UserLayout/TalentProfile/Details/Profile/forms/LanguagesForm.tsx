@@ -20,11 +20,7 @@ import {
 
 const styles = sxStyles({
    formRoot: {
-      minWidth: {
-         xs: "313px",
-         sm: "343px",
-         md: "500px",
-      },
+      maxWidth: "100%",
    },
 })
 
@@ -88,6 +84,9 @@ export const LanguageFormFields = ({
             textFieldProps={{
                requiredText: "(required)",
                placeholder: "E.g., English",
+               sx: {
+                  maxWidth: "auto",
+               },
             }}
             autocompleteProps={{
                id: "spokenLanguage",
@@ -113,6 +112,7 @@ export const LanguageFormFields = ({
                id: "languageProficiency",
                disabled: isSubmitting,
                disableClearable: false,
+               autoComplete: false, // See if it works without this
                autoHighlight: true,
                getOptionLabel: (option) => {
                   return (option && LanguageProficiencyLabels[option]) || ""
