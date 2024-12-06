@@ -37,18 +37,11 @@ const accordionStyles = sxStyles({
       borderRadius: "20px !important",
       paddingY: "8px",
       background: theme.palette.common.white,
+      boxShadow: "0px 0px 0px 0px rgba(0, 189, 64, 0.25)",
       "*": {
          color: (theme) => `${theme.palette.neutral["700"]}`,
          fontSize: "16px !important",
       },
-   }),
-   cardInactive: (theme) => ({
-      border: `1.5px solid ${theme.brand.white["500"]}`,
-      boxShadow: "0px 0px 0px 0px rgba(0, 189, 64, 0.25)",
-   }),
-   cardActive: (theme) => ({
-      border: `1.5px solid ${theme.brand.success.main}`,
-      boxShadow: "0px 0px 40px 0px rgba(0, 189, 64, 0.10)",
    }),
    summary: {
       paddingX: "12px",
@@ -143,15 +136,7 @@ type AccordionCardProps = AccordionProps & {
 
 const AccordionCard = ({ isActive = false, ...props }: AccordionCardProps) => (
    <Animation.Glowing isActive={isActive}>
-      <Accordion
-         {...props}
-         sx={[
-            accordionStyles.cardBase,
-            isActive
-               ? accordionStyles.cardActive
-               : accordionStyles.cardInactive,
-         ]}
-      />
+      <Accordion {...props} sx={accordionStyles.cardBase} />
    </Animation.Glowing>
 )
 
