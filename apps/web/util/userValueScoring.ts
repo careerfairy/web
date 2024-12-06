@@ -27,11 +27,12 @@ const VALUE_WEIGHTS = {
       life_sciences: 50,
       materials_science: 50,
       mechanical_engineering: 50,
+      physics: 50,
+      systems_engineering: 50,
+      finance: 50,
 
       // Medium-high value fields (40 points)
       biology: 40,
-      law: 40,
-      marketing: 40,
       mathematics: 40,
       medicine: 40,
       psychology: 40,
@@ -39,10 +40,13 @@ const VALUE_WEIGHTS = {
 
       // Medium value fields (30 points)
       earth_science: 30,
-      human_physics: 30,
       space_science: 30,
       environmental: 30,
-      finance: 30,
+      agriculture: 30,
+      education: 30,
+      journalism: 30,
+      law: 30,
+      marketing: 30,
 
       // Lower value fields (10 points)
       anthropology: 10,
@@ -58,6 +62,8 @@ const VALUE_WEIGHTS = {
       political_science: 10,
       religion: 10,
       sociology: 10,
+      human_physics: 10,
+      public_administration: 10,
 
       // Non-target fields (0 points)
       astronomy: 0,
