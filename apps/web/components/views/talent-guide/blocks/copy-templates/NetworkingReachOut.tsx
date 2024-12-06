@@ -18,7 +18,7 @@ const CARDS_METADATA = [
    },
    {
       icon: <Briefcase />,
-      title: "Career Adivce",
+      title: "Career Advice",
       description:
          "Hi [Name], I hope you’re doing well! I admire your work in [specific field] and would love to hear your insights on [specific topic]. Would you be open to a chat?",
    },
