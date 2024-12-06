@@ -1,21 +1,23 @@
+import LoadingButton from "@mui/lab/LoadingButton"
 import { Box, Button, Container, Grid, Typography } from "@mui/material"
-import React, { useCallback, useEffect, useState } from "react"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
+import { useRouter } from "next/router"
+import { useCallback, useEffect, useState } from "react"
+import { calculateUserValue } from "util/userValueScoring"
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
+import { userRepo } from "../../../data/RepositoryInstances"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import { sxStyles } from "../../../types/commonTypes"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
+import GenericStepper from "../common/GenericStepper"
 import MultiStepWrapper, {
    MultiStepComponentType,
 } from "../common/MultiStepWrapper"
-import SignUpUserForm from "./steps/SignUpUserForm"
-import SignUpPinForm from "./steps/SignUpPinForm"
-import SocialInformation from "./steps/SocialInformation"
-import LocationInformation from "./steps/LocationInformation"
 import InterestsInformation from "./steps/InterestsInformation"
-import { sxStyles } from "../../../types/commonTypes"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import { useRouter } from "next/router"
-import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
-import { userRepo } from "../../../data/RepositoryInstances"
-import LoadingButton from "@mui/lab/LoadingButton"
-import GenericStepper from "../common/GenericStepper"
-import { dataLayerEvent } from "../../../util/analyticsUtils"
+import LocationInformation from "./steps/LocationInformation"
+import SignUpPinForm from "./steps/SignUpPinForm"
+import SignUpUserForm from "./steps/SignUpUserForm"
+import SocialInformation from "./steps/SocialInformation"
 
 const styles = sxStyles({
    icon: {
@@ -100,7 +102,7 @@ const SignupForm = () => {
       query: { absolutePath },
    } = useRouter()
    const firebase = useFirebaseService()
-
+   const { userCountryCode } = useUserCountryCode()
    const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
    const [currentStep, setCurrentStep] = useState(0)
    const isLastStep = currentStep === steps.length - 1
@@ -124,6 +126,7 @@ const SignupForm = () => {
       ) {
          return setCurrentStep(1)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [user, firebase.auth?.currentUser?.emailVerified])
 
    const handlePrevious = () => {
@@ -154,6 +157,7 @@ const SignupForm = () => {
 
          updateAnalytics(stepId, totalSteps).catch(console.error)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [currentStep])
 
    const handleContinue = () => {
@@ -167,7 +171,12 @@ const SignupForm = () => {
             void push(fallbackSignupRedirectPath)
          }
 
-         dataLayerEvent("signup_complete_redirect")
+         const value = calculateUserValue(userData, userCountryCode)
+
+         dataLayerEvent("signup_complete_redirect", {
+            value,
+            currency: "CHF",
+         })
       } else {
          setCurrentStep((prev) => prev + 1)
       }
