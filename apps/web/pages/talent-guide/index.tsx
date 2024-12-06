@@ -37,6 +37,13 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
    locale,
    preview = false,
 }) => {
+   if (process.env.APP_ENV === "test") {
+      // no tests for talent guide yet
+      return {
+         notFound: true, // Return 404 in test environment
+      }
+   }
+
    const service = preview ? tgPreviewService : tgService
 
    const slugs = await service.getAllTalentGuideModulePageSlugs()
