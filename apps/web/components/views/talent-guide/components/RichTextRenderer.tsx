@@ -7,6 +7,7 @@ import { EmbedProps } from "@graphcms/rich-text-types"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import {
    ArticleBlockType,
+   CopyTemplateBlockType,
    FollowCompaniesBlockType,
    HeaderBlockType,
    HighlightsBlockType,
@@ -20,6 +21,7 @@ import {
 import { useMemo } from "react"
 import {
    ArticleBlock,
+   CopyTemplateBlock,
    FollowCompaniesBlock,
    HeaderBlock,
    HighlightsBlock,
@@ -71,6 +73,9 @@ export const RichTextRenderer = ({ content, references }: RichTextProps) => {
             ) => <SparksCarouselBlock {...props} />,
             VideoBlock: (props: EmbedProps<VideoBlockType>) => (
                <VideoBlock {...props} />
+            ),
+            CopyTemplateBlock: (props: EmbedProps<CopyTemplateBlockType>) => (
+               <CopyTemplateBlock {...props} />
             ),
          },
       }),
