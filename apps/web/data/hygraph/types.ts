@@ -172,6 +172,12 @@ export type VideoBlockType = {
    videoTitle: string
 }
 
+export type CopyTemplateBlockType = {
+   __typename: "CopyTemplateBlock"
+   id: string
+   templateType: "NetworkingReachOut"
+}
+
 export type QuizAnswerComponentType = {
    __typename: "QuizAnswer"
    answer: string
@@ -204,6 +210,8 @@ export type RichTextReferenceType =
    | HeaderBlockType
    | JobsBlockType
    | SparksCarouselBlockType
+   | VideoBlockType
+   | CopyTemplateBlockType
 
 export type RichTextBlockType = {
    __typename: "RichTextBlock"
