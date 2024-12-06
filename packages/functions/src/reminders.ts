@@ -1,4 +1,5 @@
 import functions = require("firebase-functions")
+import { EUROPEAN_COUNTRY_CODES } from "@careerfairy/shared-lib/constants/forms"
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
@@ -664,17 +665,20 @@ const getPostmarkTemplateMessages = (
          })
 
       const streamSpeakers = speakers.slice(0, 4).map((speaker) => {
+         const speakerLink = addUtmTagsToLink({
+            link: `${host}/portal/livestream/${stream.id}/speaker-details/${speaker.id}`,
+            source: "careerfairy",
+            medium: "email",
+            campaign: "event-followup",
+            content: stream.title,
+         })
+
          return {
             name: `${speaker.firstName} ${speaker.lastName}`,
             position: speaker.position,
             avatarUrl: speaker.avatar,
-            url: addUtmTagsToLink({
-               link: `${host}/portal/livestream/${stream.id}/speaker-details/${speaker.id}`,
-               source: "careerfairy",
-               medium: "email",
-               campaign: "event-followup",
-               content: stream.title,
-            }),
+            url: speakerLink,
+            linkedInUrl: speaker.linkedInUrl,
          }
       })
 
@@ -703,6 +707,18 @@ const getPostmarkTemplateMessages = (
       })
 
       stream.usersLivestreamData.forEach((streamUserData) => {
+         const userInEU = EUROPEAN_COUNTRY_CODES.includes(
+            streamUserData.user.universityCountryCode
+         )
+
+         const speakers = streamSpeakers.map((speaker) => ({
+            ...speaker,
+            url:
+               userInEU && speaker.linkedInUrl
+                  ? speaker.linkedInUrl
+                  : speaker.url,
+         }))
+
          templateMessages.push({
             ...baseMessage,
             To: streamUserData.user.userEmail,
@@ -716,7 +732,7 @@ const getPostmarkTemplateMessages = (
                   firstName: streamUserData.user.firstName,
                },
                jobs: streamJobs,
-               speakers: streamSpeakers,
+               speakers: speakers,
                sparks: groupSparks,
                allowsRecording: !stream.denyRecordingAccess,
             },
