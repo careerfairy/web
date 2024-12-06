@@ -346,6 +346,8 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       const tomorrow = new Date()
       tomorrow.setDate(tomorrow.getDate() + 1)
 
+      const livestreamId = firestore.collection("livestreams").doc().id
+
       const data: LivestreamEvent = {
          backgroundImageUrl: faker.image.abstract(),
          company,
@@ -360,7 +362,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
             faker.lorem.sentences(2),
          ],
          hidden: false,
-         id: uuidv4().replace(/-/g, ""),
+         id: livestreamId,
          language: {
             code: faker.address.countryCode(),
             name: faker.address.country(),

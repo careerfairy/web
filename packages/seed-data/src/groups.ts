@@ -1,22 +1,20 @@
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
+   type GroupATSAccountDocument,
+   type GroupATSIntegrationTokensDocument,
 } from "@careerfairy/shared-lib/dist/groups"
-import { faker } from "@faker-js/faker"
-import { auth, fieldValue, firestore } from "./lib/firebase"
-import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
-import { generateId } from "./utils/utils"
-import { groupTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
-import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/dist/users"
+import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 import {
    FirebaseGroupRepository,
    IGroupRepository,
 } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
-import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
-import {
-   type GroupATSAccountDocument,
-   type GroupATSIntegrationTokensDocument,
-} from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
+import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/dist/users"
+import { groupTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
+import { faker } from "@faker-js/faker"
+import { auth, fieldValue, firestore } from "./lib/firebase"
+import { generateId } from "./utils/utils"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
@@ -51,6 +49,7 @@ class GroupFirebaseSeed implements GroupSeed {
    private groupRepo: IGroupRepository
 
    constructor() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.groupRepo = new FirebaseGroupRepository(firestore as any, fieldValue)
    }
 
@@ -91,14 +90,14 @@ class GroupFirebaseSeed implements GroupSeed {
 
    async createGroup(overrideFields?: Partial<Group>): Promise<Group> {
       const batch = firestore.batch()
-      const id = generateId()
+      const groupId = firestore.collection("careerCenterData").doc().id
       const universityName =
          faker.company.companyName().replace(/[^a-zA-Z\d ]/g, "") ??
          "My university"
 
       let data: Group = {
-         id,
-         groupId: id,
+         id: groupId,
+         groupId: groupId,
          description: faker.company.bs(),
          logoUrl: faker.image.business(),
          bannerImageUrl: faker.image.business(),
@@ -114,13 +113,13 @@ class GroupFirebaseSeed implements GroupSeed {
       groupQuestions.forEach((questionData) => {
          const questionRef = firestore
             .collection("careerCenterData")
-            .doc(id)
+            .doc(groupId)
             .collection("groupQuestions")
             .doc(questionData.id)
          batch.set(questionRef, questionData)
       })
 
-      const groupRef = firestore.collection("careerCenterData").doc(id)
+      const groupRef = firestore.collection("careerCenterData").doc(groupId)
       batch.set(groupRef, data)
       await batch.commit()
       return data
@@ -194,12 +193,16 @@ class GroupFirebaseSeed implements GroupSeed {
             image: "testImageURL",
             square_image: "testSquareImageURL",
             slug: "testSlug",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             firstSyncCompletedAt: fieldValue.serverTimestamp() as any, // set to now
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             applicationTestCompletedAt: fieldValue.serverTimestamp() as any, // set to now
             extraRequiredData: null,
          },
 
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          createdAt: fieldValue.serverTimestamp() as any, // set to now
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          updatedAt: fieldValue.serverTimestamp() as any, // set to now
          id: groupId,
       }
