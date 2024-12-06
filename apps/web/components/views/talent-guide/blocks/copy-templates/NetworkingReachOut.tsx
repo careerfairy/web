@@ -24,11 +24,11 @@ const CARDS_METADATA = [
    },
 ]
 
-const AccordionCard = ({ id, card }) => {
+const AccordionCard = ({ card, ...props }) => {
    const { isActive, setIsActive } = useTemporaryState()
 
    return (
-      <CopyAccordion.Card key={id} disableGutters isActive={isActive}>
+      <CopyAccordion.Card {...props} disableGutters isActive={isActive}>
          <CopyAccordion.Summary>
             <Stack
                direction="row"
@@ -53,7 +53,7 @@ export const NetworkingReachOut = () => {
    return (
       <CopyAccordion>
          {CARDS_METADATA.map((card, index) => (
-            <AccordionCard key={index} id={index} card={card} />
+            <AccordionCard key={index} card={card} />
          ))}
       </CopyAccordion>
    )
