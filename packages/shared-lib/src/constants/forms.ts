@@ -1351,6 +1351,45 @@ export const languageOptionCodes: OptionGroup[] = [
    },
 ]
 
+export const EUROPEAN_COUNTRY_CODES = countriesOptionCodes
+   .filter((country) =>
+      [
+         "AT",
+         "AD",
+         "BE",
+         "BG",
+         "CH",
+         "CZ",
+         "DE",
+         "DK",
+         "EE",
+         "ES",
+         "FI",
+         "FR",
+         "GB",
+         "GR",
+         "HR",
+         "HU",
+         "IE",
+         "IT",
+         "LI",
+         "LU",
+         "MC",
+         "MT",
+         "NL",
+         "NO",
+         "PL",
+         "PT",
+         "RO",
+         "RS",
+         "SE",
+         "SI",
+         "SK",
+         "SM",
+      ].includes(country.id)
+   )
+   .map((country) => country.id)
+
 export const channelOptionCodes: OptionGroup[] = [
    {
       id: "facebook",
