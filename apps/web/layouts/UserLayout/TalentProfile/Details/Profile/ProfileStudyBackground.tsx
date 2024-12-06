@@ -57,8 +57,8 @@ const styles = sxStyles({
       height: "36px",
    },
    studyBackgroundSchoolIcon: {
-      width: "40px",
-      height: "40px",
+      width: "48px",
+      height: "48px",
       padding: "5px 5.833px 5px 5px",
       borderRadius: "70px",
       color: (theme) => theme.palette.neutral[200],
@@ -265,6 +265,7 @@ type StudyBackgroundCardProps = {
 }
 
 const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
+   const { successNotification } = useSnackbarNotifications()
    const { userData } = useAuth()
    const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
       useState<boolean>(false)
@@ -289,7 +290,8 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
 
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
-   }, [studyBackground, userData.id])
+      successNotification("Study background deleted")
+   }, [studyBackground, userData.id, successNotification])
 
    const university = useUniversityById(
       studyBackground.universityCountryCode,

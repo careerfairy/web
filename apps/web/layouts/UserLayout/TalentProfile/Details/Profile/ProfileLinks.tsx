@@ -61,13 +61,12 @@ const styles = sxStyles({
    buttonLink: {
       p: 0,
       m: 0,
+      color: "transparent",
       "&:hover": {
          backgroundColor: "unset",
       },
    },
    circularLogo: {
-      width: "48px",
-      height: "48px",
       mr: 1.5,
    },
 })
@@ -208,6 +207,7 @@ type LinkCardProps = {
 }
 
 const LinkCard = ({ link }: LinkCardProps) => {
+   const { successNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
    const isExtraSmall = useIsMobile(350)
    const { userData } = useAuth()
@@ -234,7 +234,8 @@ const LinkCard = ({ link }: LinkCardProps) => {
 
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
-   }, [link, userData.id])
+      successNotification("Link deleted")
+   }, [link, userData.id, successNotification])
 
    const linkUrlValue = normalizeUrl(
       getSubstringWithEllipsis(
@@ -277,6 +278,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
                   src={faviconSrc}
                   alt={`${link.title} icon`}
                   sx={styles.circularLogo}
+                  size={48}
                />
                <Stack>
                   <Typography variant="brandedBody" sx={styles.linkTitle}>
