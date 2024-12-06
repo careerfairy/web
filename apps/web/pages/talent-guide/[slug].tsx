@@ -57,17 +57,6 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
 export const getStaticPaths: GetStaticPaths = async () => {
    const paths = []
 
-   // for (const locale of locales) {
-   //    const slugs = await tgService.getAllTalentGuideModulePageSlugs()
-   //    paths = [
-   //       ...paths,
-   //       ...slugs.map((slug) => ({
-   //          params: { slug },
-   //          locale,
-   //       })),
-   //    ]
-   // }
-
    return { paths, fallback: "blocking" }
 }
 
@@ -76,6 +65,13 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
    preview = false,
    locale,
 }) => {
+   if (process.env.APP_ENV === "test") {
+      // no tests for talent guide yet
+      return {
+         notFound: true, // Return 404 in test environment
+      }
+   }
+
    const slug = params?.slug as string
    const service = preview ? tgPreviewService : tgService
 

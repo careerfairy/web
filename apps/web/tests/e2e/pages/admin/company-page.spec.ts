@@ -105,9 +105,11 @@ test.describe("Company page follow", () => {
       )
 
       // click on follow button
-      await groupPage.clickOnHeaderFollowButton()
+      await groupPage.clickOnHeaderFollowButton(group.id)
 
-      await expect(groupPage.companyUnfollowButton.first()).toBeVisible()
+      await expect(
+         groupPage.page.getByTestId(`unfollow-button-${group.id}`).first()
+      ).toBeVisible()
 
       // get user follow companies
       const followedCompanies = await UserSeed.getUserFollowedCompanies(
@@ -127,9 +129,11 @@ test.describe("Company page follow", () => {
 
       await groupPage.goToCompaniesPage()
 
-      await groupPage.clickOnFollowOnCompaniesPage()
+      await groupPage.clickOnFollowOnCompaniesPage(group.id)
 
-      await expect(groupPage.companyUnfollowButton).toBeVisible()
+      await expect(
+         groupPage.page.getByTestId(`unfollow-button-${group.id}`)
+      ).toBeVisible()
 
       // get user followed companies
       const followedCompanies = await UserSeed.getUserFollowedCompanies(

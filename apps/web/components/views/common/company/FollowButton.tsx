@@ -59,6 +59,8 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
             }
          },
          onError: (err) => {
+            console.error(err)
+            console.log(err.message)
             errorNotification(err.message)
          },
          throwOnError: false, // We don't want to throw an error, we want to handle it ourselves in the onError callback above
@@ -87,6 +89,9 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
 
    return (
       <LoadingButton
+         data-testid={`${companyFollowedData ? "unfollow" : "follow"}-button-${
+            group.id
+         }`}
          id={"follow-button"}
          loading={isMutating || status === "loading"}
          disabled={isMutating || disabled || status === "loading"}
@@ -106,12 +111,13 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
    )
 }
 
-const NonAuthedFollowButton: FC<ButtonProps> = ({ ...buttonProps }) => {
+const NonAuthedFollowButton: FC<Props> = ({ group, ...buttonProps }) => {
    const { asPath } = useRouter()
    const isMounted = useMountedState()
 
    return (
       <Link
+         data-testid={`non-authed-follow-button-${group.id}`}
          href={{
             pathname: "/signup",
             query: {
@@ -120,11 +126,7 @@ const NonAuthedFollowButton: FC<ButtonProps> = ({ ...buttonProps }) => {
             },
          }}
       >
-         <Button
-            {...buttonProps}
-            variant="contained"
-            data-testid="non-authed-follow-button"
-         >
+         <Button {...buttonProps} variant="contained">
             Follow
          </Button>
       </Link>
@@ -146,7 +148,7 @@ const FollowButton: FC<Props> = ({ group, ...buttonProps }) => {
    if (isLoggedIn) {
       return <AuthedFollowButton group={group} {...mergedProps} />
    }
-   return <NonAuthedFollowButton {...mergedProps} />
+   return <NonAuthedFollowButton group={group} {...mergedProps} />
 }
 
 const defaultButtonProps: ButtonProps = {
