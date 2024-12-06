@@ -534,7 +534,11 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    async clickOnFollowOnCompaniesPage(groupId: string) {
-      await this.page.getByTestId(`follow-button-${groupId}`).first().click()
+      const followButton = this.page
+         .getByTestId(`follow-button-${groupId}`)
+         .first()
+      await followButton.scrollIntoViewIfNeeded()
+      await followButton.click()
    }
 
    /**
