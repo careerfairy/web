@@ -2,7 +2,7 @@ import { useTheme } from "@mui/material"
 import { motion } from "framer-motion"
 
 export const ANIMATION_DURATION = 0.3
-export const ANIMATION_HOLD_SECONDS = 1
+export const ANIMATION_HOLD_SECONDS = 1.2
 
 export const Animation = () => <></>
 
