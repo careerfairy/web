@@ -33,7 +33,7 @@ const SavedPushNotifications = () => {
    const fetchAllData = async () => {
       setLoading(true)
       try {
-         const snapshot = await firestore.collection("savedNotifications").get()
+         const snapshot = await firestore.collection("pushNotifications").get()
 
          const allData = snapshot.docs.map((doc) => ({
             id: doc.id,
