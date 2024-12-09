@@ -3,7 +3,28 @@ import { Expo } from "expo-server-sdk"
 
 const expo = new Expo()
 
-export const createSavedNotification = async (data: any) => {
+export type NotificationData = {
+   title: string
+   body: string
+   url: string
+   filters: Filter
+}
+
+export type NotificationResponse = NotificationData & Identification
+
+type Identification = {
+   id: string
+}
+
+type Filter = any
+
+export type MessageBody = {
+   title: string
+   body: string
+   url: string
+}
+
+export const createSavedNotification = async (data: NotificationData) => {
    try {
       const ref = await firestore.collection("savedNotifications").add({
          ...data,
@@ -15,34 +36,14 @@ export const createSavedNotification = async (data: any) => {
    }
 }
 
-export const getSavedNotifications = async (
-   pageSize = 10,
-   lastVisible = null
-) => {
-   try {
-      let query = firestore
-         .collection("savedNotifications")
-         .limit(pageSize)
-         .orderBy("createdAt", "desc")
-      if (lastVisible) query = query.startAfter(lastVisible)
-      const snapshot = await query.get()
-      const notifications = snapshot.docs.map((doc) => ({
-         id: doc.id,
-         ...doc.data(),
-      }))
-      const newLastVisible = snapshot.docs[snapshot.docs.length - 1]
-      return { notifications, lastVisible: newLastVisible }
-   } catch (error) {
-      console.error("Error getting notifications:", error)
-   }
-}
-
-export const getSavedNotification = async (id: string) => {
+export const getSavedNotification = async (
+   id: string
+): Promise<NotificationResponse> => {
    try {
       const notificationRef = firestore.collection("savedNotifications").doc(id)
       const doc = await notificationRef.get()
       if (doc.exists) {
-         return { id: doc.id, ...doc.data() }
+         return { id: doc.id, ...(doc.data() as NotificationData) }
       } else {
          // Document does not exist
          console.error("No such document!")
@@ -53,7 +54,10 @@ export const getSavedNotification = async (id: string) => {
    }
 }
 
-export const updateSavedNotification = async (id: string, data: any) => {
+export const updateSavedNotification = async (
+   id: string,
+   data: NotificationData
+) => {
    try {
       await firestore.collection("savedNotifications").doc(id).update(data)
    } catch (error) {
@@ -69,7 +73,10 @@ export const deleteSavedNotification = async (id: string) => {
    }
 }
 
-export async function sendExpoPushNotification(filters: any, message: any) {
+export async function sendExpoPushNotification(
+   filters: Filter,
+   message: MessageBody
+) {
    try {
       // Filter out invalid tokens
       let tokens: string[] = []

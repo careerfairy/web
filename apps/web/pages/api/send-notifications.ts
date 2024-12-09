@@ -1,4 +1,4 @@
-import { sendExpoPushNotification } from "../../data/firebase/FirestoreService"
+import { sendExpoPushNotification } from "../../data/firebase/PushNotificationsService"
 
 export default async function handler(req: any, res: any) {
    if (req.method === "POST") {
