@@ -19,9 +19,6 @@ import {
    SafeAreaView,
    StatusBar,
    StyleSheet,
-   Text,
-   TouchableOpacity,
-   View,
 } from "react-native"
 import { WebView } from "react-native-webview"
 
@@ -46,7 +43,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
    onLogout,
 }) => {
-   const [showPermissionsBanner, setShowPermissionsBanner] = useState(false)
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef: any = useRef(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
@@ -132,7 +128,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             !hasAudioPermissions || !hasVideoPermissions
 
          if (audioGranted && videoGranted) {
-            setShowPermissionsBanner(false)
             if (permissionsWereMissing) {
                setHasAudioPermissions(true)
                setHasVideoPermissions(true)
@@ -141,19 +136,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          } else {
             setHasAudioPermissions(audioGranted)
             setHasVideoPermissions(videoGranted)
-            setShowPermissionsBanner(true)
          }
       } catch (e) {
          console.log("ERROR")
          console.log(e)
-      }
-   }
-
-   const openAppSettings = () => {
-      if (Platform.OS === "ios") {
-         Linking.openURL("app-settings:")
-      } else {
-         Linking.openSettings()
       }
    }
 
@@ -260,8 +246,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          (!hasAudioPermissions || !hasVideoPermissions)
       ) {
          return requestPermissions()
-      } else {
-         setShowPermissionsBanner(false)
       }
    }
 
@@ -303,18 +287,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             ]}
             onNavigationStateChange={handleNavigationStateChange}
          />
-
-         {showPermissionsBanner && (
-            <View style={styles.banner}>
-               <Text style={styles.bannerText}>
-                  Permissions not granted. Allow them in settings and restart
-                  the application
-               </Text>
-               <TouchableOpacity onPress={openAppSettings}>
-                  <Text style={styles.bannerButton}>Click here to allow</Text>
-               </TouchableOpacity>
-            </View>
-         )}
       </SafeAreaView>
    )
 }
