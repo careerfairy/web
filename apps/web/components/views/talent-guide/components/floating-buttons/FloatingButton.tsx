@@ -16,6 +16,7 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       width: 343,
+      zIndex: 3,
    },
    buttonOffset: {
       height: {
