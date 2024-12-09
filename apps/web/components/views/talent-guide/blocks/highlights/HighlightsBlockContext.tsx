@@ -24,6 +24,8 @@ type HighlightsContextType = {
    isLiveStreamDialogOpen: boolean
    handleLiveStreamDialogOpen: () => void
    handleLiveStreamDialogClose: () => void
+   isPlayingExpanded: boolean
+   toggleExpandedPlaying: () => void
 }
 
 const HighlightsContext = createContext<HighlightsContextType | undefined>(
@@ -41,6 +43,7 @@ export const HighlightsProvider = ({
 }: HighlightsProviderProps) => {
    const router = useRouter()
    const isMobile = useIsMobile()
+   const [isPausedExpanded, setIsPausedExpanded] = useState<boolean>(false)
 
    const [autoPlayingIndex, setAutoPlayingIndex] = useState<number>(
       isMobile ? 0 : undefined
@@ -67,6 +70,18 @@ export const HighlightsProvider = ({
       },
       [expandedPlayingIndex]
    )
+
+   const isPlayingExpanded = useMemo(() => {
+      return (
+         expandedPlayingIndex !== undefined &&
+         !isLiveStreamDialogOpen &&
+         !isPausedExpanded
+      )
+   }, [expandedPlayingIndex, isLiveStreamDialogOpen, isPausedExpanded])
+
+   const toggleExpandedPlaying = useCallback(() => {
+      setIsPausedExpanded((prev) => !prev)
+   }, [])
 
    const handleExpandCardClick = useCallback(
       (index: number) => {
@@ -115,6 +130,10 @@ export const HighlightsProvider = ({
    }, [router.query.highlightId])
 
    useEffect(() => {
+      setIsPausedExpanded(false)
+   }, [expandedPlayingIndex])
+
+   useEffect(() => {
       if (!isLiveStreamDialogOpen && !isExpanded(autoPlayingIndex)) {
          const interval = setInterval(() => {
             setAutoPlayingIndex((prevIndex) => {
@@ -137,6 +156,8 @@ export const HighlightsProvider = ({
          isLiveStreamDialogOpen,
          handleLiveStreamDialogOpen,
          handleLiveStreamDialogClose,
+         isPlayingExpanded,
+         toggleExpandedPlaying,
       }),
       [
          autoPlayingIndex,
@@ -149,6 +170,8 @@ export const HighlightsProvider = ({
          isLiveStreamDialogOpen,
          handleLiveStreamDialogOpen,
          handleLiveStreamDialogClose,
+         isPlayingExpanded,
+         toggleExpandedPlaying,
       ]
    )
 

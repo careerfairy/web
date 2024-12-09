@@ -3,6 +3,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { SyntheticEvent, forwardRef, useEffect } from "react"
 import { X as CloseIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { useHighlights } from "./HighlightsBlockContext"
 
 const styles = sxStyles({
    desktopContainer: {
@@ -124,6 +125,7 @@ Desktop.displayName = "ExpandedCard.Desktop"
 export const ExpandedCard = forwardRef<HTMLDivElement, ExpandedProps>(
    (props, ref) => {
       const isMobile = useIsMobile()
+      const { toggleExpandedPlaying } = useHighlights()
 
       useEffect(() => {
          const originalStyle = window.getComputedStyle(document.body).overflow
@@ -134,11 +136,16 @@ export const ExpandedCard = forwardRef<HTMLDivElement, ExpandedProps>(
          }
       }, [])
 
-      return isMobile ? (
-         <Mobile {...props} />
-      ) : (
-         <Box sx={styles.desktopContainer}>
-            <Desktop {...props} ref={ref} />
+      return (
+         <Box
+            sx={!isMobile && styles.desktopContainer}
+            onClick={toggleExpandedPlaying}
+         >
+            {isMobile ? (
+               <Mobile {...props} />
+            ) : (
+               <Desktop {...props} ref={ref} />
+            )}
          </Box>
       )
    }

@@ -30,10 +30,10 @@ export const SparkCard = ({ spark, index }: SparkCardProps) => {
    const sparkData = useSpark(spark.sparkId)
    const {
       shouldAutoPlay,
-      handleEndedPlaying,
       isExpanded,
       handleExpandCardClick,
       handleCloseCardClick,
+      isPlayingExpanded,
    } = useHighlights()
 
    const sparkPresenter = useMemo(() => {
@@ -51,13 +51,12 @@ export const SparkCard = ({ spark, index }: SparkCardProps) => {
                disableAutoPlay={isMobile}
                questionLimitLines
                muted
-               onVideoEnded={handleEndedPlaying}
             />
          </Box>
          {isExpanded(index) && (
             <ExpandedSparkCard
                spark={sparkPresenter}
-               playing={true}
+               playing={isPlayingExpanded}
                onClose={handleCloseCardClick}
             />
          )}
