@@ -62,6 +62,7 @@ const styles = sxStyles({
       position: "relative",
    },
    infoContainer: {
+      maxWidth: "100%",
       textAlign: "center",
    },
    companyLogoContainer: {
@@ -89,6 +90,10 @@ const styles = sxStyles({
    companyNameBold: {
       fontWeight: 600,
       color: (theme) => theme.palette.neutral["600"],
+      textOverflow: "ellipsis",
+      overflow: "hidden",
+      whiteSpace: "nowrap",
+      display: "block",
    },
    followButton: {
       padding: "8px 16px",

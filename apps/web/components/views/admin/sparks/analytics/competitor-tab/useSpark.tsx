@@ -9,7 +9,7 @@ import { useMemo } from "react"
 /**
  * Fetches the data of a given spark
  **/
-const useSpark = (sparkId: string) => {
+const useSpark = (sparkId: string): Spark | null => {
    const sparkByIdQuery = useMemo(() => {
       return query(
          collection(FirestoreInstance, "sparks"),
