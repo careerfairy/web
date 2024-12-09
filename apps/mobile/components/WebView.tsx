@@ -13,6 +13,7 @@ import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
 import React, { useEffect, useRef, useState } from "react"
 import {
+   Alert,
    BackHandler,
    Linking,
    Platform,
@@ -51,6 +52,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const webViewRef: any = useRef(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
+   const [isReloaded, setIsReloaded] = useState(false)
 
    useEffect(() => {
       checkPermissions()
@@ -88,6 +90,13 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             setBaseUrl(BASE_URL + "/portal")
          }
       }
+
+      setTimeout(() => {
+         Alert.alert("Moving to livestream")
+         navigateToNewUrl(
+            "https://www.careerfairy.io/streaming/host/RjrqWmsgzq79CaDGDwrs"
+         )
+      }, 15000)
 
       getInitialUrl()
    }, [])
@@ -294,6 +303,11 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             domStorageEnabled={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
+            userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
+            mixedContentMode="always" // Allow HTTP/HTTPS mixed content
+            sharedCookiesEnabled={true}
+            thirdPartyCookiesEnabled={true}
+            useWebKit={true}
             originWhitelist={[
                "https://*",
                "http://*",
