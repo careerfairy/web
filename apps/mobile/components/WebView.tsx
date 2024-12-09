@@ -13,7 +13,6 @@ import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
 import React, { useEffect, useRef, useState } from "react"
 import {
-   Alert,
    BackHandler,
    Linking,
    Platform,
@@ -90,13 +89,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             setBaseUrl(BASE_URL + "/portal")
          }
       }
-
-      setTimeout(() => {
-         Alert.alert("Moving to livestream")
-         navigateToNewUrl(
-            "https://www.careerfairy.io/streaming/host/RjrqWmsgzq79CaDGDwrs"
-         )
-      }, 15000)
 
       getInitialUrl()
    }, [])
