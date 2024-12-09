@@ -1,14 +1,15 @@
+import { CompanyIcon } from "components/views/common/icons"
 import { useEffect, useState } from "react"
 import {
+   Calendar as CalendarIcon,
+   Search as FindIcon,
+   User as ProfileIcon,
+   Smartphone as SmartphoneIcon,
    BarChart2 as StatisticsIcon,
    Film as StreamIcon,
-   User as ProfileIcon,
-   Search as FindIcon,
-   Calendar as CalendarIcon,
 } from "react-feather"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import { CompanyIcon } from "components/views/common/icons"
 
 const initialHeaderLinks = [
    {
@@ -34,6 +35,18 @@ const initialDrawerBottomLinks = [
       title: "About Us",
       basePath: "/about-us",
    },
+]
+
+const pushNotificationTesters = [
+   "matilde.ramos@careerfairy.io",
+   "goncalo@careerfairy.io",
+   "puzic.sead@gmail.com",
+   "simone@careerfairy.io",
+   "habib@careerfairy.io",
+   "lucas@careerfairy.io",
+   "carlos.rijo@careerfairy.io",
+   "walter@careerfairy.io",
+   "amal-thomas.roy@careerfairy.io",
 ]
 const useAdminLinks = () => {
    const { userData } = useAuth()
@@ -95,6 +108,16 @@ const useAdminLinks = () => {
                title: "Query Users",
                basePath: `/admin/query-users`,
             },
+            ...(pushNotificationTesters.includes(userData.userEmail)
+               ? [
+                    {
+                       href: `/admin/saved-push-notifications`,
+                       icon: SmartphoneIcon,
+                       title: "Push Notifications",
+                       basePath: `/admin/saved-push-notifications`,
+                    },
+                 ]
+               : []),
             {
                href: `/admin/academic-calendar-manager`,
                icon: CalendarIcon,
@@ -111,7 +134,7 @@ const useAdminLinks = () => {
       } else {
          setDrawerTopLinks([])
       }
-   }, [userData?.isAdmin])
+   }, [userData?.isAdmin, userData?.userEmail])
 
    return { drawerBottomLinks, drawerTopLinks, headerLinks }
 }
