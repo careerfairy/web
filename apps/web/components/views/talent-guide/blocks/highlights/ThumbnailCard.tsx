@@ -83,14 +83,12 @@ const ThumbnailHeader = ({
 type ThumbnailCardProps = {
    highlight: HighlightComponentType
    isPlaying: boolean
-   onEnded: () => void
    group: Group
 }
 
 export const ThumbnailCard = ({
    highlight,
    isPlaying,
-   onEnded,
    group,
 }: ThumbnailCardProps) => {
    const playerRef = useRef<ReactPlayer>(null)
@@ -113,7 +111,6 @@ export const ThumbnailCard = ({
             playing={isPlaying}
             muted
             playsinline
-            onEnded={onEnded}
             preload="metadata"
             controls={false}
          />
