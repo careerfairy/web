@@ -31,8 +31,8 @@ export interface IUserFunctionsRepository extends IUserRepository {
       lastActivityMonths?: number
    ): Promise<UserData[]>
 
-   getSubscribedUsersByCountryCode(
-      countryCode: string,
+   getSubscribedUsersByCountryCodes(
+      countryCodes: string[],
       userEmails?: string[]
    ): Promise<UserData[]>
    /**
@@ -120,14 +120,14 @@ export class UserFunctionsRepository
       return mapFirestoreDocuments(data)
    }
 
-   async getSubscribedUsersByCountryCode(
-      countryCode: string,
+   async getSubscribedUsersByCountryCodes(
+      countryCodes: string[],
       userEmails?: string[]
    ): Promise<UserData[]> {
       let query = this.firestore
          .collection("userData")
          .where("unsubscribed", "==", false)
-         .where("universityCountryCode", "==", countryCode)
+         .where("universityCountryCode", "in", countryCodes)
 
       if (userEmails?.length) {
          const withinLimit = isWithinNormalizationLimit(30, userEmails)
