@@ -7,7 +7,9 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
-import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
+import FeedCardActions, {
+   FEED_CARD_ACTIONS_CLASS_NAME,
+} from "components/views/sparks-feed/FeedCardActions"
 import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
 import SparkDetails from "components/views/sparks/components/spark-card/SparkDetails"
 import SparkJobButton from "components/views/sparks/components/spark-card/SparkJobButton"
@@ -74,13 +76,13 @@ const styles = sxStyles({
       background: "rgba(255, 255, 255, 0.15)",
       backdropFilter: "blur(10px)",
       padding: "12px",
-      "& .FeedCardActions-root": { margin: 0 },
+      [`& .${FEED_CARD_ACTIONS_CLASS_NAME}`]: { margin: 0 },
       "& .MuiButtonBase-root": {
          background: (theme) => theme.brand.white["500"],
       },
    },
    actionsWrapperMobile: {
-      "& .FeedCardActions-root": { margin: 0 },
+      [`& .${FEED_CARD_ACTIONS_CLASS_NAME}`]: { margin: 0 },
       "& .MuiButtonBase-root": {
          background: "transparent",
       },
