@@ -5,7 +5,9 @@ import {
    createSavedNotification,
    updateSavedNotification,
    getSavedNotification,
-} from "../../data/firebase/FirestoreService"
+   NotificationData,
+   NotificationResponse,
+} from "../../data/firebase/PushNotificationsService"
 import Button from "@mui/material/Button"
 import Head from "next/head"
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout"
@@ -106,12 +108,14 @@ const CreateNotification = ({ notification }) => {
 
    useEffect(() => {
       if (notificationId) {
-         getSavedNotification(notificationId).then((response: any) => {
-            setTitle(response.title)
-            setBody(response.body)
-            setUrl(response.url)
-            setFilters(response.filters)
-         })
+         getSavedNotification(notificationId).then(
+            (response: NotificationResponse) => {
+               setTitle(response.title)
+               setBody(response.body)
+               setUrl(response.url)
+               setFilters(response.filters)
+            }
+         )
       }
    }, [notificationId])
 
@@ -138,7 +142,7 @@ const CreateNotification = ({ notification }) => {
 
    const submitForm = async (values: any) => {
       if (update) {
-         const data = { title, body, url, filters: values }
+         const data: NotificationData = { title, body, url, filters: values }
          if (notificationId) {
             await updateSavedNotification(notificationId, data)
             alert("Notification successfully updated!")

@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation"
 import Button from "@mui/material/Button"
 import Head from "next/head"
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout"
-import { deleteSavedNotification } from "../../data/firebase/FirestoreService"
+import { deleteSavedNotification } from "../../data/firebase/PushNotificationsService"
 
 const SavedPushNotifications = () => {
    const [loading, setLoading] = useState(false)
