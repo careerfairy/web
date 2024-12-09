@@ -24,6 +24,8 @@ const TAB_VALUES = {
 
 const JOBS_DIALOG_LINK = "/profile/my-jobs/jobs"
 
+const TALENT_PROFILE_JOBS_DIALOG_LINK = "/profile/career/jobs"
+
 const styles = sxStyles({
    tabs: {
       "& *": {
@@ -241,6 +243,7 @@ const UserInitiatedCustomJobs = () => {
 
 const UserInitiatedCustomJobsView = () => {
    const { userData } = useAuth()
+   const { talentProfileV1 } = useFeatureFlags()
    const initiatedJobs = useUserInitiatedJobs(userData.id)
    const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(initiatedJobs)
 
@@ -249,7 +252,9 @@ const UserInitiatedCustomJobsView = () => {
    return (
       <CustomJobsList
          customJobs={initiatedJobs}
-         hrefLink={JOBS_DIALOG_LINK}
+         hrefLink={
+            talentProfileV1 ? TALENT_PROFILE_JOBS_DIALOG_LINK : JOBS_DIALOG_LINK
+         }
          jobWrapperSx={styles.jobWrapper}
          jobsGroupNamesMap={jobsGroupNamesMap}
       />
@@ -266,6 +271,7 @@ const UserAppliedCustomJobs = () => {
 
 const UserAppliedCustomJobsView = () => {
    const { userData } = useAuth()
+   const { talentProfileV1 } = useFeatureFlags()
    const appliedJobs = useUserAppliedJobs(userData.id)
 
    const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(appliedJobs)
@@ -275,7 +281,9 @@ const UserAppliedCustomJobsView = () => {
    return (
       <CustomJobsList
          customJobs={appliedJobs}
-         hrefLink={JOBS_DIALOG_LINK}
+         hrefLink={
+            talentProfileV1 ? TALENT_PROFILE_JOBS_DIALOG_LINK : JOBS_DIALOG_LINK
+         }
          jobWrapperSx={styles.jobWrapper}
          jobsGroupNamesMap={jobsGroupNamesMap}
          applied
