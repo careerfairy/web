@@ -75,7 +75,7 @@ export const LinkFormFields = () => {
             placeholder="E.g., behance.net/user"
             disabled={isSubmitting}
             fullWidth
-            autoCapitalize="off"
+            autoCapitalize="none"
          />
       </Stack>
    )

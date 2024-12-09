@@ -11,8 +11,6 @@ if (!hygraphUrl || !hygraphToken || !hygraphPreviewToken) {
       !hygraphPreviewToken && "HYGRAPH_TALENT_GUIDE_PREVIEW_TOKEN",
    ].filter(Boolean)
 
-   console.log("🚀 ~ process.env.APP_ENV:", process.env.APP_ENV)
-
    if (process.env.APP_ENV !== "test") {
       throw new Error(
          `Missing Hygraph environment variables: ${missingConfigs.join(", ")}`
