@@ -16,13 +16,14 @@ const styles = sxStyles({
 })
 
 type Props = {
+   isPlaying: boolean
    highlight: HighlightComponentType
    group: Group
    onEnded: () => void
    onClose: (event: SyntheticEvent) => void
 }
 
-const Mobile = ({ highlight, group, onEnded }: Props) => (
+const Mobile = ({ isPlaying, highlight, group, onEnded }: Props) => (
    <>
       <ExpandedHeader highlight={highlight} group={group} />
       <ReactPlayer
@@ -30,7 +31,7 @@ const Mobile = ({ highlight, group, onEnded }: Props) => (
          width="100%"
          height="100%"
          url={highlight.videoClip.url}
-         playing
+         playing={isPlaying}
          onEnded={onEnded}
          playsinline
       />
@@ -38,14 +39,14 @@ const Mobile = ({ highlight, group, onEnded }: Props) => (
    </>
 )
 
-const Desktop = ({ highlight, group, onEnded }: Props) => (
+const Desktop = ({ isPlaying, highlight, group, onEnded }: Props) => (
    <>
       <ReactPlayer
          url={highlight.videoClip.url}
          className="react-player"
          width="100%"
          height="100%"
-         playing
+         playing={isPlaying}
          onEnded={onEnded}
          playsinline
       />
