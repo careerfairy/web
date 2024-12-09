@@ -15,7 +15,6 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
    const isDesktop = useIsDesktop()
    const {
       shouldAutoPlay,
-      handleEndedPlaying,
       isExpanded,
       handleCloseCardClick,
       handleExpandCardClick,
@@ -39,7 +38,6 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
             <ThumbnailCard
                highlight={highlight}
                isPlaying={shouldAutoPlay(index)}
-               onEnded={handleEndedPlaying}
                group={group}
             />
          </Box>
@@ -48,7 +46,6 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
                isPlaying={!isLiveStreamDialogOpen}
                highlight={highlight}
                group={group}
-               onEnded={handleEndedPlaying}
                onClose={handleCloseCardClick}
             />
          )}

@@ -19,7 +19,6 @@ type Props = {
    isPlaying: boolean
    highlight: HighlightComponentType
    group: Group
-   onEnded: () => void
    onClose: (event: SyntheticEvent) => void
 }
 
@@ -27,7 +26,6 @@ export const HighlightExpanded = ({
    isPlaying,
    highlight,
    group,
-   onEnded,
    onClose,
 }: Props) => {
    const isMobile = useIsMobile()
@@ -41,24 +39,16 @@ export const HighlightExpanded = ({
             width="100%"
             height="100%"
             playing={isPlaying}
-            onEnded={onEnded}
             playsinline
+            loop
             onReady={() => setIsVideoReady(true)}
          />
-         {Boolean(isVideoReady) &&
-            (isMobile ? (
-               <>
-                  <ExpandedHeader highlight={highlight} group={group} />
-                  <HighlightVideoOverlay />
-               </>
-            ) : (
-               <>
-                  <Box sx={styles.desktopHeaderContainer}>
-                     <ExpandedHeader highlight={highlight} group={group} />
-                     <HighlightVideoOverlay />
-                  </Box>
-               </>
-            ))}
+         {Boolean(isVideoReady) && (
+            <Box sx={!isMobile && styles.desktopHeaderContainer}>
+               <ExpandedHeader highlight={highlight} group={group} />
+               <HighlightVideoOverlay />
+            </Box>
+         )}
       </ExpandedCard>
    )
 }
