@@ -15,6 +15,12 @@ const styles = sxStyles({
       fontWeight: "400",
       color: (theme) => theme.palette.neutral["800"],
    },
+   carouselViewport: {
+      // hack to ensure shadows are not cut off
+      padding: "16px",
+      margin: "-16px",
+      width: "calc(100% + 16px)",
+   },
 })
 
 type Props = MentorsCarouselBlockType
@@ -44,12 +50,7 @@ const MentorsCarousel = () => {
       <Box sx={{ padding: 3 }}>
          <ContentCarousel
             slideWidth={MentorCard.width}
-            viewportSx={{
-               // hack to ensure shadows are not cut off
-               padding: "16px",
-               margin: "-16px",
-               width: "calc(100% + 16px)",
-            }}
+            viewportSx={styles.carouselViewport}
             emblaProps={{
                emblaOptions: {
                   dragFree: true,
