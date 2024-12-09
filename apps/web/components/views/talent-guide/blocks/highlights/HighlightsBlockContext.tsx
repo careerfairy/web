@@ -1,3 +1,4 @@
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { HighlightsBlockType } from "data/hygraph/types"
@@ -19,7 +20,6 @@ type HighlightsContextType = {
    isExpanded: (index: number) => boolean
    handleExpandCardClick: (index: number) => () => void
    handleCloseCardClick: () => void
-   handleEndedPlaying: () => void
    setAutoPlayingIndex: (index: number) => void
    isLiveStreamDialogOpen: boolean
    handleLiveStreamDialogOpen: () => void
@@ -108,19 +108,22 @@ export const HighlightsProvider = ({
       )
    }, [router])
 
-   const handleEndedPlaying = useCallback(() => {
-      if (!isMobile) return
-
-      setAutoPlayingIndex((prevIndex) => {
-         return (prevIndex + 1) % highlights.length
-      })
-   }, [isMobile, highlights])
-
    useEffect(() => {
       if (!router.query.highlightId) {
          setExpandedPlayingIndex(undefined)
       }
    }, [router.query.highlightId])
+
+   useEffect(() => {
+      if (!isLiveStreamDialogOpen && !isExpanded(autoPlayingIndex)) {
+         const interval = setInterval(() => {
+            setAutoPlayingIndex((prevIndex) => {
+               return (prevIndex + 1) % highlights.length
+            })
+         }, SPARK_CONSTANTS.SECONDS_TO_AUTO_PLAY)
+         return () => clearInterval(interval)
+      }
+   }, [highlights.length, isExpanded, isLiveStreamDialogOpen, autoPlayingIndex])
 
    const contextValue = useMemo(
       () => ({
@@ -130,7 +133,6 @@ export const HighlightsProvider = ({
          isExpanded,
          handleExpandCardClick,
          handleCloseCardClick,
-         handleEndedPlaying,
          setAutoPlayingIndex,
          isLiveStreamDialogOpen,
          handleLiveStreamDialogOpen,
@@ -143,7 +145,6 @@ export const HighlightsProvider = ({
          isExpanded,
          handleExpandCardClick,
          handleCloseCardClick,
-         handleEndedPlaying,
          setAutoPlayingIndex,
          isLiveStreamDialogOpen,
          handleLiveStreamDialogOpen,
