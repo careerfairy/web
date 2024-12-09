@@ -46,7 +46,7 @@ service cloud.firestore {
             allow write: if isCFAdmin();
         }
 
-       match /savedNotifications/{savedNotification} {
+       match /pushNotifications/{savedNotification} {
             allow read: if true;
             allow write: if isCFAdmin();
        }

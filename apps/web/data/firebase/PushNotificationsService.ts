@@ -26,7 +26,7 @@ export type MessageBody = {
 
 export const createSavedNotification = async (data: NotificationData) => {
    try {
-      const ref = await firestore.collection("savedNotifications").add({
+      const ref = await firestore.collection("pushNotifications").add({
          ...data,
          createdAt: new Date(),
       })
@@ -40,7 +40,7 @@ export const getSavedNotification = async (
    id: string
 ): Promise<NotificationResponse> => {
    try {
-      const notificationRef = firestore.collection("savedNotifications").doc(id)
+      const notificationRef = firestore.collection("pushNotifications").doc(id)
       const doc = await notificationRef.get()
       if (doc.exists) {
          return { id: doc.id, ...(doc.data() as NotificationData) }
@@ -59,7 +59,7 @@ export const updateSavedNotification = async (
    data: NotificationData
 ) => {
    try {
-      await firestore.collection("savedNotifications").doc(id).update(data)
+      await firestore.collection("pushNotifications").doc(id).update(data)
    } catch (error) {
       console.error("Error updating notification:", error)
    }
@@ -67,7 +67,7 @@ export const updateSavedNotification = async (
 
 export const deleteSavedNotification = async (id: string) => {
    try {
-      await firestore.collection("savedNotifications").doc(id).delete()
+      await firestore.collection("pushNotifications").doc(id).delete()
    } catch (error) {
       console.error("Error deleting notification:", error)
    }
