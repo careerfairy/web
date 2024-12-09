@@ -19,7 +19,7 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
       handleCloseCardClick,
       handleExpandCardClick,
       setAutoPlayingIndex,
-      isLiveStreamDialogOpen,
+      isPlayingExpanded,
    } = useHighlights()
 
    const { data: group, status } = useGroup(
@@ -43,7 +43,7 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
          </Box>
          {isExpanded(index) && (
             <HighlightExpanded
-               isPlaying={!isLiveStreamDialogOpen}
+               isPlaying={isPlayingExpanded}
                highlight={highlight}
                group={group}
                onClose={handleCloseCardClick}
