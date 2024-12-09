@@ -112,12 +112,12 @@ const SparkPreviewCardContainer: FC<Props> = ({
          <VideoPreview
             thumbnailUrl={video.thumbnailUrl}
             videoUrl={video.url}
-            pausing={autoPlayEnabled ? !autoPlaying : undefined}
+            pausing={autoPlayEnabled ? !autoPlaying : false}
             playing={autoPlayEnabled ? autoPlaying : video.preview}
             light={false}
             autoPlaying={autoPlaying}
             containPreviewOnTablet
-            muted={video.muted || autoPlayEnabled ? true : undefined}
+            muted={video.muted || autoPlayEnabled ? true : false}
             identifier={video.url}
             onVideoEnded={onVideoEnded}
          />
