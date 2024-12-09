@@ -1,6 +1,6 @@
 import { Box, Dialog, IconButton } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { SyntheticEvent, forwardRef } from "react"
+import { SyntheticEvent, forwardRef, useEffect } from "react"
 import { X as CloseIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -124,6 +124,16 @@ Desktop.displayName = "ExpandedCard.Desktop"
 export const ExpandedCard = forwardRef<HTMLDivElement, ExpandedProps>(
    (props, ref) => {
       const isMobile = useIsMobile()
+
+      useEffect(() => {
+         const originalStyle = window.getComputedStyle(document.body).overflow
+         document.body.style.overflow = "hidden"
+
+         return () => {
+            document.body.style.overflow = originalStyle
+         }
+      }, [])
+
       return isMobile ? (
          <Mobile {...props} />
       ) : (
