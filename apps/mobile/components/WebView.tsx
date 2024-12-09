@@ -51,7 +51,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const webViewRef: any = useRef(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
-   const [isReloaded, setIsReloaded] = useState(false)
 
    useEffect(() => {
       checkPermissions()
