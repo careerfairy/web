@@ -2,7 +2,6 @@ import { convertDocArrayToDict } from "@careerfairy/shared-lib/BaseFirebaseRepos
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { ManualTemplatedEmailBuilder } from "./ManualTemplatedEmailBuilder"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
-import { ISparkFunctionsRepository } from "./sparks/SparkFunctionsRepository"
 
 const FIELD_OF_STUDIES = [
    "business_administration_economics",
@@ -47,8 +46,6 @@ export class ManualTemplatedEmailService {
 
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      private readonly sparksRepo: ISparkFunctionsRepository,
       private readonly emailBuilder: ManualTemplatedEmailBuilder,
       private readonly logger: Logger
    ) {}

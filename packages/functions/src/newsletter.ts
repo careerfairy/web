@@ -7,7 +7,6 @@ import {
    emailNotificationsRepo,
    groupRepo,
    livestreamsRepo,
-   sparkRepo,
    userRepo,
 } from "./api/repositories"
 import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
@@ -180,7 +179,6 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
 
    const newsletterService = new ManualTemplatedEmailService(
       userRepo,
-      sparkRepo,
       emailBuilder,
       logger
    )
