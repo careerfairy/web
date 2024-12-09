@@ -55,7 +55,9 @@ export const StudyDomainSelector = ({
          textFieldProps={{
             requiredText: requiredText,
             placeholder: placeholder,
-            inputMode: disableInput ? "none" : "search",
+            InputProps: {
+               inputMode: disableInput ? "none" : "search",
+            },
          }}
          autocompleteProps={{
             id: fieldName,
