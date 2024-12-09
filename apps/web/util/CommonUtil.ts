@@ -253,6 +253,15 @@ export const shouldUseEmulators = () => {
  * solving issues related to Docker deployments and environment variables.
  */
 export const getWorkflowId = (): string => {
+   console.log(
+      "🚀 ~ NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:",
+      publicRuntimeConfig.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
+   )
+   console.log(
+      "🚀 ~  process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:",
+      process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
+   )
+
    return (
       process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
       process.env.NEXT_PUBLIC_DEV_NAME ||
