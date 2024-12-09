@@ -7,7 +7,6 @@ import {
    emailNotificationsRepo,
    groupRepo,
    livestreamsRepo,
-   sparkRepo,
    userRepo,
 } from "./api/repositories"
 import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
@@ -97,7 +96,7 @@ export const manualNewsletter = onRequest(runtimeSettings, async (req, res) => {
 export const manualTemplatedEmail = onRequest(
    runtimeSettings,
    async (req, res) => {
-      logger.info("manualTemplatedEmail: v9.0 - fill and win")
+      logger.info("manualTemplatedEmail: v10.0 - X-mas newsletter")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -118,11 +117,11 @@ export const manualTemplatedEmail = onRequest(
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("Fill and win email sent to everyone")
+         res.status(200).send("X-mas newsletter email sent to everyone")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "Fill and win email sent to " + receivedEmails.join(", ")
+            "X-mas newsletter email sent to " + receivedEmails.join(", ")
          )
       }
    }
@@ -169,7 +168,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      logger.info("Fill and win email already sent, skipping")
+      logger.info("X-mas newsletter email already sent, skipping")
       return
    }
 
@@ -180,7 +179,6 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
 
    const newsletterService = new ManualTemplatedEmailService(
       userRepo,
-      sparkRepo,
       emailBuilder,
       logger
    )
@@ -194,7 +192,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   logger.info("Fill and win execution done")
+   logger.info("X-mas newsletter execution done")
 }
 
 /**
