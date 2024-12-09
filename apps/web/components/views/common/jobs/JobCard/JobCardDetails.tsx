@@ -279,7 +279,10 @@ const JobCardDetails = ({
 
                {(isMobile || smallCard) && previewMode ? (
                   <JobButtonAction
-                     published={jobPublished}
+                     published={
+                        jobPublished ||
+                        (talentProfileV1 && jobApplication.alreadyApplied)
+                     }
                      smallCard={smallCard}
                   />
                ) : null}
