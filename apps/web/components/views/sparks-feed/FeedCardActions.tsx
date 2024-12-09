@@ -46,6 +46,7 @@ import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
 const actionWidth = 48
 const fullScreenActionWidth = 40
+export const FEED_CARD_ACTIONS_CLASS_NAME = "FeedCardActions-root"
 
 const styles = sxStyles({
    hidden: {
@@ -192,7 +193,7 @@ const FeedCardActions: FC<Props> = ({
       <Stack
          spacing={3}
          sx={[styles.root, hide && styles.hidden]}
-         className="FeedCardActions-root"
+         className={FEED_CARD_ACTIONS_CLASS_NAME}
       >
          {!hideActions.includes("company") && (
             <CompanyPageAction
