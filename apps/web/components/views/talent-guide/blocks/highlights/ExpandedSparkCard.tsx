@@ -29,7 +29,7 @@ import { ExpandedCard } from "./ExpandedCard"
 
 const styles = sxStyles({
    root: {
-      aspectRatio: "9/16",
+      width: "100%",
       height: "100%",
       color: "white",
       display: "flex",
@@ -37,6 +37,10 @@ const styles = sxStyles({
       position: "relative",
       flexDirection: "column",
       overflow: "hidden",
+   },
+   rootDesktop: {
+      width: "auto",
+      aspectRatio: "9/16",
    },
    cardContent: {
       zIndex: 1,
@@ -182,7 +186,7 @@ export const ExpandedSparkCard = ({ spark, playing, onClose }: Props) => {
 
    return (
       <ExpandedCard onClose={onClose} ref={dialogRef}>
-         <Box sx={styles.root}>
+         <Box sx={[styles.root, !isMobile && styles.rootDesktop]}>
             <Box sx={styles.cardContent}>
                <VideoPreview
                   thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
