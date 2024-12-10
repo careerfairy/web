@@ -290,6 +290,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                "about:",
             ]}
             onNavigationStateChange={handleNavigationStateChange}
+            setSupportMultipleWindows={false}
          />
       </SafeAreaView>
    )
