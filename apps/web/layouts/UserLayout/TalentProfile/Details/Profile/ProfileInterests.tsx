@@ -1,6 +1,6 @@
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { ProfileInterest } from "@careerfairy/shared-lib/users"
-import { Box, Chip, Grid } from "@mui/material"
+import { Box, Chip } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { userRepo } from "data/RepositoryInstances"
@@ -164,15 +164,13 @@ const InterestsList = () => {
       dispatch(openCreateDialog({ type: TalentProfileItemTypes.Interest }))
    }, [dispatch])
 
-   const userBusinessFunctionsTagIds: string[] =
-      userData.businessFunctionsTagIds ?? []
-   const userContentTopicsTagIds: string[] = userData.contentTopicsTagIds ?? []
-
-   // TODO-WG: Probably sorted
-   const allTagIds = [
-      ...userBusinessFunctionsTagIds,
-      ...userContentTopicsTagIds,
-   ]
+   const allTagIds = useMemo(() => {
+      const businessFunctionsTagIds = userData.businessFunctionsTagIds ?? []
+      const contentTopicsTagIds = userData.contentTopicsTagIds ?? []
+      return [...businessFunctionsTagIds, ...contentTopicsTagIds].sort((a, b) =>
+         TagValuesLookup[a].localeCompare(TagValuesLookup[b])
+      )
+   }, [userData.businessFunctionsTagIds, userData.contentTopicsTagIds])
 
    if (!allTagIds.length)
       return (
@@ -190,10 +188,10 @@ const InterestsList = () => {
       )
 
    return (
-      <Grid container>
+      <Box>
          {allTagIds.map((tagId) => (
             <Chip sx={styles.chip} key={tagId} label={TagValuesLookup[tagId]} />
          ))}
-      </Grid>
+      </Box>
    )
 }
