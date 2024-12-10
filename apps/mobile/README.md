@@ -167,9 +167,35 @@ or from the root
 npm run native-build:prod
 ```
 
-NOTE: For iOS build, you need apple credentials
+---
 
-After build, starts, you will get a link of current build process, or just go to https://expo.dev/, login to the account, go to dashboard and click on latest build.
+### Local Development Build
+
+1. Run
+
+```bash
+npm run dev
+```
+
+2. On next terminal window, run (from root)
+
+```bash
+npm run native:cache
+```
+
+#### For iOS
+
+In .env file, replace current to this:
+
+BASE_URL=http://127.0.0.1:3000 and
+SEARCH_CRITERIA=127.0.0.1
+
+after running the script, type 'i' to run iOS emulator
+
+#### For Android and Expo GO application
+
+BASE_URL=http://{your_local_ip_address}:3000 (when running ios simulator, you get message Opening exp -> that IP address is the one) and
+SEARCH_CRITERIA={your_local_ip_address}
 
 ---
 
