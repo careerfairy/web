@@ -1,4 +1,8 @@
 import { loadTestEnv } from "./envConfig"
 
-// Load test environment variables before running Playwright tests
-loadTestEnv()
+async function globalSetup() {
+   // Load test environment variables before running Playwright tests
+   loadTestEnv()
+}
+
+export default globalSetup
