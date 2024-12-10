@@ -80,8 +80,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          const response = await Notifications.getLastNotificationResponseAsync()
          if (response && response.notification.request.content.data.url) {
             setBaseUrl(response.notification.request.content.data.url)
-         } else {
-            setBaseUrl(BASE_URL + "/portal")
          }
       }
 
