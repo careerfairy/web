@@ -28,7 +28,7 @@ export class ManualTemplatedEmailBuilder {
             },
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "fill-and-win",
+         Tag: "x-mas-newsletter",
       })
    }
 

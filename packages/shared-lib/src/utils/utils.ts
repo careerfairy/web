@@ -1,6 +1,15 @@
 import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
 import { LivestreamEvent } from "../livestreams"
 import { SparkStats } from "../sparks/sparks"
+import { generateCalendarEventProperties } from "./calendarEvents"
+
+export type CalendarEvent = {
+   startsAt: string
+   endsAt: string
+   name: string
+   details: string
+   location: string
+}
 
 /*
  *
@@ -196,6 +205,161 @@ export const addUtmTagsToLink = ({
    url.search = params.toString()
 
    return url.toString()
+}
+
+const makeDuration = function (event: CalendarEvent): string {
+   const minutes = Math.floor(
+      (+new Date(event.endsAt) - +new Date(event.startsAt)) / 60 / 1000
+   )
+   return (
+      "" +
+      ("0" + Math.floor(minutes / 60)).slice(-2) +
+      ("0" + (minutes % 60)).slice(-2)
+   )
+}
+
+const makeTime = function (time: string): string {
+   return new Date(time).toISOString().replace(/[-:]|\.\d{3}/g, "")
+}
+
+const makeUrl = function (
+   base: string,
+   query: Record<string, string | null | number | boolean>,
+   errorLogAndNotify?: (error: Error) => void
+): string {
+   return Object.keys(query).reduce(function (accum, key, index) {
+      const value = query[key]
+      if (value !== null) {
+         let encodedValue = ""
+
+         try {
+            encodedValue = encodeURIComponent(value)
+         } catch (error) {
+            errorLogAndNotify(error)
+            throw error
+         }
+
+         return (
+            "" + accum + (index === 0 ? "?" : "&") + key + "=" + encodedValue
+         )
+      }
+      return accum
+   }, base)
+}
+
+const makeGoogleCalendarUrl = function (
+   event: CalendarEvent,
+   errorLog?: (error: Error) => void
+): string {
+   return makeUrl(
+      "https://calendar.google.com/calendar/render",
+      {
+         action: "TEMPLATE",
+         dates: makeTime(event.startsAt) + "/" + makeTime(event.endsAt),
+         location: event.location,
+         text: event.name,
+         details: event.details,
+      },
+      errorLog
+   )
+}
+
+const makeOutlookCalendarUrl = function (
+   event: CalendarEvent,
+   errorLog?: (error: Error) => void
+): string {
+   return makeUrl(
+      "https://outlook.live.com/owa",
+      {
+         rru: "addevent",
+         startdt: event.startsAt,
+         enddt: event.endsAt,
+         subject: event.name,
+         location: event.location,
+         body: event.details,
+         allday: false,
+         uid: new Date().getTime().toString(),
+         path: "/calendar/view/Month",
+      },
+      errorLog
+   )
+}
+
+const makeYahooCalendarUrl = function (
+   event: CalendarEvent,
+   errorLog?: (error: Error) => void
+): string {
+   return makeUrl(
+      "https://calendar.yahoo.com",
+      {
+         v: 60,
+         view: "d",
+         type: 20,
+         title: event.name,
+         st: makeTime(event.startsAt),
+         dur: makeDuration(event),
+         desc: event.details,
+         in_loc: event.location,
+      },
+      errorLog
+   )
+}
+
+const makeICSCalendarUrl = function (event: CalendarEvent): string {
+   const components = ["BEGIN:VCALENDAR", "VERSION:2.0", "BEGIN:VEVENT"]
+   // In case of SSR, document won't be defined
+   if (typeof document !== "undefined") {
+      // remove any hash from the url
+      const urlComponent = "URL:" + document.URL.split("#")[0]
+      components.push(urlComponent)
+   }
+   components.push(
+      `DTSTART:${makeTime(event.startsAt)}`,
+      `DTEND:${makeTime(event.endsAt)}`,
+      `SUMMARY:${event.name}`,
+      `DESCRIPTION:${event.details}`,
+      `LOCATION:${event.location}`,
+      "END:VEVENT",
+      "END:VCALENDAR"
+   )
+   return encodeURI("data:text/calendar;charset=utf8," + components.join("\n"))
+}
+
+export const makeUrls = function (
+   event: CalendarEvent,
+   errorLog?: (error: Error) => void
+): {
+   google: string
+   outlook: string
+   yahoo: string
+   ics: string
+} {
+   return {
+      google: makeGoogleCalendarUrl(event, errorLog),
+      outlook: makeOutlookCalendarUrl(event, errorLog),
+      yahoo: makeYahooCalendarUrl(event, errorLog),
+      ics: makeICSCalendarUrl(event),
+   }
+}
+
+export const createCalendarEvent = (
+   livestream: LivestreamEvent,
+   customUtm?: Partial<AddUtmTagsToLinkProps>
+) => {
+   if (!livestream) return null
+
+   const calendarEventProps = generateCalendarEventProperties(
+      livestream,
+      customUtm
+   )
+
+   return {
+      name: calendarEventProps.summary,
+      details: calendarEventProps.description,
+      location: calendarEventProps.location,
+      startsAt: calendarEventProps.start.toISOString(),
+      endsAt: calendarEventProps.end.toISOString(),
+   }
 }
 
 /**

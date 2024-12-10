@@ -33,6 +33,7 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
+import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
 import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import {
    TalentProfile,
@@ -41,10 +42,10 @@ import {
    UserStats,
    getLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/users"
+import { createCalendarEvent, makeUrls } from "@careerfairy/shared-lib/utils"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
-import { createCalendarEvent } from "components/views/common/AddToCalendar"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
 import { DateTime } from "luxon"
@@ -52,12 +53,13 @@ import DateUtil from "util/DateUtil"
 import { v4 as uuidv4 } from "uuid"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import {
+   errorLogAndNotify,
    getReferralInformation,
    shouldUseEmulators,
 } from "../../util/CommonUtil"
 import CookiesUtil from "../../util/CookiesUtil"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
-import { makeUrls } from "../../util/makeUrls"
+import { MobileUtils } from "../../util/mobile.utils"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../constants/streamContants"
 import { clearFirestoreCache } from "../util/authUtil"
 import firebaseApp, { FunctionsInstance } from "./FirebaseInstance"
@@ -65,8 +67,6 @@ import { recommendationServiceInstance } from "./RecommendationService"
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
-import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
-import { MobileUtils } from "../../util/mobile.utils"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -298,18 +298,19 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail_v3"
+            "sendLivestreamRegistrationConfirmationEmail_v4"
          )
 
       const calendarEvent = createCalendarEvent(livestream)
 
-      const urls = makeUrls(calendarEvent)
+      const urls = makeUrls(calendarEvent, errorLogAndNotify)
 
       return sendLivestreamRegistrationConfirmationEmail({
          eventCalendarUrls: urls,
          livestream_id: livestream.id,
          recipientEmail: user.email,
          user_first_name: userData.firstName,
+         user_time_zone: userData.timezone,
          timezone: userData.timezone,
          regular_date: livestream.start.toDate().toString(),
          duration_date: livestream.duration,

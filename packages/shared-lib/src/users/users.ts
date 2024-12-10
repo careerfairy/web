@@ -152,6 +152,13 @@ export interface ProfileLink extends Identifiable {
    title: string
 }
 
+// Collection /userData/:id/languages/:id
+export interface ProfileLanguage extends Identifiable {
+   authId: string
+   languageId: string
+   proficiency: number
+}
+
 export interface ReadableQuestionAndAnswer {
    questionName: GroupQuestion["name"]
    questionId: GroupQuestion["id"]

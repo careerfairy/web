@@ -1,9 +1,20 @@
 import * as Sentry from "@sentry/nextjs"
+import { useAppDispatch } from "components/custom-hook/store"
+import { AnimatedStepContent } from "components/views/talent-guide/animations/AnimatedStepContent"
+import { StepActionButton } from "components/views/talent-guide/components/floating-buttons/StepActionButton"
 import { ModuleStepContentRenderer } from "components/views/talent-guide/components/ModuleStepContentRenderer"
-import { FORCE_GERMAN_LOCALE } from "data/hygraph/constants"
+import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
+import { TalentGuideLayout } from "components/views/talent-guide/components/TalentGuideLayout"
+import { TalentGuideProgress } from "components/views/talent-guide/components/TalentGuideProgress"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import Link from "next/link"
+import { useRouter } from "next/router"
+import { useEffect } from "react"
+import {
+   resetTalentGuide,
+   setModuleData,
+} from "store/reducers/talentGuideReducer"
+import { useVisibleSteps } from "store/selectors/talentGuideSelectors"
 import {
    tgPreviewService,
    tgService,
@@ -11,24 +22,35 @@ import {
 
 interface TalentGuidePageProps {
    // Define props here based on what you'll fetch from the service
-   locale: string
    data: Page<TalentGuideModule>
 }
 
-const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ locale, data }) => {
+const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
+   const dispatch = useAppDispatch()
+   const { isPreview } = useRouter()
+
+   useEffect(() => {
+      dispatch(setModuleData(data))
+   }, [dispatch, data])
+
+   useEffect(() => {
+      return () => {
+         dispatch(resetTalentGuide())
+      }
+   }, [dispatch])
+
+   const visibleSteps = useVisibleSteps()
+
    return (
-      <div>
-         <Link href="/talent-guide">Back to Talent Guide</Link>
-         {/* Implement your page content here using the props */}
-         <h1>Talent Guide</h1>
-         <p>Current locale: {locale}</p>
-         {data.content.moduleSteps.map((step) => (
-            <div key={step.id}>
-               <h2>{step.stepTitle}</h2>
-               <ModuleStepContentRenderer step={step} />
-            </div>
-         ))}
-      </div>
+      <TalentGuideLayout header={<TalentGuideProgress />}>
+         <AnimatedStepContent>
+            {visibleSteps.map((step) => (
+               <ModuleStepContentRenderer key={step.id} step={step} />
+            ))}
+         </AnimatedStepContent>
+         <StepActionButton />
+         {Boolean(isPreview) && <PreviewModeAlert />}
+      </TalentGuideLayout>
    )
 }
 
@@ -53,18 +75,12 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
    const slug = params?.slug as string
    const service = preview ? tgPreviewService : tgService
 
-   const forcedLocale = FORCE_GERMAN_LOCALE ? "de" : locale // TODO: remove when other languages for talent guide are available
-
    try {
       // Fetch data for the specific slug using the service
-      const data = await service.getTalentGuideModulePageBySlug(
-         slug,
-         forcedLocale
-      )
+      const data = await service.getTalentGuideModulePageBySlug(slug, locale)
 
       return {
          props: {
-            locale: forcedLocale,
             data,
          },
          revalidate: 60, // Revalidate every 60 seconds
@@ -74,7 +90,6 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
       Sentry.captureException(error, {
          extra: {
             slug,
-            locale: forcedLocale,
             error: error instanceof Error ? error.message : String(error),
          },
       })

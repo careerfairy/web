@@ -23,6 +23,13 @@ export const videoAssetFragment = gql`
 //       Components
 // ==================
 
+// Component API ID: Identifier
+export const identifierFragment = gql`
+   {
+      identifier
+   }
+`
+
 // Component API ID: Highlight
 export const highlightComponentFragment = gql`
    {
@@ -30,7 +37,12 @@ export const highlightComponentFragment = gql`
       id
       videoClip ${videoAssetFragment}
       title
-      logo ${imageAssetFragment}
+      liveStreamIdentifier {
+         ... on Identifier ${identifierFragment}
+      }
+      companyIdentifier {
+         ... on Identifier ${identifierFragment}
+      }
    }
 `
 
@@ -142,6 +154,19 @@ export const sparksCarouselBlockFragment = gql`
    }
 `
 
+// Model API ID: VideoBlock
+export const videoBlockFragment = gql`
+   {
+      __typename
+      id
+      video ${videoAssetFragment}
+      videoThumbnail ${imageAssetFragment}
+      avatar ${imageAssetFragment}
+      videoTitle: title
+      label
+   }
+`
+
 // Model API ID: Quiz
 export const quizFragment = gql`
    {
@@ -170,6 +195,7 @@ export const richTextBlockFragment = gql`
             ... on HeaderBlock ${headerBlockFragment}
             ... on JobsBlock ${jobsBlockFragment}
             ... on SparksCarouselBlock ${sparksCarouselBlockFragment}
+            ... on VideoBlock ${videoBlockFragment}
          }
       }
    }

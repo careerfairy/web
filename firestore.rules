@@ -46,6 +46,11 @@ service cloud.firestore {
             allow write: if isCFAdmin();
         }
 
+       match /pushNotifications/{savedNotification} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+       }
+
         match /levelsOfStudy/{levelOfStudy} {
             allow read: if true;
             allow write: if isCFAdmin();
@@ -165,6 +170,10 @@ service cloud.firestore {
             }
 
             match /links/{linkId} {
+                allow read, write: if isSignedInAndIsSameUser(userId);
+            }
+
+            match /languages/{languageId} {
                 allow read, write: if isSignedInAndIsSameUser(userId);
             }
 

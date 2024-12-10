@@ -19,6 +19,7 @@ import { SeenSparks } from "../sparks/sparks"
 import {
    CompanyFollowed,
    IUserReminder,
+   ProfileLanguage,
    ProfileLink,
    RegisteredLivestreams,
    RegistrationStep,
@@ -286,6 +287,27 @@ export interface IUserRepository {
     * @param linkId Link id.
     */
    deleteLink(userId: string, linkId: string): Promise<void>
+
+   /**
+    * Creates a new language for the user identified by @param userId, living in a sub collection of /userData.
+    * @param userId Id of the user.
+    * @param language Language to be created.
+    */
+   createLanguage(userId: string, language: ProfileLanguage): Promise<void>
+
+   /**
+    * Updates a given profile language for the user identified by @param userId.
+    * @param userId Id of the user.
+    * @param language Language to be updated.
+    */
+   updateLanguage(userId: string, language: ProfileLanguage): Promise<void>
+
+   /**
+    * Deletes a given language (@param languageId) for the user (@param userId).
+    * @param userId User id.
+    * @param languageId Language id.
+    */
+   deleteLanguage(userId: string, languageId: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -1231,6 +1253,47 @@ export class FirebaseUserRepository
          .doc(userId)
          .collection("links")
          .doc(linkId)
+
+      return ref.delete()
+   }
+
+   async createLanguage(
+      userId: string,
+      language: ProfileLanguage
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("languages")
+         .doc(language.languageId)
+
+      const data: ProfileLanguage = {
+         ...language,
+         id: ref.id,
+      }
+
+      await ref.set(data)
+   }
+
+   async updateLanguage(
+      userId: string,
+      language: ProfileLanguage
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("languages")
+         .doc(language.id)
+
+      return ref.set(language)
+   }
+
+   async deleteLanguage(userId: string, languageId: string): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("languages")
+         .doc(languageId)
 
       return ref.delete()
    }

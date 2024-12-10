@@ -1,4 +1,4 @@
-import { MobileUtils } from "../../../../../../util/mobile.utils"
+import { MobileUtils } from "util/mobile.utils"
 import { useLocalTracks } from "../../../context"
 
 export enum PermissionType {

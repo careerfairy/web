@@ -1,29 +1,26 @@
+import {
+   HAPTIC,
+   MESSAGING_TYPE,
+   NativeEvent,
+   NativeEventStringified,
+   PERMISSIONS,
+   USER_AUTH,
+} from "@careerfairy/shared-lib/src/messaging"
+import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
+import { Audio } from "expo-av"
+import { Camera } from "expo-camera"
+import * as Notifications from "expo-notifications"
+import * as SecureStore from "expo-secure-store"
 import React, { useEffect, useRef, useState } from "react"
 import {
    BackHandler,
    Linking,
    Platform,
-   StyleSheet,
    SafeAreaView,
-   View,
-   Text,
    StatusBar,
-   TouchableOpacity,
+   StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
-import * as Notifications from "expo-notifications"
-import * as SecureStore from "expo-secure-store"
-import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
-import {
-   MESSAGING_TYPE,
-   USER_AUTH,
-   HAPTIC,
-   PERMISSIONS,
-   NativeEventStringified,
-   NativeEvent,
-} from "@careerfairy/shared-lib/src/messaging"
-import { Camera } from "expo-camera"
-import { Audio } from "expo-av"
 
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
@@ -46,7 +43,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
    onLogout,
 }) => {
-   const [showPermissionsBanner, setShowPermissionsBanner] = useState(false)
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef: any = useRef(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
@@ -132,7 +128,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             !hasAudioPermissions || !hasVideoPermissions
 
          if (audioGranted && videoGranted) {
-            setShowPermissionsBanner(false)
             if (permissionsWereMissing) {
                setHasAudioPermissions(true)
                setHasVideoPermissions(true)
@@ -141,19 +136,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          } else {
             setHasAudioPermissions(audioGranted)
             setHasVideoPermissions(videoGranted)
-            setShowPermissionsBanner(true)
          }
       } catch (e) {
          console.log("ERROR")
          console.log(e)
-      }
-   }
-
-   const openAppSettings = () => {
-      if (Platform.OS === "ios") {
-         Linking.openURL("app-settings:")
-      } else {
-         Linking.openSettings()
       }
    }
 
@@ -260,14 +246,17 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          (!hasAudioPermissions || !hasVideoPermissions)
       ) {
          return requestPermissions()
-      } else {
-         setShowPermissionsBanner(false)
       }
    }
 
    const handleNavigation = (request: any) => {
       if (!request.url.includes(SEARCH_CRITERIA)) {
          if (isValidUrl(request.url)) {
+            // iOS calls for all types of navigation (including the non-restrictive
+            // "other", which causes issues for internal links like cookies).
+            if (Platform.OS === "ios" && request.navigationType !== "click") {
+               return false
+            }
             Linking.openURL(request.url)
          }
          return false // Prevent WebView from loading the external link
@@ -289,21 +278,20 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             domStorageEnabled={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
-            originWhitelist={["https://*", "http://*", "file://*", "sms://*"]}
+            userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
+            sharedCookiesEnabled={true}
+            thirdPartyCookiesEnabled={true}
+            useWebKit={true}
+            originWhitelist={[
+               "https://*",
+               "http://*",
+               "file://*",
+               "sms://*",
+               "about:",
+            ]}
             onNavigationStateChange={handleNavigationStateChange}
+            setSupportMultipleWindows={false}
          />
-
-         {showPermissionsBanner && (
-            <View style={styles.banner}>
-               <Text style={styles.bannerText}>
-                  Permissions not granted. Allow them in settings and restart
-                  the application
-               </Text>
-               <TouchableOpacity onPress={openAppSettings}>
-                  <Text style={styles.bannerButton}>Click here to allow</Text>
-               </TouchableOpacity>
-            </View>
-         )}
       </SafeAreaView>
    )
 }

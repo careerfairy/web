@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab"
 import {
    Box,
    Button,
@@ -9,11 +10,26 @@ import {
    Typography,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { SlideUpTransition } from "components/views/common/transitions"
 import { ReactNode } from "react"
 import { X } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
+   dialog: {
+      mt: {
+         xs: 8,
+         sm: 8,
+         md: 0,
+      },
+      "& .MuiDialog-paper": {
+         borderRadius: {
+            xs: "12px 12px 0px 0px",
+            sm: "12px 12px 0px 0px",
+            md: "12px",
+         },
+      },
+   },
    title: {
       fontWeight: 600,
       color: (theme) => theme.palette.neutral[800],
@@ -48,6 +64,7 @@ type Props = {
    handleClose: () => void
    handleSave: () => void
    saveDisabled?: boolean
+   isSubmitting?: boolean
    saveText?: string
 }
 
@@ -60,6 +77,7 @@ export const BaseProfileDialog = (props: Props) => {
       handleSave,
       saveDisabled = true,
       saveText = "Add",
+      isSubmitting,
    } = props
 
    const isMobile = useIsMobile()
@@ -74,6 +92,8 @@ export const BaseProfileDialog = (props: Props) => {
                onClick: handleClose,
             },
          }}
+         sx={styles.dialog}
+         TransitionComponent={SlideUpTransition}
       >
          <DialogContent>
             <Stack spacing={"24px"}>
@@ -102,14 +122,15 @@ export const BaseProfileDialog = (props: Props) => {
                      Cancel
                   </Typography>
                </Button>
-               <Button
+               <LoadingButton
                   variant="contained"
                   color="primary"
                   disabled={saveDisabled}
                   onClick={handleSave}
+                  loading={isSubmitting}
                >
                   {saveText}
-               </Button>
+               </LoadingButton>
             </Stack>
          </DialogActions>
       </Dialog>
