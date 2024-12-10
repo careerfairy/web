@@ -69,10 +69,12 @@ const styles = sxStyles({
       borderColor: (theme) => theme.brand.black[200],
    },
    unfollowBtn: {
+      minWidth: "fit-content",
       width: "fit-content",
       height: "fit-content",
       fontSize: "14px",
       p: "8px 16px",
+      flexShrink: 0,
       border: (theme) => `1px solid ${theme.palette.neutral[200]}`,
       color: (theme) => theme.palette.neutral[500],
       "&:hover": {
@@ -160,7 +162,12 @@ const FollowingCompanyCard = ({ group }: FollowingCompanyCardProps) => {
    return (
       <Link href={companyLink} target="_blank">
          <Stack direction={"row"} sx={styles.companyCardRoot}>
-            <Stack direction={"row"} alignItems={"center"} spacing={1.5}>
+            <Stack
+               direction={"row"}
+               alignItems={"center"}
+               spacing={1.5}
+               sx={{ flex: 1, minWidth: 0 }}
+            >
                <CircularLogo src={group.logoUrl} alt="Company logo" size={48} />
                <Stack sx={{ minWidth: 0 }}>
                   <Stack direction={"row"} alignItems={"center"} spacing={0.5}>
