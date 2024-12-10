@@ -35,7 +35,7 @@ const styles = sxStyles({
       fontWeight: 600,
    },
    companyCardRoot: {
-      p: "12px 8px 12px 16px",
+      p: "12px 8px 12px 8px",
       justifyContent: "space-between",
       alignItems: "center",
       width: "100%",
@@ -73,8 +73,10 @@ const styles = sxStyles({
       width: "fit-content",
       height: "fit-content",
       fontSize: "14px",
+      ml: 2,
       p: "8px 16px",
       flexShrink: 0,
+      backgroundColor: (theme) => theme.brand.white[100],
       border: (theme) => `1px solid ${theme.palette.neutral[200]}`,
       color: (theme) => theme.palette.neutral[500],
       "&:hover": {
@@ -91,7 +93,8 @@ export const ProfileFollowingCompaniesDetailsView = () => {
       <Box m={"20px"}>
          <ProfileSection
             showAddIcon={false}
-            title={`Followed companies (${followingCompanies.length})`}
+            title={"Followed companies"}
+            count={followingCompanies.length}
          >
             <ProfileFollowingCompanies />
          </ProfileSection>
