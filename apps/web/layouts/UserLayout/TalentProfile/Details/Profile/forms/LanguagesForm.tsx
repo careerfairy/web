@@ -4,9 +4,10 @@ import {
    languageOptionCodes,
 } from "@careerfairy/shared-lib/constants/forms"
 import { ProfileLanguage } from "@careerfairy/shared-lib/users"
-import { Stack } from "@mui/material"
+import { MenuItem, Stack, Typography } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { languageCodesDict } from "components/helperFunctions/streamFormFunctions"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { mapOptions } from "components/views/signup/utils"
 import { ReactNode, useEffect } from "react"
@@ -69,8 +70,11 @@ export const LanguageFormFields = ({
 }: LanguageFormFieldsProps) => {
    const {
       formState: { isSubmitting },
-   } = useFormContext()
+      setValue,
+      watch,
+   } = useFormContext<CreateLanguageSchemaType>()
 
+   const proficiency = watch("proficiency")
    const options = mapOptions(languageOptionCodes).filter(
       (id) => !filterLanguageIds?.includes(id)
    )
@@ -99,8 +103,38 @@ export const LanguageFormFields = ({
                isOptionEqualToValue: (option, value) => option === value,
             }}
          />
-
-         <ControlledBrandedAutoComplete
+         <BrandedTextField
+            select
+            label={"Proficiency"}
+            name={"proficiency"}
+            SelectProps={{
+               displayEmpty: true,
+               renderValue: (value: string) => {
+                  return value ? (
+                     LanguageProficiencyLabels[value]
+                  ) : (
+                     <Typography color={"neutral.400"}>
+                        E.g., Advanced
+                     </Typography>
+                  )
+               },
+            }}
+            disabled={isSubmitting}
+            fullWidth
+            value={proficiency}
+            requiredText="(required)"
+         >
+            {LanguageProficiencyValues.map((value) => (
+               <MenuItem
+                  key={value}
+                  value={value}
+                  onClick={() => setValue("proficiency", value)}
+               >
+                  {LanguageProficiencyLabels[value]}
+               </MenuItem>
+            ))}
+         </BrandedTextField>
+         {/* <ControlledBrandedAutoComplete
             label={"Proficiency"}
             name={"proficiency"}
             options={LanguageProficiencyValues}
@@ -118,7 +152,7 @@ export const LanguageFormFields = ({
                },
                isOptionEqualToValue: (option, value) => option === value,
             }}
-         />
+         /> */}
       </Stack>
    )
 }
