@@ -84,7 +84,6 @@ export const LanguageFormFields = ({
             textFieldProps={{
                requiredText: "(required)",
                placeholder: "E.g., English",
-               inputMode: "none",
                sx: {
                   maxWidth: "auto",
                },
@@ -108,7 +107,6 @@ export const LanguageFormFields = ({
             textFieldProps={{
                requiredText: "(required)",
                placeholder: "E.g., Advanced",
-               inputMode: "none",
             }}
             autocompleteProps={{
                id: "languageProficiency",
