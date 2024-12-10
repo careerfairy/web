@@ -109,11 +109,11 @@ const copyButtonStyles = sxStyles({
 })
 
 export const CopyAccordion = (props: BoxProps) => {
-   const [expanded, setExpanded] = useState<string>(undefined)
+   const [expanded, setExpanded] = useState<number>(-1)
 
    const handleChange =
-      (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-         setExpanded(isExpanded ? panel : undefined)
+      (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+         setExpanded(isExpanded ? panel : -1)
       }
 
    return (
@@ -122,8 +122,8 @@ export const CopyAccordion = (props: BoxProps) => {
             return React.cloneElement(child, {
                ...child.props,
                key: index,
-               expanded: expanded === `panel${index}`,
-               onChange: handleChange(`panel${index}`),
+               expanded: expanded === index,
+               onChange: handleChange(index),
             })
          })}
       </Box>
