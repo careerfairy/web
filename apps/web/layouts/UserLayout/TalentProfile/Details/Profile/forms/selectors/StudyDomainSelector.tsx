@@ -1,5 +1,7 @@
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { MenuItem, Typography } from "@mui/material"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { SyntheticEvent, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
@@ -10,6 +12,7 @@ type Props = {
    label?: string
    placeholder?: string
    requiredText?: string
+   useTextField?: boolean
 }
 
 export const StudyDomainSelector = ({
@@ -18,6 +21,7 @@ export const StudyDomainSelector = ({
    label,
    placeholder,
    requiredText,
+   useTextField,
 }: Props) => {
    const { data: fieldsOfStudy } =
       useFirestoreCollection<FieldOfStudy>(collection)
@@ -25,6 +29,7 @@ export const StudyDomainSelector = ({
    const {
       formState: { isSubmitting },
       setValue,
+      watch,
    } = useFormContext()
 
    const options = useMemo(
@@ -43,6 +48,46 @@ export const StudyDomainSelector = ({
       setValue(fieldName, option ? { ...option, name: option.value } : option, {
          shouldValidate: true,
       })
+   }
+
+   const value = watch(fieldName)
+
+   if (useTextField) {
+      return (
+         <BrandedTextField
+            select
+            label={label}
+            name={fieldName}
+            SelectProps={{
+               displayEmpty: true,
+               renderValue: (value: { id: string; value: string }) => {
+                  return value?.value ? (
+                     value.value
+                  ) : (
+                     <Typography color={"neutral.400"}>
+                        E.g., Advanced
+                     </Typography>
+                  )
+               },
+            }}
+            disabled={isSubmitting}
+            fullWidth
+            value={value}
+            requiredText="(required)"
+         >
+            {options.map((option) => (
+               <MenuItem
+                  key={option.id}
+                  value={option.id}
+                  onClick={() => {
+                     onChangeHandler(null, option)
+                  }}
+               >
+                  {option.value}
+               </MenuItem>
+            ))}
+         </BrandedTextField>
+      )
    }
 
    return (
@@ -99,6 +144,7 @@ export const LevelsOfStudySelector = ({
          placeholder="E.g., Bachelor's"
          label="Degree"
          requiredText="(required)"
+         useTextField
       />
    )
 }
