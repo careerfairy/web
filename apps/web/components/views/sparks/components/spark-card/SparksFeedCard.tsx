@@ -353,6 +353,7 @@ const SparksFeedCard: FC<Props> = ({
                            hide={!isOverlayedOntop}
                            spark={spark}
                            linkToCompanyPage={companyPageLink}
+                           shareUtmMedium="sparks-referrals"
                         />
                      </>
                   ) : null}
@@ -366,6 +367,7 @@ const SparksFeedCard: FC<Props> = ({
                   hide={!isOverlayedOntop}
                   spark={spark}
                   linkToCompanyPage={companyPageLink}
+                  shareUtmMedium="sparks-referrals"
                />
             </Box>
          ) : null}
