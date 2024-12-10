@@ -27,7 +27,10 @@ export const useUserLanguages = () => {
             }
          )
 
-         return () => unsubscribe()
+         return () => {
+            unsubscribe()
+            setLanguages([])
+         }
       }
    }, [userData.id, firestore])
 

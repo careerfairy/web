@@ -22,7 +22,10 @@ export const useUserLinks = () => {
             }
          )
 
-         return () => unsubscribe()
+         return () => {
+            unsubscribe()
+            setLinks([])
+         }
       }
    }, [userData.id, firestore])
 
