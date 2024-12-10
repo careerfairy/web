@@ -12,6 +12,7 @@ import {
    useMemo,
    useState,
 } from "react"
+import { useLockBodyScroll } from "react-use"
 
 type HighlightsContextType = {
    autoPlayingIndex: number
@@ -50,6 +51,10 @@ export const HighlightsProvider = ({
    )
    const [expandedPlayingIndex, setExpandedPlayingIndex] =
       useState<number>(undefined)
+
+   const [isBodyScrollLockedForMobile, setIsBodyScrollLockedForMobile] =
+      useState<boolean>(false)
+   useLockBodyScroll(isBodyScrollLockedForMobile)
 
    const [
       isLiveStreamDialogOpen,
@@ -131,7 +136,17 @@ export const HighlightsProvider = ({
 
    useEffect(() => {
       setIsPausedExpanded(false)
-   }, [expandedPlayingIndex])
+
+      if (isMobile) {
+         if (expandedPlayingIndex !== undefined) {
+            setIsBodyScrollLockedForMobile(true)
+         } else {
+            setIsBodyScrollLockedForMobile(false)
+         }
+      }
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [expandedPlayingIndex, isMobile])
 
    useEffect(() => {
       if (!isLiveStreamDialogOpen && !isExpanded(autoPlayingIndex)) {
