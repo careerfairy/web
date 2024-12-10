@@ -207,6 +207,7 @@ export const ExpandedSparkCard = ({ spark, playing, onClose }: Props) => {
                            spark={spark}
                            linkToCompanyPage={companyPageLink}
                            hideActions={["filter"]}
+                           shareUtmMedium="sparks-referrals-levels"
                         />
                      </Box>
                   </Stack>
