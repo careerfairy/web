@@ -179,6 +179,7 @@ type Props = {
    hide?: boolean
    linkToCompanyPage: string
    hideActions?: ActionType[]
+   shareUtmMedium: ShareActionProps["utmMedium"]
 }
 
 const DEFAULT_HIDE_ACTIONS: ActionType[] = []
@@ -188,6 +189,7 @@ const FeedCardActions: FC<Props> = ({
    hide,
    linkToCompanyPage,
    hideActions = DEFAULT_HIDE_ACTIONS,
+   shareUtmMedium,
 }) => {
    return (
       <Stack
@@ -203,7 +205,9 @@ const FeedCardActions: FC<Props> = ({
             />
          )}
          {!hideActions.includes("like") && <LikeAction sparkId={spark.id} />}
-         {!hideActions.includes("share") && <ShareAction sparkId={spark.id} />}
+         {!hideActions.includes("share") && (
+            <ShareAction sparkId={spark.id} utmMedium={shareUtmMedium} />
+         )}
          {!hideActions.includes("filter") && (
             <FilterAction sparkId={spark.id} />
          )}
@@ -412,9 +416,10 @@ const CompanyPageAction: FC<{
 
 type ShareActionProps = {
    sparkId: string
+   utmMedium: "sparks-referrals" | "sparks-referrals-levels"
 }
 
-const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
+const ShareAction: FC<ShareActionProps> = ({ sparkId, utmMedium }) => {
    const [isShareDialogOpen, handleOpenShareDialog, handleCloseShareDialog] =
       useDialogStateHandler()
    const isMobile = useIsMobile()
@@ -429,8 +434,8 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    const shareUrl = useMemo(() => {
       return `${getHost()}/sparks/${sparkId}?referral=${
          userData?.referralCode
-      }&invite=${sparkId}&utm_medium=sparks-referrals&utm_campaign=sparks`
-   }, [sparkId, userData?.referralCode])
+      }&invite=${sparkId}&utm_medium=${utmMedium}&utm_campaign=sparks`
+   }, [sparkId, userData?.referralCode, utmMedium])
 
    const shareData = useMemo(() => {
       return {
