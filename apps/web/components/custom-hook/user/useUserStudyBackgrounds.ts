@@ -25,7 +25,6 @@ export const useUserStudyBackgrounds = () => {
                orderBy("startedAt", "desc")
             ).withConverter(createGenericConverter<StudyBackground>()),
             (doc) => {
-               // doc.docs
                const newData = doc.docs?.map((doc) => doc.data()) || []
                setStudyBackgrounds(newData)
             }

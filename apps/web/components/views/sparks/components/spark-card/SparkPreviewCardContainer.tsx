@@ -79,7 +79,7 @@ const SparkPreviewCardContainer: FC<Props> = ({
    type = "carousel",
 }) => {
    const isMobile = useIsMobile()
-   const autoPlayEnabled = autoPlaying !== undefined
+   const autoPlayEnabled = autoPlaying !== undefined && autoPlaying !== false
 
    const getCardStyles = (type: SparkPreviewCardType) => {
       if (type == "carousel") {
@@ -98,6 +98,7 @@ const SparkPreviewCardContainer: FC<Props> = ({
          sx={[styles.root, selected && styles.cardSelected, cardStyles]}
          onMouseEnter={onMouseEnter}
          onMouseLeave={onMouseLeave}
+         className="spark-preview-card-container"
       >
          {componentHeader ? componentHeader : null}
          <Box sx={styles.cardContent}>{children}</Box>

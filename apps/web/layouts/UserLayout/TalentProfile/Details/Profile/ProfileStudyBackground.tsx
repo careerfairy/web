@@ -29,8 +29,8 @@ import { sxStyles } from "types/commonTypes"
 import { ConfirmDeleteItemDialog } from "../ConfirmDeleteItemDialog"
 import { ConfirmEmptyStudyDatesDialog } from "../ConfirmEmptyStudyDatesDialog"
 import { EmptyItemView } from "./EmptyItemView"
-import { ProfileItem } from "./ProfileItem"
 import { ProfileItemCard } from "./ProfileItemCard"
+import { ProfileSection } from "./ProfileSection"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import {
    StudyBackgroundFormFields,
@@ -79,10 +79,10 @@ const styles = sxStyles({
 })
 
 type Props = {
-   hasItems: boolean
+   showAddIcon: boolean
 }
 
-export const ProfileStudyBackground = ({ hasItems }: Props) => {
+export const ProfileStudyBackground = ({ showAddIcon }: Props) => {
    const dispatch = useDispatch()
 
    const handleAddClick = useCallback(() => {
@@ -92,13 +92,13 @@ export const ProfileStudyBackground = ({ hasItems }: Props) => {
    }, [dispatch])
 
    return (
-      <ProfileItem
+      <ProfileSection
          title={"Study background"}
-         hasItems={hasItems}
+         showAddIcon={showAddIcon}
          handleAdd={handleAddClick}
       >
          <StudyBackgroundDetails />
-      </ProfileItem>
+      </ProfileSection>
    )
 }
 
@@ -154,8 +154,6 @@ const FormDialogWrapper = () => {
 
    const onSubmit = async (data: StudyBackgroundFormValues) => {
       try {
-         handleCloseStudyBackgroundDialog()
-
          const newStudyBackground: StudyBackground = {
             ...data,
             id: data?.id,
@@ -178,6 +176,7 @@ const FormDialogWrapper = () => {
             )
          }
 
+         handleCloseStudyBackgroundDialog()
          successNotification(
             `${data.id ? "Updated" : "Added a new"} study background 🎓`
          )
@@ -207,6 +206,7 @@ const FormDialogWrapper = () => {
             handleClose={handleCloseStudyBackgroundDialog}
             handleSave={handleSaveButtonClick}
             saveDisabled={!isValid}
+            isSubmitting={isSubmitting}
             saveText={saveText}
          >
             <ConfirmEmptyStudyDatesDialog
@@ -323,21 +323,23 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             handleEdit={handleEdit}
             handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
          >
-            <SchoolIcon sx={styles.studyBackgroundSchoolIcon} />
-            <Stack spacing={0.5}>
-               <Typography variant="brandedBody" sx={styles.universityName}>
-                  {university?.name}
-               </Typography>
-               <Typography
-                  variant="small"
-                  sx={styles.studyDomains}
-               >{`${studyBackground.levelOfStudy.name} degree, ${studyBackground.fieldOfStudy.name}`}</Typography>
-               <ConditionalWrapper condition={hasStartedAtYear}>
-                  <Typography variant="xsmall" sx={styles.studyDates}>
-                     {startedAtYear}
-                     {hasEndedAtYear ? `${" - "}${endedAtYear}` : null}
+            <Stack direction={"row"} alignItems={"center"} spacing={1.5}>
+               <SchoolIcon sx={styles.studyBackgroundSchoolIcon} />
+               <Stack spacing={0.5}>
+                  <Typography variant="brandedBody" sx={styles.universityName}>
+                     {university?.name}
                   </Typography>
-               </ConditionalWrapper>
+                  <Typography
+                     variant="small"
+                     sx={styles.studyDomains}
+                  >{`${studyBackground.levelOfStudy.name} degree, ${studyBackground.fieldOfStudy.name}`}</Typography>
+                  <ConditionalWrapper condition={hasStartedAtYear}>
+                     <Typography variant="xsmall" sx={styles.studyDates}>
+                        {startedAtYear}
+                        {hasEndedAtYear ? `${" - "}${endedAtYear}` : null}
+                     </Typography>
+                  </ConditionalWrapper>
+               </Stack>
             </Stack>
          </ProfileItemCard>
       </Fragment>

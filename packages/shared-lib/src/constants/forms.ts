@@ -1351,6 +1351,45 @@ export const languageOptionCodes: OptionGroup[] = [
    },
 ]
 
+export const EUROPEAN_COUNTRY_CODES = countriesOptionCodes
+   .filter((country) =>
+      [
+         "AT",
+         "AD",
+         "BE",
+         "BG",
+         "CH",
+         "CZ",
+         "DE",
+         "DK",
+         "EE",
+         "ES",
+         "FI",
+         "FR",
+         "GB",
+         "GR",
+         "HR",
+         "HU",
+         "IE",
+         "IT",
+         "LI",
+         "LU",
+         "MC",
+         "MT",
+         "NL",
+         "NO",
+         "PL",
+         "PT",
+         "RO",
+         "RS",
+         "SE",
+         "SI",
+         "SK",
+         "SM",
+      ].includes(country.id)
+   )
+   .map((country) => country.id)
+
 export const channelOptionCodes: OptionGroup[] = [
    {
       id: "facebook",
@@ -1627,6 +1666,38 @@ export const RelevantCompanyCountryValues: OptionGroup[] = [
       name: "United States of America",
    },
 ]
+
+export const LanguageProficiencies = {
+   Beginner: "beginner",
+   Intermediate: "intermediate",
+   Advanced: "advanced",
+   Proficient: "proficient",
+   Native: "native",
+} as const
+
+export type LanguageProficiency =
+   (typeof LanguageProficiencies)[keyof typeof LanguageProficiencies]
+
+export const LanguageProficiencyValues: LanguageProficiency[] = Object.values(
+   LanguageProficiencies
+)
+
+export const LanguageProficiencyLabels: Record<LanguageProficiency, string> = {
+   beginner: "Beginner",
+   intermediate: "Intermediate",
+   advanced: "Advanced",
+   proficient: "Proficient",
+   native: "Native Speaker",
+}
+
+export const LanguageProficiencyOrderMap: Record<LanguageProficiency, number> =
+   {
+      beginner: 0,
+      intermediate: 1,
+      advanced: 2,
+      proficient: 3,
+      native: 4,
+   }
 
 export const CompanyCountryValues: OptionGroup[] = countriesOptionCodes.map(
    (country) => ({

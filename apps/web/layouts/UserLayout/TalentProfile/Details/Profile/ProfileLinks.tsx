@@ -28,8 +28,8 @@ import { sxStyles } from "types/commonTypes"
 import { getIconUrl } from "util/CommonUtil"
 import { ConfirmDeleteItemDialog } from "../ConfirmDeleteItemDialog"
 import { EmptyItemView } from "./EmptyItemView"
-import { ProfileItem } from "./ProfileItem"
 import { ProfileItemCard } from "./ProfileItemCard"
+import { ProfileSection } from "./ProfileSection"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import { LinkFormFields, LinkFormProvider } from "./forms/LinksForm"
 import { LinkFormValues, getInitialLinkValues } from "./forms/schemas"
@@ -73,10 +73,10 @@ const styles = sxStyles({
 })
 
 type Props = {
-   hasItems?: boolean
+   showAddIcon?: boolean
 }
 
-export const ProfileLinks = ({ hasItems }: Props) => {
+export const ProfileLinks = ({ showAddIcon }: Props) => {
    const dispatch = useDispatch()
 
    const handleAdd = useCallback(() => {
@@ -84,9 +84,13 @@ export const ProfileLinks = ({ hasItems }: Props) => {
    }, [dispatch])
 
    return (
-      <ProfileItem hasItems={hasItems} title="Links" handleAdd={handleAdd}>
+      <ProfileSection
+         showAddIcon={showAddIcon}
+         title="Links"
+         handleAdd={handleAdd}
+      >
          <ProfileLinksDetails />
-      </ProfileItem>
+      </ProfileSection>
    )
 }
 
@@ -110,7 +114,7 @@ const FormDialogWrapper = () => {
    const isEditingLink = useSelector(talentProfileIsEditingLinkSelector)
 
    const {
-      formState: { isValid },
+      formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
    } = useFormContext()
@@ -122,8 +126,6 @@ const FormDialogWrapper = () => {
 
    const onSubmit = async (data: LinkFormValues) => {
       try {
-         handleCloseLinkDialog()
-
          const newLink: ProfileLink = {
             ...data,
             id: data?.id,
@@ -137,6 +139,7 @@ const FormDialogWrapper = () => {
             await userRepo.updateUserLink(userData.id, newLink)
          }
 
+         handleCloseLinkDialog()
          successNotification(`${data.id ? "Updated" : "Added a new"} link 🔗`)
       } catch (error) {
          errorNotification(
@@ -159,6 +162,7 @@ const FormDialogWrapper = () => {
             handleClose={handleCloseLinkDialog}
             handleSave={handleSave}
             saveDisabled={!isValid}
+            isSubmitting={isSubmitting}
             saveText={saveText}
          >
             <LinkFormFields />
