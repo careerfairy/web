@@ -10,7 +10,6 @@ type Props = {
    label?: string
    placeholder?: string
    requiredText?: string
-   disableInput?: boolean
 }
 
 export const StudyDomainSelector = ({
@@ -19,7 +18,6 @@ export const StudyDomainSelector = ({
    label,
    placeholder,
    requiredText,
-   disableInput,
 }: Props) => {
    const { data: fieldsOfStudy } =
       useFirestoreCollection<FieldOfStudy>(collection)
@@ -55,9 +53,6 @@ export const StudyDomainSelector = ({
          textFieldProps={{
             requiredText: requiredText,
             placeholder: placeholder,
-            InputProps: {
-               inputMode: disableInput ? "none" : "search",
-            },
          }}
          autocompleteProps={{
             id: fieldName,
@@ -104,7 +99,6 @@ export const LevelsOfStudySelector = ({
          placeholder="E.g., Bachelor's"
          label="Degree"
          requiredText="(required)"
-         disableInput
       />
    )
 }
