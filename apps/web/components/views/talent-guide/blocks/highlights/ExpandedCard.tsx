@@ -1,6 +1,6 @@
 import { Box, Dialog, IconButton } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { SyntheticEvent, forwardRef, useEffect } from "react"
+import { SyntheticEvent, forwardRef } from "react"
 import { X as CloseIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useHighlights } from "./HighlightsBlockContext"
@@ -126,15 +126,6 @@ export const ExpandedCard = forwardRef<HTMLDivElement, ExpandedProps>(
    (props, ref) => {
       const isMobile = useIsMobile()
       const { toggleExpandedPlaying } = useHighlights()
-
-      useEffect(() => {
-         const originalStyle = window.getComputedStyle(document.body).overflow
-         document.body.style.overflow = "hidden"
-
-         return () => {
-            document.body.style.overflow = originalStyle
-         }
-      }, [])
 
       return (
          <Box
