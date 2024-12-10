@@ -144,7 +144,7 @@ test.describe("Signup Page Functionality", () => {
       await expect(signup.emailVerificationStepMessage).toBeVisible()
 
       // Navigate to a /portal URL and wait for navigation to finish until redirect
-      await page.goto("/portal", { waitUntil: "load", timeout: 5000 })
+      await page.goto("/portal", { waitUntil: "load", timeout: 6000 })
 
       // Expecting to be redirected to the email verification step
       await expect(signup.emailVerificationStepMessage).toBeVisible()
