@@ -20,7 +20,7 @@ import React, { Children, useState } from "react"
 import { CheckCircle, Copy } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { Animation } from "./Animations"
-import { useTemporaryState } from "./useTemporaryActiveState"
+import { useTemporaryActiveState } from "./useTemporaryActiveState"
 
 const ICON_SIZE = 14
 
@@ -164,7 +164,7 @@ type CopyActionProps = {
 }
 
 const CopyAction = ({ clipboardContent, onClickCallback }: CopyActionProps) => {
-   const { isActive, setIsActive } = useTemporaryState()
+   const { isActive, setIsActive } = useTemporaryActiveState()
 
    return (
       <Actions>

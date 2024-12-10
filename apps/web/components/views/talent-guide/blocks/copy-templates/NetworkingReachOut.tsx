@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material"
 import { Briefcase, Clock, MessageSquare } from "react-feather"
 import { CopyAccordion } from "./AccordionComponents"
-import { useTemporaryState } from "./useTemporaryActiveState"
+import { useTemporaryActiveState } from "./useTemporaryActiveState"
 
 const CARDS_METADATA = [
    {
@@ -25,7 +25,7 @@ const CARDS_METADATA = [
 ]
 
 const AccordionCard = ({ card, ...props }) => {
-   const { isActive, setIsActive } = useTemporaryState()
+   const { isActive, setIsActive } = useTemporaryActiveState()
 
    return (
       <CopyAccordion.Card {...props} disableGutters isActive={isActive}>

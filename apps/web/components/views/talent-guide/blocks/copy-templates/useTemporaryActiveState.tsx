@@ -5,7 +5,9 @@ type UseTemporaryStateOptions = {
    onReset?: () => void
 }
 
-export const useTemporaryState = (options: UseTemporaryStateOptions = {}) => {
+export const useTemporaryActiveState = (
+   options: UseTemporaryStateOptions = {}
+) => {
    const { duration = 1300, onReset } = options
    const [isActive, setIsActive] = useState(false)
 
