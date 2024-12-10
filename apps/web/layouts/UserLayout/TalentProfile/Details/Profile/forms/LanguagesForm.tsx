@@ -8,7 +8,6 @@ import { MenuItem, Stack, Typography } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { languageCodesDict } from "components/helperFunctions/streamFormFunctions"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
-import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { mapOptions } from "components/views/signup/utils"
 import { ReactNode, useEffect } from "react"
 import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
@@ -81,28 +80,39 @@ export const LanguageFormFields = ({
 
    return (
       <Stack spacing={2} sx={styles.formRoot}>
-         <ControlledBrandedAutoComplete
+         <BrandedTextField
+            select
             label={"Language"}
             name={"languageId"}
-            options={options}
-            textFieldProps={{
-               requiredText: "(required)",
-               placeholder: "E.g., English",
-               sx: {
-                  maxWidth: "auto",
+            SelectProps={{
+               displayEmpty: true,
+               renderValue: (value: string) => {
+                  return value ? (
+                     languageCodesDict[value]["name"]
+                  ) : (
+                     <Typography color={"neutral.400"}>
+                        E.g., English
+                     </Typography>
+                  )
                },
             }}
-            autocompleteProps={{
-               id: "spokenLanguage",
-               disabled: isSubmitting,
-               disableClearable: false,
-               autoHighlight: true,
-               getOptionLabel: (option) => {
-                  return (option && languageCodesDict[option]["name"]) || ""
-               },
-               isOptionEqualToValue: (option, value) => option === value,
-            }}
-         />
+            disabled={isSubmitting}
+            fullWidth
+            value={watch("languageId")}
+            requiredText="(required)"
+         >
+            {options.map((option) => (
+               <MenuItem
+                  key={option}
+                  value={option}
+                  onClick={() =>
+                     setValue("languageId", option, { shouldValidate: true })
+                  }
+               >
+                  {languageCodesDict[option]["name"]}
+               </MenuItem>
+            ))}
+         </BrandedTextField>
          <BrandedTextField
             select
             label={"Proficiency"}
@@ -128,31 +138,14 @@ export const LanguageFormFields = ({
                <MenuItem
                   key={value}
                   value={value}
-                  onClick={() => setValue("proficiency", value)}
+                  onClick={() =>
+                     setValue("proficiency", value, { shouldValidate: true })
+                  }
                >
                   {LanguageProficiencyLabels[value]}
                </MenuItem>
             ))}
          </BrandedTextField>
-         {/* <ControlledBrandedAutoComplete
-            label={"Proficiency"}
-            name={"proficiency"}
-            options={LanguageProficiencyValues}
-            textFieldProps={{
-               requiredText: "(required)",
-               placeholder: "E.g., Advanced",
-            }}
-            autocompleteProps={{
-               id: "languageProficiency",
-               disabled: isSubmitting,
-               disableClearable: false,
-               autoHighlight: true,
-               getOptionLabel: (option) => {
-                  return (option && LanguageProficiencyLabels[option]) || ""
-               },
-               isOptionEqualToValue: (option, value) => option === value,
-            }}
-         /> */}
       </Stack>
    )
 }
