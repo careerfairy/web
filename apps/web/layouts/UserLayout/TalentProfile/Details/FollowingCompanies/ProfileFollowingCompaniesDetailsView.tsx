@@ -1,14 +1,15 @@
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { CompanyFollowed } from "@careerfairy/shared-lib/users"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Button, Divider, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useUserFollowingCompanies } from "components/custom-hook/user/useUserFollowingCompanies"
 import { CompanyIcon } from "components/views/common/icons"
+import ProfileCompaniesPublicSparksBadge from "components/views/common/icons/ProfileCompaniesPublicSparksBadge"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { groupRepo } from "data/RepositoryInstances"
 import Link from "next/link"
-import { useCallback } from "react"
+import { Fragment, useCallback } from "react"
 import { MapPin, Tag, Users } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { EmptyItemView } from "../Profile/EmptyItemView"
@@ -46,6 +47,10 @@ const styles = sxStyles({
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
    },
+   publicSparksBadge: {
+      width: "16px !important",
+      height: "16px !important",
+   },
    companyInfoText: {
       color: (theme) => theme.palette.neutral[600],
       fontWeight: 400,
@@ -55,8 +60,13 @@ const styles = sxStyles({
    },
    companyInfoIcon: {
       color: (theme) => theme.palette.neutral[600],
+      minWidth: "12px !important",
+      minHeight: "12px !important",
       width: "12px",
       height: "12px",
+   },
+   divider: {
+      borderColor: (theme) => theme.brand.black[200],
    },
    unfollowBtn: {
       width: "fit-content",
@@ -73,9 +83,14 @@ const styles = sxStyles({
 })
 
 export const ProfileFollowingCompaniesDetailsView = () => {
+   const followingCompanies = useUserFollowingCompanies()
+
    return (
       <Box m={"20px"}>
-         <ProfileSection showAddIcon={false} title="Following companies">
+         <ProfileSection
+            showAddIcon={false}
+            title={`Followed companies (${followingCompanies.length})`}
+         >
             <ProfileFollowingCompanies />
          </ProfileSection>
       </Box>
@@ -110,12 +125,16 @@ const ProfileFollowingCompaniesList = ({
 }: ProfileFollowingCompaniesListProps) => {
    return (
       <Stack>
-         {followingCompanies.map((companyFollowed) => (
-            <FollowingCompanyCard
-               group={companyFollowed.group}
-               key={companyFollowed.groupId}
-            />
-         ))}
+         {followingCompanies.map((companyFollowed, idx) => {
+            return (
+               <Fragment key={companyFollowed.groupId}>
+                  <FollowingCompanyCard group={companyFollowed.group} />
+                  {idx < followingCompanies.length - 1 ? (
+                     <Divider sx={styles.divider} />
+                  ) : null}
+               </Fragment>
+            )
+         })}
       </Stack>
    )
 }
@@ -129,23 +148,31 @@ const FollowingCompanyCard = ({ group }: FollowingCompanyCardProps) => {
 
    const companyLink = `/company/${companyNameSlugify(group.universityName)}`
 
-   const handleUnfollow = useCallback(async () => {
-      await groupRepo.unfollowCompany(userData.id, group.id)
-   }, [userData.id, group.id])
+   const handleUnfollow = useCallback(
+      async (e: React.MouseEvent) => {
+         e.stopPropagation()
+         e.preventDefault()
+         await groupRepo.unfollowCompany(userData.id, group.id)
+      },
+      [userData.id, group.id]
+   )
 
    return (
-      <Stack direction={"row"} sx={styles.companyCardRoot}>
-         <Link
-            href={companyLink}
-            target="_blank"
-            style={{ maxWidth: "calc(100% - 100px)" }}
-         >
+      <Link href={companyLink} target="_blank">
+         <Stack direction={"row"} sx={styles.companyCardRoot}>
             <Stack direction={"row"} alignItems={"center"} spacing={1.5}>
                <CircularLogo src={group.logoUrl} alt="Company logo" size={48} />
                <Stack sx={{ minWidth: 0 }}>
-                  <Typography sx={styles.companyName} variant="small">
-                     {group.universityName}
-                  </Typography>
+                  <Stack direction={"row"} alignItems={"center"} spacing={0.5}>
+                     <Typography sx={styles.companyName} variant="small">
+                        {group.universityName}
+                     </Typography>
+                     {group.publicSparks ? (
+                        <ProfileCompaniesPublicSparksBadge
+                           sx={styles.publicSparksBadge}
+                        />
+                     ) : null}
+                  </Stack>
                   <FollowingCompanyCardInfo
                      icon={MapPin}
                      text={group.companyCountry?.name}
@@ -162,15 +189,16 @@ const FollowingCompanyCard = ({ group }: FollowingCompanyCardProps) => {
                   />
                </Stack>
             </Stack>
-         </Link>
-         <Button
-            sx={styles.unfollowBtn}
-            variant="outlined"
-            onClick={handleUnfollow}
-         >
-            Unfollow
-         </Button>
-      </Stack>
+
+            <Button
+               sx={styles.unfollowBtn}
+               variant="outlined"
+               onClick={handleUnfollow}
+            >
+               Unfollow
+            </Button>
+         </Stack>
+      </Link>
    )
 }
 

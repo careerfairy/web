@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography"
 import BaseDialogView, {
    MainContent,
 } from "components/views/livestream-dialog/BaseDialogView"
-import Image from "next/legacy/image"
+import Image from "next/image"
 import { FC } from "react"
 
 type EmptyJobDetailsViewProps = {

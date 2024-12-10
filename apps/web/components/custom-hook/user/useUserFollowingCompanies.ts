@@ -1,7 +1,7 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { CompanyFollowed } from "@careerfairy/shared-lib/users"
 import { useAuth } from "HOCs/AuthProvider"
-import { collection, onSnapshot, query } from "firebase/firestore"
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore"
 import { useEffect, useState } from "react"
 import { useFirestore } from "reactfire"
 
@@ -19,7 +19,8 @@ export const useUserFollowingCompanies = () => {
                   "userData",
                   userData.id,
                   "companiesUserFollows"
-               )
+               ),
+               orderBy("createdAt", "desc")
             ).withConverter(createGenericConverter<CompanyFollowed>()),
             (doc) => {
                const newData = doc.docs?.map((doc) => doc.data()) || []
@@ -27,7 +28,10 @@ export const useUserFollowingCompanies = () => {
             }
          )
 
-         return () => unsubscribe()
+         return () => {
+            unsubscribe()
+            setCompanies([])
+         }
       }
    }, [userData.id, firestore])
 

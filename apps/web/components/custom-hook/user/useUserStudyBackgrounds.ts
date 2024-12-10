@@ -30,7 +30,10 @@ export const useUserStudyBackgrounds = () => {
             }
          )
 
-         return () => unsubscribe()
+         return () => {
+            unsubscribe()
+            setStudyBackgrounds([])
+         }
       }
    }, [userData.id, firestore])
 
