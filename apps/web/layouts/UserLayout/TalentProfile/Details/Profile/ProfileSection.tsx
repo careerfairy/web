@@ -22,6 +22,10 @@ const styles = sxStyles({
          cursor: "pointer",
       },
    },
+   count: {
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[900],
+   },
 })
 
 type Props = {
@@ -29,6 +33,7 @@ type Props = {
    showAddIcon?: boolean
    addIcon?: Icon
    handleAdd?: () => void
+   count?: number
    children: ReactElement
 }
 
@@ -38,12 +43,19 @@ export const ProfileSection = ({
    title,
    children,
    handleAdd,
+   count,
 }: Props) => {
    return (
       <Stack spacing={1.5}>
          <Stack direction={"row"} sx={styles.titleRoot}>
             <Typography variant="brandedBody" sx={styles.title}>
                {title}
+               {count !== undefined ? (
+                  <Typography
+                     variant="small"
+                     sx={styles.count}
+                  >{` (${count})`}</Typography>
+               ) : null}
             </Typography>
             <ConditionalWrapper condition={showAddIcon}>
                <Box
