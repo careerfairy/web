@@ -52,6 +52,7 @@ const config: PlaywrightTestConfig = {
       video: "retain-on-failure",
    },
    globalTeardown: "./playwright.teardown",
+   globalSetup: "./playwright.setup",
 
    /* Configure projects for major browsers */
    projects: [
