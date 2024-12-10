@@ -17,14 +17,8 @@ import SparkQuestion from "components/views/sparks/components/spark-card/SparkQu
 import VideoPreview from "components/views/sparks/components/spark-card/VideoPreview"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
-import {
-   SyntheticEvent,
-   useCallback,
-   useEffect,
-   useMemo,
-   useRef,
-   useState,
-} from "react"
+import { SyntheticEvent, useCallback, useEffect, useMemo, useRef } from "react"
+import { useMeasure } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { buildMentorPageLink } from "utils/routes"
 import { ExpandedCard } from "./ExpandedCard"
@@ -112,11 +106,10 @@ type Props = {
 
 export const ExpandedSparkCard = ({ spark, playing, onClose }: Props) => {
    const isMobile = useIsMobile()
-   const [dialogWidth, setDialogWidth] = useState(undefined)
-   const dialogRef = useRef<HTMLDivElement>(null)
    const { data: visitorId } = useFingerPrint()
    const { authenticatedUser } = useAuth()
    const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
+   const [dialogRef, { width: dialogWidth }] = useMeasure()
 
    const companyPageLink = spark.group.publicProfile
       ? `/company/${companyNameSlugify(spark.group.universityName)}`
@@ -157,27 +150,6 @@ export const ExpandedSparkCard = ({ spark, playing, onClose }: Props) => {
 
       return () => clearTimeout(timeoutId)
    }, [visitorId, authenticatedUser?.email, spark.id])
-
-   useEffect(() => {
-      if (!dialogRef.current) return
-
-      const resizeObserver = new ResizeObserver((entries) => {
-         const width = entries[0]?.contentRect.width
-         if (width) {
-            setDialogWidth(width)
-         }
-      })
-
-      // Ensures the dialog is rendered before observing and setting the width
-      requestAnimationFrame(() => {
-         setDialogWidth(dialogRef.current?.offsetWidth)
-         if (dialogRef.current) {
-            resizeObserver.observe(dialogRef.current)
-         }
-      })
-
-      return () => resizeObserver.disconnect()
-   }, [])
 
    const actionsWrapperStyles = useMemo(
       () => getActionsWrapperPositionsStyles(dialogWidth ?? 0),
