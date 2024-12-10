@@ -249,15 +249,6 @@ const moduleExports = {
       REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
    },
 
-   // Add publicRuntimeConfig for runtime environment variables
-   publicRuntimeConfig: {
-      // NEXT_PUBLIC_UNIQUE_WORKFLOW_ID is used to isolate test data and operations
-      // It's set at build time and can be accessed at runtime using next/config
-      // This allows for consistent values across server and client-side rendering
-      NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
-         process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
-   },
-
    // Disabling landing pages for now (CF-701)
    redirects: async () => {
       return [
