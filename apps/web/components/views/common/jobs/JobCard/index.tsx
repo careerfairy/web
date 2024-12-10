@@ -152,7 +152,11 @@ const JobCard = ({
                   ) : null}
 
                   {!isMobile && !smallCard && (
-                     <JobCardAction job={job} previewMode={previewMode} />
+                     <JobCardAction
+                        job={job}
+                        previewMode={previewMode}
+                        applied={applied}
+                     />
                   )}
                </Box>
             </Box>
