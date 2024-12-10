@@ -1,11 +1,8 @@
 /* eslint-disable no-var */
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import * as Sentry from "@sentry/nextjs"
-import getConfig from "next/config"
 import { v4 as uuid } from "uuid"
 import LocalStorageUtil from "./LocalStorageUtil"
-
-const { publicRuntimeConfig } = getConfig() || {}
 
 export function getRandom(arr, n) {
    var result = new Array(n),
@@ -248,7 +245,7 @@ export const shouldUseEmulators = () => {
  * Get the workflow ID for isolating test data and operations
  *
  * This function prioritizes:
- * 1. The NEXT_PUBLIC_UNIQUE_WORKFLOW_ID set at build time (available through next/config)
+ * 1. The NEXT_PUBLIC_UNIQUE_WORKFLOW_ID set at build time (available through env.test or process.env in CI)
  * 2. The NEXT_PUBLIC_DEV_NAME environment variable (for local development)
  * 3. "unknown" as a fallback
  *
@@ -257,7 +254,7 @@ export const shouldUseEmulators = () => {
  */
 export const getWorkflowId = (): string => {
    return (
-      publicRuntimeConfig.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
+      process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
       process.env.NEXT_PUBLIC_DEV_NAME ||
       "unknown"
    )
