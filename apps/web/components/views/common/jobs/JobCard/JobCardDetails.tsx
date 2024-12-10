@@ -165,6 +165,9 @@ const JobCardDetails = ({
       [isAtsJob, job, jobHubV1]
    )
 
+   const published =
+      jobPublished || (talentProfileV1 && jobApplication.alreadyApplied)
+
    return (
       <>
          <Box sx={styles.wrapper}>
@@ -279,10 +282,7 @@ const JobCardDetails = ({
 
                {(isMobile || smallCard) && previewMode ? (
                   <JobButtonAction
-                     published={
-                        jobPublished ||
-                        (talentProfileV1 && jobApplication.alreadyApplied)
-                     }
+                     published={published}
                      smallCard={smallCard}
                   />
                ) : null}
