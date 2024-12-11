@@ -105,7 +105,8 @@ export const InterestFormFields = () => {
    const businessFunctionsFieldName = "businessFunctionsTagIds"
    const contentTopicsFieldName = "contentTopicsTagIds"
 
-   const { setValue, getFieldState, trigger } = useFormContext()
+   const { setValue, getFieldState, trigger } =
+      useFormContext<CreateInterestSchemaType>()
 
    const businessFunctionsState = getFieldState(businessFunctionsFieldName)
    const contentTopicsState = getFieldState(contentTopicsFieldName)
@@ -142,10 +143,9 @@ export const InterestFormFields = () => {
       checkMap: Record<string, boolean>,
       tagId: string,
       currentValues: string[],
-      fieldName: string
+      fieldName: "businessFunctionsTagIds" | "contentTopicsTagIds"
    ) => {
       const isChecked = checkMap[tagId]
-
       const newValue = isChecked
          ? currentValues.filter((id) => id !== tagId)
          : [...currentValues, tagId]

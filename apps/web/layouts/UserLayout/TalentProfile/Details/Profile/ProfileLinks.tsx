@@ -32,7 +32,11 @@ import { ProfileItemCard } from "./ProfileItemCard"
 import { ProfileSection } from "./ProfileSection"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import { LinkFormFields, LinkFormProvider } from "./forms/LinksForm"
-import { LinkFormValues, getInitialLinkValues } from "./forms/schemas"
+import {
+   CreateLinkSchemaType,
+   LinkFormValues,
+   getInitialLinkValues,
+} from "./forms/schemas"
 
 const styles = sxStyles({
    emptyLinksRoot: {
@@ -116,7 +120,7 @@ const FormDialogWrapper = () => {
       formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
-   } = useFormContext()
+   } = useFormContext<CreateLinkSchemaType>()
 
    const handleCloseLinkDialog = useCallback(() => {
       dispatch(closeCreateDialog({ type: TalentProfileItemTypes.Link }))
@@ -215,7 +219,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
    const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
       useState<boolean>(false)
    const dispatch = useDispatch()
-   const { reset } = useFormContext()
+   const { reset } = useFormContext<CreateLinkSchemaType>()
 
    const handleEdit = useCallback(() => {
       dispatch(
