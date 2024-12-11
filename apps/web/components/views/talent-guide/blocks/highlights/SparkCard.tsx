@@ -51,6 +51,7 @@ export const SparkCard = ({ spark, index }: SparkCardProps) => {
                disableAutoPlay={isMobile}
                questionLimitLines
                muted
+               hideProgress
             />
          </Box>
          {isExpanded(index) && (

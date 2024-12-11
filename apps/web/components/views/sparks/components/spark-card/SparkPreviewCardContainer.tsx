@@ -71,6 +71,7 @@ type Props = {
    containerRef?: React.RefObject<HTMLDivElement>
    selected?: boolean
    type?: SparkPreviewCardType
+   hideProgress?: boolean
 }
 
 const SparkPreviewCardContainer: FC<Props> = ({
@@ -84,6 +85,7 @@ const SparkPreviewCardContainer: FC<Props> = ({
    containerRef,
    selected,
    type = "carousel",
+   hideProgress,
 }) => {
    const isMobile = useIsMobile()
    const autoPlayEnabled = autoPlaying !== undefined && autoPlaying !== false
@@ -120,6 +122,7 @@ const SparkPreviewCardContainer: FC<Props> = ({
             muted={video.muted || autoPlayEnabled ? true : false}
             identifier={video.url}
             onVideoEnded={onVideoEnded}
+            hideProgress={hideProgress}
          />
       </Box>
    )
