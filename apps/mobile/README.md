@@ -183,19 +183,16 @@ npm run dev
 npm run native:cache
 ```
 
-#### For iOS
+#### For iOS (Only local build)
 
-In .env file, replace current to this:
-
-BASE_URL=http://127.0.0.1:3000 <br />
-SEARCH_CRITERIA=127.0.0.1
+In .env file, set LOCAL_BUILD to true
 
 after running the script, type 'i' to run iOS emulator
 
 #### For Android and Expo GO application
 
-BASE_URL=http://{your_local_ip_address}:3000 (when running ios simulator, you get message Opening exp -> that IP address is the one) and
-SEARCH_CRITERIA={your_local_ip_address}
+Currently, android and expo go cannot work, as for android emulator, it only works with http://10.0.2.2:3000 accessing localhost, and it will load the app, but will not be able to contact backend services.
+Same thing for Expo GO, which needs exposed local ip address and it will have the same effect
 
 ---
 
