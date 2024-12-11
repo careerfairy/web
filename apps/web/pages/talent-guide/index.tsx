@@ -3,9 +3,9 @@ import { GetStaticProps, NextPage } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import {
-   tgPreviewService,
-   tgService,
-} from "../../data/hygraph/TalentGuideService"
+   tgBackendPreviewService,
+   tgBackendService,
+} from "../../data/hygraph/TalentGuideBackendService"
 interface TalentGuidePageProps {
    slugs: string[]
 }
@@ -40,7 +40,7 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
       }
    }
 
-   const service = preview ? tgPreviewService : tgService
+   const service = preview ? tgBackendPreviewService : tgBackendService
 
    const slugs = await service.getAllTalentGuideModulePageSlugs()
 
