@@ -27,6 +27,7 @@ import {
    SocialPlatformObject,
    SocialPlatformType,
 } from "components/custom-hook/useSocials"
+import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
 import LikeIcon from "components/views/common/icons/LikeIcon"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
@@ -321,6 +322,7 @@ const LikeAction: FC<{
 }> = ({ sparkId }) => {
    const currentSparkId = useSelector(currentSparkIdSelector)
    const isFullScreen = useSparksFeedIsFullScreen()
+   const isTalentGuide = useIsInTalentGuide()
 
    const isCurrentSpark = sparkId && currentSparkId === sparkId
 
@@ -330,7 +332,8 @@ const LikeAction: FC<{
    const { toggleLike, isLoading, liked } = useUserSparkLike(
       authenticatedUser.email,
       sparkId,
-      !isLoggedIn || !isCurrentSpark
+      !isLoggedIn || !isCurrentSpark,
+      isTalentGuide ? [authenticatedUser.email, sparkId] : undefined
    )
 
    const handleClicked = useCallback(
