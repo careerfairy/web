@@ -1334,7 +1334,6 @@ export class FirebaseUserRepository
          const batch = this.firestore.batch()
 
          for (const userId of chunk) {
-            console.log("🚀 ~ PROCESSING USER - ", userId)
             const ref = this.firestore
                .collection("userData")
                .doc(userId)
@@ -1345,12 +1344,9 @@ export class FirebaseUserRepository
                group: group,
             }
 
-            console.log("🚀 ~ toUpdatePublicGroup:", toUpdatePublicGroup)
-
             batch.update(ref, toUpdatePublicGroup)
          }
 
-         // Commit the current batch
          await batch.commit()
       }
    }
