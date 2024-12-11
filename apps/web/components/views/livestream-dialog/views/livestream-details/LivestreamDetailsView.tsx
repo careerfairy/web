@@ -88,6 +88,62 @@ const LivestreamDetailsView = () => {
                   ) : (
                      <CountDownTimer presenter={livestreamPresenter} />
                   )}
+                  {!isFloatingActionButton && (
+                     <ActionButton
+                        livestreamPresenter={livestreamPresenter}
+                        onRegisterClick={handleRegisterClick}
+                        canWatchRecording={showRecording}
+                        isFloating={isFloatingActionButton}
+                        userEmailFromServer={serverUserEmail}
+                        heroVisible={heroInView}
+                     />
+                  )}
+               </Stack>
+            </HeroContent>
+         }
+         mainContent={
+            <>
+               <MainContentNavigation
+                  questionsDisabled={Boolean(livestream.questionsDisabled)}
+                  hasJobs={hasJobs}
+               >
+                  {({
+                     jobsRef,
+                     aboutLivestreamRef,
+                     aboutCompanyRef,
+                     questionsRef,
+                  }) => (
+                     <MainContent>
+                        <Section ref={aboutLivestreamRef}>
+                           {/* Speakers are part of the about live stream section */}
+                           <Speakers speakers={livestream.speakers} />
+                           <Section navOffset={50}>
+                              <AboutLivestream
+                                 presenter={livestreamPresenter}
+                              />
+                           </Section>
+                        </Section>
+                        {hasJobs ? (
+                           <Section navOffset={44} ref={jobsRef}>
+                              <Jobs presenter={livestreamPresenter} />
+                           </Section>
+                        ) : null}
+                        <AboutCompany
+                           sectionRef={aboutCompanyRef}
+                           presenter={livestreamPresenter}
+                        />
+                        {livestream.questionsDisabled ? null : (
+                           <Section ref={questionsRef}>
+                              <Questions livestream={livestream} />
+                           </Section>
+                        )}
+                        {isFloatingActionButton ? (
+                           <FloatingButtonOffset />
+                        ) : null}
+                     </MainContent>
+                  )}
+               </MainContentNavigation>
+               {Boolean(isFloatingActionButton) && (
                   <ActionButton
                      livestreamPresenter={livestreamPresenter}
                      onRegisterClick={handleRegisterClick}
@@ -96,46 +152,8 @@ const LivestreamDetailsView = () => {
                      userEmailFromServer={serverUserEmail}
                      heroVisible={heroInView}
                   />
-               </Stack>
-            </HeroContent>
-         }
-         mainContent={
-            <MainContentNavigation
-               questionsDisabled={Boolean(livestream.questionsDisabled)}
-               hasJobs={hasJobs}
-            >
-               {({
-                  jobsRef,
-                  aboutLivestreamRef,
-                  aboutCompanyRef,
-                  questionsRef,
-               }) => (
-                  <MainContent>
-                     <Section ref={aboutLivestreamRef}>
-                        {/* Speakers are part of the about live stream section */}
-                        <Speakers speakers={livestream.speakers} />
-                        <Section navOffset={50}>
-                           <AboutLivestream presenter={livestreamPresenter} />
-                        </Section>
-                     </Section>
-                     {hasJobs ? (
-                        <Section navOffset={44} ref={jobsRef}>
-                           <Jobs presenter={livestreamPresenter} />
-                        </Section>
-                     ) : null}
-                     <AboutCompany
-                        sectionRef={aboutCompanyRef}
-                        presenter={livestreamPresenter}
-                     />
-                     {livestream.questionsDisabled ? null : (
-                        <Section ref={questionsRef}>
-                           <Questions livestream={livestream} />
-                        </Section>
-                     )}
-                     {isFloatingActionButton ? <FloatingButtonOffset /> : null}
-                  </MainContent>
                )}
-            </MainContentNavigation>
+            </>
          }
       />
    )
