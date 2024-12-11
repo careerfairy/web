@@ -1,7 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import useLivestream from "components/custom-hook/live-stream/useLivestream"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { HighlightComponentType } from "data/hygraph/types"
 import Link from "next/link"
@@ -57,6 +56,19 @@ const styles = sxStyles({
       overflowX: "hidden",
       cursor: "pointer",
       display: "flex",
+   },
+   iconWrapper: {
+      height: {
+         xs: 22,
+         sm: 16,
+      },
+      width: {
+         xs: 22,
+         sm: 16,
+      },
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
    },
    liveStreamTitle: {
       whiteSpace: "nowrap",
@@ -115,7 +127,6 @@ export const ExpandedHeader = ({
    highlight: HighlightComponentType
 }) => {
    const router = useRouter()
-   const isMobile = useIsMobile()
    const titleRef = useRef<HTMLDivElement>(null)
    const parentRef = useRef<HTMLDivElement>(null)
    const [animationStyle, setAnimationStyle] = useState([])
@@ -195,7 +206,9 @@ export const ExpandedHeader = ({
             alignItems="center"
             onClick={handleLivestreamTitleClick}
          >
-            <Video size={isMobile ? 22 : 16} />
+            <Box sx={styles.iconWrapper}>
+               <Video />
+            </Box>
             {livestream ? (
                <Box sx={styles.liveStreamTitleContainer} ref={parentRef}>
                   <Typography
