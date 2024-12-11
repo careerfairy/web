@@ -59,11 +59,11 @@ const styles = sxStyles({
    },
    iconWrapper: {
       height: {
-         xs: 22,
+         xs: 20,
          sm: 16,
       },
       width: {
-         xs: 22,
+         xs: 20,
          sm: 16,
       },
       display: "flex",
@@ -170,13 +170,13 @@ export const ExpandedHeader = ({
    }, [])
 
    useEffect(() => {
-      if (titleRef.current && parentRef.current) {
+      if (livestream && titleRef.current && parentRef.current) {
          // hack needed to ensure elements are rendered and we have access to the correct dimensions
-         setTimeout(() => {
+         requestAnimationFrame(() => {
             setAnimationStyle(getScrollAnimationStyle(titleRef, parentRef))
-         }, 100)
+         })
       }
-   }, [titleRef, parentRef])
+   }, [livestream, titleRef, parentRef])
 
    return (
       <Box sx={styles.root}>
@@ -207,7 +207,7 @@ export const ExpandedHeader = ({
             onClick={handleLivestreamTitleClick}
          >
             <Box sx={styles.iconWrapper}>
-               <Video />
+               <Video strokeWidth={1.5} />
             </Box>
             {livestream ? (
                <Box sx={styles.liveStreamTitleContainer} ref={parentRef}>
