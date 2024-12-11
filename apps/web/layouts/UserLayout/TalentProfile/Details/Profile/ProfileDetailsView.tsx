@@ -16,15 +16,12 @@ const styles = sxStyles({
    },
 })
 export const ProfileDetailsView = () => {
-   const { userData } = useAuth()
+   const { userPresenter } = useAuth()
    const { hasItems: userHasStudyBackgrounds } = useUserStudyBackgrounds()
    const { hasItems: userHasLinks } = useUserLinks()
    const { hasItems: userHasLanguages } = useUserLanguages()
 
-   const userHasInterests = Boolean(
-      userData.businessFunctionsTagIds?.length ||
-         userData.contentTopicsTagIds?.length
-   )
+   const userHasInterests = userPresenter?.userHasInterests()
 
    return (
       <Stack sx={styles.wrapper} spacing={3}>
