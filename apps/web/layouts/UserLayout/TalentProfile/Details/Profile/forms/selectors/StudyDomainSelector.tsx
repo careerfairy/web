@@ -73,7 +73,7 @@ export const StudyDomainSelector = ({
             disabled={isSubmitting}
             fullWidth
             value={value}
-            requiredText="(required)"
+            requiredText={requiredText}
          >
             {options.map((option) => (
                <MenuItem
