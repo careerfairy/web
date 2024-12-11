@@ -310,11 +310,21 @@ export interface IUserRepository {
     */
    deleteLanguage(userId: string, languageId: string): Promise<void>
 
+   /**
+    * Updates the /userData/companiesUserFollows sub collection for each user in @param followingUsers.
+    * @param group The public group data.
+    * @param followingUsers The users to update.
+    */
    batchUpdateFollowingUsersGroup(
       group: PublicGroup,
       followingUsers: string[]
    ): Promise<void>
 
+   /**
+    * Deletes the /userData/companiesUserFollows/{groupId} sub collection for each user in @param followingUsers.
+    * @param groupId The group id.
+    * @param followingUsers The users to delete.
+    */
    batchDeleteFollowingUsersGroup(
       groupId: string,
       followingUsers: string[]
