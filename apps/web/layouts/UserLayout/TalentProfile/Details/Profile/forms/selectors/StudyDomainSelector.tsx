@@ -65,7 +65,7 @@ export const StudyDomainSelector = ({
                      value.value
                   ) : (
                      <Typography color={"neutral.400"}>
-                        E.g., Advanced
+                        {placeholder}
                      </Typography>
                   )
                },
