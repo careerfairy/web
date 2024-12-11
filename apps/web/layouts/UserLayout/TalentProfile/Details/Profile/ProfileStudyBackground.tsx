@@ -37,6 +37,7 @@ import {
    StudyBackgroundFormProvider,
 } from "./forms/StudyBackgroundForm"
 import {
+   CreateStudyBackgroundSchemaType,
    StudyBackgroundFormValues,
    getInitialStudyBackgroundValues,
 } from "./forms/schemas"
@@ -134,7 +135,7 @@ const FormDialogWrapper = () => {
       formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
-   } = useFormContext()
+   } = useFormContext<CreateStudyBackgroundSchemaType>()
 
    const handleCloseStudyBackgroundDialog = useCallback(() => {
       dispatch(
@@ -271,7 +272,7 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
       useState<boolean>(false)
    const [isDeleting, setIsDeleting] = useState<boolean>(false)
    const dispatch = useDispatch()
-   const { reset } = useFormContext()
+   const { reset } = useFormContext<CreateStudyBackgroundSchemaType>()
 
    const handleEdit = useCallback(() => {
       dispatch(
@@ -280,7 +281,7 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
             data: studyBackground,
          })
       )
-      reset(studyBackground)
+      reset(getInitialStudyBackgroundValues(studyBackground))
    }, [dispatch, studyBackground, reset])
 
    const handleDelete = useCallback(async () => {

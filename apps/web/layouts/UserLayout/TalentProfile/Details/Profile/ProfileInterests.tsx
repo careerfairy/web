@@ -19,7 +19,11 @@ import { EmptyItemView } from "./EmptyItemView"
 import { ProfileSection } from "./ProfileSection"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import { InterestFormFields, InterestFormProvider } from "./forms/InterestsForm"
-import { InterestFormValues, getInitialInterestValues } from "./forms/schemas"
+import {
+   CreateInterestSchemaType,
+   InterestFormValues,
+   getInitialInterestValues,
+} from "./forms/schemas"
 
 const styles = sxStyles({
    emptyInterestsRoot: {
@@ -98,7 +102,7 @@ const FormDialogWrapper = () => {
       formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
-   } = useFormContext()
+   } = useFormContext<CreateInterestSchemaType>()
 
    const handleCloseInterestDialog = useCallback(() => {
       dispatch(closeCreateDialog({ type: TalentProfileItemTypes.Interest }))
