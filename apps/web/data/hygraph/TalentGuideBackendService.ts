@@ -18,7 +18,7 @@ import {
  *
  * @class
  */
-export class TalentGuideService {
+export class TalentGuideBackendService {
    private client: GraphQLClient
 
    constructor({ preview = false }: { preview?: boolean } = {}) {
@@ -75,6 +75,7 @@ export class TalentGuideService {
                slug
                seo ${seoComponentFragment}
                content {
+                  id
                   moduleName
                   moduleDescription
                   moduleDuration
@@ -100,13 +101,13 @@ export class TalentGuideService {
 }
 
 /**
- * Singleton instance of TalentGuideService for published content.
+ * Singleton instance of TalentGuideBackendService for published content.
  */
-export const tgService = new TalentGuideService()
+export const tgBackendService = new TalentGuideBackendService()
 
 /**
- * Singleton instance of TalentGuideService for unpublished content.
+ * Singleton instance of TalentGuideBackendService for unpublished content.
  */
-export const tgPreviewService = new TalentGuideService({
+export const tgBackendPreviewService = new TalentGuideBackendService({
    preview: true,
 })
