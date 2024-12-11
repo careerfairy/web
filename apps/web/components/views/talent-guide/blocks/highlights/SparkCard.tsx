@@ -1,13 +1,19 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { Box } from "@mui/material"
+import { imageKitLoader } from "@careerfairy/shared-lib/utils/video"
+import { Box, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSpark from "components/views/admin/sparks/analytics/competitor-tab/useSpark"
-import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
+import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
+import SparkHeader from "components/views/sparks/components/spark-card/SparkHeader"
+import SparkPreviewCardContainer from "components/views/sparks/components/spark-card/SparkPreviewCardContainer"
+import SparkQuestion from "components/views/sparks/components/spark-card/SparkQuestion"
 import { SparkComponentType } from "data/hygraph/types"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { ExpandedSparkCard } from "./ExpandedSparkCard"
 import { useHighlights } from "./HighlightsBlockContext"
+
+const CARD_PADDING = 1.5
 
 const styles = sxStyles({
    sparkContainer: {
@@ -17,6 +23,11 @@ const styles = sxStyles({
             md: 220,
          },
       },
+   },
+   cardDetails: {
+      cursor: "pointer",
+      justifyContent: "flex-end",
+      gap: "6px",
    },
 })
 
@@ -33,6 +44,7 @@ export const SparkCard = ({ spark, index }: SparkCardProps) => {
       isExpanded,
       handleExpandCardClick,
       handleCloseCardClick,
+      setAutoPlayingIndex,
       isPlayingExpanded,
    } = useHighlights()
 
@@ -45,14 +57,34 @@ export const SparkCard = ({ spark, index }: SparkCardProps) => {
    return (
       <>
          <Box sx={styles.sparkContainer} onClick={handleExpandCardClick(index)}>
-            <SparkPreviewCard
-               spark={sparkData}
-               preview={shouldAutoPlay(index)}
-               disableAutoPlay={isMobile}
-               questionLimitLines
-               muted
-               hideProgress
-            />
+            <SparkPreviewCardContainer
+               type="carousel"
+               video={{
+                  thumbnailUrl: sparkData.video.thumbnailUrl,
+                  url: imageKitLoader({
+                     src: sparkData.video.url,
+                     height: 640 * 1,
+                     width: 360 * 1,
+                     quality: 40,
+                     maxSizeCrop: true,
+                  }),
+                  preview: shouldAutoPlay(index),
+                  muted: true,
+               }}
+               onMouseEnter={isMobile ? null : () => setAutoPlayingIndex(index)}
+               onMouseLeave={
+                  isMobile ? null : () => setAutoPlayingIndex(undefined)
+               }
+               autoPlaying={shouldAutoPlay(index)}
+            >
+               <Box px={CARD_PADDING} pt={CARD_PADDING}>
+                  <SparkHeader showAdminOptions={false} spark={sparkData} />
+               </Box>
+               <Stack sx={styles.cardDetails} p={CARD_PADDING} flexGrow={1}>
+                  <SparkCategoryChip categoryId={sparkData.category.id} />
+                  <SparkQuestion question={sparkData.question} limitLines />
+               </Stack>
+            </SparkPreviewCardContainer>
          </Box>
          {isExpanded(index) && (
             <ExpandedSparkCard
