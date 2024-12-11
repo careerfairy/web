@@ -1323,7 +1323,6 @@ export class FirebaseUserRepository
       group: PublicGroup,
       followingUsers: string[]
    ): Promise<void> {
-      console.log("🚀 ~ group:", group)
       if (!followingUsers?.length) return
 
       const BATCH_SIZE = 300
