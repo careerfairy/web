@@ -14,13 +14,13 @@ import useSocials, {
    SocialPlatformObject,
    SocialPlatformType,
 } from "components/custom-hook/useSocials"
+import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
 import { copyStringToClipboard } from "components/helperFunctions/HelperFunctions"
 import ReferralWidget from "components/views/common/ReferralWidget"
 import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { DRAWER_WIDTH } from "constants/layout"
-import { useRouter } from "next/router"
-import { FC, useCallback, useMemo, useState } from "react"
+import { FC, useCallback, useState } from "react"
 import {
    CheckCircle as CheckIcon,
    X as CloseIcon,
@@ -104,11 +104,7 @@ const SparksShareDialog: FC<Props> = ({
    const [isCopied, setIsCopied] = useState(false)
    const theme = useTheme()
    const isFullScreen = useSparksFeedIsFullScreen()
-
-   const router = useRouter()
-   const isTalentGuide = useMemo(() => {
-      return router.pathname.includes("/talent-guide")
-   }, [router.pathname])
+   const isTalentGuide = useIsInTalentGuide()
 
    const handleCloseDialog = useCallback(() => {
       handleClose()
