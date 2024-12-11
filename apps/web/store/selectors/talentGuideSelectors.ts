@@ -36,3 +36,9 @@ export const useProgress = () =>
 
 export const useTalentGuideTitle = () =>
    useAppSelector((state) => state.talentGuide.moduleData?.content.moduleName)
+
+export const useIsLoadingTalentGuide = () =>
+   useAppSelector((state) => state.talentGuide.isLoadingTalentGuide)
+
+export const useIsLoadingNextStep = () =>
+   useAppSelector((state) => state.talentGuide.isLoadingNextStep)

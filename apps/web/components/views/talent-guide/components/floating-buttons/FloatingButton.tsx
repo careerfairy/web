@@ -1,6 +1,8 @@
-import { Box, Button, ButtonProps } from "@mui/material"
+import { LoadingButton, LoadingButtonProps } from "@mui/lab"
+import { Box } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { Fragment } from "react"
+import { useIsLoadingNextStep } from "store/selectors/talentGuideSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -26,19 +28,26 @@ const styles = sxStyles({
    },
 })
 
-export const FloatingButton = ({ children, sx, ...props }: ButtonProps) => {
+export const FloatingButton = ({
+   children,
+   sx,
+   ...props
+}: LoadingButtonProps) => {
    const isMobile = useIsMobile()
+   const isLoading = useIsLoadingNextStep()
+
    return (
       <Fragment>
          <Box sx={styles.buttonOffset} />
-         <Button
+         <LoadingButton
             size="large"
             fullWidth={isMobile}
             sx={combineStyles(styles.button, sx)}
             {...props}
+            loading={isLoading || props.loading}
          >
             {children}
-         </Button>
+         </LoadingButton>
       </Fragment>
    )
 }

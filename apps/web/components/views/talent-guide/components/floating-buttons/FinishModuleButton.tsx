@@ -1,7 +1,6 @@
 import { useAppDispatch } from "components/custom-hook/store"
-import { resetSteps } from "store/reducers/talentGuideReducer"
+import { resetModuleProgressForDemo } from "../../../../../store/reducers/talentGuideReducer"
 import { FloatingButton } from "./FloatingButton"
-
 export const FinishModuleButton = () => {
    const dispatch = useAppDispatch()
 
@@ -9,7 +8,8 @@ export const FinishModuleButton = () => {
       <FloatingButton
          onClick={() => {
             // TODO: Mark module as completed in firestore
-            dispatch(resetSteps())
+            // Currently, we are just resetting the module progress in the firestore/reducer
+            dispatch(resetModuleProgressForDemo())
          }}
          color="primary"
          variant="outlined"

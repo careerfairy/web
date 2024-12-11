@@ -181,6 +181,49 @@ service cloud.firestore {
             allow update: if isSignedInAndIsSameUser(userId) && protectedFieldsDidNotChange(["credits", "isAdmin", "userEmail"]);
             allow create: if false; // only admin sdk can create users
             allow delete: if false;
+
+      
+
+            match /talentGuideProgress/{progressId} {
+                allow read: if isSignedInAndIsSameUser(userId);
+                
+                // Allow create if:
+                // 1. User is authenticated and it's their own data
+                // 2. Required fields are present and valid
+                // 3. Initial values are valid
+                allow create: if isSignedInAndIsSameUser(userId)
+                    && request.resource.data.userId == userId
+                    && request.resource.data.moduleHygraphId is string
+                    && request.resource.data.currentStepIndex >= 0
+                    && request.resource.data.completedStepIds is list
+                    && request.resource.data.moduleName is string
+                    && request.resource.data.moduleCategory in ["WHAT_TO_DO_BEFORE_APPLYING", "APPLYING_INSIGHTS", "STEPS_AFTER_APPLYING"]
+                    && request.resource.data.totalSteps > 0
+                    && request.resource.data.percentageComplete >= 0
+                    && request.resource.data.percentageComplete <= 100
+                    && request.resource.data.totalVisits == 1  // Start with first visit
+                    && request.resource.data.startedAt is timestamp
+                    && request.resource.data.lastVisitedAt is timestamp
+
+                // Allow update if:
+                // 1. User is authenticated and it's their own data
+                // 2. Not modifying core identifiers and metadata
+                // 3. Updates are valid
+                allow update: if isSignedInAndIsSameUser(userId)
+                    && isUnchanged('userId')
+                    && isUnchanged('moduleHygraphId')
+                    && request.resource.data.currentStepIndex >= 0
+                    && request.resource.data.currentStepIndex < request.resource.data.totalSteps
+                    && request.resource.data.completedStepIds is list
+                    && request.resource.data.percentageComplete >= 0
+                    && request.resource.data.percentageComplete <= 100
+                    && request.resource.data.totalVisits >= resource.data.totalVisits
+                    && request.resource.data.lastUpdated is timestamp
+                    && request.resource.data.lastVisitedAt is timestamp
+
+                // Only allow admins to delete progress for demo purposes
+                allow delete: if isCFAdmin();
+            }
         }
 
         match /universitiesByCountry/{countryId} {
