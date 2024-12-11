@@ -62,7 +62,8 @@ const styles = sxStyles({
    floatingBtnWrapper: {
       overflow: "hidden",
       borderRadius: [0, 0, 4, 4],
-      position: "fixed",
+      position: "sticky",
+      zIndex: 5,
       p: 2,
       bottom: 0,
       maxWidth: {
