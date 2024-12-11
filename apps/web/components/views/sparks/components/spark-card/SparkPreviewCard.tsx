@@ -36,7 +36,6 @@ type Props = {
    type?: SparkPreviewCardType
    muted?: boolean
    onVideoEnded?: () => void
-   hideProgress?: boolean
 }
 
 const SparkPreviewCard: FC<Props> = ({
@@ -51,7 +50,6 @@ const SparkPreviewCard: FC<Props> = ({
    type = "carousel",
    muted = false,
    onVideoEnded,
-   hideProgress,
 }) => {
    const [autoPlaying, setAutoPlaying] = useState(false)
    const containerRef = useRef<HTMLDivElement>(null)
@@ -133,7 +131,6 @@ const SparkPreviewCard: FC<Props> = ({
          autoPlaying={!disableAutoPlay && autoPlaying}
          containerRef={containerRef}
          selected={selected}
-         hideProgress={hideProgress}
       >
          {selectInput || null}
 

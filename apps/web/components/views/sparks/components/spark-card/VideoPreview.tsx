@@ -104,7 +104,6 @@ type Props = {
    containPreviewOnTablet?: boolean
    identifier?: string
    autoPlaying?: boolean
-   hideProgress?: boolean
 }
 
 const VideoPreview: FC<Props> = ({
@@ -121,7 +120,6 @@ const VideoPreview: FC<Props> = ({
    containPreviewOnTablet,
    identifier,
    autoPlaying,
-   hideProgress,
 }) => {
    const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
@@ -241,13 +239,11 @@ const VideoPreview: FC<Props> = ({
                />
             )}
          </Box>
-         {!hideProgress && (
-            <LinearProgress
-               sx={styles.progress}
-               variant="determinate"
-               value={progress}
-            />
-         )}
+         <LinearProgress
+            sx={styles.progress}
+            variant="determinate"
+            value={progress}
+         />
       </Box>
    )
 }
