@@ -1326,12 +1326,13 @@ export class FirebaseUserRepository
       console.log("🚀 ~ group:", group)
       if (!followingUsers?.length) return
 
-      const batch = this.firestore.batch()
       const BATCH_SIZE = 300
 
       const chunks = chunkArray(followingUsers, BATCH_SIZE)
 
       for (const chunk of chunks) {
+         const batch = this.firestore.batch()
+
          for (const userId of chunk) {
             console.log("🚀 ~ PROCESSING USER - ", userId)
             const ref = this.firestore
@@ -1360,24 +1361,23 @@ export class FirebaseUserRepository
    ): Promise<void> {
       if (!followingUsers?.length) return
 
-      const batch = this.firestore.batch()
       const BATCH_SIZE = 300
-
       const chunks = chunkArray(followingUsers, BATCH_SIZE)
 
       for (const chunk of chunks) {
+         const batch = this.firestore.batch()
+
          for (const userId of chunk) {
             const ref = this.firestore
                .collection("userData")
                .doc(userId)
                .collection("companiesUserFollows")
                .doc(groupId)
-
             batch.delete(ref)
          }
-      }
 
-      return batch.commit()
+         await batch.commit()
+      }
    }
 }
 
