@@ -1,6 +1,6 @@
 import functions = require("firebase-functions")
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Group } from "@careerfairy/shared-lib/groups"
+import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import { hasCustomJobsGroupMetaDataChanged } from "@careerfairy/shared-lib/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { hasMetadataChanged as hasGroupMetadataChanged } from "@careerfairy/shared-lib/livestreams/metadata"
@@ -12,6 +12,7 @@ import {
    groupRepo,
    livestreamsRepo,
    sparkRepo,
+   userRepo,
 } from "./api/repositories"
 
 import config from "./config"
@@ -25,6 +26,7 @@ import {
    handleSideEffects,
    logStart,
 } from "./lib/triggers/util"
+import { logAndThrow } from "./lib/validations"
 import { getChangeTypes } from "./util"
 import { validateGroupSparks } from "./util/sparks"
 
@@ -286,6 +288,71 @@ export const onWriteGroup = functions
       }
 
       return handleSideEffects(sideEffectPromises)
+   })
+
+export const syncGroupFollowingUserDataOnChange = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("careerCenterData/{groupId}")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      try {
+         const groupId = context.params.groupId
+
+         const newValue = change.after?.data() as Group
+
+         // An array of promise side effects to be executed in parallel
+         const sideEffectPromises: Promise<unknown>[] = []
+
+         if (changeTypes.isUpdate || changeTypes.isDelete) {
+            const followingUsers = await groupRepo.getFollowingUsers(groupId)
+
+            if (!followingUsers.length) {
+               functions.logger.log(
+                  `🚀 ~ No following users found for group: ${groupId}. Skipping...`
+               )
+            } else {
+               if (changeTypes.isUpdate) {
+                  functions.logger.log(
+                     `🚀 ~ Following users found for group: ${followingUsers.length}. Updating...`
+                  )
+
+                  // From comment above @onWriteGroup "We need the groupId from here since some groups don't have an id field"
+                  newValue.id = groupId
+
+                  const publicGroup = pickPublicDataFromGroup(newValue)
+                  sideEffectPromises.push(
+                     userRepo.batchUpdateFollowingUsersGroup(
+                        publicGroup,
+                        followingUsers
+                     )
+                  )
+               }
+
+               if (changeTypes.isDelete) {
+                  functions.logger.log(
+                     `🚀 ~ Following users found for group: ${followingUsers.length}. Deleting...`
+                  )
+
+                  sideEffectPromises.push(
+                     userRepo.batchDeleteFollowingUsersGroup(
+                        groupId,
+                        followingUsers
+                     )
+                  )
+               }
+            }
+         }
+
+         return handleSideEffects(sideEffectPromises)
+      } catch (error) {
+         logAndThrow(
+            `🚀 ~ Error synchronizing group[${context.params.groupId}] data for following users: `,
+            error,
+            context
+         )
+      }
    })
 
 export const onWriteSpark = functions

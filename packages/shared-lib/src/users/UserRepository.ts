@@ -13,9 +13,10 @@ import {
 } from "../customJobs/customJobs"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
-import { Group } from "../groups"
+import { Group, PublicGroup } from "../groups"
 import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import { SeenSparks } from "../sparks/sparks"
+import { chunkArray } from "../utils"
 import {
    CompanyFollowed,
    IUserReminder,
@@ -308,6 +309,16 @@ export interface IUserRepository {
     * @param languageId Language id.
     */
    deleteLanguage(userId: string, languageId: string): Promise<void>
+
+   batchUpdateFollowingUsersGroup(
+      group: PublicGroup,
+      followingUsers: string[]
+   ): Promise<void>
+
+   batchDeleteFollowingUsersGroup(
+      groupId: string,
+      followingUsers: string[]
+   ): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -1296,6 +1307,67 @@ export class FirebaseUserRepository
          .doc(languageId)
 
       return ref.delete()
+   }
+
+   async batchUpdateFollowingUsersGroup(
+      group: PublicGroup,
+      followingUsers: string[]
+   ): Promise<void> {
+      console.log("🚀 ~ group:", group)
+      if (!followingUsers?.length) return
+
+      const batch = this.firestore.batch()
+      const BATCH_SIZE = 300
+
+      const chunks = chunkArray(followingUsers, BATCH_SIZE)
+
+      for (const chunk of chunks) {
+         for (const userId of chunk) {
+            console.log("🚀 ~ PROCESSING USER - ", userId)
+            const ref = this.firestore
+               .collection("userData")
+               .doc(userId)
+               .collection("companiesUserFollows")
+               .doc(group.id)
+
+            const toUpdatePublicGroup: Pick<CompanyFollowed, "group"> = {
+               group: group,
+            }
+
+            console.log("🚀 ~ toUpdatePublicGroup:", toUpdatePublicGroup)
+
+            batch.update(ref, toUpdatePublicGroup)
+         }
+
+         // Commit the current batch
+         await batch.commit()
+      }
+   }
+
+   async batchDeleteFollowingUsersGroup(
+      groupId: string,
+      followingUsers: string[]
+   ): Promise<void> {
+      if (!followingUsers?.length) return
+
+      const batch = this.firestore.batch()
+      const BATCH_SIZE = 300
+
+      const chunks = chunkArray(followingUsers, BATCH_SIZE)
+
+      for (const chunk of chunks) {
+         for (const userId of chunk) {
+            const ref = this.firestore
+               .collection("userData")
+               .doc(userId)
+               .collection("companiesUserFollows")
+               .doc(groupId)
+
+            batch.delete(ref)
+         }
+      }
+
+      return batch.commit()
    }
 }
 
