@@ -6,9 +6,9 @@ import { sxStyles } from "types/commonTypes"
 import { useHighlights } from "./HighlightsBlockContext"
 
 const styles = sxStyles({
-   desktopContainer: {
+   keepLayoutInPlace: {
       // Ensures the grid layout doesn't change, otherwise it would add an empty grid item
-      display: "none",
+      position: "absolute",
    },
    desktopRoot: {
       position: "relative",
@@ -128,10 +128,7 @@ export const ExpandedCard = forwardRef<HTMLDivElement, ExpandedProps>(
       const { toggleExpandedPlaying } = useHighlights()
 
       return (
-         <Box
-            sx={!isMobile && styles.desktopContainer}
-            onClick={toggleExpandedPlaying}
-         >
+         <Box sx={styles.keepLayoutInPlace} onClick={toggleExpandedPlaying}>
             {isMobile ? (
                <Mobile {...props} />
             ) : (
