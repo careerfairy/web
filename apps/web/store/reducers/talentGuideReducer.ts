@@ -14,7 +14,7 @@ type TalentGuideState = {
    isLoadingTalentGuide: boolean
    isLoadingNextStepError: string | null
    isLoadingTalentGuideError: string | null
-   userId: string
+   userAuthUid: string
 }
 
 const initialState: TalentGuideState = {
@@ -25,7 +25,7 @@ const initialState: TalentGuideState = {
    isLoadingTalentGuide: true,
    isLoadingNextStepError: null,
    isLoadingTalentGuideError: null,
-   userId: null,
+   userAuthUid: null,
 }
 
 // Async thunk to proceed to next step
@@ -33,7 +33,7 @@ export const proceedToNextStep = createAsyncThunk(
    "talentGuide/proceedToNextStep",
    async (_, { getState }) => {
       const state = getState() as RootState
-      const { moduleData, currentStepIndex, userId } = state.talentGuide
+      const { moduleData, currentStepIndex, userAuthUid } = state.talentGuide
 
       if (!moduleData?.content) return null
 
@@ -43,7 +43,7 @@ export const proceedToNextStep = createAsyncThunk(
       // Update progress in Firestore
       await talentGuideProgressService.updateModuleProgress(
          moduleData.content.id,
-         userId,
+         userAuthUid,
          {
             currentStepIndex: nextStepIndex,
             completedStepIds: arrayUnion(
@@ -62,29 +62,29 @@ export const proceedToNextStep = createAsyncThunk(
 )
 
 type LoadTalentGuideProgressPayload = {
-   userId: string
+   userAuthUid: string
    moduleData: Page<TalentGuideModule>
 }
 
 type LoadTalentGuideProgressResult = {
    completedStepIds: string[]
    moduleData: Page<TalentGuideModule>
-   userId: string
+   userAuthUid: string
 }
 // Async thunk to load initial progress
 export const loadTalentGuide = createAsyncThunk<
    LoadTalentGuideProgressResult,
    LoadTalentGuideProgressPayload
 >("talentGuide/loadGuide", async (payload) => {
-   if (!payload.userId || !payload.moduleData.content) {
+   if (!payload.userAuthUid || !payload.moduleData.content) {
       throw new Error(
-         "Cannot load talent guide progress: userId and moduleData.content are required"
+         "Cannot load talent guide progress: userAuthUid and moduleData.content are required"
       )
    }
 
    const progressDoc = await talentGuideProgressService.getModuleProgress(
       payload.moduleData.content.id,
-      payload.userId
+      payload.userAuthUid
    )
 
    let completedStepIds: string[] = []
@@ -94,20 +94,20 @@ export const loadTalentGuide = createAsyncThunk<
    } else {
       await talentGuideProgressService.createModuleProgress(
          payload.moduleData.content.id,
-         payload.userId,
+         payload.userAuthUid,
          payload.moduleData.content
       )
    }
 
    await talentGuideProgressService.incrementTotalVisits(
       payload.moduleData.content.id,
-      payload.userId
+      payload.userAuthUid
    )
 
    return {
       completedStepIds,
       moduleData: payload.moduleData,
-      userId: payload.userId,
+      userAuthUid: payload.userAuthUid,
    }
 })
 
@@ -116,28 +116,28 @@ export const resetModuleProgressForDemo = createAsyncThunk(
    "talentGuide/resetProgressForDemo",
    async (_, { getState }) => {
       const state = getState() as RootState
-      const { moduleData, userId } = state.talentGuide
+      const { moduleData, userAuthUid: userAuthUid } = state.talentGuide
 
-      if (!moduleData?.content || !userId) {
+      if (!moduleData?.content || !userAuthUid) {
          throw new Error(
-            "Cannot reset progress: moduleData or userId is missing"
+            "Cannot reset progress: moduleData or userAuthUid is missing"
          )
       }
 
       await talentGuideProgressService.deleteModuleProgress(
          moduleData.content.id,
-         userId
+         userAuthUid
       )
 
       await talentGuideProgressService.createModuleProgress(
          moduleData.content.id,
-         userId,
+         userAuthUid,
          moduleData.content
       )
 
       return {
          moduleData,
-         userId,
+         userAuthUid,
       }
    }
 )
@@ -171,7 +171,7 @@ const talentGuideReducer = createSlice({
 
             errorLogAndNotify(new Error(errorMessage), {
                context: "proceedToNextStep",
-               userId: state.userId,
+               userAuthUid: state.userAuthUid,
                originalError: action.error,
             })
          })
@@ -183,7 +183,7 @@ const talentGuideReducer = createSlice({
                return
             }
 
-            const { completedStepIds, moduleData, userId } = action.payload
+            const { completedStepIds, moduleData, userAuthUid } = action.payload
 
             const moduleSteps = moduleData.content.moduleSteps
 
@@ -214,7 +214,7 @@ const talentGuideReducer = createSlice({
             state.currentStepIndex = actualCurrentIndex
             state.moduleData = moduleData
             state.isLoadingTalentGuide = false
-            state.userId = userId
+            state.userAuthUid = userAuthUid
          })
          .addCase(loadTalentGuide.rejected, (state, action) => {
             state.isLoadingTalentGuide = false
@@ -224,7 +224,7 @@ const talentGuideReducer = createSlice({
 
             errorLogAndNotify(new Error(errorMessage), {
                context: "loadTalentGuide",
-               userId: state.userId,
+               userAuthUid: state.userAuthUid,
                originalError: action.error,
             })
          })
@@ -248,7 +248,7 @@ const talentGuideReducer = createSlice({
 
             errorLogAndNotify(new Error(errorMessage), {
                context: "resetModuleProgressForDemo",
-               userId: state.userId,
+               userAuthUid: state.userAuthUid,
                originalError: action.error,
             })
          })

@@ -23,25 +23,37 @@ import {
 export class TalentGuideProgressService {
    constructor(private readonly functions: Functions) {}
 
-   async getModuleProgress(moduleId: string, userId: string) {
-      return getDoc(this.getModuleProgressRef(moduleId, userId))
+   private getModuleCompositeId(userAuthUid: string, moduleId: string) {
+      return `${userAuthUid}_${moduleId}`
    }
 
-   async getModuleQuiz(moduleId: string, userId: string) {
-      return getDoc(this.getQuizRef(moduleId, userId))
+   private getQuizCompositeId(
+      userAuthUid: string,
+      moduleId: string,
+      quizId: string
+   ) {
+      return `${userAuthUid}_${moduleId}_${quizId}`
+   }
+
+   async getModuleProgress(moduleId: string, userAuthUid: string) {
+      return getDoc(this.getModuleProgressRef(moduleId, userAuthUid))
+   }
+
+   async getModuleQuiz(moduleId: string, userAuthUid: string, quizId: string) {
+      return getDoc(this.getQuizRef(moduleId, userAuthUid, quizId))
    }
 
    async createModuleProgress(
       moduleId: string,
-      userId: string,
+      userAuthUid: string,
       moduleData: TalentGuideModule
    ) {
       return setDoc(
-         this.getModuleProgressRef(moduleId, userId),
+         this.getModuleProgressRef(moduleId, userAuthUid),
          {
-            id: moduleId,
+            id: this.getModuleCompositeId(userAuthUid, moduleId),
             moduleHygraphId: moduleId,
-            userId,
+            userAuthUid,
             currentStepIndex: 0,
             completedStepIds: [],
             moduleName: moduleData.moduleName,
@@ -60,48 +72,44 @@ export class TalentGuideProgressService {
       )
    }
 
-   incrementTotalVisits(moduleId: string, userId: string) {
-      return this.updateModuleProgress(moduleId, userId, {
+   incrementTotalVisits(moduleId: string, userAuthUid: string) {
+      return this.updateModuleProgress(moduleId, userAuthUid, {
          totalVisits: increment(1),
       })
    }
 
    updateModuleProgress(
       moduleId: string,
-      userId: string,
+      userAuthUid: string,
       data: UpdateData<TalentGuideProgress>
    ) {
-      return updateDoc(this.getModuleProgressRef(moduleId, userId), {
+      return updateDoc(this.getModuleProgressRef(moduleId, userAuthUid), {
          ...data,
          lastUpdated: Timestamp.now(),
       })
    }
 
-   getModuleProgressRef(moduleId: string, userId: string) {
+   getModuleProgressRef(moduleId: string, userAuthUid: string) {
       return doc(
          FirestoreInstance,
-         "userData",
-         userId,
          "talentGuideProgress",
-         moduleId
+         this.getModuleCompositeId(userAuthUid, moduleId)
       ).withConverter(createGenericConverter<TalentGuideProgress>())
    }
 
-   getQuizRef(moduleId: string, userId: string) {
+   getQuizRef(moduleId: string, userAuthUid: string, quizId: string) {
       return doc(
          FirestoreInstance,
-         "userData",
-         userId,
          "talentGuideQuizzes",
-         moduleId
+         this.getQuizCompositeId(userAuthUid, moduleId, quizId)
       ).withConverter(createGenericConverter<TalentGuideQuiz>())
    }
 
    /**
     * Reset the module for demo purposes
     */
-   deleteModuleProgress(moduleId: string, userId: string) {
-      return deleteDoc(this.getModuleProgressRef(moduleId, userId))
+   deleteModuleProgress(moduleId: string, userAuthUid: string) {
+      return deleteDoc(this.getModuleProgressRef(moduleId, userAuthUid))
    }
 }
 

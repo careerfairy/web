@@ -1,4 +1,4 @@
-import { Create, Identifiable } from "../commonTypes"
+import { Identifiable } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
 
 export enum TalentGuideModuleCategory {
@@ -7,9 +7,9 @@ export enum TalentGuideModuleCategory {
    AFTER_APPLYING = "STEPS_AFTER_APPLYING",
 }
 
-// Collection path: userData/{userId}/talentGuideProgress
+// Collection path: talentGuideProgress/{userAuthUid}_{moduleHygraphId}
 export interface TalentGuideProgress extends Identifiable {
-   userId: string
+   userAuthUid: string
    moduleHygraphId: string
 
    // Core progress tracking
@@ -32,13 +32,10 @@ export interface TalentGuideProgress extends Identifiable {
    lastVisitedAt: Timestamp
 }
 
-export type TalentGuideCreate = Create<TalentGuideProgress>
-
-// Collection path: userData/{userId}/talentGuideQuizzes
+// Collection path: talentGuideQuizzes/{userAuthUid}_{moduleHygraphId}_{quizHygraphId}
 export interface TalentGuideQuiz extends Identifiable {
-   userId: string
-   moduleId: string
-
+   userAuthUid: string
+   moduleHygraphId: string
    quizHygraphId: string
 
    // Progress tracking
@@ -54,5 +51,3 @@ export interface TalentGuideQuiz extends Identifiable {
    previousSelectedAnswerIds: string[][]
    completedAt?: Timestamp
 }
-
-export type TalentGuideQuizCreate = Create<TalentGuideQuiz>

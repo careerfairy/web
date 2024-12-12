@@ -38,13 +38,13 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const isLoadingGuide = useIsLoadingTalentGuide()
 
    useEffect(() => {
-      if (!authenticatedUser?.email) {
+      if (!authenticatedUser.uid) {
          return
       }
 
       dispatch(
          loadTalentGuide({
-            userId: authenticatedUser.email,
+            userAuthUid: authenticatedUser.uid,
             moduleData: data,
          })
       )
@@ -52,7 +52,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       return () => {
          dispatch(resetTalentGuide())
       }
-   }, [dispatch, authenticatedUser?.email, data])
+   }, [dispatch, authenticatedUser.uid, data])
 
    const visibleSteps = useVisibleSteps()
 
