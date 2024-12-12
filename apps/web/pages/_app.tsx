@@ -1,21 +1,15 @@
-import * as React from "react"
-import "styles.css"
-import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
-import config from "@stahl.luke/react-reveal/globals"
-import { store, wrapper } from "../store"
-import NextNProgress from "nextjs-progressbar"
-import { brandedLightTheme } from "../materialUI"
-import Head from "next/head"
+import { CacheProvider } from "@emotion/react"
 import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { AuthProvider } from "../HOCs/AuthProvider"
+import config from "@stahl.luke/react-reveal/globals"
+import Head from "next/head"
+import NextNProgress from "nextjs-progressbar"
+import { Provider } from "react-redux"
 import { ReactReduxFirebaseProvider } from "react-redux-firebase"
 import { actionTypes, createFirestoreInstance } from "redux-firestore"
-import { Provider } from "react-redux"
-import { CacheProvider } from "@emotion/react"
-import createEmotionCache from "../materialUI/createEmotionCache"
+import "styles.css"
 import Notifier from "../components/views/notifier"
-import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
+import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
 import firebaseApp, {
    AuthInstance,
@@ -23,22 +17,27 @@ import firebaseApp, {
    FirestoreInstance,
    FunctionsInstance,
 } from "../data/firebase/FirebaseInstance"
+import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
+import { AuthProvider } from "../HOCs/AuthProvider"
+import { brandedLightTheme } from "../materialUI"
+import createEmotionCache from "../materialUI/createEmotionCache"
+import { store, wrapper } from "../store"
 
-import "../util/FirebaseUtils"
-import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
-import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
-import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
-import TutorialProvider from "../HOCs/TutorialProvider"
-import ErrorProvider from "../HOCs/ErrorProvider"
+import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
 import {
-   AuthProvider as ReactFireAuthProvider,
    FirebaseAppProvider,
    FirestoreProvider,
    FunctionsProvider,
+   AuthProvider as ReactFireAuthProvider,
 } from "reactfire"
+import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
+import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
+import ErrorProvider from "../HOCs/ErrorProvider"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
+import TutorialProvider from "../HOCs/TutorialProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
-import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
+import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
+import "../util/FirebaseUtils"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -92,8 +91,8 @@ function MyApp(props) {
                <ReactFireProviders>
                   <FeatureFlagsProvider>
                      <TutorialProvider>
-                        <AuthProvider>
-                           <ThemeProviderWrapper>
+                        <ThemeProviderWrapper>
+                           <AuthProvider>
                               <FirebaseServiceContext.Provider
                                  value={firebaseServiceInstance}
                               >
@@ -112,8 +111,8 @@ function MyApp(props) {
                                     </UserReminderProvider>
                                  </LocalizationProvider>
                               </FirebaseServiceContext.Provider>
-                           </ThemeProviderWrapper>
-                        </AuthProvider>
+                           </AuthProvider>
+                        </ThemeProviderWrapper>
                      </TutorialProvider>
                   </FeatureFlagsProvider>
                </ReactFireProviders>

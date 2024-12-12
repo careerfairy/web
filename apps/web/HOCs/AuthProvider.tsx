@@ -5,8 +5,8 @@ import {
 } from "@careerfairy/shared-lib/dist/users"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import * as Sentry from "@sentry/nextjs"
+import Loader from "components/views/loader/Loader"
 import { clearFirestoreCache } from "data/util/authUtil"
-import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import nookies from "nookies"
 import {
@@ -32,10 +32,6 @@ import CookiesUtil from "../util/CookiesUtil"
 import DateUtil from "../util/DateUtil"
 import { dataLayerUser } from "../util/analyticsUtils"
 import { updateUserActivity } from "./user/trackActivity"
-
-const Loader = dynamic(() => import("../components/views/loader/Loader"), {
-   ssr: false,
-})
 
 type DefaultContext = {
    authenticatedUser?: FirebaseReducer.AuthState
@@ -71,6 +67,8 @@ const AuthProvider = ({ children }) => {
    const { pathname, replace, asPath } = useRouter()
    const firebaseService = useFirebaseService()
    const [claims, setClaims] = useState<{ [p: string]: any }>(null)
+   const [isLoggedIn, setIsLoggedIn] = useState(auth.isLoaded && !auth.isEmpty)
+   const [isLoggedOut, setIsLoggedOut] = useState(auth.isLoaded && auth.isEmpty)
 
    const query = useMemo(
       () =>
@@ -93,8 +91,6 @@ const AuthProvider = ({ children }) => {
    )
    useFirestoreConnect(query)
 
-   const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
-   const isLoggedIn = Boolean(auth.isLoaded && !auth.isEmpty)
    const userData = useSelector(({ firestore }: RootState) =>
       isLoggedOut ? undefined : firestore.data["userProfile"]
    )
@@ -202,9 +198,14 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       return firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
+            setIsLoggedIn(false)
+            setIsLoggedOut(true)
+            setClaims(null)
             clearFirestoreCache()
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
+            setIsLoggedIn(true)
+            setIsLoggedOut(false)
             const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
 
             setClaims(tokenResult.claims)
@@ -258,7 +259,7 @@ const AuthProvider = ({ children }) => {
       ]
    )
 
-   if ((isSecurePath(pathname) || isAdminPath(pathname)) && !auth.isLoaded) {
+   if ((isSecurePath(pathname) || isAdminPath(pathname)) && !isLoggedIn) {
       return <Loader />
    }
 
