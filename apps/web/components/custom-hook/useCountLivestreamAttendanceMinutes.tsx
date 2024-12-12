@@ -1,17 +1,15 @@
-import { useCallback } from "react"
-import { useAuth } from "../../HOCs/AuthProvider"
 import {
    LivestreamEvent,
    LivestreamEventPublicData,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import usePersistentInterval from "./usePersistentInterval"
-import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
-import { useRouter } from "next/router"
-import { useSelector } from "react-redux"
-import { rtcConnectionStateSelector } from "../../store/selectors/streamSelectors"
-import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
+import { ConnectionDisconnectedReason, ConnectionState } from "agora-rtc-react"
+import { useCallback } from "react"
+import { livestreamRepo } from "../../data/RepositoryInstances"
+import { useAuth } from "../../HOCs/AuthProvider"
+import usePersistentInterval from "./usePersistentInterval"
 
 // Send a heartbeat event to the server every minute
 const HEARTBEAT_INTERVAL_SECONDS = 60
@@ -25,15 +23,12 @@ const HEARTBEAT_INTERVAL_SECONDS = 60
  * @param livestreamData
  */
 const useCountLivestreamAttendanceMinutes = (
-   livestreamData: LivestreamEvent
+   livestreamData: LivestreamEvent,
+   connectionState: ConnectionState,
+   reason: ConnectionDisconnectedReason,
+   isBreakoutRoom?: boolean
 ) => {
    const { userData, isLoggedIn } = useAuth()
-   const {
-      query: { livestreamId },
-   } = useRouter()
-
-   const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
-   const { curState, reason } = agoraRtcConnectionStatus
 
    const intervalCallback = useCallback(() => {
       if (!livestreamData) return // still loading
@@ -45,7 +40,7 @@ const useCountLivestreamAttendanceMinutes = (
 
       try {
          // This session should be a duplicated tab, we don't want to count the minutes twice
-         if (curState === "DISCONNECTED" && reason === "UID_BANNED") {
+         if (connectionState === "DISCONNECTED" && reason === "UID_BANNED") {
             // another approach could be to proceed if the curState === "CONNECTED" or !== "DISCONNECTED"
             // but might be useful to track the attendance time for such scenarios so that we can check their
             // frequency with a histogram view
@@ -72,7 +67,7 @@ const useCountLivestreamAttendanceMinutes = (
 
          // only send a heartbeat for the right livestream document
          // old breakout room documents have a different livestream id
-         if (livestream.id === livestreamId) {
+         if (!isBreakoutRoom) {
             livestreamRepo
                .heartbeat(
                   livestream,
@@ -84,13 +79,15 @@ const useCountLivestreamAttendanceMinutes = (
       } catch (e) {
          console.error(e)
       }
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       livestreamData?.hasStarted,
       livestreamData?.hasEnded,
       userData?.id,
       isLoggedIn,
-      livestreamId,
-      curState,
+      isBreakoutRoom,
+      connectionState,
       reason,
    ])
 
