@@ -275,6 +275,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             onMessage={handleMessage}
             onShouldStartLoadWithRequest={handleNavigation}
             cacheEnabled={true}
+            incognito={false}
             domStorageEnabled={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
@@ -291,6 +292,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             ]}
             onNavigationStateChange={handleNavigationStateChange}
             setSupportMultipleWindows={false}
+            androidHardwareAccelerationDisabled={false} // Use hardware acceleration
+            mixedContentMode="always"
          />
       </SafeAreaView>
    )
