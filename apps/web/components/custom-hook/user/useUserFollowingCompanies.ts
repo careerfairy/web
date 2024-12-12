@@ -12,6 +12,14 @@ export const useUserFollowingCompanies = () => {
 
    useEffect(() => {
       if (userData.id) {
+         const cachedCompanies = sessionStorage.getItem(
+            `companies-${userData.id}`
+         )
+
+         if (cachedCompanies) {
+            setCompanies(JSON.parse(cachedCompanies))
+         }
+
          const unsubscribe = onSnapshot(
             query(
                collection(
@@ -25,9 +33,12 @@ export const useUserFollowingCompanies = () => {
             (doc) => {
                const newData = doc.docs?.map((doc) => doc.data()) || []
                setCompanies(newData)
+               sessionStorage.setItem(
+                  `companies-${userData.id}`,
+                  JSON.stringify(newData)
+               )
             }
          )
-
          return () => {
             unsubscribe()
             setCompanies([])

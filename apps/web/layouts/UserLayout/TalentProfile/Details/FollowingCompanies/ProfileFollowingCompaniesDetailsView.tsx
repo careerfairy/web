@@ -16,12 +16,15 @@ import { EmptyItemView } from "../Profile/EmptyItemView"
 import { ProfileSection } from "../Profile/ProfileSection"
 
 const styles = sxStyles({
+   root: {
+      m: "20px",
+   },
    emptyCompaniesRoot: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      p: "16px 12px",
+      padding: "16px 12px",
       backgroundColor: (theme) => theme.brand.white[300],
       border: (theme) => `1px solid ${theme.brand.white[400]}`,
       borderRadius: "8px",
@@ -84,13 +87,20 @@ const styles = sxStyles({
          backgroundColor: (theme) => theme.brand.black[400],
       },
    },
+   companyCardContent: {
+      flex: 1,
+      minWidth: 0,
+   },
+   companyCardContentWrapper: {
+      minWidth: 0,
+   },
 })
 
 export const ProfileFollowingCompaniesDetailsView = () => {
    const followingCompanies = useUserFollowingCompanies()
 
    return (
-      <Box m={"20px"}>
+      <Box sx={styles.root}>
          <ProfileSection
             showAddIcon={false}
             title={"Followed companies"}
@@ -169,10 +179,10 @@ const FollowingCompanyCard = ({ group }: FollowingCompanyCardProps) => {
                direction={"row"}
                alignItems={"center"}
                spacing={1.5}
-               sx={{ flex: 1, minWidth: 0 }}
+               sx={styles.companyCardContent}
             >
                <CircularLogo src={group.logoUrl} alt="Company logo" size={48} />
-               <Stack sx={{ minWidth: 0 }}>
+               <Stack sx={styles.companyCardContentWrapper}>
                   <Stack direction={"row"} alignItems={"center"} spacing={0.5}>
                      <Typography sx={styles.companyName} variant="small">
                         {group.universityName}
