@@ -189,6 +189,16 @@ In .env file, set LOCAL_BUILD to true
 
 after running the script, type 'i' to run iOS emulator
 
+### Troubleshooting tips
+
+Sometimes, iOS simulator will have black screen
+
+1. Make sure when running iOS simulator, that in terminal you see download of bundle to iOS emulator
+2. If there is no download, there is probably cache with iOS emulator
+3. Try closing the iOS emulator and running 'i' again
+4. If that does not help, go to apple system settings -> Storage -> Developer -> Choose xCode cache and delete it
+5. Try then running the flow again
+
 #### For Android and Expo GO application
 
 Currently, android and expo go cannot work, as for android emulator, it only works with http://10.0.2.2:3000 accessing localhost, and it will load the app, but will not be able to contact backend services.
