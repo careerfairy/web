@@ -297,6 +297,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             source={{ uri: baseUrl }}
             javaScriptEnabled={true}
             mediaPlaybackRequiresUserAction={false}
+            allowsFullscreenVideo={true}
             onMessage={handleMessage}
             onShouldStartLoadWithRequest={handleNavigation}
             cacheEnabled={true}
