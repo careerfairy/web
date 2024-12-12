@@ -104,6 +104,7 @@ export const StudyDomainSelector = ({
             disabled: isSubmitting,
             disableClearable: false,
             autoHighlight: true,
+            selectOnFocus: false,
             getOptionLabel: (option: { id: string; value: string }) =>
                option.value || "",
             onChange: onChangeHandler,

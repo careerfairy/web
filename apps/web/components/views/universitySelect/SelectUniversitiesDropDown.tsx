@@ -114,6 +114,7 @@ const SelectUniversitiesDropDown = ({
                universityCountriesMap[selectedCountryCode] === "None",
             autoHighlight: true,
             disableClearable: false,
+            selectOnFocus: false,
             renderOption: (props, option, { selected }) => {
                return getOptionEl(props, option, selectedCountryCode, selected)
             },

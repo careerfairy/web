@@ -271,6 +271,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
             deleteText={"Delete link"}
             handleEdit={handleEdit}
             handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
+            href={normalizedLink}
          >
             <Button // MUI Button
                href={normalizedLink}
