@@ -37,7 +37,7 @@ export class TalentGuideProgressService {
     * Generates a composite ID for a quiz document
     * @param userAuthUid - The authenticated user's ID
     * @param moduleId - The Hygraph module ID
-    * @param quizId - The quiz ID
+    * @param quizId - The Hygraph quiz ID
     * @returns A composite ID in the format `userAuthUid_moduleId_quizId`
     */
    private getQuizCompositeId(
@@ -62,7 +62,7 @@ export class TalentGuideProgressService {
     * Retrieves a user's quiz data for a specific module
     * @param moduleId - The Hygraph module ID
     * @param userAuthUid - The authenticated user's ID
-    * @param quizId - The quiz ID
+    * @param quizId - The Hygraph quiz ID
     * @returns A Promise resolving to the quiz document
     */
    async getModuleQuiz(moduleId: string, userAuthUid: string, quizId: string) {
@@ -153,7 +153,7 @@ export class TalentGuideProgressService {
     * Gets a reference to a quiz document
     * @param moduleId - The Hygraph module ID
     * @param userAuthUid - The authenticated user's ID
-    * @param quizId - The quiz ID
+    * @param quizId - The Hygraph quiz ID
     * @returns A DocumentReference for the quiz
     */
    getQuizRef(moduleId: string, userAuthUid: string, quizId: string) {
