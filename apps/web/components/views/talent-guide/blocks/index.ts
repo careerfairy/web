@@ -1,12 +1,15 @@
 export { ArticleBlock } from "./ArticleBlock"
+export { CopyTemplateBlock } from "./copy-templates/CopyTemplateBlock"
 export { FollowCompaniesBlock } from "./FollowCompaniesBlock"
 export { HeaderBlock } from "./HeaderBlock"
+export { HighlightsBlock, HighlightsBlock } from "./highlights/HighlightsBlock"
 export { JobsBlock } from "./JobsBlock"
 export { LivestreamsCarouselBlock } from "./LivestreamsCarouselBlock"
-export { QuizBlock } from "./QuizBlock"
+export {
+   MentorsCarouselBlock,
+   MentorsCarouselBlock,
+} from "./mentors-carousel/MentorsCarouselBlock"
+export { QuizBlock } from "./quiz/QuizBlock"
 export { RichTextBlock } from "./RichTextBlock"
 export { SparksCarouselBlock } from "./SparksCarouselBlock"
 export { VideoBlock } from "./VideoBlock"
-export { CopyTemplateBlock } from "./copy-templates/CopyTemplateBlock"
-export { HighlightsBlock } from "./highlights/HighlightsBlock"
-export { MentorsCarouselBlock } from "./mentors-carousel/MentorsCarouselBlock"

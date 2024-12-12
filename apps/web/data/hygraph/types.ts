@@ -175,24 +175,19 @@ export type CopyTemplateBlockType = {
 
 export type QuizAnswerComponentType = {
    __typename: "QuizAnswer"
+   id: string
    answer: string
-} & (
-   | {
-        isCorrect: true
-        /**
-         * If the wrong answer is chosen, this is the message to show
-         */
-        correction: string
-     }
-   | {
-        isCorrect: false
-     }
-)
+   isCorrect: boolean
+}
 
 export type QuizModelType = {
    __typename: "Quiz"
    id: string
    question: string
+   /**
+    * Text to show if the user gets the answer wrong
+    */
+   correction: string
    answers: QuizAnswerComponentType[]
 }
 
