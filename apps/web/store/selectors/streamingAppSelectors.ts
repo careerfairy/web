@@ -161,3 +161,6 @@ export const useUserUid = () =>
 
 export const useAutoplayState = () =>
    useAppSelector((state) => state.streamingApp.autoplayState)
+
+export const useRtcConnectionState = () =>
+   useAppSelector((state) => state.streamingApp.rtcState.connectionState)
