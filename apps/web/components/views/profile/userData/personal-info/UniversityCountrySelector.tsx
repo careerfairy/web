@@ -38,6 +38,7 @@ export const UniversityCountrySelector = ({
             disabled: isSubmitting,
             disableClearable: true,
             autoHighlight: true,
+            selectOnFocus: false,
             getOptionLabel: (option) => universityCountriesMap[option] || "",
             isOptionEqualToValue: (option, value) => option === value,
             onChange: () => {
