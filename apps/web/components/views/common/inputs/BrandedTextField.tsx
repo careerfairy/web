@@ -97,6 +97,9 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
          ? "#ccc"
          : "#EDE7FD",
       backgroundColor: theme.palette.mode === "dark" ? undefined : "#F7F8FC",
+      "&.Mui-focused": {
+         borderColor: theme.brand.purple[300],
+      },
    },
 }))
 
