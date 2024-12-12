@@ -313,9 +313,9 @@ export interface IGroupRepository {
    updateGroupBanner(groupId: string, image: ImageType): Promise<void>
 
    /**
-    * Gets the users that are following a group. The user ids are returned only.
+    * Gets the users that are following a group.
     * @param groupId the group to get the following users from
-    * @returns A Promise that resolves with an array of user emails.
+    * @returns A Promise that resolves with an array of user ids.
     */
    getFollowingUsers(groupId: string): Promise<string[]>
 }

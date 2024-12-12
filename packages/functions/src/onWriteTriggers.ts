@@ -27,7 +27,7 @@ import {
    logStart,
 } from "./lib/triggers/util"
 import { logAndThrow } from "./lib/validations"
-import { getChangeTypes } from "./util"
+import { ChangeType, getChangeTypeEnum, getChangeTypes } from "./util"
 import { validateGroupSparks } from "./util/sparks"
 
 export const syncLivestreams = functions
@@ -295,7 +295,7 @@ export const syncGroupFollowingUserDataOnChange = functions
    .region(config.region)
    .firestore.document("careerCenterData/{groupId}")
    .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+      const changeType = getChangeTypeEnum(change)
 
       try {
          const groupId = context.params.groupId
@@ -305,7 +305,10 @@ export const syncGroupFollowingUserDataOnChange = functions
          // An array of promise side effects to be executed in parallel
          const sideEffectPromises: Promise<unknown>[] = []
 
-         if (changeTypes.isUpdate || changeTypes.isDelete) {
+         if (
+            changeType === ChangeType.UPDATE ||
+            changeType === ChangeType.DELETE
+         ) {
             const followingUsers = await groupRepo.getFollowingUsers(groupId)
 
             if (!followingUsers.length) {
@@ -313,34 +316,39 @@ export const syncGroupFollowingUserDataOnChange = functions
                   `🚀 ~ No following users found for group: ${groupId}. Skipping...`
                )
             } else {
-               if (changeTypes.isUpdate) {
-                  functions.logger.log(
-                     `🚀 ~ Following users found for group: ${followingUsers.length}. Updating...`
-                  )
-
-                  // From comment above @onWriteGroup "We need the groupId from here since some groups don't have an id field"
-                  newValue.id = groupId
-
-                  const publicGroup = pickPublicDataFromGroup(newValue)
-                  sideEffectPromises.push(
-                     userRepo.batchUpdateFollowingUsersGroup(
-                        publicGroup,
-                        followingUsers
+               switch (changeType) {
+                  case ChangeType.UPDATE: {
+                     functions.logger.log(
+                        `🚀 ~ Following users found for group: ${followingUsers.length}. Updating...`
                      )
-                  )
-               }
 
-               if (changeTypes.isDelete) {
-                  functions.logger.log(
-                     `🚀 ~ Following users found for group: ${followingUsers.length}. Deleting...`
-                  )
+                     // From comment above @onWriteGroup "We need the groupId from here since some groups don't have an id field"
+                     newValue.id = groupId
 
-                  sideEffectPromises.push(
-                     userRepo.batchDeleteFollowingUsersGroup(
-                        groupId,
-                        followingUsers
+                     const publicGroup = pickPublicDataFromGroup(newValue)
+                     sideEffectPromises.push(
+                        userRepo.batchUpdateFollowingUsersGroup(
+                           publicGroup,
+                           followingUsers
+                        )
                      )
-                  )
+
+                     break
+                  }
+                  case ChangeType.DELETE: {
+                     functions.logger.log(
+                        `🚀 ~ Following users found for group: ${followingUsers.length}. Deleting...`
+                     )
+
+                     sideEffectPromises.push(
+                        userRepo.batchDeleteFollowingUsersGroup(
+                           groupId,
+                           followingUsers
+                        )
+                     )
+
+                     break
+                  }
                }
             }
          }
