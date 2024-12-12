@@ -60,6 +60,18 @@ export const StudyDomainSelector = ({
             name={fieldName}
             SelectProps={{
                displayEmpty: true,
+               MenuProps: {
+                  sx: {
+                     ".MuiMenu-paper": {
+                        boxShadow: "2px 8px 10px 2px rgba(0,0,0,0)",
+                     },
+                  },
+                  TransitionProps: {
+                     enter: false,
+                     exit: false,
+                  },
+                  transitionDuration: 0,
+               },
                renderValue: (value: { id: string; value: string }) => {
                   return value?.value ? (
                      value.value

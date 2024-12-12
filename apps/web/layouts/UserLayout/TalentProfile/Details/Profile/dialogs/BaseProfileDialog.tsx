@@ -95,11 +95,7 @@ export const BaseProfileDialog = (props: Props) => {
          open={open}
          fullScreen={isMobile}
          closeAfterTransition={false}
-         slotProps={{
-            backdrop: {
-               onClick: handleClose,
-            },
-         }}
+         onClose={handleClose}
          sx={styles.dialog}
          PaperProps={{
             sx: styles.dialogPaper,

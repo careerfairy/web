@@ -229,6 +229,7 @@ const TagCheckbox = ({ value, checked, handleClick }: TagCheckboxProps) => {
             styles.checkBoxBtnBase,
             checked ? styles.checkedCheckboxBtnBase : null,
          ]}
+         disableRipple
       >
          <Stack direction={"row"} sx={styles.checkBoxWrapper}>
             <Typography variant="medium" sx={styles.tagName}>
