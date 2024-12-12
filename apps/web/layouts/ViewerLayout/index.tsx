@@ -38,6 +38,7 @@ import { RootState } from "../../store"
 import {
    focusModeEnabledSelector,
    leftMenuOpenSelector,
+   rtcConnectionStateSelector,
 } from "../../store/selectors/streamSelectors"
 import { sxStyles } from "../../types/commonTypes"
 import { errorLogAndNotify } from "../../util/CommonUtil"
@@ -314,8 +315,15 @@ const ViewerLayout = (props) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
+   const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
+
    useRewardLivestreamAttendance(currentLivestream)
-   useCountLivestreamAttendanceMinutes(currentLivestream)
+   useCountLivestreamAttendanceMinutes(
+      currentLivestream,
+      agoraRtcConnectionStatus.curState,
+      agoraRtcConnectionStatus.reason,
+      isBreakout
+   )
 
    useConditionalRedirect(
       // Do not redirect to new UI if the current stream is a breakout room, as we don't support the new UI for breakout rooms
