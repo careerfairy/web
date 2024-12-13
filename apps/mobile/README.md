@@ -185,7 +185,7 @@ npm run native:cache
 
 #### For iOS (Only local build)
 
-In .env file, set LOCAL_BUILD to true
+In .env file, set BASE_URL to http://127.0.0.1:3000 and SEARCH_CRITERIA to 127.0.0.1
 
 after running the script, type 'i' to run iOS emulator
 
