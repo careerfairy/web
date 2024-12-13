@@ -26,6 +26,18 @@ import {
    StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
+import { AppState } from "react-native"
+
+const injectedCSS = `
+    body {
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    * {
+      -webkit-touch-callout: none;
+    }
+  `
 
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
@@ -73,6 +85,16 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    useEffect(() => {
       checkPermissions()
+   }, [])
+
+   useEffect(() => {
+      const subscription = AppState.addEventListener("change", (state) => {
+         if (state === "active" && webViewRef?.current) {
+            webViewRef?.current.reload() // Reload WebView on resume
+         }
+      })
+
+      return () => subscription.remove()
    }, [])
 
    useEffect(() => {
@@ -320,6 +342,16 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             setSupportMultipleWindows={false}
             androidHardwareAccelerationDisabled={false} // Use hardware acceleration
             mixedContentMode="always"
+            overScrollMode="never" // Disable over-scrolling for smoother behavior
+            bounces={true} // Enable bouncing for better UX
+            nestedScrollEnabled={true} // Improves nested scrolling behavior
+            scrollEnabled={true}
+            allowsBackForwardNavigationGestures={true}
+            injectedJavaScript={`(function() {
+                 var style = document.createElement('style');
+                 style.innerHTML = \`${injectedCSS}\`;
+                 document.head.appendChild(style);
+              })();`}
          />
       </SafeAreaView>
    )
