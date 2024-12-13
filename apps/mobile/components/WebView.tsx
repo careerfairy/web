@@ -90,7 +90,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    useEffect(() => {
       const subscription = AppState.addEventListener("change", (state) => {
          if (state === "active" && webViewRef?.current) {
-            webViewRef?.current.reload() // Reload WebView on resume
+            webViewRef?.current.stopLoading() // Stop any ongoing load
+            webViewRef?.current.reload() // Attempt a reload
          }
       })
 
