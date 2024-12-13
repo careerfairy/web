@@ -130,6 +130,7 @@ export const CustomJobApplicationSourceTypes = {
    Portal: "portal",
    Profile: "profile",
    Notification: "notification",
+   Levels: "levels",
 } as const
 
 export type JobApplicationSource =
