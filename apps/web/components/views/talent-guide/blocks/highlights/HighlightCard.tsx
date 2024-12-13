@@ -1,8 +1,8 @@
 import { Box } from "@mui/material"
 import useGroup from "components/custom-hook/group/useGroup"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import useIsDesktop from "components/custom-hook/useIsDesktop"
 import { HighlightComponentType } from "data/hygraph/types"
-import { ExpandedDesktop, ExpandedMobile } from "./ExpandedCard"
+import { HighlightExpanded } from "./HighlightExpanded"
 import { useHighlights } from "./HighlightsBlockContext"
 import { ThumbnailCard } from "./ThumbnailCard"
 
@@ -12,15 +12,14 @@ type HighlightCardProps = {
 }
 
 const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
-   const isMobile = useIsMobile()
+   const isDesktop = useIsDesktop()
    const {
       shouldAutoPlay,
-      handleEndedPlaying,
       isExpanded,
       handleCloseCardClick,
       handleExpandCardClick,
       setAutoPlayingIndex,
-      isLiveStreamDialogOpen,
+      isPlayingExpanded,
    } = useHighlights()
 
    const { data: group, status } = useGroup(
@@ -33,39 +32,22 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
       <>
          <Box
             onClick={handleExpandCardClick(index)}
-            onMouseEnter={() => setAutoPlayingIndex(index)}
-            onMouseLeave={() => setAutoPlayingIndex(null)}
+            onMouseEnter={() => isDesktop && setAutoPlayingIndex(index)}
+            onMouseLeave={() => isDesktop && setAutoPlayingIndex(undefined)}
          >
             <ThumbnailCard
                highlight={highlight}
                isPlaying={shouldAutoPlay(index)}
-               onEnded={handleEndedPlaying}
                group={group}
             />
          </Box>
          {isExpanded(index) && (
-            <>
-               {Boolean(isMobile) && (
-                  <ExpandedMobile
-                     highlight={highlight}
-                     group={group}
-                     onEnded={handleEndedPlaying}
-                     onClose={handleCloseCardClick}
-                     isPlaying={!isLiveStreamDialogOpen}
-                  />
-               )}
-               {Boolean(!isMobile) && (
-                  <Box sx={{ display: "none" }}>
-                     <ExpandedDesktop
-                        highlight={highlight}
-                        group={group}
-                        onEnded={handleEndedPlaying}
-                        onClose={handleCloseCardClick}
-                        isPlaying={!isLiveStreamDialogOpen}
-                     />
-                  </Box>
-               )}
-            </>
+            <HighlightExpanded
+               isPlaying={isPlayingExpanded}
+               highlight={highlight}
+               group={group}
+               onClose={handleCloseCardClick}
+            />
          )}
       </>
    )

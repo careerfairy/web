@@ -14,6 +14,7 @@ import useSocials, {
    SocialPlatformObject,
    SocialPlatformType,
 } from "components/custom-hook/useSocials"
+import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
 import { copyStringToClipboard } from "components/helperFunctions/HelperFunctions"
 import ReferralWidget from "components/views/common/ReferralWidget"
 import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
@@ -103,6 +104,7 @@ const SparksShareDialog: FC<Props> = ({
    const [isCopied, setIsCopied] = useState(false)
    const theme = useTheme()
    const isFullScreen = useSparksFeedIsFullScreen()
+   const isTalentGuide = useIsInTalentGuide()
 
    const handleCloseDialog = useCallback(() => {
       handleClose()
@@ -139,7 +141,7 @@ const SparksShareDialog: FC<Props> = ({
          onClose={handleCloseDialog}
          PaperProps={{
             style: {
-               left: isFullScreen ? "0%" : DRAWER_WIDTH - 120,
+               left: isFullScreen || isTalentGuide ? "0%" : DRAWER_WIDTH - 120,
             },
             sx: styles.dialogPaper,
          }}
