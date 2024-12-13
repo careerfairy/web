@@ -11,7 +11,7 @@ import { SparkComponentType } from "data/hygraph/types"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { ExpandedSparkCard } from "./ExpandedSparkCard"
-import { useHighlights } from "./HighlightsBlockContext"
+import { useHighlights } from "./control/HighlightsBlockContext"
 
 const CARD_PADDING = 1.5
 
@@ -36,7 +36,7 @@ type SparkCardProps = {
    index: number
 }
 
-export const SparkCard = ({ spark, index }: SparkCardProps) => {
+const SparkCard = ({ spark, index }: SparkCardProps) => {
    const isMobile = useIsMobile()
    const sparkData = useSpark(spark.sparkId)
    const {
@@ -96,3 +96,5 @@ export const SparkCard = ({ spark, index }: SparkCardProps) => {
       </>
    )
 }
+
+export default SparkCard
