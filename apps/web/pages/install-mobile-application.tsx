@@ -42,7 +42,8 @@ const DetectOS: React.FC<{ os: string }> = ({ os }) => {
 
          // Redirect logic on the client
          if (detectedOS.includes("iOS") || detectedOS.includes("macOS")) {
-            window.location.href = "https://www.sportsport.ba"
+            window.location.href =
+               "https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp"
          } else {
             window.location.href =
                "https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp"
