@@ -3,8 +3,8 @@ import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
 import { useMemo } from "react"
 import useSWR from "swr"
-import { errorLogAndNotify } from "util/CommonUtil"
 import useSWRMutation from "swr/mutation"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const fetcher = async ([userId, sparkId]: [string, string]) =>
    sparkService.hasUserLikedSpark(userId, sparkId)
@@ -25,17 +25,19 @@ export type UseUserSparkLike = {
  * @param {string} userId - The ID of the user.
  * @param {string} sparkId - The ID of the spark.
  * @param {boolean} disabled - Whether the like functionality is disabled.
+ * @param {string} explicitKey - An explicit key to use for the SWR and SWRMutation.
  * @returns {UseUserSparkLike} The user's like status and a function to toggle it.
  */
 const useUserSparkLike = (
    userId: string,
    sparkId: string,
-   disabled?: boolean
+   disabled?: boolean,
+   explicitKey?: [string, string]
 ): UseUserSparkLike => {
    const enabled = userId && sparkId && !disabled
    const { trackEvent } = useSparksFeedTracker()
 
-   const key = enabled ? [userId, sparkId] : null
+   const key = explicitKey || (enabled ? [userId, sparkId] : null)
 
    const {
       data: userLikesSpark,

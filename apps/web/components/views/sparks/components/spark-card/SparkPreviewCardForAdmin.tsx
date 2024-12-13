@@ -42,6 +42,7 @@ const SparkPreviewCardForAdmin: FC<Props> = ({
             thumbnailUrl: getResizedUrl(spark.video.thumbnailUrl, "lg"),
             url: spark.video.url,
             preview: !preview,
+            muted: false,
          }}
       >
          <Box px={cardPadding} pt={cardPadding}>

@@ -1,3 +1,4 @@
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { HighlightsBlockType } from "data/hygraph/types"
@@ -11,6 +12,7 @@ import {
    useMemo,
    useState,
 } from "react"
+import { useLockBodyScroll } from "react-use"
 
 type HighlightsContextType = {
    autoPlayingIndex: number
@@ -19,11 +21,12 @@ type HighlightsContextType = {
    isExpanded: (index: number) => boolean
    handleExpandCardClick: (index: number) => () => void
    handleCloseCardClick: () => void
-   handleEndedPlaying: () => void
    setAutoPlayingIndex: (index: number) => void
    isLiveStreamDialogOpen: boolean
    handleLiveStreamDialogOpen: () => void
    handleLiveStreamDialogClose: () => void
+   isPlayingExpanded: boolean
+   toggleExpandedPlaying: () => void
 }
 
 const HighlightsContext = createContext<HighlightsContextType | undefined>(
@@ -41,12 +44,17 @@ export const HighlightsProvider = ({
 }: HighlightsProviderProps) => {
    const router = useRouter()
    const isMobile = useIsMobile()
+   const [isPausedExpanded, setIsPausedExpanded] = useState<boolean>(false)
 
    const [autoPlayingIndex, setAutoPlayingIndex] = useState<number>(
       isMobile ? 0 : undefined
    )
    const [expandedPlayingIndex, setExpandedPlayingIndex] =
       useState<number>(undefined)
+
+   const [isBodyScrollLockedForMobile, setIsBodyScrollLockedForMobile] =
+      useState<boolean>(false)
+   useLockBodyScroll(isBodyScrollLockedForMobile)
 
    const [
       isLiveStreamDialogOpen,
@@ -67,6 +75,18 @@ export const HighlightsProvider = ({
       },
       [expandedPlayingIndex]
    )
+
+   const isPlayingExpanded = useMemo(() => {
+      return (
+         expandedPlayingIndex !== undefined &&
+         !isLiveStreamDialogOpen &&
+         !isPausedExpanded
+      )
+   }, [expandedPlayingIndex, isLiveStreamDialogOpen, isPausedExpanded])
+
+   const toggleExpandedPlaying = useCallback(() => {
+      setIsPausedExpanded((prev) => !prev)
+   }, [])
 
    const handleExpandCardClick = useCallback(
       (index: number) => {
@@ -108,19 +128,36 @@ export const HighlightsProvider = ({
       )
    }, [router])
 
-   const handleEndedPlaying = useCallback(() => {
-      if (!isMobile) return
-
-      setAutoPlayingIndex((prevIndex) => {
-         return (prevIndex + 1) % highlights.length
-      })
-   }, [isMobile, highlights])
-
    useEffect(() => {
       if (!router.query.highlightId) {
          setExpandedPlayingIndex(undefined)
       }
    }, [router.query.highlightId])
+
+   useEffect(() => {
+      setIsPausedExpanded(false)
+
+      if (isMobile) {
+         if (expandedPlayingIndex !== undefined) {
+            setIsBodyScrollLockedForMobile(true)
+         } else {
+            setIsBodyScrollLockedForMobile(false)
+         }
+      }
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [expandedPlayingIndex, isMobile])
+
+   useEffect(() => {
+      if (!isLiveStreamDialogOpen && !isExpanded(autoPlayingIndex)) {
+         const interval = setInterval(() => {
+            setAutoPlayingIndex((prevIndex) => {
+               return (prevIndex + 1) % highlights.length
+            })
+         }, SPARK_CONSTANTS.SECONDS_TO_AUTO_PLAY)
+         return () => clearInterval(interval)
+      }
+   }, [highlights.length, isExpanded, isLiveStreamDialogOpen, autoPlayingIndex])
 
    const contextValue = useMemo(
       () => ({
@@ -130,11 +167,12 @@ export const HighlightsProvider = ({
          isExpanded,
          handleExpandCardClick,
          handleCloseCardClick,
-         handleEndedPlaying,
          setAutoPlayingIndex,
          isLiveStreamDialogOpen,
          handleLiveStreamDialogOpen,
          handleLiveStreamDialogClose,
+         isPlayingExpanded,
+         toggleExpandedPlaying,
       }),
       [
          autoPlayingIndex,
@@ -143,11 +181,12 @@ export const HighlightsProvider = ({
          isExpanded,
          handleExpandCardClick,
          handleCloseCardClick,
-         handleEndedPlaying,
          setAutoPlayingIndex,
          isLiveStreamDialogOpen,
          handleLiveStreamDialogOpen,
          handleLiveStreamDialogClose,
+         isPlayingExpanded,
+         toggleExpandedPlaying,
       ]
    )
 

@@ -34,6 +34,8 @@ type Props = {
    disableAutoPlay?: boolean
    questionLimitLines?: boolean
    type?: SparkPreviewCardType
+   muted?: boolean
+   onVideoEnded?: () => void
 }
 
 const SparkPreviewCard: FC<Props> = ({
@@ -46,6 +48,8 @@ const SparkPreviewCard: FC<Props> = ({
    disableAutoPlay,
    questionLimitLines,
    type = "carousel",
+   muted = false,
+   onVideoEnded,
 }) => {
    const [autoPlaying, setAutoPlaying] = useState(false)
    const containerRef = useRef<HTMLDivElement>(null)
@@ -115,6 +119,7 @@ const SparkPreviewCard: FC<Props> = ({
                maxSizeCrop: true,
             }),
             preview,
+            muted,
          }}
          onMouseEnter={
             disableAutoPlay || isMobile ? null : () => setAutoPlaying(true)
@@ -122,6 +127,7 @@ const SparkPreviewCard: FC<Props> = ({
          onMouseLeave={
             disableAutoPlay || isMobile ? null : () => setAutoPlaying(false)
          }
+         onVideoEnded={onVideoEnded}
          autoPlaying={!disableAutoPlay && autoPlaying}
          containerRef={containerRef}
          selected={selected}
