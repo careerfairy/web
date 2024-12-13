@@ -41,7 +41,6 @@ export const QuizCard = ({
    // question,
    correction,
 }: Props) => {
-   console.log("🚀 ~ file: QuizCard.tsx:44 ~ correction:", correction)
    const [showAnsweredState, setShowAnsweredState] = useState(false)
    const [buttonStates, setButtonStates] = useState([
       { currentIndex: 0 },
