@@ -32,6 +32,25 @@ export interface TalentGuideProgress extends Identifiable {
    lastVisitedAt: Timestamp | null
 }
 
+export const QUIZ_STATE = {
+   /**
+    * Quiz has not been attempted
+    */
+   NOT_ATTEMPTED: "notAttempted",
+
+   /**
+    * Quiz has been attempted and failed
+    */
+   FAILED: "failed",
+
+   /**
+    * Quiz has been attempted and passed
+    */
+   PASSED: "passed",
+} as const
+
+export type QuizState = (typeof QUIZ_STATE)[keyof typeof QUIZ_STATE]
+
 // Collection path: talentGuideQuizzes/{userAuthUid}_{moduleHygraphId}_{quizHygraphId}
 export interface TalentGuideQuiz extends Identifiable {
    userAuthUid: string
@@ -39,14 +58,8 @@ export interface TalentGuideQuiz extends Identifiable {
    quizHygraphId: string
    selectedAnswerIds: string[]
 
-   /**
-    * - null: not attempted
-    * - false: failed
-    * - true: passed
-    */
-   isPassed: boolean | null
+   state: QuizState
    attemptedAt: Timestamp | null
 
-   isCompleted: boolean
-   completedAt: Timestamp | null
+   lastUpdated: Timestamp | null
 }

@@ -237,6 +237,49 @@ service cloud.firestore {
             allow delete: if isCFAdmin();
         }
 
+        match /talentGuideQuizzes/{docId} {
+            function docIdMatches(moduleHygraphId, quizHygraphId) {
+                return (request.auth.uid + "_" + moduleHygraphId + "_" + quizHygraphId) == docId;
+            }
+
+            allow read: if ( resource == null && isSignedIn() ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
+
+            // Allow create if:
+            // 1. Document ID is correctly formatted (userAuthUid_moduleHygraphId_quizHygraphId)
+            // 2. User is authenticated and it's their own data
+            // 3. Required fields are present and valid
+            // 4. Initial values are valid
+            allow create: if isSignedInAndIsSameAuthUid(request.resource.data.userAuthUid)
+                && docIdMatches(request.resource.data.moduleHygraphId, request.resource.data.quizHygraphId)
+                && request.resource.data.userAuthUid == request.auth.uid
+                && request.resource.data.moduleHygraphId is string
+                && request.resource.data.quizHygraphId is string
+                && request.resource.data.selectedAnswerIds is list
+                && request.resource.data.state in ["notAttempted", "failed", "passed"]
+                && (request.resource.data.attemptedAt == null || request.resource.data.attemptedAt is timestamp)
+                && (request.resource.data.lastUpdated == null || request.resource.data.lastUpdated is timestamp);
+
+            // Allow update if:
+            // 1. Document ID is correctly formatted (userAuthUid_moduleHygraphId_quizHygraphId)
+            // 2. User is authenticated and it's their own data
+            // 3. Not modifying core identifiers
+            // 4. Updates are valid
+            allow update: if isSignedInAndIsSameAuthUid(request.auth.uid)
+                && docIdMatches(request.resource.data.moduleHygraphId, request.resource.data.quizHygraphId)
+                && isUnchanged('userAuthUid')
+                && isUnchanged('moduleHygraphId')
+                && isUnchanged('quizHygraphId')
+                && request.resource.data.selectedAnswerIds is list
+                && request.resource.data.state in ["notAttempted", "failed", "passed"]
+                && (request.resource.data.attemptedAt == null || request.resource.data.attemptedAt is timestamp)
+                && (request.resource.data.lastUpdated == null || request.resource.data.lastUpdated is timestamp);
+
+            // Only allow admins to delete quizzes for demo purposes
+            allow delete: if isCFAdmin();
+        }
+
+        
+
         match /universitiesByCountry/{countryId} {
             allow read: if true;
             allow write: if false;

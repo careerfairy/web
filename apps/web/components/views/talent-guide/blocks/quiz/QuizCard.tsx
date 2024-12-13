@@ -1,6 +1,10 @@
+import { QUIZ_STATE } from "@careerfairy/shared-lib/talent-guide/types"
 import { Box, Collapse, Stack, Typography } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import { QuizModelType } from "data/hygraph/types"
-import { Fragment, useState } from "react"
+import { Fragment } from "react"
+import { toggleQuizAnswer } from "store/reducers/talentGuideReducer"
+import { useQuizState } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
 import { AnswerButton } from "./AnswerButton"
 
@@ -27,71 +31,46 @@ const styles = sxStyles({
 
 type AnswerVariant = "default" | "selected" | "correct" | "correction" | "wrong"
 
-const variantCycle: { variant: AnswerVariant; text: string }[] = [
-   { variant: "default", text: "Default Answer" },
-   { variant: "selected", text: "Selected Answer" },
-   { variant: "correct", text: "Correct Answer" },
-   { variant: "correction", text: "Should have been correct" },
-   { variant: "wrong", text: "Wrong Answer" },
-]
-
 type Props = QuizModelType
 
-export const QuizCard = ({
-   // question,
-   correction,
-}: Props) => {
-   const [showAnsweredState, setShowAnsweredState] = useState(false)
-   const [buttonStates, setButtonStates] = useState([
-      { currentIndex: 0 },
-      { currentIndex: 1 },
-      { currentIndex: 2 },
-      { currentIndex: 3 },
-      { currentIndex: 4 },
-   ])
+export const QuizCard = ({ question, correction, answers, id }: Props) => {
+   const quizState = useQuizState(id)
+   console.log("🚀 ", {
+      quizState,
+      answers,
+   })
+   const dispatch = useAppDispatch()
 
-   const handleButtonClick = (buttonIndex: number) => {
-      setButtonStates((prev) => {
-         const newStates = [...prev]
-         newStates[buttonIndex] = {
-            currentIndex:
-               (prev[buttonIndex].currentIndex + 1) % variantCycle.length,
-         }
-         return newStates
-      })
-   }
+   const quizHasBeenAttempted =
+      quizState.state === QUIZ_STATE.PASSED ||
+      quizState.state === QUIZ_STATE.FAILED
 
-   const toggleCorrection = () => {
-      setShowAnsweredState(!showAnsweredState)
+   const handleButtonClick = (answerId: string) => {
+      dispatch(toggleQuizAnswer({ quizId: id, answerId }))
    }
 
    return (
       <Fragment>
          <Stack direction="column" spacing={1.5}>
             <Typography variant="mobileBrandedH4" sx={styles.question}>
-               {/* {question} */}
-               Demo of AnswerButton variants, Click to cycle through
+               {question}
             </Typography>
-            {buttonStates.map((state, index) => {
-               // For Demo purposes, we want to show the first button with a longer text
-               const isFirst = index === 0
-               return (
-                  <AnswerButton
-                     key={index}
-                     onClick={() => handleButtonClick(index)}
-                     variant={variantCycle[state.currentIndex].variant}
-                  >
-                     {`${variantCycle[state.currentIndex].text} ${
-                        isFirst ? "lorem ipsum dolor sit amet".repeat(5) : ""
-                     }`}
-                  </AnswerButton>
-               )
-            })}
-            <AnswerButton variant="default" onClick={toggleCorrection}>
-               Toggle Correction
-            </AnswerButton>
+            {answers.map(({ answer, id }) => (
+               <AnswerButton
+                  key={id}
+                  onClick={() => handleButtonClick(id)}
+                  disabled={quizHasBeenAttempted}
+                  variant={getAnswerVariant(
+                     quizHasBeenAttempted,
+                     answers.find((a) => a.id === id)?.isCorrect || false,
+                     quizState.selectedAnswerIds.includes(id)
+                  )}
+               >
+                  {answer}
+               </AnswerButton>
+            ))}
          </Stack>
-         <Collapse in={showAnsweredState} unmountOnExit>
+         <Collapse in={quizState.state === QUIZ_STATE.FAILED} unmountOnExit>
             <Box sx={styles.correction}>
                <Typography component="p" variant="small">
                   <Box component="span" sx={styles.correctionText}>
@@ -103,4 +82,22 @@ export const QuizCard = ({
          </Collapse>
       </Fragment>
    )
+}
+
+const getAnswerVariant = (
+   quizHasBeenAttempted: boolean,
+   isCorrect: boolean,
+   isSelected: boolean
+): AnswerVariant => {
+   if (quizHasBeenAttempted) {
+      if (isCorrect) return "correct"
+      if (isSelected && !isCorrect) return "wrong"
+      if (!isSelected && isCorrect) return "correction"
+
+      return "default"
+   }
+
+   if (isSelected) return "selected"
+
+   return "default"
 }

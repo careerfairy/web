@@ -1,6 +1,10 @@
+import { TalentGuideQuiz } from "@careerfairy/shared-lib/talent-guide"
 import { useAppDispatch } from "components/custom-hook/store"
 import { QuizModelType } from "data/hygraph/types"
-import { proceedToNextStep } from "store/reducers/talentGuideReducer"
+import {
+   attemptQuiz,
+   proceedToNextStep,
+} from "store/reducers/talentGuideReducer"
 import { sxStyles } from "types/commonTypes"
 import { FloatingButton } from "./FloatingButton"
 
@@ -17,8 +21,9 @@ const styles = sxStyles({
 
 type Props = {
    quiz: QuizModelType
+   quizStatus: Pick<TalentGuideQuiz, "state" | "selectedAnswerIds">
 }
-export const QuizButton = ({ quiz }: Props) => {
+export const QuizButton = ({ quiz, quizStatus }: Props) => {
    const dispatch = useAppDispatch()
 
    return (
@@ -26,10 +31,12 @@ export const QuizButton = ({ quiz }: Props) => {
          variant="outlined"
          sx={styles.button}
          onClick={() => {
-            alert(
-               `Skipping quiz "${quiz.question}" and proceeding to next step (TODO)`
+            dispatch(
+               attemptQuiz({
+                  quizFromHygraph: quiz,
+                  selectedAnswerIds: quizStatus.selectedAnswerIds,
+               })
             )
-            // TODO: Mark quiz as completed in firestore
             dispatch(proceedToNextStep())
          }}
       >
