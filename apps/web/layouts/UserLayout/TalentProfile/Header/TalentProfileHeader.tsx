@@ -2,11 +2,12 @@ import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
-import { useMemo } from "react"
+import { Fragment, useMemo, useState } from "react"
 import { Settings } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { ProfileAvatar } from "./ProfileAvatar"
 import { ProfileBannerIllustration } from "./ProfileBannerIllustration"
+import { SettingsDialog } from "./Settings/SettingsView"
 
 const LOGO_SIZE = 104
 
@@ -72,6 +73,8 @@ const styles = sxStyles({
 })
 
 export const TalentProfileHeader = () => {
+   const [openSettings, setOpenSettings] = useState(false)
+
    const { userData, userPresenter } = useAuth()
    const { talentProfileV1 } = useFeatureFlags()
 
@@ -83,34 +86,45 @@ export const TalentProfileHeader = () => {
    const userCountry = universityCountriesMap[userData.universityCountryCode]
 
    return (
-      <Stack sx={styles.root}>
-         <ProfileBannerIllustration />
-         <ProfileAvatar />
-         <Stack sx={styles.userDetailsRoot}>
-            <Button
-               sx={styles.settingsButton}
-               variant="outlined"
-               startIcon={<Settings />}
-            >
-               Settings
-            </Button>
-            <Stack>
-               <Typography variant="brandedH4" sx={styles.userName}>
-                  {userPresenter?.getDisplayName()}
-               </Typography>
-               <Stack spacing={0.25}>
-                  <Typography sx={styles.userFieldOfStudy}>
-                     {fieldOfStudyDisplayName}
-                     {userData?.university?.name
-                        ? ` at ${userData?.university?.name}`
-                        : null}
+      <Fragment>
+         <Stack sx={styles.root}>
+            <ProfileBannerIllustration />
+            <ProfileAvatar />
+            <Stack sx={styles.userDetailsRoot}>
+               <Button
+                  sx={styles.settingsButton}
+                  variant="outlined"
+                  startIcon={<Settings />}
+                  onClick={() => {
+                     setOpenSettings(true)
+                  }}
+               >
+                  Settings
+               </Button>
+               <Stack>
+                  <Typography variant="brandedH4" sx={styles.userName}>
+                     {userPresenter?.getDisplayName()}
                   </Typography>
-                  <Typography sx={styles.userLocation}>
-                     {`CityTBD in Up Stack, ${userCountry}.`}
-                  </Typography>
+                  <Stack spacing={0.25}>
+                     <Typography sx={styles.userFieldOfStudy}>
+                        {fieldOfStudyDisplayName}
+                        {userData?.university?.name
+                           ? ` at ${userData?.university?.name}`
+                           : null}
+                     </Typography>
+                     <Typography sx={styles.userLocation}>
+                        {`CityTBD in Up Stack, ${userCountry}.`}
+                     </Typography>
+                  </Stack>
                </Stack>
             </Stack>
          </Stack>
-      </Stack>
+         <SettingsDialog
+            open={openSettings}
+            handleClose={() => {
+               setOpenSettings(false)
+            }}
+         />
+      </Fragment>
    )
 }
