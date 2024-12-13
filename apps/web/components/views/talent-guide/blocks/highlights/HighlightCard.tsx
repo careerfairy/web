@@ -3,8 +3,8 @@ import useGroup from "components/custom-hook/group/useGroup"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
 import { HighlightComponentType } from "data/hygraph/types"
 import { HighlightExpanded } from "./HighlightExpanded"
-import { useHighlights } from "./HighlightsBlockContext"
 import { ThumbnailCard } from "./ThumbnailCard"
+import { useHighlights } from "./control/HighlightsBlockContext"
 
 type HighlightCardProps = {
    highlight: HighlightComponentType
