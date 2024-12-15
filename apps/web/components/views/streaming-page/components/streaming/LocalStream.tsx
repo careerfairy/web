@@ -4,7 +4,7 @@ import {
    ILocalVideoTrack,
    ILocalAudioTrack,
 } from "agora-rtc-react"
-import { type ReactNode } from "react"
+import { type ReactNode, useEffect, useState } from "react"
 
 import { Box, BoxProps } from "@mui/material"
 import { useLocalTracks } from "../../context"
@@ -21,6 +21,7 @@ import { useScreenShare } from "../../context/ScreenShare"
 import { LocalUser, LocalUserScreen } from "../../types"
 import { useUserStream } from "../../context/UserStream"
 import { LinearGradient } from "./LinearGradient"
+import { isSafari } from "react-device-detect"
 
 export type LocalMicrophoneAndCameraUserProps = {
    /**
@@ -142,6 +143,13 @@ export const LocalStream = ({
    ...props
 }: LocalMicrophoneAndCameraUserProps) => {
    const { user, type } = useUserStream<LocalUser | LocalUserScreen>()
+   const [forceRender, setForceRender] = useState(0)
+
+   useEffect(() => {
+      if (isSafari) {
+         setForceRender((prev) => prev + 1) // Force DOM update
+      }
+   }, [localCameraTrack])
 
    const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
 
@@ -157,6 +165,7 @@ export const LocalStream = ({
    return (
       <VideoTrackWrapper {...props}>
          <Box
+            key={forceRender}
             sx={[
                styles.videoTrack,
                isScreenShare && styles.videoContain,
