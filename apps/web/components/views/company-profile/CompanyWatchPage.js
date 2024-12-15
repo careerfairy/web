@@ -4,6 +4,7 @@ import ReactPlayer from "react-player"
 import { withFirebase } from "context/firebase/FirebaseServiceContext"
 import YoutubePreviewer from "components/views/common/YoutubePreviewer"
 import { Container, Dialog, DialogContent, Grid } from "@mui/material"
+import useCustomBackHandler from "../../../util/backHandler.utils";
 
 function CompanyWatchPage(props) {
    const [videos, setVideos] = useState([])
@@ -27,6 +28,14 @@ function CompanyWatchPage(props) {
             setVideos(positionList)
          })
    }, [props.company])
+
+    useCustomBackHandler(() => {
+        if (modalOpen) {
+            setModalOpen(false); // Close the modal
+            return true; // Prevent navigation
+        }
+        return false; // Allow navigation
+    });
 
    function openVideo(youtubeId) {
       setCurrentVideoId(youtubeId)
