@@ -7,6 +7,7 @@ export type NotificationData = {
    title: string
    body: string
    url: string
+   tabValue: number
    filters: Filter
 }
 
@@ -75,17 +76,17 @@ export const deleteSavedNotification = async (id: string) => {
 
 export async function sendExpoPushNotification(
    filters: Filter,
+   activeTabFilter: number,
    message: MessageBody
 ) {
    try {
       // Filter out invalid tokens
       let tokens: string[] = []
-
-      if (filters.livestream) {
+      if (activeTabFilter === 0) {
          tokens = await retrieveTokensFromLivestream(filters.livestream)
-      } else {
+      } else if (activeTabFilter === 1) {
          const userRef = firestore.collection("userData")
-         let query = userRef.where("pushToken", "!=", null)
+         let query = userRef.where("fcmTokens", "!=", null)
 
          if (filters.university?.code && filters.university.code !== "other") {
             query = query.where(
@@ -104,7 +105,12 @@ export async function sendExpoPushNotification(
                filters.universityCountryCode
             )
          }
-         if (filters.gender) {
+         if (
+            filters.gender &&
+            (filters.gender === "male" ||
+               filters.gender === "female" ||
+               filters.gender === "other")
+         ) {
             query = query.where("gender", "==", filters.gender)
          }
          if (filters.fieldOfStudy?.id) {
@@ -124,12 +130,14 @@ export async function sendExpoPushNotification(
 
          const usersSnapshot = await query.get()
 
-         const users: any = usersSnapshot.docs
+         const users: any = usersSnapshot.docs.map((user) => user.data())
 
          tokens = users
             .map((user) => user?.fcmTokens || [])
             .flat()
             .filter((token) => Expo.isExpoPushToken(token))
+      } else {
+         tokens = await retrieveTokensFromEmails(filters.emails)
       }
 
       if (tokens.length === 0) {
@@ -192,7 +200,32 @@ async function retrieveTokensFromLivestream(
          }
       })
 
-      return fcmTokensArray
+      return fcmTokensArray.filter((token) => Expo.isExpoPushToken(token))
+   } catch (error) {
+      console.error("Error retrieving eligible users:", error)
+      return []
+   }
+}
+
+async function retrieveTokensFromEmails(emails: string[]): Promise<string[]> {
+   try {
+      const userDocs = await Promise.all(
+         emails.map(async (email) => {
+            const userDocRef = firestore.collection("userData").doc(email)
+
+            const userDoc = await userDocRef.get()
+            if (userDoc.exists) {
+               return { id: email, ...userDoc.data() } // Include the email (document ID) in the result
+            } else {
+               return null // Handle cases where the document doesn't exist
+            }
+         })
+      )
+
+      return userDocs
+         .map((user: any) => user?.fcmTokens || [])
+         .flat()
+         .filter((token) => Expo.isExpoPushToken(token))
    } catch (error) {
       console.error("Error retrieving eligible users:", error)
       return []
