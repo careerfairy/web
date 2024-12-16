@@ -3,23 +3,24 @@ import { Formik } from "formik"
 import { useRouter } from "next/router"
 import {
    createSavedNotification,
-   updateSavedNotification,
    getSavedNotification,
    NotificationData,
    NotificationResponse,
+   NotificationType,
+   updateSavedNotification,
 } from "../../data/firebase/PushNotificationsService"
 import Button from "@mui/material/Button"
 import Head from "next/head"
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout"
 import {
    Box,
+   Chip,
    Grid,
+   IconButton,
+   Stack,
    Tab,
    Tabs,
    Typography,
-   Chip,
-   Stack,
-   IconButton,
 } from "@mui/material"
 import GenericDropdown from "../../components/views/common/GenericDropdown"
 import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
@@ -77,6 +78,7 @@ const styles = sxStyles({
       fontWeight: "bold",
    },
 })
+
 interface IFormValues {
    gender?: string
    university?: {
@@ -104,7 +106,9 @@ const CreateNotification = ({ notification }) => {
    const [url, setUrl] = useState(notification?.url || "")
    const [open, setOpen] = useState(false)
    const [update, setUpdate] = useState(false)
-   const [tabValue, setTabValue] = useState(0)
+   const [tabValue, setTabValue] = useState<NotificationType>(
+      NotificationType.LIVESTREAM
+   )
    const [inputValue, setInputValue] = useState("")
    const [filters, setFilters] = useState({
       university: null,
@@ -119,6 +123,19 @@ const CreateNotification = ({ notification }) => {
    const router = useRouter()
    const notificationId: any = router.query.id
 
+   const tabValueParse = () => {
+      switch (tabValue) {
+         case NotificationType.LIVESTREAM:
+            return 0
+         case NotificationType.USER_DATA:
+            return 1
+         case NotificationType.EMAIL:
+            return 2
+         default:
+            return 0
+      }
+   }
+
    useEffect(() => {
       if (notificationId) {
          getSavedNotification(notificationId).then(
@@ -126,7 +143,7 @@ const CreateNotification = ({ notification }) => {
                setTitle(response.title)
                setBody(response.body)
                setUrl(response.url)
-               setTabValue(response.tabValue || 0)
+               setTabValue(response.tabValue || NotificationType.LIVESTREAM)
                setFilters(response.filters)
             }
          )
@@ -143,7 +160,7 @@ const CreateNotification = ({ notification }) => {
 
    const handleSaveNotification = async () => {
       setUpdate(true)
-      if (tabValue === 1) {
+      if (tabValue === NotificationType.USER_DATA) {
          formikRef?.current.submitForm()
       } else {
          return submitForm(filters, true)
@@ -152,7 +169,7 @@ const CreateNotification = ({ notification }) => {
    const handleSendNotification = async () => {
       try {
          setUpdate(false)
-         if (tabValue === 1) {
+         if (tabValue === NotificationType.USER_DATA) {
             formikRef?.current.submitForm()
          } else {
             return submitForm(filters, false)
@@ -167,7 +184,19 @@ const CreateNotification = ({ notification }) => {
    }
 
    const handleChangeData = (event: any, newValue: number) => {
-      setTabValue(newValue)
+      switch (newValue) {
+         case 0:
+            setTabValue(NotificationType.LIVESTREAM)
+            break
+         case 1:
+            setTabValue(NotificationType.USER_DATA)
+            break
+         case 2:
+            setTabValue(NotificationType.EMAIL)
+            break
+         default:
+            break
+      }
    }
 
    const handleAddTag = () => {
@@ -218,7 +247,7 @@ const CreateNotification = ({ notification }) => {
                },
                body: JSON.stringify({
                   filters: values,
-                  activeTabFilter: tabValue,
+                  notificationTabFilter: tabValue,
                   message: { title, body, url },
                }),
             })
@@ -287,7 +316,7 @@ const CreateNotification = ({ notification }) => {
                <Box sx={{ width: "100%" }}>
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                      <Tabs
-                        value={tabValue}
+                        value={tabValueParse()}
                         onChange={handleChangeData}
                         aria-label="basic tabs example"
                      >
@@ -298,7 +327,7 @@ const CreateNotification = ({ notification }) => {
                   </Box>
                </Box>
 
-               {tabValue === 0 && (
+               {tabValue === NotificationType.LIVESTREAM && (
                   <Grid container spacing={2}>
                      <Grid
                         style={{ marginTop: 20 }}
@@ -320,7 +349,7 @@ const CreateNotification = ({ notification }) => {
                   </Grid>
                )}
 
-               {tabValue === 1 && (
+               {tabValue === NotificationType.USER_DATA && (
                   <div style={{ marginTop: 20 }}>
                      <Fragment>
                         <Formik
@@ -431,7 +460,7 @@ const CreateNotification = ({ notification }) => {
                   </div>
                )}
 
-               {tabValue === 2 && (
+               {tabValue === NotificationType.EMAIL && (
                   <Box sx={{ width: "100%" }} style={{ marginTop: 20 }}>
                      <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
                         {filters.emails.map((tag, index) => (
