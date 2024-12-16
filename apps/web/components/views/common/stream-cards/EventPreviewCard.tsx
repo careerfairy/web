@@ -495,11 +495,12 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                scroll: false,
                legacyBehavior: true,
             })}
-            {...(isInTalentGuidePage && {
-               onClick: () => {
-                  handleLiveStreamDialogOpen(event.id)
-               },
-            })}
+            {...(isInTalentGuidePage &&
+               handleLiveStreamDialogOpen && {
+                  onClick: () => {
+                     handleLiveStreamDialogOpen(event.id)
+                  },
+               })}
          >
             <CardActionArea
                component={isLink ? "a" : "div"}
