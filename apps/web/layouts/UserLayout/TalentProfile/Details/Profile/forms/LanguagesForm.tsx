@@ -22,6 +22,14 @@ const styles = sxStyles({
    formRoot: {
       maxWidth: "100%",
    },
+   menuItem: {
+      "&.Mui-selected": {
+         backgroundColor: "info.light",
+         "&:hover": {
+            backgroundColor: "info.light",
+         },
+      },
+   },
 })
 
 type LanguageFormProviderProps = {
@@ -88,8 +96,12 @@ export const LanguageFormFields = ({
                displayEmpty: true,
                MenuProps: {
                   sx: {
-                     ".MuiMenu-paper": {
-                        boxShadow: "2px 8px 10px 2px rgba(0,0,0,0)",
+                     "& .MuiMenu-paper": {
+                        boxShadow: "0px 7px 4px -9px rgba(0,0,0,0.8)",
+                        filter: "none",
+                        border: "0.5px solid #E0E0E0",
+                        borderRadius: "4px",
+                        transition: "none",
                      },
                   },
                   TransitionProps: {
@@ -120,6 +132,7 @@ export const LanguageFormFields = ({
                   onClick={() =>
                      setValue("languageId", option, { shouldValidate: true })
                   }
+                  sx={styles.menuItem}
                >
                   {languageCodesDict[option]["name"]}
                </MenuItem>
@@ -133,8 +146,12 @@ export const LanguageFormFields = ({
                displayEmpty: true,
                MenuProps: {
                   sx: {
-                     ".MuiMenu-paper": {
-                        boxShadow: "2px 8px 10px 2px rgba(0,0,0,0)",
+                     "& .MuiMenu-paper": {
+                        boxShadow: "0px 7px 4px -9px rgba(0,0,0,0.8)",
+                        filter: "none",
+                        border: "0.5px solid #E0E0E0",
+                        borderRadius: "4px",
+                        transition: "none",
                      },
                   },
                   TransitionProps: {
@@ -165,6 +182,7 @@ export const LanguageFormFields = ({
                   onClick={() =>
                      setValue("proficiency", value, { shouldValidate: true })
                   }
+                  sx={styles.menuItem}
                >
                   {LanguageProficiencyLabels[value]}
                </MenuItem>
