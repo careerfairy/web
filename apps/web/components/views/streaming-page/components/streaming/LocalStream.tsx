@@ -145,6 +145,7 @@ export const LocalStream = ({
    const { user, type } = useUserStream<LocalUser | LocalUserScreen>()
    const [forceRender, setForceRender] = useState(0)
 
+   // If browser is Safari, we are enforcing re-render of box for it to work without adding full screen
    useEffect(() => {
       if (isSafari) {
          setForceRender((prev) => prev + 1) // Force DOM update
