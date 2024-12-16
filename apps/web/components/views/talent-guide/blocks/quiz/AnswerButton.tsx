@@ -5,6 +5,31 @@ import { AnimatePresence } from "framer-motion"
 import { Check as CorrectIcon, X as WrongIcon } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
+const getBackgroundAnimation = (color: string) => {
+   return {
+      background: `linear-gradient(to right, ${color} 50%, transparent 50%)`,
+      backgroundSize: "200% 100%",
+      backgroundPosition: "right bottom",
+      animation: "slide 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+      "@keyframes slide": {
+         "0%": {
+            backgroundPosition: "right bottom",
+            opacity: 0.7,
+            transform: "scale(0.98)",
+         },
+         "50%": {
+            opacity: 0.9,
+            transform: "scale(1.01)",
+         },
+         "100%": {
+            backgroundPosition: "left bottom",
+            opacity: 1,
+            transform: "scale(1)",
+         },
+      },
+   }
+}
+
 const styles = sxStyles({
    button: {
       justifyContent: "flex-start",
@@ -55,19 +80,19 @@ const styles = sxStyles({
          background: `linear-gradient(90deg, #00BD40 0%, rgba(0, 189, 64, 0.00) 0.01%), #FEFEFE`,
          color: (theme) => theme.palette.neutral[700] + " !important",
       },
-      correct: {
-         bgcolor: (theme) => theme.palette.success[700] + " !important",
+      correct: (theme) => ({
          color: "white !important",
-      },
-      wrong: {
-         bgcolor: (theme) => theme.palette.error[500] + " !important",
+         ...getBackgroundAnimation(theme.palette.success[700]),
+      }),
+      wrong: (theme) => ({
          color: (theme) => theme.brand.white[100] + " !important",
-      },
+         ...getBackgroundAnimation(theme.palette.error[500]),
+      }),
       correction: {
          borderColor: (theme) => theme.palette.success[700] + " !important",
          border: "1px solid",
-         bgcolor: "#F3FBF6 !important",
          color: (theme) => theme.palette.neutral[700] + " !important",
+         ...getBackgroundAnimation("#F3FBF6"),
       },
    },
    iconSlotVariants: {
@@ -98,6 +123,7 @@ type Props = Omit<LoadingButtonProps, "variant"> & {
 export const AnswerButton = ({ variant, sx, children, ...props }: Props) => (
    <Box
       variant="text"
+      key={variant}
       {...props}
       sx={combineStyles([styles.button, styles.buttonVariants[variant], sx])}
       component={LoadingButton}
