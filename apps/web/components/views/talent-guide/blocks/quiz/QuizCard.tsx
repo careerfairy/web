@@ -35,10 +35,6 @@ type Props = QuizModelType
 
 export const QuizCard = ({ question, correction, answers, id }: Props) => {
    const quizState = useQuizState(id)
-   console.log("🚀 ", {
-      quizState,
-      answers,
-   })
    const dispatch = useAppDispatch()
 
    const quizHasBeenAttempted =
@@ -58,13 +54,15 @@ export const QuizCard = ({ question, correction, answers, id }: Props) => {
             {answers.map(({ answer, id }) => (
                <AnswerButton
                   key={id}
+                  id={id}
                   onClick={() => handleButtonClick(id)}
                   disabled={quizHasBeenAttempted}
-                  variant={getAnswerVariant(
+                  variant={getAnswerVariant({
                      quizHasBeenAttempted,
-                     answers.find((a) => a.id === id)?.isCorrect || false,
-                     quizState.selectedAnswerIds.includes(id)
-                  )}
+                     isCorrect:
+                        answers.find((a) => a.id === id)?.isCorrect || false,
+                     isSelected: quizState.selectedAnswerIds.includes(id),
+                  })}
                >
                   {answer}
                </AnswerButton>
@@ -83,16 +81,20 @@ export const QuizCard = ({ question, correction, answers, id }: Props) => {
       </Fragment>
    )
 }
-
-const getAnswerVariant = (
-   quizHasBeenAttempted: boolean,
-   isCorrect: boolean,
+type GetAnswerVariantOptions = {
+   quizHasBeenAttempted: boolean
+   isCorrect: boolean
    isSelected: boolean
-): AnswerVariant => {
+}
+const getAnswerVariant = ({
+   quizHasBeenAttempted,
+   isCorrect,
+   isSelected,
+}: GetAnswerVariantOptions): AnswerVariant => {
    if (quizHasBeenAttempted) {
-      if (isCorrect) return "correct"
       if (isSelected && !isCorrect) return "wrong"
       if (!isSelected && isCorrect) return "correction"
+      if (isCorrect) return "correct"
 
       return "default"
    }

@@ -163,11 +163,13 @@ export class TalentGuideProgressService {
          .filter((answer) => answer.isCorrect)
          .map((answer) => answer.id)
 
-      const passed = selectedAnswerIds.every((answerId) =>
-         correctAnswerIds.some(
-            (correctAnswerId) => correctAnswerId === answerId
+      // Check if the number of selected answers matches the number of correct answers
+      // AND all selected answers are correct
+      const passed =
+         selectedAnswerIds.length === correctAnswerIds.length &&
+         selectedAnswerIds.every((answerId) =>
+            correctAnswerIds.includes(answerId)
          )
-      )
 
       const state = passed ? QUIZ_STATE.PASSED : QUIZ_STATE.FAILED
 

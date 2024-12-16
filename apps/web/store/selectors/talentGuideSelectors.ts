@@ -63,6 +63,4 @@ export const useCurrentQuiz = () => useAppSelector(getCurrentQuiz)
  * Hook to get quiz state from talent guide state
  */
 export const useQuizState = (quizId: string) =>
-   useAppSelector((state) => {
-      return state.talentGuide.quizStatuses[quizId] || null
-   })
+   useAppSelector((state) => state.talentGuide.quizStatuses[quizId] || null)

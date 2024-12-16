@@ -1,4 +1,3 @@
-import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import {
    QUIZ_STATE,
    QuizState,
@@ -131,11 +130,21 @@ export const loadTalentGuide = createAsyncThunk<
       )
    }
 
+   /**
+    * Convert the quiz snapshots to a dictionary of quizzes by quizHygraphId
+    */
+   const quizzes = quizSnaps.docs
+      .map((doc) => doc.data())
+      .reduce((acc, quiz) => {
+         acc[quiz.quizHygraphId] = quiz
+         return acc
+      }, {} as Record<string, TalentGuideQuiz>)
+
    return {
       completedStepIds,
       moduleData: payload.moduleData,
       userAuthUid: payload.userAuthUid,
-      quizzes: convertDocArrayToDict(quizSnaps.docs.map((doc) => doc.data())),
+      quizzes,
    }
 })
 
