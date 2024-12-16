@@ -12,6 +12,12 @@ export const useUserLinks = () => {
 
    useEffect(() => {
       if (userData.id) {
+         const cachedLinks = sessionStorage.getItem(`links-${userData.id}`)
+
+         if (cachedLinks) {
+            setLinks(JSON.parse(cachedLinks))
+         }
+
          const unsubscribe = onSnapshot(
             query(
                collection(firestore, "userData", userData.id, "links")
@@ -19,10 +25,17 @@ export const useUserLinks = () => {
             (doc) => {
                const newData = doc.docs?.map((doc) => doc.data()) || []
                setLinks(newData)
+               sessionStorage.setItem(
+                  `links-${userData.id}`,
+                  JSON.stringify(newData)
+               )
             }
          )
 
-         return () => unsubscribe()
+         return () => {
+            unsubscribe()
+            setLinks([])
+         }
       }
    }, [userData.id, firestore])
 

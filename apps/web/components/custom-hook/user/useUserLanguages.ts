@@ -17,6 +17,14 @@ export const useUserLanguages = () => {
 
    useEffect(() => {
       if (userData.id) {
+         const cachedLanguages = sessionStorage.getItem(
+            `languages-${userData.id}`
+         )
+
+         if (cachedLanguages) {
+            setLanguages(JSON.parse(cachedLanguages))
+         }
+
          const unsubscribe = onSnapshot(
             query(
                collection(firestore, "userData", userData.id, "languages")
@@ -24,10 +32,17 @@ export const useUserLanguages = () => {
             (doc) => {
                const newData = doc.docs?.map((doc) => doc.data()) || []
                setLanguages(sortLanguages(newData))
+               sessionStorage.setItem(
+                  `languages-${userData.id}`,
+                  JSON.stringify(newData)
+               )
             }
          )
 
-         return () => unsubscribe()
+         return () => {
+            unsubscribe()
+            setLanguages([])
+         }
       }
    }, [userData.id, firestore])
 
