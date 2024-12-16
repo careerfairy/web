@@ -32,7 +32,11 @@ import { ProfileItemCard } from "./ProfileItemCard"
 import { ProfileSection } from "./ProfileSection"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import { LinkFormFields, LinkFormProvider } from "./forms/LinksForm"
-import { LinkFormValues, getInitialLinkValues } from "./forms/schemas"
+import {
+   CreateLinkSchemaType,
+   LinkFormValues,
+   getInitialLinkValues,
+} from "./forms/schemas"
 
 const styles = sxStyles({
    emptyLinksRoot: {
@@ -61,13 +65,12 @@ const styles = sxStyles({
    buttonLink: {
       p: 0,
       m: 0,
+      color: "transparent",
       "&:hover": {
          backgroundColor: "unset",
       },
    },
    circularLogo: {
-      width: "48px",
-      height: "48px",
       mr: 1.5,
    },
 })
@@ -117,7 +120,7 @@ const FormDialogWrapper = () => {
       formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
-   } = useFormContext()
+   } = useFormContext<CreateLinkSchemaType>()
 
    const handleCloseLinkDialog = useCallback(() => {
       dispatch(closeCreateDialog({ type: TalentProfileItemTypes.Link }))
@@ -208,6 +211,7 @@ type LinkCardProps = {
 }
 
 const LinkCard = ({ link }: LinkCardProps) => {
+   const { successNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
    const isExtraSmall = useIsMobile(350)
    const { userData } = useAuth()
@@ -215,7 +219,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
    const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
       useState<boolean>(false)
    const dispatch = useDispatch()
-   const { reset } = useFormContext()
+   const { reset } = useFormContext<CreateLinkSchemaType>()
 
    const handleEdit = useCallback(() => {
       dispatch(
@@ -234,7 +238,8 @@ const LinkCard = ({ link }: LinkCardProps) => {
 
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
-   }, [link, userData.id])
+      successNotification("Link deleted")
+   }, [link, userData.id, successNotification])
 
    const linkUrlValue = normalizeUrl(
       getSubstringWithEllipsis(
@@ -266,6 +271,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
             deleteText={"Delete link"}
             handleEdit={handleEdit}
             handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
+            href={normalizedLink}
          >
             <Button // MUI Button
                href={normalizedLink}
@@ -277,6 +283,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
                   src={faviconSrc}
                   alt={`${link.title} icon`}
                   sx={styles.circularLogo}
+                  size={48}
                />
                <Stack>
                   <Typography variant="brandedBody" sx={styles.linkTitle}>

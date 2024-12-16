@@ -8,6 +8,7 @@ import {
    Divider,
    Stack,
    Typography,
+   useTheme,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { SlideUpTransition } from "components/views/common/transitions"
@@ -22,12 +23,15 @@ const styles = sxStyles({
          sm: 8,
          md: 0,
       },
-      "& .MuiDialog-paper": {
-         borderRadius: {
-            xs: "12px 12px 0px 0px",
-            sm: "12px 12px 0px 0px",
-            md: "12px",
-         },
+   },
+   dialogPaper: {
+      minWidth: {
+         md: "716px",
+      },
+      borderRadius: {
+         xs: "12px 12px 0px 0px",
+         sm: "12px 12px 0px 0px",
+         md: "12px",
       },
    },
    title: {
@@ -55,6 +59,10 @@ const styles = sxStyles({
          backgroundColor: (theme) => theme.brand.black[400],
       },
    },
+   saveBtn: {
+      width: "105px",
+      fontWeight: 400,
+   },
 })
 
 type Props = {
@@ -79,7 +87,7 @@ export const BaseProfileDialog = (props: Props) => {
       saveText = "Add",
       isSubmitting,
    } = props
-
+   const theme = useTheme()
    const isMobile = useIsMobile()
 
    return (
@@ -87,12 +95,11 @@ export const BaseProfileDialog = (props: Props) => {
          open={open}
          fullScreen={isMobile}
          closeAfterTransition={false}
-         slotProps={{
-            backdrop: {
-               onClick: handleClose,
-            },
-         }}
+         onClose={handleClose}
          sx={styles.dialog}
+         PaperProps={{
+            sx: styles.dialogPaper,
+         }}
          TransitionComponent={SlideUpTransition}
       >
          <DialogContent>
@@ -117,6 +124,11 @@ export const BaseProfileDialog = (props: Props) => {
                   variant="outlined"
                   sx={styles.cancelBtn}
                   onClick={handleClose}
+                  TouchRippleProps={{
+                     style: {
+                        color: theme.palette.neutral[100],
+                     },
+                  }}
                >
                   <Typography variant="medium" color={"neutral.500"}>
                      Cancel
@@ -128,6 +140,7 @@ export const BaseProfileDialog = (props: Props) => {
                   disabled={saveDisabled}
                   onClick={handleSave}
                   loading={isSubmitting}
+                  sx={styles.saveBtn}
                >
                   {saveText}
                </LoadingButton>
