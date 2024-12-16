@@ -100,6 +100,10 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
       "&.Mui-focused": {
          borderColor: theme.brand.purple[300],
       },
+      "&:hover": {
+         borderColor: theme.brand.purple[200],
+         backgroundColor: theme.brand.white[400],
+      },
    },
 }))
 
