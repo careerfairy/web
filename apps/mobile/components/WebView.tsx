@@ -59,7 +59,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const webViewRef: any = useRef(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
-   const [webviewKey, setWebviewKey] = useState(0)
 
    useEffect(() => {
       checkPermissions()
@@ -70,7 +69,12 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    useEffect(() => {
       const subscription = AppState.addEventListener("change", (state) => {
          if (state === "active" && webViewRef?.current) {
-            setWebviewKey((prevKey) => prevKey + 1) // Force WebView re-render
+            webViewRef.current.injectJavaScript(`
+               if (document.body.innerHTML.trim() === '') {
+                  window.location.reload();
+               }
+               true;
+            `)
          }
       })
 
@@ -273,17 +277,25 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const handleNavigation = (request: any) => {
-      if (!request.url.includes(SEARCH_CRITERIA)) {
-         if (isValidUrl(request.url)) {
-            // iOS calls for all types of navigation (including the non-restrictive
-            // "other", which causes issues for internal links like cookies).
-            if (Platform.OS === "ios" && request.navigationType !== "click") {
-               return false
+      if (request.url === "about:blank") {
+         return false // Stop loading the blank page
+      } else {
+         if (!request.url.includes(SEARCH_CRITERIA)) {
+            if (isValidUrl(request.url)) {
+               // iOS calls for all types of navigation (including the non-restrictive
+               // "other", which causes issues for internal links like cookies).
+               if (
+                  Platform.OS === "ios" &&
+                  request.navigationType !== "click"
+               ) {
+                  return false
+               }
+               Linking.openURL(request.url)
             }
-            Linking.openURL(request.url)
+            return false // Prevent WebView from loading the external link
          }
-         return false // Prevent WebView from loading the external link
       }
+
       return true // Allow WebView to load internal links
    }
 
@@ -292,7 +304,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          <WebView
             style={{ flex: 1 }}
             ref={webViewRef}
-            key={webviewKey}
             source={{ uri: baseUrl }}
             javaScriptEnabled={true}
             mediaPlaybackRequiresUserAction={false}
@@ -304,6 +315,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             domStorageEnabled={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
+            cacheMode="LOAD_NO_CACHE"
             userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
             sharedCookiesEnabled={true}
             thirdPartyCookiesEnabled={true}
