@@ -320,7 +320,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             androidHardwareAccelerationDisabled={false} // Use hardware acceleration
             mixedContentMode="always"
             overScrollMode="never" // Disable over-scrolling for smoother behavior
-            bounces={true} // Enable bouncing for better UX
             nestedScrollEnabled={true} // Improves nested scrolling behavior
             scrollEnabled={true}
             allowsBackForwardNavigationGestures={true}
