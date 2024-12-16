@@ -1,7 +1,6 @@
 import { UserDataPersonalInfo } from "@careerfairy/shared-lib/users"
 import { Button, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { userRepo } from "data/RepositoryInstances"
 import { useFormContext } from "react-hook-form"
@@ -50,9 +49,7 @@ const PersonalInfoView = () => {
 
    return (
       <Stack spacing={1.5}>
-         <SuspenseWithBoundary>
-            <PersonalInfoFormFields />
-         </SuspenseWithBoundary>
+         <PersonalInfoFormFields />
          <Button
             variant="contained"
             color="primary"

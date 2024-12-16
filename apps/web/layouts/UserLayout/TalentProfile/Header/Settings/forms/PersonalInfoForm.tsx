@@ -1,5 +1,6 @@
 import { UserData } from "@careerfairy/shared-lib/users"
-import { Stack } from "@mui/material"
+import { Skeleton, Stack } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCountriesList from "components/custom-hook/countries/useCountriesList"
 import useCountryCities from "components/custom-hook/countries/useCountryCities"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
@@ -59,14 +60,7 @@ export const PersonalInfoFormProvider = ({
 export const PersonalInfoFormFields = () => {
    const {
       formState: { isSubmitting },
-      watch,
-      setValue,
    } = useFormContext<PersonalInfoSchemaType>()
-
-   const countryIsoCode = watch("countryIsoCode")
-
-   const { data: countriesList } = useCountriesList()
-   const { data: countryCities } = useCountryCities(countryIsoCode)
 
    return (
       <Stack spacing={2} sx={styles.formRoot}>
@@ -86,58 +80,30 @@ export const PersonalInfoFormFields = () => {
             disabled={isSubmitting}
             fullWidth
          />
-         <ControlledBrandedAutoComplete
-            label={"Country"}
-            name={"countryIsoCode"}
-            options={Object.keys(countriesList)}
-            textFieldProps={{
-               requiredText: "",
-               placeholder: "E.g, Switzerland",
-               sx: {
-                  "& .MuiAutocomplete-inputRoot.Mui-focused": {
-                     borderColor: (theme) => theme.brand.purple[300],
-                  },
-               },
-            }}
-            autocompleteProps={{
-               id: "countryIsoCode",
-               disabled: isSubmitting,
-               disableClearable: true,
-               autoHighlight: true,
-               selectOnFocus: false,
-               getOptionLabel: (option) =>
-                  (option && countriesList[option]?.name) || "",
-               isOptionEqualToValue: (option, value) => option === value,
-               onChange: () => {
-                  setValue("cityIsoCode", "")
-               },
-            }}
-         />
+         <SuspenseWithBoundary
+            fallback={
+               <Skeleton
+                  variant="rectangular"
+                  height={56}
+                  sx={{ borderRadius: 1.5 }}
+               />
+            }
+         >
+            <CountriesDropdown />
+         </SuspenseWithBoundary>
 
-         <ControlledBrandedAutoComplete
-            label={"City"}
-            name={"cityIsoCode"}
-            options={Object.keys(countryCities)}
-            textFieldProps={{
-               requiredText: "",
-               placeholder: "E.g, Zurich",
-               sx: {
-                  "& .MuiAutocomplete-inputRoot.Mui-focused": {
-                     borderColor: (theme) => theme.brand.purple[300],
-                  },
-               },
-            }}
-            autocompleteProps={{
-               id: "cityIsoCode",
-               disabled: isSubmitting,
-               disableClearable: true,
-               autoHighlight: true,
-               selectOnFocus: false,
-               getOptionLabel: (option) =>
-                  (option && countryCities[option]?.name) || "",
-               isOptionEqualToValue: (option, value) => option === value,
-            }}
-         />
+         <SuspenseWithBoundary
+            fallback={
+               <Skeleton
+                  variant="rectangular"
+                  height={56}
+                  sx={{ borderRadius: 1.5 }}
+               />
+            }
+         >
+            <CitiesDropdown />
+         </SuspenseWithBoundary>
+
          <ControlledBrandedTextField
             id="email"
             name="email"
@@ -154,5 +120,82 @@ export const PersonalInfoFormFields = () => {
             }}
          />
       </Stack>
+   )
+}
+
+const CountriesDropdown = () => {
+   const {
+      formState: { isSubmitting },
+      setValue,
+   } = useFormContext<PersonalInfoSchemaType>()
+
+   const { data: countriesList } = useCountriesList()
+
+   return (
+      <ControlledBrandedAutoComplete
+         label={"Country"}
+         name={"countryIsoCode"}
+         options={Object.keys(countriesList)}
+         textFieldProps={{
+            requiredText: "",
+            placeholder: "E.g, Switzerland",
+            sx: {
+               "& .MuiAutocomplete-inputRoot.Mui-focused": {
+                  borderColor: (theme) => theme.brand.purple[300],
+               },
+            },
+         }}
+         autocompleteProps={{
+            id: "countryIsoCode",
+            disabled: isSubmitting,
+            disableClearable: true,
+            autoHighlight: true,
+            selectOnFocus: false,
+            getOptionLabel: (option) =>
+               (option && countriesList[option]?.name) || "",
+            isOptionEqualToValue: (option, value) => option === value,
+            onChange: () => {
+               setValue("cityIsoCode", "")
+            },
+         }}
+      />
+   )
+}
+
+const CitiesDropdown = () => {
+   const {
+      formState: { isSubmitting },
+      watch,
+   } = useFormContext<PersonalInfoSchemaType>()
+
+   const countryIsoCode = watch("countryIsoCode")
+
+   const { data: countryCities } = useCountryCities(countryIsoCode)
+
+   return (
+      <ControlledBrandedAutoComplete
+         label={"City"}
+         name={"cityIsoCode"}
+         options={Object.keys(countryCities)}
+         textFieldProps={{
+            requiredText: "",
+            placeholder: "E.g, Zurich",
+            sx: {
+               "& .MuiAutocomplete-inputRoot.Mui-focused": {
+                  borderColor: (theme) => theme.brand.purple[300],
+               },
+            },
+         }}
+         autocompleteProps={{
+            id: "cityIsoCode",
+            disabled: isSubmitting,
+            disableClearable: true,
+            autoHighlight: true,
+            selectOnFocus: false,
+            getOptionLabel: (option) =>
+               (option && countryCities[option]?.name) || "",
+            isOptionEqualToValue: (option, value) => option === value,
+         }}
+      />
    )
 }
