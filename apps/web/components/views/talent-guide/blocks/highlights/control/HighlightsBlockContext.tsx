@@ -122,7 +122,7 @@ export const HighlightsProvider = ({
 export const useHighlights = () => {
    const context = useContext(HighlightsContext)
    if (context === undefined) {
-      throw new Error("useHighlights must be used within a HighlightsProvider")
+      console.error("useHighlights must be used within a HighlightsProvider")
    }
    return context
 }
