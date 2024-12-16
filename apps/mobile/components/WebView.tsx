@@ -24,7 +24,7 @@ import { WebView } from "react-native-webview"
 import { AppState } from "react-native"
 
 const injectedCSS = `
-    body {
+    body :not(input):not(textarea) {
       -webkit-user-select: none;
       -ms-user-select: none;
       user-select: none;
