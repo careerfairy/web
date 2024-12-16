@@ -1,5 +1,7 @@
 import { UserData } from "@careerfairy/shared-lib/users"
-import { Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
+import useCountriesList from "components/custom-hook/countries/useCountriesList"
+import useCountryCities from "components/custom-hook/countries/useCountryCities"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import { ReactNode, useEffect } from "react"
@@ -58,6 +60,11 @@ export const PersonalInfoFormFields = () => {
       formState: { isSubmitting },
    } = useFormContext()
 
+   const { data: countriesList } = useCountriesList()
+   const { data: countryCities } = useCountryCities("PT")
+   console.log("🚀 ~ PersonalInfoFormFields ~ countryCities:", countryCities)
+   console.log("🚀 ~ PersonalInfoFormFields ~ countriesList:", countriesList)
+
    return (
       <Stack spacing={2} sx={styles.formRoot}>
          <ControlledBrandedTextField
@@ -76,6 +83,7 @@ export const PersonalInfoFormFields = () => {
             disabled={isSubmitting}
             fullWidth
          />
+         <Box></Box>
       </Stack>
    )
 }

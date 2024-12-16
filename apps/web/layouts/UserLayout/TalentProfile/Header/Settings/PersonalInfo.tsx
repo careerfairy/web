@@ -1,5 +1,6 @@
 import { Button, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import {
    PersonalInfoFormFields,
    PersonalInfoFormProvider,
@@ -11,7 +12,9 @@ export const PersonalInfo = () => {
    return (
       <PersonalInfoFormProvider userData={userData}>
          <Stack spacing={1.5}>
-            <PersonalInfoFormFields />
+            <SuspenseWithBoundary>
+               <PersonalInfoFormFields />
+            </SuspenseWithBoundary>
             <Button
                variant="contained"
                color="primary"
