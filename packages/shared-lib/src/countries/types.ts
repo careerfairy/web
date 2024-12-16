@@ -1,3 +1,5 @@
+import { ICity } from "country-state-city"
+
 export type CountryOption = {
    name: string
    id: string // ISO code
@@ -5,6 +7,9 @@ export type CountryOption = {
 
 export type CityOption = {
    name: string
-   countryCode: string
-   stateCode: string
+   id: string // Generated id based on countryCode and stateCode, see @generateCityId.
+}
+
+export const generateCityId = (city: ICity) => {
+   return `${city.countryCode}-${city.stateCode}-${city.name}`
 }
