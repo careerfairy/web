@@ -2,9 +2,9 @@ import { sendExpoPushNotification } from "../../data/firebase/PushNotificationsS
 
 export default async function handler(req: any, res: any) {
    if (req.method === "POST") {
-      const { filters, activeTabFilter, message } = req.body
+      const { filters, notificationTabFilter, message } = req.body
       try {
-         await sendExpoPushNotification(filters, activeTabFilter, message)
+         await sendExpoPushNotification(filters, notificationTabFilter, message)
          res.status(200).json({
             success: true,
             message: "Notifications sent successfully",
