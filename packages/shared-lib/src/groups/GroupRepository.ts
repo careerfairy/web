@@ -311,6 +311,13 @@ export interface IGroupRepository {
     * @returns A Promise that resolves when the banner image URL is updated.
     */
    updateGroupBanner(groupId: string, image: ImageType): Promise<void>
+
+   /**
+    * Gets the users that are following a group.
+    * @param groupId the group to get the following users from
+    * @returns A Promise that resolves with an array of user ids.
+    */
+   getFollowingUsers(groupId: string): Promise<string[]>
 }
 
 export class FirebaseGroupRepository
@@ -1259,6 +1266,19 @@ export class FirebaseGroupRepository
          publicSparks: isPublic,
       }
       return groupRef.update(toUpdate)
+   }
+
+   async getFollowingUsers(groupId: string): Promise<string[]> {
+      const followingUsersSnaps = await this.firestore
+         .collectionGroup("companiesUserFollows")
+         .where("groupId", "==", groupId)
+         .get()
+
+      if (followingUsersSnaps.empty) {
+         return []
+      }
+
+      return followingUsersSnaps.docs.map((doc) => doc.data().userId)
    }
 
    updateGroupLogo(groupId: string, image: ImageType): Promise<void> {
