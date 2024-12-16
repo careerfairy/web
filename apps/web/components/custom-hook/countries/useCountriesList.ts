@@ -19,13 +19,15 @@ const swrOptions: SWRConfiguration = {
 const useCountriesList = () => {
    const fetcher = useFunctionsSWR<CountryOption[]>()
 
-   const { data, error, isLoading } = useSWR<CountryOption[]>(
+   const { data, error, isLoading } = useSWR<Record<string, CountryOption>>(
       ["fetchCountriesList"],
       fetcher,
       swrOptions
    )
 
-   return { data: data ?? [], error, isLoading }
+   const countries = data ?? {}
+
+   return { data: countries, error, isLoading }
 }
 
 export default useCountriesList

@@ -121,6 +121,9 @@ export interface UserData extends Identifiable {
     */
    phoneNumber?: string
    bannerImageUrl?: string
+
+   countryIsoCode?: string
+   cityIsoCode?: string
 }
 
 export type ValidUserTagFields =
@@ -132,6 +135,11 @@ export type ValidUserTagFields =
 export type UserReadableGroupQuestionsWithAnswerMap = Record<
    GroupQuestion["id"],
    ReadableQuestionAndAnswer
+>
+
+export type UserDataPersonalInfo = Pick<
+   UserData,
+   "firstName" | "lastName" | "countryIsoCode" | "cityIsoCode"
 >
 
 // Collection /userData/:id/studyBackgrounds/:id

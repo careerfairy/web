@@ -1,10 +1,11 @@
 import {
    CityOption,
    CountryOption,
+   generateCityId,
 } from "@careerfairy/shared-lib/countries/types"
+
 import { City, Country } from "country-state-city"
 import { onRequest } from "firebase-functions/v2/https"
-import { pick } from "lodash"
 
 export const fetchCountriesList = onRequest(async (_, res) => {
    const countries: CountryOption[] = Country.getAllCountries().map(
@@ -14,22 +15,38 @@ export const fetchCountriesList = onRequest(async (_, res) => {
       })
    )
 
-   res.status(200).json({ data: countries })
+   const countriesMap: Record<string, CountryOption> = countries.reduce(
+      (acc, country) => ({
+         ...acc,
+         [country.id]: country,
+      }),
+      {} as Record<string, CountryOption>
+   )
+
+   res.status(200).json({ data: countriesMap })
 })
 
 export const fetchCountryCitiesList = onRequest(async (req, res) => {
    const { countryCode } = req.body.data
-
-   console.log("🚀 ~ countryCode:", countryCode)
 
    if (!countryCode) {
       res.status(200).json({ data: [] })
       return
    }
 
-   const cities: CityOption[] = City.getCitiesOfCountry(countryCode).map(
-      (city) => pick(city, ["name", "countryCode", "stateCode"])
+   const cities: CityOption[] =
+      City.getCitiesOfCountry(countryCode)?.map((city) => ({
+         name: city.name,
+         id: generateCityId(city),
+      })) ?? []
+
+   const citiesMap: Record<string, CityOption> = cities.reduce(
+      (acc, city) => ({
+         ...acc,
+         [city.id]: city,
+      }),
+      {} as Record<string, CityOption>
    )
 
-   res.status(200).json({ data: cities })
+   res.status(200).json({ data: citiesMap })
 })

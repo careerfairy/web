@@ -30,6 +30,7 @@ import {
    UserATSRelations,
    UserActivity,
    UserData,
+   UserDataPersonalInfo,
    UserJobApplicationDocument,
    UserPublicData,
    UserReminderType,
@@ -329,6 +330,13 @@ export interface IUserRepository {
       groupId: string,
       followingUsers: string[]
    ): Promise<void>
+
+   /**
+    * Updates the personal info for a user, updates only a subset of the user data fields.
+    * @param userId Id of the user.
+    * @param data Data to be updated.
+    */
+   updatePersonalInfo(userId: string, data: UserDataPersonalInfo): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -1373,6 +1381,23 @@ export class FirebaseUserRepository
 
          await batch.commit()
       }
+   }
+
+   async updatePersonalInfo(
+      userId: string,
+      personalInfo: UserDataPersonalInfo
+   ): Promise<void> {
+      const ref = this.firestore.collection("userData").doc(userId)
+
+      // Email explicitly excluded from update for now
+      const toUpdate: Pick<
+         UserData,
+         "firstName" | "lastName" | "countryIsoCode" | "cityIsoCode"
+      > = {
+         ...personalInfo,
+      }
+
+      return ref.update(toUpdate)
    }
 }
 
