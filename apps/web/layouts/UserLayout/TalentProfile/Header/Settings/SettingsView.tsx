@@ -27,6 +27,7 @@ import {
    X,
    XCircle,
 } from "react-feather"
+import { DeleteAccount } from "./DeleteAccount"
 import { Password } from "./Password"
 import { PersonalInfo } from "./PersonalInfo"
 import { Privacy } from "./Privacy"
@@ -83,7 +84,11 @@ const styles = {
          sm: "24px",
          xs: "16px",
       },
-      mt: "32px",
+      mt: {
+         md: "32px",
+         sm: 2,
+         xs: 2,
+      },
       mb: "24px",
    },
    selectedOptionText: {
@@ -92,7 +97,7 @@ const styles = {
    },
    divider: {
       borderColor: "neutral.50",
-      my: 3,
+      my: "20px",
       ml: {
          md: 4,
          sm: 0,
@@ -100,7 +105,11 @@ const styles = {
       },
    },
    menuItemButton: {
-      py: 1.5,
+      py: {
+         md: 1.5,
+         sm: 3,
+         xs: 3,
+      },
       color: {
          md: "neutral.400",
          sm: "neutral.800",
@@ -108,8 +117,9 @@ const styles = {
       },
    },
    menuItemButtonSelected: {
-      py: 1.5,
-      color: "neutral.800",
+      "& *": {
+         color: "neutral.800",
+      },
       backgroundColor: {
          md: "neutral.50",
          sm: "none",
@@ -130,7 +140,6 @@ const styles = {
    },
    menuItemIconSelected: {
       pl: 2,
-      color: "neutral.800",
    },
    menuItemText: {
       fontWeight: 400,
@@ -141,7 +150,11 @@ const styles = {
       },
    },
    deleteAccountButton: {
-      py: 1.5,
+      py: {
+         md: 1.5,
+         sm: 3,
+         xs: 3,
+      },
       color: (theme) => theme.brand.error[600],
    },
    deleteAccountButtonSelected: {
@@ -229,7 +242,7 @@ const SETTINGS_OPTIONS = {
    "delete-account": {
       label: "Delete account",
       icon: <XCircle />,
-      component: <Password />,
+      component: <DeleteAccount />,
    },
 }
 
@@ -240,20 +253,21 @@ type Props = {
    handleClose: () => void
 }
 
+const menuSettings: SettingsOptions[] = [
+   "personal-info",
+   "your-cv",
+   "privacy",
+   "password",
+]
+
 export const SettingsDialog = ({ open, handleClose }: Props) => {
    const [drawerOpen, setDrawerOpen] = useState(true)
    const theme = useTheme()
-   const [selectedOption, setSelectedOption] =
-      useState<SettingsOptions>("personal-info")
+   const [selectedOption, setSelectedOption] = useState<SettingsOptions>(
+      menuSettings.at(0)
+   )
 
    const isMobile = useIsMobile()
-
-   const menuSettings: SettingsOptions[] = [
-      "personal-info",
-      "your-cv",
-      "privacy",
-      "password",
-   ]
 
    const onBackButtonClick = () => {
       setDrawerOpen(true)

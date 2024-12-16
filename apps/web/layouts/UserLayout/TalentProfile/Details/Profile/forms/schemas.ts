@@ -15,7 +15,6 @@ import {
    ProfileLanguage,
    ProfileLink,
    StudyBackground,
-   UserData,
 } from "@careerfairy/shared-lib/users"
 import { URL_REGEX } from "components/util/constants"
 import { ERROR_MESSAGES } from "util/form"
@@ -97,16 +96,6 @@ export const baseInterestShape = {
       .min(1, "At least one content topic is required"),
 }
 
-export const personalInfoShape = {
-   firstName: Yup.string().required("First name is required"),
-   lastName: Yup.string().required("Last name is required"),
-   countryCode: Yup.string().required("Country is required"),
-   city: Yup.string().required("City is required"),
-   email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-}
-
 export const CreateStudyBackgroundSchema = Yup.object(baseStudyBackgroundShape)
 
 export const CreateLinkSchema = Yup.object(baseLinkShape)
@@ -114,8 +103,6 @@ export const CreateLinkSchema = Yup.object(baseLinkShape)
 export const CreateLanguageSchema = Yup.object(baseLanguageShape)
 
 export const CreateInterestSchema = Yup.object(baseInterestShape)
-
-export const PersonalInfoSchema = Yup.object(personalInfoShape)
 
 export type CreateStudyBackgroundSchemaType = Yup.InferType<
    typeof CreateStudyBackgroundSchema
@@ -130,8 +117,6 @@ export type CreateLanguageSchemaType = Yup.InferType<
 export type CreateInterestSchemaType = Yup.InferType<
    typeof CreateInterestSchema
 >
-
-export type PersonalInfoSchemaType = Yup.InferType<typeof PersonalInfoSchema>
 
 export type StudyBackgroundFormValues = {
    id?: string
@@ -158,14 +143,6 @@ export type LanguageFormValues = {
 export type InterestFormValues = {
    businessFunctionsTagIds: string[]
    contentTopicsTagIds: string[]
-}
-
-export type PersonalInfoFormValues = {
-   firstName: string
-   lastName: string
-   countryCode: string
-   city: string
-   email: string
 }
 
 export const getInitialStudyBackgroundValues = (
@@ -220,17 +197,5 @@ export const getInitialInterestValues = (
       contentTopicsTagIds: interest?.contentTopicsTagIds?.length
          ? interest?.contentTopicsTagIds
          : [],
-   }
-}
-
-export const getInitialPersonalInfoValues = (
-   personalInfo?: UserData
-): PersonalInfoFormValues => {
-   return {
-      firstName: personalInfo?.firstName || "",
-      lastName: personalInfo?.lastName || "",
-      countryCode: personalInfo?.universityCountryCode || "",
-      city: personalInfo?.authId || "",
-      email: personalInfo?.userEmail || "",
    }
 }

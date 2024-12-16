@@ -2,23 +2,18 @@ import { UserData } from "@careerfairy/shared-lib/users"
 import { Stack } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
+import { ReactNode, useEffect } from "react"
+import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
+import { sxStyles } from "types/commonTypes"
 import {
    PersonalInfoSchema,
    PersonalInfoSchemaType,
    getInitialPersonalInfoValues,
-} from "layouts/UserLayout/TalentProfile/Details/Profile/forms/schemas"
-import { ReactNode, useEffect } from "react"
-import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
-import { sxStyles } from "types/commonTypes"
+} from "./schemas"
 
 const styles = sxStyles({
    formRoot: {
-      //   minWidth: {
-      //      xs: "313px",
-      //      sm: "343px",
-      //      md: "500px",
-      //   },
-      // width: "100%",
+      // No styles for now
    },
 })
 
