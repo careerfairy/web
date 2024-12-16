@@ -65,6 +65,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       checkPermissions()
    }, [])
 
+   // Method for checking if iOS application was closes (not from processes) and return to it
+   // If it happens, we rerender the webview so it does not have blank screen
    useEffect(() => {
       const subscription = AppState.addEventListener("change", (state) => {
          if (state === "active" && webViewRef?.current) {
