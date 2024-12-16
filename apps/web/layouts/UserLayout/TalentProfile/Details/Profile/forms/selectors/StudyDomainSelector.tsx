@@ -1,5 +1,7 @@
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { MenuItem, Typography } from "@mui/material"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { SyntheticEvent, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
@@ -10,6 +12,7 @@ type Props = {
    label?: string
    placeholder?: string
    requiredText?: string
+   useTextField?: boolean
 }
 
 export const StudyDomainSelector = ({
@@ -18,6 +21,7 @@ export const StudyDomainSelector = ({
    label,
    placeholder,
    requiredText,
+   useTextField,
 }: Props) => {
    const { data: fieldsOfStudy } =
       useFirestoreCollection<FieldOfStudy>(collection)
@@ -25,6 +29,7 @@ export const StudyDomainSelector = ({
    const {
       formState: { isSubmitting },
       setValue,
+      watch,
    } = useFormContext()
 
    const options = useMemo(
@@ -45,6 +50,62 @@ export const StudyDomainSelector = ({
       })
    }
 
+   const value = watch(fieldName)
+
+   if (useTextField) {
+      return (
+         <BrandedTextField
+            select
+            label={label}
+            name={fieldName}
+            SelectProps={{
+               displayEmpty: true,
+               MenuProps: {
+                  sx: {
+                     "& .MuiMenu-paper": {
+                        boxShadow: "0px 7px 4px -9px rgba(0,0,0,0.8)",
+                        filter: "none",
+                        border: "0.5px solid #E0E0E0",
+                        borderRadius: "4px",
+                        transition: "none",
+                     },
+                  },
+                  TransitionProps: {
+                     enter: false,
+                     exit: false,
+                  },
+                  transitionDuration: 0,
+               },
+               renderValue: (value: { id: string; value: string }) => {
+                  return value?.value ? (
+                     value.value
+                  ) : (
+                     <Typography color={"neutral.400"}>
+                        {placeholder}
+                     </Typography>
+                  )
+               },
+            }}
+            disabled={isSubmitting}
+            fullWidth
+            value={value}
+            requiredText={requiredText}
+         >
+            {options.map((option) => (
+               <MenuItem
+                  key={option.id}
+                  value={option.id}
+                  onClick={() => {
+                     onChangeHandler(null, option)
+                  }}
+               >
+                  {option.value}
+               </MenuItem>
+            ))}
+         </BrandedTextField>
+      )
+   }
+
    return (
       <ControlledBrandedAutoComplete
          label={label}
@@ -59,6 +120,7 @@ export const StudyDomainSelector = ({
             disabled: isSubmitting,
             disableClearable: false,
             autoHighlight: true,
+            selectOnFocus: false,
             getOptionLabel: (option: { id: string; value: string }) =>
                option.value || "",
             onChange: onChangeHandler,
@@ -99,6 +161,7 @@ export const LevelsOfStudySelector = ({
          placeholder="E.g., Bachelor's"
          label="Degree"
          requiredText="(required)"
+         useTextField
       />
    )
 }

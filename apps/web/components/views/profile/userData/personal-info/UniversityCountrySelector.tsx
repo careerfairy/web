@@ -32,12 +32,18 @@ export const UniversityCountrySelector = ({
          textFieldProps={{
             requiredText: requiredText,
             placeholder: placeholder,
+            sx: {
+               "& .MuiAutocomplete-inputRoot.Mui-focused": {
+                  borderColor: (theme) => theme.brand.purple[300],
+               },
+            },
          }}
          autocompleteProps={{
             id: "universityCountryCode",
             disabled: isSubmitting,
             disableClearable: true,
             autoHighlight: true,
+            selectOnFocus: false,
             getOptionLabel: (option) => universityCountriesMap[option] || "",
             isOptionEqualToValue: (option, value) => option === value,
             onChange: () => {

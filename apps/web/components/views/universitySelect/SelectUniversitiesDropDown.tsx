@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import useUniversitiesByCountryCodes from "components/custom-hook/useUniversities"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
 import { SyntheticEvent, useMemo } from "react"
@@ -23,6 +23,15 @@ const styles = sxStyles({
       borderRadius: "70px",
       color: (theme) => theme.palette.neutral[200],
       backgroundColor: (theme) => theme.palette.neutral[50],
+   },
+   universityOptionRoot: {
+      backgroundColor: (theme) => theme.brand.white[50],
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.black[100],
+      },
+   },
+   selectedUniversityOption: {
+      backgroundColor: (theme) => `${theme.brand.white[300]} !important`,
    },
    universityOption: {
       py: "12px",
@@ -105,8 +114,9 @@ const SelectUniversitiesDropDown = ({
                universityCountriesMap[selectedCountryCode] === "None",
             autoHighlight: true,
             disableClearable: false,
-            renderOption: (props, option) => {
-               return getOptionEl(props, option, selectedCountryCode)
+            selectOnFocus: false,
+            renderOption: (props, option, { selected }) => {
+               return getOptionEl(props, option, selectedCountryCode, selected)
             },
             ListboxProps: {
                sx: styles.listBox,
@@ -128,9 +138,18 @@ const SelectUniversitiesDropDown = ({
 const getOptionEl = (
    props: React.HTMLAttributes<HTMLLIElement>,
    option: { id: string; value: string },
-   selectedCountryCode: string
+   selectedCountryCode: string,
+   selected?: boolean
 ) => (
-   <li {...props} key={option.id}>
+   <Box
+      component="li"
+      {...props}
+      key={option.id}
+      sx={[
+         styles.universityOptionRoot,
+         selected ? styles.selectedUniversityOption : null,
+      ]}
+   >
       <Stack direction="row" spacing={1} sx={styles.universityOption}>
          <SchoolIcon sx={styles.schoolIcon} />
          <Stack>
@@ -142,7 +161,7 @@ const getOptionEl = (
             </Typography>
          </Stack>
       </Stack>
-   </li>
+   </Box>
 )
 
 export default SelectUniversitiesDropDown

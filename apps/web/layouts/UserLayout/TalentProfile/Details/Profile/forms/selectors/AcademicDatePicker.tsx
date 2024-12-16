@@ -5,11 +5,7 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    datePicker: {
-      minWidth: {
-         md: "230px",
-         sm: "auto",
-         xs: "auto",
-      },
+      width: "100%",
    },
 })
 
