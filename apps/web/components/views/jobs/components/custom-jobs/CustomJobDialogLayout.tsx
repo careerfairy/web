@@ -74,14 +74,13 @@ export const CustomJobDialogLayout: FC<Props> = ({
    )
 
    const handleClose = useCallback(() => {
+      // Remove the jobId path param that opened the dialog.
+      delete query[dialogSource]
+
       void push(
          {
             pathname,
-            query: {
-               ...query,
-               // Remove the jobId path param that opened the dialog.
-               [dialogSource]: undefined,
-            },
+            query,
          },
          undefined,
          {

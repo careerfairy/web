@@ -26,7 +26,7 @@ const JobsPage = () => {
                title="CareerFairy | Jobs"
                canonical={`https://www.careerfairy.io${pathname}`}
             />
-            <TalentProfileView currentPath="/profile/jobs" />
+            <TalentProfileView currentPath="/profile/career" />
          </CustomJobDialogLayout>
       </UserLayout>
    )
