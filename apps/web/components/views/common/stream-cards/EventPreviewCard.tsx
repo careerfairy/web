@@ -333,7 +333,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       })
 
       const isInTalentGuidePage = useIsInTalentGuide()
-      const { handleLiveStreamDialogOpen } = useHighlights()
+      const highlightsContext = useHighlights()
 
       const router = useRouter()
 
@@ -496,9 +496,9 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                legacyBehavior: true,
             })}
             {...(isInTalentGuidePage &&
-               handleLiveStreamDialogOpen && {
+               highlightsContext && {
                   onClick: () => {
-                     handleLiveStreamDialogOpen(event.id)
+                     highlightsContext.handleLiveStreamDialogOpen(event.id)
                   },
                })}
          >
