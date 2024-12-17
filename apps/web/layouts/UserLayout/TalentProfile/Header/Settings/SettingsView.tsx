@@ -57,6 +57,7 @@ const styles = {
    contentRoot: {
       width: {
          sm: "100%",
+         xs: "100%",
          md: "700px",
       },
    },
@@ -282,10 +283,11 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
                   in={drawerOpen || !isMobile}
                   mountOnEnter
                   unmountOnExit
-                  timeout={250}
+                  timeout={200}
+                  style={{ willChange: "transform" }}
                   easing={{
-                     enter: "cubic-bezier(0.4, 0, 0.2, 1)",
-                     exit: "cubic-bezier(0.4, 0, 0.2, 1)",
+                     enter: theme.transitions.easing.easeIn,
+                     exit: theme.transitions.easing.easeIn,
                   }}
                >
                   <Box sx={styles.drawer}>
@@ -404,10 +406,11 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
                   in={!drawerOpen || !isMobile}
                   mountOnEnter
                   unmountOnExit
-                  timeout={250}
+                  timeout={200}
+                  style={{ willChange: "transform" }}
                   easing={{
-                     enter: "cubic-bezier(0.4, 0, 0.2, 1)",
-                     exit: "cubic-bezier(0.4, 0, 0.2, 1)",
+                     enter: theme.transitions.easing.easeIn,
+                     exit: theme.transitions.easing.easeIn,
                   }}
                >
                   <Box>
