@@ -2,6 +2,9 @@ import { GetServerSideProps } from "next"
 import React, { useEffect } from "react"
 import UAParser from "ua-parser-js"
 
+const APP_STORE_LINK = 'https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp';
+const GOOGLE_STORE_LINK = 'https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp'
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
    const userAgent = context.req.headers["user-agent"] || ""
    // @ts-ignore
@@ -11,11 +14,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
    // Redirection logic based on OS
    let destination: string | null = null
    if (os?.includes("iOS") || os?.includes("macOS")) {
-      destination =
-         "https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp" // Replace with your App Store link
+      destination = APP_STORE_LINK;
    } else {
-      destination =
-         "https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp" // Replace with your Google Play link
+      destination = GOOGLE_STORE_LINK;
    }
 
    if (destination) {
@@ -42,11 +43,9 @@ const DetectOS: React.FC<{ os: string }> = ({ os }) => {
 
          // Redirect logic on the client
          if (detectedOS.includes("iOS") || detectedOS.includes("macOS")) {
-            window.location.href =
-               "https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp"
+            window.location.href = APP_STORE_LINK;
          } else {
-            window.location.href =
-               "https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp"
+            window.location.href = GOOGLE_STORE_LINK;
          }
       }
    }, [os])
