@@ -3,12 +3,12 @@ import {
    Dialog,
    DialogContent,
    Divider,
-   Drawer,
    List,
    ListItem,
    ListItemButton,
    ListItemIcon,
    ListItemText,
+   Slide,
    Stack,
    Typography,
    useTheme,
@@ -39,24 +39,11 @@ const styles = {
    },
    drawer: {
       position: "relative",
-      "& .MuiDrawer-paper": {
-         position: "relative",
-         width: {
-            md: "239px",
-            sm: "100%",
-         },
-         height: "100%",
-         borderRight: "none",
-         backgroundColor: (theme) => {
-            return {
-               md: theme.brand.white[300],
-               sm: theme.brand.white[100],
-            }
-         },
-      },
-      "& MuiDrawer-docked": {
-         width: "0",
-      },
+      borderRight: "none",
+      backgroundColor: (theme) => ({
+         md: theme.brand.white[300],
+         sm: theme.brand.white[100],
+      }),
       height: {
          md: "629px",
          sm: "100%",
@@ -286,64 +273,116 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
          TransitionComponent={SlideUpTransition}
       >
          <DialogContent sx={{ p: 0 }}>
-            <Stack direction="row">
-               {drawerOpen || !isMobile ? (
-                  <Drawer
-                     anchor="left"
-                     open
-                     variant="persistent"
-                     sx={styles.drawer}
-                  >
-                     <Stack>
-                        <Stack
-                           direction={"row"}
-                           sx={styles.settingsHeader}
-                           spacing={2}
-                        >
-                           {isMobile ? (
-                              <ChevronLeft size={24} onClick={handleClose} />
-                           ) : null}
-                           <Typography
-                              variant="brandedH3"
-                              sx={styles.settingsText}
+            <Stack
+               direction="row"
+               sx={{ position: "relative", overflow: "hidden" }}
+            >
+               <Slide
+                  direction="right"
+                  in={drawerOpen || !isMobile}
+                  mountOnEnter
+                  unmountOnExit
+                  timeout={250}
+                  easing={{
+                     enter: "cubic-bezier(0.4, 0, 0.2, 1)",
+                     exit: "cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+               >
+                  <Box sx={styles.drawer}>
+                     <Box>
+                        <Stack>
+                           <Stack
+                              direction={"row"}
+                              sx={styles.settingsHeader}
+                              spacing={2}
                            >
-                              Settings
-                           </Typography>
-                        </Stack>
-                        <List sx={{ py: 0 }}>
-                           {menuSettings.map((option, index) => (
+                              {isMobile ? (
+                                 <ChevronLeft size={24} onClick={handleClose} />
+                              ) : null}
+                              <Typography
+                                 variant="brandedH3"
+                                 sx={styles.settingsText}
+                              >
+                                 Settings
+                              </Typography>
+                           </Stack>
+                           <List sx={{ py: 0 }}>
+                              {menuSettings.map((option, index) => (
+                                 <ListItem
+                                    key={`${option}-${index}`}
+                                    disablePadding
+                                    onClick={() => {
+                                       setSelectedOption(option)
+                                       setDrawerOpen(false)
+                                    }}
+                                 >
+                                    <ListItemButton
+                                       sx={[
+                                          styles.menuItemButton,
+                                          selectedOption === option
+                                             ? styles.menuItemButtonSelected
+                                             : null,
+                                       ]}
+                                    >
+                                       <ListItemIcon
+                                          sx={[
+                                             styles.menuItemIcon,
+                                             selectedOption === option
+                                                ? styles.menuItemIconSelected
+                                                : null,
+                                          ]}
+                                       >
+                                          {SETTINGS_OPTIONS[option].icon}
+                                       </ListItemIcon>
+                                       <ListItemText>
+                                          <Typography
+                                             variant="brandedBody"
+                                             sx={styles.menuItemText}
+                                          >
+                                             {SETTINGS_OPTIONS[option].label}
+                                          </Typography>
+                                       </ListItemText>
+                                       {isMobile ? (
+                                          <ChevronRight
+                                             size={24}
+                                             color={theme.palette.neutral[400]}
+                                          />
+                                       ) : null}
+                                    </ListItemButton>
+                                 </ListItem>
+                              ))}
+
+                              <Divider sx={styles.divider} />
                               <ListItem
-                                 key={`${option}-${index}`}
+                                 key={"delete-account-button"}
                                  disablePadding
                                  onClick={() => {
-                                    setSelectedOption(option)
+                                    setSelectedOption("delete-account")
                                     setDrawerOpen(false)
                                  }}
                               >
                                  <ListItemButton
                                     sx={[
-                                       styles.menuItemButton,
-                                       selectedOption === option
-                                          ? styles.menuItemButtonSelected
+                                       styles.deleteAccountButton,
+                                       selectedOption === "delete-account"
+                                          ? styles.deleteAccountButtonSelected
                                           : null,
                                     ]}
                                  >
-                                    <ListItemIcon
-                                       sx={[
-                                          styles.menuItemIcon,
-                                          selectedOption === option
-                                             ? styles.menuItemIconSelected
-                                             : null,
-                                       ]}
-                                    >
-                                       {SETTINGS_OPTIONS[option].icon}
+                                    <ListItemIcon sx={styles.deleteAccountIcon}>
+                                       {SETTINGS_OPTIONS["delete-account"].icon}
                                     </ListItemIcon>
-                                    <ListItemText>
+                                    <ListItemText
+                                       sx={styles.deleteAccountTextWrapper}
+                                    >
                                        <Typography
                                           variant="brandedBody"
-                                          sx={styles.menuItemText}
+                                          sx={styles.deleteAccountText}
                                        >
-                                          {SETTINGS_OPTIONS[option].label}
+                                          {
+                                             SETTINGS_OPTIONS["delete-account"]
+                                                .label
+                                          }
                                        </Typography>
                                     </ListItemText>
                                     {isMobile ? (
@@ -354,99 +393,72 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
                                     ) : null}
                                  </ListItemButton>
                               </ListItem>
-                           ))}
+                           </List>
+                        </Stack>
+                     </Box>
+                  </Box>
+               </Slide>
 
-                           <Divider sx={styles.divider} />
-                           <ListItem
-                              key={"delete-account-button"}
-                              disablePadding
-                              onClick={() => {
-                                 setSelectedOption("delete-account")
-                                 setDrawerOpen(false)
-                              }}
+               <Slide
+                  direction="left"
+                  in={!drawerOpen || !isMobile}
+                  mountOnEnter
+                  unmountOnExit
+                  timeout={250}
+                  easing={{
+                     enter: "cubic-bezier(0.4, 0, 0.2, 1)",
+                     exit: "cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+               >
+                  <Box>
+                     <ConditionalWrapper
+                        condition={!isMobile || (isMobile && !drawerOpen)}
+                     >
+                        <Stack sx={styles.contentRoot} spacing={1}>
+                           <Stack
+                              direction="row"
+                              justifyContent={"space-between"}
+                              sx={styles.selectedOptionHeader}
                            >
-                              <ListItemButton
-                                 sx={[
-                                    styles.deleteAccountButton,
-                                    selectedOption === "delete-account"
-                                       ? styles.deleteAccountButtonSelected
-                                       : null,
-                                 ]}
+                              <Stack
+                                 direction="row"
+                                 spacing={1.5}
+                                 alignItems={"center"}
                               >
-                                 <ListItemIcon sx={styles.deleteAccountIcon}>
-                                    {SETTINGS_OPTIONS["delete-account"].icon}
-                                 </ListItemIcon>
-                                 <ListItemText
-                                    sx={styles.deleteAccountTextWrapper}
-                                 >
-                                    <Typography
-                                       variant="brandedBody"
-                                       sx={styles.deleteAccountText}
-                                    >
-                                       {
-                                          SETTINGS_OPTIONS["delete-account"]
-                                             .label
-                                       }
-                                    </Typography>
-                                 </ListItemText>
                                  {isMobile ? (
-                                    <ChevronRight
+                                    <ChevronLeft
                                        size={24}
-                                       color={theme.palette.neutral[400]}
+                                       onClick={onBackButtonClick}
                                     />
                                  ) : null}
-                              </ListItemButton>
-                           </ListItem>
-                        </List>
-                     </Stack>
-                  </Drawer>
-               ) : null}
-               <ConditionalWrapper
-                  condition={!isMobile || (isMobile && !drawerOpen)}
-               >
-                  <Stack sx={styles.contentRoot} spacing={1}>
-                     <Stack
-                        direction="row"
-                        justifyContent={"space-between"}
-                        sx={styles.selectedOptionHeader}
-                     >
-                        <Stack
-                           direction="row"
-                           spacing={1.5}
-                           alignItems={"center"}
-                        >
-                           {isMobile ? (
-                              <ChevronLeft
-                                 size={24}
-                                 onClick={onBackButtonClick}
-                              />
-                           ) : null}
-                           <Typography
-                              variant="brandedH3"
-                              sx={styles.selectedOptionText}
-                           >
-                              {SETTINGS_OPTIONS[selectedOption].label}
-                           </Typography>
-                        </Stack>
-                        {!isMobile ? (
+                                 <Typography
+                                    variant="brandedH3"
+                                    sx={styles.selectedOptionText}
+                                 >
+                                    {SETTINGS_OPTIONS[selectedOption].label}
+                                 </Typography>
+                              </Stack>
+                              {!isMobile ? (
+                                 <Box
+                                    sx={styles.closeButton}
+                                    component={X}
+                                    onClick={handleClose}
+                                 />
+                              ) : null}
+                           </Stack>
                            <Box
-                              sx={styles.closeButton}
-                              component={X}
-                              onClick={handleClose}
-                           />
-                        ) : null}
-                     </Stack>
-                     <Box
-                        py={0}
-                        sx={[
-                           styles.contentBox,
-                           isMobile ? styles.contentBoxMobile : null,
-                        ]}
-                     >
-                        {SETTINGS_OPTIONS[selectedOption].component}
-                     </Box>
-                  </Stack>
-               </ConditionalWrapper>
+                              py={0}
+                              sx={[
+                                 styles.contentBox,
+                                 isMobile ? styles.contentBoxMobile : null,
+                              ]}
+                           >
+                              {SETTINGS_OPTIONS[selectedOption].component}
+                           </Box>
+                        </Stack>
+                     </ConditionalWrapper>
+                  </Box>
+               </Slide>
             </Stack>
          </DialogContent>
       </Dialog>
