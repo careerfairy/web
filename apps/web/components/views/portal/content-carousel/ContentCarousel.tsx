@@ -227,11 +227,11 @@ const getCTASlide = (contentItem: CTASlide) => {
       case CTASlideTopics.Sparks: {
          return <WatchSparksCTAContent cta={contentItem} />
       }
-      case CTASlideTopics.Mobile: {
-         return <DownloadMobileApplication cta={contentItem} />
-      }
       case CTASlideTopics.Jobs: {
          return <DiscoverJobsCTAContent cta={contentItem} />
+      }
+      case CTASlideTopics.App: {
+         return <DownloadMobileApplication cta={contentItem} />
       }
       default: {
          return null
