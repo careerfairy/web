@@ -27,13 +27,14 @@ import {
    X,
    XCircle,
 } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 import { DeleteAccount } from "./DeleteAccount"
 import { Password } from "./Password"
 import { PersonalInfo } from "./PersonalInfo"
 import { Privacy } from "./Privacy"
 import { YourCV } from "./YourCV"
 
-const styles = {
+const styles = sxStyles({
    dialogPaper: {
       maxWidth: "unset",
    },
@@ -204,7 +205,7 @@ const styles = {
       width: 32,
       height: 32,
    },
-}
+})
 
 const SETTINGS_OPTIONS = {
    "personal-info": {
