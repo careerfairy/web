@@ -37,6 +37,7 @@ export const CTASlideTopics = {
    CareerCoins: "CareerCoins",
    Sparks: "Sparks",
    Jobs: "Jobs",
+   Mobile: "Mobile",
 } as const
 
 export type CTASlideTopic = (typeof CTASlideTopics)[keyof typeof CTASlideTopics]
@@ -228,6 +229,14 @@ export class CarouselContentService {
             ...content,
          ]
       }
+
+      content = [
+         {
+            contentType: "CTASlide",
+            topic: CTASlideTopics.Mobile,
+         },
+         ...content
+      ]
 
       return content
    }
