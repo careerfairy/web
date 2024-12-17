@@ -1,7 +1,8 @@
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
-import { Box, Stack, Typography } from "@mui/material"
+import { alpha, Box, Stack, Typography } from "@mui/material"
 import FramerBox from "components/views/common/FramerBox"
 import { AnimatePresence } from "framer-motion"
+import { forwardRef } from "react"
 import { Check as CorrectIcon, X as WrongIcon } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
@@ -38,6 +39,9 @@ const styles = sxStyles({
       transition: (theme) => theme.transitions.create("all"),
       width: "100%",
       textAlign: "left",
+      "&:hover": {
+         backgroundColor: (theme) => alpha(theme.palette.text.primary, 0.05),
+      },
    },
    icon: {
       width: 24,
@@ -123,7 +127,6 @@ type Props = Omit<LoadingButtonProps, "variant"> & {
 export const AnswerButton = ({ variant, sx, children, ...props }: Props) => (
    <Box
       variant="text"
-      key={variant}
       {...props}
       sx={combineStyles([styles.button, styles.buttonVariants[variant], sx])}
       component={LoadingButton}
@@ -181,16 +184,20 @@ const iconAnimation = {
       scale: 0.5,
       rotate: 180,
       transition: {
-         duration: 0.2,
+         duration: 0.1,
          ease: "backIn",
       },
    },
 }
 
-const AnimateIcon = ({ children }: { children: React.ReactNode }) => {
-   return (
-      <FramerBox {...iconAnimation} sx={styles.animateIcon}>
-         {children}
-      </FramerBox>
-   )
-}
+const AnimateIcon = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
+   ({ children }, ref) => {
+      return (
+         <FramerBox ref={ref} {...iconAnimation} sx={styles.animateIcon}>
+            {children}
+         </FramerBox>
+      )
+   }
+)
+
+AnimateIcon.displayName = "AnimateIcon"
