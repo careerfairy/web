@@ -52,6 +52,7 @@ export const proceedToNextStep = createAsyncThunk(
             percentageComplete:
                ((nextStepIndex + 1) / moduleData.content.moduleSteps.length) *
                100,
+            totalSteps: moduleData.content.moduleSteps.length,
          }
       )
 
