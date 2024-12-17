@@ -31,7 +31,7 @@ const styles = sxStyles({
       textWrap: "nowrap",
    },
    subtitleMobile: {
-      fontWeight: '300 !important',
+      fontWeight: '400 !important',
    },
    descriptions: {
       fontWeight: "400 !important",
@@ -81,12 +81,14 @@ const styles = sxStyles({
          sm: "100%",
       },
       height: "100%",
+      borderRadius: "12px",
       "& img": {
          borderRadius: "12px",
          right: "-16px !important",
          objectPosition: {
             xs: "top -110% left 0",
-            sm: "top 50% left 20%",
+            sm: "top 0 left 55%",
+            md: "top 0 left 40%",
          },
       },
    },
