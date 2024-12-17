@@ -26,6 +26,7 @@ import ContentCarouselPagination from "./ContentCarouselPagination"
 import { DiscoverJobsCTAContent } from "./DiscoverJobsCTAContent"
 import LivestreamContent from "./LivestreamContent"
 import WatchSparksCTAContent from "./WatchSparksCTAContent"
+import {DownloadMobileApplication} from "./DownloadMobileApplicationContent";
 
 const styles = sxStyles({
    root: {
@@ -225,6 +226,9 @@ const getCTASlide = (contentItem: CTASlide) => {
       }
       case CTASlideTopics.Sparks: {
          return <WatchSparksCTAContent cta={contentItem} />
+      }
+      case CTASlideTopics.Mobile: {
+         return <DownloadMobileApplication cta={contentItem} />
       }
       case CTASlideTopics.Jobs: {
          return <DiscoverJobsCTAContent cta={contentItem} />
