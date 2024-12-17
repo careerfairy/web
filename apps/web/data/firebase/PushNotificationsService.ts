@@ -172,20 +172,28 @@ async function retrieveTokensFromLivestream(
 async function retrieveTokensFromUsers(filters: any): Promise<string[]> {
    try {
       const userRef = firestore.collection("userData")
-      let query = userRef.where("fcmTokens", "!=", null)
+      let query: any
 
       if (filters.university?.code && filters.university.code !== "other") {
-         query = query.where("university.code", "==", filters.university.code)
+         query = query
+            ? query.where("university.code", "==", filters.university.code)
+            : userRef.where("university.code", "==", filters.university.code)
       }
       if (
          filters.universityCountryCode &&
          filters.universityCountryCode !== "OTHER"
       ) {
-         query = query.where(
-            "universityCountryCode",
-            "==",
-            filters.universityCountryCode
-         )
+         query = query
+            ? query.where(
+                 "universityCountryCode",
+                 "==",
+                 filters.universityCountryCode
+              )
+            : userRef.where(
+                 "universityCountryCode",
+                 "==",
+                 filters.universityCountryCode
+              )
       }
       if (
          filters.gender &&
@@ -193,16 +201,22 @@ async function retrieveTokensFromUsers(filters: any): Promise<string[]> {
             filters.gender === "female" ||
             filters.gender === "other")
       ) {
-         query = query.where("gender", "==", filters.gender)
+         query = query
+            ? query.where("gender", "==", filters.gender)
+            : userRef.where("gender", "==", filters.gender)
       }
       if (filters.fieldOfStudy?.id) {
-         query = query.where("fieldOfStudy.id", "==", filters.fieldOfStudy.id)
+         query = query
+            ? query.where("fieldOfStudy.id", "==", filters.fieldOfStudy.id)
+            : userRef.where("fieldOfStudy.id", "==", filters.fieldOfStudy.id)
       }
       if (filters.levelOfStudy?.id) {
-         query = query.where("levelOfStudy.id", "==", filters.levelOfStudy.id)
+         query = query
+            ? query.where("levelOfStudy.id", "==", filters.levelOfStudy.id)
+            : userRef.where("levelOfStudy.id", "==", filters.levelOfStudy.id)
       }
 
-      const usersSnapshot = await query.get()
+      const usersSnapshot = query ? await query.get() : await userRef.get()
 
       const users: any = usersSnapshot.docs.map((user) => user.data())
 
