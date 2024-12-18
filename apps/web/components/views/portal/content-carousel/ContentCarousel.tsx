@@ -118,7 +118,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
     * Each minute watched the field minutesWatched will be increased, and we need to increment it on our DB
     */
    useEffect(() => {
-      const active = content[activeStep]
+      const active = carouselContent[activeStep]
       const isLivestream = active?.contentType === "LivestreamEvent"
       if (videoUrl && minutesWatched > 0 && isLivestream) {
          void livestreamRepo.updateRecordingStats({
@@ -128,7 +128,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             userId: userData?.userEmail,
          })
       }
-   }, [activeStep, content, minutesWatched, userData?.userEmail, videoUrl])
+   }, [activeStep, carouselContent, minutesWatched, userData?.userEmail, videoUrl])
 
    const handleStepChange = useCallback(
       (step) => {
@@ -209,11 +209,11 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
                )
             })}
          </AutoPlaySwipeableViews>
-         {content.length > 1 && (
+         {carouselContent.length > 1 && (
             <Box sx={styles.paginationWrapper}>
                <ContentCarouselPagination
                   activeStep={activeStep}
-                  count={content.length}
+                  count={carouselContent.length}
                   handleChange={handleStepChange}
                   delay={CAROUSEL_SLIDE_DELAY}
                />
