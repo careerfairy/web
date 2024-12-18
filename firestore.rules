@@ -231,7 +231,8 @@ service cloud.firestore {
                 && request.resource.data.percentageComplete <= 100
                 && request.resource.data.totalVisits >= resource.data.totalVisits
                 && request.resource.data.lastUpdated is timestamp
-                && request.resource.data.lastVisitedAt is timestamp;
+                && request.resource.data.lastVisitedAt is timestamp
+                && (request.resource.data.completedAt is timestamp || request.resource.data.completedAt == null);
 
             // Only allow admins to delete progress for demo purposes
             allow delete: if isCFAdmin();
