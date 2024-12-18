@@ -4,7 +4,7 @@ import React, { useEffect } from "react"
 import UAParser from "ua-parser-js"
 
 const APP_STORE_LINK =
-   "https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp"
+   "https://apps.apple.com/ch/app/jobs-for-students-careerfairy/id6738385789"
 const GOOGLE_STORE_LINK =
    "https://play.google.com/store/apps/details?id=com.admin_product_team.careerfairymobileapp"
 
