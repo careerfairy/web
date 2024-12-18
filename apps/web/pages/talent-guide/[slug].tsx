@@ -1,14 +1,11 @@
 import * as Sentry from "@sentry/nextjs"
 import { useAppDispatch } from "components/custom-hook/store"
 import SEO from "components/util/SEO"
-import { AnimatedStepContent } from "components/views/talent-guide/animations/AnimatedStepContent"
 import { ResetDemoButton } from "components/views/talent-guide/components/floating-buttons/ResetDemoButton"
-import { StepActionButton } from "components/views/talent-guide/components/floating-buttons/StepActionButton"
 import { Loader } from "components/views/talent-guide/components/Loader"
-import { ModuleStepContentRenderer } from "components/views/talent-guide/components/ModuleStepContentRenderer"
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
-import { TalentGuideLayout } from "components/views/talent-guide/components/TalentGuideLayout"
-import { TalentGuideProgress } from "components/views/talent-guide/components/TalentGuideProgress"
+import { TalentGuideEndLayout } from "components/views/talent-guide/components/TalentGuideEndLayout"
+import { TalentGuideStepsLayout } from "components/views/talent-guide/components/TalentGuideStepsLayout"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { useAuth } from "HOCs/AuthProvider"
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
@@ -20,7 +17,7 @@ import {
 } from "store/reducers/talentGuideReducer"
 import {
    useIsLoadingTalentGuide,
-   useVisibleSteps,
+   useShowEndOfModuleScreen,
 } from "store/selectors/talentGuideSelectors"
 import {
    tgBackendPreviewService,
@@ -37,6 +34,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const { isPreview } = useRouter()
    const { authenticatedUser, isLoggedIn } = useAuth()
    const isLoadingGuide = useIsLoadingTalentGuide()
+   const showEndScreen = useShowEndOfModuleScreen()
 
    useEffect(() => {
       if (!authenticatedUser.uid) {
@@ -55,8 +53,6 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       }
    }, [dispatch, authenticatedUser.uid, data])
 
-   const visibleSteps = useVisibleSteps()
-
    const isLoading = isLoadingGuide || !isLoggedIn
 
    return (
@@ -65,15 +61,10 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
          <SEO title={`${data.content.moduleName} - CareerFairy Levels`} />
          {isLoading ? (
             <Loader />
+         ) : showEndScreen ? (
+            <TalentGuideEndLayout />
          ) : (
-            <TalentGuideLayout header={<TalentGuideProgress />}>
-               <AnimatedStepContent>
-                  {visibleSteps.map((step) => (
-                     <ModuleStepContentRenderer key={step.id} step={step} />
-                  ))}
-               </AnimatedStepContent>
-               <StepActionButton />
-            </TalentGuideLayout>
+            <TalentGuideStepsLayout />
          )}
          <ResetDemoButton />
       </Fragment>

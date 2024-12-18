@@ -7,7 +7,6 @@ import { removeDuplicates } from "@careerfairy/shared-lib/utils"
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
 import { Page, QuizModelType, TalentGuideModule } from "data/hygraph/types"
-import { arrayUnion } from "firebase/firestore"
 import { RootState } from "store"
 import { errorLogAndNotify } from "util/CommonUtil"
 
@@ -28,6 +27,7 @@ type TalentGuideState = {
    isLoadingAttemptQuizError: string | null
    userAuthUid: string
    quizStatuses: Record<string, QuizStatus>
+   isModuleCompleted: boolean
 }
 
 const initialState: TalentGuideState = {
@@ -42,41 +42,8 @@ const initialState: TalentGuideState = {
    isLoadingAttemptQuizError: null,
    userAuthUid: null,
    quizStatuses: {},
+   isModuleCompleted: false,
 }
-
-// Async thunk to proceed to next step
-export const proceedToNextStep = createAsyncThunk(
-   "talentGuide/proceedToNextStep",
-   async (_, { getState }) => {
-      const state = getState() as RootState
-      const { moduleData, currentStepIndex, userAuthUid } = state.talentGuide
-
-      if (!moduleData?.content) return null
-
-      const nextStepIndex = currentStepIndex + 1
-      if (nextStepIndex >= moduleData.content.moduleSteps.length) return null
-
-      // Update progress in Firestore
-      await talentGuideProgressService.updateModuleProgress(
-         moduleData.content.id,
-         userAuthUid,
-         {
-            currentStepIndex: nextStepIndex,
-            completedStepIds: arrayUnion(
-               moduleData.content.moduleSteps[currentStepIndex].id
-            ),
-            percentageComplete:
-               ((nextStepIndex + 1) / moduleData.content.moduleSteps.length) *
-               100,
-            totalSteps: moduleData.content.moduleSteps.length,
-         }
-      )
-
-      return {
-         nextStepIndex,
-      }
-   }
-)
 
 type LoadTalentGuideProgressPayload = {
    userAuthUid: string
@@ -147,6 +114,23 @@ export const loadTalentGuide = createAsyncThunk<
       quizzes,
    }
 })
+
+// Async thunk to proceed to next step
+export const proceedToNextStep = createAsyncThunk(
+   "talentGuide/proceedToNextStep",
+   async (_, { getState }) => {
+      const state = getState() as RootState
+      const { moduleData, currentStepIndex, userAuthUid } = state.talentGuide
+
+      if (!moduleData?.content) throw new Error("Module data is missing")
+
+      return talentGuideProgressService.proceedToNextStep(
+         moduleData.content,
+         userAuthUid,
+         currentStepIndex
+      )
+   }
+)
 
 type AttemptQuizPayload = {
    quizFromHygraph: QuizModelType
@@ -243,12 +227,15 @@ const talentGuideReducer = createSlice({
             state.isLoadingNextStep = true
          })
          .addCase(proceedToNextStep.fulfilled, (state, action) => {
-            if (!action.payload) return
-
-            const { nextStepIndex } = action.payload
-            state.currentStepIndex = nextStepIndex
-            if (!state.visibleSteps.includes(nextStepIndex)) {
-               state.visibleSteps.push(nextStepIndex)
+            if (!action.payload) {
+               // If there is no next step, we've completed the module
+               state.isModuleCompleted = true
+            } else {
+               const { nextStepIndex } = action.payload
+               state.currentStepIndex = nextStepIndex
+               if (!state.visibleSteps.includes(nextStepIndex)) {
+                  state.visibleSteps.push(nextStepIndex)
+               }
             }
             state.isLoadingNextStep = false
          })
@@ -305,6 +292,7 @@ const talentGuideReducer = createSlice({
             state.moduleData = moduleData
             state.isLoadingTalentGuide = false
             state.userAuthUid = userAuthUid
+            state.isModuleCompleted = true // TODO: Remove before committing
 
             state.quizStatuses = moduleData.content.moduleSteps.reduce(
                (acc, step) => {
@@ -370,6 +358,7 @@ const talentGuideReducer = createSlice({
             state.visibleSteps = [0]
             state.currentStepIndex = 0
             state.isLoadingTalentGuide = false
+            state.isModuleCompleted = false
             state.quizStatuses = Object.keys(state.quizStatuses).reduce(
                (acc, quizId) => {
                   acc[quizId] = {
