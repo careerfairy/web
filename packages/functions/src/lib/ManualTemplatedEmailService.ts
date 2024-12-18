@@ -24,7 +24,7 @@ export class ManualTemplatedEmailService {
     * Fetches the required data for generating the email
     */
    async fetchRequiredData(overrideUsers: string[]) {
-      const users = await this.userRepo.getSubscribedUsersLastActive(
+      const users = await this.userRepo.getSubscribedUsersLastActiveAfter(
          new Date("2023-06-01"),
          overrideUsers
       )
