@@ -2,9 +2,11 @@ import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
+import { useRouter } from "next/router"
 import { Fragment, useMemo, useState } from "react"
 import { Settings } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { TAB_VALUES } from "../TalentProfileView"
 import { ProfileAvatar } from "./ProfileAvatar"
 import { ProfileBannerIllustration } from "./ProfileBannerIllustration"
 import { SettingsDialog } from "./Settings/SettingsView"
@@ -73,7 +75,10 @@ const styles = sxStyles({
 })
 
 export const TalentProfileHeader = () => {
-   const [openSettings, setOpenSettings] = useState(false)
+   const router = useRouter()
+
+   const isSettingsPage = router.pathname.includes(TAB_VALUES.settings.value)
+   const [openSettings, setOpenSettings] = useState(isSettingsPage)
 
    const { userData, userPresenter } = useAuth()
    const { talentProfileV1 } = useFeatureFlags()
@@ -96,7 +101,10 @@ export const TalentProfileHeader = () => {
                   variant="outlined"
                   startIcon={<Settings />}
                   onClick={() => {
-                     setOpenSettings(true)
+                     router.push({
+                        pathname: TAB_VALUES.settings.value,
+                        query: router.query,
+                     })
                   }}
                >
                   Settings
@@ -123,6 +131,17 @@ export const TalentProfileHeader = () => {
             open={openSettings}
             handleClose={() => {
                setOpenSettings(false)
+
+               delete router.query["tab"]
+
+               router.push(
+                  {
+                     pathname: TAB_VALUES.profile.value,
+                     query: router.query,
+                  },
+                  undefined,
+                  { shallow: true }
+               )
             }}
          />
       </Fragment>
