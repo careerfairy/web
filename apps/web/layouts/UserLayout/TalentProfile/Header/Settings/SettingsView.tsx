@@ -17,7 +17,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { useRouter } from "next/router"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
    ChevronLeft,
    ChevronRight,
@@ -264,19 +264,23 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
    const router = useRouter()
 
    const queryTab = router.query.tab as SettingsOptions
-   const currentTab =
-      queryTab && menuSettings.includes(queryTab)
+
+   const [currentTab, setCurrentTab] = useState<SettingsOptions | null>(() => {
+      return queryTab && menuSettings.includes(queryTab)
          ? queryTab
          : !isMobile
          ? menuSettings.at(0)
-         : undefined
+         : null
+   })
 
-   const [drawerOpen, setDrawerOpen] = useState(Boolean(!currentTab))
+   const drawerOpen = useMemo(() => {
+      return Boolean(!currentTab)
+   }, [currentTab])
 
    const theme = useTheme()
 
    const onBackButtonClick = () => {
-      setDrawerOpen(true)
+      setCurrentTab(null)
 
       delete router.query["tab"]
 
@@ -289,6 +293,17 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
          { shallow: true }
       )
    }
+
+   useEffect(() => {
+      const tab = router.query.tab as SettingsOptions
+      setCurrentTab(
+         tab && menuSettings.includes(tab)
+            ? tab
+            : !isMobile
+            ? menuSettings.at(0)
+            : null
+      )
+   }, [router, isMobile])
 
    return (
       <Dialog
@@ -343,7 +358,7 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
                                     key={`${option}-${index}`}
                                     disablePadding
                                     onClick={() => {
-                                       setDrawerOpen(false)
+                                       setCurrentTab(option)
                                        router.push({
                                           pathname: TAB_VALUES.settings.value,
                                           query: {
@@ -395,7 +410,7 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
                                  key={"delete-account-button"}
                                  disablePadding
                                  onClick={() => {
-                                    setDrawerOpen(false)
+                                    setCurrentTab("delete-account")
                                     router.push({
                                        pathname: TAB_VALUES.settings.value,
                                        query: {
