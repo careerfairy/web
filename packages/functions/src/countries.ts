@@ -5,48 +5,57 @@ import {
 } from "@careerfairy/shared-lib/countries/types"
 
 import { City, Country } from "country-state-city"
-import { onRequest } from "firebase-functions/v2/https"
+import * as functions from "firebase-functions"
+import { InferType, object, string } from "yup"
+import config from "./config"
 
-export const fetchCountriesList = onRequest(async (_, res) => {
-   const countries: CountryOption[] = Country.getAllCountries().map(
-      (country) => ({
-         name: country.name,
-         id: country.isoCode,
-      })
-   )
+const CountryCitiesOptionsSchema = {
+   countryCode: string().required(),
+}
 
-   const countriesMap: Record<string, CountryOption> = countries.reduce(
-      (acc, country) => ({
-         ...acc,
-         [country.id]: country,
-      }),
-      {} as Record<string, CountryOption>
-   )
+const CountryCitiesSchema = object().shape(CountryCitiesOptionsSchema)
 
-   res.status(200).json({ data: countriesMap })
-})
+type CountryCitiesOptions = InferType<typeof CountryCitiesSchema>
 
-export const fetchCountryCitiesList = onRequest(async (req, res) => {
-   const { countryCode } = req.body.data
+export const fetchCountriesList = functions
+   .region(config.region)
+   .https.onCall(() => {
+      const countries: CountryOption[] = Country.getAllCountries().map(
+         (country) => ({
+            name: country.name,
+            id: country.isoCode,
+         })
+      )
 
-   if (!countryCode) {
-      res.status(200).json({ data: [] })
-      return
-   }
+      const countriesMap: Record<string, CountryOption> = countries.reduce(
+         (acc, country) => ({
+            ...acc,
+            [country.id]: country,
+         }),
+         {} as Record<string, CountryOption>
+      )
 
-   const cities: CityOption[] =
-      City.getCitiesOfCountry(countryCode)?.map((city) => ({
-         name: city.name,
-         id: generateCityId(city),
-      })) ?? []
+      return countriesMap
+   })
 
-   const citiesMap: Record<string, CityOption> = cities.reduce(
-      (acc, city) => ({
-         ...acc,
-         [city.id]: city,
-      }),
-      {} as Record<string, CityOption>
-   )
+export const fetchCountryCitiesList = functions
+   .region(config.region)
+   .https.onCall((data: CountryCitiesOptions) => {
+      const { countryCode } = data
 
-   res.status(200).json({ data: citiesMap })
-})
+      const cities: CityOption[] =
+         City.getCitiesOfCountry(countryCode)?.map((city) => ({
+            name: city.name,
+            id: generateCityId(city),
+         })) ?? []
+
+      const citiesMap: Record<string, CityOption> = cities.reduce(
+         (acc, city) => ({
+            ...acc,
+            [city.id]: city,
+         }),
+         {} as Record<string, CityOption>
+      )
+
+      return citiesMap
+   })
