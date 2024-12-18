@@ -32,11 +32,11 @@ export interface IUserFunctionsRepository extends IUserRepository {
    ): Promise<UserData[]>
 
    /**
-    * Retrieves the subscribed users, which were last active before a given date.
+    * Retrieves the subscribed users, which were last active after a given date.
     * @param lastActivityAt The date to compare with the last activity date.
     * @param userEmails Optional list of emails to filter results by.
     */
-   getSubscribedUsersLastActive(
+   getSubscribedUsersLastActiveAfter(
       lastActivityAt: Date,
       userEmails?: string[]
    ): Promise<UserData[]>
@@ -130,7 +130,7 @@ export class UserFunctionsRepository
       return mapFirestoreDocuments(data)
    }
 
-   async getSubscribedUsersLastActive(
+   async getSubscribedUsersLastActiveAfter(
       lastActivityAt: Date,
       userEmails?: string[]
    ): Promise<UserData[]> {
