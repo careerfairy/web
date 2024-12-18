@@ -17,18 +17,15 @@ export class ManualTemplatedEmailBuilder {
    /**
     * Adds a recipient to the list of recipients and constructs the template data
     */
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    addRecipient(email: string, firstName: string) {
       this.recipients.push({
          From: this.from,
          To: email,
          TemplateId: Number(process.env.POSTMARK_TEMPLATE_MANUAL_EMAIL),
-         TemplateModel: {
-            user: {
-               firstName: firstName,
-            },
-         },
+         TemplateModel: {},
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "x-mas-newsletter",
+         Tag: "christmas-testimonial",
       })
    }
 
