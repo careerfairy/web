@@ -40,16 +40,15 @@ const styles = sxStyles({
       }
    },
    subtitle: {
-      fontWeight: '500 !important',
+      fontWeight: '600 !important',
+      lineHeight: '36px',
       textWrap: "nowrap",
-      maxWidth: {
-         xs: '100% !important',
-         sm: '60% !important'
-      },
+      maxWidth: '65% !important',
       fontSize: '24px !important'
    },
    subtitleMobile: {
       fontWeight: '400 !important',
+      maxWidth: '60% !important'
    },
    descriptions: {
       fontWeight: "400 !important",
@@ -75,7 +74,7 @@ const styles = sxStyles({
       },
    },
    content: {
-      justifyContent: { xs: "flex-start !important", md: "center !important" },
+      justifyContent: { xs: "flex-start !important", sm: "center !important" },
       height: "100% !important",
    },
    actionItem: {
@@ -177,7 +176,6 @@ export const DownloadMobileApplication: FC<DownloadMobileApplicationProps> = () 
                <Stack>
                   {isMobile && <ContentHeaderTitle
                       component="span"
-                      maxWidth={"65% !important"}
                       color="black"
                       sx={styles.subtitleMobile}
                       fontSize={"16px !important"}
