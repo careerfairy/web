@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/nextjs"
 import { useAppDispatch } from "components/custom-hook/store"
 import SEO from "components/util/SEO"
 import { AnimatedStepContent } from "components/views/talent-guide/animations/AnimatedStepContent"
+import { ResetDemoButton } from "components/views/talent-guide/components/floating-buttons/ResetDemoButton"
 import { StepActionButton } from "components/views/talent-guide/components/floating-buttons/StepActionButton"
 import { Loader } from "components/views/talent-guide/components/Loader"
 import { ModuleStepContentRenderer } from "components/views/talent-guide/components/ModuleStepContentRenderer"
@@ -74,6 +75,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
                <StepActionButton />
             </TalentGuideLayout>
          )}
+         <ResetDemoButton />
       </Fragment>
    )
 }
