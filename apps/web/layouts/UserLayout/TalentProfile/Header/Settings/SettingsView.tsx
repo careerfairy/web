@@ -17,7 +17,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { useRouter } from "next/router"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import {
    ChevronLeft,
    ChevronRight,
@@ -263,15 +263,22 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
    const isMobile = useIsMobile()
    const router = useRouter()
 
+   const getTabValue = useCallback(
+      (tab: SettingsOptions | null) => {
+         return tab && menuSettings.includes(tab)
+            ? tab
+            : !isMobile
+            ? menuSettings.at(0)
+            : null
+      },
+      [isMobile]
+   )
+
    const queryTab = router.query.tab as SettingsOptions
 
-   const [currentTab, setCurrentTab] = useState<SettingsOptions | null>(() => {
-      return queryTab && menuSettings.includes(queryTab)
-         ? queryTab
-         : !isMobile
-         ? menuSettings.at(0)
-         : null
-   })
+   const [currentTab, setCurrentTab] = useState<SettingsOptions | null>(() =>
+      getTabValue(queryTab)
+   )
 
    const drawerOpen = useMemo(() => {
       return Boolean(!currentTab)
@@ -279,7 +286,7 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
 
    const theme = useTheme()
 
-   const onBackButtonClick = () => {
+   const onBackButtonClick = useCallback(() => {
       setCurrentTab(null)
 
       delete router.query["tab"]
@@ -292,18 +299,29 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
          undefined,
          { shallow: true }
       )
-   }
+   }, [router])
 
    useEffect(() => {
       const tab = router.query.tab as SettingsOptions
-      setCurrentTab(
-         tab && menuSettings.includes(tab)
-            ? tab
-            : !isMobile
-            ? menuSettings.at(0)
-            : null
-      )
-   }, [router, isMobile])
+      setCurrentTab(getTabValue(tab))
+   }, [router, getTabValue])
+
+   useEffect(() => {
+      if (!isMobile) return
+
+      const handlePopState = () => {
+         if (currentTab) {
+            // If we're in a tab, prevent default back behavior and return to menu
+            onBackButtonClick()
+         } else {
+            // If we're in the menu, close the dialog
+            handleClose()
+         }
+      }
+
+      window.addEventListener("popstate", handlePopState)
+      return () => window.removeEventListener("popstate", handlePopState)
+   }, [currentTab, isMobile, handleClose, onBackButtonClick])
 
    return (
       <Dialog
