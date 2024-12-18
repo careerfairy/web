@@ -6,7 +6,7 @@ import { useTheme } from "@mui/material/styles"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { isLivestreamDialogOpen } from "components/views/livestream-dialog"
 import { useRouter } from "next/router"
-import { FC, useCallback, useEffect, useState } from "react"
+import {FC, useCallback, useEffect, useMemo, useState} from "react"
 import SwipeableViews from "react-swipeable-views"
 import { autoPlay } from "react-swipeable-views-utils"
 import { useAuth } from "../../../../HOCs/AuthProvider"
@@ -27,6 +27,8 @@ import { DiscoverJobsCTAContent } from "./DiscoverJobsCTAContent"
 import LivestreamContent from "./LivestreamContent"
 import WatchSparksCTAContent from "./WatchSparksCTAContent"
 import {DownloadMobileApplication} from "./DownloadMobileApplicationContent";
+import {MobileUtils} from "../../../../util/mobile.utils";
+import {useIsMounted} from "../../../custom-hook/utils/useIsMounted";
 
 const styles = sxStyles({
    root: {
@@ -90,8 +92,27 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal()
    const { query } = useRouter()
+   const isMounted = useIsMounted();
 
    const isLSDialogOpen = isLivestreamDialogOpen(query)
+
+   const carouselContent = useMemo<CarouselContent[]>(() => {
+      let serializedContent = content;
+
+      const userNotDownloadedTheApp = !userData?.fcmTokens || userData?.fcmTokens?.length === 0;
+      
+      if (isMounted && userNotDownloadedTheApp && !MobileUtils.webViewPresence()) {
+         serializedContent = [
+            {
+               contentType: "CTASlide",
+               topic: CTASlideTopics.App,
+            },
+            ...serializedContent
+         ]
+      }
+
+      return serializedContent;
+   }, [content, isMounted])
 
    /**
     * Each minute watched the field minutesWatched will be increased, and we need to increment it on our DB
@@ -165,7 +186,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             interval={CAROUSEL_SLIDE_DELAY}
             style={{ overflow: "visible" }}
          >
-            {content.map((contentItem, index) => {
+            {carouselContent.map((contentItem, index) => {
                // Check if contentItem is a CTASlide
                if (contentItem.contentType === "CTASlide") {
                   return (

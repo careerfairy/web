@@ -21,14 +21,32 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
       fontWeight: 700,
+      fontSize: {
+         xs: '32px !important',
+         md: '42px !important',
+      }
    },
    title: {
+      color: 'black',
       fontWeight: 700,
       textWrap: "nowrap",
+      maxWidth: {
+         xs: '100% !important',
+         sm: '60% !important'
+      },
+      fontSize: {
+         xs: '32px !important',
+         md: '42px !important',
+      }
    },
    subtitle: {
       fontWeight: '500 !important',
       textWrap: "nowrap",
+      maxWidth: {
+         xs: '100% !important',
+         sm: '60% !important'
+      },
+      fontSize: '24px !important'
    },
    subtitleMobile: {
       fontWeight: '400 !important',
@@ -81,9 +99,11 @@ const styles = sxStyles({
          sm: "100%",
       },
       height: "100%",
-      borderRadius: "12px",
+      "& span": {
+         borderRadius: "12px !important",
+      },
       "& img": {
-         borderRadius: "12px",
+         borderRadius: "12px !important",
          right: "-16px !important",
          objectPosition: {
             xs: "top -110% left 0",
@@ -121,35 +141,28 @@ export const DownloadMobileApplication: FC<DownloadMobileApplicationProps> = () 
             <>
             {!isMobile && <ContentHeaderTitle
                    component="span"
-                   maxWidth={isMobile ? "100%" : "60% !important"}
                    color="black"
                    sx={styles.subtitle}
-                   fontSize={"24px !important"}
                >{"No more missed livestreams"}
                </ContentHeaderTitle>}
                   <br/>
                <ContentHeaderTitle
                   component="span"
-                  maxWidth={isMobile ? "100%" : "60% !important"}
                   color="black"
                   sx={styles.title}
-                  fontSize={isMobile ? "32px !important" : "42px !important"}
                >
                   {"The "}
                   <ContentHeaderTitle
                      sx={styles.centeredHeaderTitle}
                      color="primary"
-                     fontSize={isMobile ? "32px !important" : "42px !important"}
                   >
                      CareerFairy App
                   </ContentHeaderTitle>
                   <br/>
                   <ContentHeaderTitle
                       component="span"
-                      maxWidth={isMobile ? "100%" : "60% !important"}
                       color="black"
                       sx={styles.title}
-                      fontSize={isMobile ? "32px !important" : "42px !important"}
                   >{"is coming soon!"}</ContentHeaderTitle>
                </ContentHeaderTitle>
             </>
@@ -191,7 +204,7 @@ export const DownloadMobileApplication: FC<DownloadMobileApplicationProps> = () 
                }
                alt={"Mobile download illustration"}
                layout="fill"
-               objectFit={isMobile ? "cover" : "cover"}
+               objectFit={"cover"}
                quality={90}
             />
          </Box>
