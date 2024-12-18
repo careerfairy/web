@@ -125,13 +125,15 @@ const SparksFilterDialog = ({
 }: Props) => {
    const isMobile = useIsMobile()
 
-   useWebviewBackHandler(() => {
+   const handleBack = () => {
       if (isOpen) {
          handleClose();
          return true;
       }
       return false;
-   });
+   };
+
+   useWebviewBackHandler(handleBack);
 
    const isFullScreen = useSparksFeedIsFullScreen()
 
