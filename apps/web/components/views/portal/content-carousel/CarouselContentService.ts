@@ -16,7 +16,6 @@ import { sparkService } from "data/firebase/SparksService"
 import DateUtil from "util/DateUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
-import { MobileUtils } from "../../../../util/mobile.utils";
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -228,18 +227,6 @@ export class CarouselContentService {
                topic: CTASlideTopics.Jobs,
             },
             ...content,
-         ]
-      }
-
-      const userNotDownloadedTheApp = !this.options.userData?.fcmTokens || this.options.userData?.fcmTokens?.length === 0;
-
-      if (userNotDownloadedTheApp && !MobileUtils.webViewPresence()) {
-         content = [
-            {
-               contentType: "CTASlide",
-               topic: CTASlideTopics.App,
-            },
-            ...content
          ]
       }
 
