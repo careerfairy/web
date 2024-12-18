@@ -86,7 +86,8 @@ const styles = sxStyles({
       selected: {
          borderColor: (theme) => theme.brand.purple[300] + " !important",
          border: "1.5px solid",
-         background: `linear-gradient(90deg, #00BD40 0%, rgba(0, 189, 64, 0.00) 0.01%), #FEFEFE`,
+         background: (theme) =>
+            `linear-gradient(90deg, ${theme.palette.success[700]} 0%, rgba(0, 189, 64, 0.00) 0.01%), ${theme.brand.white[100]}`,
          color: (theme) => theme.palette.neutral[700] + " !important",
       },
       correct: (theme) => ({
