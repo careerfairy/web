@@ -6,13 +6,18 @@ import { forwardRef } from "react"
 import { Check as CorrectIcon, X as WrongIcon } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
-const getBackgroundAnimation = (color: string) => {
+const getBackgroundAnimation = (
+   color: string,
+   // to ensure animation re-runs when variant changes
+   key: string
+) => {
+   const animationName = `slide-${key}`
    return {
       background: `linear-gradient(to right, ${color} 50%, transparent 50%)`,
       backgroundSize: "200% 100%",
       backgroundPosition: "right bottom",
-      animation: "slide 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards",
-      "@keyframes slide": {
+      animation: `${animationName} 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+      [`@keyframes ${animationName}`]: {
          "0%": {
             backgroundPosition: "right bottom",
             opacity: 0.7,
@@ -86,17 +91,17 @@ const styles = sxStyles({
       },
       correct: (theme) => ({
          color: "white !important",
-         ...getBackgroundAnimation(theme.palette.success[700]),
+         ...getBackgroundAnimation(theme.palette.success[700], "correct"),
       }),
       wrong: (theme) => ({
          color: (theme) => theme.brand.white[100] + " !important",
-         ...getBackgroundAnimation(theme.palette.error[500]),
+         ...getBackgroundAnimation(theme.palette.error[500], "wrong"),
       }),
       correction: {
          borderColor: (theme) => theme.palette.success[700] + " !important",
          border: "1px solid",
          color: (theme) => theme.palette.neutral[700] + " !important",
-         ...getBackgroundAnimation("#F3FBF6"),
+         ...getBackgroundAnimation("#F3FBF6", "correction"),
       },
    },
    iconSlotVariants: {
