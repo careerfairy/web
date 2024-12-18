@@ -41,12 +41,11 @@ const pushNotificationTesters = [
    "matilde.ramos@careerfairy.io",
    "goncalo@careerfairy.io",
    "puzic.sead@gmail.com",
-   "puzic.sead+test1234@gmail.com",
    "simone@careerfairy.io",
    "habib@careerfairy.io",
    "lucas@careerfairy.io",
    "carlos.rijo@careerfairy.io",
-   "walter@careerfairy.io",
+   "walter.goncalves@careerfairy.io",
    "amal-thomas.roy@careerfairy.io",
 ]
 const useAdminLinks = () => {
