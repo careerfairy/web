@@ -14,14 +14,7 @@ import EventsPreviewCarousel, {
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import {
-   Dispatch,
-   SetStateAction,
-   useCallback,
-   useMemo,
-   useRef,
-   useState,
-} from "react"
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react"
 import { Edit2, PlayCircle, Radio } from "react-feather"
 import { useDispatch } from "react-redux"
 import { setSparkToPreview } from "store/reducers/adminSparksReducer"
@@ -256,7 +249,6 @@ const SparksContent = ({
    setEditDialogState,
    hasSparksToLink,
 }: ContentProps) => {
-   const childRef = useRef(null)
    const isMobile = useIsMobile()
    const dispatch = useDispatch()
 
@@ -297,7 +289,6 @@ const SparksContent = ({
          <Box sx={styles.linkedContentWrapper}>
             {linkedSparks.length > 0 ? (
                <SparksCarousel
-                  ref={childRef}
                   sparks={linkedSparks}
                   options={sparksCarouselEmblaOptions}
                   onSparkClick={handleSparkClick}
