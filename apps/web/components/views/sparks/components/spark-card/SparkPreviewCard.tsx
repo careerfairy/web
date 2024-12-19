@@ -53,6 +53,8 @@ const SparkPreviewCard: FC<Props> = ({
 
    // Set up intersection observer to handle auto-playing
    useEffect(() => {
+      if (disableAutoPlay) return
+
       const currentContainerRef = containerRef.current
       let timeout
 
@@ -75,7 +77,7 @@ const SparkPreviewCard: FC<Props> = ({
          threshold: 0.9,
       })
 
-      if (isMobile && !disableAutoPlay && containerRef.current) {
+      if (isMobile && containerRef.current) {
          observer.observe(containerRef.current)
       }
 
@@ -87,6 +89,8 @@ const SparkPreviewCard: FC<Props> = ({
 
    // Set up auto-playing timeout for mobile experience
    useEffect(() => {
+      if (disableAutoPlay) return
+
       let timeout
 
       if (!disableAutoPlay && autoPlaying && isMobile) {
