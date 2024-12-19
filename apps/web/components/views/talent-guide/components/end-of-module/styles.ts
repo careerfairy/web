@@ -68,4 +68,16 @@ export const styles = sxStyles({
       flexWrap: "wrap",
       justifyContent: "start",
    },
+   // Congrats section styles
+   congratsRoot: {
+      textAlign: "center",
+   },
+   congratsTitle: {
+      color: "neutral.800",
+      fontWeight: 700,
+   },
+   congratsText: {
+      color: "neutral.700",
+      maxWidth: 323,
+   },
 })

@@ -3,24 +3,19 @@ import { Variants } from "framer-motion"
 import { FeedbackCard } from "./FeedbackCard"
 import { styles } from "./styles"
 
-type FeedbackSectionProps = {
-   isVisible: boolean
+type Props = {
    enableRating: boolean
    isShorterScreen: boolean
    onRatingClick: () => void
 }
 
 export const FeedbackSection = ({
-   isVisible,
    enableRating,
    isShorterScreen,
    onRatingClick,
-}: FeedbackSectionProps) => {
-   if (!isVisible) return null
-
+}: Props) => {
    return (
       <FramerBox
-         key="feedback"
          animate={enableRating || isShorterScreen ? "center" : "animate"}
          initial="initial"
          exit="exit"
