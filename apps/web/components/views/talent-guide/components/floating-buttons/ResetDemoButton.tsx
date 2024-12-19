@@ -1,5 +1,4 @@
-import RefreshIcon from "@mui/icons-material/RestartAlt"
-import { Fab, Tooltip } from "@mui/material"
+import { Button, ButtonGroup, Tooltip } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
 import { sxStyles } from "types/commonTypes"
 import { resetModuleProgressForDemo } from "../../../../../store/reducers/talentGuideReducer"
@@ -12,29 +11,40 @@ const styles = sxStyles({
       zIndex: (theme) => theme.zIndex.drawer + 10,
       p: 0,
       transition: "transform 0.3s ease-in-out",
-      "&:hover": {
-         transform: "rotate(45deg)",
-      },
    },
 })
 
-export const ResetDemoButton = () => {
+type Props = {
+   onResetLayout: () => void
+}
+
+export const ResetDemoButton = ({ onResetLayout }: Props) => {
    const dispatch = useAppDispatch()
 
    return (
       <Tooltip title="Reset demo">
-         <Fab
-            size="small"
+         <ButtonGroup
             sx={styles.root}
-            onClick={() => {
-               // Reset the module progress in the firestore/reducer
-               dispatch(resetModuleProgressForDemo())
-            }}
-            color="secondary"
-            variant="extended"
+            variant="outlined"
+            aria-label="Basic button group"
+            size="small"
          >
-            <RefreshIcon />
-         </Fab>
+            <Button
+               onClick={() => {
+                  onResetLayout()
+               }}
+            >
+               UI
+            </Button>
+            <Button
+               onClick={() => {
+                  // Reset the module progress in the firestore/reducer
+                  dispatch(resetModuleProgressForDemo())
+               }}
+            >
+               DB
+            </Button>
+         </ButtonGroup>
       </Tooltip>
    )
 }
