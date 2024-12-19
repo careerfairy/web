@@ -68,6 +68,17 @@ export const styles = sxStyles({
       flexWrap: "wrap",
       justifyContent: "start",
    },
+   chip: {
+      margin: "8px 8px 0 0",
+   },
+   selectedChip: {
+      color: (theme) => theme.brand.white,
+      backgroundColor: (theme) => theme.palette.primary.main + " !important",
+   },
+   unselectedChip: {
+      color: "neutral.700",
+      backgroundColor: "neutral.50",
+   },
    // Congrats section styles
    congratsRoot: {
       textAlign: "center",

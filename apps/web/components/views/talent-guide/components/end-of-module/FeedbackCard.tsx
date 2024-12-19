@@ -1,4 +1,5 @@
 import {
+   TAG_CATEGORY,
    TagCategory,
    TalentGuideFeedback,
 } from "@careerfairy/shared-lib/talent-guide/types"
@@ -12,17 +13,18 @@ import {
    Typography,
 } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { SetValueConfig } from "react-hook-form"
 import FramerBox from "../../../common/FramerBox"
 import { AnimatedCollapse } from "../../animations/AnimatedCollapse"
 import { ratingTitleAnimation } from "./animations"
 import { styles } from "./styles"
 
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { StarIcon } from "components/views/common/icons/StarIcon"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
 import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
-import { FeedbackFormData, feedbackSchema, tags } from "../../schema"
+import { FeedbackFormData, feedbackSchema } from "../../schema"
 
 export const ratingTitles: Record<TalentGuideFeedback["rating"], string> = {
    1: "Big yikes.",
@@ -38,6 +40,8 @@ type Props = {
    onFeedbackSubmitted: () => void
 }
 
+const tags = Object.values(TAG_CATEGORY)
+
 export const FeedbackCard = ({
    onRatingClick,
    preview,
@@ -45,6 +49,7 @@ export const FeedbackCard = ({
 }: Props) => {
    const [hover, setHover] = useState(-1)
    const { moduleData, userAuthUid } = useTalentGuideState()
+   const { errorNotification } = useSnackbarNotifications()
    const {
       handleSubmit,
       watch,
@@ -60,15 +65,27 @@ export const FeedbackCard = ({
    const currentTags = watch("tags")
 
    const onSubmit = async (data: FeedbackFormData) => {
-      await talentGuideProgressService.submitFeedback(
-         moduleData.content.id,
-         userAuthUid,
-         data.rating as TalentGuideFeedback["rating"],
-         data.tags as TagCategory[]
-      )
-      reset()
-      onFeedbackSubmitted?.()
+      try {
+         await talentGuideProgressService.submitFeedback(
+            moduleData.content.id,
+            userAuthUid,
+            data.rating as TalentGuideFeedback["rating"],
+            data.tags as TagCategory[]
+         )
+         reset()
+         onFeedbackSubmitted?.()
+      } catch (error) {
+         errorNotification(
+            error,
+            "Unable to submit feedback. Our team has been notified."
+         )
+      }
    }
+
+   const isSelected = useCallback(
+      (tag: TagCategory) => currentTags.includes(tag),
+      [currentTags]
+   )
 
    return (
       <Box sx={styles.root} component="form" onSubmit={handleSubmit(onSubmit)}>
@@ -123,27 +140,30 @@ export const FeedbackCard = ({
                <Box sx={styles.chipsContainer}>
                   {tags.map((tag) => (
                      <Chip
-                        key={tag}
-                        className="stacked"
-                        label={tag}
+                        key={tag.id}
+                        label={tag.label.en}
+                        sx={[
+                           styles.chip,
+                           isSelected(tag.id)
+                              ? styles.selectedChip
+                              : styles.unselectedChip,
+                        ]}
                         onClick={async () => {
-                           if (currentTags.includes(tag)) {
+                           if (isSelected(tag.id)) {
                               setValue(
                                  "tags",
-                                 currentTags.filter((t) => t !== tag),
+                                 currentTags.filter((t) => t !== tag.id),
                                  setOptions
                               )
                            } else {
                               setValue(
                                  "tags",
-                                 [...currentTags, tag],
+                                 [...currentTags, tag.id],
                                  setOptions
                               )
                            }
                         }}
-                        color={
-                           currentTags.includes(tag) ? "primary" : "default"
-                        }
+                        color={isSelected(tag.id) ? "primary" : "default"}
                      />
                   ))}
                </Box>
