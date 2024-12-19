@@ -27,6 +27,7 @@ import {
    SocialPlatformObject,
    SocialPlatformType,
 } from "components/custom-hook/useSocials"
+import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
 import LikeIcon from "components/views/common/icons/LikeIcon"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
@@ -46,6 +47,7 @@ import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
 const actionWidth = 48
 const fullScreenActionWidth = 40
+export const FEED_CARD_ACTIONS_CLASS_NAME = "FeedCardActions-root"
 
 const styles = sxStyles({
    hidden: {
@@ -171,23 +173,45 @@ const styles = sxStyles({
    },
 })
 
+type ActionType = "company" | "like" | "share" | "filter"
+
 type Props = {
    spark: Spark | SparkPresenter
    hide?: boolean
    linkToCompanyPage: string
+   hideActions?: ActionType[]
+   shareUtmMedium: ShareActionProps["utmMedium"]
 }
 
-const FeedCardActions: FC<Props> = ({ spark, hide, linkToCompanyPage }) => {
+const DEFAULT_HIDE_ACTIONS: ActionType[] = []
+
+const FeedCardActions: FC<Props> = ({
+   spark,
+   hide,
+   linkToCompanyPage,
+   hideActions = DEFAULT_HIDE_ACTIONS,
+   shareUtmMedium,
+}) => {
    return (
-      <Stack spacing={3} sx={[styles.root, hide && styles.hidden]}>
-         <CompanyPageAction
-            sparkId={spark.id}
-            href={linkToCompanyPage}
-            companyLogoUrl={spark.group.logoUrl}
-         />
-         <LikeAction sparkId={spark.id} />
-         <ShareAction sparkId={spark.id} />
-         <FilterAction sparkId={spark.id} />
+      <Stack
+         spacing={3}
+         sx={[styles.root, hide && styles.hidden]}
+         className={FEED_CARD_ACTIONS_CLASS_NAME}
+      >
+         {!hideActions.includes("company") && (
+            <CompanyPageAction
+               sparkId={spark.id}
+               href={linkToCompanyPage}
+               companyLogoUrl={spark.group.logoUrl}
+            />
+         )}
+         {!hideActions.includes("like") && <LikeAction sparkId={spark.id} />}
+         {!hideActions.includes("share") && (
+            <ShareAction sparkId={spark.id} utmMedium={shareUtmMedium} />
+         )}
+         {!hideActions.includes("filter") && (
+            <FilterAction sparkId={spark.id} />
+         )}
       </Stack>
    )
 }
@@ -298,6 +322,7 @@ const LikeAction: FC<{
 }> = ({ sparkId }) => {
    const currentSparkId = useSelector(currentSparkIdSelector)
    const isFullScreen = useSparksFeedIsFullScreen()
+   const isTalentGuide = useIsInTalentGuide()
 
    const isCurrentSpark = sparkId && currentSparkId === sparkId
 
@@ -307,7 +332,8 @@ const LikeAction: FC<{
    const { toggleLike, isLoading, liked } = useUserSparkLike(
       authenticatedUser.email,
       sparkId,
-      !isLoggedIn || !isCurrentSpark
+      !isLoggedIn || !isCurrentSpark,
+      isTalentGuide ? [authenticatedUser.email, sparkId] : undefined
    )
 
    const handleClicked = useCallback(
@@ -393,9 +419,10 @@ const CompanyPageAction: FC<{
 
 type ShareActionProps = {
    sparkId: string
+   utmMedium: "sparks-referrals" | "sparks-referrals-levels"
 }
 
-const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
+const ShareAction: FC<ShareActionProps> = ({ sparkId, utmMedium }) => {
    const [isShareDialogOpen, handleOpenShareDialog, handleCloseShareDialog] =
       useDialogStateHandler()
    const isMobile = useIsMobile()
@@ -410,8 +437,8 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    const shareUrl = useMemo(() => {
       return `${getHost()}/sparks/${sparkId}?referral=${
          userData?.referralCode
-      }&invite=${sparkId}&utm_medium=sparks-referrals&utm_campaign=sparks`
-   }, [sparkId, userData?.referralCode])
+      }&invite=${sparkId}&utm_medium=${utmMedium}&utm_campaign=sparks`
+   }, [sparkId, userData?.referralCode, utmMedium])
 
    const shareData = useMemo(() => {
       return {

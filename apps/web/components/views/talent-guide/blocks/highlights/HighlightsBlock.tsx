@@ -30,17 +30,6 @@ const HighlightCardComponent = dynamic(() => import("./HighlightCard"), {
 })
 
 export const HighlightsBlock = ({ highlights }: Props) => {
-   // // Leaving this just for testing purposes so its easier for you to see
-   // useEffect(() => {
-   //    const interval = setInterval(() => {
-   //       setCurrentPlayingIndex((prevIndex) => {
-   //          return (prevIndex + 1) % highlights.length
-   //       })
-   //    }, 1000)
-
-   //    return () => clearInterval(interval)
-   // }, [highlights.length])
-
    return (
       <HighlightsProvider highlights={highlights}>
          <Box sx={styles.root}>

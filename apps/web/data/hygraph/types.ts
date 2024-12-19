@@ -2,8 +2,8 @@ import {
    BusinessFunctionTagId,
    ContentTopicTagId,
 } from "@careerfairy/shared-lib/constants/tags"
+import { TalentGuideModuleCategory } from "@careerfairy/shared-lib/talent-guide"
 import { RichTextContent } from "@graphcms/rich-text-types"
-
 export type Page<T = any> = {
    pageType: PageType
    slug?: string
@@ -11,6 +11,7 @@ export type Page<T = any> = {
 }
 
 export type TalentGuideModule = {
+   id: string
    /**
     * The name of the module, eg "Networking" or "Interviewing"
     */
@@ -51,12 +52,6 @@ export type TalentGuideSlugsResponse = {
 export enum PageType {
    TALENT_GUIDE_MODULE_PAGE = "TALENT_GUIDE_MODULE_PAGE",
    TALENT_GUIDE_ROOT_PAGE = "TALENT_GUIDE_ROOT_PAGE",
-}
-
-export enum TalentGuideModuleCategory {
-   BEFORE_APPLYING = "WHAT_TO_DO_BEFORE_APPLYING",
-   APPLYING = "APPLYING_INSIGHTS",
-   AFTER_APPLYING = "STEPS_AFTER_APPLYING",
 }
 
 // Assets
@@ -172,6 +167,12 @@ export type VideoBlockType = {
    videoTitle: string
 }
 
+export type CopyTemplateBlockType = {
+   __typename: "CopyTemplateBlock"
+   id: string
+   templateType: "NetworkingReachOut"
+}
+
 export type QuizAnswerComponentType = {
    __typename: "QuizAnswer"
    answer: string
@@ -204,6 +205,8 @@ export type RichTextReferenceType =
    | HeaderBlockType
    | JobsBlockType
    | SparksCarouselBlockType
+   | VideoBlockType
+   | CopyTemplateBlockType
 
 export type RichTextBlockType = {
    __typename: "RichTextBlock"

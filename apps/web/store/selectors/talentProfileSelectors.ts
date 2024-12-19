@@ -32,3 +32,13 @@ export const talentProfileEditingLanguageOpenSelector = (state: RootState) =>
 
 export const talentProfileIsEditingLanguageSelector = (state: RootState) =>
    state.talentProfile.isEditingLanguage
+
+// Interest
+export const talentProfileCreateInterestOpenSelector = (state: RootState) =>
+   state.talentProfile.createInterestDialogOpen
+
+export const talentProfileEditingInterestOpenSelector = (state: RootState) =>
+   state.talentProfile.editingInterest
+
+export const talentProfileIsEditingInterestSelector = (state: RootState) =>
+   state.talentProfile.isEditingInterest

@@ -1,6 +1,11 @@
 import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
+import {
+   TAB_VALUES,
+   TalentProfileView,
+} from "layouts/UserLayout/TalentProfile/TalentProfileView"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
 import SEO from "../../../components/util/SEO"
@@ -13,7 +18,7 @@ const CustomJobsPage = ({
    customJobDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { pathname } = useRouter()
-
+   const { talentProfileV1 } = useFeatureFlags()
    return (
       <UserLayout>
          <CustomJobDialogLayout
@@ -29,7 +34,11 @@ const CustomJobsPage = ({
                title="CareerFairy | Jobs"
                canonical={`https://www.careerfairy.io${pathname}`}
             />
-            <UserView currentPath="/profile/my-jobs" />
+            {talentProfileV1 ? (
+               <TalentProfileView currentPath={TAB_VALUES.jobs.value} />
+            ) : (
+               <UserView currentPath="/profile/my-jobs" />
+            )}
          </CustomJobDialogLayout>
       </UserLayout>
    )

@@ -6,14 +6,16 @@ import { useTheme } from "@mui/material/styles"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { isLivestreamDialogOpen } from "components/views/livestream-dialog"
 import { useRouter } from "next/router"
-import { FC, useCallback, useEffect, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import SwipeableViews from "react-swipeable-views"
 import { autoPlay } from "react-swipeable-views-utils"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
+import { MobileUtils } from "../../../../util/mobile.utils"
 import useCountTime from "../../../custom-hook/useCountTime"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
+import { useIsMounted } from "../../../custom-hook/utils/useIsMounted"
 import RegistrationModal from "../../common/registration-modal"
 import HighlightVideoDialog from "../HighlightVideoDialog"
 import BuyCreditsCTAContent from "./BuyCreditsCTAContent"
@@ -24,6 +26,7 @@ import {
 } from "./CarouselContentService"
 import ContentCarouselPagination from "./ContentCarouselPagination"
 import { DiscoverJobsCTAContent } from "./DiscoverJobsCTAContent"
+import { DownloadMobileApplication } from "./DownloadMobileApplicationContent"
 import LivestreamContent from "./LivestreamContent"
 import WatchSparksCTAContent from "./WatchSparksCTAContent"
 
@@ -89,14 +92,38 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal()
    const { query } = useRouter()
+   const isMounted = useIsMounted()
 
    const isLSDialogOpen = isLivestreamDialogOpen(query)
+
+   const carouselContent = useMemo<CarouselContent[]>(() => {
+      let serializedContent = content
+
+      const userNotDownloadedTheApp =
+         !userData?.fcmTokens || userData?.fcmTokens?.length === 0
+
+      if (
+         isMounted &&
+         userNotDownloadedTheApp &&
+         !MobileUtils.webViewPresence()
+      ) {
+         serializedContent = [
+            {
+               contentType: "CTASlide",
+               topic: CTASlideTopics.App,
+            },
+            ...serializedContent,
+         ]
+      }
+
+      return serializedContent
+   }, [content, isMounted, userData?.fcmTokens])
 
    /**
     * Each minute watched the field minutesWatched will be increased, and we need to increment it on our DB
     */
    useEffect(() => {
-      const active = content[activeStep]
+      const active = carouselContent[activeStep]
       const isLivestream = active?.contentType === "LivestreamEvent"
       if (videoUrl && minutesWatched > 0 && isLivestream) {
          void livestreamRepo.updateRecordingStats({
@@ -106,7 +133,13 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             userId: userData?.userEmail,
          })
       }
-   }, [activeStep, content, minutesWatched, userData?.userEmail, videoUrl])
+   }, [
+      activeStep,
+      carouselContent,
+      minutesWatched,
+      userData?.userEmail,
+      videoUrl,
+   ])
 
    const handleStepChange = useCallback(
       (step) => {
@@ -164,7 +197,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             interval={CAROUSEL_SLIDE_DELAY}
             style={{ overflow: "visible" }}
          >
-            {content.map((contentItem, index) => {
+            {carouselContent.map((contentItem, index) => {
                // Check if contentItem is a CTASlide
                if (contentItem.contentType === "CTASlide") {
                   return (
@@ -187,11 +220,11 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
                )
             })}
          </AutoPlaySwipeableViews>
-         {content.length > 1 && (
+         {carouselContent.length > 1 && (
             <Box sx={styles.paginationWrapper}>
                <ContentCarouselPagination
                   activeStep={activeStep}
-                  count={content.length}
+                  count={carouselContent.length}
                   handleChange={handleStepChange}
                   delay={CAROUSEL_SLIDE_DELAY}
                />
@@ -228,6 +261,9 @@ const getCTASlide = (contentItem: CTASlide) => {
       }
       case CTASlideTopics.Jobs: {
          return <DiscoverJobsCTAContent cta={contentItem} />
+      }
+      case CTASlideTopics.App: {
+         return <DownloadMobileApplication cta={contentItem} />
       }
       default: {
          return null

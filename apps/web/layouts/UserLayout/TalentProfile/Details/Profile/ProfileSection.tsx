@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { ReactElement } from "react"
-import { PlusCircle } from "react-feather"
+import { Icon, PlusCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -22,30 +22,44 @@ const styles = sxStyles({
          cursor: "pointer",
       },
    },
+   count: {
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[900],
+   },
 })
 
 type Props = {
    title: string
    showAddIcon?: boolean
-   handleAdd: () => void
+   addIcon?: Icon
+   handleAdd?: () => void
+   count?: number
    children: ReactElement
 }
 
 export const ProfileSection = ({
    showAddIcon,
+   addIcon,
    title,
    children,
    handleAdd,
+   count,
 }: Props) => {
    return (
       <Stack spacing={1.5}>
          <Stack direction={"row"} sx={styles.titleRoot}>
             <Typography variant="brandedBody" sx={styles.title}>
                {title}
+               {count !== undefined ? (
+                  <Typography
+                     variant="small"
+                     sx={styles.count}
+                  >{` (${count})`}</Typography>
+               ) : null}
             </Typography>
             <ConditionalWrapper condition={showAddIcon}>
                <Box
-                  component={PlusCircle}
+                  component={addIcon ?? PlusCircle}
                   sx={styles.plusCircle}
                   onClick={handleAdd}
                />

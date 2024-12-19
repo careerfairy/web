@@ -21,6 +21,18 @@ import {
    StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
+import { AppState } from "react-native"
+
+const injectedCSS = `
+    body :not(input):not(textarea) {
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    * {
+      -webkit-touch-callout: none;
+    }
+  `
 
 Notifications.setNotificationHandler({
    handleNotification: async () => ({
@@ -52,6 +64,23 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       checkPermissions()
    }, [])
 
+   // Method for checking if iOS application was closed (opened in the background) and return to it
+   // If it happens, we rerender the webview, so it does not have blank screen
+   useEffect(() => {
+      const subscription = AppState.addEventListener("change", (state) => {
+         if (state === "active" && webViewRef?.current) {
+            webViewRef.current.injectJavaScript(`
+               if (document.body.innerHTML.trim() === '') {
+                  window.location.reload();
+               }
+               true;
+            `)
+         }
+      })
+
+      return () => subscription.remove()
+   }, [])
+
    useEffect(() => {
       const handleDeepLink = (event: { url: string }) => {
          const deepLinkUrl = event.url
@@ -80,8 +109,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          const response = await Notifications.getLastNotificationResponseAsync()
          if (response && response.notification.request.content.data.url) {
             setBaseUrl(response.notification.request.content.data.url)
-         } else {
-            setBaseUrl(BASE_URL + "/portal")
          }
       }
 
@@ -250,17 +277,25 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const handleNavigation = (request: any) => {
-      if (!request.url.includes(SEARCH_CRITERIA)) {
-         if (isValidUrl(request.url)) {
-            // iOS calls for all types of navigation (including the non-restrictive
-            // "other", which causes issues for internal links like cookies).
-            if (Platform.OS === "ios" && request.navigationType !== "click") {
-               return false
+      if (request.url === "about:blank") {
+         return false // Stop loading the blank page
+      } else {
+         if (!request.url.includes(SEARCH_CRITERIA)) {
+            if (isValidUrl(request.url)) {
+               // iOS calls for all types of navigation (including the non-restrictive
+               // "other", which causes issues for internal links like cookies).
+               if (
+                  Platform.OS === "ios" &&
+                  request.navigationType !== "click"
+               ) {
+                  return false
+               }
+               Linking.openURL(request.url)
             }
-            Linking.openURL(request.url)
+            return false // Prevent WebView from loading the external link
          }
-         return false // Prevent WebView from loading the external link
       }
+
       return true // Allow WebView to load internal links
    }
 
@@ -272,12 +307,15 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             source={{ uri: baseUrl }}
             javaScriptEnabled={true}
             mediaPlaybackRequiresUserAction={false}
+            allowsFullscreenVideo={true}
             onMessage={handleMessage}
             onShouldStartLoadWithRequest={handleNavigation}
             cacheEnabled={true}
+            incognito={false}
             domStorageEnabled={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
+            cacheMode="LOAD_NO_CACHE"
             userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
             sharedCookiesEnabled={true}
             thirdPartyCookiesEnabled={true}
@@ -291,6 +329,17 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             ]}
             onNavigationStateChange={handleNavigationStateChange}
             setSupportMultipleWindows={false}
+            androidHardwareAccelerationDisabled={false} // Use hardware acceleration
+            mixedContentMode="always"
+            overScrollMode="never" // Disable over-scrolling for smoother behavior
+            nestedScrollEnabled={true} // Improves nested scrolling behavior
+            scrollEnabled={true}
+            allowsBackForwardNavigationGestures={true}
+            injectedJavaScript={`(function() {
+                 var style = document.createElement('style');
+                 style.innerHTML = \`${injectedCSS}\`;
+                 document.head.appendChild(style);
+              })();`}
          />
       </SafeAreaView>
    )

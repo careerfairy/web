@@ -1,4 +1,5 @@
 import {
+   ProfileInterest,
    ProfileLanguage,
    ProfileLink,
    StudyBackground,
@@ -20,6 +21,11 @@ interface ITalentProfileState {
    createLanguageDialogOpen: boolean
    editingLanguage: ProfileLanguage
    isEditingLanguage: boolean
+
+   // Interests
+   createInterestDialogOpen: boolean
+   editingInterest: ProfileInterest
+   isEditingInterest: boolean
 }
 
 const initialState: ITalentProfileState = {
@@ -37,6 +43,11 @@ const initialState: ITalentProfileState = {
    createLanguageDialogOpen: false,
    editingLanguage: null,
    isEditingLanguage: false,
+
+   // Interests
+   createInterestDialogOpen: false,
+   editingInterest: null,
+   isEditingInterest: false,
 }
 
 export const TalentProfileItemTypes = {
@@ -89,6 +100,12 @@ export const talentProfileSlice = createSlice({
                state.createLanguageDialogOpen = true
                break
             }
+            case TalentProfileItemTypes.Interest: {
+               state.editingInterest = null
+               state.isEditingInterest = false
+               state.createInterestDialogOpen = true
+               break
+            }
             default: {
                return
             }
@@ -117,6 +134,12 @@ export const talentProfileSlice = createSlice({
                state.isEditingLanguage = false
                break
             }
+            case TalentProfileItemTypes.Interest: {
+               state.createInterestDialogOpen = false
+               state.editingInterest = null
+               state.isEditingInterest = false
+               break
+            }
             default: {
                return
             }
@@ -125,8 +148,10 @@ export const talentProfileSlice = createSlice({
       setEditing: (
          state,
          action: PayloadAction<
-            EditingPayload<StudyBackground | ProfileLink | ProfileLanguage>
-         > // TODO-WG: Add interests and language types when existing
+            EditingPayload<
+               StudyBackground | ProfileLink | ProfileLanguage | ProfileInterest
+            >
+         >
       ) => {
          switch (action.payload.type) {
             case TalentProfileItemTypes.StudyBackground: {
@@ -146,6 +171,12 @@ export const talentProfileSlice = createSlice({
                state.isEditingLanguage = true
                state.editingLanguage = action.payload.data as ProfileLanguage
                state.createLanguageDialogOpen = true
+               break
+            }
+            case TalentProfileItemTypes.Interest: {
+               state.isEditingInterest = true
+               state.editingInterest = action.payload.data as ProfileInterest
+               state.createInterestDialogOpen = true
                break
             }
             default: {

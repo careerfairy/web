@@ -10,10 +10,10 @@ export class MobileUtils {
    }
 
    public static webViewPresence(): boolean {
-      const webViewWindow: any = window as any
+      const webViewWindow: any = window as any;
       return !(
-         !webViewWindow.ReactNativeWebView ||
-         typeof webViewWindow.ReactNativeWebView.postMessage !== "function"
+         !webViewWindow?.ReactNativeWebView ||
+         typeof webViewWindow?.ReactNativeWebView?.postMessage !== "function"
       )
    }
 }

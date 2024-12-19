@@ -1,24 +1,30 @@
 import * as Sentry from "@sentry/nextjs"
 import { useAppDispatch } from "components/custom-hook/store"
+import SEO from "components/util/SEO"
 import { AnimatedStepContent } from "components/views/talent-guide/animations/AnimatedStepContent"
 import { StepActionButton } from "components/views/talent-guide/components/floating-buttons/StepActionButton"
+import { Loader } from "components/views/talent-guide/components/Loader"
 import { ModuleStepContentRenderer } from "components/views/talent-guide/components/ModuleStepContentRenderer"
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
 import { TalentGuideLayout } from "components/views/talent-guide/components/TalentGuideLayout"
 import { TalentGuideProgress } from "components/views/talent-guide/components/TalentGuideProgress"
 import { Page, TalentGuideModule } from "data/hygraph/types"
+import { useAuth } from "HOCs/AuthProvider"
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
-import { useEffect } from "react"
+import { Fragment, useEffect } from "react"
 import {
+   loadTalentGuide,
    resetTalentGuide,
-   setModuleData,
 } from "store/reducers/talentGuideReducer"
-import { useVisibleSteps } from "store/selectors/talentGuideSelectors"
 import {
-   tgPreviewService,
-   tgService,
-} from "../../data/hygraph/TalentGuideService"
+   useIsLoadingTalentGuide,
+   useVisibleSteps,
+} from "store/selectors/talentGuideSelectors"
+import {
+   tgBackendPreviewService,
+   tgBackendService,
+} from "../../data/hygraph/TalentGuideBackendService"
 
 interface TalentGuidePageProps {
    // Define props here based on what you'll fetch from the service
@@ -28,29 +34,47 @@ interface TalentGuidePageProps {
 const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const dispatch = useAppDispatch()
    const { isPreview } = useRouter()
+   const { authenticatedUser, isLoggedIn } = useAuth()
+   const isLoadingGuide = useIsLoadingTalentGuide()
 
    useEffect(() => {
-      dispatch(setModuleData(data))
-   }, [dispatch, data])
+      if (!authenticatedUser.uid) {
+         return
+      }
 
-   useEffect(() => {
+      dispatch(
+         loadTalentGuide({
+            userAuthUid: authenticatedUser.uid,
+            moduleData: data,
+         })
+      )
+
       return () => {
          dispatch(resetTalentGuide())
       }
-   }, [dispatch])
+   }, [dispatch, authenticatedUser.uid, data])
 
    const visibleSteps = useVisibleSteps()
 
+   const isLoading = isLoadingGuide || !isLoggedIn
+
    return (
-      <TalentGuideLayout header={<TalentGuideProgress />}>
-         <AnimatedStepContent>
-            {visibleSteps.map((step) => (
-               <ModuleStepContentRenderer key={step.id} step={step} />
-            ))}
-         </AnimatedStepContent>
-         <StepActionButton />
+      <Fragment>
          {Boolean(isPreview) && <PreviewModeAlert />}
-      </TalentGuideLayout>
+         <SEO title={`${data.content.moduleName} - CareerFairy Levels`} />
+         {isLoading ? (
+            <Loader />
+         ) : (
+            <TalentGuideLayout header={<TalentGuideProgress />}>
+               <AnimatedStepContent>
+                  {visibleSteps.map((step) => (
+                     <ModuleStepContentRenderer key={step.id} step={step} />
+                  ))}
+               </AnimatedStepContent>
+               <StepActionButton />
+            </TalentGuideLayout>
+         )}
+      </Fragment>
    )
 }
 
@@ -73,7 +97,7 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
    }
 
    const slug = params?.slug as string
-   const service = preview ? tgPreviewService : tgService
+   const service = preview ? tgBackendPreviewService : tgBackendService
 
    try {
       // Fetch data for the specific slug using the service

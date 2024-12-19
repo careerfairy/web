@@ -1,14 +1,15 @@
-import { Group } from "@careerfairy/shared-lib/groups"
 import { Box, Dialog, IconButton } from "@mui/material"
-import { HighlightComponentType } from "data/hygraph/types"
-import { SyntheticEvent } from "react"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { SyntheticEvent, forwardRef } from "react"
 import { X as CloseIcon } from "react-feather"
-import ReactPlayer from "react-player"
 import { sxStyles } from "types/commonTypes"
-import { ExpandedHeader } from "./ExpandedHeader"
-import { HighlightVideoOverlay } from "./VideoOverlay"
+import { useHighlights } from "./HighlightsBlockContext"
 
 const styles = sxStyles({
+   keepLayoutInPlace: {
+      // Ensures the grid layout doesn't change, otherwise it would add an empty grid item
+      position: "absolute",
+   },
    desktopRoot: {
       position: "relative",
       width: {
@@ -64,99 +65,78 @@ const styles = sxStyles({
          height: "max(100dvh, 177.78dvw) !important",
       },
    },
-   closeDialog: {
+   closeButton: {
       position: "absolute",
       top: {
          xs: 10,
          md: 20,
       },
       right: {
-         xs: 25,
+         xs: 10,
          md: 20,
       },
       zIndex: 3000,
       color: (theme) => theme.brand.white["50"],
    },
-   desktopHeaderContainer: {
-      width: "100%",
-   },
 })
 
-type FullScreenProps = {
-   highlight: HighlightComponentType
-   group: Group
-   onEnded: () => void
+type ExpandedProps = {
+   ref?: React.RefObject<HTMLDivElement>
    onClose: (event: SyntheticEvent) => void
-   isPlaying: boolean
+   children: React.ReactNode
 }
 
-export const ExpandedMobile = ({
-   highlight,
-   group,
-   onEnded,
-   onClose,
-   isPlaying,
-}: FullScreenProps) => (
-   <Box sx={styles.cardFullScreenMobile} onClick={onClose}>
-      <IconButton onClick={onClose} sx={styles.closeDialog}>
-         <CloseIcon size={24} />
-      </IconButton>
-      <ExpandedHeader highlight={highlight} group={group} />
-      <ReactPlayer
-         className="react-player"
-         width="100%"
-         height="100%"
-         url={highlight.videoClip.url}
-         playing={isPlaying}
-         onEnded={onEnded}
-         playsinline
-      />
-      <HighlightVideoOverlay />
+const CloseButton = ({ onClose }: { onClose: ExpandedProps["onClose"] }) => (
+   <IconButton
+      onClick={onClose}
+      sx={styles.closeButton}
+      key="full-screen-close-button"
+   >
+      <CloseIcon size={24} />
+   </IconButton>
+)
+
+const Mobile = ({ onClose, children }: ExpandedProps) => (
+   <Box sx={styles.cardFullScreenMobile}>
+      <CloseButton onClose={onClose} />
+      {children}
    </Box>
 )
 
-export const ExpandedDesktop = ({
-   highlight,
-   group,
-   onEnded,
-   onClose,
-   isPlaying,
-}: FullScreenProps) => (
-   <Box sx={styles.desktopRoot}>
-      <ReactPlayer
-         url={highlight.videoClip.url}
-         className="react-player"
-         width="100%"
-         height="100%"
-         playing={false}
-         onEnded={onEnded}
-      />
-      <Dialog
-         open
-         sx={styles.desktopDialog}
-         maxWidth="desktop"
-         onClose={onClose}
-      >
-         <ReactPlayer
-            url={highlight.videoClip.url}
-            className="react-player"
-            width="100%"
-            height="100%"
-            playing={isPlaying}
-            onEnded={onEnded}
-            playsinline
-         />
-         <Box sx={styles.desktopHeaderContainer}>
-            <ExpandedHeader highlight={highlight} group={group} />
-            <HighlightVideoOverlay />
-         </Box>
-         <IconButton
-            onClick={onClose}
-            sx={styles.closeDialog}
-            key="full-screen-close-button"
+const Desktop = forwardRef<HTMLDivElement, ExpandedProps>(
+   ({ onClose, children }, ref) => (
+      <Box sx={styles.desktopRoot} ref={ref}>
+         <Dialog
+            open
+            sx={styles.desktopDialog}
+            maxWidth="desktop"
+            onClose={onClose}
+            PaperProps={{ ref }}
          >
-            <CloseIcon size={24} />
-         </IconButton>
-      </Dialog>
-   </Box>
+            <CloseButton onClose={onClose} />
+            {children}
+         </Dialog>
+      </Box>
+   )
 )
+
+Desktop.displayName = "ExpandedCard.Desktop"
+
+export const ExpandedCard = forwardRef<HTMLDivElement, ExpandedProps>(
+   (props, ref) => {
+      const isMobile = useIsMobile()
+      const { toggleExpandedPlaying } = useHighlights()
+
+      return (
+         <Box sx={styles.keepLayoutInPlace} onClick={toggleExpandedPlaying}>
+            {isMobile ? (
+               <Mobile {...props} />
+            ) : (
+               <Desktop {...props} ref={ref} />
+            )}
+         </Box>
+      )
+   }
+)
+
+ExpandedCard.displayName = "ExpandedCard"
