@@ -21,15 +21,13 @@ export const useAutoPlaySparks = (
       if (!areSlidesInView || numberOfElementsToPlay === null) return
 
       setAutoPlayingIndex((prevIndex) => {
+         const nextIndex = (prevIndex + 1) % numberOfElementsToPlay
+
          requestAnimationFrame(() => {
-            if (prevIndex === numberOfElementsToPlay - 1) {
-               emblaApi.scrollTo(0)
-            } else {
-               emblaApi.scrollNext()
-            }
+            emblaApi.scrollTo(nextIndex)
          })
 
-         return (prevIndex + 1) % numberOfElementsToPlay
+         return nextIndex
       })
    }, [emblaApi, areSlidesInView, numberOfElementsToPlay])
 
