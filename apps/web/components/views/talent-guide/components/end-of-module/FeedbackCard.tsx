@@ -1,4 +1,7 @@
-import { TalentGuideFeedback } from "@careerfairy/shared-lib/talent-guide/types"
+import {
+   TagCategory,
+   TalentGuideFeedback,
+} from "@careerfairy/shared-lib/talent-guide/types"
 import { LoadingButton } from "@mui/lab"
 import {
    Box,
@@ -17,6 +20,8 @@ import { ratingTitleAnimation } from "./animations"
 import { styles } from "./styles"
 
 import { StarIcon } from "components/views/common/icons/StarIcon"
+import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
+import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
 import { FeedbackFormData, feedbackSchema, tags } from "../../schema"
 
 export const ratingTitles: Record<TalentGuideFeedback["rating"], string> = {
@@ -30,11 +35,16 @@ export const ratingTitles: Record<TalentGuideFeedback["rating"], string> = {
 type Props = {
    onRatingClick: () => void
    preview: boolean
+   onFeedbackSubmitted: () => void
 }
 
-export const FeedbackCard = ({ onRatingClick, preview }: Props) => {
+export const FeedbackCard = ({
+   onRatingClick,
+   preview,
+   onFeedbackSubmitted,
+}: Props) => {
    const [hover, setHover] = useState(-1)
-
+   const { moduleData, userAuthUid } = useTalentGuideState()
    const {
       handleSubmit,
       watch,
@@ -44,15 +54,20 @@ export const FeedbackCard = ({ onRatingClick, preview }: Props) => {
    } = useYupForm({
       schema: feedbackSchema,
       defaultValues,
-      shouldUnregister: false,
    })
 
    const currentRating = watch("rating")
    const currentTags = watch("tags")
 
-   const onSubmit = (data: FeedbackFormData) => {
-      console.log("Form submitted:", data)
+   const onSubmit = async (data: FeedbackFormData) => {
+      await talentGuideProgressService.submitFeedback(
+         moduleData.content.id,
+         userAuthUid,
+         data.rating as TalentGuideFeedback["rating"],
+         data.tags as TagCategory[]
+      )
       reset()
+      onFeedbackSubmitted?.()
    }
 
    return (

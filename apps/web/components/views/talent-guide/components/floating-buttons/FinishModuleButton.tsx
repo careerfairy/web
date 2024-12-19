@@ -1,11 +1,12 @@
 import { useAppDispatch } from "components/custom-hook/store"
 import { proceedToNextStep } from "store/reducers/talentGuideReducer"
-import { useIsCompletingModule } from "store/selectors/talentGuideSelectors"
+import { useIsLoadingNextStep } from "store/selectors/talentGuideSelectors"
 import { FloatingButton } from "./FloatingButton"
 
 export const FinishModuleButton = () => {
    const dispatch = useAppDispatch()
-   const isCompletingModule = useIsCompletingModule()
+   const isLoadingNextStep = useIsLoadingNextStep()
+
    return (
       <FloatingButton
          onClick={() => {
@@ -13,7 +14,7 @@ export const FinishModuleButton = () => {
          }}
          color="primary"
          variant="outlined"
-         loading={isCompletingModule}
+         loading={isLoadingNextStep}
       >
          Finish module
       </FloatingButton>
