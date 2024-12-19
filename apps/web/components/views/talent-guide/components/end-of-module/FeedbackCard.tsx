@@ -1,21 +1,23 @@
-import {
-   TAG_CATEGORY,
-   TalentGuideFeedback,
-} from "@careerfairy/shared-lib/talent-guide/types"
+import { TalentGuideFeedback } from "@careerfairy/shared-lib/talent-guide/types"
 import { LoadingButton } from "@mui/lab"
-import { Box, Chip, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Chip,
+   Rating,
+   RatingProps,
+   Stack,
+   Typography,
+} from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { useState } from "react"
 import { SetValueConfig } from "react-hook-form"
 import FramerBox from "../../../common/FramerBox"
-import { AnimatedCollapse } from "./AnimatedCollapse"
+import { AnimatedCollapse } from "../../animations/AnimatedCollapse"
 import { ratingTitleAnimation } from "./animations"
-import { FeedbackRating } from "./FeedbackRating"
 import { styles } from "./styles"
 
-import * as yup from "yup"
-
-export const tags = Object.values(TAG_CATEGORY)
+import { StarIcon } from "components/views/common/icons/StarIcon"
+import { FeedbackFormData, feedbackSchema, tags } from "../../schema"
 
 export const ratingTitles: Record<TalentGuideFeedback["rating"], string> = {
    1: "Big yikes.",
@@ -23,28 +25,6 @@ export const ratingTitles: Record<TalentGuideFeedback["rating"], string> = {
    3: "Not bad, could be better.",
    4: "Pretty solid!",
    5: "Nailed it!",
-}
-
-export const feedbackSchema = yup.object({
-   rating: yup.number().min(1).max(5).required("Please provide a rating"),
-   tags: yup
-      .array()
-      .of(yup.string().oneOf(Object.values(TAG_CATEGORY)))
-      .min(1, "Please select at least one tag")
-      .required(),
-})
-
-export type FeedbackFormData = yup.InferType<typeof feedbackSchema>
-
-export const defaultValues = {
-   rating: 0,
-   tags: [],
-}
-
-const setOptions: SetValueConfig = {
-   shouldValidate: true,
-   shouldDirty: true,
-   shouldTouch: true,
 }
 
 type Props = {
@@ -167,4 +147,27 @@ export const FeedbackCard = ({ onRatingClick, preview }: Props) => {
          </LoadingButton>
       </Box>
    )
+}
+
+const FeedbackRating = (props: RatingProps) => {
+   return (
+      <Rating
+         name="module-feedback"
+         max={5}
+         icon={<StarIcon sx={styles.icon} />}
+         emptyIcon={<StarIcon sx={styles.icon} />}
+         {...props}
+      />
+   )
+}
+
+export const defaultValues = {
+   rating: 0,
+   tags: [],
+}
+
+const setOptions: SetValueConfig = {
+   shouldValidate: true,
+   shouldDirty: true,
+   shouldTouch: true,
 }
