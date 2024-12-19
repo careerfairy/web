@@ -1,7 +1,7 @@
 import { Collapse } from "@mui/material"
 import { ReactNode } from "react"
-import FramerBox from "../../../common/FramerBox"
-import { growAndFadeAnimation } from "./animations"
+import FramerBox from "../../common/FramerBox"
+import { growAndFadeAnimation } from "../components/end-of-module/animations"
 
 interface AnimatedCollapseProps {
    children: ReactNode
