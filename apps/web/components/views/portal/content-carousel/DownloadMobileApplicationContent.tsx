@@ -22,33 +22,33 @@ const styles = sxStyles({
       justifyContent: "center",
       fontWeight: 700,
       fontSize: {
-         xs: '32px !important',
-         md: '42px !important',
-      }
+         xs: "32px !important",
+         md: "42px !important",
+      },
    },
    title: {
-      color: 'black',
+      color: "black",
       fontWeight: 700,
       textWrap: "nowrap",
       maxWidth: {
-         xs: '100% !important',
-         sm: '60% !important'
+         xs: "100% !important",
+         sm: "60% !important",
       },
       fontSize: {
-         xs: '32px !important',
-         md: '42px !important',
-      }
+         xs: "32px !important",
+         md: "42px !important",
+      },
    },
    subtitle: {
-      fontWeight: '600 !important',
-      lineHeight: '36px',
+      fontWeight: "600 !important",
+      lineHeight: "36px",
       textWrap: "nowrap",
-      maxWidth: '65% !important',
-      fontSize: '24px !important'
+      maxWidth: "65% !important",
+      fontSize: "24px !important",
    },
    subtitleMobile: {
-      fontWeight: '400 !important',
-      maxWidth: '60% !important'
+      fontWeight: "400 !important",
+      maxWidth: "60% !important",
    },
    descriptions: {
       fontWeight: "400 !important",
@@ -117,7 +117,9 @@ type DownloadMobileApplicationProps = {
    cta: CTASlide
 }
 
-export const DownloadMobileApplication: FC<DownloadMobileApplicationProps> = () => {
+export const DownloadMobileApplication: FC<
+   DownloadMobileApplicationProps
+> = () => {
    const isMobile = useIsMobile("sm")
    const router = useRouter()
 
@@ -127,44 +129,48 @@ export const DownloadMobileApplication: FC<DownloadMobileApplicationProps> = () 
       })
    }
 
-
    const { ref } = useInView({
       skip: false,
-      triggerOnce: true
+      triggerOnce: true,
    })
 
    return (
       <Box ref={ref} height={"100%"} width={"100%"}>
          <Content
             headerTitle={
-            <>
-            {!isMobile && <ContentHeaderTitle
-                   component="span"
-                   color="black"
-                   sx={styles.subtitle}
-               >{"No more missed livestreams"}
-               </ContentHeaderTitle>}
-                  <br/>
-               <ContentHeaderTitle
-                  component="span"
-                  color="black"
-                  sx={styles.title}
-               >
-                  {"The "}
+               <>
+                  {!isMobile && (
+                     <ContentHeaderTitle
+                        component="span"
+                        color="black"
+                        sx={styles.subtitle}
+                     >
+                        {"No more missed livestreams"}
+                     </ContentHeaderTitle>
+                  )}
+                  <br />
                   <ContentHeaderTitle
-                     sx={styles.centeredHeaderTitle}
-                     color="primary"
+                     component="span"
+                     color="black"
+                     sx={styles.title}
                   >
-                     CareerFairy App
+                     {"The "}
+                     <ContentHeaderTitle
+                        sx={styles.centeredHeaderTitle}
+                        color="primary"
+                     >
+                        CareerFairy App
+                     </ContentHeaderTitle>
+                     <br />
+                     <ContentHeaderTitle
+                        component="span"
+                        color="black"
+                        sx={styles.title}
+                     >
+                        {"is coming soon!"}
+                     </ContentHeaderTitle>
                   </ContentHeaderTitle>
-                  <br/>
-                  <ContentHeaderTitle
-                      component="span"
-                      color="black"
-                      sx={styles.title}
-                  >{"is coming soon!"}</ContentHeaderTitle>
-               </ContentHeaderTitle>
-            </>
+               </>
             }
             backgroundImageUrl={
                isMobile ? mobileJobsBackGroundUrl : desktopJobsBackGroundUrl
@@ -174,13 +180,16 @@ export const DownloadMobileApplication: FC<DownloadMobileApplicationProps> = () 
             contentSx={styles.content}
             actionItem={
                <Stack>
-                  {isMobile && <ContentHeaderTitle
-                      component="span"
-                      color="black"
-                      sx={styles.subtitleMobile}
-                      fontSize={"16px !important"}
-                  >{"No more missed live streams"}
-                  </ContentHeaderTitle>}
+                  {Boolean(isMobile) && (
+                     <ContentHeaderTitle
+                        component="span"
+                        color="black"
+                        sx={styles.subtitleMobile}
+                        fontSize={"16px !important"}
+                     >
+                        {"No more missed live streams"}
+                     </ContentHeaderTitle>
+                  )}
                   <Box mt={isMobile ? 1.5 : 0}>
                      <ContentButton
                         variant="contained"
