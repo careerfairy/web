@@ -6,14 +6,16 @@ import { useTheme } from "@mui/material/styles"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { isLivestreamDialogOpen } from "components/views/livestream-dialog"
 import { useRouter } from "next/router"
-import {FC, useCallback, useEffect, useMemo, useState} from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import SwipeableViews from "react-swipeable-views"
 import { autoPlay } from "react-swipeable-views-utils"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
+import { MobileUtils } from "../../../../util/mobile.utils"
 import useCountTime from "../../../custom-hook/useCountTime"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
+import { useIsMounted } from "../../../custom-hook/utils/useIsMounted"
 import RegistrationModal from "../../common/registration-modal"
 import HighlightVideoDialog from "../HighlightVideoDialog"
 import BuyCreditsCTAContent from "./BuyCreditsCTAContent"
@@ -24,11 +26,9 @@ import {
 } from "./CarouselContentService"
 import ContentCarouselPagination from "./ContentCarouselPagination"
 import { DiscoverJobsCTAContent } from "./DiscoverJobsCTAContent"
+import { DownloadMobileApplication } from "./DownloadMobileApplicationContent"
 import LivestreamContent from "./LivestreamContent"
 import WatchSparksCTAContent from "./WatchSparksCTAContent"
-import {DownloadMobileApplication} from "./DownloadMobileApplicationContent";
-import {MobileUtils} from "../../../../util/mobile.utils";
-import {useIsMounted} from "../../../custom-hook/utils/useIsMounted";
 
 const styles = sxStyles({
    root: {
@@ -92,27 +92,32 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal()
    const { query } = useRouter()
-   const isMounted = useIsMounted();
+   const isMounted = useIsMounted()
 
    const isLSDialogOpen = isLivestreamDialogOpen(query)
 
    const carouselContent = useMemo<CarouselContent[]>(() => {
-      let serializedContent = content;
+      let serializedContent = content
 
-      const userNotDownloadedTheApp = !userData?.fcmTokens || userData?.fcmTokens?.length === 0;
-      
-      if (isMounted && userNotDownloadedTheApp && !MobileUtils.webViewPresence()) {
+      const userNotDownloadedTheApp =
+         !userData?.fcmTokens || userData?.fcmTokens?.length === 0
+
+      if (
+         isMounted &&
+         userNotDownloadedTheApp &&
+         !MobileUtils.webViewPresence()
+      ) {
          serializedContent = [
             {
                contentType: "CTASlide",
                topic: CTASlideTopics.App,
             },
-            ...serializedContent
+            ...serializedContent,
          ]
       }
 
-      return serializedContent;
-   }, [content, isMounted])
+      return serializedContent
+   }, [content, isMounted, userData?.fcmTokens])
 
    /**
     * Each minute watched the field minutesWatched will be increased, and we need to increment it on our DB
@@ -128,7 +133,13 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             userId: userData?.userEmail,
          })
       }
-   }, [activeStep, carouselContent, minutesWatched, userData?.userEmail, videoUrl])
+   }, [
+      activeStep,
+      carouselContent,
+      minutesWatched,
+      userData?.userEmail,
+      videoUrl,
+   ])
 
    const handleStepChange = useCallback(
       (step) => {
