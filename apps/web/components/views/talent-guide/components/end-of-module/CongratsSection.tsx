@@ -4,6 +4,8 @@ import { Variants } from "framer-motion"
 import Image from "next/image"
 import { styles } from "./styles"
 
+const SIZE_MULTIPLIER = 1.3
+
 const CongratsMessage = () => {
    return (
       <Stack direction="column" alignItems="center" sx={styles.congratsRoot}>
@@ -11,8 +13,8 @@ const CongratsMessage = () => {
             <Image
                src="/talent-guide/medal.gif"
                alt="congrats"
-               width={150}
-               height={150}
+               width={150 * SIZE_MULTIPLIER}
+               height={150 * SIZE_MULTIPLIER}
                priority
                quality={100}
             />

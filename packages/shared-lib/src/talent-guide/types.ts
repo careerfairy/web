@@ -65,16 +65,58 @@ export interface TalentGuideQuiz extends Identifiable {
 }
 
 export const TAG_CATEGORY = {
-   RELEVANCE: "relevance",
-   INTERACTIONS: "interactions",
-   PACE: "pace",
-   DIFFICULTY: "difficulty",
-   CLARITY: "clarity",
-   STRUCTURE: "structure",
-   OTHERS: "others",
+   RELEVANCE: {
+      id: "relevance",
+      label: {
+         en: "Relevance",
+         de: "Relevanz",
+      },
+   },
+   INTERACTIONS: {
+      id: "interactions",
+      label: {
+         en: "Interactions",
+         de: "Interaktionen",
+      },
+   },
+   PACE: {
+      id: "pace",
+      label: {
+         en: "Pace",
+         de: "Tempo",
+      },
+   },
+   DIFFICULTY: {
+      id: "difficulty",
+      label: {
+         en: "Difficulty",
+         de: "Schwierigkeit",
+      },
+   },
+   CLARITY: {
+      id: "clarity",
+      label: {
+         en: "Clarity",
+         de: "Klarheit",
+      },
+   },
+   STRUCTURE: {
+      id: "structure",
+      label: {
+         en: "Structure",
+         de: "Struktur",
+      },
+   },
+   OTHERS: {
+      id: "others",
+      label: {
+         en: "Others",
+         de: "Sonstiges",
+      },
+   },
 } as const
 
-export type TagCategory = (typeof TAG_CATEGORY)[keyof typeof TAG_CATEGORY]
+export type TagCategory = (typeof TAG_CATEGORY)[keyof typeof TAG_CATEGORY]["id"]
 
 // Collection path: talentGuideFeedback/{userAuthUid}_{moduleHygraphId}
 export interface TalentGuideFeedback extends Identifiable {
