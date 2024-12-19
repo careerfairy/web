@@ -17,11 +17,6 @@ const styles = sxStyles({
       position: "relative",
       overflow: "hidden",
    },
-   resetButton: {
-      position: "fixed",
-      bottom: 16,
-      left: 16,
-   },
    feedbackCard: {
       display: "flex",
       justifyContent: "center",
@@ -31,34 +26,7 @@ const styles = sxStyles({
    },
 })
 
-const feedbackVariants: Variants = {
-   initial: {
-      opacity: 0,
-      bottom: 0,
-      y: 20,
-   },
-   animate: {
-      opacity: 1,
-      transition: { duration: 0.5, ease: "easeOut" },
-      bottom: 0,
-      y: 0,
-   },
-   exit: { opacity: 0 },
-   center: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
-      top: "50%",
-      transform: "translateY(-50%)",
-   },
-}
-
-export const TalentGuideEndLayout = () => {
-   const [enableRating, setEnableRating] = useState(false)
-   const [showFeedback, setShowFeedback] = useState(false)
-   const isShortScreen = useMediaQuery("(max-height: 730px)")
-   const isShorterScreen = useMediaQuery("(max-height: 450px)")
-
+const CongratsSection = ({ isVisible, isShorterScreen, isShortScreen }) => {
    const congratsVariants: Variants = {
       initial: { opacity: 0, y: 20 },
       animate: {
@@ -77,8 +45,74 @@ export const TalentGuideEndLayout = () => {
       },
    }
 
+   if (!isVisible) return null
+
+   return (
+      <FramerBox
+         key="congrats"
+         initial="initial"
+         animate="animate"
+         exit="exit"
+         variants={congratsVariants}
+         transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+         <CongratsMessage />
+      </FramerBox>
+   )
+}
+
+const FeedbackSection = ({
+   isVisible,
+   enableRating,
+   isShorterScreen,
+   onRatingClick,
+}) => {
+   const feedbackVariants: Variants = {
+      initial: {
+         opacity: 0,
+         bottom: 0,
+         y: 20,
+      },
+      animate: {
+         opacity: 1,
+         transition: { duration: 0.5, ease: "easeOut" },
+         bottom: 0,
+         y: 0,
+      },
+      exit: { opacity: 0 },
+      center: {
+         opacity: 1,
+         y: 0,
+         transition: { duration: 0.5, ease: "easeOut" },
+         top: "50%",
+         transform: "translateY(-50%)",
+      },
+   }
+
+   if (!isVisible) return null
+
+   return (
+      <FramerBox
+         key="feedback"
+         animate={enableRating || isShorterScreen ? "center" : "animate"}
+         initial="initial"
+         exit="exit"
+         transition={{ duration: 0.5, ease: "easeOut" }}
+         variants={feedbackVariants}
+         sx={styles.feedbackCard}
+      >
+         <FeedbackCard onRatingClick={onRatingClick} preview={!enableRating} />
+      </FramerBox>
+   )
+}
+
+export const TalentGuideEndLayout = () => {
+   const [enableRating, setEnableRating] = useState(false)
+   const [showFeedback, setShowFeedback] = useState(false)
+   const isShortScreen = useMediaQuery("(max-height: 730px)")
+   const isShorterScreen = useMediaQuery("(max-height: 450px)")
+
    useEffect(() => {
-      // Show feedback card after 2 seconds
       const timer = setTimeout(() => {
          setShowFeedback(true)
       }, 2000)
@@ -90,37 +124,19 @@ export const TalentGuideEndLayout = () => {
       <TalentGuideLayout>
          <Box id="talent-guide-end-layout" sx={styles.root}>
             <AnimatePresence>
-               {enableRating || (isShorterScreen && showFeedback) ? null : (
-                  <FramerBox
-                     key="congrats"
-                     initial="initial"
-                     animate="animate"
-                     exit="exit"
-                     variants={congratsVariants}
-                     transition={{ duration: 0.5, ease: "easeOut" }}
-                  >
-                     <CongratsMessage />
-                  </FramerBox>
-               )}
-
-               {Boolean(showFeedback) && (
-                  <FramerBox
-                     key="feedback"
-                     animate={
-                        enableRating || isShorterScreen ? "center" : "animate"
-                     }
-                     initial="initial"
-                     exit="exit"
-                     transition={{ duration: 0.5, ease: "easeOut" }}
-                     variants={feedbackVariants}
-                     sx={styles.feedbackCard}
-                  >
-                     <FeedbackCard
-                        onRatingClick={() => setEnableRating(true)}
-                        preview={!enableRating}
-                     />
-                  </FramerBox>
-               )}
+               <CongratsSection
+                  isVisible={
+                     !enableRating && !(isShorterScreen && showFeedback)
+                  }
+                  isShorterScreen={isShorterScreen}
+                  isShortScreen={isShortScreen}
+               />
+               <FeedbackSection
+                  isVisible={showFeedback}
+                  enableRating={enableRating}
+                  isShorterScreen={isShorterScreen}
+                  onRatingClick={() => setEnableRating(true)}
+               />
             </AnimatePresence>
          </Box>
       </TalentGuideLayout>
