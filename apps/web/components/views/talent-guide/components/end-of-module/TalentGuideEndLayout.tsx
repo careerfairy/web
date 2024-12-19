@@ -7,7 +7,7 @@ import { FeedbackSection } from "./FeedbackSection"
 import { styles } from "./styles"
 
 export const TalentGuideEndLayout = () => {
-   const [enableRating, setEnableRating] = useState(false)
+   const [ratingClicked, setRatingClicked] = useState(false)
    const [showFeedback, setShowFeedback] = useState(false)
    const isShortScreen = useMediaQuery("(max-height: 730px)")
    const isShorterScreen = useMediaQuery("(max-height: 450px)")
@@ -20,23 +20,27 @@ export const TalentGuideEndLayout = () => {
       return () => clearTimeout(timer)
    }, [])
 
+   const showCongrats = !ratingClicked && !(isShorterScreen && showFeedback)
+
    return (
       <TalentGuideLayout>
          <Box id="talent-guide-end-layout" sx={styles.layoutRoot}>
             <AnimatePresence>
-               <CongratsSection
-                  isVisible={
-                     !enableRating && !(isShorterScreen && showFeedback)
-                  }
-                  isShorterScreen={isShorterScreen}
-                  isShortScreen={isShortScreen}
-               />
-               <FeedbackSection
-                  isVisible={showFeedback}
-                  enableRating={enableRating}
-                  isShorterScreen={isShorterScreen}
-                  onRatingClick={() => setEnableRating(true)}
-               />
+               {Boolean(showCongrats) && (
+                  <CongratsSection
+                     key="congrats"
+                     isShorterScreen={isShorterScreen}
+                     isShortScreen={isShortScreen}
+                  />
+               )}
+               {Boolean(showFeedback) && (
+                  <FeedbackSection
+                     key="feedback"
+                     enableRating={ratingClicked}
+                     isShorterScreen={isShorterScreen}
+                     onRatingClick={() => setRatingClicked(true)}
+                  />
+               )}
             </AnimatePresence>
          </Box>
       </TalentGuideLayout>
