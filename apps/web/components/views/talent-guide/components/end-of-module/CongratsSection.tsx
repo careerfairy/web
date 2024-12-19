@@ -72,7 +72,7 @@ const getCongratsVariants = (
    isShortScreen: boolean
 ): Variants => {
    return {
-      initial: { opacity: 0, y: 20 },
+      initial: { opacity: 0, y: "-100%" },
       animate: {
          opacity: 1,
          y: 0,
@@ -81,6 +81,11 @@ const getCongratsVariants = (
             : isShortScreen
             ? "translateY(-50%)"
             : undefined,
+         transition: {
+            type: "spring",
+            bounce: 0.3,
+            duration: 0.8,
+         },
       },
       exit: {
          opacity: 0,

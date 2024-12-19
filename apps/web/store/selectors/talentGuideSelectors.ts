@@ -68,5 +68,5 @@ export const useQuizState = (quizId: string) =>
 export const useShowEndOfModuleScreen = () =>
    useAppSelector((state) => state.talentGuide.isModuleCompleted)
 
-export const useIsCompletingModule = () =>
-   useAppSelector((state) => state.talentGuide.isLoadingMarkModuleAsCompleted)
+export const useTalentGuideState = () =>
+   useAppSelector((state) => state.talentGuide)

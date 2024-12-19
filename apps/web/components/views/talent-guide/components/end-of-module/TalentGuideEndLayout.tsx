@@ -6,21 +6,27 @@ import { CongratsSection } from "./CongratsSection"
 import { FeedbackSection } from "./FeedbackSection"
 import { styles } from "./styles"
 
+const SHOW_CONGRATS_TIME = 2000
+
 export const TalentGuideEndLayout = () => {
    const [ratingClicked, setRatingClicked] = useState(false)
-   const [showFeedback, setShowFeedback] = useState(false)
+   const [someTimeHasPassed, setSomeTimeHasPassed] = useState(false)
+   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
+
    const isShortScreen = useMediaQuery("(max-height: 730px)")
    const isShorterScreen = useMediaQuery("(max-height: 450px)")
 
    useEffect(() => {
       const timer = setTimeout(() => {
-         setShowFeedback(true)
-      }, 2000)
+         setSomeTimeHasPassed(true)
+      }, SHOW_CONGRATS_TIME)
 
       return () => clearTimeout(timer)
    }, [])
 
-   const showCongrats = !ratingClicked && !(isShorterScreen && showFeedback)
+   const showCongrats =
+      !ratingClicked && !(isShorterScreen && someTimeHasPassed)
+   const showFeedback = someTimeHasPassed && !feedbackSubmitted
 
    return (
       <TalentGuideLayout>
@@ -39,6 +45,7 @@ export const TalentGuideEndLayout = () => {
                      enableRating={ratingClicked}
                      isShorterScreen={isShorterScreen}
                      onRatingClick={() => setRatingClicked(true)}
+                     onFeedbackSubmitted={() => setFeedbackSubmitted(true)}
                   />
                )}
             </AnimatePresence>
