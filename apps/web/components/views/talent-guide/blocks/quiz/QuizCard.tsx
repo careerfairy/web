@@ -2,10 +2,11 @@ import { QUIZ_STATE } from "@careerfairy/shared-lib/talent-guide/types"
 import { Box, Collapse, Stack, Typography } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
 import { QuizModelType } from "data/hygraph/types"
-import { Fragment } from "react"
+import { Fragment, useRef } from "react"
 import { toggleQuizAnswer } from "store/reducers/talentGuideReducer"
 import { useQuizState } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
+import { useProgressHeaderHeight } from "../../components/TalentGuideProgress"
 import { AnswerButton } from "./AnswerButton"
 
 const styles = sxStyles({
@@ -36,6 +37,9 @@ type Props = QuizModelType
 export const QuizCard = ({ question, correction, answers, id }: Props) => {
    const quizState = useQuizState(id)
    const dispatch = useAppDispatch()
+   const correctionRef = useRef<HTMLDivElement>(null)
+
+   const scrollOffset = useProgressHeaderHeight()
 
    const quizHasBeenAttempted =
       quizState.state === QUIZ_STATE.PASSED ||
@@ -68,8 +72,19 @@ export const QuizCard = ({ question, correction, answers, id }: Props) => {
                </AnswerButton>
             ))}
          </Stack>
-         <Collapse in={quizState.state === QUIZ_STATE.FAILED} unmountOnExit>
-            <Box sx={styles.correction}>
+         <Collapse
+            in={quizState.state === QUIZ_STATE.FAILED}
+            unmountOnExit
+            onEntered={(node) => {
+               const elementPosition =
+                  node.getBoundingClientRect().top + window.scrollY
+               window.scrollTo({
+                  top: elementPosition - scrollOffset,
+                  behavior: "smooth",
+               })
+            }}
+         >
+            <Box ref={correctionRef} sx={styles.correction}>
                <Typography component="p" variant="small">
                   <Box component="span" sx={styles.correctionText}>
                      Correction:
