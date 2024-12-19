@@ -28,33 +28,33 @@ const styles = sxStyles({
 const congratsVariants: Variants = {
    initial: { opacity: 0, y: 20 },
    animate: { opacity: 1, y: 0 },
-   exit: { opacity: 0, y: "-100%" },
+   exit: {
+      opacity: 0,
+      y: "-100%",
+      transition: { duration: 0.5, ease: "easeOut" },
+   },
 }
 
 const feedbackVariants: FramerBoxProps = {
    variants: {
       initial: {
          opacity: 0,
-         y: "100%",
-         x: "-50%",
-         left: "50%",
-         position: "absolute",
-         bottom: "-12px",
+         bottom: 0,
+         y: 20,
       },
       animate: {
          opacity: 1,
+         transition: { duration: 0.5, ease: "easeOut" },
+         bottom: 0,
          y: 0,
       },
-      exit: {
-         opacity: 0,
-      },
+      exit: { opacity: 0 },
       center: {
-         y: "-50%",
-         x: "-50%",
-         left: "50%",
-         top: "50%",
-         scale: 1.1,
          opacity: 1,
+         y: 0,
+         transition: { duration: 0.5, ease: "easeOut" },
+         top: "50%",
+         transform: "translateY(-50%)",
       },
    },
    initial: "initial",
@@ -63,28 +63,34 @@ const feedbackVariants: FramerBoxProps = {
       duration: 0.5,
       ease: "easeOut",
    },
+   sx: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      position: "absolute",
+      width: "100%",
+   },
 }
 
-export const TalentGuideEndLayout = () => {
+type Props = {
+   onResetLayout: () => void
+}
+
+export const TalentGuideEndLayout = ({ onResetLayout }: Props) => {
    const [enableRating, setEnableRating] = useState(false)
    const [showFeedback, setShowFeedback] = useState(false)
-   const [layoutKey, setLayoutKey] = useState(0)
 
    useEffect(() => {
       // Show feedback card after 2 seconds
       const timer = setTimeout(() => {
          setShowFeedback(true)
-      }, 1000)
+      }, 2000)
 
       return () => clearTimeout(timer)
    }, [])
 
-   const handleResetLayout = () => {
-      setLayoutKey((prev) => prev + 1)
-   }
-
    return (
-      <TalentGuideLayout key={layoutKey}>
+      <TalentGuideLayout>
          <Box id="talent-guide-end-layout" sx={styles.root}>
             <AnimatePresence>
                {!enableRating && (
@@ -100,7 +106,6 @@ export const TalentGuideEndLayout = () => {
                   </FramerBox>
                )}
 
-               {/* <Collapse in={showFeedback} mountOnEnter unmountOnExit> */}
                {Boolean(showFeedback) && (
                   <FramerBox
                      key="feedback"
@@ -113,12 +118,11 @@ export const TalentGuideEndLayout = () => {
                      />
                   </FramerBox>
                )}
-               {/* </Collapse> */}
             </AnimatePresence>
          </Box>
          <Fab
             size="small"
-            onClick={handleResetLayout}
+            onClick={onResetLayout}
             sx={styles.resetButton}
             color="secondary"
          >

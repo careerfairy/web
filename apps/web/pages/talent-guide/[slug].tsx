@@ -10,7 +10,7 @@ import { Page, TalentGuideModule } from "data/hygraph/types"
 import { useAuth } from "HOCs/AuthProvider"
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
-import { Fragment, useEffect } from "react"
+import { Fragment, useEffect, useState } from "react"
 import {
    loadTalentGuide,
    resetTalentGuide,
@@ -35,6 +35,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const { authenticatedUser, isLoggedIn } = useAuth()
    const isLoadingGuide = useIsLoadingTalentGuide()
    const showEndScreen = useShowEndOfModuleScreen()
+   const [layoutKey, setLayoutKey] = useState(0)
 
    useEffect(() => {
       if (!authenticatedUser.uid) {
@@ -53,16 +54,20 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       }
    }, [dispatch, authenticatedUser.uid, data])
 
+   const handleResetLayout = () => {
+      setLayoutKey((prev) => prev + 1)
+   }
+
    const isLoading = isLoadingGuide || !isLoggedIn
 
    return (
-      <Fragment>
+      <Fragment key={layoutKey}>
          {Boolean(isPreview) && <PreviewModeAlert />}
          <SEO title={`${data.content.moduleName} - CareerFairy Levels`} />
          {isLoading ? (
             <Loader />
          ) : showEndScreen ? (
-            <TalentGuideEndLayout />
+            <TalentGuideEndLayout onResetLayout={handleResetLayout} />
          ) : (
             <TalentGuideStepsLayout />
          )}
