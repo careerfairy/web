@@ -13,8 +13,8 @@ export const TalentGuideEndLayout = () => {
    const [someTimeHasPassed, setSomeTimeHasPassed] = useState(false)
    const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
 
-   const isShortScreen = useMediaQuery("(max-height: 730px)")
-   const isShorterScreen = useMediaQuery("(max-height: 450px)")
+   const isShortScreen = useMediaQuery("(max-height: 800px)")
+   const isShorterScreen = useMediaQuery("(max-height: 530px)")
 
    useEffect(() => {
       const timer = setTimeout(() => {
