@@ -22,13 +22,13 @@ export const ResetDemoButton = ({ onResetLayout }: Props) => {
    const dispatch = useAppDispatch()
 
    return (
-      <Tooltip title="Reset demo">
-         <ButtonGroup
-            sx={styles.root}
-            variant="outlined"
-            aria-label="Basic button group"
-            size="small"
-         >
+      <ButtonGroup
+         sx={styles.root}
+         variant="outlined"
+         aria-label="Basic button group"
+         size="small"
+      >
+         <Tooltip title="Reset UI">
             <Button
                onClick={() => {
                   onResetLayout()
@@ -36,6 +36,8 @@ export const ResetDemoButton = ({ onResetLayout }: Props) => {
             >
                UI
             </Button>
+         </Tooltip>
+         <Tooltip title="Reset DB">
             <Button
                onClick={() => {
                   // Reset the module progress in the firestore/reducer
@@ -44,7 +46,7 @@ export const ResetDemoButton = ({ onResetLayout }: Props) => {
             >
                DB
             </Button>
-         </ButtonGroup>
-      </Tooltip>
+         </Tooltip>
+      </ButtonGroup>
    )
 }
