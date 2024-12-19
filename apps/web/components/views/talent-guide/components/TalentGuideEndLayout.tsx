@@ -1,6 +1,5 @@
-import RefreshIcon from "@mui/icons-material/RestartAlt"
-import { Box, Fab } from "@mui/material"
-import FramerBox, { FramerBoxProps } from "components/views/common/FramerBox"
+import { Box, useMediaQuery } from "@mui/material"
+import FramerBox from "components/views/common/FramerBox"
 import { AnimatePresence, Variants } from "framer-motion"
 import { useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -23,62 +22,60 @@ const styles = sxStyles({
       bottom: 16,
       left: 16,
    },
-})
-
-const congratsVariants: Variants = {
-   initial: { opacity: 0, y: 20 },
-   animate: { opacity: 1, y: 0 },
-   exit: {
-      opacity: 0,
-      y: "-100%",
-      transition: { duration: 0.5, ease: "easeOut" },
-   },
-}
-
-const feedbackVariants: FramerBoxProps = {
-   variants: {
-      initial: {
-         opacity: 0,
-         bottom: 0,
-         y: 20,
-      },
-      animate: {
-         opacity: 1,
-         transition: { duration: 0.5, ease: "easeOut" },
-         bottom: 0,
-         y: 0,
-      },
-      exit: { opacity: 0 },
-      center: {
-         opacity: 1,
-         y: 0,
-         transition: { duration: 0.5, ease: "easeOut" },
-         top: "50%",
-         transform: "translateY(-50%)",
-      },
-   },
-   initial: "initial",
-   exit: "exit",
-   transition: {
-      duration: 0.5,
-      ease: "easeOut",
-   },
-   sx: {
+   feedbackCard: {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       position: "absolute",
       width: "100%",
    },
+})
+
+const feedbackVariants: Variants = {
+   initial: {
+      opacity: 0,
+      bottom: 0,
+      y: 20,
+   },
+   animate: {
+      opacity: 1,
+      transition: { duration: 0.5, ease: "easeOut" },
+      bottom: 0,
+      y: 0,
+   },
+   exit: { opacity: 0 },
+   center: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut" },
+      top: "50%",
+      transform: "translateY(-50%)",
+   },
 }
 
-type Props = {
-   onResetLayout: () => void
-}
-
-export const TalentGuideEndLayout = ({ onResetLayout }: Props) => {
+export const TalentGuideEndLayout = () => {
    const [enableRating, setEnableRating] = useState(false)
    const [showFeedback, setShowFeedback] = useState(false)
+   const isShortScreen = useMediaQuery("(max-height: 730px)")
+   const isShorterScreen = useMediaQuery("(max-height: 450px)")
+
+   const congratsVariants: Variants = {
+      initial: { opacity: 0, y: 20 },
+      animate: {
+         opacity: 1,
+         y: 0,
+         transform: isShorterScreen
+            ? undefined
+            : isShortScreen
+            ? "translateY(-50%)"
+            : undefined,
+      },
+      exit: {
+         opacity: 0,
+         y: "-100%",
+         transition: { duration: 0.5, ease: "easeOut" },
+      },
+   }
 
    useEffect(() => {
       // Show feedback card after 2 seconds
@@ -93,7 +90,7 @@ export const TalentGuideEndLayout = ({ onResetLayout }: Props) => {
       <TalentGuideLayout>
          <Box id="talent-guide-end-layout" sx={styles.root}>
             <AnimatePresence>
-               {!enableRating && (
+               {enableRating || (isShorterScreen && showFeedback) ? null : (
                   <FramerBox
                      key="congrats"
                      initial="initial"
@@ -109,8 +106,14 @@ export const TalentGuideEndLayout = ({ onResetLayout }: Props) => {
                {Boolean(showFeedback) && (
                   <FramerBox
                      key="feedback"
-                     animate={enableRating ? "center" : "animate"}
-                     {...feedbackVariants}
+                     animate={
+                        enableRating || isShorterScreen ? "center" : "animate"
+                     }
+                     initial="initial"
+                     exit="exit"
+                     transition={{ duration: 0.5, ease: "easeOut" }}
+                     variants={feedbackVariants}
+                     sx={styles.feedbackCard}
                   >
                      <FeedbackCard
                         onRatingClick={() => setEnableRating(true)}
@@ -120,14 +123,6 @@ export const TalentGuideEndLayout = ({ onResetLayout }: Props) => {
                )}
             </AnimatePresence>
          </Box>
-         <Fab
-            size="small"
-            onClick={onResetLayout}
-            sx={styles.resetButton}
-            color="secondary"
-         >
-            <RefreshIcon />
-         </Fab>
       </TalentGuideLayout>
    )
 }

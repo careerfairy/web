@@ -67,11 +67,11 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
          {isLoading ? (
             <Loader />
          ) : showEndScreen ? (
-            <TalentGuideEndLayout onResetLayout={handleResetLayout} />
+            <TalentGuideEndLayout />
          ) : (
             <TalentGuideStepsLayout />
          )}
-         <ResetDemoButton />
+         <ResetDemoButton onResetLayout={handleResetLayout} />
       </Fragment>
    )
 }
