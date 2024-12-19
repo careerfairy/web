@@ -13,3 +13,8 @@ export type CityOption = {
 export const generateCityId = (city: ICity) => {
    return `${city.countryCode}-${city.stateCode}-${city.name}`
 }
+
+export const getCityCodes = (generatedCityId: string) => {
+   const [countryCode, stateCode, cityName] = generatedCityId.split("-")
+   return { countryCode, stateCode, cityName }
+}
