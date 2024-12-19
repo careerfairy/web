@@ -1,7 +1,8 @@
-import { Button, Stack, Typography } from "@mui/material"
+import { Button, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useCountryCityData from "components/custom-hook/countries/useCountryCityData"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import { universityCountriesMap } from "components/util/constants/universityCountries"
 import { useRouter } from "next/router"
 import { Fragment, useMemo, useState } from "react"
 import { Settings } from "react-feather"
@@ -88,8 +89,6 @@ export const TalentProfileHeader = () => {
       [userPresenter, talentProfileV1]
    )
 
-   const userCountry = universityCountriesMap[userData.universityCountryCode]
-
    return (
       <Fragment>
          <Stack sx={styles.root}>
@@ -120,9 +119,15 @@ export const TalentProfileHeader = () => {
                            ? ` at ${userData?.university?.name}`
                            : null}
                      </Typography>
-                     <Typography sx={styles.userLocation}>
-                        {`CityTBD in Up Stack, ${userCountry}.`}
-                     </Typography>
+                     <SuspenseWithBoundary
+                        fallback={
+                           <Skeleton
+                              sx={{ maxWidth: "300px", height: "100%" }}
+                           />
+                        }
+                     >
+                        <UserLocation />
+                     </SuspenseWithBoundary>
                   </Stack>
                </Stack>
             </Stack>
@@ -145,5 +150,19 @@ export const TalentProfileHeader = () => {
             }}
          />
       </Fragment>
+   )
+}
+
+const UserLocation = () => {
+   const { userData } = useAuth()
+   const { data } = useCountryCityData(
+      userData?.countryIsoCode,
+      userData?.cityIsoCode
+   )
+
+   return (
+      <Typography sx={styles.userLocation}>
+         {`${data?.city?.name}, ${data?.country?.name}`}
+      </Typography>
    )
 }

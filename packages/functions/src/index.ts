@@ -368,3 +368,4 @@ exports.syncUserInRegisteredLivestreams =
 exports.fetchUserCountryCode = fetchUserCountryCode
 exports.fetchCountriesList = countries.fetchCountriesList
 exports.fetchCountryCitiesList = countries.fetchCountryCitiesList
+exports.fetchCountryCityData = countries.fetchCountryCityData
