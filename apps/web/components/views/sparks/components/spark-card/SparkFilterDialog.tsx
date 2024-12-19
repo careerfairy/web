@@ -30,7 +30,7 @@ import {
 } from "store/reducers/sparksFeedReducer"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { DRAWER_WIDTH } from "constants/layout"
-import {useWebviewBackHandler} from "../../../../../util/WebviewRouting.utils";
+import { useWebviewBackHandler } from "../../../../../util/WebviewRouting.utils";
 
 const styles = sxStyles({
    drawerPaper: {
@@ -125,15 +125,13 @@ const SparksFilterDialog = ({
 }: Props) => {
    const isMobile = useIsMobile()
 
-   const handleBack = () => {
+   useWebviewBackHandler(() => {
       if (isOpen) {
          handleClose();
          return true;
       }
       return false;
-   };
-
-   useWebviewBackHandler(handleBack);
+   });
 
    const isFullScreen = useSparksFeedIsFullScreen()
 
