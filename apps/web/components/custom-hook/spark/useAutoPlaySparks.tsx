@@ -1,5 +1,6 @@
 import { EmblaCarouselType } from "embla-carousel-react"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
+import { useAreSlidesInView } from "../embla-carousel/useAreSlidesInView"
 import useIsMobile from "../useIsMobile"
 
 type ReturnType = {
@@ -13,39 +14,33 @@ export const useAutoPlaySparks = (
 ): ReturnType => {
    const isMobile = useIsMobile()
    const [autoPlayingIndex, setAutoPlayingIndex] = useState<number>(0)
-   const [isCarouselInView, setIsCarouselInView] = useState<boolean>(false)
 
-   const handleSlidesInView = useCallback((emblaApi: EmblaCarouselType) => {
-      const hasSlides = emblaApi.slidesInView().length > 0
-      setIsCarouselInView(hasSlides)
-   }, [])
+   const { areSlidesInView } = useAreSlidesInView(emblaApi)
 
    const moveToNextSlide = useCallback(() => {
-      if (!isCarouselInView || numberOfElementsToPlay === null) return
+      if (!areSlidesInView || numberOfElementsToPlay === null) return
 
       setAutoPlayingIndex((prevIndex) => {
+         requestAnimationFrame(() => {
+            if (prevIndex === numberOfElementsToPlay - 1) {
+               emblaApi.scrollTo(0)
+            } else {
+               emblaApi.scrollNext()
+            }
+         })
+
          return (prevIndex + 1) % numberOfElementsToPlay
       })
-
-      if (autoPlayingIndex === numberOfElementsToPlay - 1) {
-         emblaApi.scrollTo(0)
-      } else {
-         emblaApi.scrollNext()
-      }
-   }, [autoPlayingIndex, emblaApi, isCarouselInView, numberOfElementsToPlay])
+   }, [emblaApi, areSlidesInView, numberOfElementsToPlay])
 
    const shouldDisableAutoPlay = useCallback(
       (index: number) => {
-         return isMobile && isCarouselInView && autoPlayingIndex !== index
-      },
-      [isMobile, isCarouselInView, autoPlayingIndex]
-   )
+         if (!areSlidesInView) return true
 
-   useEffect(() => {
-      if (emblaApi) {
-         emblaApi.on("slidesInView", handleSlidesInView)
-      }
-   }, [emblaApi, handleSlidesInView])
+         return isMobile && areSlidesInView && autoPlayingIndex !== index
+      },
+      [isMobile, areSlidesInView, autoPlayingIndex]
+   )
 
    return {
       shouldDisableAutoPlay,
