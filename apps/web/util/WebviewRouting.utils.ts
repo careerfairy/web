@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { MobileUtils } from "./mobile.utils";
-import { useRouter } from 'next/router';
 
 /**
  * A hook to handle custom back button behavior when in a WebView.
@@ -8,7 +7,6 @@ import { useRouter } from 'next/router';
  */
 export const useWebviewBackHandler = (onBack: () => boolean): void => {
     const onBackRef = useRef(onBack);
-    const router = useRouter();
 
     // Keep the latest onBack function in the ref
     useEffect(() => {
@@ -16,34 +14,24 @@ export const useWebviewBackHandler = (onBack: () => boolean): void => {
     }, [onBack]);
 
     useEffect(() => {
-        if (!MobileUtils.webViewPresence()) return; // Exit if not in a WebView context
+        if (!MobileUtils.webViewPresence()) return; // Allow normal routing if not in WebView
 
-        const handleRouteChangeStart = (url: string, options: any) => {
-            // If options are undefined or null, default to an empty object
-            if (!options) {
-                options = {};
-            }
-
+        const handleBackButton = () => {
             const shouldPreventNavigation = onBackRef.current();
-
             if (shouldPreventNavigation) {
-                // Prevent navigation by replacing the current state
-                window.history.pushState(null, '', window.location.href);
-
-                // Close modal (or perform whatever actions you need)
-                router.replace(router.asPath, undefined, { shallow: true });
-
-                // Throw an error to cancel the navigation (this is required by Next.js)
-                throw new Error('Navigation prevented by native webview experience');
+                window.history.pushState(null, '', window.location.pathname);
             }
         };
 
-        // Attach the handler for route changes
-        router.events.on('routeChangeStart', handleRouteChangeStart);
+        // Add event listener for the back button
+        window.addEventListener('popstate', handleBackButton);
 
-        // Cleanup on unmount
+        // Push the initial state to make the back button functional
+        window.history.pushState(null, '', window.location.pathname);
+
+        // Cleanup listener on unmount
         return () => {
-            router.events.off('routeChangeStart', handleRouteChangeStart);
+            window.removeEventListener('popstate', handleBackButton);
         };
-    }, [router]);
+    }, []);
 };
