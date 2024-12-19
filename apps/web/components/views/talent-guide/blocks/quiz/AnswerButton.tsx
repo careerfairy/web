@@ -79,13 +79,11 @@ const styles = sxStyles({
    },
    buttonVariants: {
       default: {
-         borderColor: (theme) => theme.brand.black[500] + " !important",
-         border: "1px solid",
+         outline: (theme) => `1px solid ${theme.brand.black[500]}`,
          color: (theme) => theme.palette.neutral[700] + " !important",
       },
       selected: {
-         borderColor: (theme) => theme.brand.purple[300] + " !important",
-         border: "1.5px solid",
+         outline: (theme) => `1.5px solid ${theme.brand.purple[300]}`,
          background: (theme) =>
             `linear-gradient(90deg, ${theme.palette.success[700]} 0%, rgba(0, 189, 64, 0.00) 0.01%), ${theme.brand.white[100]}`,
          color: (theme) => theme.palette.neutral[700] + " !important",
@@ -99,8 +97,7 @@ const styles = sxStyles({
          ...getBackgroundAnimation(theme.palette.error[500], "wrong"),
       }),
       correction: {
-         borderColor: (theme) => theme.palette.success[700] + " !important",
-         border: "1px solid",
+         outline: (theme) => `1px solid ${theme.palette.success[700]}`,
          color: (theme) => theme.palette.neutral[700] + " !important",
          ...getBackgroundAnimation("#F3FBF6", "correction"),
       },
