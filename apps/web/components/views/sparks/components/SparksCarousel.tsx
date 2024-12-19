@@ -7,7 +7,7 @@ import SparkPreviewCard from "./spark-card/SparkPreviewCard"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { useAutoPlaySparks } from "components/custom-hook/spark/useAutoPlaySparks"
 import { ReactNode } from "react"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    viewport: {
@@ -15,6 +15,9 @@ const styles = sxStyles({
       padding: "16px",
       margin: "-16px",
       width: "calc(100% + 16px)",
+   },
+   disableUserSelect: {
+      userSelect: "none",
    },
 })
 
@@ -49,7 +52,7 @@ export const SparksCarousel = ({
    )
 
    return (
-      <Box sx={containerSx}>
+      <Box sx={combineStyles(styles.disableUserSelect, containerSx)}>
          <ContentCarousel
             headerTitle={header}
             emblaProps={{
