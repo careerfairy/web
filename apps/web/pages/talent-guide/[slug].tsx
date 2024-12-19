@@ -17,7 +17,7 @@ import {
 } from "store/reducers/talentGuideReducer"
 import {
    useIsLoadingTalentGuide,
-   useShowEndOfModuleScreen,
+   useShowEndOfModuleExperience,
 } from "store/selectors/talentGuideSelectors"
 import {
    tgBackendPreviewService,
@@ -34,7 +34,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const { isPreview } = useRouter()
    const { authenticatedUser, isLoggedIn } = useAuth()
    const isLoadingGuide = useIsLoadingTalentGuide()
-   const showEndScreen = useShowEndOfModuleScreen()
+   const showEndOfModuleExperience = useShowEndOfModuleExperience()
    const [layoutKey, setLayoutKey] = useState(0)
 
    useEffect(() => {
@@ -66,7 +66,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
          <SEO title={`${data.content.moduleName} - CareerFairy Levels`} />
          {isLoading ? (
             <Loader />
-         ) : showEndScreen ? (
+         ) : showEndOfModuleExperience ? (
             <TalentGuideEndLayout />
          ) : (
             <TalentGuideStepsLayout />
