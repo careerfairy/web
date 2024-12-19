@@ -18,6 +18,8 @@ const styles = sxStyles({
       "&:hover": {
          cursor: "pointer",
       },
+      my: "16px",
+      mx: "12px",
    },
    menu: {
       mt: 1,

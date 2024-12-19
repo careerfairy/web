@@ -58,9 +58,15 @@ export type SparkPreviewCardType = "carousel" | "gallery" | "fullScreen"
 type Props = {
    componentHeader?: React.ReactNode
    children?: React.ReactNode
-   video: { thumbnailUrl: string; url: string; preview: boolean }
+   video: {
+      thumbnailUrl: string
+      url: string
+      preview: boolean
+      muted: boolean
+   }
    onMouseEnter?: () => void
    onMouseLeave?: () => void
+   onVideoEnded?: () => void
    autoPlaying?: boolean
    containerRef?: React.RefObject<HTMLDivElement>
    selected?: boolean
@@ -73,6 +79,7 @@ const SparkPreviewCardContainer: FC<Props> = ({
    video,
    onMouseEnter,
    onMouseLeave,
+   onVideoEnded,
    autoPlaying,
    containerRef,
    selected,
@@ -105,13 +112,14 @@ const SparkPreviewCardContainer: FC<Props> = ({
          <VideoPreview
             thumbnailUrl={video.thumbnailUrl}
             videoUrl={video.url}
-            pausing={autoPlayEnabled ? !autoPlaying : undefined}
+            pausing={autoPlayEnabled ? !autoPlaying : false}
             playing={autoPlayEnabled ? autoPlaying : video.preview}
             light={false}
             autoPlaying={autoPlaying}
             containPreviewOnTablet
-            muted={autoPlayEnabled ? true : undefined}
+            muted={video.muted || autoPlayEnabled ? true : false}
             identifier={video.url}
+            onVideoEnded={onVideoEnded}
          />
       </Box>
    )

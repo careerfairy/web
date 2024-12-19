@@ -32,7 +32,11 @@ import { ProfileItemCard } from "./ProfileItemCard"
 import { ProfileSection } from "./ProfileSection"
 import { BaseProfileDialog } from "./dialogs/BaseProfileDialog"
 import { LanguageFormFields, LanguageFormProvider } from "./forms/LanguagesForm"
-import { LanguageFormValues, getInitialLanguageValues } from "./forms/schemas"
+import {
+   CreateLanguageSchemaType,
+   LanguageFormValues,
+   getInitialLanguageValues,
+} from "./forms/schemas"
 
 const styles = sxStyles({
    emptyLinksRoot: {
@@ -107,7 +111,7 @@ const FormDialogWrapper = () => {
       formState: { isValid, isSubmitting },
       reset,
       handleSubmit,
-   } = useFormContext()
+   } = useFormContext<CreateLanguageSchemaType>()
 
    const handleCloseLanguageDialog = useCallback(() => {
       dispatch(closeCreateDialog({ type: TalentProfileItemTypes.Language }))
@@ -207,7 +211,7 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
    const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
       useState<boolean>(false)
    const dispatch = useDispatch()
-   const { reset } = useFormContext()
+   const { reset } = useFormContext<CreateLanguageSchemaType>()
    const { successNotification } = useSnackbarNotifications()
 
    const handleEdit = useCallback(() => {
@@ -217,7 +221,7 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
             data: language,
          })
       )
-      reset(language)
+      reset(getInitialLanguageValues(language))
    }, [dispatch, language, reset])
 
    const handleDelete = useCallback(async () => {

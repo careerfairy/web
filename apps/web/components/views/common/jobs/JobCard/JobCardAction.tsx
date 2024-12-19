@@ -34,14 +34,15 @@ const styles = sxStyles({
 type Props = {
    job: Job | CustomJob
    previewMode: boolean
+   applied: boolean
 }
 
-const JobCardAction = ({ job, previewMode }: Props) => {
+const JobCardAction = ({ job, previewMode, applied }: Props) => {
    const jobPublished = (job as CustomJob)?.published ?? true
    const isJobEditable = !(job as CustomJob)?.isPermanentlyExpired ?? true
 
    if (previewMode) {
-      return <JobButtonAction published={jobPublished} />
+      return <JobButtonAction published={jobPublished || applied} />
    }
 
    return <JobMenuAction jobId={job.id} editable={isJobEditable} />

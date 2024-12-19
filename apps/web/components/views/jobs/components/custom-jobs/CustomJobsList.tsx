@@ -4,7 +4,9 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import JobCard from "components/views/common/jobs/JobCard"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import { combineStyles, sxStyles } from "types/commonTypes"
+
 const styles = sxStyles({
    jobListWrapper: {
       px: { xs: 2, md: 2 },
@@ -19,14 +21,17 @@ type Props = {
    hrefLink: string // example: /portal/jobs
    jobsGroupNamesMap: Record<string, string> // {"id_of_job1": "name_of_group", ... }
    jobWrapperSx?: SxProps<DefaultTheme>
+   applied?: boolean
 }
 const CustomJobsList = ({
    customJobs,
    hrefLink,
    jobWrapperSx,
    jobsGroupNamesMap,
+   applied,
 }: Props) => {
    const isMobile = useIsMobile()
+   const router = useRouter()
 
    return (
       <Stack
@@ -36,7 +41,10 @@ const CustomJobsList = ({
          {customJobs.map((customJob, idx) => {
             return (
                <Link
-                  href={`${hrefLink}/${customJob.id}`}
+                  href={{
+                     pathname: `${hrefLink}/${customJob.id}`,
+                     query: router.query,
+                  }}
                   // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
                   shallow
                   passHref
@@ -52,6 +60,7 @@ const CustomJobsList = ({
                         hideJobUrl
                         smallCard={isMobile}
                         companyName={jobsGroupNamesMap[customJob.id]}
+                        applied={applied}
                      />
                   </ListItem>
                </Link>

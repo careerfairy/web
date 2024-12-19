@@ -265,6 +265,8 @@ exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 exports.syncUserStats = onWriteTriggers.syncUserStats
 exports.onWriteCreator = onWriteTriggers.onWriteCreator
 exports.onWriteGroup = onWriteTriggers.onWriteGroup
+exports.syncGroupFollowingUserDataOnChange =
+   onWriteTriggers.syncGroupFollowingUserDataOnChange
 exports.onWriteSpark = onWriteTriggers.onWriteSpark
 exports.onWriteCustomJobs = onWriteTriggers.onWriteCustomJobs
 exports.onWriteCustomJobsSendNotifications =

@@ -1,4 +1,4 @@
-import { tgPreviewService } from "data/hygraph/TalentGuideService"
+import { tgBackendPreviewService } from "data/hygraph/TalentGuideBackendService"
 import { PageType } from "data/hygraph/types"
 import { NextApiRequest, NextApiResponse } from "next"
 /*
@@ -59,9 +59,8 @@ const getPreviewData = async (
 
    switch (pageType) {
       case PageType.TALENT_GUIDE_MODULE_PAGE: {
-         const page = await tgPreviewService.getTalentGuideModulePageBySlug(
-            slug
-         )
+         const page =
+            await tgBackendPreviewService.getTalentGuideModulePageBySlug(slug)
 
          return {
             hasData: Boolean(page),
@@ -71,7 +70,7 @@ const getPreviewData = async (
 
       case PageType.TALENT_GUIDE_ROOT_PAGE: {
          const talentGuideRootPage =
-            await tgPreviewService.getTalentGuideRootPage(slug)
+            await tgBackendPreviewService.getTalentGuideRootPage(slug)
 
          return {
             hasData: Boolean(talentGuideRootPage),

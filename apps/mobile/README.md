@@ -167,9 +167,42 @@ or from the root
 npm run native-build:prod
 ```
 
-NOTE: For iOS build, you need apple credentials
+---
 
-After build, starts, you will get a link of current build process, or just go to https://expo.dev/, login to the account, go to dashboard and click on latest build.
+### Local Development Build
+
+1. Run
+
+```bash
+npm run dev
+```
+
+2. On next terminal window, run (from root)
+
+```bash
+npm run native:cache
+```
+
+#### For iOS (Only local build)
+
+In .env file, set BASE_URL to http://127.0.0.1:3000 and SEARCH_CRITERIA to 127.0.0.1
+
+after running the script, type 'i' to run iOS emulator
+
+### Troubleshooting tips
+
+Sometimes, iOS simulator will have black screen
+
+1. Make sure when running iOS simulator, that in terminal you see download of bundle to iOS emulator
+2. If there is no download, there is probably cache with iOS emulator
+3. Try closing the iOS emulator and running 'i' again
+4. If that does not help, go to apple system settings -> Storage -> Developer -> Choose xCode cache and delete it
+5. Try then running the flow again
+
+#### For Android and Expo GO application
+
+Currently, android and expo go cannot work, as for android emulator, it only works with http://10.0.2.2:3000 accessing localhost, and it will load the app, but will not be able to contact backend services.
+Same thing for Expo GO, which needs exposed local ip address and it will have the same effect
 
 ---
 

@@ -3,10 +3,17 @@ import { Expo } from "expo-server-sdk"
 
 const expo = new Expo()
 
+export enum NotificationType {
+   LIVESTREAM = "LIVESTREAM",
+   USER_DATA = "USER_DATA",
+   EMAIL = "EMAIL",
+}
+
 export type NotificationData = {
    title: string
    body: string
    url: string
+   tabValue: NotificationType
    filters: Filter
 }
 
@@ -75,61 +82,24 @@ export const deleteSavedNotification = async (id: string) => {
 
 export async function sendExpoPushNotification(
    filters: Filter,
+   notificationTabFilter: NotificationType,
    message: MessageBody
 ) {
    try {
-      // Filter out invalid tokens
       let tokens: string[] = []
 
-      if (filters.livestream) {
-         tokens = await retrieveTokensFromLivestream(filters.livestream)
-      } else {
-         const userRef = firestore.collection("userData")
-         let query = userRef.where("pushToken", "!=", null)
-
-         if (filters.university?.code && filters.university.code !== "other") {
-            query = query.where(
-               "university.code",
-               "==",
-               filters.university.code
-            )
-         }
-         if (
-            filters.universityCountryCode &&
-            filters.universityCountryCode !== "OTHER"
-         ) {
-            query = query.where(
-               "universityCountryCode",
-               "==",
-               filters.universityCountryCode
-            )
-         }
-         if (filters.gender) {
-            query = query.where("gender", "==", filters.gender)
-         }
-         if (filters.fieldOfStudy?.id) {
-            query = query.where(
-               "fieldOfStudy.id",
-               "==",
-               filters.fieldOfStudy.id
-            )
-         }
-         if (filters.levelOfStudy?.id) {
-            query = query.where(
-               "levelOfStudy.id",
-               "==",
-               filters.levelOfStudy.id
-            )
-         }
-
-         const usersSnapshot = await query.get()
-
-         const users: any = usersSnapshot.docs
-
-         tokens = users
-            .map((user) => user?.fcmTokens || [])
-            .flat()
-            .filter((token) => Expo.isExpoPushToken(token))
+      switch (notificationTabFilter) {
+         case NotificationType.LIVESTREAM:
+            tokens = await retrieveTokensFromLivestream(filters.livestream)
+            break
+         case NotificationType.USER_DATA:
+            tokens = await retrieveTokensFromUsers(filters)
+            break
+         case NotificationType.EMAIL:
+            tokens = await retrieveTokensFromEmails(filters.emails)
+            break
+         default:
+            break
       }
 
       if (tokens.length === 0) {
@@ -192,7 +162,93 @@ async function retrieveTokensFromLivestream(
          }
       })
 
-      return fcmTokensArray
+      return fcmTokensArray.filter((token) => Expo.isExpoPushToken(token))
+   } catch (error) {
+      console.error("Error retrieving eligible users:", error)
+      return []
+   }
+}
+
+async function retrieveTokensFromUsers(filters: any): Promise<string[]> {
+   try {
+      const userRef = firestore.collection("userData")
+      let query: any
+
+      if (filters.university?.code && filters.university.code !== "other") {
+         query = query
+            ? query.where("university.code", "==", filters.university.code)
+            : userRef.where("university.code", "==", filters.university.code)
+      }
+      if (
+         filters.universityCountryCode &&
+         filters.universityCountryCode !== "OTHER"
+      ) {
+         query = query
+            ? query.where(
+                 "universityCountryCode",
+                 "==",
+                 filters.universityCountryCode
+              )
+            : userRef.where(
+                 "universityCountryCode",
+                 "==",
+                 filters.universityCountryCode
+              )
+      }
+      if (
+         filters.gender &&
+         (filters.gender === "male" ||
+            filters.gender === "female" ||
+            filters.gender === "other")
+      ) {
+         query = query
+            ? query.where("gender", "==", filters.gender)
+            : userRef.where("gender", "==", filters.gender)
+      }
+      if (filters.fieldOfStudy?.id) {
+         query = query
+            ? query.where("fieldOfStudy.id", "==", filters.fieldOfStudy.id)
+            : userRef.where("fieldOfStudy.id", "==", filters.fieldOfStudy.id)
+      }
+      if (filters.levelOfStudy?.id) {
+         query = query
+            ? query.where("levelOfStudy.id", "==", filters.levelOfStudy.id)
+            : userRef.where("levelOfStudy.id", "==", filters.levelOfStudy.id)
+      }
+
+      const usersSnapshot = query ? await query.get() : await userRef.get()
+
+      const users: any = usersSnapshot.docs.map((user) => user.data())
+
+      return users
+         .map((user) => user?.fcmTokens || [])
+         .flat()
+         .filter((token) => Expo.isExpoPushToken(token))
+   } catch (error) {
+      console.error("Error retrieving eligible users:", error)
+      return []
+   }
+}
+
+async function retrieveTokensFromEmails(emails: string[]): Promise<string[]> {
+   try {
+      const userDocs = await Promise.all(
+         emails.map(async (email) => {
+            const userDocRef = firestore.collection("userData").doc(email)
+
+            const userDoc = await userDocRef.get()
+            if (userDoc.exists) {
+               return { id: email, ...userDoc.data() } // Include the email (document ID) in the result
+            } else {
+               return null // Handle cases where the document doesn't exist
+            }
+         })
+      )
+
+      return userDocs
+         .map((user: any) => user?.fcmTokens || [])
+         .flat()
+         .filter((token) => Expo.isExpoPushToken(token))
    } catch (error) {
       console.error("Error retrieving eligible users:", error)
       return []

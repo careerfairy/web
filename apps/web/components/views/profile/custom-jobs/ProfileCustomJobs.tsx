@@ -1,9 +1,10 @@
-import { Box, Stack, Tab, Tabs, Typography } from "@mui/material"
+import { Box, Button, Stack, Tab, Tabs, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import { useUserAppliedJobs } from "components/custom-hook/custom-job/useUserAppliedJobs"
 import { useUserInitiatedJobs } from "components/custom-hook/custom-job/useUserInitiatedJobs"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"
 import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
 import { useState } from "react"
@@ -23,6 +24,8 @@ const TAB_VALUES = {
 
 const JOBS_DIALOG_LINK = "/profile/my-jobs/jobs"
 
+const TALENT_PROFILE_JOBS_DIALOG_LINK = "/profile/career/jobs"
+
 const styles = sxStyles({
    tabs: {
       "& *": {
@@ -39,9 +42,49 @@ const styles = sxStyles({
       },
       borderBottom: "1px solid #EAEAEA",
    },
+   talentProfileTabsBtnWrapper: {
+      justifyContent: "center",
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
+      borderRadius: "66px",
+      backgroundColor: (theme) => theme.brand.white[300],
+      p: "5px",
+      width: {
+         xs: "100%",
+         sm: "100%",
+         md: "550px",
+      },
+   },
+   talentProfileTabsContentWrapper: {
+      mt: 2,
+      mb: "16px !important",
+   },
+   stateButton: {
+      width: "100%",
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.white[500],
+      },
+   },
+   selectedButton: {
+      "&:hover": {
+         backgroundColor: (theme) => theme.palette.primary.main,
+      },
+   },
+   selectedTabButtonText: {
+      color: (theme) => theme.brand.white[100],
+      fontWeight: 400,
+   },
+   tabButtonText: {
+      color: (theme) => theme.palette.neutral[400],
+      fontWeight: 400,
+   },
    tabsContentWrapper: {
       mt: 3,
       mx: 2,
+      mb: {
+         xs: 3,
+         sm: 3,
+         md: 40,
+      },
    },
    emptyApplications: {
       p: "20px",
@@ -69,24 +112,94 @@ const ProfileCustomJobs = () => {
       setTabValue(newValue)
    }
 
+   const { talentProfileV1 } = useFeatureFlags()
+
+   const TalentProfileTabsButtons = () => {
+      const isInitiatedSelected = tabValue === TAB_VALUES.initiated.value
+      const isAppliedSelected = tabValue === TAB_VALUES.applied.value
+
+      const onClickInitiated = (event) =>
+         handleTabChange(event, TAB_VALUES.initiated.value)
+      const onClickApplied = (event) =>
+         handleTabChange(event, TAB_VALUES.applied.value)
+
+      return (
+         <Stack direction={"row"} justifyContent={"center"} mt={"20px"} mx={2}>
+            <Stack
+               direction={"row"}
+               sx={styles.talentProfileTabsBtnWrapper}
+               spacing={"9px"}
+            >
+               <Button
+                  variant={isInitiatedSelected ? "contained" : "text"}
+                  sx={[
+                     styles.stateButton,
+                     isInitiatedSelected ? styles.selectedButton : null,
+                  ]}
+                  onClick={onClickInitiated}
+               >
+                  <Typography
+                     variant="brandedBody"
+                     sx={
+                        isInitiatedSelected
+                           ? styles.selectedTabButtonText
+                           : styles.tabButtonText
+                     }
+                  >
+                     Initiated
+                  </Typography>
+               </Button>
+               <Button
+                  variant={isAppliedSelected ? "contained" : "text"}
+                  sx={[
+                     styles.stateButton,
+                     isAppliedSelected ? styles.selectedButton : null,
+                  ]}
+                  onClick={onClickApplied}
+               >
+                  <Typography
+                     variant="brandedBody"
+                     sx={
+                        isAppliedSelected
+                           ? styles.selectedTabButtonText
+                           : styles.tabButtonText
+                     }
+                  >
+                     Applied
+                  </Typography>
+               </Button>
+            </Stack>
+         </Stack>
+      )
+   }
+
    return (
       <Box>
-         <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            aria-label="Job tabs"
-            sx={styles.tabs}
+         {talentProfileV1 ? (
+            <TalentProfileTabsButtons />
+         ) : (
+            <Tabs
+               value={tabValue}
+               onChange={handleTabChange}
+               aria-label="Job tabs"
+               sx={styles.tabs}
+            >
+               <Tab
+                  label={TAB_VALUES.initiated.label}
+                  value={TAB_VALUES.initiated.value}
+               />
+               <Tab
+                  label={TAB_VALUES.applied.label}
+                  value={TAB_VALUES.applied.value}
+               />
+            </Tabs>
+         )}
+         <Box
+            sx={[
+               styles.tabsContentWrapper,
+               talentProfileV1 ? styles.talentProfileTabsContentWrapper : null,
+            ]}
          >
-            <Tab
-               label={TAB_VALUES.initiated.label}
-               value={TAB_VALUES.initiated.value}
-            />
-            <Tab
-               label={TAB_VALUES.applied.label}
-               value={TAB_VALUES.applied.value}
-            />
-         </Tabs>
-         <Box sx={styles.tabsContentWrapper}>
             {tabValue === TAB_VALUES.initiated.value && (
                <UserInitiatedCustomJobs />
             )}
@@ -130,6 +243,7 @@ const UserInitiatedCustomJobs = () => {
 
 const UserInitiatedCustomJobsView = () => {
    const { userData } = useAuth()
+   const { talentProfileV1 } = useFeatureFlags()
    const initiatedJobs = useUserInitiatedJobs(userData.id)
    const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(initiatedJobs)
 
@@ -138,7 +252,9 @@ const UserInitiatedCustomJobsView = () => {
    return (
       <CustomJobsList
          customJobs={initiatedJobs}
-         hrefLink={JOBS_DIALOG_LINK}
+         hrefLink={
+            talentProfileV1 ? TALENT_PROFILE_JOBS_DIALOG_LINK : JOBS_DIALOG_LINK
+         }
          jobWrapperSx={styles.jobWrapper}
          jobsGroupNamesMap={jobsGroupNamesMap}
       />
@@ -155,6 +271,7 @@ const UserAppliedCustomJobs = () => {
 
 const UserAppliedCustomJobsView = () => {
    const { userData } = useAuth()
+   const { talentProfileV1 } = useFeatureFlags()
    const appliedJobs = useUserAppliedJobs(userData.id)
 
    const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(appliedJobs)
@@ -164,9 +281,12 @@ const UserAppliedCustomJobsView = () => {
    return (
       <CustomJobsList
          customJobs={appliedJobs}
-         hrefLink={JOBS_DIALOG_LINK}
+         hrefLink={
+            talentProfileV1 ? TALENT_PROFILE_JOBS_DIALOG_LINK : JOBS_DIALOG_LINK
+         }
          jobWrapperSx={styles.jobWrapper}
          jobsGroupNamesMap={jobsGroupNamesMap}
+         applied
       />
    )
 }

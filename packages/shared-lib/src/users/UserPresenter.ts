@@ -125,4 +125,11 @@ export default class UserPresenter extends BasePresenter<UserData> {
    getUserBannerImageStoragePath(imageId: string): string {
       return `${this.model.authId}/banner/${imageId}`
    }
+
+   userHasInterests(): boolean {
+      return Boolean(
+         this.model.businessFunctionsTagIds?.length ||
+            this.model.contentTopicsTagIds?.length
+      )
+   }
 }

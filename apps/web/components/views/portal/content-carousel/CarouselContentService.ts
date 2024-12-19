@@ -37,6 +37,7 @@ export const CTASlideTopics = {
    CareerCoins: "CareerCoins",
    Sparks: "Sparks",
    Jobs: "Jobs",
+   App: "App",
 } as const
 
 export type CTASlideTopic = (typeof CTASlideTopics)[keyof typeof CTASlideTopics]

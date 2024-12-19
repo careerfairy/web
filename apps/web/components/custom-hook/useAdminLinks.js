@@ -45,7 +45,7 @@ const pushNotificationTesters = [
    "habib@careerfairy.io",
    "lucas@careerfairy.io",
    "carlos.rijo@careerfairy.io",
-   "walter@careerfairy.io",
+   "walter.goncalves@careerfairy.io",
    "amal-thomas.roy@careerfairy.io",
 ]
 const useAdminLinks = () => {

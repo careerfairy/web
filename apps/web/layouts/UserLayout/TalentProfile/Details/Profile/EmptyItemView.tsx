@@ -26,8 +26,8 @@ const styles = sxStyles({
 type EmptyItemViewProps = {
    title: string
    description: string
-   addButtonText: string
-   handleAdd: () => void
+   addButtonText?: string
+   handleAdd?: () => void
    icon: JSX.Element
 }
 
@@ -58,14 +58,16 @@ export const EmptyItemView = ({
                   {description}
                </Typography>
             </Stack>
-            <Button
-               variant="contained"
-               color="primary"
-               sx={styles.addButton}
-               onClick={handleAdd}
-            >
-               {addButtonText}
-            </Button>
+            {handleAdd ? (
+               <Button
+                  variant="contained"
+                  color="primary"
+                  sx={styles.addButton}
+                  onClick={handleAdd}
+               >
+                  {addButtonText}
+               </Button>
+            ) : null}
          </Stack>
       </Stack>
    )
