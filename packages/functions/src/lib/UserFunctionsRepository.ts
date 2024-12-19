@@ -31,6 +31,16 @@ export interface IUserFunctionsRepository extends IUserRepository {
       lastActivityMonths?: number
    ): Promise<UserData[]>
 
+   /**
+    * Retrieves the subscribed users, which were last active after a given date.
+    * @param lastActivityAt The date to compare with the last activity date.
+    * @param userEmails Optional list of emails to filter results by.
+    */
+   getSubscribedUsersLastActiveAfter(
+      lastActivityAt: Date,
+      userEmails?: string[]
+   ): Promise<UserData[]>
+
    getSubscribedUsersByCountryCodes(
       countryCodes: string[],
       userEmails?: string[]
@@ -107,6 +117,27 @@ export class UserFunctionsRepository
       if (locationFilters?.length) {
          query = query.where("universityCountryCode", "in", locationFilters)
       }
+
+      if (userEmails?.length) {
+         const withinLimit = isWithinNormalizationLimit(30, userEmails)
+         if (withinLimit) {
+            query = query.where("userEmail", "in", userEmails)
+         }
+      }
+
+      const data = await query.get()
+
+      return mapFirestoreDocuments(data)
+   }
+
+   async getSubscribedUsersLastActiveAfter(
+      lastActivityAt: Date,
+      userEmails?: string[]
+   ): Promise<UserData[]> {
+      let query = this.firestore
+         .collection("userData")
+         .where("unsubscribed", "==", false)
+         .where("lastActivityAt", ">=", lastActivityAt)
 
       if (userEmails?.length) {
          const withinLimit = isWithinNormalizationLimit(30, userEmails)
