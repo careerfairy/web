@@ -27,7 +27,7 @@ type TalentGuideState = {
    isLoadingAttemptQuizError: string | null
    userAuthUid: string
    quizStatuses: Record<string, QuizStatus>
-   isModuleCompleted: boolean
+   showEndOfModuleExperience: boolean
 }
 
 const initialState: TalentGuideState = {
@@ -42,7 +42,7 @@ const initialState: TalentGuideState = {
    isLoadingAttemptQuizError: null,
    userAuthUid: null,
    quizStatuses: {},
-   isModuleCompleted: false,
+   showEndOfModuleExperience: false,
 }
 
 type LoadTalentGuideProgressPayload = {
@@ -229,7 +229,7 @@ const talentGuideReducer = createSlice({
          .addCase(proceedToNextStep.fulfilled, (state, action) => {
             if (!action.payload) {
                // If there is no next step, we've completed the module
-               state.isModuleCompleted = true
+               state.showEndOfModuleExperience = true
             } else {
                const { nextStepIndex } = action.payload
                state.currentStepIndex = nextStepIndex
@@ -292,7 +292,7 @@ const talentGuideReducer = createSlice({
             state.moduleData = moduleData
             state.isLoadingTalentGuide = false
             state.userAuthUid = userAuthUid
-            state.isModuleCompleted = true // TODO: Remove before committing
+            state.showEndOfModuleExperience = false
 
             state.quizStatuses = moduleData.content.moduleSteps.reduce(
                (acc, step) => {
@@ -358,7 +358,7 @@ const talentGuideReducer = createSlice({
             state.visibleSteps = [0]
             state.currentStepIndex = 0
             state.isLoadingTalentGuide = false
-            state.isModuleCompleted = false
+            state.showEndOfModuleExperience = false
             state.quizStatuses = Object.keys(state.quizStatuses).reduce(
                (acc, quizId) => {
                   acc[quizId] = {
