@@ -16,9 +16,11 @@ import {
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { SlideUpTransition } from "components/views/common/transitions"
+import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import {
+   AlertCircle,
    ChevronLeft,
    ChevronRight,
    FileText,
@@ -28,6 +30,8 @@ import {
    X,
    XCircle,
 } from "react-feather"
+import { useSelector } from "react-redux"
+import { isSettingFormDirty } from "store/selectors/profileSettingsSelectors"
 import { sxStyles } from "types/commonTypes"
 import { TAB_VALUES } from "../../TalentProfileView"
 import { DeleteAccount } from "./DeleteAccount"
@@ -207,6 +211,14 @@ const styles = sxStyles({
       width: 32,
       height: 32,
    },
+   dialog: {
+      zIndex: (theme) => theme.zIndex.modal,
+   },
+   alertIcon: {
+      color: (theme) => theme.brand.tq[500],
+      width: "48px !important",
+      height: "48px !important",
+   },
 })
 
 const SETTINGS_OPTIONS = {
@@ -259,9 +271,23 @@ const mainMenuSettings: SettingsOptions[] = [
    menuSettings.at(3),
 ]
 
-export const SettingsDialog = ({ open, handleClose }: Props) => {
+export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
    const isMobile = useIsMobile()
    const router = useRouter()
+
+   const settingFormIsDirty = useSelector(isSettingFormDirty)
+
+   const [isConfirmDialogOpen, setIsConfirmDialogOpen] =
+      useState<boolean>(false)
+
+   const handleClose = useCallback(() => {
+      if (settingFormIsDirty && !isConfirmDialogOpen)
+         setIsConfirmDialogOpen(true)
+      else {
+         setIsConfirmDialogOpen(false)
+         onClose()
+      }
+   }, [onClose, settingFormIsDirty, isConfirmDialogOpen])
 
    const getTabValue = useCallback(
       (tab: SettingsOptions | null) => {
@@ -286,7 +312,7 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
 
    const theme = useTheme()
 
-   const onBackButtonClick = useCallback(() => {
+   const onBack = useCallback(() => {
       setCurrentTab(null)
 
       delete router.query["tab"]
@@ -300,6 +326,14 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
          { shallow: true }
       )
    }, [router])
+
+   const onBackButtonClick = useCallback(() => {
+      if (settingFormIsDirty && !isConfirmDialogOpen) {
+         setIsConfirmDialogOpen(true)
+      } else {
+         onBack()
+      }
+   }, [onBack, settingFormIsDirty, isConfirmDialogOpen])
 
    useEffect(() => {
       const tab = router.query.tab as SettingsOptions
@@ -336,81 +370,170 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
          TransitionComponent={SlideUpTransition}
       >
          <DialogContent sx={{ p: 0 }}>
-            <Stack
-               direction="row"
-               sx={{ position: "relative", overflow: "hidden" }}
-            >
-               <Slide
-                  direction="right"
-                  in={drawerOpen || !isMobile}
-                  mountOnEnter
-                  unmountOnExit
-                  timeout={200}
-                  style={{ willChange: "transform" }}
-                  easing={{
-                     enter: theme.transitions.easing.easeIn,
-                     exit: theme.transitions.easing.easeIn,
+            <Stack spacing={1.5}>
+               <ConfirmationDialog
+                  open={isConfirmDialogOpen}
+                  title={"Make it count"}
+                  description={
+                     "Leaving now will discard the changes you've made to your personal information. Are you sure you want to exit?"
+                  }
+                  icon={<Box component={AlertCircle} sx={styles.alertIcon} />}
+                  primaryAction={{
+                     text: "Keep editing",
+                     callback: () => setIsConfirmDialogOpen(false),
+                     variant: "contained",
                   }}
+                  secondaryAction={{
+                     text: "Exit and discard",
+                     color: "grey",
+                     callback: () => {
+                        setIsConfirmDialogOpen(false)
+                        if (isMobile) onBack()
+                        else handleClose()
+                     },
+                     variant: "outlined",
+                  }}
+                  handleClose={() => {}}
+                  hideCloseIcon
+                  sx={styles.dialog}
+               />
+               <Stack
+                  direction="row"
+                  sx={{ position: "relative", overflow: "hidden" }}
                >
-                  <Box sx={styles.drawer}>
-                     <Box>
-                        <Stack>
-                           <Stack
-                              direction={"row"}
-                              sx={styles.settingsHeader}
-                              spacing={2}
-                           >
-                              {isMobile ? (
-                                 <ChevronLeft size={24} onClick={handleClose} />
-                              ) : null}
-                              <Typography
-                                 variant="brandedH3"
-                                 sx={styles.settingsText}
+                  <Slide
+                     direction="right"
+                     in={drawerOpen || !isMobile}
+                     mountOnEnter
+                     unmountOnExit
+                     timeout={200}
+                     style={{ willChange: "transform" }}
+                     easing={{
+                        enter: theme.transitions.easing.easeIn,
+                        exit: theme.transitions.easing.easeIn,
+                     }}
+                  >
+                     <Box sx={styles.drawer}>
+                        <Box>
+                           <Stack>
+                              <Stack
+                                 direction={"row"}
+                                 sx={styles.settingsHeader}
+                                 spacing={2}
                               >
-                                 Settings
-                              </Typography>
-                           </Stack>
-                           <List sx={{ py: 0 }}>
-                              {mainMenuSettings.map((option, index) => (
+                                 {isMobile ? (
+                                    <ChevronLeft
+                                       size={24}
+                                       onClick={handleClose}
+                                    />
+                                 ) : null}
+                                 <Typography
+                                    variant="brandedH3"
+                                    sx={styles.settingsText}
+                                 >
+                                    Settings
+                                 </Typography>
+                              </Stack>
+                              <List sx={{ py: 0 }}>
+                                 {mainMenuSettings.map((option, index) => (
+                                    <ListItem
+                                       key={`${option}-${index}`}
+                                       disablePadding
+                                       onClick={() => {
+                                          setCurrentTab(option)
+                                          router.push({
+                                             pathname:
+                                                TAB_VALUES.settings.value,
+                                             query: {
+                                                ...router.query,
+                                                tab: option,
+                                             },
+                                          })
+                                       }}
+                                    >
+                                       <ListItemButton
+                                          sx={[
+                                             styles.menuItemButton,
+                                             currentTab === option
+                                                ? styles.menuItemButtonSelected
+                                                : null,
+                                          ]}
+                                          disableRipple={isMobile}
+                                       >
+                                          <ListItemIcon
+                                             sx={[
+                                                styles.menuItemIcon,
+                                                currentTab === option
+                                                   ? styles.menuItemIconSelected
+                                                   : null,
+                                             ]}
+                                          >
+                                             {SETTINGS_OPTIONS[option].icon}
+                                          </ListItemIcon>
+                                          <ListItemText>
+                                             <Typography
+                                                variant="brandedBody"
+                                                sx={styles.menuItemText}
+                                             >
+                                                {SETTINGS_OPTIONS[option].label}
+                                             </Typography>
+                                          </ListItemText>
+                                          {isMobile ? (
+                                             <ChevronRight
+                                                size={24}
+                                                color={
+                                                   theme.palette.neutral[400]
+                                                }
+                                             />
+                                          ) : null}
+                                       </ListItemButton>
+                                    </ListItem>
+                                 ))}
+
+                                 <Divider sx={styles.divider} />
                                  <ListItem
-                                    key={`${option}-${index}`}
+                                    key={"delete-account-button"}
                                     disablePadding
                                     onClick={() => {
-                                       setCurrentTab(option)
+                                       setCurrentTab("delete-account")
                                        router.push({
                                           pathname: TAB_VALUES.settings.value,
                                           query: {
                                              ...router.query,
-                                             tab: option,
+                                             tab: "delete-account",
                                           },
                                        })
                                     }}
                                  >
                                     <ListItemButton
                                        sx={[
-                                          styles.menuItemButton,
-                                          currentTab === option
-                                             ? styles.menuItemButtonSelected
+                                          styles.deleteAccountButton,
+                                          currentTab === "delete-account"
+                                             ? styles.deleteAccountButtonSelected
                                              : null,
                                        ]}
                                        disableRipple={isMobile}
                                     >
                                        <ListItemIcon
-                                          sx={[
-                                             styles.menuItemIcon,
-                                             currentTab === option
-                                                ? styles.menuItemIconSelected
-                                                : null,
-                                          ]}
+                                          sx={styles.deleteAccountIcon}
                                        >
-                                          {SETTINGS_OPTIONS[option].icon}
+                                          {
+                                             SETTINGS_OPTIONS["delete-account"]
+                                                .icon
+                                          }
                                        </ListItemIcon>
-                                       <ListItemText>
+                                       <ListItemText
+                                          sx={styles.deleteAccountTextWrapper}
+                                       >
                                           <Typography
                                              variant="brandedBody"
-                                             sx={styles.menuItemText}
+                                             sx={styles.deleteAccountText}
                                           >
-                                             {SETTINGS_OPTIONS[option].label}
+                                             {
+                                                SETTINGS_OPTIONS[
+                                                   "delete-account"
+                                                ].label
+                                             }
                                           </Typography>
                                        </ListItemText>
                                        {isMobile ? (
@@ -421,125 +544,78 @@ export const SettingsDialog = ({ open, handleClose }: Props) => {
                                        ) : null}
                                     </ListItemButton>
                                  </ListItem>
-                              ))}
-
-                              <Divider sx={styles.divider} />
-                              <ListItem
-                                 key={"delete-account-button"}
-                                 disablePadding
-                                 onClick={() => {
-                                    setCurrentTab("delete-account")
-                                    router.push({
-                                       pathname: TAB_VALUES.settings.value,
-                                       query: {
-                                          ...router.query,
-                                          tab: "delete-account",
-                                       },
-                                    })
-                                 }}
-                              >
-                                 <ListItemButton
-                                    sx={[
-                                       styles.deleteAccountButton,
-                                       currentTab === "delete-account"
-                                          ? styles.deleteAccountButtonSelected
-                                          : null,
-                                    ]}
-                                    disableRipple={isMobile}
-                                 >
-                                    <ListItemIcon sx={styles.deleteAccountIcon}>
-                                       {SETTINGS_OPTIONS["delete-account"].icon}
-                                    </ListItemIcon>
-                                    <ListItemText
-                                       sx={styles.deleteAccountTextWrapper}
-                                    >
-                                       <Typography
-                                          variant="brandedBody"
-                                          sx={styles.deleteAccountText}
-                                       >
-                                          {
-                                             SETTINGS_OPTIONS["delete-account"]
-                                                .label
-                                          }
-                                       </Typography>
-                                    </ListItemText>
-                                    {isMobile ? (
-                                       <ChevronRight
-                                          size={24}
-                                          color={theme.palette.neutral[400]}
-                                       />
-                                    ) : null}
-                                 </ListItemButton>
-                              </ListItem>
-                           </List>
-                        </Stack>
-                     </Box>
-                  </Box>
-               </Slide>
-
-               {currentTab ? (
-                  <Slide
-                     direction="left"
-                     in={!drawerOpen || !isMobile}
-                     mountOnEnter
-                     unmountOnExit
-                     timeout={200}
-                     style={{ willChange: "transform" }}
-                     easing={{
-                        enter: theme.transitions.easing.easeIn,
-                        exit: theme.transitions.easing.easeIn,
-                     }}
-                  >
-                     <Box>
-                        <ConditionalWrapper
-                           condition={!isMobile || (isMobile && !drawerOpen)}
-                        >
-                           <Stack sx={styles.contentRoot} spacing={1}>
-                              <Stack
-                                 direction="row"
-                                 justifyContent={"space-between"}
-                                 sx={styles.selectedOptionHeader}
-                              >
-                                 <Stack
-                                    direction="row"
-                                    spacing={1.5}
-                                    alignItems={"center"}
-                                 >
-                                    {isMobile ? (
-                                       <ChevronLeft
-                                          size={24}
-                                          onClick={onBackButtonClick}
-                                       />
-                                    ) : null}
-                                    <Typography
-                                       variant="brandedH3"
-                                       sx={styles.selectedOptionText}
-                                    >
-                                       {SETTINGS_OPTIONS[currentTab].label}
-                                    </Typography>
-                                 </Stack>
-                                 {!isMobile ? (
-                                    <Box
-                                       sx={styles.closeButton}
-                                       component={X}
-                                       onClick={handleClose}
-                                    />
-                                 ) : null}
-                              </Stack>
-                              <Box
-                                 py={0}
-                                 sx={[
-                                    styles.contentBox,
-                                    isMobile ? styles.contentBoxMobile : null,
-                                 ]}
-                              >
-                                 {SETTINGS_OPTIONS[currentTab].component}
-                              </Box>
+                              </List>
                            </Stack>
-                        </ConditionalWrapper>
+                        </Box>
                      </Box>
                   </Slide>
-               ) : null}
+
+                  {currentTab ? (
+                     <Slide
+                        direction="left"
+                        in={!drawerOpen || !isMobile}
+                        mountOnEnter
+                        unmountOnExit
+                        timeout={200}
+                        style={{ willChange: "transform" }}
+                        easing={{
+                           enter: theme.transitions.easing.easeIn,
+                           exit: theme.transitions.easing.easeIn,
+                        }}
+                     >
+                        <Box>
+                           <ConditionalWrapper
+                              condition={!isMobile || (isMobile && !drawerOpen)}
+                           >
+                              <Stack sx={styles.contentRoot} spacing={1}>
+                                 <Stack
+                                    direction="row"
+                                    justifyContent={"space-between"}
+                                    sx={styles.selectedOptionHeader}
+                                 >
+                                    <Stack
+                                       direction="row"
+                                       spacing={1.5}
+                                       alignItems={"center"}
+                                    >
+                                       {isMobile ? (
+                                          <ChevronLeft
+                                             size={24}
+                                             onClick={onBackButtonClick}
+                                          />
+                                       ) : null}
+                                       <Typography
+                                          variant="brandedH3"
+                                          sx={styles.selectedOptionText}
+                                       >
+                                          {SETTINGS_OPTIONS[currentTab].label}
+                                       </Typography>
+                                    </Stack>
+                                    {!isMobile ? (
+                                       <Box
+                                          sx={styles.closeButton}
+                                          component={X}
+                                          onClick={handleClose}
+                                       />
+                                    ) : null}
+                                 </Stack>
+                                 <Box
+                                    py={0}
+                                    sx={[
+                                       styles.contentBox,
+                                       isMobile
+                                          ? styles.contentBoxMobile
+                                          : null,
+                                    ]}
+                                 >
+                                    {SETTINGS_OPTIONS[currentTab].component}
+                                 </Box>
+                              </Stack>
+                           </ConditionalWrapper>
+                        </Box>
+                     </Slide>
+                  ) : null}
+               </Stack>
             </Stack>
          </DialogContent>
       </Dialog>

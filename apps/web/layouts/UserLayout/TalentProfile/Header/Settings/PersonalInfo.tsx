@@ -3,7 +3,10 @@ import { Button, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { userRepo } from "data/RepositoryInstances"
+import { useEffect } from "react"
 import { useFormContext } from "react-hook-form"
+import { useDispatch } from "react-redux"
+import { setDirty } from "store/reducers/profileSettingsReducer"
 import {
    PersonalInfoFormFields,
    PersonalInfoFormProvider,
@@ -22,6 +25,8 @@ export const PersonalInfo = () => {
 
 const PersonalInfoView = () => {
    const { userData } = useAuth()
+   const dispatch = useDispatch()
+
    const {
       formState: { isValid, isDirty },
       handleSubmit,
@@ -46,6 +51,10 @@ const PersonalInfoView = () => {
    }
 
    const handleSave = async () => handleSubmit(onSubmit)()
+
+   useEffect(() => {
+      dispatch(setDirty({ setting: "personalInfo", dirty: isDirty }))
+   }, [isDirty, dispatch])
 
    return (
       <Stack spacing={1.5}>

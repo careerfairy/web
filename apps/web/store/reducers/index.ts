@@ -10,16 +10,16 @@ import generalLayoutReducer from "./generalLayoutReducer"
 import groupAnalyticsReducer from "./groupAnalyticsReducer"
 import groupPlanReducer from "./groupPlanReducer"
 import nextLivestreamsReducer from "./nextLivestreamsReducer"
+import profileSettingsReducer from "./profileSettingsReducer"
 import snackbarReducer from "./snackbarReducer"
 import sparksFeedReducer from "./sparksFeedReducer"
 import streamAdminReducer from "./streamAdminReducer"
-import { streamingAppReducer } from "./streamingAppReducer"
 import streamReducer from "./streamReducer"
+import { streamingAppReducer } from "./streamingAppReducer"
 import talentGuideReducer from "./talentGuideReducer"
 import talentProfileReducer from "./talentProfileReducer"
 import todosReducer from "./todosReducer"
 import userDataSetReducer from "./userDataSetReducer"
-
 
 const reducers = {
    auth: authReducer,
@@ -41,6 +41,7 @@ const reducers = {
    streamingApp: streamingAppReducer,
    talentProfile: talentProfileReducer,
    talentGuide: talentGuideReducer,
+   profileSettings: profileSettingsReducer,
 } as const // only way to get type inference on firebaseReducer
 
 export default combineReducers<typeof reducers>(reducers)
