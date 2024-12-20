@@ -28,6 +28,7 @@ export type HighlightsContextType = {
    currentLiveStreamIdInDialog: string
    setCurrentLiveStreamIdInDialog: (id: string) => void
    setExpandedPlayingIndex: (index: number) => void
+   getLiveStreamDialogKey: () => string
 }
 
 const HighlightsContext = createContext<HighlightsContextType | undefined>(
@@ -59,6 +60,7 @@ export const HighlightsProvider = ({
       handleCloseCardClick,
       currentLiveStreamIdInDialog,
       setCurrentLiveStreamIdInDialog,
+      getLiveStreamDialogKey,
    } = useLiveStreamDialogManager(
       highlights,
       expandedPlayingIndex,
@@ -91,6 +93,7 @@ export const HighlightsProvider = ({
          toggleExpandedPlaying,
          currentLiveStreamIdInDialog,
          setCurrentLiveStreamIdInDialog,
+         getLiveStreamDialogKey,
       }),
       [
          highlights,
@@ -109,6 +112,7 @@ export const HighlightsProvider = ({
          toggleExpandedPlaying,
          currentLiveStreamIdInDialog,
          setCurrentLiveStreamIdInDialog,
+         getLiveStreamDialogKey,
       ]
    )
 
