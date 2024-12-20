@@ -296,6 +296,11 @@ export const isMobileBrowser = () => {
    })
 }
 
+export const isSafariBasedBrowser = () => {
+   // @ts-ignore
+   return window.safari !== undefined
+}
+
 /**
  * To scroll to the top of the page
  */
