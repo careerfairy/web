@@ -17,10 +17,7 @@ const initialState: IProfileSettingsState = {
    profileTab: "/profile",
 }
 
-export type ProfileSettings = keyof Exclude<
-   TalentProfileTabValues,
-   "profileTab"
->
+export type ProfileSettings = keyof IProfileSettingsState
 
 export const profileSettingsSlice = createSlice({
    name: "Profile settings",
@@ -30,7 +27,11 @@ export const profileSettingsSlice = createSlice({
          state,
          action: PayloadAction<{ setting: ProfileSettings; dirty: boolean }>
       ) => {
-         state[action.payload.setting].isDirty = action.payload.dirty
+         switch (action.payload.setting) {
+            case "personalInfo":
+               state.personalInfo.isDirty = action.payload.dirty
+               break
+         }
       },
       setProfileTab: (state, action: PayloadAction<ProfileTab>) => {
          state.profileTab = action.payload
