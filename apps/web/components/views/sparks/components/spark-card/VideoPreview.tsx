@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
+import { isMobileBrowser } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -214,6 +215,12 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
+            {Boolean(isMobileBrowser()) && (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )}
             {videoPlayedForSession || !light ? null : (
                <ThumbnailOverlay
                   src={thumbnailUrl}
