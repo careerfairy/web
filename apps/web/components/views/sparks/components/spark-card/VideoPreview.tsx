@@ -14,7 +14,7 @@ import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
-import { isMobileBrowser } from "util/CommonUtil"
+import { isMobileBrowser, isSafariBasedBrowser } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -206,6 +206,11 @@ const VideoPreview: FC<Props> = ({
    }, [onVideoPlay, videoPlayedForSession])
 
    const playingVideo = Boolean(playing && !shouldPause)
+   console.log(
+      "isMobileBrowser isSafariBasedBrowser",
+      isMobileBrowser(),
+      isSafariBasedBrowser()
+   )
 
    return (
       <Box sx={styles.root}>
@@ -215,7 +220,7 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            {Boolean(isMobileBrowser()) && (
+            {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
                <ThumbnailOverlay
                   src={thumbnailUrl}
                   containPreviewOnTablet={containPreviewOnTablet}
