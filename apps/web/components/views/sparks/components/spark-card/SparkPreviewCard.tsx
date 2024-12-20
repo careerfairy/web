@@ -68,7 +68,7 @@ const SparkPreviewCard: FC<Props> = ({
          if (entry && entry.intersectionRatio > 0.9) {
             timeout = setTimeout(() => {
                setAutoPlaying(true)
-            }, 1000)
+            }, 200)
          } else {
             setAutoPlaying(false)
             clearTimeout(timeout)
