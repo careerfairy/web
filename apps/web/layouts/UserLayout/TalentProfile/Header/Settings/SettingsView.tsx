@@ -30,7 +30,8 @@ import {
    X,
    XCircle,
 } from "react-feather"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { setDirty } from "store/reducers/profileSettingsReducer"
 import { isSettingFormDirty } from "store/selectors/profileSettingsSelectors"
 import { sxStyles } from "types/commonTypes"
 import { TAB_VALUES } from "../../TalentProfileView"
@@ -274,8 +275,12 @@ const mainMenuSettings: SettingsOptions[] = [
 export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
    const isMobile = useIsMobile()
    const router = useRouter()
-
+   const dispatch = useDispatch()
    const settingFormIsDirty = useSelector(isSettingFormDirty)
+
+   const [switchingTab, setSwitchingTab] = useState<SettingsOptions | null>(
+      null
+   )
 
    const [isConfirmDialogOpen, setIsConfirmDialogOpen] =
       useState<boolean>(false)
@@ -314,7 +319,8 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
 
    const onBack = useCallback(() => {
       setCurrentTab(null)
-
+      setSwitchingTab(null)
+      dispatch(setDirty({ setting: "personalInfo", dirty: false }))
       delete router.query["tab"]
 
       router.push(
@@ -325,7 +331,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
          undefined,
          { shallow: true }
       )
-   }, [router])
+   }, [router, dispatch])
 
    const onBackButtonClick = useCallback(() => {
       if (settingFormIsDirty && !isConfirmDialogOpen) {
@@ -340,23 +346,55 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
       setCurrentTab(getTabValue(tab))
    }, [router, getTabValue])
 
-   useEffect(() => {
-      if (!isMobile) return
+   const goToTab = useCallback(
+      (option: SettingsOptions) => {
+         setCurrentTab(option)
+         router.push({
+            pathname: TAB_VALUES.settings.value,
+            query: {
+               ...router.query,
+               tab: option,
+            },
+         })
+      },
+      [router]
+   )
 
+   const onTabClick = useCallback(
+      (option: SettingsOptions) => {
+         if (settingFormIsDirty && !isConfirmDialogOpen) {
+            setSwitchingTab(option)
+            setIsConfirmDialogOpen(true)
+         } else {
+            goToTab(option)
+         }
+      },
+      [goToTab, settingFormIsDirty, isConfirmDialogOpen]
+   )
+
+   useEffect(() => {
+      // Handle browser/mobile back button navigation
       const handlePopState = () => {
-         console.log("🚀 ~ handlePopState ~ handlePopState")
-         if (currentTab) {
-            // If we're in a tab, prevent default back behavior and return to menu
-            onBackButtonClick()
+         if (currentTab && settingFormIsDirty) {
+            // If form is dirty, show confirmation dialog
+            setIsConfirmDialogOpen(true)
+            // Prevent default back behavior
+            window.history.pushState(null, "", window.location.href)
+         } else if (currentTab) {
+            // If we're in a tab but form is not dirty, return to menu
+            onBack()
          } else {
             // If we're in the menu, close the dialog
             handleClose()
          }
       }
 
+      // Push initial state to enable catching the first back button press
+      window.history.pushState(null, "", window.location.href)
+
       window.addEventListener("popstate", handlePopState)
       return () => window.removeEventListener("popstate", handlePopState)
-   }, [currentTab, isMobile, handleClose, onBackButtonClick])
+   }, [currentTab, settingFormIsDirty, handleClose, onBack])
 
    return (
       <Dialog
@@ -389,6 +427,19 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
                      color: "grey",
                      callback: () => {
                         setIsConfirmDialogOpen(false)
+
+                        if (switchingTab && !isMobile) {
+                           setSwitchingTab(null)
+                           dispatch(
+                              setDirty({
+                                 setting: "personalInfo",
+                                 dirty: false,
+                              })
+                           )
+                           goToTab(switchingTab)
+                           return
+                        }
+
                         if (isMobile) onBack()
                         else handleClose()
                      },
@@ -441,15 +492,8 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
                                        key={`${option}-${index}`}
                                        disablePadding
                                        onClick={() => {
-                                          setCurrentTab(option)
-                                          router.push({
-                                             pathname:
-                                                TAB_VALUES.settings.value,
-                                             query: {
-                                                ...router.query,
-                                                tab: option,
-                                             },
-                                          })
+                                          setSwitchingTab(option)
+                                          onTabClick(option)
                                        }}
                                     >
                                        <ListItemButton
