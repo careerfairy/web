@@ -230,8 +230,6 @@ const LivestreamDialog: FC<Props> = ({
 
 type ContentProps = Omit<Props, "open">
 
-//export const LIVESTREAM_ID_QUERY_PARAM = "livestreamDialogId"
-
 const Content: FC<ContentProps> = ({
    handleClose,
    serverSideLivestream,
