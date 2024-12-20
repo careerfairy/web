@@ -36,6 +36,7 @@ export interface UserData extends Identifiable {
    linkedinUrl: string
    isAdmin?: boolean
    userResume: string
+   resumeName?: string
    backFills: BackFillType[]
    universityCountryCode: string
    unsubscribed?: boolean
