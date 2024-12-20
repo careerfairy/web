@@ -12,6 +12,7 @@ const Dialog = () => {
       isLiveStreamDialogOpen,
       handleLiveStreamDialogClose,
       currentLiveStreamIdInDialog,
+      getLiveStreamDialogKey,
    } = useHighlights()
 
    const { data: livestream } = useLivestream(currentLiveStreamIdInDialog)
@@ -23,17 +24,18 @@ const Dialog = () => {
    }, [])
 
    useEffect(() => {
-      if (!router.query.livestreamId && isLiveStreamDialogOpen) {
+      if (!router.query.dialogLiveStreamId && isLiveStreamDialogOpen) {
          handleLiveStreamDialogClose()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [router.query.livestreamId])
+   }, [router.query.dialogLiveStreamId])
 
    if (!livestream) return null
 
    return (
       <Box onClick={handleDialogClick} key={currentLiveStreamIdInDialog}>
          <LivestreamDialog
+            key={getLiveStreamDialogKey()}
             open={isLiveStreamDialogOpen}
             livestreamId={livestream.id}
             serverSideLivestream={livestream}
