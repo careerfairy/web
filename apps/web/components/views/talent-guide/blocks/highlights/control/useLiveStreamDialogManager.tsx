@@ -29,7 +29,7 @@ export const useLiveStreamDialogManager = (
                query: {
                   ...router.query,
                   highlightId: highlights[expandedPlayingIndex].id,
-                  livestreamId: newLiveStreamId,
+                  dialogLiveStreamId: newLiveStreamId,
                },
             },
             undefined,
@@ -44,7 +44,7 @@ export const useLiveStreamDialogManager = (
 
    const handleLiveStreamDialogClose = useCallback(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { livestreamId, ...restOfQuery } = router.query
+      const { dialogLiveStreamId, ...restOfQuery } = router.query
       void router.push(
          {
             pathname: router.pathname,
@@ -78,12 +78,12 @@ export const useLiveStreamDialogManager = (
    }, [router, setCurrentLiveStreamIdInDialog, setExpandedPlayingIndex])
 
    useEffect(() => {
-      const queryParamLiveStreamId = router.query.livestreamId as string
+      const queryParamLiveStreamId = router.query.dialogLiveStreamId as string
       if (queryParamLiveStreamId) {
          setCurrentLiveStreamIdInDialog(queryParamLiveStreamId)
       }
    }, [
-      router.query.livestreamId,
+      router.query.dialogLiveStreamId,
       setCurrentLiveStreamIdInDialog,
       isLiveStreamDialogOpen,
    ])
