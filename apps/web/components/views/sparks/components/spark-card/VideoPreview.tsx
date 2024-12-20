@@ -206,11 +206,6 @@ const VideoPreview: FC<Props> = ({
    }, [onVideoPlay, videoPlayedForSession])
 
    const playingVideo = Boolean(playing && !shouldPause)
-   console.log(
-      "isMobileBrowser isSafariBasedBrowser",
-      isMobileBrowser(),
-      isSafariBasedBrowser()
-   )
 
    return (
       <Box sx={styles.root}>
