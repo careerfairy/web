@@ -12,7 +12,7 @@ import EventsPreviewCarousel, {
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
 import { useRouter } from "next/router"
-import { useMemo, useRef } from "react"
+import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -111,7 +111,6 @@ const CustomJobLinkedSparks = ({
    sparks,
    disableSparkClick,
 }: CustomJobLinkedSparksProps) => {
-   const childRef = useRef(null)
    const router = useRouter()
 
    const handleSparksClicked = (spark: Spark) => {
@@ -134,7 +133,6 @@ const CustomJobLinkedSparks = ({
          </Typography>
          <Box sx={styles.linkedContentWrapper}>
             <SparksCarousel
-               ref={childRef}
                sparks={sparks}
                options={sparksCarouselEmblaOptions}
                onSparkClick={handleSparksClicked}
