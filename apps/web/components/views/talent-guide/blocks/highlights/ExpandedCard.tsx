@@ -3,7 +3,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { SyntheticEvent, forwardRef } from "react"
 import { X as CloseIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { useHighlights } from "./HighlightsBlockContext"
+import { useHighlights } from "./control/HighlightsBlockContext"
 
 const styles = sxStyles({
    keepLayoutInPlace: {

@@ -4,7 +4,6 @@ import useLivestream from "components/custom-hook/live-stream/useLivestream"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { HighlightComponentType } from "data/hygraph/types"
 import Link from "next/link"
-import { useRouter } from "next/router"
 import {
    RefObject,
    SyntheticEvent,
@@ -16,8 +15,7 @@ import {
 import { Video } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
-import { useHighlights } from "./HighlightsBlockContext"
-import { LiveStreamDialogExtended } from "./LiveStreamDialogExtended"
+import { useHighlights } from "./control/HighlightsBlockContext"
 
 const styles = sxStyles({
    root: {
@@ -126,16 +124,15 @@ export const ExpandedHeader = ({
    group: Group
    highlight: HighlightComponentType
 }) => {
-   const router = useRouter()
    const titleRef = useRef<HTMLDivElement>(null)
    const parentRef = useRef<HTMLDivElement>(null)
    const [animationStyle, setAnimationStyle] = useState([])
 
+   const { handleLiveStreamDialogOpen } = useHighlights()
+
    const { data: livestream } = useLivestream(
       highlight.liveStreamIdentifier.identifier
    )
-
-   const { handleLiveStreamDialogOpen } = useHighlights()
 
    const handleLivestreamTitleClick = useCallback(
       (event: SyntheticEvent) => {
@@ -144,25 +141,9 @@ export const ExpandedHeader = ({
 
          if (!livestream) return
 
-         handleLiveStreamDialogOpen()
-
-         void router.push(
-            {
-               pathname: router.pathname,
-               query: {
-                  ...router.query,
-                  highlightId: highlight.id,
-                  livestreamId: livestream.id,
-               },
-            },
-            undefined,
-            {
-               scroll: false,
-               shallow: true,
-            }
-         )
+         handleLiveStreamDialogOpen(livestream.id)
       },
-      [livestream, handleLiveStreamDialogOpen, router, highlight.id]
+      [livestream, handleLiveStreamDialogOpen]
    )
 
    const handleGroupClick = useCallback((event: SyntheticEvent) => {
@@ -223,9 +204,6 @@ export const ExpandedHeader = ({
                <Skeleton variant="text" width="100%" height={14} />
             )}
          </Stack>
-         {Boolean(livestream) && (
-            <LiveStreamDialogExtended livestream={livestream} />
-         )}
       </Box>
    )
 }
