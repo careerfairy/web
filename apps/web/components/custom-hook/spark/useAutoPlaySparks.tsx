@@ -14,6 +14,7 @@ export const useAutoPlaySparks = (
 ): ReturnType => {
    const isMobile = useIsMobile()
    const [autoPlayingIndex, setAutoPlayingIndex] = useState<number>(0)
+   const [hasPlayed, setHasPlayed] = useState(false)
 
    const { areSlidesInView } = useAreSlidesInView(emblaApi)
 
@@ -70,9 +71,21 @@ export const useAutoPlaySparks = (
    )
 
    useEffect(() => {
+      if (autoPlayingIndex !== 0) {
+         setHasPlayed(true)
+      }
+
+      return () => {
+         setHasPlayed(false)
+      }
+   }, [autoPlayingIndex])
+
+   useEffect(() => {
       if (!isMobile || !emblaApi) return
 
       const handleUserScrollStart = () => {
+         if (!hasPlayed) return
+
          setIsUserScrolling(true)
       }
 
@@ -90,7 +103,14 @@ export const useAutoPlaySparks = (
          emblaApi.off("pointerDown", handleUserScrollStart)
          emblaApi.off("settle", handleSettle)
       }
-   }, [emblaApi, getMiddleSlideIndex, isMobile, isUserScrolling])
+   }, [
+      areSlidesInView,
+      emblaApi,
+      getMiddleSlideIndex,
+      hasPlayed,
+      isMobile,
+      isUserScrolling,
+   ])
 
    useEffect(() => {
       return () => {
