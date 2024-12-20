@@ -280,15 +280,6 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
    const [isConfirmDialogOpen, setIsConfirmDialogOpen] =
       useState<boolean>(false)
 
-   const handleClose = useCallback(() => {
-      if (settingFormIsDirty && !isConfirmDialogOpen)
-         setIsConfirmDialogOpen(true)
-      else {
-         setIsConfirmDialogOpen(false)
-         onClose()
-      }
-   }, [onClose, settingFormIsDirty, isConfirmDialogOpen])
-
    const getTabValue = useCallback(
       (tab: SettingsOptions | null) => {
          return tab && menuSettings.includes(tab)
@@ -305,6 +296,15 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
    const [currentTab, setCurrentTab] = useState<SettingsOptions | null>(() =>
       getTabValue(queryTab)
    )
+
+   const handleClose = useCallback(() => {
+      if (settingFormIsDirty && !isConfirmDialogOpen && currentTab)
+         setIsConfirmDialogOpen(true)
+      else {
+         setIsConfirmDialogOpen(false)
+         onClose()
+      }
+   }, [onClose, settingFormIsDirty, isConfirmDialogOpen, currentTab])
 
    const drawerOpen = useMemo(() => {
       return Boolean(!currentTab)
@@ -344,6 +344,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
       if (!isMobile) return
 
       const handlePopState = () => {
+         console.log("🚀 ~ handlePopState ~ handlePopState")
          if (currentTab) {
             // If we're in a tab, prevent default back behavior and return to menu
             onBackButtonClick()
@@ -372,7 +373,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
          <DialogContent sx={{ p: 0 }}>
             <Stack spacing={1.5}>
                <ConfirmationDialog
-                  open={isConfirmDialogOpen}
+                  open={isConfirmDialogOpen ? Boolean(currentTab) : null}
                   title={"Make it count"}
                   description={
                      "Leaving now will discard the changes you've made to your personal information. Are you sure you want to exit?"

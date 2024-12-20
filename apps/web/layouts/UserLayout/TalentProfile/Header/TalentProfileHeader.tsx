@@ -6,6 +6,8 @@ import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import { Fragment, useMemo, useState } from "react"
 import { Settings } from "react-feather"
+import { useSelector } from "react-redux"
+import { getProfileTab } from "store/selectors/profileSettingsSelectors"
 import { sxStyles } from "types/commonTypes"
 import { TAB_VALUES } from "../TalentProfileView"
 import { ProfileAvatar } from "./ProfileAvatar"
@@ -81,6 +83,8 @@ export const TalentProfileHeader = () => {
    const isSettingsPage = router.pathname.includes(TAB_VALUES.settings.value)
    const [openSettings, setOpenSettings] = useState(isSettingsPage)
 
+   const profileTab = useSelector(getProfileTab)
+
    const { userData, userPresenter } = useAuth()
    const { talentProfileV1 } = useFeatureFlags()
 
@@ -141,7 +145,7 @@ export const TalentProfileHeader = () => {
 
                router.push(
                   {
-                     pathname: TAB_VALUES.profile.value,
+                     pathname: profileTab,
                      query: router.query,
                   },
                   undefined,
