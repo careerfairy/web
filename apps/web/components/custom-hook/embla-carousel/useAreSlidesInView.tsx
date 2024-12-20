@@ -8,6 +8,10 @@ export const useAreSlidesInView = (emblaApi: EmblaCarouselType) => {
       if (emblaApi) {
          setAreSlidesInView(emblaApi.slideNodes().length > 0)
       }
+
+      return () => {
+         setAreSlidesInView(false)
+      }
    }, [emblaApi])
 
    return {
