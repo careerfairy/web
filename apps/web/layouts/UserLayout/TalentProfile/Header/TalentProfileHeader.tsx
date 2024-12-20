@@ -2,11 +2,14 @@ import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
-import { useMemo } from "react"
+import { useRouter } from "next/router"
+import { Fragment, useMemo, useState } from "react"
 import { Settings } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { TAB_VALUES } from "../TalentProfileView"
 import { ProfileAvatar } from "./ProfileAvatar"
 import { ProfileBannerIllustration } from "./ProfileBannerIllustration"
+import { SettingsDialog } from "./Settings/SettingsView"
 
 const LOGO_SIZE = 104
 
@@ -72,6 +75,11 @@ const styles = sxStyles({
 })
 
 export const TalentProfileHeader = () => {
+   const router = useRouter()
+
+   const isSettingsPage = router.pathname.includes(TAB_VALUES.settings.value)
+   const [openSettings, setOpenSettings] = useState(isSettingsPage)
+
    const { userData, userPresenter } = useAuth()
    const { talentProfileV1 } = useFeatureFlags()
 
@@ -83,34 +91,59 @@ export const TalentProfileHeader = () => {
    const userCountry = universityCountriesMap[userData.universityCountryCode]
 
    return (
-      <Stack sx={styles.root}>
-         <ProfileBannerIllustration />
-         <ProfileAvatar />
-         <Stack sx={styles.userDetailsRoot}>
-            <Button
-               sx={styles.settingsButton}
-               variant="outlined"
-               startIcon={<Settings />}
-            >
-               Settings
-            </Button>
-            <Stack>
-               <Typography variant="brandedH4" sx={styles.userName}>
-                  {userPresenter?.getDisplayName()}
-               </Typography>
-               <Stack spacing={0.25}>
-                  <Typography sx={styles.userFieldOfStudy}>
-                     {fieldOfStudyDisplayName}
-                     {userData?.university?.name
-                        ? ` at ${userData?.university?.name}`
-                        : null}
+      <Fragment>
+         <Stack sx={styles.root}>
+            <ProfileBannerIllustration />
+            <ProfileAvatar />
+            <Stack sx={styles.userDetailsRoot}>
+               <Button
+                  sx={styles.settingsButton}
+                  variant="outlined"
+                  startIcon={<Settings />}
+                  onClick={() => {
+                     router.push({
+                        pathname: TAB_VALUES.settings.value,
+                        query: router.query,
+                     })
+                  }}
+               >
+                  Settings
+               </Button>
+               <Stack>
+                  <Typography variant="brandedH4" sx={styles.userName}>
+                     {userPresenter?.getDisplayName()}
                   </Typography>
-                  <Typography sx={styles.userLocation}>
-                     {`CityTBD in Up Stack, ${userCountry}.`}
-                  </Typography>
+                  <Stack spacing={0.25}>
+                     <Typography sx={styles.userFieldOfStudy}>
+                        {fieldOfStudyDisplayName}
+                        {userData?.university?.name
+                           ? ` at ${userData?.university?.name}`
+                           : null}
+                     </Typography>
+                     <Typography sx={styles.userLocation}>
+                        {`CityTBD in Up Stack, ${userCountry}.`}
+                     </Typography>
+                  </Stack>
                </Stack>
             </Stack>
          </Stack>
-      </Stack>
+         <SettingsDialog
+            open={openSettings}
+            handleClose={() => {
+               setOpenSettings(false)
+
+               delete router.query["tab"]
+
+               router.push(
+                  {
+                     pathname: TAB_VALUES.profile.value,
+                     query: router.query,
+                  },
+                  undefined,
+                  { shallow: true }
+               )
+            }}
+         />
+      </Fragment>
    )
 }
