@@ -4,7 +4,9 @@ import useFileUploader from "components/custom-hook/useFileUploader"
 import useFirebaseUpload from "components/custom-hook/useFirebaseUpload"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import FileUploader from "components/views/common/FileUploader"
+import FileUploader, {
+   FileUploaderProps,
+} from "components/views/common/FileUploader"
 import { userRepo } from "data/RepositoryInstances"
 import Link from "next/link"
 import { FilePlus, FileText } from "react-feather"
@@ -61,17 +63,7 @@ const styles = sxStyles({
 })
 
 export const YourCV = () => {
-   const { userPresenter } = useAuth()
-
-   return (
-      <Stack>
-         {userPresenter.hasResume() ? <YourCVView /> : <EmptyYourCVView />}
-      </Stack>
-   )
-}
-
-const YourCVView = () => {
-   const { userData, userPresenter } = useAuth()
+   const { userPresenter, userData } = useAuth()
    const [uploadFile, uploadProgress, isUploading] = useFirebaseUpload()
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
@@ -83,7 +75,13 @@ const YourCVView = () => {
             successNotification("CV uploaded successfully")
          },
          onError: (err) => {
-            errorNotification(err.message)
+            errorNotification(
+               "Error updating CV, rest assured we're working on it!"
+            )
+            errorLogAndNotify(
+               err,
+               `Error uploading CV file, authId: ${userData.authId}`
+            )
          },
          throwOnError: false, // We don't want to throw an error, we want to handle it ourselves in the onError callback above.
       }
@@ -106,13 +104,49 @@ const YourCVView = () => {
       }
    }
 
-   const { fileUploaderProps: logoUploaderProps } = useFileUploader({
+   const { fileUploaderProps: cvUploaderProps } = useFileUploader({
       acceptedFileTypes: ["pdf"],
       maxFileSize: 20,
       multiple: false,
       onValidated: handleUploadCVFile,
-      // onCancel: handleClose,
    })
+
+   const EmptyView = (
+      <EmptyYourCVView
+         cvUploaderProps={cvUploaderProps}
+         isUploading={isUploading}
+         uploadProgress={uploadProgress}
+      />
+   )
+
+   return (
+      <Stack>
+         <ConditionalWrapper
+            condition={userPresenter.hasResume()}
+            fallback={EmptyView}
+         >
+            <YourCVView
+               cvUploaderProps={cvUploaderProps}
+               isUploading={isUploading}
+               uploadProgress={uploadProgress}
+            />
+         </ConditionalWrapper>
+      </Stack>
+   )
+}
+
+type CVViewProps = {
+   cvUploaderProps: FileUploaderProps
+   isUploading: boolean
+   uploadProgress: number
+}
+
+const YourCVView = ({
+   cvUploaderProps,
+   isUploading,
+   uploadProgress,
+}: CVViewProps) => {
+   const { userData, userPresenter } = useAuth()
 
    return (
       <Box sx={[styles.root, { cursor: "default" }]}>
@@ -145,7 +179,7 @@ const YourCVView = () => {
                         View CV
                      </Button>
                   </Link>
-                  <FileUploader {...logoUploaderProps}>
+                  <FileUploader {...cvUploaderProps}>
                      <Button variant="outlined" sx={styles.button}>
                         Upload new CV
                      </Button>
@@ -164,51 +198,13 @@ const YourCVView = () => {
    )
 }
 
-const EmptyYourCVView = () => {
-   const { userPresenter, userData } = useAuth()
-   const [uploadFile, uploadProgress, isUploading] = useFirebaseUpload()
-   const { successNotification, errorNotification } = useSnackbarNotifications()
-
-   const { trigger } = useSWRMutation(
-      `update-profile-${userData.id}-resume`,
-      handleUpdateResume,
-      {
-         onSuccess: () => {
-            successNotification("CV uploaded successfully")
-         },
-         onError: (err) => {
-            errorNotification(err.message)
-         },
-         throwOnError: false, // We don't want to throw an error, we want to handle it ourselves in the onError callback above.
-      }
-   )
-
-   const handleUploadCVFile = async (cv: File) => {
-      try {
-         const downloadUrl = await uploadFile(cv, userPresenter.getResumePath())
-
-         return trigger({
-            userId: userData.id,
-            resumePath: downloadUrl,
-            resumeName: cv.name,
-         })
-      } catch (error) {
-         errorNotification(
-            "Error uploading CV, rest assured we're working on it!"
-         )
-         errorLogAndNotify(error, "Error uploading CV file")
-      }
-   }
-
-   const { fileUploaderProps: logoUploaderProps } = useFileUploader({
-      acceptedFileTypes: ["pdf"],
-      maxFileSize: 20,
-      multiple: false,
-      onValidated: handleUploadCVFile,
-   })
-
+const EmptyYourCVView = ({
+   cvUploaderProps,
+   isUploading,
+   uploadProgress,
+}: CVViewProps) => {
    return (
-      <FileUploader {...logoUploaderProps}>
+      <FileUploader {...cvUploaderProps}>
          <Box sx={styles.root}>
             <Stack alignItems={"center"} spacing={2}>
                <Box color={"primary.main"}>
