@@ -95,7 +95,7 @@ export const PrivacyFormFields = () => {
                </Typography>
             </Stack>
             <BrandedSwitch
-               checked={userData?.unsubscribed}
+               checked={!userData?.unsubscribed}
                onChange={handleToggleNewsletter}
                sx={styles.switch}
             />
