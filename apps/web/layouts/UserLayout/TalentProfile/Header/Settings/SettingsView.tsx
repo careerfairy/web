@@ -303,7 +303,6 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
    )
 
    const handleClose = useCallback(() => {
-      console.log("🚀 ~ handleClose ~ handleClose")
       if (settingFormIsDirty && !isConfirmDialogOpen && currentTab)
          setIsConfirmDialogOpen(true)
       else {

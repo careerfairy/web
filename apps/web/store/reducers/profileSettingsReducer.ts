@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { TalentProfileTabValues } from "layouts/UserLayout/TalentProfile/TalentProfileView"
 
-type ProfileTab = Exclude<TalentProfileTabValues, "/profile/settings">
+export type ProfileTab = Exclude<TalentProfileTabValues, "/profile/settings">
 
 interface IProfileSettingsState {
    personalInfo: {

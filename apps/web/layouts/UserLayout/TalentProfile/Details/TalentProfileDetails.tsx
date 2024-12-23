@@ -1,6 +1,7 @@
 import { Box, Tab, Tabs } from "@mui/material"
 import { useRouter } from "next/router"
 import { useDispatch } from "react-redux"
+import { useEffectOnce } from "react-use"
 import { setProfileTab } from "store/reducers/profileSettingsReducer"
 import { sxStyles } from "types/commonTypes"
 import { TAB_VALUES, TalentProfileTabValues } from "../TalentProfileView"
@@ -54,6 +55,12 @@ export const TalentProfileDetails = ({ currentPath }: Props) => {
          { shallow: true, scroll: false }
       )
    }
+
+   useEffectOnce(() => {
+      if (currentPath !== "/profile/settings") {
+         dispatch(setProfileTab(currentPath))
+      }
+   })
 
    return (
       <Box sx={styles.root}>
