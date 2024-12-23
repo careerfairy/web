@@ -23,6 +23,7 @@ const PasswordForm = () => {
    const {
       formState: { isDirty, isValid },
       reset,
+      setError,
       handleSubmit,
    } = useFormContext<PasswordSchemaType>()
 
@@ -44,7 +45,9 @@ const PasswordForm = () => {
             // Reauthenticate the user
             await reauthenticateWithCredential(user, credential)
          } catch (error) {
-            errorNotification("Authentication failed. Please try again.")
+            setError("currentPassword", {
+               message: "Incorrect password",
+            })
             return
          }
 
