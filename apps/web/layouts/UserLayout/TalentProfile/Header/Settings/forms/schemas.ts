@@ -12,9 +12,17 @@ export const personalInfoShape = {
       .required("Email is required"),
 }
 
+export const privacyShape = {
+   unsubscribed: Yup.boolean(),
+}
+
 export const PersonalInfoSchema = Yup.object(personalInfoShape)
 
+export const PrivacySchema = Yup.object(privacyShape)
+
 export type PersonalInfoSchemaType = Yup.InferType<typeof PersonalInfoSchema>
+
+export type PrivacySchemaType = Yup.InferType<typeof PrivacySchema>
 
 export type PersonalInfoFormValues = {
    firstName: string
@@ -23,6 +31,10 @@ export type PersonalInfoFormValues = {
    stateIsoCode: string
    cityIsoCode: string
    email: string
+}
+
+export type PrivacyFormValues = {
+   unsubscribed: boolean
 }
 
 export const getInitialPersonalInfoValues = (
@@ -37,5 +49,13 @@ export const getInitialPersonalInfoValues = (
       stateIsoCode: personalInfo?.stateIsoCode || "",
       cityIsoCode: personalInfo?.cityIsoCode || "",
       email: personalInfo?.userEmail || "",
+   }
+}
+
+export const getInitialPrivacyValues = (
+   userData?: UserData
+): PrivacyFormValues => {
+   return {
+      unsubscribed: userData?.unsubscribed || false,
    }
 }
