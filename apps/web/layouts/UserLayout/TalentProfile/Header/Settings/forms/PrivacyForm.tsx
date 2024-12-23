@@ -15,11 +15,12 @@ import {
 
 const styles = sxStyles({
    formRoot: {
-      ml: {
+      mx: {
          md: 0,
          sm: 1,
          xs: 1,
       },
+      mt: 2,
    },
    switch: {
       "& .MuiSwitch-switchBase": {
@@ -80,7 +81,7 @@ export const PrivacyFormFields = () => {
    return (
       <Stack spacing={2} sx={styles.formRoot}>
          <Stack direction={"row"} alignItems={"center"} spacing={2.5}>
-            <Stack>
+            <Stack spacing={"10px"}>
                <Typography
                   variant="brandedBody"
                   fontWeight={400}
