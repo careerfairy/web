@@ -62,6 +62,7 @@ const styles = sxStyles({
 
 export const YourCV = () => {
    const { userPresenter } = useAuth()
+
    return (
       <Stack>
          {userPresenter.hasResume() ? <YourCVView /> : <EmptyYourCVView />}
@@ -71,7 +72,6 @@ export const YourCV = () => {
 
 const YourCVView = () => {
    const { userData, userPresenter } = useAuth()
-
    const [uploadFile, uploadProgress, isUploading] = useFirebaseUpload()
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
@@ -93,7 +93,11 @@ const YourCVView = () => {
       try {
          await uploadFile(cv, userPresenter.getResumePath())
 
-         return trigger({ userId: userData.id, resumeName: cv.name })
+         return trigger({
+            userId: userData.id,
+            resumePath: userPresenter.getResumePath(),
+            resumeName: cv.name,
+         })
       } catch (error) {
          errorNotification(
             "Error uploading CV, rest assured we're working on it!"
@@ -117,7 +121,7 @@ const YourCVView = () => {
                <FileText size={48} />
             </Box>
             <Stack alignItems={"center"} spacing={1.5}>
-               <ConditionalWrapper condition={userData.resumeName}>
+               <ConditionalWrapper condition={userPresenter.getResumePath()}>
                   <Stack spacing={0} alignItems={"center"}>
                      <Typography
                         variant="xsmall"
@@ -183,7 +187,11 @@ const EmptyYourCVView = () => {
       try {
          await uploadFile(cv, userPresenter.getResumePath())
 
-         return trigger({ userId: userData.id, resumeName: cv.name })
+         return trigger({
+            userId: userData.id,
+            resumePath: userPresenter.getResumePath(),
+            resumeName: cv.name,
+         })
       } catch (error) {
          errorNotification(
             "Error uploading CV, rest assured we're working on it!"
@@ -240,9 +248,16 @@ const EmptyYourCVView = () => {
 
 type Arguments = {
    userId: string
+   resumePath: string
    resumeName: string
 }
+
+// TODO-WG: Handle where userResume is not previously set
 const handleUpdateResume = (
    _: string,
-   { arg: { resumeName, userId } }: { arg: Arguments }
-) => userRepo.updateUserData(userId, { resumeName: resumeName })
+   { arg: { resumePath, resumeName, userId } }: { arg: Arguments }
+) =>
+   userRepo.updateUserData(userId, {
+      resumeName: resumeName,
+      userResume: resumePath,
+   })
