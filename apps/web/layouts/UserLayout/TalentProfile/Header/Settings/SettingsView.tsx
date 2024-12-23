@@ -303,6 +303,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
    )
 
    const handleClose = useCallback(() => {
+      console.log("🚀 ~ handleClose ~ handleClose")
       if (settingFormIsDirty && !isConfirmDialogOpen && currentTab)
          setIsConfirmDialogOpen(true)
       else {
@@ -349,6 +350,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
    const goToTab = useCallback(
       (option: SettingsOptions) => {
          setCurrentTab(option)
+         setSwitchingTab(null)
          router.push({
             pathname: TAB_VALUES.settings.value,
             query: {
