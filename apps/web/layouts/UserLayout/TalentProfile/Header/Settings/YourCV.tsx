@@ -91,11 +91,11 @@ const YourCVView = () => {
 
    const handleUploadCVFile = async (cv: File) => {
       try {
-         await uploadFile(cv, userPresenter.getResumePath())
+         const downloadUrl = await uploadFile(cv, userPresenter.getResumePath())
 
          return trigger({
             userId: userData.id,
-            resumePath: userPresenter.getResumePath(),
+            resumePath: downloadUrl,
             resumeName: cv.name,
          })
       } catch (error) {
@@ -121,7 +121,7 @@ const YourCVView = () => {
                <FileText size={48} />
             </Box>
             <Stack alignItems={"center"} spacing={1.5}>
-               <ConditionalWrapper condition={userPresenter.getResumePath()}>
+               <ConditionalWrapper condition={userPresenter.hasResume()}>
                   <Stack spacing={0} alignItems={"center"}>
                      <Typography
                         variant="xsmall"
@@ -185,11 +185,11 @@ const EmptyYourCVView = () => {
 
    const handleUploadCVFile = async (cv: File) => {
       try {
-         await uploadFile(cv, userPresenter.getResumePath())
+         const downloadUrl = await uploadFile(cv, userPresenter.getResumePath())
 
          return trigger({
             userId: userData.id,
-            resumePath: userPresenter.getResumePath(),
+            resumePath: downloadUrl,
             resumeName: cv.name,
          })
       } catch (error) {
@@ -205,7 +205,6 @@ const EmptyYourCVView = () => {
       maxFileSize: 20,
       multiple: false,
       onValidated: handleUploadCVFile,
-      // onCancel: handleClose,
    })
 
    return (
@@ -252,7 +251,6 @@ type Arguments = {
    resumeName: string
 }
 
-// TODO-WG: Handle where userResume is not previously set
 const handleUpdateResume = (
    _: string,
    { arg: { resumePath, resumeName, userId } }: { arg: Arguments }
