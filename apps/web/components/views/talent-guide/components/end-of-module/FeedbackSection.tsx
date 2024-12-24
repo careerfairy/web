@@ -1,7 +1,7 @@
 import FramerBox from "components/views/common/FramerBox"
 import { Variants } from "framer-motion"
 import { FeedbackCard } from "./FeedbackCard"
-import { styles } from "./styles"
+import { feedbackStyles } from "./styles"
 
 type Props = {
    enableRating: boolean
@@ -24,7 +24,7 @@ export const FeedbackSection = ({
          transition={{ duration: 0.5, ease: "easeOut" }}
          variants={feedbackVariants}
          sx={[
-            styles.feedbackCard,
+            feedbackStyles.section,
             {
                pb: isShorterScreen ? 3.5 : 4,
             },

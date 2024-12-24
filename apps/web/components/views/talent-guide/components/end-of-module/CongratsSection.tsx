@@ -2,13 +2,17 @@ import { Stack, Typography } from "@mui/material"
 import FramerBox, { FramerBoxProps } from "components/views/common/FramerBox"
 import { Variants } from "framer-motion"
 import Image from "next/image"
-import { styles } from "./styles"
+import { congratsStyles } from "./styles"
 
 const SIZE_MULTIPLIER = 1.3
 
 const CongratsMessage = () => {
    return (
-      <Stack direction="column" alignItems="center" sx={styles.congratsRoot}>
+      <Stack
+         direction="column"
+         alignItems="center"
+         sx={congratsStyles.congratsRoot}
+      >
          <FramerBox {...iconAnimation}>
             <Image
                src="/talent-guide/medal.gif"
@@ -20,13 +24,17 @@ const CongratsMessage = () => {
             />
          </FramerBox>
          <Typography
-            sx={styles.congratsTitle}
+            sx={congratsStyles.congratsTitle}
             variant="desktopBrandedH3"
             component="h3"
          >
             Congrats!
          </Typography>
-         <Typography sx={styles.congratsText} variant="medium" component="p">
+         <Typography
+            sx={congratsStyles.congratsText}
+            variant="medium"
+            component="p"
+         >
             You&apos;ve completed this module and are one step closer to your
             dream job!
          </Typography>
