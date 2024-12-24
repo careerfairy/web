@@ -23,7 +23,12 @@ export const FeedbackSection = ({
          exit="exit"
          transition={{ duration: 0.5, ease: "easeOut" }}
          variants={feedbackVariants}
-         sx={styles.feedbackCard}
+         sx={[
+            styles.feedbackCard,
+            {
+               pb: isShorterScreen ? 3.5 : 4,
+            },
+         ]}
       >
          <FeedbackCard
             onRatingClick={onRatingClick}

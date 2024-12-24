@@ -1,6 +1,5 @@
 import {
-   TAG_CATEGORY,
-   TagCategory,
+   FEEDBACK_TAG_CATEGORY,
    TalentGuideFeedback,
 } from "@careerfairy/shared-lib/talent-guide/types"
 import { LoadingButton } from "@mui/lab"
@@ -40,7 +39,7 @@ type Props = {
    onFeedbackSubmitted: () => void
 }
 
-const tags = Object.values(TAG_CATEGORY)
+const tags = Object.values(FEEDBACK_TAG_CATEGORY)
 
 export const FeedbackCard = ({
    onRatingClick,
@@ -70,7 +69,7 @@ export const FeedbackCard = ({
             moduleData.content.id,
             userAuthUid,
             data.rating as TalentGuideFeedback["rating"],
-            data.tags as TagCategory[]
+            data.tags as FEEDBACK_TAG_CATEGORY[]
          )
          reset()
          onFeedbackSubmitted?.()
@@ -83,7 +82,7 @@ export const FeedbackCard = ({
    }
 
    const isSelected = useCallback(
-      (tag: TagCategory) => currentTags.includes(tag),
+      (tag: FEEDBACK_TAG_CATEGORY) => currentTags.includes(tag),
       [currentTags]
    )
 

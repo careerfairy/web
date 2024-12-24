@@ -29,7 +29,7 @@ export const TalentGuideEndLayout = () => {
    const showFeedback = someTimeHasPassed && !feedbackSubmitted
 
    return (
-      <TalentGuideLayout>
+      <TalentGuideLayout sx={{ px: { xs: 3.25, md: 0 } }}>
          <Box id="talent-guide-end-layout" sx={styles.layoutRoot}>
             <AnimatePresence>
                {Boolean(showCongrats) && (

@@ -82,7 +82,7 @@ const getCongratsVariants = (
             ? undefined
             : isShortScreen
             ? "translateY(-50%)"
-            : undefined,
+            : "translateY(-40%)",
          transition: {
             type: "spring",
             bounce: 0.3,

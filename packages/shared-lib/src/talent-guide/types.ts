@@ -64,7 +64,7 @@ export interface TalentGuideQuiz extends Identifiable {
    lastUpdated: Timestamp | null
 }
 
-export const TAG_CATEGORY = {
+export const FEEDBACK_TAG_CATEGORY = {
    RELEVANCE: {
       id: "relevance",
       label: {
@@ -116,16 +116,19 @@ export const TAG_CATEGORY = {
    },
 } as const
 
-export type TagCategory = (typeof TAG_CATEGORY)[keyof typeof TAG_CATEGORY]["id"]
+export type FEEDBACK_TAG_CATEGORY =
+   (typeof FEEDBACK_TAG_CATEGORY)[keyof typeof FEEDBACK_TAG_CATEGORY]["id"]
+
+export type TalentGuideRating = 1 | 2 | 3 | 4 | 5
 
 // Collection path: talentGuideFeedback/{userAuthUid}_{moduleHygraphId}
 export interface TalentGuideFeedback extends Identifiable {
    userAuthUid: string
    moduleHygraphId: string
 
-   rating: 1 | 2 | 3 | 4 | 5
+   rating: TalentGuideRating
 
-   selectedTagIds: TagCategory[]
+   selectedTagIds: FEEDBACK_TAG_CATEGORY[]
 
    // Metadata
    submittedAt: Timestamp
