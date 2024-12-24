@@ -1,8 +1,7 @@
 import { sxStyles } from "types/commonTypes"
 
-export const styles = sxStyles({
-   // Layout styles
-   layoutRoot: {
+export const layoutStyles = sxStyles({
+   root: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -11,15 +10,16 @@ export const styles = sxStyles({
       position: "relative",
       overflow: "hidden",
    },
-   feedbackCard: {
+})
+
+export const feedbackStyles = sxStyles({
+   section: {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       position: "absolute",
       width: "100%",
    },
-
-   // Feedback card styles
    root: {
       border: (theme) => `1px solid ${theme.palette.neutral[200]}`,
       borderRadius: "8px",
@@ -79,7 +79,9 @@ export const styles = sxStyles({
       color: "neutral.700",
       backgroundColor: "neutral.50",
    },
-   // Congrats section styles
+})
+
+export const congratsStyles = sxStyles({
    congratsRoot: {
       textAlign: "center",
    },

@@ -17,7 +17,7 @@ import { SetValueConfig } from "react-hook-form"
 import FramerBox from "../../../common/FramerBox"
 import { AnimatedCollapse } from "../../animations/AnimatedCollapse"
 import { ratingTitleAnimation } from "./animations"
-import { styles } from "./styles"
+import { feedbackStyles } from "./styles"
 
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { StarIcon } from "components/views/common/icons/StarIcon"
@@ -87,9 +87,17 @@ export const FeedbackCard = ({
    )
 
    return (
-      <Box sx={styles.root} component="form" onSubmit={handleSubmit(onSubmit)}>
+      <Box
+         sx={feedbackStyles.root}
+         component="form"
+         onSubmit={handleSubmit(onSubmit)}
+      >
          <AnimatedCollapse show={preview}>
-            <Typography variant="brandedH5" component="h5" sx={styles.title}>
+            <Typography
+               variant="brandedH5"
+               component="h5"
+               sx={feedbackStyles.title}
+            >
                How did we do?
             </Typography>
             <Typography variant="medium" component="p" color="text.secondary">
@@ -104,7 +112,7 @@ export const FeedbackCard = ({
                   key={hover !== -1 ? hover : currentRating}
                >
                   <Typography
-                     sx={styles.ratingTitle}
+                     sx={feedbackStyles.ratingTitle}
                      component="p"
                      variant="small"
                   >
@@ -113,7 +121,10 @@ export const FeedbackCard = ({
                </FramerBox>
             </AnimatedCollapse>
             <FeedbackRating
-               sx={[styles.rating, preview && styles.ratingPreview]}
+               sx={[
+                  feedbackStyles.rating,
+                  preview && feedbackStyles.ratingPreview,
+               ]}
                onChange={async (_, value) => {
                   if (value !== null && value > 0) {
                      setValue("rating", value, setOptions)
@@ -132,20 +143,20 @@ export const FeedbackCard = ({
                   mt={3}
                   variant="brandedH5"
                   component="h5"
-                  sx={styles.title}
+                  sx={feedbackStyles.title}
                >
                   How did we do?
                </Typography>
-               <Box sx={styles.chipsContainer}>
+               <Box sx={feedbackStyles.chipsContainer}>
                   {tags.map((tag) => (
                      <Chip
                         key={tag.id}
                         label={tag.label.en}
                         sx={[
-                           styles.chip,
+                           feedbackStyles.chip,
                            isSelected(tag.id)
-                              ? styles.selectedChip
-                              : styles.unselectedChip,
+                              ? feedbackStyles.selectedChip
+                              : feedbackStyles.unselectedChip,
                         ]}
                         onClick={async () => {
                            if (isSelected(tag.id)) {
@@ -188,8 +199,8 @@ const FeedbackRating = (props: RatingProps) => {
       <Rating
          name="module-feedback"
          max={5}
-         icon={<StarIcon sx={styles.icon} />}
-         emptyIcon={<StarIcon sx={styles.icon} />}
+         icon={<StarIcon sx={feedbackStyles.icon} />}
+         emptyIcon={<StarIcon sx={feedbackStyles.icon} />}
          {...props}
       />
    )

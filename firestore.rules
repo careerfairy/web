@@ -193,7 +193,7 @@ service cloud.firestore {
                 return (request.auth.uid + "_" + moduleHygraphId) == docId;
             }
 
-            allow read: if ( resource == null && isSignedIn() ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
+            allow read: if ( resource == null ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
 
             // Allow create if:
             // 1. Document ID is correctly formatted (userAuthUid_moduleHygraphId)
@@ -243,7 +243,7 @@ service cloud.firestore {
                 return (request.auth.uid + "_" + moduleHygraphId + "_" + quizHygraphId) == docId;
             }
 
-            allow read: if ( resource == null && isSignedIn() ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
+            allow read: if ( resource == null ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
 
             // Allow create if:
             // 1. Document ID is correctly formatted (userAuthUid_moduleHygraphId_quizHygraphId)
@@ -284,7 +284,7 @@ service cloud.firestore {
                 return (request.auth.uid + "_" + moduleHygraphId) == docId;
             }
 
-            allow read: if ( resource == null && isSignedIn() ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
+            allow read: if ( resource == null ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
 
             // Allow create if:
             // 1. Document ID is correctly formatted (userAuthUid_moduleHygraphId)

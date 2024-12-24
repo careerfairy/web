@@ -4,9 +4,9 @@ import { useEffect, useState } from "react"
 import { TalentGuideLayout } from "../TalentGuideLayout"
 import { CongratsSection } from "./CongratsSection"
 import { FeedbackSection } from "./FeedbackSection"
-import { styles } from "./styles"
+import { layoutStyles } from "./styles"
 
-const SHOW_CONGRATS_TIME = 2000
+const SHOW_CONGRATS_TIME = 1000
 
 export const TalentGuideEndLayout = () => {
    const [ratingClicked, setRatingClicked] = useState(false)
@@ -30,7 +30,7 @@ export const TalentGuideEndLayout = () => {
 
    return (
       <TalentGuideLayout sx={{ px: { xs: 3.25, md: 0 } }}>
-         <Box id="talent-guide-end-layout" sx={styles.layoutRoot}>
+         <Box id="talent-guide-end-layout" sx={layoutStyles.root}>
             <AnimatePresence>
                {Boolean(showCongrats) && (
                   <CongratsSection
