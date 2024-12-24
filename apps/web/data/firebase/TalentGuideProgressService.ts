@@ -7,7 +7,7 @@ import {
    TalentGuideQuiz,
    TalentGuideRating,
 } from "@careerfairy/shared-lib/talent-guide"
-import { QuizModelType, TalentGuideModule } from "data/hygraph/types"
+import { Page, TalentGuideModule } from "data/hygraph/types"
 import {
    arrayUnion,
    collection,
@@ -257,6 +257,59 @@ export class TalentGuideProgressService {
       batch.delete(this.getModuleProgressRef(moduleId, userAuthUid))
 
       return batch.commit()
+   }
+
+   /**
+    * Gets all module progress for a user
+    * @param userAuthUid - The authenticated user's ID
+    * @returns Promise resolving to array of module progress documents
+    */
+   async getAllUserModuleProgress(
+      userAuthUid: string
+   ): Promise<TalentGuideProgress[]> {
+      const progressQuery = query(
+         collection(FirestoreInstance, "talentGuideProgress"),
+         where("userAuthUid", "==", userAuthUid)
+      ).withConverter(createGenericConverter<TalentGuideProgress>())
+
+      const snapshot = await getDocs(progressQuery)
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   /**
+    * Gets the next uncompleted module for a user
+    * @param userAuthUid - The authenticated user's ID
+    * @param allModules - All available modules from the CMS
+    * @returns Promise<Page<TalentGuideModule> | null> The next module or null if all completed
+    */
+   async getNextModule(
+      userAuthUid: string,
+      allModules: Page<TalentGuideModule>[]
+   ): Promise<Page<TalentGuideModule> | null> {
+      // Get user's progress from Firebase
+      const userProgress = await this.getAllUserModuleProgress(userAuthUid)
+
+      // Create a map of module IDs to progress
+      const progressMap = new Map<string, TalentGuideProgress>()
+      userProgress.forEach((progress) => {
+         progressMap.set(progress.moduleHygraphId, progress)
+      })
+      // Find the first module that hasn't been completed
+      // Sort modules by order
+      const nextModule = allModules
+         .sort((a, b) => {
+            if (!a.content || !b.content) return 0
+            return (a.content.order || 0) - (b.content.order || 0)
+         })
+         .find((module) => {
+            if (!module.content) return false
+            const progress = progressMap.get(module.content.id)
+
+            // Module hasn't been started or isn't completed
+            return !progress || !progress.completedAt
+         })
+
+      return nextModule || null
    }
 
    /**

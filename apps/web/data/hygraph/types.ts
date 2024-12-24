@@ -29,6 +29,10 @@ export type TalentGuideModule = {
     */
    category: TalentGuideModuleCategory
    /**
+    * The order in which the module should appear, used for sorting
+    */
+   order: number
+   /**
     * The blocks of the module, eg HeaderBlock, TextBlock, ImageBlock, LivestreamsBlock etc
     */
    moduleSteps: ModuleStepType[]
