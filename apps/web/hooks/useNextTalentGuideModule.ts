@@ -1,5 +1,4 @@
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
-import { tgBackendService } from "data/hygraph/TalentGuideBackendService"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import useSWR from "swr"
 
@@ -9,10 +8,12 @@ const fetchNextModule = async (
 ): Promise<Page<TalentGuideModule> | null> => {
    if (!userAuthUid) return null
 
-   // Get all modules from CMS
-   const allModules = await tgBackendService.getAllTalentGuideModulePages(
-      locale
-   )
+   // Get all modules from API
+   const response = await fetch(`/api/talent-guide/modules?locale=${locale}`)
+   if (!response.ok) {
+      throw new Error("Failed to fetch existing modules")
+   }
+   const allModules = (await response.json()) as Page<TalentGuideModule>[]
 
    // Get next module using the progress service
    return talentGuideProgressService.getNextModule(userAuthUid, allModules)
