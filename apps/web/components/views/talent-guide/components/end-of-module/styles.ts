@@ -88,6 +88,9 @@ export const congratsStyles = sxStyles({
    congratsTitle: {
       color: "neutral.800",
       fontWeight: 700,
+      mt: {
+         md: 3.6,
+      },
    },
    congratsText: {
       color: "neutral.700",

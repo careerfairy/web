@@ -1,10 +1,16 @@
 import { Stack, Typography } from "@mui/material"
 import FramerBox, { FramerBoxProps } from "components/views/common/FramerBox"
 import { Variants } from "framer-motion"
-import Image from "next/image"
+import dynamic from "next/dynamic"
 import { congratsStyles } from "./styles"
 
-const SIZE_MULTIPLIER = 1.3
+const DotLottiePlayer = dynamic(
+   () =>
+      import("@lottiefiles/dotlottie-react").then((mod) => mod.DotLottieReact),
+   { ssr: false }
+)
+
+const ICON_SIZE = 220
 
 const CongratsMessage = () => {
    return (
@@ -14,13 +20,14 @@ const CongratsMessage = () => {
          sx={congratsStyles.congratsRoot}
       >
          <FramerBox {...iconAnimation}>
-            <Image
-               src="/talent-guide/medal.gif"
-               alt="congrats"
-               width={150 * SIZE_MULTIPLIER}
-               height={150 * SIZE_MULTIPLIER}
-               priority
-               quality={100}
+            <DotLottiePlayer
+               src="https://lottie.host/d558d19f-a358-49da-94db-720735dfdd9f/8vHnDUfZon.lottie"
+               autoplay
+               loop
+               style={{
+                  width: ICON_SIZE,
+                  height: ICON_SIZE,
+               }}
             />
          </FramerBox>
          <Typography
