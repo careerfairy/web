@@ -82,6 +82,7 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
                      initial="hidden"
                      animate="visible"
                      exit="exit"
+                     id={`talent-guide-step-${index}`}
                      onAnimationComplete={() =>
                         handleAnimationComplete(isLastStep)
                      }
