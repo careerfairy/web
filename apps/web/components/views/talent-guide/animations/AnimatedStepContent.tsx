@@ -1,3 +1,4 @@
+import { Stack } from "@mui/material"
 import FramerBox from "components/views/common/FramerBox"
 import { AnimatePresence, Variants } from "framer-motion"
 import React, { ReactElement, useCallback, useRef } from "react"
@@ -67,9 +68,13 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
 
    return (
       <FramerBox
+         component={Stack}
          variants={containerVariants}
          initial="hidden"
          animate="visible"
+         sx={{
+            gap: "24px",
+         }}
       >
          <AnimatePresence mode="sync">
             {React.Children.map(children, (child, index) => {
