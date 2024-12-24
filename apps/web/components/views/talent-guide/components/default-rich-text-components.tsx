@@ -88,6 +88,7 @@ export const createDefaultRichTextComponents = (
          <Box display="flex" justifyContent="center">
             <Image
                alt={altText || title}
+               quality={100}
                height={height}
                width={width}
                // loader={HygraphImageLoader} TODO: fix this not working, see example in https://github.com/hygraph/hygraph-examples/blob/master/with-nextjs-image-loader/pages/index.js
