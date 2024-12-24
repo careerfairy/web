@@ -23,7 +23,7 @@ const CongratsMessage = () => {
             <DotLottiePlayer
                src="https://lottie.host/d558d19f-a358-49da-94db-720735dfdd9f/8vHnDUfZon.lottie"
                autoplay
-               loop
+               loop={false}
                style={{
                   width: ICON_SIZE,
                   height: ICON_SIZE,
