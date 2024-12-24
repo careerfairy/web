@@ -1,5 +1,7 @@
 import { Box, useMediaQuery } from "@mui/material"
 import { AnimatePresence } from "framer-motion"
+import { useAuth } from "HOCs/AuthProvider"
+import { useNextTalentGuideModule } from "hooks/useNextTalentGuideModule"
 import { useEffect, useState } from "react"
 import { TalentGuideLayout } from "../TalentGuideLayout"
 import { CongratsSection } from "./CongratsSection"
@@ -9,6 +11,7 @@ import { layoutStyles } from "./styles"
 const SHOW_CONGRATS_TIME = 1000
 
 export const TalentGuideEndLayout = () => {
+   const { authenticatedUser } = useAuth()
    const [ratingClicked, setRatingClicked] = useState(false)
    const [someTimeHasPassed, setSomeTimeHasPassed] = useState(false)
    const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
@@ -23,6 +26,15 @@ export const TalentGuideEndLayout = () => {
 
       return () => clearTimeout(timer)
    }, [])
+
+   const { data: nextModule } = useNextTalentGuideModule(
+      authenticatedUser?.uid,
+      "de"
+   )
+   console.log(
+      "🚀 ~ file: TalentGuideEndLayout.tsx:31 ~ TalentGuideEndLayout ~ nextModule:",
+      nextModule
+   )
 
    const showCongrats =
       !ratingClicked && !(isShorterScreen && someTimeHasPassed)
