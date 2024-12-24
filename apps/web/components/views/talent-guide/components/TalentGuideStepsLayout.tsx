@@ -14,6 +14,10 @@ export const TalentGuideStepsLayout = () => {
          sx={{
             maxWidth: 600,
             px: 2,
+            pt: {
+               xs: 1.25,
+               md: 3.5,
+            },
          }}
       >
          <AnimatedStepContent>

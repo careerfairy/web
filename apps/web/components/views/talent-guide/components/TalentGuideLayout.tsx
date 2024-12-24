@@ -34,6 +34,7 @@ export const TalentGuideLayout = ({
          {Boolean(header) && <Box sx={styles.header}>{header}</Box>}
          <Container
             maxWidth={false}
+            disableGutters
             id="talent-guide-container"
             {...containerProps}
          >
