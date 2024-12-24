@@ -85,14 +85,16 @@ export const createDefaultRichTextComponents = (
          </Typography>
       ),
       img: ({ title, altText, height, width, src }) => (
-         <Image
-            alt={altText || title}
-            height={height}
-            width={width}
-            // loader={HygraphImageLoader} TODO: fix this not working, see example in https://github.com/hygraph/hygraph-examples/blob/master/with-nextjs-image-loader/pages/index.js
-            src={src}
-            style={styles.image}
-         />
+         <Box display="flex" justifyContent="center">
+            <Image
+               alt={altText || title}
+               height={height}
+               width={width}
+               // loader={HygraphImageLoader} TODO: fix this not working, see example in https://github.com/hygraph/hygraph-examples/blob/master/with-nextjs-image-loader/pages/index.js
+               src={src}
+               style={styles.image}
+            />
+         </Box>
       ),
       a: ({ children, openInNewTab, href, rel, ...rest }) => {
          if (href.match(/^https?:\/\/|^\/\//i)) {

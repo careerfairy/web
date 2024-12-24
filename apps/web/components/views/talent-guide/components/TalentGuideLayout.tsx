@@ -32,7 +32,11 @@ export const TalentGuideLayout = ({
    return (
       <Box id="talent-guide-layout" component="main" sx={styles.root}>
          {Boolean(header) && <Box sx={styles.header}>{header}</Box>}
-         <Container maxWidth={false} {...containerProps}>
+         <Container
+            maxWidth={false}
+            id="talent-guide-container"
+            {...containerProps}
+         >
             {children}
          </Container>
       </Box>
