@@ -97,3 +97,31 @@ export const congratsStyles = sxStyles({
       maxWidth: 323,
    },
 })
+
+export const nextModuleStyles = sxStyles({
+   section: {
+      width: "100%",
+      minHeight: "inherit",
+      textAlign: "center",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+   },
+   bottomContent: {
+      mt: "auto",
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+   },
+   bottomTitle: {
+      color: "neutral.800",
+      fontWeight: 700,
+   },
+   bottomText: {
+      color: "neutral.700",
+   },
+   bottomButton: {
+      my: 4,
+   },
+})
