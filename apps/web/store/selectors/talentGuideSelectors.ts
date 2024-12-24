@@ -70,3 +70,6 @@ export const useShowEndOfModuleExperience = () =>
 
 export const useTalentGuideState = () =>
    useAppSelector((state) => state.talentGuide)
+
+export const useModuleData = () =>
+   useAppSelector((state) => state.talentGuide.moduleData)

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { TalentGuideLayout } from "../TalentGuideLayout"
 import { CongratsSection } from "./CongratsSection"
 import { FeedbackSection } from "./FeedbackSection"
+import { NextModuleSection } from "./NextModuleSection"
 import { layoutStyles } from "./styles"
 
 const SHOW_CONGRATS_TIME = 1000
@@ -31,14 +32,11 @@ export const TalentGuideEndLayout = () => {
       authenticatedUser?.uid,
       "de"
    )
-   console.log(
-      "🚀 ~ file: TalentGuideEndLayout.tsx:31 ~ TalentGuideEndLayout ~ nextModule:",
-      nextModule
-   )
 
    const showCongrats =
       !ratingClicked && !(isShorterScreen && someTimeHasPassed)
    const showFeedback = someTimeHasPassed && !feedbackSubmitted
+   const showNextModule = Boolean(nextModule) && feedbackSubmitted
 
    return (
       <TalentGuideLayout sx={{ px: { xs: 3.25, md: 0 } }}>
@@ -58,6 +56,12 @@ export const TalentGuideEndLayout = () => {
                      isShorterScreen={isShorterScreen}
                      onRatingClick={() => setRatingClicked(true)}
                      onFeedbackSubmitted={() => setFeedbackSubmitted(true)}
+                  />
+               )}
+               {Boolean(showNextModule) && (
+                  <NextModuleSection
+                     key="next-module"
+                     nextModule={nextModule}
                   />
                )}
             </AnimatePresence>
