@@ -12,7 +12,7 @@ if (!hygraphUrl || !hygraphToken || !hygraphPreviewToken) {
    ].filter(Boolean)
 
    if (process.env.APP_ENV !== "test") {
-      console.error(
+      throw new Error(
          `Missing Hygraph environment variables: ${missingConfigs.join(", ")}`
       )
    }
