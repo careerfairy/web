@@ -1,10 +1,11 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
+   FEEDBACK_TAG_CATEGORY,
    QUIZ_STATE,
-   TagCategory,
    TalentGuideFeedback,
    TalentGuideProgress,
    TalentGuideQuiz,
+   TalentGuideRating,
 } from "@careerfairy/shared-lib/talent-guide"
 import { QuizModelType, TalentGuideModule } from "data/hygraph/types"
 import {
@@ -319,8 +320,8 @@ export class TalentGuideProgressService {
    async submitFeedback(
       moduleId: string,
       userAuthUid: string,
-      rating: 1 | 2 | 3 | 4 | 5,
-      selectedTagIds: TagCategory[]
+      rating: TalentGuideRating,
+      selectedTagIds: FEEDBACK_TAG_CATEGORY[]
    ) {
       const now = Timestamp.now()
 

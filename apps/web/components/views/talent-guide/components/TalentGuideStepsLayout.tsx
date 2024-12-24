@@ -9,7 +9,13 @@ export const TalentGuideStepsLayout = () => {
    const visibleSteps = useVisibleSteps()
 
    return (
-      <TalentGuideLayout header={<TalentGuideProgress />}>
+      <TalentGuideLayout
+         header={<TalentGuideProgress />}
+         sx={{
+            maxWidth: 600,
+            px: 2,
+         }}
+      >
          <AnimatedStepContent>
             {visibleSteps.map((step) => (
                <ModuleStepContentRenderer key={step.id} step={step} />

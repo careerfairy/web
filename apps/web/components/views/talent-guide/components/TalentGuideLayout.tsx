@@ -1,4 +1,4 @@
-import { Box, Container } from "@mui/material"
+import { Box, Container, ContainerProps } from "@mui/material"
 import { ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -22,13 +22,19 @@ const styles = sxStyles({
 type Props = {
    children: ReactNode
    header?: ReactNode
-}
+} & Omit<ContainerProps, "maxWidth">
 
-export const TalentGuideLayout = ({ children, header }: Props) => {
+export const TalentGuideLayout = ({
+   children,
+   header,
+   ...containerProps
+}: Props) => {
    return (
       <Box id="talent-guide-layout" component="main" sx={styles.root}>
          {Boolean(header) && <Box sx={styles.header}>{header}</Box>}
-         <Container maxWidth="md">{children}</Container>
+         <Container maxWidth={false} {...containerProps}>
+            {children}
+         </Container>
       </Box>
    )
 }
