@@ -1,4 +1,5 @@
 import {
+   FEEDBACK,
    HAPTIC,
    MESSAGING_TYPE,
    NativeEvent,
@@ -6,21 +7,35 @@ import {
    PERMISSIONS,
    USER_AUTH,
 } from "@careerfairy/shared-lib/src/messaging"
-import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
+import {
+   APPSTORE_LINK,
+   BASE_URL,
+   GOOGLE_STORE_LINK,
+   INCLUDES_PERMISSIONS,
+   SEARCH_CRITERIA,
+} from "@env"
 import { Audio } from "expo-av"
 import { Camera } from "expo-camera"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
 import React, { useEffect, useRef, useState } from "react"
 import {
+   Alert,
    AppState,
    BackHandler,
    Linking,
+   Modal,
    Platform,
    SafeAreaView,
+   ScrollView,
    StatusBar,
    StyleSheet,
+   Text,
+   TextInput,
+   TouchableOpacity,
+   View,
 } from "react-native"
+import { Rating } from "react-native-ratings"
 import { WebView } from "react-native-webview"
 
 const injectedCSS = `
@@ -49,16 +64,56 @@ interface WebViewScreenProps {
       userPassword: string,
       userToken: string | null
    ) => void
+   onFeedbackSent: (
+      ratingType: string,
+      rating: number,
+      feedback: string
+   ) => void
 }
 
 const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
+   onFeedbackSent,
    onLogout,
 }) => {
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef: any = useRef(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
+   const [modalVisible, setModalVisible] = useState(false)
+   const [rating, setRating] = useState(1)
+   const [feedback, setFeedback] = useState("")
+   const [ratingType, setRatingType] = useState("")
+   const [modalTitle, setModalTitle] = useState("")
+   const [modalSubtitle, setModalSubtitle] = useState("")
+
+   const openStore = () => {
+      const url = Platform.select({
+         ios: APPSTORE_LINK,
+         android: GOOGLE_STORE_LINK,
+      })
+
+      if (url) {
+         Linking.openURL(url)
+      }
+   }
+
+   const handleSubmit = () => {
+      if (rating >= 4) {
+         openStore()
+      }
+
+      Alert.alert("Thank you for your feedback!")
+      setModalVisible(false)
+      setRating(0)
+      setFeedback("")
+      setRatingType("")
+      setModalTitle("")
+      setModalSubtitle("")
+      if (rating > 0) {
+         onFeedbackSent(ratingType, rating, feedback)
+      }
+   }
 
    useEffect(() => {
       checkPermissions()
@@ -191,6 +246,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                return handlePermissions(data as PERMISSIONS)
             case MESSAGING_TYPE.LOGOUT:
                return handleLogout()
+            case MESSAGING_TYPE.FEEDBACK:
+               return handleFeedback(data as FEEDBACK)
             default:
                break
          }
@@ -232,6 +289,13 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       } catch (error) {
          console.log(error)
       }
+   }
+
+   const handleFeedback = (feedback: FEEDBACK) => {
+      setModalVisible(true)
+      setRatingType(feedback.ratingType)
+      setModalTitle(feedback.title)
+      setModalSubtitle(feedback.subtitle)
    }
 
    // Handle back button in WebView
@@ -353,36 +417,130 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
             renderToHardwareTextureAndroid={true} // Improve performance on android
          />
+
+         <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+         >
+            <View style={styles.modalOverlay}>
+               <View style={styles.modalContent}>
+                  <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+                     <Text style={styles.title}>{modalTitle}</Text>
+                     <Text style={styles.subtitle}>{modalSubtitle}</Text>
+                     <Rating
+                        type="star"
+                        startingValue={1}
+                        imageSize={30}
+                        onFinishRating={setRating}
+                        minValue={1}
+                        style={{ paddingVertical: 10 }}
+                     />
+                     <TextInput
+                        style={styles.feedbackInput}
+                        placeholder="Leave a comment if you want to..."
+                        placeholderTextColor="#888"
+                        value={feedback}
+                        onChangeText={setFeedback}
+                        multiline={true}
+                        numberOfLines={6}
+                     />
+                     <TouchableOpacity
+                        onPress={handleSubmit}
+                        style={styles.submitButton}
+                     >
+                        <Text style={styles.submitButtonText}>Submit</Text>
+                     </TouchableOpacity>
+                     <TouchableOpacity
+                        onPress={() => setModalVisible(false)}
+                        style={styles.closeButton}
+                     >
+                        <Text style={styles.closeButtonText}>Close</Text>
+                     </TouchableOpacity>
+                  </ScrollView>
+               </View>
+            </View>
+         </Modal>
       </SafeAreaView>
    )
 }
 
 const styles = StyleSheet.create({
-   banner: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: "#3bbba5",
-      paddingTop: 10,
-      paddingBottom: 10,
-      paddingRight: 10,
-      paddingLeft: 10,
-      gap: 4,
-      flexDirection: "column",
-      alignItems: "center",
+   container: {
+      flex: 1,
       justifyContent: "center",
-      zIndex: 1000,
+      alignItems: "center",
+      backgroundColor: "#f5f5f5",
    },
-   bannerText: {
-      color: "#000000",
+   rateButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "#3bbba5",
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 25,
+   },
+   rateText: {
+      color: "white",
+      fontSize: 16,
+      marginLeft: 8,
+   },
+   modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+   modalContent: {
+      backgroundColor: "white",
+      padding: 20,
+      borderRadius: 10,
+      alignItems: "center",
+      width: "90%",
+   },
+   title: {
+      fontSize: 20,
+      fontWeight: "bold",
+      marginBottom: 10,
+   },
+   subtitle: {
+      fontSize: 16,
+      color: "#555",
+      marginBottom: 20,
+   },
+   feedbackInput: {
+      width: "100%",
+      borderWidth: 1,
+      borderColor: "#ddd",
+      borderRadius: 8,
+      padding: 10,
       fontSize: 14,
-      fontWeight: "bold",
+      color: "#333",
+      marginTop: 10,
+      textAlignVertical: "top", // Keeps text aligned at the top
    },
-   bannerButton: {
-      color: "#ffffff",
-      fontWeight: "bold",
-      marginLeft: 5,
+   submitButton: {
+      marginTop: 20,
+      backgroundColor: "#3bbba5",
+      paddingVertical: 10,
+      paddingHorizontal: 30,
+      borderRadius: 25,
+   },
+   submitButtonText: {
+      color: "white",
+      fontSize: 16,
+   },
+   closeButton: {
+      marginTop: 10,
+      backgroundColor: "#ff6347",
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 25,
+   },
+   closeButtonText: {
+      color: "white",
+      fontSize: 16,
    },
 })
 

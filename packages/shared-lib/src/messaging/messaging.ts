@@ -2,6 +2,7 @@ export enum MESSAGING_TYPE {
    "USER_AUTH" = "USER_AUTH",
    "HAPTIC" = "HAPTIC",
    "PERMISSIONS" = "PERMISSIONS",
+   "FEEDBACK" = "FEEDBACK",
    "LOGOUT" = "LOGOUT",
 }
 
@@ -20,8 +21,14 @@ export type PERMISSIONS = {
    permissions: string[]
 }
 
+export type FEEDBACK = {
+   title: string
+   subtitle: string
+   ratingType: string
+}
+
 export type NativeEventStringified = { nativeEvent: { data: string } }
 export type NativeEvent = {
    type: MESSAGING_TYPE
-   data: USER_AUTH | HAPTIC | PERMISSIONS
+   data: USER_AUTH | HAPTIC | PERMISSIONS | FEEDBACK
 }

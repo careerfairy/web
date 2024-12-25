@@ -10,4 +10,6 @@ declare module "@env" {
    export const FIREBASE_STORAGE_BUCKET: string
    export const FIREBASE_MESSAGING_SENDER_ID: string
    export const FIREBASE_APPS_ID: string
+   export const APPSTORE_LINK: string
+   export const GOOGLE_STORE_LINK: string
 }

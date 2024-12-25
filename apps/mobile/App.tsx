@@ -7,7 +7,14 @@ import {
    Image,
 } from "react-native"
 import WebViewComponent from "./components/WebView"
-import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
+import {
+   arrayRemove,
+   arrayUnion,
+   doc,
+   getDoc,
+   setDoc,
+   updateDoc,
+} from "firebase/firestore"
 import { app, db, auth } from "./firebase"
 import * as SecureStore from "expo-secure-store"
 import * as Notifications from "expo-notifications"
@@ -143,6 +150,14 @@ export default function Native() {
       }
    }
 
+   const onFeedbackSent = (
+      ratingType: string,
+      rating: number,
+      feedback: string
+   ) => {
+      saveUserRating(ratingType, rating, feedback)
+   }
+
    const onLogout = async (
       userId: string,
       userPassword: string,
@@ -168,6 +183,60 @@ export default function Native() {
                await updateDoc(userDocRef, { fcmTokens: arrayUnion(pushToken) })
             }
             await SecureStore.setItemAsync("pushToken", pushToken)
+         }
+      } catch (error) {
+         console.error("Failed to send data to the Firestore:", error)
+      }
+   }
+
+   async function saveUserRating(
+      ratingKey: string,
+      userRating: number,
+      feedback: string
+   ) {
+      try {
+         const userId = await SecureStore.getItemAsync("userId")
+         const userPassword = await SecureStore.getItemAsync("userPassword")
+         const ratingData = {
+            rating: userRating,
+            feedback,
+         }
+
+         if (userId && userPassword) {
+            await signInWithEmailAndPassword(auth, userId, userPassword)
+            if (auth.currentUser?.email) {
+               const userDocRef = doc(db, "userData", auth.currentUser.email)
+
+               const userSnap = await getDoc(userDocRef)
+
+               if (userSnap.exists()) {
+                  const userData = userSnap.data()
+
+                  // Check if `rating` exists in the document
+                  if (userData.rating) {
+                     // Update the specific field in the `rating` map
+                     await updateDoc(userDocRef, {
+                        [`rating.${ratingKey}`]: ratingData,
+                     })
+                  } else {
+                     // Initialize the `rating` field if it doesn't exist
+                     await updateDoc(userDocRef, {
+                        rating: {
+                           [ratingKey]: ratingData,
+                        },
+                     })
+                     console.log("Rating initialized and updated successfully!")
+                  }
+               } else {
+                  // If the document doesn't exist, create it with the rating field
+                  await setDoc(userDocRef, {
+                     rating: {
+                        [ratingKey]: ratingData,
+                     },
+                  })
+                  console.log("Document created with rating!")
+               }
+            }
          }
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
@@ -235,6 +304,10 @@ export default function Native() {
    }
 
    return (
-      <WebViewComponent onTokenInjected={getPushToken} onLogout={onLogout} />
+      <WebViewComponent
+         onTokenInjected={getPushToken}
+         onLogout={onLogout}
+         onFeedbackSent={onFeedbackSent}
+      />
    )
 }
