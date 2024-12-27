@@ -10,10 +10,11 @@ import { BrandedPagination } from "components/views/common/BrandedPagination"
 import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import JobCard from "components/views/common/jobs/JobCard"
 import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
+import { useJobsBlock } from "./control/JobsBlockContext"
 import { EmptyJobsView } from "./EmptyJobsView"
-import { useJobsBlock } from "./JobsBlockContext"
+import { LiveStreamDialogExtended } from "./LiveStreamDialogExtended"
 
 const styles = sxStyles({
    jobList: {
@@ -25,7 +26,14 @@ const styles = sxStyles({
 })
 
 export const JobsList = () => {
-   const { blockId, selectedJobTypesIds, selectedJobAreasIds } = useJobsBlock()
+   const {
+      blockId,
+      selectedJobTypesIds,
+      selectedJobAreasIds,
+      selectedJob,
+      handleCloseJobDialog,
+      handleJobCardClick,
+   } = useJobsBlock()
 
    const { customJobs: allCustomJobs } = useCustomJobs({
       businessFunctionTagIds: selectedJobAreasIds,
@@ -41,16 +49,6 @@ export const JobsList = () => {
       data: allCustomJobs,
       itemsPerPage: 4,
    })
-
-   const [selectedJob, setSelectedJob] = useState<CustomJob>(null)
-
-   const onCloseDialog = useCallback(() => {
-      setSelectedJob(null)
-   }, [])
-
-   const handleJobClick = useCallback((job: CustomJob) => {
-      setSelectedJob(job)
-   }, [])
 
    const onPageChange = useCallback(
       (_event: React.ChangeEvent<unknown>, value: number) => {
@@ -69,7 +67,7 @@ export const JobsList = () => {
                         <SuspenseWithBoundary fallback={<JobCardSkeleton />}>
                            <JobCard
                               job={job}
-                              handleClick={handleJobClick}
+                              handleClick={handleJobCardClick}
                               previewMode
                               smallCard
                            />
@@ -91,20 +89,20 @@ export const JobsList = () => {
                   <CustomJobDetailsDialog
                      customJobId={selectedJob.id}
                      isOpen={Boolean(selectedJob)}
-                     onClose={onCloseDialog}
+                     onClose={handleCloseJobDialog}
                      source={{
                         source: CustomJobApplicationSourceTypes.Levels,
                         id: blockId,
                      }}
                      heroContent={
                         <CustomJobDetailsDialog.CloseButton
-                           onClose={onCloseDialog}
+                           onClose={handleCloseJobDialog}
                         />
                      }
-                     hideLinkedLivestreams
                      heroSx={styles.heroSx}
                   />
                ) : null}
+               <LiveStreamDialogExtended />
             </>
          ) : (
             <EmptyJobsView />
