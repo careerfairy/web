@@ -75,7 +75,7 @@ export class ManualTemplatedEmailService {
          EUROPEAN_COUNTRY_CODES.includes(user.universityCountryCode)
       )
 
-      const batchSize = 200
+      const batchSize = 500
 
       await processInBatches(
          europeanUsers.map((user) => user.userEmail),
@@ -93,7 +93,7 @@ export class ManualTemplatedEmailService {
             this.usersStats[userEmail] = { seenSparks, watchedEvents }
          },
          this.logger,
-         300
+         200
       )
 
       this.subscribedUsers = convertDocArrayToDict(europeanUsers)
