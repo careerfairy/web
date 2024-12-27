@@ -81,6 +81,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
    const [modalVisible, setModalVisible] = useState(false)
+   const [redirectModalVisible, setRedirectModalVisible] = useState(false)
    const [rating, setRating] = useState(1)
    const [feedback, setFeedback] = useState("")
    const [ratingType, setRatingType] = useState("")
@@ -88,6 +89,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [modalSubtitle, setModalSubtitle] = useState("")
 
    const openStore = () => {
+      closeRedirectModal()
       const url = Platform.select({
          ios: APPSTORE_LINK,
          android: GOOGLE_STORE_LINK,
@@ -98,13 +100,18 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
    }
 
-   const handleSubmit = () => {
-      if (rating >= 4) {
-         openStore()
-      }
-
+   const closeRedirectModal = () => {
+      setRedirectModalVisible(false)
       Alert.alert("Thank you for your feedback!")
+   }
+
+   const handleSubmit = () => {
       setModalVisible(false)
+      if (rating >= 4) {
+         setRedirectModalVisible(true)
+      } else {
+         Alert.alert("Thank you for your feedback!")
+      }
       setRating(0)
       setFeedback("")
       setRatingType("")
@@ -117,6 +124,13 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    useEffect(() => {
       checkPermissions()
+      setTimeout(() => {
+         handleFeedback({
+            title: "Do you like our application?",
+            subtitle: "If you don't mind, please rate us!",
+            ratingType: "Application",
+         })
+      }, 10000)
    }, [])
 
    // Method for checking if iOS application was closed (opened in the background) and return to it
@@ -454,6 +468,38 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                      </TouchableOpacity>
                      <TouchableOpacity
                         onPress={() => setModalVisible(false)}
+                        style={styles.closeButton}
+                     >
+                        <Text style={styles.closeButtonText}>Close</Text>
+                     </TouchableOpacity>
+                  </ScrollView>
+               </View>
+            </View>
+         </Modal>
+
+         <Modal
+            animationType="slide"
+            transparent={true}
+            visible={redirectModalVisible}
+            onRequestClose={() => setRedirectModalVisible(false)}
+         >
+            <View style={styles.modalOverlay}>
+               <View style={styles.modalContent}>
+                  <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+                     <Text style={styles.title}>
+                        If you would like to rate us on Store as well?
+                     </Text>
+                     <Text style={styles.subtitle}>
+                        We would appreciate it!
+                     </Text>
+                     <TouchableOpacity
+                        onPress={openStore}
+                        style={styles.submitButton}
+                     >
+                        <Text style={styles.submitButtonText}>Rate</Text>
+                     </TouchableOpacity>
+                     <TouchableOpacity
+                        onPress={closeRedirectModal}
                         style={styles.closeButton}
                      >
                         <Text style={styles.closeButtonText}>Close</Text>
