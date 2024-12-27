@@ -5,6 +5,7 @@ import LinearProgress, {
 } from "@mui/material/LinearProgress"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/legacy/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
@@ -122,6 +123,7 @@ const VideoPreview: FC<Props> = ({
    identifier,
    autoPlaying,
 }) => {
+   const isMobile = useIsMobile()
    const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
@@ -221,7 +223,13 @@ const VideoPreview: FC<Props> = ({
                   containPreviewOnTablet={containPreviewOnTablet}
                />
             )}
-            {videoPlayedForSession || !light ? null : (
+            {Boolean(isMobile && (!playing || !autoPlaying)) && (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )}
+            {isMobile && (videoPlayedForSession || !light) ? null : (
                <ThumbnailOverlay
                   src={thumbnailUrl}
                   containPreviewOnTablet={containPreviewOnTablet}
