@@ -124,13 +124,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    useEffect(() => {
       checkPermissions()
-      setTimeout(() => {
-         handleFeedback({
-            title: "Do you like our application?",
-            subtitle: "If you don't mind, please rate us!",
-            ratingType: "Application",
-         })
-      }, 10000)
    }, [])
 
    // Method for checking if iOS application was closed (opened in the background) and return to it
