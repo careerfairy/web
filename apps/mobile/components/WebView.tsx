@@ -112,14 +112,14 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       } else {
          Alert.alert("Thank you for your feedback!")
       }
+      if (rating > 0) {
+         onFeedbackSent(ratingType, rating, feedback)
+      }
       setRating(0)
       setFeedback("")
       setRatingType("")
       setModalTitle("")
       setModalSubtitle("")
-      if (rating > 0) {
-         onFeedbackSent(ratingType, rating, feedback)
-      }
    }
 
    useEffect(() => {
