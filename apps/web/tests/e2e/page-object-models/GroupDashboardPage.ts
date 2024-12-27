@@ -537,7 +537,7 @@ export class GroupDashboardPage extends CommonPage {
       const followButton = this.page
          .getByTestId(`follow-button-${groupId}`)
          .first()
-      await followButton.scrollIntoViewIfNeeded()
+      await followButton.scrollIntoViewIfNeeded({ timeout: 1000 })
       await followButton.click()
    }
 
