@@ -30,8 +30,9 @@ export class ManualTemplatedEmailBuilder {
          TemplateModel: {
             user: {
                firstName,
+               totLivestreams: stats.watchedEvents,
+               totSparks: stats.seenSparks,
             },
-            stats,
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
          Tag: "christmas-highlight",
