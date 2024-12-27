@@ -162,7 +162,7 @@ const YourCVView = ({
                         fontWeight={400}
                         color="neutral.600"
                      >
-                        Current cv
+                        Current CV
                      </Typography>
                      <Typography
                         variant="medium"
