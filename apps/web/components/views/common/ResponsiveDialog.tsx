@@ -8,10 +8,8 @@ import {
 } from "@mui/material"
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ReactNode } from "react"
-import { Loader } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import BrandedSwipeableDrawer from "./inputs/BrandedSwipeableDrawer"
 
@@ -57,7 +55,8 @@ type ResponsiveDialogProps = {
 export const ResponsiveDialogLayout = ({
    children,
    open,
-}: Pick<ResponsiveDialogProps, "children" | "open">) => {
+   handleClose,
+}: ResponsiveDialogProps) => {
    const isMobile = useIsMobile()
 
    if (isMobile) {
@@ -69,7 +68,7 @@ export const ResponsiveDialogLayout = ({
                sx: styles.drawer,
             }}
             onOpen={() => {}}
-            onClose={() => {}}
+            onClose={handleClose}
             disableEnforceFocus
          >
             {children}
@@ -77,7 +76,13 @@ export const ResponsiveDialogLayout = ({
       )
    }
    return (
-      <Dialog open={open} maxWidth={"md"} fullWidth disableEnforceFocus>
+      <Dialog
+         open={open}
+         maxWidth={"md"}
+         onClose={handleClose}
+         fullWidth
+         disableEnforceFocus
+      >
          {children}
       </Dialog>
    )
@@ -117,29 +122,20 @@ const Header = ({
 const Actions = ({ children }: Pick<ResponsiveDialogProps, "children">) => {
    const isMobile = useIsMobile()
 
-   return (
-      <SuspenseWithBoundary>
-         {isMobile ? (
-            <Box sx={styles.dialogActions}>{children}</Box>
-         ) : (
-            <DialogActions sx={styles.dialogActions}>{children}</DialogActions>
-         )}
-      </SuspenseWithBoundary>
-   )
+   if (isMobile) {
+      return <Box sx={styles.dialogActions}>{children}</Box>
+   }
+
+   return <DialogActions sx={styles.dialogActions}>{children}</DialogActions>
 }
 
 const Content = ({ children }: Pick<ResponsiveDialogProps, "children">) => {
    const isMobile = useIsMobile()
 
-   return (
-      <SuspenseWithBoundary fallback={<Loader />}>
-         {isMobile ? (
-            <Box>{children}</Box>
-         ) : (
-            <DialogContent>{children}</DialogContent>
-         )}
-      </SuspenseWithBoundary>
-   )
+   if (isMobile) {
+      return <Box>{children}</Box>
+   }
+   return <DialogContent>{children}</DialogContent>
 }
 
 ResponsiveDialogLayout.Header = Header

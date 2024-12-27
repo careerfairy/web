@@ -1,20 +1,16 @@
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
 import { useIsLiveStreamDialogOpen } from "../../../live-stream/useIsLiveStreamDialogOpen"
-import { HighlightsContextType } from "./HighlightsBlockContext"
+import { JobsBlockContextType } from "./JobsBlockContext"
 
-export const useLiveStreamDialogManager = (
-   highlights: HighlightsContextType["highlights"],
-   expandedPlayingIndex: HighlightsContextType["expandedPlayingIndex"],
-   setExpandedPlayingIndex: HighlightsContextType["setExpandedPlayingIndex"]
-): {
-   handleLiveStreamDialogOpen: HighlightsContextType["handleLiveStreamDialogOpen"]
-   handleLiveStreamDialogClose: HighlightsContextType["handleLiveStreamDialogClose"]
-   handleCloseCardClick: HighlightsContextType["handleCloseCardClick"]
-   isLiveStreamDialogOpen: HighlightsContextType["isLiveStreamDialogOpen"]
-   currentLiveStreamIdInDialog: HighlightsContextType["currentLiveStreamIdInDialog"]
-   setCurrentLiveStreamIdInDialog: HighlightsContextType["setCurrentLiveStreamIdInDialog"]
-   getLiveStreamDialogKey: () => string
+export const useLiveStreamDialogJobsManager = (): {
+   currentLiveStreamIdInDialog: JobsBlockContextType["currentLiveStreamIdInDialog"]
+   setCurrentLiveStreamIdInDialog: JobsBlockContextType["setCurrentLiveStreamIdInDialog"]
+   handleLiveStreamDialogOpen: JobsBlockContextType["handleLiveStreamDialogOpen"]
+   handleLiveStreamDialogClose: JobsBlockContextType["handleLiveStreamDialogClose"]
+   handleCloseCardClick: JobsBlockContextType["handleCloseCardClick"]
+   isLiveStreamDialogOpen: JobsBlockContextType["isLiveStreamDialogOpen"]
+   getLiveStreamDialogKey: JobsBlockContextType["getLiveStreamDialogKey"]
 } => {
    const router = useRouter()
    const isLiveStreamDialogOpen = useIsLiveStreamDialogOpen()
@@ -29,7 +25,7 @@ export const useLiveStreamDialogManager = (
       useState<string>(undefined)
 
    const handleLiveStreamDialogOpen = useCallback(
-      (newLiveStreamId: string) => {
+      (jobId: string, newLiveStreamId: string) => {
          if (currentLiveStreamIdInDialog === newLiveStreamId) {
             setLiveStreamDialogKey(
                `${currentLiveStreamIdInDialog}-${Date.now()}`
@@ -43,7 +39,7 @@ export const useLiveStreamDialogManager = (
                pathname: router.pathname,
                query: {
                   ...router.query,
-                  highlightId: highlights[expandedPlayingIndex].id,
+                  jobId: jobId,
                   dialogLiveStreamId: newLiveStreamId,
                },
             },
@@ -54,7 +50,7 @@ export const useLiveStreamDialogManager = (
             }
          )
       },
-      [currentLiveStreamIdInDialog, expandedPlayingIndex, highlights, router]
+      [currentLiveStreamIdInDialog, router]
    )
 
    const handleLiveStreamDialogClose = useCallback(() => {
@@ -75,9 +71,8 @@ export const useLiveStreamDialogManager = (
    }, [router])
 
    const handleCloseCardClick = useCallback(() => {
-      setExpandedPlayingIndex(undefined)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { highlightId, ...restOfQuery } = router.query
+      const { jobId, ...restOfQuery } = router.query
       void router.push(
          {
             pathname: router.pathname,
@@ -91,7 +86,7 @@ export const useLiveStreamDialogManager = (
       )
 
       setCurrentLiveStreamIdInDialog(undefined)
-   }, [router, setCurrentLiveStreamIdInDialog, setExpandedPlayingIndex])
+   }, [router, setCurrentLiveStreamIdInDialog])
 
    const getLiveStreamDialogKey = useCallback(() => {
       return liveStreamDialogKey || currentLiveStreamIdInDialog
@@ -114,12 +109,6 @@ export const useLiveStreamDialogManager = (
       isLiveStreamDialogOpen,
       liveStreamDialogKey,
    ])
-
-   useEffect(() => {
-      if (!router.query.highlightId) {
-         setExpandedPlayingIndex(undefined)
-      }
-   }, [router.query.highlightId, setExpandedPlayingIndex])
 
    return {
       handleLiveStreamDialogOpen,
