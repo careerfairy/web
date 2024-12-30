@@ -8,7 +8,6 @@ export const layoutStyles = sxStyles({
       justifyContent: "center",
       minHeight: "100dvh",
       position: "relative",
-      overflow: "hidden",
    },
 })
 
@@ -31,13 +30,6 @@ export const feedbackStyles = sxStyles({
    },
    title: {
       fontWeight: 700,
-   },
-   container: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: 2,
-      textAlign: "center",
    },
    starsContainer: {
       display: "flex",
@@ -102,7 +94,6 @@ export const nextModuleStyles = sxStyles({
    section: {
       width: "100%",
       minHeight: "inherit",
-      textAlign: "center",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -120,6 +111,7 @@ export const nextModuleStyles = sxStyles({
    },
    bottomText: {
       color: "neutral.700",
+      textAlign: "center",
    },
    bottomButton: {
       my: 4,
