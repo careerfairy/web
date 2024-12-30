@@ -15,7 +15,7 @@ npm install
 ### 2. Setup of base url and search criteria
 
 For setup of base webview url, go to .env file and change the data. For any new variable added to the file (or removed), please update the types in .env.d.ts file.
-When testing on branch and created a PR, use the PR preview url that should be in pattern: https://pr-[pr-number].preview.careerfairy.io
+When testing on branch and created a PR, use the PR preview url that should be in pattern: careerfairy-ssr-webapp-web-pr-[pr-number].now.sh
 
 Go to this link to see how to get current preview url: https://github.com/careerfairy/web/pull/1340
 If you change base url, please go to apps/mobile and run command:
