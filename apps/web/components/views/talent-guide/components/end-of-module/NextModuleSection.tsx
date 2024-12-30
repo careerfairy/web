@@ -174,7 +174,12 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          </AnimatePresence>
          <FramerBox
             key="bottom-content"
-            sx={[nextModuleStyles.bottomContent]}
+            sx={[
+               nextModuleStyles.bottomContent,
+               isShortScreen && {
+                  paddingTop: 4,
+               },
+            ]}
             variants={childVariants}
          >
             <BottomContent nextModule={nextModule} />
