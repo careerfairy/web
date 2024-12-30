@@ -6,7 +6,11 @@ import { Box, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { statusStyles } from "./styles"
 
-export const ModuleCompletedChip = () => {
+type Props = {
+   onShineAnimationComplete?: () => void
+}
+
+export const ModuleCompletedChip = ({ onShineAnimationComplete }: Props) => {
    const isMobile = useIsMobile()
    return (
       <Box display="flex">
@@ -22,7 +26,9 @@ export const ModuleCompletedChip = () => {
                transition={{
                   duration: 2,
                   ease: [0.4, 0, 0.2, 1],
+                  delay: 0.5,
                }}
+               onAnimationComplete={onShineAnimationComplete}
             />
             <svg
                xmlns="http://www.w3.org/2000/svg"

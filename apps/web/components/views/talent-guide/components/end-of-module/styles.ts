@@ -121,4 +121,21 @@ export const nextModuleStyles = sxStyles({
    bottomButton: {
       my: 4,
    },
+   divider: {
+      width: "1px !important",
+      height: 36,
+      bgcolor: "neutral.300",
+   },
+   dividerOffset: {
+      height: 36,
+   },
+   completedModuleCard: {
+      transition: (theme) => theme.transitions.create("opacity"),
+      position: "absolute",
+      opacity: 1,
+   },
+   slideUp: {
+      position: "static",
+      opacity: 0.6,
+   },
 })
