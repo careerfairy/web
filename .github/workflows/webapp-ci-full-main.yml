@@ -191,7 +191,7 @@ jobs:
       steps:
          - uses: actions/checkout@v4
          - name: Deploy to Vercel
-           uses: BetaHuhn/deploy-to-vercel-action@v1
+           uses: BetaHuhn/deploy-to-vercel-action@v1.10.0
            id: vercel-deploy
            with:
               VERCEL_SCOPE: careerfairy-ssr
