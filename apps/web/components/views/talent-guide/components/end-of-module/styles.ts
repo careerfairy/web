@@ -100,6 +100,9 @@ export const nextModuleStyles = sxStyles({
       position: "relative",
       justifyContent: "center",
    },
+   shortScreenSection: {
+      minHeight: 602,
+   },
    bottomContent: {
       mt: "auto",
       width: "100%",
@@ -107,8 +110,7 @@ export const nextModuleStyles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
       marginTop: "auto",
-      position: "absolute",
-      bottom: 0,
+      position: "static",
    },
    bottomTitle: {
       color: "neutral.800",
@@ -133,6 +135,7 @@ export const nextModuleStyles = sxStyles({
       transition: (theme) => theme.transitions.create("opacity"),
       position: "absolute",
       opacity: 1,
+      marginTop: "auto",
    },
    slideUp: {
       position: "static",
