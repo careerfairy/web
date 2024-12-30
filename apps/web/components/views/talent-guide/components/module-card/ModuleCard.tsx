@@ -1,4 +1,5 @@
 import { Stack } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import Link from "next/link"
 import { sxStyles } from "types/commonTypes"
@@ -12,7 +13,10 @@ const styles = sxStyles({
       padding: -1,
    },
    card: {
-      padding: 1,
+      padding: {
+         xs: 1,
+         md: "8px 12px 8px 8px",
+      },
       borderRadius: "12px",
       border: (theme) => `1px solid ${theme.palette.secondary[50]}`,
       minWidth: 300,
@@ -29,7 +33,10 @@ const styles = sxStyles({
       },
    },
    content: {
-      padding: "4px 4px 4px 0px",
+      padding: {
+         xs: "4px 4px 4px 0px",
+         md: "12px 0px",
+      },
    },
 })
 
@@ -42,6 +49,8 @@ type Props = {
 }
 
 export const ModuleCard = ({ module, interactive }: Props) => {
+   const isMobile = useIsMobile()
+
    const CardWrapper = interactive ? Link : Stack
    const cardProps = interactive
       ? {
@@ -60,7 +69,7 @@ export const ModuleCard = ({ module, interactive }: Props) => {
          <Thumbnail thumbnailUrl={module.content.moduleIllustration?.url} />
          <Stack
             data-testid="module-card-content"
-            spacing={1}
+            spacing={isMobile ? 1 : 1.5}
             sx={styles.content}
          >
             <Status module={module.content} />

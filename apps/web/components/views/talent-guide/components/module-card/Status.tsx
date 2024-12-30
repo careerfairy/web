@@ -1,4 +1,3 @@
-import { Box } from "@mui/material"
 import { useModuleProgress } from "components/custom-hook/talent-guide/useModuleProgress"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { TalentGuideModule } from "data/hygraph/types"
@@ -14,7 +13,7 @@ export const Status = ({ module }: Props) => {
       <SuspenseWithBoundary
          fallback={
             <ModuleInfoChip
-               moduleName={module.moduleName}
+               moduleLevel={module.level}
                moduleDuration={module.moduleDuration}
             />
          }
@@ -27,20 +26,15 @@ export const Status = ({ module }: Props) => {
 const Content = ({ module }: Props) => {
    const moduleProgress = useModuleProgress(module.id)
 
-   if (!moduleProgress) {
-      return (
-         <ModuleInfoChip
-            moduleName={module.moduleName}
-            moduleDuration={module.moduleDuration}
-            percentProgress={25}
-            // percentProgress={moduleProgress?.percentageComplete}
-         />
-      )
-   }
-
-   if (moduleProgress.completedAt) {
+   if (moduleProgress?.completedAt) {
       return <ModuleCompletedChip />
    }
 
-   return <Box>Status</Box>
+   return (
+      <ModuleInfoChip
+         moduleLevel={module.level}
+         moduleDuration={module.moduleDuration}
+         percentProgress={moduleProgress?.percentageComplete}
+      />
+   )
 }

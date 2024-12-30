@@ -1,6 +1,7 @@
+import { reducedRemoteCallsOptions } from "components/custom-hook/utils/useFunctionsSWRFetcher"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
 import { Page, TalentGuideModule } from "data/hygraph/types"
-import useSWR from "swr"
+import useSWR, { SWRConfiguration } from "swr"
 
 const fetchNextModule = async (
    userAuthUid: string | null,
@@ -21,14 +22,15 @@ const fetchNextModule = async (
 
 export function useNextTalentGuideModule(
    userAuthUid: string | null,
-   locale: string = "en"
+   locale: string = "en",
+   options?: SWRConfiguration
 ) {
    return useSWR(
-      userAuthUid ? ["next-talent-guide-module", userAuthUid, locale] : null,
+      userAuthUid ? `next-talent-guide-module-${userAuthUid}-${locale}` : null,
       () => fetchNextModule(userAuthUid, locale),
       {
-         revalidateOnFocus: false,
-         revalidateOnReconnect: false,
+         ...reducedRemoteCallsOptions,
+         ...options,
       }
    )
 }

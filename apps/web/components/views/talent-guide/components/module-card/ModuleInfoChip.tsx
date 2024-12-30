@@ -5,28 +5,31 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { statusStyles } from "./styles"
 
 type Props = {
-   moduleName: string
    moduleDuration: string
    percentProgress?: number
+   moduleLevel: number
 }
 
 export const ModuleInfoChip = ({
-   moduleName,
    moduleDuration,
    percentProgress,
+   moduleLevel,
 }: Props) => {
+   const isMobile = useIsMobile()
+
    return (
       <Stack direction="row" justifyContent="space-between" alignItems="center">
          <Box sx={[statusStyles.info, statusStyles.chip]}>
             <Typography
                sx={statusStyles.infoText}
-               variant="small"
+               variant={isMobile ? "xsmall" : "small"}
                component="p"
             >
-               {moduleName}{" "}
+               Level {moduleLevel}
                <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="4"
@@ -46,7 +49,11 @@ export const ModuleInfoChip = ({
                direction="row"
             >
                <Progress value={25} />
-               <Typography variant="small" component="p" color="primary.main">
+               <Typography
+                  variant={isMobile ? "xsmall" : "small"}
+                  component="p"
+                  color="primary.main"
+               >
                   {percentProgress}%
                </Typography>
             </Stack>
