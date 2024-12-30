@@ -288,7 +288,6 @@ export class TalentGuideProgressService {
    ): Promise<Page<TalentGuideModule> | null> {
       // Get user's progress from Firebase
       const userProgress = await this.getAllUserModuleProgress(userAuthUid)
-      console.table(userProgress)
 
       // Create a map of module IDs to progress
       const progressMap = new Map<string, TalentGuideProgress>()
