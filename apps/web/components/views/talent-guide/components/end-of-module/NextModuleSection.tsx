@@ -1,5 +1,4 @@
 import { Button, Typography, useMediaQuery } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
@@ -49,7 +48,6 @@ export const NextModuleSection = ({ nextModule }: Props) => {
    useTraceUpdate(animationsState)
 
    const moduleData = useModuleData()
-   const isMobile = useIsMobile()
    const [cardOffset, setCardOffset] = useState(0)
 
    const isShortScreen = useMediaQuery("(max-height: 745px)")
