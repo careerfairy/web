@@ -1,33 +1,46 @@
 import { Button, Typography } from "@mui/material"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
-import { Variants } from "framer-motion"
+import { AnimatePresence, Variants } from "framer-motion"
 import { useRouter } from "next/router"
+import { Fragment } from "react"
 import { Play } from "react-feather"
 import { useModuleData } from "store/selectors/talentGuideSelectors"
 import { ModuleCard } from "../module-card/ModuleCard"
 import { nextModuleStyles } from "./styles"
 
 type Props = {
-   nextModule: Page<TalentGuideModule>
+   nextModule: Page<TalentGuideModule> | null
 }
 
 export const NextModuleSection = ({ nextModule }: Props) => {
    const moduleData = useModuleData()
 
    return (
-      <FramerBox
-         animate={"animate"}
-         initial="initial"
-         exit="exit"
-         transition={{ duration: 0.5, ease: "easeOut" }}
-         variants={feedbackVariants}
-         sx={nextModuleStyles.section}
-      >
-         <ModuleCard module={nextModule} />
-         <ModuleCard module={moduleData} />
-         <BottomContent nextModule={nextModule} />
-      </FramerBox>
+      <AnimatePresence>
+         <FramerBox
+            animate={"animate"}
+            initial="initial"
+            exit="exit"
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            variants={containerVariants}
+            sx={nextModuleStyles.section}
+            data-testid="next-module-section"
+         >
+            <FramerBox variants={childVariants}>
+               <ModuleCard interactive module={nextModule} />
+            </FramerBox>
+            <FramerBox variants={childVariants}>
+               <ModuleCard module={moduleData} />
+            </FramerBox>
+            <FramerBox
+               sx={nextModuleStyles.bottomContent}
+               variants={childVariants}
+            >
+               <BottomContent nextModule={nextModule} />
+            </FramerBox>
+         </FramerBox>
+      </AnimatePresence>
    )
 }
 
@@ -39,7 +52,7 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
    const { push } = useRouter()
 
    return (
-      <FramerBox sx={nextModuleStyles.bottomContent}>
+      <Fragment>
          <Typography
             variant="desktopBrandedH3"
             sx={nextModuleStyles.bottomTitle}
@@ -68,24 +81,41 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
          >
             Start next level
          </Button>
-      </FramerBox>
+      </Fragment>
    )
 }
 
-const feedbackVariants: Variants = {
+const containerVariants: Variants = {
    initial: {
       opacity: 0,
-      bottom: 0,
       y: 20,
    },
    animate: {
       opacity: 1,
-      transition: { duration: 0.5, ease: "easeOut" },
-      bottom: 0,
       y: 0,
+      transition: {
+         duration: 0.5,
+         ease: "easeOut",
+         staggerChildren: 0.1,
+      },
    },
    exit: {
       opacity: 0,
       transition: { duration: 0.3, ease: "easeIn" },
+   },
+}
+
+const childVariants: Variants = {
+   initial: {
+      opacity: 0,
+      y: 20,
+   },
+   animate: {
+      opacity: 1,
+      y: 0,
+      transition: {
+         duration: 0.5,
+         ease: "easeOut",
+      },
    },
 }

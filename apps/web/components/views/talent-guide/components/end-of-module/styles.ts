@@ -93,10 +93,12 @@ export const congratsStyles = sxStyles({
 export const nextModuleStyles = sxStyles({
    section: {
       width: "100%",
-      minHeight: "inherit",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
+      minHeight: "inherit",
+      position: "relative",
+      justifyContent: "center",
    },
    bottomContent: {
       mt: "auto",
@@ -104,6 +106,9 @@ export const nextModuleStyles = sxStyles({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
+      marginTop: "auto",
+      position: "absolute",
+      bottom: 0,
    },
    bottomTitle: {
       color: "neutral.800",
