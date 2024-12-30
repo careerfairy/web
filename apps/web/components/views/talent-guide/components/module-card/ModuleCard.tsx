@@ -20,10 +20,24 @@ const styles = sxStyles({
       borderRadius: "12px",
       border: (theme) => `1px solid ${theme.palette.secondary[50]}`,
       minWidth: 300,
+      width: "100%",
       textDecoration: "none", // prevent link underline
       color: "inherit", // prevent link color
-      transition: (theme) =>
-         theme.transitions.create(["transform", "box-shadow", "border-color"]),
+      transition: (theme) => theme.transitions.create(["all"]),
+      backgroundColor: (theme) => theme.brand.white[100],
+   },
+   recommended: {
+      animation: "boxShadowFadeIn 0.6s ease-in-out forwards",
+      "@keyframes boxShadowFadeIn": {
+         "0%": {
+            boxShadow: "none",
+         },
+         "100%": {
+            boxShadow:
+               "0px 0px 21.161px 0px rgba(0, 210, 170, 0.17), 0px 0px 44.439px 0px rgba(20, 20, 20, 0.08)",
+         },
+      },
+      border: (theme) => `1px solid ${theme.palette.primary[600]}`,
    },
    interactive: {
       "&:hover, &:focus": {
@@ -46,9 +60,16 @@ type Props = {
     * If true, the module card will be a link otherwise it will be a stack
     */
    interactive?: boolean
+   isRecommended?: boolean
+   onShineAnimationComplete?: () => void
 }
 
-export const ModuleCard = ({ module, interactive }: Props) => {
+export const ModuleCard = ({
+   module,
+   interactive,
+   isRecommended,
+   onShineAnimationComplete,
+}: Props) => {
    const isMobile = useIsMobile()
 
    const CardWrapper = interactive ? Link : Stack
@@ -64,7 +85,11 @@ export const ModuleCard = ({ module, interactive }: Props) => {
          {...cardProps}
          direction="row"
          spacing={1.5}
-         sx={[styles.card, interactive && styles.interactive]}
+         sx={[
+            styles.card,
+            interactive && styles.interactive,
+            isRecommended && styles.recommended,
+         ]}
       >
          <Thumbnail thumbnailUrl={module.content.moduleIllustration?.url} />
          <Stack
@@ -72,7 +97,10 @@ export const ModuleCard = ({ module, interactive }: Props) => {
             spacing={isMobile ? 1 : 1.5}
             sx={styles.content}
          >
-            <Status module={module.content} />
+            <Status
+               onShineAnimationComplete={onShineAnimationComplete}
+               module={module.content}
+            />
             <Details module={module.content} />
          </Stack>
       </Stack>

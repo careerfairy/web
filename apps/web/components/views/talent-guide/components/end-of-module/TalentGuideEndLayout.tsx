@@ -54,7 +54,7 @@ export const TalentGuideEndLayout = () => {
    const showCongrats =
       !ratingClicked && !(isShorterScreen && someTimeHasPassed)
    const showFeedback = someTimeHasPassed && !feedbackSubmitted
-   const showNextModule = feedbackSubmitted
+   const showNextModule = feedbackSubmitted && nextModule
 
    return (
       <TalentGuideLayout sx={{ px: { xs: 3.25, md: 0 }, maxWidth: 600 }}>
