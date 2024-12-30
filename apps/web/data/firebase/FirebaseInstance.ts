@@ -82,15 +82,23 @@ export const FunctionsInstance = firebaseApp.functions(region)
 
 if (typeof window !== "undefined") {
    // Enable offline persistence BEFORE setting any other Firestore settings
-   firestore.enablePersistence({ synchronizeTabs: true }).catch((err) => {
-      if (err.code === "failed-precondition") {
-         // Multiple tabs open, persistence can only be enabled in one tab at a time
-         console.warn("Firebase persistence failed: Multiple tabs open", err)
-      } else if (err.code === "unimplemented") {
-         // The current browser doesn't support persistence
-         console.warn("Firebase persistence not supported in this browser", err)
-      }
-   })
+   firestore
+      .enablePersistence({ synchronizeTabs: true })
+      .catch((err) => {
+         if (err.code === "failed-precondition") {
+            // Multiple tabs open, persistence can only be enabled in one tab at a time
+            console.warn("Firebase persistence failed: Multiple tabs open", err)
+         } else if (err.code === "unimplemented") {
+            // The current browser doesn't support persistence
+            console.warn(
+               "Firebase persistence not supported in this browser",
+               err
+            )
+         }
+      })
+      .then(() => {
+         console.log("Firebase persistence enabled")
+      })
 }
 
 export const FieldValue = firebase.firestore.FieldValue
