@@ -109,6 +109,9 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   nextModuleStyles.completedModuleCard,
                   animationsState.hasShineAnimationComplete &&
                      nextModuleStyles.slideUp,
+                  isShortScreen && {
+                     top: "20%",
+                  },
                ]}
                onLayoutAnimationComplete={() => {
                   setAnimationsState((prev) => ({
@@ -174,6 +177,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          </AnimatePresence>
          <FramerBox
             key="bottom-content"
+            layout
             sx={[
                nextModuleStyles.bottomContent,
                isShortScreen && {
