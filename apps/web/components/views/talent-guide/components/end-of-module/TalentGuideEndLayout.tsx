@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, useMediaQuery } from "@mui/material"
 import { AnimatePresence } from "framer-motion"
 import { useAuth } from "HOCs/AuthProvider"
@@ -6,8 +7,6 @@ import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { TalentGuideLayout } from "../TalentGuideLayout"
-import { CongratsSection } from "./CongratsSection"
-import { FeedbackSection } from "./FeedbackSection"
 import { NextModuleSection } from "./NextModuleSection"
 import { layoutStyles } from "./styles"
 
@@ -60,7 +59,7 @@ export const TalentGuideEndLayout = () => {
       <TalentGuideLayout sx={{ px: { xs: 3.25, md: 0 }, maxWidth: 600 }}>
          <Box id="talent-guide-end-layout" sx={layoutStyles.root}>
             <AnimatePresence>
-               {Boolean(showCongrats) && (
+               {/* {Boolean(showCongrats) && (
                   <CongratsSection
                      key="congrats"
                      isShorterScreen={isShorterScreen}
@@ -75,8 +74,8 @@ export const TalentGuideEndLayout = () => {
                      onRatingClick={() => setRatingClicked(true)}
                      onFeedbackSubmitted={() => setFeedbackSubmitted(true)}
                   />
-               )}
-               {Boolean(showNextModule) && (
+               )} */}
+               {Boolean(nextModule) && (
                   <NextModuleSection
                      key="next-module"
                      nextModule={nextModule}
