@@ -35,7 +35,6 @@ export const createFirebaseInstance = (
 
    const app = firebase.initializeApp(firebaseConfig, name)
 
-   // Set Firestore settings AFTER enabling persistence
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
 
    if (shouldUseEmulators()) {
@@ -52,10 +51,7 @@ export const createFirebaseInstance = (
 const getFirestoreSettings = (
    firestoreSettings?: firebase.firestore.Settings
 ) => {
-   const firestoreDefaultSettings = {
-      merge: true,
-      cacheSizeBytes: 100 * 1024 * 1024, // 100MB
-   }
+   const firestoreDefaultSettings = { merge: true }
 
    // The user doesn't seem to have Firestore connectivity, let's enable the long polling mode
    // This mode is set on FirebaseUtils.js
@@ -79,27 +75,6 @@ export const auth = firebase.auth()
 export const FirestoreInstance = firebaseApp.firestore()
 export const AuthInstance = firebaseApp.auth()
 export const FunctionsInstance = firebaseApp.functions(region)
-
-if (typeof window !== "undefined") {
-   // Enable offline persistence BEFORE setting any other Firestore settings
-   firestore
-      .enablePersistence({ synchronizeTabs: true })
-      .catch((err) => {
-         if (err.code === "failed-precondition") {
-            // Multiple tabs open, persistence can only be enabled in one tab at a time
-            console.warn("Firebase persistence failed: Multiple tabs open", err)
-         } else if (err.code === "unimplemented") {
-            // The current browser doesn't support persistence
-            console.warn(
-               "Firebase persistence not supported in this browser",
-               err
-            )
-         }
-      })
-      .then(() => {
-         console.log("Firebase persistence enabled")
-      })
-}
 
 export const FieldValue = firebase.firestore.FieldValue
 export const Timestamp = firebase.firestore.Timestamp
