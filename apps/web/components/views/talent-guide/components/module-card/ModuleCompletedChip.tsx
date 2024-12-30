@@ -3,9 +3,11 @@ import { Typography } from "@mui/material"
 import FramerBox from "components/views/common/FramerBox"
 
 import { Box, Stack } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { statusStyles } from "./styles"
 
 export const ModuleCompletedChip = () => {
+   const isMobile = useIsMobile()
    return (
       <Box display="flex">
          <Stack
@@ -42,7 +44,11 @@ export const ModuleCompletedChip = () => {
                   strokeLinejoin="round"
                />
             </svg>
-            <Typography variant="small" component="p" color="inherit">
+            <Typography
+               variant={isMobile ? "xsmall" : "small"}
+               component="p"
+               color="inherit"
+            >
                Level cleared
             </Typography>
          </Stack>
