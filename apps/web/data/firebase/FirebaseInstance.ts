@@ -1,11 +1,11 @@
-import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
-import "firebase/compat/auth"
-import "firebase/compat/storage"
-import "firebase/compat/functions"
-import SessionStorageUtil from "../../util/SessionStorageUtil"
-import { shouldUseEmulators } from "../../util/CommonUtil"
 import { fromDateFirestoreFn } from "@careerfairy/shared-lib/dist/firebaseTypes"
+import firebase from "firebase/compat/app"
+import "firebase/compat/auth"
+import "firebase/compat/firestore"
+import "firebase/compat/functions"
+import "firebase/compat/storage"
+import { shouldUseEmulators } from "../../util/CommonUtil"
+import SessionStorageUtil from "../../util/SessionStorageUtil"
 
 export const firebaseConfig = {
    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -35,6 +35,21 @@ export const createFirebaseInstance = (
 
    const app = firebase.initializeApp(firebaseConfig, name)
 
+   // Enable offline persistence
+   app.firestore()
+      .enablePersistence({
+         synchronizeTabs: true, // Enable multi-tab support
+      })
+      .catch((err) => {
+         if (err.code === "failed-precondition") {
+            // Multiple tabs open, persistence can only be enabled in one tab at a time
+            console.warn("Firebase persistence failed: Multiple tabs open")
+         } else if (err.code === "unimplemented") {
+            // The current browser doesn't support persistence
+            console.warn("Firebase persistence not supported in this browser")
+         }
+      })
+
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
 
    if (shouldUseEmulators()) {
@@ -51,7 +66,10 @@ export const createFirebaseInstance = (
 const getFirestoreSettings = (
    firestoreSettings?: firebase.firestore.Settings
 ) => {
-   const firestoreDefaultSettings = { merge: true }
+   const firestoreDefaultSettings = {
+      merge: true,
+      cacheSizeBytes: 100 * 1024 * 1024, // 100MB
+   }
 
    // The user doesn't seem to have Firestore connectivity, let's enable the long polling mode
    // This mode is set on FirebaseUtils.js

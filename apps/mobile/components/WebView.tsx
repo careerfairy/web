@@ -13,6 +13,7 @@ import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
 import React, { useEffect, useRef, useState } from "react"
 import {
+   AppState,
    BackHandler,
    Linking,
    Platform,
@@ -21,7 +22,6 @@ import {
    StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
-import { AppState } from "react-native"
 
 const injectedCSS = `
     body :not(input):not(textarea) {
@@ -315,7 +315,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             domStorageEnabled={true}
             startInLoadingState={true}
             allowsInlineMediaPlayback={true}
-            cacheMode="LOAD_NO_CACHE"
+            cacheMode="LOAD_DEFAULT" // Use cache
             userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
             sharedCookiesEnabled={true}
             thirdPartyCookiesEnabled={true}
@@ -340,6 +340,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                  style.innerHTML = \`${injectedCSS}\`;
                  document.head.appendChild(style);
               })();`}
+            allowFileAccess={true} // Allow service worker support for firebase offline caching
+            allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
+            javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
+            renderToHardwareTextureAndroid={true} // Improve performance on android
          />
       </SafeAreaView>
    )
