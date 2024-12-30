@@ -200,10 +200,16 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const handleUserAuth = async (data: USER_AUTH) => {
-      await SecureStore.setItemAsync("authToken", data.token)
-      await SecureStore.setItemAsync("userId", data.userId)
-      await SecureStore.setItemAsync("userPassword", data.userPassword)
-      onTokenInjected()
+      try {
+         await Promise.all([
+            SecureStore.setItemAsync("authToken", data.token),
+            SecureStore.setItemAsync("userId", data.userId),
+            SecureStore.setItemAsync("userPassword", data.userPassword),
+         ])
+         onTokenInjected()
+      } catch (error) {
+         console.error("Failed to store auth data:", error)
+      }
    }
 
    const handleHaptic = (data: HAPTIC) => {
