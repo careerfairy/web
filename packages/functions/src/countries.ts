@@ -66,6 +66,7 @@ export const fetchCountryCitiesList = functions
          citiesData.map((city) => ({
             name: city.name,
             id: generateCityId(city),
+            stateIsoCode: city.stateCode,
          })) ?? []
 
       const citiesMap: Record<string, CityOption> = cities
@@ -108,6 +109,7 @@ export const fetchCountryCityData = functions
          cityResult = {
             name: city.name,
             id: generateCityId(city),
+            stateIsoCode: stateCode,
          }
       }
 

@@ -164,9 +164,13 @@ const UserLocation = () => {
       userData?.cityIsoCode
    )
 
+   if (!data?.city && !data?.country) return null
+
    return (
       <Typography sx={styles.userLocation}>
-         {`${data?.city?.name}, ${data?.country?.name}`}
+         {data?.city?.name
+            ? `${data.city.name}, ${data?.country?.name}`
+            : data?.country?.name}
       </Typography>
    )
 }

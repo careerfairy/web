@@ -8,6 +8,7 @@ export type CountryOption = {
 export type CityOption = {
    name: string
    id: string // Generated id based on countryCode and stateCode, see @generateCityId.
+   stateIsoCode?: string
 }
 
 export const generateCityId = (city: ICity) => {
