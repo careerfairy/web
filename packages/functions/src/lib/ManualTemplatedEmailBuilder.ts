@@ -18,11 +18,7 @@ export class ManualTemplatedEmailBuilder {
     * Adds a recipient to the list of recipients and constructs the template data
     */
    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   addRecipient(
-      email: string,
-      firstName: string,
-      stats: { seenSparks: number; watchedEvents: number }
-   ) {
+   addRecipient(email: string, firstName: string) {
       this.recipients.push({
          From: this.from,
          To: email,
@@ -30,12 +26,10 @@ export class ManualTemplatedEmailBuilder {
          TemplateModel: {
             user: {
                firstName,
-               totLivestreams: stats.watchedEvents,
-               totSparks: stats.seenSparks,
             },
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "christmas-highlight",
+         Tag: "christmas-app",
       })
    }
 
