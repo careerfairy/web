@@ -156,7 +156,7 @@ const YourCVView = ({
             </Box>
             <Stack alignItems={"center"} spacing={1.5}>
                <ConditionalWrapper condition={userPresenter.hasResume()}>
-                  <Stack spacing={0} alignItems={"center"}>
+                  <Stack alignItems={"center"}>
                      <Typography
                         variant="xsmall"
                         fontWeight={400}
