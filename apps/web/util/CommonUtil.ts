@@ -289,6 +289,8 @@ export const getDictValues = <K extends keyof any, T>(
  * Check if the browser is from a mobile device
  */
 export const isMobileBrowser = () => {
+   if (typeof window === "undefined") return false
+
    const toMatch = [/Android/i, /webOS/i, /iPhone/i, /iPad/i]
 
    return toMatch.some((toMatchItem) => {
@@ -297,6 +299,7 @@ export const isMobileBrowser = () => {
 }
 
 export const isSafariBasedBrowser = () => {
+   if (typeof window === "undefined") return false
    // @ts-ignore
    return window.safari !== undefined
 }
