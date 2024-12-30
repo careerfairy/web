@@ -5,6 +5,7 @@ export const personalInfoShape = {
    firstName: Yup.string().required("First name is required"),
    lastName: Yup.string().required("Last name is required"),
    countryIsoCode: Yup.string().required("Country is required"),
+   stateIsoCode: Yup.string().required("State is required"),
    cityIsoCode: Yup.string().required("City is required"),
    email: Yup.string()
       .email("Invalid email address")
@@ -19,6 +20,7 @@ export type PersonalInfoFormValues = {
    firstName: string
    lastName: string
    countryIsoCode: string
+   stateIsoCode: string
    cityIsoCode: string
    email: string
 }
@@ -32,6 +34,7 @@ export const getInitialPersonalInfoValues = (
       countryIsoCode: personalInfo?.countryIsoCode
          ? personalInfo?.countryIsoCode
          : personalInfo?.universityCountryCode || "",
+      stateIsoCode: personalInfo?.stateIsoCode || "",
       cityIsoCode: personalInfo?.cityIsoCode || "",
       email: personalInfo?.userEmail || "",
    }

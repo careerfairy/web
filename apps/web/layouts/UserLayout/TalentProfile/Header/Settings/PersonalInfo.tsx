@@ -37,6 +37,7 @@ const PersonalInfoView = () => {
       try {
          const profileInfo: UserDataPersonalInfo = {
             ...data,
+            stateIsoCode: data.stateIsoCode || "",
          }
 
          await userRepo.updatePersonalInfo(userData.id, profileInfo)

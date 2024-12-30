@@ -1392,7 +1392,11 @@ export class FirebaseUserRepository
       // Email explicitly excluded from update for now
       const toUpdate: Pick<
          UserData,
-         "firstName" | "lastName" | "countryIsoCode" | "cityIsoCode"
+         | "firstName"
+         | "lastName"
+         | "countryIsoCode"
+         | "stateIsoCode"
+         | "cityIsoCode"
       > = {
          ...personalInfo,
       }

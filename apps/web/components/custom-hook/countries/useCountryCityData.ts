@@ -12,26 +12,24 @@ import useFunctionsSWR, {
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
    keepPreviousData: true,
-   suspense: true,
    onError: (error) =>
       errorLogAndNotify(error, {
          message: `Error fetching country and city data`,
       }),
 }
 
+type Data = {
+   country: CountryOption
+   city: CityOption
+}
+
 const useCountryCityData = (
    countryIsoCode: string,
    generatedCityId: string
 ) => {
-   const fetcher = useFunctionsSWR<{
-      country: CountryOption
-      city: CityOption
-   }>()
+   const fetcher = useFunctionsSWR<Data>()
 
-   const { data, error, isLoading } = useSWR<{
-      country: CountryOption
-      city: CityOption
-   }>(
+   const { data, error, isLoading } = useSWR<Data>(
       ["fetchCountryCityData", { countryIsoCode, generatedCityId }],
       fetcher,
       swrOptions

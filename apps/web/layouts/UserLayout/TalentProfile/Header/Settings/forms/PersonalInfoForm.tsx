@@ -165,6 +165,7 @@ const CountriesDropdown = () => {
 const CitiesDropdown = () => {
    const {
       formState: { isSubmitting },
+      setValue,
       watch,
    } = useFormContext<PersonalInfoSchemaType>()
 
@@ -195,6 +196,13 @@ const CitiesDropdown = () => {
             getOptionLabel: (option) =>
                (option && countryCities[option]?.name) || "",
             isOptionEqualToValue: (option, value) => option === value,
+            onChange: (_, value: string) => {
+               setValue("cityIsoCode", value, { shouldValidate: true })
+               setValue(
+                  "stateIsoCode",
+                  countryCities[value]?.stateIsoCode || ""
+               )
+            },
          }}
       />
    )

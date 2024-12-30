@@ -123,6 +123,7 @@ export interface UserData extends Identifiable {
    bannerImageUrl?: string
 
    countryIsoCode?: string
+   stateIsoCode?: string
    cityIsoCode?: string
 }
 
@@ -139,7 +140,7 @@ export type UserReadableGroupQuestionsWithAnswerMap = Record<
 
 export type UserDataPersonalInfo = Pick<
    UserData,
-   "firstName" | "lastName" | "countryIsoCode" | "cityIsoCode"
+   "firstName" | "lastName" | "countryIsoCode" | "stateIsoCode" | "cityIsoCode"
 >
 
 // Collection /userData/:id/studyBackgrounds/:id

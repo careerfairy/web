@@ -9,7 +9,6 @@ import useFunctionsSWR, {
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
    keepPreviousData: true,
-   suspense: true,
    onError: (error) =>
       errorLogAndNotify(error, {
          message: `Error fetching countries list`,
@@ -17,7 +16,7 @@ const swrOptions: SWRConfiguration = {
 }
 
 const useCountriesList = () => {
-   const fetcher = useFunctionsSWR<CountryOption[]>()
+   const fetcher = useFunctionsSWR<Record<string, CountryOption>>()
 
    const { data, error, isLoading } = useSWR<Record<string, CountryOption>>(
       ["fetchCountriesList"],
