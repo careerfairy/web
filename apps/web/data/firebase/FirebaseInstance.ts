@@ -35,21 +35,7 @@ export const createFirebaseInstance = (
 
    const app = firebase.initializeApp(firebaseConfig, name)
 
-   // Enable offline persistence
-   app.firestore()
-      .enablePersistence({
-         synchronizeTabs: true, // Enable multi-tab support
-      })
-      .catch((err) => {
-         if (err.code === "failed-precondition") {
-            // Multiple tabs open, persistence can only be enabled in one tab at a time
-            console.warn("Firebase persistence failed: Multiple tabs open")
-         } else if (err.code === "unimplemented") {
-            // The current browser doesn't support persistence
-            console.warn("Firebase persistence not supported in this browser")
-         }
-      })
-
+   // Set Firestore settings AFTER enabling persistence
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
 
    if (shouldUseEmulators()) {
@@ -93,6 +79,19 @@ export const auth = firebase.auth()
 export const FirestoreInstance = firebaseApp.firestore()
 export const AuthInstance = firebaseApp.auth()
 export const FunctionsInstance = firebaseApp.functions(region)
+
+if (typeof window !== "undefined") {
+   // Enable offline persistence BEFORE setting any other Firestore settings
+   firestore.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+      if (err.code === "failed-precondition") {
+         // Multiple tabs open, persistence can only be enabled in one tab at a time
+         console.warn("Firebase persistence failed: Multiple tabs open", err)
+      } else if (err.code === "unimplemented") {
+         // The current browser doesn't support persistence
+         console.warn("Firebase persistence not supported in this browser", err)
+      }
+   })
+}
 
 export const FieldValue = firebase.firestore.FieldValue
 export const Timestamp = firebase.firestore.Timestamp
