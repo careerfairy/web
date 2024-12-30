@@ -136,6 +136,7 @@ export const nextModuleStyles = sxStyles({
       position: "absolute",
       opacity: 1,
       marginTop: "auto",
+      top: "28%",
    },
    slideUp: {
       position: "static",
