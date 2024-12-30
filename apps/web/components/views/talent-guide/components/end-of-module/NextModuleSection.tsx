@@ -1,5 +1,6 @@
-import { Box, Button, Typography } from "@mui/material"
+import { Button, Typography, useMediaQuery } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { AnimatePresence, Variants } from "framer-motion"
@@ -45,9 +46,14 @@ export const NextModuleSection = ({ nextModule }: Props) => {
       hasNextModuleCardAppeared: false,
    })
 
+   useTraceUpdate(animationsState)
+
    const moduleData = useModuleData()
    const isMobile = useIsMobile()
    const [cardOffset, setCardOffset] = useState(0)
+
+   const isShortScreen = useMediaQuery("(max-height: 745px)")
+
    const completedCardRef = useRef<HTMLDivElement>(null)
    const dividerRef = useRef<HTMLDivElement>(null)
 
@@ -80,7 +86,10 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          exit="exit"
          transition={{ duration: 0.5, ease: "easeOut" }}
          variants={containerVariants}
-         sx={nextModuleStyles.section}
+         sx={[
+            nextModuleStyles.section,
+            isShortScreen && nextModuleStyles.shortScreenSection,
+         ]}
          data-testid="next-module-section"
       >
          <AnimatePresence mode="sync">
@@ -139,37 +148,33 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   }))
                }}
             >
-               {animationsState.hasCompletedModuleCardSlidUp ? (
-                  <FramerBox
-                     key="divider"
-                     ref={dividerRef}
-                     variants={dividerVariants}
-                     animate={
-                        animationsState.hasCompletedModuleCardSlidUp
-                           ? "animate"
-                           : "initial"
-                     }
-                     sx={nextModuleStyles.divider}
-                     onAnimationComplete={() => {
-                        setAnimationsState((prev) => ({
-                           ...prev,
-                           hasDividerAnimationComplete: true,
-                        }))
-                     }}
-                  />
-               ) : (
-                  <Box ref={dividerRef} sx={nextModuleStyles.dividerOffset} />
-               )}
+               <FramerBox
+                  key="divider"
+                  ref={dividerRef}
+                  variants={dividerVariants}
+                  animate={
+                     animationsState.hasCompletedModuleCardSlidUp
+                        ? "animate"
+                        : "initial"
+                  }
+                  sx={nextModuleStyles.divider}
+                  layout
+                  onAnimationComplete={() => {
+                     setAnimationsState((prev) => ({
+                        ...prev,
+                        hasDividerAnimationComplete: true,
+                     }))
+                  }}
+               />
                <ModuleCard
                   isRecommended={animationsState.hasDividerAnimationComplete}
                   module={nextModule}
                />
-               <Box height={isMobile ? 50 : 150} />
             </FramerBox>
          </AnimatePresence>
          <FramerBox
             key="bottom-content"
-            sx={nextModuleStyles.bottomContent}
+            sx={[nextModuleStyles.bottomContent]}
             variants={childVariants}
          >
             <BottomContent nextModule={nextModule} />
