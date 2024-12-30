@@ -24,13 +24,11 @@ const fetcher = async (userId?: string) => {
  * @returns SWR response object containing user sparks data.
  */
 export const useUserSparks = () => {
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, isLoggedIn } = useAuth()
 
-   const key = authenticatedUser.isLoaded
-      ? getKey(authenticatedUser.email)
-      : null
+   const key = isLoggedIn ? getKey(authenticatedUser.email) : null
 
-   return useSWR(key, async () => fetcher(authenticatedUser.email), {
+   const { data } = useSWR(key, async () => fetcher(authenticatedUser.email), {
       ...reducedRemoteCallsOptions,
       onError: (error, key) => {
          errorLogAndNotify(error, {
@@ -39,6 +37,8 @@ export const useUserSparks = () => {
          })
       },
    })
+
+   return data
 }
 
 /**
