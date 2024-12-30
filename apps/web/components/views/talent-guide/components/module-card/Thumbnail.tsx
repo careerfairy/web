@@ -22,10 +22,10 @@ export const Thumbnail = ({
    return (
       <Box id="talent-guide-module-thumbnail" sx={styles.root}>
          <Image
-            objectFit="cover"
             src={thumbnailUrl}
             alt="Talent Guide Module Thumbnail"
             fill
+            style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 100vw, 50vw"
          />
       </Box>

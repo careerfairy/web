@@ -1,9 +1,10 @@
-import { Button, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { AnimatePresence, Variants } from "framer-motion"
 import { useRouter } from "next/router"
-import { Fragment } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
 import { Play } from "react-feather"
 import { useModuleData } from "store/selectors/talentGuideSelectors"
 import { ModuleCard } from "../module-card/ModuleCard"
@@ -13,34 +14,167 @@ type Props = {
    nextModule: Page<TalentGuideModule> | null
 }
 
+const SHRINK_FACTOR = 0.7
+
+const dividerVariants: Variants = {
+   initial: {
+      scaleY: 0,
+      originY: 0,
+   },
+   animate: {
+      scaleY: 1,
+      transition: {
+         duration: 1,
+         ease: "easeOut",
+      },
+   },
+}
+
+type AnimationsState = {
+   hasShineAnimationComplete: boolean
+   hasDividerAnimationComplete: boolean
+   hasCompletedModuleCardSlidUp: boolean
+   hasNextModuleCardAppeared: boolean
+}
+
 export const NextModuleSection = ({ nextModule }: Props) => {
+   const [animationsState, setAnimationsState] = useState<AnimationsState>({
+      hasShineAnimationComplete: false,
+      hasDividerAnimationComplete: false,
+      hasCompletedModuleCardSlidUp: false,
+      hasNextModuleCardAppeared: false,
+   })
+
    const moduleData = useModuleData()
+   const isMobile = useIsMobile()
+   const [cardOffset, setCardOffset] = useState(0)
+   const completedCardRef = useRef<HTMLDivElement>(null)
+   const dividerRef = useRef<HTMLDivElement>(null)
+
+   useEffect(() => {
+      return () => {
+         setAnimationsState({
+            hasShineAnimationComplete: false,
+            hasDividerAnimationComplete: false,
+            hasCompletedModuleCardSlidUp: false,
+            hasNextModuleCardAppeared: false,
+         })
+         setCardOffset(0)
+      }
+   }, [])
+
+   useEffect(() => {
+      if (completedCardRef.current && dividerRef.current) {
+         const cardHeight =
+            completedCardRef.current.getBoundingClientRect().height
+         const scaledHeight = cardHeight * SHRINK_FACTOR
+         const offset = (cardHeight - scaledHeight) / 2
+         setCardOffset(offset)
+      }
+   }, [])
 
    return (
-      <AnimatePresence>
-         <FramerBox
-            animate={"animate"}
-            initial="initial"
-            exit="exit"
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            variants={containerVariants}
-            sx={nextModuleStyles.section}
-            data-testid="next-module-section"
-         >
-            <FramerBox variants={childVariants}>
-               <ModuleCard interactive module={nextModule} />
-            </FramerBox>
-            <FramerBox variants={childVariants}>
-               <ModuleCard module={moduleData} />
+      <FramerBox
+         animate={"animate"}
+         initial="initial"
+         exit="exit"
+         transition={{ duration: 0.5, ease: "easeOut" }}
+         variants={containerVariants}
+         sx={nextModuleStyles.section}
+         data-testid="next-module-section"
+      >
+         <AnimatePresence mode="sync">
+            <FramerBox
+               key="completed-module-card"
+               ref={completedCardRef}
+               layout
+               initial={{ scale: 1, y: 0 }}
+               animate={{
+                  scale: animationsState.hasShineAnimationComplete
+                     ? SHRINK_FACTOR
+                     : 1,
+                  y: animationsState.hasShineAnimationComplete ? cardOffset : 0,
+               }}
+               transition={{ duration: 0.5 }}
+               sx={[
+                  nextModuleStyles.completedModuleCard,
+                  animationsState.hasShineAnimationComplete &&
+                     nextModuleStyles.slideUp,
+               ]}
+               onLayoutAnimationComplete={() => {
+                  setAnimationsState((prev) => ({
+                     ...prev,
+                     hasCompletedModuleCardSlidUp: true,
+                  }))
+               }}
+            >
+               <ModuleCard
+                  module={moduleData}
+                  onShineAnimationComplete={() => {
+                     setAnimationsState((prev) => ({
+                        ...prev,
+                        hasShineAnimationComplete: true,
+                     }))
+                  }}
+               />
             </FramerBox>
             <FramerBox
-               sx={nextModuleStyles.bottomContent}
-               variants={childVariants}
+               variants={{
+                  initial: {
+                     opacity: 0,
+                  },
+                  animate: animationsState.hasCompletedModuleCardSlidUp && {
+                     opacity: 1,
+                  },
+               }}
+               animate={"animate"}
+               initial={"initial"}
+               display="flex"
+               flexDirection="column"
+               alignItems="center"
+               onLayoutAnimationComplete={() => {
+                  setAnimationsState((prev) => ({
+                     ...prev,
+                     hasNextModuleCardAppeared: true,
+                  }))
+               }}
             >
-               <BottomContent nextModule={nextModule} />
+               {animationsState.hasCompletedModuleCardSlidUp ? (
+                  <FramerBox
+                     key="divider"
+                     ref={dividerRef}
+                     variants={dividerVariants}
+                     animate={
+                        animationsState.hasCompletedModuleCardSlidUp
+                           ? "animate"
+                           : "initial"
+                     }
+                     sx={nextModuleStyles.divider}
+                     onAnimationComplete={() => {
+                        setAnimationsState((prev) => ({
+                           ...prev,
+                           hasDividerAnimationComplete: true,
+                        }))
+                     }}
+                  />
+               ) : (
+                  <Box ref={dividerRef} sx={nextModuleStyles.dividerOffset} />
+               )}
+               <ModuleCard
+                  isRecommended={animationsState.hasDividerAnimationComplete}
+                  module={nextModule}
+               />
+               <Box height={isMobile ? 50 : 150} />
             </FramerBox>
+         </AnimatePresence>
+         <FramerBox
+            key="bottom-content"
+            sx={nextModuleStyles.bottomContent}
+            variants={childVariants}
+         >
+            <BottomContent nextModule={nextModule} />
          </FramerBox>
-      </AnimatePresence>
+      </FramerBox>
    )
 }
 
