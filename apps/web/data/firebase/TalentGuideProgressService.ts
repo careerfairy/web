@@ -295,11 +295,11 @@ export class TalentGuideProgressService {
          progressMap.set(progress.moduleHygraphId, progress)
       })
       // Find the first module that hasn't been completed
-      // Sort modules by order
+      // Sort modules by level
       const nextModule = allModules
          .sort((a, b) => {
             if (!a.content || !b.content) return 0
-            return (a.content.order || 0) - (b.content.order || 0)
+            return (a.content.level || 0) - (b.content.level || 0)
          })
          .find((module) => {
             if (!module.content) return false
