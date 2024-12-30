@@ -203,7 +203,7 @@ jobs:
               PR_LABELS: false
               ALIAS_DOMAINS: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'staging.careerfairy.io' ) || '' }}
               DELETE_EXISTING_COMMENT: true
-              PR_PREVIEW_DOMAIN: "{REPO}-pr-{PR}.now.sh"
+              PR_PREVIEW_DOMAIN: "${{ secrets.VERCEL_PROJECT_ID }}-{REPO}-pr-{PR}.now.sh"
          - name: preview-url
            run: |
               echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
