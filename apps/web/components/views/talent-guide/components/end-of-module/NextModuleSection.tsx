@@ -4,6 +4,7 @@ import { Page, TalentGuideModule } from "data/hygraph/types"
 import { Variants } from "framer-motion"
 import { useRouter } from "next/router"
 import { Play } from "react-feather"
+import { AnimatedModuleCard } from "./AnimatedModuleCard"
 import { nextModuleStyles } from "./styles"
 
 type Props = {
@@ -22,6 +23,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          variants={feedbackVariants}
          sx={nextModuleStyles.section}
       >
+         <AnimatedModuleCard />
          <BottomContent nextModule={nextModule} />
       </FramerBox>
    )
