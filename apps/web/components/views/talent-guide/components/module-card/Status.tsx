@@ -6,9 +6,10 @@ import { ModuleInfoChip } from "./ModuleInfoChip"
 
 type Props = {
    module: TalentGuideModule
+   onShineAnimationComplete?: () => void
 }
 
-export const Status = ({ module }: Props) => {
+export const Status = ({ module, onShineAnimationComplete }: Props) => {
    return (
       <SuspenseWithBoundary
          fallback={
@@ -18,16 +19,23 @@ export const Status = ({ module }: Props) => {
             />
          }
       >
-         <Content module={module} />
+         <Content
+            module={module}
+            onShineAnimationComplete={onShineAnimationComplete}
+         />
       </SuspenseWithBoundary>
    )
 }
 
-const Content = ({ module }: Props) => {
+const Content = ({ module, onShineAnimationComplete }: Props) => {
    const moduleProgress = useModuleProgress(module.id)
 
    if (moduleProgress?.completedAt) {
-      return <ModuleCompletedChip />
+      return (
+         <ModuleCompletedChip
+            onShineAnimationComplete={onShineAnimationComplete}
+         />
+      )
    }
 
    return (
