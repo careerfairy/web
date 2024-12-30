@@ -233,15 +233,16 @@ export const talentGuideModulePageFragment = gql`
       slug
       seo ${seoComponentFragment}
       content {
-            id
-            moduleName
-            moduleDescription
-            moduleDuration
-            category
-            order
-            contentTopicTags
-            businessFunctionTags
-            moduleSteps ${moduleStepFragment}
-            }
+         id
+         moduleName
+         moduleDescription
+         moduleDuration
+         moduleIllustration ${imageAssetFragment}
+         category
+         level
+         contentTopicTags
+         businessFunctionTags
+         moduleSteps ${moduleStepFragment}
+      }
    }
 `

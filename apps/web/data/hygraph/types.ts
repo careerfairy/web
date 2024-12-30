@@ -25,13 +25,17 @@ export type TalentGuideModule = {
     */
    moduleDuration: string
    /**
+    * The thumbnail of the module, eg "https://www.example.com/thumbnail.jpg"
+    */
+   moduleIllustration: ImageAssetType
+   /**
     * The category of the module, eg "Before Applying" or "Applying Insights"
     */
    category: TalentGuideModuleCategory
    /**
-    * The order in which the module should appear, used for sorting
+    * The level of the module, used for sorting
     */
-   order: number
+   level: number
    /**
     * The blocks of the module, eg HeaderBlock, TextBlock, ImageBlock, LivestreamsBlock etc
     */
