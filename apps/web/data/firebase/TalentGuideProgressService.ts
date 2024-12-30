@@ -288,28 +288,29 @@ export class TalentGuideProgressService {
    ): Promise<Page<TalentGuideModule> | null> {
       // Get user's progress from Firebase
       const userProgress = await this.getAllUserModuleProgress(userAuthUid)
+      console.table(userProgress)
 
       // Create a map of module IDs to progress
       const progressMap = new Map<string, TalentGuideProgress>()
       userProgress.forEach((progress) => {
          progressMap.set(progress.moduleHygraphId, progress)
       })
-      // Find the first module that hasn't been completed
+
       // Sort modules by level
-      const nextModule = allModules
-         .sort((a, b) => {
-            if (!a.content || !b.content) return 0
-            return (a.content.level || 0) - (b.content.level || 0)
-         })
-         .find((module) => {
-            if (!module.content) return false
-            const progress = progressMap.get(module.content.id)
+      const sortedModules = allModules.sort((a, b) => {
+         if (!a.content || !b.content) return 0
+         return (a.content.level || 0) - (b.content.level || 0)
+      })
 
-            // Module hasn't been started or isn't completed
-            return !progress || !progress.completedAt
-         })
+      // First, try to find an uncompleted module
+      const nextIncompleteModule = sortedModules.find((module) => {
+         if (!module.content) return false
+         const progress = progressMap.get(module.content.id)
+         return !progress || !progress.completedAt
+      })
 
-      return nextModule || null
+      // If we found an incomplete module, return it
+      return nextIncompleteModule || null
    }
 
    /**
@@ -325,27 +326,27 @@ export class TalentGuideProgressService {
       currentStepIndex: number
    ): Promise<{ nextStepIndex: number } | null> {
       const nextStepIndex = currentStepIndex + 1
-      if (nextStepIndex >= moduleData.moduleSteps.length) return null
 
       const data: UpdateData<TalentGuideProgress> = {
          completedStepIds: arrayUnion(
             moduleData.moduleSteps[currentStepIndex].id
          ),
          percentageComplete:
-            ((nextStepIndex + 1) / moduleData.moduleSteps.length) * 100,
+            ((currentStepIndex + 1) / moduleData.moduleSteps.length) * 100,
          totalSteps: moduleData.moduleSteps.length,
          moduleName: moduleData.moduleName,
          moduleCategory: moduleData.category,
       }
 
-      const isCompleted = data.percentageComplete === 100
+      const isCompleted = nextStepIndex >= moduleData.moduleSteps.length
 
       if (isCompleted) {
          data.completedAt = Timestamp.now()
       }
+
       await this.updateModuleProgress(moduleData.id, userAuthUid, data)
 
-      return { nextStepIndex }
+      return isCompleted ? null : { nextStepIndex }
    }
 
    /**
