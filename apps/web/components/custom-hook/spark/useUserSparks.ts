@@ -15,6 +15,7 @@ import {
    where,
 } from "firebase/firestore"
 import { useEffect } from "react"
+import { useLocalStorage } from "react-use"
 import useSWR, { preload } from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import useUserCountryCode from "../useUserCountryCode"
@@ -31,13 +32,13 @@ type FetcherParams = {
 
 // Utility functions
 const getKey = (userId: string, userCountryCode?: string) => {
-   const countryCodeSuffix = userCountryCode ? `-${userCountryCode}` : ""
-   return userId
-      ? `userSparks-${userId}${countryCodeSuffix}`
-      : `userSparks${countryCodeSuffix}`
-}
+   if (userId) {
+      return `userSparks-${userId}`
+   }
 
-const getUserCountryCode = () => localStorage.getItem(STORAGE_KEY)
+   const suffix = userCountryCode ? `-${userCountryCode}` : ""
+   return `userSparks${suffix}`
+}
 
 // Firebase query builders
 const createBaseFeedQuery = (userId: string) =>
@@ -99,11 +100,11 @@ const fetchPublicSparks = async (countryCode?: string): Promise<Spark[]> => {
    return snapshots.docs.map((doc) => doc.data())
 }
 
-const fetcher = async ({ userId }: FetcherParams) => {
+const fetcher = async ({ userId, countryCode }: FetcherParams) => {
    if (userId) {
       return fetchUserFeed(userId)
    }
-   return fetchPublicSparks(getUserCountryCode())
+   return fetchPublicSparks(countryCode)
 }
 
 /**
@@ -116,17 +117,24 @@ export const useUserSparks = () => {
    const { authenticatedUser } = useAuth()
    const { userCountryCode } = useUserCountryCode()
 
+   const [storedUserCountryCode, setStoredUserCountryCode] =
+      useLocalStorage<string>(STORAGE_KEY, null)
+
    useEffect(() => {
       if (userCountryCode) {
-         localStorage.setItem(STORAGE_KEY, userCountryCode)
+         setStoredUserCountryCode(userCountryCode)
       }
-   }, [userCountryCode])
+   }, [userCountryCode, setStoredUserCountryCode])
 
-   const key = getKey(authenticatedUser.email, userCountryCode)
+   const key = getKey(authenticatedUser.email, storedUserCountryCode)
 
    const { data } = useSWR(
       key,
-      () => fetcher({ userId: authenticatedUser.email }),
+      () =>
+         fetcher({
+            userId: authenticatedUser.email,
+            countryCode: storedUserCountryCode,
+         }),
       {
          suspense: true,
          onError: (error, key) => {
