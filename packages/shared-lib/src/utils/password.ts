@@ -34,9 +34,9 @@ export const validatePassword = (password: string): true | string => {
    if (PASSWORD_RULES.minNumbers.tester(password)) {
       return "Password must contain at least one number"
    }
-   // TODO: Check if needed
-   // if (PASSWORD_RULES.minSymbols.tester(password)) {
-   //     return 'Password must contain at least one special character'
-   // }
+
+   if (PASSWORD_RULES.minSymbols.tester(password)) {
+      return "Password must contain at least one special character"
+   }
    return true
 }
