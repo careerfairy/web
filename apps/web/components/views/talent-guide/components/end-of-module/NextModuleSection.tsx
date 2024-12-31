@@ -1,13 +1,17 @@
 import { Button, Typography, useMediaQuery } from "@mui/material"
-import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
-import { AnimatePresence, Variants } from "framer-motion"
+import { AnimatePresence } from "framer-motion"
 import { useRouter } from "next/router"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { Play } from "react-feather"
 import { useModuleData } from "store/selectors/talentGuideSelectors"
 import { ModuleCard } from "../module-card/ModuleCard"
+import {
+   bottomContentVariants,
+   dividerVariants,
+   nextModuleVariants,
+} from "./animations"
 import { nextModuleStyles } from "./styles"
 
 type Props = {
@@ -15,20 +19,6 @@ type Props = {
 }
 
 const SHRINK_FACTOR = 0.7
-
-const dividerVariants: Variants = {
-   initial: {
-      scaleY: 0,
-      originY: 0,
-   },
-   animate: {
-      scaleY: 1,
-      transition: {
-         duration: 1,
-         ease: "easeOut",
-      },
-   },
-}
 
 type AnimationsState = {
    hasShineAnimationComplete: boolean
@@ -40,14 +30,13 @@ type AnimationsState = {
 export const NextModuleSection = ({ nextModule }: Props) => {
    const [animationsState, setAnimationsState] = useState<AnimationsState>({
       hasShineAnimationComplete: false,
-      hasDividerAnimationComplete: false,
       hasCompletedModuleCardSlidUp: false,
+      hasDividerAnimationComplete: false,
       hasNextModuleCardAppeared: false,
    })
 
-   useTraceUpdate(animationsState)
-
    const moduleData = useModuleData()
+
    const [cardOffset, setCardOffset] = useState(0)
 
    const isShortScreen = useMediaQuery("(max-height: 745px)")
@@ -83,7 +72,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          initial="initial"
          exit="exit"
          transition={{ duration: 0.5, ease: "easeOut" }}
-         variants={containerVariants}
+         variants={nextModuleVariants}
          sx={[nextModuleStyles.section]}
          data-testid="next-module-section"
       >
@@ -149,6 +138,13 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                      hasNextModuleCardAppeared: true,
                   }))
                }}
+               sx={
+                  Boolean(isShortScreen) && {
+                     paddingBottom: animationsState.hasNextModuleCardAppeared
+                        ? 5
+                        : 10,
+                  }
+               }
             >
                <FramerBox
                   key="divider-container"
@@ -162,10 +158,12 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   sx={nextModuleStyles.divider}
                   layout
                   onLayoutAnimationComplete={() => {
-                     setAnimationsState((prev) => ({
-                        ...prev,
-                        hasDividerAnimationComplete: true,
-                     }))
+                     setTimeout(() => {
+                        setAnimationsState((prev) => ({
+                           ...prev,
+                           hasDividerAnimationComplete: true,
+                        }))
+                     }, 500)
                   }}
                />
                <ModuleCard
@@ -177,13 +175,8 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          <FramerBox
             key="bottom-content"
             layout
-            sx={[
-               nextModuleStyles.bottomContent,
-               isShortScreen && {
-                  paddingTop: 4,
-               },
-            ]}
-            variants={childVariants}
+            sx={nextModuleStyles.bottomContent}
+            variants={bottomContentVariants}
          >
             <BottomContent nextModule={nextModule} />
          </FramerBox>
@@ -230,39 +223,4 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
          </Button>
       </Fragment>
    )
-}
-
-const containerVariants: Variants = {
-   initial: {
-      opacity: 0,
-      y: 20,
-   },
-   animate: {
-      opacity: 1,
-      y: 0,
-      transition: {
-         duration: 0.5,
-         ease: "easeOut",
-         staggerChildren: 0.1,
-      },
-   },
-   exit: {
-      opacity: 0,
-      transition: { duration: 0.3, ease: "easeIn" },
-   },
-}
-
-const childVariants: Variants = {
-   initial: {
-      opacity: 0,
-      y: 20,
-   },
-   animate: {
-      opacity: 1,
-      y: 0,
-      transition: {
-         duration: 0.5,
-         ease: "easeOut",
-      },
-   },
 }

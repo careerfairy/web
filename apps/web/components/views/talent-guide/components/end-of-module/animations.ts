@@ -1,3 +1,4 @@
+import { Variants } from "framer-motion"
 import { FramerBoxProps } from "../../../common/FramerBox"
 
 export const growAndFadeAnimation: FramerBoxProps = {
@@ -36,5 +37,54 @@ export const ratingTitleAnimation: FramerBoxProps = {
    exit: {
       opacity: 0,
       y: -20,
+   },
+}
+
+export const nextModuleVariants: Variants = {
+   initial: {
+      opacity: 0,
+      y: 20,
+   },
+   animate: {
+      opacity: 1,
+      y: 0,
+      transition: {
+         duration: 0.5,
+         ease: "easeOut",
+         staggerChildren: 0.1,
+      },
+   },
+   exit: {
+      opacity: 0,
+      transition: { duration: 0.3, ease: "easeIn" },
+   },
+}
+
+export const dividerVariants: Variants = {
+   initial: {
+      scaleY: 0,
+      originY: 0,
+   },
+   animate: {
+      scaleY: 1,
+      transition: {
+         duration: 1,
+         ease: "easeOut",
+      },
+   },
+}
+
+export const bottomContentVariants: Variants = {
+   initial: {
+      opacity: 0,
+      y: 20,
+   },
+   animate: {
+      opacity: 1,
+      y: 0,
+      transition: {
+         duration: 0.5,
+         ease: "easeOut",
+      },
    },
 }
