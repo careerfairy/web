@@ -145,33 +145,26 @@ const PortalPage = ({
                         <Container disableGutters>
                            <PortalTagsContent>
                               {isMounted ? (
-                                 <UserSparksCarousel
-                                    header={
-                                       <Typography
-                                          variant="brandedH4"
-                                          color="neutral.800"
-                                          fontWeight="600"
-                                       >
-                                          Sparks
-                                       </Typography>
-                                    }
-                                    handleSparksClicked={handleSparksClicked}
-                                    containerSx={styles.sparksCarousel}
-                                    headerSx={styles.sparksCarouselHeader}
-                                 />
+                                 <SuspenseWithBoundary
+                                    fallback={<SparksLoadingFallback />}
+                                 >
+                                    <UserSparksCarousel
+                                       header={
+                                          <Typography
+                                             variant="brandedH4"
+                                             color="neutral.800"
+                                             fontWeight="600"
+                                          >
+                                             Sparks
+                                          </Typography>
+                                       }
+                                       handleSparksClicked={handleSparksClicked}
+                                       containerSx={styles.sparksCarousel}
+                                       headerSx={styles.sparksCarouselHeader}
+                                    />
+                                 </SuspenseWithBoundary>
                               ) : (
-                                 <FallbackComponent
-                                    sx={styles.sparksCarousel}
-                                    header={
-                                       <Typography
-                                          variant="brandedH4"
-                                          color="neutral.800"
-                                          fontWeight="600"
-                                       >
-                                          Sparks
-                                       </Typography>
-                                    }
-                                 />
+                                 <SparksLoadingFallback />
                               )}
                               {hasInterests ? (
                                  <RecommendedEvents limit={10} />
@@ -202,6 +195,23 @@ const PortalPage = ({
             </>
          </GenericDashboardLayout>
       </>
+   )
+}
+
+const SparksLoadingFallback = () => {
+   return (
+      <FallbackComponent
+         sx={styles.sparksCarousel}
+         header={
+            <Typography
+               variant="brandedH4"
+               color="neutral.800"
+               fontWeight="600"
+            >
+               Sparks
+            </Typography>
+         }
+      />
    )
 }
 

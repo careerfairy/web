@@ -19,7 +19,7 @@ export const UserSparksCarousel = ({
    headerSx,
    ...props
 }: Props) => {
-   const { data: userSparks } = useUserSparks()
+   const userSparks = useUserSparks()
    const { isLoadingAuth } = useAuth()
 
    if (isLoadingAuth)
