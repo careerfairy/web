@@ -1,6 +1,9 @@
+import { QUIZ_STATE } from "@careerfairy/shared-lib/talent-guide/types"
 import {
+   useCurrentQuiz,
    useCurrentStep,
    useIsLastStep,
+   useQuizState,
 } from "store/selectors/talentGuideSelectors"
 import { FinishModuleButton } from "./FinishModuleButton"
 import { NextButton } from "./NextButton"
@@ -10,20 +13,20 @@ export const completedQuizIds = ["abc", "def", "ghi"] // TODO: store and get fro
 
 export const StepActionButton = () => {
    const currentStep = useCurrentStep()
+   const currentQuiz = useCurrentQuiz()
+   const quizState = useQuizState(currentQuiz?.id)
    const isLastStep = useIsLastStep()
 
    if (!currentStep) return null
 
-   if (currentStep.content.__typename === "Quiz") {
-      const quiz = currentStep.content
+   if (currentQuiz) {
+      const quizIsAttempted = quizState.state !== QUIZ_STATE.NOT_ATTEMPTED
 
-      const quizIsCompleted = completedQuizIds.includes(quiz.id) // TODO: replace with hook to check if quiz is completed in firestore
+      if (quizIsAttempted && isLastStep) return <FinishModuleButton />
 
-      if (quizIsCompleted && isLastStep) return <FinishModuleButton />
+      if (quizIsAttempted) return <NextButton />
 
-      if (quizIsCompleted) return <NextButton />
-
-      return <QuizButton quiz={quiz} />
+      return <QuizButton quiz={currentQuiz} quizStatus={quizState} />
    }
 
    if (isLastStep) return <FinishModuleButton />

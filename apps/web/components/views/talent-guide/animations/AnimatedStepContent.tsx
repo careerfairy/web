@@ -1,7 +1,7 @@
-import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import { AnimatePresence, Variants } from "framer-motion"
 import React, { ReactElement, useCallback, useRef } from "react"
+import { useProgressHeaderHeight } from "../components/TalentGuideProgress"
 
 const containerVariants: Variants = {
    hidden: { opacity: 0 },
@@ -42,9 +42,8 @@ type AnimatedStepContentProps = {
  */
 export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
    const lastStepRef = useRef<HTMLDivElement>(null)
-   const isMobile = useIsMobile()
 
-   const scrollOffset = isMobile ? 88 : 120 // This is the estimated height of the sticky progress bar, we need to account for it when scrolling to the last step
+   const scrollOffset = useProgressHeaderHeight()
    const scrollPadding = 15 // Give a little space between the last step and the sticky progress bar
 
    const handleAnimationComplete = useCallback(

@@ -1,7 +1,12 @@
+import { QUIZ_STATE } from "@careerfairy/shared-lib/talent-guide/types"
 import { Box, Collapse, Stack, Typography } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import { QuizModelType } from "data/hygraph/types"
-import { Fragment, useState } from "react"
+import { Fragment, useRef } from "react"
+import { toggleQuizAnswer } from "store/reducers/talentGuideReducer"
+import { useQuizState } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
+import { useProgressHeaderHeight } from "../../components/TalentGuideProgress"
 import { AnswerButton } from "./AnswerButton"
 
 const styles = sxStyles({
@@ -27,72 +32,59 @@ const styles = sxStyles({
 
 type AnswerVariant = "default" | "selected" | "correct" | "correction" | "wrong"
 
-const variantCycle: { variant: AnswerVariant; text: string }[] = [
-   { variant: "default", text: "Default Answer" },
-   { variant: "selected", text: "Selected Answer" },
-   { variant: "correct", text: "Correct Answer" },
-   { variant: "correction", text: "Should have been correct" },
-   { variant: "wrong", text: "Wrong Answer" },
-]
-
 type Props = QuizModelType
 
-export const QuizCard = ({
-   // question,
-   correction,
-}: Props) => {
-   const [showAnsweredState, setShowAnsweredState] = useState(false)
-   const [buttonStates, setButtonStates] = useState([
-      { currentIndex: 0 },
-      { currentIndex: 1 },
-      { currentIndex: 2 },
-      { currentIndex: 3 },
-      { currentIndex: 4 },
-   ])
+export const QuizCard = ({ question, correction, answers, id }: Props) => {
+   const quizState = useQuizState(id)
+   const dispatch = useAppDispatch()
+   const correctionRef = useRef<HTMLDivElement>(null)
 
-   const handleButtonClick = (buttonIndex: number) => {
-      setButtonStates((prev) => {
-         const newStates = [...prev]
-         newStates[buttonIndex] = {
-            currentIndex:
-               (prev[buttonIndex].currentIndex + 1) % variantCycle.length,
-         }
-         return newStates
-      })
-   }
+   const scrollOffset = useProgressHeaderHeight()
 
-   const toggleCorrection = () => {
-      setShowAnsweredState(!showAnsweredState)
+   const quizHasBeenAttempted =
+      quizState.state === QUIZ_STATE.PASSED ||
+      quizState.state === QUIZ_STATE.FAILED
+
+   const handleButtonClick = (answerId: string) => {
+      dispatch(toggleQuizAnswer({ quizId: id, answerId }))
    }
 
    return (
       <Fragment>
          <Stack direction="column" spacing={1.5}>
             <Typography variant="mobileBrandedH4" sx={styles.question}>
-               {/* {question} */}
-               Demo of AnswerButton variants, Click to cycle through
+               {question}
             </Typography>
-            {buttonStates.map((state, index) => {
-               // For Demo purposes, we want to show the first button with a longer text
-               const isFirst = index === 0
-               return (
-                  <AnswerButton
-                     key={index}
-                     onClick={() => handleButtonClick(index)}
-                     variant={variantCycle[state.currentIndex].variant}
-                  >
-                     {`${variantCycle[state.currentIndex].text} ${
-                        isFirst ? "lorem ipsum dolor sit amet".repeat(5) : ""
-                     }`}
-                  </AnswerButton>
-               )
-            })}
-            <AnswerButton variant="default" onClick={toggleCorrection}>
-               Toggle Correction
-            </AnswerButton>
+            {answers.map(({ answer, id }) => (
+               <AnswerButton
+                  key={id}
+                  id={id}
+                  onClick={() => handleButtonClick(id)}
+                  disabled={quizHasBeenAttempted}
+                  variant={getAnswerVariant({
+                     quizHasBeenAttempted,
+                     isCorrect:
+                        answers.find((a) => a.id === id)?.isCorrect || false,
+                     isSelected: quizState.selectedAnswerIds.includes(id),
+                  })}
+               >
+                  {answer}
+               </AnswerButton>
+            ))}
          </Stack>
-         <Collapse in={showAnsweredState} unmountOnExit>
-            <Box sx={styles.correction}>
+         <Collapse
+            in={quizState.state === QUIZ_STATE.FAILED}
+            unmountOnExit
+            onEntered={(node) => {
+               const elementPosition =
+                  node.getBoundingClientRect().top + window.scrollY
+               window.scrollTo({
+                  top: elementPosition - scrollOffset,
+                  behavior: "smooth",
+               })
+            }}
+         >
+            <Box ref={correctionRef} sx={styles.correction}>
                <Typography component="p" variant="small">
                   <Box component="span" sx={styles.correctionText}>
                      Correction:
@@ -103,4 +95,26 @@ export const QuizCard = ({
          </Collapse>
       </Fragment>
    )
+}
+type GetAnswerVariantOptions = {
+   quizHasBeenAttempted: boolean
+   isCorrect: boolean
+   isSelected: boolean
+}
+const getAnswerVariant = ({
+   quizHasBeenAttempted,
+   isCorrect,
+   isSelected,
+}: GetAnswerVariantOptions): AnswerVariant => {
+   if (quizHasBeenAttempted) {
+      if (isSelected && !isCorrect) return "wrong"
+      if (!isSelected && isCorrect) return "correction"
+      if (isCorrect) return "correct"
+
+      return "default"
+   }
+
+   if (isSelected) return "selected"
+
+   return "default"
 }

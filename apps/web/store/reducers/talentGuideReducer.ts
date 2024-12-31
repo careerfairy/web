@@ -1,10 +1,20 @@
+import {
+   QUIZ_STATE,
+   QuizState,
+   TalentGuideQuiz,
+} from "@careerfairy/shared-lib/talent-guide"
 import { removeDuplicates } from "@careerfairy/shared-lib/utils"
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
-import { Page, TalentGuideModule } from "data/hygraph/types"
+import { Page, QuizModelType, TalentGuideModule } from "data/hygraph/types"
 import { arrayUnion } from "firebase/firestore"
 import { RootState } from "store"
 import { errorLogAndNotify } from "util/CommonUtil"
+
+export type QuizStatus = {
+   selectedAnswerIds: string[]
+   state: QuizState
+}
 
 type TalentGuideState = {
    visibleSteps: number[]
@@ -14,7 +24,10 @@ type TalentGuideState = {
    isLoadingTalentGuide: boolean
    isLoadingNextStepError: string | null
    isLoadingTalentGuideError: string | null
+   isLoadingAttemptQuiz: boolean
+   isLoadingAttemptQuizError: string | null
    userAuthUid: string
+   quizStatuses: Record<string, QuizStatus>
 }
 
 const initialState: TalentGuideState = {
@@ -25,7 +38,10 @@ const initialState: TalentGuideState = {
    isLoadingTalentGuide: true,
    isLoadingNextStepError: null,
    isLoadingTalentGuideError: null,
+   isLoadingAttemptQuiz: false,
+   isLoadingAttemptQuizError: null,
    userAuthUid: null,
+   quizStatuses: {},
 }
 
 // Async thunk to proceed to next step
@@ -71,6 +87,7 @@ type LoadTalentGuideProgressResult = {
    completedStepIds: string[]
    moduleData: Page<TalentGuideModule>
    userAuthUid: string
+   quizzes: Record<string, TalentGuideQuiz>
 }
 // Async thunk to load initial progress
 export const loadTalentGuide = createAsyncThunk<
@@ -83,10 +100,16 @@ export const loadTalentGuide = createAsyncThunk<
       )
    }
 
-   const progressDoc = await talentGuideProgressService.getModuleProgress(
-      payload.moduleData.content.id,
-      payload.userAuthUid
-   )
+   const [progressDoc, quizSnaps] = await Promise.all([
+      talentGuideProgressService.getModuleProgress(
+         payload.moduleData.content.id,
+         payload.userAuthUid
+      ),
+      talentGuideProgressService.getAllModuleQuizzes(
+         payload.moduleData.content.id,
+         payload.userAuthUid
+      ),
+   ])
 
    let completedStepIds: string[] = []
 
@@ -107,12 +130,49 @@ export const loadTalentGuide = createAsyncThunk<
       )
    }
 
+   /**
+    * Convert the quiz snapshots to a dictionary of quizzes by quizHygraphId
+    */
+   const quizzes = quizSnaps.docs
+      .map((doc) => doc.data())
+      .reduce((acc, quiz) => {
+         acc[quiz.quizHygraphId] = quiz
+         return acc
+      }, {} as Record<string, TalentGuideQuiz>)
+
    return {
       completedStepIds,
       moduleData: payload.moduleData,
       userAuthUid: payload.userAuthUid,
+      quizzes,
    }
 })
+
+type AttemptQuizPayload = {
+   quizFromHygraph: QuizModelType
+   selectedAnswerIds: string[]
+}
+
+export const attemptQuiz = createAsyncThunk(
+   "talentGuide/attemptQuiz",
+   async (payload: AttemptQuizPayload, { getState }) => {
+      const state = getState() as RootState
+      const { userAuthUid, moduleData } = state.talentGuide
+      const { quizFromHygraph, selectedAnswerIds } = payload
+
+      const passed = await talentGuideProgressService.attemptQuiz(
+         moduleData.content.id,
+         userAuthUid,
+         quizFromHygraph,
+         selectedAnswerIds
+      )
+
+      return {
+         passed,
+         quizId: quizFromHygraph.id,
+      }
+   }
+)
 
 // Ignore this is for demo purposes
 export const resetModuleProgressForDemo = createAsyncThunk(
@@ -150,6 +210,32 @@ const talentGuideReducer = createSlice({
    initialState,
    reducers: {
       resetTalentGuide: () => initialState,
+      toggleQuizAnswer: (
+         state,
+         action: PayloadAction<{ quizId: string; answerId: string }>
+      ) => {
+         const { quizId, answerId } = action.payload
+         const quizStatus = state.quizStatuses[quizId]
+         if (!quizStatus) return
+
+         if (quizStatus.selectedAnswerIds.includes(answerId)) {
+            // Single choice implementation
+            state.quizStatuses[quizId].selectedAnswerIds = []
+
+            // Multiple choice implementation in case we want to support it later
+            // state.quizStatuses[quizId].selectedAnswerIds = quizStatus.selectedAnswerIds.filter((id) => id !== answerId)
+            // quizStatus.selectedAnswerIds.filter((id) => id !== answerId)
+         } else {
+            // Single choice implementation
+            state.quizStatuses[quizId].selectedAnswerIds = [answerId]
+
+            // Multiple choice implementation in case we want to support it later
+            // state.quizStatuses[quizId].selectedAnswerIds = removeDuplicates([
+            //    ...quizStatus.selectedAnswerIds,
+            //    answerId,
+            // ])
+         }
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -186,7 +272,8 @@ const talentGuideReducer = createSlice({
                return
             }
 
-            const { completedStepIds, moduleData, userAuthUid } = action.payload
+            const { completedStepIds, moduleData, userAuthUid, quizzes } =
+               action.payload
 
             const moduleSteps = moduleData.content.moduleSteps
 
@@ -218,6 +305,22 @@ const talentGuideReducer = createSlice({
             state.moduleData = moduleData
             state.isLoadingTalentGuide = false
             state.userAuthUid = userAuthUid
+
+            state.quizStatuses = moduleData.content.moduleSteps.reduce(
+               (acc, step) => {
+                  if (step.content.__typename === "Quiz") {
+                     const quizId = step.content.id
+                     acc[quizId] = {
+                        state:
+                           quizzes[quizId]?.state || QUIZ_STATE.NOT_ATTEMPTED,
+                        selectedAnswerIds:
+                           quizzes[quizId]?.selectedAnswerIds || [],
+                     }
+                  }
+                  return acc
+               },
+               {} as Record<string, QuizStatus>
+            )
          })
          .addCase(loadTalentGuide.rejected, (state, action) => {
             state.isLoadingTalentGuide = false
@@ -227,6 +330,31 @@ const talentGuideReducer = createSlice({
 
             errorLogAndNotify(new Error(errorMessage), {
                context: "loadTalentGuide",
+               userAuthUid: state.userAuthUid,
+               originalError: action.error,
+            })
+         })
+         .addCase(attemptQuiz.pending, (state) => {
+            state.isLoadingAttemptQuiz = true
+         })
+         .addCase(attemptQuiz.fulfilled, (state, action) => {
+            state.isLoadingAttemptQuiz = false
+            if (!action.payload) return
+
+            const { quizId, passed } = action.payload
+
+            state.quizStatuses[quizId].state = passed
+               ? QUIZ_STATE.PASSED
+               : QUIZ_STATE.FAILED
+         })
+         .addCase(attemptQuiz.rejected, (state, action) => {
+            state.isLoadingAttemptQuiz = false
+            const errorMessage =
+               action.error.message || "Failed to attempt quiz"
+            state.isLoadingAttemptQuizError = errorMessage
+
+            errorLogAndNotify(new Error(errorMessage), {
+               context: "attemptQuiz",
                userAuthUid: state.userAuthUid,
                originalError: action.error,
             })
@@ -242,6 +370,16 @@ const talentGuideReducer = createSlice({
             state.visibleSteps = [0]
             state.currentStepIndex = 0
             state.isLoadingTalentGuide = false
+            state.quizStatuses = Object.keys(state.quizStatuses).reduce(
+               (acc, quizId) => {
+                  acc[quizId] = {
+                     selectedAnswerIds: [],
+                     state: QUIZ_STATE.NOT_ATTEMPTED,
+                  }
+                  return acc
+               },
+               {} as Record<string, QuizStatus>
+            )
          })
          .addCase(resetModuleProgressForDemo.rejected, (state, action) => {
             state.isLoadingTalentGuide = false
@@ -258,6 +396,6 @@ const talentGuideReducer = createSlice({
    },
 })
 
-export const { resetTalentGuide } = talentGuideReducer.actions
+export const { resetTalentGuide, toggleQuizAnswer } = talentGuideReducer.actions
 
 export default talentGuideReducer.reducer
