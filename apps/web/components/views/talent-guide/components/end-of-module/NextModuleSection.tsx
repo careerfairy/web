@@ -84,15 +84,11 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          exit="exit"
          transition={{ duration: 0.5, ease: "easeOut" }}
          variants={containerVariants}
-         sx={[
-            nextModuleStyles.section,
-            isShortScreen && nextModuleStyles.shortScreenSection,
-         ]}
+         sx={[nextModuleStyles.section]}
          data-testid="next-module-section"
       >
          <AnimatePresence mode="sync">
             <FramerBox
-               key="completed-module-card"
                ref={completedCardRef}
                layout
                initial={{ scale: 1, y: 0 }}
@@ -103,6 +99,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   y: animationsState.hasShineAnimationComplete ? cardOffset : 0,
                }}
                transition={{ duration: 0.5 }}
+               key="completed-module-card"
                sx={[
                   nextModuleStyles.completedModuleCard,
                   animationsState.hasShineAnimationComplete &&
@@ -133,12 +130,16 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   initial: {
                      opacity: 0,
                   },
-                  animate: animationsState.hasCompletedModuleCardSlidUp && {
+                  animate: {
                      opacity: 1,
                   },
                }}
-               animate={"animate"}
-               initial={"initial"}
+               layout
+               animate={
+                  Boolean(animationsState.hasCompletedModuleCardSlidUp) &&
+                  "animate"
+               }
+               initial="initial"
                display="flex"
                flexDirection="column"
                alignItems="center"
@@ -150,7 +151,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                }}
             >
                <FramerBox
-                  key="divider"
+                  key="divider-container"
                   ref={dividerRef}
                   variants={dividerVariants}
                   animate={
@@ -160,7 +161,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   }
                   sx={nextModuleStyles.divider}
                   layout
-                  onAnimationComplete={() => {
+                  onLayoutAnimationComplete={() => {
                      setAnimationsState((prev) => ({
                         ...prev,
                         hasDividerAnimationComplete: true,
