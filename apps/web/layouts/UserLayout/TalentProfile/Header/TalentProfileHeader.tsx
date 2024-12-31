@@ -1,10 +1,13 @@
-import { Button, Stack, Typography } from "@mui/material"
+import { Button, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useCountryCityData from "components/custom-hook/countries/useCountryCityData"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import { universityCountriesMap } from "components/util/constants/universityCountries"
 import { useRouter } from "next/router"
 import { Fragment, useMemo, useState } from "react"
 import { Settings } from "react-feather"
+import { useSelector } from "react-redux"
+import { getProfileTab } from "store/selectors/profileSettingsSelectors"
 import { sxStyles } from "types/commonTypes"
 import { TAB_VALUES } from "../TalentProfileView"
 import { ProfileAvatar } from "./ProfileAvatar"
@@ -80,6 +83,8 @@ export const TalentProfileHeader = () => {
    const isSettingsPage = router.pathname.includes(TAB_VALUES.settings.value)
    const [openSettings, setOpenSettings] = useState(isSettingsPage)
 
+   const profileTab = useSelector(getProfileTab)
+
    const { userData, userPresenter } = useAuth()
    const { talentProfileV1 } = useFeatureFlags()
 
@@ -87,8 +92,6 @@ export const TalentProfileHeader = () => {
       () => userPresenter?.getFieldOfStudyDisplayName(talentProfileV1),
       [userPresenter, talentProfileV1]
    )
-
-   const userCountry = universityCountriesMap[userData.universityCountryCode]
 
    return (
       <Fragment>
@@ -120,9 +123,15 @@ export const TalentProfileHeader = () => {
                            ? ` at ${userData?.university?.name}`
                            : null}
                      </Typography>
-                     <Typography sx={styles.userLocation}>
-                        {`CityTBD in Up Stack, ${userCountry}.`}
-                     </Typography>
+                     <SuspenseWithBoundary
+                        fallback={
+                           <Skeleton
+                              sx={{ maxWidth: "300px", height: "100%" }}
+                           />
+                        }
+                     >
+                        <UserLocation />
+                     </SuspenseWithBoundary>
                   </Stack>
                </Stack>
             </Stack>
@@ -136,7 +145,7 @@ export const TalentProfileHeader = () => {
 
                router.push(
                   {
-                     pathname: TAB_VALUES.profile.value,
+                     pathname: profileTab,
                      query: router.query,
                   },
                   undefined,
@@ -145,5 +154,23 @@ export const TalentProfileHeader = () => {
             }}
          />
       </Fragment>
+   )
+}
+
+const UserLocation = () => {
+   const { userData } = useAuth()
+   const { data } = useCountryCityData(
+      userData?.countryIsoCode,
+      userData?.cityIsoCode
+   )
+
+   if (!data?.city && !data?.country) return null
+
+   return (
+      <Typography sx={styles.userLocation}>
+         {data?.city?.name
+            ? `${data.city.name}, ${data?.country?.name}`
+            : data?.country?.name}
+      </Typography>
    )
 }

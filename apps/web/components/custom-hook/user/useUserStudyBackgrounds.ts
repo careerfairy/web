@@ -20,10 +20,6 @@ export const useUserStudyBackgrounds = () => {
          )
 
          if (cachedBackgrounds) {
-            console.log(
-               "🚀 ~ useEffect ~ cachedBackgrounds:",
-               JSON.parse(cachedBackgrounds)
-            )
             setStudyBackgrounds(
                (JSON.parse(cachedBackgrounds) as any[]).map((data) => ({
                   ...data,
