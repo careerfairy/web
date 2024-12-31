@@ -156,15 +156,15 @@ export const useUserSparks = () => {
  * 3. Backfill the sparks feed for the user, if they never had one to begin with
  */
 export const usePrefetchUserSparks = () => {
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, isLoggedIn } = useAuth()
 
    useEffect(() => {
-      if (authenticatedUser.isLoaded) {
+      if (isLoggedIn) {
          preload(getKey(authenticatedUser.email), () =>
             fetcher({ userId: authenticatedUser.email })
          )
       }
-   }, [authenticatedUser.email, authenticatedUser.isLoaded])
+   }, [authenticatedUser.email, isLoggedIn])
 
    return null
 }
