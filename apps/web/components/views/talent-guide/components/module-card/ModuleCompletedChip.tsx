@@ -14,22 +14,22 @@ export const ModuleCompletedChip = ({ onShineAnimationComplete }: Props) => {
    const isMobile = useIsMobile()
    return (
       <Box display="flex">
+         <FramerBox
+            sx={statusStyles.shine}
+            initial={{ transform: "skewX(-45deg) translateX(-100%)" }}
+            animate={{ transform: "skewX(-45deg) translateX(300%)" }}
+            transition={{
+               duration: 2,
+               ease: [0.4, 0, 0.2, 1],
+               delay: 0.5,
+            }}
+            onAnimationComplete={onShineAnimationComplete}
+         />
          <Stack
             sx={[statusStyles.completed, statusStyles.chip]}
             direction="row"
             spacing={0.5}
          >
-            <FramerBox
-               sx={statusStyles.shine}
-               initial={{ transform: "skewX(-45deg) translateX(-100%)" }}
-               animate={{ transform: "skewX(-45deg) translateX(300%)" }}
-               transition={{
-                  duration: 2,
-                  ease: [0.4, 0, 0.2, 1],
-                  delay: 0.5,
-               }}
-               onAnimationComplete={onShineAnimationComplete}
-            />
             <svg
                xmlns="http://www.w3.org/2000/svg"
                width="14"
