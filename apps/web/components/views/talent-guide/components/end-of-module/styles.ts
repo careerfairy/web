@@ -100,9 +100,6 @@ export const nextModuleStyles = sxStyles({
       position: "relative",
       justifyContent: "center",
    },
-   shortScreenSection: {
-      minHeight: 602,
-   },
    bottomContent: {
       mt: "auto",
       width: "100%",
