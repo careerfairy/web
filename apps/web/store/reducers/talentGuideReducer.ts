@@ -309,8 +309,6 @@ const talentGuideReducer = createSlice({
                },
                {} as Record<string, QuizStatus>
             )
-
-            state.showEndOfModuleExperience = true // TODO: Remove this before committing
          })
          .addCase(loadTalentGuide.rejected, (state, action) => {
             state.isLoadingTalentGuide = false
