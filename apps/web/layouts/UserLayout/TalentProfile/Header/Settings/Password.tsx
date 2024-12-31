@@ -1,4 +1,5 @@
-import { Button, Stack } from "@mui/material"
+import { LoadingButton } from "@mui/lab"
+import { Stack } from "@mui/material"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { auth } from "data/firebase/FirebaseInstance"
 import {
@@ -21,7 +22,7 @@ export const Password = () => {
 const PasswordForm = () => {
    const { errorNotification, successNotification } = useSnackbarNotifications()
    const {
-      formState: { isDirty, isValid },
+      formState: { isDirty, isValid, isSubmitting },
       reset,
       setError,
       handleSubmit,
@@ -69,14 +70,15 @@ const PasswordForm = () => {
    return (
       <Stack spacing={1.5}>
          <PasswordFormFields />
-         <Button
+         <LoadingButton
             onClick={handleSave}
             disabled={!isDirty || !isValid}
             variant="contained"
             color="primary"
+            loading={isSubmitting}
          >
             Update password
-         </Button>
+         </LoadingButton>
       </Stack>
    )
 }
