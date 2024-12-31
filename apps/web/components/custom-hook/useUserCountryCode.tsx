@@ -10,7 +10,7 @@ const useUserCountryCode = () => {
             "fetchUserCountryCode"
          )()
 
-         return result.data
+         return result.data as string
       },
       {
          onError: (error, key) => {
