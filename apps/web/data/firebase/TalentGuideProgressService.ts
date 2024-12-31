@@ -7,7 +7,7 @@ import {
    TalentGuideQuiz,
    TalentGuideRating,
 } from "@careerfairy/shared-lib/talent-guide"
-import { Page, TalentGuideModule } from "data/hygraph/types"
+import { Page, QuizModelType, TalentGuideModule } from "data/hygraph/types"
 import {
    arrayUnion,
    collection,
