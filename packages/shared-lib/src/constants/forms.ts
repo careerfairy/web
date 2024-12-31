@@ -1351,6 +1351,14 @@ export const languageOptionCodes: OptionGroup[] = [
    },
 ]
 
+export const languageOptionCodesMap = languageOptionCodes.reduce(
+   (acc, language) => ({
+      ...acc,
+      [language.id]: language,
+   }),
+   {} as Record<string, OptionGroup>
+)
+
 export const EUROPEAN_COUNTRY_CODES = countriesOptionCodes
    .filter((country) =>
       [
@@ -1698,6 +1706,21 @@ export const LanguageProficiencyOrderMap: Record<LanguageProficiency, number> =
       proficient: 3,
       native: 4,
    }
+
+export const LanguageProficiencyMap = LanguageProficiencyValues.reduce(
+   (acc, value) => ({
+      ...acc,
+      [value]: {
+         id: value,
+         name: LanguageProficiencyLabels[value],
+      },
+   }),
+   {} as Record<string, OptionGroup>
+)
+
+export const ProficiencyOptions = Object.keys(LanguageProficiencyMap).map(
+   (proficiency) => LanguageProficiencyMap[proficiency]
+)
 
 export const CompanyCountryValues: OptionGroup[] = countriesOptionCodes.map(
    (country) => ({
