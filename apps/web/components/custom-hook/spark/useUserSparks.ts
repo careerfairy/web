@@ -30,8 +30,12 @@ type FetcherParams = {
 }
 
 // Utility functions
-const getKey = (userId: string, userCountryCode?: string) =>
-   userId ? `userSparks-${userId}-${userCountryCode}` : "userSparks"
+const getKey = (userId: string, userCountryCode?: string) => {
+   const countryCodeSuffix = userCountryCode ? `-${userCountryCode}` : ""
+   return userId
+      ? `userSparks-${userId}${countryCodeSuffix}`
+      : `userSparks${countryCodeSuffix}`
+}
 
 const getUserCountryCode = () => localStorage.getItem(STORAGE_KEY)
 
@@ -99,7 +103,7 @@ const fetcher = async ({ userId }: FetcherParams) => {
    if (userId) {
       return fetchUserFeed(userId)
    }
-   return fetchPublicSparks(getUserCountryCode() || undefined)
+   return fetchPublicSparks(getUserCountryCode())
 }
 
 /**
