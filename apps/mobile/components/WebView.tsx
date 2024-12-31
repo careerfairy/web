@@ -13,6 +13,7 @@ import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
 import React, { useEffect, useRef, useState } from "react"
 import {
+   AppState,
    BackHandler,
    Linking,
    Platform,
@@ -21,7 +22,6 @@ import {
    StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
-import { AppState } from "react-native"
 
 const injectedCSS = `
     body :not(input):not(textarea) {
@@ -200,10 +200,16 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const handleUserAuth = async (data: USER_AUTH) => {
-      await SecureStore.setItemAsync("authToken", data.token)
-      await SecureStore.setItemAsync("userId", data.userId)
-      await SecureStore.setItemAsync("userPassword", data.userPassword)
-      onTokenInjected()
+      try {
+         await Promise.all([
+            SecureStore.setItemAsync("authToken", data.token),
+            SecureStore.setItemAsync("userId", data.userId),
+            SecureStore.setItemAsync("userPassword", data.userPassword),
+         ])
+         onTokenInjected()
+      } catch (error) {
+         console.error("Failed to store auth data:", error)
+      }
    }
 
    const handleHaptic = (data: HAPTIC) => {
@@ -342,6 +348,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                  style.innerHTML = \`${injectedCSS}\`;
                  document.head.appendChild(style);
               })();`}
+            allowFileAccess={true} // Allow service worker support for firebase offline caching
+            allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
+            javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
+            renderToHardwareTextureAndroid={true} // Improve performance on android
          />
       </SafeAreaView>
    )

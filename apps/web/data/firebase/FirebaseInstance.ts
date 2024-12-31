@@ -1,11 +1,11 @@
-import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
-import "firebase/compat/auth"
-import "firebase/compat/storage"
-import "firebase/compat/functions"
-import SessionStorageUtil from "../../util/SessionStorageUtil"
-import { shouldUseEmulators } from "../../util/CommonUtil"
 import { fromDateFirestoreFn } from "@careerfairy/shared-lib/dist/firebaseTypes"
+import firebase from "firebase/compat/app"
+import "firebase/compat/auth"
+import "firebase/compat/firestore"
+import "firebase/compat/functions"
+import "firebase/compat/storage"
+import { shouldUseEmulators } from "../../util/CommonUtil"
+import SessionStorageUtil from "../../util/SessionStorageUtil"
 
 export const firebaseConfig = {
    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
