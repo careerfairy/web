@@ -80,3 +80,8 @@ export const TalentGuideProgress = () => {
       </Box>
    )
 }
+
+export const useProgressHeaderHeight = () => {
+   const isMobile = useIsMobile()
+   return isMobile ? 88 : 120 // This is the estimated height of the sticky progress bar, we need to account for it when scrolling to the last step
+}
