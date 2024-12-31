@@ -26,6 +26,7 @@ export const statusStyles = sxStyles({
          "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0) 20%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 80%, transparent 100%)",
       transform: "skewX(-45deg) translateX(-100%)",
       pointerEvents: "none",
+      mr: "-4px !important",
    },
    chip: {
       padding: "4px 8px",

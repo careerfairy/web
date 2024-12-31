@@ -57,14 +57,18 @@ export const NextModuleSection = ({ nextModule }: Props) => {
    }, [])
 
    useEffect(() => {
-      if (completedCardRef.current && dividerRef.current) {
+      if (
+         completedCardRef.current &&
+         dividerRef.current &&
+         animationsState.hasShineAnimationComplete
+      ) {
          const cardHeight =
             completedCardRef.current.getBoundingClientRect().height
          const scaledHeight = cardHeight * SHRINK_FACTOR
          const offset = (cardHeight - scaledHeight) / 2
          setCardOffset(offset)
       }
-   }, [])
+   }, [animationsState.hasShineAnimationComplete])
 
    return (
       <FramerBox
