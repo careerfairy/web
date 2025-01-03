@@ -1,4 +1,3 @@
-import { Stack } from "@mui/material"
 import FramerBox from "components/views/common/FramerBox"
 import { AnimatePresence, Variants } from "framer-motion"
 import React, { ReactElement, useCallback, useRef } from "react"
@@ -68,12 +67,14 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
 
    return (
       <FramerBox
-         component={Stack}
+         id="talent-guide-step-content"
          variants={containerVariants}
          initial="hidden"
          animate="visible"
          sx={{
             gap: "24px",
+            display: "flex",
+            flexDirection: "column",
          }}
       >
          <AnimatePresence mode="sync">
@@ -89,7 +90,7 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
                      initial="hidden"
                      animate="visible"
                      exit="exit"
-                     id={`talent-guide-step-${index}`}
+                     data-testid={`talent-guide-step-${index}`}
                      onAnimationComplete={() => {
                         if (numberOfSteps === 1) return // Don't scroll if there is only one step rendered
                         handleAnimationComplete(isLastStep)

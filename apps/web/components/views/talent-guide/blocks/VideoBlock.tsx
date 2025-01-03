@@ -48,7 +48,7 @@ export const VideoBlock = ({
    videoTitle,
 }: Props) => {
    return (
-      <Stack gap={1} sx={styles.root}>
+      <Stack data-testid="talent-guide-video-block" gap={1} sx={styles.root}>
          <ReactPlayer
             url={video.url}
             className="react-player"
