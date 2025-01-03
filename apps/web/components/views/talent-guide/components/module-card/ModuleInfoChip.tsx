@@ -48,7 +48,7 @@ export const ModuleInfoChip = ({
                spacing={0.75}
                direction="row"
             >
-               <Progress value={25} />
+               <Progress value={percentProgress || 0} />
                <Typography
                   variant={isMobile ? "xsmall" : "small"}
                   component="p"
