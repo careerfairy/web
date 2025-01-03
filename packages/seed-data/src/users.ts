@@ -32,7 +32,7 @@ interface UserSeed {
 
    getUserData(email: string): Promise<UserData | null>
 
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
    deleteUser(email: string): Promise<any>
 
    addSavedRecruiter(
@@ -50,6 +50,11 @@ interface UserSeed {
     * Tests need different emails, re-use this package faker lib to generate them
     */
    getRandomEmail(): string
+
+   getSubCollectionData<T>(
+      userId: string,
+      subCollectionName: string
+   ): Promise<T[]>
 }
 
 class UserFirebaseSeed implements UserSeed {
@@ -121,7 +126,8 @@ class UserFirebaseSeed implements UserSeed {
    async deleteUser(email: string) {
       const userSnap = await firestore.collection("userData").doc(email).get()
       const authId = userSnap.data()?.authId
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+
       const promises: Promise<any>[] = [
          firestore.collection("userData").doc(email).delete(),
       ]
@@ -241,6 +247,18 @@ class UserFirebaseSeed implements UserSeed {
          : (userCompaniesFollowsSnap.docs.map((doc) =>
               doc.data()
            ) as CompanyFollowed[])
+   }
+
+   async getSubCollectionData<T>(
+      userId: string,
+      subCollectionName: string
+   ): Promise<T[]> {
+      const subCollectionSnap = await firestore
+         .collection("userData")
+         .doc(userId)
+         .collection(subCollectionName)
+         .get()
+      return (subCollectionSnap.docs?.map((doc) => doc.data()) as T[]) ?? []
    }
 }
 
