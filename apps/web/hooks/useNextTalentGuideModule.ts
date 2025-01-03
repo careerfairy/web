@@ -20,6 +20,12 @@ const fetchNextModule = async (
    return talentGuideProgressService.getNextModule(userAuthUid, allModules)
 }
 
+/**
+ * Hook to fetch the next talent guide module
+ * @param userAuthUid - The user's auth UID
+ * @param locale - The locale for the content
+ * @param options - SWR configuration options
+ */
 export function useNextTalentGuideModule(
    userAuthUid: string | null,
    locale: string = "en",
