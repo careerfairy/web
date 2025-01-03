@@ -96,7 +96,7 @@ test.describe("Signup Page Functionality", () => {
 
       const userLanguages =
          await UserSeed.getSubCollectionData<ProfileLanguage>(
-            userDataFromDb.userId,
+            userDataFromDb.id,
             "languages"
          )
 
