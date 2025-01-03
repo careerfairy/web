@@ -6,8 +6,10 @@ import {
    LanguageProficiencyValues,
    ProficiencyOptions,
    countriesAndRegionsOptionCodes,
+   countryGroupId,
    languageOptionCodes,
    languageOptionCodesMap,
+   regionGroupId,
 } from "@careerfairy/shared-lib/constants/forms"
 import { Box, Button, Grid, Stack, Switch, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
@@ -24,7 +26,11 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
-import { formatToOptionArray, multiListSelectMapValueFn } from "../utils"
+import {
+   formatToOptionArray,
+   mapOptions,
+   multiListSelectMapValueFn,
+} from "../utils"
 
 const styles = sxStyles({
    inputLabel: {
@@ -172,6 +178,17 @@ const LocationInformationView = () => {
       },
 
       [userData.id, countriesList]
+   )
+
+   const handleCountriesOfInterestChange = useCallback(
+      (_: string, selectedCountriesAndRegions: OptionGroup[]) => {
+         const fieldToUpdate = mapCountriesAndRegionsToFieldToUpdate(
+            selectedCountriesAndRegions
+         )
+
+         updateFields(fieldToUpdate).catch(console.error)
+      },
+      [updateFields]
    )
 
    const handleSelectedCityChange = useCallback(
@@ -461,7 +478,7 @@ const LocationInformationView = () => {
                   selectedItems={inputValues[COUNTRIES_OF_INTEREST_FIELD_NAME]}
                   allValues={countriesAndRegionsOptionCodes}
                   getGroupByFn={mapGroupBy}
-                  setFieldValue={handleSelectedCountriesChange}
+                  setFieldValue={handleCountriesOfInterestChange}
                   inputProps={{
                      label: "Countries of interest",
                      placeholder: "Select one or more countries or regions.",
@@ -489,6 +506,25 @@ const LocationInformationView = () => {
          </Grid>
       </>
    )
+}
+
+const mapCountriesAndRegionsToFieldToUpdate = (selectedCountriesAndRegions) => {
+   const selectedCountries = selectedCountriesAndRegions.filter(
+      (item) => item.groupId === countryGroupId
+   )
+   const selectedRegions = selectedCountriesAndRegions.filter(
+      (item) => item.groupId === regionGroupId
+   )
+
+   const mappedCountries = mapOptions(selectedCountries)
+   const mappedRegions = mapOptions(selectedRegions)
+
+   const toUpdate = {
+      countriesOfInterest: mappedCountries,
+      regionsOfInterest: mappedRegions,
+   }
+
+   return toUpdate
 }
 
 const mapGroupBy = (item) => item.groupId
