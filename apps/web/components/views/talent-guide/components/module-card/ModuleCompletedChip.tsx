@@ -2,7 +2,7 @@ import { Typography } from "@mui/material"
 
 import FramerBox from "components/views/common/FramerBox"
 
-import { Box, Stack } from "@mui/material"
+import { Box } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { statusStyles } from "./styles"
 
@@ -14,22 +14,18 @@ export const ModuleCompletedChip = ({ onShineAnimationComplete }: Props) => {
    const isMobile = useIsMobile()
    return (
       <Box display="flex">
-         <FramerBox
-            sx={statusStyles.shine}
-            initial={{ transform: "skewX(-45deg) translateX(-100%)" }}
-            animate={{ transform: "skewX(-45deg) translateX(300%)" }}
-            transition={{
-               duration: 2,
-               ease: [0.4, 0, 0.2, 1],
-               delay: 0.5,
-            }}
-            onAnimationComplete={onShineAnimationComplete}
-         />
-         <Stack
-            sx={[statusStyles.completed, statusStyles.chip]}
-            direction="row"
-            spacing={0.5}
-         >
+         <Box sx={[statusStyles.completed, statusStyles.chip]}>
+            <FramerBox
+               sx={statusStyles.shine}
+               initial={{ transform: "skewX(-45deg) translateX(-100%)" }}
+               animate={{ transform: "skewX(-45deg) translateX(300%)" }}
+               transition={{
+                  duration: 2,
+                  ease: [0.4, 0, 0.2, 1],
+                  delay: 0.5,
+               }}
+               onAnimationComplete={onShineAnimationComplete}
+            />
             <svg
                xmlns="http://www.w3.org/2000/svg"
                width="14"
@@ -51,13 +47,14 @@ export const ModuleCompletedChip = ({ onShineAnimationComplete }: Props) => {
                />
             </svg>
             <Typography
+               ml={0.5}
                variant={isMobile ? "xsmall" : "small"}
                component="p"
                color="inherit"
             >
                Level cleared
             </Typography>
-         </Stack>
+         </Box>
       </Box>
    )
 }
