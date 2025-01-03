@@ -20,19 +20,13 @@ export const TalentGuideEndLayout = () => {
    const [ratingClicked, setRatingClicked] = useState(false)
    const [someTimeHasPassed, setSomeTimeHasPassed] = useState(false)
    const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
+   const [isRedirectingToOverview, setIsRedirectingToOverview] = useState(false)
 
    const isShortScreen = useMediaQuery("(max-height: 800px)")
    const isShorterScreen = useMediaQuery("(max-height: 530px)")
 
-   const { data: nextModule } = useNextTalentGuideModule(
-      authenticatedUser?.uid,
-      "de",
-      {
-         onSuccess: (nextModule) => {
-            if (!nextModule) {
-               push("/talent-guide")
-            }
-         },
+   const { data: nextModule, isLoading: isLoadingNextModule } =
+      useNextTalentGuideModule(authenticatedUser?.uid, "de", {
          onError: (error, key) => {
             errorLogAndNotify(error, {
                message: "Error fetching next talent guide module",
@@ -41,8 +35,26 @@ export const TalentGuideEndLayout = () => {
             push("/talent-guide")
          },
          suspense: false,
+
+         /**
+          * Disable caching of the next module
+          */
+         revalidateOnMount: true,
+         revalidateIfStale: true,
+         revalidateOnFocus: true,
+         revalidateOnReconnect: true,
+      })
+
+   useEffect(() => {
+      if (!isLoadingNextModule && nextModule === null) {
+         setIsRedirectingToOverview(true)
+         push("/talent-guide")
+
+         return () => {
+            setIsRedirectingToOverview(false)
+         }
       }
-   )
+   }, [nextModule, isLoadingNextModule, push])
 
    useEffect(() => {
       const timer = setTimeout(() => {
@@ -53,7 +65,10 @@ export const TalentGuideEndLayout = () => {
    }, [])
 
    const showCongrats =
-      !ratingClicked && !(isShorterScreen && someTimeHasPassed)
+      !isLoadingNextModule &&
+      !isRedirectingToOverview &&
+      !ratingClicked &&
+      !(isShorterScreen && someTimeHasPassed)
    const showFeedback = someTimeHasPassed && !feedbackSubmitted
    const showNextModule = feedbackSubmitted && nextModule
 
