@@ -1,8 +1,13 @@
 import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
 import InterestSeed from "@careerfairy/seed-data/dist/interests"
 import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
-import UserSeed from "@careerfairy/seed-data/dist/users"
+import UserSeed from "@careerfairy/seed-data/users"
+import {
+   LanguageProficiency,
+   LanguageProficiencyOrderMap,
+} from "@careerfairy/shared-lib/constants/forms"
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/dist/rewards"
+import { ProfileLanguage } from "@careerfairy/shared-lib/users"
 import { expect, test } from "@playwright/test"
 import { correctRegistrationAnalyticsSteps, credentials } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"
@@ -89,9 +94,14 @@ test.describe("Signup Page Functionality", () => {
 
       const userDataFromDb = await UserSeed.getUserData(correctEmail)
 
+      const userLanguages =
+         await UserSeed.getSubCollectionData<ProfileLanguage>(
+            userDataFromDb.userId,
+            "languages"
+         )
+
       const {
          linkedinUrl: userDataLinkedinUrl,
-         spokenLanguages: userDataSpokenLanguages,
          countriesOfInterest: userDataCountriesOfInterest,
          businessFunctionsTagIds: userDataBusinessFunctionsTagIds,
          contentTopicsTagIds: userDataContentTopicsTagIds,
@@ -105,7 +115,7 @@ test.describe("Signup Page Functionality", () => {
 
       expect(userDataLinkedinUrl).toBeFalsy()
       expect(userDataIsLookingForJob).toBeFalsy()
-      expect(userDataSpokenLanguages).toBeFalsy()
+      expect(userLanguages.length).toBeFalsy()
       expect(userDataCountriesOfInterest).toBeFalsy()
       expect(userBusinessFunctionsTagIds.length).toBe(0)
       expect(userContentTopicsTagIds.length).toBe(0)
@@ -195,7 +205,9 @@ test.describe("Signup Page Functionality", () => {
          correctLastName,
          correctFirstName,
          linkedinUrl,
-         spokenLanguagesIds: [firstSpokenLanguageId],
+         languages,
+         countryIsoCode,
+         cityIsoCode,
          countriesOfInterestIds: [firstCountriesOfInterestId],
          regionsOfInterestIds: [firstRegionOfInterestId],
          businessFunctionsTagIds: [firstBusinessFunctionTagId],
@@ -235,7 +247,21 @@ test.describe("Signup Page Functionality", () => {
       // should be on the additional information step
       await expect(signup.additionalInformationStep).toBeVisible()
 
-      await signup.selectSpokenLanguageOption(firstSpokenLanguageId)
+      await signup.selectCountryOption(countryIsoCode)
+
+      await signup.selectCityOption(cityIsoCode)
+
+      for (const language of languages) {
+         console.log(
+            "🚀 ~ test.describe ~ language.proficiency:",
+            language.proficiency
+         )
+         await signup.addLanguage(
+            language.languageId,
+            language.proficiency as LanguageProficiency
+         )
+      }
+
       await signup.selectCountriesOfInterestOption(firstCountriesOfInterestId)
       await signup.selectCountriesOfInterestOption(firstRegionOfInterestId)
       await signup.selectIsLookingForJobToggleOption()
@@ -258,19 +284,39 @@ test.describe("Signup Page Functionality", () => {
 
       const userDataFromDb = await UserSeed.getUserData(correctEmail)
 
+      const userLanguages =
+         await UserSeed.getSubCollectionData<ProfileLanguage>(
+            userDataFromDb.userId,
+            "languages"
+         )
+
       const {
          linkedinUrl: userDataLinkedinUrl,
-         spokenLanguages: userDataSpokenLanguages,
          countriesOfInterest: userDataCountriesOfInterest,
          regionsOfInterest: userDataRegionsOfInterest,
          businessFunctionsTagIds: userBusinessFunctionsTagIds,
          contentTopicsTagIds: userContentTopicsTagIds,
          isLookingForJob: userDataIsLookingForJob,
+         countryIsoCode: userDataCountryIsoCode,
+         cityIsoCode: userDataCityIsoCode,
       } = userDataFromDb
 
       expect(userDataLinkedinUrl).toEqual(linkedinUrl)
       expect(userDataIsLookingForJob).toBeTruthy()
-      expect(firstSpokenLanguageId).toEqual(userDataSpokenLanguages[0])
+      expect(userDataCountryIsoCode).toEqual(countryIsoCode)
+      expect(userDataCityIsoCode).toEqual(cityIsoCode)
+
+      expect(userLanguages.length).toEqual(languages.length)
+
+      languages.slice(0, 2).forEach((language) => {
+         expect(userLanguages).toContain(
+            (userLanguage: ProfileLanguage) =>
+               userLanguage.languageId === language.languageId &&
+               userLanguage.proficiency ===
+                  LanguageProficiencyOrderMap[language.proficiency]
+         )
+      })
+
       expect(firstCountriesOfInterestId).toEqual(userDataCountriesOfInterest[0])
       expect(firstRegionOfInterestId).toEqual(userDataRegionsOfInterest[0])
       expect(firstBusinessFunctionTagId).toEqual(userBusinessFunctionsTagIds[0])
