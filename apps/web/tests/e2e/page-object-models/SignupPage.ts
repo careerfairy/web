@@ -1,4 +1,5 @@
 import UserSeed from "@careerfairy/seed-data/dist/users"
+import { LanguageProficiency } from "@careerfairy/shared-lib/constants/forms"
 import { expect, Locator, Page } from "@playwright/test"
 import { credentials } from "../../constants"
 import { sleep } from "../utils"
@@ -47,7 +48,12 @@ export class SignupPage extends CommonPage {
    readonly linkedInLinkInput: Locator
    readonly additionalInformationStep: Locator
    readonly interestsInformationStep: Locator
-   readonly spokenLanguagesInput: Locator
+   readonly addLanguageButton: Locator
+   readonly applyAddLanguageButton: Locator
+   readonly languageSelector: Locator
+   readonly countrySelector: Locator
+   readonly citySelector: Locator
+   readonly proficiencySelector: Locator
    readonly countriesOfInterestInput: Locator
    readonly isLookingForJobToggle: Locator
 
@@ -145,7 +151,13 @@ export class SignupPage extends CommonPage {
       this.interestsInformationStep = page.locator(
          "data-testid=registration-interests-information-step"
       )
-      this.spokenLanguagesInput = page.locator("id=spokenLanguages")
+
+      this.addLanguageButton = page.getByText("Add language")
+      this.applyAddLanguageButton = page.getByText("Add")
+      this.countrySelector = page.locator('input[name="countryIsoCode"]')
+      this.citySelector = page.locator('input[name="cityIsoCode"]')
+      this.languageSelector = page.locator('input[name="language"]')
+      this.proficiencySelector = page.locator('input[name="proficiency"]')
       this.countriesOfInterestInput = page.locator("id=countriesOfInterest")
       this.isLookingForJobToggle = page.locator("id=isLookingForJob")
    }
@@ -212,13 +224,29 @@ export class SignupPage extends CommonPage {
    async clickBackButton() {
       return this.userRegistrationBackButton?.click()
    }
-   async selectSpokenLanguageOption(optionId: string) {
-      await this.spokenLanguagesInput.click()
-      await this.page
-         .locator(`data-testid=spokenLanguages_${optionId}_option`)
-         ?.click()
-      await this.spokenLanguagesInput.click()
+
+   async addLanguage(languageId: string, proficiency: LanguageProficiency) {
+      await this.addLanguageButton?.click()
+
+      await this.languageSelector?.click()
+      await this.page.getByTestId(`language_${languageId}_option`)?.click()
+
+      await this.proficiencySelector.click()
+      await this.page.getByTestId(`proficiency_${proficiency}_option`)?.click()
+
+      await this.applyAddLanguageButton?.click()
    }
+
+   async selectCountryOption(countryId: string) {
+      await this.countrySelector.click()
+      await this.page.getByTestId(`countryIsoCode_${countryId}_option`)?.click()
+   }
+
+   async selectCityOption(cityId: string) {
+      await this.citySelector.click()
+      await this.page.getByTestId(`cityIsoCode_${cityId}_option`)?.click()
+   }
+
    async selectCountriesOfInterestOption(optionId: string) {
       await this.countriesOfInterestInput.click()
       await this.page
