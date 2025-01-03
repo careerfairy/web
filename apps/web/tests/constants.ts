@@ -18,7 +18,22 @@ export const credentials = {
    correctUniversityCountry: "Switzerland",
    linkedinUrl: "http://www.linkedin.com/in/user",
    wrongLinkedinUrl: "http://www.linkAdin.com/in/user",
-   spokenLanguagesIds: ["en", "pt", "de"],
+   languages: [
+      {
+         languageId: "en",
+         proficiency: "native",
+      },
+      {
+         languageId: "de",
+         proficiency: "intermediate",
+      },
+      {
+         languageId: "fr",
+         proficiency: "beginner",
+      },
+   ],
+   countryIsoCode: "CH",
+   cityIsoCode: "CH-ZH-Zürich",
    countriesOfInterestIds: ["GB", "PT", "DE"],
    regionsOfInterestIds: ["asia", "africa"],
    businessFunctionsTagIds: ["SupplyChainLogistics"],
