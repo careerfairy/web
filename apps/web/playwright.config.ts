@@ -110,6 +110,8 @@ const config: PlaywrightTestConfig = {
          FIRESTORE_EMULATOR_HOST: "127.0.0.1:8080",
          NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
          APP_ENV: "test",
+         NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
+            process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
       },
       port: 3000,
       // emulators need some time to boot
