@@ -39,7 +39,7 @@ export const ModuleInfoChip = ({
                >
                   <circle cx="2" cy="2" r="2" fill="currentColor" />
                </svg>
-               {moduleDuration}
+               {moduleDuration} min
             </Typography>
          </Box>
          {Boolean(percentProgress) && (
@@ -54,7 +54,7 @@ export const ModuleInfoChip = ({
                   component="p"
                   color="primary.main"
                >
-                  {percentProgress}%
+                  {percentProgress?.toFixed(0)}%
                </Typography>
             </Stack>
          )}
