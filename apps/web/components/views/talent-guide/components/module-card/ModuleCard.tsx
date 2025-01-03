@@ -57,7 +57,7 @@ const styles = sxStyles({
 type Props = {
    module: Page<TalentGuideModule>
    /**
-    * If true, the module card will be a link otherwise it will be a stack
+    * If true, the module card will be a link
     */
    interactive?: boolean
    isRecommended?: boolean
