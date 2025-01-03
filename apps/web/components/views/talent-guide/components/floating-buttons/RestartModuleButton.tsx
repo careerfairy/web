@@ -4,7 +4,7 @@ import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
 import { useState } from "react"
 import { RotateCcw as RestartIcon } from "react-feather"
 import { restartModule } from "store/reducers/talentGuideReducer"
-import { useIsLoadingTalentGuide } from "store/selectors/talentGuideSelectors"
+import { useIsRestartingModule } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
 import { FloatingButton } from "./FloatingButton"
 
@@ -22,7 +22,7 @@ const styles = sxStyles({
 export const RestartModuleButton = () => {
    const dispatch = useAppDispatch()
    const [showConfirmation, setShowConfirmation] = useState(false)
-   const isLoading = useIsLoadingTalentGuide()
+   const isLoading = useIsRestartingModule()
 
    return (
       <>
