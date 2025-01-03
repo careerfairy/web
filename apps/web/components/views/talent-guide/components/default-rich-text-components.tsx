@@ -42,6 +42,11 @@ export const createDefaultRichTextComponents = (
    isMobile: boolean
 ): NodeRendererType => {
    return {
+      p: ({ children }) => (
+         <Typography variant="medium" component="p">
+            {children}
+         </Typography>
+      ),
       h1: ({ children }) => (
          <Typography
             variant={isMobile ? "mobileBrandedH1" : "desktopBrandedH1"}

@@ -1,10 +1,9 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
-import { SyntheticEvent, useCallback } from "react"
-import { UserPlus } from "react-feather"
+import { useCallback } from "react"
 
 const CARD_WIDTH = 254
 
@@ -122,12 +121,12 @@ export const MentorCard = ({
       console.log("Card clicked")
    }, [])
 
-   const handleFollowClick = useCallback((event: SyntheticEvent) => {
-      event.preventDefault()
-      event.stopPropagation()
-      alert("Follow clicked")
-      console.log("Follow clicked")
-   }, [])
+   // const handleFollowClick = useCallback((event: SyntheticEvent) => {
+   //    event.preventDefault()
+   //    event.stopPropagation()
+   //    alert("Follow clicked")
+   //    console.log("Follow clicked")
+   // }, [])
 
    return (
       <Stack sx={styles.root} onClick={handleCardClick}>
@@ -176,7 +175,8 @@ export const MentorCard = ({
                   </Box>
                </Typography>
             </Stack>
-            <Button
+            {/* TODO: Follow functionality not part of MVP */}
+            {/* <Button
                variant="contained"
                color="primary"
                startIcon={<UserPlus />}
@@ -185,7 +185,7 @@ export const MentorCard = ({
                onClick={handleFollowClick}
             >
                Follow
-            </Button>
+            </Button> */}
          </Stack>
       </Stack>
    )
