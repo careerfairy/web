@@ -15,6 +15,7 @@ import { Box, Button, Grid, Stack, Switch, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCountriesList from "components/custom-hook/countries/useCountriesList"
 import useCountryCities from "components/custom-hook/countries/useCountryCities"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useUserLanguages } from "components/custom-hook/user/useUserLanguages"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
@@ -84,6 +85,7 @@ const styles = sxStyles({
 })
 
 const COUNTRIES_OF_INTEREST_FIELD_NAME = "countriesOfInterest"
+const SPOKEN_LANGUAGES_FIELD_NAME = "spokenLanguages"
 const IS_LOOKING_FOR_JOB_FIELD_NAME = "isLookingForJob"
 
 const LocationInformation = () => {
@@ -97,6 +99,7 @@ const LocationInformation = () => {
 
 const LocationInformationView = () => {
    const { authenticatedUser: user, userData } = useAuth()
+   const { talentProfileV1 } = useFeatureFlags()
    const { errorNotification } = useSnackbarNotifications()
 
    const { data: userLanguages } = useUserLanguages()
@@ -164,6 +167,16 @@ const LocationInformationView = () => {
          }
       },
       [user]
+   )
+
+   const handleSelectedLanguageChange = useCallback(
+      (name: string, selectedLanguages: OptionGroup[]) => {
+         const fieldToUpdate = {
+            spokenLanguages: mapOptions(selectedLanguages),
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+      },
+      [updateFields]
    )
 
    const handleSelectedCountriesChange = useCallback(
@@ -274,62 +287,85 @@ const LocationInformationView = () => {
             justifyContent="center"
             data-testid="registration-additional-information-step"
          >
-            <Grid item xs={12} sm={8}>
-               <Typography sx={styles.inputLabel} variant="h5">
-                  What&apos;s your location?
-               </Typography>
-            </Grid>
-            <Grid item xs={12} sm={8}>
-               <SingleListSelect
-                  inputName={"countryIsoCode"}
-                  selectedItem={country}
-                  options={countriesOptions}
-                  setFieldValue={(_, value) =>
-                     handleSelectedCountriesChange(value)
-                  }
-                  inputProps={{
-                     label: "What's your country?",
-                     className: "registrationInput",
-                  }}
-                  extraOptions={{
-                     sx: {
-                        "& .MuiInputBase-input": {
-                           fontWeight: 600,
-                           fontSize: "16px",
+            <ConditionalWrapper condition={talentProfileV1}>
+               <Grid item xs={12} sm={8}>
+                  <Typography sx={styles.inputLabel} variant="h5">
+                     What&apos;s your location?
+                  </Typography>
+               </Grid>
+               <Grid item xs={12} sm={8}>
+                  <SingleListSelect
+                     inputName={"countryIsoCode"}
+                     selectedItem={country}
+                     options={countriesOptions}
+                     setFieldValue={(_, value) =>
+                        handleSelectedCountriesChange(value)
+                     }
+                     inputProps={{
+                        label: "What's your country?",
+                        className: "registrationInput",
+                     }}
+                     extraOptions={{
+                        sx: {
+                           "& .MuiInputBase-input": {
+                              fontWeight: 600,
+                              fontSize: "16px",
+                           },
                         },
-                     },
-                  }}
-               />
-            </Grid>
-
-            <Grid item xs={12} sm={8}>
-               <SingleListSelect
-                  inputName={"cityIsoCode"}
-                  selectedItem={city}
-                  options={citiesOptions}
-                  setFieldValue={(_, value) => handleSelectedCityChange(value)}
-                  inputProps={{
-                     label: "And your city?",
-                     className: "registrationInput",
-                  }}
-                  extraOptions={{
-                     sx: {
-                        "& .MuiInputBase-input": {
-                           fontWeight: 600,
-                           fontSize: "16px",
+                     }}
+                  />
+               </Grid>
+               <Grid item xs={12} sm={8}>
+                  <SingleListSelect
+                     inputName={"cityIsoCode"}
+                     selectedItem={city}
+                     options={citiesOptions}
+                     setFieldValue={(_, value) =>
+                        handleSelectedCityChange(value)
+                     }
+                     inputProps={{
+                        label: "And your city?",
+                        className: "registrationInput",
+                     }}
+                     extraOptions={{
+                        sx: {
+                           "& .MuiInputBase-input": {
+                              fontWeight: 600,
+                              fontSize: "16px",
+                           },
                         },
-                     },
-                  }}
-               />
-            </Grid>
-
+                     }}
+                  />
+               </Grid>
+            </ConditionalWrapper>
             <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
                   Which languages do you speak?
                </Typography>
             </Grid>
-
-            <ConditionalWrapper condition={userLanguages?.length > 0}>
+            <ConditionalWrapper condition={!talentProfileV1}>
+               <Grid item xs={12} sm={8}>
+                  <MultiListSelect
+                     inputName={SPOKEN_LANGUAGES_FIELD_NAME}
+                     isCheckbox
+                     selectedItems={inputValues[SPOKEN_LANGUAGES_FIELD_NAME]}
+                     allValues={languageOptionCodes}
+                     setFieldValue={handleSelectedLanguageChange}
+                     inputProps={{
+                        label: "Languages you speak",
+                        placeholder: "Select languages",
+                        className: "registrationInput",
+                     }}
+                     getValueFn={multiListSelectMapValueFn}
+                     chipProps={{
+                        color: "primary",
+                     }}
+                  />
+               </Grid>
+            </ConditionalWrapper>
+            <ConditionalWrapper
+               condition={Boolean(talentProfileV1 && userLanguages?.length > 0)}
+            >
                <Grid item xs={12} sm={8}>
                   {userLanguages.map((language, idx) => (
                      <Stack
@@ -381,7 +417,11 @@ const LocationInformationView = () => {
                </Grid>
             </ConditionalWrapper>
             <ConditionalWrapper
-               condition={!isLanguageFormOpen && !hasSelectedAllLanguages}
+               condition={Boolean(
+                  talentProfileV1 &&
+                     !isLanguageFormOpen &&
+                     !hasSelectedAllLanguages
+               )}
             >
                <Grid item xs={12} sm={8}>
                   <Stack
@@ -404,7 +444,9 @@ const LocationInformationView = () => {
                </Grid>
             </ConditionalWrapper>
 
-            <ConditionalWrapper condition={isLanguageFormOpen}>
+            <ConditionalWrapper
+               condition={Boolean(talentProfileV1 && isLanguageFormOpen)}
+            >
                <Grid item xs={12} sm={8}>
                   <Stack spacing={1.5} sx={styles.languageSelectWrapper}>
                      <SingleListSelect
