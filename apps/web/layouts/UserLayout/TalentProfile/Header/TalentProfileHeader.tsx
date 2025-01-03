@@ -1,12 +1,18 @@
-import { Button, Stack, Typography } from "@mui/material"
+import { Button, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useCountryCityData from "components/custom-hook/countries/useCountryCityData"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import { universityCountriesMap } from "components/util/constants/universityCountries"
-import { useMemo } from "react"
+import { useRouter } from "next/router"
+import { Fragment, useMemo, useState } from "react"
 import { Settings } from "react-feather"
+import { useSelector } from "react-redux"
+import { getProfileTab } from "store/selectors/profileSettingsSelectors"
 import { sxStyles } from "types/commonTypes"
+import { TAB_VALUES } from "../TalentProfileView"
 import { ProfileAvatar } from "./ProfileAvatar"
 import { ProfileBannerIllustration } from "./ProfileBannerIllustration"
+import { SettingsDialog } from "./Settings/SettingsView"
 
 const LOGO_SIZE = 104
 
@@ -72,6 +78,13 @@ const styles = sxStyles({
 })
 
 export const TalentProfileHeader = () => {
+   const router = useRouter()
+
+   const isSettingsPage = router.pathname.includes(TAB_VALUES.settings.value)
+   const [openSettings, setOpenSettings] = useState(isSettingsPage)
+
+   const profileTab = useSelector(getProfileTab)
+
    const { userData, userPresenter } = useAuth()
    const { talentProfileV1 } = useFeatureFlags()
 
@@ -80,37 +93,84 @@ export const TalentProfileHeader = () => {
       [userPresenter, talentProfileV1]
    )
 
-   const userCountry = universityCountriesMap[userData.universityCountryCode]
-
    return (
-      <Stack sx={styles.root}>
-         <ProfileBannerIllustration />
-         <ProfileAvatar />
-         <Stack sx={styles.userDetailsRoot}>
-            <Button
-               sx={styles.settingsButton}
-               variant="outlined"
-               startIcon={<Settings />}
-            >
-               Settings
-            </Button>
-            <Stack>
-               <Typography variant="brandedH4" sx={styles.userName}>
-                  {userPresenter?.getDisplayName()}
-               </Typography>
-               <Stack spacing={0.25}>
-                  <Typography sx={styles.userFieldOfStudy}>
-                     {fieldOfStudyDisplayName}
-                     {userData?.university?.name
-                        ? ` at ${userData?.university?.name}`
-                        : null}
+      <Fragment>
+         <Stack sx={styles.root}>
+            <ProfileBannerIllustration />
+            <ProfileAvatar />
+            <Stack sx={styles.userDetailsRoot}>
+               <Button
+                  sx={styles.settingsButton}
+                  variant="outlined"
+                  startIcon={<Settings />}
+                  onClick={() => {
+                     router.push({
+                        pathname: TAB_VALUES.settings.value,
+                        query: router.query,
+                     })
+                  }}
+               >
+                  Settings
+               </Button>
+               <Stack>
+                  <Typography variant="brandedH4" sx={styles.userName}>
+                     {userPresenter?.getDisplayName()}
                   </Typography>
-                  <Typography sx={styles.userLocation}>
-                     {`CityTBD in Up Stack, ${userCountry}.`}
-                  </Typography>
+                  <Stack spacing={0.25}>
+                     <Typography sx={styles.userFieldOfStudy}>
+                        {fieldOfStudyDisplayName}
+                        {userData?.university?.name
+                           ? ` at ${userData?.university?.name}`
+                           : null}
+                     </Typography>
+                     <SuspenseWithBoundary
+                        fallback={
+                           <Skeleton
+                              sx={{ maxWidth: "300px", height: "100%" }}
+                           />
+                        }
+                     >
+                        <UserLocation />
+                     </SuspenseWithBoundary>
+                  </Stack>
                </Stack>
             </Stack>
          </Stack>
-      </Stack>
+         <SettingsDialog
+            open={openSettings}
+            handleClose={() => {
+               setOpenSettings(false)
+
+               delete router.query["tab"]
+
+               router.push(
+                  {
+                     pathname: profileTab,
+                     query: router.query,
+                  },
+                  undefined,
+                  { shallow: true }
+               )
+            }}
+         />
+      </Fragment>
+   )
+}
+
+const UserLocation = () => {
+   const { userData } = useAuth()
+   const { data } = useCountryCityData(
+      userData?.countryIsoCode,
+      userData?.cityIsoCode
+   )
+
+   if (!data?.city && !data?.country) return null
+
+   return (
+      <Typography sx={styles.userLocation}>
+         {data?.city?.name
+            ? `${data.city.name}, ${data?.country?.name}`
+            : data?.country?.name}
+      </Typography>
    )
 }

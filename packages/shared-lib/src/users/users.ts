@@ -36,6 +36,7 @@ export interface UserData extends Identifiable {
    linkedinUrl: string
    isAdmin?: boolean
    userResume: string
+   resumeName?: string
    backFills: BackFillType[]
    universityCountryCode: string
    unsubscribed?: boolean
@@ -121,6 +122,10 @@ export interface UserData extends Identifiable {
     */
    phoneNumber?: string
    bannerImageUrl?: string
+
+   countryIsoCode?: string
+   stateIsoCode?: string
+   cityIsoCode?: string
 }
 
 export type ValidUserTagFields =
@@ -132,6 +137,11 @@ export type ValidUserTagFields =
 export type UserReadableGroupQuestionsWithAnswerMap = Record<
    GroupQuestion["id"],
    ReadableQuestionAndAnswer
+>
+
+export type UserDataPersonalInfo = Pick<
+   UserData,
+   "firstName" | "lastName" | "countryIsoCode" | "stateIsoCode" | "cityIsoCode"
 >
 
 // Collection /userData/:id/studyBackgrounds/:id

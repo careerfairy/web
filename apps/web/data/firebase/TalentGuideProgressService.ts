@@ -1,17 +1,23 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
+   QUIZ_STATE,
    TalentGuideProgress,
    TalentGuideQuiz,
 } from "@careerfairy/shared-lib/talent-guide"
-import { TalentGuideModule } from "data/hygraph/types"
+import { QuizModelType, TalentGuideModule } from "data/hygraph/types"
 import {
-   deleteDoc,
+   collection,
    doc,
    getDoc,
+   getDocs,
    increment,
+   PartialWithFieldValue,
+   query,
    setDoc,
    UpdateData,
    updateDoc,
+   where,
+   writeBatch,
 } from "firebase/firestore"
 import { Functions } from "firebase/functions"
 import {
@@ -135,6 +141,54 @@ export class TalentGuideProgressService {
       })
    }
 
+   updateQuiz(
+      moduleId: string,
+      userAuthUid: string,
+      quizId: string,
+      data: PartialWithFieldValue<TalentGuideQuiz>
+   ) {
+      return setDoc(this.getQuizRef(moduleId, userAuthUid, quizId), {
+         ...data,
+         lastUpdated: Timestamp.now(),
+      })
+   }
+
+   async attemptQuiz(
+      moduleId: string,
+      userAuthUid: string,
+      quizFromHygraph: QuizModelType,
+      selectedAnswerIds: string[]
+   ): Promise<boolean> {
+      const correctAnswerIds = quizFromHygraph.answers
+         .filter((answer) => answer.isCorrect)
+         .map((answer) => answer.id)
+
+      // Check if the number of selected answers matches the number of correct answers
+      // AND all selected answers are correct
+      const passed =
+         selectedAnswerIds.length === correctAnswerIds.length &&
+         selectedAnswerIds.every((answerId) =>
+            correctAnswerIds.includes(answerId)
+         )
+
+      const state = passed ? QUIZ_STATE.PASSED : QUIZ_STATE.FAILED
+
+      const data: TalentGuideQuiz = {
+         id: this.getQuizCompositeId(userAuthUid, moduleId, quizFromHygraph.id),
+         userAuthUid,
+         moduleHygraphId: moduleId,
+         quizHygraphId: quizFromHygraph.id,
+         selectedAnswerIds,
+         state,
+         attemptedAt: Timestamp.now(),
+         lastUpdated: Timestamp.now(),
+      }
+
+      await this.updateQuiz(moduleId, userAuthUid, quizFromHygraph.id, data)
+
+      return passed
+   }
+
    /**
     * Gets a reference to a module progress document
     * @param moduleId - The Hygraph module ID
@@ -165,14 +219,40 @@ export class TalentGuideProgressService {
    }
 
    /**
+    * Gets all quizzes for a module
+    * @param moduleId - The Hygraph module ID
+    * @param userAuthUid - The authenticated user's ID
+    * @returns A Promise resolving to an array of quiz documents
+    */
+   getAllModuleQuizzes(moduleId: string, userAuthUid: string) {
+      return getDocs(
+         query(
+            collection(FirestoreInstance, "talentGuideQuizzes"),
+            where("moduleHygraphId", "==", moduleId),
+            where("userAuthUid", "==", userAuthUid)
+         ).withConverter(createGenericConverter<TalentGuideQuiz>())
+      )
+   }
+
+   /**
     * Deletes a user's module progress document
     * Used for demo purposes only
     * @param moduleId - The Hygraph module ID
     * @param userAuthUid - The authenticated user's ID
     * @returns A Promise resolving when the document is deleted
     */
-   deleteModuleProgress(moduleId: string, userAuthUid: string) {
-      return deleteDoc(this.getModuleProgressRef(moduleId, userAuthUid))
+   async deleteModuleProgress(moduleId: string, userAuthUid: string) {
+      const batch = writeBatch(FirestoreInstance)
+
+      const quizSnaps = await this.getAllModuleQuizzes(moduleId, userAuthUid)
+
+      quizSnaps.forEach((quizSnap) => {
+         batch.delete(quizSnap.ref)
+      })
+
+      batch.delete(this.getModuleProgressRef(moduleId, userAuthUid))
+
+      return batch.commit()
    }
 }
 

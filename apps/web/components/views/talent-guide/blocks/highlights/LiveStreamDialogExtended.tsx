@@ -1,19 +1,21 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box } from "@mui/material"
+import useLivestream from "components/custom-hook/live-stream/useLivestream"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { useRouter } from "next/router"
 import { SyntheticEvent, useCallback, useEffect } from "react"
-import { useHighlights } from "./HighlightsBlockContext"
+import { useHighlights } from "./control/HighlightsBlockContext"
 
-export const LiveStreamDialogExtended = ({
-   livestream,
-}: {
-   livestream: LivestreamEvent
-}) => {
+const Dialog = () => {
    const router = useRouter()
 
-   const { isLiveStreamDialogOpen, handleLiveStreamDialogClose } =
-      useHighlights()
+   const {
+      isLiveStreamDialogOpen,
+      handleLiveStreamDialogClose,
+      currentLiveStreamIdInDialog,
+      getLiveStreamDialogKey,
+   } = useHighlights()
+
+   const { data: livestream } = useLivestream(currentLiveStreamIdInDialog)
 
    // Prevents exiting the fullscreen view when interacting with the dialog
    const handleDialogClick = useCallback((event: SyntheticEvent) => {
@@ -21,41 +23,37 @@ export const LiveStreamDialogExtended = ({
       event.preventDefault()
    }, [])
 
-   const handleLiveStreamDialogCloseExtended = useCallback(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { livestreamId, ...restOfQuery } = router.query
-      void router.push(
-         {
-            pathname: router.pathname,
-            query: restOfQuery,
-         },
-         undefined,
-         {
-            scroll: false,
-            shallow: true,
-         }
-      )
-      handleLiveStreamDialogClose()
-   }, [handleLiveStreamDialogClose, router])
-
    useEffect(() => {
-      if (!router.query.livestreamId && isLiveStreamDialogOpen) {
+      if (!router.query.dialogLiveStreamId && isLiveStreamDialogOpen) {
          handleLiveStreamDialogClose()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [router.query.livestreamId])
+   }, [router.query.dialogLiveStreamId])
+
+   if (!livestream) return null
 
    return (
-      <Box onClick={handleDialogClick}>
+      <Box onClick={handleDialogClick} key={currentLiveStreamIdInDialog}>
          <LivestreamDialog
+            key={getLiveStreamDialogKey()}
             open={isLiveStreamDialogOpen}
             livestreamId={livestream.id}
             serverSideLivestream={livestream}
-            handleClose={handleLiveStreamDialogCloseExtended}
+            handleClose={handleLiveStreamDialogClose}
             page={"details"}
             mode="stand-alone"
             serverUserEmail={""}
          />
       </Box>
    )
+}
+
+export const LiveStreamDialogExtended = () => {
+   const { currentLiveStreamIdInDialog } = useHighlights()
+
+   // So we don't run into runtime errors when trying
+   // to fetch data of an undefined live stream id
+   if (!currentLiveStreamIdInDialog) return null
+
+   return <Dialog />
 }

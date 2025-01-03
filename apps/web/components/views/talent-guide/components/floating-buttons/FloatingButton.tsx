@@ -5,6 +5,8 @@ import { Fragment } from "react"
 import { useIsLoadingNextStep } from "store/selectors/talentGuideSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
+const PADDING = 15
+
 const styles = sxStyles({
    button: {
       position: "fixed",
@@ -18,12 +20,12 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       width: 343,
-      zIndex: 1202,
+      zIndex: (theme) => theme.zIndex.drawer + 2,
    },
    buttonOffset: {
       height: {
-         xs: 78,
-         md: 88,
+         xs: 78 + PADDING,
+         md: 88 + PADDING,
       },
    },
 })

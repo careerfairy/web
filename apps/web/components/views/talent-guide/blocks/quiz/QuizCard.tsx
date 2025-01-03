@@ -1,0 +1,120 @@
+import { QUIZ_STATE } from "@careerfairy/shared-lib/talent-guide/types"
+import { Box, Collapse, Stack, Typography } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
+import { QuizModelType } from "data/hygraph/types"
+import { Fragment, useRef } from "react"
+import { toggleQuizAnswer } from "store/reducers/talentGuideReducer"
+import { useQuizState } from "store/selectors/talentGuideSelectors"
+import { sxStyles } from "types/commonTypes"
+import { useProgressHeaderHeight } from "../../components/TalentGuideProgress"
+import { AnswerButton } from "./AnswerButton"
+
+const styles = sxStyles({
+   question: {
+      fontWeight: 700,
+      color: "neutral.700",
+   },
+   correction: {
+      mt: 1.5,
+      p: 1,
+      borderRadius: "8px",
+      bgcolor: "rgba(255, 232, 232, 0.40)",
+      border: (theme) => `1px solid ${theme.palette.error.main}`,
+      display: "flex",
+      alignItems: "center",
+      whiteSpace: "pre-line",
+   },
+   correctionText: {
+      fontWeight: 600,
+      color: "error.main",
+   },
+})
+
+type AnswerVariant = "default" | "selected" | "correct" | "correction" | "wrong"
+
+type Props = QuizModelType
+
+export const QuizCard = ({ question, correction, answers, id }: Props) => {
+   const quizState = useQuizState(id)
+   const dispatch = useAppDispatch()
+   const correctionRef = useRef<HTMLDivElement>(null)
+
+   const scrollOffset = useProgressHeaderHeight()
+
+   const quizHasBeenAttempted =
+      quizState.state === QUIZ_STATE.PASSED ||
+      quizState.state === QUIZ_STATE.FAILED
+
+   const handleButtonClick = (answerId: string) => {
+      dispatch(toggleQuizAnswer({ quizId: id, answerId }))
+   }
+
+   return (
+      <Fragment>
+         <Stack direction="column" spacing={1.5}>
+            <Typography variant="mobileBrandedH4" sx={styles.question}>
+               {question}
+            </Typography>
+            {answers.map(({ answer, id }) => (
+               <AnswerButton
+                  key={id}
+                  id={id}
+                  onClick={() => handleButtonClick(id)}
+                  disabled={quizHasBeenAttempted}
+                  variant={getAnswerVariant({
+                     quizHasBeenAttempted,
+                     isCorrect:
+                        answers.find((a) => a.id === id)?.isCorrect || false,
+                     isSelected: quizState.selectedAnswerIds.includes(id),
+                  })}
+               >
+                  {answer}
+               </AnswerButton>
+            ))}
+         </Stack>
+         <Collapse
+            in={quizState.state === QUIZ_STATE.FAILED}
+            unmountOnExit
+            onEntered={(node) => {
+               const elementPosition =
+                  node.getBoundingClientRect().top + window.scrollY
+               window.scrollTo({
+                  top: elementPosition - scrollOffset,
+                  behavior: "smooth",
+               })
+            }}
+         >
+            <Box ref={correctionRef} sx={styles.correction}>
+               <Typography component="p" variant="small">
+                  <Box component="span" sx={styles.correctionText}>
+                     Correction:
+                  </Box>{" "}
+                  {correction}
+               </Typography>
+            </Box>
+         </Collapse>
+      </Fragment>
+   )
+}
+type GetAnswerVariantOptions = {
+   quizHasBeenAttempted: boolean
+   isCorrect: boolean
+   isSelected: boolean
+}
+const getAnswerVariant = ({
+   quizHasBeenAttempted,
+   isCorrect,
+   isSelected,
+}: GetAnswerVariantOptions): AnswerVariant => {
+   if (quizHasBeenAttempted) {
+      if (isSelected && !isCorrect) return "wrong"
+      if (!isSelected && isCorrect) return "correction"
+      if (isCorrect) return "correct"
+
+      return "default"
+   }
+
+   if (isSelected) return "selected"
+
+   return "default"
+}
