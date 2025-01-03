@@ -17,6 +17,7 @@ import {
    increment,
    PartialWithFieldValue,
    query,
+   runTransaction,
    setDoc,
    UpdateData,
    updateDoc,
@@ -257,6 +258,56 @@ export class TalentGuideProgressService {
       batch.delete(this.getModuleProgressRef(moduleId, userAuthUid))
 
       return batch.commit()
+   }
+
+   /**
+    * Restarts a module by resetting progress but keeping the visit count
+    * @param moduleId - The Hygraph module ID
+    * @param userAuthUid - The authenticated user's ID
+    * @param moduleData - The module data from Hygraph
+    * @returns Promise resolving when the module is restarted
+    */
+   async restartModule(
+      moduleId: string,
+      userAuthUid: string,
+      moduleData: TalentGuideModule
+   ) {
+      const progressRef = this.getModuleProgressRef(moduleId, userAuthUid)
+
+      // Get quiz snapshots outside transaction since they're not part of the atomic operation
+      const quizSnaps = await this.getAllModuleQuizzes(moduleId, userAuthUid)
+
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const progressDoc = await transaction.get(progressRef)
+
+         if (!progressDoc.exists()) {
+            throw new Error(
+               "Cannot restart module: progress document does not exist"
+            )
+         }
+
+         const currentProgress = progressDoc.data()
+
+         // Delete all quizzes
+         quizSnaps.forEach((quizSnap) => {
+            transaction.delete(quizSnap.ref)
+         })
+
+         // Reset progress but keep total visits
+         transaction.update(progressRef, {
+            currentStepIndex: 0,
+            completedStepIds: [],
+            moduleName: moduleData.moduleName,
+            moduleCategory: moduleData.category,
+            totalSteps: moduleData.moduleSteps.length,
+            percentageComplete: 0,
+            startedAt: Timestamp.now(),
+            lastUpdated: Timestamp.now(),
+            lastVisitedAt: Timestamp.now(),
+            totalVisits: currentProgress.totalVisits,
+            completedAt: null,
+         })
+      })
    }
 
    /**

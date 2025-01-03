@@ -189,6 +189,31 @@ export const resetModuleProgressForDemo = createAsyncThunk(
    }
 )
 
+export const restartModule = createAsyncThunk(
+   "talentGuide/restartModule",
+   async (_, { getState }) => {
+      const state = getState() as RootState
+      const { moduleData, userAuthUid } = state.talentGuide
+
+      if (!moduleData?.content || !userAuthUid) {
+         throw new Error(
+            "Cannot restart module: moduleData or userAuthUid is missing"
+         )
+      }
+
+      await talentGuideProgressService.restartModule(
+         moduleData.content.id,
+         userAuthUid,
+         moduleData.content
+      )
+
+      return {
+         moduleData,
+         userAuthUid,
+      }
+   }
+)
+
 const talentGuideReducer = createSlice({
    name: "talentGuide",
    initialState,
@@ -378,6 +403,40 @@ const talentGuideReducer = createSlice({
 
             errorLogAndNotify(new Error(errorMessage), {
                context: "resetModuleProgressForDemo",
+               userAuthUid: state.userAuthUid,
+               originalError: action.error,
+            })
+         })
+         .addCase(restartModule.pending, (state) => {
+            state.isLoadingTalentGuide = true
+         })
+         .addCase(restartModule.fulfilled, (state, action) => {
+            if (!action.payload) return
+
+            // Reset to initial state but keep moduleData
+            state.visibleSteps = [0]
+            state.currentStepIndex = 0
+            state.isLoadingTalentGuide = false
+            state.showEndOfModuleExperience = false
+            state.quizStatuses = Object.keys(state.quizStatuses).reduce(
+               (acc, quizId) => {
+                  acc[quizId] = {
+                     selectedAnswerIds: [],
+                     state: QUIZ_STATE.NOT_ATTEMPTED,
+                  }
+                  return acc
+               },
+               {} as Record<string, QuizStatus>
+            )
+         })
+         .addCase(restartModule.rejected, (state, action) => {
+            state.isLoadingTalentGuide = false
+            const errorMessage =
+               action.error.message || "Failed to restart module"
+            state.isLoadingTalentGuideError = errorMessage
+
+            errorLogAndNotify(new Error(errorMessage), {
+               context: "restartModule",
                userAuthUid: state.userAuthUid,
                originalError: action.error,
             })
