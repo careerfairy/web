@@ -29,7 +29,7 @@ export const useModuleProgress = (moduleId: string): TalentGuideProgress => {
    useEffect(() => {
       if (error) {
          errorLogAndNotify(error, {
-            message: "Error fetching module progress",
+            message: "Error subscribing to module progress",
             moduleId,
          })
       }

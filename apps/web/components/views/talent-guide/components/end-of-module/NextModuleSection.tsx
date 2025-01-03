@@ -77,7 +77,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          exit="exit"
          transition={{ duration: 0.5, ease: "easeOut" }}
          variants={nextModuleVariants}
-         sx={[nextModuleStyles.section]}
+         sx={nextModuleStyles.section}
          data-testid="next-module-section"
       >
          <AnimatePresence mode="sync">
@@ -143,11 +143,12 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   }))
                }}
                sx={
-                  Boolean(isShortScreen) && {
-                     paddingBottom: animationsState.hasNextModuleCardAppeared
-                        ? 5
-                        : 10,
-                  }
+                  isShortScreen
+                     ? {
+                          paddingBottom:
+                             animationsState.hasNextModuleCardAppeared ? 5 : 10,
+                       }
+                     : null
                }
             >
                <FramerBox
@@ -189,7 +190,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
 }
 
 type BottomContentProps = {
-   nextModule: Page<TalentGuideModule>
+   nextModule: Page<TalentGuideModule> | null
 }
 
 const BottomContent = ({ nextModule }: BottomContentProps) => {
@@ -220,7 +221,9 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
             fullWidth
             sx={nextModuleStyles.bottomButton}
             onClick={() => {
-               push(`/talent-guide/${nextModule.slug}`)
+               if (nextModule) {
+                  push(`/talent-guide/${nextModule.slug}`)
+               }
             }}
          >
             Start next level
