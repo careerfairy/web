@@ -106,13 +106,15 @@ export class TalentGuideBackendService {
          }
       `
 
-      const data = await this.client.request<{ pages: Page[] }>(query, {
+      const data = await this.client.request<{
+         pages: Page<TalentGuideModule>[]
+      }>(query, {
          locale: forcedLocale,
       })
 
-      // Sort the pages by content.order
+      // Sort the pages by content.level
       return data.pages.sort(
-         (a, b) => (a.content?.order ?? 0) - (b.content?.order ?? 0)
+         (a, b) => (a.content?.level ?? 0) - (b.content?.level ?? 0)
       )
    }
 }
