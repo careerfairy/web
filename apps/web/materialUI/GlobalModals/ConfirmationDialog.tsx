@@ -115,6 +115,7 @@ type Props = {
    secondaryAction?: ConfirmationDialogAction
    sx?: DialogProps["sx"]
    width?: number
+   mobileButtonsHorizontal?: boolean
 }
 
 const ConfirmationDialog: FC<Props> = (props) => {
@@ -213,6 +214,7 @@ const MobileDrawer = ({
    primaryAction,
    secondaryAction,
    sx,
+   mobileButtonsHorizontal,
 }: Props) => {
    const isSwipeable = Boolean(handleClose)
    const DrawerComponent = isSwipeable ? SwipeableDrawer : Drawer
@@ -259,12 +261,17 @@ const MobileDrawer = ({
          )}
          {additionalContent}
          <Stack
-            direction={{
-               xs: "column-reverse",
-               sm: "row",
-            }}
+            direction={
+               mobileButtonsHorizontal
+                  ? "row"
+                  : {
+                       xs: "column-reverse",
+                       sm: "row",
+                    }
+            }
             spacing={1.5}
             justifyContent="center"
+            width="100%"
          >
             {Boolean(secondaryAction) && <ActionButton {...secondaryAction} />}
             <ActionButton autoFocus {...primaryAction} />
