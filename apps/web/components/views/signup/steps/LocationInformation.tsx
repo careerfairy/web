@@ -10,11 +10,13 @@ import {
    languageOptionCodesMap,
 } from "@careerfairy/shared-lib/constants/forms"
 import { Box, Button, Grid, Stack, Switch, Typography } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCountriesList from "components/custom-hook/countries/useCountriesList"
 import useCountryCities from "components/custom-hook/countries/useCountryCities"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useUserLanguages } from "components/custom-hook/user/useUserLanguages"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import MultiListSelect from "components/views/common/MultiListSelect"
 import SingleListSelect from "components/views/common/SingleListSelect"
 import { useCallback, useEffect, useState } from "react"
 import { PlusCircle, Trash2 } from "react-feather"
@@ -22,7 +24,6 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
-import MultiListSelect from "../../common/MultiListSelect"
 import { formatToOptionArray, multiListSelectMapValueFn } from "../utils"
 
 const styles = sxStyles({
@@ -80,6 +81,15 @@ const COUNTRIES_OF_INTEREST_FIELD_NAME = "countriesOfInterest"
 const IS_LOOKING_FOR_JOB_FIELD_NAME = "isLookingForJob"
 
 const LocationInformation = () => {
+   // TODO: Add loading skeleton
+   return (
+      <SuspenseWithBoundary>
+         <LocationInformationView />
+      </SuspenseWithBoundary>
+   )
+}
+
+const LocationInformationView = () => {
    const { authenticatedUser: user, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
 
