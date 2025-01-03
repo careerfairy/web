@@ -2,7 +2,7 @@ import { Stack } from "@mui/material"
 import FramerBox from "components/views/common/FramerBox"
 import { AnimatePresence, Variants } from "framer-motion"
 import React, { ReactElement, useCallback, useRef } from "react"
-import { useProgressHeaderHeight } from "../components/TalentGuideProgress"
+import { useProgressHeaderHeight } from "../hooks/useProgressHeaderHeight"
 
 const containerVariants: Variants = {
    hidden: { opacity: 0 },

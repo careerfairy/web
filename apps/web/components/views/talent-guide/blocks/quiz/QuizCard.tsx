@@ -6,7 +6,7 @@ import { Fragment, useRef } from "react"
 import { toggleQuizAnswer } from "store/reducers/talentGuideReducer"
 import { useQuizState } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
-import { useProgressHeaderHeight } from "../../components/TalentGuideProgress"
+import { useProgressHeaderHeight } from "../../hooks/useProgressHeaderHeight"
 import { AnswerButton } from "./AnswerButton"
 
 const styles = sxStyles({

@@ -1,6 +1,10 @@
 import { Box, Container, ContainerProps } from "@mui/material"
 import { ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
+import {
+   HeaderHeightContext,
+   useMeasureHeaderHeight,
+} from "../context/HeaderHeightContext"
 
 const styles = sxStyles({
    root: (theme) => ({
@@ -29,17 +33,25 @@ export const TalentGuideLayout = ({
    header,
    ...containerProps
 }: Props) => {
+   const { height, ref } = useMeasureHeaderHeight()
+
    return (
-      <Box id="talent-guide-layout" component="main" sx={styles.root}>
-         {Boolean(header) && <Box sx={styles.header}>{header}</Box>}
-         <Container
-            maxWidth={false}
-            disableGutters
-            id="talent-guide-container"
-            {...containerProps}
-         >
-            {children}
-         </Container>
-      </Box>
+      <HeaderHeightContext.Provider value={height}>
+         <Box id="talent-guide-layout" component="main" sx={styles.root}>
+            {Boolean(header) && (
+               <Box ref={ref} sx={styles.header}>
+                  {header}
+               </Box>
+            )}
+            <Container
+               maxWidth={false}
+               disableGutters
+               id="talent-guide-container"
+               {...containerProps}
+            >
+               {children}
+            </Container>
+         </Box>
+      </HeaderHeightContext.Provider>
    )
 }
