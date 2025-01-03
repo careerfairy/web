@@ -25,6 +25,8 @@ type TalentGuideState = {
    isLoadingTalentGuideError: string | null
    isLoadingAttemptQuiz: boolean
    isLoadingAttemptQuizError: string | null
+   isRestartingModule: boolean
+   isRestartingModuleError: string | null
    userAuthUid: string
    quizStatuses: Record<string, QuizStatus>
    showEndOfModuleExperience: boolean
@@ -40,6 +42,8 @@ const initialState: TalentGuideState = {
    isLoadingTalentGuideError: null,
    isLoadingAttemptQuiz: false,
    isLoadingAttemptQuizError: null,
+   isRestartingModule: false,
+   isRestartingModuleError: null,
    userAuthUid: null,
    quizStatuses: {},
    showEndOfModuleExperience: false,
@@ -408,15 +412,18 @@ const talentGuideReducer = createSlice({
             })
          })
          .addCase(restartModule.pending, (state) => {
-            state.isLoadingTalentGuide = true
+            state.isRestartingModule = true
          })
          .addCase(restartModule.fulfilled, (state, action) => {
-            if (!action.payload) return
+            if (!action.payload) {
+               state.isRestartingModule = false
+               return
+            }
 
             // Reset to initial state but keep moduleData
             state.visibleSteps = [0]
             state.currentStepIndex = 0
-            state.isLoadingTalentGuide = false
+            state.isRestartingModule = false
             state.showEndOfModuleExperience = false
             state.quizStatuses = Object.keys(state.quizStatuses).reduce(
                (acc, quizId) => {
@@ -430,10 +437,10 @@ const talentGuideReducer = createSlice({
             )
          })
          .addCase(restartModule.rejected, (state, action) => {
-            state.isLoadingTalentGuide = false
+            state.isRestartingModule = false
             const errorMessage =
                action.error.message || "Failed to restart module"
-            state.isLoadingTalentGuideError = errorMessage
+            state.isRestartingModuleError = errorMessage
 
             errorLogAndNotify(new Error(errorMessage), {
                context: "restartModule",
