@@ -1,4 +1,5 @@
 import { useAppSelector } from "components/custom-hook/store"
+import { RootState } from "store"
 
 export const useVisibleSteps = () =>
    useAppSelector((state) =>
@@ -42,3 +43,24 @@ export const useIsLoadingTalentGuide = () =>
 
 export const useIsLoadingNextStep = () =>
    useAppSelector((state) => state.talentGuide.isLoadingNextStep)
+
+export const getCurrentQuiz = (state: RootState) => {
+   const currentStep =
+      state.talentGuide.moduleData?.content.moduleSteps[
+         state.talentGuide.currentStepIndex
+      ]
+   if (!currentStep) return null
+   if (currentStep.content.__typename !== "Quiz") return null
+   return currentStep.content
+}
+
+/**
+ * Hook to get current quiz content from talent guide state
+ */
+export const useCurrentQuiz = () => useAppSelector(getCurrentQuiz)
+
+/**
+ * Hook to get quiz state from talent guide state
+ */
+export const useQuizState = (quizId: string) =>
+   useAppSelector((state) => state.talentGuide.quizStatuses[quizId] || null)

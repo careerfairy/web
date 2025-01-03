@@ -80,6 +80,7 @@ import tags = require("./lib/tagging/tags")
 import notificationLivestreams = require("./notificationLivestreams")
 import notificationOnboardings = require("./notificationOnboarding")
 import user = require("./user")
+import countries = require("./countries")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -365,3 +366,6 @@ exports.syncUserInRegisteredLivestreams =
 
 // Utils
 exports.fetchUserCountryCode = fetchUserCountryCode
+exports.fetchCountriesList = countries.fetchCountriesList
+exports.fetchCountryCitiesList = countries.fetchCountryCitiesList
+exports.fetchCountryCityData = countries.fetchCountryCityData

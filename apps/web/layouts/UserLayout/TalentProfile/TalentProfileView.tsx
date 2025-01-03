@@ -27,6 +27,10 @@ export const TAB_VALUES = {
       value: "/profile/companies",
       label: "Companies",
    },
+   settings: {
+      value: "/profile/settings",
+      label: "Settings",
+   },
 } as const
 
 export type TalentProfileTabValues =

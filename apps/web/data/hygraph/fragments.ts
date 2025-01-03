@@ -182,7 +182,9 @@ export const quizFragment = gql`
       __typename
       id
       question
+      correction
       answers {
+         id
          answer
          isCorrect
       }

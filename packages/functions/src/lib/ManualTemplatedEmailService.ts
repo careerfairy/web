@@ -3,34 +3,39 @@ import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { ManualTemplatedEmailBuilder } from "./ManualTemplatedEmailBuilder"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
 
-const FIELD_OF_STUDIES = [
-   "business_administration_economics",
-   "finance",
-   "law",
-   "luxury_fashion",
-   "marketing",
-   "military_sciences",
-   "public_administration",
-   "transportation",
-   "business_engineering",
-   "chemical_engineering",
-   "civil_engineering",
-   "electrical_engineering",
-   "materials_science_and_engineering",
-   "mechanical_engineering",
-   "space_sciences",
-   "computer_science",
-   "mathematics",
-   "astronomy",
-   "biology",
-   "chemistry",
-   "earth_sciences",
-   "environmental_studies_and_forestry",
-   "geography",
-   "life_sciences",
-   "medicine",
-   "physics",
-   "systems_science",
+const EUROPEAN_COUNTRY_CODES = [
+   "AT",
+   "AD",
+   "BE",
+   "BG",
+   "CH",
+   "CZ",
+   "DE",
+   "DK",
+   "EE",
+   "ES",
+   "FI",
+   "FR",
+   "GB",
+   "GR",
+   "HR",
+   "HU",
+   "IE",
+   "IT",
+   "LI",
+   "LU",
+   "MC",
+   "MT",
+   "NL",
+   "NO",
+   "PL",
+   "PT",
+   "RO",
+   "RS",
+   "SE",
+   "SI",
+   "SK",
+   "SM",
 ]
 
 /**
@@ -54,21 +59,19 @@ export class ManualTemplatedEmailService {
     * Fetches the required data for generating the email
     */
    async fetchRequiredData(overrideUsers: string[]) {
-      const users = await this.userRepo.getSubscribedUsersByCountryCodes(
-         ["DE", "CH"],
+      const users = await this.userRepo.getSubscribedUsersLastActiveAfter(
+         new Date("2023-01-01"),
          overrideUsers
       )
 
-      const filteredUsers = users.filter(
-         (user) =>
-            user.fieldOfStudy?.id &&
-            FIELD_OF_STUDIES.includes(user.fieldOfStudy.id)
+      const europeanUsers = users.filter((user) =>
+         EUROPEAN_COUNTRY_CODES.includes(user.universityCountryCode)
       )
 
-      this.subscribedUsers = convertDocArrayToDict(filteredUsers)
+      this.subscribedUsers = convertDocArrayToDict(europeanUsers)
 
       this.logger.info(
-         "Total Users for X-mas newsletter - ",
+         "Total Users for X-mas app - ",
          Object.keys(this.subscribedUsers || {}).length
       )
 

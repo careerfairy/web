@@ -342,6 +342,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             scrollEnabled={true}
             allowsBackForwardNavigationGestures={true}
             injectedJavaScript={`(function() {
+                 window._hjSettings = null;
+                 window.hj = null;
                  var style = document.createElement('style');
                  style.innerHTML = \`${injectedCSS}\`;
                  document.head.appendChild(style);
