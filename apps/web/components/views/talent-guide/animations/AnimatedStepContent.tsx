@@ -78,7 +78,9 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
       >
          <AnimatePresence mode="sync">
             {React.Children.map(children, (child, index) => {
-               const isLastStep = index === React.Children.count(children) - 1
+               const numberOfSteps = React.Children.count(children)
+               const isLastStep = index === numberOfSteps - 1
+
                return (
                   <FramerBox
                      key={child.key}
@@ -88,9 +90,10 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
                      animate="visible"
                      exit="exit"
                      id={`talent-guide-step-${index}`}
-                     onAnimationComplete={() =>
+                     onAnimationComplete={() => {
+                        if (numberOfSteps === 1) return // Don't scroll if there is only one step rendered
                         handleAnimationComplete(isLastStep)
-                     }
+                     }}
                   >
                      {child}
                   </FramerBox>
