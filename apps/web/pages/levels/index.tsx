@@ -1,4 +1,5 @@
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
+import { Page, TalentGuideModule } from "data/hygraph/types"
 import { GetStaticProps, NextPage } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -11,10 +12,10 @@ import {
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 interface TalentGuidePageProps {
-   slugs: string[]
+   pages: Page<TalentGuideModule>[]
 }
 
-const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ slugs }) => {
+const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ pages }) => {
    const { isPreview, locale } = useRouter()
    return (
       <Fragment>
@@ -28,10 +29,10 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ slugs }) => {
                <h1>Levels: {isPreview ? "Preview" : "Published"}</h1>
                <p>Locale: {locale}</p>
                <ul>
-                  {slugs.map((slug) => (
-                     <li key={slug}>
-                        <Link locale={locale} href={`/levels/${slug}`}>
-                           {slug}
+                  {pages.map((page) => (
+                     <li key={page.slug}>
+                        <Link locale={locale} href={`/levels/${page.slug}`}>
+                           {page.slug}
                         </Link>
                      </li>
                   ))}
@@ -55,11 +56,11 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
 
    const service = preview ? tgBackendPreviewService : tgBackendService
 
-   const slugs = await service.getAllTalentGuideModulePageSlugs()
+   const pages = await service.getAllTalentGuideModulePages()
 
    return {
       props: {
-         slugs,
+         pages,
       },
       revalidate: 60, // Revalidate every 60 seconds
    }
