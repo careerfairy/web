@@ -1,7 +1,7 @@
 import ClockIcon from "@mui/icons-material/AccessTime"
 import DomainIcon from "@mui/icons-material/Domain"
 import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
-import { createContext, useContext, useMemo } from "react"
+import { createContext, ReactNode, useContext, useMemo } from "react"
 import {
    Home as HomeIcon,
    Radio as LiveStreamsIcon,
@@ -60,7 +60,7 @@ const PastLivestreamsPath: INavLink = {
 }
 
 type Props = {
-   children: JSX.Element
+   children: ReactNode
    pageDisplayName?: string
    bgColor?: string
    isPortalPage?: boolean
