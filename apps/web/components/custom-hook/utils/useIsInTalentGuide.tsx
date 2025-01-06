@@ -5,6 +5,6 @@ export const useIsInTalentGuide = () => {
    const router = useRouter()
 
    return useMemo(() => {
-      return router.pathname.includes("/talent-guide")
+      return router.pathname.includes("/levels")
    }, [router.pathname])
 }

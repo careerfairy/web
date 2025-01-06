@@ -32,7 +32,7 @@ export function useNextTalentGuideModule(
    options?: SWRConfiguration
 ) {
    return useSWR(
-      userAuthUid ? `next-talent-guide-module-${userAuthUid}-${locale}` : null,
+      userAuthUid ? `next-levels-module-${userAuthUid}-${locale}` : null,
       () => fetchNextModule(userAuthUid, locale),
       {
          ...reducedRemoteCallsOptions,
