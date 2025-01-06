@@ -83,6 +83,9 @@ export const createNewUserAccount = functions
                   })
                )
                .then(async () => {
+                  // TODO: Update study backgrounds
+               })
+               .then(async () => {
                   try {
                      await marketingUsersRepo.delete(recipientEmail)
                   } catch (e) {
