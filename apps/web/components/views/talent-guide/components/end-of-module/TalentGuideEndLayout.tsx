@@ -32,7 +32,7 @@ export const TalentGuideEndLayout = () => {
                message: "Error fetching next talent guide module",
                key,
             })
-            push("/talent-guide")
+            push("/levels")
          },
          suspense: false,
 
@@ -48,7 +48,7 @@ export const TalentGuideEndLayout = () => {
    useEffect(() => {
       if (!isLoadingNextModule && nextModule === null) {
          setIsRedirectingToOverview(true)
-         push("/talent-guide")
+         push("/levels")
 
          return () => {
             setIsRedirectingToOverview(false)

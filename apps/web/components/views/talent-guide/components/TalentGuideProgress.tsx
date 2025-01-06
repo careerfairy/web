@@ -69,7 +69,7 @@ export const TalentGuideProgress = () => {
                   value={progress}
                   sx={styles.progress}
                />
-               <Box sx={styles.backIcon} component={Link} href="/talent-guide">
+               <Box sx={styles.backIcon} component={Link} href="/levels">
                   <BackIcon size={20} />
                </Box>
             </Stack>
