@@ -2,10 +2,14 @@ import { PreviewModeAlert } from "components/views/talent-guide/components/Previ
 import { GetStaticProps, NextPage } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { Fragment } from "react"
+import SEO from "../../components/util/SEO"
 import {
    tgBackendPreviewService,
    tgBackendService,
 } from "../../data/hygraph/TalentGuideBackendService"
+import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+
 interface TalentGuidePageProps {
    slugs: string[]
 }
@@ -13,20 +17,29 @@ interface TalentGuidePageProps {
 const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ slugs }) => {
    const { isPreview, locale } = useRouter()
    return (
-      <div>
-         <h1>Talent Guide: {isPreview ? "Preview" : "Published"}</h1>
-         <p>Locale: {locale}</p>
-         <ul>
-            {slugs.map((slug) => (
-               <li key={slug}>
-                  <Link locale={locale} href={`/levels/${slug}`}>
-                     {slug}
-                  </Link>
-               </li>
-            ))}
-         </ul>
-         {Boolean(isPreview) && <PreviewModeAlert />}
-      </div>
+      <Fragment>
+         <SEO
+            title="CareerFairy | Levels"
+            description="Enhance your job search journey with expert-curated learning modules. Get in-depth insights, company perspectives, and practical guidance tailored to each stage of your career development."
+            noIndex={isPreview}
+         />
+         <GenericDashboardLayout pageDisplayName="Levels">
+            <div>
+               <h1>Levels: {isPreview ? "Preview" : "Published"}</h1>
+               <p>Locale: {locale}</p>
+               <ul>
+                  {slugs.map((slug) => (
+                     <li key={slug}>
+                        <Link locale={locale} href={`/levels/${slug}`}>
+                           {slug}
+                        </Link>
+                     </li>
+                  ))}
+               </ul>
+               {Boolean(isPreview) && <PreviewModeAlert />}
+            </div>
+         </GenericDashboardLayout>
+      </Fragment>
    )
 }
 
