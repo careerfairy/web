@@ -7,6 +7,7 @@ type Options = {
    businessFunctionTagIds: string[]
    ignoreIds?: string[]
    disabled?: boolean
+   livestreamId?: string
 }
 const useCustomJobsCount = (options?: Options) => {
    const { businessFunctionTagIds } = options
@@ -22,6 +23,9 @@ const useCustomJobsCount = (options?: Options) => {
                  businessFunctionTagIds
               ),
            ]
+         : []),
+      ...(options?.livestreamId
+         ? [where("livestreams", "array-contains", options.livestreamId)]
          : [])
    )
 
