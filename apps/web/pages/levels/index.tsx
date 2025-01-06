@@ -1,10 +1,10 @@
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { GetStaticProps, NextPage } from "next"
-import Link from "next/link"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
 import SEO from "../../components/util/SEO"
+import { LevelsContainer } from "../../components/views/levels/components/LevelsContainer"
 import {
    tgBackendPreviewService,
    tgBackendService,
@@ -16,7 +16,8 @@ interface TalentGuidePageProps {
 }
 
 const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ pages }) => {
-   const { isPreview, locale } = useRouter()
+   const { isPreview } = useRouter()
+
    return (
       <Fragment>
          <SEO
@@ -25,20 +26,8 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ pages }) => {
             noIndex={isPreview}
          />
          <GenericDashboardLayout pageDisplayName="Levels">
-            <div>
-               <h1>Levels: {isPreview ? "Preview" : "Published"}</h1>
-               <p>Locale: {locale}</p>
-               <ul>
-                  {pages.map((page) => (
-                     <li key={page.slug}>
-                        <Link locale={locale} href={`/levels/${page.slug}`}>
-                           {page.slug}
-                        </Link>
-                     </li>
-                  ))}
-               </ul>
-               {Boolean(isPreview) && <PreviewModeAlert />}
-            </div>
+            <LevelsContainer pages={pages} />
+            {Boolean(isPreview) && <PreviewModeAlert />}
          </GenericDashboardLayout>
       </Fragment>
    )
