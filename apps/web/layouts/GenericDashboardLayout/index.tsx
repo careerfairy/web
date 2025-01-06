@@ -1,5 +1,6 @@
 import ClockIcon from "@mui/icons-material/AccessTime"
 import DomainIcon from "@mui/icons-material/Domain"
+import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
 import { createContext, useContext, useMemo } from "react"
 import {
    Home as HomeIcon,
@@ -160,6 +161,13 @@ const GenericDashboardLayout = ({
             pathname: `/companies`,
             Icon: DomainIcon,
             title: "Companies",
+         },
+         {
+            id: "levels",
+            href: `/levels`,
+            pathname: `/levels`,
+            Icon: LevelsIcon,
+            title: "Levels",
          },
       ]
 
