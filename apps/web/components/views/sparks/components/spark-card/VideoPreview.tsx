@@ -7,6 +7,7 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import Image from "next/legacy/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
@@ -209,6 +210,14 @@ const VideoPreview: FC<Props> = ({
 
    const playingVideo = Boolean(playing && !shouldPause)
 
+   const isMobileDevice =
+      isMobile || isMobileBrowser() || isSafariBasedBrowser()
+   const notPlaying = !playing || !autoPlaying
+
+   const showThumbnailOverlay = Boolean(
+      isMobile && (notPlaying || videoPlayedForSession || !light)
+   )
+
    return (
       <Box sx={styles.root}>
          <Box
@@ -217,24 +226,14 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
+            <ConditionalWrapper
+               condition={isMobileDevice || showThumbnailOverlay}
+            >
                <ThumbnailOverlay
                   src={thumbnailUrl}
                   containPreviewOnTablet={containPreviewOnTablet}
                />
-            )}
-            {Boolean(isMobile && (!playing || !autoPlaying)) && (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )}
-            {isMobile && (videoPlayedForSession || !light) ? null : (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )}
+            </ConditionalWrapper>
             {light ? null : (
                <ReactPlayer
                   ref={playerRef}
