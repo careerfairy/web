@@ -7,8 +7,7 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
-import Image from "next/legacy/image"
+import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
@@ -210,14 +209,6 @@ const VideoPreview: FC<Props> = ({
 
    const playingVideo = Boolean(playing && !shouldPause)
 
-   const isMobileDevice =
-      isMobile || isMobileBrowser() || isSafariBasedBrowser()
-   const notPlaying = !playing || !autoPlaying
-
-   const showThumbnailOverlay = Boolean(
-      isMobile && (notPlaying || videoPlayedForSession || !light)
-   )
-
    return (
       <Box sx={styles.root}>
          <Box
@@ -226,14 +217,24 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            <ConditionalWrapper
-               condition={isMobileDevice || showThumbnailOverlay}
-            >
+            {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
                <ThumbnailOverlay
                   src={thumbnailUrl}
                   containPreviewOnTablet={containPreviewOnTablet}
                />
-            </ConditionalWrapper>
+            )}
+            {Boolean(isMobile && (!playing || !autoPlaying)) && (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )}
+            {isMobile && (videoPlayedForSession || !light) ? null : (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )}
             {light ? null : (
                <ReactPlayer
                   ref={playerRef}
