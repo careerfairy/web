@@ -11,7 +11,15 @@ import {
    languageOptionCodesMap,
    regionGroupId,
 } from "@careerfairy/shared-lib/constants/forms"
-import { Box, Button, Grid, Stack, Switch, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   Grid,
+   Skeleton,
+   Stack,
+   Switch,
+   Typography,
+} from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCountriesList from "components/custom-hook/countries/useCountriesList"
 import useCountryCities from "components/custom-hook/countries/useCountryCities"
@@ -89,9 +97,8 @@ const SPOKEN_LANGUAGES_FIELD_NAME = "spokenLanguages"
 const IS_LOOKING_FOR_JOB_FIELD_NAME = "isLookingForJob"
 
 const LocationInformation = () => {
-   // TODO: Add loading skeleton
    return (
-      <SuspenseWithBoundary>
+      <SuspenseWithBoundary fallback={<LocationSkeleton />}>
          <LocationInformationView />
       </SuspenseWithBoundary>
    )
@@ -547,6 +554,22 @@ const LocationInformationView = () => {
             </Grid>
          </Grid>
       </>
+   )
+}
+
+const LocationSkeleton = () => {
+   return (
+      <Grid container spacing={2} justifyContent="center">
+         <Grid item xs={12} sm={8}>
+            <Skeleton variant="rectangular" height={50} />
+         </Grid>
+         <Grid item xs={12} sm={8}>
+            <Skeleton variant="rectangular" height={50} />
+         </Grid>
+         <Grid item xs={12} sm={8}>
+            <Skeleton variant="rectangular" height={50} />
+         </Grid>
+      </Grid>
    )
 }
 
