@@ -300,7 +300,10 @@ const SparksFeedCard: FC<Props> = ({
                {showCardNotification || hideVideo ? null : (
                   <VideoPreview
                      muted={videosMuted}
-                     thumbnailUrl={spark.video.thumbnailUrl}
+                     thumbnailUrl={getResizedUrl(
+                        spark.video.thumbnailUrl,
+                        "lg"
+                     )}
                      videoUrl={spark.getTransformedVideoUrl()}
                      playing={playing}
                      onSecondPassed={trackSecondsWatched}

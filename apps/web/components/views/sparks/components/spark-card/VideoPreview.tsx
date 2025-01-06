@@ -8,14 +8,13 @@ import useMediaQuery from "@mui/material/useMediaQuery"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/image"
-import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
+import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
-import { isMobileBrowser, isSafariBasedBrowser } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -124,6 +123,7 @@ const VideoPreview: FC<Props> = ({
    autoPlaying,
 }) => {
    const isMobile = useIsMobile()
+   console.log("🚀 ~ isMobile:", isMobile, muted, videoUrl)
    const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
@@ -208,6 +208,13 @@ const VideoPreview: FC<Props> = ({
    }, [onVideoPlay, videoPlayedForSession])
 
    const playingVideo = Boolean(playing && !shouldPause)
+   console.log(
+      "🚀 ~ playingVideo:",
+      playingVideo,
+      handleError,
+      handleProgress,
+      onPlay
+   )
 
    return (
       <Box sx={styles.root}>
@@ -217,7 +224,7 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
+            {/* {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
                <ThumbnailOverlay
                   src={thumbnailUrl}
                   containPreviewOnTablet={containPreviewOnTablet}
@@ -234,8 +241,12 @@ const VideoPreview: FC<Props> = ({
                   src={thumbnailUrl}
                   containPreviewOnTablet={containPreviewOnTablet}
                />
-            )}
-            {light ? null : (
+            )} */}
+            <ThumbnailOverlay
+               src={thumbnailUrl}
+               containPreviewOnTablet={containPreviewOnTablet}
+            />
+            {/* {light ? null : (
                <ReactPlayer
                   ref={playerRef}
                   playing={playingVideo}
@@ -252,7 +263,7 @@ const VideoPreview: FC<Props> = ({
                   playIcon={<Fragment />}
                   muted={muted}
                />
-            )}
+            )} */}
          </Box>
          <LinearProgress
             sx={styles.progress}
