@@ -15,9 +15,8 @@ const styles = sxStyles({
          md: "repeat(2, 220px)",
       },
       gap: 1,
-      placeItems: "center",
       justifyContent: "center",
-      margin: "0 auto",
+      width: "100%",
    },
 })
 
@@ -32,7 +31,7 @@ const HighlightCardComponent = dynamic(() => import("./HighlightCard"), {
 export const HighlightsGrid = () => {
    const { highlights } = useHighlights()
    return (
-      <Box id="highlights-grid" sx={styles.root}>
+      <Box data-testid="highlights-grid" sx={styles.root}>
          {highlights.map((highlight, index) => {
             const isSpark = highlight.__typename === "Spark"
             return (
