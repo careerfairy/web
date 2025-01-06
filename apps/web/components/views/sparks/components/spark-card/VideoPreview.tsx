@@ -8,7 +8,7 @@ import useMediaQuery from "@mui/material/useMediaQuery"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/image"
-import { FC, useCallback, useEffect, useRef, useState } from "react"
+import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
@@ -123,7 +123,7 @@ const VideoPreview: FC<Props> = ({
    autoPlaying,
 }) => {
    const isMobile = useIsMobile()
-   console.log("🚀 ~ isMobile:", isMobile, muted, videoUrl)
+   console.log("🚀 ~ isMobile:", isMobile)
    const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
@@ -208,13 +208,6 @@ const VideoPreview: FC<Props> = ({
    }, [onVideoPlay, videoPlayedForSession])
 
    const playingVideo = Boolean(playing && !shouldPause)
-   console.log(
-      "🚀 ~ playingVideo:",
-      playingVideo,
-      handleError,
-      handleProgress,
-      onPlay
-   )
 
    return (
       <Box sx={styles.root}>
@@ -224,29 +217,35 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            {/* {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )}
-            {Boolean(isMobile && (!playing || !autoPlaying)) && (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )}
-            {isMobile && (videoPlayedForSession || !light) ? null : (
+            <ThumbnailOverlay
+               src={thumbnailUrl}
+               containPreviewOnTablet={containPreviewOnTablet}
+            />
+            {/* {Boolean(isMobileBrowserOrSafari || ( isMobile && (isPlaying || videoPlayedForSession))) && (
                <ThumbnailOverlay
                   src={thumbnailUrl}
                   containPreviewOnTablet={containPreviewOnTablet}
                />
             )} */}
-            <ThumbnailOverlay
-               src={thumbnailUrl}
-               containPreviewOnTablet={containPreviewOnTablet}
-            />
-            {/* {light ? null : (
+            {/* {Boolean(isMobileBrowserOrSafari) && (
+                  <ThumbnailOverlay
+                     src={thumbnailUrl}
+                     containPreviewOnTablet={containPreviewOnTablet}
+                  />
+               )} */}
+            {/* {Boolean(isMobile && isPlaying) && (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )}
+            {isMobile && videoPlayedForSession ? null : (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )} */}
+            {light ? null : (
                <ReactPlayer
                   ref={playerRef}
                   playing={playingVideo}
@@ -263,7 +262,7 @@ const VideoPreview: FC<Props> = ({
                   playIcon={<Fragment />}
                   muted={muted}
                />
-            )} */}
+            )}
          </Box>
          <LinearProgress
             sx={styles.progress}
