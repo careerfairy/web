@@ -10,7 +10,7 @@ const fetchNextModule = async (
    if (!userAuthUid) return null
 
    // Get all modules from API
-   const response = await fetch(`/api/talent-guide/modules?locale=${locale}`)
+   const response = await fetch(`/api/levels/modules?locale=${locale}`)
    if (!response.ok) {
       throw new Error("Failed to fetch existing modules")
    }
@@ -21,7 +21,7 @@ const fetchNextModule = async (
 }
 
 /**
- * Hook to fetch the next talent guide module
+ * Hook to fetch the next levels module
  * @param userAuthUid - The user's auth UID
  * @param locale - The locale for the content
  * @param options - SWR configuration options
