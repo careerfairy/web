@@ -4,7 +4,10 @@ import {
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/rewards"
-import { UserData } from "@careerfairy/shared-lib/users"
+import {
+   UserAccountCreationAdditionalData,
+   UserData,
+} from "@careerfairy/shared-lib/users"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { FieldValue, auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
@@ -26,6 +29,9 @@ export const createNewUserAccount = functions
       }
 
       const userData = data.userData
+      const additionalData: UserAccountCreationAdditionalData =
+         data.additionalData
+
       const recipientEmail = data.userData.email.toLowerCase().trim()
       const pinCode = getRandomInt(9999)
       const {
@@ -83,7 +89,13 @@ export const createNewUserAccount = functions
                   })
                )
                .then(async () => {
-                  // TODO: Update study backgrounds
+                  if (additionalData?.studyBackgrounds) {
+                     await firestore
+                        .collection("userData")
+                        .doc(recipientEmail)
+                        .collection("studyBackgrounds")
+                        .add(additionalData.studyBackgrounds)
+                  }
                })
                .then(async () => {
                   try {
