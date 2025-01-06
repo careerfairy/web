@@ -13,6 +13,7 @@ import Typography from "@mui/material/Typography"
 import { Theme, alpha } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
 import { usePartnership } from "HOCs/PartnershipProvider"
+import useCustomJobsCount from "components/custom-hook/custom-job/useCustomJobsCount"
 import { useUserHasParticipated } from "components/custom-hook/live-stream/useUserHasParticipated"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
@@ -374,11 +375,18 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          [event]
       )
 
+      const { count: jobsCount } = useCustomJobsCount({
+         businessFunctionTagIds: [],
+         livestreamId: presenterEvent?.id,
+      })
+
       const hasJobsToApply = useMemo<boolean>(() => {
          if (loading) return false
 
+         if (jobsCount === 0) return false
+
          return Boolean(event?.hasJobs || event?.jobs?.length > 0)
-      }, [event?.hasJobs, event?.jobs?.length, loading])
+      }, [event?.hasJobs, event?.jobs?.length, jobsCount, loading])
 
       useEffect(() => {
          if (!loading) {
