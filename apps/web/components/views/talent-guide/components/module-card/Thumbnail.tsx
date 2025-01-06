@@ -20,10 +20,10 @@ export const Thumbnail = ({
    thumbnailUrl = "/levels/placeholder.jpeg",
 }: Props) => {
    return (
-      <Box id="talent-guide-module-thumbnail" sx={styles.root}>
+      <Box id="levels-module-thumbnail" sx={styles.root}>
          <Image
             src={thumbnailUrl}
-            alt="Talent Guide Module Thumbnail"
+            alt="Levels Module Thumbnail"
             fill
             style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 100vw, 50vw"
