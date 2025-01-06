@@ -16,7 +16,7 @@ export const NextLevelButton = ({ nextModule }: Props) => {
          variant="contained"
          startIcon={<Play />}
          onClick={() => {
-            push(`/talent-guide/${nextModule.slug}`)
+            push(`/levels/${nextModule.slug}`)
          }}
       >
          Start next level
