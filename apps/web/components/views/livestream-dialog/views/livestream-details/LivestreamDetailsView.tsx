@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import { useAuth } from "HOCs/AuthProvider"
+import useCustomJobsCount from "components/custom-hook/custom-job/useCustomJobsCount"
 import { boxShadowAnimation } from "materialUI/GlobalBackground/GlobalBackGround"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
@@ -51,7 +52,11 @@ const LivestreamDetailsView = () => {
       livestreamPresenter
    )
 
-   const hasJobs = livestreamPresenter.hasJobs
+   const { count: jobsCount } = useCustomJobsCount({
+      businessFunctionTagIds: [],
+      livestreamId: livestreamPresenter.id,
+   })
+   const hasJobs = livestreamPresenter.hasJobs && jobsCount > 0
 
    const isFloatingActionButton = isMobile || !heroInView
 
