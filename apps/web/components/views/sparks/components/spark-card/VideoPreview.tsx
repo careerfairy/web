@@ -7,6 +7,7 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
@@ -221,46 +222,50 @@ const VideoPreview: FC<Props> = ({
                src={thumbnailUrl}
                containPreviewOnTablet={containPreviewOnTablet}
             />
-            {/* {Boolean(isMobileBrowserOrSafari || ( isMobile && (isPlaying || videoPlayedForSession))) && (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )} */}
-            {/* {Boolean(isMobileBrowserOrSafari) && (
+            <ConditionalWrapper condition={light}>
+               {/* <ThumbnailOverlay
+                     src={thumbnailUrl}
+                     containPreviewOnTablet={containPreviewOnTablet}
+                  /> */}
+               {/* {Boolean(isMobileBrowserOrSafari || (isMobile && (isPlaying || videoPlayedForSession))) && (
                   <ThumbnailOverlay
                      src={thumbnailUrl}
                      containPreviewOnTablet={containPreviewOnTablet}
                   />
-               )} */}
-            {/* {Boolean(isMobile && isPlaying) && (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
+               )}
+               {Boolean(isMobile && isPlaying) && (
+                  <ThumbnailOverlay
+                     src={thumbnailUrl}
+                     containPreviewOnTablet={containPreviewOnTablet}
+                  />
+               )}
+               {isMobile && videoPlayedForSession ? null : (
+                  <ThumbnailOverlay
+                     src={thumbnailUrl}
+                     containPreviewOnTablet={containPreviewOnTablet}
+                  />
+               )}
+               <Box width="100%" height="100%" sx={{ backgroundColor: "red" }}>
+               </Box> */}
+            </ConditionalWrapper>
+            {light ? null : (
+               <ReactPlayer
+                  ref={playerRef}
+                  playing={playingVideo}
+                  playsinline
+                  loop={playing}
+                  width="100%"
+                  height="100%"
+                  className="player"
+                  onProgress={handleProgress}
+                  onPlay={onPlay}
+                  onError={handleError}
+                  progressInterval={250}
+                  url={videoUrl}
+                  playIcon={<Fragment />}
+                  muted={muted}
                />
             )}
-            {isMobile && videoPlayedForSession ? null : (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )} */}
-            <ReactPlayer
-               ref={playerRef}
-               playing={playingVideo}
-               playsinline
-               loop={playing}
-               width="100%"
-               height="100%"
-               className="player"
-               onProgress={handleProgress}
-               onPlay={onPlay}
-               onError={handleError}
-               progressInterval={250}
-               url={videoUrl}
-               playIcon={<Fragment />}
-               muted={muted}
-            />
          </Box>
          <LinearProgress
             sx={styles.progress}
