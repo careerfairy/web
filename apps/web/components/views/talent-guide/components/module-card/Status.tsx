@@ -16,6 +16,9 @@ export const Status = ({ module, onShineAnimationComplete }: Props) => {
             <ModuleInfoChip
                moduleLevel={module.level}
                moduleDuration={module.moduleDuration}
+               estimatedModuleDurationMinutes={
+                  module.estimatedModuleDurationMinutes
+               }
             />
          }
       >
@@ -42,6 +45,7 @@ const Content = ({ module, onShineAnimationComplete }: Props) => {
       <ModuleInfoChip
          moduleLevel={module.level}
          moduleDuration={module.moduleDuration}
+         estimatedModuleDurationMinutes={module.estimatedModuleDurationMinutes}
          percentProgress={moduleProgress?.percentageComplete}
       />
    )

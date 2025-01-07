@@ -255,6 +255,7 @@ export const talentGuideModulePageFragment = gql`
          moduleName
          moduleDescription
          moduleDuration
+         estimatedModuleDurationMinutes
          moduleIllustration ${imageAssetFragment}
          category
          level
