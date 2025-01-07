@@ -56,10 +56,10 @@ const styles = sxStyles({
    metadataIcon: {
       fontSize: 16,
    },
-   startButtonDesktop: {
+   ctaDesktop: {
       width: "100%",
    },
-   startButtonMobile: (theme) => ({
+   ctaMobile: (theme) => ({
       position: "fixed",
       bottom: 67,
       left: 0,
@@ -76,6 +76,7 @@ const styles = sxStyles({
       "& > *": {
          maxWidth: 500,
       },
+      m: "0px !important", // override margin from Stack component
    }),
 })
 
@@ -153,18 +154,13 @@ export const CourseOverview = ({ pages, isMobile }: Props) => {
                      {copy.description}
                   </Typography>
                )}
-               <Grow unmountOnExit in={Boolean(nextModule && !isMobile)}>
-                  <Box>
+               <Grow unmountOnExit in={Boolean(nextModule)}>
+                  <Box sx={isMobile ? styles.ctaMobile : styles.ctaDesktop}>
                      <CTAButton nextModule={pages[0]} />
                   </Box>
                </Grow>
             </Stack>
          </Stack>
-         <Grow unmountOnExit in={Boolean(nextModule && isMobile)}>
-            <Box sx={styles.startButtonMobile}>
-               <CTAButton nextModule={pages[0]} />
-            </Box>
-         </Grow>
       </Box>
    )
 }
