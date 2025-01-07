@@ -245,24 +245,22 @@ const VideoPreview: FC<Props> = ({
                   containPreviewOnTablet={containPreviewOnTablet}
                />
             )} */}
-            {light ? null : (
-               <ReactPlayer
-                  ref={playerRef}
-                  playing={playingVideo}
-                  playsinline
-                  loop={playing}
-                  width="100%"
-                  height="100%"
-                  className="player"
-                  onProgress={handleProgress}
-                  onPlay={onPlay}
-                  onError={handleError}
-                  progressInterval={250}
-                  url={videoUrl}
-                  playIcon={<Fragment />}
-                  muted={muted}
-               />
-            )}
+            <ReactPlayer
+               ref={playerRef}
+               playing={playingVideo}
+               playsinline
+               loop={playing}
+               width="100%"
+               height="100%"
+               className="player"
+               onProgress={handleProgress}
+               onPlay={onPlay}
+               onError={handleError}
+               progressInterval={250}
+               url={videoUrl}
+               playIcon={<Fragment />}
+               muted={muted}
+            />
          </Box>
          <LinearProgress
             sx={styles.progress}
