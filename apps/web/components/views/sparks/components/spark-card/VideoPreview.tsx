@@ -15,7 +15,6 @@ import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
-import { isMobileBrowser, isSafariBasedBrowser } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -75,6 +74,7 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
+      zIndex: 1000,
    },
    previewVideo: {
       "& .react-player__preview": {
@@ -126,6 +126,7 @@ const VideoPreview: FC<Props> = ({
    const isMobile = useIsMobile()
    console.log("🚀 ~ isMobile:", isMobile)
    const playerRef = useRef<ReactPlayer | null>(null)
+   const [isVideoReady, setIsVideoReady] = useState(false)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
    const dispatch = useDispatch()
@@ -210,6 +211,10 @@ const VideoPreview: FC<Props> = ({
 
    const playingVideo = Boolean(playing && !shouldPause)
 
+   const onReady = () => {
+      setIsVideoReady(true)
+   }
+
    return (
       <Box sx={styles.root}>
          <Box
@@ -218,18 +223,19 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
+            {/* {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )} */}
+            {!isVideoReady || videoPlayedForSession ? null : (
                <ThumbnailOverlay
                   src={thumbnailUrl}
                   containPreviewOnTablet={containPreviewOnTablet}
                />
             )}
-            {videoPlayedForSession || !light ? null : (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )}
+
             {light ? null : (
                <ReactPlayer
                   ref={playerRef}
@@ -241,6 +247,7 @@ const VideoPreview: FC<Props> = ({
                   className="player"
                   onProgress={handleProgress}
                   onPlay={onPlay}
+                  onReady={onReady}
                   onError={handleError}
                   progressInterval={250}
                   url={videoUrl}
