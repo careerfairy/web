@@ -28,15 +28,21 @@ type Props = MentorsCarouselBlockType
 export const MentorsCarouselBlock = ({ title, subHeader }: Props) => {
    return (
       <SuspenseWithBoundary fallback={"Loading..."}>
-         <Stack gap="12px">
-            <Stack gap="4px">
-               <Typography variant="brandedH4" sx={styles.title}>
-                  {title}
-               </Typography>
-               <Typography variant="brandedBody" sx={styles.subHeader}>
-                  {subHeader}
-               </Typography>
-            </Stack>
+         <Stack id="mentors-carousel-block" gap="12px">
+            {(Boolean(title) || Boolean(subHeader)) && (
+               <Stack id="mentors-carousel-block-header" gap="4px">
+                  {Boolean(title) && (
+                     <Typography variant="brandedH4" sx={styles.title}>
+                        {title}
+                     </Typography>
+                  )}
+                  {Boolean(subHeader) && (
+                     <Typography variant="brandedBody" sx={styles.subHeader}>
+                        {subHeader}
+                     </Typography>
+                  )}
+               </Stack>
+            )}
             <MentorsCarousel />
          </Stack>
       </SuspenseWithBoundary>
@@ -47,7 +53,7 @@ const MentorsCarousel = () => {
    const { data: creators } = useGroupCreators("i8NjOiRu85ohJWDuFPwo")
 
    return (
-      <Box sx={{ padding: 3 }}>
+      <Box id="mentors-carousel-block-content">
          <ContentCarousel
             slideWidth={MentorCard.width}
             viewportSx={styles.carouselViewport}

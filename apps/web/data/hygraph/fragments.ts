@@ -187,6 +187,7 @@ export const quizFragment = gql`
          id
          answer
          isCorrect
+         correction
       }
    }
 `

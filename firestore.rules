@@ -193,7 +193,7 @@ service cloud.firestore {
                 return (request.auth.uid + "_" + moduleHygraphId) == docId;
             }
 
-            allow read: if ( resource == null && isSignedIn() ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
+            allow read: if ( resource == null ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
 
             // Allow create if:
             // 1. Document ID is correctly formatted (userAuthUid_moduleHygraphId)
@@ -231,7 +231,8 @@ service cloud.firestore {
                 && request.resource.data.percentageComplete <= 100
                 && request.resource.data.totalVisits >= resource.data.totalVisits
                 && request.resource.data.lastUpdated is timestamp
-                && request.resource.data.lastVisitedAt is timestamp;
+                && request.resource.data.lastVisitedAt is timestamp
+                && (request.resource.data.completedAt is timestamp || request.resource.data.completedAt == null);
 
             // Only allow admins to delete progress for demo purposes
             allow delete: if isCFAdmin();
@@ -242,7 +243,7 @@ service cloud.firestore {
                 return (request.auth.uid + "_" + moduleHygraphId + "_" + quizHygraphId) == docId;
             }
 
-            allow read: if ( resource == null && isSignedIn() ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
+            allow read: if ( resource == null ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
 
             // Allow create if:
             // 1. Document ID is correctly formatted (userAuthUid_moduleHygraphId_quizHygraphId)
@@ -277,6 +278,49 @@ service cloud.firestore {
             // Only allow admins to delete quizzes for demo purposes
             allow delete: if isCFAdmin();
         }
+
+        match /talentGuideFeedback/{docId} {
+            function docIdMatches(moduleHygraphId) {
+                return (request.auth.uid + "_" + moduleHygraphId) == docId;
+            }
+
+            allow read: if ( resource == null ) || isSignedInAndIsSameAuthUid(resource.data.userAuthUid);
+
+            // Allow create if:
+            // 1. Document ID is correctly formatted (userAuthUid_moduleHygraphId)
+            // 2. User is authenticated and it's their own data
+            // 3. Required fields are present and valid
+            // 4. Initial values are valid
+            allow create: if isSignedInAndIsSameAuthUid(request.resource.data.userAuthUid)
+                && docIdMatches(request.resource.data.moduleHygraphId)
+                && request.resource.data.userAuthUid == request.auth.uid
+                && request.resource.data.moduleHygraphId is string
+                && request.resource.data.rating >= 1
+                && request.resource.data.rating <= 5
+                && request.resource.data.selectedTagIds is list
+                && request.resource.data.submittedAt is timestamp
+                && request.resource.data.lastUpdated is timestamp;
+
+            // Allow update if:
+            // 1. Document ID is correctly formatted (userAuthUid_moduleHygraphId)
+            // 2. User is authenticated and it's their own data
+            // 3. Not modifying core identifiers
+            // 4. Updates are valid
+            allow update: if isSignedInAndIsSameAuthUid(request.auth.uid)
+                && docIdMatches(request.resource.data.moduleHygraphId)
+                && isUnchanged('userAuthUid')
+                && isUnchanged('moduleHygraphId')
+                && request.resource.data.rating >= 1
+                && request.resource.data.rating <= 5
+                && request.resource.data.selectedTagIds is list
+                && request.resource.data.submittedAt is timestamp
+                && request.resource.data.lastUpdated is timestamp;
+
+            // Only allow admins to delete feedback for demo purposes
+            allow delete: if isCFAdmin();
+        }
+
+        
 
         
 

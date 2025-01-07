@@ -178,6 +178,7 @@ export type QuizAnswerComponentType = {
    id: string
    answer: string
    isCorrect: boolean
+   correction: string
 }
 
 export type QuizModelType = {

@@ -63,3 +63,74 @@ export interface TalentGuideQuiz extends Identifiable {
 
    lastUpdated: Timestamp | null
 }
+
+export const FEEDBACK_TAG_CATEGORY = {
+   RELEVANCE: {
+      id: "relevance",
+      label: {
+         en: "Relevance",
+         de: "Relevanz",
+      },
+   },
+   INTERACTIONS: {
+      id: "interactions",
+      label: {
+         en: "Interactions",
+         de: "Interaktionen",
+      },
+   },
+   PACE: {
+      id: "pace",
+      label: {
+         en: "Pace",
+         de: "Tempo",
+      },
+   },
+   DIFFICULTY: {
+      id: "difficulty",
+      label: {
+         en: "Difficulty",
+         de: "Schwierigkeit",
+      },
+   },
+   CLARITY: {
+      id: "clarity",
+      label: {
+         en: "Clarity",
+         de: "Klarheit",
+      },
+   },
+   STRUCTURE: {
+      id: "structure",
+      label: {
+         en: "Structure",
+         de: "Struktur",
+      },
+   },
+   OTHERS: {
+      id: "others",
+      label: {
+         en: "Others",
+         de: "Sonstiges",
+      },
+   },
+} as const
+
+export type FEEDBACK_TAG_CATEGORY =
+   (typeof FEEDBACK_TAG_CATEGORY)[keyof typeof FEEDBACK_TAG_CATEGORY]["id"]
+
+export type TalentGuideRating = 1 | 2 | 3 | 4 | 5
+
+// Collection path: talentGuideFeedback/{userAuthUid}_{moduleHygraphId}
+export interface TalentGuideFeedback extends Identifiable {
+   userAuthUid: string
+   moduleHygraphId: string
+
+   rating: TalentGuideRating
+
+   selectedTagIds: FEEDBACK_TAG_CATEGORY[]
+
+   // Metadata
+   submittedAt: Timestamp
+   lastUpdated: Timestamp
+}
