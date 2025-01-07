@@ -72,23 +72,25 @@ export const ContentCarousel = ({
 
    return (
       <Stack display="grid" gap="16px">
-         <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={headerSx}
-         >
-            {typeof headerTitle === "string" ? (
-               <HeaderTitle>{headerTitle}</HeaderTitle>
-            ) : (
-               Boolean(headerTitle) && headerTitle
-            )}
-            {shouldShowArrows() && (
-               <GenericCarousel.Arrows
-                  emblaApi={emblaProps?.emblaApi || emblaApi}
-               />
-            )}
-         </Stack>
+         {Boolean(headerTitle) || shouldShowArrows() ? (
+            <Stack
+               direction="row"
+               justifyContent="space-between"
+               alignItems="center"
+               sx={headerSx}
+            >
+               {typeof headerTitle === "string" ? (
+                  <HeaderTitle>{headerTitle}</HeaderTitle>
+               ) : (
+                  Boolean(headerTitle) && headerTitle
+               )}
+               {shouldShowArrows() && (
+                  <GenericCarousel.Arrows
+                     emblaApi={emblaProps?.emblaApi || emblaApi}
+                  />
+               )}
+            </Stack>
+         ) : null}
          <GenericCarousel
             emblaApi={emblaProps?.emblaApi || emblaApi}
             emblaRef={emblaProps?.emblaRef || emblaRef}

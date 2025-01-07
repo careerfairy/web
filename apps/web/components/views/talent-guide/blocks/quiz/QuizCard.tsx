@@ -6,7 +6,7 @@ import { Fragment, useRef } from "react"
 import { toggleQuizAnswer } from "store/reducers/talentGuideReducer"
 import { useQuizState } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
-import { useProgressHeaderHeight } from "../../components/TalentGuideProgress"
+import { useProgressHeaderHeight } from "../../hooks/useProgressHeaderHeight"
 import { AnswerButton } from "./AnswerButton"
 
 const styles = sxStyles({
@@ -34,7 +34,7 @@ type AnswerVariant = "default" | "selected" | "correct" | "correction" | "wrong"
 
 type Props = QuizModelType
 
-export const QuizCard = ({ question, correction, answers, id }: Props) => {
+export const QuizCard = ({ question, answers, id }: Props) => {
    const quizState = useQuizState(id)
    const dispatch = useAppDispatch()
    const correctionRef = useRef<HTMLDivElement>(null)
@@ -48,6 +48,11 @@ export const QuizCard = ({ question, correction, answers, id }: Props) => {
    const handleButtonClick = (answerId: string) => {
       dispatch(toggleQuizAnswer({ quizId: id, answerId }))
    }
+
+   // Find the correction text from the correct answer
+   const correctAnswerCorrection = answers.find(
+      (answer) => answer.isCorrect
+   )?.correction
 
    return (
       <Fragment>
@@ -89,13 +94,14 @@ export const QuizCard = ({ question, correction, answers, id }: Props) => {
                   <Box component="span" sx={styles.correctionText}>
                      Correction:
                   </Box>{" "}
-                  {correction}
+                  {correctAnswerCorrection}
                </Typography>
             </Box>
          </Collapse>
       </Fragment>
    )
 }
+
 type GetAnswerVariantOptions = {
    quizHasBeenAttempted: boolean
    isCorrect: boolean

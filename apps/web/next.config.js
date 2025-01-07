@@ -75,6 +75,7 @@ const csp = {
       "https://www.googleadservices.com", // Google Ads services
       "https://cdn.prod.website-files.com", // Webflow
       "https://infrd.com",
+      "https://unpkg.com", // Added for dotlottie-wc script
    ],
    "style-src": [
       "'self'",
@@ -89,6 +90,9 @@ const csp = {
       "https://cdn.prod.website-files.com", // Webflow
    ],
    "connect-src": [
+      "https://unpkg.com", // Added for dotlottie-wc script
+      "https://cdn.jsdelivr.net",
+      "https://lottie.host",
       "'self'",
       "*.usercentrics.eu",
       "*.agora.io:*",

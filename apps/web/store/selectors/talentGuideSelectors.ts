@@ -64,3 +64,9 @@ export const useCurrentQuiz = () => useAppSelector(getCurrentQuiz)
  */
 export const useQuizState = (quizId: string) =>
    useAppSelector((state) => state.talentGuide.quizStatuses[quizId] || null)
+
+export const useShowEndOfModuleExperience = () =>
+   useAppSelector((state) => state.talentGuide.showEndOfModuleExperience)
+
+export const useTalentGuideState = () =>
+   useAppSelector((state) => state.talentGuide)

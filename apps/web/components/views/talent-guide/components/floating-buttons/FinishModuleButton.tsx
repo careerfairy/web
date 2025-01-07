@@ -1,18 +1,20 @@
 import { useAppDispatch } from "components/custom-hook/store"
-import { resetModuleProgressForDemo } from "../../../../../store/reducers/talentGuideReducer"
+import { proceedToNextStep } from "store/reducers/talentGuideReducer"
+import { useIsLoadingNextStep } from "store/selectors/talentGuideSelectors"
 import { FloatingButton } from "./FloatingButton"
+
 export const FinishModuleButton = () => {
    const dispatch = useAppDispatch()
+   const isLoadingNextStep = useIsLoadingNextStep()
 
    return (
       <FloatingButton
          onClick={() => {
-            // TODO: Mark module as completed in firestore
-            // Currently, we are just resetting the module progress in the firestore/reducer
-            dispatch(resetModuleProgressForDemo())
+            dispatch(proceedToNextStep())
          }}
          color="primary"
          variant="outlined"
+         loading={isLoadingNextStep}
       >
          Finish module
       </FloatingButton>

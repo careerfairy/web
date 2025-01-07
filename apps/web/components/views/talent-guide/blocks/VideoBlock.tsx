@@ -11,14 +11,11 @@ const styles = sxStyles({
          borderRadius: "8px",
          overflow: "hidden",
          border: (theme) => `1px solid ${theme.palette.neutral["50"]}`,
-         width: {
-            xs: "343px !important",
-            md: "568px !important",
-         },
          height: {
             xs: "173px !important",
             md: "285px !important",
          },
+         maxWidth: "100%",
       },
    },
    playIcon: {
@@ -51,7 +48,7 @@ export const VideoBlock = ({
    videoTitle,
 }: Props) => {
    return (
-      <Stack gap={1} sx={styles.root}>
+      <Stack data-testid="talent-guide-video-block" gap={1} sx={styles.root}>
          <ReactPlayer
             url={video.url}
             className="react-player"

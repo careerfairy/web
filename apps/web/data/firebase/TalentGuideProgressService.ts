@@ -1,11 +1,15 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
+   FEEDBACK_TAG_CATEGORY,
    QUIZ_STATE,
+   TalentGuideFeedback,
    TalentGuideProgress,
    TalentGuideQuiz,
+   TalentGuideRating,
 } from "@careerfairy/shared-lib/talent-guide"
 import { QuizModelType, TalentGuideModule } from "data/hygraph/types"
 import {
+   arrayUnion,
    collection,
    doc,
    getDoc,
@@ -253,6 +257,83 @@ export class TalentGuideProgressService {
       batch.delete(this.getModuleProgressRef(moduleId, userAuthUid))
 
       return batch.commit()
+   }
+
+   /**
+    * Calculates and updates progress for proceeding to the next step
+    * @param moduleData - The module data from Hygraph
+    * @param userAuthUid - The authenticated user's ID
+    * @param currentStepIndex - The current step index
+    * @returns The next step index, or null if there are no more steps
+    */
+   async proceedToNextStep(
+      moduleData: TalentGuideModule,
+      userAuthUid: string,
+      currentStepIndex: number
+   ): Promise<{ nextStepIndex: number } | null> {
+      const nextStepIndex = currentStepIndex + 1
+      if (nextStepIndex >= moduleData.moduleSteps.length) return null
+
+      const data: UpdateData<TalentGuideProgress> = {
+         completedStepIds: arrayUnion(
+            moduleData.moduleSteps[currentStepIndex].id
+         ),
+         percentageComplete:
+            ((nextStepIndex + 1) / moduleData.moduleSteps.length) * 100,
+         totalSteps: moduleData.moduleSteps.length,
+         moduleName: moduleData.moduleName,
+         moduleCategory: moduleData.category,
+      }
+
+      const isCompleted = data.percentageComplete === 100
+
+      if (isCompleted) {
+         data.completedAt = Timestamp.now()
+      }
+      await this.updateModuleProgress(moduleData.id, userAuthUid, data)
+
+      return { nextStepIndex }
+   }
+
+   /**
+    * Gets a reference to a feedback document
+    * @param moduleId - The Hygraph module ID
+    * @param userAuthUid - The authenticated user's ID
+    * @returns A DocumentReference for the feedback
+    */
+   getFeedbackRef(moduleId: string, userAuthUid: string) {
+      return doc(
+         FirestoreInstance,
+         "talentGuideFeedback",
+         this.getModuleCompositeId(userAuthUid, moduleId)
+      ).withConverter(createGenericConverter<TalentGuideFeedback>())
+   }
+
+   /**
+    * Submits feedback for a module
+    * @param moduleId - The Hygraph module ID
+    * @param userAuthUid - The authenticated user's ID
+    * @param rating - Rating from 1 to 5
+    * @param selectedTagIds - Array of selected tag categories
+    * @returns A Promise resolving when the feedback is submitted
+    */
+   async submitFeedback(
+      moduleId: string,
+      userAuthUid: string,
+      rating: TalentGuideRating,
+      selectedTagIds: FEEDBACK_TAG_CATEGORY[]
+   ) {
+      const now = Timestamp.now()
+
+      return setDoc(this.getFeedbackRef(moduleId, userAuthUid), {
+         id: this.getModuleCompositeId(userAuthUid, moduleId),
+         userAuthUid,
+         moduleHygraphId: moduleId,
+         rating,
+         selectedTagIds,
+         submittedAt: now,
+         lastUpdated: now,
+      })
    }
 }
 
