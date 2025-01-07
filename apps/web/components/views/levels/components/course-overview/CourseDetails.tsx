@@ -42,6 +42,7 @@ type Props = {
       title: string
       description: string
    }
+   overallProgress: number
 }
 
 export const CourseDetails = ({
@@ -49,6 +50,7 @@ export const CourseDetails = ({
    isMobile,
    nextModule,
    copy,
+   overallProgress,
 }: Props) => {
    const theme = useTheme()
 
@@ -90,7 +92,7 @@ export const CourseDetails = ({
             </Stack>
             <ProgressWithPercentage
                isOverlay={isMobile}
-               percentageComplete={75}
+               percentageComplete={overallProgress}
             />
          </Stack>
 
