@@ -9,7 +9,6 @@ import {
    useMemo,
    useState,
 } from "react"
-import { useLiveStreamDialogJobsManager } from "./useLivestreamDialogJobsManager"
 
 export type JobsBlockContextType = {
    selectedJob: CustomJob
@@ -20,13 +19,6 @@ export type JobsBlockContextType = {
    selectedJobTypesIds: string[]
    handleSelectJobType: (typeId: string) => void
    blockId: string
-   isLiveStreamDialogOpen: boolean
-   handleLiveStreamDialogOpen: (jobId: string, liveStreamId: string) => void
-   handleLiveStreamDialogClose: () => void
-   handleCloseCardClick: () => void
-   currentLiveStreamIdInDialog: string
-   setCurrentLiveStreamIdInDialog: (liveStreamId: string) => void
-   getLiveStreamDialogKey: () => string
 }
 
 const JobsBlockContext = createContext<JobsBlockContextType | undefined>(
@@ -53,21 +45,6 @@ export const JobsBlockProvider = ({
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(null)
 
-   const {
-      isLiveStreamDialogOpen,
-      handleLiveStreamDialogOpen,
-      handleLiveStreamDialogClose,
-      handleCloseCardClick,
-      currentLiveStreamIdInDialog,
-      setCurrentLiveStreamIdInDialog,
-      getLiveStreamDialogKey,
-   } = useLiveStreamDialogJobsManager()
-
-   const handleCloseJobDialog = useCallback(() => {
-      handleCloseCardClick()
-      setSelectedJob(null)
-   }, [handleCloseCardClick])
-
    const handleJobCardClick = useCallback(
       (job: CustomJob) => {
          setSelectedJob(job)
@@ -88,6 +65,24 @@ export const JobsBlockProvider = ({
       },
       [router]
    )
+
+   const handleCloseJobDialog = useCallback(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { jobId, ...restOfQuery } = router.query
+      void router.push(
+         {
+            pathname: router.pathname,
+            query: restOfQuery,
+         },
+         undefined,
+         {
+            scroll: false,
+            shallow: true,
+         }
+      )
+
+      setSelectedJob(null)
+   }, [router])
 
    const handleSelectJobArea = useCallback(
       (areaId: string) => {
@@ -127,13 +122,6 @@ export const JobsBlockProvider = ({
          selectedJobTypesIds,
          handleSelectJobType,
          blockId,
-         isLiveStreamDialogOpen,
-         handleLiveStreamDialogOpen,
-         handleLiveStreamDialogClose,
-         handleCloseCardClick,
-         currentLiveStreamIdInDialog,
-         setCurrentLiveStreamIdInDialog,
-         getLiveStreamDialogKey,
       }),
       [
          selectedJob,
@@ -144,13 +132,6 @@ export const JobsBlockProvider = ({
          selectedJobTypesIds,
          handleSelectJobType,
          blockId,
-         isLiveStreamDialogOpen,
-         handleLiveStreamDialogOpen,
-         handleLiveStreamDialogClose,
-         handleCloseCardClick,
-         currentLiveStreamIdInDialog,
-         setCurrentLiveStreamIdInDialog,
-         getLiveStreamDialogKey,
       ]
    )
 

@@ -1,8 +1,8 @@
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { Box, ButtonBase, Checkbox, Stack, Typography } from "@mui/material"
 import { RadioProps } from "@mui/material/Radio"
-import { styled } from "@mui/material/styles"
-import { sxStyles } from "types/commonTypes"
+import { styled, SxProps } from "@mui/material/styles"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    checkboxIconWrapper: {
@@ -24,16 +24,11 @@ const styles = sxStyles({
       alignItems: "center",
       width: "100%",
       justifyContent: "space-between",
-      p: "16px 24px",
+      p: "16px",
    },
    checkBoxBtnBase: {
       height: "56px",
       fontFamily: "inherit",
-      mx: {
-         xs: "-23px !important",
-         sm: "-23px !important",
-         md: "-24px !important",
-      },
       "&:hover": {
          backgroundColor: (theme) => theme.brand.black[100],
          "& .MuiBox-root": {
@@ -53,11 +48,6 @@ const styles = sxStyles({
    tagName: {
       color: (theme) => theme.palette.neutral[800],
       fontWeight: 400,
-      pl: {
-         xs: "12px",
-         sm: "12px",
-         md: 0,
-      },
    },
 })
 
@@ -82,12 +72,14 @@ type BrandedCheckboxListItemProps = {
    value: { id: string; name: string }
    checked: boolean
    handleClick: (id: string) => void
+   wrapperSx?: SxProps
 }
 
 export const BrandedCheckboxListItem = ({
    value,
    checked,
    handleClick,
+   wrapperSx,
 }: BrandedCheckboxListItemProps) => {
    return (
       <ButtonBase
@@ -98,11 +90,14 @@ export const BrandedCheckboxListItem = ({
          ]}
          disableRipple
       >
-         <Stack direction={"row"} sx={styles.checkBoxWrapper}>
+         <Stack
+            direction={"row"}
+            sx={combineStyles(styles.checkBoxWrapper, wrapperSx)}
+         >
             <Typography variant="medium" sx={styles.tagName}>
                {value.name}
             </Typography>
-            <BrandedCheckbox checked={checked} />
+            <BrandedCheckbox checked={checked} sx={{ p: 0 }} />
          </Stack>
       </ButtonBase>
    )

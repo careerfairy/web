@@ -79,9 +79,6 @@ const styles = sxStyles({
       "&:not(:first-of-type)": {
          ml: `calc(${slideSpacing}px - 5px)`,
       },
-      "&:first-of-type": {
-         ml: 0.3,
-      },
    },
    paddingSlide: {
       flex: `0 0 ${slideSpacing}px`,
@@ -179,7 +176,8 @@ export type EventsProps = {
    events: LivestreamEvent[]
    eventDescription?: string
    seeMoreLink?: string
-   title?: string
+   title?: ReactNode | string
+   subtitle?: ReactNode | string
    loading?: boolean
    hidePreview?: boolean
    type: EventsTypes
@@ -203,6 +201,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
    (props, ref) => {
       const {
          title,
+         subtitle,
          seeMoreLink,
          loading = false,
          events,
@@ -352,6 +351,18 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                      condition={!isEmbedded && !allStyles.compact}
                   >
                      <Box sx={allStyles.eventsHeader}>
+                        {typeof title === "string" ? (
+                           <Typography
+                              variant={allStyles.titleVariant}
+                              sx={allStyles.title}
+                              fontWeight={"600"}
+                              color="black"
+                           >
+                              {title}
+                           </Typography>
+                        ) : (
+                           Boolean(title) && title
+                        )}
                         <Typography
                            variant={allStyles.titleVariant}
                            sx={allStyles.title}
@@ -397,6 +408,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            {arrowsComponent}
                         </Stack>
                      </ConditionalWrapper>
+                     {subtitle}
                      <Box id={id} sx={allStyles.viewportSx} ref={emblaRef}>
                         <Box sx={[styles.container]}>
                            <ConditionalWrapper
@@ -410,7 +422,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                  {events?.map((event, index, arr) => (
                                     <Box sx={allStyles.slide} key={event.id}>
                                        <EventPreviewCard
-                                          key={event.id}
                                           loading={loading}
                                           index={index}
                                           totalElements={arr.length}

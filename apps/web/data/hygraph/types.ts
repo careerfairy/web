@@ -97,6 +97,12 @@ export type SparkComponentType = {
    sparkId: string
 }
 
+export type LiveStreamComponentType = {
+   __typename: "LiveStream"
+   id: string
+   liveStreamId: string
+}
+
 export type SeoComponentType = {
    __typename: "Seo"
    id: string
@@ -155,9 +161,7 @@ export type LivestreamsCarouselBlockType = {
    id: string
    title: string
    subHeader: string
-   businessFunctionTags: BusinessFunctionTagId[]
-   contentTopicTags: ContentTopicTagId[]
-   typeOfStreams: "UPCOMING" | "PAST"
+   liveStreamIds: LiveStreamComponentType[]
 }
 
 export type SparksCarouselBlockType = {

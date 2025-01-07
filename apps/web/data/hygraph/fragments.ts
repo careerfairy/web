@@ -55,6 +55,15 @@ export const sparkComponentFragment = gql`
    }
 `
 
+// Component API ID: LiveStream
+export const liveStreamComponentFragment = gql`
+   {
+      __typename
+      id
+      liveStreamId
+   }
+`
+
 // Component API ID: Seo
 export const seoComponentFragment = gql`
    {
@@ -140,9 +149,9 @@ export const livestreamsCarouselBlockFragment = gql`
       id
       title
       subHeader
-      businessFunctionTags
-      contentTopicTags
-      typeOfStreams #Enum: [UPCOMING, PAST]
+      liveStreamIds {
+        ... on LiveStream ${liveStreamComponentFragment}
+      }
    }
 `
 
