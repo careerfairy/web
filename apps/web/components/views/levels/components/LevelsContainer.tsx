@@ -61,7 +61,7 @@ export const LevelsContainer = ({ pages }: Props) => {
          sx={styles.root}
       >
          <Stack spacing={2} direction={isMobile ? "column" : "row"}>
-            <CourseOverview isMobile={isMobile} pages={pages} />
+            <CourseOverview isMobile={isMobile} modules={pages} />
             <Stack sx={styles.modulesContainer}>
                {pages.map((page) => (
                   <FramerBox key={page.slug} variants={itemVariants}>

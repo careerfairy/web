@@ -2,6 +2,7 @@ import { Box, Stack, Typography } from "@mui/material"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { useAuth } from "HOCs/AuthProvider"
 import { useNextTalentGuideModule } from "hooks/useNextTalentGuideModule"
+import { useOverallTalentGuideProgress } from "hooks/useOverallTalentGuideProgress"
 import { sxStyles } from "types/commonTypes"
 import { CourseDetails } from "./CourseDetails"
 import { CourseIllustration } from "./CourseIllustration"
@@ -50,7 +51,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   pages: Page<TalentGuideModule>[]
+   modules: Page<TalentGuideModule>[]
    isMobile: boolean
 }
 
@@ -60,9 +61,13 @@ const copy = {
       "Ready to land your dream job? Learn the insider tips and practical strategies to stand out in today's competitive job market. Start building the career you deserve!",
 }
 
-export const CourseOverview = ({ pages, isMobile }: Props) => {
+export const CourseOverview = ({ modules, isMobile }: Props) => {
    const { authenticatedUser } = useAuth()
    const { data: nextModule } = useNextTalentGuideModule(authenticatedUser.uid)
+   const { data: overallProgress = 0 } = useOverallTalentGuideProgress(
+      authenticatedUser.uid,
+      modules
+   )
 
    return (
       <Box sx={[styles.root, isMobile && styles.rootMobile]}>
@@ -74,20 +79,22 @@ export const CourseOverview = ({ pages, isMobile }: Props) => {
                   {isMobile ? (
                      <Box sx={styles.detailsMobile}>
                         <CourseDetails
-                           numLevels={pages.length}
+                           numLevels={modules.length}
                            isMobile={isMobile}
                            nextModule={nextModule}
                            copy={copy}
+                           overallProgress={overallProgress}
                         />
                      </Box>
                   ) : null}
                </CourseIllustration>
                {isMobile ? null : (
                   <CourseDetails
-                     numLevels={pages.length}
+                     numLevels={modules.length}
                      isMobile={isMobile}
                      nextModule={nextModule}
                      copy={copy}
+                     overallProgress={overallProgress}
                   />
                )}
             </Stack>
