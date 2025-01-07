@@ -28,7 +28,7 @@ const fetchNextModule = async (
  */
 export function useNextTalentGuideModule(
    userAuthUid: string | null,
-   locale: string = "en",
+   locale: string = "de",
    options?: SWRConfiguration
 ) {
    return useSWR(
