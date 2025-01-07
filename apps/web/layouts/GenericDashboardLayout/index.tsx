@@ -28,6 +28,7 @@ type IGenericDashboardContext = {
    headerFixed?: boolean
    headerType?: "sticky" | "fixed"
    navLinks: INavLink[]
+   drawerOpen: boolean
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
@@ -36,6 +37,7 @@ const GenericDashboardContext = createContext<IGenericDashboardContext>({
    headerScrollThreshold: 10,
    headerFixed: false,
    navLinks: [],
+   drawerOpen: false,
 })
 
 const MyRegistrationsPath: INavLink = {
@@ -174,6 +176,8 @@ const GenericDashboardLayout = ({
       return links
    }, [isLoggedIn])
 
+   const drawerOpen = !hideDrawer && !isMobile
+
    const value = useMemo<IGenericDashboardContext>(
       () => ({
          isPortalPage,
@@ -182,6 +186,7 @@ const GenericDashboardLayout = ({
          headerFixed: Boolean(headerFixed),
          headerType: headerType,
          navLinks,
+         drawerOpen,
       }),
       [
          handleOpenCreditsDialog,
@@ -190,6 +195,7 @@ const GenericDashboardLayout = ({
          navLinks,
          headerFixed,
          headerType,
+         drawerOpen,
       ]
    )
 
@@ -209,7 +215,7 @@ const GenericDashboardLayout = ({
                      <GenericNavList isDark={isBottomNavDark} />
                   )
                }
-               drawerOpen={!isMobile}
+               drawerOpen={drawerOpen}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
                headerWidth={headerWidth}
             >
