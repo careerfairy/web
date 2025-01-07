@@ -92,28 +92,23 @@ export class TalentGuideProgressService {
       userAuthUid: string,
       moduleData: TalentGuideModule
    ) {
-      return setDoc(
-         this.getModuleProgressRef(moduleId, userAuthUid),
-         {
-            id: this.getModuleCompositeId(userAuthUid, moduleId),
-            moduleHygraphId: moduleId,
-            userAuthUid,
-            currentStepIndex: 0,
-            completedStepIds: [],
-            moduleName: moduleData.moduleName,
-            moduleCategory: moduleData.category,
-            totalSteps: moduleData.moduleSteps.length,
-            percentageComplete: 0,
-            startedAt: Timestamp.now(),
-            lastUpdated: null,
-            lastVisitedAt: Timestamp.now(),
-            totalVisits: 1,
-            completedAt: null,
-         },
-         {
-            merge: true,
-         }
-      )
+      return setDoc(this.getModuleProgressRef(moduleId, userAuthUid), {
+         id: this.getModuleCompositeId(userAuthUid, moduleId),
+         moduleHygraphId: moduleId,
+         userAuthUid,
+         currentStepIndex: 0,
+         completedStepIds: [],
+         moduleName: moduleData.moduleName,
+         moduleCategory: moduleData.category,
+         totalSteps: moduleData.moduleSteps.length,
+         percentageComplete: 0,
+         startedAt: Timestamp.now(),
+         lastUpdated: null,
+         lastVisitedAt: Timestamp.now(),
+         totalVisits: 1,
+         completedAt: null,
+         restartCount: 0,
+      })
    }
 
    /**
@@ -306,6 +301,7 @@ export class TalentGuideProgressService {
             lastVisitedAt: Timestamp.now(),
             totalVisits: currentProgress.totalVisits,
             completedAt: null,
+            restartCount: (currentProgress.restartCount ?? 0) + 1,
          })
       })
    }
