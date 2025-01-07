@@ -1,5 +1,6 @@
 import { Box } from "@mui/material"
 import Image from "next/image"
+import { ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -22,9 +23,10 @@ const styles = sxStyles({
 
 type Props = {
    isMobile: boolean
+   children?: ReactNode
 }
 
-export const CourseIllustration = ({ isMobile }: Props) => {
+export const CourseIllustration = ({ isMobile, children }: Props) => {
    return (
       <Box
          width={isMobile ? "100%" : 360}
@@ -39,6 +41,7 @@ export const CourseIllustration = ({ isMobile }: Props) => {
             sizes={isMobile ? "100vw" : "360px"}
          />
          <Box sx={styles.overlay} />
+         {children}
       </Box>
    )
 }
