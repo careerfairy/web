@@ -61,11 +61,7 @@ export const HighlightsProvider = ({
       currentLiveStreamIdInDialog,
       setCurrentLiveStreamIdInDialog,
       getLiveStreamDialogKey,
-   } = useLiveStreamDialogManager(
-      highlights,
-      expandedPlayingIndex,
-      setExpandedPlayingIndex
-   )
+   } = useLiveStreamDialogManager(setExpandedPlayingIndex)
 
    const { shouldAutoPlay, autoPlayingIndex, setAutoPlayingIndex } =
       useAutoPlayManager(

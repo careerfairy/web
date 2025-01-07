@@ -1,6 +1,9 @@
+import { GroupWithPolicy } from "@careerfairy/shared-lib/src/groups"
 import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/src/livestreams"
 import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 import { Form, Formik } from "formik"
+import Image from "next/legacy/image"
 import { useCallback } from "react"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../types/commonTypes"
@@ -8,7 +11,9 @@ import useIsMobile from "../../../../custom-hook/useIsMobile"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import { validate } from "../../../common/registration-modal/steps/LivestreamGroupQuestionForm/util"
+
+import { validate } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
+import Link from "../../../common/Link"
 import BaseDialogView, {
    HeroContent,
    HeroTitle,
@@ -18,12 +23,8 @@ import { useLiveStreamDialog, ViewKey } from "../../LivestreamDialog"
 import RegistrationPreConditions from "../../RegistrationPreConditions"
 import useRegistrationHandler from "../../useRegistrationHandler"
 import GroupConsentDataFetching from "./GroupConsentDataFetching"
-import RegisterDataConsentViewSkeleton from "./RegisterDataConsentViewSkeleton"
-import Image from "next/legacy/image"
-import { GroupWithPolicy } from "@careerfairy/shared-lib/src/groups"
-import Link from "../../../common/Link"
 import LivestreamGroupQuestionsSelector from "./LivestreamGroupQuestionsSelector"
-import CircularLogo from "components/views/common/logos/CircularLogo"
+import RegisterDataConsentViewSkeleton from "./RegisterDataConsentViewSkeleton"
 
 const styles = sxStyles({
    logoWrapper: {
@@ -238,6 +239,7 @@ const GroupQuestionsForm = () => {
                                  <ActionButtons
                                     disabled={Object.keys(errors).length > 0}
                                     policiesToAccept={policiesToAccept}
+                                    onClickPrimary={handleSubmit}
                                  />
                               )}
                            </Stack>
@@ -249,6 +251,7 @@ const GroupQuestionsForm = () => {
                            <ActionButtons
                               disabled={Object.keys(errors).length > 0}
                               policiesToAccept={policiesToAccept}
+                              onClickPrimary={handleSubmit}
                            />
                         ) : null
                      }
@@ -260,7 +263,17 @@ const GroupQuestionsForm = () => {
    )
 }
 
-const ActionButtons = ({ disabled, policiesToAccept }) => {
+type ActionButtonProps = {
+   disabled: boolean
+   policiesToAccept: boolean
+   onClickPrimary?: () => void
+}
+
+const ActionButtons = ({
+   disabled,
+   policiesToAccept,
+   onClickPrimary,
+}: ActionButtonProps) => {
    const { goToView, onRegisterSuccess } = useLiveStreamDialog()
 
    return (
@@ -276,6 +289,7 @@ const ActionButtons = ({ disabled, policiesToAccept }) => {
                   ? undefined
                   : () => goToView("livestream-details")
             }
+            onClickPrimary={onClickPrimary}
          />
       </Box>
    )

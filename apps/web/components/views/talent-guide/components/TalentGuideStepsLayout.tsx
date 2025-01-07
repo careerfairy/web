@@ -1,5 +1,6 @@
 import { useVisibleSteps } from "store/selectors/talentGuideSelectors"
 import { AnimatedStepContent } from "../animations/AnimatedStepContent"
+import { LiveStreamDialogProvider } from "../blocks/live-stream/LiveStreamDialogContext"
 import { ModuleStepContentRenderer } from "./ModuleStepContentRenderer"
 import { TalentGuideLayout } from "./TalentGuideLayout"
 import { TalentGuideProgress } from "./TalentGuideProgress"
@@ -20,12 +21,14 @@ export const TalentGuideStepsLayout = () => {
             },
          }}
       >
-         <AnimatedStepContent>
-            {visibleSteps.map((step) => (
-               <ModuleStepContentRenderer key={step.id} step={step} />
-            ))}
-         </AnimatedStepContent>
-         <StepActionButton />
+         <LiveStreamDialogProvider>
+            <AnimatedStepContent>
+               {visibleSteps.map((step) => (
+                  <ModuleStepContentRenderer key={step.id} step={step} />
+               ))}
+            </AnimatedStepContent>
+            <StepActionButton />
+         </LiveStreamDialogProvider>
       </TalentGuideLayout>
    )
 }

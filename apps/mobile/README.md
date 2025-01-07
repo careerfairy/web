@@ -167,6 +167,8 @@ or from the root
 npm run native-build:prod
 ```
 
+Note: If you are running a build for a new release on the app store, you will need to bump the version on the app.json file.
+
 ---
 
 ### Local Development Build

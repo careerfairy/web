@@ -3,18 +3,21 @@ import useLivestream from "components/custom-hook/live-stream/useLivestream"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { useRouter } from "next/router"
 import { SyntheticEvent, useCallback, useEffect } from "react"
-import { useJobsBlock } from "./control/JobsBlockContext"
 
-const Dialog = () => {
+type Props = {
+   isLiveStreamDialogOpen: boolean
+   handleLiveStreamDialogClose: () => void
+   currentLiveStreamIdInDialog: string
+   getLiveStreamDialogKey: () => string
+}
+
+const Dialog = ({
+   isLiveStreamDialogOpen,
+   handleLiveStreamDialogClose,
+   currentLiveStreamIdInDialog,
+   getLiveStreamDialogKey,
+}: Props) => {
    const router = useRouter()
-
-   const {
-      isLiveStreamDialogOpen,
-      handleLiveStreamDialogClose,
-      currentLiveStreamIdInDialog,
-      getLiveStreamDialogKey,
-   } = useJobsBlock()
-
    const { data: livestream } = useLivestream(currentLiveStreamIdInDialog)
 
    // Prevents exiting the fullscreen view when interacting with the dialog
@@ -33,7 +36,7 @@ const Dialog = () => {
    if (!livestream) return null
 
    return (
-      <Box onClick={handleDialogClick} key={currentLiveStreamIdInDialog}>
+      <Box onClick={handleDialogClick}>
          <LivestreamDialog
             key={getLiveStreamDialogKey()}
             open={isLiveStreamDialogOpen}
@@ -48,12 +51,18 @@ const Dialog = () => {
    )
 }
 
-export const LiveStreamDialogExtended = () => {
-   const { currentLiveStreamIdInDialog } = useJobsBlock()
-
+export const LiveStreamDialogExtended = ({
+   currentLiveStreamIdInDialog,
+   ...props
+}: Props) => {
    // So we don't run into runtime errors when trying
    // to fetch data of an undefined live stream id
    if (!currentLiveStreamIdInDialog) return null
 
-   return <Dialog />
+   return (
+      <Dialog
+         currentLiveStreamIdInDialog={currentLiveStreamIdInDialog}
+         {...props}
+      />
+   )
 }

@@ -1,17 +1,36 @@
 import { useRouter } from "next/router"
-import { useCallback, useEffect, useState } from "react"
-import { useIsLiveStreamDialogOpen } from "../../../live-stream/useIsLiveStreamDialogOpen"
-import { JobsBlockContextType } from "./JobsBlockContext"
+import {
+   createContext,
+   ReactNode,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
+import { LiveStreamDialogExtended } from "./LiveStreamDialogExtended"
+import { useIsLiveStreamDialogOpen } from "./useIsLiveStreamDialogOpen"
 
-export const useLiveStreamDialogJobsManager = (): {
-   currentLiveStreamIdInDialog: JobsBlockContextType["currentLiveStreamIdInDialog"]
-   setCurrentLiveStreamIdInDialog: JobsBlockContextType["setCurrentLiveStreamIdInDialog"]
-   handleLiveStreamDialogOpen: JobsBlockContextType["handleLiveStreamDialogOpen"]
-   handleLiveStreamDialogClose: JobsBlockContextType["handleLiveStreamDialogClose"]
-   handleCloseCardClick: JobsBlockContextType["handleCloseCardClick"]
-   isLiveStreamDialogOpen: JobsBlockContextType["isLiveStreamDialogOpen"]
-   getLiveStreamDialogKey: JobsBlockContextType["getLiveStreamDialogKey"]
-} => {
+export type LiveStreamDialogContextType = {
+   handleLiveStreamDialogOpen: (liveStreamId: string) => void
+   handleLiveStreamDialogClose: () => void
+   currentLiveStreamIdInDialog: string
+   setCurrentLiveStreamIdInDialog: (liveStreamId: string) => void
+   getLiveStreamDialogKey: () => string
+   isLiveStreamDialogOpen: boolean
+}
+
+const LiveStreamDialogContext = createContext<
+   LiveStreamDialogContextType | undefined
+>(undefined)
+
+type LiveStreamDialogProviderProps = {
+   children: ReactNode
+}
+
+export const LiveStreamDialogProvider = ({
+   children,
+}: LiveStreamDialogProviderProps) => {
    const router = useRouter()
    const isLiveStreamDialogOpen = useIsLiveStreamDialogOpen()
 
@@ -25,7 +44,7 @@ export const useLiveStreamDialogJobsManager = (): {
       useState<string>(undefined)
 
    const handleLiveStreamDialogOpen = useCallback(
-      (jobId: string, newLiveStreamId: string) => {
+      (newLiveStreamId: string) => {
          if (currentLiveStreamIdInDialog === newLiveStreamId) {
             setLiveStreamDialogKey(
                `${currentLiveStreamIdInDialog}-${Date.now()}`
@@ -39,7 +58,6 @@ export const useLiveStreamDialogJobsManager = (): {
                pathname: router.pathname,
                query: {
                   ...router.query,
-                  jobId: jobId,
                   dialogLiveStreamId: newLiveStreamId,
                },
             },
@@ -57,6 +75,7 @@ export const useLiveStreamDialogJobsManager = (): {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { dialogLiveStreamId, ...restOfQuery } = router.query
       setLiveStreamDialogKey(undefined)
+      setCurrentLiveStreamIdInDialog(undefined)
       void router.push(
          {
             pathname: router.pathname,
@@ -69,24 +88,6 @@ export const useLiveStreamDialogJobsManager = (): {
          }
       )
    }, [router])
-
-   const handleCloseCardClick = useCallback(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { jobId, ...restOfQuery } = router.query
-      void router.push(
-         {
-            pathname: router.pathname,
-            query: restOfQuery,
-         },
-         undefined,
-         {
-            scroll: false,
-            shallow: true,
-         }
-      )
-
-      setCurrentLiveStreamIdInDialog(undefined)
-   }, [router, setCurrentLiveStreamIdInDialog])
 
    const getLiveStreamDialogKey = useCallback(() => {
       return liveStreamDialogKey || currentLiveStreamIdInDialog
@@ -110,13 +111,38 @@ export const useLiveStreamDialogJobsManager = (): {
       liveStreamDialogKey,
    ])
 
-   return {
-      handleLiveStreamDialogOpen,
-      handleLiveStreamDialogClose,
-      handleCloseCardClick,
-      isLiveStreamDialogOpen,
-      currentLiveStreamIdInDialog,
-      setCurrentLiveStreamIdInDialog,
-      getLiveStreamDialogKey,
-   }
+   const contextValue = useMemo(
+      () => ({
+         isLiveStreamDialogOpen,
+         handleLiveStreamDialogOpen,
+         handleLiveStreamDialogClose,
+         currentLiveStreamIdInDialog,
+         setCurrentLiveStreamIdInDialog,
+         getLiveStreamDialogKey,
+      }),
+      [
+         isLiveStreamDialogOpen,
+         handleLiveStreamDialogOpen,
+         handleLiveStreamDialogClose,
+         currentLiveStreamIdInDialog,
+         setCurrentLiveStreamIdInDialog,
+         getLiveStreamDialogKey,
+      ]
+   )
+
+   return (
+      <LiveStreamDialogContext.Provider value={contextValue}>
+         {children}
+         <LiveStreamDialogExtended
+            isLiveStreamDialogOpen={isLiveStreamDialogOpen}
+            currentLiveStreamIdInDialog={currentLiveStreamIdInDialog}
+            handleLiveStreamDialogClose={handleLiveStreamDialogClose}
+            getLiveStreamDialogKey={getLiveStreamDialogKey}
+         />
+      </LiveStreamDialogContext.Provider>
+   )
+}
+
+export const useLiveStreamDialog = () => {
+   return useContext(LiveStreamDialogContext)
 }
