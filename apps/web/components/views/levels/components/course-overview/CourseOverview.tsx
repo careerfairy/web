@@ -79,7 +79,7 @@ export const CourseOverview = ({ modules, isMobile }: Props) => {
                   {isMobile ? (
                      <Box sx={styles.detailsMobile}>
                         <CourseDetails
-                           numLevels={modules.length}
+                           levels={modules}
                            isMobile={isMobile}
                            nextModule={nextModule}
                            copy={copy}
@@ -90,7 +90,7 @@ export const CourseOverview = ({ modules, isMobile }: Props) => {
                </CourseIllustration>
                {isMobile ? null : (
                   <CourseDetails
-                     numLevels={modules.length}
+                     levels={modules}
                      isMobile={isMobile}
                      nextModule={nextModule}
                      copy={copy}
