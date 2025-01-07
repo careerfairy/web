@@ -35,7 +35,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   numLevels: number
+   levels: Page<TalentGuideModule>[]
    isMobile: boolean
    nextModule: Page<TalentGuideModule> | null
    copy: {
@@ -46,7 +46,7 @@ type Props = {
 }
 
 export const CourseDetails = ({
-   numLevels,
+   levels,
    isMobile,
    nextModule,
    copy,
@@ -81,7 +81,7 @@ export const CourseDetails = ({
                         variant={isMobile ? "xsmall" : "small"}
                         component="p"
                      >
-                        {numLevels} levels
+                        {levels.length} levels
                      </Typography>
                   </Stack>
                   <Stack direction="row" alignItems="center" spacing={0.5}>
