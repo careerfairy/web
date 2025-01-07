@@ -3,6 +3,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { sxStyles } from "types/commonTypes"
 import { CourseIllustration } from "./CourseIllustration"
+import { ProgressWithPercentage } from "./ProgressWithPercentage"
 
 const styles = sxStyles({
    root: {
@@ -55,10 +56,15 @@ export const CourseOverview = ({ pages }: Props) => {
          <Stack sx={styles.content}>
             <CourseIllustration isMobile={isMobile} />
             <Stack sx={styles.details} spacing={2}>
-               <Typography variant="h4">{copy.title}</Typography>
-               <Typography variant="body2" sx={styles.metadata}>
-                  {pages.length} levels • 2 hours
-               </Typography>
+               <Stack direction="row" alignItems="center" spacing={1}>
+                  <Box>
+                     <Typography variant="h4">{copy.title}</Typography>
+                     <Typography variant="body2" sx={styles.metadata}>
+                        {pages.length} levels • 2 hours
+                     </Typography>
+                  </Box>
+                  <ProgressWithPercentage percentageComplete={75} />
+               </Stack>
                <Typography variant="body1" sx={styles.description}>
                   {copy.description}
                </Typography>
