@@ -1,4 +1,4 @@
-import { Box, Grow, Stack, Typography, useTheme } from "@mui/material"
+import { Box, Stack, Typography, useTheme } from "@mui/material"
 import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { Clock } from "react-feather"
@@ -120,11 +120,11 @@ export const CourseDetails = ({
                {copy.description}
             </Typography>
          )}
-         <Grow unmountOnExit in={Boolean(nextLevel)}>
+         {nextLevel ? (
             <Box sx={isOverlay ? styles.ctaOverlay : styles.ctaDesktop}>
                <CTAButton nextLevel={nextLevel} />
             </Box>
-         </Grow>
+         ) : null}
       </Stack>
    )
 }
