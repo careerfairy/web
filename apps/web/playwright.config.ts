@@ -23,7 +23,7 @@ const config: PlaywrightTestConfig = {
    /* Maximum time one test can run for. */
    timeout: process.env.CI ? 60 * 1000 : 30 * 1000,
    // Increase the number of workers on CI (GitHub runners have 2 cores), use default locally (cpus/2)
-   workers: 1,
+   workers: process.env.CI ? 2 : undefined, // Undefined allows Playwright to use all available cores
    expect: {
       /**
        * Maximum time expect() should wait for the condition to be met.
@@ -49,7 +49,15 @@ const config: PlaywrightTestConfig = {
       /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
       trace: process.env.CI ? "on-first-retry" : "retain-on-failure",
       screenshot: "only-on-failure",
-      video: "retain-on-failure",
+      // Reduce video quality to improve performance
+      video: {
+         mode: "retain-on-failure",
+         size: { width: 640, height: 480 },
+      },
+      // Optimize launch options for better performance
+      launchOptions: {
+         chromiumSandbox: false, // Disable sandbox for better performance
+      },
    },
    globalTeardown: "./playwright.teardown",
    globalSetup: "./playwright.setup",
@@ -67,6 +75,10 @@ const config: PlaywrightTestConfig = {
                   "--use-fake-ui-for-media-stream", // avoids the need to grant camera/microphone permissions
                   "--use-fake-device-for-media-stream", // feeds a test pattern to getUserMedia() instead of live camera input
                   "--mute-audio",
+                  "--disable-gpu", // Disable GPU hardware acceleration
+                  "--disable-dev-shm-usage", // Overcome limited resource problems
+                  "--no-sandbox", // Disable sandbox for better performance
+                  "--disable-setuid-sandbox",
                ],
             },
          },
