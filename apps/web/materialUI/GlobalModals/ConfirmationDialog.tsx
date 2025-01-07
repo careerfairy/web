@@ -229,6 +229,9 @@ const MobileDrawer = ({
          }}
          {...(isSwipeable && { onOpen: () => {} })}
          sx={sx}
+         ModalProps={{
+            keepMounted: false, // Fixed Blocked aria-hidden console error
+         }}
       >
          <Stack
             alignItems="center"
