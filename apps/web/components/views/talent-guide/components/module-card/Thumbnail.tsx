@@ -25,6 +25,7 @@ export const Thumbnail = ({
             src={thumbnailUrl}
             alt="Levels Module Thumbnail"
             fill
+            priority
             style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 100vw, 50vw"
          />
