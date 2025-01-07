@@ -74,7 +74,7 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      zIndex: 1000,
+      zIndex: -2,
    },
    previewVideo: {
       "& .react-player__preview": {
@@ -127,6 +127,7 @@ const VideoPreview: FC<Props> = ({
    console.log("🚀 ~ isMobile:", isMobile)
    const playerRef = useRef<ReactPlayer | null>(null)
    const [isVideoReady, setIsVideoReady] = useState(false)
+   console.log("🚀 ~ isVideoReady:", isVideoReady)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
    const dispatch = useDispatch()
@@ -229,32 +230,35 @@ const VideoPreview: FC<Props> = ({
                   containPreviewOnTablet={containPreviewOnTablet}
                />
             )} */}
-            {!isVideoReady || videoPlayedForSession ? null : (
+            {/* {!isVideoReady || videoPlayedForSession || playingVideo ? null : (
                <ThumbnailOverlay
                   src={thumbnailUrl}
                   containPreviewOnTablet={containPreviewOnTablet}
                />
-            )}
+            )} */}
 
-            {light ? null : (
-               <ReactPlayer
-                  ref={playerRef}
-                  playing={playingVideo}
-                  playsinline
-                  loop={playing}
-                  width="100%"
-                  height="100%"
-                  className="player"
-                  onProgress={handleProgress}
-                  onPlay={onPlay}
-                  onReady={onReady}
-                  onError={handleError}
-                  progressInterval={250}
-                  url={videoUrl}
-                  playIcon={<Fragment />}
-                  muted={muted}
-               />
-            )}
+            <ThumbnailOverlay
+               src={thumbnailUrl}
+               containPreviewOnTablet={containPreviewOnTablet}
+            />
+
+            <ReactPlayer
+               ref={playerRef}
+               playing={playingVideo}
+               playsinline
+               loop={playing}
+               width="100%"
+               height="100%"
+               className="player"
+               onProgress={handleProgress}
+               onPlay={onPlay}
+               onReady={onReady}
+               onError={handleError}
+               progressInterval={250}
+               url={videoUrl}
+               playIcon={<Fragment />}
+               muted={muted}
+            />
          </Box>
          <LinearProgress
             sx={styles.progress}
