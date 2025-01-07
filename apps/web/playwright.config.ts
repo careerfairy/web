@@ -23,7 +23,7 @@ const config: PlaywrightTestConfig = {
    /* Maximum time one test can run for. */
    timeout: process.env.CI ? 60 * 1000 : 30 * 1000,
    // Increase the number of workers on CI (GitHub runners have 2 cores), use default locally (cpus/2)
-   workers: process.env.CI ? 2 : undefined, // Undefined allows Playwright to use all available cores
+   workers: process.env.CI ? 1 : undefined, // Undefined allows Playwright to use all available cores
    expect: {
       /**
        * Maximum time expect() should wait for the condition to be met.
