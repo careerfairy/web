@@ -21,7 +21,12 @@ export type TalentGuideModule = {
     */
    moduleDescription: string
    /**
-    * The duration of the module, eg "10 - 20"
+    * The estimated duration in minutes, eg 10
+    */
+   estimatedModuleDurationMinutes: number
+   /**
+    * The duration range of the module, eg "10-16"
+    * @deprecated Use estimatedModuleDurationMinutes instead
     */
    moduleDuration: string
    /**
