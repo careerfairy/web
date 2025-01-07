@@ -7,7 +7,6 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
@@ -16,6 +15,7 @@ import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
+import { isMobileBrowser, isSafariBasedBrowser } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -218,36 +218,18 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            <ThumbnailOverlay
-               src={thumbnailUrl}
-               containPreviewOnTablet={containPreviewOnTablet}
-            />
-            <ConditionalWrapper condition={light}>
-               {/* <ThumbnailOverlay
-                     src={thumbnailUrl}
-                     containPreviewOnTablet={containPreviewOnTablet}
-                  /> */}
-               {/* {Boolean(isMobileBrowserOrSafari || (isMobile && (isPlaying || videoPlayedForSession))) && (
-                  <ThumbnailOverlay
-                     src={thumbnailUrl}
-                     containPreviewOnTablet={containPreviewOnTablet}
-                  />
-               )}
-               {Boolean(isMobile && isPlaying) && (
-                  <ThumbnailOverlay
-                     src={thumbnailUrl}
-                     containPreviewOnTablet={containPreviewOnTablet}
-                  />
-               )}
-               {isMobile && videoPlayedForSession ? null : (
-                  <ThumbnailOverlay
-                     src={thumbnailUrl}
-                     containPreviewOnTablet={containPreviewOnTablet}
-                  />
-               )}
-               <Box width="100%" height="100%" sx={{ backgroundColor: "red" }}>
-               </Box> */}
-            </ConditionalWrapper>
+            {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )}
+            {videoPlayedForSession || !light ? null : (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )}
             {light ? null : (
                <ReactPlayer
                   ref={playerRef}
