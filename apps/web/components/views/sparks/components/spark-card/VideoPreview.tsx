@@ -5,7 +5,6 @@ import LinearProgress, {
 } from "@mui/material/LinearProgress"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
@@ -74,7 +73,6 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      zIndex: -2,
    },
    previewVideo: {
       "& .react-player__preview": {
@@ -123,11 +121,7 @@ const VideoPreview: FC<Props> = ({
    identifier,
    autoPlaying,
 }) => {
-   const isMobile = useIsMobile()
-   console.log("🚀 ~ isMobile:", isMobile)
    const playerRef = useRef<ReactPlayer | null>(null)
-   const [isVideoReady, setIsVideoReady] = useState(false)
-   console.log("🚀 ~ isVideoReady:", isVideoReady)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
    const dispatch = useDispatch()
@@ -212,10 +206,6 @@ const VideoPreview: FC<Props> = ({
 
    const playingVideo = Boolean(playing && !shouldPause)
 
-   const onReady = () => {
-      setIsVideoReady(true)
-   }
-
    return (
       <Box sx={styles.root}>
          <Box
@@ -224,41 +214,30 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            {/* {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )} */}
-            {/* {!isVideoReady || videoPlayedForSession || playingVideo ? null : (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )} */}
-
             <ThumbnailOverlay
                src={thumbnailUrl}
                containPreviewOnTablet={containPreviewOnTablet}
+               playing={playingVideo}
             />
 
-            <ReactPlayer
-               ref={playerRef}
-               playing={playingVideo}
-               playsinline
-               loop={playing}
-               width="100%"
-               height="100%"
-               className="player"
-               onProgress={handleProgress}
-               onPlay={onPlay}
-               onReady={onReady}
-               onError={handleError}
-               progressInterval={250}
-               url={videoUrl}
-               playIcon={<Fragment />}
-               muted={muted}
-            />
+            {light ? null : (
+               <ReactPlayer
+                  ref={playerRef}
+                  playing={playingVideo}
+                  playsinline
+                  loop={playing}
+                  width="100%"
+                  height="100%"
+                  className="player"
+                  onProgress={handleProgress}
+                  onPlay={onPlay}
+                  onError={handleError}
+                  progressInterval={250}
+                  url={videoUrl}
+                  playIcon={<Fragment />}
+                  muted={muted}
+               />
+            )}
          </Box>
          <LinearProgress
             sx={styles.progress}
@@ -272,17 +251,19 @@ const VideoPreview: FC<Props> = ({
 type ThumbnailOverlayProps = {
    src: string
    containPreviewOnTablet?: boolean
+   playing?: boolean
 }
 
 export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
    src,
    containPreviewOnTablet,
+   playing,
 }) => {
    const theme = useTheme()
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
 
    return (
-      <Box sx={styles.thumbnailOverlay}>
+      <Box sx={[styles.thumbnailOverlay, { zIndex: playing ? 0 : 1 }]}>
          <Image
             src={src}
             layout="fill"
