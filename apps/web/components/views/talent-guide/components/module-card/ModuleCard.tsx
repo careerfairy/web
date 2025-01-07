@@ -8,7 +8,7 @@ import { Details } from "./Details"
 import { Thumbnail } from "./Thumbnail"
 
 const Status = dynamic(() => import("./Status").then((mod) => mod.Status), {
-   ssr: false,
+   ssr: false, // disable ssr for status component as it uses suspense
 })
 
 const styles = sxStyles({

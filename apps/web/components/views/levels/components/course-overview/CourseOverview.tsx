@@ -41,6 +41,12 @@ type Props = {
    pages: Page<TalentGuideModule>[]
 }
 
+const copy = {
+   title: "Quick start your career",
+   description:
+      "Ready to land your dream job? Learn the insider tips and practical strategies to stand out in today's competitive job market. Start building the career you deserve!",
+}
+
 export const CourseOverview = ({ pages }: Props) => {
    const isMobile = useIsMobile("sm")
 
@@ -49,14 +55,12 @@ export const CourseOverview = ({ pages }: Props) => {
          <Stack sx={styles.content}>
             <CourseIllustration isMobile={isMobile} />
             <Stack sx={styles.details} spacing={2}>
-               <Typography variant="h4">Quick start your career</Typography>
+               <Typography variant="h4">{copy.title}</Typography>
                <Typography variant="body2" sx={styles.metadata}>
                   {pages.length} levels • 2 hours
                </Typography>
                <Typography variant="body1" sx={styles.description}>
-                  Ready to land your dream job? Learn the insider tips and
-                  practical strategies to stand out in today&apos;s competitive
-                  job market. Start building the career you deserve!
+                  {copy.description}
                </Typography>
                <Button
                   variant="contained"
