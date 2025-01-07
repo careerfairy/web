@@ -13,7 +13,7 @@ const styles = sxStyles({
    ctaDesktop: {
       width: "100%",
    },
-   ctaMobile: (theme) => ({
+   ctaOverlay: (theme) => ({
       position: "fixed",
       bottom: 67,
       left: 0,
@@ -34,10 +34,23 @@ const styles = sxStyles({
    }),
 })
 
+const calculateTotalHours = (levels: Page<TalentGuideModule>[]) => {
+   const totalMinutes = levels.reduce((sum, level) => {
+      if (!level.content?.estimatedModuleDurationMinutes) return sum
+      return sum + level.content.estimatedModuleDurationMinutes
+   }, 0)
+
+   return Math.ceil(totalMinutes / 60)
+}
+
 type Props = {
    levels: Page<TalentGuideModule>[]
-   isMobile: boolean
-   nextModule: Page<TalentGuideModule> | null
+   /**
+    * Whether the component is overlaying the illustration
+    * If true, the component will have contrast with the illustration
+    */
+   isOverlay: boolean
+   nextLevel: Page<TalentGuideModule> | null
    copy: {
       title: string
       description: string
@@ -47,18 +60,19 @@ type Props = {
 
 export const CourseDetails = ({
    levels,
-   isMobile,
-   nextModule,
+   isOverlay,
+   nextLevel,
    copy,
    overallProgress,
 }: Props) => {
    const theme = useTheme()
+   const hours = calculateTotalHours(levels)
 
    return (
       <Stack
          p={2}
          spacing={2}
-         color={isMobile ? theme.brand.white[50] : "neutral.600"}
+         color={isOverlay ? theme.brand.white[50] : "neutral.600"}
       >
          <Stack
             direction="row"
@@ -78,7 +92,7 @@ export const CourseDetails = ({
                   <Stack direction="row" alignItems="center" spacing={0.5}>
                      <LevelsIcon sx={styles.metadataIcon} isOutlined />
                      <Typography
-                        variant={isMobile ? "xsmall" : "small"}
+                        variant={isOverlay ? "xsmall" : "small"}
                         component="p"
                      >
                         {levels.length} levels
@@ -86,24 +100,29 @@ export const CourseDetails = ({
                   </Stack>
                   <Stack direction="row" alignItems="center" spacing={0.5}>
                      <Clock size={16} />
-                     <Typography variant="body2">2 hours</Typography>
+                     <Typography
+                        variant={isOverlay ? "xsmall" : "small"}
+                        component="p"
+                     >
+                        {hours} hour{hours !== 1 ? "s" : ""}
+                     </Typography>
                   </Stack>
                </Stack>
             </Stack>
             <ProgressWithPercentage
-               isOverlay={isMobile}
+               isOverlay={isOverlay}
                percentageComplete={overallProgress}
             />
          </Stack>
 
-         {isMobile ? null : (
+         {isOverlay ? null : (
             <Typography variant={"medium"} component="p" color="neutral.700">
                {copy.description}
             </Typography>
          )}
-         <Grow unmountOnExit in={Boolean(nextModule)}>
-            <Box sx={isMobile ? styles.ctaMobile : styles.ctaDesktop}>
-               <CTAButton nextModule={nextModule} />
+         <Grow unmountOnExit in={Boolean(nextLevel)}>
+            <Box sx={isOverlay ? styles.ctaOverlay : styles.ctaDesktop}>
+               <CTAButton nextLevel={nextLevel} />
             </Box>
          </Grow>
       </Stack>

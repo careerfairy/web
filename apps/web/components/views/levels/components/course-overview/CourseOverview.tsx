@@ -33,12 +33,11 @@ const styles = sxStyles({
       backgroundColor: theme.brand.white[100],
       borderRadius: "8px",
    }),
-   detailsMobile: {
+   detailsOverlay: {
       position: "absolute",
       bottom: 0,
       left: 0,
       right: 0,
-      // padding: 2,
    },
    contentInnerMobile: {
       backgroundColor: "none",
@@ -77,11 +76,11 @@ export const CourseOverview = ({ modules, isMobile }: Props) => {
             >
                <CourseIllustration isMobile={isMobile}>
                   {isMobile ? (
-                     <Box sx={styles.detailsMobile}>
+                     <Box sx={styles.detailsOverlay}>
                         <CourseDetails
+                           isOverlay
                            levels={modules}
-                           isMobile={isMobile}
-                           nextModule={nextModule}
+                           nextLevel={nextModule}
                            copy={copy}
                            overallProgress={overallProgress}
                         />
@@ -90,9 +89,9 @@ export const CourseOverview = ({ modules, isMobile }: Props) => {
                </CourseIllustration>
                {isMobile ? null : (
                   <CourseDetails
+                     isOverlay={isMobile}
                      levels={modules}
-                     isMobile={isMobile}
-                     nextModule={nextModule}
+                     nextLevel={nextModule}
                      copy={copy}
                      overallProgress={overallProgress}
                   />
