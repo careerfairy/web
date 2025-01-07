@@ -9,13 +9,19 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { statusStyles } from "./styles"
 
 type Props = {
-   moduleDuration: string
+   estimatedModuleDurationMinutes?: number
    percentProgress?: number
    moduleLevel: number
 }
 
+const calculateDurationRange = (estimatedMinutes = 20) => {
+   const minDuration = Math.floor(estimatedMinutes * 0.75)
+   const maxDuration = estimatedMinutes
+   return `${minDuration}-${maxDuration}`
+}
+
 export const ModuleInfoChip = ({
-   moduleDuration,
+   estimatedModuleDurationMinutes,
    percentProgress,
    moduleLevel,
 }: Props) => {
@@ -39,7 +45,7 @@ export const ModuleInfoChip = ({
                >
                   <circle cx="2" cy="2" r="2" fill="currentColor" />
                </svg>
-               {moduleDuration} min
+               {calculateDurationRange(estimatedModuleDurationMinutes)} min
             </Typography>
          </Box>
          {Boolean(percentProgress) && (
