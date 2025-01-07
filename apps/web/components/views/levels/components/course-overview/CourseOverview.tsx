@@ -1,6 +1,18 @@
-import { Box, Button, Stack, Typography, useTheme } from "@mui/material"
+import {
+   Box,
+   Button,
+   ButtonProps,
+   Grow,
+   Stack,
+   Typography,
+   useTheme,
+} from "@mui/material"
 import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
+import Link from "components/views/common/Link"
 import { Page, TalentGuideModule } from "data/hygraph/types"
+import { useAuth } from "HOCs/AuthProvider"
+import { useNextTalentGuideModule } from "hooks/useNextTalentGuideModule"
+import { forwardRef } from "react"
 import { Clock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { CourseIllustration } from "./CourseIllustration"
@@ -27,23 +39,44 @@ const styles = sxStyles({
       borderRadius: "8px",
    }),
    contentMobile: {
-      border: "none",
       backgroundColor: "none",
+      position: "static",
    },
 
    details: {
       padding: 2,
    },
+   detailsMobile: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      padding: 2,
+   },
    metadataIcon: {
       fontSize: 16,
    },
-   description: {
-      color: "secondary.700",
-      marginBottom: 2,
-   },
-   startButton: {
+   startButtonDesktop: {
       width: "100%",
    },
+   startButtonMobile: (theme) => ({
+      position: "fixed",
+      bottom: 67,
+      left: 0,
+      right: 0,
+      pb: 1.5,
+      px: 1,
+      zIndex: theme.zIndex.drawer + 1000,
+      height: 85,
+      display: "flex",
+      alignItems: "end",
+      justifyContent: "center",
+      background:
+         "linear-gradient(180deg, rgba(247, 248, 252, 0.00) 0%, rgba(247, 248, 252, 0.90) 100%)",
+      "& > *": {
+         maxWidth: 500,
+      },
+   }),
 })
 
 type Props = {
@@ -59,22 +92,25 @@ const copy = {
 
 export const CourseOverview = ({ pages, isMobile }: Props) => {
    const theme = useTheme()
+   const { authenticatedUser } = useAuth()
+   const { data: nextModule } = useNextTalentGuideModule(authenticatedUser.uid)
 
    return (
       <Box sx={[styles.root, isMobile && styles.rootMobile]}>
          <Stack sx={[styles.content, isMobile && styles.contentMobile]}>
             <CourseIllustration isMobile={isMobile} />
-            <Stack sx={styles.details} spacing={2}>
+            <Stack
+               sx={[styles.details, isMobile && styles.detailsMobile]}
+               spacing={2}
+               color={isMobile ? theme.brand.white[50] : "neutral.600"}
+            >
                <Stack
                   direction="row"
                   alignItems="center"
                   justifyContent="space-between"
                   spacing={1}
                >
-                  <Stack
-                     color={isMobile ? theme.brand.white[50] : "neutral.600"}
-                     spacing={0.5}
-                  >
+                  <Stack spacing={0.5}>
                      <Typography
                         fontWeight={700}
                         variant="desktopBrandedH4"
@@ -111,20 +147,50 @@ export const CourseOverview = ({ pages, isMobile }: Props) => {
                      percentageComplete={75}
                   />
                </Stack>
-               <Typography variant="body1" sx={styles.description}>
-                  {copy.description}
-               </Typography>
-               <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  sx={styles.startButton}
-                  href={`/levels/${pages[0]?.slug}`}
-               >
-                  Start course 1
-               </Button>
+
+               {isMobile ? null : (
+                  <Typography variant={"medium"} component="p">
+                     {copy.description}
+                  </Typography>
+               )}
+               <Grow unmountOnExit in={Boolean(nextModule && !isMobile)}>
+                  <Box>
+                     <CTAButton nextModule={pages[0]} />
+                  </Box>
+               </Grow>
             </Stack>
          </Stack>
+         <Grow unmountOnExit in={Boolean(nextModule && isMobile)}>
+            <Box sx={styles.startButtonMobile}>
+               <CTAButton nextModule={pages[0]} />
+            </Box>
+         </Grow>
       </Box>
    )
 }
+
+type CTAButtonProps = ButtonProps & {
+   nextModule: Page<TalentGuideModule>
+}
+
+const CTAButton = forwardRef<HTMLButtonElement, CTAButtonProps>(
+   ({ nextModule, ...props }, ref) => {
+      return (
+         <Button
+            ref={ref}
+            variant="contained"
+            color="primary"
+            size="large"
+            fullWidth
+            component={Link}
+            noLinkStyle
+            href={`/levels/${nextModule.slug}`}
+            {...props}
+         >
+            Start course {nextModule.content.level}
+         </Button>
+      )
+   }
+)
+
+CTAButton.displayName = "CTAButton"

@@ -3,7 +3,6 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { Variants } from "framer-motion"
-import { useGenericDashboard } from "layouts/GenericDashboardLayout"
 import { sxStyles } from "types/commonTypes"
 import { ModuleCard } from "../../talent-guide/components/module-card/ModuleCard"
 import { CourseOverview } from "./course-overview/CourseOverview"
@@ -50,8 +49,7 @@ type Props = {
 }
 
 export const LevelsContainer = ({ pages }: Props) => {
-   const { drawerOpen } = useGenericDashboard()
-   const isMobile = useIsMobile(drawerOpen ? 1030 : 890)
+   const isMobile = useIsMobile()
 
    return (
       <FramerBox
