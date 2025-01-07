@@ -1,4 +1,9 @@
-import { Box, CircularProgress, Typography } from "@mui/material"
+import {
+   Box,
+   CircularProgress,
+   Typography,
+   circularProgressClasses,
+} from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -33,6 +38,9 @@ const styles = sxStyles({
    progressCircle: {
       position: "relative",
       color: "primary.main",
+      [`& .${circularProgressClasses.circle}`]: {
+         strokeLinecap: "round",
+      },
    },
 })
 
