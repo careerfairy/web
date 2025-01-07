@@ -4,11 +4,11 @@ import { Page, TalentGuideModule } from "data/hygraph/types"
 import { forwardRef } from "react"
 
 type CTAButtonProps = ButtonProps & {
-   nextModule: Page<TalentGuideModule>
+   nextLevel: Page<TalentGuideModule>
 }
 
 export const CTAButton = forwardRef<HTMLButtonElement, CTAButtonProps>(
-   ({ nextModule, ...props }, ref) => {
+   ({ nextLevel, ...props }, ref) => {
       return (
          <Button
             ref={ref}
@@ -18,10 +18,10 @@ export const CTAButton = forwardRef<HTMLButtonElement, CTAButtonProps>(
             fullWidth
             component={Link}
             noLinkStyle
-            href={`/levels/${nextModule.slug}`}
+            href={`/levels/${nextLevel.slug}`}
             {...props}
          >
-            Start course {nextModule.content.level}
+            Start course {nextLevel.content.level}
          </Button>
       )
    }
