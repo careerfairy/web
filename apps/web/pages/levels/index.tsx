@@ -1,5 +1,6 @@
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
 import { Page, TalentGuideModule } from "data/hygraph/types"
+import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
@@ -9,7 +10,6 @@ import {
    tgBackendPreviewService,
    tgBackendService,
 } from "../../data/hygraph/TalentGuideBackendService"
-import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 interface TalentGuidePageProps {
    pages: Page<TalentGuideModule>[]
