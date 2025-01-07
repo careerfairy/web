@@ -36,6 +36,7 @@ export const CourseIllustration = ({ isMobile }: Props) => {
             alt="Quick start your career"
             style={styles.image}
             fill
+            sizes={isMobile ? "100vw" : "360px"}
          />
          <Box sx={styles.overlay} />
       </Box>
