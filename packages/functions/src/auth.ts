@@ -89,12 +89,13 @@ export const createNewUserAccount = functions
                   })
                )
                .then(async () => {
-                  if (additionalData?.studyBackgrounds) {
+                  if (additionalData?.studyBackground) {
+                     additionalData.studyBackground.authId = user.uid
                      await firestore
                         .collection("userData")
                         .doc(recipientEmail)
                         .collection("studyBackgrounds")
-                        .add(additionalData.studyBackgrounds)
+                        .add(additionalData.studyBackground)
                   }
                })
                .then(async () => {
