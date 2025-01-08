@@ -10,16 +10,18 @@ const GOOGLE_STORE_LINK =
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
    const userAgent = context.req.headers["user-agent"] || ""
+   const query = context.query; // Capture all query parameters
    // @ts-ignore
    const parser = new UAParser(userAgent)
    const os = parser.getOS().name || ""
 
    // Redirection logic based on OS
+   const utmParams = new URLSearchParams(query as Record<string, string>).toString();
    let destination: string | null = null
    if (os?.includes("iOS") || os?.includes("macOS")) {
-      destination = APP_STORE_LINK
+      destination = APP_STORE_LINK + `?${utmParams}`
    } else {
-      destination = GOOGLE_STORE_LINK
+      destination = GOOGLE_STORE_LINK + `?${utmParams}`
    }
 
    if (destination) {
