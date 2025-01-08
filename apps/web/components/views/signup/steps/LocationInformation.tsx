@@ -192,8 +192,8 @@ const LocationInformationView = () => {
          setCity(null)
          await userRepo.updateUserData(userData.id, {
             countryIsoCode: countryCode,
-            cityIsoCode: null,
-            stateIsoCode: null,
+            cityIsoCode: "",
+            stateIsoCode: "",
          })
       },
 
