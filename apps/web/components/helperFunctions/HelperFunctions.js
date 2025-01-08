@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { isEmpty } from "lodash/fp"
 import { v4 as uuidv4 } from "uuid"
 import { LONG_NUMBER } from "../util/constants"
@@ -162,12 +163,11 @@ export const isServer = () => {
 }
 
 export const isInIframe = () => {
-  
-  if(isServer()) {
-   return false
-  }
+   if (isServer()) {
+      return false
+   }
 
-  try {
+   try {
       return window.self !== window.top
    } catch (e) {
       return true

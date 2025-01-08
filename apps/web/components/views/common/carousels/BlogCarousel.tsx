@@ -1,14 +1,14 @@
-import React, { useState } from "react"
-import { Carousel } from "types/cmsTypes"
 import Box from "@mui/material/Box"
-import Slider from "react-slick"
-import { GraphCMSImageLoader } from "../../../cms/util"
 import Image from "next/legacy/image"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-import { SampleNextArrow, SamplePrevArrow } from "./arrows"
+import { useMemo, useState } from "react"
 import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css" // This only needs to be imported once in your app
+import Slider from "react-slick"
+import "slick-carousel/slick/slick-theme.css"
+import "slick-carousel/slick/slick.css"
+import { Carousel } from "types/cmsTypes"
+import { GraphCMSImageLoader } from "../../../cms/util"
+import { SampleNextArrow, SamplePrevArrow } from "./arrows"
 
 import { EmbedProps } from "@graphcms/rich-text-types"
 import { useTheme } from "@mui/material/styles"
@@ -55,32 +55,35 @@ const styles = {
    },
 }
 
-const BlogCarousel = ({ images, nodeId }: EmbedProps<Carousel>) => {
+const BlogCarousel = ({ images }: EmbedProps<Carousel>) => {
    const [photoIndex, setPhotoIndex] = useState(0)
    const theme = useTheme()
    const [isOpenLightbox, setIsOpenLightbox] = useState(false)
-   const [settings] = useState({
-      dots: true,
-      nextArrow: <SampleNextArrow />,
-      prevArrow: <SamplePrevArrow />,
-      lazyLoad: true,
-      infinite: true,
-      autoplay: true,
-      autoplaySpeed: 5000,
-      slidesToShow: 3,
-      slidesToScroll: 1,
-      initialSlide: 0,
-      centerMode: true,
-      arrows: true,
-      responsive: [
-         {
-            breakpoint: 600,
-            settings: {
-               slidesToShow: 1,
+   const settings = useMemo(
+      () => ({
+         dots: true,
+         nextArrow: <SampleNextArrow />,
+         prevArrow: <SamplePrevArrow />,
+         lazyLoad: true,
+         infinite: true,
+         autoplay: true,
+         autoplaySpeed: 5000,
+         slidesToShow: 3,
+         slidesToScroll: 1,
+         initialSlide: 0,
+         centerMode: true,
+         arrows: true,
+         responsive: [
+            {
+               breakpoint: 600,
+               settings: {
+                  slidesToShow: 1,
+               },
             },
-         },
-      ],
-   })
+         ],
+      }),
+      []
+   )
 
    const handleOpenLightbox = (index: number) => {
       if (!isNaN(index)) {
@@ -109,7 +112,7 @@ const BlogCarousel = ({ images, nodeId }: EmbedProps<Carousel>) => {
                ))}
             </Slider>
          </Box>
-         {isOpenLightbox && (
+         {Boolean(isOpenLightbox) && (
             // @ts-ignore
             <Lightbox
                mainSrc={images[photoIndex].url}

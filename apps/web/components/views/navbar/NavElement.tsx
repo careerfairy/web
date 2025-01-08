@@ -1,5 +1,3 @@
-import React, { FunctionComponent } from "react"
-import Box from "@mui/material/Box"
 import {
    IconProps,
    ListItem,
@@ -7,12 +5,14 @@ import {
    ListItemIcon,
    ListItemText,
 } from "@mui/material"
+import Box from "@mui/material/Box"
+import { alpha } from "@mui/material/styles"
+import { useRouter } from "next/router"
+import { FunctionComponent } from "react"
 import { Icon } from "react-feather"
 import { StylesProps } from "../../../types/commonTypes"
-import Link from "../common/Link"
-import { useRouter } from "next/router"
-import { alpha } from "@mui/material/styles"
 import { PageLinkProps } from "../../custom-hook/useGeneralLinks"
+import Link from "../common/Link"
 
 interface NavElementProps {
    href: string
@@ -83,7 +83,7 @@ const NavElement = ({
                { "&:hover , &:focus": { ...styles.active, ...styles.hovered } },
             ]}
          >
-            {(svgIcon || Icon) && (
+            {Boolean(svgIcon || Icon) && (
                <ListItemIcon color={"inherit"}>
                   {svgIcon ? (
                      <Box sx={styles.icon}>

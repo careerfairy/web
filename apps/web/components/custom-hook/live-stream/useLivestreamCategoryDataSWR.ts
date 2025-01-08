@@ -28,11 +28,15 @@ const useLivestreamCategoryDataSWR = (
       )
    }
 
-   return useSWRImmutable(`useLivestreamCategoryDataSWR-${options.livestream.id}`, swrFetcher, {
-      ...swrOptions,
-      onSuccess,
-      revalidateOnMount: true, // refetch the registratioin data when the hook mounts for the first time only. This will ensure that if we navigate out of the live stream room to a different page, then we return back to the room, we re-fetch your reg status 
-   })
+   return useSWRImmutable(
+      `useLivestreamCategoryDataSWR-${options.livestream.id}`,
+      swrFetcher,
+      {
+         ...swrOptions,
+         onSuccess,
+         revalidateOnMount: true, // refetch the registratioin data when the hook mounts for the first time only. This will ensure that if we navigate out of the live stream room to a different page, then we return back to the room, we re-fetch your reg status
+      }
+   )
 }
 
 export default useLivestreamCategoryDataSWR
