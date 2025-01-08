@@ -45,9 +45,13 @@ export const StudyDomainSelector = ({
       _: SyntheticEvent,
       option: { id: string; value: string }
    ) => {
-      setValue(fieldName, option ? { ...option, name: option.value } : option, {
-         shouldValidate: true,
-      })
+      setValue(
+         fieldName,
+         option ? { id: option.id, name: option.value } : option,
+         {
+            shouldValidate: true,
+         }
+      )
    }
 
    const value = watch(fieldName)

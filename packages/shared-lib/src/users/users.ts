@@ -145,7 +145,7 @@ export type UserDataPersonalInfo = Pick<
 >
 
 export type UserAccountCreationAdditionalData = {
-   studyBackgrounds?: StudyBackground[]
+   studyBackground?: StudyBackground
 }
 
 // Collection /userData/:id/studyBackgrounds/:id
