@@ -6,7 +6,7 @@ import LinearProgress, {
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
-import Image from "next/legacy/image"
+import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
@@ -14,7 +14,6 @@ import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
-import { isMobileBrowser, isSafariBasedBrowser } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -215,18 +214,12 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            {Boolean(isMobileBrowser() || isSafariBasedBrowser()) && (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )}
-            {videoPlayedForSession || !light ? null : (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )}
+            <ThumbnailOverlay
+               src={thumbnailUrl}
+               containPreviewOnTablet={containPreviewOnTablet}
+               playing={playingVideo}
+            />
+
             {light ? null : (
                <ReactPlayer
                   ref={playerRef}
@@ -258,17 +251,19 @@ const VideoPreview: FC<Props> = ({
 type ThumbnailOverlayProps = {
    src: string
    containPreviewOnTablet?: boolean
+   playing?: boolean
 }
 
 export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
    src,
    containPreviewOnTablet,
+   playing,
 }) => {
    const theme = useTheme()
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
 
    return (
-      <Box sx={styles.thumbnailOverlay}>
+      <Box sx={[styles.thumbnailOverlay, { zIndex: playing ? 0 : 1 }]}>
          <Image
             src={src}
             layout="fill"
