@@ -2,8 +2,10 @@ import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { ProfileInterest } from "@careerfairy/shared-lib/users"
 import { Box, Chip } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { userRepo } from "data/RepositoryInstances"
+import { OptionsObject } from "notistack"
 import { Fragment, useCallback, useMemo } from "react"
 import { Edit3, Heart } from "react-feather"
 import { useFormContext } from "react-hook-form"
@@ -93,10 +95,19 @@ const FormDialogWrapper = () => {
    const dispatch = useDispatch()
    const { userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
-
    const createInterestDialogOpen = useSelector(
       talentProfileCreateInterestOpenSelector
    )
+   const isMobile = useIsMobile()
+
+   const notificationOptions: OptionsObject = isMobile
+      ? {
+           anchorOrigin: {
+              vertical: "top",
+              horizontal: "left",
+           },
+        }
+      : undefined
 
    const {
       formState: { isValid, isSubmitting },
@@ -131,11 +142,17 @@ const FormDialogWrapper = () => {
 
          handleCloseInterestDialog()
          reset(data)
-         successNotification(`Saved interests 👁️`)
+         successNotification(
+            `Saved interests 👁️`,
+            undefined,
+            notificationOptions
+         )
       } catch (error) {
          errorNotification(
             error,
-            "We encountered a problem while updating your interests. Rest assured, we're on it!"
+            "We encountered a problem while updating your interests. Rest assured, we're on it!",
+            undefined,
+            notificationOptions
          )
       }
    }

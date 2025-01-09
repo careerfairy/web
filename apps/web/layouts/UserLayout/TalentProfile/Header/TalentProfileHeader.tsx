@@ -3,6 +3,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCountryCityData from "components/custom-hook/countries/useCountryCityData"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { useRouter } from "next/router"
 import { Fragment, useMemo, useState } from "react"
 import { Settings } from "react-feather"
@@ -104,6 +105,10 @@ export const TalentProfileHeader = () => {
                   variant="outlined"
                   startIcon={<Settings />}
                   onClick={() => {
+                     console.log(
+                        "🚀 ~ TalentProfileHeader ~ onClick:",
+                        router.query
+                     )
                      router.push({
                         pathname: TAB_VALUES.settings.value,
                         query: router.query,
@@ -136,23 +141,25 @@ export const TalentProfileHeader = () => {
                </Stack>
             </Stack>
          </Stack>
-         <SettingsDialog
-            open={openSettings}
-            handleClose={() => {
-               setOpenSettings(false)
+         <ConditionalWrapper condition={isSettingsPage}>
+            <SettingsDialog
+               open={openSettings}
+               handleClose={() => {
+                  setOpenSettings(false)
 
-               delete router.query["tab"]
+                  delete router.query["tab"]
 
-               router.push(
-                  {
-                     pathname: profileTab,
-                     query: router.query,
-                  },
-                  undefined,
-                  { shallow: true }
-               )
-            }}
-         />
+                  router.push(
+                     {
+                        pathname: profileTab,
+                        query: router.query,
+                     }
+                     // undefined,
+                     // { shallow: true }
+                  )
+               }}
+            />
+         </ConditionalWrapper>
       </Fragment>
    )
 }
