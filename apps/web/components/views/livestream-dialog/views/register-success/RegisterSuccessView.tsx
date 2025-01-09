@@ -19,17 +19,15 @@ import { FallbackComponent } from "components/views/portal/sparks/FallbackCompon
 import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
 import Image from "next/legacy/image"
 import { useRouter } from "next/router"
-import { FC, useCallback, useEffect } from "react"
+import { FC, useCallback, useEffect, useMemo } from "react"
 import { MessageSquare } from "react-feather"
-import { useSelector } from "react-redux"
 import { confetti } from "../../../../../constants/images"
-import { eventDetailsDialogVisibilitySelector } from "../../../../../store/selectors/sparksFeedSelectors"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { responsiveConfetti } from "../../../../util/confetti"
 import { AddToCalendar } from "../../../common/AddToCalendar"
 import BaseDialogView, { MainContent } from "../../BaseDialogView"
-import { useLiveStreamDialog } from "../../LivestreamDialog"
+import { AllDialogSettings, useLiveStreamDialog } from "../../LivestreamDialog"
 
 const styles = sxStyles({
    fullHeight: {
@@ -317,21 +315,38 @@ const Header = ({ isSparksOpen }) => {
 
 const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
    const route = useRouter()
-   const { closeDialog, livestream, goToView, isDiscoverCompanySparksOpen } =
-      useLiveStreamDialog()
+   const {
+      closeDialog,
+      livestream,
+      goToView,
+      isDiscoverCompanySparksOpen,
+      setting,
+   } = useLiveStreamDialog()
    const { data: group } = useGroup(livestream.groupIds[0])
    const groupHasSparks = group?.publicSparks
-   const eventDetailsDialogVisibility = useSelector(
-      eventDetailsDialogVisibilitySelector
-   )
+
+   const secondaryCopy = useMemo(() => {
+      if (setting == AllDialogSettings.Levels) {
+         return "Continue with Levels"
+      } else if (groupHasSparks) {
+         return "Discover company Sparks"
+      } else if (setting == AllDialogSettings.SparksFeed) {
+         return "Back to Sparks"
+      } else {
+         return "Discover more live streams"
+      }
+   }, [groupHasSparks, setting])
 
    const handleBackClick = useCallback(() => {
-      if (eventDetailsDialogVisibility) {
+      if (
+         setting == AllDialogSettings.Levels ||
+         setting == AllDialogSettings.SparksFeed
+      ) {
          closeDialog()
       } else {
          void route.push("/next-livestreams")
       }
-   }, [closeDialog, eventDetailsDialogVisibility, route])
+   }, [closeDialog, route, setting])
 
    return (
       <Box sx={styles.buttonsWrapper}>
@@ -370,18 +385,14 @@ const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
 
             {!isSparksOpen && (
                <Button
-                  variant={groupHasSparks ? "outlined" : "text"}
+                  variant={"outlined"}
                   color={groupHasSparks ? "primary" : "grey"}
                   onClick={
                      groupHasSparks ? handleDiscoverSparks : handleBackClick
                   }
                   size="large"
                >
-                  {groupHasSparks
-                     ? "Discover company Sparks"
-                     : eventDetailsDialogVisibility
-                     ? "Back to Sparks"
-                     : "Discover more live streams"}
+                  {secondaryCopy}
                </Button>
             )}
          </Stack>
