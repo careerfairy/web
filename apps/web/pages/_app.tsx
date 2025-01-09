@@ -1,9 +1,11 @@
+import ProgressBar from "@badrap/bar-of-progress"
 import { CacheProvider } from "@emotion/react"
 import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import config from "@stahl.luke/react-reveal/globals"
 import Head from "next/head"
-import NextNProgress from "nextjs-progressbar"
+import { useRouter } from "next/router"
+import { useEffect } from "react"
 import { Provider } from "react-redux"
 import { ReactReduxFirebaseProvider } from "react-redux-firebase"
 import { actionTypes, createFirestoreInstance } from "redux-firestore"
@@ -19,7 +21,6 @@ import firebaseApp, {
 } from "../data/firebase/FirebaseInstance"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import { AuthProvider } from "../HOCs/AuthProvider"
-import { brandedLightTheme } from "../materialUI"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import { store, wrapper } from "../store"
 
@@ -68,8 +69,29 @@ const rrfProps = {
    createFirestoreInstance,
 }
 
+const progress = new ProgressBar({
+   size: 2,
+   color: "#2ABAA5",
+   className: "bar-of-progress",
+   delay: 100,
+})
+
 function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+   const router = useRouter()
+
+   useEffect(() => {
+      router.events.on("routeChangeStart", progress.start)
+      router.events.on("routeChangeComplete", progress.finish)
+      router.events.on("routeChangeError", progress.finish)
+
+      return () => {
+         router.events.off("routeChangeStart", progress.start)
+         router.events.off("routeChangeComplete", progress.finish)
+         router.events.off("routeChangeError", progress.finish)
+      }
+   }, [router])
+
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
 
@@ -82,10 +104,6 @@ function MyApp(props) {
             />
             <title>CareerFairy | Watch live streams. Get hired.</title>
          </Head>
-         <NextNProgress
-            color={brandedLightTheme.palette.primary.main}
-            options={{ showSpinner: false }}
-         />
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
                <ReactFireProviders>
