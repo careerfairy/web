@@ -317,8 +317,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const isExternalNavigation = (request: InterceptedRequest) => {
-      console.log(request.url)
-
       if (externalLinks.includes(request.url)) {
          return true
       }
@@ -335,8 +333,17 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       )
    }
 
+   const openOnWebBrowser = (url: string) => {
+      const options: WebBrowser.WebBrowserOpenOptions = {}
+
+      if (Platform.OS === "android") {
+         options.browserPackage = "com.android.chrome"
+      }
+
+      WebBrowser.openBrowserAsync(url, options)
+   }
+
    const handleNavigation = (request: InterceptedRequest) => {
-      console.log(request.url)
       if (request.url === "about:blank") {
          return false // Stop loading the blank page
       } else {
@@ -350,13 +357,13 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                ) {
                   return false
                }
-               WebBrowser.openBrowserAsync(request.url)
+               openOnWebBrowser(request.url)
             }
             return false // Prevent WebView from loading the external link
          }
 
          if (isExternalNavigation(request)) {
-            WebBrowser.openBrowserAsync(request.url)
+            openOnWebBrowser(request.url)
             return false
          }
       }
