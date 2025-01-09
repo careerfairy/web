@@ -9,6 +9,7 @@ import CircularLogo from "components/views/common/logos/CircularLogo"
 import { userRepo } from "data/RepositoryInstances"
 import Link from "next/link"
 import normalizeUrl from "normalize-url"
+import { OptionsObject } from "notistack"
 import { Fragment, useCallback, useState } from "react"
 import { ExternalLink, Link as FeatherLink } from "react-feather"
 import { useFormContext } from "react-hook-form"
@@ -75,6 +76,13 @@ const styles = sxStyles({
    },
 })
 
+const NOTIFICATION_OPTIONS: OptionsObject = {
+   anchorOrigin: {
+      vertical: "top",
+      horizontal: "left",
+   },
+}
+
 type Props = {
    showAddIcon?: boolean
 }
@@ -111,7 +119,7 @@ const FormDialogWrapper = () => {
    const dispatch = useDispatch()
    const { userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
-
+   const isMobile = useIsMobile()
    const createLinkDialogOpen = useSelector(talentProfileCreateLinkOpenSelector)
 
    const isEditingLink = useSelector(talentProfileIsEditingLinkSelector)
@@ -143,11 +151,17 @@ const FormDialogWrapper = () => {
          }
 
          handleCloseLinkDialog()
-         successNotification(`${data.id ? "Updated" : "Added a new"} link 🔗`)
+         successNotification(
+            `${data.id ? "Updated" : "Added a new"} link 🔗`,
+            undefined,
+            isMobile ? NOTIFICATION_OPTIONS : undefined
+         )
       } catch (error) {
          errorNotification(
             error,
-            "We encountered a problem while adding your link. Rest assured, we're on it!"
+            "We encountered a problem while adding your link. Rest assured, we're on it!",
+            undefined,
+            isMobile ? NOTIFICATION_OPTIONS : undefined
          )
       }
    }
@@ -238,8 +252,12 @@ const LinkCard = ({ link }: LinkCardProps) => {
 
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
-      successNotification("Link deleted")
-   }, [link, userData.id, successNotification])
+      successNotification(
+         "Link deleted",
+         undefined,
+         isMobile ? NOTIFICATION_OPTIONS : undefined
+      )
+   }, [link, userData.id, successNotification, isMobile])
 
    const linkUrlValue = normalizeUrl(
       getSubstringWithEllipsis(

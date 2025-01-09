@@ -326,16 +326,13 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
       setCurrentTab(null)
       setSwitchingTab(null)
       dispatch(setDirty({ setting: "personalInfo", dirty: false }))
+
       delete router.query["tab"]
 
-      router.push(
-         {
-            pathname: TAB_VALUES.settings.value,
-            query: router.query,
-         },
-         undefined,
-         { shallow: true }
-      )
+      router.push({
+         pathname: TAB_VALUES.settings.value,
+         query: router.query,
+      })
    }, [router, dispatch])
 
    const onBackButtonClick = useCallback(() => {
@@ -355,6 +352,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
       (option: SettingsOptions) => {
          setCurrentTab(option)
          setSwitchingTab(null)
+
          router.push({
             pathname: TAB_VALUES.settings.value,
             query: {
@@ -385,9 +383,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
             // If form is dirty, show confirmation dialog
             setIsConfirmDialogOpen(true)
             // Prevent default back behavior
-            window.history.pushState(null, "", window.location.href)
-         } else if (currentTab) {
-            // If we're in a tab but form is not dirty, return to menu
+         } else if (currentTab && isMobile) {
             onBack()
          } else {
             // If we're in the menu, close the dialog
@@ -400,7 +396,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
 
       window.addEventListener("popstate", handlePopState)
       return () => window.removeEventListener("popstate", handlePopState)
-   }, [currentTab, settingFormIsDirty, handleClose, onBack])
+   }, [currentTab, settingFormIsDirty, handleClose, onBack, isMobile])
 
    const Content = () => {
       return (
