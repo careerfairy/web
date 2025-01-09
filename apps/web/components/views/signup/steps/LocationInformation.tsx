@@ -297,7 +297,7 @@ const LocationInformationView = () => {
             <ConditionalWrapper condition={talentProfileV1}>
                <Grid item xs={12} sm={8}>
                   <Typography sx={styles.inputLabel} variant="h5">
-                     What&apos;s your location?
+                     Where are you located?
                   </Typography>
                </Grid>
                <Grid item xs={12} sm={8}>
@@ -326,6 +326,7 @@ const LocationInformationView = () => {
                   <SingleListSelect
                      inputName={"cityIsoCode"}
                      selectedItem={city}
+                     disabled={!country}
                      options={citiesOptions}
                      setFieldValue={(_, value) =>
                         handleSelectedCityChange(value)
