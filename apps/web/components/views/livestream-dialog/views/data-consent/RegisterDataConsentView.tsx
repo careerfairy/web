@@ -239,7 +239,6 @@ const GroupQuestionsForm = () => {
                                  <ActionButtons
                                     disabled={Object.keys(errors).length > 0}
                                     policiesToAccept={policiesToAccept}
-                                    onClickPrimary={handleSubmit}
                                  />
                               )}
                            </Stack>
@@ -251,7 +250,6 @@ const GroupQuestionsForm = () => {
                            <ActionButtons
                               disabled={Object.keys(errors).length > 0}
                               policiesToAccept={policiesToAccept}
-                              onClickPrimary={handleSubmit}
                            />
                         ) : null
                      }
@@ -266,14 +264,9 @@ const GroupQuestionsForm = () => {
 type ActionButtonProps = {
    disabled: boolean
    policiesToAccept: boolean
-   onClickPrimary?: () => void
 }
 
-const ActionButtons = ({
-   disabled,
-   policiesToAccept,
-   onClickPrimary,
-}: ActionButtonProps) => {
+const ActionButtons = ({ disabled, policiesToAccept }: ActionButtonProps) => {
    const { goToView, onRegisterSuccess } = useLiveStreamDialog()
 
    return (
@@ -289,7 +282,6 @@ const ActionButtons = ({
                   ? undefined
                   : () => goToView("livestream-details")
             }
-            onClickPrimary={onClickPrimary}
          />
       </Box>
    )
