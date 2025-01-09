@@ -1,15 +1,15 @@
-import { useRouter } from "next/router"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import { useCallback, useMemo, useState } from "react"
 import {
    LivestreamEvent,
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
-import { recommendationServiceInstance } from "../../../data/firebase/RecommendationService"
-import { errorLogAndNotify } from "../../../util/CommonUtil"
 import LivestreamService, {
    livestreamService,
 } from "data/firebase/LivestreamService"
+import { useRouter } from "next/router"
+import { useCallback, useMemo, useState } from "react"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import { recommendationServiceInstance } from "../../../data/firebase/RecommendationService"
+import { errorLogAndNotify } from "../../../util/CommonUtil"
 
 type UseLivestreamQuestionHandlers = {
    toggleUpvoteQuestion: (
@@ -67,9 +67,12 @@ const useLivestreamQuestionHandlers = (): UseLivestreamQuestionHandlers => {
 
    const hasUpvotedQuestion = useCallback(
       (question: LivestreamQuestion) => {
-         return question.emailOfVoters?.includes(authenticatedUser.email)
+         return (
+            question.emailOfVoters?.includes(authenticatedUser.email) ||
+            question.voterIds?.includes(authenticatedUser.uid)
+         )
       },
-      [authenticatedUser.email]
+      [authenticatedUser.email, authenticatedUser.uid]
    )
 
    return useMemo(
