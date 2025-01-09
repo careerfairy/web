@@ -1,5 +1,6 @@
 import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
 import { URL_REGEX } from "components/util/constants"
+import { DateTime } from "luxon"
 import * as yup from "yup"
 
 export const signupSchema = {
@@ -74,6 +75,7 @@ export const signupSchema = {
    startedAt: yup
       .date()
       .nullable()
+      .typeError("Please enter a valid start date")
       .when("endedAt", {
          is: (val) => val != null, // Check if endedAt has a value
          then: yup
@@ -89,7 +91,12 @@ export const signupSchema = {
          function (endedAt) {
             const { startedAt } = this.parent
             // Check if both dates are provided before validating
-            return !startedAt || !endedAt || endedAt > startedAt
+            return (
+               !startedAt ||
+               !endedAt ||
+               endedAt >=
+                  DateTime.fromJSDate(startedAt).plus({ months: 1 }).toJSDate()
+            )
          }
       )
       .typeError("Please enter a valid end date"),

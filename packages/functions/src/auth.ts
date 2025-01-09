@@ -5,11 +5,13 @@ import {
 } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/rewards"
 import {
+   StudyBackground,
    UserAccountCreationAdditionalData,
    UserData,
 } from "@careerfairy/shared-lib/users"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { FieldValue, auth, firestore } from "./api/firestoreAdmin"
+
+import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
 import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
 import config from "./config"
@@ -90,12 +92,36 @@ export const createNewUserAccount = functions
                )
                .then(async () => {
                   if (additionalData?.studyBackground) {
-                     additionalData.studyBackground.authId = user.uid
-                     await firestore
+                     const studyBackgroundRef = firestore
                         .collection("userData")
                         .doc(recipientEmail)
                         .collection("studyBackgrounds")
-                        .add(additionalData.studyBackground)
+                        .doc()
+
+                     const studyBackground: StudyBackground = {
+                        ...additionalData.studyBackground,
+                        id: studyBackgroundRef.id,
+                        authId: user.uid,
+                        startedAt: additionalData.studyBackground.startedAt
+                           ? Timestamp.fromDate(
+                                new Date(
+                                   additionalData.studyBackground.startedAt
+                                )
+                             )
+                           : null,
+                        endedAt: additionalData.studyBackground.endedAt
+                           ? Timestamp.fromDate(
+                                new Date(additionalData.studyBackground.endedAt)
+                             )
+                           : null,
+                     }
+
+                     console.log(
+                        "🚀 ~ .then ~ studyBackground:",
+                        studyBackground
+                     )
+
+                     await studyBackgroundRef.set(studyBackground)
                   }
                })
                .then(async () => {
