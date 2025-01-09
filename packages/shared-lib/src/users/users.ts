@@ -145,7 +145,10 @@ export type UserDataPersonalInfo = Pick<
 >
 
 export type UserAccountCreationAdditionalData = {
-   studyBackground?: StudyBackground
+   studyBackground?: Omit<StudyBackground, "startedAt" | "endedAt"> & {
+      startedAt?: Date
+      endedAt?: Date
+   }
 }
 
 // Collection /userData/:id/studyBackgrounds/:id
