@@ -3,8 +3,6 @@ import { Box } from "@mui/material"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
-import { useTheme } from "@mui/material/styles"
-import useMediaQuery from "@mui/material/useMediaQuery"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
@@ -206,6 +204,8 @@ const VideoPreview: FC<Props> = ({
 
    const playingVideo = Boolean(playing && !shouldPause)
 
+   const showThumbnail = !playing && !autoPlaying
+
    return (
       <Box sx={styles.root}>
          <Box
@@ -217,9 +217,8 @@ const VideoPreview: FC<Props> = ({
             <ThumbnailOverlay
                src={thumbnailUrl}
                containPreviewOnTablet={containPreviewOnTablet}
-               playing={playingVideo}
+               force={showThumbnail}
             />
-
             {light ? null : (
                <ReactPlayer
                   ref={playerRef}
@@ -251,30 +250,17 @@ const VideoPreview: FC<Props> = ({
 type ThumbnailOverlayProps = {
    src: string
    containPreviewOnTablet?: boolean
-   playing?: boolean
+   force?: boolean
 }
 
-export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
-   src,
-   containPreviewOnTablet,
-   playing,
-}) => {
-   const theme = useTheme()
-   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
-
+export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src, force }) => {
    return (
-      <Box sx={[styles.thumbnailOverlay, { zIndex: playing ? 0 : 1 }]}>
+      <Box sx={[styles.thumbnailOverlay, { zIndex: force ? 1 : 0 }]}>
          <Image
             src={src}
             layout="fill"
             quality={40}
-            objectFit={
-               containPreviewOnTablet
-                  ? isSmallScreen
-                     ? "cover"
-                     : "contain"
-                  : "cover"
-            }
+            objectFit="cover"
             alt="thumbnail"
             priority={true}
          />
