@@ -1,4 +1,6 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useAuth } from "HOCs/AuthProvider"
+import { useRouter } from "next/router"
 import {
    ReactNode,
    createContext,
@@ -7,13 +9,24 @@ import {
    useMemo,
    useState,
 } from "react"
+import { useLiveStreamDialogJobsManager } from "./useLivestreamDialogJobsManager"
 
-type JobsBlockContextType = {
+export type JobsBlockContextType = {
+   selectedJob: CustomJob
+   handleCloseJobDialog: () => void
+   handleJobCardClick: (job: CustomJob) => void
    selectedJobAreasIds: string[]
    handleSelectJobArea: (areaId: string) => void
    selectedJobTypesIds: string[]
    handleSelectJobType: (typeId: string) => void
    blockId: string
+   isLiveStreamDialogOpen: boolean
+   handleLiveStreamDialogOpen: (jobId: string, liveStreamId: string) => void
+   handleLiveStreamDialogClose: () => void
+   handleCloseCardClick: () => void
+   currentLiveStreamIdInDialog: string
+   setCurrentLiveStreamIdInDialog: (liveStreamId: string) => void
+   getLiveStreamDialogKey: () => string
 }
 
 const JobsBlockContext = createContext<JobsBlockContextType | undefined>(
@@ -30,12 +43,51 @@ export const JobsBlockProvider = ({
    blockId,
 }: JobsBlockProviderProps) => {
    const { userData } = useAuth()
+   const router = useRouter()
    const userBusinessFunctions = userData?.businessFunctionsTagIds || []
 
    const [selectedJobAreasIds, setSelectedJobAreasIds] = useState<string[]>(
       userBusinessFunctions || []
    )
    const [selectedJobTypesIds, setSelectedJobTypesIds] = useState<string[]>([])
+
+   const [selectedJob, setSelectedJob] = useState<CustomJob>(null)
+
+   const {
+      isLiveStreamDialogOpen,
+      handleLiveStreamDialogOpen,
+      handleLiveStreamDialogClose,
+      handleCloseCardClick,
+      currentLiveStreamIdInDialog,
+      setCurrentLiveStreamIdInDialog,
+      getLiveStreamDialogKey,
+   } = useLiveStreamDialogJobsManager()
+
+   const handleCloseJobDialog = useCallback(() => {
+      handleCloseCardClick()
+      setSelectedJob(null)
+   }, [handleCloseCardClick])
+
+   const handleJobCardClick = useCallback(
+      (job: CustomJob) => {
+         setSelectedJob(job)
+         void router.push(
+            {
+               pathname: router.pathname,
+               query: {
+                  ...router.query,
+                  jobId: job.id,
+               },
+            },
+            undefined,
+            {
+               scroll: false,
+               shallow: true,
+            }
+         )
+      },
+      [router]
+   )
 
    const handleSelectJobArea = useCallback(
       (areaId: string) => {
@@ -67,18 +119,38 @@ export const JobsBlockProvider = ({
 
    const contextValue = useMemo(
       () => ({
+         selectedJob,
+         handleCloseJobDialog,
+         handleJobCardClick,
          selectedJobAreasIds,
          handleSelectJobArea,
          selectedJobTypesIds,
          handleSelectJobType,
          blockId,
+         isLiveStreamDialogOpen,
+         handleLiveStreamDialogOpen,
+         handleLiveStreamDialogClose,
+         handleCloseCardClick,
+         currentLiveStreamIdInDialog,
+         setCurrentLiveStreamIdInDialog,
+         getLiveStreamDialogKey,
       }),
       [
+         selectedJob,
+         handleCloseJobDialog,
+         handleJobCardClick,
          selectedJobAreasIds,
          handleSelectJobArea,
          selectedJobTypesIds,
          handleSelectJobType,
          blockId,
+         isLiveStreamDialogOpen,
+         handleLiveStreamDialogOpen,
+         handleLiveStreamDialogClose,
+         handleCloseCardClick,
+         currentLiveStreamIdInDialog,
+         setCurrentLiveStreamIdInDialog,
+         getLiveStreamDialogKey,
       ]
    )
 
@@ -91,8 +163,5 @@ export const JobsBlockProvider = ({
 
 export const useJobsBlock = () => {
    const context = useContext(JobsBlockContext)
-   if (context === undefined) {
-      throw new Error("useJobsBlock must be used within a JobsBlockProvider")
-   }
    return context
 }

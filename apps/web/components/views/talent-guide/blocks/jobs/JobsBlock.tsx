@@ -3,7 +3,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import CircularLoader from "components/views/loader/CircularLoader"
 import { JobsBlockType } from "data/hygraph/types"
 import { sxStyles } from "types/commonTypes"
-import { JobsBlockProvider } from "./JobsBlockContext"
+import { JobsBlockProvider } from "./control/JobsBlockContext"
 import { JobsFilter } from "./JobsFilter"
 import { JobsList } from "./JobsList"
 

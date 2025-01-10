@@ -1,12 +1,14 @@
 import { BusinessFunctionsTagValues } from "@careerfairy/shared-lib/constants/tags"
 import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Button, Stack, Typography } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { BrandedCheckboxListItem } from "components/views/common/inputs/BrandedCheckbox"
+import CircularLoader from "components/views/loader/CircularLoader"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { useJobsBlock } from "./JobsBlockContext"
+import { useJobsBlock } from "./control/JobsBlockContext"
 
 const styles = sxStyles({
    filterButton: (theme) => ({
@@ -24,6 +26,9 @@ const styles = sxStyles({
    }),
    dialogTitle: {
       fontWeight: 600,
+   },
+   dialogTitleWrapper: {
+      pl: { md: 0 },
    },
 })
 
@@ -96,26 +101,28 @@ const JobAreasDialog = ({ isOpen, handleClose }: FilterDialogProps) => {
    const { selectedJobAreasIds, handleSelectJobArea } = useJobsBlock()
 
    return (
-      <ResponsiveDialogLayout open={isOpen}>
+      <ResponsiveDialogLayout open={isOpen} handleClose={handleClose}>
          <ResponsiveDialogLayout.Header
             handleClose={handleClose}
-            sx={{ pl: 0 }}
+            sx={styles.dialogTitleWrapper}
          >
             <Typography sx={styles.dialogTitle} variant="medium">
                Job Areas
             </Typography>
          </ResponsiveDialogLayout.Header>
          <ResponsiveDialogLayout.Content>
-            <Stack>
-               {BusinessFunctionsTagValues.map((tag) => (
-                  <BrandedCheckboxListItem
-                     key={tag.id}
-                     value={tag}
-                     checked={selectedJobAreasIds.includes(tag.id)}
-                     handleClick={handleSelectJobArea}
-                  />
-               ))}
-            </Stack>
+            <SuspenseWithBoundary fallback={<CircularLoader />}>
+               <Stack>
+                  {BusinessFunctionsTagValues.map((tag) => (
+                     <BrandedCheckboxListItem
+                        key={tag.id}
+                        value={tag}
+                        checked={selectedJobAreasIds.includes(tag.id)}
+                        handleClick={handleSelectJobArea}
+                     />
+                  ))}
+               </Stack>
+            </SuspenseWithBoundary>
          </ResponsiveDialogLayout.Content>
       </ResponsiveDialogLayout>
    )
@@ -125,26 +132,28 @@ const JobTypesDialog = ({ isOpen, handleClose }: FilterDialogProps) => {
    const { selectedJobTypesIds, handleSelectJobType } = useJobsBlock()
 
    return (
-      <ResponsiveDialogLayout open={isOpen}>
+      <ResponsiveDialogLayout open={isOpen} handleClose={handleClose}>
          <ResponsiveDialogLayout.Header
             handleClose={handleClose}
-            sx={{ pl: 0 }}
+            sx={styles.dialogTitleWrapper}
          >
             <Typography sx={styles.dialogTitle} variant="medium">
                Job Types
             </Typography>
          </ResponsiveDialogLayout.Header>
          <ResponsiveDialogLayout.Content>
-            <Stack>
-               {jobTypeOptions.map(({ id, label }) => (
-                  <BrandedCheckboxListItem
-                     key={id}
-                     value={{ id: id, name: label }}
-                     checked={selectedJobTypesIds.includes(id)}
-                     handleClick={handleSelectJobType}
-                  />
-               ))}
-            </Stack>
+            <SuspenseWithBoundary fallback={<CircularLoader />}>
+               <Stack>
+                  {jobTypeOptions.map(({ id, label }) => (
+                     <BrandedCheckboxListItem
+                        key={id}
+                        value={{ id: id, name: label }}
+                        checked={selectedJobTypesIds.includes(id)}
+                        handleClick={handleSelectJobType}
+                     />
+                  ))}
+               </Stack>
+            </SuspenseWithBoundary>
          </ResponsiveDialogLayout.Content>
       </ResponsiveDialogLayout>
    )
