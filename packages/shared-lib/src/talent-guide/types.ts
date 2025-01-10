@@ -30,6 +30,7 @@ export interface TalentGuideProgress extends Identifiable {
    // Engagement metrics
    totalVisits: number
    lastVisitedAt: Timestamp | null
+   restartCount: number
 }
 
 export const QUIZ_STATE = {

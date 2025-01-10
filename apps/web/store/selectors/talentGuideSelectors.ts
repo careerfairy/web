@@ -73,3 +73,9 @@ export const useTalentGuideState = () =>
 
 export const useModuleData = () =>
    useAppSelector((state) => state.talentGuide.moduleData)
+
+export const useModuleId = () =>
+   useAppSelector((state) => state.talentGuide.moduleData?.content.id)
+
+export const useIsRestartingModule = () =>
+   useAppSelector((state) => state.talentGuide.isRestartingModule)
