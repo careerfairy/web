@@ -20,7 +20,7 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       width: 343,
-      zIndex: (theme) => theme.zIndex.drawer + 2,
+      zIndex: (theme) => theme.zIndex.appBar + 2,
    },
    buttonOffset: {
       height: {

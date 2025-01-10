@@ -8,7 +8,7 @@ import {
 import { styled } from "@mui/material/styles"
 import { useField } from "formik"
 import { FC, ReactElement } from "react"
-import BrandedCheckbox from "./BrandedCheckbox"
+import { BrandedCheckbox } from "./BrandedCheckbox"
 import BrandedTextField, {
    BrandedTextFieldProps,
    FormBrandedTextField,
