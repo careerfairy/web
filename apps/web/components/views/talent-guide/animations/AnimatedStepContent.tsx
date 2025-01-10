@@ -90,7 +90,7 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
                      initial="hidden"
                      animate="visible"
                      exit="exit"
-                     data-testid={`talent-guide-step-${index}`}
+                     data-testid={`levels-step-${index}`}
                      onAnimationComplete={() => {
                         if (numberOfSteps === 1) return // Don't scroll if there is only one step rendered
                         handleAnimationComplete(isLastStep)

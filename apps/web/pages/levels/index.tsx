@@ -19,7 +19,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ slugs }) => {
          <ul>
             {slugs.map((slug) => (
                <li key={slug}>
-                  <Link locale={locale} href={`/talent-guide/${slug}`}>
+                  <Link locale={locale} href={`/levels/${slug}`}>
                      {slug}
                   </Link>
                </li>
