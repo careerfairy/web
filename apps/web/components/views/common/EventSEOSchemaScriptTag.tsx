@@ -1,15 +1,19 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import { Event } from "schema-dts"
 import {
    addMinutes,
+   getBaseUrl,
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions"
 
 interface EventSEOProps {
    event: LivestreamEvent
 }
+
+const nextYear = new Date().getFullYear() + 1
+
 const EventSEOSchemaScriptTag = ({ event }: EventSEOProps) => {
    const data = useMemo(
       () => ({
@@ -17,7 +21,7 @@ const EventSEOSchemaScriptTag = ({ event }: EventSEOProps) => {
             ? new Date(event?.startDate)
             : event.start
             ? event.start.toDate?.()
-            : new Date(),
+            : new Date(nextYear, 0, 8, 14, 1, 0), // Use a fixed date for placeholder events
          eventCompanyImageUrl: getResizedUrl(event?.companyLogoUrl, "md"),
          companyImageXSmall: getResizedUrl(event?.companyLogoUrl, "xs"),
          companyImageSmall: getResizedUrl(event?.companyLogoUrl, "sm"),
@@ -26,11 +30,14 @@ const EventSEOSchemaScriptTag = ({ event }: EventSEOProps) => {
          eventName: event?.title,
          eventDescription: event?.summary,
          eventCompanyName: event?.company,
-         url: makeLivestreamEventDetailsUrl(event?.id),
+         url: makeLivestreamEventDetailsUrl(event?.id, {
+            overrideBaseUrl: getBaseUrl(),
+         }),
          duration: event?.duration || 60,
       }),
       [event]
    )
+
    const eventSchema: Event = {
       "@type": "Event",
       name: data.eventName,

@@ -15,9 +15,9 @@ service cloud.firestore {
         }
 
         function allowIncrementField(field) {
-            return request.resource.data.keys() == [field]
-                   && (resource == null || request.resource.data[field] ==
-                                           resource.data[field] + 1);
+            return request.resource.data.diff(resource.data).affectedKeys().hasOnly([field])
+                && request.resource.data[field] is int
+                && request.resource.data[field] == resource.data[field] + 1;
         }
 
         function isSignedIn() {

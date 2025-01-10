@@ -258,7 +258,8 @@ export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src, force }) => {
       <Box sx={[styles.thumbnailOverlay, { zIndex: force ? 1 : 0 }]}>
          <Image
             src={src}
-            layout="fill"
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             quality={40}
             objectFit="cover"
             alt="thumbnail"
