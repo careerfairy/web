@@ -44,7 +44,7 @@ const styles = sxStyles({
    },
 })
 
-const RecommendedCustomJobs = () => {
+export const RecommendedCustomJobs = () => {
    const featureFlags = useFeatureFlags()
    const { isLoggedOut } = useAuth()
    if (!featureFlags.jobHubV1) return null
@@ -110,5 +110,3 @@ export const RecommendedCustomJobsSkeleton = () => {
       </Stack>
    )
 }
-
-export default RecommendedCustomJobs

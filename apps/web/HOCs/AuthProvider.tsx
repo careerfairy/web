@@ -67,8 +67,10 @@ const AuthProvider = ({ children }) => {
    const { pathname, replace, asPath } = useRouter()
    const firebaseService = useFirebaseService()
    const [claims, setClaims] = useState<{ [p: string]: any }>(null)
-   const [isLoggedIn, setIsLoggedIn] = useState(auth.isLoaded && !auth.isEmpty)
-   const [isLoggedOut, setIsLoggedOut] = useState(auth.isLoaded && auth.isEmpty)
+   const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>(undefined)
+   const [isLoggedOut, setIsLoggedOut] = useState<boolean | undefined>(
+      undefined
+   )
 
    const query = useMemo(
       () =>
@@ -92,12 +94,12 @@ const AuthProvider = ({ children }) => {
    useFirestoreConnect(query)
 
    const userData = useSelector(({ firestore }: RootState) =>
-      isLoggedOut ? undefined : firestore.data["userProfile"]
+      isLoggedIn ? firestore.data["userProfile"] : undefined
    )
    const prevUserData = usePreviousDistinct<UserData>(userData)
 
    const userStats = useSelector(({ firestore }: RootState) =>
-      isLoggedOut ? null : firestore.data["userStats"]
+      isLoggedIn ? firestore.data["userStats"] : undefined
    )
 
    useEffect(() => {

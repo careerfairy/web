@@ -22,6 +22,7 @@ export const getHost = (): string => {
 type OptionsMakeLivestreamEventUrl = {
    section?: "portal" | "next-livestreams"
    relative?: boolean
+   overrideBaseUrl?: string
 }
 
 /**
@@ -37,10 +38,10 @@ export const makeLivestreamEventDetailsUrl = (
       ...options,
    }
 
-   let url: string = `/${options.section}/livestream/${livestreamId}`
+   let url = `/${options.section}/livestream/${livestreamId}`
 
    if (options.relative === false) {
-      url = `${getHost()}${url}`
+      url = `${options.overrideBaseUrl || getHost()}${url}`
    }
 
    return url

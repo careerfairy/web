@@ -112,6 +112,7 @@ const config: PlaywrightTestConfig = {
          APP_ENV: "test",
          NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
             process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
+         NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
       },
       port: 3000,
       // emulators need some time to boot
