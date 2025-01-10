@@ -8,7 +8,7 @@
    ],
    "scripts": {
       "build": "turbo run build",
-      "dev": "turbo run dev --parallel",
+      "dev": "turbo run dev --parallel --filter=!@careerfairy/mobile",
       "test": "turbo test",
       "clean": "turbo run clean",
       "clean-packages-dist": "func() { rimraf packages/\"$1\"/dist; }; func",

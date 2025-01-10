@@ -135,6 +135,8 @@ test.describe("Company page follow", () => {
          groupPage.page.getByTestId(`unfollow-button-${group.id}`)
       ).toBeVisible()
 
+      await groupPage.page.waitForTimeout(1000) // Give db time to update
+
       // get user followed companies
       const followedCompanies = await UserSeed.getUserFollowedCompanies(
          user.userEmail

@@ -227,12 +227,12 @@ export const JobButton: FC<JobButtonProps> = ({
    ...props
 }) => {
    const isAtsJob = useIsAtsJob(job)
-   const { isLoggedOut } = useAuth()
+   const { isLoggedIn } = useAuth()
 
    return (
       <>
          {isAtsJob ? (
-            !isLoggedOut && (
+            isLoggedIn && (
                <JobCTAButton
                   livestreamId={livestreamId}
                   job={job as Job}

@@ -19,12 +19,17 @@ const buildDescription = (parts: string[], eventLink: string): string => {
    return description.replace(EVENT_LINK_PLACEHOLDER, eventLink)
 }
 
+type OptionsGenerateCalendarEventProperties = {
+   overrideBaseUrl?: string
+}
+
 export const generateCalendarEventProperties = (
    livestream: LivestreamEvent,
-   customUtm?: Partial<AddUtmTagsToLinkProps>
+   customUtm?: Partial<AddUtmTagsToLinkProps>,
+   options?: OptionsGenerateCalendarEventProperties
 ) => {
    const livestreamStartDate = DateTime.fromJSDate(livestream.start.toDate())
-   const livestreamUrl = makeLivestreamEventDetailsUrl(livestream.id)
+   const livestreamUrl = makeLivestreamEventDetailsUrl(livestream.id, options)
    const linkWithUTM = addUtmTagsToLink({
       link: livestreamUrl,
       campaign: "fromCalendarEvent",

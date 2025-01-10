@@ -16,7 +16,6 @@ import { FC, MouseEvent, useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
-import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import { Reply } from "@mui/icons-material"
 import { useAuth } from "HOCs/AuthProvider"
 import useUserSparkLike from "components/custom-hook/spark/useUserSparkLike"
@@ -28,6 +27,7 @@ import {
    SocialPlatformType,
 } from "components/custom-hook/useSocials"
 import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import LikeIcon from "components/views/common/icons/LikeIcon"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
@@ -435,7 +435,7 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId, utmMedium }) => {
    const { trackEvent } = useSparksFeedTracker()
 
    const shareUrl = useMemo(() => {
-      return `${getHost()}/sparks/${sparkId}?referral=${
+      return `${getBaseUrl()}/sparks/${sparkId}?referral=${
          userData?.referralCode
       }&invite=${sparkId}&utm_medium=${utmMedium}&utm_campaign=sparks`
    }, [sparkId, userData?.referralCode, utmMedium])

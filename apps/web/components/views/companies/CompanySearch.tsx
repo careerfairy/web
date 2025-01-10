@@ -188,7 +188,7 @@ const CompanySearch = () => {
       return data?.flatMap((page) => page.deserializedHits)
    }, [data])
 
-   const firstPage = data?.[0].deserializedHits
+   const firstPage = data?.[0].deserializedHits || []
 
    const isValidatingRef = useRef(isValidating)
    isValidatingRef.current = isValidating

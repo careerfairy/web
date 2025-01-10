@@ -91,7 +91,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
       if (inputTooSmall) {
          return []
       }
-      return options
+      return options || []
    }, [inputTooSmall, options])
 
    const onChange = useCallback(

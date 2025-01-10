@@ -70,6 +70,9 @@ export default class LivestreamDialogPage extends CommonPage {
       joinTalentPool?: boolean
       questionsViewArgs?: CompleteLivestreamQuestionsViewOptions
    } = {}) {
+      // Wait for dialog to open fully
+      await this.page.waitForTimeout(500)
+
       // register
       await this.clickRegistrationButton()
 
