@@ -197,7 +197,7 @@ const TestStreamingPage = () => {
                testSpeakers
             )
             .then(() => {
-               router.push("/streaming/" + livestreamRef.id + "/main-streamer")
+               router.push("/streaming/host/" + livestreamRef.id)
             })
       } catch (e) {
          console.log(e)

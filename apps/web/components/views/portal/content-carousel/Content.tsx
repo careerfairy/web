@@ -179,6 +179,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
                         objectFit={"cover"}
                         quality={90}
                         style={styles.image}
+                        priority
                      />
                   )}
                </Box>

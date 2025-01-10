@@ -567,7 +567,7 @@ export class GroupDashboardPage extends CommonPage {
       }
 
       await expect(filteredCards).toBeVisible({
-         timeout: 15000, // Give the trigger functions some time buffer to sync the live stream stats
+         timeout: 20000, // Give the trigger functions some time buffer to sync the live stream stats
       })
    }
 

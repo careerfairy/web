@@ -1,14 +1,11 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
-import {
-   getHost,
-   makeLivestreamEventDetailsUrl,
-} from "@careerfairy/shared-lib/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
 
 export const makeGroupCompanyPageUrl = (group: Group) => {
-   return `${getHost()}/company/${companyNameSlugify(group.universityName)}`
+   return `${getBaseUrl()}/company/${companyNameSlugify(group.universityName)}`
 }
 
 export const makeLivestreamEventDetailsInviteUrl = (
@@ -16,13 +13,15 @@ export const makeLivestreamEventDetailsInviteUrl = (
    referralCode
 ) => {
    return (
-      makeLivestreamEventDetailsUrl(livestreamId) +
+      makeLivestreamEventDetailsUrl(livestreamId, {
+         overrideBaseUrl: getBaseUrl(),
+      }) +
       `?${queryReferralCode}=${referralCode}&${queryInvite}=${livestreamId}`
    )
 }
 
 export const makeReferralUrl = (userReferralCode) => {
-   return `${getHost()}/?${queryReferralCode}=${userReferralCode}`
+   return `${getBaseUrl()}/?${queryReferralCode}=${userReferralCode}`
 }
 
 type LivestreamURLOptions = {

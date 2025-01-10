@@ -9,7 +9,7 @@ import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import SanitizedHTML from "components/util/SanitizedHTML"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import Image from "next/legacy/image"
+import Image from "next/image"
 import { FC, useMemo } from "react"
 import { ChevronRight as MoreIcon } from "react-feather"
 import { sxStyles } from "../../../../../../types/commonTypes"
@@ -106,6 +106,9 @@ const styles = sxStyles({
       width: 32,
       ml: 1,
    },
+   backgroundImage: {
+      objectFit: "cover",
+   },
 })
 
 const LOGO_SIZE = 120
@@ -150,11 +153,11 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
             <CardMedia sx={styles.media}>
                <Image
                   src={getResizedUrl(presenter.backgroundImageUrl, "lg")}
-                  width={205}
-                  height={205}
-                  layout="fill"
+                  fill
                   alt="Thumbnail"
-                  objectFit="cover"
+                  style={styles.backgroundImage}
+                  priority
+                  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
                />
                <Box sx={styles.overlay} />
                <Box sx={styles.logoWrapper}>

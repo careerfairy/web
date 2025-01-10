@@ -1,7 +1,7 @@
 import { ButtonProps } from "@mui/material"
-import React, { FC } from "react"
 import Button from "@mui/material/Button"
-import Link from "../../common/Link"
+import Link from "next/link"
+import { FC } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 
 const styles = sxStyles({
@@ -13,14 +13,37 @@ const styles = sxStyles({
 
 type WatchRecordingButtonProps = ButtonProps & {
    target?: string
+   href?: string
+   shallow?: boolean
 }
+
 const ContentButton: FC<WatchRecordingButtonProps> = ({
    onClick,
    color = "primary",
    href,
+   target,
    children,
+   shallow,
    ...props
 }) => {
+   if (href) {
+      return (
+         <Link href={href} target={target} shallow={shallow}>
+            <Button
+               onClick={onClick}
+               sx={styles.button}
+               variant={"contained"}
+               color={color}
+               disableRipple
+               size={"large"}
+               {...props}
+            >
+               {children}
+            </Button>
+         </Link>
+      )
+   }
+
    return (
       <Button
          onClick={onClick}
@@ -29,9 +52,6 @@ const ContentButton: FC<WatchRecordingButtonProps> = ({
          color={color}
          disableRipple
          size={"large"}
-         // @ts-ignore
-         component={href ? Link : "button"}
-         href={href}
          {...props}
       >
          {children}

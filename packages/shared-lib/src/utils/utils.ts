@@ -342,15 +342,21 @@ export const makeUrls = function (
    }
 }
 
+type OptionsCreateCalendarEvent = {
+   overrideBaseUrl?: string
+}
+
 export const createCalendarEvent = (
    livestream: LivestreamEvent,
-   customUtm?: Partial<AddUtmTagsToLinkProps>
+   customUtm?: Partial<AddUtmTagsToLinkProps>,
+   options?: OptionsCreateCalendarEvent
 ) => {
    if (!livestream) return null
 
    const calendarEventProps = generateCalendarEventProperties(
       livestream,
-      customUtm
+      customUtm,
+      options
    )
 
    return {

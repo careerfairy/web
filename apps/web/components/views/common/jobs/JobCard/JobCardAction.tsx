@@ -82,6 +82,7 @@ export const JobButtonAction = ({ published, smallCard = false }) => {
             isMobile ? styles.smallButton : styles.button,
             styles.inlineButton,
          ]}
+         component="div"
       >
          Check details
       </Button>

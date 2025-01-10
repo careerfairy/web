@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
-import { useMemo, useState } from "react"
+import { Fragment, useMemo, useState } from "react"
 import SEO from "../../components/util/SEO"
 import CarouselContentService, {
    filterNonRegisteredStreams,
@@ -42,8 +42,11 @@ import EventsPreviewCarousel, {
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
 import { UserSparksCarousel } from "components/views/portal/sparks/UserSparksCarousel"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
-import dynamic from "next/dynamic"
 import { sxStyles } from "types/commonTypes"
+import {
+   RecommendedCustomJobs,
+   RecommendedCustomJobsSkeleton,
+} from "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
@@ -61,16 +64,6 @@ const styles = sxStyles({
 })
 
 const DIALOG_SOURCE = "livestreamDialog"
-
-const RecommendedCustomJobs = dynamic(
-   () =>
-      import(
-         "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
-      ),
-   {
-      ssr: false,
-   }
-)
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -114,7 +107,7 @@ const PortalPage = ({
    }
 
    return (
-      <>
+      <Fragment>
          <SEO
             id={"CareerFairy | Portal"}
             description={
@@ -123,7 +116,7 @@ const PortalPage = ({
             title={"CareerFairy | Portal"}
          />
          <GenericDashboardLayout pageDisplayName={""} isPortalPage={true}>
-            <>
+            <Fragment>
                <LivestreamDialogLayout
                   livestreamDialogData={livestreamDialogData}
                >
@@ -135,66 +128,68 @@ const PortalPage = ({
                      }}
                      dialogSource={DIALOG_SOURCE}
                   >
-                     <>
-                        <Container disableGutters sx={{ overflow: "hidden" }}>
-                           <ContentCarousel
-                              content={carouselContent}
-                              serverUserStats={serverUserStats}
-                           />
-                        </Container>
-                        <Container disableGutters>
-                           <PortalTagsContent>
-                              {isMounted ? (
-                                 <SuspenseWithBoundary
-                                    fallback={<SparksLoadingFallback />}
-                                 >
-                                    <UserSparksCarousel
-                                       header={
-                                          <Typography
-                                             variant="brandedH4"
-                                             color="neutral.800"
-                                             fontWeight="600"
-                                          >
-                                             Sparks
-                                          </Typography>
-                                       }
-                                       handleSparksClicked={handleSparksClicked}
-                                       containerSx={styles.sparksCarousel}
-                                       headerSx={styles.sparksCarouselHeader}
-                                    />
-                                 </SuspenseWithBoundary>
-                              ) : (
-                                 <SparksLoadingFallback />
-                              )}
-                              {hasInterests ? (
-                                 <RecommendedEvents limit={10} />
-                              ) : null}
-                              <ComingUpNextEvents
-                                 serverSideEvents={comingUpNext}
-                                 limit={20}
-                              />
-                              <RecommendedCustomJobs />
-                              <MyNextEvents />
-                              <ConditionalWrapper
-                                 condition={Boolean(events?.length)}
+                     <Container disableGutters sx={{ overflow: "hidden" }}>
+                        <ContentCarousel
+                           content={carouselContent}
+                           serverUserStats={serverUserStats}
+                        />
+                     </Container>
+                     <Container disableGutters>
+                        <PortalTagsContent>
+                           {isMounted ? (
+                              <SuspenseWithBoundary
+                                 fallback={<SparksLoadingFallback />}
                               >
-                                 <EventsPreviewCarousel
-                                    id={"past-events"}
-                                    title={"Past live streams"}
-                                    type={EventsTypes.PAST_EVENTS}
-                                    events={events}
-                                    seeMoreLink={"/past-livestreams"}
+                                 <UserSparksCarousel
+                                    header={
+                                       <Typography
+                                          variant="brandedH4"
+                                          color="neutral.800"
+                                          fontWeight="600"
+                                       >
+                                          Sparks
+                                       </Typography>
+                                    }
+                                    handleSparksClicked={handleSparksClicked}
+                                    containerSx={styles.sparksCarousel}
+                                    headerSx={styles.sparksCarouselHeader}
                                  />
-                              </ConditionalWrapper>
-                           </PortalTagsContent>
-                        </Container>
-                     </>
+                              </SuspenseWithBoundary>
+                           ) : (
+                              <SparksLoadingFallback />
+                           )}
+                           {hasInterests ? (
+                              <RecommendedEvents limit={10} />
+                           ) : null}
+                           <ComingUpNextEvents
+                              serverSideEvents={comingUpNext}
+                              limit={20}
+                           />
+                           {isMounted ? (
+                              <RecommendedCustomJobs />
+                           ) : (
+                              <RecommendedCustomJobsSkeleton />
+                           )}
+                           <MyNextEvents />
+                           <ConditionalWrapper
+                              condition={Boolean(events?.length)}
+                           >
+                              <EventsPreviewCarousel
+                                 id={"past-events"}
+                                 title={"Past live streams"}
+                                 type={EventsTypes.PAST_EVENTS}
+                                 events={events}
+                                 seeMoreLink={"/past-livestreams"}
+                              />
+                           </ConditionalWrapper>
+                        </PortalTagsContent>
+                     </Container>
                   </CustomJobDialogLayout>
                </LivestreamDialogLayout>
                <WelcomeDialogContainer />
-            </>
+            </Fragment>
          </GenericDashboardLayout>
-      </>
+      </Fragment>
    )
 }
 
