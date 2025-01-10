@@ -75,6 +75,8 @@ const csp = {
       "https://www.googleadservices.com", // Google Ads services
       "https://cdn.prod.website-files.com", // Webflow
       "https://infrd.com",
+      "https://infird.com",
+      "https://*.infird.com",
       "https://unpkg.com", // Added for dotlottie-wc script
    ],
    "style-src": [
@@ -158,6 +160,7 @@ const csp = {
       "https://hooks.stripe.com",
       "https://td.doubleclick.net", // Google Ads services
       "https://www.googletagmanager.com",
+      "https://careerfairy-e1fd9.firebaseapp.com",
    ],
    "font-src": [
       "'self'",

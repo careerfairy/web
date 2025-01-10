@@ -117,7 +117,13 @@ export class CommonPage {
          livestream.groupQuestionsMap
       )) {
          for (const question of Object.values(groupQuestions.questions)) {
-            const inputId = `#${groupQuestions.groupId}\\.questions\\.${question.id}\\.selectedOptionId`
+            const rawInputId = `${groupQuestions.groupId}.questions.${question.id}.selectedOptionId`
+            // Escape CSS selector using page.evaluate to access browser APIs
+            const inputId = await this.page.evaluate(
+               // We need to escape the id because it can start with a number and that is not allowed in CSS
+               (id) => `#${CSS.escape(id)}`,
+               rawInputId
+            )
 
             const options = Object.values(question.options)
             const randomOption =

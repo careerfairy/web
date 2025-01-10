@@ -45,6 +45,7 @@ import {
 import { createCalendarEvent, makeUrls } from "@careerfairy/shared-lib/utils"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
@@ -301,7 +302,9 @@ class FirebaseService {
             "sendLivestreamRegistrationConfirmationEmail_v4"
          )
 
-      const calendarEvent = createCalendarEvent(livestream)
+      const calendarEvent = createCalendarEvent(livestream, undefined, {
+         overrideBaseUrl: getBaseUrl(),
+      })
 
       const urls = makeUrls(calendarEvent, errorLogAndNotify)
 
@@ -354,7 +357,9 @@ class FirebaseService {
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
          event_address: event.address,
-         livestream_link: makeLivestreamEventDetailsUrl(event.id),
+         livestream_link: makeLivestreamEventDetailsUrl(event.id, {
+            overrideBaseUrl: getBaseUrl(),
+         }),
       })
    }
 
@@ -3040,29 +3045,14 @@ class FirebaseService {
          .collection("impressions")
          .add(data)
 
-      // Don't use the distributed counter for emulators
-      if (shouldUseEmulators()) {
-         // TODO: Disabled for causing perfomance issues in development
-         // const toUpdate: Pick<
-         //    LivestreamEvent,
-         //    "impressions" | "recommendedImpressions"
-         // > = {
-         //    impressions: firebase.firestore.FieldValue.increment(1) as any,
-         // }
-         // if (impressionData.isRecommended) {
-         //    toUpdate.recommendedImpressions =
-         //       firebase.firestore.FieldValue.increment(1) as any
-         // }
-         //
-         // return streamRef.update(toUpdate)
-      } else {
-         impressionsCounter.incrementBy(1).catch(console.error)
+      const isProduction = !shouldUseEmulators()
 
+      if (isProduction) {
+         // Affects performance in development, so only do it in production
+         impressionsCounter.incrementBy(1).catch(console.error)
          if (impressionData.isRecommended) {
-            // If the impression is recommended, increment the recommended impressions counter
             recommendedImpressionsCounter.incrementBy(1).catch(console.error)
          }
-         return
       }
    }
 
