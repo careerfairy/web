@@ -12,7 +12,7 @@ import { Camera } from "expo-camera"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
 import * as WebBrowser from "expo-web-browser"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
    AppState,
    BackHandler,
@@ -174,6 +174,21 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
    }, [])
 
+   const [defaultBrowser, setDefaultBrowser] = useState<string | null>(null)
+
+   useEffect(() => {
+      const getDefaultBrowser = async () => {
+         const browsers =
+            await WebBrowser.getCustomTabsSupportingBrowsersAsync()
+         if (browsers.browserPackages?.length > 0) {
+            setDefaultBrowser(
+               browsers.defaultBrowserPackage || browsers.browserPackages[0]
+            )
+         }
+      }
+      getDefaultBrowser()
+   }, [])
+
    const requestPermissions = async () => {
       try {
          const audioGranted = hasAudioPermissions
@@ -333,15 +348,18 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       )
    }
 
-   const openOnWebBrowser = (url: string) => {
-      const options: WebBrowser.WebBrowserOpenOptions = {}
+   const openOnWebBrowser = useCallback(
+      (url: string) => {
+         const options: WebBrowser.WebBrowserOpenOptions = {}
 
-      if (Platform.OS === "android") {
-         options.browserPackage = "com.android.chrome"
-      }
+         if (Platform.OS === "android" && defaultBrowser) {
+            options.browserPackage = defaultBrowser
+         }
 
-      WebBrowser.openBrowserAsync(url, options)
-   }
+         WebBrowser.openBrowserAsync(url, options)
+      },
+      [defaultBrowser]
+   )
 
    const handleNavigation = (request: InterceptedRequest) => {
       if (request.url === "about:blank") {
