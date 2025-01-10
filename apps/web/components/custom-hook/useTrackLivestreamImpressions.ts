@@ -4,14 +4,8 @@ import { useInView } from "react-intersection-observer"
 import {
    ImpressionLocation,
    LivestreamEvent,
-   LivestreamImpression,
-   pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
-import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import { useRouter } from "next/router"
-import { useMemo } from "react"
-import { useAuth } from "../../HOCs/AuthProvider"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 
 type Props = {
@@ -26,40 +20,12 @@ const useTrackLivestreamImpressions = ({
    event,
    numberOfResults,
    positionInResults,
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    isRecommended,
    location = ImpressionLocation.unknown,
    disableTracking,
 }: Props) => {
-   const { pathname, asPath } = useRouter()
-   const { userData } = useAuth()
-   const firebase = useFirebaseService()
-
-   const metaData = useMemo<Omit<LivestreamImpression, "createdAt" | "id">>(
-      () => ({
-         eventId: event?.id,
-         eventTitle: event?.title,
-         pathname,
-         livestream: event ? pickPublicDataFromLivestream(event) : null,
-         isRecommended: isRecommended ?? false,
-         livestreamId: event?.id,
-         user: userData ? pickPublicDataFromUser(userData) : null,
-         userId: userData?.id ?? null,
-         numberOfResults: numberOfResults || 0,
-         positionInResults: positionInResults || 0,
-         location,
-         asPath,
-      }),
-      [
-         asPath,
-         event,
-         isRecommended,
-         location,
-         numberOfResults,
-         pathname,
-         positionInResults,
-         userData,
-      ]
-   )
+   const { pathname } = useRouter()
 
    const { ref } = useInView({
       triggerOnce: true, // only ever trigger once per element
@@ -78,7 +44,7 @@ const useTrackLivestreamImpressions = ({
 
             // Store the impression in the database.
             // This is a good place to use the `metaData` object.
-            firebase.addImpression(event.id, metaData).catch(console.error)
+            // firebase.addImpression(event.id, metaData).catch(console.error)
          }
       },
    })
