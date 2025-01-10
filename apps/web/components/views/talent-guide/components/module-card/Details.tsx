@@ -14,7 +14,7 @@ const styles = sxStyles({
    },
    description: {
       color: "inherit",
-      ...getMaxLineStyles(5),
+      ...getMaxLineStyles(4),
    },
 })
 
