@@ -28,7 +28,7 @@ const styles = sxStyles({
 })
 
 const NewsletterSection = () => {
-   const { userData, isLoggedIn, isLoggedOut } = useAuth()
+   const { userData, isLoggedIn } = useAuth()
    const { editMode } = useCompanyPage()
    const { asPath } = useRouter()
    const { errorNotification } = useSnackbarNotifications()
@@ -75,12 +75,21 @@ const NewsletterSection = () => {
                textAlign="center"
                mx={1}
             >
-               {isLoggedOut
-                  ? "Create an account to receive personalised invitations to career live streams and job openings"
-                  : "Sign up for our weekly update and receive personalised invitations to career live streams and job openings"}
+               {isLoggedIn
+                  ? "Sign up for our weekly update and receive personalised invitations to career live streams and job openings"
+                  : "Create an account to receive personalised invitations to career live streams and job openings"}
             </Typography>
             <Box mt={4}>
-               {isLoggedOut ? (
+               {isLoggedIn ? (
+                  <Button
+                     onClick={handleAcceptNewsletter}
+                     variant={"contained"}
+                     color={"secondary"}
+                     size={"large"}
+                  >
+                     SIGN ME UP
+                  </Button>
+               ) : (
                   <Link
                      noLinkStyle
                      href={{
@@ -98,15 +107,6 @@ const NewsletterSection = () => {
                         Join CareerFairy
                      </Button>
                   </Link>
-               ) : (
-                  <Button
-                     onClick={handleAcceptNewsletter}
-                     variant={"contained"}
-                     color={"secondary"}
-                     size={"large"}
-                  >
-                     SIGN ME UP
-                  </Button>
                )}
             </Box>
          </Box>

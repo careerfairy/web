@@ -10,6 +10,7 @@ import {
    Menu,
    MenuItem,
 } from "@mui/material"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { memo, useCallback, useMemo, useState } from "react"
 import {
    appleIcon,
@@ -117,9 +118,15 @@ export const AddToCalendar = memo(function AddToCalendar({
    const urls = useMemo(
       () =>
          makeUrls(
-            createCalendarEvent(event, {
-               medium: "add-to-calendar-register-confirmation",
-            })
+            createCalendarEvent(
+               event,
+               {
+                  medium: "add-to-calendar-register-confirmation",
+               },
+               {
+                  overrideBaseUrl: getBaseUrl(),
+               }
+            )
          ),
       [event]
    )

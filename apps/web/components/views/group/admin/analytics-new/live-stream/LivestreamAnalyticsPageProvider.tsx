@@ -1,4 +1,11 @@
-import React, {
+import {
+   FieldOfStudy,
+   LevelOfStudy,
+} from "@careerfairy/shared-lib/fieldOfStudy"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { createLookup } from "@careerfairy/shared-lib/utils"
+import { useRouter } from "next/router"
+import {
    createContext,
    Dispatch,
    SetStateAction,
@@ -7,24 +14,17 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import {
-   FieldOfStudy,
-   LevelOfStudy,
-} from "@careerfairy/shared-lib/fieldOfStudy"
-import { useFirestoreCollection } from "../../../../../custom-hook/utils/useFirestoreCollection"
-import { createLookup } from "@careerfairy/shared-lib/utils"
-import { useRouter } from "next/router"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
-import useClosestLivestreamStats from "./useClosestLivestreamStats"
 import useGroupLivestreamStat from "../../../../../custom-hook/live-stream/useGroupLivestreamStat"
+import { useFirestoreCollection } from "../../../../../custom-hook/utils/useFirestoreCollection"
+import useClosestLivestreamStats from "./useClosestLivestreamStats"
 
 export const userTypes = [
    { value: "registrations", label: "Registrations" },
    { value: "participants", label: "Participants" },
 ] as const
 
-export type LivestreamUserType = typeof userTypes[number]["value"]
+export type LivestreamUserType = (typeof userTypes)[number]["value"]
 
 /**
  * Loading status:
@@ -74,7 +74,10 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
    const [userType, setUserType] = useState<LivestreamUserType>(initialUserType)
 
    const { isLoading: isClosestStreamLoading, closestLivestreamId } =
-      useClosestLivestreamStats(group.id, isOnBasePage)
+      useClosestLivestreamStats(group.id, {
+         shouldFetch: isOnBasePage,
+         refreshInterval: 3000,
+      })
 
    const { data: fieldsOfStudy } = useFirestoreCollection<FieldOfStudy>(
       "fieldsOfStudy",

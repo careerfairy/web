@@ -1,14 +1,18 @@
-import { useRouter } from "next/router"
 import "firebase/firestore"
-import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
-import useSWR from "swr"
-import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
+import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
+import useSWR, { SWRConfiguration } from "swr"
+import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
+import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
 
 type Return = {
    isLoading: boolean // Whether the closest livestream is being fetched
    closestLivestreamId: string | null // The ID of the closest livestream or null if there are no upcoming or past livestreams
 }
+
+type Options = {
+   shouldFetch: boolean
+} & SWRConfiguration
 
 /**
  * Hook to fetch the closest livestream stats for a group
@@ -19,7 +23,7 @@ type Return = {
  */
 const useClosestLivestreamStats = (
    groupId: string,
-   shouldFetch: boolean
+   { shouldFetch, ...options }: Options
 ): Return => {
    const { replace } = useRouter()
    const [isRedirecting, setIsRedirecting] = useState(false)
@@ -28,7 +32,7 @@ const useClosestLivestreamStats = (
       shouldFetch
          ? `/group/${groupId}/admin/analytics/live-stream-stats/closest`
          : null,
-      () => fetchClosestLivestreamId(groupId),
+      async () => fetchClosestLivestreamId(groupId),
       {
          onError: (error) => {
             errorLogAndNotify(error, {
@@ -36,6 +40,7 @@ const useClosestLivestreamStats = (
                groupId: groupId,
             })
          },
+         ...options,
       }
    )
 

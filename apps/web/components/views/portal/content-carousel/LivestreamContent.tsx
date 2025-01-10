@@ -154,8 +154,6 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
       redirectToLogin,
    ])
 
-   console.log(subtitle)
-
    return (
       <Content
          headerTitle={
