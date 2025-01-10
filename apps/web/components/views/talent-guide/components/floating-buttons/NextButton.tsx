@@ -15,7 +15,6 @@ export const NextButton = () => {
          color="primary"
          variant="contained"
          onClick={() => {
-            // TODO: Mark step as completed in firestore
             dispatch(proceedToNextStep())
          }}
       >

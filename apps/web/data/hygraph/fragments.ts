@@ -227,3 +227,22 @@ export const moduleStepFragment = gql`
       }
    }
 `
+
+export const talentGuideModulePageFragment = gql`
+   {
+      slug
+      seo ${seoComponentFragment}
+      content {
+         id
+         moduleName
+         moduleDescription
+         moduleDuration
+         moduleIllustration ${imageAssetFragment}
+         category
+         level
+         contentTopicTags
+         businessFunctionTags
+         moduleSteps ${moduleStepFragment}
+      }
+   }
+`
