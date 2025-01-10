@@ -8,7 +8,6 @@ export const layoutStyles = sxStyles({
       justifyContent: "center",
       minHeight: "100dvh",
       position: "relative",
-      overflow: "hidden",
    },
 })
 
@@ -31,13 +30,6 @@ export const feedbackStyles = sxStyles({
    },
    title: {
       fontWeight: 700,
-   },
-   container: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: 2,
-      textAlign: "center",
    },
    starsContainer: {
       display: "flex",
@@ -95,5 +87,56 @@ export const congratsStyles = sxStyles({
    congratsText: {
       color: "neutral.700",
       maxWidth: 323,
+   },
+})
+
+export const nextModuleStyles = sxStyles({
+   section: {
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      minHeight: "inherit",
+      position: "relative",
+      justifyContent: "center",
+   },
+   bottomContent: {
+      mt: "auto",
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      marginTop: "auto",
+      position: "static",
+   },
+   bottomTitle: {
+      color: "neutral.800",
+      fontWeight: 700,
+   },
+   bottomText: {
+      color: "neutral.700",
+      textAlign: "center",
+   },
+   bottomButton: {
+      my: 4,
+   },
+   divider: {
+      width: "1px !important",
+      height: 36,
+      bgcolor: "neutral.300",
+   },
+   dividerOffset: {
+      height: 36,
+   },
+   completedModuleCard: {
+      transition: (theme) => theme.transitions.create("opacity"),
+      position: "absolute",
+      opacity: 1,
+      marginTop: "auto",
+      top: "28%",
+   },
+   slideUp: {
+      position: "static",
+      opacity: 0.6,
    },
 })

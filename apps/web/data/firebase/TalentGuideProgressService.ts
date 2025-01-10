@@ -7,7 +7,7 @@ import {
    TalentGuideQuiz,
    TalentGuideRating,
 } from "@careerfairy/shared-lib/talent-guide"
-import { QuizModelType, TalentGuideModule } from "data/hygraph/types"
+import { Page, QuizModelType, TalentGuideModule } from "data/hygraph/types"
 import {
    arrayUnion,
    collection,
@@ -260,6 +260,59 @@ export class TalentGuideProgressService {
    }
 
    /**
+    * Gets all module progress for a user
+    * @param userAuthUid - The authenticated user's ID
+    * @returns Promise resolving to array of module progress documents
+    */
+   async getAllUserModuleProgress(
+      userAuthUid: string
+   ): Promise<TalentGuideProgress[]> {
+      const progressQuery = query(
+         collection(FirestoreInstance, "talentGuideProgress"),
+         where("userAuthUid", "==", userAuthUid)
+      ).withConverter(createGenericConverter<TalentGuideProgress>())
+
+      const snapshot = await getDocs(progressQuery)
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   /**
+    * Gets the next uncompleted module for a user
+    * @param userAuthUid - The authenticated user's ID
+    * @param allModules - All available modules from the CMS
+    * @returns Promise<Page<TalentGuideModule> | null> The next module or null if all completed
+    */
+   async getNextModule(
+      userAuthUid: string,
+      allModules: Page<TalentGuideModule>[]
+   ): Promise<Page<TalentGuideModule> | null> {
+      // Get user's progress from Firebase
+      const userProgress = await this.getAllUserModuleProgress(userAuthUid)
+
+      // Create a map of module IDs to progress
+      const progressMap = new Map<string, TalentGuideProgress>()
+      userProgress.forEach((progress) => {
+         progressMap.set(progress.moduleHygraphId, progress)
+      })
+
+      // Sort modules by level
+      const sortedModules = allModules.sort((a, b) => {
+         if (!a.content || !b.content) return 0
+         return (a.content.level || 0) - (b.content.level || 0)
+      })
+
+      // First, try to find an uncompleted module
+      const nextIncompleteModule = sortedModules.find((module) => {
+         if (!module.content) return false
+         const progress = progressMap.get(module.content.id)
+         return !progress || !progress.completedAt
+      })
+
+      // If we found an incomplete module, return it
+      return nextIncompleteModule || null
+   }
+
+   /**
     * Calculates and updates progress for proceeding to the next step
     * @param moduleData - The module data from Hygraph
     * @param userAuthUid - The authenticated user's ID
@@ -272,27 +325,27 @@ export class TalentGuideProgressService {
       currentStepIndex: number
    ): Promise<{ nextStepIndex: number } | null> {
       const nextStepIndex = currentStepIndex + 1
-      if (nextStepIndex >= moduleData.moduleSteps.length) return null
 
       const data: UpdateData<TalentGuideProgress> = {
          completedStepIds: arrayUnion(
             moduleData.moduleSteps[currentStepIndex].id
          ),
          percentageComplete:
-            ((nextStepIndex + 1) / moduleData.moduleSteps.length) * 100,
+            ((currentStepIndex + 1) / moduleData.moduleSteps.length) * 100,
          totalSteps: moduleData.moduleSteps.length,
          moduleName: moduleData.moduleName,
          moduleCategory: moduleData.category,
       }
 
-      const isCompleted = data.percentageComplete === 100
+      const isCompleted = nextStepIndex >= moduleData.moduleSteps.length
 
       if (isCompleted) {
          data.completedAt = Timestamp.now()
       }
+
       await this.updateModuleProgress(moduleData.id, userAuthUid, data)
 
-      return { nextStepIndex }
+      return isCompleted ? null : { nextStepIndex }
    }
 
    /**
