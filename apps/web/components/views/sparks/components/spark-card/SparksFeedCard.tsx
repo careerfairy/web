@@ -288,7 +288,6 @@ const SparksFeedCard: FC<Props> = ({
                   styles.cardContent,
                   ...(showCardNotification ? cardNotificationStyle() : []),
                ]}
-               data-context="feed-card-slide"
                onClick={(event: SyntheticEvent) => {
                   if (event.target === event.currentTarget) {
                      handleClickCard(event)
