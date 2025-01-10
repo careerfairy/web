@@ -25,6 +25,8 @@ type TalentGuideState = {
    isLoadingTalentGuideError: string | null
    isLoadingAttemptQuiz: boolean
    isLoadingAttemptQuizError: string | null
+   isRestartingModule: boolean
+   isRestartingModuleError: string | null
    userAuthUid: string
    quizStatuses: Record<string, QuizStatus>
    showEndOfModuleExperience: boolean
@@ -40,6 +42,8 @@ const initialState: TalentGuideState = {
    isLoadingTalentGuideError: null,
    isLoadingAttemptQuiz: false,
    isLoadingAttemptQuizError: null,
+   isRestartingModule: false,
+   isRestartingModuleError: null,
    userAuthUid: null,
    quizStatuses: {},
    showEndOfModuleExperience: false,
@@ -177,6 +181,31 @@ export const resetModuleProgressForDemo = createAsyncThunk(
       )
 
       await talentGuideProgressService.createModuleProgress(
+         moduleData.content.id,
+         userAuthUid,
+         moduleData.content
+      )
+
+      return {
+         moduleData,
+         userAuthUid,
+      }
+   }
+)
+
+export const restartModule = createAsyncThunk(
+   "talentGuide/restartModule",
+   async (_, { getState }) => {
+      const state = getState() as RootState
+      const { moduleData, userAuthUid } = state.talentGuide
+
+      if (!moduleData?.content || !userAuthUid) {
+         throw new Error(
+            "Cannot restart module: moduleData or userAuthUid is missing"
+         )
+      }
+
+      await talentGuideProgressService.restartModule(
          moduleData.content.id,
          userAuthUid,
          moduleData.content
@@ -378,6 +407,43 @@ const talentGuideReducer = createSlice({
 
             errorLogAndNotify(new Error(errorMessage), {
                context: "resetModuleProgressForDemo",
+               userAuthUid: state.userAuthUid,
+               originalError: action.error,
+            })
+         })
+         .addCase(restartModule.pending, (state) => {
+            state.isRestartingModule = true
+         })
+         .addCase(restartModule.fulfilled, (state, action) => {
+            if (!action.payload) {
+               state.isRestartingModule = false
+               return
+            }
+
+            // Reset to initial state but keep moduleData
+            state.visibleSteps = [0]
+            state.currentStepIndex = 0
+            state.isRestartingModule = false
+            state.showEndOfModuleExperience = false
+            state.quizStatuses = Object.keys(state.quizStatuses).reduce(
+               (acc, quizId) => {
+                  acc[quizId] = {
+                     selectedAnswerIds: [],
+                     state: QUIZ_STATE.NOT_ATTEMPTED,
+                  }
+                  return acc
+               },
+               {} as Record<string, QuizStatus>
+            )
+         })
+         .addCase(restartModule.rejected, (state, action) => {
+            state.isRestartingModule = false
+            const errorMessage =
+               action.error.message || "Failed to restart module"
+            state.isRestartingModuleError = errorMessage
+
+            errorLogAndNotify(new Error(errorMessage), {
+               context: "restartModule",
                userAuthUid: state.userAuthUid,
                originalError: action.error,
             })
