@@ -4,7 +4,6 @@ import { HighlightComponentType, SparkComponentType } from "data/hygraph/types"
 import dynamic from "next/dynamic"
 import { sxStyles } from "types/commonTypes"
 import { HighlightCardSkeleton } from "./HighlightCardSkeleton"
-import { LiveStreamDialogExtended } from "./LiveStreamDialogExtended"
 import { useHighlights } from "./control/HighlightsBlockContext"
 
 const styles = sxStyles({
@@ -53,7 +52,6 @@ export const HighlightsGrid = () => {
                </SuspenseWithBoundary>
             )
          })}
-         <LiveStreamDialogExtended />
       </Box>
    )
 }

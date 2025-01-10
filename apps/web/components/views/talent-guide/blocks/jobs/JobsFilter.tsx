@@ -27,8 +27,11 @@ const styles = sxStyles({
    dialogTitle: {
       fontWeight: 600,
    },
-   dialogTitleWrapper: {
-      pl: { md: 0 },
+   checkboxWrapper: {
+      px: {
+         sm: 0,
+         md: 3,
+      },
    },
 })
 
@@ -102,10 +105,7 @@ const JobAreasDialog = ({ isOpen, handleClose }: FilterDialogProps) => {
 
    return (
       <ResponsiveDialogLayout open={isOpen} handleClose={handleClose}>
-         <ResponsiveDialogLayout.Header
-            handleClose={handleClose}
-            sx={styles.dialogTitleWrapper}
-         >
+         <ResponsiveDialogLayout.Header handleClose={handleClose}>
             <Typography sx={styles.dialogTitle} variant="medium">
                Job Areas
             </Typography>
@@ -119,6 +119,7 @@ const JobAreasDialog = ({ isOpen, handleClose }: FilterDialogProps) => {
                         value={tag}
                         checked={selectedJobAreasIds.includes(tag.id)}
                         handleClick={handleSelectJobArea}
+                        wrapperSx={styles.checkboxWrapper}
                      />
                   ))}
                </Stack>
@@ -133,10 +134,7 @@ const JobTypesDialog = ({ isOpen, handleClose }: FilterDialogProps) => {
 
    return (
       <ResponsiveDialogLayout open={isOpen} handleClose={handleClose}>
-         <ResponsiveDialogLayout.Header
-            handleClose={handleClose}
-            sx={styles.dialogTitleWrapper}
-         >
+         <ResponsiveDialogLayout.Header handleClose={handleClose}>
             <Typography sx={styles.dialogTitle} variant="medium">
                Job Types
             </Typography>
@@ -150,6 +148,7 @@ const JobTypesDialog = ({ isOpen, handleClose }: FilterDialogProps) => {
                         value={{ id: id, name: label }}
                         checked={selectedJobTypesIds.includes(id)}
                         handleClick={handleSelectJobType}
+                        wrapperSx={styles.checkboxWrapper}
                      />
                   ))}
                </Stack>

@@ -3,7 +3,7 @@ import useGroup from "components/custom-hook/group/useGroup"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
-import { buildMentorPageLink } from "utils/routes"
+import { buildMentorPageLink } from "util/routes"
 
 const styles = sxStyles({
    profileButton: (theme) => ({

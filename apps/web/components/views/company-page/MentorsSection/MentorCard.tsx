@@ -6,7 +6,7 @@ import Link from "next/link"
 import { ReactNode, SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { buildMentorPageLink } from "utils/routes"
+import { buildMentorPageLink } from "util/routes"
 import { useCompanyPage } from ".."
 
 const CARD_WIDTH = 214

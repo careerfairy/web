@@ -18,7 +18,7 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      p: 1.5,
+      p: { xs: 1.5, md: "16px 24px" },
    },
    closeButton: {
       flexShrink: 0,
@@ -27,6 +27,9 @@ const styles = sxStyles({
          width: "24px",
          height: "24px",
       },
+   },
+   dialogContent: {
+      p: 0,
    },
    dialogActions: (theme) => ({
       display: "flex",
@@ -100,7 +103,7 @@ const Header = ({
    const isMobile = useIsMobile()
 
    const header = (
-      <Box sx={combineStyles(styles.header, sx)}>
+      <>
          {children}
          <IconButton
             color="inherit"
@@ -110,13 +113,15 @@ const Header = ({
          >
             <CloseIcon />
          </IconButton>
-      </Box>
+      </>
    )
 
-   if (!isMobile) {
-      return <DialogTitle>{header}</DialogTitle>
+   if (isMobile) {
+      return <Box sx={combineStyles(styles.header, sx)}>{header}</Box>
    }
-   return header
+   return (
+      <DialogTitle sx={combineStyles(styles.header, sx)}>{header}</DialogTitle>
+   )
 }
 
 const Actions = ({ children }: Pick<ResponsiveDialogProps, "children">) => {
@@ -133,9 +138,9 @@ const Content = ({ children }: Pick<ResponsiveDialogProps, "children">) => {
    const isMobile = useIsMobile()
 
    if (isMobile) {
-      return <Box>{children}</Box>
+      return <Box sx={styles.dialogContent}>{children}</Box>
    }
-   return <DialogContent>{children}</DialogContent>
+   return <DialogContent sx={styles.dialogContent}>{children}</DialogContent>
 }
 
 ResponsiveDialogLayout.Header = Header
