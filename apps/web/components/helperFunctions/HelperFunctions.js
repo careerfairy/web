@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { isEmpty } from "lodash/fp"
 import { v4 as uuidv4 } from "uuid"
 import { LONG_NUMBER } from "../util/constants"
@@ -162,12 +163,11 @@ export const isServer = () => {
 }
 
 export const isInIframe = () => {
-  
-  if(isServer()) {
-   return false
-  }
+   if (isServer()) {
+      return false
+   }
 
-  try {
+   try {
       return window.self !== window.top
    } catch (e) {
       return true
@@ -297,10 +297,21 @@ export const truncate = (str, n) => {
    return str.length > n ? str.substr(0, n - 1) + "..." : str
 }
 
+/**
+ * Get the base url of the current environment.
+ * @returns {string} The base url of the current environment.
+ * Examples:
+ *
+ * • https://careerfairy.io - production
+ *
+ * • https://staging.careerfairy.io - staging
+ *
+ * • https://careerfairy-ssr-webapp-pr-{number}.vercel.app - Vercel Preview
+ *
+ * • http://localhost:3000 - development
+ */
 export const getBaseUrl = () => {
-   let baseUrl = "https://careerfairy.io"
-   if (typeof window === "undefined") return baseUrl
-   return window?.location?.origin
+   return process.env.NEXT_PUBLIC_URL
 }
 
 export const maybePluralize = (count, noun, suffix = "s") =>

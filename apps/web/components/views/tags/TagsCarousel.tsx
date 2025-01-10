@@ -1,7 +1,7 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { Chip, Stack } from "@mui/material"
 import Box from "@mui/material/Box"
-import React from "react"
+import { forwardRef, useImperativeHandle } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
@@ -57,8 +57,13 @@ type PropType = {
    onAllClick?: () => void
 }
 
-const TagsCarousel = React.forwardRef<ChildRefType, PropType>((props) => {
+const TagsCarousel = forwardRef<ChildRefType, PropType>((props, ref) => {
    const { selectedCategories, emblaRef, tags, onTagClick } = props
+
+   useImperativeHandle(ref, () => ({
+      goNext: () => {},
+      goPrev: () => {},
+   }))
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>

@@ -471,7 +471,7 @@ const Content: FC<ContentProps> = ({
                         value={index}
                         activeValue={value}
                      >
-                        {livestream ? <View /> : Skeleton}
+                        {livestream ? <View /> : <Skeleton />}
                      </AnimatedTabPanel>
                   )
                )}

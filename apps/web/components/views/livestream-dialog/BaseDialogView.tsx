@@ -4,7 +4,7 @@ import { Box, Container, IconButton, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SxProps } from "@mui/system"
-import Image from "next/legacy/image"
+import Image from "next/image"
 import { FC, forwardRef, ReactNode } from "react"
 import { useMeasure } from "react-use"
 import { combineStyles, sxStyles } from "../../../types/commonTypes"
@@ -97,6 +97,9 @@ const styles = sxStyles({
       textAlign: "center",
       fontWeight: 600,
       maxWidth: 655,
+   },
+   backgroundImage: {
+      objectFit: "cover",
    },
 })
 
@@ -232,8 +235,10 @@ export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
                <Image
                   alt={"background image"}
                   src={backgroundImg}
-                  layout={"fill"}
-                  objectFit={"cover"}
+                  fill
+                  priority
+                  style={styles.backgroundImage}
+                  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   id={"background-image"}
                />
             ) : null}

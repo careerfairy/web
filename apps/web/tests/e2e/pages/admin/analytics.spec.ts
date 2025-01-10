@@ -6,6 +6,7 @@ import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"
 import { setupLivestreamData } from "../../setupData"
 
 const testWithPrivacyPolicyActive = test.extend({
+   // eslint-disable-next-line no-empty-pattern
    options: async ({}, use) => {
       await use({
          createUser: true,
@@ -72,9 +73,6 @@ test.describe("Group Analytics", () => {
       async ({ groupPage, group, context, user }) => {
          const { livestream } = await setupLivestreamData(group)
 
-         await groupPage.goToAnalyticsPage()
-         await groupPage.goToLivestreamAnalyticsPage()
-
          const livestreamDialogPage = await setupLivestreamDialogPage(
             context,
             livestream
@@ -82,11 +80,10 @@ test.describe("Group Analytics", () => {
 
          await completeRegistration(livestreamDialogPage, true, true)
 
-         // Reload the page to make the live stream analytics fetch(swr) the newly created live stream
-         await groupPage.page.reload()
+         await groupPage.goToAnalyticsPage()
+         await groupPage.goToLivestreamAnalyticsPage()
 
          await verifyAnalyticsCard(groupPage, "Registrations", "1", true)
-
          await groupPage.assertUserIsInAnalyticsTable(user)
       }
    )
