@@ -1,18 +1,16 @@
-import React, {
-   forwardRef,
-   memo,
-   useCallback,
-   useEffect,
-   useState,
-} from "react"
-import cx from "clsx"
-import { alpha, useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
-import Avatar from "@mui/material/Avatar"
-import Box from "@mui/material/Box"
-import CardMedia from "@mui/material/CardMedia"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   makeLivestreamEventDetailsUrl,
+   makeLivestreamGroupEventDetailsUrl,
+} from "@careerfairy/shared-lib/utils/urls"
+import RegisterIcon from "@mui/icons-material/AddToPhotosRounded"
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks"
+import {
+   AvatarGroup,
    Button,
    Slide,
    Stack,
@@ -20,22 +18,24 @@ import {
    Typography,
    useMediaQuery,
 } from "@mui/material"
-import { AvatarGroup } from "@mui/material"
-import { MainLogo } from "../../../logos"
-import RegisterIcon from "@mui/icons-material/AddToPhotosRounded"
-import LibraryBooksIcon from "@mui/icons-material/LibraryBooks"
-import EmbedTimeDisplay from "../time-display/EmbedTimeDisplay"
-import MobileCarousel from "../carousels/MobileCarousel"
+import Avatar from "@mui/material/Avatar"
+import Box from "@mui/material/Box"
+import CardMedia from "@mui/material/CardMedia"
+import { alpha, useTheme } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import cx from "clsx"
+import React, {
+   forwardRef,
+   memo,
+   useCallback,
+   useEffect,
+   useState,
+} from "react"
 import useTrackLivestreamImpressions from "../../../custom-hook/useTrackLivestreamImpressions"
-import {
-   ImpressionLocation,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import {
-   makeLivestreamEventDetailsUrl,
-   makeLivestreamGroupEventDetailsUrl,
-} from "@careerfairy/shared-lib/utils/urls"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import { MainLogo } from "../../../logos"
+import MobileCarousel from "../carousels/MobileCarousel"
+import EmbedTimeDisplay from "../time-display/EmbedTimeDisplay"
 
 const useStyles = makeStyles((theme) => ({
    // @ts-ignore
