@@ -213,6 +213,7 @@ export const DownloadMobileApplication: FC<
                layout="fill"
                objectFit={"cover"}
                quality={90}
+               priority
             />
          </Box>
       </Box>

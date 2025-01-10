@@ -169,6 +169,7 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
    const SignUpButton = () => {
       return (
          <Button
+            component="div"
             color={"primary"}
             variant="contained"
             onClick={redirectToLogin}

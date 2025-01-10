@@ -266,15 +266,16 @@ export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
       <Box sx={[styles.thumbnailOverlay, { zIndex: playing ? 0 : 1 }]}>
          <Image
             src={src}
-            layout="fill"
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             quality={40}
-            objectFit={
-               containPreviewOnTablet
+            style={{
+               objectFit: containPreviewOnTablet
                   ? isSmallScreen
                      ? "cover"
                      : "contain"
-                  : "cover"
-            }
+                  : "cover",
+            }}
             alt="thumbnail"
             priority={true}
          />

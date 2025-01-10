@@ -56,9 +56,10 @@ const LivestreamDetailsView = () => {
       businessFunctionTagIds: [],
       livestreamId: livestreamPresenter.id,
    })
-   const hasJobs = livestreamPresenter.hasJobs && jobsCount > 0
 
    const isFloatingActionButton = isMobile || !heroInView
+
+   const hasJobs = livestreamPresenter.hasJobs && jobsCount > 0
 
    return (
       <BaseDialogView
