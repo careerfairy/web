@@ -141,6 +141,9 @@ const CustomJobCTAButtons = (props: Props) => {
       notification: () => {
          return <></>
       },
+      levels: () => {
+         return <SparkJobCTA {...props} alreadyApplied={alreadyApplied} />
+      },
    }
 
    return ctas[props.applicationSource.source](props)
