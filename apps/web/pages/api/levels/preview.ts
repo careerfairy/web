@@ -64,7 +64,7 @@ const getPreviewData = async (
 
          return {
             hasData: Boolean(page),
-            location: `/talent-guide/${page.slug}`,
+            location: `/levels/${page.slug}`,
          }
       }
 
@@ -74,7 +74,7 @@ const getPreviewData = async (
 
          return {
             hasData: Boolean(talentGuideRootPage),
-            location: `/${talentGuideRootPage.slug}`, // /talent-guide
+            location: `/${talentGuideRootPage.slug}`, // /levels
          }
       }
 

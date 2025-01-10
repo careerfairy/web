@@ -75,7 +75,7 @@ export const ModuleCard = ({
    const CardWrapper = interactive ? Link : Stack
    const cardProps = interactive
       ? {
-           href: `/talent-guide/${module.slug}`,
+           href: `/levels/${module.slug}`,
         }
       : {}
 

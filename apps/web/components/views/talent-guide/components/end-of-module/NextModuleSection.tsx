@@ -222,7 +222,7 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
             sx={nextModuleStyles.bottomButton}
             onClick={() => {
                if (nextModule) {
-                  push(`/talent-guide/${nextModule.slug}`)
+                  push(`/levels/${nextModule.slug}`)
                }
             }}
          >

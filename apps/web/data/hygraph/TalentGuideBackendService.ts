@@ -27,7 +27,7 @@ export class TalentGuideBackendService {
    }
 
    /**
-    * Get all talent guide module page slugs, eg /talent-guide/(networking) or /talent-guide/(interviewing)
+    * Get all levels module page slugs, eg /levels/(networking) or /levels/(interviewing)
     */
    async getAllTalentGuideModulePageSlugs(): Promise<string[]> {
       const query = gql`
@@ -44,7 +44,7 @@ export class TalentGuideBackendService {
    }
 
    /**
-    * Get the talent guide root page, eg /talent-guide
+    * Get the levels root page, eg /levels
     */
    async getTalentGuideRootPage(slug: string): Promise<Page> {
       const query = gql`
