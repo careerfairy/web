@@ -20,7 +20,7 @@ import { sparkService } from "data/firebase/SparksService"
 import { SyntheticEvent, useCallback, useEffect, useMemo, useRef } from "react"
 import { useMeasure } from "react-use"
 import { sxStyles } from "types/commonTypes"
-import { buildMentorPageLink } from "utils/routes"
+import { buildMentorPageLink } from "util/routes"
 import { ExpandedCard } from "./ExpandedCard"
 
 const styles = sxStyles({

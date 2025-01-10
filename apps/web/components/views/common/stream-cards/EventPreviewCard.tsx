@@ -21,8 +21,7 @@ import {
    getResizedUrl,
    isInIframe,
 } from "components/helperFunctions/HelperFunctions"
-import { useHighlights } from "components/views/talent-guide/blocks/highlights/control/HighlightsBlockContext"
-import { useJobsBlock } from "components/views/talent-guide/blocks/jobs/control/JobsBlockContext"
+import { useLiveStreamDialog } from "components/views/talent-guide/blocks/live-stream/LiveStreamDialogContext"
 import Image from "next/legacy/image"
 import Link, { LinkProps } from "next/link"
 import { useRouter } from "next/router"
@@ -665,27 +664,17 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       })
 
       const isInTalentGuidePage = useIsInTalentGuide()
-      const highlightsContext = useHighlights()
-      const jobsContext = useJobsBlock()
+      const livestreamDialogContext = useLiveStreamDialog()
 
       const contextProps = useMemo(() => {
-         if (highlightsContext) {
-            return {
-               onClick: () => {
-                  highlightsContext.handleLiveStreamDialogOpen(props.event.id)
-               },
-            }
-         } else if (jobsContext) {
-            return {
-               onClick: () => {
-                  jobsContext.handleLiveStreamDialogOpen(
-                     jobsContext.selectedJob.id,
-                     props.event.id
-                  )
-               },
-            }
+         return {
+            onClick: () => {
+               livestreamDialogContext.handleLiveStreamDialogOpen(
+                  props.event.id
+               )
+            },
          }
-      }, [props.event.id, highlightsContext, jobsContext])
+      }, [props.event?.id, livestreamDialogContext])
 
       const { getPartnerEventLink } = usePartnership()
 

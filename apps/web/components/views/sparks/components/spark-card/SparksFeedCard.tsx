@@ -31,7 +31,7 @@ import {
    videosMuttedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { sxStyles } from "types/commonTypes"
-import { buildMentorPageLink } from "utils/routes"
+import { buildMentorPageLink } from "util/routes"
 import FullCardNotification from "./Notifications/FullCardNotification"
 import { SparksPopUpNotificationManager } from "./Notifications/SparksPopUpNotificationManager"
 import { useLinkedInNotificationStateManagement } from "./Notifications/useLinkedInNotificationStateManagement"

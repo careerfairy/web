@@ -2,7 +2,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useLockBodyScroll } from "react-use"
-import { useIsLiveStreamDialogOpen } from "../../../live-stream/useIsLiveStreamDialogOpen"
+import { useIsLiveStreamDialogOpen } from "../../live-stream/useIsLiveStreamDialogOpen"
 import { HighlightsContextType } from "./HighlightsBlockContext"
 
 export const useExpandManager = (

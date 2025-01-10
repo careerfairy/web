@@ -14,7 +14,6 @@ import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useJobsBlock } from "./control/JobsBlockContext"
 import { EmptyJobsView } from "./EmptyJobsView"
-import { LiveStreamDialogExtended } from "./LiveStreamDialogExtended"
 
 const styles = sxStyles({
    jobList: {
@@ -102,7 +101,6 @@ export const JobsList = () => {
                      heroSx={styles.heroSx}
                   />
                ) : null}
-               <LiveStreamDialogExtended />
             </>
          ) : (
             <EmptyJobsView />
