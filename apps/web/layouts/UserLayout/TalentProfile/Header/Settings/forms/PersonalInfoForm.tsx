@@ -144,7 +144,7 @@ const CountriesDropdown = () => {
          name={"countryIsoCode"}
          options={Object.keys(countriesList)}
          textFieldProps={{
-            // requiredText: null,
+            requiredText: null,
             placeholder: "E.g, Switzerland",
             sx: {
                "& .MuiAutocomplete-inputRoot.Mui-focused": {
@@ -186,7 +186,7 @@ const CitiesDropdown = () => {
          name={"cityIsoCode"}
          options={Object.keys(countryCities)}
          textFieldProps={{
-            // requiredText: null,
+            requiredText: null,
             placeholder: "E.g, Zurich",
             sx: {
                "& .MuiAutocomplete-inputRoot.Mui-focused": {
