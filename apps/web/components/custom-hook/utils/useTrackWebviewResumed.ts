@@ -37,9 +37,9 @@ export const useTrackWebviewResumedCount = () => {
          }
       }
 
-      window.addEventListener("message", handleWebViewMessage)
+      window.addEventListener("message", handleWebViewMessage, true)
       return () => {
-         window.removeEventListener("message", handleWebViewMessage)
+         window.removeEventListener("message", handleWebViewMessage, true)
       }
    }, [])
 
