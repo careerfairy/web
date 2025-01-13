@@ -3,7 +3,6 @@ import {
    MESSAGING_TYPE,
 } from "@careerfairy/shared-lib/messaging"
 import { useEffect } from "react"
-import { shouldUseEmulators } from "util/CommonUtil"
 import { MobileUtils } from "../../../util/mobile.utils"
 
 type ConsoleArg = string | number | boolean | object | null | undefined
@@ -31,7 +30,7 @@ const originalMethods = {
  */
 export const useWebviewConsoleProxy = () => {
    useEffect(() => {
-      if (!MobileUtils.webViewPresence() || !shouldUseEmulators()) return
+      if (!MobileUtils.webViewPresence()) return
 
       // Create proxy for each method we want to intercept
       Object.entries(originalMethods).forEach(
