@@ -5,7 +5,7 @@ import { Stack } from "@mui/material"
 import Box from "@mui/material/Box"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { debounce } from "lodash"
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkHeader from "./SparkHeader"
@@ -109,6 +109,20 @@ const SparkPreviewCard: FC<Props> = ({
          clearTimeout(timeout)
       }
    }, [autoPlaying, disableAutoPlay, isMobile, onGoNext])
+
+   const handleVisibilityChange = useCallback(() => {
+      setAutoPlaying(document.visibilityState === "visible")
+   }, [])
+
+   useEffect(() => {
+      document.addEventListener("visibilitychange", handleVisibilityChange)
+      return () => {
+         document.removeEventListener(
+            "visibilitychange",
+            handleVisibilityChange
+         )
+      }
+   }, [handleVisibilityChange])
 
    return (
       <SparkPreviewCardContainer
