@@ -4,7 +4,7 @@ export enum MESSAGING_TYPE {
    "PERMISSIONS" = "PERMISSIONS",
    "LOGOUT" = "LOGOUT",
    /**
-    * We you return to the app from the background
+    * When you return to the app from the background
     */
    "WEBVIEW_RESUMED" = "WEBVIEW_RESUMED",
    "CONSOLE" = "CONSOLE",
