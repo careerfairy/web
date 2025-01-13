@@ -1,4 +1,5 @@
 import { CountryOption } from "@careerfairy/shared-lib/countries/types"
+import { FormHelperText } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { CountryAutoComplete } from "components/views/countries/CountryAutoComplete"
 import { userRepo } from "data/RepositoryInstances"
@@ -17,9 +18,16 @@ export const UserCountrySelector = () => {
    }
 
    return (
-      <CountryAutoComplete
-         countryValueId={userData.countryIsoCode}
-         handleSelectedCountryChange={handleSelectedCountryChange}
-      />
+      <>
+         <CountryAutoComplete
+            countryValueId={userData.countryIsoCode}
+            handleSelectedCountryChange={handleSelectedCountryChange}
+         />
+         {!userData.countryIsoCode ? (
+            <FormHelperText sx={{ color: "error.main", ml: 2 }}>
+               Please select the country you are currently located in.
+            </FormHelperText>
+         ) : null}
+      </>
    )
 }
