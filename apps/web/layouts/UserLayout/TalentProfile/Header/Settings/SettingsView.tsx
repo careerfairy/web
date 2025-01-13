@@ -15,6 +15,7 @@ import {
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { ConditionalWrapper as WrapConditionally } from "components/views/common/ConditionalWrapper"
 import { SlideUpTransition } from "components/views/common/transitions"
 import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
 import { useRouter } from "next/router"
@@ -326,13 +327,16 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
       setCurrentTab(null)
       setSwitchingTab(null)
       dispatch(setDirty({ setting: "personalInfo", dirty: false }))
-
       delete router.query["tab"]
 
-      router.push({
-         pathname: TAB_VALUES.settings.value,
-         query: router.query,
-      })
+      router.push(
+         {
+            pathname: TAB_VALUES.settings.value,
+            query: router.query,
+         },
+         undefined,
+         { shallow: true }
+      )
    }, [router, dispatch])
 
    const onBackButtonClick = useCallback(() => {
@@ -352,7 +356,6 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
       (option: SettingsOptions) => {
          setCurrentTab(option)
          setSwitchingTab(null)
-
          router.push({
             pathname: TAB_VALUES.settings.value,
             query: {
@@ -376,73 +379,75 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
       [goToTab, settingFormIsDirty, isConfirmDialogOpen]
    )
 
-   useEffect(() => {
-      // Handle browser/mobile back button navigation
-      const handlePopState = () => {
-         if (currentTab && settingFormIsDirty) {
-            // If form is dirty, show confirmation dialog
-            setIsConfirmDialogOpen(true)
-            // Prevent default back behavior
-         } else if (currentTab && isMobile) {
-            onBack()
-         } else {
-            // If we're in the menu, close the dialog
-            handleClose()
-         }
-      }
+   // useEffect(() => {
+   //    // Handle browser/mobile back button navigation
+   //    const handlePopState = () => {
+   //       if (currentTab && settingFormIsDirty) {
+   //          // If form is dirty, show confirmation dialog
+   //          setIsConfirmDialogOpen(true)
+   //          // Prevent default back behavior
+   //          window.history.pushState(null, "", window.location.href)
+   //       } else if (currentTab) {
+   //          // If we're in a tab but form is not dirty, return to menu
+   //          onBack()
+   //       } else {
+   //          // If we're in the menu, close the dialog
+   //          handleClose()
+   //       }
+   //    }
 
-      // Push initial state to enable catching the first back button press
-      window.history.pushState(null, "", window.location.href)
+   //    // Push initial state to enable catching the first back button press
+   //    window.history.pushState(null, "", window.location.href)
 
-      window.addEventListener("popstate", handlePopState)
-      return () => window.removeEventListener("popstate", handlePopState)
-   }, [currentTab, settingFormIsDirty, handleClose, onBack, isMobile])
+   //    window.addEventListener("popstate", handlePopState)
+   //    return () => window.removeEventListener("popstate", handlePopState)
+   // }, [currentTab, settingFormIsDirty, handleClose, onBack])
 
-   const Content = () => {
-      return (
-         <Box>
-            <ConditionalWrapper
-               condition={!isMobile || (isMobile && !drawerOpen)}
-            >
-               <Stack sx={styles.contentRoot} spacing={1}>
-                  <Stack
-                     direction="row"
-                     justifyContent={"space-between"}
-                     sx={styles.selectedOptionHeader}
-                  >
-                     <Stack direction="row" spacing={1.5} alignItems={"center"}>
-                        {isMobile ? (
-                           <ChevronLeft size={24} onClick={onBackButtonClick} />
-                        ) : null}
-                        <Typography
-                           variant="brandedH3"
-                           sx={styles.selectedOptionText}
-                        >
-                           {SETTINGS_OPTIONS[currentTab].label}
-                        </Typography>
-                     </Stack>
-                     {!isMobile ? (
-                        <Box
-                           sx={styles.closeButton}
-                           component={X}
-                           onClick={handleClose}
-                        />
-                     ) : null}
-                  </Stack>
-                  <Box
-                     py={0}
-                     sx={[
-                        styles.contentBox,
-                        isMobile ? styles.contentBoxMobile : null,
-                     ]}
-                  >
-                     {SETTINGS_OPTIONS[currentTab].component}
-                  </Box>
-               </Stack>
-            </ConditionalWrapper>
-         </Box>
-      )
-   }
+   // const Content = () => {
+   //    return (
+   //       <Box>
+   //          <ConditionalWrapper
+   //             condition={!isMobile || (isMobile && !drawerOpen)}
+   //          >
+   //             <Stack sx={styles.contentRoot} spacing={1}>
+   //                <Stack
+   //                   direction="row"
+   //                   justifyContent={"space-between"}
+   //                   sx={styles.selectedOptionHeader}
+   //                >
+   //                   <Stack direction="row" spacing={1.5} alignItems={"center"}>
+   //                      {isMobile ? (
+   //                         <ChevronLeft size={24} onClick={onBackButtonClick} />
+   //                      ) : null}
+   //                      <Typography
+   //                         variant="brandedH3"
+   //                         sx={styles.selectedOptionText}
+   //                      >
+   //                         {SETTINGS_OPTIONS[currentTab].label}
+   //                      </Typography>
+   //                   </Stack>
+   //                   {!isMobile ? (
+   //                      <Box
+   //                         sx={styles.closeButton}
+   //                         component={X}
+   //                         onClick={handleClose}
+   //                      />
+   //                   ) : null}
+   //                </Stack>
+   //                <Box
+   //                   py={0}
+   //                   sx={[
+   //                      styles.contentBox,
+   //                      isMobile ? styles.contentBoxMobile : null,
+   //                   ]}
+   //                >
+   //                   {SETTINGS_OPTIONS[currentTab].component}
+   //                </Box>
+   //             </Stack>
+   //          </ConditionalWrapper>
+   //       </Box>
+   //    )
+   // }
 
    return (
       <Dialog
@@ -459,7 +464,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
          <DialogContent sx={{ p: 0 }}>
             <Stack spacing={1.5}>
                <ConfirmationDialog
-                  open={isConfirmDialogOpen ? Boolean(currentTab) : null}
+                  open={isConfirmDialogOpen ? Boolean(currentTab) : false}
                   title={"Make it count"}
                   description={
                      "Leaving now will discard the changes you've made to your personal information. Are you sure you want to exit?"
@@ -501,7 +506,36 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
                   direction="row"
                   sx={{ position: "relative", overflow: "hidden" }}
                >
-                  {isMobile ? (
+                  <WrapConditionally
+                     condition={isMobile}
+                     wrapper={(children) => {
+                        return (
+                           <Slide
+                              direction="right"
+                              in={drawerOpen || !isMobile}
+                              mountOnEnter
+                              unmountOnExit
+                              timeout={200}
+                              style={{ willChange: "transform" }}
+                              easing={{
+                                 enter: theme.transitions.easing.easeIn,
+                                 exit: theme.transitions.easing.easeIn,
+                              }}
+                           >
+                              <Box width={"100%"}>{children}</Box>
+                           </Slide>
+                        )
+                     }}
+                  >
+                     <SettingsSideDrawer
+                        handleClose={handleClose}
+                        setSwitchingTab={setSwitchingTab}
+                        onTabClick={onTabClick}
+                        currentTab={currentTab}
+                        setCurrentTab={setCurrentTab}
+                     />
+                  </WrapConditionally>
+                  {/* {isMobile ? (
                      <Slide
                         direction="right"
                         in={drawerOpen || !isMobile}
@@ -532,8 +566,84 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
                         currentTab={currentTab}
                         setCurrentTab={setCurrentTab}
                      />
-                  )}
+                  )} */}
+
                   {currentTab ? (
+                     <WrapConditionally
+                        condition={isMobile}
+                        wrapper={(children) => {
+                           return (
+                              <Slide
+                                 direction="left"
+                                 in={!drawerOpen || !isMobile}
+                                 mountOnEnter
+                                 unmountOnExit
+                                 timeout={200}
+                                 style={{ willChange: "transform" }}
+                                 easing={{
+                                    enter: theme.transitions.easing.easeIn,
+                                    exit: theme.transitions.easing.easeIn,
+                                 }}
+                              >
+                                 <Box>
+                                    <ConditionalWrapper
+                                       condition={
+                                          !isMobile || (isMobile && !drawerOpen)
+                                       }
+                                    >
+                                       {children}
+                                    </ConditionalWrapper>
+                                 </Box>
+                              </Slide>
+                           )
+                        }}
+                     >
+                        <Stack sx={styles.contentRoot} spacing={1}>
+                           <Stack
+                              direction="row"
+                              justifyContent={"space-between"}
+                              sx={styles.selectedOptionHeader}
+                           >
+                              <Stack
+                                 direction="row"
+                                 spacing={1.5}
+                                 alignItems={"center"}
+                              >
+                                 {isMobile ? (
+                                    <ChevronLeft
+                                       size={24}
+                                       onClick={onBackButtonClick}
+                                    />
+                                 ) : null}
+                                 <Typography
+                                    variant="brandedH3"
+                                    sx={styles.selectedOptionText}
+                                 >
+                                    {SETTINGS_OPTIONS[currentTab].label}
+                                 </Typography>
+                              </Stack>
+                              {!isMobile ? (
+                                 <Box
+                                    sx={styles.closeButton}
+                                    component={X}
+                                    onClick={handleClose}
+                                 />
+                              ) : null}
+                           </Stack>
+                           <Box
+                              py={0}
+                              sx={[
+                                 styles.contentBox,
+                                 isMobile ? styles.contentBoxMobile : null,
+                              ]}
+                           >
+                              {SETTINGS_OPTIONS[currentTab].component}
+                           </Box>
+                        </Stack>
+                     </WrapConditionally>
+                  ) : null}
+
+                  {/* {currentTab ? (
                      isMobile ? (
                         <Slide
                            direction="left"
@@ -566,7 +676,7 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
                            </ConditionalWrapper>
                         </Box>
                      )
-                  ) : null}
+                  ) : null} */}
                </Stack>
             </Stack>
          </DialogContent>
