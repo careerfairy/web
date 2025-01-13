@@ -83,6 +83,7 @@ export const TalentProfileHeader = () => {
 
    const isSettingsPage = router.pathname.includes(TAB_VALUES.settings.value)
    const [openSettings, setOpenSettings] = useState(isSettingsPage)
+   console.log("🚀 ~ TalentProfileHeader ~ openSettings:", openSettings)
 
    const profileTab = useSelector(getProfileTab)
 
@@ -105,14 +106,14 @@ export const TalentProfileHeader = () => {
                   variant="outlined"
                   startIcon={<Settings />}
                   onClick={() => {
-                     console.log(
-                        "🚀 ~ TalentProfileHeader ~ onClick:",
-                        router.query
+                     router.push(
+                        {
+                           pathname: TAB_VALUES.settings.value,
+                           query: router.query,
+                        },
+                        undefined,
+                        { shallow: true }
                      )
-                     router.push({
-                        pathname: TAB_VALUES.settings.value,
-                        query: router.query,
-                     })
                   }}
                >
                   Settings
