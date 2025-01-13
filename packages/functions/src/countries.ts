@@ -21,11 +21,19 @@ const CountryCityDataOptionsSchema = {
    generatedCityId: string().optional(),
 }
 
+const CityDataOptionsSchema = {
+   generatedCityId: string().optional(),
+}
+
 const CountryCityDataSchema = object().shape(CountryCityDataOptionsSchema)
+
+const CityDataSchema = object().shape(CityDataOptionsSchema)
 
 type CountryCitiesOptions = InferType<typeof CountryCitiesSchema>
 
 type CountryCityDataOptions = InferType<typeof CountryCityDataSchema>
+
+type CityDataOptions = InferType<typeof CityDataSchema>
 
 export const fetchCountriesList = functions
    .region(config.region)
@@ -114,4 +122,29 @@ export const fetchCountryCityData = functions
       }
 
       return { country: countryResult, city: cityResult }
+   })
+
+export const fetchCityData = functions
+   .region(config.region)
+   .https.onCall((data: CityDataOptions) => {
+      const { generatedCityId } = data
+
+      let cityResult: CityOption | null = null
+
+      if (generatedCityId) {
+         const { countryCode, stateCode, cityName } =
+            getCityCodes(generatedCityId)
+
+         const city = City.getCitiesOfState(countryCode, stateCode)?.find(
+            (city) => city.name === cityName
+         )
+
+         cityResult = {
+            name: city.name,
+            id: generateCityId(city),
+            stateIsoCode: stateCode,
+         }
+      }
+
+      return cityResult
    })
