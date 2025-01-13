@@ -59,6 +59,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const webViewRef: any = useRef(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
+   const [refreshKey, setRefreshKey] = useState(0)
 
    useEffect(() => {
       checkPermissions()
@@ -305,9 +306,29 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       return true // Allow WebView to load internal links
    }
 
+   const handleContentProcessTerminate = () => {
+      console.error("[WebView] Content process terminated", {
+         timestamp: new Date().toISOString(),
+         url: baseUrl,
+      })
+      setRefreshKey((prev) => prev + 1)
+   }
+
+   const handleRenderProcessGone = (syntheticEvent: any) => {
+      const { nativeEvent } = syntheticEvent
+      console.error("[WebView] Render process crashed", {
+         timestamp: new Date().toISOString(),
+         didCrash: nativeEvent.didCrash,
+         url: baseUrl,
+         details: nativeEvent,
+      })
+      setRefreshKey((prev) => prev + 1)
+   }
+
    return (
       <SafeAreaView style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
          <WebView
+            key={refreshKey}
             style={{ flex: 1 }}
             ref={webViewRef}
             source={{ uri: baseUrl }}
@@ -352,6 +373,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
             javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
             renderToHardwareTextureAndroid={true} // Improve performance on android
+            onContentProcessDidTerminate={handleContentProcessTerminate}
+            onRenderProcessGone={handleRenderProcessGone}
          />
       </SafeAreaView>
    )
