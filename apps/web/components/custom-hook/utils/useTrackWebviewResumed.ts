@@ -19,6 +19,11 @@ export const useTrackWebviewResumedCount = () => {
       if (!MobileUtils.webViewPresence()) return
 
       const handleWebViewMessage = (event: MessageEvent) => {
+         console.log("[Debug] Received WebView message:", {
+            data: event.data,
+            rawEvent: event,
+         })
+
          const message = JSON.parse(event.data)
          if (message.type === MESSAGING_TYPE.WEBVIEW_RESUMED) {
             setWebviewResumedCount((prev) => prev + 1)
