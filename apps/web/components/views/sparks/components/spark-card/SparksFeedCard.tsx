@@ -276,10 +276,7 @@ const SparksFeedCard: FC<Props> = ({
    }
    return (
       <>
-         <Box
-            onClick={handleClickCard}
-            sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
-         >
+         <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
             {isOverlayedOntop ? (
                <Box key={identifier}>
                   <SparksPopUpNotificationManager spark={spark} />
@@ -291,6 +288,11 @@ const SparksFeedCard: FC<Props> = ({
                   styles.cardContent,
                   ...(showCardNotification ? cardNotificationStyle() : []),
                ]}
+               onClick={(event: SyntheticEvent) => {
+                  if (event.target === event.currentTarget) {
+                     handleClickCard(event)
+                  }
+               }}
             >
                {videosMuted &&
                isOverlayedOntop &&
