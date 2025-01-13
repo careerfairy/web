@@ -423,19 +423,13 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
       if (nextAppState === "active" && webViewRef.current) {
-         console.log(
-            `🚀[WebView] AppState changed to ${nextAppState}, OS: ${Platform.OS}`
-         )
          // Send message to web app that the app has resumed
-
          const message: NativeEvent = {
             type: MESSAGING_TYPE.WEBVIEW_RESUMED,
             data: null,
          }
-
          const messageString = JSON.stringify(message)
          webViewRef.current.postMessage(messageString)
-         console.log(`🚀[WebView] sent message to web app: ${messageString}`)
       }
    }
 
