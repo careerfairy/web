@@ -1,6 +1,6 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CityOption } from "@careerfairy/shared-lib/countries/types"
-import { Skeleton } from "@mui/material"
+import { FormHelperText, Skeleton } from "@mui/material"
 import useCityById from "components/custom-hook/countries/useCityById"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { CityAutoComplete } from "components/views/countries/CityAutoComplete"
@@ -30,7 +30,7 @@ const UserCityDropdown = () => {
    const [userCountryCode, setUserCountryCode] = useState<string | null>(
       userData.countryIsoCode
    )
-   const { data: userCityOption } = useCityById(userData.cityIsoCode)
+   const { data: userCityOption, isLoading } = useCityById(userData.cityIsoCode)
    const [city, setCity] = useState<OptionGroup | null>(userCityOption)
 
    const handleSelectedCityChange = useCallback(
@@ -52,11 +52,18 @@ const UserCityDropdown = () => {
    }, [userData.countryIsoCode, userCountryCode, handleSelectedCityChange])
 
    return (
-      <CityAutoComplete
-         value={city}
-         disabled={!userData.countryIsoCode}
-         countryId={userData.countryIsoCode}
-         handleSelectedCityChange={handleSelectedCityChange}
-      />
+      <>
+         <CityAutoComplete
+            value={city}
+            disabled={!userData.countryIsoCode}
+            countryId={userData.countryIsoCode}
+            handleSelectedCityChange={handleSelectedCityChange}
+         />
+         {!isLoading && !city ? (
+            <FormHelperText sx={{ color: "error.main", ml: 2 }}>
+               Please select the city you are currently located in.
+            </FormHelperText>
+         ) : null}
+      </>
    )
 }
