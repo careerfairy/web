@@ -116,11 +116,6 @@ export const createNewUserAccount = functions
                            : null,
                      }
 
-                     console.log(
-                        "🚀 ~ .then ~ studyBackground:",
-                        studyBackground
-                     )
-
                      await studyBackgroundRef.set(studyBackground)
                   }
                })
