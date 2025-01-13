@@ -2,10 +2,10 @@ import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CityOption } from "@careerfairy/shared-lib/countries/types"
 import { Autocomplete, TextField } from "@mui/material"
 import useCountryCities from "components/custom-hook/countries/useCountryCities"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 
 type CityAutoCompleteProps = {
-   value?: OptionGroup
+   value?: OptionGroup | null
    disabled?: boolean
    countryId?: string
    handleSelectedCityChange: (city: CityOption | null) => void
@@ -17,7 +17,11 @@ export const CityAutoComplete = ({
    countryId,
    handleSelectedCityChange,
 }: CityAutoCompleteProps) => {
-   const { data: citiesList } = useCountryCities(countryId)
+   const {
+      data: citiesList,
+      isLoading,
+      mutate,
+   } = useCountryCities(countryId, false)
 
    const citiesOptions = useMemo(() => {
       return (
@@ -31,10 +35,14 @@ export const CityAutoComplete = ({
       )
    }, [citiesList])
 
+   useEffect(() => {
+      mutate()
+   }, [countryId, mutate])
+
    return (
       <>
          <Autocomplete
-            loading={true}
+            loading={isLoading}
             value={value}
             disabled={disabled}
             options={citiesOptions}

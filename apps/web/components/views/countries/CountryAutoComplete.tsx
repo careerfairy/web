@@ -1,9 +1,8 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CountryOption } from "@careerfairy/shared-lib/countries/types"
-import { Autocomplete, Skeleton, TextField } from "@mui/material"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { Autocomplete, TextField } from "@mui/material"
 import useCountriesList from "components/custom-hook/countries/useCountriesList"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 type CountryAutoCompleteProps = {
    countryValueId?: string
@@ -16,35 +15,9 @@ export const CountryAutoComplete = ({
    disabled,
    handleSelectedCountryChange,
 }: CountryAutoCompleteProps) => {
-   return (
-      <SuspenseWithBoundary
-         fallback={
-            <Skeleton
-               variant="rectangular"
-               height={50}
-               sx={{ borderRadius: "8px" }}
-            />
-         }
-      >
-         <CountryAutoCompleteDropdown
-            countryValueId={countryValueId}
-            disabled={disabled}
-            handleSelectedCountryChange={handleSelectedCountryChange}
-         />
-      </SuspenseWithBoundary>
-   )
-}
+   const { data: countriesList, isLoading } = useCountriesList(false)
 
-export const CountryAutoCompleteDropdown = ({
-   countryValueId,
-   disabled,
-   handleSelectedCountryChange,
-}: CountryAutoCompleteProps) => {
-   const { data: countriesList } = useCountriesList()
-
-   const [country, setCountry] = useState<OptionGroup | null>(() => {
-      return countryValueId ? countriesList[countryValueId] : null
-   })
+   const [country, setCountry] = useState<OptionGroup | null>(null)
 
    const countriesOptions = useMemo(() => {
       return (
@@ -58,10 +31,19 @@ export const CountryAutoCompleteDropdown = ({
       )
    }, [countriesList])
 
+   useEffect(() => {
+      if (countryValueId && Boolean(countriesList[countryValueId])) {
+         setCountry(countriesList[countryValueId])
+      } else {
+         setCountry(null)
+      }
+   }, [countryValueId, countriesList])
+
    return (
       <Autocomplete
          value={country}
          disabled={disabled}
+         loading={isLoading}
          options={countriesOptions}
          onChange={(_, value) => {
             setCountry(value?.id ? countriesList[value.id] : null)
@@ -71,7 +53,7 @@ export const CountryAutoCompleteDropdown = ({
          }}
          getOptionLabel={(option) => option.name}
          getOptionKey={(option) => option.id}
-         isOptionEqualToValue={(option, value) => option.id === value?.id}
+         isOptionEqualToValue={(option, value) => option?.id === value?.id}
          renderInput={(params) => (
             <TextField
                {...params}

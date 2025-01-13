@@ -16,7 +16,7 @@ const swrOptions: SWRConfiguration = {
       }),
 }
 
-const useCityById = (generatedCityId: string) => {
+const useCityById = (generatedCityId: string, suspense = true) => {
    const fetcher = useFunctionsSWR<CityOption>()
 
    const options = useMemo(() => {
@@ -28,7 +28,10 @@ const useCityById = (generatedCityId: string) => {
    const { data, error, isLoading } = useSWR<CityOption>(
       ["fetchCityData", options],
       fetcher,
-      swrOptions
+      {
+         ...swrOptions,
+         suspense,
+      }
    )
 
    return { data, error, isLoading }
