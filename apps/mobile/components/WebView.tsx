@@ -423,7 +423,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
       if (nextAppState === "active" && webViewRef.current) {
-         // Send message to web app to reconnect Agora
+         // Send message to web app that the app has resumed
          webViewRef.current.postMessage(
             JSON.stringify({
                type: MESSAGING_TYPE.WEBVIEW_RESUMED,

@@ -81,7 +81,7 @@ function MyApp(props) {
    const webviewResumedCount = useTrackWebviewResumedCount()
 
    return (
-      // Only render the entire if its a webview, and the webview has resumed
+      // Only re-render the entire app if its a webview, and the webview has resumed
       <Fragment key={MobileUtils.webViewPresence() ? webviewResumedCount : 0}>
          <CacheProvider value={emotionCache}>
             <Head>
