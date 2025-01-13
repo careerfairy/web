@@ -1,41 +1,27 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CityOption } from "@careerfairy/shared-lib/countries/types"
-import { FormHelperText, Skeleton } from "@mui/material"
+import { FormHelperText } from "@mui/material"
 import useCityById from "components/custom-hook/countries/useCityById"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { CityAutoComplete } from "components/views/countries/CityAutoComplete"
 import { userRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCallback, useEffect, useState } from "react"
 
 export const UserCitySelector = () => {
-   return (
-      <SuspenseWithBoundary
-         fallback={
-            <Skeleton
-               variant="rectangular"
-               height={50}
-               sx={{ borderRadius: "8px" }}
-            />
-         }
-      >
-         <UserCityDropdown />
-      </SuspenseWithBoundary>
-   )
-}
-
-const UserCityDropdown = () => {
    const { userData } = useAuth()
 
    const [userCountryCode, setUserCountryCode] = useState<string | null>(
       userData.countryIsoCode
    )
-   const { data: userCityOption, isLoading } = useCityById(userData.cityIsoCode)
-   const [city, setCity] = useState<OptionGroup | null>(userCityOption)
+   const { data: userCityOption, isLoading } = useCityById(
+      userData.cityIsoCode,
+      false
+   )
+   const [city, setCity] = useState<OptionGroup | null>(userCityOption ?? null)
 
    const handleSelectedCityChange = useCallback(
       async (city: CityOption | null) => {
-         setCity(city as OptionGroup)
+         setCity(city ? (city as OptionGroup) : null)
          await userRepo.updateUserData(userData.id, {
             cityIsoCode: city?.id ?? null,
             stateIsoCode: city?.stateIsoCode ?? null,
@@ -51,6 +37,14 @@ const UserCityDropdown = () => {
       }
    }, [userData.countryIsoCode, userCountryCode, handleSelectedCityChange])
 
+   useEffect(() => {
+      if (userData.cityIsoCode && Boolean(userCityOption)) {
+         setCity(userCityOption)
+      } else {
+         setCity(null)
+      }
+   }, [userData.cityIsoCode, userCityOption])
+
    return (
       <>
          <CityAutoComplete
@@ -59,7 +53,7 @@ const UserCityDropdown = () => {
             countryId={userData.countryIsoCode}
             handleSelectedCityChange={handleSelectedCityChange}
          />
-         {!isLoading && !city ? (
+         {userData.countryIsoCode && !isLoading && !city ? (
             <FormHelperText sx={{ color: "error.main", ml: 2 }}>
                Please select the city you are currently located in.
             </FormHelperText>
