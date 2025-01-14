@@ -83,7 +83,6 @@ export const TalentProfileHeader = () => {
 
    const isSettingsPage = router.pathname.includes(TAB_VALUES.settings.value)
    const [openSettings, setOpenSettings] = useState(isSettingsPage)
-   console.log("🚀 ~ TalentProfileHeader ~ openSettings:", openSettings)
 
    const profileTab = useSelector(getProfileTab)
 
@@ -150,14 +149,10 @@ export const TalentProfileHeader = () => {
 
                   delete router.query["tab"]
 
-                  router.push(
-                     {
-                        pathname: profileTab,
-                        query: router.query,
-                     }
-                     // undefined,
-                     // { shallow: true }
-                  )
+                  router.push({
+                     pathname: profileTab,
+                     query: router.query,
+                  })
                }}
             />
          </ConditionalWrapper>
