@@ -34,6 +34,10 @@ export const NextModuleSection = ({ nextModule }: Props) => {
       hasDividerAnimationComplete: false,
       hasNextModuleCardAppeared: false,
    })
+   console.log(
+      "🚀 ~ file: NextModuleSection.tsx:37 ~ NextModuleSection ~ animationsState:",
+      animationsState
+   )
 
    const moduleData = useModuleData()
 

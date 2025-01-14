@@ -14,6 +14,10 @@ const styles = sxStyles({
       minHeight: "100dvh",
       mb: 5,
    },
+   desktopRoot: {
+      pt: "-3px",
+      mt: "3px",
+   },
    modulesContainer: {
       flex: 1,
       gap: 2,
@@ -58,7 +62,7 @@ export const LevelsContainer = ({ pages }: Props) => {
          variants={containerVariants}
          initial="hidden"
          animate="visible"
-         sx={styles.root}
+         sx={[styles.root, !isMobile && styles.desktopRoot]}
       >
          <Stack spacing={2} direction={isMobile ? "column" : "row"}>
             <CourseOverview isMobile={isMobile} modules={pages} />

@@ -1,12 +1,11 @@
 import { Box, LinearProgress, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import Link from "next/link"
-import { X as BackIcon } from "react-feather"
 import {
    useProgress,
    useTalentGuideTitle,
 } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
+import { BackButton } from "./floating-buttons/BackButton"
 
 const styles = sxStyles({
    root: {
@@ -69,9 +68,7 @@ export const TalentGuideProgress = () => {
                   value={progress}
                   sx={styles.progress}
                />
-               <Box sx={styles.backIcon} component={Link} href="/levels">
-                  <BackIcon size={20} />
-               </Box>
+               <BackButton size={20} sx={styles.backIcon} />
             </Stack>
             <Typography variant="brandedH5" sx={styles.title}>
                {title}
