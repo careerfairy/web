@@ -36,6 +36,7 @@ export const HighlightsGrid = () => {
             return (
                <SuspenseWithBoundary
                   fallback={<HighlightCardSkeleton />}
+                  hide
                   key={index}
                >
                   {isSpark ? (

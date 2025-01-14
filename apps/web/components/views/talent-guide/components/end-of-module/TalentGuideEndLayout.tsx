@@ -1,20 +1,40 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Box, useMediaQuery } from "@mui/material"
+import { Box, useMediaQuery, Zoom } from "@mui/material"
 import { AnimatePresence } from "framer-motion"
 import { useAuth } from "HOCs/AuthProvider"
 import { useNextTalentGuideModule } from "hooks/useNextTalentGuideModule"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { BackButton } from "../floating-buttons/BackButton"
 import { TalentGuideLayout } from "../TalentGuideLayout"
 import { CongratsSection } from "./CongratsSection"
 import { FeedbackSection } from "./FeedbackSection"
 import { NextModuleSection } from "./NextModuleSection"
 import { layoutStyles } from "./styles"
 
+const styles = sxStyles({
+   root: {
+      px: { xs: 3.25, md: 0 },
+      maxWidth: 600,
+   },
+   backButton: {
+      p: 1.5,
+      position: "absolute",
+      top: 55,
+      right: 12,
+   },
+   zoomDelay: {
+      transitionDelay: "3000ms",
+   },
+})
+
 const SHOW_CONGRATS_TIME = 1000
 
 export const TalentGuideEndLayout = () => {
+   const random = useRef(Date.now())
+
    const { authenticatedUser } = useAuth()
    const { push } = useRouter()
    const [ratingClicked, setRatingClicked] = useState(false)
@@ -35,14 +55,7 @@ export const TalentGuideEndLayout = () => {
             push("/levels")
          },
          suspense: false,
-
-         /**
-          * Disable caching of the next module
-          */
-         revalidateOnMount: true,
-         revalidateIfStale: true,
-         revalidateOnFocus: true,
-         revalidateOnReconnect: true,
+         noCache: true,
       })
 
    useEffect(() => {
@@ -61,7 +74,10 @@ export const TalentGuideEndLayout = () => {
          setSomeTimeHasPassed(true)
       }, SHOW_CONGRATS_TIME)
 
-      return () => clearTimeout(timer)
+      return () => {
+         setSomeTimeHasPassed(false)
+         return clearTimeout(timer)
+      }
    }, [])
 
    const showCongrats =
@@ -70,10 +86,13 @@ export const TalentGuideEndLayout = () => {
       !ratingClicked &&
       !(isShorterScreen && someTimeHasPassed)
    const showFeedback = someTimeHasPassed && !feedbackSubmitted
-   const showNextModule = feedbackSubmitted && nextModule
+   const showNextModule = Boolean(feedbackSubmitted && nextModule)
 
    return (
-      <TalentGuideLayout sx={{ px: { xs: 3.25, md: 0 }, maxWidth: 600 }}>
+      <TalentGuideLayout key={random.current} sx={styles.root}>
+         <Zoom unmountOnExit style={styles.zoomDelay} in={showNextModule}>
+            <BackButton size={24} sx={styles.backButton} />
+         </Zoom>
          <Box id="talent-guide-end-layout" sx={layoutStyles.root}>
             <AnimatePresence>
                {Boolean(showCongrats) && (

@@ -51,7 +51,7 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
       props: {
          pages,
       },
-      revalidate: 60, // Revalidate every 60 seconds
+      revalidate: process.env.NODE_ENV === "development" ? false : 60,
    }
 }
 

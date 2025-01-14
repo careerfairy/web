@@ -1,7 +1,8 @@
 import { reducedRemoteCallsOptions } from "components/custom-hook/utils/useFunctionsSWRFetcher"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
 import { Page, TalentGuideModule } from "data/hygraph/types"
-import useSWR, { SWRConfiguration } from "swr"
+import { useEffect, useRef } from "react"
+import useSWR, { SWRConfiguration, useSWRConfig } from "swr"
 
 const fetchNextModule = async (
    userAuthUid: string | null,
@@ -29,14 +30,34 @@ const fetchNextModule = async (
 export function useNextTalentGuideModule(
    userAuthUid: string | null,
    locale: string = "de",
-   options?: SWRConfiguration
+   options?: SWRConfiguration & {
+      noCache?: boolean
+   }
 ) {
-   return useSWR(
-      userAuthUid ? `next-levels-module-${userAuthUid}-${locale}` : null,
-      () => fetchNextModule(userAuthUid, locale),
-      {
-         ...reducedRemoteCallsOptions,
-         ...options,
+   const { cache } = useSWRConfig()
+   const random = useRef(Date.now())
+
+   const key = userAuthUid
+      ? `next-levels-module-${userAuthUid}-${locale}${
+           options?.noCache ? `-${random.current}` : ""
+        }`
+      : null
+
+   const swr = useSWR(key, () => fetchNextModule(userAuthUid, locale), {
+      ...reducedRemoteCallsOptions,
+      ...options,
+   })
+
+   // Cleanup cache when component unmounts (only if noCache is true)
+   useEffect(() => {
+      if (!options?.noCache) return
+
+      return () => {
+         if (key) {
+            cache.delete(key)
+         }
       }
-   )
+   }, [cache, key, options?.noCache])
+
+   return swr
 }
