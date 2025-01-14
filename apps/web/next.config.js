@@ -330,6 +330,7 @@ const moduleExports = {
       externalDir: true,
       esmExternals: false, // fixes issue with [firebase](https://github.com/FirebaseExtended/reactfire/issues/491)
       outputFileTracingRoot: path.join(__dirname, "../../"),
+      scrollRestoration: true,
    },
    images: {
       domains: [
