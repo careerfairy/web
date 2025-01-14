@@ -11,7 +11,8 @@ import { Audio } from "expo-av"
 import { Camera } from "expo-camera"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
-import React, { useEffect, useRef, useState } from "react"
+import * as WebBrowser from "expo-web-browser"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
    AppState,
    BackHandler,
@@ -49,6 +50,37 @@ interface WebViewScreenProps {
       userPassword: string,
       userToken: string | null
    ) => void
+}
+
+type InterceptedRequest = {
+   hasTargetFrame: boolean
+   mainDocumentURL: string
+   canGoBack: boolean
+   title: string
+   isTopFrame: boolean
+   canGoForward: boolean
+   target: number
+   lockIdentifier: number
+   url: string
+   loading: boolean
+   navigationType: string
+}
+
+const externalLinks = [
+   "https://www.careerfairy.io/terms",
+   "https://www.careerfairy.io/data-protection",
+   "http://127.0.0.1:3000/terms", // iOS Localhost
+   "http://127.0.0.1:3000/data-protection", // iOS Localhost
+   "http://10.0.2.2:3000/terms", // Android Localhost
+   "http://10.0.2.2:3000/data-protection", // Android Localhost
+]
+
+const isLocalHost = (url: string) => {
+   return (
+      url.startsWith("http://127.0.0.1") ||
+      url.startsWith("http://localhost") ||
+      url.startsWith("http://10.0.2.2")
+   )
 }
 
 const WebViewComponent: React.FC<WebViewScreenProps> = ({
@@ -140,6 +172,21 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          Notifications.removeNotificationSubscription(notificationListener)
          Notifications.removeNotificationSubscription(responseListener)
       }
+   }, [])
+
+   const [defaultBrowser, setDefaultBrowser] = useState<string | null>(null)
+
+   useEffect(() => {
+      const getDefaultBrowser = async () => {
+         const browsers =
+            await WebBrowser.getCustomTabsSupportingBrowsersAsync()
+         if (browsers.browserPackages?.length > 0) {
+            setDefaultBrowser(
+               browsers.defaultBrowserPackage || browsers.browserPackages[0]
+            )
+         }
+      }
+      getDefaultBrowser()
    }, [])
 
    const requestPermissions = async () => {
@@ -267,9 +314,11 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const isValidUrl = (url: string) => {
-      const regex =
-         /^(https?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
-      return regex.test(url)
+      try {
+         return Boolean(new URL(url))
+      } catch {
+         return false
+      }
    }
 
    const handleNavigationStateChange = (navState: any) => {
@@ -282,9 +331,42 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
    }
 
-   const handleNavigation = (request: any) => {
+   const isExternalNavigation = (request: InterceptedRequest) => {
+      if (externalLinks.includes(request.url)) {
+         return true
+      }
+
+      if (isLocalHost(request.url)) {
+         return false
+      }
+
+      return (
+         !request.url.startsWith(`https://${SEARCH_CRITERIA}`) &&
+         !request.url.startsWith(`https://www.${SEARCH_CRITERIA}`) &&
+         !request.url.startsWith("about:") &&
+         request.loading
+      )
+   }
+
+   const openOnWebBrowser = useCallback(
+      (url: string) => {
+         const options: WebBrowser.WebBrowserOpenOptions = {}
+
+         if (Platform.OS === "android" && defaultBrowser) {
+            options.browserPackage = defaultBrowser
+         }
+
+         WebBrowser.openBrowserAsync(url, options)
+      },
+      [defaultBrowser]
+   )
+
+   const handleNavigation = (request: InterceptedRequest) => {
       if (request.url === "about:blank") {
          return false // Stop loading the blank page
+      } else if (request.url.startsWith("mailto:")) {
+         Linking.openURL(request.url)
+         return false
       } else {
          if (!request.url.includes(SEARCH_CRITERIA)) {
             if (isValidUrl(request.url)) {
@@ -296,12 +378,16 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                ) {
                   return false
                }
-               Linking.openURL(request.url)
+               openOnWebBrowser(request.url)
             }
             return false // Prevent WebView from loading the external link
          }
-      }
 
+         if (isExternalNavigation(request)) {
+            openOnWebBrowser(request.url)
+            return false
+         }
+      }
       return true // Allow WebView to load internal links
    }
 
@@ -315,7 +401,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             mediaPlaybackRequiresUserAction={false}
             allowsFullscreenVideo={true}
             onMessage={handleMessage}
-            onShouldStartLoadWithRequest={handleNavigation}
+            onShouldStartLoadWithRequest={(request) => {
+               return handleNavigation(request as InterceptedRequest)
+            }}
             cacheEnabled={true}
             incognito={false}
             domStorageEnabled={true}
