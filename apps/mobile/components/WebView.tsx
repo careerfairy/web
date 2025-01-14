@@ -365,7 +365,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       if (request.url === "about:blank") {
          return false // Stop loading the blank page
       } else if (request.url.startsWith("mailto:")) {
-         console.log("MAILTO", request.url)
          Linking.openURL(request.url)
          return false
       } else {
