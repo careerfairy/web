@@ -484,8 +484,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
             javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
             renderToHardwareTextureAndroid={true} // Improve performance on android
-            onContentProcessDidTerminate={handleContentProcessTerminate}
-            onRenderProcessGone={handleRenderProcessGone}
+            onContentProcessDidTerminate={handleContentProcessTerminate} // Automatically reload WebView when iOS/Android kills its process to free memory
+            onRenderProcessGone={handleRenderProcessGone} // Recover from WebView crashes on Android by refreshing the view
          />
       </SafeAreaView>
    )
