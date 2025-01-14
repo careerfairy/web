@@ -5,6 +5,7 @@ import { isServer } from "components/helperFunctions/HelperFunctions"
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
+import { MobileUtils } from "util/mobile.utils"
 
 const styles = sxStyles({
    root: {
@@ -37,6 +38,10 @@ const CloseSparksFeedButton: FC<Props> = ({ dark }) => {
          push("/portal")
       }
    }, [back, isLoggedIn, push, userPresenter])
+
+   if (MobileUtils.webViewPresence()) {
+      return null
+   }
 
    return (
       <IconButton
