@@ -94,7 +94,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
    const [refreshKey, setRefreshKey] = useState(0)
-   const [shouldRefreshAppWhenReOpened, setShouldRefreshAppWhenReOpened] =
+   const [shouldRefreshAppWhenResumed, setShouldRefreshAppWhenResumed] =
       useState(false)
 
    useEffect(() => {
@@ -361,7 +361,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          const options: WebBrowser.WebBrowserOpenOptions = {}
 
          if (isAndroid) {
-            setShouldRefreshAppWhenReOpened(true)
+            setShouldRefreshAppWhenResumed(true)
          }
 
          if (isAndroid && defaultBrowser) {
@@ -386,7 +386,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       if (request.url === "about:blank") {
          return false // Stop loading the blank page
       } else if (request.url.startsWith("mailto:")) {
-         isAndroid && setShouldRefreshAppWhenReOpened(true)
+         isAndroid && setShouldRefreshAppWhenResumed(true)
          Linking.openURL(request.url)
          return false
       } else {
@@ -446,7 +446,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       if (
          nextAppState === "active" &&
          webViewRef.current &&
-         shouldRefreshAppWhenReOpened
+         shouldRefreshAppWhenResumed
       ) {
          // Send message to web app that the app has resumed from external link
          const message: NativeEvent = {
@@ -455,7 +455,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          }
          const messageString = JSON.stringify(message)
          webViewRef.current.postMessage(messageString)
-         setShouldRefreshAppWhenReOpened(false) // Reset the state
+         setShouldRefreshAppWhenResumed(false) // Reset the state
       }
    }
 
