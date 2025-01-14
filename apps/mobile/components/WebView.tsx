@@ -94,6 +94,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
    const [refreshKey, setRefreshKey] = useState(0)
+   const [shouldRefreshAppWhenReOpened, setShouldRefreshAppWhenReOpened] =
+      useState(false)
 
    useEffect(() => {
       checkPermissions()
@@ -349,11 +351,17 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       )
    }
 
+   const isAndroid = Platform.OS === "android"
+
    const openOnWebBrowser = useCallback(
       (url: string) => {
          const options: WebBrowser.WebBrowserOpenOptions = {}
 
-         if (Platform.OS === "android" && defaultBrowser) {
+         if (isAndroid) {
+            setShouldRefreshAppWhenReOpened(true)
+         }
+
+         if (isAndroid && defaultBrowser) {
             options.browserPackage = defaultBrowser
          }
 
@@ -363,9 +371,20 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    )
 
    const handleNavigation = (request: InterceptedRequest) => {
+      if (
+         request.url.includes(
+            "careerfairy-e1fd9.firebaseapp.com/__/auth/iframe"
+         )
+      ) {
+         // Block auth iframe navigation, we don't want to allow this
+         return false
+      }
+
       if (request.url === "about:blank") {
+         openOnWebBrowser(request.url)
          return false // Stop loading the blank page
       } else if (request.url.startsWith("mailto:")) {
+         isAndroid && setShouldRefreshAppWhenReOpened(true)
          Linking.openURL(request.url)
          return false
       } else {
@@ -422,14 +441,19 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }, [])
 
    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      if (nextAppState === "active" && webViewRef.current) {
-         // Send message to web app that the app has resumed
+      if (
+         nextAppState === "active" &&
+         webViewRef.current &&
+         shouldRefreshAppWhenReOpened
+      ) {
+         // Send message to web app that the app has resumed from external link
          const message: NativeEvent = {
             type: MESSAGING_TYPE.WEBVIEW_RESUMED,
             data: null,
          }
          const messageString = JSON.stringify(message)
          webViewRef.current.postMessage(messageString)
+         setShouldRefreshAppWhenReOpened(false) // Reset the state
       }
    }
 
