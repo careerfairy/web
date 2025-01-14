@@ -46,13 +46,13 @@ export const SparksCarousel = ({
       [WheelGesturesPlugin()]
    )
 
-   const { shouldDisableAutoPlay, moveToNextSlide } = useAutoPlaySparks(
+   const { shouldDisableAutoPlay, moveToNextSlide, ref } = useAutoPlaySparks(
       sparks.length,
       emblaApi
    )
 
    return (
-      <Box sx={combineStyles(styles.disableUserSelect, containerSx)}>
+      <Box ref={ref} sx={combineStyles(styles.disableUserSelect, containerSx)}>
          <ContentCarousel
             headerTitle={header}
             emblaProps={{
@@ -69,6 +69,7 @@ export const SparksCarousel = ({
                   onClick={!disableClick && handleSparksClicked}
                   questionLimitLines={true}
                   onGoNext={moveToNextSlide}
+                  muted // there is never a case where we want to play audio on a carousel
                   disableAutoPlay={shouldDisableAutoPlay(index)}
                />
             ))}

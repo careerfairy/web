@@ -1,12 +1,12 @@
-import * as path from "path"
-import axios from "axios"
-import { readFile } from "fs/promises"
-import { existsSync, mkdirSync, rmSync } from "fs"
-import config from "./config"
-import { debug, h1Text, log } from "./lib/util"
 import UserSeed from "@careerfairy/seed-data/dist/users"
+import axios from "axios"
 import { ChildProcessWithoutNullStreams } from "child_process"
+import { existsSync, mkdirSync, rmSync } from "fs"
+import { readFile } from "fs/promises"
+import * as path from "path"
+import config from "./config"
 import { CommandOutput, currentRunningProcess, execute } from "./lib/executor"
+import { debug, h1Text, log } from "./lib/util"
 
 // save global reference for the emulators so that we can close them on CTRL+C
 let emulatorsProcess: ChildProcessWithoutNullStreams
@@ -36,8 +36,8 @@ async function run(): Promise<void> {
 
    await createUser("carlos@careerfairy.io")
    await createUser("habib@careerfairy.io", true)
-   await createUser("maximilian@careerfairy.io")
-   await createUser("goncalo@careerfairy.io")
+   await createUser("walter@careerfairy.io")
+   await createUser("matilde@careerfairy.io")
 
    emulatorsProcess.on("exit", () => {
       h1Text(
