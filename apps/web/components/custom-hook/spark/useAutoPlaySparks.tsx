@@ -15,49 +15,9 @@ export const useAutoPlaySparks = (
    const isMobile = useIsMobile()
    const [autoPlayingIndex, setAutoPlayingIndex] = useState<number>(0)
 
-   const { areSlidesInView } = useAreSlidesInView(emblaApi)
+   const { areSlidesInView } = useAreSlidesInView(emblaApi, 500)
 
    const [isUserScrolling, setIsUserScrolling] = useState(false)
-
-   const getSlideToPlayAfterScroll = useCallback(() => {
-      if (!isMobile || !emblaApi?.slideNodes()) return null
-
-      const viewportBoundingRect = emblaApi.rootNode().getBoundingClientRect()
-      const viewportLeft = viewportBoundingRect.left
-      const viewportRight = viewportBoundingRect.right
-
-      // Embla appends an extra node to the end of the carousel
-      // to ensure the last slide is fully visible (I think...)
-      // so we need to filter out the extra node
-      const slideNodes = emblaApi.slideNodes().slice(0, -1)
-
-      let firstVisibleIndex = null
-      let lastVisibleIndex = null
-
-      for (let i = 0; i < slideNodes.length; i++) {
-         const slideBoundingRect = slideNodes[i].getBoundingClientRect()
-
-         const isFullyVisible =
-            slideBoundingRect.left >= viewportLeft &&
-            slideBoundingRect.right <= viewportRight
-
-         if (isFullyVisible) {
-            if (firstVisibleIndex === null) {
-               firstVisibleIndex = i
-            }
-            lastVisibleIndex = i
-         }
-      }
-
-      // In case the user scroll to the end of the carousel,
-      // we want to play the last slide
-      if (lastVisibleIndex === slideNodes.length - 1) {
-         return lastVisibleIndex
-      }
-
-      // Otherwise, we want to play the first slide that is fully visible
-      return firstVisibleIndex
-   }, [isMobile, emblaApi])
 
    const moveToNextSlide = useCallback(() => {
       if (
@@ -88,37 +48,22 @@ export const useAutoPlaySparks = (
    )
 
    useEffect(() => {
-      if (!isMobile || !emblaApi) return
+      if (!emblaApi) return
 
-      const handleUserScrollStart = () => {
-         if (!areSlidesInView) return
-
-         setIsUserScrolling(true)
+      const onSelect = () => {
+         // Get the current selected index
+         const selectedIndex = emblaApi.selectedScrollSnap()
+         setAutoPlayingIndex(selectedIndex)
       }
 
-      const handleSettle = () => {
-         if (!isUserScrolling) return
-         const indexToPlay = getSlideToPlayAfterScroll()
+      // Subscribe to the select event
+      emblaApi.on("select", onSelect)
 
-         setIsUserScrolling(false)
-         setAutoPlayingIndex(indexToPlay)
-      }
-
-      emblaApi.on("pointerDown", handleUserScrollStart)
-      emblaApi.on("settle", handleSettle)
-
+      // Cleanup listener when component unmounts
       return () => {
-         emblaApi.off("pointerDown", handleUserScrollStart)
-         emblaApi.off("settle", handleSettle)
+         emblaApi.off("select", onSelect)
       }
-   }, [
-      areSlidesInView,
-      autoPlayingIndex,
-      emblaApi,
-      getSlideToPlayAfterScroll,
-      isMobile,
-      isUserScrolling,
-   ])
+   }, [emblaApi])
 
    useEffect(() => {
       return () => {

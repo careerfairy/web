@@ -180,7 +180,12 @@ const MobileSparksTransition = ({ isSparksOpen, handleDiscoverSparks }) => {
    )
 }
 
-const Component = ({ isSparksOpen, handleDiscoverSparks }) => {
+type ComponentProps = {
+   isSparksOpen: boolean
+   handleDiscoverSparks: () => void
+}
+
+const Component = ({ isSparksOpen, handleDiscoverSparks }: ComponentProps) => {
    const isMobile = useIsMobile()
    const router = useRouter()
    const { livestream } = useLiveStreamDialog()
@@ -315,12 +320,20 @@ const Header = ({ isSparksOpen }) => {
    )
 }
 
-const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
+type ActionButtonsProps = {
+   handleDiscoverSparks: () => void
+   isSparksOpen: boolean
+}
+
+const ActionButtons = ({
+   handleDiscoverSparks,
+   isSparksOpen,
+}: ActionButtonsProps) => {
    const route = useRouter()
    const { closeDialog, livestream, goToView, isDiscoverCompanySparksOpen } =
       useLiveStreamDialog()
    const { data: group } = useGroup(livestream.groupIds[0])
-   const groupHasSparks = group?.publicSparks
+   const groupHasSparks = Boolean(group?.publicSparks)
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )

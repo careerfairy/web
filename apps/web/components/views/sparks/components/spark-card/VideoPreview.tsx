@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -137,9 +138,14 @@ const VideoPreview: FC<Props> = ({
          dispatch(setVideosMuted(true))
          playerRef.current?.getInternalPlayer()?.play()
 
-         console.error(error)
+         errorLogAndNotify(error, {
+            message: "Error playing video",
+            videoUrl,
+            error: JSON.stringify(error, null, 2),
+            videoShouldBeMuted: muted,
+         })
       },
-      [dispatch]
+      [dispatch, videoUrl, muted]
    )
 
    const handleProgress = useCallback(
@@ -161,6 +167,25 @@ const VideoPreview: FC<Props> = ({
       setProgress(0)
       playerRef.current?.seekTo(0)
    }
+
+   const playingVideo = Boolean(playing && !shouldPause)
+
+   // checks for tab switch/minimize in browser, stops the preview video from playing force the carousel to remount
+   useEffect(() => {
+      const handleVisibilityChange = () => {
+         if (document.visibilityState === "visible" && playingVideo) {
+            playerRef.current?.getInternalPlayer()?.play()
+         }
+      }
+
+      document.addEventListener("visibilitychange", handleVisibilityChange)
+      return () => {
+         document.removeEventListener(
+            "visibilitychange",
+            handleVisibilityChange
+         )
+      }
+   }, [playingVideo])
 
    useEffect(() => {
       if (prevIdentifier !== identifier) {
@@ -203,8 +228,6 @@ const VideoPreview: FC<Props> = ({
          onVideoPlay?.()
       }
    }, [onVideoPlay, videoPlayedForSession])
-
-   const playingVideo = Boolean(playing && !shouldPause)
 
    return (
       <Box sx={styles.root}>

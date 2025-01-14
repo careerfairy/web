@@ -1,7 +1,10 @@
 import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
 import { LivestreamEvent } from "../livestreams"
 import { SparkStats } from "../sparks/sparks"
-import { generateCalendarEventProperties } from "./calendarEvents"
+import {
+   EventProperties,
+   generateCalendarEventProperties,
+} from "./calendarEvents"
 
 export type CalendarEvent = {
    startsAt: string
@@ -347,7 +350,7 @@ type OptionsCreateCalendarEvent = {
 }
 
 export const createCalendarEvent = (
-   livestream: LivestreamEvent,
+   livestream: EventProperties,
    customUtm?: Partial<AddUtmTagsToLinkProps>,
    options?: OptionsCreateCalendarEvent
 ) => {

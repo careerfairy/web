@@ -5,7 +5,7 @@ import { Stack } from "@mui/material"
 import Box from "@mui/material/Box"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { debounce } from "lodash"
-import { FC, useCallback, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkHeader from "./SparkHeader"
@@ -60,9 +60,9 @@ const SparkPreviewCard: FC<Props> = ({
       if (disableAutoPlay) return
 
       const currentContainerRef = containerRef.current
-      let timeout
+      let timeout: NodeJS.Timeout
 
-      const observable = (entries) => {
+      const observable = (entries: IntersectionObserverEntry[]) => {
          const entry = entries[0]
 
          if (entry && entry.intersectionRatio > 0.9) {
@@ -95,7 +95,7 @@ const SparkPreviewCard: FC<Props> = ({
    useEffect(() => {
       if (disableAutoPlay) return
 
-      let timeout
+      let timeout: NodeJS.Timeout
 
       if (!disableAutoPlay && autoPlaying && isMobile) {
          // After auto-play we should transition to the next spark
@@ -109,21 +109,6 @@ const SparkPreviewCard: FC<Props> = ({
          clearTimeout(timeout)
       }
    }, [autoPlaying, disableAutoPlay, isMobile, onGoNext])
-
-   const handleVisibilityChange = useCallback(() => {
-      setAutoPlaying(document.visibilityState === "visible")
-   }, [])
-
-   // checks for tab switch/minimize in browser, stops the preview video from playing
-   useEffect(() => {
-      document.addEventListener("visibilitychange", handleVisibilityChange)
-      return () => {
-         document.removeEventListener(
-            "visibilitychange",
-            handleVisibilityChange
-         )
-      }
-   }, [handleVisibilityChange])
 
    return (
       <SparkPreviewCardContainer
