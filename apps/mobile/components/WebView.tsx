@@ -335,20 +335,23 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const isExternalNavigation = (request: InterceptedRequest) => {
-      if (externalLinks.includes(request.url)) {
-         return true
+      // Special case for auth iframe and blank pages
+      if (request.url === "about:blank") {
+         return false
       }
 
+      // Check if it's a localhost URL
       if (isLocalHost(request.url)) {
          return false
       }
 
-      return (
-         !request.url.startsWith(`https://${SEARCH_CRITERIA}`) &&
-         !request.url.startsWith(`https://www.${SEARCH_CRITERIA}`) &&
-         !request.url.startsWith("about:") &&
-         request.loading
-      )
+      try {
+         const urlObj = new URL(request.url)
+         // Check if the URL is within your domain
+         return !urlObj.hostname.includes(SEARCH_CRITERIA) && request.loading
+      } catch {
+         return false // Invalid URL
+      }
    }
 
    const isAndroid = Platform.OS === "android"
