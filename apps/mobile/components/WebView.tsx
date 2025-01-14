@@ -381,7 +381,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
 
       if (request.url === "about:blank") {
-         openOnWebBrowser(request.url)
          return false // Stop loading the blank page
       } else if (request.url.startsWith("mailto:")) {
          isAndroid && setShouldRefreshAppWhenReOpened(true)
