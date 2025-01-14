@@ -129,6 +129,7 @@ const csp = {
       "https://pagead2.googlesyndication.com", // Google Ads
       "https://vimeocdn.com",
       "https://player.vimeo.com",
+      "https://overbridgenet.com",
    ],
    "img-src": [
       "'self'",

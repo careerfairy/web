@@ -4,8 +4,8 @@ import { imageKitLoader } from "@careerfairy/shared-lib/utils/video"
 import { Stack } from "@mui/material"
 import Box from "@mui/material/Box"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { debounce } from "lodash"
-import { FC, useCallback, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useState } from "react"
+import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkHeader from "./SparkHeader"
@@ -52,50 +52,48 @@ const SparkPreviewCard: FC<Props> = ({
    onVideoEnded,
 }) => {
    const [autoPlaying, setAutoPlaying] = useState(false)
-   const containerRef = useRef<HTMLDivElement>(null)
+
+   const { ref, inView } = useInView({
+      threshold: 0.9,
+      skip: disableAutoPlay,
+   })
    const isMobile = useIsMobile()
 
-   // Set up intersection observer to handle auto-playing
+   /**
+    * Auto-plays Spark preview cards on mobile when they become visible.
+    * Uses intersection observer to detect when card is 90% in viewport.
+    *
+    * Flow:
+    * 1. Card enters view -> Start playing after 200ms delay
+    * 2. Card exits view -> Stop playing
+    * 3. After auto-play duration -> Go to next Spark
+    *
+    * @param disableAutoPlay - Disables auto-play if true
+    * @param isMobile - Is mobile device
+    * @param inView - Is card visible
+    * @param onGoNext - Handler for going to next Spark
+    */
    useEffect(() => {
       if (disableAutoPlay) return
 
-      const currentContainerRef = containerRef.current
-      let timeout
+      let timeout: NodeJS.Timeout
 
-      const observable = (entries) => {
-         const entry = entries[0]
-
-         if (entry && entry.intersectionRatio > 0.9) {
-            timeout = setTimeout(() => {
-               setAutoPlaying(true)
-            }, 200)
-         } else {
-            setAutoPlaying(false)
-            clearTimeout(timeout)
-         }
+      if (isMobile && inView) {
+         timeout = setTimeout(() => {
+            setAutoPlaying(true)
+         }, 200)
+      } else if (!inView) {
+         setAutoPlaying(false)
       }
 
-      const debouncedObservable = debounce(observable, 300)
-
-      const observer = new IntersectionObserver(debouncedObservable, {
-         threshold: 0.9,
-      })
-
-      if (isMobile && containerRef.current) {
-         observer.observe(containerRef.current)
-      }
-
-      return () => {
-         observer.unobserve(currentContainerRef)
-         clearTimeout(timeout)
-      }
-   }, [disableAutoPlay, isMobile])
+      return () => clearTimeout(timeout)
+   }, [disableAutoPlay, isMobile, inView])
 
    // Set up auto-playing timeout for mobile experience
    useEffect(() => {
       if (disableAutoPlay) return
 
-      let timeout
+      let timeout: NodeJS.Timeout
 
       if (!disableAutoPlay && autoPlaying && isMobile) {
          // After auto-play we should transition to the next spark
@@ -109,21 +107,6 @@ const SparkPreviewCard: FC<Props> = ({
          clearTimeout(timeout)
       }
    }, [autoPlaying, disableAutoPlay, isMobile, onGoNext])
-
-   const handleVisibilityChange = useCallback(() => {
-      setAutoPlaying(document.visibilityState === "visible")
-   }, [])
-
-   // checks for tab switch/minimize in browser, stops the preview video from playing
-   useEffect(() => {
-      document.addEventListener("visibilitychange", handleVisibilityChange)
-      return () => {
-         document.removeEventListener(
-            "visibilitychange",
-            handleVisibilityChange
-         )
-      }
-   }, [handleVisibilityChange])
 
    return (
       <SparkPreviewCardContainer
@@ -148,7 +131,7 @@ const SparkPreviewCard: FC<Props> = ({
          }
          onVideoEnded={onVideoEnded}
          autoPlaying={!disableAutoPlay && autoPlaying}
-         containerRef={containerRef}
+         containerRef={ref}
          selected={selected}
       >
          {selectInput || null}

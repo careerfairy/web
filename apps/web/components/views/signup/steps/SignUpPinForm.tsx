@@ -206,7 +206,7 @@ const SignUpPinForm = () => {
                         Having issues signing up?{" "}
                         <MuiLink
                            style={{ cursor: "pointer" }}
-                           href="mailto:maximilian@careerfairy.io"
+                           href="mailto:support@careerfairy.io"
                         >
                            {" "}
                            Let us know
