@@ -1,15 +1,11 @@
 import { Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { Page, TalentGuideModule } from "data/hygraph/types"
-import dynamic from "next/dynamic"
 import Link from "next/link"
 import { sxStyles } from "types/commonTypes"
 import { Details } from "./Details"
+import { Status } from "./Status"
 import { Thumbnail } from "./Thumbnail"
-
-const Status = dynamic(() => import("./Status").then((mod) => mod.Status), {
-   ssr: false, // disable ssr for status component as it uses suspense
-})
 
 const styles = sxStyles({
    preventBoxShadowClipping: {

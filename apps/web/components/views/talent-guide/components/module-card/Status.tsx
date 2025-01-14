@@ -1,6 +1,5 @@
 import { Skeleton } from "@mui/material"
 import { useModuleProgress } from "components/custom-hook/talent-guide/useModuleProgress"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { TalentGuideModule } from "data/hygraph/types"
 import { useAuth } from "HOCs/AuthProvider"
 import { ModuleCompletedChip } from "./ModuleCompletedChip"
@@ -12,39 +11,51 @@ type Props = {
    onShineAnimationComplete?: () => void
 }
 
+const SkeletonStatus = () => {
+   return (
+      <Skeleton
+         sx={statusStyles.chip}
+         height={25.98}
+         width={115}
+         variant="rectangular"
+      />
+   )
+}
+
 export const Status = ({ module, onShineAnimationComplete }: Props) => {
    const { isLoggedOut, isLoadingAuth } = useAuth()
 
-   const fallBack = (
-      <ModuleInfoChip
-         moduleLevel={module.level}
-         estimatedModuleDurationMinutes={module.estimatedModuleDurationMinutes}
-      />
-   )
+   if (isLoadingAuth) {
+      return <SkeletonStatus />
+   }
+
+   if (isLoggedOut) {
+      return (
+         <ModuleInfoChip
+            moduleLevel={module.level}
+            estimatedModuleDurationMinutes={
+               module.estimatedModuleDurationMinutes
+            }
+         />
+      )
+   }
 
    return (
-      <SuspenseWithBoundary fallback={fallBack}>
-         {isLoadingAuth ? (
-            <Skeleton
-               sx={statusStyles.chip}
-               height={26}
-               width={115}
-               variant="rectangular"
-            />
-         ) : isLoggedOut ? (
-            fallBack
-         ) : (
-            <Content
-               module={module}
-               onShineAnimationComplete={onShineAnimationComplete}
-            />
-         )}
-      </SuspenseWithBoundary>
+      <Content
+         module={module}
+         onShineAnimationComplete={onShineAnimationComplete}
+      />
    )
 }
 
 const Content = ({ module, onShineAnimationComplete }: Props) => {
-   const moduleProgress = useModuleProgress(module.id)
+   const { moduleProgress, loading: isLoadingProgress } = useModuleProgress(
+      module.id
+   )
+
+   if (isLoadingProgress) {
+      return <SkeletonStatus />
+   }
 
    if (moduleProgress?.completedAt) {
       return (

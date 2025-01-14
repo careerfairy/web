@@ -1,4 +1,5 @@
 import { Button, Typography, useMediaQuery } from "@mui/material"
+import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { AnimatePresence } from "framer-motion"
@@ -34,10 +35,8 @@ export const NextModuleSection = ({ nextModule }: Props) => {
       hasDividerAnimationComplete: false,
       hasNextModuleCardAppeared: false,
    })
-   console.log(
-      "🚀 ~ file: NextModuleSection.tsx:37 ~ NextModuleSection ~ animationsState:",
-      animationsState
-   )
+
+   useTraceUpdate(animationsState)
 
    const moduleData = useModuleData()
 
@@ -84,7 +83,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          sx={nextModuleStyles.section}
          data-testid="next-module-section"
       >
-         <AnimatePresence mode="sync">
+         <AnimatePresence mode="popLayout">
             <FramerBox
                ref={completedCardRef}
                layout
