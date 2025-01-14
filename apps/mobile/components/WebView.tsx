@@ -1,4 +1,5 @@
 import {
+   CONSOLE,
    HAPTIC,
    MESSAGING_TYPE,
    NativeEvent,
@@ -15,6 +16,7 @@ import * as WebBrowser from "expo-web-browser"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
    AppState,
+   AppStateStatus,
    BackHandler,
    Linking,
    Platform,
@@ -88,29 +90,13 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onLogout,
 }) => {
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
-   const webViewRef: any = useRef(null)
+   const webViewRef = useRef<WebView>(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
+   const [refreshKey, setRefreshKey] = useState(0)
 
    useEffect(() => {
       checkPermissions()
-   }, [])
-
-   // Method for checking if iOS application was closed (opened in the background) and return to it
-   // If it happens, we rerender the webview, so it does not have blank screen
-   useEffect(() => {
-      const subscription = AppState.addEventListener("change", (state) => {
-         if (state === "active" && webViewRef?.current) {
-            webViewRef.current.injectJavaScript(`
-               if (document.body.innerHTML.trim() === '') {
-                  window.location.reload();
-               }
-               true;
-            `)
-         }
-      })
-
-      return () => subscription.remove()
    }, [])
 
    useEffect(() => {
@@ -223,6 +209,19 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
    }
 
+   const handleWebAppConsoleMessage = (data: CONSOLE) => {
+      console[data.type](
+         `[WebView]:`,
+         ...data.args.map((arg) => {
+            try {
+               return JSON.parse(arg)
+            } catch (e) {
+               return arg
+            }
+         })
+      )
+   }
+
    const handleMessage = (event: NativeEventStringified) => {
       try {
          const receivedData = JSON.parse(event.nativeEvent.data)
@@ -230,12 +229,14 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          const { type, data } = receivedData as NativeEvent
 
          switch (type) {
+            case MESSAGING_TYPE.CONSOLE:
+               return handleWebAppConsoleMessage(data)
             case MESSAGING_TYPE.USER_AUTH:
-               return handleUserAuth(data as USER_AUTH)
+               return handleUserAuth(data)
             case MESSAGING_TYPE.HAPTIC:
-               return handleHaptic(data as HAPTIC)
+               return handleHaptic(data)
             case MESSAGING_TYPE.PERMISSIONS:
-               return handlePermissions(data as PERMISSIONS)
+               return handlePermissions(data)
             case MESSAGING_TYPE.LOGOUT:
                return handleLogout()
             default:
@@ -391,9 +392,51 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       return true // Allow WebView to load internal links
    }
 
+   const handleContentProcessTerminate = () => {
+      console.error("[WebView] Content process terminated", {
+         timestamp: new Date().toISOString(),
+         url: baseUrl,
+      })
+      setRefreshKey((prev) => prev + 1)
+   }
+
+   const handleRenderProcessGone = (syntheticEvent: any) => {
+      const { nativeEvent } = syntheticEvent
+      console.error("[WebView] Render process crashed", {
+         timestamp: new Date().toISOString(),
+         didCrash: nativeEvent.didCrash,
+         url: baseUrl,
+         details: nativeEvent,
+      })
+      setRefreshKey((prev) => prev + 1)
+   }
+
+   useEffect(() => {
+      const subscription = AppState.addEventListener(
+         "change",
+         handleAppStateChange
+      )
+      return () => {
+         subscription.remove()
+      }
+   }, [])
+
+   const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+      if (nextAppState === "active" && webViewRef.current) {
+         // Send message to web app that the app has resumed
+         const message: NativeEvent = {
+            type: MESSAGING_TYPE.WEBVIEW_RESUMED,
+            data: null,
+         }
+         const messageString = JSON.stringify(message)
+         webViewRef.current.postMessage(messageString)
+      }
+   }
+
    return (
       <SafeAreaView style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
          <WebView
+            key={refreshKey + 1}
             style={{ flex: 1 }}
             ref={webViewRef}
             source={{ uri: baseUrl }}
@@ -413,6 +456,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
             sharedCookiesEnabled={true}
             thirdPartyCookiesEnabled={true}
+            // @ts-ignore
             useWebKit={true}
             originWhitelist={[
                "https://*",
@@ -440,6 +484,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
             javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
             renderToHardwareTextureAndroid={true} // Improve performance on android
+            onContentProcessDidTerminate={handleContentProcessTerminate} // Automatically reload WebView when iOS/Android kills its process to free memory
+            onRenderProcessGone={handleRenderProcessGone} // Recover from WebView crashes on Android by refreshing the view
          />
       </SafeAreaView>
    )

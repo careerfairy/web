@@ -23,13 +23,18 @@ import { brandedLightTheme } from "../materialUI"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import { store, wrapper } from "../store"
 
+import { Button, Typography } from "@mui/material"
+import { useTrackWebviewResumedCount } from "components/custom-hook/utils/useTrackWebviewResumed"
+import { useWebviewConsoleProxy } from "components/custom-hook/utils/useWebviewConsoleProxy"
 import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
+import { Fragment } from "react"
 import {
    FirebaseAppProvider,
    FirestoreProvider,
    FunctionsProvider,
    AuthProvider as ReactFireAuthProvider,
 } from "reactfire"
+import { MobileUtils } from "util/mobile.utils"
 import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
 import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
 import ErrorProvider from "../HOCs/ErrorProvider"
@@ -72,53 +77,68 @@ function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
+   useWebviewConsoleProxy()
+
+   const webviewResumedCount = useTrackWebviewResumedCount()
 
    return (
-      <CacheProvider value={emotionCache}>
-         <Head>
-            <meta
-               name="viewport"
-               content="initial-scale=1, width=device-width, maximum-scale=1.0, user-scalable=0" //https://github.com/vercel/next.js/issues/7176
+      // Only re-render the entire app if its a webview, and the webview has resumed
+      <Fragment key={MobileUtils.webViewPresence() ? webviewResumedCount : 0}>
+         <Button
+            variant="contained"
+            color="primary"
+            sx={{ top: 100, left: 0, position: "fixed", zIndex: 1000 }}
+         >
+            <Typography>
+               Webview Resumed Count: {webviewResumedCount}
+            </Typography>
+         </Button>
+         <CacheProvider value={emotionCache}>
+            <Head>
+               <meta
+                  name="viewport"
+                  content="initial-scale=1, width=device-width, maximum-scale=1.0, user-scalable=0" //https://github.com/vercel/next.js/issues/7176
+               />
+               <title>CareerFairy | Watch live streams. Get hired.</title>
+            </Head>
+            <NextNProgress
+               color={brandedLightTheme.palette.primary.main}
+               options={{ showSpinner: false }}
             />
-            <title>CareerFairy | Watch live streams. Get hired.</title>
-         </Head>
-         <NextNProgress
-            color={brandedLightTheme.palette.primary.main}
-            options={{ showSpinner: false }}
-         />
-         <Provider store={store}>
-            <ReactReduxFirebaseProvider {...rrfProps}>
-               <ReactFireProviders>
-                  <FeatureFlagsProvider>
-                     <TutorialProvider>
-                        <ThemeProviderWrapper>
-                           <AuthProvider>
-                              <FirebaseServiceContext.Provider
-                                 value={firebaseServiceInstance}
-                              >
-                                 <LocalizationProvider
-                                    dateAdapter={AdapterDateFns}
+            <Provider store={store}>
+               <ReactReduxFirebaseProvider {...rrfProps}>
+                  <ReactFireProviders>
+                     <FeatureFlagsProvider>
+                        <TutorialProvider>
+                           <ThemeProviderWrapper>
+                              <AuthProvider>
+                                 <FirebaseServiceContext.Provider
+                                    value={firebaseServiceInstance}
                                  >
-                                    <UserReminderProvider>
-                                       <ErrorProvider>
-                                          <UserRewardsNotifications>
-                                             <SparksFeedTrackerProvider>
-                                                <Component {...pageProps} />
-                                             </SparksFeedTrackerProvider>
-                                          </UserRewardsNotifications>
-                                          <Notifier />
-                                       </ErrorProvider>
-                                    </UserReminderProvider>
-                                 </LocalizationProvider>
-                              </FirebaseServiceContext.Provider>
-                           </AuthProvider>
-                        </ThemeProviderWrapper>
-                     </TutorialProvider>
-                  </FeatureFlagsProvider>
-               </ReactFireProviders>
-            </ReactReduxFirebaseProvider>
-         </Provider>
-      </CacheProvider>
+                                    <LocalizationProvider
+                                       dateAdapter={AdapterDateFns}
+                                    >
+                                       <UserReminderProvider>
+                                          <ErrorProvider>
+                                             <UserRewardsNotifications>
+                                                <SparksFeedTrackerProvider>
+                                                   <Component {...pageProps} />
+                                                </SparksFeedTrackerProvider>
+                                             </UserRewardsNotifications>
+                                             <Notifier />
+                                          </ErrorProvider>
+                                       </UserReminderProvider>
+                                    </LocalizationProvider>
+                                 </FirebaseServiceContext.Provider>
+                              </AuthProvider>
+                           </ThemeProviderWrapper>
+                        </TutorialProvider>
+                     </FeatureFlagsProvider>
+                  </ReactFireProviders>
+               </ReactReduxFirebaseProvider>
+            </Provider>
+         </CacheProvider>
+      </Fragment>
    )
 }
 
