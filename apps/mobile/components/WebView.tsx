@@ -364,6 +364,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const handleNavigation = (request: InterceptedRequest) => {
       if (request.url === "about:blank") {
          return false // Stop loading the blank page
+      } else if (request.url.startsWith("mailto:")) {
+         console.log("MAILTO", request.url)
+         Linking.openURL(request.url)
+         return false
       } else {
          if (!request.url.includes(SEARCH_CRITERIA)) {
             if (isValidUrl(request.url)) {
