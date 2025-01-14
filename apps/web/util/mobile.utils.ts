@@ -19,4 +19,11 @@ export class MobileUtils {
          typeof webViewWindow?.ReactNativeWebView?.postMessage !== "function"
       )
    }
+
+   public static isAndroidWebView(): boolean {
+      return (
+         this.webViewPresence() &&
+         navigator.userAgent.toLowerCase().includes("android")
+      )
+   }
 }

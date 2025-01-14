@@ -213,6 +213,7 @@ const styles = sxStyles({
       cursor: "pointer",
    },
    cardWrapper: (theme) => ({
+      color: theme.palette.action.active,
       minWidth: "300px",
       height: "100%",
       borderRadius: theme.spacing(2),
