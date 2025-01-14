@@ -1,5 +1,12 @@
 import {
+   SparkCategory,
+   getCategoryEmoji,
+   sparksCategoriesArray,
+} from "@careerfairy/shared-lib/sparks/sparks"
+import CloseIcon from "@mui/icons-material/CloseRounded"
+import {
    Box,
+   Button,
    Chip,
    Dialog,
    DialogActions,
@@ -10,27 +17,20 @@ import {
    IconButton,
    Typography,
 } from "@mui/material"
-import React, { useCallback, useMemo } from "react"
-import { sxStyles } from "types/commonTypes"
-import CloseIcon from "@mui/icons-material/CloseRounded"
-import {
-   SparkCategory,
-   getCategoryEmoji,
-   sparksCategoriesArray,
-} from "@careerfairy/shared-lib/sparks/sparks"
-import { Button } from "@mui/material"
-import { useFormik } from "formik"
-import SparkIcon from "components/views/common/icons/SparkIcon"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import SparkIcon from "components/views/common/icons/SparkIcon"
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
+import { DRAWER_WIDTH } from "constants/layout"
+import { useFormik } from "formik"
+import { useCallback, useMemo } from "react"
 import { useDispatch } from "react-redux"
 import {
    fetchNextSparks,
    resetSparksFeed,
    setSparkCategories,
 } from "store/reducers/sparksFeedReducer"
-import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { DRAWER_WIDTH } from "constants/layout"
-import { useWebviewBackHandler } from "../../../../../util/WebviewRouting.utils";
+import { sxStyles } from "types/commonTypes"
+import { useWebviewBackHandler } from "../../../../../util/WebviewRouting.utils"
 
 const styles = sxStyles({
    drawerPaper: {
@@ -125,14 +125,6 @@ const SparksFilterDialog = ({
 }: Props) => {
    const isMobile = useIsMobile()
 
-   useWebviewBackHandler(() => {
-      if (isOpen) {
-         handleClose();
-         return true;
-      }
-      return false;
-   });
-
    const isFullScreen = useSparksFeedIsFullScreen()
 
    return (
@@ -151,6 +143,7 @@ const SparksFilterDialog = ({
                   handleClose={handleClose}
                   selectedCategoryIds={selectedCategoryIds}
                   isMobile={isMobile}
+                  isOpen={isOpen}
                />
             </Drawer>
          ) : (
@@ -169,6 +162,7 @@ const SparksFilterDialog = ({
                   handleClose={handleClose}
                   selectedCategoryIds={selectedCategoryIds}
                   isMobile={isMobile}
+                  isOpen={isOpen}
                />
             </Dialog>
          )}
@@ -180,12 +174,14 @@ type ContentProps = {
    handleClose: () => void
    isMobile: boolean
    selectedCategoryIds: SparkCategory["id"][]
+   isOpen: boolean
 }
 
 const FilterContent = ({
    handleClose,
    isMobile,
    selectedCategoryIds,
+   isOpen,
 }: ContentProps) => {
    const dispatch = useDispatch()
    const formik = useFormik({
@@ -195,6 +191,14 @@ const FilterContent = ({
          dispatch(setSparkCategories(values ? values : []))
          dispatch(fetchNextSparks())
       },
+   })
+
+   useWebviewBackHandler(() => {
+      if (isOpen) {
+         handleClose()
+         return true
+      }
+      return false
    })
 
    const handleChipClick = useCallback(

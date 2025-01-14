@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
-import { Fragment, useMemo, useState } from "react"
+import { Fragment, ReactNode, useMemo, useState } from "react"
 import SEO from "../../components/util/SEO"
 import CarouselContentService, {
    filterNonRegisteredStreams,
@@ -135,7 +135,7 @@ const PortalPage = ({
                         />
                      </Container>
                      <Container disableGutters>
-                        <PortalTagsContent>
+                        <PortalTags>
                            {isMounted ? (
                               <SuspenseWithBoundary
                                  fallback={<SparksLoadingFallback />}
@@ -182,7 +182,7 @@ const PortalPage = ({
                                  seeMoreLink={"/past-livestreams"}
                               />
                            </ConditionalWrapper>
-                        </PortalTagsContent>
+                        </PortalTags>
                      </Container>
                   </CustomJobDialogLayout>
                </LivestreamDialogLayout>
@@ -211,66 +211,34 @@ const SparksLoadingFallback = () => {
 }
 
 type PortalTagsContentProps = {
-   children: React.ReactNode
+   children: ReactNode
 }
-const PortalTagsContent = ({ children }: PortalTagsContentProps) => {
-   const isMounted = useIsMounted()
-   return (
-      <SuspenseWithBoundary fallback={children}>
-         {isMounted ? <PortalTags>{children}</PortalTags> : children}
-      </SuspenseWithBoundary>
-   )
-}
+
+type CategoryId = string | undefined
 
 const PortalTags = ({ children }: PortalTagsContentProps) => {
-   const availableCategories = useAvailableTagsByHits()
-   const defaultCategories = availableCategories.map((tag) => {
-      return [
-         tag.id,
-         {
-            selected: false,
-         },
-      ]
-   })
+   const { tags } = useAvailableTagsByHits()
+   const [selectedCategoryId, setSelectedCategoryId] =
+      useState<CategoryId>(undefined)
 
-   const [categoriesData, setCategoriesData] = useState(() => {
-      return Object.fromEntries(defaultCategories)
-   })
-
-   const selectedCategories = useMemo(() => {
-      return Object.keys(categoriesData).filter(
-         (cat) => categoriesData[cat].selected
+   const handleCategoryChipClicked = (categoryId: CategoryId) => {
+      setSelectedCategoryId((previousCategoryId) =>
+         previousCategoryId === categoryId ? undefined : categoryId
       )
-   }, [categoriesData])
-
-   const handleCategoryChipClicked = (categoryId: string) => {
-      const newCategories = Object.fromEntries(
-         Object.keys(categoriesData).map((id) => {
-            return [
-               id,
-               {
-                  selected:
-                     id === categoryId
-                        ? !categoriesData[categoryId].selected
-                        : false,
-               },
-            ]
-         })
-      )
-
-      setCategoriesData(newCategories)
    }
 
    return (
       <Box sx={{ mb: 3, minHeight: "100vh" }}>
          <TagsCarouselWithArrow
-            selectedCategories={selectedCategories}
-            tags={availableCategories}
+            selectedCategories={selectedCategoryId ? [selectedCategoryId] : []}
+            tags={tags}
             handleTagClicked={handleCategoryChipClicked}
             handleAllClicked={() => handleCategoryChipClicked(undefined)}
          />
-         {selectedCategories.length ? (
-            <CategoryTagsContent categories={categoriesData} />
+         {selectedCategoryId ? (
+            <CategoryTagsContent
+               categories={{ [selectedCategoryId]: { selected: true } }}
+            />
          ) : (
             children
          )}

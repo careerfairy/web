@@ -12,6 +12,7 @@ import {
 } from "@mui/material"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { memo, useCallback, useMemo, useState } from "react"
+import { sxStyles } from "types/commonTypes"
 import {
    appleIcon,
    googleIcon,
@@ -20,8 +21,9 @@ import {
    yahooIcon,
 } from "../../../../constants/svgs"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
-const styles = {
+const styles = sxStyles({
    avatar: {
       borderRadius: 0,
       width: (theme) => theme.spacing(3),
@@ -30,7 +32,7 @@ const styles = {
          objectFit: "contain",
       },
    },
-}
+})
 
 const LinkMenuItem = ({ children, filename = false, href, ...rest }) => (
    <MenuItem
@@ -115,21 +117,38 @@ export const AddToCalendar = memo(function AddToCalendar({
 }: Props) {
    const [anchorEl, setAnchorEl] = useState(null)
 
-   const urls = useMemo(
-      () =>
-         makeUrls(
+   const urls = useMemo(() => {
+      const overrideBaseUrl = getBaseUrl()
+      try {
+         return makeUrls(
             createCalendarEvent(
                event,
                {
                   medium: "add-to-calendar-register-confirmation",
                },
                {
-                  overrideBaseUrl: getBaseUrl(),
+                  overrideBaseUrl,
                }
             )
-         ),
-      [event]
-   )
+         )
+      } catch (error) {
+         const data = {
+            event,
+            message:
+               "Failed to create calendar URLs in AddToCalendar component",
+            location: "AddToCalendar.useMemo",
+            overrideBaseUrl,
+         }
+         console.log("errorData", data)
+         errorLogAndNotify(error, data)
+         return {
+            google: "#",
+            outlook: "#",
+            yahoo: "#",
+            ics: "#",
+         }
+      }
+   }, [event])
 
    const handleClick = useCallback((event) => {
       dataLayerEvent("event_add_to_calendar")
