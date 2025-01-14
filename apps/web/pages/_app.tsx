@@ -23,7 +23,6 @@ import { brandedLightTheme } from "../materialUI"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import { store, wrapper } from "../store"
 
-import { Button, Typography } from "@mui/material"
 import { useTrackWebviewResumedCount } from "components/custom-hook/utils/useTrackWebviewResumed"
 import { useWebviewConsoleProxy } from "components/custom-hook/utils/useWebviewConsoleProxy"
 import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
@@ -84,15 +83,6 @@ function MyApp(props) {
    return (
       // Only re-render the entire app if its a webview, and the webview has resumed
       <Fragment key={MobileUtils.webViewPresence() ? webviewResumedCount : 0}>
-         <Button
-            variant="contained"
-            color="primary"
-            sx={{ top: 100, left: 0, position: "fixed", zIndex: 1000 }}
-         >
-            <Typography>
-               Webview Resumed Count: {webviewResumedCount}
-            </Typography>
-         </Button>
          <CacheProvider value={emotionCache}>
             <Head>
                <meta
