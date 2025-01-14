@@ -1,8 +1,8 @@
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CountryOption } from "@careerfairy/shared-lib/countries/types"
 import { Autocomplete, TextField } from "@mui/material"
-import useCountriesList from "components/custom-hook/countries/useCountriesList"
-import { useEffect, useMemo, useState } from "react"
+import useCountryById from "components/custom-hook/countries/useCountryById"
+import { useCountrySearch } from "components/custom-hook/countries/useCountrySearch"
+import { useEffect, useState } from "react"
 
 type CountryAutoCompleteProps = {
    countryValueId?: string
@@ -15,42 +15,47 @@ export const CountryAutoComplete = ({
    disabled,
    handleSelectedCountryChange,
 }: CountryAutoCompleteProps) => {
-   const { data: countriesList, isLoading } = useCountriesList(false)
+   const { data: userCountry } = useCountryById(countryValueId, false)
 
-   const [country, setCountry] = useState<OptionGroup | null>(null)
+   const [options, setOptions] = useState<CountryOption[]>([])
+   const [inputValue, setInputValue] = useState(userCountry?.name ?? "")
+   const [country, setCountry] = useState<CountryOption | null>(
+      userCountry ?? null
+   )
 
-   const countriesOptions = useMemo(() => {
-      return (
-         Object.keys(countriesList)?.map(
-            (country) =>
-               ({
-                  id: country,
-                  name: countriesList[country].name,
-               } as OptionGroup)
-         ) ?? []
-      )
-   }, [countriesList])
+   const { data: countriesResult, isLoading } = useCountrySearch(inputValue)
 
    useEffect(() => {
-      if (countryValueId && Boolean(countriesList[countryValueId])) {
-         setCountry(countriesList[countryValueId])
-      } else {
-         setCountry(null)
+      const newOptions = countriesResult ?? []
+
+      if (
+         userCountry &&
+         !newOptions.find((option) => option.id === userCountry.id)
+      ) {
+         newOptions.unshift(userCountry)
       }
-   }, [countryValueId, countriesList])
+
+      setOptions(newOptions)
+   }, [countriesResult, userCountry])
+
+   useEffect(() => {
+      setCountry(userCountry ?? null)
+   }, [userCountry, options])
 
    return (
       <Autocomplete
          value={country}
          disabled={disabled}
+         options={options}
          loading={isLoading}
-         options={countriesOptions}
          onChange={(_, value) => {
-            setCountry(value?.id ? countriesList[value.id] : null)
-            handleSelectedCountryChange(
-               value?.id ? countriesList[value.id] : null
-            )
+            setCountry(value ?? null)
+            handleSelectedCountryChange(value ?? null)
          }}
+         onInputChange={(_, newInputValue) => {
+            setInputValue(newInputValue)
+         }}
+         filterOptions={(x) => x}
          getOptionLabel={(option) => option.name}
          getOptionKey={(option) => option.id}
          isOptionEqualToValue={(option, value) => option?.id === value?.id}

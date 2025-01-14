@@ -1,8 +1,8 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CityOption } from "@careerfairy/shared-lib/countries/types"
 import { Autocomplete, TextField } from "@mui/material"
-import useCountryCities from "components/custom-hook/countries/useCountryCities"
-import { useEffect, useMemo } from "react"
+import { useCitySearch } from "components/custom-hook/countries/useCitySearch"
+import { useEffect, useState } from "react"
 
 type CityAutoCompleteProps = {
    value?: OptionGroup | null
@@ -17,68 +17,48 @@ export const CityAutoComplete = ({
    countryId,
    handleSelectedCityChange,
 }: CityAutoCompleteProps) => {
+   const [options, setOptions] = useState<CityOption[]>([])
+   const [inputValue, setInputValue] = useState(value?.name ?? "")
+   const [city, setCity] = useState<CityOption | null>(value ?? null)
+
    const {
-      data: citiesList,
+      data: citiesResult,
       isLoading,
       mutate,
-   } = useCountryCities(countryId, false)
-
-   const citiesOptions = useMemo(() => {
-      return (
-         Object.keys(citiesList)?.map(
-            (city) =>
-               ({
-                  id: city,
-                  name: citiesList[city].name,
-               } as OptionGroup)
-         ) ?? []
-      )
-   }, [citiesList])
+   } = useCitySearch(inputValue, countryId)
 
    useEffect(() => {
-      mutate()
-   }, [countryId, mutate])
+      const newOptions = citiesResult ?? []
 
-   const filterOptions = (
-      options: OptionGroup[],
-      { inputValue }: { inputValue: string }
-   ) => {
-      const searchText = inputValue.toLowerCase().trim()
-
-      if (!searchText) {
-         return options
+      if (value && !newOptions.find((option) => option.id === value.id)) {
+         newOptions.unshift(value)
       }
 
-      return options.filter((option) => {
-         const cityName = option.name.toLowerCase()
-         let searchIndex = 0
-         let cityIndex = 0
+      setOptions(newOptions)
+   }, [citiesResult, value])
 
-         // Try to find all characters from searchText in order in cityName
-         while (
-            searchIndex < searchText.length &&
-            cityIndex < cityName.length
-         ) {
-            if (searchText[searchIndex] === cityName[cityIndex]) {
-               searchIndex++
-            }
-            cityIndex++
-         }
+   useEffect(() => {
+      setCity(value ?? null)
+   }, [value, options])
 
-         // If we found all characters, it's a match
-         return searchIndex === searchText.length
-      })
-   }
+   useEffect(() => {
+      setCity(null)
+      setOptions([])
+      setInputValue("")
+      mutate()
+   }, [countryId, mutate])
 
    return (
       <Autocomplete
          loading={isLoading}
-         value={value}
+         value={city}
          disabled={disabled}
-         options={citiesOptions}
-         onChange={(_, value) =>
-            handleSelectedCityChange(value?.id ? citiesList[value.id] : null)
-         }
+         options={options}
+         onChange={(_, value) => handleSelectedCityChange(value ?? null)}
+         onInputChange={(_, newInputValue) => {
+            setInputValue(newInputValue)
+         }}
+         filterOptions={(x) => x}
          getOptionLabel={(option) => option.name}
          getOptionKey={(option) => option.id}
          isOptionEqualToValue={(option, value) => option.id === value?.id}
@@ -95,7 +75,6 @@ export const CityAutoComplete = ({
                fontSize: "16px",
             },
          }}
-         filterOptions={filterOptions}
       />
    )
 }
