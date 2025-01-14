@@ -1,8 +1,9 @@
-import { Box } from "@mui/material"
 import useLivestream from "components/custom-hook/live-stream/useLivestream"
-import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
+import LivestreamDialog, {
+   AllDialogSettings,
+} from "components/views/livestream-dialog/LivestreamDialog"
 import { useRouter } from "next/router"
-import { SyntheticEvent, useCallback, useEffect } from "react"
+import { useEffect } from "react"
 
 type Props = {
    isLiveStreamDialogOpen: boolean
@@ -20,12 +21,6 @@ const Dialog = ({
    const router = useRouter()
    const { data: livestream } = useLivestream(currentLiveStreamIdInDialog)
 
-   // Prevents exiting the fullscreen view when interacting with the dialog
-   const handleDialogClick = useCallback((event: SyntheticEvent) => {
-      event.stopPropagation()
-      event.preventDefault()
-   }, [])
-
    useEffect(() => {
       if (!router.query.dialogLiveStreamId && isLiveStreamDialogOpen) {
          handleLiveStreamDialogClose()
@@ -36,18 +31,17 @@ const Dialog = ({
    if (!livestream) return null
 
    return (
-      <Box onClick={handleDialogClick}>
-         <LivestreamDialog
-            key={getLiveStreamDialogKey()}
-            open={isLiveStreamDialogOpen}
-            livestreamId={livestream.id}
-            serverSideLivestream={livestream}
-            handleClose={handleLiveStreamDialogClose}
-            page={"details"}
-            mode="stand-alone"
-            serverUserEmail={""}
-         />
-      </Box>
+      <LivestreamDialog
+         key={getLiveStreamDialogKey()}
+         open={isLiveStreamDialogOpen}
+         livestreamId={livestream.id}
+         serverSideLivestream={livestream}
+         handleClose={handleLiveStreamDialogClose}
+         page={"details"}
+         mode="stand-alone"
+         serverUserEmail={""}
+         setting={AllDialogSettings.Levels}
+      />
    )
 }
 

@@ -1,29 +1,31 @@
-import { useDispatch, useSelector } from "react-redux"
-import {
-   activeSparkSelector,
-   cardNotificationSelector,
-   currentSparkEventNotificationSelector,
-   currentSparkIndexSelector,
-   eventDetailsDialogVisibilitySelector,
-   groupIdSelector,
-   sparksSelector,
-   eventToRegisterTo,
-   jobToOpen,
-} from "../../../store/selectors/sparksFeedSelectors"
-import useUserSparksNotifications from "../../custom-hook/spark/useUserSparksNotifications"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
+import { useAuth } from "HOCs/AuthProvider"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { FC, useCallback, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import {
    setCardEventNotification,
    setEventNotification,
    setEventToRegisterTo,
    showEventDetailsDialog,
 } from "../../../store/reducers/sparksFeedReducer"
-import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
-import LivestreamDialog from "../livestream-dialog/LivestreamDialog"
-import { useAuth } from "HOCs/AuthProvider"
-import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
-import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
+import {
+   activeSparkSelector,
+   cardNotificationSelector,
+   currentSparkEventNotificationSelector,
+   currentSparkIndexSelector,
+   eventDetailsDialogVisibilitySelector,
+   eventToRegisterTo,
+   groupIdSelector,
+   jobToOpen,
+   sparksSelector,
+} from "../../../store/selectors/sparksFeedSelectors"
+import useUserSparksNotifications from "../../custom-hook/spark/useUserSparksNotifications"
+import LivestreamDialog, {
+   AllDialogSettings,
+} from "../livestream-dialog/LivestreamDialog"
 
 type Props = {
    userEmail: string
@@ -116,6 +118,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
          currentSparkId={currentSpark?.id}
          onRegisterSuccess={handleSuccessfulEventRegistration}
          jobId={jobToOpenId}
+         setting={AllDialogSettings.SparksFeed}
       />
    ) : null
 }
