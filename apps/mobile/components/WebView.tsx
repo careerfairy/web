@@ -22,7 +22,6 @@ import {
    Platform,
    SafeAreaView,
    StatusBar,
-   StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
 
@@ -357,12 +356,11 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const isAndroid = Platform.OS === "android"
 
    const openOnWebBrowser = useCallback(
-      (url: string) => {
+      async (url: string) => {
          const options: WebBrowser.WebBrowserOpenOptions = {}
 
-         if (isAndroid) {
-            setShouldRefreshAppWhenResumed(true)
-         }
+         console.debug(`${isAndroid}`)
+         isAndroid && setShouldRefreshAppWhenResumed(true)
 
          if (isAndroid && defaultBrowser) {
             options.browserPackage = defaultBrowser
@@ -379,30 +377,33 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             "careerfairy-e1fd9.firebaseapp.com/__/auth/iframe"
          )
       ) {
-         // Block auth iframe navigation, we don't want to allow this
+         // Blocking auth iframe navigation for security
          return false
       }
 
       if (request.url === "about:blank") {
-         return false // Stop loading the blank page
+         // Blocking about:blank page load
+         return false
       } else if (request.url.startsWith("mailto:")) {
+         // Opening mailto link externally
+         console.debug(`${isAndroid}`)
          isAndroid && setShouldRefreshAppWhenResumed(true)
          Linking.openURL(request.url)
          return false
       } else {
          if (!request.url.includes(SEARCH_CRITERIA)) {
             if (isValidUrl(request.url)) {
-               // iOS calls for all types of navigation (including the non-restrictive
-               // "other", which causes issues for internal links like cookies).
                if (
                   Platform.OS === "ios" &&
                   request.navigationType !== "click"
                ) {
+                  // Blocking non-click navigation to prevent cookie issues
                   return false
                }
                openOnWebBrowser(request.url)
             }
-            return false // Prevent WebView from loading the external link
+            // Preventing WebView from loading external link
+            return false
          }
 
          if (isExternalNavigation(request)) {
@@ -410,7 +411,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             return false
          }
       }
-      return true // Allow WebView to load internal links
+      return true
    }
 
    const handleContentProcessTerminate = () => {
@@ -443,20 +444,23 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }, [])
 
    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      if (
-         nextAppState === "active" &&
-         webViewRef.current &&
-         shouldRefreshAppWhenResumed
-      ) {
-         // Send message to web app that the app has resumed from external link
-         const message: NativeEvent = {
-            type: MESSAGING_TYPE.WEBVIEW_RESUMED,
-            data: null,
+      setTimeout(() => {
+         if (
+            nextAppState === "active" &&
+            webViewRef.current &&
+            shouldRefreshAppWhenResumed
+         ) {
+            // Send message to web app that the app has resumed from external link
+            const message: NativeEvent = {
+               type: MESSAGING_TYPE.WEBVIEW_RESUMED,
+               data: null,
+            }
+            const messageString = JSON.stringify(message)
+
+            webViewRef.current.postMessage(messageString)
+            setShouldRefreshAppWhenResumed(false) // Reset the state
          }
-         const messageString = JSON.stringify(message)
-         webViewRef.current.postMessage(messageString)
-         setShouldRefreshAppWhenResumed(false) // Reset the state
-      }
+      }, 100)
    }
 
    return (
@@ -516,34 +520,5 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       </SafeAreaView>
    )
 }
-
-const styles = StyleSheet.create({
-   banner: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: "#3bbba5",
-      paddingTop: 10,
-      paddingBottom: 10,
-      paddingRight: 10,
-      paddingLeft: 10,
-      gap: 4,
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1000,
-   },
-   bannerText: {
-      color: "#000000",
-      fontSize: 14,
-      fontWeight: "bold",
-   },
-   bannerButton: {
-      color: "#ffffff",
-      fontWeight: "bold",
-      marginLeft: 5,
-   },
-})
 
 export default WebViewComponent
