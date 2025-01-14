@@ -334,6 +334,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const isExternalNavigation = (request: InterceptedRequest) => {
+      if (externalLinks.includes(request.url)) {
+         return true
+      }
+
       // Special case for auth iframe and blank pages
       if (request.url === "about:blank") {
          return false
