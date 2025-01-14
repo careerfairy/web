@@ -10,7 +10,10 @@ export class MobileUtils {
    }
 
    public static webViewPresence(): boolean {
-      const webViewWindow: any = window as any;
+      if (typeof window === "undefined") return false
+
+      const webViewWindow: any = window as any
+
       return !(
          !webViewWindow?.ReactNativeWebView ||
          typeof webViewWindow?.ReactNativeWebView?.postMessage !== "function"

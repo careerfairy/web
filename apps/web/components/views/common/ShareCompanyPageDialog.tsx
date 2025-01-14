@@ -1,10 +1,5 @@
-import { useSnackbar } from "notistack"
-import { makeGroupCompanyPageUrl } from "../../../util/makeUrls"
-import {
-   copyStringToClipboard,
-   getMaxLineStyles,
-   getResizedUrl,
-} from "../../helperFunctions/HelperFunctions"
+import { Group } from "@careerfairy/shared-lib/groups"
+import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import {
    Box,
    Button,
@@ -17,15 +12,20 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import ContentPasteIcon from "@mui/icons-material/ContentPaste"
-import React, { FC, useMemo } from "react"
-import { dataLayerEvent } from "../../../util/analyticsUtils"
-import { Group } from "@careerfairy/shared-lib/groups"
-import Image from "next/legacy/image"
-import ReferralWidget from "./ReferralWidget"
-import useSocials, { SocialPlatformObject } from "../../custom-hook/useSocials"
-import { sxStyles } from "../../../types/commonTypes"
 import SanitizedHTML from "components/util/SanitizedHTML"
+import Image from "next/legacy/image"
+import { useSnackbar } from "notistack"
+import { FC, useMemo } from "react"
+import { sxStyles } from "../../../types/commonTypes"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
+import { makeGroupCompanyPageUrl } from "../../../util/makeUrls"
+import useSocials, { SocialPlatformObject } from "../../custom-hook/useSocials"
+import {
+   copyStringToClipboard,
+   getMaxLineStyles,
+   getResizedUrl,
+} from "../../helperFunctions/HelperFunctions"
+import ReferralWidget from "./ReferralWidget"
 
 const styles = sxStyles({
    title: {
@@ -76,7 +76,6 @@ const ShareCompanyPageDialog: FC<Props> = ({
          SocialPlatformObject.Facebook,
          SocialPlatformObject.X,
          SocialPlatformObject.Email,
-         SocialPlatformObject.Copy,
       ],
    })
 
