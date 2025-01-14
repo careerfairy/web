@@ -379,76 +379,6 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
       [goToTab, settingFormIsDirty, isConfirmDialogOpen]
    )
 
-   // useEffect(() => {
-   //    // Handle browser/mobile back button navigation
-   //    const handlePopState = () => {
-   //       if (currentTab && settingFormIsDirty) {
-   //          // If form is dirty, show confirmation dialog
-   //          setIsConfirmDialogOpen(true)
-   //          // Prevent default back behavior
-   //          window.history.pushState(null, "", window.location.href)
-   //       } else if (currentTab) {
-   //          // If we're in a tab but form is not dirty, return to menu
-   //          onBack()
-   //       } else {
-   //          // If we're in the menu, close the dialog
-   //          handleClose()
-   //       }
-   //    }
-
-   //    // Push initial state to enable catching the first back button press
-   //    window.history.pushState(null, "", window.location.href)
-
-   //    window.addEventListener("popstate", handlePopState)
-   //    return () => window.removeEventListener("popstate", handlePopState)
-   // }, [currentTab, settingFormIsDirty, handleClose, onBack])
-
-   // const Content = () => {
-   //    return (
-   //       <Box>
-   //          <ConditionalWrapper
-   //             condition={!isMobile || (isMobile && !drawerOpen)}
-   //          >
-   //             <Stack sx={styles.contentRoot} spacing={1}>
-   //                <Stack
-   //                   direction="row"
-   //                   justifyContent={"space-between"}
-   //                   sx={styles.selectedOptionHeader}
-   //                >
-   //                   <Stack direction="row" spacing={1.5} alignItems={"center"}>
-   //                      {isMobile ? (
-   //                         <ChevronLeft size={24} onClick={onBackButtonClick} />
-   //                      ) : null}
-   //                      <Typography
-   //                         variant="brandedH3"
-   //                         sx={styles.selectedOptionText}
-   //                      >
-   //                         {SETTINGS_OPTIONS[currentTab].label}
-   //                      </Typography>
-   //                   </Stack>
-   //                   {!isMobile ? (
-   //                      <Box
-   //                         sx={styles.closeButton}
-   //                         component={X}
-   //                         onClick={handleClose}
-   //                      />
-   //                   ) : null}
-   //                </Stack>
-   //                <Box
-   //                   py={0}
-   //                   sx={[
-   //                      styles.contentBox,
-   //                      isMobile ? styles.contentBoxMobile : null,
-   //                   ]}
-   //                >
-   //                   {SETTINGS_OPTIONS[currentTab].component}
-   //                </Box>
-   //             </Stack>
-   //          </ConditionalWrapper>
-   //       </Box>
-   //    )
-   // }
-
    return (
       <Dialog
          open={open}
@@ -532,42 +462,8 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
                         setSwitchingTab={setSwitchingTab}
                         onTabClick={onTabClick}
                         currentTab={currentTab}
-                        setCurrentTab={setCurrentTab}
                      />
                   </WrapConditionally>
-                  {/* {isMobile ? (
-                     <Slide
-                        direction="right"
-                        in={drawerOpen || !isMobile}
-                        mountOnEnter
-                        unmountOnExit
-                        timeout={200}
-                        style={{ willChange: "transform" }}
-                        easing={{
-                           enter: theme.transitions.easing.easeIn,
-                           exit: theme.transitions.easing.easeIn,
-                        }}
-                     >
-                        <Box width={"100%"}>
-                           <SettingsSideDrawer
-                              handleClose={handleClose}
-                              setSwitchingTab={setSwitchingTab}
-                              onTabClick={onTabClick}
-                              currentTab={currentTab}
-                              setCurrentTab={setCurrentTab}
-                           />
-                        </Box>
-                     </Slide>
-                  ) : (
-                     <SettingsSideDrawer
-                        handleClose={handleClose}
-                        setSwitchingTab={setSwitchingTab}
-                        onTabClick={onTabClick}
-                        currentTab={currentTab}
-                        setCurrentTab={setCurrentTab}
-                     />
-                  )} */}
-
                   {currentTab ? (
                      <WrapConditionally
                         condition={isMobile}
@@ -642,41 +538,6 @@ export const SettingsDialog = ({ open, handleClose: onClose }: Props) => {
                         </Stack>
                      </WrapConditionally>
                   ) : null}
-
-                  {/* {currentTab ? (
-                     isMobile ? (
-                        <Slide
-                           direction="left"
-                           in={!drawerOpen || !isMobile}
-                           mountOnEnter
-                           unmountOnExit
-                           timeout={200}
-                           style={{ willChange: "transform" }}
-                           easing={{
-                              enter: theme.transitions.easing.easeIn,
-                              exit: theme.transitions.easing.easeIn,
-                           }}
-                        >
-                           <Box>
-                              <ConditionalWrapper
-                                 condition={
-                                    !isMobile || (isMobile && !drawerOpen)
-                                 }
-                              >
-                                 <Content />
-                              </ConditionalWrapper>
-                           </Box>
-                        </Slide>
-                     ) : (
-                        <Box>
-                           <ConditionalWrapper
-                              condition={!isMobile || (isMobile && !drawerOpen)}
-                           >
-                              <Content />
-                           </ConditionalWrapper>
-                        </Box>
-                     )
-                  ) : null} */}
                </Stack>
             </Stack>
          </DialogContent>
@@ -689,7 +550,6 @@ type SettingsSideDrawerProps = {
    setSwitchingTab: (option: SettingsOptions) => void
    onTabClick: (option: SettingsOptions) => void
    currentTab: SettingsOptions | null
-   setCurrentTab: (option: SettingsOptions | null) => void
 }
 
 const SettingsSideDrawer = ({
@@ -697,11 +557,9 @@ const SettingsSideDrawer = ({
    setSwitchingTab,
    onTabClick,
    currentTab,
-   setCurrentTab,
 }: SettingsSideDrawerProps) => {
    const isMobile = useIsMobile()
    const theme = useTheme()
-   const router = useRouter()
 
    return (
       <Box sx={styles.drawer}>
@@ -767,14 +625,8 @@ const SettingsSideDrawer = ({
                      key={"delete-account-button"}
                      disablePadding
                      onClick={() => {
-                        setCurrentTab("delete-account")
-                        router.push({
-                           pathname: TAB_VALUES.settings.value,
-                           query: {
-                              ...router.query,
-                              tab: "delete-account",
-                           },
-                        })
+                        setSwitchingTab("delete-account")
+                        onTabClick("delete-account")
                      }}
                   >
                      <ListItemButton
