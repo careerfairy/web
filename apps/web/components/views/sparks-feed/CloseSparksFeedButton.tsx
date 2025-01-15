@@ -1,10 +1,12 @@
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { IconButton } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { isServer } from "components/helperFunctions/HelperFunctions"
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
+import { MobileUtils } from "util/mobile.utils"
 
 const styles = sxStyles({
    root: {
@@ -26,6 +28,7 @@ type Props = {
 const CloseSparksFeedButton: FC<Props> = ({ dark }) => {
    const { back, push } = useRouter()
    const { isLoggedIn, userPresenter } = useAuth()
+   const isMobile = useIsMobile()
 
    const handleClick = useCallback(() => {
       if (isServer()) return
@@ -37,6 +40,10 @@ const CloseSparksFeedButton: FC<Props> = ({ dark }) => {
          push("/portal")
       }
    }, [back, isLoggedIn, push, userPresenter])
+
+   if (MobileUtils.webViewPresence() || isMobile) {
+      return null
+   }
 
    return (
       <IconButton
