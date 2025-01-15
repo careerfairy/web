@@ -1,10 +1,10 @@
-import { ThemeOptions, createTheme } from "@mui/material/styles"
 import { PaletteMode } from "@mui/material"
+import { ThemeOptions, createTheme } from "@mui/material/styles"
+import { breakpoints } from "./breakpoints"
+import { getComponents } from "./components"
+import { legacyStyles } from "./legacy-styles"
 import { brand, getPalette } from "./palette"
 import { getTypography } from "./typography"
-import { legacyStyles } from "./legacy-styles"
-import { getComponents } from "./components"
-import { breakpoints } from "./breakpoints"
 
 /**
  * This function generates the base theme without custom components/typography.
@@ -42,6 +42,6 @@ export const createBrandedTheme = ({
 
    // Create the full theme, which includes the base theme and custom components/typography
    return createTheme(baseTheme, {
-      components: getComponents(baseTheme),
+      components: getComponents(baseTheme, fontFamily),
    })
 }
