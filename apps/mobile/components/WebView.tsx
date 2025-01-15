@@ -89,7 +89,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
    onLogout,
 }) => {
-   const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
+   const [baseUrl, setBaseUrl] = useState(
+      BASE_URL + "/streaming/viewer/RjrqWmsgzq79CaDGDwrs"
+   )
    const webViewRef = useRef<WebView>(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
@@ -391,8 +393,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          return false
       } else if (request.url.startsWith("mailto:")) {
          // Opening mailto link externally
-         console.debug(`${isAndroid}`)
-         isAndroid && setRefreshAfterExternalActivity(true)
+         !!isAndroid && setRefreshAfterExternalActivity(true)
          Linking.openURL(request.url)
          return false
       } else {
