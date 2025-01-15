@@ -366,6 +366,7 @@ exports.syncUserInRegisteredLivestreams =
 
 // Utils
 exports.fetchUserCountryCode = fetchUserCountryCode
+exports.fetchCountriesList = countries.fetchCountriesList
 exports.searchCountries = countries.searchCountries
 exports.searchCities = countries.searchCities
 exports.fetchCountryCitiesList = countries.fetchCountryCitiesList

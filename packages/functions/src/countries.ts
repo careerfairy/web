@@ -91,6 +91,29 @@ export const searchCountries = functions
       return performFuzzySearch(countries, searchValue)
    })
 
+export const fetchCountriesList = functions
+   .region(config.region)
+   .https.onCall(() => {
+      const countries: CountryOption[] = Country.getAllCountries()
+         .map((country) => ({
+            name: country.name,
+            id: country.isoCode,
+         }))
+         .sort((countryA, countryB) =>
+            countryA.name.localeCompare(countryB.name)
+         )
+
+      const countriesMap: Record<string, CountryOption> = countries.reduce(
+         (acc, country) => ({
+            ...acc,
+            [country.id]: country,
+         }),
+         {} as Record<string, CountryOption>
+      )
+
+      return countriesMap
+   })
+
 export const searchCities = functions
    .region(config.region)
    .https.onCall((data: SearchCityOptions) => {
