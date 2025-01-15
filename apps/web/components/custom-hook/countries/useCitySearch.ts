@@ -9,9 +9,10 @@ import useFunctionsSWR, {
 
 const DEBOUNCE_MS = 500
 const MIN_SEARCH_LENGTH = 2
+
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
-   keepPreviousData: true,
+   keepPreviousData: false,
    onError: (error) =>
       errorLogAndNotify(error, {
          message: `Error searching cities list`,
@@ -40,7 +41,9 @@ export const useCitySearch = (
       [searchValue]
    )
 
-   return useSWR<CityOption[]>(getKey(debouncedValue, countryId), fetcher, {
+   const key = getKey(debouncedValue, countryId)
+
+   return useSWR<CityOption[]>(key, fetcher, {
       ...swrOptions,
       suspense,
    })
