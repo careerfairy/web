@@ -96,7 +96,7 @@ export const manualNewsletter = onRequest(runtimeSettings, async (req, res) => {
 export const manualTemplatedEmail = onRequest(
    runtimeSettings,
    async (req, res) => {
-      logger.info("manualTemplatedEmail: v13.0 - X-mas app")
+      logger.info("manualTemplatedEmail: v14.0 - App live announcement")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -117,11 +117,13 @@ export const manualTemplatedEmail = onRequest(
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("X-mas app email sent to everyone")
+         res.status(200).send("App live announcement email sent to everyone.")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "X-mas app email sent to " + receivedEmails.join(", ")
+            "App live announcement email sent to " +
+               receivedEmails.join(", ") +
+               "."
          )
       }
    }
@@ -168,7 +170,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      logger.info("X-mas app email already sent, skipping")
+      logger.info("App live announcement email already sent, skipping")
       return
    }
 
@@ -192,7 +194,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   logger.info("X-mas app execution done")
+   logger.info("App live announcement email execution done")
 }
 
 /**

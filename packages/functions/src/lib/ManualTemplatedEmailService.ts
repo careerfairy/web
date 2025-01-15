@@ -71,7 +71,7 @@ export class ManualTemplatedEmailService {
       this.subscribedUsers = convertDocArrayToDict(europeanUsers)
 
       this.logger.info(
-         "Total Users for X-mas app - ",
+         "Total Users for app live announcement - ",
          Object.keys(this.subscribedUsers || {}).length
       )
 
