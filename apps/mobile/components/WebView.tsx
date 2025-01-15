@@ -94,8 +94,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
    const [refreshKey, setRefreshKey] = useState(0)
-   const [refreshAfterExternalActivity, setRefreshAfterExternalActivity] =
-      useState(false)
+   const refreshAfterExternalActivityRef = useRef(false)
 
    useEffect(() => {
       checkPermissions()
@@ -365,7 +364,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          const options: WebBrowser.WebBrowserOpenOptions = {}
 
          // Must do double bang to ensure boolean, sometimes in react native booleans don't evaluate until some operation is performed on them
-         !!isAndroid && setRefreshAfterExternalActivity(true)
+         if (isAndroid) {
+            refreshAfterExternalActivityRef.current = true
+         }
 
          if (isAndroid && defaultBrowser) {
             options.browserPackage = defaultBrowser
@@ -391,7 +392,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          return false
       } else if (request.url.startsWith("mailto:")) {
          // Opening mailto link externally
-         !!isAndroid && setRefreshAfterExternalActivity(true)
+         if (isAndroid) {
+            refreshAfterExternalActivityRef.current = true
+         }
          Linking.openURL(request.url)
          return false
       } else {
@@ -451,16 +454,14 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }, [])
 
    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      setTimeout(() => {
-         if (
-            nextAppState === "active" &&
-            webViewRef.current &&
-            !!refreshAfterExternalActivity // Must do double bang to ensure boolean, sometimes in react native booleans don't evaluate until some operation is performed on them
-         ) {
-            refreshWebAppOnResume()
-            setRefreshAfterExternalActivity(false) // Reset the state
-         }
-      }, 100)
+      if (
+         nextAppState === "active" &&
+         webViewRef.current &&
+         refreshAfterExternalActivityRef.current
+      ) {
+         refreshWebAppOnResume()
+         refreshAfterExternalActivityRef.current = false
+      }
    }
 
    const refreshWebAppOnResume = () => {
