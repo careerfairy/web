@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -137,9 +138,14 @@ const VideoPreview: FC<Props> = ({
          dispatch(setVideosMuted(true))
          playerRef.current?.getInternalPlayer()?.play()
 
-         console.error(error)
+         errorLogAndNotify(error, {
+            message: "Error playing video",
+            videoUrl,
+            error: JSON.stringify(error, null, 2),
+            videoShouldBeMuted: muted,
+         })
       },
-      [dispatch]
+      [dispatch, videoUrl, muted]
    )
 
    const handleProgress = useCallback(

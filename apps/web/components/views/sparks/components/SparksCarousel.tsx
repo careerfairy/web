@@ -69,6 +69,7 @@ export const SparksCarousel = ({
                   onClick={!disableClick && handleSparksClicked}
                   questionLimitLines={true}
                   onGoNext={moveToNextSlide}
+                  muted // there is never a case where we want to play audio on a carousel
                   disableAutoPlay={shouldDisableAutoPlay(index)}
                />
             ))}
