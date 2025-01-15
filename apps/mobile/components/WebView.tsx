@@ -89,9 +89,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onTokenInjected,
    onLogout,
 }) => {
-   const [baseUrl, setBaseUrl] = useState(
-      BASE_URL + "/streaming/viewer/RjrqWmsgzq79CaDGDwrs"
-   )
+   const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const webViewRef = useRef<WebView>(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
@@ -453,14 +451,16 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }, [])
 
    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      if (
-         nextAppState === "active" &&
-         webViewRef.current &&
-         !!refreshAfterExternalActivity // Must do double bang to ensure boolean, sometimes in react native booleans don't evaluate until some operation is performed on them
-      ) {
-         refreshWebAppOnResume()
-         setRefreshAfterExternalActivity(false) // Reset the state
-      }
+      setTimeout(() => {
+         if (
+            nextAppState === "active" &&
+            webViewRef.current &&
+            !!refreshAfterExternalActivity // Must do double bang to ensure boolean, sometimes in react native booleans don't evaluate until some operation is performed on them
+         ) {
+            refreshWebAppOnResume()
+            setRefreshAfterExternalActivity(false) // Reset the state
+         }
+      }, 100)
    }
 
    const refreshWebAppOnResume = () => {
