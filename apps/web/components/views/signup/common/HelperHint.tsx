@@ -1,8 +1,7 @@
-import React from "react"
 import { Box } from "@mui/material"
 import Link from "next/link"
-import { sxStyles } from "../../../../types/commonTypes"
 import { useRouter } from "next/router"
+import { sxStyles } from "../../../../types/commonTypes"
 const styles = sxStyles({
    submit: {
       margin: (theme) => theme.spacing(3, 0, 2),
@@ -47,7 +46,7 @@ const HelperHint = ({ groupAdmin }: Props) => {
                Having issues signing up?
                <a
                   style={{ marginLeft: "5px" }}
-                  href="mailto:maximilian@careerfairy.io"
+                  href="mailto:support@careerfairy.io"
                >
                   Let us know
                </a>
