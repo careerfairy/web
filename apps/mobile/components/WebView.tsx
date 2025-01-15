@@ -75,6 +75,7 @@ const externalLinks = [
    "http://127.0.0.1:3000/data-protection", // iOS Localhost
    "http://10.0.2.2:3000/terms", // Android Localhost
    "http://10.0.2.2:3000/data-protection", // Android Localhost
+   "https://support.careerfairy.io",
 ]
 
 const isLocalHost = (url: string) => {
@@ -334,7 +335,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const isExternalNavigation = (request: InterceptedRequest) => {
-      if (externalLinks.includes(request.url)) {
+      if (externalLinks.some((link) => request.url.startsWith(link))) {
          return true
       }
 
@@ -378,6 +379,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    )
 
    const handleNavigation = (request: InterceptedRequest) => {
+      const isIframe = request.isTopFrame === false
+
       if (
          request.url.includes(
             "careerfairy-e1fd9.firebaseapp.com/__/auth/iframe"
@@ -401,7 +404,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          if (!request.url.includes(SEARCH_CRITERIA)) {
             if (isValidUrl(request.url)) {
                if (
-                  request.isTopFrame === false && // Skip iframe navigation requests (e.g. cookie consent, tracking pixels, etc)
+                  isIframe && // Skip iframe navigation requests (e.g. cookie consent, tracking pixels, etc)
                   Platform.OS === "ios" &&
                   request.navigationType !== "click"
                ) {
@@ -414,7 +417,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             return false
          }
 
-         if (isExternalNavigation(request)) {
+         if (isExternalNavigation(request) && !isIframe) {
             openOnWebBrowser(request.url)
             return false
          }
