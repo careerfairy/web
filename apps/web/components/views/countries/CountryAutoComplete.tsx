@@ -45,7 +45,7 @@ export const CountryAutoComplete = ({
    return (
       <Autocomplete
          value={country}
-         disabled={disabled}
+         disabled={disabled || isLoading}
          options={options}
          loading={isLoading}
          onChange={(_, value) => {

@@ -51,7 +51,7 @@ export const CityAutoComplete = ({
       <Autocomplete
          loading={isLoading}
          value={city}
-         disabled={disabled}
+         disabled={disabled || isLoading}
          options={options}
          onChange={(_, value) => handleSelectedCityChange(value ?? null)}
          onInputChange={(_, newInputValue) => {
