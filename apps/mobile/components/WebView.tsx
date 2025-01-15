@@ -20,9 +20,7 @@ import {
    BackHandler,
    Linking,
    Platform,
-   RefreshControl,
    SafeAreaView,
-   ScrollView,
    StatusBar,
    StyleSheet,
 } from "react-native"
@@ -98,7 +96,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [refreshKey, setRefreshKey] = useState(0)
    const [refreshAfterExternalActivity, setRefreshAfterExternalActivity] =
       useState(false)
-   const [isRefreshing, setIsRefreshing] = useState(false)
 
    useEffect(() => {
       checkPermissions()
@@ -478,83 +475,60 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       webViewRef.current.postMessage(messageString)
    }
 
-   const handleRefresh = useCallback(() => {
-      setIsRefreshing(true)
-      if (webViewRef.current) {
-         webViewRef.current.reload()
-      }
-      // Reset refreshing state after a short delay
-      setTimeout(() => {
-         setIsRefreshing(false)
-      }, 1000)
-   }, [])
-
    return (
       <SafeAreaView style={styles.container}>
-         <ScrollView
-            contentContainerStyle={styles.flex}
-            refreshControl={
-               <RefreshControl
-                  refreshing={isRefreshing}
-                  onRefresh={handleRefresh}
-                  progressViewOffset={60}
-               />
-            }
-         >
-            <WebView
-               key={refreshKey + 1}
-               style={styles.flex}
-               ref={webViewRef}
-               source={{ uri: baseUrl }}
-               javaScriptEnabled={true}
-               mediaPlaybackRequiresUserAction={false}
-               allowsFullscreenVideo={true}
-               onMessage={handleMessage}
-               onShouldStartLoadWithRequest={(request) => {
-                  return handleNavigation(request as InterceptedRequest)
-               }}
-               cacheEnabled={true}
-               incognito={false}
-               domStorageEnabled={true}
-               startInLoadingState={true}
-               allowsInlineMediaPlayback={true}
-               cacheMode="LOAD_NO_CACHE"
-               userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
-               sharedCookiesEnabled={true}
-               thirdPartyCookiesEnabled={true}
-               // @ts-ignore
-               useWebKit={true}
-               originWhitelist={[
-                  "https://*",
-                  "http://*",
-                  "file://*",
-                  "sms://*",
-                  "about:",
-               ]}
-               onNavigationStateChange={handleNavigationStateChange}
-               setSupportMultipleWindows={false}
-               androidHardwareAccelerationDisabled={false} // Use hardware acceleration
-               mixedContentMode="always"
-               overScrollMode="never" // Disable over-scrolling for smoother behavior
-               nestedScrollEnabled={true} // Improves nested scrolling behavior
-               scrollEnabled={true}
-               allowsBackForwardNavigationGestures={true}
-               injectedJavaScript={`(function() {
+         <WebView
+            key={refreshKey + 1}
+            style={styles.flex}
+            ref={webViewRef}
+            source={{ uri: baseUrl }}
+            javaScriptEnabled={true}
+            mediaPlaybackRequiresUserAction={false}
+            allowsFullscreenVideo={true}
+            onMessage={handleMessage}
+            onShouldStartLoadWithRequest={(request) => {
+               return handleNavigation(request as InterceptedRequest)
+            }}
+            cacheEnabled={true}
+            incognito={false}
+            domStorageEnabled={true}
+            startInLoadingState={true}
+            allowsInlineMediaPlayback={true}
+            cacheMode="LOAD_NO_CACHE"
+            userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
+            sharedCookiesEnabled={true}
+            thirdPartyCookiesEnabled={true}
+            // @ts-ignore
+            useWebKit={true}
+            originWhitelist={[
+               "https://*",
+               "http://*",
+               "file://*",
+               "sms://*",
+               "about:",
+            ]}
+            onNavigationStateChange={handleNavigationStateChange}
+            setSupportMultipleWindows={false}
+            androidHardwareAccelerationDisabled={false} // Use hardware acceleration
+            mixedContentMode="always"
+            overScrollMode="never" // Disable over-scrolling for smoother behavior
+            nestedScrollEnabled={true} // Improves nested scrolling behavior
+            scrollEnabled={true}
+            allowsBackForwardNavigationGestures={true}
+            injectedJavaScript={`(function() {
                     window._hjSettings = null;
                     window.hj = null;
                     var style = document.createElement('style');
                     style.innerHTML = \`${injectedCSS}\`;
                     document.head.appendChild(style);
                  })();`}
-               allowFileAccess={true} // Allow service worker support for firebase offline caching
-               allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
-               javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
-               renderToHardwareTextureAndroid={true} // Improve performance on android
-               onContentProcessDidTerminate={handleContentProcessTerminate} // Automatically reload WebView when iOS/Android kills its process to free memory
-               onRenderProcessGone={handleRenderProcessGone} // Recover from WebView crashes on Android by refreshing the view
-               onLoadEnd={() => setIsRefreshing(false)}
-            />
-         </ScrollView>
+            allowFileAccess={true} // Allow service worker support for firebase offline caching
+            allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
+            javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
+            renderToHardwareTextureAndroid={true} // Improve performance on android
+            onContentProcessDidTerminate={handleContentProcessTerminate} // Automatically reload WebView when iOS/Android kills its process to free memory
+            onRenderProcessGone={handleRenderProcessGone} // Recover from WebView crashes on Android by refreshing the view
+         />
       </SafeAreaView>
    )
 }
