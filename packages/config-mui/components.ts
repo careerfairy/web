@@ -1,6 +1,9 @@
 import { Components, Theme, alpha } from "@mui/material"
 
-export const getComponents = (theme: Theme): Components => ({
+export const getComponents = (
+   theme: Theme,
+   fontFamily = "inherit"
+): Components => ({
    MuiTooltip: {
       defaultProps: {
          arrow: true,
@@ -218,6 +221,20 @@ export const getComponents = (theme: Theme): Components => ({
       styleOverrides: {
          root: {
             borderRadius: 8,
+         },
+      },
+   },
+   MuiCardActionArea: {
+      styleOverrides: {
+         root: {
+            fontFamily,
+         },
+      },
+   },
+   MuiButtonBase: {
+      styleOverrides: {
+         root: {
+            fontFamily,
          },
       },
    },
