@@ -1,13 +1,12 @@
-import PropTypes from "prop-types"
-import React from "react"
-import Section from "components/views/common/Section"
-import SectionContainer from "../../common/Section/Container"
-import HighlightText from "components/views/common/HighlightText"
-import SectionHeader from "../../common/SectionHeader"
+import EmailIcon from "@mui/icons-material/Email"
+import { Button } from "@mui/material"
 import Box from "@mui/material/Box"
 import Fade from "@stahl.luke/react-reveal/Fade"
-import { Button } from "@mui/material"
-import EmailIcon from "@mui/icons-material/Email"
+import HighlightText from "components/views/common/HighlightText"
+import Section from "components/views/common/Section"
+import PropTypes from "prop-types"
+import SectionContainer from "../../common/Section/Container"
+import SectionHeader from "../../common/SectionHeader"
 
 const styles = {
    header: {
@@ -35,14 +34,14 @@ const ContactSection = (props) => {
          backgroundColor={props.backgroundColor}
       >
          <SectionContainer>
-            {props.overheadText && (
+            {Boolean(props.overheadText) && (
                <Fade bottom>
                   <Box marginBottom={2}>
                      <HighlightText text={props.overheadText} />
                   </Box>
                </Fade>
             )}
-            {(props.title || props.subtitle) && (
+            {Boolean(props.title || props.subtitle) && (
                <Fade bottom>
                   <SectionHeader
                      color={props.color}
@@ -58,7 +57,7 @@ const ContactSection = (props) => {
                   <Box marginTop={2} display="flex" justifyContent="center">
                      <a
                         className="aboutContentContactButton"
-                        href="mailto:thomas@careerfairy.io"
+                        href="mailto:support@careerfairy.io"
                      >
                         <Button
                            size="large"

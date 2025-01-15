@@ -20,8 +20,11 @@ import {
    BackHandler,
    Linking,
    Platform,
+   RefreshControl,
    SafeAreaView,
+   ScrollView,
    StatusBar,
+   StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
 
@@ -93,8 +96,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
    const [refreshKey, setRefreshKey] = useState(0)
-   const [shouldRefreshAppWhenResumed, setShouldRefreshAppWhenResumed] =
+   const [refreshAfterExternalActivity, setRefreshAfterExternalActivity] =
       useState(false)
+   const [isRefreshing, setIsRefreshing] = useState(false)
 
    useEffect(() => {
       checkPermissions()
@@ -363,8 +367,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       async (url: string) => {
          const options: WebBrowser.WebBrowserOpenOptions = {}
 
-         console.debug(`${isAndroid}`)
-         isAndroid && setShouldRefreshAppWhenResumed(true)
+         // Must do double bang to ensure boolean, sometimes in react native booleans don't evaluate until some operation is performed on them
+         !!isAndroid && setRefreshAfterExternalActivity(true)
 
          if (isAndroid && defaultBrowser) {
             options.browserPackage = defaultBrowser
@@ -391,13 +395,14 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       } else if (request.url.startsWith("mailto:")) {
          // Opening mailto link externally
          console.debug(`${isAndroid}`)
-         isAndroid && setShouldRefreshAppWhenResumed(true)
+         isAndroid && setRefreshAfterExternalActivity(true)
          Linking.openURL(request.url)
          return false
       } else {
          if (!request.url.includes(SEARCH_CRITERIA)) {
             if (isValidUrl(request.url)) {
                if (
+                  request.isTopFrame === false && // Skip iframe navigation requests (e.g. cookie consent, tracking pixels, etc)
                   Platform.OS === "ios" &&
                   request.navigationType !== "click"
                ) {
@@ -424,6 +429,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          url: baseUrl,
       })
       setRefreshKey((prev) => prev + 1)
+      refreshWebAppOnResume()
    }
 
    const handleRenderProcessGone = (syntheticEvent: any) => {
@@ -435,6 +441,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          details: nativeEvent,
       })
       setRefreshKey((prev) => prev + 1)
+      refreshWebAppOnResume()
    }
 
    useEffect(() => {
@@ -448,81 +455,118 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }, [])
 
    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      setTimeout(() => {
-         if (
-            nextAppState === "active" &&
-            webViewRef.current &&
-            shouldRefreshAppWhenResumed
-         ) {
-            // Send message to web app that the app has resumed from external link
-            const message: NativeEvent = {
-               type: MESSAGING_TYPE.WEBVIEW_RESUMED,
-               data: null,
-            }
-            const messageString = JSON.stringify(message)
-
-            webViewRef.current.postMessage(messageString)
-            setShouldRefreshAppWhenResumed(false) // Reset the state
-         }
-      }, 100)
+      if (
+         nextAppState === "active" &&
+         webViewRef.current &&
+         !!refreshAfterExternalActivity // Must do double bang to ensure boolean, sometimes in react native booleans don't evaluate until some operation is performed on them
+      ) {
+         refreshWebAppOnResume()
+         setRefreshAfterExternalActivity(false) // Reset the state
+      }
    }
 
+   const refreshWebAppOnResume = () => {
+      if (!webViewRef.current) return
+
+      // Send message to web app that the app has resumed from external link
+      const message: NativeEvent = {
+         type: MESSAGING_TYPE.WEBVIEW_RESUMED,
+         data: null,
+      }
+      const messageString = JSON.stringify(message)
+
+      webViewRef.current.postMessage(messageString)
+   }
+
+   const handleRefresh = useCallback(() => {
+      setIsRefreshing(true)
+      if (webViewRef.current) {
+         webViewRef.current.reload()
+      }
+      // Reset refreshing state after a short delay
+      setTimeout(() => {
+         setIsRefreshing(false)
+      }, 1000)
+   }, [])
+
    return (
-      <SafeAreaView style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
-         <WebView
-            key={refreshKey + 1}
-            style={{ flex: 1 }}
-            ref={webViewRef}
-            source={{ uri: baseUrl }}
-            javaScriptEnabled={true}
-            mediaPlaybackRequiresUserAction={false}
-            allowsFullscreenVideo={true}
-            onMessage={handleMessage}
-            onShouldStartLoadWithRequest={(request) => {
-               return handleNavigation(request as InterceptedRequest)
-            }}
-            cacheEnabled={true}
-            incognito={false}
-            domStorageEnabled={true}
-            startInLoadingState={true}
-            allowsInlineMediaPlayback={true}
-            cacheMode="LOAD_NO_CACHE"
-            userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
-            sharedCookiesEnabled={true}
-            thirdPartyCookiesEnabled={true}
-            // @ts-ignore
-            useWebKit={true}
-            originWhitelist={[
-               "https://*",
-               "http://*",
-               "file://*",
-               "sms://*",
-               "about:",
-            ]}
-            onNavigationStateChange={handleNavigationStateChange}
-            setSupportMultipleWindows={false}
-            androidHardwareAccelerationDisabled={false} // Use hardware acceleration
-            mixedContentMode="always"
-            overScrollMode="never" // Disable over-scrolling for smoother behavior
-            nestedScrollEnabled={true} // Improves nested scrolling behavior
-            scrollEnabled={true}
-            allowsBackForwardNavigationGestures={true}
-            injectedJavaScript={`(function() {
-                 window._hjSettings = null;
-                 window.hj = null;
-                 var style = document.createElement('style');
-                 style.innerHTML = \`${injectedCSS}\`;
-                 document.head.appendChild(style);
-              })();`}
-            allowFileAccess={true} // Allow service worker support for firebase offline caching
-            allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
-            javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
-            renderToHardwareTextureAndroid={true} // Improve performance on android
-            onContentProcessDidTerminate={handleContentProcessTerminate} // Automatically reload WebView when iOS/Android kills its process to free memory
-            onRenderProcessGone={handleRenderProcessGone} // Recover from WebView crashes on Android by refreshing the view
-         />
+      <SafeAreaView style={styles.container}>
+         <ScrollView
+            contentContainerStyle={styles.flex}
+            refreshControl={
+               <RefreshControl
+                  refreshing={isRefreshing}
+                  onRefresh={handleRefresh}
+                  progressViewOffset={60}
+               />
+            }
+         >
+            <WebView
+               key={refreshKey + 1}
+               style={styles.flex}
+               ref={webViewRef}
+               source={{ uri: baseUrl }}
+               javaScriptEnabled={true}
+               mediaPlaybackRequiresUserAction={false}
+               allowsFullscreenVideo={true}
+               onMessage={handleMessage}
+               onShouldStartLoadWithRequest={(request) => {
+                  return handleNavigation(request as InterceptedRequest)
+               }}
+               cacheEnabled={true}
+               incognito={false}
+               domStorageEnabled={true}
+               startInLoadingState={true}
+               allowsInlineMediaPlayback={true}
+               cacheMode="LOAD_NO_CACHE"
+               userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
+               sharedCookiesEnabled={true}
+               thirdPartyCookiesEnabled={true}
+               // @ts-ignore
+               useWebKit={true}
+               originWhitelist={[
+                  "https://*",
+                  "http://*",
+                  "file://*",
+                  "sms://*",
+                  "about:",
+               ]}
+               onNavigationStateChange={handleNavigationStateChange}
+               setSupportMultipleWindows={false}
+               androidHardwareAccelerationDisabled={false} // Use hardware acceleration
+               mixedContentMode="always"
+               overScrollMode="never" // Disable over-scrolling for smoother behavior
+               nestedScrollEnabled={true} // Improves nested scrolling behavior
+               scrollEnabled={true}
+               allowsBackForwardNavigationGestures={true}
+               injectedJavaScript={`(function() {
+                    window._hjSettings = null;
+                    window.hj = null;
+                    var style = document.createElement('style');
+                    style.innerHTML = \`${injectedCSS}\`;
+                    document.head.appendChild(style);
+                 })();`}
+               allowFileAccess={true} // Allow service worker support for firebase offline caching
+               allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
+               javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
+               renderToHardwareTextureAndroid={true} // Improve performance on android
+               onContentProcessDidTerminate={handleContentProcessTerminate} // Automatically reload WebView when iOS/Android kills its process to free memory
+               onRenderProcessGone={handleRenderProcessGone} // Recover from WebView crashes on Android by refreshing the view
+               onLoadEnd={() => setIsRefreshing(false)}
+            />
+         </ScrollView>
       </SafeAreaView>
    )
 }
+
+const styles = StyleSheet.create({
+   container: {
+      flex: 1,
+      paddingTop: StatusBar.currentHeight,
+   },
+   flex: {
+      flex: 1,
+   },
+})
 
 export default WebViewComponent
