@@ -45,7 +45,6 @@ export const CityAutoComplete = ({
       setCity(null)
       setOptions([])
       setInputValue("")
-      mutate()
    }, [countryId, mutate])
 
    return (
