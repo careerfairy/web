@@ -1,17 +1,16 @@
 import { ProfileLink } from "@careerfairy/shared-lib/users"
 import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useUserLinks } from "components/custom-hook/user/useUserLinks"
-import CircularLogo from "components/views/common/logos/CircularLogo"
+import { CustomLinkCard } from "components/views/common/links/LinkCard"
 import { userRepo } from "data/RepositoryInstances"
-import Link from "next/link"
 import normalizeUrl from "normalize-url"
 import { OptionsObject } from "notistack"
 import { Fragment, useCallback, useState } from "react"
-import { ExternalLink, Link as FeatherLink } from "react-feather"
+import { Link as FeatherLink } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -291,7 +290,13 @@ const LinkCard = ({ link }: LinkCardProps) => {
             handleDelete={() => setIsConfirmDeleteDialogOpen(true)}
             href={normalizedLink}
          >
-            <Button // MUI Button
+            <CustomLinkCard
+               normalizedLink={normalizedLink}
+               faviconSrc={faviconSrc}
+               link={link}
+               linkUrlValue={linkUrlValue}
+            />
+            {/* <Button // MUI Button
                href={normalizedLink}
                target="_blank"
                LinkComponent={Link} // NextJS Link
@@ -321,7 +326,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
                      </Link>
                   </Stack>
                </Stack>
-            </Button>
+            </Button> */}
          </ProfileItemCard>
       </Fragment>
    )
