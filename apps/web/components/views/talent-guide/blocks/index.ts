@@ -1,5 +1,6 @@
 export { ArticleBlock } from "./ArticleBlock"
 export { CopyTemplateBlock } from "./copy-templates/CopyTemplateBlock"
+export { CVBlock } from "./CVBlock"
 export { FollowCompaniesBlock } from "./FollowCompaniesBlock"
 export { HeaderBlock } from "./HeaderBlock"
 export { HighlightsBlock } from "./highlights/HighlightsBlock"

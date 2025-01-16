@@ -185,6 +185,14 @@ export const copyTemplateBlockFragment = gql`
    }
 `
 
+// Model API ID: CvBlock
+export const cvBlockFragment = gql`
+   {
+      __typename
+      id
+   }
+`
+
 // Model API ID: Quiz
 export const quizFragment = gql`
    {
@@ -218,6 +226,7 @@ export const richTextBlockFragment = gql`
             ... on SparksCarouselBlock ${sparksCarouselBlockFragment}
             ... on VideoBlock ${videoBlockFragment}
             ... on CopyTemplateBlock ${copyTemplateBlockFragment}
+            ... on CVBlock ${cvBlockFragment}
          }
       }
    }
