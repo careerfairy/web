@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
-import { Fragment, useMemo, useState } from "react"
+import { Fragment, ReactNode, useMemo, useState } from "react"
 import SEO from "../../components/util/SEO"
 import CarouselContentService, {
    filterNonRegisteredStreams,
@@ -135,7 +135,7 @@ const PortalPage = ({
                         />
                      </Container>
                      <Container disableGutters>
-                        <PortalTagsContent>
+                        <PortalTags>
                            {isMounted ? (
                               <SuspenseWithBoundary
                                  fallback={<SparksLoadingFallback />}
@@ -182,7 +182,7 @@ const PortalPage = ({
                                  seeMoreLink={"/past-livestreams"}
                               />
                            </ConditionalWrapper>
-                        </PortalTagsContent>
+                        </PortalTags>
                      </Container>
                   </CustomJobDialogLayout>
                </LivestreamDialogLayout>
@@ -211,20 +211,13 @@ const SparksLoadingFallback = () => {
 }
 
 type PortalTagsContentProps = {
-   children: React.ReactNode
-}
-const PortalTagsContent = ({ children }: PortalTagsContentProps) => {
-   const isMounted = useIsMounted()
-   return (
-      <SuspenseWithBoundary fallback={children}>
-         {isMounted ? <PortalTags>{children}</PortalTags> : children}
-      </SuspenseWithBoundary>
-   )
+   children: ReactNode
 }
 
 const PortalTags = ({ children }: PortalTagsContentProps) => {
-   const availableCategories = useAvailableTagsByHits()
-   const defaultCategories = availableCategories.map((tag) => {
+   const { tags } = useAvailableTagsByHits()
+
+   const defaultCategories = tags.map((tag) => {
       return [
          tag.id,
          {
@@ -265,7 +258,7 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
       <Box sx={{ mb: 3, minHeight: "100vh" }}>
          <TagsCarouselWithArrow
             selectedCategories={selectedCategories}
-            tags={availableCategories}
+            tags={tags}
             handleTagClicked={handleCategoryChipClicked}
             handleAllClicked={() => handleCategoryChipClicked(undefined)}
          />
