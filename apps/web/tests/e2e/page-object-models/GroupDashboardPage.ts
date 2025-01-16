@@ -537,24 +537,7 @@ export class GroupDashboardPage extends CommonPage {
       const followButton = this.page
          .getByTestId(`follow-button-${groupId}`)
          .first()
-
-      // Add retry logic and explicit waits
-      await followButton.waitFor({ state: "attached", timeout: 10000 })
-
-      // Try scrolling with multiple approaches
-      try {
-         await followButton.scrollIntoViewIfNeeded({ timeout: 5000 })
-      } catch (e) {
-         // Fallback: try JavaScript scroll if Playwright scroll fails
-         await followButton.evaluate((button) => {
-            button.scrollIntoView({ behavior: "smooth", block: "center" })
-         })
-         // Give the scroll some time to complete
-         await this.page.waitForTimeout(1000)
-      }
-
-      // Ensure button is visible before clicking
-      await followButton.waitFor({ state: "visible", timeout: 5000 })
+      await followButton.scrollIntoViewIfNeeded()
       await followButton.click()
    }
 
