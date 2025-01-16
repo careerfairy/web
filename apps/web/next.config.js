@@ -372,12 +372,22 @@ if (notProduction) {
    moduleExports.images.domains.push("loremflickr.com")
 }
 
+/** @type {import('@sentry/nextjs').SentryWebpackPluginOptions} */
 const sentryWebpackPluginOptions = {
    // Additional config options for the Sentry Webpack plugin. Keep in mind that
    // the following options are set automatically, and overriding them is not
    // recommended:
    //   release, url, org, project, authToken, configFile, stripPrefix,
    //   urlPrefix, include, ignore
+
+   // Upload a larger set of source maps for prettier stack traces (increases build time)
+   widenClientFileUpload: true,
+
+   // Hides source maps from generated client bundles
+   hideSourceMaps: true,
+
+   // Automatically tree-shake Sentry logger statements to reduce bundle size
+   disableLogger: true,
 
    silent: true, // Suppresses all logs
    // For all available options, see:
