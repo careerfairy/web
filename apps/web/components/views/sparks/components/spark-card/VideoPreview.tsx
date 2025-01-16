@@ -22,17 +22,6 @@ const styles = sxStyles({
       inset: 0,
    },
    playerWrapper: {
-      "&::after": {
-         zIndex: 0,
-         content: '""',
-         position: "absolute",
-         top: 0,
-         right: 0,
-         bottom: 0,
-         left: 0,
-         // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
-         background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0) 82.29%, rgba(0, 0, 0, 0.60) 100%)`,
-      },
       position: "relative",
       width: "100%",
       height: "100%",
@@ -87,6 +76,19 @@ const styles = sxStyles({
                sm: "cover !important",
             },
          },
+      },
+   },
+   withOverlay: {
+      "&::after": {
+         zIndex: 0,
+         content: '""',
+         position: "absolute",
+         top: 0,
+         right: 0,
+         bottom: 0,
+         left: 0,
+         // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
+         background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0.00) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0.00) 49.57%, rgba(0, 0, 0, 0.60) 100%)`,
       },
    },
 })
@@ -234,13 +236,14 @@ const VideoPreview: FC<Props> = ({
          <Box
             sx={[
                styles.playerWrapper,
+               styles.withOverlay,
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
             <ThumbnailOverlay
                src={thumbnailUrl}
                containPreviewOnTablet={containPreviewOnTablet}
-               playing={playingVideo}
+               hide={!light}
             />
 
             {light ? null : (
@@ -274,19 +277,25 @@ const VideoPreview: FC<Props> = ({
 type ThumbnailOverlayProps = {
    src: string
    containPreviewOnTablet?: boolean
-   playing?: boolean
+   hide?: boolean
 }
 
 export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
    src,
    containPreviewOnTablet,
-   playing,
+   hide,
 }) => {
    const theme = useTheme()
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
 
    return (
-      <Box sx={[styles.thumbnailOverlay, { zIndex: playing ? 0 : 1 }]}>
+      <Box
+         sx={[
+            styles.thumbnailOverlay,
+            styles.withOverlay,
+            { zIndex: hide ? 0 : 1 },
+         ]}
+      >
          <Image
             src={src}
             fill
