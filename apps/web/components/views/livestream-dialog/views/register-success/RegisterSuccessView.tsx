@@ -362,24 +362,28 @@ const ActionButtons = ({
                </Button>
             )}
 
-            <AddToCalendar
-               event={livestream}
-               filename={`${livestream.company}-event`}
-               onCalendarClick={() => groupHasSparks && handleDiscoverSparks()}
-            >
-               {(handleClick) => (
-                  <Button
-                     fullWidth
-                     variant={"contained"}
-                     color={"primary"}
-                     onClick={handleClick}
-                     size="large"
-                     startIcon={<CalendarIcon />}
-                  >
-                     Add to calendar
-                  </Button>
-               )}
-            </AddToCalendar>
+            <SuspenseWithBoundary fallback={<CircularProgress />}>
+               <AddToCalendar
+                  event={livestream}
+                  filename={`${livestream.company}-event`}
+                  onCalendarClick={() =>
+                     groupHasSparks && handleDiscoverSparks()
+                  }
+               >
+                  {(handleClick) => (
+                     <Button
+                        fullWidth
+                        variant={"contained"}
+                        color={"primary"}
+                        onClick={handleClick}
+                        size="large"
+                        startIcon={<CalendarIcon />}
+                     >
+                        Add to calendar
+                     </Button>
+                  )}
+               </AddToCalendar>
+            </SuspenseWithBoundary>
 
             {!isSparksOpen && (
                <Button
