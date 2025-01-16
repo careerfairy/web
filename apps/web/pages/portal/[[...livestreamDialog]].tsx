@@ -214,56 +214,31 @@ type PortalTagsContentProps = {
    children: ReactNode
 }
 
+type CategoryId = string | undefined
+
 const PortalTags = ({ children }: PortalTagsContentProps) => {
    const { tags } = useAvailableTagsByHits()
+   const [selectedCategoryId, setSelectedCategoryId] =
+      useState<CategoryId>(undefined)
 
-   const defaultCategories = tags.map((tag) => {
-      return [
-         tag.id,
-         {
-            selected: false,
-         },
-      ]
-   })
-
-   const [categoriesData, setCategoriesData] = useState(() => {
-      return Object.fromEntries(defaultCategories)
-   })
-
-   const selectedCategories = useMemo(() => {
-      return Object.keys(categoriesData).filter(
-         (cat) => categoriesData[cat].selected
+   const handleCategoryChipClicked = (categoryId: CategoryId) => {
+      setSelectedCategoryId((previousCategoryId) =>
+         previousCategoryId === categoryId ? undefined : categoryId
       )
-   }, [categoriesData])
-
-   const handleCategoryChipClicked = (categoryId: string) => {
-      const newCategories = Object.fromEntries(
-         Object.keys(categoriesData).map((id) => {
-            return [
-               id,
-               {
-                  selected:
-                     id === categoryId
-                        ? !categoriesData[categoryId].selected
-                        : false,
-               },
-            ]
-         })
-      )
-
-      setCategoriesData(newCategories)
    }
 
    return (
       <Box sx={{ mb: 3, minHeight: "100vh" }}>
          <TagsCarouselWithArrow
-            selectedCategories={selectedCategories}
+            selectedCategories={selectedCategoryId ? [selectedCategoryId] : []}
             tags={tags}
             handleTagClicked={handleCategoryChipClicked}
             handleAllClicked={() => handleCategoryChipClicked(undefined)}
          />
-         {selectedCategories.length ? (
-            <CategoryTagsContent categories={categoriesData} />
+         {selectedCategoryId ? (
+            <CategoryTagsContent
+               categories={{ [selectedCategoryId]: { selected: true } }}
+            />
          ) : (
             children
          )}
