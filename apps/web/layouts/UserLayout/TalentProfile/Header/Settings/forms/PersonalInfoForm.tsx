@@ -6,7 +6,6 @@ import useCountryCities from "components/custom-hook/countries/useCountryCities"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
-import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { ReactNode, useEffect } from "react"
 import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
@@ -105,27 +104,23 @@ export const PersonalInfoFormFields = () => {
             <CitiesDropdown />
          </SuspenseWithBoundary>
 
-         <BrandedTooltip
-            title={"As of now, you can't change your email address."}
-            placement="bottom"
-         >
-            <Box>
-               <ControlledBrandedTextField
-                  id="email"
-                  name="email"
-                  label="Email"
-                  placeholder="E.g., your@email.com"
-                  disabled
-                  fullWidth
-                  sx={{
-                     "& .MuiAutocomplete-inputRoot": {
-                        backgroundColor: (theme) => theme.brand.white[300],
-                        opacity: 0.45,
-                     },
-                  }}
-               />
-            </Box>
-         </BrandedTooltip>
+         <Box>
+            <ControlledBrandedTextField
+               id="email"
+               name="email"
+               label="Email"
+               placeholder="E.g., your@email.com"
+               disabled
+               fullWidth
+               sx={{
+                  "& .MuiAutocomplete-inputRoot": {
+                     backgroundColor: (theme) => theme.brand.white[300],
+                     opacity: 0.45,
+                  },
+               }}
+               tooltipText="As of now, you can't change your email address."
+            />
+         </Box>
       </Stack>
    )
 }
