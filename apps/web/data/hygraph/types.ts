@@ -204,6 +204,11 @@ export type QuizModelType = {
    answers: QuizAnswerComponentType[]
 }
 
+export type CVBlockType = {
+   __typename: "CVBlock"
+   id: string
+}
+
 export type RichTextReferenceType =
    | ArticleBlockType
    | MentorsCarouselBlockType
@@ -215,6 +220,7 @@ export type RichTextReferenceType =
    | SparksCarouselBlockType
    | VideoBlockType
    | CopyTemplateBlockType
+   | CVBlockType
 
 export type RichTextBlockType = {
    __typename: "RichTextBlock"
