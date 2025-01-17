@@ -1,7 +1,7 @@
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
 import { RtcRole, RtcTokenBuilder } from "agora-token"
 import axios, { Method } from "axios"
-import { isLocalEnvironment } from "src/util"
+import { isLocalEnvironment } from "../util"
 
 // Project: Production
 let appID = "53675bc6d3884026a72ecb1de3d19eb1"
