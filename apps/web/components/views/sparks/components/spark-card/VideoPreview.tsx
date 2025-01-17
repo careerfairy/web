@@ -166,7 +166,6 @@ const VideoPreview: FC<Props> = ({
    const prevIdentifier = usePrevious(identifier)
 
    const reset = () => {
-      setIsVideoReady(false)
       setVideoPlayedForSession(false)
       setProgress(0)
       playerRef.current?.seekTo(0)
@@ -192,7 +191,7 @@ const VideoPreview: FC<Props> = ({
    }, [playingVideo])
 
    useEffect(() => {
-      if (prevIdentifier !== identifier) {
+      if (prevIdentifier !== undefined && prevIdentifier !== identifier) {
          reset()
       }
    }, [identifier, prevIdentifier])
@@ -249,6 +248,7 @@ const VideoPreview: FC<Props> = ({
 
             {light ? null : (
                <ReactPlayer
+                  key={videoUrl}
                   ref={playerRef}
                   playing={playingVideo}
                   playsinline
@@ -264,7 +264,6 @@ const VideoPreview: FC<Props> = ({
                   url={videoUrl}
                   playIcon={<Fragment />}
                   muted={muted}
-                  style={{ visibility: isVideoReady ? "visible" : "hidden" }}
                />
             )}
          </Box>
