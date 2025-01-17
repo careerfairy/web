@@ -18,11 +18,13 @@ const useCustomJobsGroupNames = (customJobs: CustomJob[]) => {
 
    const fetcher = useFunctionsSWR<Result>()
 
-   return useSWR<Record<string, string>>(
+   const { data, isLoading } = useSWR<Record<string, string>>(
       ["fetchCustomJobGroupNames", options],
       fetcher,
-      reducedRemoteCallsOptions
+      { ...reducedRemoteCallsOptions, suspense: false }
    )
+
+   return { data: data ?? {}, isLoading }
 }
 
 export default useCustomJobsGroupNames

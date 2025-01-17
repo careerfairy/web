@@ -1,6 +1,5 @@
 import { GroupedTags } from "@careerfairy/shared-lib/constants/tags"
 import { Button, Stack, Typography } from "@mui/material"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobs from "components/custom-hook/custom-job/useCustomJobs"
 import useCustomJobsCount from "components/custom-hook/custom-job/useCustomJobsCount"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
@@ -67,12 +66,10 @@ const CustomJobsTagsContent = ({ tags, title }: Props) => {
          <Typography sx={styles.heading} color="neutral.800">
             {title}
          </Typography>
-         <SuspenseWithBoundary fallback={<RecommendedCustomJobsSkeleton />}>
-            <Content
-               businessFunctionTagIds={businessFunctionTagIds}
-               totalCount={count}
-            />
-         </SuspenseWithBoundary>
+         <Content
+            businessFunctionTagIds={businessFunctionTagIds}
+            totalCount={count}
+         />
       </Stack>
    )
 }
@@ -84,9 +81,10 @@ type ContentProps = {
 const Content = ({ businessFunctionTagIds, totalCount }: ContentProps) => {
    const [batchSize, setBatchSize] = useState<number>(ITEMS_PER_BATCH)
 
-   const { customJobs: allCustomJobs } = useCustomJobs({
-      businessFunctionTagIds: businessFunctionTagIds,
-   })
+   const { customJobs: allCustomJobs, isLoading: isLoadingCustomJobs } =
+      useCustomJobs({
+         businessFunctionTagIds: businessFunctionTagIds,
+      })
 
    const customJobs = useMemo(() => {
       return allCustomJobs.slice(0, batchSize)
@@ -96,9 +94,14 @@ const Content = ({ businessFunctionTagIds, totalCount }: ContentProps) => {
       setBatchSize(batchSize + ITEMS_PER_BATCH)
    }, [setBatchSize, batchSize])
 
-   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(allCustomJobs)
+   const { data: jobsGroupNamesMap, isLoading: isLoadingGroupNamesMap } =
+      useCustomJobsGroupNames(allCustomJobs)
 
    const seeMoreDisabled = customJobs.length == totalCount
+
+   if (isLoadingCustomJobs || isLoadingGroupNamesMap) {
+      return <RecommendedCustomJobsSkeleton />
+   }
 
    return (
       <Stack sx={styles.jobsWrapper}>
