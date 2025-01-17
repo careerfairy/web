@@ -1,8 +1,10 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { ListItem, Stack, SxProps } from "@mui/material"
+import { Box, ListItem, Stack, SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import JobCard from "components/views/common/jobs/JobCard"
+import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { combineStyles, sxStyles } from "types/commonTypes"
@@ -54,14 +56,22 @@ const CustomJobsList = ({
                   key={idx}
                >
                   <ListItem sx={styles.jobListItemWrapper}>
-                     <JobCard
-                        job={customJob}
-                        previewMode
-                        hideJobUrl
-                        smallCard={isMobile}
-                        companyName={jobsGroupNamesMap[customJob.id]}
-                        applied={applied}
-                     />
+                     <SuspenseWithBoundary
+                        fallback={
+                           <Box width="100%">
+                              <JobCardSkeleton />
+                           </Box>
+                        }
+                     >
+                        <JobCard
+                           job={customJob}
+                           previewMode
+                           hideJobUrl
+                           smallCard={isMobile}
+                           companyName={jobsGroupNamesMap[customJob.id]}
+                           applied={applied}
+                        />
+                     </SuspenseWithBoundary>
                   </ListItem>
                </Link>
             )
