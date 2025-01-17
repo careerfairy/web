@@ -31,7 +31,6 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
@@ -39,7 +38,6 @@ import { getCustomJobDialogData } from "components/views/jobs/components/custom-
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
 import { UserSparksCarousel } from "components/views/portal/sparks/UserSparksCarousel"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
 import { sxStyles } from "types/commonTypes"
@@ -136,28 +134,20 @@ const PortalPage = ({
                      </Container>
                      <Container disableGutters>
                         <PortalTags>
-                           {isMounted ? (
-                              <SuspenseWithBoundary
-                                 fallback={<SparksLoadingFallback />}
-                              >
-                                 <UserSparksCarousel
-                                    header={
-                                       <Typography
-                                          variant="brandedH4"
-                                          color="neutral.800"
-                                          fontWeight="600"
-                                       >
-                                          Sparks
-                                       </Typography>
-                                    }
-                                    handleSparksClicked={handleSparksClicked}
-                                    containerSx={styles.sparksCarousel}
-                                    headerSx={styles.sparksCarouselHeader}
-                                 />
-                              </SuspenseWithBoundary>
-                           ) : (
-                              <SparksLoadingFallback />
-                           )}
+                           <UserSparksCarousel
+                              header={
+                                 <Typography
+                                    variant="brandedH4"
+                                    color="neutral.800"
+                                    fontWeight="600"
+                                 >
+                                    Sparks
+                                 </Typography>
+                              }
+                              handleSparksClicked={handleSparksClicked}
+                              containerSx={styles.sparksCarousel}
+                              headerSx={styles.sparksCarouselHeader}
+                           />
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
                            ) : null}
@@ -190,23 +180,6 @@ const PortalPage = ({
             </Fragment>
          </GenericDashboardLayout>
       </Fragment>
-   )
-}
-
-const SparksLoadingFallback = () => {
-   return (
-      <FallbackComponent
-         sx={styles.sparksCarousel}
-         header={
-            <Typography
-               variant="brandedH4"
-               color="neutral.800"
-               fontWeight="600"
-            >
-               Sparks
-            </Typography>
-         }
-      />
    )
 }
 
