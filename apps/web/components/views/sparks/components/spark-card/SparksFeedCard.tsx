@@ -327,7 +327,14 @@ const SparksFeedCard: FC<Props> = ({
                   {showCardNotification ? (
                      <FullCardNotification spark={spark} />
                   ) : isOverlayedOntop ? (
-                     <Stack sx={styles.desktopContentInner}>
+                     <Stack
+                        sx={styles.desktopContentInner}
+                        onClick={(e: SyntheticEvent) => {
+                           if (e.target === e.currentTarget) {
+                              handleClickCard(e)
+                           }
+                        }}
+                     >
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
                               spark.creator.avatarUrl,
