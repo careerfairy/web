@@ -130,6 +130,8 @@ const VideoPreview: FC<Props> = ({
    const dispatch = useDispatch()
    const [isVideoReady, setIsVideoReady] = useState(false)
 
+   const isAnAutoPlayingCard = autoPlaying !== undefined
+
    const onProgress = useReactPlayerTracker({
       identifier,
       onSecondPass: onSecondPassed,
@@ -263,7 +265,11 @@ const VideoPreview: FC<Props> = ({
             <ThumbnailOverlay
                src={thumbnailUrl}
                containPreviewOnTablet={containPreviewOnTablet}
-               show={light || !isVideoReady}
+               show={
+                  light ||
+                  !isVideoReady ||
+                  (isAnAutoPlayingCard && !playingVideo) // Fixes black thumbnail on auto-playing cards
+               }
             />
          </Box>
          <LinearProgress
