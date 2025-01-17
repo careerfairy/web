@@ -1,5 +1,5 @@
+import { isLocalEnvironment } from "@careerfairy/shared-lib/utils"
 import { BigQuery, BigQueryOptions } from "@google-cloud/bigquery"
-import { isLocalEnvironment } from "../util"
 
 let options: BigQueryOptions = {
    projectId: "careerfairy-e1fd9",

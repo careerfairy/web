@@ -1,8 +1,8 @@
-import { chunkArray } from "@careerfairy/shared-lib/utils"
+import { chunkArray, isLocalEnvironment } from "@careerfairy/shared-lib/utils"
 import * as postmark from "postmark"
 import { ServerClient } from "postmark"
 import { Callback, MessageSendingResponse } from "postmark/dist/client/models"
-import { isLocalEnvironment, isTestEnvironment } from "../util"
+import { isTestEnvironment } from "../util"
 let serverToken = "3f6d5713-5461-4453-adfd-71f5fdad4e63"
 
 // on local emulators use the sandbox environment

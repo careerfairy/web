@@ -2,12 +2,13 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    addUtmTagsToLink,
    companyNameSlugify,
+   getLivestreamICSDownloadUrl,
 } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import { client } from "./api/postmark"
 import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
-import { getLivestreamICSDownloadUrl, setCORSHeaders } from "./util"
+import { setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"

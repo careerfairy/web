@@ -1,6 +1,7 @@
+import { isLocalEnvironment } from "@careerfairy/shared-lib/utils"
 import Mailgun from "mailgun.js"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
-import { isLocalEnvironment, processInBatches } from "../util"
+import { processInBatches } from "../util"
 import formData = require("form-data")
 import functions = require("firebase-functions")
 

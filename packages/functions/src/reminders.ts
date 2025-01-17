@@ -15,6 +15,7 @@ import {
    addUtmTagsToLink,
    chunkArray,
    companyNameSlugify,
+   isLocalEnvironment,
 } from "@careerfairy/shared-lib/utils"
 import { WriteBatch } from "firebase-admin/firestore"
 import { onRequest } from "firebase-functions/v2/https"
@@ -41,7 +42,6 @@ import {
    addMinutesDate,
    generateNonAttendeesReminder,
    generateReminderEmailData,
-   isLocalEnvironment,
    processInBatches,
    setCORSHeaders,
 } from "./util"
