@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app"
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore"
-import { isLocalEnvironment } from "src/util"
+import { isLocalEnvironment } from "../util"
 
 /**
  * Ideally we wouldn't need the client SDK on the server..
