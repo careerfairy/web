@@ -1,7 +1,6 @@
 import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useCustomJobsByUser from "components/custom-hook/custom-job/useCustomJobsByUser"
+import { useCustomJobsByUser } from "components/custom-hook/custom-job/useCustomJobsByUser"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
@@ -57,9 +56,7 @@ export const RecommendedCustomJobs = () => {
          >
             {isLoggedOut ? "Highlighted jobs" : "Jobs matching your interests"}
          </Typography>
-         <SuspenseWithBoundary fallback={<RecommendedCustomJobsSkeleton />}>
-            <Content />
-         </SuspenseWithBoundary>
+         <Content />
       </Stack>
    )
 }
@@ -67,7 +64,11 @@ export const RecommendedCustomJobs = () => {
 const Content = () => {
    const [batchSize, setBatchSize] = useState<number>(ITEMS_PER_BATCH)
 
-   const { customJobs: allCustomJobs, totalCount } = useCustomJobsByUser()
+   const {
+      customJobs: allCustomJobs,
+      totalCount,
+      isLoading: isLoadingCustomJobs,
+   } = useCustomJobsByUser()
 
    const customJobs = useMemo(() => {
       return allCustomJobs.slice(0, batchSize)
@@ -77,9 +78,14 @@ const Content = () => {
       setBatchSize(batchSize + ITEMS_PER_BATCH)
    }, [setBatchSize, batchSize])
 
-   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(allCustomJobs)
+   const { data: jobsGroupNamesMap, isLoading: isLoadingGroupNamesMap } =
+      useCustomJobsGroupNames(allCustomJobs)
 
    const seeMoreDisabled = customJobs.length == totalCount
+
+   if (isLoadingCustomJobs || isLoadingGroupNamesMap) {
+      return <RecommendedCustomJobsSkeleton />
+   }
 
    return (
       <Stack sx={styles.jobsWrapper}>

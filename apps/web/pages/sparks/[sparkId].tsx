@@ -32,6 +32,7 @@ import {
    setOriginalSparkId,
    setSparks,
    setUserEmail,
+   setVideosMuted,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
@@ -82,6 +83,12 @@ const SparksPage: NextPage<
    const isInCreatorFeed = useSelector(isInCreatorFeedSelector)
    const wasInCreatorFeed = useSelector(wasInCreatorFeedSelector)
    const { userData } = useAuth()
+
+   useEffect(() => {
+      if ("userActivation" in navigator) {
+         dispatch(setVideosMuted(!navigator.userActivation.hasBeenActive))
+      }
+   }, [dispatch])
 
    useEffect(() => {
       dispatch(setGroupId(groupId))

@@ -52,34 +52,33 @@ const CategoryTagsContentComponent = ({ categories }: Props) => {
 
    return (
       <Stack sx={styles.wrapper} spacing={3}>
-         <ConditionalWrapper condition={hasContentTopics || hasLanguages}>
+         {Boolean(hasContentTopics || hasLanguages) && (
             <SparksTagsContent
                tags={tags}
                selectTagIds={selectedCategories}
                selectedTagLabel={selectedTagLabel}
             />
-         </ConditionalWrapper>
-
-         <ConditionalWrapper
-            condition={hasBusinessFunctions || hasContentTopics || hasLanguages}
-         >
-            <LivestreamTagsContent
-               title={"Upcoming live streams related to " + selectedTagLabel}
-               type="future"
-               tags={tags}
-            />
-            <ConditionalWrapper condition={hasBusinessFunctions}>
-               <CustomJobsTagsContent
+         )}
+         {Boolean(hasBusinessFunctions || hasContentTopics || hasLanguages) && (
+            <>
+               <LivestreamTagsContent
+                  title={"Upcoming live streams related to " + selectedTagLabel}
+                  type="future"
                   tags={tags}
-                  title={"Top " + selectedTagLabel + " jobs"}
                />
-            </ConditionalWrapper>
-            <LivestreamTagsContent
-               title={"Top " + selectedTagLabel + " recordings"}
-               type="past"
-               tags={tags}
-            />
-         </ConditionalWrapper>
+               <ConditionalWrapper condition={hasBusinessFunctions}>
+                  <CustomJobsTagsContent
+                     tags={tags}
+                     title={"Top " + selectedTagLabel + " jobs"}
+                  />
+               </ConditionalWrapper>
+               <LivestreamTagsContent
+                  title={"Top " + selectedTagLabel + " recordings"}
+                  type="past"
+                  tags={tags}
+               />
+            </>
+         )}
       </Stack>
    )
 }
