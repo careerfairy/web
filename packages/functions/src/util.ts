@@ -9,6 +9,7 @@ import {
    addUtmTagsToLink,
    companyNameSlugify,
    createCalendarEvent,
+   getLivestreamICSDownloadUrl,
    makeUrls,
 } from "@careerfairy/shared-lib/utils"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
@@ -414,20 +415,6 @@ export const partition = <T>(
    ) as { matches: T[]; noMatches: T[] }
 }
 
-/**
- * Detect if we're running the emulators
- */
-export const isLocalEnvironment = () => {
-   return (
-      process.env.FIREBASE_AUTH_EMULATOR_HOST ||
-      process.env.FIREBASE_STORAGE_EMULATOR_HOST ||
-      process.env.FIRESTORE_EMULATOR_HOST ||
-      process.env.FUNCTIONS_EMULATOR ||
-      process.env.NODE_ENV === "development" ||
-      process.env.NODE_ENV === "test"
-   )
-}
-
 export const isTestEnvironment = () => {
    return process.env.NODE_ENV === "test"
 }
@@ -733,10 +720,4 @@ export const processInBatches = async <T, R>(
    }
 
    return results
-}
-
-export const getLivestreamICSDownloadUrl = (streamId: string) => {
-   return isLocalEnvironment()
-      ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${streamId}`
-      : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${streamId}`
 }

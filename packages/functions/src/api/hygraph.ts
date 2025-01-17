@@ -1,4 +1,4 @@
-import { isLocalEnvironment } from "../util"
+import { isLocalEnvironment } from "@careerfairy/shared-lib/utils"
 import { GraphQLClient } from "graphql-request"
 
 // Project: Production
