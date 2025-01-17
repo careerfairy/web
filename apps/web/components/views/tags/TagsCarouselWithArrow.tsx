@@ -1,5 +1,5 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
-import { Box, IconButton, Stack } from "@mui/material"
+import { Box, IconButton, Skeleton, Stack } from "@mui/material"
 import { ArrowLeftIcon, ArrowRightIcon } from "@mui/x-date-pickers"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
@@ -28,6 +28,24 @@ const styles = sxStyles({
    disabledArrow: {
       opacity: 0,
    },
+   skeletonChip: {
+      height: 32,
+      width: {
+         xs: 60,
+         sm: 80,
+      },
+      borderRadius: 16,
+      flexShrink: 0,
+   },
+   skeletonWrapper: {
+      overflowX: "auto",
+      width: "100%",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
+      msOverflowStyle: "none",
+      scrollbarWidth: "none",
+   },
 })
 
 const tagsCarouselEmblaOptions: EmblaOptionsType = {
@@ -41,6 +59,7 @@ type CarouselProps = {
    tags: OptionGroup[]
    handleTagClicked: (tagId: string) => void
    handleAllClicked?: () => void
+   isLoading?: boolean
 }
 
 const TagsCarouselWithArrow: FC<CarouselProps> = ({
@@ -48,6 +67,7 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
    handleTagClicked,
    selectedCategories,
    handleAllClicked,
+   isLoading,
 }) => {
    const isMobile = useIsMobile()
    const childRef = useRef<ChildRefType | null>(null)
@@ -103,6 +123,10 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
       },
    }))
 
+   if (isLoading) {
+      return <TagsCarouselSkeleton />
+   }
+
    if (!tags?.length) return null
 
    return (
@@ -143,6 +167,26 @@ const TagsCarouselWithArrow: FC<CarouselProps> = ({
                   </IconButton>
                </Box>
             </ConditionalWrapper>
+         </Box>
+      </Stack>
+   )
+}
+
+const TagsCarouselSkeleton = () => {
+   return (
+      <Stack spacing={1.25} direction={"row"} mb={3}>
+         <Box sx={styles.contentWrapper} pr={3}>
+            <Box sx={styles.skeletonWrapper}>
+               <Stack direction={"row"} spacing={"12px"} pl={2} pr={2}>
+                  {Array.from({ length: 18 }).map((_, index) => (
+                     <Skeleton
+                        key={index}
+                        variant="rounded"
+                        sx={styles.skeletonChip}
+                     />
+                  ))}
+               </Stack>
+            </Box>
          </Box>
       </Stack>
    )

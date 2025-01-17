@@ -1,10 +1,9 @@
-import React from "react"
-import StepsView, { StepId } from "../common/StepsView"
 import { Divider, Stack, Typography } from "@mui/material"
-import ResourcesView from "../common/ResourcesView"
-import FaqView from "../common/FaqView"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import GenericDialog from "../../../../common/GenericDialog"
+import FaqView from "../common/FaqView"
+import ResourcesView from "../common/ResourcesView"
+import StepsView, { StepId } from "../common/StepsView"
 
 const styles = sxStyles({
    divider: {
@@ -45,7 +44,7 @@ const DebugModal = () => {
                <a
                   color="inherit"
                   target="_blank"
-                  href="mailto:thomas@careerfairy.io"
+                  href="mailto:support@careerfairy.io"
                   rel="noreferrer"
                >
                   Get in touch with the CareerFairy Team

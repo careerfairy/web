@@ -45,7 +45,7 @@ export const Sparks = () => {
 }
 
 const Content = () => {
-   const sparks = useUserSparks()
+   const { sparks } = useUserSparks({ suspense: true })
    const streamIsMobile = useStreamIsMobile()
 
    return (

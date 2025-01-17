@@ -17,23 +17,8 @@ const styles = sxStyles({
       flexDirection: "column",
       overflow: "hidden",
       aspectRatio: "9/16",
-      // CSS hack for Safari to fix https://linear.app/careerfairy/issue/CF-1251/sparks-overlay-breaks
-      "*:not(.MuiChip-root, .MuiChip-root *)": {
-         backdropFilter: "grayscale(0)",
-      },
    },
    cardContent: {
-      "&::after": {
-         content: '""',
-         position: "absolute",
-         top: 0,
-         right: 0,
-         bottom: 0,
-         left: 0,
-         // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
-         background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0) 82.29%, rgba(0, 0, 0, 0.60) 100%)`,
-         zIndex: -1,
-      },
       zIndex: 1,
       display: "flex",
       flexDirection: "column",
@@ -72,7 +57,7 @@ type Props = {
    onMouseLeave?: () => void
    onVideoEnded?: () => void
    autoPlaying?: boolean
-   containerRef?: React.RefObject<HTMLDivElement>
+   containerRef?: (node?: Element | null) => void
    selected?: boolean
    type?: SparkPreviewCardType
 }
@@ -90,7 +75,6 @@ const SparkPreviewCardContainer: FC<Props> = ({
    type = "carousel",
 }) => {
    const isMobile = useIsMobile()
-   const autoPlayEnabled = autoPlaying !== undefined && autoPlaying !== false
 
    const getCardStyles = (type: SparkPreviewCardType) => {
       if (type == "carousel") {
@@ -113,18 +97,21 @@ const SparkPreviewCardContainer: FC<Props> = ({
       >
          {componentHeader ? componentHeader : null}
          <Box sx={styles.cardContent}>{children}</Box>
-         <VideoPreview
-            thumbnailUrl={video.thumbnailUrl}
-            videoUrl={video.url}
-            pausing={autoPlayEnabled ? !autoPlaying : false}
-            playing={autoPlayEnabled ? autoPlaying : video.preview}
-            light={false}
-            autoPlaying={autoPlaying}
-            containPreviewOnTablet
-            muted={video.muted || autoPlayEnabled ? true : false}
-            identifier={video.url}
-            onVideoEnded={onVideoEnded}
-         />
+         <Box component="span" zIndex={-1}>
+            <VideoPreview
+               key={`${video.url}-${isMobile ? "mobile" : "desktop"}`}
+               thumbnailUrl={video.thumbnailUrl}
+               videoUrl={video.url}
+               pausing={!autoPlaying}
+               playing={autoPlaying || video.preview}
+               light={false}
+               autoPlaying={autoPlaying}
+               containPreviewOnTablet
+               muted={video.muted}
+               identifier={video.url}
+               onVideoEnded={onVideoEnded}
+            />
+         </Box>
       </Box>
    )
 }

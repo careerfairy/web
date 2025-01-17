@@ -53,14 +53,14 @@ const SparksCarousel = ({
       WheelGesturesPlugin(),
    ])
 
-   const { shouldDisableAutoPlay, moveToNextSlide } = useAutoPlaySparks(
+   const { shouldDisableAutoPlay, moveToNextSlide, ref } = useAutoPlaySparks(
       sparks?.length ?? null,
       emblaApi
    )
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>
-         <Box sx={styles.container}>
+         <Box sx={styles.container} ref={ref}>
             {sparks?.length
                ? sparks.map((spark, index) => (
                     <Box key={spark.id} sx={styles.slide}>
