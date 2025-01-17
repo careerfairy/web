@@ -9,6 +9,7 @@ import {
    addUtmTagsToLink,
    companyNameSlugify,
    createCalendarEvent,
+   getLivestreamICSDownloadUrl,
    makeUrls,
 } from "@careerfairy/shared-lib/utils"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
@@ -30,6 +31,20 @@ import * as zlib from "zlib"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
 import DocumentSnapshot = firestore.DocumentSnapshot
+
+/**
+ * Detect if we're running the emulators
+ */
+export const isLocalEnvironment = () => {
+   return Boolean(
+      process.env.FIREBASE_AUTH_EMULATOR_HOST ||
+         process.env.FIREBASE_STORAGE_EMULATOR_HOST ||
+         process.env.FIRESTORE_EMULATOR_HOST ||
+         process.env.FUNCTIONS_EMULATOR ||
+         process.env.NODE_ENV === "development" ||
+         process.env.NODE_ENV === "test"
+   )
+}
 
 export const setCORSHeaders = (req: Request, res: Response): void => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -269,7 +284,7 @@ const createRecipientVariables = (
          },
          calendar: {
             google: urls.google,
-            apple: getLivestreamICSDownloadUrl(streamId),
+            apple: getLivestreamICSDownloadUrl(streamId, isLocalEnvironment()),
             outlook: urls.outlook,
          },
       }
@@ -412,20 +427,6 @@ export const partition = <T>(
       },
       { matches: [], noMatches: [] }
    ) as { matches: T[]; noMatches: T[] }
-}
-
-/**
- * Detect if we're running the emulators
- */
-export const isLocalEnvironment = () => {
-   return (
-      process.env.FIREBASE_AUTH_EMULATOR_HOST ||
-      process.env.FIREBASE_STORAGE_EMULATOR_HOST ||
-      process.env.FIRESTORE_EMULATOR_HOST ||
-      process.env.FUNCTIONS_EMULATOR ||
-      process.env.NODE_ENV === "development" ||
-      process.env.NODE_ENV === "test"
-   )
 }
 
 export const isTestEnvironment = () => {
@@ -733,10 +734,4 @@ export const processInBatches = async <T, R>(
    }
 
    return results
-}
-
-export const getLivestreamICSDownloadUrl = (streamId: string) => {
-   return isLocalEnvironment()
-      ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${streamId}`
-      : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${streamId}`
 }

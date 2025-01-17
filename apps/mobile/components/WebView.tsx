@@ -68,7 +68,7 @@ type InterceptedRequest = {
    navigationType: string
 }
 
-const externalLinks = [
+const careerfairyUrls = [
    "https://www.careerfairy.io/terms",
    "https://www.careerfairy.io/data-protection",
    "http://127.0.0.1:3000/terms", // iOS Localhost
@@ -79,6 +79,24 @@ const externalLinks = [
 ]
 
 const agoraPages = ["/streaming/host", "/streaming/viewer"]
+
+const nativeAppUrlsWhiteList = [
+   "https://calendar.google.com",
+   "https://outlook.live.com",
+   "https://calendar.yahoo.com",
+   "data:text/calendar",
+   "https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent",
+]
+
+const isUrlInNativeWhitelist = (url: string): boolean => {
+   try {
+      return nativeAppUrlsWhiteList.some((whitelistedUrl) =>
+         url.startsWith(whitelistedUrl)
+      )
+   } catch {
+      return false
+   }
+}
 
 const isLocalHost = (url: string) => {
    return (
@@ -337,7 +355,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const isExternalNavigation = (request: InterceptedRequest) => {
-      if (externalLinks.some((link) => request.url.startsWith(link))) {
+      if (careerfairyUrls.some((link) => request.url.startsWith(link))) {
          return true
       }
 
@@ -397,7 +415,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       if (request.url === "about:blank") {
          // Blocking about:blank page load
          return false
-      } else if (request.url.startsWith("mailto:")) {
+      } else if (isUrlInNativeWhitelist(request.url)) {
          // Opening mailto link externally
          if (isAndroid && isAgoraPage) {
             refreshAfterExternalActivityRef.current = true
