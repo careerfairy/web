@@ -240,12 +240,6 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            <ThumbnailOverlay
-               src={thumbnailUrl}
-               containPreviewOnTablet={containPreviewOnTablet}
-               show={light || !isVideoReady}
-            />
-
             {light ? null : (
                <ReactPlayer
                   key={videoUrl}
@@ -266,6 +260,11 @@ const VideoPreview: FC<Props> = ({
                   muted={muted}
                />
             )}
+            <ThumbnailOverlay
+               src={thumbnailUrl}
+               containPreviewOnTablet={containPreviewOnTablet}
+               show={light || !isVideoReady}
+            />
          </Box>
          <LinearProgress
             sx={styles.progress}
@@ -291,7 +290,7 @@ export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
 
    return (
-      <Box sx={[styles.thumbnailOverlay, { zIndex: show ? 1 : 0 }]}>
+      <Box sx={[styles.thumbnailOverlay, { zIndex: show ? 1 : -1 }]}>
          <Image
             src={src}
             fill
