@@ -166,6 +166,7 @@ const VideoPreview: FC<Props> = ({
    const prevIdentifier = usePrevious(identifier)
 
    const reset = () => {
+      setIsVideoReady(false)
       setVideoPlayedForSession(false)
       setProgress(0)
       playerRef.current?.seekTo(0)
@@ -226,9 +227,6 @@ const VideoPreview: FC<Props> = ({
    }, [autoPlaying])
 
    const onPlay = useCallback(() => {
-      setTimeout(() => {
-         setIsVideoReady(true)
-      }, 150)
       setVideoPlayedForSession(true)
       if (!videoPlayedForSession) {
          onVideoPlay?.()
@@ -260,6 +258,7 @@ const VideoPreview: FC<Props> = ({
                   className="player"
                   onProgress={handleProgress}
                   onPlay={onPlay}
+                  onReady={() => setIsVideoReady(true)}
                   onError={handleError}
                   progressInterval={250}
                   url={videoUrl}
