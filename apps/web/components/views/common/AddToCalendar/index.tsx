@@ -1,18 +1,14 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    createCalendarEvent,
+   getLivestreamICSDownloadUrl,
    makeUrls,
 } from "@careerfairy/shared-lib/utils/utils"
-import {
-   Avatar,
-   ListItemIcon,
-   ListItemText,
-   Menu,
-   MenuItem,
-} from "@mui/material"
+import { Avatar } from "@mui/material"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { memo, useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
+import { MobileUtils } from "util/mobile.utils"
 import {
    appleIcon,
    googleIcon,
@@ -20,8 +16,14 @@ import {
    outlookYellowIcon,
    yahooIcon,
 } from "../../../../constants/svgs"
+import {
+   errorLogAndNotify,
+   shouldUseEmulators,
+} from "../../../../util/CommonUtil"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { errorLogAndNotify } from "../../../../util/CommonUtil"
+import BrandedResponsiveMenu, {
+   MenuOption,
+} from "../inputs/BrandedResponsiveMenu"
 
 const styles = sxStyles({
    avatar: {
@@ -34,69 +36,28 @@ const styles = sxStyles({
    },
 })
 
-const LinkMenuItem = ({ children, filename = false, href, ...rest }) => (
-   <MenuItem
-      download={filename}
-      href={href}
-      dense
-      target="_blank"
-      rel="noopener noreferrer"
-      component="a"
-      {...rest}
-   >
-      {children}
-   </MenuItem>
-)
-
-const Dropdown = ({ filename, handleClose, anchorEl, urls, onItemClick }) => {
+const CalendarLink = memo(function CalendarLink({
+   children,
+   href,
+   download,
+   ...props
+}: {
+   children?: React.ReactNode
+   href: string
+   download?: string
+}) {
    return (
-      <Menu
-         id="add to calendar menu"
-         anchorEl={anchorEl}
-         open={Boolean(anchorEl)}
-         onClose={handleClose}
+      <a
+         href={href}
+         download={download}
+         target="_blank"
+         rel="noopener noreferrer"
+         {...props}
       >
-         <LinkMenuItem
-            onClick={onItemClick}
-            download={filename}
-            href={urls.ics}
-         >
-            <ListItemIcon>
-               <Avatar sx={styles.avatar} src={appleIcon} />
-            </ListItemIcon>
-            <ListItemText primary="Apple Calendar" />
-         </LinkMenuItem>
-         <LinkMenuItem href={urls.google} onClick={onItemClick}>
-            <ListItemIcon>
-               <Avatar sx={styles.avatar} src={googleIcon} />
-            </ListItemIcon>
-            <ListItemText primary="Google" />
-         </LinkMenuItem>
-         <LinkMenuItem
-            href={urls.ics}
-            download={filename}
-            onClick={onItemClick}
-         >
-            <ListItemIcon>
-               <Avatar sx={styles.avatar} src={outlookYellowIcon} />
-            </ListItemIcon>
-            <ListItemText primary="Outlook" />
-         </LinkMenuItem>
-         <LinkMenuItem href={urls.outlook} onClick={onItemClick}>
-            <ListItemIcon>
-               <Avatar sx={styles.avatar} src={outlookBlueIcon} />
-            </ListItemIcon>
-            <ListItemText primary="Outlook Web App" />
-         </LinkMenuItem>
-         <LinkMenuItem href={urls.yahoo} onClick={onItemClick}>
-            <ListItemIcon>
-               <Avatar sx={styles.avatar} src={yahooIcon} />
-            </ListItemIcon>
-            <ListItemText primary="Yahoo" />
-         </LinkMenuItem>
-      </Menu>
+         {children}
+      </a>
    )
-}
+})
 
 type Props = {
    children: (handler: (event: any) => void) => void
@@ -156,15 +117,68 @@ export const AddToCalendar = memo(function AddToCalendar({
       onCalendarClick && onCalendarClick()
    }, [onCalendarClick, handleClose])
 
+   const handleMobileClick = useCallback(() => {
+      window.open(getLivestreamICSDownloadUrl(event.id, shouldUseEmulators()))
+   }, [event.id])
+
+   const options: MenuOption[] = useMemo(
+      () => [
+         {
+            label: "Apple Calendar",
+            icon: <Avatar sx={styles.avatar} src={appleIcon} />,
+            handleClick: handleItemClick,
+            wrapperComponent: (props) => (
+               <CalendarLink href={urls.ics} download={filename} {...props} />
+            ),
+         },
+         {
+            label: "Google",
+            icon: <Avatar sx={styles.avatar} src={googleIcon} />,
+            handleClick: handleItemClick,
+            wrapperComponent: (props) => (
+               <CalendarLink href={urls.google} {...props} />
+            ),
+         },
+         {
+            label: "Outlook",
+            icon: <Avatar sx={styles.avatar} src={outlookYellowIcon} />,
+            handleClick: handleItemClick,
+            wrapperComponent: (props) => (
+               <CalendarLink href={urls.ics} download={filename} {...props} />
+            ),
+         },
+         {
+            label: "Outlook Web App",
+            icon: <Avatar sx={styles.avatar} src={outlookBlueIcon} />,
+            handleClick: handleItemClick,
+            wrapperComponent: (props) => (
+               <CalendarLink href={urls.outlook} {...props} />
+            ),
+         },
+         {
+            label: "Yahoo",
+            icon: <Avatar sx={styles.avatar} src={yahooIcon} />,
+            handleClick: handleItemClick,
+            wrapperComponent: (props) => (
+               <CalendarLink href={urls.yahoo} {...props} />
+            ),
+         },
+      ],
+      [urls, filename, handleItemClick]
+   )
+
+   if (MobileUtils.webViewPresence()) {
+      return <>{children(handleMobileClick)}</>
+   }
+
    return (
       <>
          {children(handleClick)}
-         <Dropdown
-            filename={filename}
+         <BrandedResponsiveMenu
+            options={options}
+            open={Boolean(anchorEl)}
             anchorEl={anchorEl}
             handleClose={handleClose}
-            urls={urls}
-            onItemClick={handleItemClick}
          />
       </>
    )
