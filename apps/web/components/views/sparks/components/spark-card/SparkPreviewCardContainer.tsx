@@ -99,6 +99,7 @@ const SparkPreviewCardContainer: FC<Props> = ({
          <Box sx={styles.cardContent}>{children}</Box>
          <Box component="span" zIndex={-1}>
             <VideoPreview
+               key={autoPlaying ? "autoPlaying" : "notAutoPlaying"}
                thumbnailUrl={video.thumbnailUrl}
                videoUrl={video.url}
                pausing={!autoPlaying}
