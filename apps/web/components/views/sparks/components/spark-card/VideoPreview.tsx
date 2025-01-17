@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux"
 import { usePrevious } from "react-use"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -21,17 +22,6 @@ const styles = sxStyles({
       inset: 0,
    },
    playerWrapper: {
-      "&::after": {
-         zIndex: 0,
-         content: '""',
-         position: "absolute",
-         top: 0,
-         right: 0,
-         bottom: 0,
-         left: 0,
-         // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
-         background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0) 82.29%, rgba(0, 0, 0, 0.60) 100%)`,
-      },
       position: "relative",
       width: "100%",
       height: "100%",
@@ -88,6 +78,19 @@ const styles = sxStyles({
          },
       },
    },
+   withOverlay: {
+      "&::after": {
+         zIndex: 1,
+         content: '""',
+         position: "absolute",
+         top: 0,
+         right: 0,
+         bottom: 0,
+         left: 0,
+         // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
+         background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0.00) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0.00) 49.57%, rgba(0, 0, 0, 0.60) 100%)`,
+      },
+   },
 })
 
 type Props = {
@@ -125,6 +128,9 @@ const VideoPreview: FC<Props> = ({
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
    const dispatch = useDispatch()
+   const [isVideoReady, setIsVideoReady] = useState(false)
+
+   const isAnAutoPlayingCard = autoPlaying !== undefined
 
    const onProgress = useReactPlayerTracker({
       identifier,
@@ -137,9 +143,14 @@ const VideoPreview: FC<Props> = ({
          dispatch(setVideosMuted(true))
          playerRef.current?.getInternalPlayer()?.play()
 
-         console.error(error)
+         errorLogAndNotify(error, {
+            message: "Error playing video",
+            videoUrl,
+            error: JSON.stringify(error, null, 2),
+            videoShouldBeMuted: muted,
+         })
       },
-      [dispatch]
+      [dispatch, videoUrl, muted]
    )
 
    const handleProgress = useCallback(
@@ -162,8 +173,27 @@ const VideoPreview: FC<Props> = ({
       playerRef.current?.seekTo(0)
    }
 
+   const playingVideo = Boolean(playing && !shouldPause)
+
+   // checks for tab switch/minimize in browser, stops the preview video from playing force the carousel to remount
    useEffect(() => {
-      if (prevIdentifier !== identifier) {
+      const handleVisibilityChange = () => {
+         if (document.visibilityState === "visible" && playingVideo) {
+            playerRef.current?.getInternalPlayer()?.play()
+         }
+      }
+
+      document.addEventListener("visibilitychange", handleVisibilityChange)
+      return () => {
+         document.removeEventListener(
+            "visibilitychange",
+            handleVisibilityChange
+         )
+      }
+   }, [playingVideo])
+
+   useEffect(() => {
+      if (prevIdentifier !== undefined && prevIdentifier !== identifier) {
          reset()
       }
    }, [identifier, prevIdentifier])
@@ -204,24 +234,17 @@ const VideoPreview: FC<Props> = ({
       }
    }, [onVideoPlay, videoPlayedForSession])
 
-   const playingVideo = Boolean(playing && !shouldPause)
-
    return (
-      <Box sx={styles.root}>
+      <Box sx={[styles.root, styles.withOverlay]}>
          <Box
             sx={[
                styles.playerWrapper,
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            <ThumbnailOverlay
-               src={thumbnailUrl}
-               containPreviewOnTablet={containPreviewOnTablet}
-               playing={playingVideo}
-            />
-
             {light ? null : (
                <ReactPlayer
+                  key={videoUrl}
                   ref={playerRef}
                   playing={playingVideo}
                   playsinline
@@ -231,6 +254,7 @@ const VideoPreview: FC<Props> = ({
                   className="player"
                   onProgress={handleProgress}
                   onPlay={onPlay}
+                  onReady={() => setIsVideoReady(true)}
                   onError={handleError}
                   progressInterval={250}
                   url={videoUrl}
@@ -238,6 +262,15 @@ const VideoPreview: FC<Props> = ({
                   muted={muted}
                />
             )}
+            <ThumbnailOverlay
+               src={thumbnailUrl}
+               containPreviewOnTablet={containPreviewOnTablet}
+               show={
+                  light ||
+                  !isVideoReady ||
+                  (isAnAutoPlayingCard && !playingVideo) // Fixes black thumbnail on auto-playing cards
+               }
+            />
          </Box>
          <LinearProgress
             sx={styles.progress}
@@ -251,19 +284,19 @@ const VideoPreview: FC<Props> = ({
 type ThumbnailOverlayProps = {
    src: string
    containPreviewOnTablet?: boolean
-   playing?: boolean
+   show?: boolean
 }
 
 export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
    src,
    containPreviewOnTablet,
-   playing,
+   show = true,
 }) => {
    const theme = useTheme()
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
 
    return (
-      <Box sx={[styles.thumbnailOverlay, { zIndex: playing ? 0 : 1 }]}>
+      <Box sx={[styles.thumbnailOverlay, { zIndex: show ? 1 : -1 }]}>
          <Image
             src={src}
             fill

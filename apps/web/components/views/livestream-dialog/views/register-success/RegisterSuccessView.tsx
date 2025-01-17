@@ -178,7 +178,12 @@ const MobileSparksTransition = ({ isSparksOpen, handleDiscoverSparks }) => {
    )
 }
 
-const Component = ({ isSparksOpen, handleDiscoverSparks }) => {
+type ComponentProps = {
+   isSparksOpen: boolean
+   handleDiscoverSparks: () => void
+}
+
+const Component = ({ isSparksOpen, handleDiscoverSparks }: ComponentProps) => {
    const isMobile = useIsMobile()
    const router = useRouter()
    const { livestream } = useLiveStreamDialog()
@@ -313,7 +318,15 @@ const Header = ({ isSparksOpen }) => {
    )
 }
 
-const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
+type ActionButtonsProps = {
+   handleDiscoverSparks: () => void
+   isSparksOpen: boolean
+}
+
+const ActionButtons = ({
+   handleDiscoverSparks,
+   isSparksOpen,
+}: ActionButtonsProps) => {
    const route = useRouter()
    const {
       closeDialog,
@@ -323,7 +336,7 @@ const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
       setting,
    } = useLiveStreamDialog()
    const { data: group } = useGroup(livestream.groupIds[0])
-   const groupHasSparks = group?.publicSparks
+   const groupHasSparks = Boolean(group?.publicSparks)
 
    const secondaryCopy = useMemo(() => {
       if (setting == AllDialogSettings.Levels) {
@@ -364,24 +377,28 @@ const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
                </Button>
             )}
 
-            <AddToCalendar
-               event={livestream}
-               filename={`${livestream.company}-event`}
-               onCalendarClick={() => groupHasSparks && handleDiscoverSparks()}
-            >
-               {(handleClick) => (
-                  <Button
-                     fullWidth
-                     variant={"contained"}
-                     color={"primary"}
-                     onClick={handleClick}
-                     size="large"
-                     startIcon={<CalendarIcon />}
-                  >
-                     Add to calendar
-                  </Button>
-               )}
-            </AddToCalendar>
+            <SuspenseWithBoundary fallback={<CircularProgress />}>
+               <AddToCalendar
+                  event={livestream}
+                  filename={`${livestream.company}-event`}
+                  onCalendarClick={() =>
+                     groupHasSparks && handleDiscoverSparks()
+                  }
+               >
+                  {(handleClick) => (
+                     <Button
+                        fullWidth
+                        variant={"contained"}
+                        color={"primary"}
+                        onClick={handleClick}
+                        size="large"
+                        startIcon={<CalendarIcon />}
+                     >
+                        Add to calendar
+                     </Button>
+                  )}
+               </AddToCalendar>
+            </SuspenseWithBoundary>
 
             {!isSparksOpen && (
                <Button
