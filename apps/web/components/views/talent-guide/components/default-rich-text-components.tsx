@@ -43,7 +43,13 @@ export const createDefaultRichTextComponents = (
 ): NodeRendererType => {
    return {
       p: ({ children }) => (
-         <Typography variant="medium" component="p">
+         <Typography
+            variant="medium"
+            component="p"
+            sx={{
+               margin: "revert", // allows render of empty paragraphs
+            }}
+         >
             {children}
          </Typography>
       ),
