@@ -122,3 +122,9 @@ export const sadEmoji =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsad-empty.png?alt=media&token=83f6170f-0a05-4c89-a051-4943f5549da7"
 
 export const cfLogo = "/logo-green.png"
+
+export const cfMobileIcon =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mobile-app%2Fapp-icon.png?alt=media"
+
+export const appQrCode =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mobile-app%2Fapp-download-qr-code.png?alt=media"
