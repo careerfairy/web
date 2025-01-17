@@ -107,13 +107,18 @@ const fetcher = async ({ userId, countryCode }: FetcherParams) => {
    return fetchPublicSparks(countryCode)
 }
 
+type Options = {
+   suspense?: boolean
+}
+
 /**
  * Custom hook to fetch user sparks.
  * Utilizes SWR for data fetching and caching.
  *
+ * @param options - Options for the hook
  * @returns Array of Spark objects
  */
-export const useUserSparks = () => {
+export const useUserSparks = (options: Options = {}) => {
    const { authenticatedUser } = useAuth()
    const { userCountryCode } = useUserCountryCode()
 
@@ -128,7 +133,7 @@ export const useUserSparks = () => {
 
    const key = getKey(authenticatedUser.email, storedUserCountryCode)
 
-   const { data } = useSWR(
+   const { data, isLoading } = useSWR(
       key,
       () =>
          fetcher({
@@ -136,7 +141,7 @@ export const useUserSparks = () => {
             countryCode: storedUserCountryCode,
          }),
       {
-         suspense: true,
+         suspense: options?.suspense,
          onError: (error, key) => {
             errorLogAndNotify(error, {
                message: "Error fetching user sparks",
@@ -146,7 +151,7 @@ export const useUserSparks = () => {
       }
    )
 
-   return data
+   return { sparks: data, isLoading }
 }
 
 /**
