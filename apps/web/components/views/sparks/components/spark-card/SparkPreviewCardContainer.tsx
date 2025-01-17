@@ -75,7 +75,6 @@ const SparkPreviewCardContainer: FC<Props> = ({
    type = "carousel",
 }) => {
    const isMobile = useIsMobile()
-   const autoPlayEnabled = autoPlaying !== undefined && autoPlaying !== false
 
    const getCardStyles = (type: SparkPreviewCardType) => {
       if (type == "carousel") {
@@ -102,12 +101,12 @@ const SparkPreviewCardContainer: FC<Props> = ({
             <VideoPreview
                thumbnailUrl={video.thumbnailUrl}
                videoUrl={video.url}
-               pausing={autoPlayEnabled ? !autoPlaying : false}
-               playing={autoPlayEnabled ? autoPlaying : video.preview}
+               pausing={!autoPlaying}
+               playing={autoPlaying || video.preview}
                light={false}
                autoPlaying={autoPlaying}
                containPreviewOnTablet
-               muted={video.muted || autoPlayEnabled ? true : false}
+               muted={video.muted}
                identifier={video.url}
                onVideoEnded={onVideoEnded}
             />
