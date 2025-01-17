@@ -1,7 +1,7 @@
 import functions = require("firebase-functions")
-import { isLocalEnvironment, logGraphqlErrorAndThrow } from "./util"
 import HygraphClient from "./api/hygraph"
 import config from "./config"
+import { isLocalEnvironment, logGraphqlErrorAndThrow } from "./util"
 
 export const syncFieldsOfStudyToHygraph = functions
    .region(config.region)
