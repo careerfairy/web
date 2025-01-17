@@ -129,18 +129,10 @@ export const AddToCalendar = memo(function AddToCalendar({
                {
                   overrideBaseUrl,
                }
-            )
+            ),
+            errorLogAndNotify
          )
       } catch (error) {
-         const data = {
-            event,
-            message:
-               "Failed to create calendar URLs in AddToCalendar component",
-            location: "AddToCalendar.useMemo",
-            overrideBaseUrl,
-         }
-         console.log("errorData", data)
-         errorLogAndNotify(error, data)
          return {
             google: "#",
             outlook: "#",
