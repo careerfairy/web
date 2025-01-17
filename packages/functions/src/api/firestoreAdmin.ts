@@ -9,7 +9,7 @@ import {
    Timestamp,
 } from "firebase-admin/firestore"
 import { getStorage, Storage } from "firebase-admin/storage"
-import { isLocalEnvironment } from "src/util"
+import { isLocalEnvironment } from "../util"
 
 /**
  * Firebase Admin SDK
