@@ -1,9 +1,13 @@
+import { userIsTargetedApp } from "@careerfairy/shared-lib/countries/filters"
 import { Box, Typography } from "@mui/material"
 import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
+import { useAuth } from "HOCs/AuthProvider"
 import { sxStyles } from "types/commonTypes"
+import { MobileUtils } from "util/mobile.utils"
+import { MobileAppPrompt } from "./MobileAppPrompt"
 
 const styles = sxStyles({
    root: {
@@ -30,6 +34,10 @@ const styles = sxStyles({
 export const Footer = () => {
    const streamIsMobile = useStreamIsMobile()
    const streamIsLandscape = useStreamIsLandscape()
+   const { userData } = useAuth()
+
+   if (!MobileUtils.webViewPresence() && userIsTargetedApp(userData))
+      return <MobileAppPrompt />
 
    return (
       <Box

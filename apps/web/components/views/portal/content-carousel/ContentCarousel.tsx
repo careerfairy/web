@@ -1,9 +1,14 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import {
+   europeCountryFilters,
+   userIsTargetedApp,
+} from "@careerfairy/shared-lib/countries/filters"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import { Box } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { isLivestreamDialogOpen } from "components/views/livestream-dialog"
 import { useRouter } from "next/router"
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
@@ -79,6 +84,7 @@ type Props = {
 const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
    const theme = useTheme()
    const { userData, userStats } = useAuth()
+   const { userCountryCode } = useUserCountryCode()
    const isMobile = useIsMobile()
    const [activeStep, setActiveStep] = useState(0)
    const [videoUrl, setVideoUrl] = useState(null)
@@ -99,13 +105,12 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
    const carouselContent = useMemo<CarouselContent[]>(() => {
       let serializedContent = content
 
-      const userNotDownloadedTheApp =
-         !userData?.fcmTokens || userData?.fcmTokens?.length === 0
-
       if (
          isMounted &&
-         userNotDownloadedTheApp &&
-         !MobileUtils.webViewPresence()
+         !MobileUtils.webViewPresence() &&
+         (userData
+            ? userIsTargetedApp(userData)
+            : europeCountryFilters.includes(userCountryCode)) // check IP if not logged in
       ) {
          serializedContent = [
             {
@@ -117,7 +122,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
       }
 
       return serializedContent
-   }, [content, isMounted, userData?.fcmTokens])
+   }, [content, isMounted, userData, userCountryCode])
 
    /**
     * Each minute watched the field minutesWatched will be increased, and we need to increment it on our DB
