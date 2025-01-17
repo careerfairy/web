@@ -217,7 +217,7 @@ type PortalTagsContentProps = {
 type CategoryId = string | undefined
 
 const PortalTags = ({ children }: PortalTagsContentProps) => {
-   const { tags } = useAvailableTagsByHits()
+   const { tags, isLoading } = useAvailableTagsByHits()
    const [selectedCategoryId, setSelectedCategoryId] =
       useState<CategoryId>(undefined)
 
@@ -232,6 +232,7 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
          <TagsCarouselWithArrow
             selectedCategories={selectedCategoryId ? [selectedCategoryId] : []}
             tags={tags}
+            isLoading={isLoading}
             handleTagClicked={handleCategoryChipClicked}
             handleAllClicked={() => handleCategoryChipClicked(undefined)}
          />
