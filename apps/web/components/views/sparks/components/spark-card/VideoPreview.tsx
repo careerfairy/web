@@ -226,7 +226,9 @@ const VideoPreview: FC<Props> = ({
    }, [autoPlaying])
 
    const onPlay = useCallback(() => {
-      setIsVideoReady(true)
+      setTimeout(() => {
+         setIsVideoReady(true)
+      }, 150)
       setVideoPlayedForSession(true)
       if (!videoPlayedForSession) {
          onVideoPlay?.()
@@ -244,7 +246,7 @@ const VideoPreview: FC<Props> = ({
             <ThumbnailOverlay
                src={thumbnailUrl}
                containPreviewOnTablet={containPreviewOnTablet}
-               hide={!light && isVideoReady}
+               show={light || !isVideoReady}
             />
 
             {light ? null : (
@@ -279,19 +281,19 @@ const VideoPreview: FC<Props> = ({
 type ThumbnailOverlayProps = {
    src: string
    containPreviewOnTablet?: boolean
-   hide?: boolean
+   show?: boolean
 }
 
 export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
    src,
    containPreviewOnTablet,
-   hide,
+   show = true,
 }) => {
    const theme = useTheme()
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
 
    return (
-      <Box sx={[styles.thumbnailOverlay, { zIndex: hide ? 0 : 1 }]}>
+      <Box sx={[styles.thumbnailOverlay, { zIndex: show ? 1 : 0 }]}>
          <Image
             src={src}
             fill
