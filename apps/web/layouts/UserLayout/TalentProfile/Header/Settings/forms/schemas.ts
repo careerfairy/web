@@ -5,9 +5,9 @@ import * as Yup from "yup"
 export const personalInfoShape = {
    firstName: Yup.string().required("First name is required"),
    lastName: Yup.string().required("Last name is required"),
-   countryIsoCode: Yup.string().required("Country is required"),
-   stateIsoCode: Yup.string().required("State is required"),
-   cityIsoCode: Yup.string().required("City is required"),
+   countryIsoCode: Yup.string().optional(),
+   stateIsoCode: Yup.string().optional(),
+   cityIsoCode: Yup.string().optional(),
    email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
