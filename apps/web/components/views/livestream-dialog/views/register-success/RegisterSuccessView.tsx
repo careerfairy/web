@@ -1,4 +1,4 @@
-import { europeCountryFilters } from "@careerfairy/shared-lib/countries/filters"
+import { userIsTargetedApp } from "@careerfairy/shared-lib/countries/filters"
 import { useAuth } from "HOCs/AuthProvider"
 import { FC, useMemo } from "react"
 import { MobileUtils } from "util/mobile.utils"
@@ -9,12 +9,7 @@ const RegisterSuccessView: FC = () => {
    const { userData } = useAuth()
 
    const userIsTargeted = useMemo(() => {
-      return (
-         userData &&
-         europeCountryFilters.includes(userData.universityCountryCode) &&
-         (!userData.fcmTokens || userData.fcmTokens?.length === 0) &&
-         !MobileUtils.webViewPresence()
-      )
+      return userIsTargetedApp(userData) && !MobileUtils.webViewPresence()
    }, [userData])
 
    return userIsTargeted ? <DownloadApp /> : <DiscoverContent />
