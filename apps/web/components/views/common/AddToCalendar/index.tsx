@@ -1,6 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    createCalendarEvent,
+   getLivestreamICSDownloadUrl,
    makeUrls,
 } from "@careerfairy/shared-lib/utils/utils"
 import { Avatar } from "@mui/material"
@@ -114,9 +115,7 @@ export const AddToCalendar = memo(function AddToCalendar({
    }, [onCalendarClick, handleClose])
 
    const handleMobileClick = useCallback(() => {
-      window.open(
-         `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${event.id}`
-      )
+      window.open(getLivestreamICSDownloadUrl(event.id))
    }, [event.id])
 
    const options: MenuOption[] = useMemo(
