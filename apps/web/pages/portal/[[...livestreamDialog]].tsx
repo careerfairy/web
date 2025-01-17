@@ -30,7 +30,6 @@ import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJ
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
-import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
@@ -41,10 +40,7 @@ import EventsPreviewCarousel, {
 import { UserSparksCarousel } from "components/views/portal/sparks/UserSparksCarousel"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
 import { sxStyles } from "types/commonTypes"
-import {
-   RecommendedCustomJobs,
-   RecommendedCustomJobsSkeleton,
-} from "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
+import { RecommendedCustomJobs } from "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
@@ -73,7 +69,6 @@ const PortalPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
-   const isMounted = useIsMounted()
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -155,11 +150,7 @@ const PortalPage = ({
                               serverSideEvents={comingUpNext}
                               limit={20}
                            />
-                           {isMounted ? (
-                              <RecommendedCustomJobs />
-                           ) : (
-                              <RecommendedCustomJobsSkeleton />
-                           )}
+                           <RecommendedCustomJobs />
                            <MyNextEvents />
                            <ConditionalWrapper
                               condition={Boolean(events?.length)}
