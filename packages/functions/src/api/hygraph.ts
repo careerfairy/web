@@ -1,5 +1,5 @@
-import { isLocalEnvironment } from "@careerfairy/shared-lib/utils"
 import { GraphQLClient } from "graphql-request"
+import { isLocalEnvironment } from "src/util"
 
 // Project: Production
 let url =

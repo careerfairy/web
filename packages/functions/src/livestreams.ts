@@ -8,7 +8,7 @@ import * as functions from "firebase-functions"
 import { client } from "./api/postmark"
 import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
-import { setCORSHeaders } from "./util"
+import { isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
@@ -103,7 +103,8 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
                content: data.livestream_title,
             }),
             calendar_event_i_calendar: getLivestreamICSDownloadUrl(
-               data.livestream_id
+               data.livestream_id,
+               isLocalEnvironment()
             ),
             calendar_event_google: data.eventCalendarUrls.google,
             calendar_event_outlook: data.eventCalendarUrls.outlook,
@@ -230,7 +231,10 @@ export const livestreamRegistrationConfirmationEmail = functions
       const emailCalendar = {
          google: data.eventCalendarUrls.google,
          outlook: data.eventCalendarUrls.outlook,
-         apple: getLivestreamICSDownloadUrl(data.livestream_id),
+         apple: getLivestreamICSDownloadUrl(
+            data.livestream_id,
+            isLocalEnvironment()
+         ),
       }
 
       const livestreamStartDate = DateTime.fromJSDate(

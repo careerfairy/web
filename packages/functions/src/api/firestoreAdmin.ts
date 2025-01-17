@@ -1,4 +1,3 @@
-import { isLocalEnvironment } from "@careerfairy/shared-lib/utils"
 import { initializeApp } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
 import {
@@ -10,6 +9,7 @@ import {
    Timestamp,
 } from "firebase-admin/firestore"
 import { getStorage, Storage } from "firebase-admin/storage"
+import { isLocalEnvironment } from "src/util"
 
 /**
  * Firebase Admin SDK

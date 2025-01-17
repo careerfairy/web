@@ -32,6 +32,20 @@ import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
 import DocumentSnapshot = firestore.DocumentSnapshot
 
+/**
+ * Detect if we're running the emulators
+ */
+export const isLocalEnvironment = () => {
+   return Boolean(
+      process.env.FIREBASE_AUTH_EMULATOR_HOST ||
+         process.env.FIREBASE_STORAGE_EMULATOR_HOST ||
+         process.env.FIRESTORE_EMULATOR_HOST ||
+         process.env.FUNCTIONS_EMULATOR ||
+         process.env.NODE_ENV === "development" ||
+         process.env.NODE_ENV === "test"
+   )
+}
+
 export const setCORSHeaders = (req: Request, res: Response): void => {
    res.set("Access-Control-Allow-Origin", "*")
    res.set("Access-Control-Allow-Credentials", "true")
@@ -270,7 +284,7 @@ const createRecipientVariables = (
          },
          calendar: {
             google: urls.google,
-            apple: getLivestreamICSDownloadUrl(streamId),
+            apple: getLivestreamICSDownloadUrl(streamId, isLocalEnvironment()),
             outlook: urls.outlook,
          },
       }

@@ -16,7 +16,10 @@ import {
    outlookYellowIcon,
    yahooIcon,
 } from "../../../../constants/svgs"
-import { errorLogAndNotify } from "../../../../util/CommonUtil"
+import {
+   errorLogAndNotify,
+   shouldUseEmulators,
+} from "../../../../util/CommonUtil"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
 import BrandedResponsiveMenu, {
    MenuOption,
@@ -115,7 +118,7 @@ export const AddToCalendar = memo(function AddToCalendar({
    }, [onCalendarClick, handleClose])
 
    const handleMobileClick = useCallback(() => {
-      window.open(getLivestreamICSDownloadUrl(event.id))
+      window.open(getLivestreamICSDownloadUrl(event.id, shouldUseEmulators()))
    }, [event.id])
 
    const options: MenuOption[] = useMemo(
