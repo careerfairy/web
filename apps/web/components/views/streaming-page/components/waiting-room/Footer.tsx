@@ -5,7 +5,6 @@ import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
-import { useAuth } from "HOCs/AuthProvider"
 import { sxStyles } from "types/commonTypes"
 import { MobileUtils } from "util/mobile.utils"
 import { MobileAppPrompt } from "./MobileAppPrompt"
