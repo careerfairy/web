@@ -1,21 +1,22 @@
-import { Grid, Switch, Typography } from "@mui/material"
-import React, { useCallback, useEffect, useState } from "react"
-import { sxStyles } from "../../../../types/commonTypes"
-import MultiListSelect from "../../common/MultiListSelect"
-import { useAuth } from "../../../../HOCs/AuthProvider"
 import {
    countriesAndRegionsOptionCodes,
    countryGroupId,
    languageOptionCodes,
    regionGroupId,
 } from "@careerfairy/shared-lib/constants/forms"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+import { Grid, Switch, Typography } from "@mui/material"
+import { useCallback, useEffect, useState } from "react"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { userRepo } from "../../../../data/RepositoryInstances"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { sxStyles } from "../../../../types/commonTypes"
+import MultiListSelect from "../../common/MultiListSelect"
 import {
    formatToOptionArray,
    mapOptions,
    multiListSelectMapValueFn,
 } from "../utils"
-import { userRepo } from "../../../../data/RepositoryInstances"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 const styles = sxStyles({
    inputLabel: {
@@ -74,7 +75,9 @@ const LocationInformation = () => {
                fieldToUpdate
             )
          } catch (error) {
-            console.log(error)
+            errorLogAndNotify(error, {
+               message: "Error updating location information in SignUp",
+            })
          }
       },
       [user]
@@ -85,7 +88,7 @@ const LocationInformation = () => {
          const fieldToUpdate = {
             spokenLanguages: mapOptions(selectedLanguages),
          }
-         updateFields(fieldToUpdate).catch(console.error)
+         updateFields(fieldToUpdate).catch(errorLogAndNotify)
       },
       [updateFields]
    )
@@ -96,7 +99,7 @@ const LocationInformation = () => {
             selectedCountriesAndRegions
          )
 
-         updateFields(fieldToUpdate).catch(console.error)
+         updateFields(fieldToUpdate).catch(errorLogAndNotify)
       },
       [updateFields]
    )
@@ -106,7 +109,7 @@ const LocationInformation = () => {
          const fieldToUpdate = {
             isLookingForJob: isLookingForJob,
          }
-         updateFields(fieldToUpdate).catch(console.error)
+         updateFields(fieldToUpdate).catch(errorLogAndNotify)
       },
       [updateFields]
    )

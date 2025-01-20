@@ -15,6 +15,7 @@ import { Formik } from "formik"
 import { Fragment, useContext, useState } from "react"
 import { useDispatch } from "react-redux"
 import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
+import { errorLogAndNotify } from "util/CommonUtil"
 import * as yup from "yup"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
@@ -53,7 +54,9 @@ const SignUpPinForm = () => {
          setIncorrectPin(false)
          setGeneralLoading(false)
       } catch (error) {
-         console.error(error)
+         errorLogAndNotify(error, {
+            message: "Error resending verification email",
+         })
          setIncorrectPin(false)
          setGeneralLoading(false)
       }
