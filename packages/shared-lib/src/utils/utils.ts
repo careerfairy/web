@@ -1,7 +1,10 @@
 import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
 import { LivestreamEvent } from "../livestreams"
 import { SparkStats } from "../sparks/sparks"
-import { generateCalendarEventProperties } from "./calendarEvents"
+import {
+   EventProperties,
+   generateCalendarEventProperties,
+} from "./calendarEvents"
 
 export type CalendarEvent = {
    startsAt: string
@@ -342,12 +345,21 @@ export const makeUrls = function (
    }
 }
 
+export const getLivestreamICSDownloadUrl = (
+   streamId: string,
+   isLocal: boolean
+) => {
+   return isLocal
+      ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${streamId}`
+      : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${streamId}`
+}
+
 type OptionsCreateCalendarEvent = {
    overrideBaseUrl?: string
 }
 
 export const createCalendarEvent = (
-   livestream: LivestreamEvent,
+   livestream: EventProperties,
    customUtm?: Partial<AddUtmTagsToLinkProps>,
    options?: OptionsCreateCalendarEvent
 ) => {

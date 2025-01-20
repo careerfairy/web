@@ -34,7 +34,7 @@ const useCustomJobs = (options?: Options) => {
    // Due to limitations, cannot filter id using 'not-in' as deadline is also used with inequality operator
    // so filtering the ignore ids is done in memory
 
-   const { data } = useSWR(
+   const { data, isLoading } = useSWR(
       disabled
          ? null
          : [
@@ -79,11 +79,13 @@ const useCustomJobs = (options?: Options) => {
                totalItems,
             })
          },
+         suspense: false,
       }
    )
 
    return {
-      customJobs: data,
+      customJobs: data || [],
+      isLoading,
    }
 }
 

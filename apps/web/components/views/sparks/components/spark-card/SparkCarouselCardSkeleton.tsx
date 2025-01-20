@@ -1,7 +1,12 @@
 import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
+import {
+   SPARK_DESKTOP_WIDTH,
+   SPARK_MOBILE_WIDTH,
+} from "./SparkPreviewCardContainer"
 
 const styles = sxStyles({
    root: {
@@ -16,15 +21,24 @@ const styles = sxStyles({
       borderRadius: 3,
    },
    skeleton: {
-      width: "100%",
       height: "100%",
+      width: SPARK_DESKTOP_WIDTH,
+      transition: (theme) => theme.transitions.create("width"),
+   },
+   skeletonMobile: {
+      width: SPARK_MOBILE_WIDTH,
    },
 })
 
 const SparkCarouselCardSkeleton: FC = () => {
+   const isMobile = useIsMobile()
+
    return (
       <Box sx={styles.root}>
-         <Skeleton variant="rectangular" sx={styles.skeleton} />
+         <Skeleton
+            variant="rectangular"
+            sx={[styles.skeleton, isMobile && styles.skeletonMobile]}
+         />
       </Box>
    )
 }

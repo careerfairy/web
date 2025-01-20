@@ -311,7 +311,7 @@ export const truncate = (str, n) => {
  * • http://localhost:3000 - development
  */
 export const getBaseUrl = () => {
-   return process.env.NEXT_PUBLIC_URL
+   return process.env.NEXT_PUBLIC_URL || "https://careerfairy.io"
 }
 
 export const maybePluralize = (count, noun, suffix = "s") =>

@@ -1,6 +1,10 @@
-import { useRouter } from "next/router"
-import React, { Fragment, useContext, useEffect, useState } from "react"
-import { Formik } from "formik"
+import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
+import {
+   IUserReminder,
+   UserData,
+   UserReminderType,
+} from "@careerfairy/shared-lib/dist/users"
+import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
 import {
    Box,
    Button,
@@ -11,37 +15,34 @@ import {
    Grid,
    Typography,
 } from "@mui/material"
-import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector"
-import UniversitySelector from "../../universitySelect/UniversitySelector"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { Formik } from "formik"
+import { useRouter } from "next/router"
+import React, { Fragment, useContext, useEffect, useState } from "react"
+import { errorLogAndNotify } from "util/CommonUtil"
 import * as yup from "yup"
+import { userRepo } from "../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../types/commonTypes"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import CookiesUtil from "../../../../util/CookiesUtil"
+import { MobileUtils } from "../../../../util/mobile.utils"
+import GenericDropdown from "../../common/GenericDropdown"
 import {
    IMultiStepContext,
    MultiStepContext,
 } from "../../common/MultiStepWrapper"
-import { sxStyles } from "../../../../types/commonTypes"
-import GenericDropdown from "../../common/GenericDropdown"
-import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
-import {
-   UserReminderType,
-   UserData,
-   IUserReminder,
-} from "@careerfairy/shared-lib/dist/users"
-import { FieldOfStudySelector } from "../userInformation/FieldOfStudySelector"
-import { LevelOfStudySelector } from "../userInformation/LevelOfStudySelector"
+import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector"
+import UniversitySelector from "../../universitySelect/UniversitySelector"
+import HelperHint from "../common/HelperHint"
 import { signupSchema } from "../schemas"
+import Email from "../userInformation/Email"
+import { FieldOfStudySelector } from "../userInformation/FieldOfStudySelector"
 import FirstName from "../userInformation/FirstName"
 import LastName from "../userInformation/LastName"
-import Email from "../userInformation/Email"
+import { LevelOfStudySelector } from "../userInformation/LevelOfStudySelector"
 import Password from "../userInformation/Password"
-import TermsAgreement from "../userInformation/TermsAgreement"
 import PasswordRepeat from "../userInformation/PasswordRepeat"
-import HelperHint from "../common/HelperHint"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { userRepo } from "../../../../data/RepositoryInstances"
-import CookiesUtil from "../../../../util/CookiesUtil"
-import { MobileUtils } from "../../../../util/mobile.utils"
-import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
+import TermsAgreement from "../userInformation/TermsAgreement"
 
 const styles = sxStyles({
    submit: {
@@ -165,7 +166,10 @@ function SignUpUserForm() {
                      })
                      await userRepo.updateUserReminder(values.email, reminder)
                   } catch (e) {
-                     console.error(e)
+                     errorLogAndNotify(e, {
+                        message: "Error updating user reminder",
+                        email: values.email,
+                     })
                   }
                })
                .then(() => {
@@ -180,11 +184,18 @@ function SignUpUserForm() {
                   dataLayerEvent("signup_credentials_completed")
                })
                .catch((e) => {
-                  console.error(e)
+                  errorLogAndNotify(e, {
+                     message: "Error signing in with email and password",
+                     email: values.email,
+                  })
                   void push("/login")
                })
          })
          .catch((error) => {
+            errorLogAndNotify(error, {
+               message: "Error creating user in Auth and Firebase",
+               email: values.email,
+            })
             setErrorMessage(error)
             setGeneralLoading(false)
             setSubmitting(false)
