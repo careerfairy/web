@@ -4,6 +4,8 @@ import { Autocomplete, TextField } from "@mui/material"
 import { useCitySearch } from "components/custom-hook/countries/useCitySearch"
 import { useEffect, useState } from "react"
 
+const MIN_SEARCH_LENGTH = 2
+
 type CityAutoCompleteProps = {
    value?: OptionGroup | null
    disabled?: boolean
@@ -57,6 +59,11 @@ export const CityAutoComplete = ({
          onInputChange={(_, newInputValue) => {
             setInputValue(newInputValue)
          }}
+         noOptionsText={
+            inputValue.length >= MIN_SEARCH_LENGTH
+               ? "No results found"
+               : "Start typing to search (at least 2 characters)"
+         }
          filterOptions={(x) => x}
          getOptionLabel={(option) => option.name}
          getOptionKey={(option) => option.id}
