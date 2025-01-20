@@ -49,7 +49,8 @@ export const UserCitySelector = () => {
       <>
          <CityAutoComplete
             value={city}
-            disabled={!userData.countryIsoCode || isLoading}
+            disabled={!userData.countryIsoCode}
+            loading={isLoading}
             countryId={userData.countryIsoCode}
             handleSelectedCityChange={handleSelectedCityChange}
          />

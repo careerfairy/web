@@ -11,6 +11,7 @@ type CityAutoCompleteProps = {
    disabled?: boolean
    countryId?: string
    handleSelectedCityChange: (city: CityOption | null) => void
+   loading?: boolean
 }
 
 export const CityAutoComplete = ({
@@ -18,6 +19,7 @@ export const CityAutoComplete = ({
    disabled,
    countryId,
    handleSelectedCityChange,
+   loading,
 }: CityAutoCompleteProps) => {
    const [options, setOptions] = useState<CityOption[]>([])
    const [inputValue, setInputValue] = useState(value?.name ?? "")
@@ -51,7 +53,7 @@ export const CityAutoComplete = ({
 
    return (
       <Autocomplete
-         loading={isLoading}
+         loading={isLoading || loading}
          value={city}
          disabled={disabled}
          options={options}
