@@ -727,6 +727,13 @@ const getPostmarkTemplateMessages = (
                   document_id: stream.id,
                   company: streamGroup.universityName,
                   companyBannerImageUrl: streamGroup.bannerImageUrl,
+                  details_url: addUtmTagsToLink({
+                     link: `${host}/portal/livestream/${stream.id}`,
+                     source: "careerfairy",
+                     medium: "email",
+                     campaign: "event-followup",
+                     content: stream.title,
+                  }),
                },
                user: {
                   firstName: streamUserData.user.firstName,
