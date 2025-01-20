@@ -300,6 +300,7 @@ const Header = ({ isSparksOpen }) => {
             ]}
             variant={isSparksOpen && isMobile ? "brandedH2" : "brandedH1"}
             component={isSparksOpen && isMobile ? "h2" : "h1"}
+            data-testid="registration-success-heading"
          >
             {"Successfully "}
             <Typography

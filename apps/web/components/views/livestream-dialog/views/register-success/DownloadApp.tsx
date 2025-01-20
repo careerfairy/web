@@ -151,6 +151,7 @@ export const DownloadApp: FC = () => {
                         sx={[styles.title, styles.transition, styles.bigTitle]}
                         variant="brandedH1"
                         component="h1"
+                        data-testid="registration-success-heading"
                      >
                         {"Get "}
                         <Typography
@@ -158,7 +159,7 @@ export const DownloadApp: FC = () => {
                            color="primary.main"
                            sx={styles.bigTitle}
                         >
-                           Registered
+                           Notified
                         </Typography>
                         {"!"}
                      </Typography>
