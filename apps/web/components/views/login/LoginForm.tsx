@@ -1,3 +1,4 @@
+import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
 import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded"
 import MicOutlinedIcon from "@mui/icons-material/MicOutlined"
 import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded"
@@ -22,9 +23,8 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import { BLACKLISTED_ABSOLUTE_PATHS } from "../../../constants/routes"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
-import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
-import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
 import { MobileUtils } from "../../../util/mobile.utils"
+import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
 
 const styles = {
    box: {
@@ -179,7 +179,10 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                      "submitError",
                      "An error occurred while logging in to your account."
                   )
-                  errorLogAndNotify(error)
+                  errorLogAndNotify(error, {
+                     message: "Error logging in with email and password",
+                     email: values.email,
+                  })
             }
             dataLayerEvent("login_failed")
          }

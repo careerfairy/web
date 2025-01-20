@@ -217,9 +217,14 @@ export const capitalizeFirstLetter = (string: string) => {
    return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
+/**
+ * Logs an error to the console and sends it to Sentry
+ * @param error The error to log and send to Sentry
+ * @param metadata Any additional metadata to be sent to Sentry
+ */
 export const errorLogAndNotify = (error: Error, metadata?: any) => {
    console.error("error", error)
-   Sentry.captureException(error, metadata)
+   Sentry.captureException(error, metadata ? { data: metadata } : undefined)
 }
 /**
  * Check if the emulators are enabled or if we're running locally
