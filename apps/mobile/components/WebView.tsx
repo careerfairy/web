@@ -68,14 +68,35 @@ type InterceptedRequest = {
    navigationType: string
 }
 
-const externalLinks = [
+const careerfairyUrls = [
    "https://www.careerfairy.io/terms",
    "https://www.careerfairy.io/data-protection",
    "http://127.0.0.1:3000/terms", // iOS Localhost
    "http://127.0.0.1:3000/data-protection", // iOS Localhost
    "http://10.0.2.2:3000/terms", // Android Localhost
    "http://10.0.2.2:3000/data-protection", // Android Localhost
+   "https://support.careerfairy.io",
 ]
+
+const agoraPages = ["/streaming/host", "/streaming/viewer"]
+
+const nativeAppUrlsWhiteList = [
+   "https://calendar.google.com",
+   "https://outlook.live.com",
+   "https://calendar.yahoo.com",
+   "data:text/calendar",
+   "https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent",
+]
+
+const isUrlInNativeWhitelist = (url: string): boolean => {
+   try {
+      return nativeAppUrlsWhiteList.some((whitelistedUrl) =>
+         url.startsWith(whitelistedUrl)
+      )
+   } catch {
+      return false
+   }
+}
 
 const isLocalHost = (url: string) => {
    return (
@@ -94,6 +115,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
    const [refreshKey, setRefreshKey] = useState(0)
+   const refreshAfterExternalActivityRef = useRef(false)
 
    useEffect(() => {
       checkPermissions()
@@ -333,63 +355,96 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const isExternalNavigation = (request: InterceptedRequest) => {
-      if (externalLinks.includes(request.url)) {
+      if (careerfairyUrls.some((link) => request.url.startsWith(link))) {
          return true
       }
 
+      // Special case for auth iframe and blank pages
+      if (request.url === "about:blank") {
+         return false
+      }
+
+      // Check if it's a localhost URL
       if (isLocalHost(request.url)) {
          return false
       }
 
-      return (
-         !request.url.startsWith(`https://${SEARCH_CRITERIA}`) &&
-         !request.url.startsWith(`https://www.${SEARCH_CRITERIA}`) &&
-         !request.url.startsWith("about:") &&
-         request.loading
-      )
+      try {
+         const urlObj = new URL(request.url)
+         // Check if the URL is within your domain
+         return !urlObj.hostname.includes(SEARCH_CRITERIA) && request.loading
+      } catch {
+         return false // Invalid URL
+      }
    }
 
+   const isAndroid = Platform.OS === "android"
+
+   const isAgoraPage = agoraPages.some((page) => baseUrl.includes(page))
+
    const openOnWebBrowser = useCallback(
-      (url: string) => {
+      async (url: string) => {
          const options: WebBrowser.WebBrowserOpenOptions = {}
 
-         if (Platform.OS === "android" && defaultBrowser) {
+         // Must do double bang to ensure boolean, sometimes in react native booleans don't evaluate until some operation is performed on them
+         if (isAndroid && isAgoraPage) {
+            refreshAfterExternalActivityRef.current = true
+         }
+
+         if (isAndroid && defaultBrowser) {
             options.browserPackage = defaultBrowser
          }
 
          WebBrowser.openBrowserAsync(url, options)
       },
-      [defaultBrowser]
+      [defaultBrowser, isAgoraPage]
    )
 
    const handleNavigation = (request: InterceptedRequest) => {
+      const isIframe = request.isTopFrame === false
+
+      if (
+         request.url.includes(
+            "careerfairy-e1fd9.firebaseapp.com/__/auth/iframe"
+         )
+      ) {
+         // Blocking auth iframe navigation for security
+         return false
+      }
+
       if (request.url === "about:blank") {
-         return false // Stop loading the blank page
-      } else if (request.url.startsWith("mailto:")) {
+         // Blocking about:blank page load
+         return false
+      } else if (isUrlInNativeWhitelist(request.url)) {
+         // Opening mailto link externally
+         if (isAndroid && isAgoraPage) {
+            refreshAfterExternalActivityRef.current = true
+         }
          Linking.openURL(request.url)
          return false
       } else {
          if (!request.url.includes(SEARCH_CRITERIA)) {
             if (isValidUrl(request.url)) {
-               // iOS calls for all types of navigation (including the non-restrictive
-               // "other", which causes issues for internal links like cookies).
                if (
+                  isIframe && // Skip iframe navigation requests (e.g. cookie consent, tracking pixels, etc)
                   Platform.OS === "ios" &&
                   request.navigationType !== "click"
                ) {
+                  // Blocking non-click navigation to prevent cookie issues
                   return false
                }
                openOnWebBrowser(request.url)
             }
-            return false // Prevent WebView from loading the external link
+            // Preventing WebView from loading external link
+            return false
          }
 
-         if (isExternalNavigation(request)) {
+         if (isExternalNavigation(request) && !isIframe) {
             openOnWebBrowser(request.url)
             return false
          }
       }
-      return true // Allow WebView to load internal links
+      return true
    }
 
    const handleContentProcessTerminate = () => {
@@ -398,6 +453,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          url: baseUrl,
       })
       setRefreshKey((prev) => prev + 1)
+      refreshAfterExternalActivityRef.current = true
+      refreshWebAppOnResume()
    }
 
    const handleRenderProcessGone = (syntheticEvent: any) => {
@@ -409,6 +466,8 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          details: nativeEvent,
       })
       setRefreshKey((prev) => prev + 1)
+      refreshAfterExternalActivityRef.current = true
+      refreshWebAppOnResume()
    }
 
    useEffect(() => {
@@ -422,22 +481,34 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }, [])
 
    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      if (nextAppState === "active" && webViewRef.current) {
-         // Send message to web app that the app has resumed
-         const message: NativeEvent = {
-            type: MESSAGING_TYPE.WEBVIEW_RESUMED,
-            data: null,
-         }
-         const messageString = JSON.stringify(message)
-         webViewRef.current.postMessage(messageString)
+      if (
+         nextAppState === "active" &&
+         webViewRef.current &&
+         refreshAfterExternalActivityRef.current
+      ) {
+         refreshWebAppOnResume()
+         refreshAfterExternalActivityRef.current = false
       }
    }
 
+   const refreshWebAppOnResume = () => {
+      if (!webViewRef.current) return
+
+      // Send message to web app that the app has resumed from external link
+      const message: NativeEvent = {
+         type: MESSAGING_TYPE.WEBVIEW_RESUMED,
+         data: null,
+      }
+      const messageString = JSON.stringify(message)
+
+      webViewRef.current.postMessage(messageString)
+   }
+
    return (
-      <SafeAreaView style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
+      <SafeAreaView style={styles.container}>
          <WebView
             key={refreshKey + 1}
-            style={{ flex: 1 }}
+            style={styles.flex}
             ref={webViewRef}
             source={{ uri: baseUrl }}
             javaScriptEnabled={true}
@@ -474,12 +545,12 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             scrollEnabled={true}
             allowsBackForwardNavigationGestures={true}
             injectedJavaScript={`(function() {
-                 window._hjSettings = null;
-                 window.hj = null;
-                 var style = document.createElement('style');
-                 style.innerHTML = \`${injectedCSS}\`;
-                 document.head.appendChild(style);
-              })();`}
+                    window._hjSettings = null;
+                    window.hj = null;
+                    var style = document.createElement('style');
+                    style.innerHTML = \`${injectedCSS}\`;
+                    document.head.appendChild(style);
+                 })();`}
             allowFileAccess={true} // Allow service worker support for firebase offline caching
             allowUniversalAccessFromFileURLs={true} // Allow service worker support for firebase offline
             javaScriptCanOpenWindowsAutomatically={true} // Reduce delay in javascript execution
@@ -492,31 +563,12 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 }
 
 const styles = StyleSheet.create({
-   banner: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: "#3bbba5",
-      paddingTop: 10,
-      paddingBottom: 10,
-      paddingRight: 10,
-      paddingLeft: 10,
-      gap: 4,
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1000,
+   container: {
+      flex: 1,
+      paddingTop: StatusBar.currentHeight,
    },
-   bannerText: {
-      color: "#000000",
-      fontSize: 14,
-      fontWeight: "bold",
-   },
-   bannerButton: {
-      color: "#ffffff",
-      fontWeight: "bold",
-      marginLeft: 5,
+   flex: {
+      flex: 1,
    },
 })
 

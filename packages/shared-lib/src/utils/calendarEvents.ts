@@ -23,8 +23,21 @@ type OptionsGenerateCalendarEventProperties = {
    overrideBaseUrl?: string
 }
 
+export type EventProperties = Pick<
+   LivestreamEvent,
+   | "start"
+   | "id"
+   | "summary"
+   | "reasonsToJoinLivestream_v2"
+   | "title"
+   | "duration"
+   | "isHybrid"
+   | "address"
+   | "company"
+>
+
 export const generateCalendarEventProperties = (
-   livestream: LivestreamEvent,
+   livestream: EventProperties,
    customUtm?: Partial<AddUtmTagsToLinkProps>,
    options?: OptionsGenerateCalendarEventProperties
 ) => {

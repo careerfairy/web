@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
-import { Fragment, useMemo, useState } from "react"
+import { Fragment, ReactNode, useMemo, useState } from "react"
 import SEO from "../../components/util/SEO"
 import CarouselContentService, {
    filterNonRegisteredStreams,
@@ -30,8 +30,6 @@ import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJ
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
-import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
@@ -39,14 +37,10 @@ import { getCustomJobDialogData } from "components/views/jobs/components/custom-
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
 import { UserSparksCarousel } from "components/views/portal/sparks/UserSparksCarousel"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
 import { sxStyles } from "types/commonTypes"
-import {
-   RecommendedCustomJobs,
-   RecommendedCustomJobsSkeleton,
-} from "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
+import { RecommendedCustomJobs } from "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
@@ -75,7 +69,6 @@ const PortalPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
-   const isMounted = useIsMounted()
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -135,29 +128,21 @@ const PortalPage = ({
                         />
                      </Container>
                      <Container disableGutters>
-                        <PortalTagsContent>
-                           {isMounted ? (
-                              <SuspenseWithBoundary
-                                 fallback={<SparksLoadingFallback />}
-                              >
-                                 <UserSparksCarousel
-                                    header={
-                                       <Typography
-                                          variant="brandedH4"
-                                          color="neutral.800"
-                                          fontWeight="600"
-                                       >
-                                          Sparks
-                                       </Typography>
-                                    }
-                                    handleSparksClicked={handleSparksClicked}
-                                    containerSx={styles.sparksCarousel}
-                                    headerSx={styles.sparksCarouselHeader}
-                                 />
-                              </SuspenseWithBoundary>
-                           ) : (
-                              <SparksLoadingFallback />
-                           )}
+                        <PortalTags>
+                           <UserSparksCarousel
+                              header={
+                                 <Typography
+                                    variant="brandedH4"
+                                    color="neutral.800"
+                                    fontWeight="600"
+                                 >
+                                    Sparks
+                                 </Typography>
+                              }
+                              handleSparksClicked={handleSparksClicked}
+                              containerSx={styles.sparksCarousel}
+                              headerSx={styles.sparksCarouselHeader}
+                           />
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
                            ) : null}
@@ -165,11 +150,7 @@ const PortalPage = ({
                               serverSideEvents={comingUpNext}
                               limit={20}
                            />
-                           {isMounted ? (
-                              <RecommendedCustomJobs />
-                           ) : (
-                              <RecommendedCustomJobsSkeleton />
-                           )}
+                           <RecommendedCustomJobs />
                            <MyNextEvents />
                            <ConditionalWrapper
                               condition={Boolean(events?.length)}
@@ -182,7 +163,7 @@ const PortalPage = ({
                                  seeMoreLink={"/past-livestreams"}
                               />
                            </ConditionalWrapper>
-                        </PortalTagsContent>
+                        </PortalTags>
                      </Container>
                   </CustomJobDialogLayout>
                </LivestreamDialogLayout>
@@ -193,84 +174,36 @@ const PortalPage = ({
    )
 }
 
-const SparksLoadingFallback = () => {
-   return (
-      <FallbackComponent
-         sx={styles.sparksCarousel}
-         header={
-            <Typography
-               variant="brandedH4"
-               color="neutral.800"
-               fontWeight="600"
-            >
-               Sparks
-            </Typography>
-         }
-      />
-   )
+type PortalTagsContentProps = {
+   children: ReactNode
 }
 
-type PortalTagsContentProps = {
-   children: React.ReactNode
-}
-const PortalTagsContent = ({ children }: PortalTagsContentProps) => {
-   const isMounted = useIsMounted()
-   return (
-      <SuspenseWithBoundary fallback={children}>
-         {isMounted ? <PortalTags>{children}</PortalTags> : children}
-      </SuspenseWithBoundary>
-   )
-}
+type CategoryId = string | undefined
 
 const PortalTags = ({ children }: PortalTagsContentProps) => {
-   const availableCategories = useAvailableTagsByHits()
-   const defaultCategories = availableCategories.map((tag) => {
-      return [
-         tag.id,
-         {
-            selected: false,
-         },
-      ]
-   })
+   const { tags, isLoading } = useAvailableTagsByHits()
+   const [selectedCategoryId, setSelectedCategoryId] =
+      useState<CategoryId>(undefined)
 
-   const [categoriesData, setCategoriesData] = useState(() => {
-      return Object.fromEntries(defaultCategories)
-   })
-
-   const selectedCategories = useMemo(() => {
-      return Object.keys(categoriesData).filter(
-         (cat) => categoriesData[cat].selected
+   const handleCategoryChipClicked = (categoryId: CategoryId) => {
+      setSelectedCategoryId((previousCategoryId) =>
+         previousCategoryId === categoryId ? undefined : categoryId
       )
-   }, [categoriesData])
-
-   const handleCategoryChipClicked = (categoryId: string) => {
-      const newCategories = Object.fromEntries(
-         Object.keys(categoriesData).map((id) => {
-            return [
-               id,
-               {
-                  selected:
-                     id === categoryId
-                        ? !categoriesData[categoryId].selected
-                        : false,
-               },
-            ]
-         })
-      )
-
-      setCategoriesData(newCategories)
    }
 
    return (
       <Box sx={{ mb: 3, minHeight: "100vh" }}>
          <TagsCarouselWithArrow
-            selectedCategories={selectedCategories}
-            tags={availableCategories}
+            selectedCategories={selectedCategoryId ? [selectedCategoryId] : []}
+            tags={tags}
+            isLoading={isLoading}
             handleTagClicked={handleCategoryChipClicked}
             handleAllClicked={() => handleCategoryChipClicked(undefined)}
          />
-         {selectedCategories.length ? (
-            <CategoryTagsContent categories={categoriesData} />
+         {selectedCategoryId ? (
+            <CategoryTagsContent
+               categories={{ [selectedCategoryId]: { selected: true } }}
+            />
          ) : (
             children
          )}

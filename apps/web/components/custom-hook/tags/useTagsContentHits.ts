@@ -8,7 +8,7 @@ import useFunctionsSWR, {
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
    keepPreviousData: true,
-   suspense: true,
+   suspense: false,
    onError: (error, key) =>
       errorLogAndNotify(error, {
          message: `Error fetching tags content hits: ${key}`,

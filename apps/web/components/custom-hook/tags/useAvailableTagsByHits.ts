@@ -15,15 +15,17 @@ import { useTagsContentHits } from "./useTagsContentHits"
  * tag has been used. To determine how many hits each tag has, a custom cloud function (fetchTagsContentHits), which does this calculation via Algolia and
  * returns a map with all the counts and also grouping of the counts by content. Allowing this hook to apply the custom rule for defining if a tag should be selectable
  * or displayable.
- * @returns @type OptionGroup with all available tags for usage, based on rules according to content usage.
  */
 export const useAvailableTagsByHits = () => {
    const { isLoggedIn, userData } = useAuth()
-   const { data: hits } = useTagsContentHits()
+   const { data, isLoading } = useTagsContentHits()
+
+   const businessFunctionsHits = data?.businessFunctions.hits || []
+   const contentTopicsHits = data?.contentTopics.hits || []
 
    const availableBusinessFunctions = BusinessFunctionsTagValues.filter(
       (tag) => {
-         const tagHits = hits.businessFunctions.hits[tag.id]
+         const tagHits = businessFunctionsHits[tag.id]
          return (
             tagHits && shouldShowBusinessFunctionTagByCount(tagHits.count, 6)
          )
@@ -31,15 +33,20 @@ export const useAvailableTagsByHits = () => {
    )
 
    const availableContentTopics = ContentTopicsTagValues.filter((tag) => {
-      const tagHits = hits.contentTopics.hits[tag.id]
+      const tagHits = contentTopicsHits[tag.id]
       return tagHits && shouldShowContentTopicTagByCount(tagHits.count, 6, 6)
    })
 
-   return sortByUserInterests(
+   const sortedTags = sortByUserInterests(
       [...availableBusinessFunctions, ...availableContentTopics],
       userData,
       isLoggedIn
    )
+
+   return {
+      tags: sortedTags,
+      isLoading,
+   }
 }
 
 const sortByUserInterests = (

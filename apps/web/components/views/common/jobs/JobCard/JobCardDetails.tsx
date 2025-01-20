@@ -135,6 +135,11 @@ const JobCardDetails = ({
 
    const jobApplication = useUserJobApplication(userData?.id, job.id)
 
+   const showTooltip = useMemo(
+      () => !isAtsJob && isJobValidButNoLinkedContent(job) && jobHubV1,
+      [isAtsJob, job, jobHubV1]
+   )
+
    let jobName: string
    let jobType: string
    let jobDeadline: Timestamp
@@ -159,11 +164,6 @@ const JobCardDetails = ({
 
       jobIsPermanentlyExpired = job.isPermanentlyExpired
    }
-
-   const showTooltip = useMemo(
-      () => !isAtsJob && isJobValidButNoLinkedContent(job) && jobHubV1,
-      [isAtsJob, job, jobHubV1]
-   )
 
    const published =
       jobPublished || (talentProfileV1 && jobApplication.alreadyApplied)

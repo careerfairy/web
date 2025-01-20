@@ -1,5 +1,8 @@
-import React, { memo } from "react"
+import { PdfReportData } from "@careerfairy/shared-lib/groups/pdf-report"
+import CloseIcon from "@mui/icons-material/Close"
 import {
+   Alert,
+   AlertTitle,
    Box,
    Button,
    CircularProgress,
@@ -10,13 +13,11 @@ import {
    IconButton,
    Slide,
 } from "@mui/material"
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer"
-import EventPdfReport from "./EventPdfReport"
 import { useTheme } from "@mui/material/styles"
-import CloseIcon from "@mui/icons-material/Close"
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer"
+import React, { memo } from "react"
 import { isMobile } from "react-device-detect"
-import { Alert, AlertTitle } from "@mui/material"
-import { PdfReportData } from "@careerfairy/shared-lib/groups/pdf-report"
+import EventPdfReport from "./EventPdfReport"
 
 interface DialogContentProps {
    handleClose: () => void
@@ -50,7 +51,7 @@ const PdfReportDownloadDialogContent = ({
                            Something went wrong —{" "}
                            <a
                               color="inherit"
-                              href="mailto:thomas@careerfairy.io"
+                              href="mailto:support@careerfairy.io"
                            >
                               <strong>
                                  Get in touch with the CareerFairy Team
@@ -128,7 +129,7 @@ const PdfReportDownloadDialog = ({
          }}
          aria-labelledby="pdf-report-download-dialog"
       >
-         {reportPdfData && (
+         {Boolean(reportPdfData) && (
             <PdfReportDownloadDialogContent
                handleClose={handleClose}
                reportPdfData={reportPdfData}
