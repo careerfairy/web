@@ -145,7 +145,7 @@ export const DownloadMobileApplication: FC<
                         color="black"
                         sx={styles.subtitle}
                      >
-                        {"No more missed livestreams"}
+                        {"No more missed live streams"}
                      </ContentHeaderTitle>
                   )}
                   <br />
@@ -167,7 +167,7 @@ export const DownloadMobileApplication: FC<
                         color="black"
                         sx={styles.title}
                      >
-                        {"is coming soon!"}
+                        {"is live now!"}
                      </ContentHeaderTitle>
                   </ContentHeaderTitle>
                </>
