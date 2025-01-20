@@ -3,8 +3,6 @@ import { Autocomplete, TextField } from "@mui/material"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
 import { useState } from "react"
 
-// const MIN_SEARCH_LENGTH = 2
-
 const countries = Object.keys(universityCountriesMap).map((key) => ({
    id: key,
    name: universityCountriesMap[key],
