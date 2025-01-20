@@ -1,8 +1,14 @@
 import { CountryOption } from "@careerfairy/shared-lib/countries/types"
 import { Autocomplete, TextField } from "@mui/material"
-import useCountryById from "components/custom-hook/countries/useCountryById"
-import { useCountrySearch } from "components/custom-hook/countries/useCountrySearch"
-import { useEffect, useState } from "react"
+import { universityCountriesMap } from "components/util/constants/universityCountries"
+import { useState } from "react"
+
+// const MIN_SEARCH_LENGTH = 2
+
+const countries = Object.keys(universityCountriesMap).map((key) => ({
+   id: key,
+   name: universityCountriesMap[key],
+}))
 
 type CountryAutoCompleteProps = {
    countryValueId?: string
@@ -15,47 +21,24 @@ export const CountryAutoComplete = ({
    disabled,
    handleSelectedCountryChange,
 }: CountryAutoCompleteProps) => {
-   const { data: userCountry } = useCountryById(countryValueId, false)
-
-   const [options, setOptions] = useState<CountryOption[]>([])
-   const [inputValue, setInputValue] = useState(userCountry?.name ?? "")
-   const [country, setCountry] = useState<CountryOption | null>(
-      userCountry ?? null
-   )
-
-   const { data: countriesResult, isLoading } = useCountrySearch(inputValue)
-
-   useEffect(() => {
-      const newOptions = countriesResult ?? []
-
-      if (
-         userCountry &&
-         !newOptions.find((option) => option.id === userCountry.id)
-      ) {
-         newOptions.unshift(userCountry)
-      }
-
-      setOptions(newOptions)
-   }, [countriesResult, userCountry])
-
-   useEffect(() => {
-      setCountry(userCountry ?? null)
-   }, [userCountry, options])
+   const [country, setCountry] = useState<CountryOption | null>(() => {
+      return countryValueId
+         ? {
+              id: countryValueId,
+              name: universityCountriesMap[countryValueId],
+           }
+         : null
+   })
 
    return (
       <Autocomplete
          value={country}
-         disabled={disabled || isLoading}
-         options={options}
-         loading={isLoading}
+         disabled={disabled}
+         options={countries}
          onChange={(_, value) => {
             setCountry(value ?? null)
             handleSelectedCountryChange(value ?? null)
          }}
-         onInputChange={(_, newInputValue) => {
-            setInputValue(newInputValue)
-         }}
-         filterOptions={(x) => x}
          getOptionLabel={(option) => option.name}
          getOptionKey={(option) => option.id}
          isOptionEqualToValue={(option, value) => option?.id === value?.id}
