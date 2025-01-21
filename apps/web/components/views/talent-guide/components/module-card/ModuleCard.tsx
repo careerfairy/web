@@ -53,24 +53,16 @@ const styles = sxStyles({
          md: "12px 0px",
       },
    },
-   lighting: {
-      border: (theme) => `1px solid ${theme.palette.primary[600]}`,
-      boxShadow: "0px 0px 20px 0px rgba(0, 210, 170, 0.17)",
-   },
 })
 
 type Props = {
    module: Page<TalentGuideModule>
    /**
-    * If true, the module card will be a link
+    * If true, applies the lighting effect to the card
     */
    interactive?: boolean
    isRecommended?: boolean
    onShineAnimationComplete?: () => void
-   /**
-    * If true, applies the lighting effect to the card
-    */
-   hasLighting?: boolean
 }
 
 export const ModuleCard = forwardRef<HTMLDivElement, Props>(
@@ -95,7 +87,6 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
                styles.card,
                interactive && styles.interactive,
                isRecommended && styles.recommended,
-               // hasLighting && styles.lighting,
             ]}
          >
             <Thumbnail thumbnailUrl={module.content.moduleIllustration?.url} />
