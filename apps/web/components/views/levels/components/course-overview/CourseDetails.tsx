@@ -56,6 +56,7 @@ type Props = {
       description: string
    }
    overallProgress: number
+   isLoadingNextModule: boolean
 }
 
 export const CourseDetails = ({
@@ -64,6 +65,7 @@ export const CourseDetails = ({
    nextLevel,
    copy,
    overallProgress,
+   isLoadingNextModule,
 }: Props) => {
    const theme = useTheme()
    const hours = calculateTotalHours(levels)
@@ -120,11 +122,9 @@ export const CourseDetails = ({
                {copy.description}
             </Typography>
          )}
-         {nextLevel ? (
-            <Box sx={isOverlay ? styles.ctaOverlay : styles.ctaDesktop}>
-               <CTAButton nextLevel={nextLevel} />
-            </Box>
-         ) : null}
+         <Box sx={isOverlay ? styles.ctaOverlay : styles.ctaDesktop}>
+            <CTAButton nextLevel={nextLevel} loading={isLoadingNextModule} />
+         </Box>
       </Stack>
    )
 }
