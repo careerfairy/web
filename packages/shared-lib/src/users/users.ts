@@ -159,6 +159,10 @@ export type UserAccountCreationAdditionalData = {
    }
 }
 
+export type AdditionalUserRecommendationInfo = {
+   studyBackgrounds: StudyBackground[]
+}
+
 // Collection /userData/:id/studyBackgrounds/:id
 export interface StudyBackground extends Identifiable {
    authId: string

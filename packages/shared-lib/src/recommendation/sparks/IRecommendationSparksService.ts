@@ -1,6 +1,10 @@
 import { combineRankedDocuments } from "../../BaseFirebaseRepository"
 import { SparkStats } from "../../sparks/sparks"
-import { UserData } from "../../users/users"
+import {
+   AdditionalUserRecommendationInfo,
+   StudyBackground,
+   UserData,
+} from "../../users/users"
 import { Logger } from "../../utils/types"
 import { sortRankedByPoints } from "../utils"
 import { RankedSpark } from "./RankedSpark"
@@ -19,6 +23,12 @@ type MaxRecommendations = number
 
 export interface IRecommendationSparksService {
    getRecommendations(limit?: MaxRecommendations): Promise<Recommendations>
+   setStudyBackgrounds(
+      studyBackgrounds: StudyBackground[]
+   ): IRecommendationSparksService
+   setAdditionalUserInfo(
+      additionalUserInfo: AdditionalUserRecommendationInfo
+   ): IRecommendationSparksService
 }
 
 export default class RecommendationSparksServiceCore {
@@ -86,12 +96,14 @@ export default class RecommendationSparksServiceCore {
    protected getRecommendedSparksBasedOnUserData(
       userData: UserData,
       sparks: SparkStats[],
+      additionalUserInfo: AdditionalUserRecommendationInfo,
       limit: number
    ): RankedSpark[] {
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
          userData,
-         new RankedSparkRepository(sparks)
+         new RankedSparkRepository(sparks),
+         additionalUserInfo
       )
 
       return userRecommendationBuilder
@@ -99,6 +111,7 @@ export default class RecommendationSparksServiceCore {
          .userUniversityCountry()
          .userUniversityCode()
          .userFieldOfStudy()
+         .userStudyBackground()
          .get()
    }
 }
