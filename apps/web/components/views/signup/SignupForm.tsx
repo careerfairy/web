@@ -3,10 +3,13 @@ import { Box, Button, Container, Grid, Typography } from "@mui/material"
 import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
+import { useSelector } from "react-redux"
+import { RootState } from "store"
+import { userSignUpStepContinueDisabledSelector } from "store/selectors/userSignUpSelectors"
 import { calculateUserValue } from "util/userValueScoring"
+import { useAuth } from "../../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import { userRepo } from "../../../data/RepositoryInstances"
-import { useAuth } from "../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../types/commonTypes"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import GenericStepper from "../common/GenericStepper"
@@ -110,6 +113,9 @@ const SignupForm = () => {
    const isFirstStep = currentStep === 0
    const showBackButton = currentStep > 2
    const shouldUpdateStepAnalytics = currentStep > 1
+   const disableContinue = useSelector((state: RootState) =>
+      userSignUpStepContinueDisabledSelector(state, currentStep)
+   )
 
    useEffect(() => {
       if (userData && currentStep === 0) {
@@ -182,7 +188,7 @@ const SignupForm = () => {
       }
    }
 
-   const renderContinueAndBackButtons = () => (
+   const renderContinueAndBackButtons = (disableContinue: boolean) => (
       <Grid
          container
          alignItems="center"
@@ -204,6 +210,7 @@ const SignupForm = () => {
             <LoadingButton
                variant="contained"
                onClick={handleContinue}
+               disabled={disableContinue}
                data-testid={"user-registration-continue-button"}
                loading={isLoadingRedirectPage}
             >
@@ -229,7 +236,8 @@ const SignupForm = () => {
                   currentStep={currentStep}
                   setCurrentStep={setCurrentStep}
                />
-               {currentStep > 1 && renderContinueAndBackButtons()}
+               {currentStep > 1 &&
+                  renderContinueAndBackButtons(disableContinue)}
             </Box>
          </Container>
       </>

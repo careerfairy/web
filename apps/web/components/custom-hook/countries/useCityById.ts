@@ -12,27 +12,29 @@ const swrOptions: SWRConfiguration = {
    keepPreviousData: true,
    onError: (error, key) =>
       errorLogAndNotify(error, {
-         message: `Error fetching countries list: ${key}`,
+         message: `Error fetching city by id: ${key}`,
       }),
 }
 
-const useCountryCities = (countryCode: string, suspense = true) => {
-   const fetcher = useFunctionsSWR<Record<string, CityOption>>()
+const useCityById = (generatedCityId: string, suspense = true) => {
+   const fetcher = useFunctionsSWR<CityOption>()
 
    const options = useMemo(() => {
       return {
-         countryCode,
+         generatedCityId,
       }
-   }, [countryCode])
+   }, [generatedCityId])
 
-   const { data, error, isLoading, mutate } = useSWR<
-      Record<string, CityOption>
-   >(["fetchCountryCitiesList", options], fetcher, {
-      ...swrOptions,
-      suspense,
-   })
+   const { data, error, isLoading } = useSWR<CityOption>(
+      ["fetchCityData", options],
+      fetcher,
+      {
+         ...swrOptions,
+         suspense,
+      }
+   )
 
-   return { data: data ?? [], error, isLoading, mutate }
+   return { data, error, isLoading }
 }
 
-export default useCountryCities
+export default useCityById
