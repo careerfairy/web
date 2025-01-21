@@ -212,7 +212,6 @@ export class GroupDashboardPage extends CommonPage {
          tagValueLooker
       )
 
-      // Comment to see if build is failing
       await this.fillMultiSelect(
          "Choose at least 1 business function presented in this live stream",
          data.businessFunctionsTagIds,

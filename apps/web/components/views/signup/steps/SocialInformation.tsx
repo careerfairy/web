@@ -27,7 +27,6 @@ import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
 import LinkedInInput from "../../common/inputs/LinkedInInput"
 import ReferralCodeInput from "../../common/inputs/ReferralCodeInput"
-
 const styles = sxStyles({
    inputLabel: {
       textTransform: "uppercase",
@@ -416,18 +415,9 @@ const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
    const { userData } = useAuth()
    const [linkTitle, setLinkTitle] = useState("")
    const [link, setLink] = useState("")
-   const [debouncedLink, setDebouncedLink] = useState("")
    const [isValidLink, setIsValidLink] = useState<boolean>(false)
 
    const isValidForm = isValidLink && Boolean(linkTitle?.length)
-   useDebounce(
-      () => {
-         setDebouncedLink(link)
-         setIsValidLink(isValidHttpUrl(link))
-      },
-      1000,
-      [link]
-   )
 
    const resetForm = () => {
       setLinkTitle("")
@@ -438,7 +428,7 @@ const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
       resetForm()
       onSubmit({
          title: linkTitle,
-         url: link,
+         url: normalizeUrl(link, { forceHttps: true }),
          authId: userData.authId,
          id: null,
       })
@@ -449,6 +439,10 @@ const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
       resetForm()
       onCancel()
    }, [onCancel])
+
+   useEffect(() => {
+      setIsValidLink(isValidHttpUrl(link))
+   }, [link])
 
    return (
       <Stack sx={styles.linkFormRoot} spacing={2}>
@@ -467,14 +461,14 @@ const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
                   label="Add your link URL"
                   name="linkUrl"
                   value={link}
-                  onChange={(e) => setLink(e.target.value)}
+                  onChange={(e) => {
+                     setLink(e.target.value)
+                  }}
                   sx={styles.linkTextField}
                   fullWidth
                   variant="outlined"
                />
-               <ConditionalWrapper
-                  condition={debouncedLink?.length > 0 && !isValidLink}
-               >
+               <ConditionalWrapper condition={link?.length > 0 && !isValidLink}>
                   <FormHelperText sx={{ ml: 2, color: "error.main" }}>
                      Invalid UrL
                   </FormHelperText>
@@ -551,8 +545,8 @@ const isValidLinkedInLink = (link: string): boolean => {
 
 const isValidHttpUrl = (link: string): boolean => {
    try {
-      const newUrl = new URL(link)
-      return newUrl.protocol === "http:" || newUrl.protocol === "https:"
+      new URL(link)
+      return true
    } catch (err) {
       return false
    }
