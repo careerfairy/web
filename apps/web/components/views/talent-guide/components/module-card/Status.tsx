@@ -61,7 +61,12 @@ const Content = ({ module, onShineAnimationComplete }: Props) => {
 
    if (moduleProgress?.completedAt) {
       return (
-         <Stack direction="row" justifyContent="space-between" spacing={1}>
+         <Stack
+            direction="row"
+            justifyContent="space-between"
+            width="100%"
+            spacing={1}
+         >
             {!isMobile && (
                <LevelInfo
                   moduleLevel={module.level}

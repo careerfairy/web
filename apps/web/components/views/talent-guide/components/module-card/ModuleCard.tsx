@@ -48,6 +48,7 @@ const styles = sxStyles({
       },
    },
    content: {
+      width: "100%",
       padding: {
          xs: "4px 4px 4px 0px",
          md: "12px 0px",

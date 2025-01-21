@@ -57,7 +57,7 @@ export const LevelsContainer = ({ pages }: Props) => {
    const isMobile = useIsMobile()
    const { drawerOpen } = useGenericDashboard()
 
-   const cardsAreMobile = useIsMobile(drawerOpen ? 1100 : undefined)
+   const cardsAreMobile = useIsMobile(drawerOpen ? 1110 : undefined)
 
    return (
       <FramerBox
