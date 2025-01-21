@@ -82,10 +82,7 @@ export const VALID_SOURCES: RegistrationSource[] = [
             /student[_-]assoc[_-][a-z]{2}|unicc[_-][a-z]{2}|student[_-]council[_-][a-z]{2}/i,
             /^professors$/i,
          ]
-         const matchSource = validSources.some((r) => r.test(utms?.utm_source))
-         const matchMedium = /email/i.test(utms?.utm_medium)
-
-         return matchSource && matchMedium
+         return validSources.some((r) => r.test(utms?.utm_source))
       },
    },
 
