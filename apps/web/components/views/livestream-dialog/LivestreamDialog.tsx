@@ -209,6 +209,9 @@ const LivestreamDialog: FC<Props> = ({
          fullWidth
          fullScreen={isMobile}
          closeAfterTransition={true}
+         TransitionProps={{
+            appear: false, // on Page load, the dialog is already open, not sliding up, better for SEO
+         }}
          PaperProps={{
             sx: styles.dialogPaper,
          }}
