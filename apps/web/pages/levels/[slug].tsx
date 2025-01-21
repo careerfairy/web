@@ -32,8 +32,8 @@ interface TalentGuidePageProps {
 
 const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const dispatch = useAppDispatch()
-   const { isPreview } = useRouter()
-   const { authenticatedUser, isLoggedIn } = useAuth()
+   const { isPreview, asPath, replace } = useRouter()
+   const { authenticatedUser, isLoggedIn, isLoggedOut } = useAuth()
    const isLoadingGuide = useIsLoadingTalentGuide()
    const showEndOfModuleExperience = useShowEndOfModuleExperience()
    const [layoutKey, setLayoutKey] = useState(0)
@@ -55,8 +55,26 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       }
    }, [dispatch, authenticatedUser.uid, data])
 
+   useEffect(() => {
+      if (isLoggedOut) {
+         void replace({
+            pathname: `/login`,
+            query: { absolutePath: asPath },
+         })
+      }
+   }, [isLoggedOut, asPath, replace])
+
    const handleResetLayout = () => {
       setLayoutKey((prev) => prev + 1)
+   }
+
+   if (!isLoggedIn) {
+      return (
+         <Fragment>
+            <SEO {...getTalentGuideModuleSeoProps(data, isPreview)} />
+            <Loader />
+         </Fragment>
+      )
    }
 
    const isLoading = isLoadingGuide || !isLoggedIn
@@ -64,7 +82,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    return (
       <Fragment key={layoutKey}>
          {Boolean(isPreview) && <PreviewModeAlert />}
-         <SEO {...getTalentGuideModuleSeoProps(data)} />
+         <SEO {...getTalentGuideModuleSeoProps(data, isPreview)} />
          {isLoading ? (
             <Loader />
          ) : showEndOfModuleExperience ? (
