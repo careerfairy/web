@@ -1,4 +1,5 @@
 import { fromDateFirestoreFn } from "@careerfairy/shared-lib/dist/firebaseTypes"
+import { isServer } from "components/helperFunctions/HelperFunctions"
 import firebase from "firebase/compat/app"
 import "firebase/compat/auth"
 import "firebase/compat/firestore"
@@ -38,10 +39,11 @@ export const createFirebaseInstance = (
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
 
    if (shouldUseEmulators()) {
-      app.auth().useEmulator("http://127.0.0.1:9099")
-      app.firestore().useEmulator("127.0.0.1", 8080)
-      app.functions(region).useEmulator("127.0.0.1", 5001)
-      app.storage().useEmulator("127.0.0.1", 9199)
+      const host = isServer() ? "127.0.0.1" : window.location.hostname
+      app.auth().useEmulator(`http://${host}:9099`)
+      app.firestore().useEmulator(host, 8080)
+      app.functions(region).useEmulator(host, 5001)
+      app.storage().useEmulator(host, 9199)
       console.log("You're connected to the emulators!")
    }
 
