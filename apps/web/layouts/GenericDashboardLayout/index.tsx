@@ -1,5 +1,6 @@
 import ClockIcon from "@mui/icons-material/AccessTime"
 import DomainIcon from "@mui/icons-material/Domain"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
 import { createContext, ReactNode, useContext, useMemo } from "react"
 import {
@@ -112,7 +113,7 @@ const GenericDashboardLayout = ({
    hideHeader,
 }: Props) => {
    const isMobile = useIsMobile(989, { defaultMatches: true })
-
+   const { levelsV1 } = useFeatureFlags()
    const { isLoggedIn } = useAuth()
 
    const [
@@ -164,17 +165,21 @@ const GenericDashboardLayout = ({
             Icon: DomainIcon,
             title: "Companies",
          },
-         {
-            id: "levels",
-            href: `/levels`,
-            pathname: `/levels`,
-            Icon: LevelsIcon,
-            title: "Levels",
-         },
+         ...(levelsV1
+            ? [
+                 {
+                    id: "levels",
+                    href: `/levels`,
+                    pathname: `/levels`,
+                    Icon: LevelsIcon,
+                    title: "Levels",
+                 },
+              ]
+            : []),
       ]
 
       return links
-   }, [isLoggedIn])
+   }, [isLoggedIn, levelsV1])
 
    const drawerOpen = !hideDrawer && !isMobile
 

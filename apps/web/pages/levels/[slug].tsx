@@ -19,6 +19,7 @@ import {
    useIsLoadingTalentGuide,
    useShowEndOfModuleExperience,
 } from "store/selectors/talentGuideSelectors"
+import { getTalentGuideModuleSeoProps } from "util/seo/talentGuideSeo"
 import {
    tgBackendPreviewService,
    tgBackendService,
@@ -63,7 +64,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    return (
       <Fragment key={layoutKey}>
          {Boolean(isPreview) && <PreviewModeAlert />}
-         <SEO title={`${data.content.moduleName} - CareerFairy Levels`} />
+         <SEO {...getTalentGuideModuleSeoProps(data)} />
          {isLoading ? (
             <Loader />
          ) : showEndOfModuleExperience ? (
