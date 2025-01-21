@@ -731,9 +731,15 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       if (isLink) {
          return (
-            <Link {...linkProps} shallow scroll={false}>
+            <Box
+               display="inline-flex"
+               component={Link}
+               {...linkProps}
+               shallow
+               scroll={false}
+            >
                <CardContent {...props} {...additionalProps} ref={ref} />
-            </Link>
+            </Box>
          )
       }
 
