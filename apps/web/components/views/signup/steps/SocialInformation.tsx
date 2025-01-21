@@ -125,7 +125,9 @@ const SocialInformation = () => {
                fieldToUpdate
             )
          } catch (error) {
-            console.log(error)
+            errorLogAndNotify(error, {
+               message: "Error updating social information in SignUp",
+            })
          }
       },
       [currentUser]
@@ -135,11 +137,16 @@ const SocialInformation = () => {
       if (userData) {
          const { linkedinUrl, referredBy } = userData
 
-         if (linkedinUrl && inputValues[LINKEDIN_FIELD_NAME] === "") {
-            setInputValues((prev) => ({
-               ...prev,
-               [LINKEDIN_FIELD_NAME]: linkedinUrl || "",
-            }))
+         if (linkedinUrl) {
+            setInputValues((prev) => {
+               if (prev[LINKEDIN_FIELD_NAME] !== "") {
+                  return prev
+               }
+               return {
+                  ...prev,
+                  [LINKEDIN_FIELD_NAME]: linkedinUrl || "",
+               }
+            })
          }
 
          if (referredBy) {
@@ -157,62 +164,60 @@ const SocialInformation = () => {
    }, [])
 
    return (
-      <>
-         <Grid
-            container
-            spacing={2}
-            justifyContent="center"
-            data-testid="registration-social-information-step"
-         >
-            <Grid item xs={12} sm={8}>
-               <Typography sx={styles.inputLabel} variant="h5">
-                  Do you have a linkedin account?
-               </Typography>
-            </Grid>
+      <Grid
+         container
+         spacing={2}
+         justifyContent="center"
+         data-testid="registration-social-information-step"
+      >
+         <Grid item xs={12} sm={8}>
+            <Typography sx={styles.inputLabel} variant="h5">
+               Do you have a linkedin account?
+            </Typography>
+         </Grid>
 
-            <Grid item xs={12} sm={8}>
-               <ConditionalWrapper
-                  condition={talentProfileV1}
-                  fallback={
-                     <LinkedInInput
-                        name={LINKEDIN_FIELD_NAME}
-                        linkedInValue={inputValues[LINKEDIN_FIELD_NAME]}
-                        onUpdateField={updateFields}
-                        onChange={handleInputChange}
-                     />
-                  }
-               >
-                  <UserLinkedInLink />
-               </ConditionalWrapper>
-            </Grid>
-            <ConditionalWrapper condition={talentProfileV1}>
-               <Grid item xs={12} sm={8}>
-                  <Typography sx={styles.inputLabel} variant="h5">
-                     Any other links?
-                  </Typography>
-               </Grid>
-               <Grid item xs={12} sm={8}>
-                  <UserOtherLinks />
-               </Grid>
-            </ConditionalWrapper>
-            <ConditionalWrapper condition={!talentProfileV1}>
-               <Grid item xs={12} sm={8}>
-                  <Typography sx={styles.inputLabel} variant="h5">
-                     Do you have a referral code?
-                  </Typography>
-               </Grid>
-               <Grid item xs={12} sm={8}>
-                  <ReferralCodeInput
-                     name={REFERRAL_CODE_FIELD_NAME}
-                     referralCodeValue={inputValues[REFERRAL_CODE_FIELD_NAME]}
+         <Grid item xs={12} sm={8}>
+            <ConditionalWrapper
+               condition={talentProfileV1}
+               fallback={
+                  <LinkedInInput
+                     name={LINKEDIN_FIELD_NAME}
+                     linkedInValue={inputValues[LINKEDIN_FIELD_NAME]}
+                     onUpdateField={updateFields}
                      onChange={handleInputChange}
-                     isValid={isValidReferralCode}
-                     onSetIsValid={setIsValidReferralCode}
                   />
-               </Grid>
+               }
+            >
+               <UserLinkedInLink />
             </ConditionalWrapper>
          </Grid>
-      </>
+         <ConditionalWrapper condition={talentProfileV1}>
+            <Grid item xs={12} sm={8}>
+               <Typography sx={styles.inputLabel} variant="h5">
+                  Any other links?
+               </Typography>
+            </Grid>
+            <Grid item xs={12} sm={8}>
+               <UserOtherLinks />
+            </Grid>
+         </ConditionalWrapper>
+         <ConditionalWrapper condition={!talentProfileV1}>
+            <Grid item xs={12} sm={8}>
+               <Typography sx={styles.inputLabel} variant="h5">
+                  Do you have a referral code?
+               </Typography>
+            </Grid>
+            <Grid item xs={12} sm={8}>
+               <ReferralCodeInput
+                  name={REFERRAL_CODE_FIELD_NAME}
+                  referralCodeValue={inputValues[REFERRAL_CODE_FIELD_NAME]}
+                  onChange={handleInputChange}
+                  isValid={isValidReferralCode}
+                  onSetIsValid={setIsValidReferralCode}
+               />
+            </Grid>
+         </ConditionalWrapper>
+      </Grid>
    )
 }
 
