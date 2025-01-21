@@ -89,13 +89,10 @@ const styles = sxStyles({
    },
    actionsDesktopTitle: {
       textAlign: "center",
-      fontFamily: "Poppins",
-      fontSize: "18px",
       fontStyle: "normal",
       fontWeight: 500,
    },
    actionsDesktopOr: {
-      fontSize: 14,
       fontStyle: "normal",
       fontWeight: 400,
       lineHeight: "20px !important",
