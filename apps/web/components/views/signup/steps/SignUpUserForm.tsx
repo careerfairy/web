@@ -1,10 +1,11 @@
 import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
+import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
 import {
    IUserReminder,
+   UserAccountCreationAdditionalData,
    UserData,
    UserReminderType,
-} from "@careerfairy/shared-lib/dist/users"
-import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
+} from "@careerfairy/shared-lib/users"
 import {
    Box,
    Button,
@@ -15,16 +16,18 @@ import {
    Grid,
    Typography,
 } from "@mui/material"
+import { DatePicker } from "@mui/x-date-pickers"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { Formik } from "formik"
+import { DateTime } from "luxon"
 import { useRouter } from "next/router"
 import React, { Fragment, useContext, useEffect, useState } from "react"
-import { errorLogAndNotify } from "util/CommonUtil"
 import * as yup from "yup"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
 import CookiesUtil from "../../../../util/CookiesUtil"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 import { MobileUtils } from "../../../../util/mobile.utils"
 import GenericDropdown from "../../common/GenericDropdown"
 import {
@@ -53,6 +56,15 @@ const styles = sxStyles({
       fontSize: "0.8rem !important",
       fontWeight: "bold",
    },
+   datePicker: {
+      width: "100%",
+      backgroundColor: (theme) => theme.brand.white[100],
+      borderRadius: "8px",
+      boxShadow: "0px 5px 15px 0px #BDBDBD",
+      "& .MuiOutlinedInput-notchedOutline": {
+         border: "none",
+      },
+   },
 })
 
 interface IFormValues
@@ -75,6 +87,8 @@ interface IFormValues
       name: string
       code: string
    }
+   startedAt: Date
+   endedAt: Date
 }
 
 const schema: yup.SchemaOf<IFormValues> = yup.object().shape(signupSchema)
@@ -92,13 +106,15 @@ const initValues: IFormValues = {
    gender: "",
    fieldOfStudy: null,
    levelOfStudy: null,
+   startedAt: null, // Study background
+   endedAt: null, // Study background
 }
 
 function SignUpUserForm() {
    const firebase = useFirebaseService()
    const { push } = useRouter()
    const { setCurrentStep } = useContext<IMultiStepContext>(MultiStepContext)
-
+   const { talentProfileV1 } = useFeatureFlags()
    const [emailSent, setEmailSent] = useState(false)
    const [errorMessage, setErrorMessage] = useState(null)
    const [generalLoading, setGeneralLoading] = useState(false)
@@ -130,8 +146,21 @@ function SignUpUserForm() {
          accountCreationUTMParams: CookiesUtil.getUTMParams() ?? {},
       }
 
+      const additionalData: UserAccountCreationAdditionalData = {
+         studyBackground: {
+            authId: null, // At the moment there is not user auth, this will be set on the backend after user creation
+            id: null,
+            fieldOfStudy: values.fieldOfStudy,
+            levelOfStudy: values.levelOfStudy,
+            universityCountryCode: values.universityCountryCode,
+            universityId: values.university.code,
+            startedAt: values.startedAt ? new Date(values.startedAt) : null,
+            endedAt: values.endedAt ? new Date(values.endedAt) : null,
+         },
+      }
+
       firebase
-         .createUserInAuthAndFirebase(valuesWithUtmParams)
+         .createUserInAuthAndFirebase(valuesWithUtmParams, additionalData)
          .then(() => {
             firebase
                .signInWithEmailAndPassword(values.email, values.password)
@@ -166,10 +195,7 @@ function SignUpUserForm() {
                      })
                      await userRepo.updateUserReminder(values.email, reminder)
                   } catch (e) {
-                     errorLogAndNotify(e, {
-                        message: "Error updating user reminder",
-                        email: values.email,
-                     })
+                     console.error(e)
                   }
                })
                .then(() => {
@@ -184,18 +210,11 @@ function SignUpUserForm() {
                   dataLayerEvent("signup_credentials_completed")
                })
                .catch((e) => {
-                  errorLogAndNotify(e, {
-                     message: "Error signing in with email and password",
-                     email: values.email,
-                  })
+                  console.error(e)
                   void push("/login")
                })
          })
          .catch((error) => {
-            errorLogAndNotify(error, {
-               message: "Error creating user in Auth and Firebase",
-               email: values.email,
-            })
             setErrorMessage(error)
             setGeneralLoading(false)
             setSubmitting(false)
@@ -219,6 +238,7 @@ function SignUpUserForm() {
                handleSubmit,
                setFieldValue,
                isSubmitting,
+               setFieldError,
                /* and other goodies */
             }) => (
                <form id="signUpForm" onSubmit={handleSubmit}>
@@ -351,6 +371,89 @@ function SignUpUserForm() {
                            }
                         />
                      </Grid>
+
+                     {talentProfileV1 ? (
+                        <>
+                           <Grid item xs={12} sm={6}>
+                              <Box>
+                                 <DatePicker
+                                    sx={styles.datePicker}
+                                    value={values.startedAt}
+                                    views={["year", "month"]}
+                                    label="Start date"
+                                    onChange={(date) => {
+                                       setFieldValue("startedAt", date, true)
+                                       if (
+                                          date &&
+                                          values.endedAt &&
+                                          date >
+                                             DateTime.fromJSDate(values.endedAt)
+                                                .minus({ months: 1 })
+                                                .toJSDate()
+                                       ) {
+                                          setFieldError(
+                                             "endedAt",
+                                             "Ended at cannot be before started at"
+                                          )
+                                       }
+                                    }}
+                                    disabled={submitting(isSubmitting)}
+                                 />
+                              </Box>
+                           </Grid>
+                           <Grid item xs={12} sm={6}>
+                              <Box>
+                                 <DatePicker
+                                    sx={styles.datePicker}
+                                    value={values.endedAt}
+                                    onChange={(date) => {
+                                       setFieldValue("endedAt", date, true)
+                                    }}
+                                    onError={(error) => {
+                                       switch (error) {
+                                          case "minDate": {
+                                             setFieldError(
+                                                "endedAt",
+                                                "Ended at cannot be before started at"
+                                             )
+                                             break
+                                          }
+
+                                          case "invalidDate": {
+                                             setFieldError(
+                                                "endedAt",
+                                                "Ended at is not valid"
+                                             )
+                                             break
+                                          }
+
+                                          default: {
+                                             setFieldError("endedAt", "")
+                                             break
+                                          }
+                                       }
+                                    }}
+                                    disabled={
+                                       !values.startedAt ||
+                                       submitting(isSubmitting)
+                                    }
+                                    views={["year", "month"]}
+                                    label="End date (or expected)"
+                                    minDate={DateTime.fromJSDate(
+                                       values.startedAt
+                                    )
+                                       .plus({ months: 1 })
+                                       .toJSDate()}
+                                 />
+                                 {errors.endedAt ? (
+                                    <FormHelperText sx={{ ml: "16px" }} error>
+                                       {errors.endedAt.toString()}
+                                    </FormHelperText>
+                                 ) : null}
+                              </Box>
+                           </Grid>
+                        </>
+                     ) : null}
                      <Grid item xs={12}>
                         <TermsAgreement
                            onChange={handleChange}
