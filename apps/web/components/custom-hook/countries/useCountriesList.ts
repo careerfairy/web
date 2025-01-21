@@ -15,18 +15,19 @@ const swrOptions: SWRConfiguration = {
       }),
 }
 
-const useCountriesList = () => {
+const useCountriesList = (suspense = true) => {
    const fetcher = useFunctionsSWR<Record<string, CountryOption>>()
 
-   const { data, error, isLoading } = useSWR<Record<string, CountryOption>>(
-      ["fetchCountriesList"],
-      fetcher,
-      swrOptions
-   )
+   const { data, error, isLoading, mutate } = useSWR<
+      Record<string, CountryOption>
+   >(["fetchCountriesList"], fetcher, {
+      ...swrOptions,
+      suspense,
+   })
 
    const countries = data ?? {}
 
-   return { data: countries, error, isLoading }
+   return { data: countries, error, isLoading, mutate }
 }
 
 export default useCountriesList
