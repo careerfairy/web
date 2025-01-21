@@ -1,9 +1,9 @@
 import { Button, Typography, useMediaQuery } from "@mui/material"
 import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import FramerBox from "components/views/common/FramerBox"
+import Link from "components/views/common/Link"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { AnimatePresence } from "framer-motion"
-import { useRouter } from "next/router"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { Play } from "react-feather"
 import { useModuleData } from "store/selectors/talentGuideSelectors"
@@ -197,8 +197,6 @@ type BottomContentProps = {
 }
 
 const BottomContent = ({ nextModule }: BottomContentProps) => {
-   const { push } = useRouter()
-
    return (
       <Fragment>
          <Typography
@@ -222,12 +220,10 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
             size="large"
             startIcon={<Play />}
             fullWidth
+            component={Link}
+            noLinkStyle
+            href={nextModule ? `/levels/${nextModule.slug}` : "/levels"}
             sx={nextModuleStyles.bottomButton}
-            onClick={() => {
-               if (nextModule) {
-                  push(`/levels/${nextModule.slug}`)
-               }
-            }}
          >
             Start next level
          </Button>

@@ -1,6 +1,7 @@
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import { Box } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import Link from "next/link"
 import { Fragment } from "react"
 import { useIsLoadingNextStep } from "store/selectors/talentGuideSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
@@ -30,26 +31,31 @@ const styles = sxStyles({
    },
 })
 
-export const FloatingButton = ({
-   children,
-   sx,
-   ...props
-}: LoadingButtonProps) => {
+type Props = LoadingButtonProps & {
+   href?: string
+}
+
+export const FloatingButton = ({ children, sx, ...props }: Props) => {
    const isMobile = useIsMobile()
    const isLoading = useIsLoadingNextStep()
+
+   const ButtonWrapper = props.href ? Link : Fragment
+   const ButtonWrapperProps = props.href ? { href: props.href } : {}
 
    return (
       <Fragment>
          <Box sx={styles.buttonOffset} />
-         <LoadingButton
-            size="large"
-            fullWidth={isMobile}
-            sx={combineStyles(styles.button, sx)}
-            {...props}
-            loading={isLoading || props.loading}
-         >
-            {children}
-         </LoadingButton>
+         <ButtonWrapper {...ButtonWrapperProps}>
+            <LoadingButton
+               size="large"
+               fullWidth={isMobile}
+               sx={combineStyles(styles.button, sx)}
+               {...props}
+               loading={isLoading || props.loading}
+            >
+               {children}
+            </LoadingButton>
+         </ButtonWrapper>
       </Fragment>
    )
 }
