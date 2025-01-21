@@ -5,6 +5,7 @@ import {
 import {
    CompanyFollowed,
    RegisteredLivestreams,
+   StudyBackground,
    UserData,
 } from "@careerfairy/shared-lib/users"
 import {
@@ -79,6 +80,8 @@ export interface IUserFunctionsRepository extends IUserRepository {
       userEmails?: string[],
       locationFilters?: string[]
    ): Promise<RegisteredLivestreams[]>
+
+   getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]>
 }
 
 export class UserFunctionsRepository
@@ -449,5 +452,17 @@ export class UserFunctionsRepository
       const querySnapshot = await query.get()
 
       return querySnapshot.docs.map((doc) => doc.data())
+   }
+
+   async getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]> {
+      const querySnapshot = await this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("studyBackgrounds")
+         .get()
+
+      return querySnapshot.empty
+         ? []
+         : querySnapshot.docs.map((doc) => doc.data() as StudyBackground)
    }
 }
