@@ -41,6 +41,10 @@ export const NextModuleSection = ({ nextModule }: Props) => {
    const moduleData = useModuleData()
 
    const [cardOffset, setCardOffset] = useState(0)
+   console.log(
+      "🚀 ~ file: NextModuleSection.tsx:44 ~ NextModuleSection ~ cardOffset:",
+      cardOffset
+   )
 
    const isShortScreen = useMediaQuery("(max-height: 745px)")
 
@@ -60,6 +64,11 @@ export const NextModuleSection = ({ nextModule }: Props) => {
    }, [])
 
    useEffect(() => {
+      console.log("🚀", {
+         completedCardRef: completedCardRef.current,
+         dividerRef: dividerRef.current,
+         hasShineAnimationComplete: animationsState.hasShineAnimationComplete,
+      })
       if (
          completedCardRef.current &&
          dividerRef.current &&
@@ -67,8 +76,14 @@ export const NextModuleSection = ({ nextModule }: Props) => {
       ) {
          const cardHeight =
             completedCardRef.current.getBoundingClientRect().height
+         console.log("🚀 ~ cardHeight:", cardHeight)
+
          const scaledHeight = cardHeight * SHRINK_FACTOR
+         console.log("🚀 ~ scaledHeight:", scaledHeight)
+
          const offset = (cardHeight - scaledHeight) / 2
+         console.log("🚀 ~ offset:", offset)
+
          setCardOffset(offset)
       }
    }, [animationsState.hasShineAnimationComplete])
