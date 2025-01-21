@@ -200,18 +200,19 @@ const csp = {
 }
 
 if (notProduction) {
-   csp["default-src"].push("localhost:*")
-   csp["default-src"].push("127.0.0.1:*")
-   csp["default-src"].push("http://127.0.0.1:*")
-   csp["connect-src"].push("localhost:*")
-   csp["connect-src"].push("127.0.0.1:*")
-   csp["connect-src"].push("http://127.0.0.1:*")
-   csp["img-src"].push("localhost:*")
-   csp["img-src"].push("127.0.0.1:*")
-   csp["img-src"].push("http://127.0.0.1:*")
-   csp["media-src"].push("localhost:*")
-   csp["media-src"].push("127.0.0.1:*")
-   csp["media-src"].push("http://127.0.0.1:*")
+   const allowedPorts = [
+      "*:3000", // Next.js
+      "*:5000", // Hosting
+      "*:5001", // Functions
+      "*:8080", // Firestore
+      "*:9099", // Auth
+      "*:9199", // Storage
+   ]
+
+   csp["default-src"].push(...allowedPorts)
+   csp["connect-src"].push(...allowedPorts, "ws:*") // For WebSocket connections
+   csp["img-src"].push(...allowedPorts)
+   csp["media-src"].push(...allowedPorts)
 }
 
 if (isVercelPreview) {
