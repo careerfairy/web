@@ -95,7 +95,7 @@ export const CourseDetails = ({
                         variant={isOverlay ? "xsmall" : "small"}
                         component="p"
                      >
-                        {levels.length} levels
+                        {levels.length} Levels
                      </Typography>
                   </Stack>
                   <Stack direction="row" alignItems="center" spacing={0.5}>
