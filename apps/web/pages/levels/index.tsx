@@ -4,6 +4,7 @@ import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
+import { getTalentGuideOverviewSeoProps } from "util/seo/talentGuideSeo"
 import SEO from "../../components/util/SEO"
 import { LevelsContainer } from "../../components/views/levels/components/LevelsContainer"
 import {
@@ -20,11 +21,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ pages }) => {
 
    return (
       <Fragment>
-         <SEO
-            title="CareerFairy | Levels"
-            description="Enhance your job search journey with expert-curated learning modules. Get in-depth insights, company perspectives, and practical guidance tailored to each stage of your career development."
-            noIndex={isPreview}
-         />
+         <SEO {...getTalentGuideOverviewSeoProps(pages, isPreview)} />
          <GenericDashboardLayout pageDisplayName="Levels">
             <LevelsContainer pages={pages} />
             {Boolean(isPreview) && <PreviewModeAlert />}

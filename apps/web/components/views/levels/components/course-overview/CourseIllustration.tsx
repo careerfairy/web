@@ -48,5 +48,5 @@ export const CourseIllustration = ({ isMobile, children }: Props) => {
    )
 }
 
-const ILLUSTRATION_URL =
+export const ILLUSTRATION_URL =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/levels%2Fperson-with-laptop.jpg?alt=media&token=b9ed8f45-5ec8-4194-8dcc-7f40c3a55b7a"
