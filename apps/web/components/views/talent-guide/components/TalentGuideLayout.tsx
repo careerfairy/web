@@ -8,7 +8,7 @@ import {
 
 const styles = sxStyles({
    root: (theme) => ({
-      minHeight: "100vh",
+      minHeight: "100dvh",
       position: "relative",
       bgcolor: theme.brand.white[300],
    }),

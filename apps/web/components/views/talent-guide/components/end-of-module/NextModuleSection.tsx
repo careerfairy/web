@@ -227,7 +227,7 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
             color="primary"
             variant="contained"
             size="large"
-            startIcon={<Play />}
+            endIcon={<Play />}
             fullWidth
             component={Link}
             noLinkStyle

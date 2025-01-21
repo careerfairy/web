@@ -12,7 +12,7 @@ const styles = sxStyles({
       width: "100%",
       position: "relative",
       minHeight: "100dvh",
-      mb: 5,
+      mb: 12,
    },
    desktopRoot: {
       pt: "-3px",

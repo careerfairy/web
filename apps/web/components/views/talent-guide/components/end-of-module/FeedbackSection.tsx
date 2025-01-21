@@ -26,7 +26,7 @@ export const FeedbackSection = ({
          sx={[
             feedbackStyles.section,
             {
-               pb: isShorterScreen ? 3.5 : 4,
+               pb: isShorterScreen ? 3.5 : "5%",
             },
          ]}
       >
