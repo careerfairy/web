@@ -2,6 +2,7 @@ import { Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import Link from "next/link"
+import { forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
 import { Details } from "./Details"
 import { Status } from "./Status"
@@ -72,46 +73,46 @@ type Props = {
    hasLighting?: boolean
 }
 
-export const ModuleCard = ({
-   module,
-   interactive,
-   isRecommended,
-   onShineAnimationComplete,
-}: Props) => {
-   const isMobile = useIsMobile()
+export const ModuleCard = forwardRef<HTMLDivElement, Props>(
+   ({ module, interactive, isRecommended, onShineAnimationComplete }, ref) => {
+      const isMobile = useIsMobile()
 
-   const CardWrapper = interactive ? Link : Stack
-   const cardProps = interactive
-      ? {
-           href: `/levels/${module.slug}`,
-        }
-      : {}
+      const CardWrapper = interactive ? Link : Stack
+      const cardProps = interactive
+         ? {
+              href: `/levels/${module.slug}`,
+           }
+         : {}
 
-   return (
-      <Stack
-         component={CardWrapper}
-         {...cardProps}
-         direction="row"
-         spacing={1.5}
-         sx={[
-            styles.card,
-            interactive && styles.interactive,
-            isRecommended && styles.recommended,
-            // hasLighting && styles.lighting,
-         ]}
-      >
-         <Thumbnail thumbnailUrl={module.content.moduleIllustration?.url} />
+      return (
          <Stack
-            data-testid="module-card-content"
-            spacing={isMobile ? 1 : 1.5}
-            sx={styles.content}
+            ref={ref}
+            component={CardWrapper}
+            {...cardProps}
+            direction="row"
+            spacing={1.5}
+            sx={[
+               styles.card,
+               interactive && styles.interactive,
+               isRecommended && styles.recommended,
+               // hasLighting && styles.lighting,
+            ]}
          >
-            <Status
-               onShineAnimationComplete={onShineAnimationComplete}
-               module={module.content}
-            />
-            <Details module={module.content} />
+            <Thumbnail thumbnailUrl={module.content.moduleIllustration?.url} />
+            <Stack
+               data-testid="module-card-content"
+               spacing={isMobile ? 1 : 1.5}
+               sx={styles.content}
+            >
+               <Status
+                  onShineAnimationComplete={onShineAnimationComplete}
+                  module={module.content}
+               />
+               <Details module={module.content} />
+            </Stack>
          </Stack>
-      </Stack>
-   )
-}
+      )
+   }
+)
+
+ModuleCard.displayName = "ModuleCard"

@@ -1,5 +1,4 @@
 import { Button, Typography, useMediaQuery } from "@mui/material"
-import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import FramerBox from "components/views/common/FramerBox"
 import Link from "components/views/common/Link"
 import { Page, TalentGuideModule } from "data/hygraph/types"
@@ -14,6 +13,7 @@ import {
    nextModuleVariants,
 } from "./animations"
 import { nextModuleStyles } from "./styles"
+import { useDelayedValue } from "./useDelayedValue"
 
 type Props = {
    nextModule: Page<TalentGuideModule> | null
@@ -23,9 +23,9 @@ const SHRINK_FACTOR = 0.7
 
 type AnimationsState = {
    hasShineAnimationComplete: boolean
-   hasDividerAnimationComplete: boolean
    hasCompletedModuleCardSlidUp: boolean
    hasNextModuleCardAppeared: boolean
+   hasDividerAnimationComplete: boolean
 }
 
 export const NextModuleSection = ({ nextModule }: Props) => {
@@ -36,15 +36,9 @@ export const NextModuleSection = ({ nextModule }: Props) => {
       hasNextModuleCardAppeared: false,
    })
 
-   useTraceUpdate(animationsState)
-
    const moduleData = useModuleData()
 
    const [cardOffset, setCardOffset] = useState(0)
-   console.log(
-      "🚀 ~ file: NextModuleSection.tsx:44 ~ NextModuleSection ~ cardOffset:",
-      cardOffset
-   )
 
    const isShortScreen = useMediaQuery("(max-height: 745px)")
 
@@ -64,11 +58,6 @@ export const NextModuleSection = ({ nextModule }: Props) => {
    }, [])
 
    useEffect(() => {
-      console.log("🚀", {
-         completedCardRef: completedCardRef.current,
-         dividerRef: dividerRef.current,
-         hasShineAnimationComplete: animationsState.hasShineAnimationComplete,
-      })
       if (
          completedCardRef.current &&
          dividerRef.current &&
@@ -76,17 +65,19 @@ export const NextModuleSection = ({ nextModule }: Props) => {
       ) {
          const cardHeight =
             completedCardRef.current.getBoundingClientRect().height
-         console.log("🚀 ~ cardHeight:", cardHeight)
 
          const scaledHeight = cardHeight * SHRINK_FACTOR
-         console.log("🚀 ~ scaledHeight:", scaledHeight)
 
          const offset = (cardHeight - scaledHeight) / 2
-         console.log("🚀 ~ offset:", offset)
 
          setCardOffset(offset)
       }
    }, [animationsState.hasShineAnimationComplete])
+
+   const hasCompletedModuleCardSlidUp = useDelayedValue(
+      animationsState.hasCompletedModuleCardSlidUp,
+      500
+   )
 
    return (
       <FramerBox
@@ -100,7 +91,6 @@ export const NextModuleSection = ({ nextModule }: Props) => {
       >
          <AnimatePresence mode="popLayout">
             <FramerBox
-               ref={completedCardRef}
                layout
                initial={{ scale: 1, y: 0 }}
                animate={{
@@ -127,6 +117,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                }}
             >
                <ModuleCard
+                  ref={completedCardRef}
                   module={moduleData}
                   onShineAnimationComplete={() => {
                      setAnimationsState((prev) => ({
@@ -190,7 +181,10 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   }}
                />
                <ModuleCard
-                  isRecommended={animationsState.hasDividerAnimationComplete}
+                  isRecommended={
+                     hasCompletedModuleCardSlidUp ||
+                     animationsState.hasDividerAnimationComplete
+                  }
                   module={nextModule}
                />
             </FramerBox>
