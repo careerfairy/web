@@ -4,9 +4,14 @@ import {
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/rewards"
-import { UserData } from "@careerfairy/shared-lib/users"
+import {
+   StudyBackground,
+   UserAccountCreationAdditionalData,
+   UserData,
+} from "@careerfairy/shared-lib/users"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { FieldValue, auth, firestore } from "./api/firestoreAdmin"
+
+import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
 import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
 import config from "./config"
@@ -26,6 +31,9 @@ export const createNewUserAccount = functions
       }
 
       const userData = data.userData
+      const additionalData: UserAccountCreationAdditionalData =
+         data.additionalData
+
       const recipientEmail = data.userData.email.toLowerCase().trim()
       const pinCode = getRandomInt(9999)
       const {
@@ -82,6 +90,35 @@ export const createNewUserAccount = functions
                      ...registrationUTMsToSave,
                   })
                )
+               .then(async () => {
+                  if (additionalData?.studyBackground) {
+                     const studyBackgroundRef = firestore
+                        .collection("userData")
+                        .doc(recipientEmail)
+                        .collection("studyBackgrounds")
+                        .doc()
+
+                     const studyBackground: StudyBackground = {
+                        ...additionalData.studyBackground,
+                        id: studyBackgroundRef.id,
+                        authId: user.uid,
+                        startedAt: additionalData.studyBackground.startedAt
+                           ? Timestamp.fromDate(
+                                new Date(
+                                   additionalData.studyBackground.startedAt
+                                )
+                             )
+                           : null,
+                        endedAt: additionalData.studyBackground.endedAt
+                           ? Timestamp.fromDate(
+                                new Date(additionalData.studyBackground.endedAt)
+                             )
+                           : null,
+                     }
+
+                     await studyBackgroundRef.set(studyBackground)
+                  }
+               })
                .then(async () => {
                   try {
                      await marketingUsersRepo.delete(recipientEmail)

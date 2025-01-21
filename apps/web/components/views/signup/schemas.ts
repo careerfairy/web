@@ -1,6 +1,7 @@
-import { URL_REGEX } from "components/util/constants"
-import * as yup from "yup"
 import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
+import { URL_REGEX } from "components/util/constants"
+import { DateTime } from "luxon"
+import * as yup from "yup"
 
 export const signupSchema = {
    email: yup
@@ -71,6 +72,34 @@ export const signupSchema = {
    linkedinUrl: yup.string().matches(URL_REGEX, "Please enter a valid URL"),
    position: yup.string().max(50, "Cannot be longer than 50 characters"),
    avatar: yup.string(),
+   startedAt: yup
+      .date()
+      .nullable()
+      .typeError("Please enter a valid start date")
+      .when("endedAt", {
+         is: (val) => val != null, // Check if endedAt has a value
+         then: yup
+            .date()
+            .required("Start date is required when end date is provided"),
+      }),
+   endedAt: yup
+      .date()
+      .nullable()
+      .test(
+         "is-after-startedAt",
+         "End date must be after start date",
+         function (endedAt) {
+            const { startedAt } = this.parent
+            // Check if both dates are provided before validating
+            return (
+               !startedAt ||
+               !endedAt ||
+               endedAt >=
+                  DateTime.fromJSDate(startedAt).plus({ months: 1 }).toJSDate()
+            )
+         }
+      )
+      .typeError("Please enter a valid end date"),
 }
 
 export const pushNotificationsFilteringSchema = {

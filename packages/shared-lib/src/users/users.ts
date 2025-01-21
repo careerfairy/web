@@ -144,6 +144,13 @@ export type UserDataPersonalInfo = Pick<
    "firstName" | "lastName" | "countryIsoCode" | "stateIsoCode" | "cityIsoCode"
 >
 
+export type UserAccountCreationAdditionalData = {
+   studyBackground?: Omit<StudyBackground, "startedAt" | "endedAt"> & {
+      startedAt?: Date
+      endedAt?: Date
+   }
+}
+
 // Collection /userData/:id/studyBackgrounds/:id
 export interface StudyBackground extends Identifiable {
    authId: string

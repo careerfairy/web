@@ -83,7 +83,7 @@ import user = require("./user")
 import countries = require("./countries")
 
 // Auth
-exports.createNewUserAccount_v2 = auth.createNewUserAccount
+exports.createNewUserAccount_v3 = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
 exports.backfillUserData_eu = auth.backfillUserData
 exports.validateUserEmailWithPin_eu = auth.validateUserEmailWithPin
