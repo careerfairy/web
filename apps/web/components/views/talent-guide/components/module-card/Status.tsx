@@ -1,9 +1,10 @@
-import { Skeleton } from "@mui/material"
+import { Skeleton, Stack } from "@mui/material"
 import { useModuleProgress } from "components/custom-hook/talent-guide/useModuleProgress"
 import { TalentGuideModule } from "data/hygraph/types"
 import { useAuth } from "HOCs/AuthProvider"
+import { useModuleCardContext } from "./ModuleCard"
 import { ModuleCompletedChip } from "./ModuleCompletedChip"
-import { ModuleInfoChip } from "./ModuleInfoChip"
+import { LevelInfo, ModuleInfoChip } from "./ModuleInfoChip"
 import { statusStyles } from "./styles"
 
 type Props = {
@@ -49,6 +50,7 @@ export const Status = ({ module, onShineAnimationComplete }: Props) => {
 }
 
 const Content = ({ module, onShineAnimationComplete }: Props) => {
+   const { isMobile } = useModuleCardContext()
    const { moduleProgress, loading: isLoadingProgress } = useModuleProgress(
       module.id
    )
@@ -59,9 +61,19 @@ const Content = ({ module, onShineAnimationComplete }: Props) => {
 
    if (moduleProgress?.completedAt) {
       return (
-         <ModuleCompletedChip
-            onShineAnimationComplete={onShineAnimationComplete}
-         />
+         <Stack direction="row" justifyContent="space-between" spacing={1}>
+            {!isMobile && (
+               <LevelInfo
+                  moduleLevel={module.level}
+                  estimatedModuleDurationMinutes={
+                     module.estimatedModuleDurationMinutes
+                  }
+               />
+            )}
+            <ModuleCompletedChip
+               onShineAnimationComplete={onShineAnimationComplete}
+            />
+         </Stack>
       )
    }
 

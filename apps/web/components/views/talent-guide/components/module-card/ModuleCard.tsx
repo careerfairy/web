@@ -2,7 +2,7 @@ import { Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import Link from "next/link"
-import { forwardRef } from "react"
+import { createContext, forwardRef, useContext, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { Details } from "./Details"
 import { Status } from "./Status"
@@ -55,6 +55,14 @@ const styles = sxStyles({
    },
 })
 
+type ModuleCardContextType = {
+   isMobile: boolean
+}
+
+const ModuleCardContext = createContext<ModuleCardContextType | undefined>(
+   undefined
+)
+
 type Props = {
    module: Page<TalentGuideModule>
    /**
@@ -63,12 +71,24 @@ type Props = {
    interactive?: boolean
    isRecommended?: boolean
    onShineAnimationComplete?: () => void
+   /**
+    * Controls mobile responsiveness. Falls back to auto-detection if omitted
+    */
+   overrideIsMobile?: boolean
 }
 
 export const ModuleCard = forwardRef<HTMLDivElement, Props>(
-   ({ module, interactive, isRecommended, onShineAnimationComplete }, ref) => {
-      const isMobile = useIsMobile()
-
+   (
+      {
+         module,
+         interactive,
+         isRecommended,
+         onShineAnimationComplete,
+         overrideIsMobile,
+      },
+      ref
+   ) => {
+      const isDefaultMobile = useIsMobile()
       const CardWrapper = interactive ? Link : Stack
       const cardProps = interactive
          ? {
@@ -76,34 +96,51 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
            }
          : {}
 
+      const value = useMemo(
+         () => ({ isMobile: overrideIsMobile ?? isDefaultMobile }),
+         [overrideIsMobile, isDefaultMobile]
+      )
+
       return (
-         <Stack
-            ref={ref}
-            component={CardWrapper}
-            {...cardProps}
-            direction="row"
-            spacing={1.5}
-            sx={[
-               styles.card,
-               interactive && styles.interactive,
-               isRecommended && styles.recommended,
-            ]}
-         >
-            <Thumbnail thumbnailUrl={module.content.moduleIllustration?.url} />
+         <ModuleCardContext.Provider value={value}>
             <Stack
-               data-testid="module-card-content"
-               spacing={isMobile ? 1 : 1.5}
-               sx={styles.content}
+               ref={ref}
+               component={CardWrapper}
+               {...cardProps}
+               direction="row"
+               spacing={1.5}
+               sx={[
+                  styles.card,
+                  interactive && styles.interactive,
+                  isRecommended && styles.recommended,
+               ]}
             >
-               <Status
-                  onShineAnimationComplete={onShineAnimationComplete}
-                  module={module.content}
+               <Thumbnail
+                  thumbnailUrl={module.content.moduleIllustration?.url}
                />
-               <Details module={module.content} />
+               <Stack
+                  data-testid="module-card-content"
+                  spacing={value.isMobile ? 1 : 1.5}
+                  sx={styles.content}
+               >
+                  <Status
+                     onShineAnimationComplete={onShineAnimationComplete}
+                     module={module.content}
+                  />
+                  <Details module={module.content} />
+               </Stack>
             </Stack>
-         </Stack>
+         </ModuleCardContext.Provider>
       )
    }
 )
+
+export const useModuleCardContext = () => {
+   const context = useContext(ModuleCardContext)
+   if (context === undefined) {
+      throw new Error("useModuleCardContext must be used within a ModuleCard")
+   }
+   return context
+}
 
 ModuleCard.displayName = "ModuleCard"
