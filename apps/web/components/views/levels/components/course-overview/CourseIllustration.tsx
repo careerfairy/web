@@ -4,7 +4,7 @@ import { ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   root: {
+   overlayRoot: {
       width: "100%",
       borderRadius: "8px",
       position: "relative",
@@ -28,20 +28,22 @@ type Props = {
 
 export const CourseIllustration = ({ isMobile, children }: Props) => {
    return (
-      <Box
-         width={isMobile ? "100%" : 360}
-         height={isMobile ? 194 : 99}
-         sx={styles.root}
-      >
-         <Image
-            src={ILLUSTRATION_URL}
-            alt="Quick start your career"
-            style={styles.image}
-            fill
-            sizes={isMobile ? "100vw" : "360px"}
-         />
-         <Box sx={styles.overlay} />
-         {children}
+      <Box p={isMobile ? 0 : 1}>
+         <Box
+            width={isMobile ? "100%" : 360}
+            height={isMobile ? 194 : 99}
+            sx={styles.overlayRoot}
+         >
+            <Image
+               src={ILLUSTRATION_URL}
+               alt="Quick start your career"
+               style={styles.image}
+               fill
+               sizes={isMobile ? "100vw" : "360px"}
+            />
+            <Box sx={styles.overlay} />
+            {children}
+         </Box>
       </Box>
    )
 }

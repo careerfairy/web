@@ -41,9 +41,7 @@ export const TalentGuideEndLayout = () => {
    const [someTimeHasPassed, setSomeTimeHasPassed] = useState(false)
    const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
    const [isRedirectingToOverview, setIsRedirectingToOverview] = useState(false)
-
-   const isShortScreen = useMediaQuery("(max-height: 800px)")
-   const isShorterScreen = useMediaQuery("(max-height: 530px)")
+   const isShorterScreen = useMediaQuery("(max-height: 590px)")
 
    const { data: nextModule, isLoading: isLoadingNextModule } =
       useNextTalentGuideModule(authenticatedUser?.uid, "de", {
@@ -93,13 +91,16 @@ export const TalentGuideEndLayout = () => {
          <Zoom unmountOnExit style={styles.zoomDelay} in={showNextModule}>
             <BackButton size={24} sx={styles.backButton} />
          </Zoom>
-         <Box id="talent-guide-end-layout" sx={layoutStyles.root}>
+         <Box
+            id="talent-guide-end-layout"
+            overflow="hidden"
+            sx={layoutStyles.root}
+         >
             <AnimatePresence>
                {Boolean(showCongrats) && (
                   <CongratsSection
                      key="congrats"
                      isShorterScreen={isShorterScreen}
-                     isShortScreen={isShortScreen}
                   />
                )}
                {Boolean(showFeedback) && (

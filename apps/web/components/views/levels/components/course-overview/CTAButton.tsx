@@ -2,6 +2,7 @@ import { Button, ButtonProps } from "@mui/material"
 import Link from "components/views/common/Link"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { forwardRef } from "react"
+import { Play } from "react-feather"
 
 type CTAButtonProps = ButtonProps & {
    nextLevel: Page<TalentGuideModule>
@@ -19,6 +20,7 @@ export const CTAButton = forwardRef<HTMLButtonElement, CTAButtonProps>(
             component={Link}
             noLinkStyle
             href={`/levels/${nextLevel.slug}`}
+            endIcon={<Play />}
             {...props}
          >
             Start course {nextLevel.content.level}

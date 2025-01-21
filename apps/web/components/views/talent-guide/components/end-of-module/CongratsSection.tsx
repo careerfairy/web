@@ -51,16 +51,15 @@ const CongratsMessage = () => {
 
 type Props = {
    isShorterScreen: boolean
-   isShortScreen: boolean
 }
 
-export const CongratsSection = ({ isShorterScreen, isShortScreen }: Props) => {
+export const CongratsSection = ({ isShorterScreen }: Props) => {
    return (
       <FramerBox
          initial="initial"
          animate="animate"
          exit="exit"
-         variants={getCongratsVariants(isShorterScreen, isShortScreen)}
+         variants={getCongratsVariants(isShorterScreen)}
          transition={{ duration: 0.5, ease: "easeOut" }}
       >
          <CongratsMessage />
@@ -84,20 +83,13 @@ const iconAnimation: FramerBoxProps = {
    },
 }
 
-const getCongratsVariants = (
-   isShorterScreen: boolean,
-   isShortScreen: boolean
-): Variants => {
+const getCongratsVariants = (isShorterScreen: boolean): Variants => {
    return {
       initial: { opacity: 0, y: "-100%" },
       animate: {
          opacity: 1,
          y: 0,
-         transform: isShorterScreen
-            ? undefined
-            : isShortScreen
-            ? "translateY(-50%)"
-            : "translateY(-40%)",
+         transform: isShorterScreen ? undefined : "translateY(-40%)",
          transition: {
             type: "spring",
             bounce: 0.3,
