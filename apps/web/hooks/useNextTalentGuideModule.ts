@@ -8,14 +8,16 @@ const fetchNextModule = async (
    userAuthUid: string | null,
    locale: string = "en"
 ): Promise<Page<TalentGuideModule> | null> => {
-   if (!userAuthUid) return null
-
    // Get all modules from API
    const response = await fetch(`/api/levels/modules?locale=${locale}`)
    if (!response.ok) {
       throw new Error("Failed to fetch existing modules")
    }
    const allModules = (await response.json()) as Page<TalentGuideModule>[]
+
+   if (!userAuthUid && allModules.length) {
+      return allModules[0] // Return the first module if no user is logged in
+   }
 
    // Get next module using the progress service
    return talentGuideProgressService.getNextModule(userAuthUid, allModules)
@@ -37,15 +39,14 @@ export function useNextTalentGuideModule(
    const { cache } = useSWRConfig()
    const random = useRef(Date.now())
 
-   const key = userAuthUid
-      ? `next-levels-module-${userAuthUid}-${locale}${
-           options?.noCache ? `-${random.current}` : ""
-        }`
-      : null
+   const key = `next-levels-module-${userAuthUid}-${locale}${
+      options?.noCache ? `-${random.current}` : ""
+   }`
 
    const swr = useSWR(key, () => fetchNextModule(userAuthUid, locale), {
       ...reducedRemoteCallsOptions,
       ...options,
+      suspense: false,
    })
 
    // Cleanup cache when component unmounts (only if noCache is true)

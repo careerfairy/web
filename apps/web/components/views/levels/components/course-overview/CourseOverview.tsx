@@ -62,7 +62,8 @@ const copy = {
 
 export const CourseOverview = ({ modules, isMobile }: Props) => {
    const { authenticatedUser } = useAuth()
-   const { data: nextModule } = useNextTalentGuideModule(authenticatedUser.uid)
+   const { data: nextModule, isLoading: isLoadingNextModule } =
+      useNextTalentGuideModule(authenticatedUser?.uid)
    const { data: overallProgress = 0 } = useOverallTalentGuideProgress(
       authenticatedUser.uid,
       modules
@@ -83,6 +84,7 @@ export const CourseOverview = ({ modules, isMobile }: Props) => {
                            nextLevel={nextModule}
                            copy={copy}
                            overallProgress={overallProgress}
+                           isLoadingNextModule={isLoadingNextModule}
                         />
                      </Box>
                   ) : null}
@@ -94,6 +96,7 @@ export const CourseOverview = ({ modules, isMobile }: Props) => {
                      nextLevel={nextModule}
                      copy={copy}
                      overallProgress={overallProgress}
+                     isLoadingNextModule={isLoadingNextModule}
                   />
                )}
             </Stack>
