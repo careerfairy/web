@@ -23,6 +23,7 @@ import { Formik } from "formik"
 import { DateTime } from "luxon"
 import { useRouter } from "next/router"
 import React, { Fragment, useContext, useEffect, useState } from "react"
+import { errorLogAndNotify } from "util/CommonUtil"
 import * as yup from "yup"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -195,7 +196,10 @@ function SignUpUserForm() {
                      })
                      await userRepo.updateUserReminder(values.email, reminder)
                   } catch (e) {
-                     console.error(e)
+                     errorLogAndNotify(e, {
+                        message: "Error updating user reminder",
+                        email: values.email,
+                     })
                   }
                })
                .then(() => {
@@ -210,11 +214,18 @@ function SignUpUserForm() {
                   dataLayerEvent("signup_credentials_completed")
                })
                .catch((e) => {
-                  console.error(e)
+                  errorLogAndNotify(e, {
+                     message: "Error signing in with email and password",
+                     email: values.email,
+                  })
                   void push("/login")
                })
          })
          .catch((error) => {
+            errorLogAndNotify(error, {
+               message: "Error creating user in Auth and Firebase",
+               email: values.email,
+            })
             setErrorMessage(error)
             setGeneralLoading(false)
             setSubmitting(false)
