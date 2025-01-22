@@ -11,6 +11,7 @@ import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
 import { Audio } from "expo-av"
 import { Camera } from "expo-camera"
 import * as Notifications from "expo-notifications"
+import * as ScreenOrientation from "expo-screen-orientation"
 import * as SecureStore from "expo-secure-store"
 import * as WebBrowser from "expo-web-browser"
 import React, { useCallback, useEffect, useRef, useState } from "react"
@@ -111,6 +112,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    onLogout,
 }) => {
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
+   const [currentUrl, setCurrentUrl] = useState(baseUrl)
    const webViewRef = useRef<WebView>(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
@@ -346,6 +348,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const handleNavigationStateChange = (navState: any) => {
       const { url } = navState
+      setCurrentUrl(url)
       if (
          url?.includes(INCLUDES_PERMISSIONS) &&
          (!hasAudioPermissions || !hasVideoPermissions)
@@ -380,7 +383,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const isAndroid = Platform.OS === "android"
 
-   const isAgoraPage = agoraPages.some((page) => baseUrl.includes(page))
+   const isAgoraPage = agoraPages.some((page) => currentUrl.includes(page))
 
    const openOnWebBrowser = useCallback(
       async (url: string) => {
@@ -503,6 +506,27 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
       webViewRef.current.postMessage(messageString)
    }
+
+   /**
+    * Only allow landscape orientation when on streaming page
+    */
+   useEffect(() => {
+      const handleScreenOrientation = async () => {
+         try {
+            if (isAgoraPage) {
+               await ScreenOrientation.unlockAsync()
+            } else {
+               await ScreenOrientation.lockAsync(
+                  ScreenOrientation.OrientationLock.PORTRAIT_UP
+               )
+            }
+         } catch (error) {
+            console.error("Failed to update screen orientation:", error)
+         }
+      }
+
+      handleScreenOrientation()
+   }, [isAgoraPage, baseUrl])
 
    return (
       <SafeAreaView style={styles.container}>
