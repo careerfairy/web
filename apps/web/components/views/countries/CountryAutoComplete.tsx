@@ -11,12 +11,14 @@ const countries = Object.keys(universityCountriesMap).map((key) => ({
 type CountryAutoCompleteProps = {
    countryValueId?: string
    disabled?: boolean
+   onFocus?: () => void
    handleSelectedCountryChange: (country: CountryOption | null) => void
 }
 
 export const CountryAutoComplete = ({
    countryValueId,
    disabled,
+   onFocus,
    handleSelectedCountryChange,
 }: CountryAutoCompleteProps) => {
    const [country, setCountry] = useState<CountryOption | null>(() => {
@@ -37,6 +39,7 @@ export const CountryAutoComplete = ({
             setCountry(value ?? null)
             handleSelectedCountryChange(value ?? null)
          }}
+         onFocus={onFocus}
          getOptionLabel={(option) => option.name}
          getOptionKey={(option) => option.id}
          isOptionEqualToValue={(option, value) => option?.id === value?.id}

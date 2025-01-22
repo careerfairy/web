@@ -12,6 +12,7 @@ type CityAutoCompleteProps = {
    countryId?: string
    handleSelectedCityChange: (city: CityOption | null) => void
    loading?: boolean
+   onFocus?: () => void
 }
 
 export const CityAutoComplete = ({
@@ -20,6 +21,7 @@ export const CityAutoComplete = ({
    countryId,
    handleSelectedCityChange,
    loading,
+   onFocus,
 }: CityAutoCompleteProps) => {
    const [options, setOptions] = useState<CityOption[]>([])
    const [inputValue, setInputValue] = useState(value?.name ?? "")
@@ -66,6 +68,7 @@ export const CityAutoComplete = ({
                ? "No results found"
                : "Start typing to search (at least 2 characters)"
          }
+         onFocus={onFocus}
          filterOptions={(x) => x}
          getOptionLabel={(option) => option.name}
          getOptionKey={(option) => option.id}

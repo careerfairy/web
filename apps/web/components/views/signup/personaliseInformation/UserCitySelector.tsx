@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react"
 
 export const UserCitySelector = () => {
    const { userData } = useAuth()
-
+   const [hasFocused, setHasFocused] = useState<boolean>(false)
    const [userCountryCode, setUserCountryCode] = useState<string | null>(
       userData.countryIsoCode
    )
@@ -52,9 +52,10 @@ export const UserCitySelector = () => {
             disabled={!userData.countryIsoCode}
             loading={isLoading}
             countryId={userData.countryIsoCode}
+            onFocus={() => setHasFocused(true)}
             handleSelectedCityChange={handleSelectedCityChange}
          />
-         {userData.countryIsoCode && !isLoading && !city ? (
+         {userData.countryIsoCode && !isLoading && !city && hasFocused ? (
             <FormHelperText sx={{ color: "error.main", ml: 2 }}>
                Please select the city you are currently located in.
             </FormHelperText>
