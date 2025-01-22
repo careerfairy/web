@@ -1,7 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { useAuth } from "HOCs/AuthProvider"
-import { useNextTalentGuideModule } from "hooks/useNextTalentGuideModule"
 import { useOverallTalentGuideProgress } from "hooks/useOverallTalentGuideProgress"
 import { sxStyles } from "types/commonTypes"
 import { CourseDetails } from "./CourseDetails"
@@ -62,8 +61,7 @@ const copy = {
 
 export const CourseOverview = ({ modules, isMobile }: Props) => {
    const { authenticatedUser } = useAuth()
-   const { data: nextModule, isLoading: isLoadingNextModule } =
-      useNextTalentGuideModule(authenticatedUser?.uid)
+
    const { data: overallProgress = 0 } = useOverallTalentGuideProgress(
       authenticatedUser.uid,
       modules
@@ -81,10 +79,8 @@ export const CourseOverview = ({ modules, isMobile }: Props) => {
                         <CourseDetails
                            isOverlay
                            levels={modules}
-                           nextLevel={nextModule}
                            copy={copy}
                            overallProgress={overallProgress}
-                           isLoadingNextModule={isLoadingNextModule}
                         />
                      </Box>
                   ) : null}
@@ -93,10 +89,8 @@ export const CourseOverview = ({ modules, isMobile }: Props) => {
                   <CourseDetails
                      isOverlay={isMobile}
                      levels={modules}
-                     nextLevel={nextModule}
                      copy={copy}
                      overallProgress={overallProgress}
-                     isLoadingNextModule={isLoadingNextModule}
                   />
                )}
             </Stack>
