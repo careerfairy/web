@@ -364,7 +364,7 @@ class FirebaseService {
    }
 
    deleteUserAccount = () => {
-      return this.functions.httpsCallable("deleteLoggedInUserAccount_eu")()
+      return this.functions.httpsCallable("deleteLoggedInUserAccount_v2")()
    }
 
    setAnonymousJobApplicationsUserId = (
