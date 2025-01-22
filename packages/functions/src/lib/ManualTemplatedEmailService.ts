@@ -64,8 +64,10 @@ export class ManualTemplatedEmailService {
          overrideUsers
       )
 
-      const europeanUsers = users.filter((user) =>
-         EUROPEAN_COUNTRY_CODES.includes(user.universityCountryCode)
+      const europeanUsers = users?.filter(
+         (user) =>
+            !user.fcmTokens?.length &&
+            EUROPEAN_COUNTRY_CODES.includes(user.universityCountryCode)
       )
 
       this.subscribedUsers = convertDocArrayToDict(europeanUsers)
