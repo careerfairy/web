@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab"
 import {
    Box,
    Button,
@@ -6,15 +7,18 @@ import {
    FormHelperText,
    Link as MuiLink,
    Paper,
+   Stack,
    TextField,
    Typography,
 } from "@mui/material"
+import { useAppSelector } from "components/custom-hook/store"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { Formik } from "formik"
 import { Fragment, useContext, useState } from "react"
 import { useDispatch } from "react-redux"
 import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
+import * as actions from "store/actions"
 import { errorLogAndNotify } from "util/CommonUtil"
 import * as yup from "yup"
 import { useAuth } from "../../../../HOCs/AuthProvider"
@@ -41,9 +45,17 @@ const SignUpPinForm = () => {
    const [incorrectPin, setIncorrectPin] = useState(false)
    const [generalLoading, setGeneralLoading] = useState(false)
    const { authenticatedUser: user } = useAuth()
-   const { nextStep } = useContext<IMultiStepContext>(MultiStepContext)
+   const { nextStep, previousStep } =
+      useContext<IMultiStepContext>(MultiStepContext)
    const dispatch = useDispatch()
    const { data: fingerPrintId } = useFingerPrint()
+
+   const { loading } = useAppSelector((state) => state.auth)
+
+   const handleBack = () => {
+      dispatch(actions.deleteUser())
+      previousStep()
+   }
 
    async function resendVerificationEmail() {
       setGeneralLoading(true)
@@ -167,26 +179,34 @@ const SignUpPinForm = () => {
                         </FormHelperText>
                      </Collapse>
                   </Box>
-                  <Button
-                     size="large"
-                     type="submit"
-                     fullWidth
-                     data-testid={"validate-email-button"}
-                     color="primary"
-                     variant="contained"
-                     disabled={isSubmitting || generalLoading}
-                     endIcon={
-                        Boolean(isSubmitting || generalLoading) && (
-                           <CircularProgress color="inherit" size={20} />
-                        )
-                     }
-                  >
-                     {isSubmitting
-                        ? "Checking"
-                        : generalLoading
-                        ? "Resending"
-                        : "Validate Email"}
-                  </Button>
+                  <Stack justifyContent="flex-end" direction="row" spacing={1}>
+                     <LoadingButton
+                        onClick={handleBack}
+                        variant="text"
+                        color="primary"
+                        loading={loading}
+                     >
+                        Back
+                     </LoadingButton>
+                     <Button
+                        type="submit"
+                        data-testid={"validate-email-button"}
+                        color="primary"
+                        variant="contained"
+                        disabled={isSubmitting || generalLoading}
+                        endIcon={
+                           Boolean(isSubmitting || generalLoading) && (
+                              <CircularProgress color="inherit" size={20} />
+                           )
+                        }
+                     >
+                        {isSubmitting
+                           ? "Checking"
+                           : generalLoading
+                           ? "Resending"
+                           : "Validate Email"}
+                     </Button>
+                  </Stack>
                   {/* @ts-ignore */}
                   <Typography
                      style={{ marginTop: "0.5rem" }}
