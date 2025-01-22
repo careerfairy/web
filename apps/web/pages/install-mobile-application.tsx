@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import React, { useEffect } from "react"
 import UAParser from "ua-parser-js"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const APP_STORE_LINK =
    "https://apps.apple.com/ch/app/jobs-for-students-careerfairy/id6738385789"
@@ -27,8 +28,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
    const utmParams = new URLSearchParams(
       query as Record<string, string>
    ).toString()
+
    if (utmParams) {
-      destination = `${destination}?${utmParams}`
+      try {
+         const url = new URL(destination)
+         const params = new URLSearchParams(utmParams)
+
+         params.forEach((value, key) => {
+            url.searchParams.set(key, value)
+         })
+
+         destination = url.toString()
+      } catch (error) {
+         errorLogAndNotify(error, {
+            message:
+               "Install mobile application: Failed to update URL with query parameters",
+            context: { destination, utmParams },
+         })
+      }
    }
 
    if (destination) {
