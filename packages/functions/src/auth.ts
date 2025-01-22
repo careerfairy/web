@@ -526,6 +526,31 @@ export const backfillUserData = functions
       }
    })
 
+const deleteUserSubCollections = async (
+   userDocRef: FirebaseFirestore.DocumentReference
+) => {
+   try {
+      const bulkWriter = firestore.bulkWriter()
+      const collections = await userDocRef.listCollections()
+
+      for (const collection of collections) {
+         const querySnapshot = await collection.get()
+         querySnapshot.docs.forEach((doc) => {
+            void bulkWriter.delete(doc.ref).catch((error) => {
+               functions.logger.error(
+                  `Error deleting document ${doc.ref.path}:`,
+                  error
+               )
+            })
+         })
+      }
+
+      await bulkWriter.close()
+   } catch (error) {
+      functions.logger.error("Error deleting subcollections:", error)
+   }
+}
+
 export const deleteLoggedInUserAccount = functions
    .region(config.region)
    .https.onCall(async (_, context) => {
@@ -543,8 +568,14 @@ export const deleteLoggedInUserAccount = functions
       }
 
       try {
+         const userDocRef = firestore.collection("userData").doc(userEmail)
+
+         // Try to delete sub-collections but continue if it fails
+         await deleteUserSubCollections(userDocRef)
+
+         // Critical deletions
          await auth.deleteUser(userId)
-         await firestore.collection("userData").doc(userEmail).delete()
+         await userDocRef.delete()
 
          // add userId and timestamp on analytics collection
          await firestore
@@ -558,11 +589,11 @@ export const deleteLoggedInUserAccount = functions
             })
 
          functions.logger.info(
-            `User ${userEmail} with the id ${userId} was deleted successfully`
+            `User ${userEmail} with id ${userId} was deleted successfully`
          )
       } catch (error) {
          console.error(
-            `Error deleting user ${userEmail} with the id ${userId} in firestore`,
+            `Error deleting user ${userEmail} with id ${userId}:`,
             error
          )
          throw new functions.https.HttpsError(error.code, error.message)

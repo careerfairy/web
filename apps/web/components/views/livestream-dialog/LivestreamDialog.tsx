@@ -112,6 +112,7 @@ type Props = {
    speakerId?: string
    isDiscoverCompanySparksOpen?: boolean
    handleDiscoverCompanySparks?: () => void
+   appear?: boolean
 }
 
 export type ViewKey =
@@ -191,6 +192,7 @@ const LivestreamDialog: FC<Props> = ({
    handleClose,
    open,
    livestreamId,
+   appear,
    ...rest
 }) => {
    const isMobile = useIsMobile()
@@ -209,6 +211,9 @@ const LivestreamDialog: FC<Props> = ({
          fullWidth
          fullScreen={isMobile}
          closeAfterTransition={true}
+         TransitionProps={{
+            appear: appear ?? undefined,
+         }}
          PaperProps={{
             sx: styles.dialogPaper,
          }}
