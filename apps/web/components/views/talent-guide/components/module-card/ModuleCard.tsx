@@ -42,7 +42,6 @@ const styles = sxStyles({
    },
    interactive: {
       "&:hover, &:focus": {
-         transform: "translateY(-2px) scale(1.005)",
          boxShadow: (theme) => `0 6px 20px ${theme.palette.secondary[100]}40`,
          borderColor: (theme) => theme.palette.secondary[200],
       },

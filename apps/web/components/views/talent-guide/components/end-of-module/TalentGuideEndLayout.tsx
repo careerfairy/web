@@ -88,9 +88,6 @@ export const TalentGuideEndLayout = () => {
 
    return (
       <TalentGuideLayout key={random.current} sx={styles.root}>
-         <Zoom unmountOnExit style={styles.zoomDelay} in={showNextModule}>
-            <BackButton size={24} sx={styles.backButton} />
-         </Zoom>
          <Box
             id="talent-guide-end-layout"
             overflow="hidden"
@@ -120,6 +117,9 @@ export const TalentGuideEndLayout = () => {
                )}
             </AnimatePresence>
          </Box>
+         <Zoom unmountOnExit style={styles.zoomDelay} in={showNextModule}>
+            <BackButton size={24} sx={styles.backButton} />
+         </Zoom>
       </TalentGuideLayout>
    )
 }
