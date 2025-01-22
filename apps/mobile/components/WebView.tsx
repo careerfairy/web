@@ -512,12 +512,16 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
     */
    useEffect(() => {
       const handleScreenOrientation = async () => {
-         if (isAgoraPage) {
-            await ScreenOrientation.unlockAsync()
-         } else {
-            await ScreenOrientation.lockAsync(
-               ScreenOrientation.OrientationLock.PORTRAIT_UP
-            )
+         try {
+            if (isAgoraPage) {
+               await ScreenOrientation.unlockAsync()
+            } else {
+               await ScreenOrientation.lockAsync(
+                  ScreenOrientation.OrientationLock.PORTRAIT_UP
+               )
+            }
+         } catch (error) {
+            console.error("Failed to update screen orientation:", error)
          }
       }
 
