@@ -1,6 +1,6 @@
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
-import dynamic from "next/dynamic"
+import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import React, { FC, useCallback, useMemo } from "react"
@@ -9,8 +9,7 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import { getStreamMetaInfo } from "../../../util/SeoUtil"
 import SEO from "../../util/SEO"
 import EventSEOSchemaScriptTag from "../common/EventSEOSchemaScriptTag"
-
-const LivestreamDialog = dynamic(() => import("./LivestreamDialog"))
+import LivestreamDialog from "./LivestreamDialog"
 
 export type LiveStreamDialogData = {
    serverSideLivestream: { [p: string]: any } | null
@@ -46,8 +45,10 @@ export const LivestreamDialogLayout: FC<Props> = ({
 }) => {
    const { userStats } = useAuth()
    const { query, push, pathname } = useRouter()
+   const isMounted = useIsMounted()
    const { livestreamDialog } = query
 
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const [pathType, livestreamId, dialogPage] = livestreamDialog || []
 
    const updatedStats = useMemo(() => {
@@ -100,6 +101,7 @@ export const LivestreamDialogLayout: FC<Props> = ({
             livestreamId={livestreamId}
             handleClose={handleClose}
             page={page}
+            appear={isMounted}
          />
          {/* Set SEO tags for the page. */}
          {serverLivestream ? (

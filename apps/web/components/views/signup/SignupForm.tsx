@@ -118,10 +118,10 @@ const SignupForm = () => {
    )
 
    useEffect(() => {
-      if (userData && currentStep === 0) {
+      if (user.emailVerified && userData && currentStep === 0) {
          setCurrentStep(2)
       }
-   }, [userData, currentStep])
+   }, [user.emailVerified, userData, currentStep])
 
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return
