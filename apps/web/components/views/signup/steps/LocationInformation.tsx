@@ -104,6 +104,7 @@ const LocationInformation = () => {
    const dispatch = useDispatch()
    const { data: userLanguages } = useUserLanguages()
 
+   const [hasChanged, setHasChanged] = useState<boolean>(false)
    const [isLanguageFormOpen, setIsLanguageFormOpen] = useState(false)
    const [language, setLanguage] = useState<OptionGroup | null>(null)
    const [proficiency, setProficiency] = useState<OptionGroup | null>(null)
@@ -339,7 +340,10 @@ const LocationInformation = () => {
                         <Box
                            sx={styles.languageDeleteIcon}
                            component={Trash2}
-                           onClick={() => handleLanguageDelete(language.id)}
+                           onClick={() => {
+                              handleLanguageDelete(language.id)
+                              setHasChanged(true)
+                           }}
                         />
                      </Stack>
                   ))}
@@ -359,7 +363,10 @@ const LocationInformation = () => {
                      alignItems="center"
                      justifyContent="center"
                      spacing={1}
-                     onClick={() => setIsLanguageFormOpen(true)}
+                     onClick={() => {
+                        setIsLanguageFormOpen(true)
+                        setHasChanged(true)
+                     }}
                   >
                      <Box
                         component={PlusCircle}
@@ -443,7 +450,9 @@ const LocationInformation = () => {
                )}
             >
                <Grid item xs={12} sm={8}>
-                  {!userLanguages?.length && !isLanguageFormOpen ? (
+                  {!userLanguages?.length &&
+                  !isLanguageFormOpen &&
+                  hasChanged ? (
                      <FormHelperText
                         sx={{ color: "error.main", ml: 2, mt: -3.5 }}
                      >
