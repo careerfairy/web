@@ -3,8 +3,8 @@ import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { Clock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { CTAButton } from "./CTAButton"
 import { ProgressWithPercentage } from "./ProgressWithPercentage"
+import { StartNextLevelButton } from "./StartNextLevelButton"
 
 const styles = sxStyles({
    metadataIcon: {
@@ -50,22 +50,18 @@ type Props = {
     * If true, the component will have contrast with the illustration
     */
    isOverlay: boolean
-   nextLevel: Page<TalentGuideModule> | null
    copy: {
       title: string
       description: string
    }
    overallProgress: number
-   isLoadingNextModule: boolean
 }
 
 export const CourseDetails = ({
    levels,
    isOverlay,
-   nextLevel,
    copy,
    overallProgress,
-   isLoadingNextModule,
 }: Props) => {
    const theme = useTheme()
    const hours = calculateTotalHours(levels)
@@ -123,7 +119,7 @@ export const CourseDetails = ({
             </Typography>
          )}
          <Box sx={isOverlay ? styles.ctaOverlay : styles.ctaDesktop}>
-            <CTAButton nextLevel={nextLevel} loading={isLoadingNextModule} />
+            <StartNextLevelButton allLevels={levels} />
          </Box>
       </Stack>
    )

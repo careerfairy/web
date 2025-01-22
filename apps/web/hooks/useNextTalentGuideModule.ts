@@ -34,14 +34,17 @@ export function useNextTalentGuideModule(
    locale: string = "de",
    options?: SWRConfiguration & {
       noCache?: boolean
+      disabled?: boolean
    }
 ) {
    const { cache } = useSWRConfig()
    const random = useRef(Date.now())
 
-   const key = `next-levels-module-${userAuthUid}-${locale}${
-      options?.noCache ? `-${random.current}` : ""
-   }`
+   const key = options?.disabled
+      ? null
+      : `next-levels-module-${userAuthUid}-${locale}${
+           options?.noCache ? `-${random.current}` : ""
+        }`
 
    const swr = useSWR(key, () => fetchNextModule(userAuthUid, locale), {
       ...reducedRemoteCallsOptions,
@@ -58,7 +61,7 @@ export function useNextTalentGuideModule(
             cache.delete(key)
          }
       }
-   }, [cache, key, options?.noCache])
+   }, [cache, options?.noCache, key])
 
    return swr
 }
