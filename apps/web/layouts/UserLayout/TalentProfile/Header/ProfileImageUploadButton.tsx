@@ -39,6 +39,16 @@ const userAvatarImageValidator = getImageDimensionsValidator({
    maxWidth: USER_AVATAR_IMAGE_SPECS.maxWidth,
    minHeight: USER_AVATAR_IMAGE_SPECS.minHeight,
    minWidth: USER_AVATAR_IMAGE_SPECS.minWidth,
+   getErrorMessage: (width, height) => {
+      if (
+         width < USER_AVATAR_IMAGE_SPECS.minWidth ||
+         height < USER_AVATAR_IMAGE_SPECS.minHeight
+      ) {
+         // TODO-WG: Improve this message
+         return "Image is too small"
+      }
+      return ""
+   },
 })
 
 type ProfileImageUploadButtonProps = {
