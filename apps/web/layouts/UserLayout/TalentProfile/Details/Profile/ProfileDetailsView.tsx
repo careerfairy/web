@@ -16,7 +16,7 @@ const styles = sxStyles({
    },
 })
 export const ProfileDetailsView = () => {
-   const { userPresenter } = useAuth()
+   const { userPresenter, userData } = useAuth()
    const { hasItems: userHasStudyBackgrounds } = useUserStudyBackgrounds()
    const { hasItems: userHasLinks } = useUserLinks()
    const { hasItems: userHasLanguages } = useUserLanguages()
@@ -26,7 +26,9 @@ export const ProfileDetailsView = () => {
    return (
       <Stack sx={styles.wrapper} spacing={3}>
          <ProfileStudyBackground showAddIcon={userHasStudyBackgrounds} />
-         <ProfileLinks showAddIcon={userHasLinks} />
+         <ProfileLinks
+            showAddIcon={userHasLinks || Boolean(userData.linkedinUrl?.length)}
+         />
          <ProfileLanguages showAddIcon={userHasLanguages} />
          <ProfileInterests showAddIcon={userHasInterests} />
       </Stack>

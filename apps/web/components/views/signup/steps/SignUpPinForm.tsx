@@ -11,6 +11,7 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
+import { usePreFetchCityById } from "components/custom-hook/countries/useCityById"
 import { useAppSelector } from "components/custom-hook/store"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -44,7 +45,7 @@ const SignUpPinForm = () => {
    const [errorMessageShown] = useState(false)
    const [incorrectPin, setIncorrectPin] = useState(false)
    const [generalLoading, setGeneralLoading] = useState(false)
-   const { authenticatedUser: user } = useAuth()
+   const { authenticatedUser: user, userData } = useAuth()
    const { nextStep, previousStep } =
       useContext<IMultiStepContext>(MultiStepContext)
    const dispatch = useDispatch()
@@ -57,6 +58,7 @@ const SignUpPinForm = () => {
       previousStep()
    }
 
+   usePreFetchCityById(userData?.cityIsoCode)
    async function resendVerificationEmail() {
       setGeneralLoading(true)
       try {

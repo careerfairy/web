@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react"
-import { Identifiable } from "../../types/commonTypes"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import { Interest } from "types/interests"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import firebase from "firebase/compat/app"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { UniversityCountry } from "@careerfairy/shared-lib/dist/universities"
+import firebase from "firebase/compat/app"
+import { useEffect, useState } from "react"
+import { Interest } from "types/interests"
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import { Identifiable } from "../../types/commonTypes"
 
 /**
  * Fetch a Firestore collection
@@ -58,7 +58,7 @@ function useCollection<T extends Identifiable>(
          setDocuments(list)
          setIsLoading(false)
       }
-   }, [collection, realtime])
+   }, [collection, realtime, firestore])
 
    return { isLoading: isLoading, data: documents, error: error }
 }
@@ -79,8 +79,20 @@ export const useGroups = (realtime: boolean = false) =>
    useCollection<Group>("careerCenterData", realtime)
 
 // use fields of Study
-export const useFieldsOfStudy = (realtime: boolean = false) =>
-   useCollection<FieldOfStudy>("fieldsOfStudy", realtime)
+export const useFieldsOfStudy = (realtime: boolean = false) => {
+   const { data, error } = useCollection<FieldOfStudy>(
+      "fieldsOfStudy",
+      realtime
+   )
+   const sortedData = data.sort((a, b) => {
+      if (a.id === "other") return 1
+      if (b.id === "other") return -1
+      return a.name.localeCompare(b.name)
+   })
+
+   return { data: sortedData, error }
+}
+
 // use university countries
 export const useUniversityCountries = (realtime: boolean = false) =>
    useCollection<UniversityCountry>("universitiesByCountry", realtime)
