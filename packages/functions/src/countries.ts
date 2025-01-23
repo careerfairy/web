@@ -200,6 +200,7 @@ export const fetchCityData = functions
    .region(config.region)
    .https.onCall((data: CityDataOptions) => {
       const { generatedCityId } = data
+      console.log("🚀 ~ .https.onCall ~ generatedCityId:", generatedCityId)
 
       let cityResult: CityOption | null = null
 

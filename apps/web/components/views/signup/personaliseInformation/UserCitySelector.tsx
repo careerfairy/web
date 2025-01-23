@@ -17,6 +17,7 @@ export const UserCitySelector = () => {
       userData.cityIsoCode,
       false
    )
+
    const [city, setCity] = useState<OptionGroup | null>(userCityOption ?? null)
 
    const handleSelectedCityChange = useCallback(

@@ -18,10 +18,10 @@ export const USER_BANNER_IMAGE_SPECS = {
 }
 
 export const USER_AVATAR_IMAGE_SPECS = {
-   minWidth: 320,
+   minWidth: 240,
    minHeight: 240,
    maxWidth: 5000,
-   maxHeight: 3000,
+   maxHeight: 5000,
    // In megabytes
    maxSize: 10, // 10MB
    allowedFormats: IMAGE_CONSTANTS.allowedFormats,

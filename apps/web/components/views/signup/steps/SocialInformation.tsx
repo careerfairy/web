@@ -10,6 +10,7 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
+import { usePreFetchCityById } from "components/custom-hook/countries/useCityById"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useUserLinks } from "components/custom-hook/user/useUserLinks"
@@ -17,16 +18,18 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { CustomLinkCard } from "components/views/common/links/CustomLinkCard"
 import { isLinkedInUrl } from "layouts/UserLayout/TalentProfile/Details/Profile/ProfileLinks"
 import normalizeUrl from "normalize-url"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { PlusCircle, Trash2 } from "react-feather"
 import { useDebounce, useLocalStorage } from "react-use"
 import { errorLogAndNotify, getIconUrl } from "util/CommonUtil"
+import { isWebUri } from "valid-url"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
 import LinkedInInput from "../../common/inputs/LinkedInInput"
 import ReferralCodeInput from "../../common/inputs/ReferralCodeInput"
+
 const styles = sxStyles({
    inputLabel: {
       textTransform: "uppercase",
@@ -115,6 +118,8 @@ const SocialInformation = () => {
       [REFERRAL_CODE_FIELD_NAME]: existingReferralCode,
    })
    const [isValidReferralCode, setIsValidReferralCode] = useState(false)
+
+   usePreFetchCityById(userData?.cityIsoCode)
 
    const updateFields = useCallback(
       async (fieldToUpdate: Partial<UserData>) => {
@@ -415,9 +420,6 @@ const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
    const { userData } = useAuth()
    const [linkTitle, setLinkTitle] = useState("")
    const [link, setLink] = useState("")
-   const [isValidLink, setIsValidLink] = useState<boolean>(false)
-
-   const isValidForm = isValidLink && Boolean(linkTitle?.length)
 
    const resetForm = () => {
       setLinkTitle("")
@@ -440,9 +442,13 @@ const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
       onCancel()
    }, [onCancel])
 
-   useEffect(() => {
-      setIsValidLink(isValidHttpUrl(link))
+   const isValidLink = useMemo(() => {
+      return isWebUri(link)
    }, [link])
+
+   const isValidForm = useMemo(() => {
+      return isValidLink && Boolean(linkTitle?.length)
+   }, [isValidLink, linkTitle])
 
    return (
       <Stack sx={styles.linkFormRoot} spacing={2}>
@@ -541,15 +547,6 @@ const LinkCard = ({
 
 const isValidLinkedInLink = (link: string): boolean => {
    return linkedInRegex.test(link)
-}
-
-const isValidHttpUrl = (link: string): boolean => {
-   try {
-      new URL(link)
-      return true
-   } catch (err) {
-      return false
-   }
 }
 
 export default SocialInformation

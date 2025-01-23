@@ -59,10 +59,7 @@ const SelectUniversitiesDropDown = ({
    placeholder,
    countryCodeFieldName,
 }: Props) => {
-   const {
-      formState: { isSubmitting },
-      setValue,
-   } = useFormContext()
+   const { setValue } = useFormContext()
 
    const selectedCountryCode = useWatch({
       name: countryCodeFieldName,
@@ -108,10 +105,6 @@ const SelectUniversitiesDropDown = ({
          }}
          autocompleteProps={{
             id: "selectUniversity",
-            disabled:
-               isSubmitting ||
-               !selectedCountryCode ||
-               universityCountriesMap[selectedCountryCode] === "None",
             autoHighlight: true,
             disableClearable: false,
             selectOnFocus: false,
