@@ -88,7 +88,7 @@ export const createNewUserAccount = functions
                      lastActivityAt: FieldValue.serverTimestamp(),
                      createdAt: FieldValue.serverTimestamp(),
                      ...registrationUTMsToSave,
-                  })
+                  } as UserData)
                )
                .then(async () => {
                   if (additionalData?.studyBackground) {

@@ -35,6 +35,10 @@ export interface UserData extends Identifiable {
    fcmTokens?: string[]
    linkedinUrl: string
    isAdmin?: boolean
+   /**
+    * Created account through regular signup flow and not group admin signup flow
+    */
+   isStudent?: boolean
    userResume: string
    resumeName?: string
    backFills: BackFillType[]
