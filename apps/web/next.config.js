@@ -168,6 +168,7 @@ const csp = {
       "https://td.doubleclick.net", // Google Ads services
       "https://www.googletagmanager.com",
       "https://careerfairy-e1fd9.firebaseapp.com",
+      "https://renderer.gist.build", // For sending events to Customer.io
    ],
    "font-src": [
       "'self'",
