@@ -80,7 +80,7 @@ export const useGroups = (realtime: boolean = false) =>
 
 // use fields of Study
 export const useFieldsOfStudy = (realtime: boolean = false) => {
-   const { data, error } = useCollection<FieldOfStudy>(
+   const { data, error, isLoading } = useCollection<FieldOfStudy>(
       "fieldsOfStudy",
       realtime
    )
@@ -89,8 +89,7 @@ export const useFieldsOfStudy = (realtime: boolean = false) => {
       if (b.id === "other") return -1
       return a.name.localeCompare(b.name)
    })
-
-   return { data: sortedData, error }
+   return { data: sortedData, error, isLoading }
 }
 
 // use university countries
