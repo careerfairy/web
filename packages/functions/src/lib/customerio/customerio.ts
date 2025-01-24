@@ -9,7 +9,7 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { isLocalEnvironment } from "../../util"
 import { trackingClient } from "./client"
 
-const CHECK_FOR_CHANGES = false
+const CHECK_FOR_CHANGES = true
 
 export const syncUserToCustomerIO = onDocumentWritten(
    {
