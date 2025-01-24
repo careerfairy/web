@@ -1,7 +1,7 @@
 import { CityOption } from "@careerfairy/shared-lib/countries/types"
 import { useState } from "react"
 import { useDebounce } from "react-use"
-import useSWR, { SWRConfiguration } from "swr"
+import useSWR, { SWRConfiguration, preload } from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
@@ -47,4 +47,13 @@ export const useCitySearch = (
       ...swrOptions,
       suspense,
    })
+}
+
+export const usePreFetchCitySearch = (
+   searchValue: string,
+   countryId: string
+) => {
+   const fetcher = useFunctionsSWR<CityOption[]>()
+   preload(["searchCities", { searchValue, countryId }], fetcher)
+   return null
 }

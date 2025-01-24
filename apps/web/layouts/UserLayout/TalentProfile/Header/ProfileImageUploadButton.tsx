@@ -1,4 +1,7 @@
-import { USER_AVATAR_IMAGE_SPECS } from "@careerfairy/shared-lib/users/UserPresenter"
+import {
+   USER_AVATAR_IMAGE_SPECS,
+   getProfileImageErrorMessage,
+} from "@careerfairy/shared-lib/users/UserPresenter"
 import { darken } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
 import { useDeleteUserAvatarImage } from "components/custom-hook/user/useDeleteUserAvatarImage"
@@ -39,16 +42,7 @@ const userAvatarImageValidator = getImageDimensionsValidator({
    maxWidth: USER_AVATAR_IMAGE_SPECS.maxWidth,
    minHeight: USER_AVATAR_IMAGE_SPECS.minHeight,
    minWidth: USER_AVATAR_IMAGE_SPECS.minWidth,
-   getErrorMessage: (width, height) => {
-      if (
-         width < USER_AVATAR_IMAGE_SPECS.minWidth ||
-         height < USER_AVATAR_IMAGE_SPECS.minHeight
-      ) {
-         // TODO-WG: Improve this message
-         return "Image is too small"
-      }
-      return ""
-   },
+   getErrorMessage: getProfileImageErrorMessage,
 })
 
 type ProfileImageUploadButtonProps = {

@@ -10,7 +10,6 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import { usePreFetchCityById } from "components/custom-hook/countries/useCityById"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useUserLinks } from "components/custom-hook/user/useUserLinks"
@@ -118,8 +117,6 @@ const SocialInformation = () => {
       [REFERRAL_CODE_FIELD_NAME]: existingReferralCode,
    })
    const [isValidReferralCode, setIsValidReferralCode] = useState(false)
-
-   usePreFetchCityById(userData?.cityIsoCode)
 
    const updateFields = useCallback(
       async (fieldToUpdate: Partial<UserData>) => {
@@ -243,6 +240,10 @@ const UserLinkedInLink = () => {
       [linkedInLink]
    )
 
+   useEffect(() => {
+      setDebouncedLink(userData.linkedinUrl)
+   }, [userData.linkedinUrl])
+
    const isLinkedInLinkValid =
       debouncedLink?.length > 0 && isValidLinkedInLink(debouncedLink)
 
@@ -364,13 +365,29 @@ const UserOtherLinks = () => {
       }
    })
 
-   const handleLinkSubmit = async (link: ProfileLink) => {
-      await userRepo.createUserLink(userData.id, link)
-   }
+   const handleLinkSubmit = useCallback(
+      async (link: ProfileLink) => {
+         if (!userData.linkedinUrl && isLinkedInUrl(link.url)) {
+            await userRepo
+               .updateAdditionalInformation(userData.id, {
+                  linkedinUrl: link.url,
+               })
+               .catch(errorLogAndNotify)
+         } else {
+            await userRepo
+               .createUserLink(userData.id, link)
+               .catch(errorLogAndNotify)
+         }
+      },
+      [userData.linkedinUrl, userData.id]
+   )
 
-   const handleLinkDelete = async (linkId: string) => {
-      await userRepo.deleteLink(userData.id, linkId)
-   }
+   const handleLinkDelete = useCallback(
+      async (linkId: string) => {
+         await userRepo.deleteLink(userData.id, linkId).catch(errorLogAndNotify)
+      },
+      [userData.id]
+   )
 
    return (
       <Stack spacing={1.5}>
