@@ -1,7 +1,5 @@
 import LoadingButton from "@mui/lab/LoadingButton"
 import { Box, Button, Container, Grid, Typography } from "@mui/material"
-import { usePreFetchCityById } from "components/custom-hook/countries/useCityById"
-import { usePreFetchCitySearch } from "components/custom-hook/countries/useCitySearch"
 import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
@@ -119,9 +117,6 @@ const SignupForm = () => {
       userSignUpStepContinueDisabledSelector(state, currentStep)
    )
 
-   // Warming up city related cloud functions (Used in LocationInformation)
-   usePreFetchCityById(null)
-   usePreFetchCitySearch("CH", "Zurich")
    useEffect(() => {
       if (user.emailVerified && userData && currentStep === 0) {
          setCurrentStep(2)
