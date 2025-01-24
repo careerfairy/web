@@ -37,6 +37,8 @@ const csp = {
       "blob:",
       "careerfairy-e1fd9.firebaseapp.com",
       "https://ik.imagekit.io",
+      "*.customer.io", // For sending events to Customer.io
+      "*.cdn-eu.customer.io", // For sending events to Customer.io
    ],
    "script-src": [
       "'self'",
@@ -135,6 +137,9 @@ const csp = {
       "https://vimeocdn.com",
       "https://player.vimeo.com",
       "https://overbridgenet.com",
+      "https://cdp-eu.customer.io", // For sending events to Customer.io
+      "https://cdn-eu.customer.io", // For sending events to Customer.io
+      "https://*.customer.io", // For sending events to Customer.io
    ],
    "img-src": [
       "'self'",
