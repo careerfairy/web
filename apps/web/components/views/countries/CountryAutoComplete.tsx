@@ -50,12 +50,6 @@ export const CountryAutoComplete = ({
                className="registrationInput"
             />
          )}
-         sx={{
-            "& .MuiInputBase-input": {
-               fontWeight: 600,
-               fontSize: "16px",
-            },
-         }}
       />
    )
 }

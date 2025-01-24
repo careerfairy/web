@@ -38,14 +38,6 @@ export const UserCitySelector = () => {
       }
    }, [userData.countryIsoCode, userCountryCode, handleSelectedCityChange])
 
-   useEffect(() => {
-      if (userData.cityIsoCode && Boolean(userCityOption)) {
-         setCity(userCityOption)
-      } else {
-         setCity(null)
-      }
-   }, [userData.cityIsoCode, userCityOption])
-
    return (
       <>
          <CityAutoComplete
