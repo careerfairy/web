@@ -169,6 +169,7 @@ const csp = {
       "https://www.googletagmanager.com",
       "https://careerfairy-e1fd9.firebaseapp.com",
       "https://renderer.gist.build", // For sending events to Customer.io
+      "https://code.gist.build", // For sending events to Customer.io
    ],
    "font-src": [
       "'self'",
