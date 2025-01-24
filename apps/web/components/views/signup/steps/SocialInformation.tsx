@@ -10,6 +10,8 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
+import { usePreFetchCityById } from "components/custom-hook/countries/useCityById"
+import { usePreFetchCitySearch } from "components/custom-hook/countries/useCitySearch"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useUserLinks } from "components/custom-hook/user/useUserLinks"
@@ -117,6 +119,10 @@ const SocialInformation = () => {
       [REFERRAL_CODE_FIELD_NAME]: existingReferralCode,
    })
    const [isValidReferralCode, setIsValidReferralCode] = useState(false)
+
+   // Warming up city related cloud functions (Used in LocationInformation)
+   usePreFetchCityById(null)
+   usePreFetchCitySearch("CH", "Zurich")
 
    const updateFields = useCallback(
       async (fieldToUpdate: Partial<UserData>) => {
