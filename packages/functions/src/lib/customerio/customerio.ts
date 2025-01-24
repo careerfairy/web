@@ -6,7 +6,7 @@ import {
 import { UserData } from "@careerfairy/shared-lib/users"
 import { logger } from "firebase-functions/v2"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
-import { isLocalEnvironment } from "src/util"
+import { isLocalEnvironment } from "../../util"
 import { trackingClient } from "./client"
 
 const CHECK_FOR_CHANGES = false
