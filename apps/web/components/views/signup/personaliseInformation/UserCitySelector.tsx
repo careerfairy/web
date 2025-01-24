@@ -1,4 +1,3 @@
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CityOption } from "@careerfairy/shared-lib/countries/types"
 import { FormHelperText } from "@mui/material"
 import useCityById from "components/custom-hook/countries/useCityById"
@@ -18,11 +17,8 @@ export const UserCitySelector = () => {
       false
    )
 
-   const [city, setCity] = useState<OptionGroup | null>(userCityOption ?? null)
-
    const handleSelectedCityChange = useCallback(
       async (city: CityOption | null) => {
-         setCity(city ? (city as OptionGroup) : null)
          await userRepo.updateUserData(userData.id, {
             cityIsoCode: city?.id ?? null,
             stateIsoCode: city?.stateIsoCode ?? null,
@@ -41,14 +37,17 @@ export const UserCitySelector = () => {
    return (
       <>
          <CityAutoComplete
-            value={city}
+            value={userCityOption}
             disabled={!userData.countryIsoCode}
             loading={isLoading}
             countryId={userData.countryIsoCode}
             onFocus={() => setHasFocused(true)}
             handleSelectedCityChange={handleSelectedCityChange}
          />
-         {userData.countryIsoCode && !isLoading && !city && hasFocused ? (
+         {userData.countryIsoCode &&
+         !isLoading &&
+         !userCityOption &&
+         hasFocused ? (
             <FormHelperText sx={{ color: "error.main", ml: 2 }}>
                Please select the city you are currently located in.
             </FormHelperText>
