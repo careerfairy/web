@@ -1,12 +1,12 @@
 import { Button } from "@mui/material"
-import Tab from "@mui/material/Tab"
-import React, { useContext } from "react"
 import { alpha } from "@mui/material/styles"
+import Tab from "@mui/material/Tab"
 import makeStyles from "@mui/styles/makeStyles"
+import { useContext } from "react"
+import { useCurrentStream } from "../../../../../../../context/stream/StreamContext"
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext"
 import { StyledTooltipWithButton } from "../../../../../../../materialUI/GlobalTooltips"
-import { useCurrentStream } from "../../../../../../../context/stream/StreamContext"
-import ConditionalWrapper from "../../../../../common/ConditionalWrapper"
+import { ConditionalWrapper } from "../../../../../common/ConditionalWrapper"
 
 const useCtaCardStyles = makeStyles(({ palette: { mode, common } }) => ({
    cardRoot: {},
@@ -23,6 +23,7 @@ const CallToActionTypeButton = ({
    mobile,
    active,
    isJobPosting,
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    data: { type, description, title, icon, buttonText, message, value },
    color,
    handleSetCallToActionType,
