@@ -296,7 +296,8 @@ const UserLinkedInLink = () => {
                `Error updating LinkedIn URL for authId ${userData.authId}`
             )
          )
-   }, [debouncedLink, userData.id, userData.linkedinUrl, userData.authId])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [debouncedLink, userData.id, userData.authId])
 
    return (
       <ConditionalWrapper
