@@ -11,6 +11,8 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
+import { usePreFetchCityById } from "components/custom-hook/countries/useCityById"
+import { usePreFetchCitySearch } from "components/custom-hook/countries/useCitySearch"
 import { useAppSelector } from "components/custom-hook/store"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -57,6 +59,9 @@ const SignUpPinForm = () => {
       previousStep()
    }
 
+   // Warming up city related cloud functions (Used in LocationInformation)
+   usePreFetchCityById(null)
+   usePreFetchCitySearch("CH", "Zurich")
    async function resendVerificationEmail() {
       setGeneralLoading(true)
       try {
