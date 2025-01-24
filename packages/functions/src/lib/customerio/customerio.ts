@@ -6,6 +6,7 @@ import {
 import { UserData } from "@careerfairy/shared-lib/users"
 import { logger } from "firebase-functions/v2"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
+import { isLocalEnvironment } from "src/util"
 import { trackingClient } from "./client"
 
 const CHECK_FOR_CHANGES = false
@@ -13,10 +14,15 @@ const CHECK_FOR_CHANGES = false
 export const syncUserToCustomerIO = onDocumentWritten(
    {
       document: "userData/{userId}",
-      maxInstances: 90, // CustomerIO has a fair-use rate limit of 100 requests/second
+      maxInstances: 70, // CustomerIO has a fair-use rate limit of 100 requests/second
       concurrency: 1, // Process updates sequentially to avoid rate limit issues
    },
    async (event) => {
+      if (isLocalEnvironment()) {
+         logger.info("Skipping CustomerIO sync in local environment")
+         return
+      }
+
       const after = event.data?.after?.data() as UserData
       const before = event.data?.before?.data() as UserData
 

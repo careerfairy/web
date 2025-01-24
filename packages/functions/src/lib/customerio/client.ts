@@ -9,8 +9,8 @@ const createTrackingClient = () => {
    if (isLocalEnvironment()) {
       siteId = process.env.DEV_CUSTOMERIO_SITE_ID
       apiKey = process.env.DEV_CUSTOMERIO_API_KEY
-      logger.error(
-         "Missing required .env.local environment variables for CustomerIO tracking client: DEV_CUSTOMERIO_SITE_ID and/or DEV_CUSTOMERIO_API_KEY"
+      logger.info(
+         "Running in local environment. Ensure DEV_CUSTOMERIO_SITE_ID and DEV_CUSTOMERIO_API_KEY are set for testing."
       )
    }
 
