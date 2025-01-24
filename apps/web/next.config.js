@@ -78,6 +78,7 @@ const csp = {
       "https://infird.com",
       "https://*.infird.com",
       "https://unpkg.com", // Added for dotlottie-wc script
+      "https://cdp-eu.customer.io", // For sending events to Customer.io
    ],
    "style-src": [
       "'self'",
