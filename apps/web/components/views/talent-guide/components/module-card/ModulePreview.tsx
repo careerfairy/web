@@ -9,7 +9,7 @@ import {
 import FramerBox from "components/views/common/FramerBox"
 import { MotionProps } from "framer-motion"
 import Link from "next/link"
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import { ArrowRight, Minus, Plus, Volume2, VolumeX, X } from "react-feather"
 import ReactPlayer from "react-player/file"
 import { sxStyles } from "types/commonTypes"
@@ -73,6 +73,7 @@ type Props = {
    thumbnailUrl: string
    videoUrl: string
    onClose?: () => void
+   overlay?: ReactNode
 }
 
 const checkIsMuted = () => {
@@ -82,7 +83,12 @@ const checkIsMuted = () => {
    return false
 }
 
-export const ModulePreview = ({ thumbnailUrl, videoUrl, onClose }: Props) => {
+export const ModulePreview = ({
+   thumbnailUrl,
+   videoUrl,
+   onClose,
+   overlay,
+}: Props) => {
    const [isMuted, setIsMuted] = useState(checkIsMuted())
 
    const [showDescription, setShowDescription] = useState(true)
@@ -93,6 +99,7 @@ export const ModulePreview = ({ thumbnailUrl, videoUrl, onClose }: Props) => {
 
    return (
       <Box sx={styles.videoContainer}>
+         {overlay}
          <Box sx={styles.controls}>
             <IconButton
                sx={styles.iconButton}
