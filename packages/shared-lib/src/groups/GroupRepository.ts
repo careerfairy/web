@@ -36,6 +36,7 @@ import {
    GroupQuestion,
    GroupVideo,
    pickPublicDataFromGroup,
+   PublicGroup,
    Testimonial,
    UserGroupData,
 } from "./groups"
@@ -275,7 +276,7 @@ export interface IGroupRepository {
     * @param groupId the group to get creators from
     * @returns A Promise that resolves with an array of creators.
     */
-   getCreatorsWithPublicContent(group: Group): Promise<Creator[]>
+   getCreatorsWithPublicContent(group: Group | PublicGroup): Promise<Creator[]>
 
    /**
     * Gets all public content from a given creator
@@ -1110,8 +1111,10 @@ export class FirebaseGroupRepository
       return mapFirestoreDocuments<Creator>(snaps)
    }
 
-   async getCreatorsWithPublicContent(group: Group): Promise<Creator[]> {
-      if (!group?.groupId) return []
+   async getCreatorsWithPublicContent(
+      group: Group | PublicGroup
+   ): Promise<Creator[]> {
+      if (!group?.id) return []
 
       const [creatorsSnaps, livestreamsSnaps] = await Promise.all([
          this.firestore
