@@ -16,6 +16,7 @@ import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useUserLinks } from "components/custom-hook/user/useUserLinks"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { URL_REGEX } from "components/util/constants"
 import { CustomLinkCard } from "components/views/common/links/CustomLinkCard"
 import { isLinkedInUrl } from "layouts/UserLayout/TalentProfile/Details/Profile/ProfileLinks"
 import normalizeUrl from "normalize-url"
@@ -23,14 +24,12 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { PlusCircle, Trash2 } from "react-feather"
 import { useDebounce, useLocalStorage } from "react-use"
 import { errorLogAndNotify, getIconUrl } from "util/CommonUtil"
-import { isWebUri } from "valid-url"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
 import LinkedInInput from "../../common/inputs/LinkedInInput"
 import ReferralCodeInput from "../../common/inputs/ReferralCodeInput"
-
 const styles = sxStyles({
    inputLabel: {
       textTransform: "uppercase",
@@ -447,11 +446,11 @@ type LinkFormProps = {
    onCancel: () => void
    onSubmit: (link: ProfileLink) => Promise<void>
 }
+
 const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
    const { userData } = useAuth()
    const [linkTitle, setLinkTitle] = useState("")
    const [link, setLink] = useState("")
-
    const resetForm = () => {
       setLinkTitle("")
       setLink("")
@@ -474,7 +473,12 @@ const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
    }, [onCancel])
 
    const isValidLink = useMemo(() => {
-      return isWebUri(link)
+      // This seems... wrong :(, but it works for now.
+      const value =
+         !link?.startsWith("http") || !link.startsWith("https")
+            ? `https://${link}`
+            : link
+      return URL_REGEX.test(value)
    }, [link])
 
    const isValidForm = useMemo(() => {
