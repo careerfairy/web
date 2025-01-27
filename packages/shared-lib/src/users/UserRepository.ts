@@ -337,6 +337,8 @@ export interface IUserRepository {
     * @param data Data to be updated.
     */
    updatePersonalInfo(userId: string, data: UserDataPersonalInfo): Promise<void>
+
+   getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]>
 }
 
 export class FirebaseUserRepository
@@ -1249,6 +1251,18 @@ export class FirebaseUserRepository
          .doc(studyBackgroundId)
 
       return ref.delete()
+   }
+
+   async getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]> {
+      const querySnapshot = await this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("studyBackgrounds")
+         .get()
+
+      return querySnapshot.empty
+         ? []
+         : querySnapshot.docs.map((doc) => doc.data() as StudyBackground)
    }
 
    async createUserLink(userId: string, link: ProfileLink): Promise<void> {
