@@ -1,3 +1,4 @@
+import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
@@ -11,7 +12,7 @@ const styles = sxStyles({
       overflow: "hidden",
       flexShrink: 0,
    },
-   expandedThumbnail: {
+   expandedThumbnailDesktop: {
       position: "relative",
       width: "100%",
       aspectRatio: "533/947",
@@ -19,6 +20,10 @@ const styles = sxStyles({
       margin: "0 auto",
       borderRadius: "12px",
       overflow: "hidden",
+   },
+   expandedThumbnailMobile: {
+      width: "100%",
+      height: "100%",
    },
 })
 
@@ -33,12 +38,19 @@ export const Thumbnail = ({
    moduleId,
    expanded,
 }: Props) => {
+   // const { hasFinishedExpanding } = useModuleCardContext()
+   const isMobile = useIsMobile()
+
    if (expanded) {
       return (
          <FramerBox
             id="expanded-thumbnail"
             layoutId={`thumbnail-${moduleId}`}
-            sx={styles.expandedThumbnail}
+            sx={[
+               isMobile
+                  ? styles.expandedThumbnailMobile
+                  : styles.expandedThumbnailDesktop,
+            ]}
          >
             <Image
                src={thumbnailUrl}

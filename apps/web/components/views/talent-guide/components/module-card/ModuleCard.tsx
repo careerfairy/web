@@ -3,8 +3,17 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { AnimatePresence } from "framer-motion"
+import Link from "next/link"
 import { useRouter } from "next/router"
-import { createContext, forwardRef, useContext, useMemo } from "react"
+import {
+   createContext,
+   forwardRef,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 import { sxStyles } from "types/commonTypes"
 import { Details } from "./Details"
 import { Status } from "./Status"
@@ -67,22 +76,13 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
    }),
-   expandedCard: {
-      width: "90vw",
-      height: "90vh",
-      maxWidth: "1200px",
-      backgroundColor: "white",
-      borderRadius: "12px",
-      overflow: "hidden",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
 })
 
 type ModuleCardContextType = {
    isMobile: boolean
    isExpanded: boolean
+   hasFinishedExpanding: boolean
+   module: Page<TalentGuideModule>
 }
 
 const ModuleCardContext = createContext<ModuleCardContextType | undefined>(
@@ -117,28 +117,18 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
       const isDefaultMobile = useIsMobile()
       const router = useRouter()
       const isExpanded = router.query.moduleId === module.slug
+      const [hasFinishedExpanding, setHasFinishedExpanding] = useState(false)
 
-      const handleCardClick = (e: React.MouseEvent) => {
+      const handleCardClick = () => {
          if (interactive) {
-            e.preventDefault()
-            router.push(
-               `?moduleId=${module.slug}`,
-               {
-                  query: {
-                     ...router.query,
-                     moduleId: module.slug,
-                  },
-               },
-               {
-                  shallow: true,
-               }
-            )
+            setHasFinishedExpanding(false)
          }
       }
 
-      const handleClose = () => {
+      const handleClose = useCallback(() => {
          const newQuery = { ...router.query }
          delete newQuery.moduleId
+         setHasFinishedExpanding(false)
          router.push(
             "",
             {
@@ -146,15 +136,56 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
             },
             { shallow: true }
          )
+      }, [router])
+
+      useEffect(() => {
+         const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === "Escape" && isExpanded) {
+               handleClose()
+            }
+         }
+
+         if (isExpanded) {
+            document.addEventListener("keydown", handleEscapeKey)
+         }
+
+         return () => {
+            document.removeEventListener("keydown", handleEscapeKey)
+         }
+      }, [isExpanded, handleClose])
+
+      const handleAnimationComplete = () => {
+         setHasFinishedExpanding(true)
       }
 
       const value = useMemo(
          () => ({
             isMobile: overrideIsMobile ?? isDefaultMobile,
             isExpanded,
+            hasFinishedExpanding,
+            module,
          }),
-         [overrideIsMobile, isDefaultMobile, isExpanded]
+         [
+            overrideIsMobile,
+            isDefaultMobile,
+            isExpanded,
+            hasFinishedExpanding,
+            module,
+         ]
       )
+
+      const props = interactive
+         ? {
+              href: {
+                 pathname: "/levels",
+                 query: {
+                    ...router.query,
+                    moduleId: module.slug,
+                 },
+              },
+              shallow: true,
+           }
+         : {}
 
       return (
          <ModuleCardContext.Provider value={value}>
@@ -164,8 +195,8 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
             >
                <Stack
                   ref={ref}
-                  component={interactive ? "a" : Stack}
-                  href={interactive ? `/levels/${module.slug}` : undefined}
+                  component={interactive ? Link : Stack}
+                  {...props}
                   direction="row"
                   spacing={1.5}
                   sx={[
@@ -200,9 +231,9 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
                      initial={{ opacity: 0 }}
                      animate={{ opacity: 1 }}
                      exit={{ opacity: 0 }}
-                     onClick={handleClose}
                      sx={styles.expandedOverlay}
                      layoutId={`card-${module.slug}`}
+                     onLayoutAnimationComplete={handleAnimationComplete}
                   >
                      <Thumbnail
                         thumbnailUrl={module.content.moduleIllustration?.url}
