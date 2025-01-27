@@ -2,7 +2,6 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { ONBOARDING_VIDEO_URL_DESKTOP } from "components/util/constants"
 import FramerBox from "components/views/common/FramerBox"
 import Image from "next/image"
-import { useRouter } from "next/router"
 import { sxStyles } from "types/commonTypes"
 import { useModuleCardContext } from "./ModuleCard"
 import { ModulePreview } from "./ModulePreview"
@@ -42,16 +41,17 @@ type Props = {
    thumbnailUrl: string
    moduleId: string
    expanded?: boolean
+   onClose?: () => void
 }
 
 export const Thumbnail = ({
    thumbnailUrl = "/levels/placeholder.jpeg",
    moduleId,
    expanded,
+   onClose,
 }: Props) => {
    const { hasFinishedExpanding } = useModuleCardContext()
    const isMobile = useIsMobile()
-   const router = useRouter()
 
    if (expanded) {
       return (
@@ -82,17 +82,7 @@ export const Thumbnail = ({
                <ModulePreview
                   thumbnailUrl={thumbnailUrl}
                   videoUrl={ONBOARDING_VIDEO_URL_DESKTOP}
-                  onClose={() => {
-                     const newQuery = { ...router.query }
-                     delete newQuery.moduleId
-                     router.push(
-                        "",
-                        {
-                           query: newQuery,
-                        },
-                        { shallow: true }
-                     )
-                  }}
+                  onClose={onClose}
                />
             </FramerBox>
          </FramerBox>
