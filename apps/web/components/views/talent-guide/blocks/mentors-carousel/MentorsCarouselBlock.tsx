@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
+import useFollowedCreators from "components/custom-hook/user/useFollowedCreators"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { MentorsCarouselBlockType } from "data/hygraph/types"
 import { sxStyles } from "types/commonTypes"
@@ -50,7 +50,7 @@ export const MentorsCarouselBlock = ({ title, subHeader }: Props) => {
 }
 
 const MentorsCarousel = () => {
-   const { data: creators } = useGroupCreators("i8NjOiRu85ohJWDuFPwo")
+   const followedCreators = useFollowedCreators()
 
    return (
       <Box id="mentors-carousel-block-content">
@@ -67,7 +67,7 @@ const MentorsCarousel = () => {
             }}
             disableArrows
          >
-            {creators.map((creator, index) => (
+            {followedCreators.map((creator, index) => (
                <Box key={`mentor-slide-box-${index}`}>
                   <MentorCard
                      bannerUrl={
