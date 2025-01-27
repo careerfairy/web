@@ -1,3 +1,4 @@
+import { Box } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ONBOARDING_VIDEO_URL_DESKTOP } from "components/util/constants"
 import FramerBox from "components/views/common/FramerBox"
@@ -84,6 +85,7 @@ export const Thumbnail = ({
                   videoUrl={ONBOARDING_VIDEO_URL_DESKTOP}
                   onClose={onClose}
                />
+               <Overlay />
             </FramerBox>
          </FramerBox>
       )
@@ -105,5 +107,19 @@ export const Thumbnail = ({
             sizes="(max-width: 768px) 100vw, 50vw"
          />
       </FramerBox>
+   )
+}
+
+const Overlay = () => {
+   return (
+      <Box
+         sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+         }}
+      />
    )
 }
