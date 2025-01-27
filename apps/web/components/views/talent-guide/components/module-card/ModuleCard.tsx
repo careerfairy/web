@@ -62,7 +62,7 @@ const styles = sxStyles({
       right: 0,
       bottom: 0,
       backgroundColor: theme.brand.white[300],
-      zIndex: theme.zIndex.drawer + 1,
+      zIndex: theme.zIndex.drawer + 1001,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
