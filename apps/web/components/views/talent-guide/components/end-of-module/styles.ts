@@ -96,9 +96,10 @@ export const nextModuleStyles = sxStyles({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      minHeight: "inherit",
       position: "relative",
       justifyContent: "center",
+      minHeight: 700,
+      marginTop: "auto",
    },
    bottomContent: {
       mt: "auto",

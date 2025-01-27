@@ -1,4 +1,5 @@
 import { Button, Typography, useMediaQuery } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import Link from "components/views/common/Link"
 import { Page, TalentGuideModule } from "data/hygraph/types"
@@ -41,6 +42,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
    const [cardOffset, setCardOffset] = useState(0)
 
    const isShortScreen = useMediaQuery("(max-height: 745px)")
+   const isMobile = useIsMobile()
 
    const completedCardRef = useRef<HTMLDivElement>(null)
    const dividerRef = useRef<HTMLDivElement>(null)
@@ -151,14 +153,9 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                      hasNextModuleCardAppeared: true,
                   }))
                }}
-               sx={
-                  isShortScreen
-                     ? {
-                          paddingBottom:
-                             animationsState.hasNextModuleCardAppeared ? 5 : 10,
-                       }
-                     : null
-               }
+               sx={{
+                  paddingBottom: isShortScreen ? 2 : isMobile ? undefined : 10,
+               }}
             >
                <FramerBox
                   key="divider-container"
