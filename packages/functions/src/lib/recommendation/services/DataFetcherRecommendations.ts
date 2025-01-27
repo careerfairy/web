@@ -12,6 +12,7 @@ import {
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
    CompanyFollowed,
+   ProfileLanguage,
    RegisteredLivestreams,
    StudyBackground,
    UserData,
@@ -40,6 +41,8 @@ export interface IRecommendationDataFetcher {
    getUserRegisteredLivestreams(): Promise<RegisteredLivestreams>
 
    getUserStudyBackgrounds(): Promise<StudyBackground[]>
+
+   getUserLanguages(): Promise<ProfileLanguage[]>
 }
 
 /**
@@ -95,6 +98,12 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
    }
 
    async getUserStudyBackgrounds(): Promise<StudyBackground[]> {
+      // Not implemented for newsletter, since data fetching would be per
+      // user meaning an excess number requests would be made for each subscribed user
+      throw new Error("Not implemented")
+   }
+
+   async getUserLanguages(): Promise<ProfileLanguage[]> {
       // Not implemented for newsletter, since data fetching would be per
       // user meaning an excess number requests would be made for each subscribed user
       throw new Error("Not implemented")
@@ -182,6 +191,10 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
 
    async getUserStudyBackgrounds(): Promise<StudyBackground[]> {
       return this.userRepo.getUserStudyBackgrounds(this.userId)
+   }
+
+   async getUserLanguages(): Promise<ProfileLanguage[]> {
+      return this.userRepo.getUserLanguages(this.userId)
    }
 }
 

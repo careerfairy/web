@@ -157,12 +157,14 @@ export default class UserEventRecommendationService
          pastLivestreams,
          registeredLivestreams,
          studyBackgrounds,
+         languages,
       ] = await Promise.all([
          dataFetcher.getUser(),
          dataFetcher.getFutureLivestreams(),
          dataFetcher.getPastLivestreams(),
          dataFetcher.getUserRegisteredLivestreams(),
          dataFetcher.getUserStudyBackgrounds(),
+         dataFetcher.getUserLanguages(),
       ])
 
       const [watchedSparks, interactedEvents, appliedJobs, followedCompanies] =
@@ -188,6 +190,6 @@ export default class UserEventRecommendationService
          registeredLivestreams
       )
 
-      return instance.setAdditionalData({ studyBackgrounds })
+      return instance.setAdditionalData({ studyBackgrounds, languages })
    }
 }
