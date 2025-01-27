@@ -36,6 +36,15 @@ const styles = sxStyles({
       right: 0,
       bottom: 0,
    },
+   overlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: "black",
+      pointerEvents: "none",
+   },
 })
 
 type Props = {
@@ -66,14 +75,18 @@ export const Thumbnail = ({
             ]}
          >
             <Image
+               className="thumbnail-image"
                src={thumbnailUrl}
                alt="Levels Module Thumbnail"
                fill
                priority
                quality={100}
-               style={{ objectFit: "cover" }}
-               sizes="90vw"
+               style={{
+                  objectFit: "cover",
+               }}
+               sizes="(max-width: 768px) 100vw, 50vw"
             />
+            <Overlay />
             <FramerBox
                sx={styles.mediaContainer}
                initial={{ opacity: 0 }}
@@ -84,8 +97,8 @@ export const Thumbnail = ({
                   thumbnailUrl={thumbnailUrl}
                   videoUrl={ONBOARDING_VIDEO_URL_DESKTOP}
                   onClose={onClose}
+                  overlay={<Overlay />}
                />
-               <Overlay />
             </FramerBox>
          </FramerBox>
       )
@@ -97,29 +110,34 @@ export const Thumbnail = ({
          layoutId={`thumbnail-${moduleId}`}
          sx={styles.thumbnail}
       >
-         <Image
+         <Box
+            component={Image}
+            className="thumbnail-image"
             src={thumbnailUrl}
             alt="Levels Module Thumbnail"
             fill
             priority
             quality={100}
-            style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 100vw, 50vw"
          />
+         <Overlay opacity={0.2} />
       </FramerBox>
    )
 }
 
-const Overlay = () => {
+type OverlayProps = {
+   opacity?: number
+}
+
+const Overlay = ({ opacity = 0.25 }: OverlayProps) => {
    return (
       <Box
-         sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-         }}
+         sx={[
+            styles.overlay,
+            {
+               opacity,
+            },
+         ]}
       />
    )
 }
