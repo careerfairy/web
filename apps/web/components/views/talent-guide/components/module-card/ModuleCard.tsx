@@ -184,6 +184,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
                  },
               },
               shallow: true,
+              scroll: false,
            }
          : {}
 
