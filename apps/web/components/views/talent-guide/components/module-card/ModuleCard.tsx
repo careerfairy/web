@@ -239,6 +239,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
                      <Thumbnail
                         thumbnailUrl={module.content.moduleIllustration?.url}
                         moduleId={module.slug}
+                        onClose={handleClose}
                         expanded
                      />
                   </FramerBox>
