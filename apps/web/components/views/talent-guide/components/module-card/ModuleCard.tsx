@@ -3,7 +3,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { AnimatePresence } from "framer-motion"
-import Link from "next/link"
+import Link, { LinkProps } from "next/link"
 import { useRouter } from "next/router"
 import {
    createContext,
@@ -101,6 +101,10 @@ type Props = {
     * Controls mobile responsiveness. Falls back to auto-detection if omitted
     */
    overrideIsMobile?: boolean
+   /**
+    * Controls whether the card can expand. Used to delay expansion until parent animations complete.
+    */
+   canExpand?: boolean
 }
 
 export const ModuleCard = forwardRef<HTMLDivElement, Props>(
@@ -111,16 +115,17 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
          isRecommended,
          onShineAnimationComplete,
          overrideIsMobile,
+         canExpand = true,
       },
       ref
    ) => {
       const isDefaultMobile = useIsMobile()
       const router = useRouter()
-      const isExpanded = router.query.moduleId === module.slug
+      const isExpanded = router.query.moduleId === module.slug && canExpand
       const [hasFinishedExpanding, setHasFinishedExpanding] = useState(false)
 
       const handleCardClick = () => {
-         if (interactive) {
+         if (interactive && canExpand) {
             setHasFinishedExpanding(false)
          }
       }
@@ -174,19 +179,19 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
          ]
       )
 
-      const props = interactive
-         ? {
-              href: {
-                 pathname: "/levels",
-                 query: {
-                    ...router.query,
-                    moduleId: module.slug,
-                 },
-              },
-              shallow: true,
-              scroll: false,
-           }
-         : {}
+      const linkProps: LinkProps = {
+         href: {
+            pathname: "/levels",
+            query: {
+               ...router.query,
+               moduleId: module.slug,
+            },
+         },
+         shallow: true,
+         scroll: false,
+      }
+
+      const props = interactive && canExpand ? linkProps : {}
 
       return (
          <ModuleCardContext.Provider value={value}>
@@ -196,7 +201,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
             >
                <Stack
                   ref={ref}
-                  component={interactive ? Link : Stack}
+                  component={interactive && canExpand ? Link : Stack}
                   {...props}
                   direction="row"
                   spacing={1.5}
