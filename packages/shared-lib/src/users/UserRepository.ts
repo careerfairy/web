@@ -339,6 +339,8 @@ export interface IUserRepository {
    updatePersonalInfo(userId: string, data: UserDataPersonalInfo): Promise<void>
 
    getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]>
+
+   getUserLanguages(userId: string): Promise<ProfileLanguage[]>
 }
 
 export class FirebaseUserRepository
@@ -1263,6 +1265,18 @@ export class FirebaseUserRepository
       return querySnapshot.empty
          ? []
          : querySnapshot.docs.map((doc) => doc.data() as StudyBackground)
+   }
+
+   async getUserLanguages(userId: string): Promise<ProfileLanguage[]> {
+      const querySnapshot = await this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("languages")
+         .get()
+
+      return querySnapshot.empty
+         ? []
+         : querySnapshot.docs.map((doc) => doc.data() as ProfileLanguage)
    }
 
    async createUserLink(userId: string, link: ProfileLink): Promise<void> {

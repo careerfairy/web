@@ -9,6 +9,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    private implicitDataRepo: ImplicitDataRepository
    private userAdditionalInfo: AdditionalUserRecommendationInfo = {
       studyBackgrounds: [],
+      languages: [],
    }
 
    constructor(
@@ -195,7 +196,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    }
 
    public userStudyBackground() {
-      if (this.userAdditionalInfo.studyBackgrounds?.length) {
+      if (this.userAdditionalInfo?.studyBackgrounds?.length) {
          // Fetch recommended events based on the user's study background
          this.userAdditionalInfo.studyBackgrounds.forEach((studyBackground) => {
             console.log(
@@ -207,6 +208,25 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
                   [studyBackground.fieldOfStudy],
                   this.limit
                )
+            )
+         })
+      }
+
+      return this
+   }
+
+   public userLanguages() {
+      if (this.userAdditionalInfo?.languages?.length) {
+         // Fetch recommended events based on the user's study background
+         this.userAdditionalInfo.languages.forEach((language) => {
+            console.log(
+               "🚀 ~ UserBasedRecommendationsBuilder ~ languages ~ language:",
+               language
+            )
+            this.addResults(
+               this.rankedLivestreamRepo.getEventsBasedOnSpokenLanguages([
+                  language.languageId,
+               ])
             )
          })
       }

@@ -153,9 +153,7 @@ export default class RecommendationServiceCore {
       return userRecommendationBuilder
          .userUniversityCountry()
          .userUniversity()
-         .userFieldsOfStudy() // Uses livestream.targetFieldsOfStudy
          .userLevelsOfStudy()
-         .userSpokenLanguages()
          .userUniversityCompanyTargetCountry()
          .userCountriesOfInterest()
          .userCompanyTargetUniversity()
@@ -175,6 +173,7 @@ export default class RecommendationServiceCore {
          .userImplicitAppliedJobsCompanyIndustries()
          .userImplicitAppliedJobsCompanySize()
          .userStudyBackground()
+         .userLanguages()
          .get()
    }
 }
