@@ -14,11 +14,9 @@ const styles = sxStyles({
    expandedThumbnail: {
       position: "relative",
       width: "100%",
-      height: "100%",
+      aspectRatio: "533/947",
       maxWidth: "533px",
-      maxHeight: "947px",
       margin: "0 auto",
-      border: "1px solid red",
       borderRadius: "12px",
       overflow: "hidden",
    },
