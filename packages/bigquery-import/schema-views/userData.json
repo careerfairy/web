@@ -161,6 +161,10 @@
       {
          "name": "spokenLanguages",
          "type": "stringified_map"
+      },
+      {
+         "name": "fcmTokens",
+         "type": "stringified_map"
       }
    ]
 }
