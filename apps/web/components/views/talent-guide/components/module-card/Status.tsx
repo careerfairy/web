@@ -24,7 +24,9 @@ const SkeletonStatus = () => {
 }
 
 export const Status = ({ module, onShineAnimationComplete }: Props) => {
-   const { isLoggedOut, isLoadingAuth } = useAuth()
+   const { isLoggedOut, isLoggedIn } = useAuth()
+
+   const isLoadingAuth = !isLoggedIn && !isLoggedOut
 
    if (isLoadingAuth) {
       return <SkeletonStatus />

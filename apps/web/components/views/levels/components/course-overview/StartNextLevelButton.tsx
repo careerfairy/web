@@ -23,15 +23,17 @@ export const StartNextLevelButton = ({ allLevels, ...props }: Props) => {
 
    const isLoadingAuth = !isLoggedOut && !isLoggedIn
 
-   const { data, isLoading } = useNextTalentGuideModule(
+   const { data, isLoading: isLoadingNextLevel } = useNextTalentGuideModule(
       authenticatedUser.uid,
       undefined,
       { disabled: isLoadingAuth }
    )
 
+   const isLoading = isLoadingAuth || isLoadingNextLevel
+
    const hasNoNextLevel = data === null
 
-   if (isLoading || isLoadingAuth) {
+   if (isLoading) {
       return (
          <LoadingButton {...defaultProps} {...props} loading={isLoading}>
             Review Level {allLevels[0].slug}
@@ -45,7 +47,7 @@ export const StartNextLevelButton = ({ allLevels, ...props }: Props) => {
 
    return (
       <Box width="100%" component={Link} href={link}>
-         <LoadingButton {...defaultProps} {...props}>
+         <LoadingButton {...defaultProps} {...props} loading={isLoading}>
             {hasNoNextLevel
                ? `Review Level ${allLevels[0].slug}`
                : `Start Level ${data.slug}`}
