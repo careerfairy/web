@@ -1240,7 +1240,7 @@ export class LivestreamService {
          string[]
       >(
          this.functions,
-         "getRecommendedEvents_v4"
+         "getRecommendedEvents_v5"
       )({ limit })
 
       const recommendedLivestreams: LivestreamEvent[] = []

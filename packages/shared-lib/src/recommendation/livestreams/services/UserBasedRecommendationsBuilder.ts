@@ -1,4 +1,4 @@
-import { UserData } from "../../../users"
+import { AdditionalUserRecommendationInfo, UserData } from "../../../users"
 import { ImplicitLivestreamRecommendationData } from "../ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "../RankedLivestreamEvent"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
@@ -7,6 +7,10 @@ import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
 
 export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    private implicitDataRepo: ImplicitDataRepository
+   private userAdditionalInfo: AdditionalUserRecommendationInfo = {
+      studyBackgrounds: [],
+   }
+
    constructor(
       limit: number,
       private readonly user: UserData,
@@ -17,6 +21,10 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public setImplicitData(implicitData: ImplicitLivestreamRecommendationData) {
       this.implicitDataRepo = new ImplicitDataRepository(implicitData)
+   }
+
+   public setAdditionalData(data: AdditionalUserRecommendationInfo) {
+      this.userAdditionalInfo = data
    }
 
    public userInterests() {
@@ -181,6 +189,26 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
                this.limit
             )
          )
+      }
+
+      return this
+   }
+
+   public userStudyBackground() {
+      if (this.userAdditionalInfo.studyBackgrounds?.length) {
+         // Fetch recommended events based on the user's study background
+         this.userAdditionalInfo.studyBackgrounds.forEach((studyBackground) => {
+            console.log(
+               "🚀 ~ UserBasedRecommendationsBuilder ~ userStudyBackground ~ studyBackground.fieldOfStudy:",
+               studyBackground.fieldOfStudy
+            )
+            this.addResults(
+               this.rankedLivestreamRepo.getEventsBasedOnFieldOfStudies(
+                  [studyBackground.fieldOfStudy],
+                  this.limit
+               )
+            )
+         })
       }
 
       return this

@@ -13,6 +13,7 @@ import {
 import {
    CompanyFollowed,
    RegisteredLivestreams,
+   StudyBackground,
    UserData,
 } from "@careerfairy/shared-lib/users"
 import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
@@ -37,6 +38,8 @@ export interface IRecommendationDataFetcher {
    getFollowedCompanies(userId: string): Promise<CompanyFollowed[]>
 
    getUserRegisteredLivestreams(): Promise<RegisteredLivestreams>
+
+   getUserStudyBackgrounds(): Promise<StudyBackground[]>
 }
 
 /**
@@ -89,6 +92,12 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
       // Not implemented for newsletter, since data fetching would be per
       // user meaning an excess number requests would be made for each subscribed user
       throw new Error("Not implemented: " + userId)
+   }
+
+   async getUserStudyBackgrounds(): Promise<StudyBackground[]> {
+      // Not implemented for newsletter, since data fetching would be per
+      // user meaning an excess number requests would be made for each subscribed user
+      throw new Error("Not implemented")
    }
 
    static async create(): Promise<NewsletterDataFetcher> {
@@ -169,6 +178,10 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
    async getFollowedCompanies(userId: string): Promise<CompanyFollowed[]> {
       const companies = await this.userRepo.getCompaniesUserFollows(userId)
       return companies || []
+   }
+
+   async getUserStudyBackgrounds(): Promise<StudyBackground[]> {
+      return this.userRepo.getUserStudyBackgrounds(this.userId)
    }
 }
 

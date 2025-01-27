@@ -1,6 +1,6 @@
 import { removeDuplicateDocuments } from "../../BaseFirebaseRepository"
 import { LivestreamEvent } from "../../livestreams"
-import { UserData } from "../../users"
+import { AdditionalUserRecommendationInfo, UserData } from "../../users"
 import { Logger } from "../../utils/types"
 import { sortDocumentByPopularity } from "../../utils/utils"
 import { sortRankedByPoints } from "../utils"
@@ -135,7 +135,8 @@ export default class RecommendationServiceCore {
       userData: UserData,
       livestreams: LivestreamEvent[],
       limit: number,
-      implicitData?: ImplicitLivestreamRecommendationData
+      implicitData?: ImplicitLivestreamRecommendationData,
+      additionalUserData?: AdditionalUserRecommendationInfo
    ): RankedLivestreamEvent[] {
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
@@ -146,6 +147,8 @@ export default class RecommendationServiceCore {
       if (implicitData) {
          userRecommendationBuilder.setImplicitData(implicitData)
       }
+
+      userRecommendationBuilder.setAdditionalData(additionalUserData)
 
       return userRecommendationBuilder
          .userUniversityCountry()
@@ -171,6 +174,7 @@ export default class RecommendationServiceCore {
          .userImplicitAppliedJobsCompanyCountry()
          .userImplicitAppliedJobsCompanyIndustries()
          .userImplicitAppliedJobsCompanySize()
+         .userStudyBackground()
          .get()
    }
 }
