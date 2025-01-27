@@ -299,6 +299,13 @@ const UserLinkedInLink = () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [debouncedLink, userData.id, userData.authId])
 
+   const handleDelete = useCallback(async () => {
+      await userRepo.updateAdditionalInformation(userData.id, {
+         linkedinUrl: "",
+      })
+      setLinkedInLink("")
+   }, [userData.id])
+
    return (
       <ConditionalWrapper
          condition={isLinkedInLinkValid}
@@ -331,7 +338,7 @@ const UserLinkedInLink = () => {
             faviconSrc={faviconSrc}
             link={link}
             linkUrlValue={linkUrlValue}
-            onDelete={() => setLinkedInLink("")}
+            onDelete={handleDelete}
          />
       </ConditionalWrapper>
    )
