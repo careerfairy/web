@@ -280,8 +280,8 @@ const UserLinkedInLink = () => {
 
    useEffect(() => {
       if (
-         (debouncedLink.length > 0 && !isValidLinkedInLink(debouncedLink)) ||
-         userData.linkedinUrl === debouncedLink
+         (debouncedLink?.length > 0 && !isValidLinkedInLink(debouncedLink)) ||
+         userData?.linkedinUrl === debouncedLink
       ) {
          return
       }
