@@ -82,6 +82,7 @@ import notificationLivestreams = require("./notificationLivestreams")
 import notificationOnboardings = require("./notificationOnboarding")
 import user = require("./user")
 import countries = require("./countries")
+import levels = require("./levels")
 
 // Auth
 exports.createNewUserAccount_v3 = auth.createNewUserAccount
@@ -374,6 +375,9 @@ exports.fetchCountryCitiesList = countries.fetchCountryCitiesList
 exports.fetchCountryCityData = countries.fetchCountryCityData
 exports.fetchCityData = countries.fetchCityData
 exports.fetchCountryData = countries.fetchCountryData
+
+// Levels
+exports.getFollowedCreators = levels.getFollowedCreators
 
 // CustomerIO
 exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
