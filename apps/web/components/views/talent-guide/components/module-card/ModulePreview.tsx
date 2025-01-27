@@ -1,4 +1,5 @@
-import { Box, IconButton, Stack, Typography } from "@mui/material"
+import { Box, Button, IconButton, Stack, Typography } from "@mui/material"
+import Link from "next/link"
 import { useState } from "react"
 import { Volume2, VolumeX, X } from "react-feather"
 import ReactPlayer from "react-player/file"
@@ -27,10 +28,11 @@ const styles = sxStyles({
       zIndex: 1,
    },
    iconButton: {
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      backgroundColor: "rgba(31, 31, 35, 0.50)",
+      p: 1.5,
       color: "white",
-      "&:hover": {
-         backgroundColor: "rgba(0, 0, 0, 0.7)",
+      "&:hover, &:focus": {
+         backgroundColor: "rgba(31, 31, 35, 0.70)",
       },
    },
    bottomContent: {
@@ -42,18 +44,6 @@ const styles = sxStyles({
       background: "linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent)",
       color: "white",
    },
-   startButton: {
-      backgroundColor: (theme) => theme.palette.primary[500],
-      color: "white",
-      padding: "12px 24px",
-      borderRadius: "100px",
-      textAlign: "center",
-      cursor: "pointer",
-      transition: "background-color 0.2s",
-      "&:hover": {
-         backgroundColor: (theme) => theme.palette.primary[600],
-      },
-   },
 })
 
 type Props = {
@@ -62,12 +52,16 @@ type Props = {
    onClose?: () => void
 }
 
+const checkIsMuted = () => {
+   if ("userActivation" in navigator) {
+      return !navigator.userActivation.hasBeenActive
+   }
+   return false
+}
+
 export const ModulePreview = ({ thumbnailUrl, videoUrl, onClose }: Props) => {
-   const [isMuted, setIsMuted] = useState(
-      "userActivation" in navigator
-         ? !navigator.userActivation.hasBeenActive
-         : false
-   )
+   const [isMuted, setIsMuted] = useState(checkIsMuted())
+
    const { module } = useModuleCardContext()
 
    const toggleMute = () => setIsMuted(!isMuted)
@@ -111,7 +105,14 @@ export const ModulePreview = ({ thumbnailUrl, videoUrl, onClose }: Props) => {
             <Typography variant="body1" sx={{ opacity: 0.8 }}>
                {module.content.moduleDescription}
             </Typography>
-            <Box sx={styles.startButton}>Start Level</Box>
+            <Button
+               component={Link}
+               href={`/levels/${module.slug}`}
+               variant="contained"
+               color="primary"
+            >
+               Start Level
+            </Button>
          </Stack>
       </Box>
    )
