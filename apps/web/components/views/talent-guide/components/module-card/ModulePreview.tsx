@@ -124,9 +124,9 @@ export const ModulePreview = ({ thumbnailUrl, videoUrl, onClose }: Props) => {
          />
 
          <FramerBox
-            {...bottomContentAnimation}
             sx={styles.bottomContent}
             component={Stack}
+            {...bottomContentAnimation}
          >
             <Stack
                direction="row"
@@ -165,7 +165,7 @@ export const ModulePreview = ({ thumbnailUrl, videoUrl, onClose }: Props) => {
    )
 }
 
-const bottomContentAnimation: MotionProps = {
+const bottomContentAnimation = {
    initial: { y: 100, opacity: 0 },
    animate: { y: 0, opacity: 1 },
    transition: {
@@ -174,4 +174,4 @@ const bottomContentAnimation: MotionProps = {
       stiffness: 200,
       delay: 0.2,
    },
-}
+} satisfies MotionProps
