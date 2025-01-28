@@ -117,6 +117,10 @@ const SelectUniversitiesDropDown = ({
             sx: {
                ".Mui-disabled": {
                   backgroundColor: "none",
+                  "&:hover": {
+                     borderColor: (theme) => theme.brand.purple[50],
+                     cursor: "not-allowed",
+                  },
                },
             },
             selectOnFocus: false,
