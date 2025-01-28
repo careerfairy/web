@@ -35,7 +35,7 @@ export const buildLevelQueryParams = (params: {
          pathname: "/levels",
          query: {
             ...currentQuery,
-            levelSlug: levelSlug,
+            levelSlug,
          },
       },
       shallow: true,

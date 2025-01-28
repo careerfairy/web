@@ -11,7 +11,7 @@ import FramerBox from "components/views/common/FramerBox"
 import { MotionProps } from "framer-motion"
 import dynamic from "next/dynamic"
 import Link from "next/link"
-import { ReactNode, useState } from "react"
+import { useState } from "react"
 import { ArrowRight, Minus, Plus, Volume2, VolumeX, X } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useModuleCardContext } from "./ModuleCard"
@@ -26,6 +26,15 @@ const styles = sxStyles({
       "& .react-player": {
          width: "100% !important",
          height: "100% !important",
+         "&::after": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0, 0, 0, 0.25)",
+         },
          "& video": {
             objectFit: "cover",
          },
@@ -35,9 +44,6 @@ const styles = sxStyles({
       position: "absolute",
       top: 16,
       right: 16,
-      display: "flex",
-      gap: 1,
-      zIndex: 1,
    },
    iconButton: {
       backgroundColor: "rgba(31, 31, 35, 0.50)",
@@ -74,7 +80,6 @@ const styles = sxStyles({
 
 type Props = {
    onClose?: () => void
-   overlay?: ReactNode
 }
 
 const PLACEHOLDER_VIDEO_URL = ONBOARDING_VIDEO_URL_DESKTOP
@@ -86,30 +91,17 @@ const checkIsMuted = () => {
    return false
 }
 
-export const ModulePreview = ({ onClose, overlay }: Props) => {
+export const ModulePreview = ({ onClose }: Props) => {
    const [isMuted, setIsMuted] = useState(checkIsMuted())
 
    const [showDescription, setShowDescription] = useState(true)
 
-   const { module, hasFinishedExpanding } = useModuleCardContext()
+   const { module, hasFinishedExpanding, isMobile } = useModuleCardContext()
 
    const toggleMute = () => setIsMuted(!isMuted)
 
    return (
       <Box sx={styles.videoContainer}>
-         {overlay}
-         <Box sx={styles.controls}>
-            <IconButton
-               sx={styles.iconButton}
-               onClick={toggleMute}
-               size="small"
-            >
-               {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-            </IconButton>
-            <IconButton sx={styles.iconButton} onClick={onClose} size="small">
-               <X size={20} />
-            </IconButton>
-         </Box>
          {Boolean(hasFinishedExpanding) && (
             <ReactPlayer
                className="react-player"
@@ -131,6 +123,22 @@ export const ModulePreview = ({ onClose, overlay }: Props) => {
                playing
             />
          )}
+         <Stack
+            spacing={1}
+            direction={isMobile ? "column" : "row"}
+            sx={styles.controls}
+         >
+            <IconButton
+               sx={styles.iconButton}
+               onClick={toggleMute}
+               size="small"
+            >
+               {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            </IconButton>
+            <IconButton sx={styles.iconButton} onClick={onClose} size="small">
+               <X size={20} />
+            </IconButton>
+         </Stack>
          <FramerBox
             sx={styles.bottomContent}
             component={Stack}

@@ -44,6 +44,9 @@ const styles = sxStyles({
       background: "black",
       pointerEvents: "none",
    },
+   image: {
+      objectFit: "cover",
+   },
 })
 
 type Props = {
@@ -81,9 +84,7 @@ export const Thumbnail = ({
                fill
                priority
                quality={100}
-               style={{
-                  objectFit: "cover",
-               }}
+               style={styles.image}
                sizes="(max-width: 768px) 100vw, 50vw"
             />
             <Overlay />
@@ -93,7 +94,7 @@ export const Thumbnail = ({
                animate={{ opacity: hasFinishedExpanding ? 1 : 0 }}
                transition={{ duration: 0.5 }}
             >
-               <ModulePreview onClose={onClose} overlay={<Overlay />} />
+               <ModulePreview onClose={onClose} />
             </FramerBox>
          </FramerBox>
       )
@@ -112,6 +113,7 @@ export const Thumbnail = ({
             alt="Levels Module Thumbnail"
             fill
             priority
+            style={styles.image}
             quality={100}
             sizes="(max-width: 768px) 100vw, 50vw"
          />
@@ -127,6 +129,7 @@ type OverlayProps = {
 const Overlay = ({ opacity = 0.25 }: OverlayProps) => {
    return (
       <Box
+         id="overlay"
          sx={[
             styles.overlay,
             {
