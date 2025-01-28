@@ -153,15 +153,15 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
       }, [router])
 
       useEffect(() => {
+         if (!shouldExpand) return
+
          const handleEscapeKey = (event: KeyboardEvent) => {
             if (event.key === "Escape" && shouldExpand) {
                handleClose()
             }
          }
 
-         if (shouldExpand) {
-            document.addEventListener("keydown", handleEscapeKey)
-         }
+         document.addEventListener("keydown", handleEscapeKey)
 
          return () => {
             document.removeEventListener("keydown", handleEscapeKey)
