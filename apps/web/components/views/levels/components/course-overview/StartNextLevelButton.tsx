@@ -44,14 +44,14 @@ export const StartNextLevelButton = ({ allLevels, ...props }: Props) => {
       )
    }
 
-   const levelSlug = hasNoNextLevel ? allLevels[0].slug : data.slug
+   const levelId = hasNoNextLevel ? allLevels[0].slug : data.slug
 
    return (
       <Box
          width="100%"
          component={Link}
          {...buildLevelQueryParams({
-            levelSlug: levelSlug,
+            levelId,
             currentQuery: query,
          })}
       >

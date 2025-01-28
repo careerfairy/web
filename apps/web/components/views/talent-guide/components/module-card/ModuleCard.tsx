@@ -16,7 +16,7 @@ import {
 } from "react"
 import { useLockBodyScroll } from "react-use"
 import { sxStyles } from "types/commonTypes"
-import { buildLevelQueryParams } from "util/routes"
+import { buildLevelQueryParams, LEVEL_SLUG_PARAM } from "util/routes"
 import { Details } from "./Details"
 import { Status } from "./Status"
 import { Thumbnail } from "./Thumbnail"
@@ -127,8 +127,10 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
    ) => {
       const isDefaultMobile = useIsMobile()
       const router = useRouter()
-      const shouldExpand = router.query.levelSlug === module.slug && canAnimate
       const [hasFinishedAnimating, setHasFinishedAnimating] = useState(false)
+
+      const shouldExpand =
+         router.query[LEVEL_SLUG_PARAM] === module.slug && canAnimate
 
       // Lock body scroll when overlay is expanded
       useLockBodyScroll(shouldExpand)
@@ -141,7 +143,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
 
       const handleClose = useCallback(() => {
          const newQuery = { ...router.query }
-         delete newQuery.levelSlug
+         delete newQuery[LEVEL_SLUG_PARAM]
          setHasFinishedAnimating(false)
          router.push(
             "/levels",
@@ -153,10 +155,10 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
       }, [router])
 
       useEffect(() => {
-         if (!shouldExpand) return
+         if (!shouldExpand || !hasFinishedAnimating) return
 
          const handleEscapeKey = (event: KeyboardEvent) => {
-            if (event.key === "Escape" && shouldExpand) {
+            if (event.key === "Escape") {
                handleClose()
             }
          }
@@ -166,7 +168,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
          return () => {
             document.removeEventListener("keydown", handleEscapeKey)
          }
-      }, [shouldExpand, handleClose])
+      }, [shouldExpand, handleClose, hasFinishedAnimating])
 
       const handleAnimationComplete = () => {
          setHasFinishedAnimating(true)
@@ -193,7 +195,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
       const props =
          interactive && canAnimate
             ? buildLevelQueryParams({
-                 levelSlug: module.slug,
+                 [LEVEL_SLUG_PARAM]: module.slug,
                  currentQuery: router.query,
               })
             : {}

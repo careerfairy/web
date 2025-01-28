@@ -21,21 +21,23 @@ export const buildMentorPageLink = (params: {
    )}/${creatorId}`
 }
 
+export const LEVEL_SLUG_PARAM = "levelId"
+
 /**
  * Builds the query parameters for level navigation with proper type safety
  */
 export const buildLevelQueryParams = (params: {
-   levelSlug: string
+   [LEVEL_SLUG_PARAM]: string
    currentQuery: NextRouter["query"]
 }): LinkProps => {
-   const { levelSlug, currentQuery } = params
+   const { [LEVEL_SLUG_PARAM]: levelId, currentQuery } = params
 
    return {
       href: {
          pathname: "/levels",
          query: {
             ...currentQuery,
-            levelSlug,
+            [LEVEL_SLUG_PARAM]: levelId,
          },
       },
       shallow: true,
