@@ -48,6 +48,9 @@ const styles = sxStyles({
       backgroundColor: "rgba(31, 31, 35, 0.50)",
       p: 1.5,
       color: "white",
+      "& svg": {
+         strokeWidth: 2.5,
+      },
       "&:hover, &:focus": {
          backgroundColor: "rgba(31, 31, 35, 0.70)",
       },
@@ -117,7 +120,7 @@ export const ModulePreview = ({ onClose }: Props) => {
          )}
          <Stack
             spacing={1}
-            direction={isMobile ? "column" : "row"}
+            direction={isMobile ? "column-reverse" : "row"}
             sx={styles.controls}
          >
             <IconButton
