@@ -107,6 +107,9 @@ export const ModulePreview = ({ onClose }: Props) => {
                height="100%"
                playsinline
                muted={isMuted}
+               onError={(error) => {
+                  console.error("Error loading video", error)
+               }}
                url={module.content.modulePreviewVideo?.url}
                loop
                playing
