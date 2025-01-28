@@ -80,7 +80,7 @@ export const LevelsContainer = ({ pages }: Props) => {
                         module={page}
                         interactive
                         overrideIsMobile={cardsAreMobile}
-                        canExpand={hasStaggerFinished}
+                        canAnimate={hasStaggerFinished}
                      />
                   </FramerBox>
                ))}
