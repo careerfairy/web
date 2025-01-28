@@ -20,7 +20,7 @@ export const StepActionButton = () => {
    const quizState = useQuizState(currentQuiz?.id)
    const isLastStep = useIsLastStep()
    const moduleId = useModuleId()
-   const moduleProgress = useModuleProgress(moduleId)
+   const { moduleProgress } = useModuleProgress(moduleId)
    const isModuleCompleted = Boolean(moduleProgress?.completedAt)
 
    if (!currentStep) return null

@@ -19,6 +19,7 @@ import {
    useIsLoadingTalentGuide,
    useShowEndOfModuleExperience,
 } from "store/selectors/talentGuideSelectors"
+import { getTalentGuideModuleSeoProps } from "util/seo/talentGuideSeo"
 import {
    tgBackendPreviewService,
    tgBackendService,
@@ -31,8 +32,8 @@ interface TalentGuidePageProps {
 
 const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const dispatch = useAppDispatch()
-   const { isPreview } = useRouter()
-   const { authenticatedUser, isLoggedIn } = useAuth()
+   const { isPreview, asPath, replace } = useRouter()
+   const { authenticatedUser, isLoggedIn, isLoggedOut } = useAuth()
    const isLoadingGuide = useIsLoadingTalentGuide()
    const showEndOfModuleExperience = useShowEndOfModuleExperience()
    const [layoutKey, setLayoutKey] = useState(0)
@@ -54,8 +55,26 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       }
    }, [dispatch, authenticatedUser.uid, data])
 
+   useEffect(() => {
+      if (isLoggedOut) {
+         void replace({
+            pathname: `/login`,
+            query: { absolutePath: asPath },
+         })
+      }
+   }, [isLoggedOut, asPath, replace])
+
    const handleResetLayout = () => {
       setLayoutKey((prev) => prev + 1)
+   }
+
+   if (!isLoggedIn) {
+      return (
+         <Fragment>
+            <SEO {...getTalentGuideModuleSeoProps(data, isPreview)} />
+            <Loader />
+         </Fragment>
+      )
    }
 
    const isLoading = isLoadingGuide || !isLoggedIn
@@ -63,7 +82,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    return (
       <Fragment key={layoutKey}>
          {Boolean(isPreview) && <PreviewModeAlert />}
-         <SEO title={`${data.content.moduleName} - CareerFairy Levels`} />
+         <SEO {...getTalentGuideModuleSeoProps(data, isPreview)} />
          {isLoading ? (
             <Loader />
          ) : showEndOfModuleExperience ? (
@@ -105,7 +124,7 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
          props: {
             data,
          },
-         revalidate: 60, // Revalidate every 60 seconds
+         revalidate: process.env.NODE_ENV === "development" ? false : 60,
       }
    } catch (error) {
       console.error(error)

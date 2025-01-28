@@ -16,7 +16,7 @@ export const FinishModuleButton = () => {
          variant="outlined"
          loading={isLoadingNextStep}
       >
-         Finish module
+         Finish Level
       </FloatingButton>
    )
 }

@@ -1,47 +1,93 @@
+import { Skeleton, Stack } from "@mui/material"
 import { useModuleProgress } from "components/custom-hook/talent-guide/useModuleProgress"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { TalentGuideModule } from "data/hygraph/types"
+import { useAuth } from "HOCs/AuthProvider"
+import { useModuleCardContext } from "./ModuleCard"
 import { ModuleCompletedChip } from "./ModuleCompletedChip"
-import { ModuleInfoChip } from "./ModuleInfoChip"
+import { LevelInfo, ModuleInfoChip } from "./ModuleInfoChip"
+import { statusStyles } from "./styles"
 
 type Props = {
    module: TalentGuideModule
    onShineAnimationComplete?: () => void
 }
 
-export const Status = ({ module, onShineAnimationComplete }: Props) => {
+const SkeletonStatus = () => {
    return (
-      <SuspenseWithBoundary
-         fallback={
-            <ModuleInfoChip
-               moduleLevel={module.level}
-               moduleDuration={module.moduleDuration}
-            />
-         }
-      >
-         <Content
-            module={module}
-            onShineAnimationComplete={onShineAnimationComplete}
+      <Skeleton
+         sx={statusStyles.chip}
+         height={25.98}
+         width={115}
+         variant="rectangular"
+      />
+   )
+}
+
+export const Status = ({ module, onShineAnimationComplete }: Props) => {
+   const { isLoggedOut, isLoggedIn } = useAuth()
+
+   const isLoadingAuth = !isLoggedIn && !isLoggedOut
+
+   if (isLoadingAuth) {
+      return <SkeletonStatus />
+   }
+
+   if (isLoggedOut) {
+      return (
+         <ModuleInfoChip
+            moduleLevel={module.level}
+            estimatedModuleDurationMinutes={
+               module.estimatedModuleDurationMinutes
+            }
          />
-      </SuspenseWithBoundary>
+      )
+   }
+
+   return (
+      <Content
+         module={module}
+         onShineAnimationComplete={onShineAnimationComplete}
+      />
    )
 }
 
 const Content = ({ module, onShineAnimationComplete }: Props) => {
-   const moduleProgress = useModuleProgress(module.id)
+   const { isMobile } = useModuleCardContext()
+   const { moduleProgress, loading: isLoadingProgress } = useModuleProgress(
+      module.id
+   )
+
+   if (isLoadingProgress) {
+      return <SkeletonStatus />
+   }
 
    if (moduleProgress?.completedAt) {
       return (
-         <ModuleCompletedChip
-            onShineAnimationComplete={onShineAnimationComplete}
-         />
+         <Stack
+            direction="row"
+            justifyContent="space-between"
+            width="100%"
+            spacing={1}
+         >
+            {!isMobile && (
+               <LevelInfo
+                  moduleLevel={module.level}
+                  estimatedModuleDurationMinutes={
+                     module.estimatedModuleDurationMinutes
+                  }
+               />
+            )}
+            <ModuleCompletedChip
+               onShineAnimationComplete={onShineAnimationComplete}
+            />
+         </Stack>
       )
    }
 
    return (
       <ModuleInfoChip
          moduleLevel={module.level}
-         moduleDuration={module.moduleDuration}
+         estimatedModuleDurationMinutes={module.estimatedModuleDurationMinutes}
          percentProgress={moduleProgress?.percentageComplete}
       />
    )

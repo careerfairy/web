@@ -33,7 +33,7 @@ export const RestartModuleButton = () => {
                variant="outlined"
                startIcon={<RestartIcon />}
             >
-               Restart module
+               Restart Level
             </FloatingButton>
          )}
 

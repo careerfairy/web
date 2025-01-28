@@ -30,6 +30,7 @@ const createFeatureFlagEnableCondition = (groupIds: string[]) => {
  * - ?sparksAdminPageFlag=true
  * - ?sparksB2BOnboardingFlag=true
  * - ?livestreamCreationFlowV2=true
+ * - ?levelsV1=true
  */
 export const flagsInitialState = {
    /**
@@ -78,6 +79,9 @@ export const flagsInitialState = {
       enabled: true,
    },
    talentProfileV1: {
+      enabled: false,
+   },
+   levelsV1: {
       enabled: false,
    },
 } satisfies FeatureFlagsDetails
