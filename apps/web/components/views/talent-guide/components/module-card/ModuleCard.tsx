@@ -14,6 +14,7 @@ import {
    useMemo,
    useState,
 } from "react"
+import { useLockBodyScroll } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { Details } from "./Details"
 import { Status } from "./Status"
@@ -76,6 +77,9 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
    }),
+   expandedOverlayDesktop: {
+      py: 4.75,
+   },
 })
 
 type ModuleCardContextType = {
@@ -123,6 +127,9 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
       const router = useRouter()
       const isExpanded = router.query.moduleId === module.slug && canExpand
       const [hasFinishedExpanding, setHasFinishedExpanding] = useState(false)
+
+      // Lock body scroll when overlay is expanded
+      useLockBodyScroll(isExpanded)
 
       const handleCardClick = () => {
          if (interactive && canExpand) {
@@ -237,7 +244,10 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
                      initial={{ opacity: 0 }}
                      animate={{ opacity: 1 }}
                      exit={{ opacity: 0 }}
-                     sx={styles.expandedOverlay}
+                     sx={[
+                        styles.expandedOverlay,
+                        !value.isMobile && styles.expandedOverlayDesktop,
+                     ]}
                      layoutId={`card-${module.slug}`}
                      onLayoutAnimationComplete={handleAnimationComplete}
                   >
