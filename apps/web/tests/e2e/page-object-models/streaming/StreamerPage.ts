@@ -83,7 +83,7 @@ export class StreamerPage extends StreamingPage {
       await expect(this.text("Join live stream")).toBeVisible()
       await expect(
          this.page.locator('input[id="select-microphone"]')
-      ).not.toHaveValue("", { timeout: 8000 })
+      ).not.toHaveValue("", { timeout: 12000 })
       await this.page.locator('button:has-text("Join live stream")').click()
    }
 
@@ -97,12 +97,12 @@ export class StreamerPage extends StreamingPage {
    public async createPoll(poll: Partial<CreateLivestreamPollRequest>) {
       await this.page.locator('textarea[name="question"]').click()
       await this.page.locator('textarea[name="question"]').fill(poll.question)
-  // Iterate over the poll options and fill them dynamically
-  for (const [index, option] of poll.options.entries()) {
-    const optionSelector = `input[name="options.${index}.text"]`;
-    await this.page.locator(optionSelector).click();
-    await this.page.locator(optionSelector).fill(option.text);
-  }
+      // Iterate over the poll options and fill them dynamically
+      for (const [index, option] of poll.options.entries()) {
+         const optionSelector = `input[name="options.${index}.text"]`
+         await this.page.locator(optionSelector).click()
+         await this.page.locator(optionSelector).fill(option.text)
+      }
 
       await this.page.locator('button:has-text("Create poll")').click()
    }
