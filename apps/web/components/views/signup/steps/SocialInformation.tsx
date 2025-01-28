@@ -18,12 +18,14 @@ import { useUserLinks } from "components/custom-hook/user/useUserLinks"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { CustomLinkCard } from "components/views/common/links/CustomLinkCard"
 import { isLinkedInUrl } from "layouts/UserLayout/TalentProfile/Details/Profile/ProfileLinks"
+import { LinkFormProvider } from "layouts/UserLayout/TalentProfile/Details/Profile/forms/LinksForm"
+import { CreateLinkSchemaType } from "layouts/UserLayout/TalentProfile/Details/Profile/forms/schemas"
 import normalizeUrl from "normalize-url"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { PlusCircle, Trash2 } from "react-feather"
+import { useFormContext } from "react-hook-form"
 import { useDebounce, useLocalStorage } from "react-use"
 import { errorLogAndNotify, getIconUrl } from "util/CommonUtil"
-import { isWebUri } from "valid-url"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
 import { userRepo } from "../../../../data/RepositoryInstances"
@@ -419,8 +421,8 @@ const UserOtherLinks = () => {
          <ConditionalWrapper
             condition={!isLinkFormOpen}
             fallback={
-               <LinkForm
-                  onCancel={() => setIsLinkFormOpen(false)}
+               <ProfileLinkForm
+                  onClose={() => setIsLinkFormOpen(false)}
                   onSubmit={handleLinkSubmit}
                />
             }
@@ -443,74 +445,94 @@ const UserOtherLinks = () => {
    )
 }
 
-type LinkFormProps = {
-   onCancel: () => void
+type ProfileLinkFormProps = {
+   onClose: () => void
    onSubmit: (link: ProfileLink) => Promise<void>
 }
 
-const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
+const ProfileLinkForm = ({ onClose }: ProfileLinkFormProps) => {
+   return (
+      <LinkFormProvider>
+         <LinkForm onClose={onClose} />
+      </LinkFormProvider>
+   )
+}
+
+type LinkFormProps = {
+   onClose: () => void
+}
+
+const LinkForm = ({ onClose }: LinkFormProps) => {
    const { userData } = useAuth()
-   const [linkTitle, setLinkTitle] = useState("")
-   const [link, setLink] = useState("")
-   const resetForm = () => {
-      setLinkTitle("")
-      setLink("")
+
+   const {
+      formState: { isValid, isSubmitting },
+      setValue,
+      getFieldState,
+      reset,
+      handleSubmit,
+   } = useFormContext<CreateLinkSchemaType>()
+
+   const urlFieldState = getFieldState("url")
+   const titleFieldState = getFieldState("title")
+
+   const onSubmit = async (link: ProfileLink) => {
+      link.url = normalizeUrl(link.url, { forceHttps: true })
+
+      reset({})
+      onClose()
+      if (!userData.linkedinUrl && isLinkedInUrl(link.url)) {
+         await userRepo
+            .updateAdditionalInformation(userData.id, {
+               linkedinUrl: link.url,
+            })
+            .catch(errorLogAndNotify)
+      } else {
+         await userRepo
+            .createUserLink(userData.id, link)
+            .catch(errorLogAndNotify)
+      }
    }
 
-   const handleSave = async () => {
-      resetForm()
-      onSubmit({
-         title: linkTitle,
-         url: normalizeUrl(link, { forceHttps: true }),
-         authId: userData.authId,
-         id: null,
-      })
-      onCancel()
-   }
+   const handleSave = async () => handleSubmit(onSubmit)()
 
    const handleCancel = useCallback(() => {
-      resetForm()
-      onCancel()
-   }, [onCancel])
-
-   const isValidLink = useMemo(() => {
-      // This seems... wrong :(, but it works for now.
-      const value =
-         !link?.startsWith("http") || !link.startsWith("https")
-            ? `https://${link}`
-            : link
-      return isWebUri(value)
-   }, [link])
-
-   const isValidForm = useMemo(() => {
-      return isValidLink && Boolean(linkTitle?.length)
-   }, [isValidLink, linkTitle])
+      reset({})
+      onClose()
+   }, [onClose, reset])
 
    return (
       <Stack sx={styles.linkFormRoot} spacing={2}>
          <Stack spacing={1.5}>
-            <TextField
-               label="Add your link title"
-               name="linkTitle"
-               value={linkTitle}
-               onChange={(e) => setLinkTitle(e.target.value)}
-               sx={styles.linkTextField}
-               fullWidth
-               variant="outlined"
-            />
+            <Stack justifyContent={"flex-start"}>
+               <TextField
+                  label="Add your link title"
+                  name="title"
+                  onChange={(e) =>
+                     setValue("title", e.target.value, { shouldValidate: true })
+                  }
+                  sx={styles.linkTextField}
+                  fullWidth
+                  variant="outlined"
+               />
+               <ConditionalWrapper condition={titleFieldState.invalid}>
+                  <FormHelperText sx={{ ml: 2, color: "error.main" }}>
+                     Title is required
+                  </FormHelperText>
+               </ConditionalWrapper>
+            </Stack>
             <Stack justifyContent={"flex-start"}>
                <TextField
                   label="Add your link URL"
-                  name="linkUrl"
-                  value={link}
+                  name="url"
                   onChange={(e) => {
-                     setLink(e.target.value)
+                     setValue("url", e.target.value, { shouldValidate: true })
                   }}
                   sx={styles.linkTextField}
                   fullWidth
                   variant="outlined"
                />
-               <ConditionalWrapper condition={link?.length > 0 && !isValidLink}>
+               <ConditionalWrapper condition={urlFieldState.invalid}>
                   <FormHelperText sx={{ ml: 2, color: "error.main" }}>
                      Invalid UrL
                   </FormHelperText>
@@ -531,7 +553,7 @@ const LinkForm = ({ onCancel, onSubmit }: LinkFormProps) => {
                sx={styles.linkFormAddButton}
                variant="contained"
                onClick={handleSave}
-               disabled={!isValidForm}
+               disabled={!isValid || isSubmitting}
             >
                <Typography variant="small" fontWeight={400} color="white.100">
                   Add
