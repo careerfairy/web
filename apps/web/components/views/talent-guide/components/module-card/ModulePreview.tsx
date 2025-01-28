@@ -8,12 +8,14 @@ import {
 } from "@mui/material"
 import FramerBox from "components/views/common/FramerBox"
 import { MotionProps } from "framer-motion"
+import dynamic from "next/dynamic"
 import Link from "next/link"
 import { ReactNode, useState } from "react"
 import { ArrowRight, Minus, Plus, Volume2, VolumeX, X } from "react-feather"
-import ReactPlayer from "react-player/file"
 import { sxStyles } from "types/commonTypes"
 import { useModuleCardContext } from "./ModuleCard"
+
+const ReactPlayer = dynamic(() => import("react-player/file"), { ssr: false })
 
 const styles = sxStyles({
    videoContainer: {
@@ -93,7 +95,7 @@ export const ModulePreview = ({
 
    const [showDescription, setShowDescription] = useState(true)
 
-   const { module } = useModuleCardContext()
+   const { module, hasFinishedExpanding } = useModuleCardContext()
 
    const toggleMute = () => setIsMuted(!isMuted)
 
@@ -112,24 +114,24 @@ export const ModulePreview = ({
                <X size={20} />
             </IconButton>
          </Box>
-
-         <ReactPlayer
-            className="react-player"
-            width="100%"
-            height="100%"
-            playsinline
-            controls={false}
-            muted={isMuted}
-            url={videoUrl}
-            config={{
-               attributes: {
-                  poster: thumbnailUrl,
-               },
-            }}
-            loop
-            playing
-         />
-
+         {Boolean(hasFinishedExpanding) && (
+            <ReactPlayer
+               className="react-player"
+               width="100%"
+               height="100%"
+               playsinline
+               controls={false}
+               muted={isMuted}
+               url={videoUrl}
+               config={{
+                  attributes: {
+                     poster: thumbnailUrl,
+                  },
+               }}
+               loop
+               playing
+            />
+         )}
          <FramerBox
             sx={styles.bottomContent}
             component={Stack}
