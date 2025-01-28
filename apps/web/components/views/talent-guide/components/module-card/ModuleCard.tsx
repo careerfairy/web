@@ -87,6 +87,7 @@ type ModuleCardContextType = {
    isExpanded: boolean
    hasFinishedExpanding: boolean
    module: Page<TalentGuideModule>
+   canAnimate: boolean
 }
 
 const ModuleCardContext = createContext<ModuleCardContextType | undefined>(
@@ -108,7 +109,7 @@ type Props = {
    /**
     * Controls whether the card can expand. Used to delay expansion until parent animations complete.
     */
-   canExpand?: boolean
+   canAnimate?: boolean
 }
 
 export const ModuleCard = forwardRef<HTMLDivElement, Props>(
@@ -119,20 +120,20 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
          isRecommended,
          onShineAnimationComplete,
          overrideIsMobile,
-         canExpand = true,
+         canAnimate = true,
       },
       ref
    ) => {
       const isDefaultMobile = useIsMobile()
       const router = useRouter()
-      const isExpanded = router.query.moduleId === module.slug && canExpand
+      const isExpanded = router.query.moduleId === module.slug && canAnimate
       const [hasFinishedExpanding, setHasFinishedExpanding] = useState(false)
 
       // Lock body scroll when overlay is expanded
       useLockBodyScroll(isExpanded)
 
       const handleCardClick = () => {
-         if (interactive && canExpand) {
+         if (interactive && canAnimate) {
             setHasFinishedExpanding(false)
          }
       }
@@ -170,12 +171,13 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
          setHasFinishedExpanding(true)
       }
 
-      const value = useMemo(
+      const value = useMemo<ModuleCardContextType>(
          () => ({
             isMobile: overrideIsMobile ?? isDefaultMobile,
             isExpanded,
             hasFinishedExpanding,
             module,
+            canAnimate,
          }),
          [
             overrideIsMobile,
@@ -183,6 +185,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
             isExpanded,
             hasFinishedExpanding,
             module,
+            canAnimate,
          ]
       )
 
@@ -198,7 +201,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
          scroll: false,
       }
 
-      const props = interactive && canExpand ? linkProps : {}
+      const props = interactive && canAnimate ? linkProps : {}
 
       return (
          <ModuleCardContext.Provider value={value}>
@@ -208,7 +211,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
             >
                <Stack
                   ref={ref}
-                  component={interactive && canExpand ? Link : Stack}
+                  component={interactive && canAnimate ? Link : Stack}
                   {...props}
                   direction="row"
                   spacing={1.5}
