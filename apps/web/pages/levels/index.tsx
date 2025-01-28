@@ -1,32 +1,32 @@
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
+import { Page, TalentGuideModule } from "data/hygraph/types"
+import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { GetStaticProps, NextPage } from "next"
-import Link from "next/link"
 import { useRouter } from "next/router"
+import { Fragment } from "react"
+import { getTalentGuideOverviewSeoProps } from "util/seo/talentGuideSeo"
+import SEO from "../../components/util/SEO"
+import { LevelsContainer } from "../../components/views/levels/components/LevelsContainer"
 import {
    tgBackendPreviewService,
    tgBackendService,
 } from "../../data/hygraph/TalentGuideBackendService"
+
 interface TalentGuidePageProps {
-   slugs: string[]
+   pages: Page<TalentGuideModule>[]
 }
 
-const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ slugs }) => {
-   const { isPreview, locale } = useRouter()
+const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ pages }) => {
+   const { isPreview } = useRouter()
+
    return (
-      <div>
-         <h1>Talent Guide: {isPreview ? "Preview" : "Published"}</h1>
-         <p>Locale: {locale}</p>
-         <ul>
-            {slugs.map((slug) => (
-               <li key={slug}>
-                  <Link locale={locale} href={`/levels/${slug}`}>
-                     {slug}
-                  </Link>
-               </li>
-            ))}
-         </ul>
-         {Boolean(isPreview) && <PreviewModeAlert />}
-      </div>
+      <Fragment>
+         <SEO {...getTalentGuideOverviewSeoProps(pages, isPreview)} />
+         <GenericDashboardLayout pageDisplayName="Levels">
+            <LevelsContainer pages={pages} />
+            {Boolean(isPreview) && <PreviewModeAlert />}
+         </GenericDashboardLayout>
+      </Fragment>
    )
 }
 
@@ -42,13 +42,13 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
 
    const service = preview ? tgBackendPreviewService : tgBackendService
 
-   const slugs = await service.getAllTalentGuideModulePageSlugs()
+   const pages = await service.getAllTalentGuideModulePages()
 
    return {
       props: {
-         slugs,
+         pages,
       },
-      revalidate: 60, // Revalidate every 60 seconds
+      revalidate: process.env.NODE_ENV === "development" ? false : 60,
    }
 }
 

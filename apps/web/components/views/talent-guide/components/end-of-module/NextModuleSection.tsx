@@ -1,8 +1,9 @@
 import { Button, Typography, useMediaQuery } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
+import Link from "components/views/common/Link"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { AnimatePresence } from "framer-motion"
-import { useRouter } from "next/router"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { Play } from "react-feather"
 import { useModuleData } from "store/selectors/talentGuideSelectors"
@@ -13,6 +14,7 @@ import {
    nextModuleVariants,
 } from "./animations"
 import { nextModuleStyles } from "./styles"
+import { useDelayedValue } from "./useDelayedValue"
 
 type Props = {
    nextModule: Page<TalentGuideModule> | null
@@ -22,9 +24,9 @@ const SHRINK_FACTOR = 0.7
 
 type AnimationsState = {
    hasShineAnimationComplete: boolean
-   hasDividerAnimationComplete: boolean
    hasCompletedModuleCardSlidUp: boolean
    hasNextModuleCardAppeared: boolean
+   hasDividerAnimationComplete: boolean
 }
 
 export const NextModuleSection = ({ nextModule }: Props) => {
@@ -40,6 +42,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
    const [cardOffset, setCardOffset] = useState(0)
 
    const isShortScreen = useMediaQuery("(max-height: 745px)")
+   const isMobile = useIsMobile()
 
    const completedCardRef = useRef<HTMLDivElement>(null)
    const dividerRef = useRef<HTMLDivElement>(null)
@@ -64,11 +67,19 @@ export const NextModuleSection = ({ nextModule }: Props) => {
       ) {
          const cardHeight =
             completedCardRef.current.getBoundingClientRect().height
+
          const scaledHeight = cardHeight * SHRINK_FACTOR
+
          const offset = (cardHeight - scaledHeight) / 2
+
          setCardOffset(offset)
       }
    }, [animationsState.hasShineAnimationComplete])
+
+   const hasCompletedModuleCardSlidUp = useDelayedValue(
+      animationsState.hasCompletedModuleCardSlidUp,
+      500
+   )
 
    return (
       <FramerBox
@@ -80,9 +91,8 @@ export const NextModuleSection = ({ nextModule }: Props) => {
          sx={nextModuleStyles.section}
          data-testid="next-module-section"
       >
-         <AnimatePresence mode="sync">
+         <AnimatePresence mode="popLayout">
             <FramerBox
-               ref={completedCardRef}
                layout
                initial={{ scale: 1, y: 0 }}
                animate={{
@@ -109,6 +119,7 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                }}
             >
                <ModuleCard
+                  ref={completedCardRef}
                   module={moduleData}
                   onShineAnimationComplete={() => {
                      setAnimationsState((prev) => ({
@@ -142,14 +153,9 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                      hasNextModuleCardAppeared: true,
                   }))
                }}
-               sx={
-                  isShortScreen
-                     ? {
-                          paddingBottom:
-                             animationsState.hasNextModuleCardAppeared ? 5 : 10,
-                       }
-                     : null
-               }
+               sx={{
+                  paddingBottom: isShortScreen ? 2 : isMobile ? undefined : 10,
+               }}
             >
                <FramerBox
                   key="divider-container"
@@ -172,7 +178,10 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   }}
                />
                <ModuleCard
-                  isRecommended={animationsState.hasDividerAnimationComplete}
+                  isRecommended={
+                     hasCompletedModuleCardSlidUp ||
+                     animationsState.hasDividerAnimationComplete
+                  }
                   module={nextModule}
                />
             </FramerBox>
@@ -194,8 +203,6 @@ type BottomContentProps = {
 }
 
 const BottomContent = ({ nextModule }: BottomContentProps) => {
-   const { push } = useRouter()
-
    return (
       <Fragment>
          <Typography
@@ -217,14 +224,12 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
             color="primary"
             variant="contained"
             size="large"
-            startIcon={<Play />}
+            endIcon={<Play />}
             fullWidth
+            component={Link}
+            noLinkStyle
+            href={nextModule ? `/levels/${nextModule.slug}` : "/levels"}
             sx={nextModuleStyles.bottomButton}
-            onClick={() => {
-               if (nextModule) {
-                  push(`/levels/${nextModule.slug}`)
-               }
-            }}
          >
             Start next level
          </Button>

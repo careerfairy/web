@@ -435,6 +435,34 @@ export class TalentGuideProgressService {
          lastUpdated: now,
       })
    }
+
+   /**
+    * Calculates the overall progress percentage across all modules for a user
+    * @param userAuthUid - The authenticated user's ID
+    * @param allModules - All available modules from the CMS
+    * @returns Promise resolving to overall progress percentage (0-100)
+    */
+   async getOverallProgress(
+      userAuthUid: string,
+      allModules: Page<TalentGuideModule>[]
+   ): Promise<number> {
+      const allProgress = await this.getAllUserModuleProgress(userAuthUid)
+      const progressMap = new Map<string, TalentGuideProgress>()
+      allProgress.forEach((progress) => {
+         progressMap.set(progress.moduleHygraphId, progress)
+      })
+
+      if (allModules.length === 0) return 0
+
+      // Calculate total progress including modules that haven't been started (0% progress)
+      const totalProgressPercentage = allModules.reduce((sum, module) => {
+         if (!module.content) return sum
+         const progress = progressMap.get(module.content.id)
+         return sum + (progress?.percentageComplete || 0)
+      }, 0)
+
+      return totalProgressPercentage / allModules.length
+   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

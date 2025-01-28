@@ -1,6 +1,8 @@
 import ClockIcon from "@mui/icons-material/AccessTime"
 import DomainIcon from "@mui/icons-material/Domain"
-import { createContext, useContext, useMemo } from "react"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
+import { createContext, ReactNode, useContext, useMemo } from "react"
 import {
    Home as HomeIcon,
    Radio as LiveStreamsIcon,
@@ -27,6 +29,7 @@ type IGenericDashboardContext = {
    headerFixed?: boolean
    headerType?: "sticky" | "fixed"
    navLinks: INavLink[]
+   drawerOpen: boolean
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
@@ -35,6 +38,7 @@ const GenericDashboardContext = createContext<IGenericDashboardContext>({
    headerScrollThreshold: 10,
    headerFixed: false,
    navLinks: [],
+   drawerOpen: false,
 })
 
 const MyRegistrationsPath: INavLink = {
@@ -59,7 +63,7 @@ const PastLivestreamsPath: INavLink = {
 }
 
 type Props = {
-   children: JSX.Element
+   children: ReactNode
    pageDisplayName?: string
    bgColor?: string
    isPortalPage?: boolean
@@ -109,7 +113,7 @@ const GenericDashboardLayout = ({
    hideHeader,
 }: Props) => {
    const isMobile = useIsMobile(989, { defaultMatches: true })
-
+   const { levelsV1 } = useFeatureFlags()
    const { isLoggedIn } = useAuth()
 
    const [
@@ -161,10 +165,23 @@ const GenericDashboardLayout = ({
             Icon: DomainIcon,
             title: "Companies",
          },
+         ...(levelsV1
+            ? [
+                 {
+                    id: "levels",
+                    href: `/levels`,
+                    pathname: `/levels`,
+                    Icon: LevelsIcon,
+                    title: "Levels",
+                 },
+              ]
+            : []),
       ]
 
       return links
-   }, [isLoggedIn])
+   }, [isLoggedIn, levelsV1])
+
+   const drawerOpen = !hideDrawer && !isMobile
 
    const value = useMemo<IGenericDashboardContext>(
       () => ({
@@ -174,6 +191,7 @@ const GenericDashboardLayout = ({
          headerFixed: Boolean(headerFixed),
          headerType: headerType,
          navLinks,
+         drawerOpen,
       }),
       [
          handleOpenCreditsDialog,
@@ -182,6 +200,7 @@ const GenericDashboardLayout = ({
          navLinks,
          headerFixed,
          headerType,
+         drawerOpen,
       ]
    )
 
@@ -201,7 +220,7 @@ const GenericDashboardLayout = ({
                      <GenericNavList isDark={isBottomNavDark} />
                   )
                }
-               drawerOpen={!isMobile}
+               drawerOpen={drawerOpen}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
                headerWidth={headerWidth}
             >
