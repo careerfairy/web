@@ -116,11 +116,26 @@ const SelectUniversitiesDropDown = ({
             disableClearable: false,
             sx: {
                ".Mui-disabled": {
-                  backgroundColor: "none",
+                  backgroundColor: "#F7F8FC",
+                  borderColor: (theme) => theme.brand.purple[50],
+                  "&.MuiInputLabel-root": {
+                     opacity: 0.5,
+                  },
+                  "&::placeholder": {
+                     opacity: 0.5,
+                  },
                   "&:hover": {
+                     backgroundColor: "#F7F8FC",
                      borderColor: (theme) => theme.brand.purple[50],
+                     ".MuiFilledInput-root:hover": {
+                        backgroundColor: "#F7F8FC",
+                        borderColor: (theme) => theme.brand.purple[50],
+                     },
                      cursor: "not-allowed",
                   },
+               },
+               ".MuiFormHelperText-root.Mui-disabled": {
+                  backgroundColor: "unset",
                },
             },
             selectOnFocus: false,
