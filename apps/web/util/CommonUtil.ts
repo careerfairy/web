@@ -1,5 +1,4 @@
 /* eslint-disable no-var */
-import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import * as Sentry from "@sentry/nextjs"
 import { v4 as uuid } from "uuid"
 import LocalStorageUtil from "./LocalStorageUtil"
@@ -191,25 +190,6 @@ export const convertMillisecondsToTime = (milliseconds: number) => {
    } else {
       return `${Math.round(seconds)} seconds`
    }
-}
-
-// returns an array of elements with duplicate properties
-export const findElementsWithDuplicatePropertiesInArray = <T>(
-   elements: T[],
-   properties: Array<keyof T>,
-   sortBy: keyof T
-): T[] => {
-   const getPropertyString = (element: T) =>
-      properties.map((p) => element[p]).join("")
-   const duplicateProperties = elements
-      .map((v) => `${getPropertyString(v)}`) // convert element to a string of properties
-      .filter(
-         (propertyValue, i, arrayOfPropertyValues) =>
-            propertyValue && arrayOfPropertyValues.indexOf(propertyValue) !== i
-      )
-   return elements
-      .filter((obj) => duplicateProperties.includes(getPropertyString(obj)))
-      .sort(dynamicSort(sortBy))
 }
 
 export const capitalizeFirstLetter = (string: string) => {

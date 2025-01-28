@@ -411,6 +411,24 @@ export const removeDuplicates = <T>(arr: T[]): T[] => {
    return Array.from(new Set(arr))
 }
 
+// returns an array of elements with duplicate properties
+export const findElementsWithDuplicatePropertiesInArray = <T>(
+   elements: T[],
+   properties: Array<keyof T>,
+   sortBy: keyof T
+): T[] => {
+   const getPropertyString = (element: T) =>
+      properties.map((p) => element[p]).join("")
+   const duplicateProperties = elements
+      .map((v) => `${getPropertyString(v)}`) // convert element to a string of properties
+      .filter(
+         (propertyValue, i, arrayOfPropertyValues) =>
+            propertyValue && arrayOfPropertyValues.indexOf(propertyValue) !== i
+      )
+   return elements
+      .filter((obj) => duplicateProperties.includes(getPropertyString(obj)))
+      .sort(dynamicSort(sortBy))
+}
 /**
  * @description
  * Creates a lookup object from an array of objects based on the given property name.
