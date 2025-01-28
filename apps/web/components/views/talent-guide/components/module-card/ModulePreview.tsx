@@ -15,7 +15,7 @@ import { ArrowRight, Minus, Plus, Volume2, VolumeX, X } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useModuleCardContext } from "./ModuleCard"
 
-const ReactPlayer = dynamic(() => import("react-player/file"), { ssr: false })
+const ReactPlayer = dynamic(() => import("react-player"), { ssr: false })
 
 const styles = sxStyles({
    videoContainer: {
@@ -106,14 +106,8 @@ export const ModulePreview = ({ onClose }: Props) => {
                width="100%"
                height="100%"
                playsinline
-               controls={false}
                muted={isMuted}
                url={module.content.modulePreviewVideo?.url}
-               config={{
-                  attributes: {
-                     poster: module.content.moduleIllustration?.url,
-                  },
-               }}
                loop
                playing
             />
