@@ -94,6 +94,10 @@ export interface UserData extends Identifiable {
     * Last user activity on any device
     */
    lastActivityAt: Timestamp
+   /**
+    * Field added on 2025-01-28. Users signed in before this date won't have it.
+    */
+   lastSignInAt?: Timestamp
    createdAt: Timestamp
 
    /**

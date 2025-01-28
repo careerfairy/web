@@ -16,7 +16,7 @@ export function transformUserDataForCustomerIO(
       is_student: !!userData.isStudent,
       created_at: userData.createdAt?.toDate()?.getTime() / 1000,
       last_activity_at: userData.lastActivityAt?.toDate()?.getTime() / 1000,
-
+      last_sign_in_at: userData.lastSignInAt?.toDate()?.getTime() / 1000,
       // Education
       university_name: userData.university?.name,
       university_code: userData.university?.code,

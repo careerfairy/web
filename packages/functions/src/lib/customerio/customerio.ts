@@ -9,7 +9,10 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { isLocalEnvironment } from "../../util"
 import { trackingClient } from "./client"
 
-const CHECK_FOR_CHANGES = true
+/**
+ * Set to false when running backfill
+ */
+const CHECK_FOR_CHANGES = false
 
 export const syncUserToCustomerIO = onDocumentWritten(
    {
@@ -88,17 +91,12 @@ export const syncUserToCustomerIO = onDocumentWritten(
 
 const shouldSyncUser = (user: UserData) => {
    return (
-      user.unsubscribed !== true && // User is not unsubscribed
       user.lastActivityAt && // User has an activity date
       user.lastActivityAt.toDate() >= CUTOFF_DATE // User is active since before Sept 2023
    )
 }
 
 const getReasonForExclusion = (user: UserData) => {
-   if (user.unsubscribed) {
-      return "unsubscribed"
-   }
-
    if (!user.lastActivityAt) {
       return "no activity date"
    }
