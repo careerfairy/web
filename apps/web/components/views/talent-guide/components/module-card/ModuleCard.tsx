@@ -86,7 +86,7 @@ const styles = sxStyles({
 type ModuleCardContextType = {
    isMobile: boolean
    isExpanded: boolean
-   hasFinishedExpanding: boolean
+   hasFinishedAnimating: boolean
    module: Page<TalentGuideModule>
    canAnimate: boolean
 }
@@ -127,22 +127,22 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
    ) => {
       const isDefaultMobile = useIsMobile()
       const router = useRouter()
-      const isExpanded = router.query.levelSlug === module.slug && canAnimate
-      const [hasFinishedExpanding, setHasFinishedExpanding] = useState(false)
+      const shouldExpand = router.query.levelSlug === module.slug && canAnimate
+      const [hasFinishedAnimating, setHasFinishedAnimating] = useState(false)
 
       // Lock body scroll when overlay is expanded
-      useLockBodyScroll(isExpanded)
+      useLockBodyScroll(shouldExpand)
 
       const handleCardClick = () => {
          if (interactive && canAnimate) {
-            setHasFinishedExpanding(false)
+            setHasFinishedAnimating(false)
          }
       }
 
       const handleClose = useCallback(() => {
          const newQuery = { ...router.query }
          delete newQuery.levelSlug
-         setHasFinishedExpanding(false)
+         setHasFinishedAnimating(false)
          router.push(
             "/levels",
             {
@@ -154,37 +154,37 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
 
       useEffect(() => {
          const handleEscapeKey = (event: KeyboardEvent) => {
-            if (event.key === "Escape" && isExpanded) {
+            if (event.key === "Escape" && shouldExpand) {
                handleClose()
             }
          }
 
-         if (isExpanded) {
+         if (shouldExpand) {
             document.addEventListener("keydown", handleEscapeKey)
          }
 
          return () => {
             document.removeEventListener("keydown", handleEscapeKey)
          }
-      }, [isExpanded, handleClose])
+      }, [shouldExpand, handleClose])
 
       const handleAnimationComplete = () => {
-         setHasFinishedExpanding(true)
+         setHasFinishedAnimating(true)
       }
 
       const value = useMemo<ModuleCardContextType>(
          () => ({
             isMobile: overrideIsMobile ?? isDefaultMobile,
-            isExpanded,
-            hasFinishedExpanding,
+            isExpanded: shouldExpand,
+            hasFinishedAnimating,
             module,
             canAnimate,
          }),
          [
             overrideIsMobile,
             isDefaultMobile,
-            isExpanded,
-            hasFinishedExpanding,
+            shouldExpand,
+            hasFinishedAnimating,
             module,
             canAnimate,
          ]
@@ -235,7 +235,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
             </FramerBox>
 
             <AnimatePresence>
-               {Boolean(isExpanded) && (
+               {Boolean(shouldExpand) && (
                   <FramerBox
                      id="expanded-overlay"
                      key="expanded-overlay"

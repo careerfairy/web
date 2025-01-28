@@ -6,7 +6,6 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import { ONBOARDING_VIDEO_URL_DESKTOP } from "components/util/constants"
 import FramerBox from "components/views/common/FramerBox"
 import { MotionProps } from "framer-motion"
 import dynamic from "next/dynamic"
@@ -82,8 +81,6 @@ type Props = {
    onClose?: () => void
 }
 
-const PLACEHOLDER_VIDEO_URL = ONBOARDING_VIDEO_URL_DESKTOP
-
 const checkIsMuted = () => {
    if ("userActivation" in navigator) {
       return !navigator.userActivation.hasBeenActive
@@ -96,13 +93,14 @@ export const ModulePreview = ({ onClose }: Props) => {
 
    const [showDescription, setShowDescription] = useState(true)
 
-   const { module, hasFinishedExpanding, isMobile } = useModuleCardContext()
+   const { module, hasFinishedAnimating, isMobile } = useModuleCardContext()
 
    const toggleMute = () => setIsMuted(!isMuted)
 
    return (
       <Box sx={styles.videoContainer}>
-         {Boolean(hasFinishedExpanding) && (
+         {/* Render video player after animation completes to prevent stuttering */}
+         {Boolean(hasFinishedAnimating) && (
             <ReactPlayer
                className="react-player"
                width="100%"
@@ -110,10 +108,7 @@ export const ModulePreview = ({ onClose }: Props) => {
                playsinline
                controls={false}
                muted={isMuted}
-               url={
-                  module.content.modulePreviewVideo?.url ||
-                  PLACEHOLDER_VIDEO_URL
-               }
+               url={module.content.modulePreviewVideo?.url}
                config={{
                   attributes: {
                      poster: module.content.moduleIllustration?.url,

@@ -62,8 +62,7 @@ export const Thumbnail = ({
    expanded,
    onClose,
 }: Props) => {
-   const { hasFinishedExpanding, canAnimate: canExpand } =
-      useModuleCardContext()
+   const { hasFinishedAnimating, canAnimate } = useModuleCardContext()
    const isMobile = useIsMobile()
 
    if (expanded) {
@@ -91,7 +90,7 @@ export const Thumbnail = ({
             <FramerBox
                sx={styles.mediaContainer}
                initial={{ opacity: 0 }}
-               animate={{ opacity: hasFinishedExpanding ? 1 : 0 }}
+               animate={{ opacity: hasFinishedAnimating ? 1 : 0 }}
                transition={{ duration: 0.5 }}
             >
                <ModulePreview onClose={onClose} />
@@ -103,7 +102,7 @@ export const Thumbnail = ({
    return (
       <FramerBox
          id="thumbnail"
-         layoutId={canExpand ? `thumbnail-${moduleId}` : undefined}
+         layoutId={canAnimate ? `thumbnail-${moduleId}` : undefined}
          sx={styles.thumbnail}
       >
          <Box
