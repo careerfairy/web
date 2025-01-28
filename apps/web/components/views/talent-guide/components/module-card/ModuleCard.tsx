@@ -3,7 +3,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { AnimatePresence } from "framer-motion"
-import Link, { LinkProps } from "next/link"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import {
    createContext,
@@ -16,6 +16,7 @@ import {
 } from "react"
 import { useLockBodyScroll } from "react-use"
 import { sxStyles } from "types/commonTypes"
+import { buildLevelQueryParams } from "util/routes"
 import { Details } from "./Details"
 import { Status } from "./Status"
 import { Thumbnail } from "./Thumbnail"
@@ -126,7 +127,7 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
    ) => {
       const isDefaultMobile = useIsMobile()
       const router = useRouter()
-      const isExpanded = router.query.moduleId === module.slug && canAnimate
+      const isExpanded = router.query.levelSlug === module.slug && canAnimate
       const [hasFinishedExpanding, setHasFinishedExpanding] = useState(false)
 
       // Lock body scroll when overlay is expanded
@@ -140,10 +141,10 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
 
       const handleClose = useCallback(() => {
          const newQuery = { ...router.query }
-         delete newQuery.moduleId
+         delete newQuery.levelSlug
          setHasFinishedExpanding(false)
          router.push(
-            "",
+            "/levels",
             {
                query: newQuery,
             },
@@ -189,19 +190,13 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
          ]
       )
 
-      const linkProps: LinkProps = {
-         href: {
-            pathname: "/levels",
-            query: {
-               ...router.query,
-               moduleId: module.slug,
-            },
-         },
-         shallow: true,
-         scroll: false,
-      }
-
-      const props = interactive && canAnimate ? linkProps : {}
+      const props =
+         interactive && canAnimate
+            ? buildLevelQueryParams({
+                 levelSlug: module.slug,
+                 currentQuery: router.query,
+              })
+            : {}
 
       return (
          <ModuleCardContext.Provider value={value}>

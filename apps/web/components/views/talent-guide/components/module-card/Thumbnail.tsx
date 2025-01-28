@@ -1,6 +1,5 @@
 import { Box } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { ONBOARDING_VIDEO_URL_DESKTOP } from "components/util/constants"
 import FramerBox from "components/views/common/FramerBox"
 import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
@@ -94,12 +93,7 @@ export const Thumbnail = ({
                animate={{ opacity: hasFinishedExpanding ? 1 : 0 }}
                transition={{ duration: 0.5 }}
             >
-               <ModulePreview
-                  thumbnailUrl={thumbnailUrl}
-                  videoUrl={ONBOARDING_VIDEO_URL_DESKTOP}
-                  onClose={onClose}
-                  overlay={<Overlay />}
-               />
+               <ModulePreview onClose={onClose} overlay={<Overlay />} />
             </FramerBox>
          </FramerBox>
       )

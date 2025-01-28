@@ -6,6 +6,7 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
+import { ONBOARDING_VIDEO_URL_DESKTOP } from "components/util/constants"
 import FramerBox from "components/views/common/FramerBox"
 import { MotionProps } from "framer-motion"
 import dynamic from "next/dynamic"
@@ -72,11 +73,11 @@ const styles = sxStyles({
 })
 
 type Props = {
-   thumbnailUrl: string
-   videoUrl: string
    onClose?: () => void
    overlay?: ReactNode
 }
+
+const PLACEHOLDER_VIDEO_URL = ONBOARDING_VIDEO_URL_DESKTOP
 
 const checkIsMuted = () => {
    if ("userActivation" in navigator) {
@@ -85,12 +86,7 @@ const checkIsMuted = () => {
    return false
 }
 
-export const ModulePreview = ({
-   thumbnailUrl,
-   videoUrl,
-   onClose,
-   overlay,
-}: Props) => {
+export const ModulePreview = ({ onClose, overlay }: Props) => {
    const [isMuted, setIsMuted] = useState(checkIsMuted())
 
    const [showDescription, setShowDescription] = useState(true)
@@ -122,10 +118,13 @@ export const ModulePreview = ({
                playsinline
                controls={false}
                muted={isMuted}
-               url={videoUrl}
+               url={
+                  module.content.modulePreviewVideo?.url ||
+                  PLACEHOLDER_VIDEO_URL
+               }
                config={{
                   attributes: {
-                     poster: thumbnailUrl,
+                     poster: module.content.moduleIllustration?.url,
                   },
                }}
                loop

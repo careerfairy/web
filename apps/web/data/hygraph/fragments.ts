@@ -257,6 +257,7 @@ export const talentGuideModulePageFragment = gql`
          moduleDuration
          estimatedModuleDurationMinutes
          moduleIllustration ${imageAssetFragment}
+         modulePreviewVideo ${videoAssetFragment}
          category
          level
          contentTopicTags
