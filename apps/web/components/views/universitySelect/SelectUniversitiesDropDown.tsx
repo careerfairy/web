@@ -126,11 +126,9 @@ const SelectUniversitiesDropDown = ({
                   },
                   "&:hover": {
                      backgroundColor: "#F7F8FC",
-                     borderColor: (theme) => theme.brand.purple[50],
-                     ".MuiFilledInput-root:hover": {
-                        backgroundColor: "#F7F8FC",
-                        borderColor: (theme) => theme.brand.purple[50],
-                     },
+                     borderColor: (theme) =>
+                        `${theme.brand.purple[50]} !important`,
+
                      cursor: "not-allowed",
                   },
                },
@@ -150,6 +148,8 @@ const SelectUniversitiesDropDown = ({
                return universitiesMap[optionId] || ""
             },
             isOptionEqualToValue: (option, value) => {
+               console.log("🚀 ~ value:", value)
+               console.log("🚀 ~ option:", option)
                const optionValue = value as any as string
                return option.id == optionValue
             },
