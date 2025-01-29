@@ -101,12 +101,10 @@ const MentorsCarousel = () => {
                      avatarUrl={creator.avatarUrl}
                      name={creator.firstName + " " + creator.lastName}
                      position={creator.position}
-                     companyName={"CareerFairy"}
-                     companyLogoUrl={
-                        "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/groups%2Fi8NjOiRu85ohJWDuFPwo%2Flogos%2F18154762-db0e-4e03-900f-d79afbb4ec99.png?alt=media&token=39b9a078-7a22-457d-9f33-c469edcc3956"
-                     }
+                     companyName={creator.companyName}
+                     companyLogoUrl={creator.companyLogoUrl}
                      mentorPageLink={buildMentorPageLink({
-                        universityName: "CareerFairy",
+                        universityName: creator.companyName,
                         firstName: creator.firstName,
                         lastName: creator.lastName,
                         creatorId: creator.id,
