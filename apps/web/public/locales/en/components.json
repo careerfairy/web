@@ -1,0 +1,13 @@
+{
+   "dialog": {
+      "close": "Close dialog"
+   },
+   "form": {
+      "required": "Required field",
+      "optional": "Optional"
+   },
+   "navigation": {
+      "back": "Back",
+      "next": "Next"
+   }
+}

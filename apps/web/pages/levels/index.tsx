@@ -1,8 +1,11 @@
 import * as Sentry from "@sentry/nextjs"
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
+import { FORCE_GERMAN_LOCALE } from "data/hygraph/constants"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { GetStaticProps, NextPage } from "next"
+import { useTranslation } from "next-i18next"
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
 import { getTalentGuideOverviewSeoProps } from "util/seo/talentGuideSeo"
@@ -24,6 +27,10 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({
 }) => {
    const { isPreview } = useRouter()
 
+   const { t } = useTranslation("levels")
+   const foo = t("navigation.")
+
+   console.log("🚀 ~ file: index.tsx:29 ~ foo :", foo)
    return (
       <Fragment>
          {rootPage.seo ? (
@@ -39,6 +46,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({
 
 export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
    preview = false,
+   locale,
 }) => {
    if (process.env.APP_ENV === "test") {
       // no tests for talent guide yet
@@ -46,6 +54,8 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
          notFound: true, // Return 404 in test environment
       }
    }
+
+   const currentLocale = FORCE_GERMAN_LOCALE ? "de" : locale
 
    const service = preview ? tgBackendPreviewService : tgBackendService
 
@@ -55,6 +65,10 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
 
       return {
          props: {
+            ...(await serverSideTranslations(currentLocale, [
+               "common",
+               "levels",
+            ])),
             pages,
             rootPage,
          },

@@ -1,0 +1,58 @@
+{
+   "navigation": {
+      "start": "Level starten",
+      "continue": "Weiter",
+      "nextLevel": "Nächstes Level starten",
+      "finish": "Level abschliessen",
+      "restartButton": "Level neustarten",
+      "restartDialogTitle": "Level neustarten?",
+      "restartDialogText": "Bist du dir sicher? Dein Fortschritt wird nicht gespeichert, aber du kannst jederzeit zurückkommen und den Level abschliessen."
+   },
+   "quiz": {
+      "check": "Antwort prüfen",
+      "correction": "Inkorrekt"
+   },
+   "congratulations": {
+      "title": "Glückwunsch!",
+      "subtitle": "Mit diesem Level bist du einen Schritt näher an deinem Karrierestart."
+   },
+   "feedback": {
+      "continue": "Weiter",
+      "title": "Wie findest du's ganz allgemein?",
+      "subtitle": "Wie können wir Levels noch besser für dich machen? Teil uns dein Feedback mit!",
+      "titleNegative": "Was könnte besser sein?",
+      "titlePositive": "Was gefällt dir besonders?",
+      "1Star": "Cringe",
+      "2Star": "Meh",
+      "3Star": "50-50",
+      "4Star": "Ziemlich gut!",
+      "5Star": "Perfekt!"
+   },
+   "end": {
+      "title": "Bock auf mehr?",
+      "subtitle": "Top! Mit nur einem Klick geht's weiter auf deiner persönlichen Job Journey."
+   },
+   "card": {
+      "tag": "Level geschafft"
+   },
+   "course": {
+      "title": "Kickstarte deine Karriere",
+      "subtitle": "Bereit für den Berufseinstieg? Lerne von echten Profis die Insider Tipps und erprobte Strategien, die du brauchst um den super kompetitiven Jobmarkt zu navigieren. Für eine erfolgreiche Karriere, die du verdienst!",
+      "tag": {
+         "content": "Levels",
+         "duration": "Stunden"
+      }
+   },
+   "networking": {
+      "templateRecruiter": "Hallo [Name], ich habe deinen Livestream auf CareerFairy geschaut und (spezifische Punkte) stachen besonders für mich heraus. Da ich (Studiengang XYZ) studiere, sind diese Punkte besonders spannend für mich. Gerne würde ich dir dazu weiterführende Fragen stellen und mich zu den Themen austauschen!",
+      "templateSpeaker": "Hallo [Name], deine Inputs und Ideen rund um das (Thema einfügen) bei dem Livestream auf CareerFairy fand ich super inspirierend. Da ich aktuell (Studiengang einfügen) studiere und hoffe, in deinem Fachbereich mal einen Job zu ergattern, würde ich mich gerne mehr zu dem Thema mit dir austauschen!"
+   },
+   "jobsFilter": {
+      "area": "Berufsfeld",
+      "type": "Position"
+   },
+   "jobsNavigation": {
+      "next": "Nächste",
+      "previous": "Vorherige"
+   }
+}
