@@ -3,7 +3,7 @@ import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
-import { useCallback } from "react"
+import Link from "next/link"
 
 const CARD_WIDTH = 254
 
@@ -113,6 +113,7 @@ type Props = {
    position: string
    companyName: string
    companyLogoUrl: string
+   mentorPageLink: string
 }
 
 export const MentorCard = ({
@@ -122,12 +123,8 @@ export const MentorCard = ({
    position,
    companyName,
    companyLogoUrl,
+   mentorPageLink,
 }: Props) => {
-   const handleCardClick = useCallback(() => {
-      alert("Card clicked")
-      console.log("Card clicked")
-   }, [])
-
    // const handleFollowClick = useCallback((event: SyntheticEvent) => {
    //    event.preventDefault()
    //    event.stopPropagation()
@@ -136,7 +133,7 @@ export const MentorCard = ({
    // }, [])
 
    return (
-      <Stack sx={styles.root} onClick={handleCardClick}>
+      <Stack sx={styles.root} component={Link} href={mentorPageLink} prefetch>
          <Box sx={styles.bannerContainer}>
             <Box sx={styles.bannerEffect} />
             <Box sx={styles.bannerEffectColor} />
