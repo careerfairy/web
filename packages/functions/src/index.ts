@@ -34,6 +34,7 @@ setGlobalOptions({
 import { bundles } from "./bundles"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
+import * as customerio from "./lib/customerio"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import * as streaming from "./lib/streaming"
@@ -373,3 +374,6 @@ exports.fetchCountryCitiesList = countries.fetchCountryCitiesList
 exports.fetchCountryCityData = countries.fetchCountryCityData
 exports.fetchCityData = countries.fetchCityData
 exports.fetchCountryData = countries.fetchCountryData
+
+// CustomerIO
+exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO

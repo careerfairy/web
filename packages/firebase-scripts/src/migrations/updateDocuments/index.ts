@@ -1,4 +1,5 @@
-import { FieldPath } from "firebase-admin/firestore"
+import { CUTOFF_DATE } from "@careerfairy/shared-lib/dist/customerio"
+import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import { firestore } from "../../lib/firebase"
 import {
@@ -8,16 +9,31 @@ import {
 } from "../../util/bulkWriter"
 import { logAction } from "../../util/logger"
 
-const BATCH_SIZE = 1_000
-const TRIGGER_FIELD = "migrationTrigger"
+interface UpdateDocumentsConfig {
+   query: Query
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   updateData: Record<string, any>
+   batchSize?: number
+   waitTimeBetweenBatches?: number
+}
 
-const getTotalUserLivestreamDataCount = async () => {
-   const totalUserLivestreamDataDocumentCountSnapshot = await firestore
-      .collectionGroup("userLivestreamData")
-      .count()
-      .get()
+const FIELD_TO_ORDER_BY = "lastActivityAt"
 
-   return totalUserLivestreamDataDocumentCountSnapshot.data().count
+// Configure your update here
+const config: UpdateDocumentsConfig = {
+   // Example: collection query
+   query: firestore
+      .collection("userData")
+      .where(FIELD_TO_ORDER_BY, ">", CUTOFF_DATE)
+      .orderBy(FIELD_TO_ORDER_BY, "desc"),
+   updateData: { migrationTrigger: Date.now() },
+   batchSize: 1_000,
+   waitTimeBetweenBatches: 5000,
+}
+
+const getTotalDocumentCount = async (query: Query) => {
+   const totalDocumentsSnapshot = await query.count().get()
+   return totalDocumentsSnapshot.data().count
 }
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -27,28 +43,24 @@ export async function run() {
    const bulkWriter = firestore.bulkWriter()
 
    let processedDocuments = 0
+   const totalDocumentsCounts = await getTotalDocumentCount(config.query)
 
-   const totalDocumentsCounts = await getTotalUserLivestreamDataCount()
-
-   console.log(`Total userLivestreamData documents: ${totalDocumentsCounts}`)
+   console.log(`Total documents to process: ${totalDocumentsCounts}`)
 
    try {
-      let lastDocPath = null
+      let lastDoc = null
       let hasMoreDocs = true
 
       while (hasMoreDocs) {
-         let query = firestore
-            .collectionGroup("userLivestreamData")
-            .orderBy(FieldPath.documentId())
-            .limit(BATCH_SIZE)
+         let query = config.query.limit(config.batchSize ?? 1_000)
 
-         if (lastDocPath) {
-            query = query.startAfter(lastDocPath)
+         if (lastDoc) {
+            query = query.startAfter(lastDoc)
          }
 
          const snapshot = await logAction(
             () => query.get(),
-            "Getting next page of userLivestreamData documents"
+            `Getting next page of documents`
          )
 
          if (snapshot.empty) {
@@ -61,14 +73,12 @@ export async function run() {
 
          for (const doc of docs) {
             bulkWriter
-               .update(doc.ref, {
-                  [TRIGGER_FIELD]: Date.now(),
-               })
+               .update(doc.ref, config.updateData)
                .then(() => handleBulkWriterSuccess(counter))
                .catch((err) => handleBulkWriterError(err, counter))
          }
 
-         lastDocPath = docs[docs.length - 1].ref.path
+         lastDoc = docs[docs.length - 1]
 
          // Log batch progress
          const progress = (processedDocuments / totalDocumentsCounts) * 100
@@ -79,7 +89,7 @@ export async function run() {
          )
 
          await bulkWriter.flush()
-         await wait(5000)
+         await wait(config.waitTimeBetweenBatches ?? 5000)
       }
 
       await bulkWriter.close()
