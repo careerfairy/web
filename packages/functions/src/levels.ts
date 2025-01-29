@@ -1,3 +1,6 @@
+import { Group, PublicGroup } from "@careerfairy/shared-lib/groups"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { LevelsMentor } from "@careerfairy/shared-lib/talent-guide/types"
 import * as functions from "firebase-functions"
 import { uniqBy } from "lodash"
 import { groupRepo, userRepo } from "./api/repositories"
@@ -7,6 +10,17 @@ import { userAuthExists } from "./middlewares/validations"
 
 const CAREER_FAIRY_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
 const MIN_CREATORS_COUNT = 8
+
+export const mapCreatorToLevelsMentors = (
+   creator: Creator,
+   followedCompany: Group | PublicGroup
+) => {
+   return {
+      ...creator,
+      companyName: followedCompany.universityName,
+      companyLogoUrl: followedCompany.logoUrl,
+   }
+}
 
 export const getFollowedCreators = functions.region(config.region).https.onCall(
    middlewares(userAuthExists(), async (_, context) => {
@@ -18,15 +32,29 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
             8
          )
 
+         const followedCompaniesLookup = followedCompanies.reduce(
+            (acc, company) => ({
+               ...acc,
+               [company.groupId]: company.group,
+            }),
+            {}
+         )
+
          const creatorsPromises = (followedCompanies ?? []).map((company) =>
             groupRepo.getCreatorsWithPublicContent(company.group)
          )
 
          let creators = (await Promise.all(creatorsPromises)).flat()
-
          creators = uniqBy(creators, "id")
 
-         if (creators.length < MIN_CREATORS_COUNT) {
+         let levelsMentors: LevelsMentor[] = creators.map((creator) => {
+            return mapCreatorToLevelsMentors(
+               creator,
+               followedCompaniesLookup[creator.groupId]
+            )
+         })
+
+         if (levelsMentors.length < MIN_CREATORS_COUNT) {
             const careerFairyGroup = await groupRepo.getGroupById(
                CAREER_FAIRY_GROUP_ID
             )
@@ -41,20 +69,19 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
                         creator.linkedInUrl && creator.linkedInUrl.trim() !== ""
                   )
 
-               const newCareerFairyCreators =
-                  careerFairyCreatorsWithLinkedIn.filter(
-                     (cfCreator) =>
-                        !creators.some((creator) => creator.id === cfCreator.id)
-                  )
+               const careerFairyMentors = careerFairyCreatorsWithLinkedIn.map(
+                  (creator) =>
+                     mapCreatorToLevelsMentors(creator, careerFairyGroup)
+               )
 
                const creatorsNeeded = MIN_CREATORS_COUNT - creators.length
-               creators = creators.concat(
-                  newCareerFairyCreators.slice(0, creatorsNeeded)
+               levelsMentors = levelsMentors.concat(
+                  careerFairyMentors.slice(0, creatorsNeeded)
                )
             }
          }
 
-         return creators
+         return levelsMentors
       } catch (error) {
          functions.logger.error("Error in getFollowedCreators:", error)
          throw new functions.https.HttpsError(
