@@ -97,7 +97,7 @@ const SparkPreviewCardContainer: FC<Props> = ({
       >
          {componentHeader ? componentHeader : null}
          <Box sx={styles.cardContent}>{children}</Box>
-         <Box component="span" zIndex={-1}>
+         <Box component="span" zIndex={0}>
             <VideoPreview
                key={`${video.url}-${isMobile ? "mobile" : "desktop"}`}
                thumbnailUrl={video.thumbnailUrl}
