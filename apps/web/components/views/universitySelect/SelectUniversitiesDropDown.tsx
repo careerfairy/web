@@ -16,6 +16,15 @@ const styles = sxStyles({
          md: "228px",
       },
    },
+   dropdownPaper: {
+      mt: 1.5,
+      borderRadius: "8px",
+      boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.08)",
+      backgroundColor: (theme) => theme.brand.white[50],
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.black[100],
+      },
+   },
    schoolIcon: {
       width: "40px",
       height: "40px",
@@ -114,6 +123,11 @@ const SelectUniversitiesDropDown = ({
                universityCountriesMap[selectedCountryCode] === "None",
             autoHighlight: true,
             disableClearable: false,
+            PaperComponent: ({ children }) => (
+               <Box component="div" sx={styles.dropdownPaper}>
+                  {children}
+               </Box>
+            ),
             sx: {
                ".Mui-disabled": {
                   backgroundColor: "#F7F8FC",
