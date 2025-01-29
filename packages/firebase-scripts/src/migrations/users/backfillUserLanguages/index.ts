@@ -22,9 +22,11 @@ export async function run() {
 
       const allUsers = await logAction(
          () =>
-            Promise.all([userRepo.getAllUsers(true)]).then(([users]) =>
-               users.filter((user) => user.spokenLanguages?.length)
-            ),
+            userRepo
+               .getAllUsers(true)
+               .then((users) =>
+                  users.filter((user) => user.spokenLanguages?.length)
+               ),
          "Fetching all Users"
       )
 
