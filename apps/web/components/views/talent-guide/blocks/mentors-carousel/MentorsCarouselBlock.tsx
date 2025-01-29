@@ -4,6 +4,7 @@ import useFollowedCreators from "components/custom-hook/user/useFollowedCreators
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { MentorsCarouselBlockType } from "data/hygraph/types"
 import { sxStyles } from "types/commonTypes"
+import { buildMentorPageLink } from "util/routes"
 import { MentorCard } from "./MentorCard"
 
 const styles = sxStyles({
@@ -104,6 +105,12 @@ const MentorsCarousel = () => {
                      companyLogoUrl={
                         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/groups%2Fi8NjOiRu85ohJWDuFPwo%2Flogos%2F18154762-db0e-4e03-900f-d79afbb4ec99.png?alt=media&token=39b9a078-7a22-457d-9f33-c469edcc3956"
                      }
+                     mentorPageLink={buildMentorPageLink({
+                        universityName: "CareerFairy",
+                        firstName: creator.firstName,
+                        lastName: creator.lastName,
+                        creatorId: creator.id,
+                     })}
                   />
                </Box>
             ))}
