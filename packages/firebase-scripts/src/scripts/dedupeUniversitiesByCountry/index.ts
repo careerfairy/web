@@ -48,6 +48,8 @@ const dedupeProgressBar = new cliProgress.SingleBar(
 )
 
 const PERFORM_UPDATE = false
+const SHOW_LONG_LOG = false
+
 export async function run() {
    console.log("Start deduping universities by country collection")
    const bulkWriter = firestore.bulkWriter()
@@ -67,13 +69,20 @@ export async function run() {
       // console.log("🚀 ~ run ~ china length:", china?.universities?.length)
 
       const duplicationData = getCountriesWithDuplicateUniversities(
-         allUniversitiesByCountry.slice(3, 4)
+         allUniversitiesByCountry.slice(0, 10)
       )
 
       const duplicatedCountries = Object.keys(duplicationData) || []
 
+      console.log(
+         `Deduping resulted in ${duplicatedCountries.length} countries with duplicate universities`
+      )
+
+      console.log(`Starting to fetch users using the removed universities`)
       // Fetch all users using the removed universities
       const userUniversities: UserUniversitiesData = {}
+
+      // const promises = []
 
       for (const countryId of duplicatedCountries) {
          const removedUniversities =
@@ -102,34 +111,39 @@ export async function run() {
          }
       }
 
-      // Logging
-      console.log("🚀 ~ duplicate countries: ", duplicatedCountries.length)
-      duplicatedCountries.forEach((countryId) => {
-         console.log(
-            `🚀 ~ ~ country: ${countryId} - original universities: ${duplicationData[countryId].originalDocument.universities.length} - deduplicated universities: ${duplicationData[countryId].deduplicatedUniversities.length}`
-         )
-         const removedUnis = Object.keys(
-            duplicationData[countryId].removedUniversities
-         )
+      const totalAffectedUsers = Object.values(userUniversities).reduce(
+         (total, data) => total + data.userIds.length,
+         0
+      )
+      console.log(`Total number of users affected: ${totalAffectedUsers}`)
 
-         removedUnis.forEach((removedUniversity) => {
+      if (SHOW_LONG_LOG) {
+         duplicatedCountries.forEach((countryId) => {
             console.log(
-               `🚀 ~ ~ ~ removed university: ${removedUniversity} -  ${duplicationData[countryId].removedUniversities[removedUniversity].removedUniversity.name}`
+               `🚀 ~ ~ country: ${countryId} - original universities: ${duplicationData[countryId].originalDocument.universities.length} - deduplicated universities: ${duplicationData[countryId].deduplicatedUniversities.length}`
+            )
+            const removedUnis = Object.keys(
+               duplicationData[countryId].removedUniversities
             )
 
-            console.log(
-               `🚀 ~ ~ ~ ~ ~ replaced by: ${duplicationData[countryId].removedUniversities[removedUniversity].replacedBy.id} - ${duplicationData[countryId].removedUniversities[removedUniversity].replacedBy.name}`
-            )
+            removedUnis.forEach((removedUniversity) => {
+               console.log(
+                  `🚀 ~ ~ ~ removed university: ${removedUniversity} -  ${duplicationData[countryId].removedUniversities[removedUniversity].removedUniversity.name}`
+               )
 
-            console.log(
-               `🚀 ~ ~ ~ ~ ~ ~ ~ users to be updated: ${
-                  userUniversities[removedUniversity]?.userIds ?? "none"
-               }`
-            )
+               console.log(
+                  `🚀 ~ ~ ~ ~ ~ replaced by: ${duplicationData[countryId].removedUniversities[removedUniversity].replacedBy.id} - ${duplicationData[countryId].removedUniversities[removedUniversity].replacedBy.name}`
+               )
+
+               console.log(
+                  `🚀 ~ ~ ~ ~ ~ ~ ~ users to be updated: ${
+                     userUniversities[removedUniversity]?.userIds ?? "none"
+                  }`
+               )
+            })
          })
-      })
+      }
 
-      console.log("🚀 ~ run ~ userUniversities:", userUniversities)
       // Data update
       if (PERFORM_UPDATE) {
          duplicatedCountries.forEach((countryId) => {
