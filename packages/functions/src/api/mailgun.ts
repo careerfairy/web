@@ -51,14 +51,23 @@ export const sendIndividualMessages = (emailData: MailgunMessageData) => {
       recipients,
       50,
       (userEmail) => {
-         return client.messages.create(domain, {
-            ...emailData,
-            to: userEmail,
-            "h:X-Mailgun-Variables": JSON.stringify(
-               recipientVariables[userEmail]
-            ),
-            attachment: attach,
-         })
+         return client.messages
+            .create(domain, {
+               ...emailData,
+               to: userEmail,
+               "h:X-Mailgun-Variables": JSON.stringify(
+                  recipientVariables[userEmail]
+               ),
+               attachment: attach,
+            })
+            .catch((err) => {
+               functions.logger.error(
+                  `Error processing mailgun email ${userEmail}`,
+                  err,
+                  emailData,
+                  recipientVariables[userEmail]
+               )
+            })
       },
       functions.logger
    ).catch((err) => {
