@@ -1,5 +1,5 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
@@ -97,6 +97,9 @@ const styles = sxStyles({
    followButton: {
       padding: "8px 16px",
    },
+   skeleton: {
+      borderRadius: "8px",
+   },
 })
 
 type Props = {
@@ -191,4 +194,16 @@ export const MentorCard = ({
    )
 }
 
+const CardSkeleton = () => {
+   return (
+      <Skeleton
+         variant="rounded"
+         width={252}
+         height={226}
+         sx={styles.skeleton}
+      />
+   )
+}
+
 MentorCard.width = CARD_WIDTH
+MentorCard.Skeleton = CardSkeleton
