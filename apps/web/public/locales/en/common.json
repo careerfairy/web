@@ -1,0 +1,13 @@
+{
+   "buttons": {
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "close": "Close"
+   },
+   "messages": {
+      "loading": "Loading...",
+      "error": "An error occurred",
+      "success": "Success"
+   }
+}

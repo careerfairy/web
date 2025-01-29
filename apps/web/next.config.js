@@ -3,6 +3,9 @@ const { withSentryConfig } = require("@sentry/nextjs")
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require("path")
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { i18n } = require("./next-i18next.config")
+
 // const withBundleAnalyzer = require("@next/bundle-analyzer")({
 //    enabled: process.env.ANALYZE === "true",
 // });
@@ -381,10 +384,7 @@ const moduleExports = {
    },
    // this is an open issue on MUI's GitHub: https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
    transpilePackages: ["@mui/x-charts", "mui-tel-input"],
-   // i18n: {
-   //    locales: ["en", "de"],
-   //    defaultLocale: "en",
-   // },
+   i18n,
 }
 
 // test or development environment

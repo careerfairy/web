@@ -1,0 +1,67 @@
+{
+   "navigation": {
+      "start": "Start Level",
+      "continue": "Next",
+      "nextLevel": "Start next Level",
+      "finish": "Finish Level",
+      "restartButton": "Restart Level",
+      "restartDialogTitle": "Restart level now?",
+      "restartDialogText": "Are you sure you want to restart this level? Your progress will reset, but you can always come back to complete it."
+   },
+   "quiz": {
+      "check": "Check answer",
+      "correction": "Correction"
+   },
+   "congratulations": {
+      "title": "Congrats!",
+      "subtitle": "You've completed this level and are on step closer to your dream job!"
+   },
+   "feedback": {
+      "continue": "Continue",
+      "title": "How did we do?",
+      "subtitle": "Rate your experience and let us know how we can improve",
+      "titleNegative": "What could be better?",
+      "titlePositive": "What stood out?",
+      "tags": [
+         "relevance",
+         "interactions",
+         "pace",
+         "difficulty",
+         "clarity",
+         "structure",
+         "other"
+      ],
+      "1Star": "Big yikes",
+      "2Star": "Kinda meh",
+      "3Star": "Not bad, could be better",
+      "4Star": "Pretty solid",
+      "5Star": "Nailed it"
+   },
+   "end": {
+      "title": "Ready for more?",
+      "subtitle": "Fantastic work on clearing this level! Click below to continue your learning journey and tackle the next challenge"
+   },
+   "card": {
+      "tag": "Level cleared"
+   },
+   "course": {
+      "title": "Quick start your career",
+      "subtitle": "Ready to land your dream job? Learn the insider tips and practical strategies to stand out in today's competitive job market. Start building the career you deserve!",
+      "tag": {
+         "content": "Levels",
+         "duration": "Hours"
+      }
+   },
+   "networking": {
+      "templateRecruiter": "Hi [Name], I found your insights on (topic of live stream) during the (name of live stream on CareerFairy) super interesting! As a student of (study background) I obviously would love to deep dive on this topic with someone as experienced as you are. Would you be open to a chat?†",
+      "templateSpeaker": "Hi [Name], I found your insights on (topic of live stream) during the (name of live stream on CareerFairy) super interesting! As a student of (study background) I obviously would love to deep dive on this topic with someone as experienced as you are. Would you be open to a chat?†"
+   },
+   "jobsFilter": {
+      "area": "Job areas",
+      "type": "Job type"
+   },
+   "jobsNavigation": {
+      "next": "Next",
+      "previous": "Back"
+   }
+}

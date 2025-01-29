@@ -1,0 +1,13 @@
+{
+   "buttons": {
+      "submit": "Absenden",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "close": "Schließen"
+   },
+   "messages": {
+      "loading": "Lädt...",
+      "error": "Ein Fehler ist aufgetreten",
+      "success": "Erfolgreich"
+   }
+}
