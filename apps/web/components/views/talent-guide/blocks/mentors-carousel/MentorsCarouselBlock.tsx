@@ -23,11 +23,35 @@ const styles = sxStyles({
    },
 })
 
+const MentorsCarouselSkeleton = () => {
+   return (
+      <ContentCarousel
+         slideWidth={MentorCard.width}
+         viewportSx={styles.carouselViewport}
+         emblaProps={{
+            emblaOptions: {
+               dragFree: true,
+               skipSnaps: true,
+               loop: false,
+               axis: "x",
+            },
+         }}
+         disableArrows
+      >
+         {Array(8)
+            .fill(null)
+            .map((_, i) => (
+               <MentorCard.Skeleton key={i} />
+            ))}
+      </ContentCarousel>
+   )
+}
+
 type Props = MentorsCarouselBlockType
 
 export const MentorsCarouselBlock = ({ title, subHeader }: Props) => {
    return (
-      <SuspenseWithBoundary fallback={"Loading..."}>
+      <SuspenseWithBoundary fallback={<MentorsCarouselSkeleton />}>
          <Stack id="mentors-carousel-block" gap="12px">
             {(Boolean(title) || Boolean(subHeader)) && (
                <Stack id="mentors-carousel-block-header" gap="4px">
