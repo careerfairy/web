@@ -18,7 +18,7 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
             8
          )
 
-         const creatorsPromises = followedCompanies.map((company) =>
+         const creatorsPromises = (followedCompanies ?? []).map((company) =>
             groupRepo.getCreatorsWithPublicContent(company.group)
          )
 
