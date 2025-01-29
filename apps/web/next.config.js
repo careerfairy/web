@@ -37,6 +37,8 @@ const csp = {
       "blob:",
       "careerfairy-e1fd9.firebaseapp.com",
       "https://ik.imagekit.io",
+      "*.customer.io", // For sending events to Customer.io
+      "*.cdn-eu.customer.io", // For sending events to Customer.io
    ],
    "script-src": [
       "'self'",
@@ -78,6 +80,7 @@ const csp = {
       "https://infird.com",
       "https://*.infird.com",
       "https://unpkg.com", // Added for dotlottie-wc script
+      "https://cdp-eu.customer.io", // For sending events to Customer.io
    ],
    "style-src": [
       "'self'",
@@ -134,6 +137,9 @@ const csp = {
       "https://vimeocdn.com",
       "https://player.vimeo.com",
       "https://overbridgenet.com",
+      "https://cdp-eu.customer.io", // For sending events to Customer.io
+      "https://cdn-eu.customer.io", // For sending events to Customer.io
+      "https://*.customer.io", // For sending events to Customer.io
    ],
    "img-src": [
       "'self'",
@@ -162,6 +168,8 @@ const csp = {
       "https://td.doubleclick.net", // Google Ads services
       "https://www.googletagmanager.com",
       "https://careerfairy-e1fd9.firebaseapp.com",
+      "https://renderer.gist.build", // For sending events to Customer.io
+      "https://code.gist.build", // For sending events to Customer.io
    ],
    "font-src": [
       "'self'",
