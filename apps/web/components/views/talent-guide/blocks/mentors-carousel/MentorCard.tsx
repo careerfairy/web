@@ -178,7 +178,7 @@ export const MentorCard = ({
                   </Box>
                </Typography>
             </Stack>
-            {/* TODO: Follow functionality not part of MVP */}
+            {/* TODO: Follow functionality not part of MVP. DO NOT FORGET TO UPDATE SKELETON'S HEIGHT! */}
             {/* <Button
                variant="contained"
                color="primary"
