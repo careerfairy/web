@@ -22,6 +22,7 @@ module.exports = {
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/ban-ts-ignore": "off",
       "@typescript-eslint/ban-ts-comment": "off",
+      "no-extra-semi": "off",
    },
    parser: "@typescript-eslint/parser",
 }

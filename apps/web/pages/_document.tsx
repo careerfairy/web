@@ -213,7 +213,7 @@ export default function MyDocument(props: DocumentProps) {
                   react components run client side, this array is already set
                   Even if we don't load GTM, its okay to have this variable
                  */}
-            <script dangerouslySetInnerHTML={dataLayerObj}></script>
+            <script dangerouslySetInnerHTML={analyticsInitScript}></script>
             {/* Inject MUI styles first to match with the prepend: true configuration. */}
             <meta name="emotion-insertion-point" content="" />
             {props.emotionStyleTags}
@@ -338,8 +338,14 @@ function shouldRunGTM(ctx: DocumentContext) {
 }
 
 /**
- * Memoized object
+ * Memoized script
+ *
+ * Initialize dataLayer and analytics arrays to be ready to start receiving events
+ * and identify users even before the relevant scripts are loaded
  */
-const dataLayerObj = {
-   __html: `window.dataLayer = window.dataLayer || []; `,
+const analyticsInitScript = {
+   __html: `
+      window.dataLayer = window.dataLayer || [];
+      window.analytics = window.analytics || []; 
+   `,
 }
