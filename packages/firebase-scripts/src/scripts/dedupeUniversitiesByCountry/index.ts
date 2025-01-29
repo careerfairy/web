@@ -47,8 +47,8 @@ const dedupeProgressBar = new cliProgress.SingleBar(
    cliProgress.Presets.shades_classic
 )
 
-const PERFORM_UPDATE = true
-const SHOW_LONG_LOG = true
+const PERFORM_UPDATE = false
+const SHOW_LONG_LOG = false
 
 export async function run() {
    console.log("Start deduping universities by country collection")
