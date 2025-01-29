@@ -24,6 +24,9 @@ const styles = sxStyles({
    },
 })
 
+const BANNER_URL =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-pages%2Fi8NjOiRu85ohJWDuFPwo%2Fbanners%2F6b0acd76-8742-4b47-994e-f70616c95cb1_1200x900?alt=media&token=3eef2fd6-b3e5-4933-a65f-2242bf6f8dc6"
+
 const MentorsCarouselSkeleton = () => {
    return (
       <ContentCarousel
@@ -95,9 +98,7 @@ const MentorsCarousel = () => {
             {followedCreators.map((creator, index) => (
                <Box key={`mentor-slide-box-${index}`}>
                   <MentorCard
-                     bannerUrl={
-                        "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-pages%2Fi8NjOiRu85ohJWDuFPwo%2Fbanners%2F6b0acd76-8742-4b47-994e-f70616c95cb1_1200x900?alt=media&token=3eef2fd6-b3e5-4933-a65f-2242bf6f8dc6"
-                     }
+                     bannerUrl={BANNER_URL}
                      avatarUrl={creator.avatarUrl}
                      name={creator.firstName + " " + creator.lastName}
                      position={creator.position}
