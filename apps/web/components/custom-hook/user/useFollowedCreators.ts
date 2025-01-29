@@ -1,4 +1,4 @@
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { LevelsMentor } from "@careerfairy/shared-lib/talent-guide"
 import { useMemo } from "react"
 import useSWR from "swr"
 import useFunctionsSWRFetcher, {
@@ -6,7 +6,7 @@ import useFunctionsSWRFetcher, {
 } from "../utils/useFunctionsSWRFetcher"
 
 const useFollowedCreators = () => {
-   const fetcher = useFunctionsSWRFetcher<Creator[]>()
+   const fetcher = useFunctionsSWRFetcher<LevelsMentor[]>()
 
    const { data } = useSWR(
       ["getFollowedCreators"],
@@ -14,7 +14,7 @@ const useFollowedCreators = () => {
       reducedRemoteCallsOptions
    )
 
-   return useMemo<Creator[]>(() => {
+   return useMemo<LevelsMentor[]>(() => {
       return data
    }, [data])
 }
