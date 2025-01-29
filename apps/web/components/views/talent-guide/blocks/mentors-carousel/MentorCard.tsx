@@ -85,6 +85,10 @@ const styles = sxStyles({
    companyName: {
       ...getMaxLineStyles(2),
       color: (theme) => theme.palette.neutral["600"],
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
    },
    companyNameBold: {
       fontWeight: 600,
@@ -171,8 +175,7 @@ export const MentorCard = ({
                   {position}
                </Typography>
                <Typography variant="small" sx={styles.companyName}>
-                  {" "}
-                  at{" "}
+                  at&nbsp;
                   <Box component="span" sx={styles.companyNameBold}>
                      {companyName}
                   </Box>
@@ -199,7 +202,7 @@ const CardSkeleton = () => {
       <Skeleton
          variant="rounded"
          width={252}
-         height={226}
+         height={204}
          sx={styles.skeleton}
       />
    )
