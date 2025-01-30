@@ -67,21 +67,10 @@ export const dataLayerLivestreamEvent = (
 }
 
 /**
- * We queue analytics events in window["analytics"] array before GTM loads.
- * Once GTM initializes the customer.io analytics script, it will automatically process any queued/incoming events.
+ * Before you continue, please read the following:
+ * 1. We queue analytics events in window["analytics"] array before Customer.io script loads.
+ * 2. Once Customer.io script loads, it will automatically process any queued/incoming events.
  */
-
-/**
- * Track a page view in analytics
- *
- * Customer.io captures everything automatically when using the JavaScript source.
- * This includes page events with the page URL and other common properties.
- */
-export const analyticsPage = () => {
-   if (typeof window === "undefined") return
-
-   window["analytics"].push(["page"])
-}
 
 /**
  * Track an event
@@ -95,17 +84,6 @@ export const analyticsTrackEvent = (
    if (typeof window === "undefined") return
 
    window["analytics"].push(["track", eventName, properties])
-}
-
-/**
- * Associate a user with a group
- * @param id the group id
- * @param traits the group traits
- */
-export const analyticsGroup = (id: string, traits: GroupTraits) => {
-   if (typeof window === "undefined") return
-
-   window["analytics"].push(["group", id, traits])
 }
 
 /**
@@ -135,4 +113,45 @@ export const analyticsUserLogout = async () => {
    if (typeof window === "undefined") return
 
    window["analytics"].push(["reset"])
+}
+
+type GroupTraitOptions = GroupTraits & {
+   /**
+    * The type of association to the group, must be an incrementing number
+    * 1 = User Follows Company
+    * 2 = User Registered to Livestream
+    * 3 = User Participates in Livestream
+    */
+   objectTypeId: 1 | 2 | 3
+}
+
+/**
+ * Associates an existing user with a group
+ * @param id the group id
+ * @param traits the group traits
+ */
+export const analyticsAssociateUserToGroup = (
+   id: string,
+   traits: GroupTraitOptions
+) => {
+   if (typeof window === "undefined") return
+
+   window["analytics"].push(["group", id, traits])
+}
+
+/**
+ * Removes an existing user association from a group
+ * @param id the group id
+ * @param options the group options
+ */
+export const analyticsRemoveUserAssociationFromGroup = (
+   id: string,
+   options: {
+      objectTypeId: number
+      objectId: string
+   }
+) => {
+   if (typeof window === "undefined") return
+
+   window["analytics"].push(["track", "Delete Relationship", options])
 }
