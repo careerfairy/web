@@ -20,6 +20,31 @@ export const makeLivestreamEventDetailsInviteUrl = (
    )
 }
 
+type LivestreamShareURLOptions = {
+   utm_source?: string
+   utm_campaign?: string
+   utm_content?: string
+}
+
+export const makeLivestreamEventDetailsShareUrl = (
+   livestreamId: string,
+   options?: LivestreamShareURLOptions
+) => {
+   const url = new URL(
+      makeLivestreamEventDetailsUrl(livestreamId, {
+         overrideBaseUrl: getBaseUrl(),
+      })
+   )
+   if (options?.utm_source)
+      url.searchParams.set("utm_source", options.utm_source)
+   if (options?.utm_campaign)
+      url.searchParams.set("utm_campaign", options.utm_campaign)
+   if (options?.utm_content)
+      url.searchParams.set("utm_content", options.utm_content)
+
+   return url
+}
+
 export const makeReferralUrl = (userReferralCode) => {
    return `${getBaseUrl()}/?${queryReferralCode}=${userReferralCode}`
 }
