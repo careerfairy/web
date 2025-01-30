@@ -160,7 +160,8 @@ export type UserAccountCreationAdditionalData = {
 }
 
 export type AdditionalUserRecommendationInfo = {
-   studyBackgrounds: StudyBackground[]
+   studyBackgrounds?: StudyBackground[]
+   languages?: ProfileLanguage[]
 }
 
 // Collection /userData/:id/studyBackgrounds/:id
