@@ -162,3 +162,18 @@ export const analyticsRemoveUserAssociationFromEntity = (
       },
    ])
 }
+
+/**
+ * Tracks a page view event in Customer.io analytics
+ * Automatically captures current page metadata including but not limited to:
+ * - URL path
+ * - Page title
+ * - Referrer
+ * - Search parameters
+ * No manual parameters needed since the analytics script handles collection
+ */
+export const analyticsTrackPageView = () => {
+   if (typeof window === "undefined") return
+
+   window["analytics"].push(["page"])
+}
