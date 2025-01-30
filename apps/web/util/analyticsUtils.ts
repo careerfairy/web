@@ -87,8 +87,7 @@ export const analyticsTrackEvent = (
 }
 
 /**
- * 1. Associate a user with an anonymous id if it exists
- 
+ * Link anonymous user's activity to their new account after login
  * @param userAuthId the user auth id
  */
 export const analyticsLogin = async (userAuthId: string) => {
@@ -115,24 +114,28 @@ export const analyticsUserLogout = async () => {
    window["analytics"].push(["reset"])
 }
 
-type GroupTraitOptions = GroupTraits & {
-   /**
-    * The type of association to the group, must be an incrementing number
-    * 1 = User Follows Company
-    * 2 = User Registered to Livestream
-    * 3 = User Participates in Livestream
-    */
-   objectTypeId: 1 | 2 | 3
-}
+/**
+ * Reserved relationship types between users and entities
+ * Entities can be companies, livestreams, sparks, etc.
+ * Note: Entities will also have to be synced into Customer.io as "objects"
+ */
+const USER_RELATIONSHIP_TYPE = {
+   FOLLOWS_COMPANY: 1,
+   REGISTERED_TO_LIVESTREAM: 2,
+   PARTICIPATES_IN_LIVESTREAM: 3,
+} as const
+
+type UserRelationshipType =
+   (typeof USER_RELATIONSHIP_TYPE)[keyof typeof USER_RELATIONSHIP_TYPE]
 
 /**
- * Associates an existing user with a group
- * @param id the group id
- * @param traits the group traits
+ * Associates an existing user with an entity
+ * @param id the entity id
+ * @param traits the entity traits
  */
-export const analyticsAssociateUserToGroup = (
+export const analyticsAssociateUserToEntity = (
    id: string,
-   traits: GroupTraitOptions
+   traits: GroupTraits & { objectTypeId: UserRelationshipType }
 ) => {
    if (typeof window === "undefined") return
 
@@ -140,18 +143,22 @@ export const analyticsAssociateUserToGroup = (
 }
 
 /**
- * Removes an existing user association from a group
- * @param id the group id
- * @param options the group options
+ * Removes an existing user association from an entity
+ * @param objectTypeId the association type
+ * @param objectId the id of the entity
  */
-export const analyticsRemoveUserAssociationFromGroup = (
-   id: string,
-   options: {
-      objectTypeId: number
-      objectId: string
-   }
+export const analyticsRemoveUserAssociationFromEntity = (
+   objectTypeId: UserRelationshipType,
+   objectId: string
 ) => {
    if (typeof window === "undefined") return
 
-   window["analytics"].push(["track", "Delete Relationship", options])
+   window["analytics"].push([
+      "track",
+      "Delete Relationship", // Reserved event name from Customer.io
+      {
+         objectTypeId,
+         objectId,
+      },
+   ])
 }
