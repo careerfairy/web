@@ -29,13 +29,13 @@ export const useAutoPlayManager = (
       if (!isLiveStreamDialogOpen && !isExpanded(autoPlayingIndex)) {
          const interval = setInterval(() => {
             setAutoPlayingIndex((prevIndex) => {
-               return (prevIndex + 1) % highlights.length
+               return (prevIndex + 1) % (highlights?.length || 1)
             })
          }, SPARK_CONSTANTS.SECONDS_TO_AUTO_PLAY)
          return () => clearInterval(interval)
       }
    }, [
-      highlights.length,
+      highlights?.length,
       isExpanded,
       isLiveStreamDialogOpen,
       autoPlayingIndex,
