@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material"
 import useUniversitiesByCountryCodes from "components/custom-hook/useUniversities"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
-import { SyntheticEvent, useMemo } from "react"
+import { SyntheticEvent, useMemo, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { SchoolIcon } from "../common/icons/SchoolIcon"
@@ -15,11 +15,6 @@ const styles = sxStyles({
          sm: "100dvh",
          md: "228px",
       },
-      // width: {
-      //    // xs: "100dvw !important",
-      //    // sm: "100dvw !important",
-      //    // md: "auto",
-      // },
       width: {
          xs: "100dvw !important",
          sm: "100dvw !important",
@@ -30,7 +25,6 @@ const styles = sxStyles({
          sm: -3,
          md: -0.2,
       },
-      // overflowX: "hidden",
       borderRadius: "8px",
       my: 1.5,
       boxShadow: {
@@ -41,9 +35,6 @@ const styles = sxStyles({
    dropdownPaper: {
       width: "100%",
       backgroundColor: (theme) => theme.brand.white[50],
-      // "&:hover": {
-      //    backgroundColor: (theme) => theme.brand.black[100],
-      // },
    },
    schoolIcon: {
       width: "40px",
@@ -54,16 +45,12 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.palette.neutral[50],
    },
    universityOptionRoot: {
-      // width: "auto",
-      // minWidth: "100dvw !important",
-      // overflowX: "hidden",
       backgroundColor: (theme) => `${theme.brand.white[50]} !important`,
       "&:hover": {
          backgroundColor: (theme) => `${theme.brand.black[100]} !important`,
       },
    },
    selectedUniversityOption: {
-      // overflowX: "hidden",
       backgroundColor: (theme) => `${theme.brand.white[300]} !important`,
    },
    universityOption: {
@@ -92,6 +79,7 @@ const SelectUniversitiesDropDown = ({
    placeholder,
    countryCodeFieldName,
 }: Props) => {
+   const [isFocused, setIsFocused] = useState(false)
    const {
       formState: { isSubmitting },
       setValue,
@@ -99,6 +87,10 @@ const SelectUniversitiesDropDown = ({
 
    const selectedCountryCode = useWatch({
       name: countryCodeFieldName,
+   })
+
+   const universityId = useWatch({
+      name: name,
    })
 
    const countryCode = useMemo(() => {
@@ -124,10 +116,18 @@ const SelectUniversitiesDropDown = ({
    }, [options])
 
    const onChangeHandler = (
-      _: SyntheticEvent,
+      event: SyntheticEvent,
       option: { id: string; value: string }
    ) => {
       setValue(name, option?.id, { shouldValidate: true })
+      setIsFocused(false)
+      ;(event.target as HTMLElement).blur()
+      const inputElement = document.querySelector(
+         "#selectUniversity"
+      ) as HTMLElement
+      if (inputElement) {
+         inputElement.blur()
+      }
    }
 
    return (
@@ -137,7 +137,77 @@ const SelectUniversitiesDropDown = ({
          options={options}
          textFieldProps={{
             requiredText: "(required)",
-            placeholder: placeholder,
+            placeholder: universityId ? "" : placeholder,
+            InputProps: {
+               startAdornment: (() => {
+                  const selectedValue = options.find(
+                     (opt) => opt.id === universityId
+                  )
+                  if (!selectedValue || isFocused) return null
+                  return (
+                     <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        sx={{
+                           pt: "4px",
+                           pb: "12px",
+                           "&.MuiInputAdornment-root": {
+                              display: { xs: "none", md: "flex" },
+                              ".Mui-focused &": { display: "none" },
+                           },
+                           "& .MuiTypography-root": {
+                              fontSize: "12px",
+                              lineHeight: "16px",
+                              fontWeight: 400,
+                              color: "#525252",
+                           },
+                        }}
+                     >
+                        <SchoolIcon
+                           sx={[
+                              styles.schoolIcon,
+                              {
+                                 width: "28px",
+                                 height: "28px",
+                                 padding: "3.5px 4.083px 3.5px 3.5px",
+                              },
+                           ]}
+                        />
+                        <Typography
+                           variant="medium"
+                           sx={{
+                              fontSize: "16px !important",
+                              fontWeight: "400 !important",
+                              color: (theme) =>
+                                 `${theme.palette.neutral[900]} !important`,
+                              textOverflow: "ellipsis",
+                              overflow: "hidden",
+                              py: "2px",
+                              // whiteSpace: "nowrap",
+                              // width: "100%",
+                           }}
+                        >
+                           {selectedValue.value}
+                        </Typography>
+                     </Stack>
+                  )
+               })(),
+            },
+            sx: [
+               !isFocused
+                  ? {
+                       "& input": {
+                          width: 0,
+                          p: 0,
+                          "&:focus": {
+                             width: "100%",
+                             p: "16.5px 14px",
+                          },
+                       },
+                    }
+                  : null,
+            ],
          }}
          autocompleteProps={{
             id: "selectUniversity",
@@ -168,6 +238,16 @@ const SelectUniversitiesDropDown = ({
                },
             },
             selectOnFocus: false,
+            onFocus: () => {
+               setIsFocused(true)
+               const inputElement = document.querySelector(
+                  "#selectUniversity"
+               ) as HTMLElement
+               if (inputElement) {
+                  inputElement.click()
+               }
+            },
+            onBlur: () => setIsFocused(false),
             renderOption: (props, option, { selected }) => {
                return getOptionEl(props, option, selectedCountryCode, selected)
             },
@@ -175,7 +255,9 @@ const SelectUniversitiesDropDown = ({
                sx: styles.listBox,
             },
             getOptionLabel: (option: { id: string; value: string }) => {
+               if (!isFocused) return ""
                const optionId = typeof option === "string" ? option : option.id
+
                return universitiesMap[optionId] || ""
             },
             isOptionEqualToValue: (option, value) => {
