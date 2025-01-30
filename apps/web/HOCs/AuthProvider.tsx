@@ -6,6 +6,7 @@ import {
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import * as Sentry from "@sentry/nextjs"
 import Loader from "components/views/loader/Loader"
+import { userRepo } from "data/RepositoryInstances"
 import { clearFirestoreCache } from "data/util/authUtil"
 import { useRouter } from "next/router"
 import nookies from "nookies"
@@ -30,7 +31,11 @@ import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { RootState } from "../store"
 import CookiesUtil from "../util/CookiesUtil"
 import DateUtil from "../util/DateUtil"
-import { dataLayerUser } from "../util/analyticsUtils"
+import {
+   analyticsLogin,
+   analyticsUserLogout,
+   dataLayerUser,
+} from "../util/analyticsUtils"
 import { updateUserActivity } from "./user/trackActivity"
 
 type DefaultContext = {
@@ -200,12 +205,14 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       return firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
+            analyticsUserLogout()
             setIsLoggedIn(false)
             setIsLoggedOut(true)
             setClaims(null)
             clearFirestoreCache()
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
+            analyticsLogin(user.uid)
             setIsLoggedIn(true)
             setIsLoggedOut(false)
             const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
@@ -234,6 +241,21 @@ const AuthProvider = ({ children }) => {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [userData?.authId, userData?.isAdmin])
+
+   /**
+    * Update user Timezone
+    */
+   useEffect(() => {
+      const usersTimezone = userData?.timezone
+
+      if (usersTimezone !== DateUtil.getCurrentTimeZone()) {
+         userRepo
+            .updateUserData(userData.id, {
+               timezone: DateUtil.getCurrentTimeZone(),
+            })
+            .catch(errorLogAndNotify)
+      }
+   }, [userData?.id, userData?.timezone])
 
    const contextValue = useMemo<DefaultContext>(
       () => ({

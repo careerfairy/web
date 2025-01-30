@@ -1,6 +1,7 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
 // Only import this type, will not be part of the bundle
+import { type GroupTraits } from "@customerio/cdp-analytics-browser"
 
 /**
  * Push an event to the GTM DataLayer
@@ -14,7 +15,7 @@ export const dataLayerEvent = (eventName: string, optionalVariables = {}) => {
       ...optionalVariables,
    })
 
-   analyticsTrack(eventName, optionalVariables)
+   analyticsTrackEvent(eventName, optionalVariables)
 }
 
 /**
@@ -28,8 +29,6 @@ export const dataLayerUser = (userData: UserData) => {
       user_id: userData.authId,
       isAdmin: userData.isAdmin === true,
    })
-
-   analyticsIdentify(userData.authId)
 }
 
 const dataLayerWrapper = (event: object) => {
@@ -67,24 +66,15 @@ export const dataLayerLivestreamEvent = (
 }
 
 /**
- * Track a page view
- * @param category Optional category of the page
- * @param name Optional name of the page
- * @param properties Optional additional properties
+ * Track a page view in analytics
+ *
+ * Customer.io captures everything automatically when using the JavaScript source.
+ * This includes page events with the page URL and other common properties.
  */
-export const analyticsPage = (
-   category?: string,
-   name?: string,
-   properties: Record<string, any> = {}
-) => {
+export const analyticsPage = () => {
    if (typeof window === "undefined") return
 
-   window.analytics.push([
-      "page",
-      category, // optional
-      name, // optional
-      properties, // optional
-   ])
+   window["analytics"].push(["page"])
 }
 
 /**
@@ -92,24 +82,38 @@ export const analyticsPage = (
  * @param eventName Name of the event
  * @param properties Optional properties for the event
  */
-export const analyticsTrack = (
+export const analyticsTrackEvent = (
    eventName: string,
    properties: Record<string, any> = {}
 ) => {
    if (typeof window === "undefined") return
 
-   window.analytics.push(["track", eventName, properties])
+   window["analytics"].push(["track", eventName, properties])
 }
 
-export const analyticsIdentify = (userId: string) => {
+export const group = (id: string, traits: GroupTraits) => {
    if (typeof window === "undefined") return
 
-   window.analytics.push(["identify", userId])
+   window["analytics"].push(["group", id, traits])
 }
 
-declare global {
-   interface Window {
-      analytics: any[]
-      dataLayer: any[]
+export const analyticsLogin = async (userAuthId: string) => {
+   if (typeof window === "undefined") return
+
+   // If the analytics object is already initialized, we need to alias the anonymous id to the userAuthId
+   if (typeof window["analytics"] !== "undefined") {
+      const previousId = window["analytics"].user().anonymousId()
+
+      if (previousId) {
+         window["analytics"].alias(previousId, userAuthId)
+      }
    }
+
+   window["analytics"].push(["identify", userAuthId])
+}
+
+export const analyticsUserLogout = async () => {
+   if (typeof window === "undefined") return
+
+   window["analytics"].push(["reset"])
 }

@@ -13,6 +13,12 @@ export interface CustomerIOUserData {
    is_admin: boolean
    is_student: boolean
    /**
+    * User's last used browser timezone
+    * Reserved field in Customer.io, used for sending localized messages.
+    * Format: "Europe/Zurich", "Europe/Lisbon"
+    */
+   timezone: string
+   /**
     * Unix timestamp
     */
    created_at: number
