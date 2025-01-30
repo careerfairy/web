@@ -30,11 +30,11 @@ const HighlightCardComponent = dynamic(() => import("./HighlightCard"), {
 export const HighlightsGrid = () => {
    const { highlights } = useHighlights()
 
-   // Could be better
-   // if(!highlights.length) return null
+   if (!highlights?.length) return null
+
    return (
       <Box data-testid="highlights-grid" sx={styles.root}>
-         {highlights?.map((highlight, index) => {
+         {highlights.map((highlight, index) => {
             const isSpark = highlight.__typename === "Spark"
             return (
                <SuspenseWithBoundary
