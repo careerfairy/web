@@ -248,7 +248,7 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       const usersTimezone = userData?.timezone
 
-      if (usersTimezone !== DateUtil.getCurrentTimeZone()) {
+      if (userData?.id && usersTimezone !== DateUtil.getCurrentTimeZone()) {
          userRepo
             .updateUserData(userData.id, {
                timezone: DateUtil.getCurrentTimeZone(),
