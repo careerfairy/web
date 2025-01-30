@@ -29,6 +29,9 @@ const HighlightCardComponent = dynamic(() => import("./HighlightCard"), {
 
 export const HighlightsGrid = () => {
    const { highlights } = useHighlights()
+
+   if (!highlights?.length) return null
+
    return (
       <Box data-testid="highlights-grid" sx={styles.root}>
          {highlights.map((highlight, index) => {
