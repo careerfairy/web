@@ -15,16 +15,31 @@ const styles = sxStyles({
          sm: "100dvh",
          md: "228px",
       },
+      // width: {
+      //    // xs: "100dvw !important",
+      //    // sm: "100dvw !important",
+      //    // md: "auto",
+      // },
       width: {
          xs: "100dvw !important",
          sm: "100dvw !important",
-         md: "auto",
+         md: "670px !important",
       },
+      ml: {
+         xs: -3,
+         sm: -3,
+         md: -0.2,
+      },
+      // overflowX: "hidden",
       borderRadius: "8px",
       my: 1.5,
-      boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.08)",
+      boxShadow: {
+         sm: "none",
+         md: "0px 4px 16px rgba(0, 0, 0, 0.08)",
+      },
    },
    dropdownPaper: {
+      width: "100%",
       backgroundColor: (theme) => theme.brand.white[50],
       // "&:hover": {
       //    backgroundColor: (theme) => theme.brand.black[100],
@@ -39,12 +54,16 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.palette.neutral[50],
    },
    universityOptionRoot: {
-      backgroundColor: (theme) => theme.brand.white[50],
+      // width: "auto",
+      // minWidth: "100dvw !important",
+      // overflowX: "hidden",
+      backgroundColor: (theme) => `${theme.brand.white[50]} !important`,
       "&:hover": {
-         backgroundColor: (theme) => theme.brand.black[100],
+         backgroundColor: (theme) => `${theme.brand.black[100]} !important`,
       },
    },
    selectedUniversityOption: {
+      // overflowX: "hidden",
       backgroundColor: (theme) => `${theme.brand.white[300]} !important`,
    },
    universityOption: {
@@ -160,8 +179,6 @@ const SelectUniversitiesDropDown = ({
                return universitiesMap[optionId] || ""
             },
             isOptionEqualToValue: (option, value) => {
-               console.log("🚀 ~ value:", value)
-               console.log("🚀 ~ option:", option)
                const optionValue = value as any as string
                return option.id == optionValue
             },
