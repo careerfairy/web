@@ -225,12 +225,12 @@ const EventsTable = ({
             talentPoolAction(rowData),
             {
                icon: <GetStreamerLinksIcon color="action" />,
-               tooltip: "Get Streamer Links",
+               tooltip: "Get Stream Links",
                onClick: () => handleOpenStreamerLinksModal(rowData),
                hidden: isDraft,
-               hintTitle: "Get Streamer Links",
+               hintTitle: "Get Stream Links",
                hintDescription:
-                  "Copy your streamer links in your browser URL to access your streaming room. The first link should be use by one person only and all other speakers can use the second link.",
+                  "Get links to share with other streamers and viewers, and access your streaming room directly.",
             },
             {
                icon: <DeleteIcon color="action" />,
@@ -482,6 +482,8 @@ const EventsTable = ({
          ) : null}
          <StreamerLinksDialog
             livestreamId={targetLivestreamStreamerLinksId}
+            companyName={group.universityName}
+            companyCountryCode={group.companyCountry?.id}
             openDialog={Boolean(targetLivestreamStreamerLinksId)}
             onClose={handleCloseStreamerLinksModal}
          />
