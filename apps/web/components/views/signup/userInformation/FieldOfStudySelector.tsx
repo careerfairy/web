@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo, useState } from "react"
-import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
-import { FormikHelpers } from "formik"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
-import SingleListSelect from "../../common/SingleListSelect"
+import { FormikHelpers } from "formik"
+import { useCallback, useMemo, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { userRepo } from "../../../../data/RepositoryInstances"
+import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
+import SingleListSelect from "../../common/SingleListSelect"
 
 interface Props {
    setFieldValue?: FormikHelpers<FieldOfStudy>["setFieldValue"]
