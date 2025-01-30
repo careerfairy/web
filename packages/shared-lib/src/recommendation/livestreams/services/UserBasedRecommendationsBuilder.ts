@@ -199,10 +199,6 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
       if (this.userAdditionalInfo?.studyBackgrounds?.length) {
          // Fetch recommended events based on the user's study background
          this.userAdditionalInfo.studyBackgrounds.forEach((studyBackground) => {
-            console.log(
-               "🚀 ~ UserBasedRecommendationsBuilder ~ userStudyBackground ~ studyBackground.fieldOfStudy:",
-               studyBackground.fieldOfStudy
-            )
             this.addResults(
                this.rankedLivestreamRepo.getEventsBasedOnFieldOfStudies(
                   [studyBackground.fieldOfStudy],
@@ -219,10 +215,6 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
       if (this.userAdditionalInfo?.languages?.length) {
          // Fetch recommended events based on the user's study background
          this.userAdditionalInfo.languages.forEach((language) => {
-            console.log(
-               "🚀 ~ UserBasedRecommendationsBuilder ~ languages ~ language:",
-               language
-            )
             this.addResults(
                this.rankedLivestreamRepo.getEventsBasedOnSpokenLanguages([
                   language.languageId,

@@ -71,11 +71,6 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    public userStudyBackground() {
       this.userAdditionalInfo.studyBackgrounds?.forEach((studyBackground) => {
          if (studyBackground.fieldOfStudy?.id) {
-            console.log(
-               "🚀 ~ UserBasedRecommendationsBuilder ~ userStudyBackground: ",
-               this.user.id,
-               studyBackground.fieldOfStudy?.id
-            )
             // Fetch the top recommended sparks based on the user's field of study
             this.addResults(
                this.rankedSparkRepo.getSparksBasedOnFieldOfStudies(
