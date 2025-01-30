@@ -1,3 +1,7 @@
+import {
+   FieldOfStudy,
+   LevelOfStudy,
+} from "@careerfairy/shared-lib/fieldOfStudy"
 import { StudyBackground } from "@careerfairy/shared-lib/users"
 import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
@@ -166,6 +170,8 @@ const FormDialogWrapper = () => {
          const newStudyBackground: StudyBackground = {
             ...data,
             id: data?.id,
+            fieldOfStudy: data.fieldOfStudy as FieldOfStudy,
+            levelOfStudy: data.levelOfStudy as LevelOfStudy,
             startedAt: data.startedAt
                ? Timestamp.fromDate(data.startedAt)
                : null,

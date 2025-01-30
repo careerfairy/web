@@ -47,14 +47,18 @@ export const StudyDomainSelector = ({
    ) => {
       setValue(
          fieldName,
-         option ? { id: option.id, name: option.value } : option,
+         option ? { ...option, id: option.id, name: option.value } : option,
          {
             shouldValidate: true,
          }
       )
    }
 
-   const value = watch(fieldName)
+   const field = watch(fieldName)
+
+   const value = field
+      ? { id: field.id, name: field.name, value: field.name }
+      : null
 
    if (useTextField) {
       return (
