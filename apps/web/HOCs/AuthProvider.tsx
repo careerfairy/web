@@ -243,7 +243,7 @@ const AuthProvider = ({ children }) => {
    }, [userData?.authId, userData?.isAdmin])
 
    /**
-    * Update user Timezone
+    * Update user Timezone based on browser timezone
     */
    useEffect(() => {
       const usersTimezone = userData?.timezone
