@@ -4,7 +4,9 @@ import { Page, TalentGuideModule } from "data/hygraph/types"
 import { useAuth } from "HOCs/AuthProvider"
 import { useNextTalentGuideModule } from "hooks/useNextTalentGuideModule"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import { Play } from "react-feather"
+import { buildLevelQueryParams } from "util/routes"
 
 const defaultProps: LoadingButtonProps = {
    variant: "contained",
@@ -20,6 +22,7 @@ type Props = LoadingButtonProps & {
 
 export const StartNextLevelButton = ({ allLevels, ...props }: Props) => {
    const { authenticatedUser, isLoggedIn, isLoggedOut } = useAuth()
+   const { query } = useRouter()
 
    const isLoadingAuth = !isLoggedOut && !isLoggedIn
 
@@ -41,12 +44,17 @@ export const StartNextLevelButton = ({ allLevels, ...props }: Props) => {
       )
    }
 
-   const link = hasNoNextLevel
-      ? `/levels/${allLevels[0].slug}`
-      : `/levels/${data.slug}`
+   const levelId = hasNoNextLevel ? allLevels[0].slug : data.slug
 
    return (
-      <Box width="100%" component={Link} href={link}>
+      <Box
+         width="100%"
+         component={Link}
+         {...buildLevelQueryParams({
+            levelId,
+            currentQuery: query,
+         })}
+      >
          <LoadingButton {...defaultProps} {...props} loading={isLoading}>
             {hasNoNextLevel
                ? `Review Level ${allLevels[0].slug}`

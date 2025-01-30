@@ -4,6 +4,7 @@ import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { Variants } from "framer-motion"
 import { useGenericDashboard } from "layouts/GenericDashboardLayout"
+import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { ModuleCard } from "../../talent-guide/components/module-card/ModuleCard"
 import { CourseOverview } from "./course-overview/CourseOverview"
@@ -56,6 +57,7 @@ type Props = {
 export const LevelsContainer = ({ pages }: Props) => {
    const isMobile = useIsMobile()
    const { drawerOpen } = useGenericDashboard()
+   const [hasStaggerFinished, setHasStaggerFinished] = useState(false)
 
    const cardsAreMobile = useIsMobile(drawerOpen ? 1110 : undefined)
 
@@ -66,6 +68,7 @@ export const LevelsContainer = ({ pages }: Props) => {
          variants={containerVariants}
          initial="hidden"
          animate="visible"
+         onAnimationComplete={() => setHasStaggerFinished(true)}
          sx={[styles.root, !isMobile && styles.desktopRoot]}
       >
          <Stack spacing={2} direction={isMobile ? "column" : "row"}>
@@ -77,6 +80,7 @@ export const LevelsContainer = ({ pages }: Props) => {
                         module={page}
                         interactive
                         overrideIsMobile={cardsAreMobile}
+                        canAnimate={hasStaggerFinished}
                      />
                   </FramerBox>
                ))}
