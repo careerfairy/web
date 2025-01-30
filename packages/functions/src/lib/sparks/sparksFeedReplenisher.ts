@@ -3,10 +3,10 @@ import {
    UserSparksFeedMetrics,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { Firestore, Timestamp } from "../../api/firestoreAdmin"
+import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
 import { addAddedToFeedAt } from "../../util/sparks"
 import SparkRecommendationService from "../recommendation/SparkRecommendationService"
 import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
-import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
 
 /**
  * The SparksFeedReplenisher class is responsible for replenishing the user's feed
@@ -109,9 +109,13 @@ export class SparksFeedReplenisher {
             userRepo,
             sparkRepo
          )
-         const recommendationService = await SparkRecommendationService.create(
-            dataFetcher
-         )
+
+         const [studyBackgrounds, recommendationService] = await Promise.all([
+            userRepo.getUserStudyBackgrounds(userId),
+            SparkRecommendationService.create(dataFetcher),
+         ])
+
+         recommendationService.setStudyBackgrounds(studyBackgrounds)
 
          const recommendedSparkIds =
             await recommendationService.getRecommendations(
