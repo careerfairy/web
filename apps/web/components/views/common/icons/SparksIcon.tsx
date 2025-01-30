@@ -1,0 +1,20 @@
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon"
+
+export const SparksIcon = ({ fill = "none", ...props }: SvgIconProps) => {
+   return (
+      <SvgIcon viewBox="0 0 24 24" fill={fill} {...props}>
+         <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+         >
+            <path
+               d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 15.5V8.5C10 8.09 10.47 7.85 10.8 8.1L15.47 11.6C15.74 11.8 15.74 12.2 15.47 12.4L10.8 15.9C10.47 16.15 10 15.91 10 15.5Z"
+               stroke="currentColor"
+               strokeWidth={fill == "none" ? "1.5" : "0.3"}
+            />
+         </svg>
+      </SvgIcon>
+   )
+}

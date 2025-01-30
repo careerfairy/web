@@ -35,7 +35,14 @@ export const europeCountryFilters = [
    "SM",
 ]
 
+export const swissGermanCountryFilters = ["DE", "CH"]
+
 export const userIsTargetedApp = (userData: UserData) =>
    userData &&
    europeCountryFilters.includes(userData.universityCountryCode) &&
    (!userData.fcmTokens || userData.fcmTokens?.length === 0) // check if user hasn't downloaded the app
+
+export const userIsTargetedLevels = (userData: UserData) =>
+   userData &&
+   (swissGermanCountryFilters.includes(userData.universityCountryCode) ||
+      swissGermanCountryFilters.includes(userData.countryIsoCode))

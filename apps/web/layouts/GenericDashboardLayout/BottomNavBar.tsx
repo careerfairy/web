@@ -1,7 +1,6 @@
 import Box from "@mui/material/Box"
 import Tab, { tabClasses } from "@mui/material/Tab"
 import Tabs, { tabsClasses } from "@mui/material/Tabs"
-import { alpha } from "@mui/material/styles"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
@@ -30,40 +29,31 @@ const styles = sxStyles({
          display: "none",
       },
       [`& .${tabClasses.selected}`]: {
-         color: (theme) => `${theme.palette.text.primary} !important`,
+         color: (theme) => `${theme.palette.neutral[800]} !important`,
       },
    },
    wrapperDark: {
-      backgroundColor: "neutral.800",
+      backgroundColor: "neutral.900",
       borderTop: "1px solid #313131",
-      [`& .${tabClasses.root}`]: {
-         color: (theme) => `${theme.brand.white[50]} !important`,
-         opacity: 0.4
-      },
       [`& .${tabClasses.selected}`]: {
-         opacity: 1
-      },
-      [`& a:hover`]: {
-         opacity: 1
+         color: (theme) => `${theme.brand.white[500]} !important`,
       },
    },
    navLink: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      minWidth: 0,
+      minWidth: "74px",
       maxWidth: "20%",
       backgroundColor: "transparent !important",
-      color: (theme) => alpha(theme.palette.text.secondary, 0.3),
+      color: (theme) => theme.brand.black[700],
       p: 0,
-      "&:hover , &:focus": {
-         color: "text.primary",
-      },
    },
    icon: {
       "& .MuiSvgIcon-root": {
          fontSize: "24px",
       },
+      mb: "4px !important",
    },
    iconLabel: {
       textTransform: "none",
@@ -75,8 +65,8 @@ const styles = sxStyles({
 })
 
 type Props = {
-   links: INavLink[],
-   isDark?: boolean 
+   links: INavLink[]
+   isDark?: boolean
 }
 
 const BottomNavBar = ({ links, isDark = false }: Props) => {
@@ -95,13 +85,18 @@ const BottomNavBar = ({ links, isDark = false }: Props) => {
    }, [links, routerPathname])
 
    return (
-      <Tabs sx={[styles.wrapper, isDark && styles.wrapperDark]} value={activeTab}>
+      <Tabs
+         sx={[styles.wrapper, isDark && styles.wrapperDark]}
+         value={activeTab}
+      >
          {links.map(({ id, href, Icon, title, mobileTitle }, index) => (
             <Tab
                key={id}
                icon={
                   <Box sx={styles.icon}>
-                     <Icon />
+                     <Icon
+                        fill={activeTab === index ? "currentColor" : "none"}
+                     />
                   </Box>
                }
                component={Link}
