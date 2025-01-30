@@ -9,7 +9,7 @@ import { middlewares } from "./middlewares/middlewares"
 import { userAuthExists } from "./middlewares/validations"
 
 const CAREER_FAIRY_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
-const MIN_CREATORS_COUNT = 8
+const MAX_CREATORS_COUNT = 8
 
 export const mapCreatorToLevelsMentors = (
    creator: Creator,
@@ -27,9 +27,13 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
       try {
          const userEmail = context.auth.token.email
 
-         const followedCompanies = await userRepo.getCompaniesUserFollows(
+         const allFollowedCompanies = await userRepo.getCompaniesUserFollows(
             userEmail,
-            8
+            9
+         )
+
+         const followedCompanies = allFollowedCompanies.filter(
+            (company) => company.groupId !== CAREER_FAIRY_GROUP_ID
          )
 
          const followedCompaniesLookup = followedCompanies.reduce(
@@ -44,44 +48,47 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
             groupRepo.getCreatorsWithPublicContent(company.group)
          )
 
-         let creators = (await Promise.all(creatorsPromises)).flat()
-         creators = uniqBy(creators, "id")
+         const creators = (await Promise.all(creatorsPromises)).flat()
 
-         let levelsMentors: LevelsMentor[] = creators.map((creator) => {
-            return mapCreatorToLevelsMentors(
-               creator,
-               followedCompaniesLookup[creator.groupId]
-            )
-         })
-
-         if (levelsMentors.length < MIN_CREATORS_COUNT) {
-            const careerFairyGroup = await groupRepo.getGroupById(
-               CAREER_FAIRY_GROUP_ID
-            )
-
-            if (careerFairyGroup) {
-               const allCareerFairyCreators =
-                  await groupRepo.getCreatorsWithPublicContent(careerFairyGroup)
-
-               const careerFairyCreatorsWithLinkedIn =
-                  allCareerFairyCreators.filter(
-                     (creator) =>
-                        creator.linkedInUrl && creator.linkedInUrl.trim() !== ""
-                  )
-
-               const careerFairyMentors = careerFairyCreatorsWithLinkedIn.map(
-                  (creator) =>
-                     mapCreatorToLevelsMentors(creator, careerFairyGroup)
+         const levelsMentors: LevelsMentor[] = uniqBy(creators, "id")
+            .sort((a, b) => a.id.localeCompare(b.id))
+            .slice(0, MAX_CREATORS_COUNT)
+            .map((creator) => {
+               return mapCreatorToLevelsMentors(
+                  creator,
+                  followedCompaniesLookup[creator.groupId]
                )
+            })
 
-               const creatorsNeeded = MIN_CREATORS_COUNT - creators.length
-               levelsMentors = levelsMentors.concat(
-                  careerFairyMentors.slice(0, creatorsNeeded)
-               )
-            }
+         if (levelsMentors.length == MAX_CREATORS_COUNT) {
+            return levelsMentors
          }
 
-         return levelsMentors
+         const careerFairyGroup = await groupRepo.getGroupById(
+            CAREER_FAIRY_GROUP_ID
+         )
+
+         if (!careerFairyGroup) {
+            return levelsMentors
+         }
+
+         const allCareerFairyCreators =
+            await groupRepo.getCreatorsWithPublicContent(careerFairyGroup)
+
+         const careerFairyCreatorsWithLinkedIn = allCareerFairyCreators.filter(
+            (creator) =>
+               creator.linkedInUrl && creator.linkedInUrl.trim() !== ""
+         )
+
+         const careerFairyMentors = careerFairyCreatorsWithLinkedIn.map(
+            (creator) => mapCreatorToLevelsMentors(creator, careerFairyGroup)
+         )
+
+         const creatorsNeeded = MAX_CREATORS_COUNT - levelsMentors.length
+
+         return levelsMentors.concat(
+            careerFairyMentors.slice(0, creatorsNeeded)
+         )
       } catch (error) {
          functions.logger.error("Error in getFollowedCreators:", error)
          throw new functions.https.HttpsError(
