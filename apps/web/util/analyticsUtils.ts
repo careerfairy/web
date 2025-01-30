@@ -1,6 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
-// Only import this type, will not be part of the bundle
+
+// Only import types, will not be part of the bundle, real package is loaded by GTM
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
 
 /**
@@ -66,6 +67,11 @@ export const dataLayerLivestreamEvent = (
 }
 
 /**
+ * We queue analytics events in window["analytics"] array before GTM loads.
+ * Once GTM initializes the customer.io analytics script, it will automatically process any queued/incoming events.
+ */
+
+/**
  * Track a page view in analytics
  *
  * Customer.io captures everything automatically when using the JavaScript source.
@@ -91,27 +97,40 @@ export const analyticsTrackEvent = (
    window["analytics"].push(["track", eventName, properties])
 }
 
-export const group = (id: string, traits: GroupTraits) => {
+/**
+ * Associate a user with a group
+ * @param id the group id
+ * @param traits the group traits
+ */
+export const analyticsGroup = (id: string, traits: GroupTraits) => {
    if (typeof window === "undefined") return
 
    window["analytics"].push(["group", id, traits])
 }
 
+/**
+ * 1. Associate a user with an anonymous id if it exists
+ 
+ * @param userAuthId the user auth id
+ */
 export const analyticsLogin = async (userAuthId: string) => {
    if (typeof window === "undefined") return
 
-   // If the analytics object is already initialized, we need to alias the anonymous id to the userAuthId
+   // Link anonymous user's activity to their new account after login
    if (typeof window["analytics"] !== "undefined") {
-      const previousId = window["analytics"].user().anonymousId()
+      const anonymousId = window["analytics"].user().anonymousId()
 
-      if (previousId) {
-         window["analytics"].alias(previousId, userAuthId)
+      if (anonymousId) {
+         window["analytics"].alias(anonymousId, userAuthId)
       }
    }
 
    window["analytics"].push(["identify", userAuthId])
 }
 
+/**
+ * Remove the logged in user from the analytics
+ */
 export const analyticsUserLogout = async () => {
    if (typeof window === "undefined") return
 
