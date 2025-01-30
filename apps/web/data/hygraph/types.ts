@@ -34,6 +34,10 @@ export type TalentGuideModule = {
     */
    moduleIllustration: ImageAssetType
    /**
+    * The preview video of the module, eg "https://www.example.com/preview.mp4"
+    */
+   modulePreviewVideo: VideoAssetType
+   /**
     * The category of the module, eg "Before Applying" or "Applying Insights"
     */
    category: TalentGuideModuleCategory

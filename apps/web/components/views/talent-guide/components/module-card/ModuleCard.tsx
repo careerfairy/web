@@ -1,9 +1,22 @@
 import { Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
+import { AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { createContext, forwardRef, useContext, useMemo } from "react"
+import { useRouter } from "next/router"
+import {
+   createContext,
+   forwardRef,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
+import { useLockBodyScroll } from "react-use"
 import { sxStyles } from "types/commonTypes"
+import { buildLevelQueryParams, LEVEL_SLUG_PARAM } from "util/routes"
 import { Details } from "./Details"
 import { Status } from "./Status"
 import { Thumbnail } from "./Thumbnail"
@@ -53,10 +66,29 @@ const styles = sxStyles({
          md: "12px 0px",
       },
    },
+   expandedOverlay: (theme) => ({
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: theme.brand.white[300],
+      zIndex: theme.zIndex.drawer + 1001,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+   }),
+   expandedOverlayDesktop: {
+      py: 4.75,
+   },
 })
 
 type ModuleCardContextType = {
    isMobile: boolean
+   isExpanded: boolean
+   hasFinishedAnimating: boolean
+   module: Page<TalentGuideModule>
+   canAnimate: boolean
 }
 
 const ModuleCardContext = createContext<ModuleCardContextType | undefined>(
@@ -75,6 +107,10 @@ type Props = {
     * Controls mobile responsiveness. Falls back to auto-detection if omitted
     */
    overrideIsMobile?: boolean
+   /**
+    * Controls whether the card can expand. Used to delay expansion until parent animations complete.
+    */
+   canAnimate?: boolean
 }
 
 export const ModuleCard = forwardRef<HTMLDivElement, Props>(
@@ -85,51 +121,145 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
          isRecommended,
          onShineAnimationComplete,
          overrideIsMobile,
+         canAnimate = true,
       },
       ref
    ) => {
       const isDefaultMobile = useIsMobile()
-      const CardWrapper = interactive ? Link : Stack
-      const cardProps = interactive
-         ? {
-              href: `/levels/${module.slug}`,
-           }
-         : {}
+      const router = useRouter()
+      const [hasFinishedAnimating, setHasFinishedAnimating] = useState(false)
 
-      const value = useMemo(
-         () => ({ isMobile: overrideIsMobile ?? isDefaultMobile }),
-         [overrideIsMobile, isDefaultMobile]
+      const shouldExpand =
+         router.query[LEVEL_SLUG_PARAM] === module.slug && canAnimate
+
+      // Lock body scroll when overlay is expanded
+      useLockBodyScroll(shouldExpand)
+
+      const handleCardClick = () => {
+         if (interactive && canAnimate) {
+            setHasFinishedAnimating(false)
+         }
+      }
+
+      const handleClose = useCallback(() => {
+         const newQuery = { ...router.query }
+         delete newQuery[LEVEL_SLUG_PARAM]
+         setHasFinishedAnimating(false)
+         router.push(
+            "/levels",
+            {
+               query: newQuery,
+            },
+            { shallow: true }
+         )
+      }, [router])
+
+      useEffect(() => {
+         if (!shouldExpand || !hasFinishedAnimating) return
+
+         const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+               handleClose()
+            }
+         }
+
+         document.addEventListener("keydown", handleEscapeKey)
+
+         return () => {
+            document.removeEventListener("keydown", handleEscapeKey)
+         }
+      }, [shouldExpand, handleClose, hasFinishedAnimating])
+
+      const handleAnimationComplete = () => {
+         setHasFinishedAnimating(true)
+      }
+
+      const value = useMemo<ModuleCardContextType>(
+         () => ({
+            isMobile: overrideIsMobile ?? isDefaultMobile,
+            isExpanded: shouldExpand,
+            hasFinishedAnimating,
+            module,
+            canAnimate,
+         }),
+         [
+            overrideIsMobile,
+            isDefaultMobile,
+            shouldExpand,
+            hasFinishedAnimating,
+            module,
+            canAnimate,
+         ]
       )
+
+      const props =
+         interactive && canAnimate
+            ? buildLevelQueryParams({
+                 [LEVEL_SLUG_PARAM]: module.slug,
+                 currentQuery: router.query,
+              })
+            : {}
 
       return (
          <ModuleCardContext.Provider value={value}>
-            <Stack
-               ref={ref}
-               component={CardWrapper}
-               {...cardProps}
-               direction="row"
-               spacing={1.5}
-               sx={[
-                  styles.card,
-                  interactive && styles.interactive,
-                  isRecommended && styles.recommended,
-               ]}
+            <FramerBox
+               layoutId={`card-${module.slug}`}
+               onClick={handleCardClick}
             >
-               <Thumbnail
-                  thumbnailUrl={module.content.moduleIllustration?.url}
-               />
                <Stack
-                  data-testid="module-card-content"
-                  spacing={value.isMobile ? 1 : 1.5}
-                  sx={styles.content}
+                  ref={ref}
+                  component={interactive && canAnimate ? Link : Stack}
+                  {...props}
+                  direction="row"
+                  spacing={1.5}
+                  sx={[
+                     styles.card,
+                     interactive && styles.interactive,
+                     isRecommended && styles.recommended,
+                  ]}
                >
-                  <Status
-                     onShineAnimationComplete={onShineAnimationComplete}
-                     module={module.content}
+                  <Thumbnail
+                     thumbnailUrl={module.content.moduleIllustration?.url}
+                     moduleId={module.slug}
                   />
-                  <Details module={module.content} />
+                  <Stack
+                     data-testid="module-card-content"
+                     spacing={value.isMobile ? 1 : 1.5}
+                     sx={styles.content}
+                  >
+                     <Status
+                        onShineAnimationComplete={onShineAnimationComplete}
+                        module={module.content}
+                     />
+                     <Details module={module.content} />
+                  </Stack>
                </Stack>
-            </Stack>
+            </FramerBox>
+
+            <AnimatePresence>
+               {Boolean(shouldExpand) && (
+                  <FramerBox
+                     id="expanded-overlay"
+                     key="expanded-overlay"
+                     initial={{ opacity: 0 }}
+                     animate={{ opacity: 1 }}
+                     exit={{ opacity: 0 }}
+                     sx={[
+                        styles.expandedOverlay,
+                        !value.isMobile && styles.expandedOverlayDesktop,
+                     ]}
+                     layoutId={`card-${module.slug}`}
+                     onLayoutAnimationComplete={handleAnimationComplete}
+                  >
+                     <Thumbnail
+                        thumbnailUrl={module.content.moduleIllustration?.url}
+                        moduleId={module.slug}
+                        onClose={handleClose}
+                        expanded
+                     />
+                  </FramerBox>
+               )}
+            </AnimatePresence>
          </ModuleCardContext.Provider>
       )
    }
