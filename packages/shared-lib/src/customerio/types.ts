@@ -7,6 +7,7 @@ import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
  */
 export interface CustomerIOUserData {
    // Basic Info
+   auth_id: string
    email: string
    first_name: string
    last_name: string

@@ -10,6 +10,7 @@ export function transformUserDataForCustomerIO(
    return {
       // Basic Info
       email: userData.userEmail,
+      auth_id: userData.authId,
       first_name: userData.firstName,
       last_name: userData.lastName,
       is_admin: !!userData.isAdmin,
