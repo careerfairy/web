@@ -45,7 +45,7 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
          )
 
          const creatorsPromises = (followedCompanies ?? []).map((company) =>
-            groupRepo.getCreatorsWithPublicContent(company.group)
+            groupRepo.getMentorsForLevels(company.group)
          )
 
          const creators = (await Promise.all(creatorsPromises)).flat()
@@ -72,8 +72,9 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
             return levelsMentors
          }
 
-         const allCareerFairyCreators =
-            await groupRepo.getCreatorsWithPublicContent(careerFairyGroup)
+         const allCareerFairyCreators = await groupRepo.getMentorsForLevels(
+            careerFairyGroup
+         )
 
          const careerFairyCreatorsWithLinkedIn = allCareerFairyCreators.filter(
             (creator) =>
@@ -86,9 +87,11 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
 
          const creatorsNeeded = MAX_CREATORS_COUNT - levelsMentors.length
 
-         return levelsMentors.concat(
+         const result = levelsMentors.concat(
             careerFairyMentors.slice(0, creatorsNeeded)
          )
+
+         return result
       } catch (error) {
          functions.logger.error("Error in getFollowedCreators:", error)
          throw new functions.https.HttpsError(

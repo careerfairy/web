@@ -8,7 +8,11 @@ import BaseFirebaseRepository, {
 } from "../BaseFirebaseRepository"
 import { Create, ImageType } from "../commonTypes"
 import { CustomJob } from "../customJobs/customJobs"
-import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestionsMap,
+   Speaker,
+} from "../livestreams"
 import { Spark } from "../sparks/sparks"
 import {
    CompanyFollowed,
@@ -22,6 +26,8 @@ import {
    Creator,
    CreatorPublicContent,
    CreatorRole,
+   PublicCreator,
+   transformCreatorNameIntoSlug,
    UpdateCreatorData,
 } from "./creators"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
@@ -270,6 +276,14 @@ export interface IGroupRepository {
     * @returns A Promise that resolves with an array of creators.
     */
    getCreators(groupId: string): Promise<Creator[]>
+
+   /**
+    * Gets all group creators that have at least two public content (live streams or sparks)
+    * Example: 1 live stream and 1 spark; 2 live streams and 0 sparks; 0 live streams and 2 sparks
+    * @param groupId the group to get creators from
+    * @returns A Promise that resolves with an array of creators.
+    */
+   getMentorsForLevels(group: Group | PublicGroup): Promise<Creator[]>
 
    /**
     * Gets all group creators with public content
@@ -1109,6 +1123,118 @@ export class FirebaseGroupRepository
          .get()
 
       return mapFirestoreDocuments<Creator>(snaps)
+   }
+
+   async getMentorsForLevels(group: Group | PublicGroup): Promise<Creator[]> {
+      if (!group?.id) return []
+
+      const getCreatorSlug = (creator: Creator | PublicCreator | Speaker) => {
+         return transformCreatorNameIntoSlug(
+            creator.firstName,
+            creator.lastName
+         )
+      }
+
+      const [creatorsSnaps, livestreamsSnaps] = await Promise.all([
+         this.firestore
+            .collection("careerCenterData")
+            .doc(group.id)
+            .collection("creators")
+            .get(),
+         this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", group.id)
+            .where("test", "==", false)
+            .where("hidden", "==", false)
+            .where("denyRecordingAccess", "==", false)
+            .get(),
+      ])
+
+      if (creatorsSnaps.empty) return []
+
+      const creators = mapFirestoreDocuments<Creator>(creatorsSnaps)
+
+      const creatorsMapById: Record<string, Creator> = {}
+      for (const creator of creators) {
+         if (creator.id) {
+            creatorsMapById[creator.id] = creator
+         }
+      }
+
+      const creatorsIdBySlug: Record<string, string> = {}
+      for (const creator of creators) {
+         if (creator.firstName && creator.lastName && creator.id) {
+            creatorsIdBySlug[getCreatorSlug(creator)] = creator.id
+         }
+      }
+
+      const creatorContentCount: Record<string, number> = {}
+
+      const creatorsWithSparksSnaps = group.publicSparks
+         ? await Promise.all(
+              creators.map((creator) => {
+                 return this.firestore
+                    .collection("sparks")
+                    .where("published", "==", true)
+                    .where("creator.id", "==", creator.id)
+                    .limit(2)
+                    .get()
+              })
+           )
+         : []
+
+      for (const snap of creatorsWithSparksSnaps) {
+         if (snap.empty) continue
+
+         const sparks = mapFirestoreDocuments<Spark>(snap)[0]
+         if (!sparks) continue
+
+         const creatorId = creatorsIdBySlug[getCreatorSlug(sparks.creator)]
+         if (!creatorId) continue
+
+         creatorContentCount[creatorId] =
+            (creatorContentCount[creatorId] || 0) + 1
+      }
+
+      const livestreams =
+         mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps)
+
+      // covers co-hosted live stream edge case
+      const groupLivestreams = livestreams.filter(
+         (livestream) => livestream.groupIds[0] === group.id
+      )
+
+      for (const livestream of groupLivestreams) {
+         if (livestream.speakers) {
+            for (const speaker of livestream.speakers) {
+               const creatorId = creatorsIdBySlug[getCreatorSlug(speaker)]
+               if (!creatorId) continue
+               if (creatorId == "J3pE4mRXG8LR58L8BG05")
+                  console.log("AAAAAAAAAA", livestream.id)
+
+               creatorContentCount[creatorId] =
+                  (creatorContentCount[creatorId] || 0) + 1
+            }
+         }
+      }
+
+      const creatorsWithTwoOrMoreContent = uniqBy(
+         creators,
+         (creator) => creator.id
+      )
+         .filter((creator) => {
+            const creatorId = creatorsIdBySlug[getCreatorSlug(creator)]
+            return creatorId && creatorContentCount[creatorId] >= 2
+         })
+         .sort((a, b) => {
+            const creatorIdA = creatorsIdBySlug[getCreatorSlug(a)]
+            const creatorIdB = creatorsIdBySlug[getCreatorSlug(b)]
+            const countA = creatorContentCount[creatorIdA] || 0
+            const countB = creatorContentCount[creatorIdB] || 0
+            return countB - countA
+         })
+
+      return creatorsWithTwoOrMoreContent
    }
 
    async getCreatorsWithPublicContent(
