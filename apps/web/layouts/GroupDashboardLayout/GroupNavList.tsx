@@ -1,34 +1,31 @@
-import React, { useMemo } from "react"
 import { useRouter } from "next/router"
+import { useMemo } from "react"
 
 // react feather
-import {
-   BarChart2 as AnalyticsIcon,
-   Radio as LiveStreamsIcon,
-   Sliders as ATSIcon,
-   Home as HomeIcon,
-   PlayCircle as SparksIcon,
-   Briefcase,
-} from "react-feather"
+import { BarChart2 as AnalyticsIcon, Sliders as ATSIcon } from "react-feather"
 
 // material-ui
 import AllLiveStreamsIcon from "@mui/icons-material/HistoryToggleOff"
-import DomainIcon from "@mui/icons-material/Domain"
 import Skeleton from "@mui/material/Skeleton"
 
 // project imports
-import { INavLink } from "../types"
-import { useGroup } from "./index"
-import NavList from "../common/NavList"
-import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
-import ATSStatus from "./ATSStatus"
-import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
-import NewFeatureHint from "../../components/util/NewFeatureHint"
-import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { Box } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { CompanyIcon } from "components/views/common/icons"
 import CircleIcon from "components/views/common/icons/CircleIcon"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { HomeIcon } from "components/views/common/icons/HomeIcon"
+import { JobsIcon } from "components/views/common/icons/JobsIcon"
+import { LiveStreamsIcon } from "components/views/common/icons/LiveStreamsIcon"
+import { SparksIcon } from "components/views/common/icons/SparksIcon"
+import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
+import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
+import NewFeatureHint from "../../components/util/NewFeatureHint"
+import NavList from "../common/NavList"
+import { INavLink } from "../types"
+import ATSStatus from "./ATSStatus"
+import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
+import { useGroup } from "./index"
 
 const BASE_HREF_PATH = "group"
 const BASE_PARAM = "[groupId]"
@@ -130,14 +127,14 @@ const GroupNavList = () => {
                     id: "customJobs",
                     href: `/${BASE_HREF_PATH}/${group.id}/admin/jobs`,
                     pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/jobs/[[...jobId]]`,
-                    Icon: Briefcase,
+                    Icon: JobsIcon,
                     title: "Jobs",
                  },
               ]),
          {
             id: "company",
             title: "Company",
-            Icon: DomainIcon,
+            Icon: CompanyIcon,
             href: `/${BASE_HREF_PATH}/${group.id}/admin/edit`,
             wrapper: ({ children }) => (
                <NewFeatureHint

@@ -1,14 +1,10 @@
-import ClockIcon from "@mui/icons-material/AccessTime"
-import DomainIcon from "@mui/icons-material/Domain"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { CompanyIcon } from "components/views/common/icons"
+import { HomeIcon } from "components/views/common/icons/HomeIcon"
 import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
+import { LiveStreamsIcon } from "components/views/common/icons/LiveStreamsIcon"
+import { RecordingIcon } from "components/views/common/icons/RecordingIcon"
+import { SparksIcon } from "components/views/common/icons/SparksIcon"
 import { createContext, ReactNode, useContext, useMemo } from "react"
-import {
-   Home as HomeIcon,
-   Radio as LiveStreamsIcon,
-   PlayCircle as SparksIcon,
-} from "react-feather"
-import { useAuth } from "../../HOCs/AuthProvider"
 import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
 import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
@@ -16,7 +12,7 @@ import Footer from "../../components/views/footer/Footer"
 import AdminGenericLayout from "../AdminGenericLayout"
 import CreditsDialogLayout from "../CreditsDialogLayout"
 import { INavLink } from "../types"
-import DropdownNavigator from "./DropdownNavigator"
+import TabsNavigator from "./DropdownNavigator"
 import GenericNavList from "./GenericNavList"
 import NavBar from "./NavBar"
 import TopBar from "./TopBar"
@@ -41,25 +37,20 @@ const GenericDashboardContext = createContext<IGenericDashboardContext>({
    drawerOpen: false,
 })
 
-const MyRegistrationsPath: INavLink = {
-   id: "my-registrations",
-   href: `/next-livestreams/my-registrations`,
-   pathname: `/next-livestreams/my-registrations/[[...livestreamDialog]]`,
-   title: "My registrations",
-}
-
 const NextLivestreamsPath: INavLink = {
    id: "next-live-streams",
    href: `/next-livestreams`,
    pathname: `/next-livestreams/[[...livestreamDialog]]`,
-   title: "Next live streams",
+   title: "Live streams",
+   Icon: LiveStreamsIcon,
 }
 
 const PastLivestreamsPath: INavLink = {
    id: "all-past-live-streams",
    href: `/past-livestreams`,
    pathname: `/past-livestreams/[[...livestreamDialog]]`,
-   title: "All past streams",
+   title: "Recordings",
+   Icon: RecordingIcon,
 }
 
 type Props = {
@@ -113,8 +104,6 @@ const GenericDashboardLayout = ({
    hideHeader,
 }: Props) => {
    const isMobile = useIsMobile(989, { defaultMatches: true })
-   const { levelsV1 } = useFeatureFlags()
-   const { isLoggedIn } = useAuth()
 
    const [
       creditsDialogOpen,
@@ -138,19 +127,25 @@ const GenericDashboardLayout = ({
             mobileTitle: "Live streams",
             Icon: LiveStreamsIcon,
             href: `/next-livestreams`,
-            childLinks: [
-               NextLivestreamsPath,
-               ...(isLoggedIn ? [MyRegistrationsPath] : []),
-            ],
+            pathname: `/next-livestreams/[[...livestreamDialog]]`,
+            ...(isMobile
+               ? {
+                    childLinks: [NextLivestreamsPath, PastLivestreamsPath],
+                 }
+               : []),
          },
-         {
-            id: "past-live-streams",
-            title: "Past live streams",
-            mobileTitle: "Past streams",
-            Icon: ClockIcon,
-            href: `/past-livestreams`,
-            childLinks: [PastLivestreamsPath],
-         },
+         ...(!isMobile
+            ? [
+                 {
+                    id: "past-live-streams",
+                    title: "Recordings",
+                    mobileTitle: "Recordings",
+                    Icon: RecordingIcon,
+                    href: `/past-livestreams`,
+                    pathname: `/past-livestreams/[[...livestreamDialog]]`,
+                 },
+              ]
+            : []),
          {
             id: "sparks",
             href: `/sparks`,
@@ -159,27 +154,23 @@ const GenericDashboardLayout = ({
             title: "Sparks",
          },
          {
+            id: "levels",
+            href: `/levels`,
+            pathname: `/levels`,
+            Icon: LevelsIcon,
+            title: "Levels",
+         },
+         {
             id: "company",
             href: `/companies`,
             pathname: `/companies`,
-            Icon: DomainIcon,
+            Icon: CompanyIcon,
             title: "Companies",
          },
-         ...(levelsV1
-            ? [
-                 {
-                    id: "levels",
-                    href: `/levels`,
-                    pathname: `/levels`,
-                    Icon: LevelsIcon,
-                    title: "Levels",
-                 },
-              ]
-            : []),
       ]
 
       return links
-   }, [isLoggedIn, levelsV1])
+   }, [isMobile])
 
    const drawerOpen = !hideDrawer && !isMobile
 
@@ -221,7 +212,7 @@ const GenericDashboardLayout = ({
                   )
                }
                drawerOpen={drawerOpen}
-               dropdownNav={isMobile ? <DropdownNavigator /> : null}
+               dropdownNav={isMobile ? <TabsNavigator /> : null}
                headerWidth={headerWidth}
             >
                {children}

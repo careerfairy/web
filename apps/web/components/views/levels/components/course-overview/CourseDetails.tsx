@@ -88,7 +88,7 @@ export const CourseDetails = ({
                </Typography>
                <Stack direction="row" alignItems="center" spacing={1.5}>
                   <Stack direction="row" alignItems="center" spacing={0.5}>
-                     <LevelsIcon sx={styles.metadataIcon} isOutlined />
+                     <LevelsIcon sx={styles.metadataIcon} />
                      <Typography
                         variant={isOverlay ? "xsmall" : "small"}
                         component="p"
