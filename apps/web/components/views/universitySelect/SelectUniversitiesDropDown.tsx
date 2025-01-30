@@ -118,12 +118,7 @@ const SelectUniversitiesDropDown = ({
                ".Mui-disabled": {
                   backgroundColor: "#F7F8FC",
                   borderColor: (theme) => theme.brand.purple[50],
-                  "&.MuiInputLabel-root": {
-                     opacity: 0.5,
-                  },
-                  "&::placeholder": {
-                     opacity: 0.5,
-                  },
+                  opacity: 0.5,
                   "&:hover": {
                      backgroundColor: "#F7F8FC",
                      borderColor: (theme) =>
