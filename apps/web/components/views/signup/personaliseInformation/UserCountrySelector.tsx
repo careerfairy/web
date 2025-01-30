@@ -3,9 +3,11 @@ import { FormHelperText } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { CountryAutoComplete } from "components/views/countries/CountryAutoComplete"
 import { userRepo } from "data/RepositoryInstances"
+import { useState } from "react"
 
 export const UserCountrySelector = () => {
    const { userData } = useAuth()
+   const [hasFocused, setHasFocused] = useState<boolean>(false)
 
    const handleSelectedCountryChange = async (
       country: CountryOption | null
@@ -22,8 +24,9 @@ export const UserCountrySelector = () => {
          <CountryAutoComplete
             countryValueId={userData.countryIsoCode}
             handleSelectedCountryChange={handleSelectedCountryChange}
+            onFocus={() => setHasFocused(true)}
          />
-         {!userData.countryIsoCode ? (
+         {!userData.countryIsoCode && hasFocused ? (
             <FormHelperText sx={{ color: "error.main", ml: 2 }}>
                Please select the country you are currently located in.
             </FormHelperText>

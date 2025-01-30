@@ -5,12 +5,13 @@ import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useUserLinks } from "components/custom-hook/user/useUserLinks"
+import { LINKEDIN_URL_REGEX } from "components/util/constants"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { userRepo } from "data/RepositoryInstances"
 import Link from "next/link"
 import normalizeUrl from "normalize-url"
 import { OptionsObject } from "notistack"
-import { Fragment, useCallback, useState } from "react"
+import { Fragment, useCallback, useMemo, useState } from "react"
 import { ExternalLink, Link as FeatherLink } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
@@ -144,10 +145,35 @@ const FormDialogWrapper = () => {
             authId: userData.authId,
          }
 
-         if (!data?.id) {
-            await userRepo.createUserLink(userData.id, newLink)
+         // User has no linkedin url and the new url is valid (a linkedin url)
+         if (!userData.linkedinUrl && LINKEDIN_URL_REGEX.test(data.url)) {
+            await userRepo.updateAdditionalInformation(userData.id, {
+               linkedinUrl: data.url,
+            })
          } else {
-            await userRepo.updateUserLink(userData.id, newLink)
+            if (data?.id === "linkedin") {
+               // User is updating their linkedin url, leaving it as a valid linkedin url or
+               // changing it to an invalid linkedin url but still keeping it in the user links.
+
+               // Either way the linkedinUrl must be updated, empty if the url is not valid and the url if it is valid.
+               const isValidLinkedinUrl = LINKEDIN_URL_REGEX.test(data.url)
+
+               await userRepo.updateAdditionalInformation(userData.id, {
+                  linkedinUrl: isValidLinkedinUrl ? data.url : "",
+               })
+
+               if (!isValidLinkedinUrl) {
+                  // Since the linkedin url is not valid anymore, we create a new user link
+                  await userRepo.createUserLink(userData.id, newLink)
+               }
+            } else {
+               // User is creating/updating a non-linkedin link
+               if (!data?.id) {
+                  await userRepo.createUserLink(userData.id, newLink)
+               } else {
+                  await userRepo.updateUserLink(userData.id, newLink)
+               }
+            }
          }
 
          handleCloseLinkDialog()
@@ -189,12 +215,28 @@ const FormDialogWrapper = () => {
 }
 
 const LinksList = () => {
-   const { data: userLinks } = useUserLinks()
+   const { userData } = useAuth()
+
+   const { data: userStoredLinks } = useUserLinks()
    const dispatch = useDispatch()
 
    const handleAdd = useCallback(() => {
       dispatch(openCreateDialog({ type: TalentProfileItemTypes.Link }))
    }, [dispatch])
+
+   const userLinks = useMemo(() => {
+      return userData.linkedinUrl
+         ? [
+              {
+                 title: "LinkedIn",
+                 url: userData.linkedinUrl,
+                 authId: userData.authId,
+                 id: "linkedin",
+              },
+              ...userStoredLinks,
+           ]
+         : userStoredLinks
+   }, [userStoredLinks, userData.linkedinUrl, userData.authId])
 
    if (!userLinks?.length)
       return (
@@ -248,7 +290,13 @@ const LinkCard = ({ link }: LinkCardProps) => {
    const handleDelete = useCallback(async () => {
       setIsDeleting(true)
 
-      await userRepo.deleteLink(userData.id, link.id)
+      if (link.id === "linkedin") {
+         await userRepo.updateAdditionalInformation(userData.id, {
+            linkedinUrl: null,
+         })
+      } else {
+         await userRepo.deleteLink(userData.id, link.id)
+      }
 
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
@@ -327,4 +375,4 @@ const LinkCard = ({ link }: LinkCardProps) => {
    )
 }
 
-const isLinkedInUrl = (url: string) => url.includes("linkedin.")
+export const isLinkedInUrl = (url: string) => url.includes("linkedin.")

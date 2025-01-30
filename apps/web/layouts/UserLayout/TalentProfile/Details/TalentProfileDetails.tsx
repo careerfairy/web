@@ -30,6 +30,9 @@ const styles = sxStyles({
       },
       borderBottom: "1px solid #EAEAEA",
    },
+   tab: {
+      width: "125px",
+   },
 })
 
 type Props = {
@@ -73,11 +76,17 @@ export const TalentProfileDetails = ({ currentPath }: Props) => {
             <Tab
                label={TAB_VALUES.profile.label}
                value={TAB_VALUES.profile.value}
+               sx={styles.tab}
             />
-            <Tab label={TAB_VALUES.jobs.label} value={TAB_VALUES.jobs.value} />
+            <Tab
+               label={TAB_VALUES.jobs.label}
+               value={TAB_VALUES.jobs.value}
+               sx={styles.tab}
+            />
             <Tab
                label={TAB_VALUES.company.label}
                value={TAB_VALUES.company.value}
+               sx={styles.tab}
             />
          </Tabs>
          <Box>

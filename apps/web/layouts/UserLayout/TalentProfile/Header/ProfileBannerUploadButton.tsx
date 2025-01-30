@@ -1,4 +1,7 @@
-import { USER_BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/users/UserPresenter"
+import {
+   USER_BANNER_IMAGE_SPECS,
+   getProfileImageErrorMessage,
+} from "@careerfairy/shared-lib/users/UserPresenter"
 import { useAuth } from "HOCs/AuthProvider"
 import { useDeleteUserBannerImage } from "components/custom-hook/user/useDeleteUserBannerImage"
 import { getImageDimensionsValidator } from "components/views/common/FileUploader/validations"
@@ -14,6 +17,7 @@ const userBannerImageValidator = getImageDimensionsValidator({
    maxWidth: USER_BANNER_IMAGE_SPECS.maxWidth,
    minHeight: USER_BANNER_IMAGE_SPECS.minHeight,
    minWidth: USER_BANNER_IMAGE_SPECS.minWidth,
+   getErrorMessage: getProfileImageErrorMessage,
 })
 
 type BannerPhotoUploadButtonProps = {

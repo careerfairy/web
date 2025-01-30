@@ -1,4 +1,3 @@
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CityOption } from "@careerfairy/shared-lib/countries/types"
 import { FormHelperText } from "@mui/material"
 import useCityById from "components/custom-hook/countries/useCityById"
@@ -9,7 +8,7 @@ import { useCallback, useEffect, useState } from "react"
 
 export const UserCitySelector = () => {
    const { userData } = useAuth()
-
+   const [hasFocused, setHasFocused] = useState<boolean>(false)
    const [userCountryCode, setUserCountryCode] = useState<string | null>(
       userData.countryIsoCode
    )
@@ -17,11 +16,9 @@ export const UserCitySelector = () => {
       userData.cityIsoCode,
       false
    )
-   const [city, setCity] = useState<OptionGroup | null>(userCityOption ?? null)
 
    const handleSelectedCityChange = useCallback(
       async (city: CityOption | null) => {
-         setCity(city ? (city as OptionGroup) : null)
          await userRepo.updateUserData(userData.id, {
             cityIsoCode: city?.id ?? null,
             stateIsoCode: city?.stateIsoCode ?? null,
@@ -37,24 +34,20 @@ export const UserCitySelector = () => {
       }
    }, [userData.countryIsoCode, userCountryCode, handleSelectedCityChange])
 
-   useEffect(() => {
-      if (userData.cityIsoCode && Boolean(userCityOption)) {
-         setCity(userCityOption)
-      } else {
-         setCity(null)
-      }
-   }, [userData.cityIsoCode, userCityOption])
-
    return (
       <>
          <CityAutoComplete
-            value={city}
+            value={userCityOption}
             disabled={!userData.countryIsoCode}
             loading={isLoading}
             countryId={userData.countryIsoCode}
+            onFocus={() => setHasFocused(true)}
             handleSelectedCityChange={handleSelectedCityChange}
          />
-         {userData.countryIsoCode && !isLoading && !city ? (
+         {userData.countryIsoCode &&
+         !isLoading &&
+         !userCityOption &&
+         hasFocused ? (
             <FormHelperText sx={{ color: "error.main", ml: 2 }}>
                Please select the city you are currently located in.
             </FormHelperText>
