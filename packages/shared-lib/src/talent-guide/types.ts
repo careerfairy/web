@@ -11,6 +11,11 @@ export enum TalentGuideModuleCategory {
 export interface TalentGuideProgress extends Identifiable {
    userAuthUid: string
    moduleHygraphId: string
+   /**
+    * The url slug of the level, eg "1", "2", "3"
+    * Used for debugging pages
+    */
+   levelSlug: string
 
    // Core progress tracking
    currentStepIndex: number

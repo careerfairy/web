@@ -97,7 +97,7 @@ export const loadTalentGuide = createAsyncThunk<
       await talentGuideProgressService.createModuleProgress(
          payload.moduleData.content.id,
          payload.userAuthUid,
-         payload.moduleData.content
+         payload.moduleData
       )
    }
 
@@ -129,7 +129,7 @@ export const proceedToNextStep = createAsyncThunk(
       if (!moduleData?.content) throw new Error("Module data is missing")
 
       return talentGuideProgressService.proceedToNextStep(
-         moduleData.content,
+         moduleData,
          userAuthUid,
          currentStepIndex
       )
@@ -183,7 +183,7 @@ export const resetModuleProgressForDemo = createAsyncThunk(
       await talentGuideProgressService.createModuleProgress(
          moduleData.content.id,
          userAuthUid,
-         moduleData.content
+         moduleData
       )
 
       return {
@@ -208,7 +208,7 @@ export const restartModule = createAsyncThunk(
       await talentGuideProgressService.restartModule(
          moduleData.content.id,
          userAuthUid,
-         moduleData.content
+         moduleData
       )
 
       return {
