@@ -140,4 +140,9 @@ export type CreatorPublicContent = {
    hasJobs: boolean
 }
 
-export type CreatorWithContent = Creator & { numberOfContent: number }
+export type CreatorWithContent = Creator & {
+   numberOfContent: number
+   companyName: string
+   companyLogoUrl: string
+   companyBannerUrl: string
+}
