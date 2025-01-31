@@ -95,7 +95,7 @@ const MentorsCarousel = () => {
             {followedCreators.map((creator, index) => (
                <Box key={`mentor-slide-box-${index}`}>
                   <MentorCard
-                     bannerUrl={creator.companyLogoUrl}
+                     bannerUrl={creator.companyBannerUrl}
                      avatarUrl={creator.avatarUrl}
                      name={creator.firstName + " " + creator.lastName}
                      position={creator.position}
