@@ -12,7 +12,7 @@ const CARDS_METADATA = [
    },
    {
       icon: <Clock />,
-      title: "Anfrage an Sprecher*innen aus Fachbereich",
+      title: "Anfrage an Speaker*in aus Fachbereich",
       description:
          "Hallo [Name], deine Inputs und Ideen rund um das (Thema einfügen) bei dem Livestream auf CareerFairy fand ich super inspirierend. Da ich aktuell (Studiengang einfügen) studiere und hoffe, in deinem Fachbereich mal einen Job zu ergattern, würde ich mich gerne mehr zu dem Thema mit dir austauschen!",
    },

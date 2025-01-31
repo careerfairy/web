@@ -1,4 +1,4 @@
-import { Box, Button, Typography, useMediaQuery } from "@mui/material"
+import { Button, Typography, useMediaQuery } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import Link from "components/views/common/Link"
@@ -181,15 +181,13 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                      }, 500)
                   }}
                />
-               <Box px={-3} mx={3}>
-                  <ModuleCard
-                     isRecommended={
-                        hasCompletedModuleCardSlidUp ||
-                        animationsState.hasDividerAnimationComplete
-                     }
-                     module={nextModule}
-                  />
-               </Box>
+               <ModuleCard
+                  isRecommended={
+                     hasCompletedModuleCardSlidUp ||
+                     animationsState.hasDividerAnimationComplete
+                  }
+                  module={nextModule}
+               />
             </FramerBox>
          </AnimatePresence>
          <FramerBox
