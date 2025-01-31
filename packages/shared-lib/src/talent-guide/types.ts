@@ -1,6 +1,5 @@
 import { Identifiable } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
-import { Creator } from "../groups/creators"
 
 export enum TalentGuideModuleCategory {
    BEFORE_APPLYING = "WHAT_TO_DO_BEFORE_APPLYING",
@@ -135,11 +134,4 @@ export interface TalentGuideFeedback extends Identifiable {
    // Metadata
    submittedAt: Timestamp
    lastUpdated: Timestamp
-}
-
-// Communication
-
-export type LevelsMentor = Creator & {
-   companyName: string
-   companyLogoUrl: string
 }
