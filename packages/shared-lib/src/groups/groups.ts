@@ -289,6 +289,7 @@ export type PublicGroup = Pick<
    Group,
    | "id"
    | "description"
+   | "bannerImageUrl"
    | "logoUrl"
    | "extraInfo"
    | "universityName"
@@ -309,6 +310,7 @@ export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
    return {
       id: group.id,
       description: group.description ?? null,
+      bannerImageUrl: group.bannerImageUrl ?? null,
       logoUrl: group.logoUrl ?? null,
       extraInfo: group.extraInfo ?? null,
       universityName: group.universityName ?? null,
