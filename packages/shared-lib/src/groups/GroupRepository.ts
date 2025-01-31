@@ -26,6 +26,7 @@ import {
    Creator,
    CreatorPublicContent,
    CreatorRole,
+   CreatorWithContent,
    PublicCreator,
    transformCreatorNameIntoSlug,
    UpdateCreatorData,
@@ -283,7 +284,9 @@ export interface IGroupRepository {
     * @param groupId the group to get creators from
     * @returns A Promise that resolves with an array of creators.
     */
-   getMentorsForLevels(group: Group | PublicGroup): Promise<Creator[]>
+   getMentorsForLevels(
+      group: Group | PublicGroup
+   ): Promise<CreatorWithContent[]>
 
    /**
     * Gets all group creators with public content
@@ -1125,7 +1128,9 @@ export class FirebaseGroupRepository
       return mapFirestoreDocuments<Creator>(snaps)
    }
 
-   async getMentorsForLevels(group: Group | PublicGroup): Promise<Creator[]> {
+   async getMentorsForLevels(
+      group: Group | PublicGroup
+   ): Promise<CreatorWithContent[]> {
       if (!group?.id) return []
 
       const getCreatorSlug = (creator: Creator | PublicCreator | Speaker) => {
@@ -1177,7 +1182,6 @@ export class FirebaseGroupRepository
                     .collection("sparks")
                     .where("published", "==", true)
                     .where("creator.id", "==", creator.id)
-                    .limit(2)
                     .get()
               })
            )
@@ -1186,14 +1190,16 @@ export class FirebaseGroupRepository
       for (const snap of creatorsWithSparksSnaps) {
          if (snap.empty) continue
 
-         const sparks = mapFirestoreDocuments<Spark>(snap)[0]
+         const sparks = mapFirestoreDocuments<Spark>(snap)
          if (!sparks) continue
 
-         const creatorId = creatorsIdBySlug[getCreatorSlug(sparks.creator)]
-         if (!creatorId) continue
+         for (const spark of sparks) {
+            const creatorId = creatorsIdBySlug[getCreatorSlug(spark.creator)]
+            if (!creatorId) continue
 
-         creatorContentCount[creatorId] =
-            (creatorContentCount[creatorId] || 0) + 1
+            creatorContentCount[creatorId] =
+               (creatorContentCount[creatorId] || 0) + 1
+         }
       }
 
       const livestreams =
@@ -1209,8 +1215,6 @@ export class FirebaseGroupRepository
             for (const speaker of livestream.speakers) {
                const creatorId = creatorsIdBySlug[getCreatorSlug(speaker)]
                if (!creatorId) continue
-               if (creatorId == "J3pE4mRXG8LR58L8BG05")
-                  console.log("AAAAAAAAAA", livestream.id)
 
                creatorContentCount[creatorId] =
                   (creatorContentCount[creatorId] || 0) + 1
@@ -1226,13 +1230,12 @@ export class FirebaseGroupRepository
             const creatorId = creatorsIdBySlug[getCreatorSlug(creator)]
             return creatorId && creatorContentCount[creatorId] >= 2
          })
-         .sort((a, b) => {
-            const creatorIdA = creatorsIdBySlug[getCreatorSlug(a)]
-            const creatorIdB = creatorsIdBySlug[getCreatorSlug(b)]
-            const countA = creatorContentCount[creatorIdA] || 0
-            const countB = creatorContentCount[creatorIdB] || 0
-            return countB - countA
-         })
+         .map((creator) => ({
+            ...creator,
+            numberOfContent:
+               creatorContentCount[creatorsIdBySlug[getCreatorSlug(creator)]] ||
+               0,
+         }))
 
       return creatorsWithTwoOrMoreContent
    }
