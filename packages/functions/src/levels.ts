@@ -1,6 +1,4 @@
-import { Group, PublicGroup } from "@careerfairy/shared-lib/groups"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import { LevelsMentor } from "@careerfairy/shared-lib/talent-guide/types"
+import { CreatorWithContent } from "@careerfairy/shared-lib/groups/creators"
 import * as functions from "firebase-functions"
 import { uniqBy } from "lodash"
 import { groupRepo, userRepo } from "./api/repositories"
@@ -12,13 +10,14 @@ const CAREER_FAIRY_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
 const MAX_CREATORS_COUNT = 8
 
 export const mapCreatorToLevelsMentors = (
-   creator: Creator,
-   followedCompany: Group | PublicGroup
-) => {
+   creator: CreatorWithContent
+): CreatorWithContent => {
    return {
       ...creator,
-      companyName: followedCompany.universityName,
-      companyLogoUrl: followedCompany.logoUrl,
+      numberOfContent: creator.numberOfContent,
+      companyName: creator.companyName,
+      companyLogoUrl: creator.companyLogoUrl,
+      companyBannerUrl: creator.companyBannerUrl,
    }
 }
 
@@ -28,37 +27,28 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
          const userEmail = context.auth.token.email
 
          const allFollowedCompanies = await userRepo.getCompaniesUserFollows(
-            userEmail,
-            9
+            userEmail
          )
 
          const followedCompanies = allFollowedCompanies.filter(
             (company) => company.groupId !== CAREER_FAIRY_GROUP_ID
          )
 
-         const followedCompaniesLookup = followedCompanies.reduce(
-            (acc, company) => ({
-               ...acc,
-               [company.groupId]: company.group,
-            }),
-            {}
-         )
-
          const creatorsPromises = (followedCompanies ?? []).map((company) =>
             groupRepo.getMentorsForLevels(company.group)
          )
 
-         const creators = (await Promise.all(creatorsPromises)).flat()
+         const creatorsWithContent = (
+            await Promise.all(creatorsPromises)
+         ).flat()
 
-         const levelsMentors: LevelsMentor[] = uniqBy(creators, "id")
+         const levelsMentors: CreatorWithContent[] = uniqBy(
+            creatorsWithContent,
+            "id"
+         )
             .sort((a, b) => b.numberOfContent - a.numberOfContent)
             .slice(0, MAX_CREATORS_COUNT)
-            .map((creator) => {
-               return mapCreatorToLevelsMentors(
-                  creator,
-                  followedCompaniesLookup[creator.groupId]
-               )
-            })
+            .map(mapCreatorToLevelsMentors)
 
          if (levelsMentors.length == MAX_CREATORS_COUNT) {
             return levelsMentors
@@ -83,9 +73,7 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
 
          const careerFairyMentors = careerFairyCreatorsWithLinkedIn
             .sort((a, b) => b.numberOfContent - a.numberOfContent)
-            .map((creator) =>
-               mapCreatorToLevelsMentors(creator, careerFairyGroup)
-            )
+            .map(mapCreatorToLevelsMentors)
 
          const creatorsNeeded = MAX_CREATORS_COUNT - levelsMentors.length
 
