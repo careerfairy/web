@@ -18,6 +18,7 @@ import {
    useIsLoadingTalentGuide,
    useShowEndOfModuleExperience,
 } from "store/selectors/talentGuideSelectors"
+import { getTalentGuideLevelSeoProps } from "util/seo/talentGuideSeo"
 import {
    tgBackendPreviewService,
    tgBackendService,
@@ -62,15 +63,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       }
    }, [isLoggedOut, asPath, replace])
 
-   const seo = (
-      <SEO
-         image={data?.seo?.image}
-         title={data?.seo?.title}
-         description={data?.seo?.description}
-         keywords={data?.seo?.keywords?.join(", ")}
-         noIndex={data?.seo?.noIndex}
-      />
-   )
+   const seo = <SEO {...getTalentGuideLevelSeoProps(data)} />
 
    if (!isLoggedIn) {
       return (

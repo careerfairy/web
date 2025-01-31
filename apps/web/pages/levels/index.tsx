@@ -4,6 +4,7 @@ import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
+import { getTalentGuideOverviewSeoProps } from "util/seo/talentGuideSeo"
 import SEO from "../../components/util/SEO"
 import { LevelsContainer } from "../../components/views/levels/components/LevelsContainer"
 import {
@@ -24,13 +25,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({
 
    return (
       <Fragment>
-         <SEO
-            title={rootPage.seo?.title}
-            description={rootPage.seo?.description}
-            keywords={rootPage.seo?.keywords?.join(", ")}
-            noIndex={rootPage.seo?.noIndex}
-            image={rootPage.seo?.image}
-         />
+         <SEO {...getTalentGuideOverviewSeoProps(rootPage, pages)} />
          <GenericDashboardLayout pageDisplayName="Levels">
             <LevelsContainer pages={pages} />
             {Boolean(isPreview) && <PreviewModeAlert />}

@@ -1,26 +1,18 @@
 import { SeoProps } from "components/util/SEO"
-import { ILLUSTRATION_URL } from "components/views/levels/components/course-overview/CourseIllustration"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 
-export const getTalentGuideModuleSeoProps = (
-   data: Page<TalentGuideModule>,
-   isPreview: boolean
+export const getTalentGuideLevelSeoProps = (
+   data: Page<TalentGuideModule>
 ): Partial<SeoProps> => {
    return {
-      title: `${data.content?.moduleName} - CareerFairy Levels`,
-      description: data.content?.moduleDescription,
-      noIndex: isPreview,
-      image: {
-         url: data.content?.moduleIllustration?.url,
-         width: data.content?.moduleIllustration?.width,
-         height: data.content?.moduleIllustration?.height,
-         alt:
-            data.content?.moduleIllustration?.alt ||
-            `${data.content?.moduleName} illustration`,
-      },
+      title: data.seo?.title,
+      description: data.seo?.description,
+      image: data.seo?.image,
+      keywords: data.seo?.keywords?.join(", "),
+      noIndex: data.seo?.noIndex,
       openGraph: {
-         title: `${data.content?.moduleName} - CareerFairy Levels`,
-         description: data.content?.moduleDescription,
+         title: data.seo?.title,
+         description: data.seo?.description,
          type: "article",
          article: {
             section: data.content?.category,
@@ -47,26 +39,23 @@ export const getTalentGuideModuleSeoProps = (
 }
 
 export const getTalentGuideOverviewSeoProps = (
-   pages: Page<TalentGuideModule>[],
-   isPreview: boolean
+   rootPage: Page<TalentGuideModule>,
+   pages: Page<TalentGuideModule>[]
 ): Partial<SeoProps> => {
    const totalModules = pages.length
    const categories = [
       ...new Set(pages.map((page) => page.content?.category).filter(Boolean)),
    ]
-   const description =
-      "Enhance your job search journey with expert-curated learning modules. Get in-depth insights, company perspectives, and practical guidance tailored to each stage of your career development."
+   const description = rootPage.seo?.description
 
    return {
-      title: "CareerFairy | Levels",
+      title: rootPage.seo?.title,
       description,
-      noIndex: isPreview,
-      image: {
-         url: ILLUSTRATION_URL,
-         alt: "CareerFairy Levels Overview",
-      },
+      image: rootPage.seo?.image,
+      keywords: rootPage.seo?.keywords?.join(", "),
+      noIndex: rootPage.seo?.noIndex,
       openGraph: {
-         title: "CareerFairy Levels - Career Development Modules",
+         title: rootPage.seo?.title,
          description,
          type: "website",
          article: {
