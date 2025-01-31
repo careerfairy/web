@@ -89,6 +89,7 @@ const csp = {
       "client.crisp.chat",
       "https://assets-global.website-files.com",
       "https://cdn.prod.website-files.com", // Webflow
+      "https://sibforms.com", // Webflow extension
    ],
    "connect-src": [
       "'self'",
