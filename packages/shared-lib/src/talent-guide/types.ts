@@ -77,21 +77,21 @@ export const FEEDBACK_TAG_CATEGORY = {
       id: "interactions",
       label: {
          en: "Interactions",
-         de: "Interaktionen",
+         de: "Interaktive",
       },
    },
    PACE: {
       id: "pace",
       label: {
          en: "Pace",
-         de: "Tempo",
+         de: "Zeitaufwand",
       },
    },
    DIFFICULTY: {
       id: "difficulty",
       label: {
          en: "Difficulty",
-         de: "Schwierigkeit",
+         de: "Schwierigskeitgrad",
       },
    },
    CLARITY: {
@@ -112,7 +112,7 @@ export const FEEDBACK_TAG_CATEGORY = {
       id: "others",
       label: {
          en: "Others",
-         de: "Sonstiges",
+         de: "Anderes",
       },
    },
 } as const

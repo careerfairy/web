@@ -36,7 +36,7 @@ export const CourseIllustration = ({ isMobile, children }: Props) => {
          >
             <Image
                src={ILLUSTRATION_URL}
-               alt="Quick start your career"
+               alt="Kickstarte deine Karriere"
                style={styles.image}
                fill
                sizes={isMobile ? "100vw" : "360px"}

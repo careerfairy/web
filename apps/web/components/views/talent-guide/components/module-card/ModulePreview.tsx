@@ -169,7 +169,7 @@ export const ModulePreview = ({ onClose }: Props) => {
                size="large"
                endIcon={<ArrowRight size={20} />}
             >
-               Start Level
+               Level starten
             </Button>
          </FramerBox>
       </Box>

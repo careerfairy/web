@@ -45,7 +45,7 @@ const styles = sxStyles({
 })
 
 const defaultProps = {
-   size: 44,
+   size: 48,
    thickness: 4,
    variant: "determinate" as const,
 }

@@ -2,7 +2,6 @@ import * as Sentry from "@sentry/nextjs"
 import { useAppDispatch } from "components/custom-hook/store"
 import SEO from "components/util/SEO"
 import { TalentGuideEndLayout } from "components/views/talent-guide/components/end-of-module/TalentGuideEndLayout"
-import { ResetDemoButton } from "components/views/talent-guide/components/floating-buttons/ResetDemoButton"
 import { Loader } from "components/views/talent-guide/components/Loader"
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
 import { TalentGuideStepsLayout } from "components/views/talent-guide/components/TalentGuideStepsLayout"
@@ -10,7 +9,7 @@ import { Page, TalentGuideModule } from "data/hygraph/types"
 import { useAuth } from "HOCs/AuthProvider"
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useEffect } from "react"
 import {
    loadTalentGuide,
    resetTalentGuide,
@@ -19,7 +18,6 @@ import {
    useIsLoadingTalentGuide,
    useShowEndOfModuleExperience,
 } from "store/selectors/talentGuideSelectors"
-import { getTalentGuideModuleSeoProps } from "util/seo/talentGuideSeo"
 import {
    tgBackendPreviewService,
    tgBackendService,
@@ -36,7 +34,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const { authenticatedUser, isLoggedIn, isLoggedOut } = useAuth()
    const isLoadingGuide = useIsLoadingTalentGuide()
    const showEndOfModuleExperience = useShowEndOfModuleExperience()
-   const [layoutKey, setLayoutKey] = useState(0)
+   // const [layoutKey, setLayoutKey] = useState(0)
 
    useEffect(() => {
       if (!authenticatedUser.uid) {
@@ -64,14 +62,20 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       }
    }, [isLoggedOut, asPath, replace])
 
-   const handleResetLayout = () => {
-      setLayoutKey((prev) => prev + 1)
-   }
+   const seo = (
+      <SEO
+         image={data?.seo?.image}
+         title={data?.seo?.title}
+         description={data?.seo?.description}
+         keywords={data?.seo?.keywords?.join(", ")}
+         noIndex={data?.seo?.noIndex}
+      />
+   )
 
    if (!isLoggedIn) {
       return (
          <Fragment>
-            <SEO {...getTalentGuideModuleSeoProps(data, isPreview)} />
+            {seo}
             <Loader />
          </Fragment>
       )
@@ -80,9 +84,9 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const isLoading = isLoadingGuide || !isLoggedIn
 
    return (
-      <Fragment key={layoutKey}>
+      <Fragment>
          {Boolean(isPreview) && <PreviewModeAlert />}
-         <SEO {...getTalentGuideModuleSeoProps(data, isPreview)} />
+         {seo}
          {isLoading ? (
             <Loader />
          ) : showEndOfModuleExperience ? (
@@ -90,7 +94,9 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
          ) : (
             <TalentGuideStepsLayout />
          )}
-         <ResetDemoButton onResetLayout={handleResetLayout} />
+         {/* <ResetDemoButton
+            onResetLayout={() => setLayoutKey((prev) => prev + 1)}
+         /> */}
       </Fragment>
    )
 }

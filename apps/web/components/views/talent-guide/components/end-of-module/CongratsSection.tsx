@@ -35,15 +35,15 @@ const CongratsMessage = () => {
             variant="desktopBrandedH3"
             component="h3"
          >
-            Congrats!
+            Glückwunsch!
          </Typography>
          <Typography
             sx={congratsStyles.congratsText}
             variant="medium"
             component="p"
          >
-            You&apos;ve completed this module and are one step closer to your
-            dream job!
+            Mit diesem Level bist du einen Schritt näher an deinem
+            Karrierestart.
          </Typography>
       </Stack>
    )

@@ -6,7 +6,7 @@ import useSWR, { SWRConfiguration, useSWRConfig } from "swr"
 
 const fetchNextModule = async (
    userAuthUid: string | null,
-   locale: string = "en"
+   locale: string
 ): Promise<Page<TalentGuideModule> | null> => {
    // Get all modules from API
    const response = await fetch(`/api/levels/modules?locale=${locale}`)
@@ -31,7 +31,7 @@ const fetchNextModule = async (
  */
 export function useNextTalentGuideModule(
    userAuthUid: string | null,
-   locale: string = "de",
+   locale: string,
    options?: SWRConfiguration & {
       noCache?: boolean
       disabled?: boolean

@@ -70,7 +70,7 @@ const getPreviewData = async (
 
       case PageType.TALENT_GUIDE_ROOT_PAGE: {
          const talentGuideRootPage =
-            await tgBackendPreviewService.getTalentGuideRootPage(slug)
+            await tgBackendPreviewService.getTalentGuideRootPage()
 
          return {
             hasData: Boolean(talentGuideRootPage),

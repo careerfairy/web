@@ -92,7 +92,7 @@ export const QuizCard = ({ question, answers, id }: Props) => {
             <Box ref={correctionRef} sx={styles.correction}>
                <Typography component="p" variant="small">
                   <Box component="span" sx={styles.correctionText}>
-                     Correction:
+                     Inkorrekt:
                   </Box>{" "}
                   {correctAnswerCorrection}
                </Typography>

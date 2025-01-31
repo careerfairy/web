@@ -132,7 +132,6 @@ export const ModuleCard = forwardRef<HTMLDivElement, Props>(
       const shouldExpand =
          router.query[LEVEL_SLUG_PARAM] === module.slug && canAnimate
 
-      // Lock body scroll when overlay is expanded
       useLockBodyScroll(shouldExpand)
 
       const handleCardClick = () => {
