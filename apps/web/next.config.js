@@ -93,6 +93,7 @@ const csp = {
       "client.crisp.chat",
       "https://assets-global.website-files.com",
       "https://cdn.prod.website-files.com", // Webflow
+      "https://sibforms.com", // Webflow extension
    ],
    "connect-src": [
       "https://unpkg.com", // Added for dotlottie-wc script
