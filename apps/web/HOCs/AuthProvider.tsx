@@ -200,14 +200,6 @@ const AuthProvider = ({ children }) => {
       auth.stsTokenManager?.accessToken,
    ])
 
-   const handleResetAuthState = useCallback(() => {
-      setIsLoggedIn(false)
-      setIsLoggedOut(true)
-      setClaims(null)
-      clearFirestoreCache()
-      nookies.set(undefined, "token", "", { path: "/" })
-   }, [])
-
    /**
     * Listen to when the user actually signs out
     */
@@ -216,14 +208,12 @@ const AuthProvider = ({ children }) => {
          // This will only fire when the token changes
          // A null user with a previous token indicates a sign-out event
          if (!user && auth.uid) {
-            handleResetAuthState()
             dataLayerEvent("logout")
-            analyticsResetUser()
          }
       })
 
       return () => unsubscribe()
-   }, [firebaseService.auth, auth.uid, handleResetAuthState])
+   }, [firebaseService.auth, auth.uid])
 
    /**
     * Listen for auth changes and update claims
@@ -231,7 +221,12 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       return firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
-            handleResetAuthState()
+            analyticsResetUser()
+            setIsLoggedIn(false)
+            setIsLoggedOut(true)
+            setClaims(null)
+            clearFirestoreCache()
+            nookies.set(undefined, "token", "", { path: "/" })
          } else {
             analyticsSetUser(user.uid)
             setIsLoggedIn(true)
@@ -243,7 +238,7 @@ const AuthProvider = ({ children }) => {
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
       })
-   }, [firebaseService.auth, handleResetAuthState])
+   }, [firebaseService.auth])
 
    /**
     * Update user activity when there are new claims
