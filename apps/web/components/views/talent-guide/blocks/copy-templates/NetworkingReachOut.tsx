@@ -1,26 +1,20 @@
 import { Stack } from "@mui/material"
-import { Briefcase, Clock, MessageSquare } from "react-feather"
+import { Clock } from "react-feather"
 import { CopyAccordion } from "./AccordionComponents"
 import { useTemporaryActiveState } from "./useTemporaryActiveState"
 
 const CARDS_METADATA = [
    {
       icon: <Clock />,
-      title: "Post-event follow-up",
+      title: "Anfrage an Recruiter*in",
       description:
-         "Hi [Name], it was great meeting you at [Event]! I enjoyed our conversation about [topic]. Let’s stay in touch!",
+         "Hallo [Name], ich habe deinen Livestream auf CareerFairy geschaut und (spezifische Punkte) stachen besonders für mich heraus. Da ich (Studiengang XYZ) studiere, sind diese Punkte besonders spannend für mich. Gerne würde ich dir dazu weiterführende Fragen stellen und mich zu den Themen austauschen!",
    },
    {
-      icon: <MessageSquare />,
-      title: "Requesting an introduction",
+      icon: <Clock />,
+      title: "Anfrage an Sprecher*innen aus Fachbereich",
       description:
-         "Hi [Name], I noticed you’re connected with [Person]. I’m really interested in their work in [field]. Would you be willing to introduce us?",
-   },
-   {
-      icon: <Briefcase />,
-      title: "Career Advice",
-      description:
-         "Hi [Name], I hope you’re doing well! I admire your work in [specific field] and would love to hear your insights on [specific topic]. Would you be open to a chat?",
+         "Hallo [Name], deine Inputs und Ideen rund um das (Thema einfügen) bei dem Livestream auf CareerFairy fand ich super inspirierend. Da ich aktuell (Studiengang einfügen) studiere und hoffe, in deinem Fachbereich mal einen Job zu ergattern, würde ich mich gerne mehr zu dem Thema mit dir austauschen!",
    },
 ]
 
