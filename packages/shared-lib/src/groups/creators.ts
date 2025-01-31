@@ -139,3 +139,5 @@ export type CreatorPublicContent = {
    sparks: Spark[]
    hasJobs: boolean
 }
+
+export type CreatorWithContent = Creator & { numberOfContent: number }
