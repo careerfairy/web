@@ -51,7 +51,7 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
          const creators = (await Promise.all(creatorsPromises)).flat()
 
          const levelsMentors: LevelsMentor[] = uniqBy(creators, "id")
-            .sort((a, b) => a.id.localeCompare(b.id))
+            .sort((a, b) => b.numberOfContent - a.numberOfContent)
             .slice(0, MAX_CREATORS_COUNT)
             .map((creator) => {
                return mapCreatorToLevelsMentors(
@@ -81,9 +81,11 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
                creator.linkedInUrl && creator.linkedInUrl.trim() !== ""
          )
 
-         const careerFairyMentors = careerFairyCreatorsWithLinkedIn.map(
-            (creator) => mapCreatorToLevelsMentors(creator, careerFairyGroup)
-         )
+         const careerFairyMentors = careerFairyCreatorsWithLinkedIn
+            .sort((a, b) => b.numberOfContent - a.numberOfContent)
+            .map((creator) =>
+               mapCreatorToLevelsMentors(creator, careerFairyGroup)
+            )
 
          const creatorsNeeded = MAX_CREATORS_COUNT - levelsMentors.length
 
