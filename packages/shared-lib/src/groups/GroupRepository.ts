@@ -1201,7 +1201,7 @@ export class FirebaseGroupRepository
       }
 
       const livestreams =
-         mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps)
+         mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps) || []
 
       // covers co-hosted live stream edge case
       const groupLivestreams = livestreams.filter(
