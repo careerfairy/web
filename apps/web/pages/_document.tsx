@@ -10,6 +10,7 @@ import Document, {
    NextScript,
 } from "next/document"
 import * as React from "react"
+import { shouldUseEmulators } from "util/CommonUtil"
 import { isEmbedded, isGroupAdminPath, isStreamingPath } from "util/PathUtils"
 
 interface DocumentProps extends DocumentInitialProps {
@@ -294,7 +295,7 @@ MyDocument.getInitialProps = async function (
 
 function shouldRunUsercentrics(ctx: DocumentContext) {
    // Don't run when developing / tests
-   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+   if (shouldUseEmulators()) {
       return false
    }
 

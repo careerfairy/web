@@ -87,18 +87,20 @@ export const analyticsTrackEvent = (
 }
 
 /**
- * Link anonymous user's activity to their new account after login
+ * By setting the user, all activity will be associated with the user
  * @param userAuthId the user auth id
  */
-export const analyticsLogin = async (userAuthId: string) => {
+export const analyticsSetUser = async (userAuthId: string) => {
    if (typeof window === "undefined") return
 
-   // Link anonymous user's activity to their new account after login
-   if (typeof window["analytics"] !== "undefined") {
+   // Link anonymous user's activity to their new account after setting the user
+   if (typeof window["analytics"] !== "undefined" && window["analytics"].user) {
       const anonymousId = window["analytics"].user().anonymousId()
 
+      // Immediately alias the anonymous user to the new user before identifying
+      // Docs: https://docs.customer.io/cdp/sources/source-spec/alias-spec/
       if (anonymousId) {
-         window["analytics"].alias(anonymousId, userAuthId)
+         window["analytics"].alias(userAuthId, anonymousId)
       }
    }
 
@@ -108,7 +110,7 @@ export const analyticsLogin = async (userAuthId: string) => {
 /**
  * Remove the logged in user from the analytics
  */
-export const analyticsUserLogout = async () => {
+export const analyticsResetUser = async () => {
    if (typeof window === "undefined") return
 
    window["analytics"].push(["reset"])

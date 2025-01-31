@@ -32,8 +32,9 @@ import { RootState } from "../store"
 import CookiesUtil from "../util/CookiesUtil"
 import DateUtil from "../util/DateUtil"
 import {
-   analyticsLogin,
-   analyticsUserLogout,
+   analyticsResetUser,
+   analyticsSetUser,
+   dataLayerEvent,
    dataLayerUser,
 } from "../util/analyticsUtils"
 import { updateUserActivity } from "./user/trackActivity"
@@ -199,20 +200,40 @@ const AuthProvider = ({ children }) => {
       auth.stsTokenManager?.accessToken,
    ])
 
+   const handleResetAuthState = useCallback(() => {
+      setIsLoggedIn(false)
+      setIsLoggedOut(true)
+      setClaims(null)
+      clearFirestoreCache()
+      nookies.set(undefined, "token", "", { path: "/" })
+   }, [])
+
+   /**
+    * Listen to when the user actually signs out
+    */
+   useEffect(() => {
+      const unsubscribe = firebaseService.auth.onIdTokenChanged((user) => {
+         // This will only fire when the token changes
+         // A null user with a previous token indicates a sign-out event
+         if (!user && auth.uid) {
+            handleResetAuthState()
+            dataLayerEvent("logout")
+            analyticsResetUser()
+         }
+      })
+
+      return () => unsubscribe()
+   }, [firebaseService.auth, auth.uid, handleResetAuthState])
+
    /**
     * Listen for auth changes and update claims
     */
    useEffect(() => {
       return firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
-            analyticsUserLogout()
-            setIsLoggedIn(false)
-            setIsLoggedOut(true)
-            setClaims(null)
-            clearFirestoreCache()
-            nookies.set(undefined, "token", "", { path: "/" })
+            handleResetAuthState()
          } else {
-            analyticsLogin(user.uid)
+            analyticsSetUser(user.uid)
             setIsLoggedIn(true)
             setIsLoggedOut(false)
             const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
@@ -222,7 +243,7 @@ const AuthProvider = ({ children }) => {
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
       })
-   }, [firebaseService.auth])
+   }, [firebaseService.auth, handleResetAuthState])
 
    /**
     * Update user activity when there are new claims
