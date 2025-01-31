@@ -13,8 +13,8 @@ import Link from "next/link"
 import { useState } from "react"
 import { ArrowRight, Minus, Plus, Volume2, VolumeX, X } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { useModuleCardContext } from "./ModuleCard"
-
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false })
 
 const styles = sxStyles({
@@ -93,7 +93,7 @@ const checkIsMuted = () => {
 
 export const ModulePreview = ({ onClose }: Props) => {
    const [isMuted, setIsMuted] = useState(checkIsMuted())
-
+   const [playerKey, setPlayerKey] = useState(0)
    const [showDescription, setShowDescription] = useState(true)
 
    const { module, hasFinishedAnimating, isMobile } = useModuleCardContext()
@@ -105,13 +105,17 @@ export const ModulePreview = ({ onClose }: Props) => {
          {/* Render video player after animation completes to prevent stuttering */}
          {Boolean(hasFinishedAnimating) && (
             <ReactPlayer
+               key={playerKey}
                className="react-player"
                width="100%"
                height="100%"
                playsinline
                muted={isMuted}
                onError={(error) => {
-                  console.error("Error loading video", error)
+                  errorLogAndNotify(error)
+                  setIsMuted(true)
+                  // Force remount of player if it fails to play
+                  setPlayerKey(1) // Only remount once to prevent infinite remounts
                }}
                url={module.content.modulePreviewVideo?.url}
                loop
