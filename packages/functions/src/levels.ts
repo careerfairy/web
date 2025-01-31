@@ -27,7 +27,8 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
          const userEmail = context.auth.token.email
 
          const allFollowedCompanies = await userRepo.getCompaniesUserFollows(
-            userEmail
+            userEmail,
+            20
          )
 
          const followedCompanies = allFollowedCompanies.filter(
