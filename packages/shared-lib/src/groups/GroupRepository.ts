@@ -284,9 +284,7 @@ export interface IGroupRepository {
     * @param groupId the group to get creators from
     * @returns A Promise that resolves with an array of creators.
     */
-   getMentorsForLevels(
-      group: Group | PublicGroup
-   ): Promise<CreatorWithContent[]>
+   getMentorsForLevels(group: PublicGroup): Promise<CreatorWithContent[]>
 
    /**
     * Gets all group creators with public content
@@ -1235,6 +1233,9 @@ export class FirebaseGroupRepository
             numberOfContent:
                creatorContentCount[creatorsIdBySlug[getCreatorSlug(creator)]] ||
                0,
+            companyName: group.universityName,
+            companyLogoUrl: group.logoUrl,
+            companyBannerUrl: group.bannerImageUrl,
          }))
 
       return creatorsWithTwoOrMoreContent
