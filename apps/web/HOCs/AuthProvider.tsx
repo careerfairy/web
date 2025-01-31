@@ -32,7 +32,6 @@ import { RootState } from "../store"
 import CookiesUtil from "../util/CookiesUtil"
 import DateUtil from "../util/DateUtil"
 import {
-   analyticsResetUser,
    analyticsSetUser,
    dataLayerEvent,
    dataLayerUser,
@@ -201,27 +200,15 @@ const AuthProvider = ({ children }) => {
    ])
 
    /**
-    * Listen to when the user actually signs out
-    */
-   useEffect(() => {
-      const unsubscribe = firebaseService.auth.onIdTokenChanged((user) => {
-         // This will only fire when the token changes
-         // A null user with a previous token indicates a sign-out event
-         if (!user && auth.uid) {
-            dataLayerEvent("logout")
-         }
-      })
-
-      return () => unsubscribe()
-   }, [firebaseService.auth, auth.uid])
-
-   /**
     * Listen for auth changes and update claims
     */
    useEffect(() => {
       return firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
-            analyticsResetUser()
+            if (auth.uid) {
+               // If previous user was signed in, send logout event
+               dataLayerEvent("logout")
+            }
             setIsLoggedIn(false)
             setIsLoggedOut(true)
             setClaims(null)
@@ -238,7 +225,7 @@ const AuthProvider = ({ children }) => {
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
       })
-   }, [firebaseService.auth])
+   }, [firebaseService.auth, auth.uid])
 
    /**
     * Update user activity when there are new claims
