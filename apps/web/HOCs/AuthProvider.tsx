@@ -32,6 +32,7 @@ import { RootState } from "../store"
 import CookiesUtil from "../util/CookiesUtil"
 import DateUtil from "../util/DateUtil"
 import {
+   analyticsResetUser,
    analyticsSetUser,
    dataLayerEvent,
    dataLayerUser,
@@ -200,15 +201,24 @@ const AuthProvider = ({ children }) => {
    ])
 
    /**
+    * Listen for when user actually logs out
+    */
+   useEffect(() => {
+      return firebaseService.auth.onIdTokenChanged(async (user) => {
+         if (!user && auth.uid) {
+            // If previous user was signed in, send logout event
+            dataLayerEvent("logout")
+            analyticsResetUser()
+         }
+      })
+   }, [auth.uid, firebaseService.auth])
+
+   /**
     * Listen for auth changes and update claims
     */
    useEffect(() => {
       return firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
-            if (auth.uid) {
-               // If previous user was signed in, send logout event
-               dataLayerEvent("logout")
-            }
             setIsLoggedIn(false)
             setIsLoggedOut(true)
             setClaims(null)

@@ -95,6 +95,12 @@ export const analyticsSetUser = async (userAuthId: string) => {
 
    // Link anonymous user's activity to their new account after setting the user
    if (typeof window["analytics"] !== "undefined" && window["analytics"].user) {
+      const isSameUser = window["analytics"].user().id() === userAuthId
+
+      if (isSameUser) {
+         return // Don't identify the same user multiple times
+      }
+
       const anonymousId = window["analytics"].user().anonymousId()
 
       // Immediately alias the anonymous user to the new user before identifying
