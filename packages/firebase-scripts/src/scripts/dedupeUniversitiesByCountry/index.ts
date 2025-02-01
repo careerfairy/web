@@ -3,11 +3,15 @@ import {
    UniversityCountry,
 } from "@careerfairy/shared-lib/dist/universities"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { findElementsWithDuplicatePropertiesInArray } from "@careerfairy/shared-lib/dist/utils"
+import { chunkArray } from "@careerfairy/shared-lib/dist/utils"
 import * as cliProgress from "cli-progress"
 import Counter from "../../lib/Counter"
 import { firestore } from "../../lib/firebase"
 import { universitiesRepo, userRepo } from "../../repositories"
+import {
+   handleBulkWriterError,
+   handleBulkWriterSuccess,
+} from "../../util/bulkWriter"
 import { logAction } from "../../util/logger"
 import { getCLIBarOptions } from "../../util/misc"
 
@@ -47,7 +51,7 @@ const dedupeProgressBar = new cliProgress.SingleBar(
    cliProgress.Presets.shades_classic
 )
 
-const PERFORM_UPDATE = false
+const PERFORM_UPDATE = true
 const SHOW_LONG_LOG = false
 
 export async function run() {
@@ -63,6 +67,7 @@ export async function run() {
       console.log(
          `Start deduping ${allUniversitiesByCountry?.length} universities by country documents`
       )
+
       counter.addToReadCount(allUniversitiesByCountry?.length)
 
       const duplicationData = getCountriesWithDuplicateUniversities(
@@ -71,67 +76,76 @@ export async function run() {
 
       const duplicatedCountries = Object.keys(duplicationData) || []
 
-      console.log(
-         `Deduping resulted in ${duplicatedCountries.length} countries with duplicate universities`
-      )
+      duplicatedCountries.forEach((countryId) => {
+         console.log(
+            `Country: ${countryId} will have ${duplicationData[countryId].deduplicatedUniversities.length} universities from ${duplicationData[countryId].originalDocument.universities.length}`
+         )
+      })
 
       // Fetch all users using the removed universities
-      const userUniversities: UserUniversitiesData = {}
+      const allUsers = await logAction(
+         () => userRepo.getAllUsers(),
+         "fetching all users"
+      )
 
-      const promises = []
+      const userUniversities: UserUniversitiesData = {}
 
       console.log(
          `Building promises for fetching users using the removed universities`
       )
+
       for (const countryId of duplicatedCountries) {
          const removedUniversities =
             duplicationData[countryId].removedUniversities
 
          for (const removedUniversity of Object.keys(removedUniversities)) {
-            promises.push(
-               getUsersUsingRemovedUniversities(
-                  countryId,
-                  removedUniversities[removedUniversity].removedUniversity
-               ).then((users) => {
-                  counter.addToReadCount(users?.length || 0)
-                  users?.forEach((user) => {
-                     const userIds =
-                        userUniversities[removedUniversity]?.userIds || []
-
-                     userUniversities[removedUniversity] = {
-                        userIds: [...userIds, user.id],
-                        countryId,
-                        newUniversity: {
-                           ...user.university,
-                           // universitiesByCountry collection university has field id but userData university has field code
-                           code: removedUniversities[removedUniversity]
-                              .replacedBy.id,
-                        },
-                     }
-                  })
-               })
+            console.log(
+               `COUNTRY: ${countryId} - filtering users for ${removedUniversity}`
             )
+            const users = allUsers?.filter(
+               (user) =>
+                  user?.university?.code ===
+                  removedUniversities[removedUniversity].removedUniversity.id
+            )
+
+            users?.forEach((user) => {
+               const userIds =
+                  userUniversities[removedUniversity]?.userIds || []
+
+               userUniversities[removedUniversity] = {
+                  userIds: [...userIds, user.id],
+                  countryId,
+                  newUniversity: {
+                     ...user.university,
+                     // universitiesByCountry collection university has field id but userData university has field code
+                     code: removedUniversities[removedUniversity].replacedBy.id,
+                     name: removedUniversities[removedUniversity].replacedBy
+                        .name,
+                  },
+               }
+            })
          }
       }
 
-      await logAction(
-         () => Promise.all(promises),
-         "fetching users using the removed universities"
-      )
-
-      const totalAffectedUsers = Object.values(userUniversities).reduce(
-         (total, data) => total + data.userIds.length,
-         0
-      )
-
-      console.log(`Total number of users affected: ${totalAffectedUsers}`)
-
       if (SHOW_LONG_LOG) {
+         console.log(
+            `Users to be updated: ${JSON.stringify(userUniversities, null, 2)}`
+         )
+
+         const totalAffectedUsers = Object.values(userUniversities).reduce(
+            (total, data) => total + data.userIds.length,
+            0
+         )
+
+         console.log(`Total number of users affected: ${totalAffectedUsers}`)
+
          console.log("🚀 ~ user update data:", userUniversities)
+
          duplicatedCountries.forEach((countryId) => {
             console.log(
-               `🚀 ~ ~ country: ${countryId} - original universities: ${duplicationData[countryId].originalDocument.universities.length} - deduplicated universities: ${duplicationData[countryId].deduplicatedUniversities.length}`
+               `🚀 ~ ~ COUNTRY: ${countryId} - original universities: ${duplicationData[countryId].originalDocument.universities.length} - deduplicated universities: ${duplicationData[countryId].deduplicatedUniversities.length}`
             )
+
             const removedUnis = Object.keys(
                duplicationData[countryId].removedUniversities
             )
@@ -156,34 +170,72 @@ export async function run() {
 
       // Data update
       if (PERFORM_UPDATE) {
-         console.log(`Updating "universitiesByCountry" collection`)
-         duplicatedCountries.forEach((countryId) => {
-            const docRef = firestore
-               .collection("universitiesByCountry")
-               .doc(countryId)
+         const chunkedDuplicatedCountries = chunkArray(duplicatedCountries, 50)
 
-            bulkWriter.update(docRef, {
-               universities:
-                  duplicationData[countryId].deduplicatedUniversities,
-            })
+         console.log(
+            `Updating "universitiesByCountry" collection: ${duplicatedCountries.length} countries split into ${chunkedDuplicatedCountries.length} chunks`
+         )
 
-            counter.writeIncrement()
-            dedupeProgressBar.increment()
-         })
+         for (let i = 0; i < chunkedDuplicatedCountries.length; i++) {
+            for (const countryId of chunkedDuplicatedCountries[i]) {
+               const docRef = firestore
+                  .collection("universitiesByCountry")
+                  .doc(countryId)
 
-         console.log(`Updating "userData" collection`)
-         Object.keys(userUniversities)?.forEach((universityId) => {
-            userUniversities[universityId].userIds.forEach((userId) => {
-               const docRef = firestore.collection("userData").doc(userId)
-
-               bulkWriter.update(docRef, {
-                  university: userUniversities[universityId].newUniversity,
-               })
+               bulkWriter
+                  .update(docRef, {
+                     universities:
+                        duplicationData[countryId].deduplicatedUniversities,
+                  })
+                  .then(() => handleBulkWriterSuccess(counter))
+                  .catch((e) => handleBulkWriterError(e, counter))
 
                counter.writeIncrement()
                dedupeProgressBar.increment()
+            }
+
+            await logAction(
+               () => bulkWriter.flush(),
+               `Flushing chunk ${i + 1} of ${chunkedDuplicatedCountries.length}`
+            )
+               .then(() => new Promise((resolve) => setTimeout(resolve, 1000)))
+               .catch((e) => handleBulkWriterError(e, counter))
+            // await new Promise((resolve) => setTimeout(resolve, 1000))
+         }
+
+         const userUpdates: {
+            userId: string
+            university: UserData["university"]
+         }[] = []
+         Object.keys(userUniversities)?.forEach((universityId) => {
+            userUniversities[universityId].userIds.forEach((userId) => {
+               userUpdates.push({
+                  userId,
+                  university: userUniversities[universityId].newUniversity,
+               })
             })
          })
+
+         const chunkedUserUpdates = chunkArray(userUpdates, 200)
+
+         console.log(
+            `Updating "userData" collection: ${userUpdates.length} users split into ${chunkedUserUpdates.length} chunks`
+         )
+         for (let i = 0; i < chunkedUserUpdates.length; i++) {
+            for (const userUpdate of chunkedUserUpdates[i]) {
+               const docRef = firestore
+                  .collection("userData")
+                  .doc(userUpdate.userId)
+               bulkWriter.update(docRef, { university: userUpdate.university })
+            }
+            await logAction(
+               () => bulkWriter.flush(),
+               `Flushing chunk ${i + 1} of ${chunkedUserUpdates.length}`
+            )
+               .then(() => new Promise((resolve) => setTimeout(resolve, 1000)))
+               .catch((e) => handleBulkWriterError(e, counter))
+            // await new Promise((resolve) => setTimeout(resolve, 1000))
+         }
       }
 
       dedupeProgressBar.stop()
@@ -195,13 +247,6 @@ export async function run() {
    }
 }
 
-const getUsersUsingRemovedUniversities = async (
-   countryId: string,
-   removedUniversity: University
-) => {
-   return await userRepo.getUsersByUniversity(countryId, removedUniversity.id)
-}
-
 const getCountriesWithDuplicateUniversities = (
    universitiesByCountry: UniversityCountry[]
 ) => {
@@ -209,40 +254,43 @@ const getCountriesWithDuplicateUniversities = (
 
    universitiesByCountry?.forEach((universityCountry) => {
       const universities = universityCountry.universities
-      const duplicates = findElementsWithDuplicatePropertiesInArray(
-         universities,
-         ["name"],
-         "id"
-      )
 
-      // We could always create the Map but this is a bit more efficient as we
-      // only perform the operation if there are duplicates
-      if (duplicates.length > 0) {
-         const deduplicatedUniversities = [
-            ...new Map(universities.map((d) => [d.name, d])).values(),
-         ]
+      // Deduplication by id
+      const universitiesMap = new Map(universities.map((d) => [d.id, d]))
 
-         const removedUniversities = universities.filter(
-            (university) => !deduplicatedUniversities.includes(university)
-         )
+      const deduplicatedUniversitiesById = [...universitiesMap.values()]
 
-         const removedUniversitiesData: RemovedUniversitiesData = {}
+      const deduplicatedUniversitiesByName = [
+         ...new Map(
+            deduplicatedUniversitiesById.map((d) => [d.name, d])
+         ).values(),
+      ]
 
-         removedUniversities.forEach((university) => {
-            removedUniversitiesData[university.id] = {
-               removedUniversity: university,
-               replacedBy: deduplicatedUniversities.find(
-                  (deduplicatedUniversity) =>
-                     deduplicatedUniversity.name === university.name
-               ),
-            }
-         })
+      const deduplicatedUniversities = [
+         ...deduplicatedUniversitiesByName.values(),
+      ]
 
-         countriesWithDuplicates[universityCountry.countryId] = {
-            originalDocument: universityCountry,
-            deduplicatedUniversities: deduplicatedUniversities,
-            removedUniversities: removedUniversitiesData,
+      const removedUniversities = universities.filter((university) => {
+         return !deduplicatedUniversities.includes(university)
+      })
+
+      const removedUniversitiesData: RemovedUniversitiesData = {}
+
+      removedUniversities.forEach((university) => {
+         removedUniversitiesData[university.id] = {
+            removedUniversity: university,
+            replacedBy: deduplicatedUniversities.find(
+               (deduplicatedUniversity) =>
+                  deduplicatedUniversity.name === university.name ||
+                  deduplicatedUniversity.id === university.id
+            ),
          }
+      })
+
+      countriesWithDuplicates[universityCountry.countryId] = {
+         originalDocument: universityCountry,
+         deduplicatedUniversities: deduplicatedUniversities,
+         removedUniversities: removedUniversitiesData,
       }
    })
 
