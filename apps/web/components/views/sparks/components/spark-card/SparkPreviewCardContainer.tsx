@@ -17,6 +17,10 @@ const styles = sxStyles({
       flexDirection: "column",
       overflow: "hidden",
       aspectRatio: "9/16",
+      // CSS hack for Safari to fix https://linear.app/careerfairy/issue/CF-1251/sparks-overlay-breaks
+      "*:not(.MuiChip-root, .MuiChip-root *)": {
+         backdropFilter: "grayscale(0)",
+      },
    },
    cardContent: {
       zIndex: 1,
@@ -97,21 +101,19 @@ const SparkPreviewCardContainer: FC<Props> = ({
       >
          {componentHeader ? componentHeader : null}
          <Box sx={styles.cardContent}>{children}</Box>
-         <Box component="span" zIndex={0}>
-            <VideoPreview
-               key={`${video.url}-${isMobile ? "mobile" : "desktop"}`}
-               thumbnailUrl={video.thumbnailUrl}
-               videoUrl={video.url}
-               pausing={!autoPlaying}
-               playing={autoPlaying || video.preview}
-               light={false}
-               autoPlaying={autoPlaying}
-               containPreviewOnTablet
-               muted={video.muted}
-               identifier={video.url}
-               onVideoEnded={onVideoEnded}
-            />
-         </Box>
+         <VideoPreview
+            key={`${video.url}-${isMobile ? "mobile" : "desktop"}`}
+            thumbnailUrl={video.thumbnailUrl}
+            videoUrl={video.url}
+            pausing={!autoPlaying}
+            playing={autoPlaying || video.preview}
+            light={false}
+            autoPlaying={autoPlaying}
+            containPreviewOnTablet
+            muted={video.muted}
+            identifier={video.url}
+            onVideoEnded={onVideoEnded}
+         />
       </Box>
    )
 }
