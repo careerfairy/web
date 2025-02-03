@@ -90,7 +90,7 @@ export class TalentGuideProgressService {
    async createModuleProgress(
       moduleId: string,
       userAuthUid: string,
-      moduleData: TalentGuideModule
+      moduleData: Page<TalentGuideModule>
    ) {
       return setDoc(this.getModuleProgressRef(moduleId, userAuthUid), {
          id: this.getModuleCompositeId(userAuthUid, moduleId),
@@ -98,9 +98,9 @@ export class TalentGuideProgressService {
          userAuthUid,
          currentStepIndex: 0,
          completedStepIds: [],
-         moduleName: moduleData.moduleName,
-         moduleCategory: moduleData.category,
-         totalSteps: moduleData.moduleSteps.length,
+         moduleName: moduleData.content.moduleName,
+         moduleCategory: moduleData.content.category,
+         totalSteps: moduleData.content.moduleSteps.length,
          percentageComplete: 0,
          startedAt: Timestamp.now(),
          lastUpdated: null,
@@ -108,6 +108,7 @@ export class TalentGuideProgressService {
          totalVisits: 1,
          completedAt: null,
          restartCount: 0,
+         levelSlug: moduleData.slug,
       })
    }
 
@@ -265,7 +266,7 @@ export class TalentGuideProgressService {
    async restartModule(
       moduleId: string,
       userAuthUid: string,
-      moduleData: TalentGuideModule
+      moduleData: Page<TalentGuideModule>
    ) {
       const progressRef = this.getModuleProgressRef(moduleId, userAuthUid)
 
@@ -292,9 +293,9 @@ export class TalentGuideProgressService {
          transaction.update(progressRef, {
             currentStepIndex: 0,
             completedStepIds: [],
-            moduleName: moduleData.moduleName,
-            moduleCategory: moduleData.category,
-            totalSteps: moduleData.moduleSteps.length,
+            moduleName: moduleData.content.moduleName,
+            moduleCategory: moduleData.content.category,
+            totalSteps: moduleData.content.moduleSteps.length,
             percentageComplete: 0,
             startedAt: Timestamp.now(),
             lastUpdated: Timestamp.now(),
@@ -302,6 +303,7 @@ export class TalentGuideProgressService {
             totalVisits: currentProgress.totalVisits,
             completedAt: null,
             restartCount: (currentProgress.restartCount ?? 0) + 1,
+            levelSlug: moduleData.slug,
          })
       })
    }
@@ -367,7 +369,7 @@ export class TalentGuideProgressService {
     * @returns The next step index, or null if there are no more steps
     */
    async proceedToNextStep(
-      moduleData: TalentGuideModule,
+      moduleData: Page<TalentGuideModule>,
       userAuthUid: string,
       currentStepIndex: number
    ): Promise<{ nextStepIndex: number } | null> {
@@ -375,22 +377,24 @@ export class TalentGuideProgressService {
 
       const data: UpdateData<TalentGuideProgress> = {
          completedStepIds: arrayUnion(
-            moduleData.moduleSteps[currentStepIndex].id
+            moduleData.content.moduleSteps[currentStepIndex].id
          ),
          percentageComplete:
-            ((currentStepIndex + 1) / moduleData.moduleSteps.length) * 100,
-         totalSteps: moduleData.moduleSteps.length,
-         moduleName: moduleData.moduleName,
-         moduleCategory: moduleData.category,
+            ((currentStepIndex + 1) / moduleData.content.moduleSteps.length) *
+            100,
+         totalSteps: moduleData.content.moduleSteps.length,
+         moduleName: moduleData.content.moduleName,
+         moduleCategory: moduleData.content.category,
+         levelSlug: moduleData.slug,
       }
 
-      const isCompleted = nextStepIndex >= moduleData.moduleSteps.length
+      const isCompleted = nextStepIndex >= moduleData.content.moduleSteps.length
 
       if (isCompleted) {
          data.completedAt = Timestamp.now()
       }
 
-      await this.updateModuleProgress(moduleData.id, userAuthUid, data)
+      await this.updateModuleProgress(moduleData.content.id, userAuthUid, data)
 
       return isCompleted ? null : { nextStepIndex }
    }

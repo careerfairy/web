@@ -102,7 +102,7 @@ export const CourseDetails = ({
                         variant={isOverlay ? "xsmall" : "small"}
                         component="p"
                      >
-                        {hours} hour{hours !== 1 ? "s" : ""}
+{hours} Stunde{hours !== 1 ? 'n' : ''}
                      </Typography>
                   </Stack>
                </Stack>

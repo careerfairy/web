@@ -10,7 +10,7 @@ export default async function handler(
    }
 
    try {
-      const locale = (req.query.locale as string) || "de"
+      const locale = req.query.locale as string
       const modules = await tgBackendService.getAllTalentGuideModulePages(
          locale
       )

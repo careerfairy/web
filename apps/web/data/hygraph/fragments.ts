@@ -117,7 +117,7 @@ export const highlightsBlockFragment = gql`
       __typename
       id
       shouldFetchBasedOnUserData 
-      highlights {
+      highlights(first: 100) {
         ... on Highlight ${highlightComponentFragment}
         ... on Spark ${sparkComponentFragment}
       }
@@ -149,7 +149,7 @@ export const livestreamsCarouselBlockFragment = gql`
       id
       title
       subHeader
-      liveStreamIds {
+      liveStreamIds(first: 100) {
         ... on LiveStream ${liveStreamComponentFragment}
       }
    }
@@ -262,7 +262,7 @@ export const talentGuideModulePageFragment = gql`
          level
          contentTopicTags
          businessFunctionTags
-         moduleSteps ${moduleStepFragment}
+         moduleSteps(first: 100) ${moduleStepFragment}
       }
    }
 `

@@ -1,7 +1,10 @@
 import { gql, GraphQLClient } from "graphql-request"
 import { createTalentGuideClient } from "./client"
 import { FORCE_GERMAN_LOCALE } from "./constants"
-import { talentGuideModulePageFragment } from "./fragments"
+import {
+   seoComponentFragment,
+   talentGuideModulePageFragment,
+} from "./fragments"
 import {
    Page,
    PageType,
@@ -46,18 +49,19 @@ export class TalentGuideBackendService {
    /**
     * Get the levels root page, eg /levels
     */
-   async getTalentGuideRootPage(slug: string): Promise<Page> {
+   async getTalentGuideRootPage(): Promise<Page> {
       const query = gql`
          query GetTalentGuideRootPage($slug: String!) {
             pages(where: { pageType: ${PageType.TALENT_GUIDE_ROOT_PAGE}, slug: $slug }) {
                slug
+               seo ${seoComponentFragment}
             }
          }
       `
       const { pages } = await this.client.request<TalentGuideRootPageResponse>(
          query,
          {
-            slug,
+            slug: "levels",
          }
       )
 
@@ -93,7 +97,7 @@ export class TalentGuideBackendService {
     * @returns Promise<Page[]> Array of all module pages
     */
    async getAllTalentGuideModulePages(
-      locale: string = "en"
+      locale = "en"
    ): Promise<Page<TalentGuideModule>[]> {
       const forcedLocale = FORCE_GERMAN_LOCALE ? "de" : locale
 

@@ -12,6 +12,7 @@ type Props = {
 
 export const ModuleCompletedChip = ({ onShineAnimationComplete }: Props) => {
    const isMobile = useIsMobile()
+
    return (
       <Box display="flex">
          <Box sx={[statusStyles.completed, statusStyles.chip]}>
@@ -52,7 +53,7 @@ export const ModuleCompletedChip = ({ onShineAnimationComplete }: Props) => {
                component="p"
                color="inherit"
             >
-               Level cleared
+               Level geschafft
             </Typography>
          </Box>
       </Box>

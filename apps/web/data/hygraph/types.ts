@@ -6,8 +6,9 @@ import { TalentGuideModuleCategory } from "@careerfairy/shared-lib/talent-guide"
 import { RichTextContent } from "@graphcms/rich-text-types"
 export type Page<T = any> = {
    pageType: PageType
-   slug?: string
+   slug: string
    content?: T
+   seo?: SeoComponentType
 }
 
 export type TalentGuideModule = {

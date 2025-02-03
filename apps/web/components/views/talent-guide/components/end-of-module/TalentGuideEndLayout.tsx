@@ -57,7 +57,7 @@ export const TalentGuideEndLayout = () => {
       })
 
    useEffect(() => {
-      if (!isLoadingNextModule && nextModule === null) {
+      if (!isLoadingNextModule && nextModule === null && feedbackSubmitted) {
          setIsRedirectingToOverview(true)
          push("/levels")
 
@@ -65,7 +65,7 @@ export const TalentGuideEndLayout = () => {
             setIsRedirectingToOverview(false)
          }
       }
-   }, [nextModule, isLoadingNextModule, push])
+   }, [nextModule, isLoadingNextModule, push, feedbackSubmitted])
 
    useEffect(() => {
       const timer = setTimeout(() => {
@@ -88,11 +88,7 @@ export const TalentGuideEndLayout = () => {
 
    return (
       <TalentGuideLayout key={random.current} sx={styles.root}>
-         <Box
-            id="talent-guide-end-layout"
-            overflow="hidden"
-            sx={layoutStyles.root}
-         >
+         <Box id="talent-guide-end-layout" sx={layoutStyles.root}>
             <AnimatePresence>
                {Boolean(showCongrats) && (
                   <CongratsSection

@@ -39,7 +39,7 @@ export const StartNextLevelButton = ({ allLevels, ...props }: Props) => {
    if (isLoading) {
       return (
          <LoadingButton {...defaultProps} {...props} loading={isLoading}>
-            Review Level {allLevels[0].slug}
+            Level {allLevels[0].slug} wiederholen
          </LoadingButton>
       )
    }
@@ -57,8 +57,8 @@ export const StartNextLevelButton = ({ allLevels, ...props }: Props) => {
       >
          <LoadingButton {...defaultProps} {...props} loading={isLoading}>
             {hasNoNextLevel
-               ? `Review Level ${allLevels[0].slug}`
-               : `Start Level ${data.slug}`}
+               ? `Level ${allLevels[0].slug} wiederholen`
+               : `Level ${data.slug} starten`}
          </LoadingButton>
       </Box>
    )

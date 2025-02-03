@@ -54,9 +54,9 @@ type Props = {
 }
 
 const copy = {
-   title: "Quick start your career",
+   title: "Kickstarte deine Karriere",
    description:
-      "Ready to land your dream job? Learn the insider tips and practical strategies to stand out in today's competitive job market. Start building the career you deserve!",
+      "Bereit für den Berufseinstieg? Lerne von echten Profis die Insider Tipps und erprobte Strategien, die du brauchst um den super kompetitiven Jobmarkt zu navigieren. Für eine erfolgreiche Karriere, die du verdienst!",
 }
 
 export const CourseOverview = ({ modules, isMobile }: Props) => {

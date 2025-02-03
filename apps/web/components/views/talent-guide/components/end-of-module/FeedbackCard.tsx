@@ -26,11 +26,11 @@ import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
 import { FeedbackFormData, feedbackSchema } from "../../schema"
 
 export const ratingTitles: Record<TalentGuideFeedback["rating"], string> = {
-   1: "Big yikes.",
-   2: "Kinda meh.",
-   3: "Not bad, could be better.",
-   4: "Pretty solid!",
-   5: "Nailed it!",
+   1: "Cringe",
+   2: "Meh",
+   3: "50-50",
+   4: "Ziemlich gut!",
+   5: "Perfekt!",
 }
 
 type Props = {
@@ -98,10 +98,11 @@ export const FeedbackCard = ({
                component="h5"
                sx={feedbackStyles.title}
             >
-               How did we do?
+               Wie findest du&apos;s ganz allgemein?
             </Typography>
             <Typography variant="medium" component="p" color="text.secondary">
-               Rate your experience and let us know how we can improve!
+               Wie können wir Levels noch besser für dich machen? Teil uns dein
+               Feedback mit!
             </Typography>
          </AnimatedCollapse>
 
@@ -145,13 +146,13 @@ export const FeedbackCard = ({
                   component="h5"
                   sx={feedbackStyles.title}
                >
-                  How did we do?
+                  Wie findest du&apos;s ganz allgemein?
                </Typography>
                <Box sx={feedbackStyles.chipsContainer}>
                   {tags.map((tag) => (
                      <Chip
                         key={tag.id}
-                        label={tag.label.en}
+                        label={tag.label.de}
                         sx={[
                            feedbackStyles.chip,
                            isSelected(tag.id)
@@ -188,7 +189,7 @@ export const FeedbackCard = ({
             disabled={preview || !isValid || !isDirty}
             fullWidth
          >
-            Continue
+            Weiter
          </LoadingButton>
       </Box>
    )

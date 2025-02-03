@@ -24,8 +24,10 @@ const SEO = ({
          site: "@FairyCareer",
       },
       openGraph: {
+         ...props.openGraph,
          ...(image && {
             images: [
+               ...(props.openGraph?.images || []),
                {
                   alt: props.title,
                   ...image,
@@ -33,8 +35,6 @@ const SEO = ({
             ],
          }),
          url: getBaseUrl() + router.asPath,
-         type: "",
-         ...props.openGraph,
       },
    }
 
