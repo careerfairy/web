@@ -31,7 +31,7 @@ export const getFollowedCreators = functions.region(config.region).https.onCall(
             20
          )
 
-         const followedCompanies = allFollowedCompanies.filter(
+         const followedCompanies = (allFollowedCompanies ?? []).filter(
             (company) => company.groupId !== CAREER_FAIRY_GROUP_ID
          )
 
