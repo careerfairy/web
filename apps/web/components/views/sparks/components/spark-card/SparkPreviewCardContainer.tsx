@@ -17,7 +17,6 @@ const styles = sxStyles({
       flexDirection: "column",
       overflow: "hidden",
       aspectRatio: "9/16",
-      aspectRatio: "9/16",
       // CSS hack for Safari to fix https://linear.app/careerfairy/issue/CF-1251/sparks-overlay-breaks
       "*:not(.MuiChip-root, .MuiChip-root *)": {
          backdropFilter: "grayscale(0)",
