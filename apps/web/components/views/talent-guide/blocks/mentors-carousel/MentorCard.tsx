@@ -1,9 +1,9 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
-import { useCallback } from "react"
+import Link from "next/link"
 
 const CARD_WIDTH = 254
 
@@ -11,22 +11,23 @@ const styles = sxStyles({
    root: {
       width: `${CARD_WIDTH}px`,
       gap: 0,
-      borderRadius: "8px",
       border: "1px solid #F0EDFD",
       boxShadow: "0px 0px 8px 0px #1414140F",
       userSelect: "none",
       cursor: "pointer",
+      borderRadius: "8px",
    },
    bannerContainer: {
       position: "relative",
       height: "66px",
       borderRadius: "8px 8px 0 0",
+      zIndex: 1,
    },
    bannerEffect: {
       position: "absolute",
       top: 0,
       left: 0,
-      zIndex: -2,
+      zIndex: 0,
       backdropFilter: "blur(10px)",
       width: "100%",
       height: "100%",
@@ -36,7 +37,7 @@ const styles = sxStyles({
       position: "absolute",
       top: 0,
       left: 0,
-      zIndex: -3,
+      zIndex: -1,
       width: "100%",
       height: "100%",
       backgroundColor: "#8E8E8E",
@@ -44,7 +45,7 @@ const styles = sxStyles({
       opacity: 0.5,
    },
    bannerImage: {
-      zIndex: -4,
+      zIndex: -2,
       borderRadius: "8px 8px 0 0",
       objectFit: "cover",
    },
@@ -56,9 +57,12 @@ const styles = sxStyles({
       gap: "8px",
       height: "calc(100% - 66px)",
       marginTop: "-40px",
+      backgroundColor: "white",
+      borderRadius: "0 0 8px 8px",
    },
    avatar: {
       position: "relative",
+      zIndex: 2,
    },
    infoContainer: {
       maxWidth: "100%",
@@ -85,6 +89,10 @@ const styles = sxStyles({
    companyName: {
       ...getMaxLineStyles(2),
       color: (theme) => theme.palette.neutral["600"],
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
    },
    companyNameBold: {
       fontWeight: 600,
@@ -97,6 +105,9 @@ const styles = sxStyles({
    followButton: {
       padding: "8px 16px",
    },
+   skeleton: {
+      borderRadius: "8px",
+   },
 })
 
 type Props = {
@@ -106,6 +117,7 @@ type Props = {
    position: string
    companyName: string
    companyLogoUrl: string
+   mentorPageLink: string
 }
 
 export const MentorCard = ({
@@ -115,12 +127,8 @@ export const MentorCard = ({
    position,
    companyName,
    companyLogoUrl,
+   mentorPageLink,
 }: Props) => {
-   const handleCardClick = useCallback(() => {
-      alert("Card clicked")
-      console.log("Card clicked")
-   }, [])
-
    // const handleFollowClick = useCallback((event: SyntheticEvent) => {
    //    event.preventDefault()
    //    event.stopPropagation()
@@ -129,7 +137,7 @@ export const MentorCard = ({
    // }, [])
 
    return (
-      <Stack sx={styles.root} onClick={handleCardClick}>
+      <Stack sx={styles.root} component={Link} href={mentorPageLink} prefetch>
          <Box sx={styles.bannerContainer}>
             <Box sx={styles.bannerEffect} />
             <Box sx={styles.bannerEffectColor} />
@@ -168,14 +176,13 @@ export const MentorCard = ({
                   {position}
                </Typography>
                <Typography variant="small" sx={styles.companyName}>
-                  {" "}
-                  at{" "}
+                  at&nbsp;
                   <Box component="span" sx={styles.companyNameBold}>
                      {companyName}
                   </Box>
                </Typography>
             </Stack>
-            {/* TODO: Follow functionality not part of MVP */}
+            {/* TODO: Follow functionality not part of MVP. DO NOT FORGET TO UPDATE SKELETON'S HEIGHT! */}
             {/* <Button
                variant="contained"
                color="primary"
@@ -191,4 +198,16 @@ export const MentorCard = ({
    )
 }
 
+const CardSkeleton = () => {
+   return (
+      <Skeleton
+         variant="rounded"
+         width={252}
+         height={204}
+         sx={styles.skeleton}
+      />
+   )
+}
+
 MentorCard.width = CARD_WIDTH
+MentorCard.Skeleton = CardSkeleton
