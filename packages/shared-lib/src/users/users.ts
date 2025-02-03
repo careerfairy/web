@@ -82,6 +82,10 @@ export interface UserData extends Identifiable {
     * */
    refreshTokenTime?: Timestamp
 
+   /**
+    * User's last used browser timezone
+    * Format: "Europe/Zurich", "Europe/Lisbon"
+    */
    timezone?: string
 
    /**

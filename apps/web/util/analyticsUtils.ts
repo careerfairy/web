@@ -1,5 +1,8 @@
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
+
+// Only import types, will not be part of the bundle, real package is loaded by GTM
+import { type GroupTraits } from "@customerio/cdp-analytics-browser"
 
 /**
  * Push an event to the GTM DataLayer
@@ -12,6 +15,8 @@ export const dataLayerEvent = (eventName: string, optionalVariables = {}) => {
       event: eventName,
       ...optionalVariables,
    })
+
+   analyticsTrackEvent(eventName, optionalVariables)
 }
 
 /**
@@ -59,4 +64,124 @@ export const dataLayerLivestreamEvent = (
          optionalVariables
       )
    )
+}
+
+/**
+ * Before you continue, please read the following:
+ * 1. We queue analytics events in window["analytics"] array before Customer.io script loads.
+ * 2. Once Customer.io script loads, it will automatically process any queued/incoming events.
+ */
+
+/**
+ * Track an event
+ * @param eventName Name of the event
+ * @param properties Optional properties for the event
+ */
+export const analyticsTrackEvent = (
+   eventName: string,
+   properties: Record<string, any> = {}
+) => {
+   if (typeof window === "undefined") return
+
+   window["analytics"].push(["track", eventName, properties])
+}
+
+/**
+ * By setting the user, all activity will be associated with the user
+ * @param userAuthId the user auth id
+ */
+export const analyticsSetUser = async (userAuthId: string) => {
+   if (typeof window === "undefined") return
+
+   // Link anonymous user's activity to their new account after setting the user
+   if (typeof window["analytics"] !== "undefined" && window["analytics"].user) {
+      const isSameUser = window["analytics"].user().id() === userAuthId
+
+      if (isSameUser) {
+         return // Don't identify the same user multiple times
+      }
+
+      const anonymousId = window["analytics"].user().anonymousId()
+
+      // Immediately alias the anonymous user to the new user before identifying
+      // Docs: https://docs.customer.io/cdp/sources/source-spec/alias-spec/
+      if (anonymousId) {
+         window["analytics"].alias(userAuthId, anonymousId)
+      }
+   }
+
+   window["analytics"].push(["identify", userAuthId])
+}
+
+/**
+ * Remove the logged in user from the analytics
+ */
+export const analyticsResetUser = async () => {
+   if (typeof window === "undefined") return
+
+   window["analytics"].push(["reset"])
+}
+
+/**
+ * Reserved relationship types between users and entities
+ * Entities can be companies, livestreams, sparks, etc.
+ * Note: Entities will also have to be synced into Customer.io as "objects"
+ */
+const USER_RELATIONSHIP_TYPE = {
+   FOLLOWS_COMPANY: 1,
+   REGISTERED_TO_LIVESTREAM: 2,
+   PARTICIPATES_IN_LIVESTREAM: 3,
+} as const
+
+type UserRelationshipType =
+   (typeof USER_RELATIONSHIP_TYPE)[keyof typeof USER_RELATIONSHIP_TYPE]
+
+/**
+ * Associates an existing user with an entity
+ * @param id the entity id
+ * @param traits the entity traits
+ */
+export const analyticsAssociateUserToEntity = (
+   id: string,
+   traits: GroupTraits & { objectTypeId: UserRelationshipType }
+) => {
+   if (typeof window === "undefined") return
+
+   window["analytics"].push(["group", id, traits])
+}
+
+/**
+ * Removes an existing user association from an entity
+ * @param objectTypeId the association type
+ * @param objectId the id of the entity
+ */
+export const analyticsRemoveUserAssociationFromEntity = (
+   objectTypeId: UserRelationshipType,
+   objectId: string
+) => {
+   if (typeof window === "undefined") return
+
+   window["analytics"].push([
+      "track",
+      "Delete Relationship", // Reserved event name from Customer.io
+      {
+         objectTypeId,
+         objectId,
+      },
+   ])
+}
+
+/**
+ * Tracks a page view event in Customer.io analytics
+ * Automatically captures current page metadata including but not limited to:
+ * - URL path
+ * - Page title
+ * - Referrer
+ * - Search parameters
+ * No manual parameters needed since the analytics script handles collection
+ */
+export const analyticsTrackPageView = () => {
+   if (typeof window === "undefined") return
+
+   window["analytics"].push(["page"])
 }

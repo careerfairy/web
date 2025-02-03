@@ -7,11 +7,18 @@ import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
  */
 export interface CustomerIOUserData {
    // Basic Info
+   auth_id: string
    email: string
    first_name: string
    last_name: string
    is_admin: boolean
    is_student: boolean
+   /**
+    * User's last used browser timezone
+    * Reserved field in Customer.io, used for sending localized messages.
+    * Format: "Europe/Zurich", "Europe/Lisbon"
+    */
+   timezone: string
    /**
     * Unix timestamp
     */

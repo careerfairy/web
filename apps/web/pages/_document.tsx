@@ -10,6 +10,7 @@ import Document, {
    NextScript,
 } from "next/document"
 import * as React from "react"
+import { shouldUseEmulators } from "util/CommonUtil"
 import { isEmbedded, isGroupAdminPath, isStreamingPath } from "util/PathUtils"
 
 interface DocumentProps extends DocumentInitialProps {
@@ -213,7 +214,7 @@ export default function MyDocument(props: DocumentProps) {
                   react components run client side, this array is already set
                   Even if we don't load GTM, its okay to have this variable
                  */}
-            <script dangerouslySetInnerHTML={dataLayerObj}></script>
+            <script dangerouslySetInnerHTML={analyticsInitScript}></script>
             {/* Inject MUI styles first to match with the prepend: true configuration. */}
             <meta name="emotion-insertion-point" content="" />
             {props.emotionStyleTags}
@@ -294,7 +295,7 @@ MyDocument.getInitialProps = async function (
 
 function shouldRunUsercentrics(ctx: DocumentContext) {
    // Don't run when developing / tests
-   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+   if (shouldUseEmulators()) {
       return false
    }
 
@@ -338,8 +339,14 @@ function shouldRunGTM(ctx: DocumentContext) {
 }
 
 /**
- * Memoized object
+ * Memoized script
+ *
+ * Initialize dataLayer and analytics arrays to be ready to start receiving events
+ * and identify users even before the relevant scripts are loaded
  */
-const dataLayerObj = {
-   __html: `window.dataLayer = window.dataLayer || []; `,
+const analyticsInitScript = {
+   __html: `
+      window.dataLayer = window.dataLayer || [];
+      window.analytics = window.analytics || []; 
+   `,
 }
