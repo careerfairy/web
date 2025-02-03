@@ -33,8 +33,9 @@ const styles = sxStyles({
       },
    },
    dropdownPaper: {
-      width: "100%",
-      backgroundColor: (theme) => theme.brand.white[50],
+      // width: "100dvw !important",
+      // backgroundColor: (theme) => theme.brand.white[50],
+      // pt: "85px",
    },
    schoolIcon: {
       width: "40px",
@@ -121,7 +122,9 @@ const SelectUniversitiesDropDown = ({
    ) => {
       setValue(name, option?.id, { shouldValidate: true })
       setIsFocused(false)
-      ;(event.target as HTMLElement).blur()
+      // const target = event.target as HTMLElement
+      // target.blur()
+
       const inputElement = document.querySelector(
          "#selectUniversity"
       ) as HTMLElement
@@ -151,7 +154,7 @@ const SelectUniversitiesDropDown = ({
                         alignItems="center"
                         sx={{
                            pt: "4px",
-                           pb: "12px",
+                           pb: "8px",
                            "&.MuiInputAdornment-root": {
                               display: { xs: "none", md: "flex" },
                               ".Mui-focused &": { display: "none" },
@@ -183,9 +186,12 @@ const SelectUniversitiesDropDown = ({
                                  `${theme.palette.neutral[900]} !important`,
                               textOverflow: "ellipsis",
                               overflow: "hidden",
-                              py: "2px",
-                              // whiteSpace: "nowrap",
-                              // width: "100%",
+                              whiteSpace: "nowrap",
+                              maxWidth: {
+                                 xs: "200px",
+                                 sm: "310px",
+                                 md: "580px",
+                              },
                            }}
                         >
                            {selectedValue.value}
@@ -221,6 +227,7 @@ const SelectUniversitiesDropDown = ({
                <Box sx={styles.dropdownPaper}>{children}</Box>
             ),
             sx: {
+               // height: "72px !important",
                ".Mui-disabled": {
                   backgroundColor: "#F7F8FC",
                   borderColor: (theme) => theme.brand.purple[50],
@@ -240,14 +247,9 @@ const SelectUniversitiesDropDown = ({
             selectOnFocus: false,
             onFocus: () => {
                setIsFocused(true)
-               const inputElement = document.querySelector(
-                  "#selectUniversity"
-               ) as HTMLElement
-               if (inputElement) {
-                  inputElement.click()
-               }
             },
             onBlur: () => setIsFocused(false),
+            openOnFocus: true,
             renderOption: (props, option, { selected }) => {
                return getOptionEl(props, option, selectedCountryCode, selected)
             },

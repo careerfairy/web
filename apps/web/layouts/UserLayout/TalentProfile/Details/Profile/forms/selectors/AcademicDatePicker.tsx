@@ -6,6 +6,28 @@ import { sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    datePicker: {
       width: "100%",
+      "& .MuiOutlinedInput-root": {
+         "& fieldset": {
+            // default border
+            borderColor: (theme) => theme.brand.purple[100],
+         },
+         "&:hover fieldset": {
+            // hover border
+            borderColor: (theme) => theme.brand.purple[200],
+         },
+         "&.Mui-focused fieldset": {
+            // focused border (when clicked/opened)
+            borderColor: "#EDE7FD",
+         },
+         "&.Mui-disabled fieldset": {
+            borderColor: (theme) => theme.brand.purple[50],
+         },
+      },
+      "& .MuiInputLabel-root": {
+         "&.Mui-focused": {
+            color: (theme) => theme.brand.purple[500],
+         },
+      },
    },
 })
 
@@ -52,7 +74,9 @@ export const AcademicDatePicker = ({
          }}
          disableOpenPicker
          disabled={disabled}
-         views={["year", "month"]}
+         views={["month", "year"]}
+         label={label}
+         closeOnSelect
          value={fieldValue}
          onChange={(value) => {
             setValue(fieldName, value, { shouldValidate: true })
