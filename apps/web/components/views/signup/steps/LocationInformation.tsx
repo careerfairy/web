@@ -134,7 +134,9 @@ const LocationInformation = () => {
                fieldToUpdate
             )
          } catch (error) {
-            console.log(error)
+            errorLogAndNotify(error, {
+               message: "Error updating location information in SignUp",
+            })
          }
       },
       [user]
