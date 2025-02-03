@@ -262,7 +262,7 @@ export const talentGuideModulePageFragment = gql`
          level
          contentTopicTags
          businessFunctionTags
-         moduleSteps ${moduleStepFragment}
+         moduleSteps(first: 100) ${moduleStepFragment}
       }
    }
 `

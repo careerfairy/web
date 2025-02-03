@@ -301,9 +301,26 @@ const talentGuideReducer = createSlice({
                .filter((index) => index !== -1) // Remove any not found (-1)
                .sort((a, b) => a - b)
 
-            // Current step is the next step after the last completed one
+            // Check for any unattempted quizzes in the completed steps
+            const firstUnattemptedQuizIndex = moduleSteps.findIndex(
+               (step, index) => {
+                  if (step.content.__typename !== "Quiz") return false
+                  const quizId = step.content.id
+                  const quizStatus = quizzes[quizId]?.state
+                  return (
+                     index <= Math.max(...completedStepIndices) &&
+                     (!quizStatus || quizStatus === QUIZ_STATE.NOT_ATTEMPTED)
+                  )
+               }
+            )
+
+            // If we found an unattempted quiz in completed steps, use that as current step
+            // Otherwise, use the next step after the last completed one
             const lastCompletedIndex = Math.max(...completedStepIndices, -1)
-            const currentStepIndex = lastCompletedIndex + 1
+            const currentStepIndex =
+               firstUnattemptedQuizIndex !== -1
+                  ? firstUnattemptedQuizIndex
+                  : lastCompletedIndex + 1
 
             // If we've completed all steps, stay on the last one
             const actualCurrentIndex = Math.min(
@@ -313,7 +330,12 @@ const talentGuideReducer = createSlice({
 
             // Set visible steps (completed + current)
             state.visibleSteps = removeDuplicates([
-               ...completedStepIndices,
+               // If there's an unattempted quiz, only show steps up to that quiz
+               ...(firstUnattemptedQuizIndex !== -1
+                  ? completedStepIndices.filter(
+                       (index) => index <= firstUnattemptedQuizIndex
+                    )
+                  : completedStepIndices),
                actualCurrentIndex,
             ]).sort((a, b) => a - b)
 
