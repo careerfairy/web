@@ -21,6 +21,7 @@
       "@careerfairy/config-mui": "*",
       "@careerfairy/shared-lib": "*",
       "@careerfairy/shared-ui": "*",
+      "@customerio/cdp-analytics-browser": "^0.3.0",
       "@dnd-kit/core": "^6.0.8",
       "@dnd-kit/sortable": "^7.0.2",
       "@fingerprintjs/fingerprintjs": "^3.4.1",

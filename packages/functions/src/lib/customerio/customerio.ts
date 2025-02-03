@@ -12,7 +12,7 @@ import { trackingClient } from "./client"
 /**
  * Set to false when running backfill
  */
-const CHECK_FOR_CHANGES = false
+const CHECK_FOR_CHANGES = true
 
 export const syncUserToCustomerIO = onDocumentWritten(
    {

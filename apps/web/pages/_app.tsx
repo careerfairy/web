@@ -36,6 +36,7 @@ import {
 import { MobileUtils } from "util/mobile.utils"
 import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
 import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
+import { useTrackPageViews } from "../components/custom-hook/utils/useTrackPageViews"
 import ErrorProvider from "../HOCs/ErrorProvider"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import TutorialProvider from "../HOCs/TutorialProvider"
@@ -77,6 +78,7 @@ function MyApp(props) {
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
    useWebviewConsoleProxy()
+   useTrackPageViews()
 
    const webviewResumedCount = useTrackWebviewResumedCount()
 

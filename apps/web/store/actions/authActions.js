@@ -1,7 +1,6 @@
-import * as actions from "./actionTypes"
 import { firebaseServiceInstance } from "../../data/firebase/FirebaseService"
-import { dataLayerEvent } from "../../util/analyticsUtils"
 import { clearFirestoreCache } from "../../data/util/authUtil"
+import * as actions from "./actionTypes"
 
 // Sign up action creator
 export const signUp =
@@ -38,7 +37,6 @@ export const signOut =
       try {
          await firebase.auth().signOut()
          clearFirestoreCache()
-         dataLayerEvent("logout")
       } catch (err) {
          console.log(err.message)
       }
@@ -99,26 +97,13 @@ export const recoverPassword =
 // Edit profile
 export const editUserProfile =
    (data) =>
-   async (dispatch, getState, { getFirebase, getFirestore }) => {
-      // const firebase = getFirebase();
+   async (dispatch, getState, { getFirestore }) => {
       const firestore = getFirestore()
-      // const user = firebase.auth().currentUser; // dont need it yet for updating email
-      const {
-         // uid: userId,
-         email: userEmail,
-      } = getState().firebase.auth
+      const { email: userEmail } = getState().firebase.auth
       dispatch({ type: actions.PROFILE_EDIT_START })
       try {
-         //edit the user profile
-         // if (data.email !== userEmail) {
-         //     await user.updateEmail(data.email);
-         // }
-
          await firestore.collection("userData").doc(userEmail).update(data)
 
-         // if (data.password.length > 0) { // dont need it yet since we haven't implemented it on the front end
-         //     await user.updatePassword(data.password);
-         // }
          dispatch({ type: actions.PROFILE_EDIT_SUCCESS })
       } catch (err) {
          dispatch({ type: actions.PROFILE_EDIT_FAIL, payload: err.message })
