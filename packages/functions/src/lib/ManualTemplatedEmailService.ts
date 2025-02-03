@@ -53,14 +53,11 @@ export class ManualTemplatedEmailService {
          overrideUsers
       )
 
-      // TODO: Remove slice outside of testing
-      const audience = users
-         ?.slice(0, 10)
-         .filter(
-            (user) =>
-               AUDIENCE.includes(user.universityCountryCode) &&
-               !EXCLUDED_USER_EMAILS.includes(user.userEmail)
-         )
+      const audience = users.filter(
+         (user) =>
+            AUDIENCE.includes(user.universityCountryCode) &&
+            !EXCLUDED_USER_EMAILS.includes(user.userEmail)
+      )
 
       this.subscribedUsers = convertDocArrayToDict(audience)
 
