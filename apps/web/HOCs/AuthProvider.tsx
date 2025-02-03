@@ -6,6 +6,7 @@ import {
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import * as Sentry from "@sentry/nextjs"
 import Loader from "components/views/loader/Loader"
+import { userRepo } from "data/RepositoryInstances"
 import { clearFirestoreCache } from "data/util/authUtil"
 import { useRouter } from "next/router"
 import nookies from "nookies"
@@ -30,7 +31,12 @@ import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { RootState } from "../store"
 import CookiesUtil from "../util/CookiesUtil"
 import DateUtil from "../util/DateUtil"
-import { dataLayerUser } from "../util/analyticsUtils"
+import {
+   analyticsResetUser,
+   analyticsSetUser,
+   dataLayerEvent,
+   dataLayerUser,
+} from "../util/analyticsUtils"
 import { updateUserActivity } from "./user/trackActivity"
 
 type DefaultContext = {
@@ -195,6 +201,19 @@ const AuthProvider = ({ children }) => {
    ])
 
    /**
+    * Listen for when user actually logs out
+    */
+   useEffect(() => {
+      return firebaseService.auth.onIdTokenChanged(async (user) => {
+         if (!user && auth.uid) {
+            // If previous user was signed in, send logout event
+            dataLayerEvent("logout")
+            analyticsResetUser()
+         }
+      })
+   }, [auth.uid, firebaseService.auth])
+
+   /**
     * Listen for auth changes and update claims
     */
    useEffect(() => {
@@ -206,6 +225,7 @@ const AuthProvider = ({ children }) => {
             clearFirestoreCache()
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
+            analyticsSetUser(user.uid)
             setIsLoggedIn(true)
             setIsLoggedOut(false)
             const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
@@ -215,7 +235,7 @@ const AuthProvider = ({ children }) => {
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
       })
-   }, [firebaseService.auth])
+   }, [firebaseService.auth, auth.uid])
 
    /**
     * Update user activity when there are new claims
@@ -234,6 +254,21 @@ const AuthProvider = ({ children }) => {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [userData?.authId, userData?.isAdmin])
+
+   /**
+    * Update user Timezone based on browser timezone
+    */
+   useEffect(() => {
+      const usersTimezone = userData?.timezone
+
+      if (userData?.id && usersTimezone !== DateUtil.getCurrentTimeZone()) {
+         userRepo
+            .updateUserData(userData.id, {
+               timezone: DateUtil.getCurrentTimeZone(),
+            })
+            .catch(errorLogAndNotify)
+      }
+   }, [userData?.id, userData?.timezone])
 
    const contextValue = useMemo<DefaultContext>(
       () => ({

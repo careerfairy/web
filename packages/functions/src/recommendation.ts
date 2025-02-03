@@ -39,6 +39,7 @@ export const getRecommendedEvents = functions
 
                const recommendationService =
                   await UserEventRecommendationService.create(dataFetcher)
+
                return await recommendationService.getRecommendations(data.limit)
             } catch (error) {
                functions.logger.error(

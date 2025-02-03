@@ -1,10 +1,9 @@
 import { NextSeo, NextSeoProps } from "next-seo"
 import { useRouter } from "next/router"
-import { getBaseUrl } from "../helperFunctions/HelperFunctions"
 import { facebookAppId } from "../../constants/links"
+import { getBaseUrl } from "../helperFunctions/HelperFunctions"
 
 const SEO = ({
-   id,
    image,
    keywords,
    noIndex: noindex = false,
@@ -25,8 +24,10 @@ const SEO = ({
          site: "@FairyCareer",
       },
       openGraph: {
+         ...props.openGraph,
          ...(image && {
             images: [
+               ...(props.openGraph?.images || []),
                {
                   alt: props.title,
                   ...image,
@@ -34,8 +35,6 @@ const SEO = ({
             ],
          }),
          url: getBaseUrl() + router.asPath,
-         type: "",
-         ...props.openGraph,
       },
    }
 
@@ -48,6 +47,7 @@ export interface SeoProps extends NextSeoProps {
       height?: number
       type?: string
       url: string
+      alt?: string
    }
    keywords?: string
    noIndex?: boolean

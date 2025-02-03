@@ -12,6 +12,8 @@ import Grid from "@mui/material/Grid"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
+import { userRepo } from "data/RepositoryInstances"
+import { Timestamp } from "firebase/firestore"
 import { Formik, FormikValues } from "formik"
 import { FormikHelpers } from "formik/dist/types"
 import Link from "next/link"
@@ -154,6 +156,11 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                values.email,
                fingerPrintId
             )
+            await userRepo
+               .updateUserData(values.email, {
+                  lastSignInAt: Timestamp.now(),
+               })
+               .catch(console.error) // fail silently
             helpers.setErrors({})
             const token = userCred.user.multiFactor["user"].accessToken || ""
             MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {

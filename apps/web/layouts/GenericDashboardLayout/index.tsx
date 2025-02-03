@@ -1,12 +1,10 @@
-import ClockIcon from "@mui/icons-material/AccessTime"
-import DomainIcon from "@mui/icons-material/Domain"
-import { createContext, useContext, useMemo } from "react"
-import {
-   Home as HomeIcon,
-   Radio as LiveStreamsIcon,
-   PlayCircle as SparksIcon,
-} from "react-feather"
-import { useAuth } from "../../HOCs/AuthProvider"
+import { CompanyIcon } from "components/views/common/icons"
+import { HomeIcon } from "components/views/common/icons/HomeIcon"
+import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
+import { LiveStreamsIcon } from "components/views/common/icons/LiveStreamsIcon"
+import { RecordingIcon } from "components/views/common/icons/RecordingIcon"
+import { SparksIcon } from "components/views/common/icons/SparksIcon"
+import { createContext, ReactNode, useContext, useMemo } from "react"
 import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
 import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
@@ -14,7 +12,7 @@ import Footer from "../../components/views/footer/Footer"
 import AdminGenericLayout from "../AdminGenericLayout"
 import CreditsDialogLayout from "../CreditsDialogLayout"
 import { INavLink } from "../types"
-import DropdownNavigator from "./DropdownNavigator"
+import TabsNavigator from "./DropdownNavigator"
 import GenericNavList from "./GenericNavList"
 import NavBar from "./NavBar"
 import TopBar from "./TopBar"
@@ -27,6 +25,7 @@ type IGenericDashboardContext = {
    headerFixed?: boolean
    headerType?: "sticky" | "fixed"
    navLinks: INavLink[]
+   drawerOpen: boolean
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
@@ -35,31 +34,27 @@ const GenericDashboardContext = createContext<IGenericDashboardContext>({
    headerScrollThreshold: 10,
    headerFixed: false,
    navLinks: [],
+   drawerOpen: false,
 })
-
-const MyRegistrationsPath: INavLink = {
-   id: "my-registrations",
-   href: `/next-livestreams/my-registrations`,
-   pathname: `/next-livestreams/my-registrations/[[...livestreamDialog]]`,
-   title: "My registrations",
-}
 
 const NextLivestreamsPath: INavLink = {
    id: "next-live-streams",
    href: `/next-livestreams`,
    pathname: `/next-livestreams/[[...livestreamDialog]]`,
-   title: "Next live streams",
+   title: "Live streams",
+   Icon: LiveStreamsIcon,
 }
 
 const PastLivestreamsPath: INavLink = {
    id: "all-past-live-streams",
    href: `/past-livestreams`,
    pathname: `/past-livestreams/[[...livestreamDialog]]`,
-   title: "All past streams",
+   title: "Recordings",
+   Icon: RecordingIcon,
 }
 
 type Props = {
-   children: JSX.Element
+   children: ReactNode
    pageDisplayName?: string
    bgColor?: string
    isPortalPage?: boolean
@@ -110,8 +105,6 @@ const GenericDashboardLayout = ({
 }: Props) => {
    const isMobile = useIsMobile(989, { defaultMatches: true })
 
-   const { isLoggedIn } = useAuth()
-
    const [
       creditsDialogOpen,
       handleOpenCreditsDialog,
@@ -134,18 +127,12 @@ const GenericDashboardLayout = ({
             mobileTitle: "Live streams",
             Icon: LiveStreamsIcon,
             href: `/next-livestreams`,
-            childLinks: [
-               NextLivestreamsPath,
-               ...(isLoggedIn ? [MyRegistrationsPath] : []),
-            ],
-         },
-         {
-            id: "past-live-streams",
-            title: "Past live streams",
-            mobileTitle: "Past streams",
-            Icon: ClockIcon,
-            href: `/past-livestreams`,
-            childLinks: [PastLivestreamsPath],
+            pathname: `/next-livestreams/[[...livestreamDialog]]`,
+            ...(isMobile
+               ? {
+                    childLinks: [NextLivestreamsPath, PastLivestreamsPath],
+                 }
+               : []),
          },
          {
             id: "sparks",
@@ -154,17 +141,38 @@ const GenericDashboardLayout = ({
             Icon: SparksIcon,
             title: "Sparks",
          },
+         ...(!isMobile
+            ? [
+                 {
+                    id: "past-live-streams",
+                    title: "Recordings",
+                    mobileTitle: "Recordings",
+                    Icon: RecordingIcon,
+                    href: `/past-livestreams`,
+                    pathname: `/past-livestreams/[[...livestreamDialog]]`,
+                 },
+              ]
+            : []),
+         {
+            id: "levels",
+            href: `/levels`,
+            pathname: `/levels`,
+            Icon: LevelsIcon,
+            title: "Levels",
+         },
          {
             id: "company",
             href: `/companies`,
             pathname: `/companies`,
-            Icon: DomainIcon,
+            Icon: CompanyIcon,
             title: "Companies",
          },
       ]
 
       return links
-   }, [isLoggedIn])
+   }, [isMobile])
+
+   const drawerOpen = !hideDrawer && !isMobile
 
    const value = useMemo<IGenericDashboardContext>(
       () => ({
@@ -174,6 +182,7 @@ const GenericDashboardLayout = ({
          headerFixed: Boolean(headerFixed),
          headerType: headerType,
          navLinks,
+         drawerOpen,
       }),
       [
          handleOpenCreditsDialog,
@@ -182,6 +191,7 @@ const GenericDashboardLayout = ({
          navLinks,
          headerFixed,
          headerType,
+         drawerOpen,
       ]
    )
 
@@ -201,8 +211,8 @@ const GenericDashboardLayout = ({
                      <GenericNavList isDark={isBottomNavDark} />
                   )
                }
-               drawerOpen={!isMobile}
-               dropdownNav={isMobile ? <DropdownNavigator /> : null}
+               drawerOpen={drawerOpen}
+               dropdownNav={isMobile ? <TabsNavigator /> : null}
                headerWidth={headerWidth}
             >
                {children}

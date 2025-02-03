@@ -6,10 +6,12 @@ import {
 import { ProfileLanguage } from "@careerfairy/shared-lib/users"
 import { Box, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useUserLanguages } from "components/custom-hook/user/useUserLanguages"
 import { languageCodesDict } from "components/helperFunctions/streamFormFunctions"
 import { userRepo } from "data/RepositoryInstances"
+import { OptionsObject } from "notistack"
 import { Fragment, useCallback, useState } from "react"
 import { Globe } from "react-feather"
 import { useFormContext } from "react-hook-form"
@@ -63,6 +65,13 @@ const styles = sxStyles({
    },
 })
 
+const NOTIFICATION_OPTIONS: OptionsObject = {
+   anchorOrigin: {
+      vertical: "top",
+      horizontal: "left",
+   },
+}
+
 type Props = {
    showAddIcon?: boolean
 }
@@ -100,7 +109,7 @@ const FormDialogWrapper = () => {
    const dispatch = useDispatch()
    const { userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
-
+   const isMobile = useIsMobile()
    const createLanguageDialogOpen = useSelector(
       talentProfileCreateLanguageOpenSelector
    )
@@ -135,12 +144,16 @@ const FormDialogWrapper = () => {
 
          handleCloseLanguageDialog()
          successNotification(
-            `${data.id ? "Updated" : "Added a new"} language 🗣️`
+            `${data.id ? "Updated" : "Added a new"} language 🗣️`,
+            undefined,
+            isMobile ? NOTIFICATION_OPTIONS : undefined
          )
       } catch (error) {
          errorNotification(
             error,
-            "We encountered a problem while adding your language. Rest assured, we're on it!"
+            "We encountered a problem while adding your language. Rest assured, we're on it!",
+            undefined,
+            isMobile ? NOTIFICATION_OPTIONS : undefined
          )
       }
    }
@@ -206,6 +219,7 @@ type LanguageCardProps = {
 }
 
 const LanguageCard = ({ language }: LanguageCardProps) => {
+   const isMobile = useIsMobile()
    const { userData } = useAuth()
    const [isDeleting, setIsDeleting] = useState<boolean>(false)
    const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
@@ -232,9 +246,11 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
       successNotification(
-         `Deleted language: ${languageCodesDict[language.languageId].name} 🗣️`
+         `Deleted language: ${languageCodesDict[language.languageId].name} 🗣️`,
+         undefined,
+         isMobile ? NOTIFICATION_OPTIONS : undefined
       )
-   }, [language, userData.id, successNotification])
+   }, [language, userData.id, successNotification, isMobile])
 
    return (
       <Fragment>

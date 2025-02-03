@@ -1,10 +1,14 @@
 import { gql, GraphQLClient } from "graphql-request"
 import { createTalentGuideClient } from "./client"
 import { FORCE_GERMAN_LOCALE } from "./constants"
-import { moduleStepFragment, seoComponentFragment } from "./fragments"
+import {
+   seoComponentFragment,
+   talentGuideModulePageFragment,
+} from "./fragments"
 import {
    Page,
    PageType,
+   TalentGuideModule,
    TalentGuideModulePageResponse,
    TalentGuideRootPageResponse,
    TalentGuideSlugsResponse,
@@ -26,7 +30,7 @@ export class TalentGuideBackendService {
    }
 
    /**
-    * Get all talent guide module page slugs, eg /talent-guide/(networking) or /talent-guide/(interviewing)
+    * Get all levels module page slugs, eg /levels/(networking) or /levels/(interviewing)
     */
    async getAllTalentGuideModulePageSlugs(): Promise<string[]> {
       const query = gql`
@@ -43,20 +47,21 @@ export class TalentGuideBackendService {
    }
 
    /**
-    * Get the talent guide root page, eg /talent-guide
+    * Get the levels root page, eg /levels
     */
-   async getTalentGuideRootPage(slug: string): Promise<Page> {
+   async getTalentGuideRootPage(): Promise<Page> {
       const query = gql`
          query GetTalentGuideRootPage($slug: String!) {
             pages(where: { pageType: ${PageType.TALENT_GUIDE_ROOT_PAGE}, slug: $slug }) {
                slug
+               seo ${seoComponentFragment}
             }
          }
       `
       const { pages } = await this.client.request<TalentGuideRootPageResponse>(
          query,
          {
-            slug,
+            slug: "levels",
          }
       )
 
@@ -71,20 +76,7 @@ export class TalentGuideBackendService {
 
       const query = gql`
          query GetTalentGuideBySlug($slug: String!, $locale: Locale!) {
-            page(where: { slug: $slug }, locales: [$locale]) {
-               slug
-               seo ${seoComponentFragment}
-               content {
-                  id
-                  moduleName
-                  moduleDescription
-                  moduleDuration
-                  category
-                  contentTopicTags
-                  businessFunctionTags
-                  moduleSteps ${moduleStepFragment}
-               }
-            }
+            page(where: { slug: $slug }, locales: [$locale]) ${talentGuideModulePageFragment}
          }
       `
 
@@ -97,6 +89,37 @@ export class TalentGuideBackendService {
       )
 
       return page
+   }
+
+   /**
+    * Get all talent guide module pages
+    * @param locale - The locale to fetch content in
+    * @returns Promise<Page[]> Array of all module pages
+    */
+   async getAllTalentGuideModulePages(
+      locale = "en"
+   ): Promise<Page<TalentGuideModule>[]> {
+      const forcedLocale = FORCE_GERMAN_LOCALE ? "de" : locale
+
+      const query = gql`
+         query GetAllTalentGuideModules($locale: Locale!) {
+            pages(
+               where: { pageType: ${PageType.TALENT_GUIDE_MODULE_PAGE} }, 
+               locales: [$locale]
+            ) ${talentGuideModulePageFragment}
+         }
+      `
+
+      const data = await this.client.request<{
+         pages: Page<TalentGuideModule>[]
+      }>(query, {
+         locale: forcedLocale,
+      })
+
+      // Sort the pages by content.level
+      return data.pages.sort(
+         (a, b) => (a.content?.level ?? 0) - (b.content?.level ?? 0)
+      )
    }
 }
 

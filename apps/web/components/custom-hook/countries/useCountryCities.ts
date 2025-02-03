@@ -16,7 +16,7 @@ const swrOptions: SWRConfiguration = {
       }),
 }
 
-const useCountryCities = (countryCode: string) => {
+const useCountryCities = (countryCode: string, suspense = true) => {
    const fetcher = useFunctionsSWR<Record<string, CityOption>>()
 
    const options = useMemo(() => {
@@ -25,13 +25,14 @@ const useCountryCities = (countryCode: string) => {
       }
    }, [countryCode])
 
-   const { data, error, isLoading } = useSWR<Record<string, CityOption>>(
-      ["fetchCountryCitiesList", options],
-      fetcher,
-      swrOptions
-   )
+   const { data, error, isLoading, mutate } = useSWR<
+      Record<string, CityOption>
+   >(["fetchCountryCitiesList", options], fetcher, {
+      ...swrOptions,
+      suspense,
+   })
 
-   return { data: data ?? [], error, isLoading }
+   return { data: data ?? [], error, isLoading, mutate }
 }
 
 export default useCountryCities

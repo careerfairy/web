@@ -6,8 +6,9 @@ import { TalentGuideModuleCategory } from "@careerfairy/shared-lib/talent-guide"
 import { RichTextContent } from "@graphcms/rich-text-types"
 export type Page<T = any> = {
    pageType: PageType
-   slug?: string
+   slug: string
    content?: T
+   seo?: SeoComponentType
 }
 
 export type TalentGuideModule = {
@@ -21,13 +22,30 @@ export type TalentGuideModule = {
     */
    moduleDescription: string
    /**
-    * The duration of the module, eg "10 - 20"
+    * The estimated duration in minutes, eg 10
+    */
+   estimatedModuleDurationMinutes: number
+   /**
+    * The duration range of the module, eg "10-16"
+    * @deprecated Use estimatedModuleDurationMinutes instead
     */
    moduleDuration: string
+   /**
+    * The thumbnail of the module, eg "https://www.example.com/thumbnail.jpg"
+    */
+   moduleIllustration: ImageAssetType
+   /**
+    * The preview video of the module, eg "https://www.example.com/preview.mp4"
+    */
+   modulePreviewVideo: VideoAssetType
    /**
     * The category of the module, eg "Before Applying" or "Applying Insights"
     */
    category: TalentGuideModuleCategory
+   /**
+    * The level of the module, used for sorting
+    */
+   level: number
    /**
     * The blocks of the module, eg HeaderBlock, TextBlock, ImageBlock, LivestreamsBlock etc
     */
@@ -89,6 +107,12 @@ export type SparkComponentType = {
    sparkId: string
 }
 
+export type LiveStreamComponentType = {
+   __typename: "LiveStream"
+   id: string
+   liveStreamId: string
+}
+
 export type SeoComponentType = {
    __typename: "Seo"
    id: string
@@ -147,9 +171,7 @@ export type LivestreamsCarouselBlockType = {
    id: string
    title: string
    subHeader: string
-   businessFunctionTags: BusinessFunctionTagId[]
-   contentTopicTags: ContentTopicTagId[]
-   typeOfStreams: "UPCOMING" | "PAST"
+   liveStreamIds: LiveStreamComponentType[]
 }
 
 export type SparksCarouselBlockType = {
@@ -178,6 +200,7 @@ export type QuizAnswerComponentType = {
    id: string
    answer: string
    isCorrect: boolean
+   correction: string
 }
 
 export type QuizModelType = {
@@ -191,6 +214,11 @@ export type QuizModelType = {
    answers: QuizAnswerComponentType[]
 }
 
+export type CVBlockType = {
+   __typename: "CVBlock"
+   id: string
+}
+
 export type RichTextReferenceType =
    | ArticleBlockType
    | MentorsCarouselBlockType
@@ -202,6 +230,7 @@ export type RichTextReferenceType =
    | SparksCarouselBlockType
    | VideoBlockType
    | CopyTemplateBlockType
+   | CVBlockType
 
 export type RichTextBlockType = {
    __typename: "RichTextBlock"

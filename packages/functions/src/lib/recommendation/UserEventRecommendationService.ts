@@ -3,7 +3,11 @@ import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRe
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
-import { RegisteredLivestreams, UserData } from "@careerfairy/shared-lib/users"
+import {
+   AdditionalUserRecommendationInfo,
+   RegisteredLivestreams,
+   UserData,
+} from "@careerfairy/shared-lib/users"
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
@@ -24,6 +28,8 @@ export default class UserEventRecommendationService
    extends RecommendationServiceCore
    implements IRecommendationService
 {
+   private additionalUserData: AdditionalUserRecommendationInfo
+
    constructor(
       private readonly user: UserData,
       private readonly futureLivestreams: LivestreamEvent[],
@@ -54,7 +60,8 @@ export default class UserEventRecommendationService
                   this.user,
                   this.futureLivestreams,
                   limit,
-                  this.implicitData
+                  this.implicitData,
+                  this.additionalUserData
                )
             )
          ),
@@ -74,6 +81,13 @@ export default class UserEventRecommendationService
          this.futureLivestreams,
          this.user
       )
+   }
+
+   public setAdditionalData(
+      data: AdditionalUserRecommendationInfo
+   ): UserEventRecommendationService {
+      this.additionalUserData = data
+      return this
    }
 
    /**
@@ -137,13 +151,21 @@ export default class UserEventRecommendationService
    static async create(
       dataFetcher: IRecommendationDataFetcher
    ): Promise<IRecommendationService> {
-      const [user, futureLivestreams, pastLivestreams, registeredLivestreams] =
-         await Promise.all([
-            dataFetcher.getUser(),
-            dataFetcher.getFutureLivestreams(),
-            dataFetcher.getPastLivestreams(),
-            dataFetcher.getUserRegisteredLivestreams(),
-         ])
+      const [
+         user,
+         futureLivestreams,
+         pastLivestreams,
+         registeredLivestreams,
+         studyBackgrounds,
+         languages,
+      ] = await Promise.all([
+         dataFetcher.getUser(),
+         dataFetcher.getFutureLivestreams(),
+         dataFetcher.getPastLivestreams(),
+         dataFetcher.getUserRegisteredLivestreams(),
+         dataFetcher.getUserStudyBackgrounds(),
+         dataFetcher.getUserLanguages(),
+      ])
 
       const [watchedSparks, interactedEvents, appliedJobs, followedCompanies] =
          await Promise.all([
@@ -160,12 +182,14 @@ export default class UserEventRecommendationService
          followedCompanies: followedCompanies,
       }
 
-      return new UserEventRecommendationService(
+      const instance = new UserEventRecommendationService(
          user,
          futureLivestreams,
          pastLivestreams,
          implicitData,
          registeredLivestreams
       )
+
+      return instance.setAdditionalData({ studyBackgrounds, languages })
    }
 }

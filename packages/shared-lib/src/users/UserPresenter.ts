@@ -18,13 +18,30 @@ export const USER_BANNER_IMAGE_SPECS = {
 }
 
 export const USER_AVATAR_IMAGE_SPECS = {
-   minWidth: 320,
+   minWidth: 240,
    minHeight: 240,
    maxWidth: 5000,
-   maxHeight: 3000,
+   maxHeight: 5000,
    // In megabytes
    maxSize: 10, // 10MB
    allowedFormats: IMAGE_CONSTANTS.allowedFormats,
+}
+
+export const getProfileImageErrorMessage = (width, height) => {
+   let errorMessage = ""
+   if (
+      width < USER_AVATAR_IMAGE_SPECS.minWidth ||
+      height < USER_AVATAR_IMAGE_SPECS.minHeight
+   ) {
+      errorMessage = `Oops! Your file's dimensions are too small. Minimum: ${USER_AVATAR_IMAGE_SPECS.minHeight}x${USER_AVATAR_IMAGE_SPECS.minWidth}px, but yours are ${width}x${height}px.`
+   }
+   if (
+      width > USER_AVATAR_IMAGE_SPECS.maxWidth ||
+      height > USER_AVATAR_IMAGE_SPECS.maxHeight
+   ) {
+      errorMessage = `Oops! Your file's dimensions are too large. Maximum: ${USER_AVATAR_IMAGE_SPECS.maxHeight}x${USER_AVATAR_IMAGE_SPECS.maxWidth}px, but yours are ${width}x${height}px.`
+   }
+   return errorMessage
 }
 
 export default class UserPresenter extends BasePresenter<UserData> {

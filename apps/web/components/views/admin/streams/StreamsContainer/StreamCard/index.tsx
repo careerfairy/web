@@ -1,3 +1,4 @@
+import { countriesOptionCodes } from "@careerfairy/shared-lib/constants/forms"
 import {
    LivestreamEvent,
    LivestreamRecordingDetails,
@@ -305,7 +306,7 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
                                     setOpenStreamerLinksDialog(true)
                                  }
                               >
-                                 Get streamer links
+                                 Get stream links
                               </MenuItem>
                               <MenuItem
                                  disabled={recordingRequestOngoing}
@@ -512,6 +513,10 @@ const StreamCard = ({ isUpcoming, stream }: Props) => {
             livestreamId={stream.id}
             openDialog={openStreamerLinksDialog}
             setOpenDialog={setOpenStreamerLinksDialog}
+            companyName={stream.company}
+            companyCountryCode={countriesOptionCodes.find(
+               (country) => country.name == stream.companyCountries?.[0]
+            )}
          />
          <Dialog open={recordingRequestOngoing}>
             <DialogContent>

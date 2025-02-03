@@ -11,7 +11,6 @@ import {
 } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
-import { alpha } from "@mui/material/styles"
 import Link from "../../components/views/common/Link"
 
 // project imports
@@ -19,43 +18,37 @@ import Collapse from "@mui/material/Collapse"
 import { sxStyles } from "../../types/commonTypes"
 import type { INavLink } from "../types"
 
-const leftPadding = 5
 const iconSize = 24
-const styles = sxStyles({
+export const styles = sxStyles({
    icon: {
-      fontSize: iconSize,
       width: iconSize,
       height: iconSize,
+      color: "inherit",
+      strokeWidth: 1.5,
    },
    navLink: {
       backgroundColor: "transparent !important",
-      mb: 0.5,
       alignItems: "flex-start",
-      py: 0.5,
-      color: (theme) => alpha(theme.palette.text.secondary, 0.3),
-      fontWeight: 500,
-      fontSize: "15px",
-      pl: leftPadding,
-      pr: 1,
-      transition: (theme) =>
-         theme.transitions.create(["color", "border-right"], {
-            duration: theme.transitions.duration.shortest,
-         }),
+      py: 1.25,
+      px: 1.5,
+      borderRadius: "8px",
+      color: (theme) => theme.palette.neutral[700],
+      fontWeight: 400,
       "&:hover , &:focus": {
-         color: "text.primary",
-         borderRight: (theme) =>
-            `5px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+         backgroundColor: (theme) => `${theme.brand.white[400]} !important`,
       },
+   },
+   navLinkMobile: {
+      color: (theme) => theme.brand.black[700],
    },
    navLinkNested: {
       py: 1,
-      pl: 7,
+      pl: 5,
    },
-   textActive: {
-      color: "text.primary",
-   },
-   borderActive: {
-      borderRight: (theme) => `5px solid ${theme.palette.primary.main}`,
+   linkActive: {
+      backgroundColor: (theme) => `${theme.brand.white[500]} !important`,
+      color: (theme) => theme.palette.neutral[800],
+      fontWeight: 600,
    },
    iconWrapper: {
       my: "auto",
@@ -67,6 +60,13 @@ const styles = sxStyles({
    },
    list: {
       width: "100%",
+      px: 2,
+   },
+   label: {
+      fontWeight: "inherit",
+      fontSize: "inherit",
+      color: "inherit",
+      lineHeight: "20px",
    },
 })
 
@@ -76,7 +76,7 @@ type NavListProps = {
 const NavList = ({ links }: NavListProps) => {
    return (
       <Box component={"nav"} sx={styles.list}>
-         <Stack sx={styles.list} spacing={2} component={List}>
+         <Stack spacing={2} component={List}>
             {links.map((navItem) => (
                <NavLink key={navItem.id} {...navItem} />
             ))}
@@ -118,8 +118,6 @@ export const NavLink = ({
 
    const isOpen = childLinkActive || isActivePath
 
-   const isTextActive = isOpen || isActivePath
-
    const Wrapper = wrapper || React.Fragment
 
    return (
@@ -129,8 +127,7 @@ export const NavLink = ({
                sx={[
                   styles.navLink,
                   isNested && styles.navLinkNested,
-                  isTextActive && styles.textActive,
-                  isActivePath && styles.borderActive,
+                  isActivePath && styles.linkActive,
                   baseTextColor && { color: baseTextColor },
                ]}
                target={external ? "_blank" : undefined}
@@ -142,17 +139,16 @@ export const NavLink = ({
                <ListItemIcon
                   sx={[styles.iconWrapper, !Icon && styles.iconWrapperEmpty]}
                >
-                  <Box sx={styles.icon} component={Icon} />
+                  <Box
+                     sx={styles.icon}
+                     component={Icon}
+                     fill={isActivePath ? "currentColor" : "none"}
+                  />
                </ListItemIcon>
                {shrunk ? null : (
                   <ListItemText
                      primary={
-                        <Typography
-                           variant={"body1"}
-                           fontWeight={"inherit"}
-                           fontSize={"inherit"}
-                           color="inherit"
-                        >
+                        <Typography variant={"small"} sx={styles.label}>
                            {title}
                         </Typography>
                      }

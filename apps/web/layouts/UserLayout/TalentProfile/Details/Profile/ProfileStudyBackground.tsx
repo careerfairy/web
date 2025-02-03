@@ -1,3 +1,7 @@
+import {
+   FieldOfStudy,
+   LevelOfStudy,
+} from "@careerfairy/shared-lib/fieldOfStudy"
 import { StudyBackground } from "@careerfairy/shared-lib/users"
 import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
@@ -11,6 +15,7 @@ import { SchoolIcon } from "components/views/common/icons/SchoolIcon"
 import { userRepo } from "data/RepositoryInstances"
 import { Timestamp } from "data/firebase/FirebaseInstance"
 import { DateTime } from "luxon"
+import { OptionsObject } from "notistack"
 import { Fragment, useCallback, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
@@ -79,6 +84,13 @@ const styles = sxStyles({
    },
 })
 
+const NOTIFICATION_OPTIONS: OptionsObject = {
+   anchorOrigin: {
+      vertical: "top",
+      horizontal: "left",
+   },
+}
+
 type Props = {
    showAddIcon: boolean
 }
@@ -119,7 +131,7 @@ const FormDialogWrapper = () => {
    const dispatch = useDispatch()
    const { userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
-
+   const isMobile = useIsMobile()
    const [isConfirmEmptyDatesOpen, setIsConfirmEmptyDatesOpen] =
       useState<boolean>(false)
 
@@ -158,6 +170,8 @@ const FormDialogWrapper = () => {
          const newStudyBackground: StudyBackground = {
             ...data,
             id: data?.id,
+            fieldOfStudy: data.fieldOfStudy as FieldOfStudy,
+            levelOfStudy: data.levelOfStudy as LevelOfStudy,
             startedAt: data.startedAt
                ? Timestamp.fromDate(data.startedAt)
                : null,
@@ -179,12 +193,16 @@ const FormDialogWrapper = () => {
 
          handleCloseStudyBackgroundDialog()
          successNotification(
-            `${data.id ? "Updated" : "Added a new"} study background 🎓`
+            `${data.id ? "Updated" : "Added a new"} study background 🎓`,
+            undefined,
+            isMobile ? NOTIFICATION_OPTIONS : undefined
          )
       } catch (error) {
          errorNotification(
             error,
-            "We encountered a problem while adding your study background. Rest assured, we're on it!"
+            "We encountered a problem while adding your study background. Rest assured, we're on it!",
+            undefined,
+            isMobile ? NOTIFICATION_OPTIONS : undefined
          )
       }
    }
@@ -267,6 +285,7 @@ type StudyBackgroundCardProps = {
 
 const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
    const { successNotification } = useSnackbarNotifications()
+   const isMobile = useIsMobile()
    const { userData } = useAuth()
    const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
       useState<boolean>(false)
@@ -291,8 +310,12 @@ const StudyBackgroundCard = ({ studyBackground }: StudyBackgroundCardProps) => {
 
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
-      successNotification("Study background deleted")
-   }, [studyBackground, userData.id, successNotification])
+      successNotification(
+         "Study background deleted",
+         undefined,
+         isMobile ? NOTIFICATION_OPTIONS : undefined
+      )
+   }, [studyBackground, userData.id, successNotification, isMobile])
 
    const university = useUniversityById(
       studyBackground.universityCountryCode,

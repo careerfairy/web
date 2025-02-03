@@ -8,6 +8,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import {
    ArticleBlockType,
    CopyTemplateBlockType,
+   CVBlockType,
    FollowCompaniesBlockType,
    HeaderBlockType,
    HighlightsBlockType,
@@ -22,6 +23,7 @@ import { useMemo } from "react"
 import {
    ArticleBlock,
    CopyTemplateBlock,
+   CVBlock,
    FollowCompaniesBlock,
    HeaderBlock,
    HighlightsBlock,
@@ -77,6 +79,7 @@ export const RichTextRenderer = ({ content, references }: RichTextProps) => {
             CopyTemplateBlock: (props: EmbedProps<CopyTemplateBlockType>) => (
                <CopyTemplateBlock {...props} />
             ),
+            CVBlock: (props: EmbedProps<CVBlockType>) => <CVBlock {...props} />,
          },
       }),
       [isMobile]

@@ -8,8 +8,8 @@ import {
    Slide,
    Toolbar,
    useMediaQuery,
+   useTheme,
 } from "@mui/material"
-import { useTheme } from "@mui/material/styles"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
 
 // project imports

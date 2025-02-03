@@ -22,13 +22,7 @@ export const BackButton = () => {
          color="grey"
          startIcon={<ChevronLeft />}
          LinkComponent={Link}
-         href={
-            router.query.companyName
-               ? `/company/${encodeURIComponent(
-                    router.query.companyName as string
-                 )}`
-               : "/"
-         }
+         onClick={() => router.back()}
          sx={styles.backButton}
       >
          Back

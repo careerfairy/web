@@ -19,7 +19,7 @@ interface UC_UI {
 /**
  * Name of the services on UC
  */
-type UC_SERVICES = "Sentry Error Monitoring" | "Crisp Chat"
+type UC_SERVICES = "Sentry Error Monitoring" | "Crisp Chat" | "Customer.io"
 
 /**
  * Checks if a given service name has consent enabled

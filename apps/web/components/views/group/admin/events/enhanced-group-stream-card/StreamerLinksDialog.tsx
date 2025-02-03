@@ -1,3 +1,4 @@
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import CloseIcon from "@mui/icons-material/Close"
 import {
    Box,
@@ -13,13 +14,15 @@ import {
 import useIsMobile from "components/custom-hook/useIsMobile"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { withFirebase } from "context/firebase/FirebaseServiceContext"
-import { useAuth } from "HOCs/AuthProvider"
 import PropTypes from "prop-types"
 import { useEffect, useMemo, useState } from "react"
 import { Copy, ExternalLink } from "react-feather"
 import { useCopyToClipboard } from "react-use"
 import { sxStyles } from "types/commonTypes"
-import { makeLivestreamUrl } from "util/makeUrls"
+import {
+   makeLivestreamEventDetailsShareUrl,
+   makeLivestreamUrl,
+} from "util/makeUrls"
 
 const styles = sxStyles({
    root: {
@@ -49,9 +52,16 @@ const styles = sxStyles({
       color: theme.palette.neutral[800],
       fontWeight: 700,
    }),
+   link: {
+      "& .MuiInputBase-input": {
+         overflow: "hidden",
+         textOverflow: "ellipsis",
+      },
+   },
    copyButton: (theme) => ({
       cursor: "pointer",
       color: theme.palette.neutral[500],
+      ml: 1,
    }),
    copiedInput: (theme) => ({
       borderColor: `${theme.palette.success[700]} !important`,
@@ -68,10 +78,11 @@ const StreamerLinksDialogContent = ({
    livestreamId,
    handleClose,
    firebase,
+   companyName,
+   companyCountryCode,
 }) => {
    const [secureToken, setSecureToken] = useState(null)
    const [copyToClipboardState, copyToClipboard] = useCopyToClipboard()
-   const { userData } = useAuth()
 
    useEffect(() => {
       if (livestreamId) {
@@ -94,12 +105,15 @@ const StreamerLinksDialogContent = ({
    )
    const viewerLink = useMemo(
       () =>
-         makeLivestreamUrl(livestreamId, {
-            type: "viewer",
-            referralCode: userData.referralCode,
-            inviteCode: livestreamId,
-         }),
-      [livestreamId, userData.referralCode]
+         makeLivestreamEventDetailsShareUrl(livestreamId, {
+            utm_source: "client",
+            utm_campaign: "events",
+            utm_content: (
+               companyNameSlugify(companyName) +
+               (companyCountryCode ? `-${companyCountryCode}` : "")
+            ).toLowerCase(),
+         }).toString(),
+      [livestreamId, companyCountryCode, companyName]
    )
 
    const hasCopiedHost = copyToClipboardState?.value === hostLink
@@ -139,7 +153,10 @@ const StreamerLinksDialogContent = ({
                                  />
                               ),
                               readOnly: true,
-                              sx: hasCopiedHost ? styles.copiedInput : {},
+                              sx: [
+                                 styles.link,
+                                 hasCopiedHost && styles.copiedInput,
+                              ],
                            }}
                            InputLabelProps={{
                               sx: hasCopiedHost ? styles.copiedText : {},
@@ -148,7 +165,7 @@ const StreamerLinksDialogContent = ({
                      </Stack>
                      <Stack gap={0.5}>
                         <Typography variant="brandedBody" color="neutral.700">
-                           Share the stream with your audience!
+                           Promote your live stream with your talent community!
                         </Typography>
                         <BrandedTextField
                            label={
@@ -163,7 +180,10 @@ const StreamerLinksDialogContent = ({
                                     onClick={() => copyToClipboard(viewerLink)}
                                  />
                               ),
-                              sx: hasCopiedViewer ? styles.copiedInput : {},
+                              sx: [
+                                 styles.link,
+                                 hasCopiedViewer && styles.copiedInput,
+                              ],
                            }}
                            InputLabelProps={{
                               sx: hasCopiedViewer ? styles.copiedText : {},
@@ -193,6 +213,8 @@ const StreamerLinksDialogContent = ({
 StreamerLinksDialogContent.propTypes = {
    handleClose: PropTypes.func,
    livestreamId: PropTypes.string,
+   companyName: PropTypes.string,
+   companyCountryCode: PropTypes.string,
    firebase: PropTypes.shape({
       getLivestreamSecureToken: PropTypes.func,
    }),
@@ -201,6 +223,8 @@ StreamerLinksDialogContent.propTypes = {
 const StreamerLinksDialog = ({
    firebase,
    livestreamId,
+   companyName,
+   companyCountryCode,
    openDialog,
    onClose,
 }) => {
@@ -224,6 +248,8 @@ const StreamerLinksDialog = ({
                livestreamId={livestreamId}
                handleClose={handleClose}
                firebase={firebase}
+               companyName={companyName}
+               companyCountryCode={companyCountryCode}
             />
          </SwipeableDrawer>
       )
@@ -241,6 +267,8 @@ const StreamerLinksDialog = ({
             livestreamId={livestreamId}
             handleClose={handleClose}
             firebase={firebase}
+            companyName={companyName}
+            companyCountryCode={companyCountryCode}
          />
       </Dialog>
    )
@@ -252,6 +280,8 @@ StreamerLinksDialog.propTypes = {
    }),
    onClose: PropTypes.func,
    livestreamId: PropTypes.string,
+   companyName: PropTypes.string,
+   companyCountryCode: PropTypes.string,
    openDialog: PropTypes.bool,
    setOpenDialog: PropTypes.func,
 }

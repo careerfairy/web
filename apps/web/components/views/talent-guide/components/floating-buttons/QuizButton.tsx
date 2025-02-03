@@ -50,7 +50,7 @@ export const QuizButton = ({ quiz, quizStatus }: Props) => {
             )
          }}
       >
-         Check answer
+         Antwort prüfen
       </FloatingButton>
    )
 }

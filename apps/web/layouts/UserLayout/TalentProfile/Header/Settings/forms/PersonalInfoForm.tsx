@@ -1,5 +1,5 @@
 import { UserData } from "@careerfairy/shared-lib/users"
-import { Skeleton, Stack } from "@mui/material"
+import { Box, Skeleton, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCountriesList from "components/custom-hook/countries/useCountriesList"
 import useCountryCities from "components/custom-hook/countries/useCountryCities"
@@ -63,7 +63,7 @@ export const PersonalInfoFormFields = () => {
    } = useFormContext<PersonalInfoSchemaType>()
 
    return (
-      <Stack spacing={2} sx={styles.formRoot}>
+      <Stack spacing={1.5} sx={styles.formRoot}>
          <ControlledBrandedTextField
             id="firstName"
             name="firstName"
@@ -104,21 +104,23 @@ export const PersonalInfoFormFields = () => {
             <CitiesDropdown />
          </SuspenseWithBoundary>
 
-         <ControlledBrandedTextField
-            id="email"
-            name="email"
-            label="Email"
-            placeholder="E.g., your@email.com"
-            disabled
-            fullWidth
-            tooltipText="As of now, you can't change your email address."
-            sx={{
-               "& .MuiAutocomplete-inputRoot": {
-                  backgroundColor: (theme) => theme.brand.white[300],
-                  opacity: 0.45,
-               },
-            }}
-         />
+         <Box>
+            <ControlledBrandedTextField
+               id="email"
+               name="email"
+               label="Email"
+               placeholder="E.g., your@email.com"
+               disabled
+               fullWidth
+               sx={{
+                  "& .MuiAutocomplete-inputRoot": {
+                     backgroundColor: (theme) => theme.brand.white[300],
+                     opacity: 0.45,
+                  },
+               }}
+               tooltipText="As of now, you can't change your email address."
+            />
+         </Box>
       </Stack>
    )
 }
@@ -137,7 +139,7 @@ const CountriesDropdown = () => {
          name={"countryIsoCode"}
          options={Object.keys(countriesList)}
          textFieldProps={{
-            requiredText: "",
+            requiredText: null,
             placeholder: "E.g, Switzerland",
             sx: {
                "& .MuiAutocomplete-inputRoot.Mui-focused": {
@@ -179,7 +181,7 @@ const CitiesDropdown = () => {
          name={"cityIsoCode"}
          options={Object.keys(countryCities)}
          textFieldProps={{
-            requiredText: "",
+            requiredText: null,
             placeholder: "E.g, Zurich",
             sx: {
                "& .MuiAutocomplete-inputRoot.Mui-focused": {

@@ -7,7 +7,7 @@ import Stack from "@mui/material/Stack"
 
 // project imports
 import { LoadingButton } from "@mui/lab"
-import { alpha } from "@mui/material/styles"
+import { alpha } from "@mui/material"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
 import { ReactNode } from "react"

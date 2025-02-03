@@ -4,14 +4,15 @@ import {
    FilledInputProps,
    InputLabelProps,
    SelectProps,
+   TooltipProps,
    Typography,
    lighten,
 } from "@mui/material"
 import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
 import { styled } from "@mui/material/styles"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { useField } from "formik"
 import { FC, ReactElement } from "react"
-import BrandedTooltip from "../tooltips/BrandedTooltip"
 
 export interface CustomBrandedTextFieldProps {
    /**
@@ -24,6 +25,7 @@ export interface CustomBrandedTextFieldProps {
     * Text for the additional tooltip, empty if not provided
     */
    tooltipText?: string
+   tooltipPlacement?: TooltipProps["placement"]
    /**
     * Indicates whether the input should support autocomplete feature
     */
@@ -35,9 +37,12 @@ export type BrandedTextFieldProps = Omit<
    "variant"
 >
 
-function getBrandedTooltip(title: string): ReactElement<typeof BrandedTooltip> {
+function getBrandedTooltip(
+   title: string,
+   tooltipPlacement: TooltipProps["placement"] = "bottom"
+): ReactElement<typeof BrandedTooltip> {
    return (
-      <BrandedTooltip title={title}>
+      <BrandedTooltip title={title} placement={tooltipPlacement}>
          <InfoIcon color="secondary" />
       </BrandedTooltip>
    )
@@ -59,7 +64,10 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
                {props.requiredText ? <span>{props.requiredText}</span> : null}
                {props.tooltipText ? (
                   <span className="branded-tooltip">
-                     {getBrandedTooltip(props.tooltipText)}
+                     {getBrandedTooltip(
+                        props.tooltipText,
+                        props.tooltipPlacement
+                     )}
                   </span>
                ) : null}
             </Box>

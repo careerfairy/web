@@ -1,18 +1,17 @@
-import React from "react"
-
 // material-ui
 import { Box } from "@mui/material"
 import Stack from "@mui/material/Stack"
 
 // project imports
-import BottomLinks from "../common/BottomLinks"
 import { MainLogo } from "../../components/logos"
-import GenericNavList from "./GenericNavList"
 import { sxStyles } from "../../types/commonTypes"
+import BottomLinks from "../common/BottomLinks"
+import GenericNavList from "./GenericNavList"
 
 const styles = sxStyles({
    logoWrapper: {
-      height: 180,
+      mt: "24px",
+      mb: "44px",
       width: "100%",
       display: "flex",
       justifyContent: "center",

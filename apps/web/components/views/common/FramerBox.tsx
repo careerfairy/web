@@ -1,6 +1,6 @@
 import Box, { BoxProps } from "@mui/material/Box"
 import { motion } from "framer-motion"
-import { forwardRef } from "react"
+import { ComponentProps, forwardRef } from "react"
 
 const BoxComponent = forwardRef<HTMLDivElement, BoxProps>((props, ref) => (
    <Box {...props} ref={ref} />
@@ -9,5 +9,7 @@ const BoxComponent = forwardRef<HTMLDivElement, BoxProps>((props, ref) => (
 BoxComponent.displayName = "BoxComponent"
 
 const FramerBox = motion(BoxComponent)
+
+export type FramerBoxProps = ComponentProps<typeof FramerBox>
 
 export default FramerBox

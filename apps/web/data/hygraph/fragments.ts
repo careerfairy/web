@@ -55,6 +55,15 @@ export const sparkComponentFragment = gql`
    }
 `
 
+// Component API ID: LiveStream
+export const liveStreamComponentFragment = gql`
+   {
+      __typename
+      id
+      liveStreamId
+   }
+`
+
 // Component API ID: Seo
 export const seoComponentFragment = gql`
    {
@@ -108,7 +117,7 @@ export const highlightsBlockFragment = gql`
       __typename
       id
       shouldFetchBasedOnUserData 
-      highlights {
+      highlights(first: 100) {
         ... on Highlight ${highlightComponentFragment}
         ... on Spark ${sparkComponentFragment}
       }
@@ -140,9 +149,9 @@ export const livestreamsCarouselBlockFragment = gql`
       id
       title
       subHeader
-      businessFunctionTags
-      contentTopicTags
-      typeOfStreams #Enum: [UPCOMING, PAST]
+      liveStreamIds(first: 100) {
+        ... on LiveStream ${liveStreamComponentFragment}
+      }
    }
 `
 
@@ -176,6 +185,14 @@ export const copyTemplateBlockFragment = gql`
    }
 `
 
+// Model API ID: CvBlock
+export const cvBlockFragment = gql`
+   {
+      __typename
+      id
+   }
+`
+
 // Model API ID: Quiz
 export const quizFragment = gql`
    {
@@ -187,6 +204,7 @@ export const quizFragment = gql`
          id
          answer
          isCorrect
+         correction
       }
    }
 `
@@ -208,6 +226,7 @@ export const richTextBlockFragment = gql`
             ... on SparksCarouselBlock ${sparksCarouselBlockFragment}
             ... on VideoBlock ${videoBlockFragment}
             ... on CopyTemplateBlock ${copyTemplateBlockFragment}
+            ... on CVBlock ${cvBlockFragment}
          }
       }
    }
@@ -223,6 +242,27 @@ export const moduleStepFragment = gql`
       content {
          ... on RichTextBlock ${richTextBlockFragment}
          ... on Quiz ${quizFragment}
+      }
+   }
+`
+
+export const talentGuideModulePageFragment = gql`
+   {
+      slug
+      seo ${seoComponentFragment}
+      content {
+         id
+         moduleName
+         moduleDescription
+         moduleDuration
+         estimatedModuleDurationMinutes
+         moduleIllustration ${imageAssetFragment}
+         modulePreviewVideo ${videoAssetFragment}
+         category
+         level
+         contentTopicTags
+         businessFunctionTags
+         moduleSteps(first: 100) ${moduleStepFragment}
       }
    }
 `

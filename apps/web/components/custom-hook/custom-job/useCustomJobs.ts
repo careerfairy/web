@@ -16,6 +16,7 @@ import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 type Options = {
    totalItems?: number
    businessFunctionTagIds: string[]
+   jobTypesIds?: string[]
    ignoreIds?: string[]
    disabled?: boolean
 }
@@ -27,6 +28,7 @@ const useCustomJobs = (options?: Options) => {
    const {
       totalItems,
       businessFunctionTagIds,
+      jobTypesIds,
       disabled,
       ignoreIds = [],
    } = options
@@ -41,6 +43,7 @@ const useCustomJobs = (options?: Options) => {
               "get-custom-jobs-by-tags",
               totalItems,
               businessFunctionTagIds,
+              jobTypesIds,
               ignoreIds,
            ],
       async () => {
@@ -50,7 +53,7 @@ const useCustomJobs = (options?: Options) => {
                where("deadline", ">", new Date()),
                where("published", "==", true),
                orderBy("deadline", "asc"),
-               ...(businessFunctionTagIds.length
+               ...(businessFunctionTagIds?.length
                   ? [
                        where(
                           "businessFunctionsTagIds",
@@ -58,6 +61,9 @@ const useCustomJobs = (options?: Options) => {
                           businessFunctionTagIds
                        ),
                     ]
+                  : []),
+               ...(jobTypesIds?.length
+                  ? [where("jobType", "in", jobTypesIds)]
                   : []),
                ...(totalItems ? [limit(totalItems)] : [])
             ).withConverter(createGenericConverter<CustomJob>())

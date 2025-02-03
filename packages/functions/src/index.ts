@@ -34,6 +34,7 @@ setGlobalOptions({
 import { bundles } from "./bundles"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
+import * as customerio from "./lib/customerio"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import * as streaming from "./lib/streaming"
@@ -81,9 +82,10 @@ import notificationLivestreams = require("./notificationLivestreams")
 import notificationOnboardings = require("./notificationOnboarding")
 import user = require("./user")
 import countries = require("./countries")
+import levels = require("./levels")
 
 // Auth
-exports.createNewUserAccount_v2 = auth.createNewUserAccount
+exports.createNewUserAccount_v3 = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
 exports.backfillUserData_eu = auth.backfillUserData
 exports.validateUserEmailWithPin_eu = auth.validateUserEmailWithPin
@@ -255,7 +257,7 @@ exports.periodicallyRemoveCachedDocument =
 // exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
-exports.getRecommendedEvents_v4 = recommendation.getRecommendedEvents
+exports.getRecommendedEvents_v5 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
@@ -305,8 +307,8 @@ exports.removeAndSyncUserSparkNotification_v2 =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
-exports.getSparksFeed_v8 = userSparks.getSparksFeed
-exports.markSparkAsSeenByUser_v4 = userSparks.markSparkAsSeenByUser
+exports.getSparksFeed_v9 = userSparks.getSparksFeed
+exports.markSparkAsSeenByUser_v5 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
 exports.trackSparkEvents_v6 = userSparks.trackSparkEvents
@@ -367,5 +369,15 @@ exports.syncUserInRegisteredLivestreams =
 // Utils
 exports.fetchUserCountryCode = fetchUserCountryCode
 exports.fetchCountriesList = countries.fetchCountriesList
+exports.searchCountries = countries.searchCountries
+exports.searchCities = countries.searchCities
 exports.fetchCountryCitiesList = countries.fetchCountryCitiesList
 exports.fetchCountryCityData = countries.fetchCountryCityData
+exports.fetchCityData = countries.fetchCityData
+exports.fetchCountryData = countries.fetchCountryData
+
+// Levels
+exports.getFollowedCreators = levels.getFollowedCreators
+
+// CustomerIO
+exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO

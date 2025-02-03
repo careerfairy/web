@@ -35,6 +35,10 @@ export interface UserData extends Identifiable {
    fcmTokens?: string[]
    linkedinUrl: string
    isAdmin?: boolean
+   /**
+    * Created account through regular signup flow and not group admin signup flow
+    */
+   isStudent?: boolean
    userResume: string
    resumeName?: string
    backFills: BackFillType[]
@@ -78,6 +82,10 @@ export interface UserData extends Identifiable {
     * */
    refreshTokenTime?: Timestamp
 
+   /**
+    * User's last used browser timezone
+    * Format: "Europe/Zurich", "Europe/Lisbon"
+    */
    timezone?: string
 
    /**
@@ -90,6 +98,10 @@ export interface UserData extends Identifiable {
     * Last user activity on any device
     */
    lastActivityAt: Timestamp
+   /**
+    * Field added on 2025-01-28. Users signed in before this date won't have it.
+    */
+   lastSignInAt?: Timestamp
    createdAt: Timestamp
 
    /**
@@ -143,6 +155,18 @@ export type UserDataPersonalInfo = Pick<
    UserData,
    "firstName" | "lastName" | "countryIsoCode" | "stateIsoCode" | "cityIsoCode"
 >
+
+export type UserAccountCreationAdditionalData = {
+   studyBackground?: Omit<StudyBackground, "startedAt" | "endedAt"> & {
+      startedAt?: Date
+      endedAt?: Date
+   }
+}
+
+export type AdditionalUserRecommendationInfo = {
+   studyBackgrounds?: StudyBackground[]
+   languages?: ProfileLanguage[]
+}
 
 // Collection /userData/:id/studyBackgrounds/:id
 export interface StudyBackground extends Identifiable {

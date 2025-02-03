@@ -112,6 +112,7 @@ export const ProfileBannerIllustration = () => {
                style={{
                   objectFit: "cover",
                }}
+               priority
             />
          </Box>
          <Box sx={styles.buttonWrapper}>

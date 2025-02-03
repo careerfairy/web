@@ -37,6 +37,7 @@ import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
 import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import {
    TalentProfile,
+   UserAccountCreationAdditionalData,
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserStats,
@@ -126,11 +127,14 @@ class FirebaseService {
       return await stopLivestreamRecording(data)
    }
 
-   createUserInAuthAndFirebase = async (userData) => {
+   createUserInAuthAndFirebase = async (
+      userData,
+      additionalData?: UserAccountCreationAdditionalData
+   ) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
-         "createNewUserAccount_v2"
+         "createNewUserAccount_v3"
       )
-      return createUserInAuthAndFirebase({ userData })
+      return createUserInAuthAndFirebase({ userData, additionalData })
    }
 
    getRegistrationSources = (args: GetRegistrationSourcesFnArgs) => {
@@ -3236,7 +3240,7 @@ class FirebaseService {
    }
 
    // Backfill user data
-   backfillUserData = async ({ timezone }) => {
+   backfillUserData = async ({ timezone }: Pick<UserData, "timezone">) => {
       return this.functions.httpsCallable("backfillUserData_eu")({ timezone })
    }
 

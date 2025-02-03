@@ -123,6 +123,9 @@ export const sadEmoji =
 
 export const cfLogo = "/logo-green.png"
 
+export const cvBackground =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/levels%2Fcv-template-background.png?alt=media"
+
 export const cfMobileIcon =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mobile-app%2Fapp-icon.png?alt=media"
 

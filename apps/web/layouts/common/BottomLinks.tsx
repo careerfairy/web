@@ -29,6 +29,7 @@ const BottomLinks = ({ hideMainLogo }: Props) => {
       <Stack
          spacing={2}
          mb={3}
+         mx={2}
          justifyContent="center"
          width={"100%"}
          divider={
@@ -49,14 +50,16 @@ const BottomLinks = ({ hideMainLogo }: Props) => {
             </Box>
          )}
 
-         <NavLink
-            href={supportPageLink}
-            id={"support-page"}
-            baseTextColor={"text.primary"}
-            title={shrunkLeftMenuIsActive ? "" : "Support"}
-            Icon={HelpCircle}
-            external
-         />
+         <Box mx={"16px !important"}>
+            <NavLink
+               href={supportPageLink}
+               id={"support-page"}
+               baseTextColor={"text.primary"}
+               title={shrunkLeftMenuIsActive ? "" : "Support"}
+               Icon={HelpCircle}
+               external
+            />
+         </Box>
       </Stack>
    )
 }

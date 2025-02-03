@@ -49,7 +49,7 @@ export const removeSnackbar = (key) => ({
 })
 
 export const sendGeneralError =
-   (errorInstance, message = GENERAL_ERROR, extra = {}) =>
+   (errorInstance, message = GENERAL_ERROR, extra = {}, options) =>
    async (dispatch) => {
       const error = errorInstance || ""
       console.error("error", error)
@@ -70,6 +70,7 @@ export const sendGeneralError =
          enqueueSnackbar({
             message: message,
             options: {
+               ...options,
                variant: "error",
                preventDuplicate: true,
             },
@@ -78,12 +79,13 @@ export const sendGeneralError =
    }
 
 export const sendSuccessMessage =
-   (message = "Success", title) =>
+   (message = "Success", title, options) =>
    async (dispatch) => {
       dispatch(
          enqueueSnackbar({
             message: message,
             options: {
+               ...options,
                variant: "success",
                preventDuplicate: true,
                key: message,
