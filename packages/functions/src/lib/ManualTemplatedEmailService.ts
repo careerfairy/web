@@ -4,6 +4,28 @@ import { ManualTemplatedEmailBuilder } from "./ManualTemplatedEmailBuilder"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
 
 const AUDIENCE = ["CH", "DE"]
+const EXCLUDED_USER_EMAILS = [
+   "imke00@web.de",
+   "tinika+eva@gmail.com",
+   "lucilechapuis73@gmail.com",
+   "zhoutianjing519@gmail.com",
+   "fabiennenina.hess@bluewin.ch",
+   "lucas@careerfairy.io",
+   "jose.monterrosasro@udlap.mx",
+   "stanley.wong26@yahoo.de",
+   "jfjoel.fischer@gmail.com",
+   "tanvi.chinnapa@rwth-aachen.de",
+   "j.senz@gmx.net",
+   "gautamj97@gmail.com",
+   "bossujung@outlook.com",
+   "vicki.windpassinger@icloud.com",
+   "kaayushie@gmail.com",
+   "senoussimht05@gmail.com",
+   "agnes.wiecek@gmail.com",
+   "msidimamachabi@yahoo.fr",
+   "tywoniukmagdalena@gmail.com",
+   "motouri@gmail.com",
+]
 
 /**
  * Gathers all the required data to build the release email
@@ -31,14 +53,19 @@ export class ManualTemplatedEmailService {
          overrideUsers
       )
 
-      const audience = users?.filter((user) =>
-         AUDIENCE.includes(user.universityCountryCode)
-      )
+      // TODO: Remove slice outside of testing
+      const audience = users
+         ?.slice(0, 10)
+         .filter(
+            (user) =>
+               AUDIENCE.includes(user.universityCountryCode) &&
+               !EXCLUDED_USER_EMAILS.includes(user.userEmail)
+         )
 
       this.subscribedUsers = convertDocArrayToDict(audience)
 
       this.logger.info(
-         "Total Users for levels teaser - ",
+         "Total Users for levels launch - ",
          Object.keys(this.subscribedUsers || {}).length
       )
 
