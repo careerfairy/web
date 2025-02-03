@@ -51,7 +51,7 @@ const dedupeProgressBar = new cliProgress.SingleBar(
    cliProgress.Presets.shades_classic
 )
 
-const PERFORM_UPDATE = true
+const PERFORM_UPDATE = false
 const SHOW_LONG_LOG = false
 
 export async function run() {
@@ -99,9 +99,11 @@ export async function run() {
             duplicationData[countryId].removedUniversities
 
          for (const removedUniversity of Object.keys(removedUniversities)) {
-            console.log(
-               `COUNTRY: ${countryId} - filtering users for ${removedUniversity}`
-            )
+            if (SHOW_LONG_LOG) {
+               console.log(
+                  `COUNTRY: ${countryId} - filtering users for ${removedUniversity}`
+               )
+            }
             const users = allUsers?.filter(
                (user) =>
                   user?.university?.code ===
@@ -127,17 +129,17 @@ export async function run() {
          }
       }
 
+      const totalAffectedUsers = Object.values(userUniversities).reduce(
+         (total, data) => total + data.userIds.length,
+         0
+      )
+
+      console.log(`Total number of users affected: ${totalAffectedUsers}`)
+
       if (SHOW_LONG_LOG) {
          console.log(
             `Users to be updated: ${JSON.stringify(userUniversities, null, 2)}`
          )
-
-         const totalAffectedUsers = Object.values(userUniversities).reduce(
-            (total, data) => total + data.userIds.length,
-            0
-         )
-
-         console.log(`Total number of users affected: ${totalAffectedUsers}`)
 
          console.log("🚀 ~ user update data:", userUniversities)
 
@@ -200,7 +202,6 @@ export async function run() {
             )
                .then(() => new Promise((resolve) => setTimeout(resolve, 1000)))
                .catch((e) => handleBulkWriterError(e, counter))
-            // await new Promise((resolve) => setTimeout(resolve, 1000))
          }
 
          const userUpdates: {
@@ -234,7 +235,6 @@ export async function run() {
             )
                .then(() => new Promise((resolve) => setTimeout(resolve, 1000)))
                .catch((e) => handleBulkWriterError(e, counter))
-            // await new Promise((resolve) => setTimeout(resolve, 1000))
          }
       }
 
