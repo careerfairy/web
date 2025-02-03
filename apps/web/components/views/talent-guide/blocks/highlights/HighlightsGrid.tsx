@@ -4,7 +4,6 @@ import { HighlightComponentType, SparkComponentType } from "data/hygraph/types"
 import dynamic from "next/dynamic"
 import { sxStyles } from "types/commonTypes"
 import { HighlightCardSkeleton } from "./HighlightCardSkeleton"
-import { LiveStreamDialogExtended } from "./LiveStreamDialogExtended"
 import { useHighlights } from "./control/HighlightsBlockContext"
 
 const styles = sxStyles({
@@ -15,6 +14,8 @@ const styles = sxStyles({
          md: "repeat(2, 220px)",
       },
       gap: 1,
+      justifyContent: "center",
+      width: "100%",
    },
 })
 
@@ -28,13 +29,17 @@ const HighlightCardComponent = dynamic(() => import("./HighlightCard"), {
 
 export const HighlightsGrid = () => {
    const { highlights } = useHighlights()
+
+   if (!highlights?.length) return null
+
    return (
-      <Box sx={styles.root}>
+      <Box data-testid="highlights-grid" sx={styles.root}>
          {highlights.map((highlight, index) => {
             const isSpark = highlight.__typename === "Spark"
             return (
                <SuspenseWithBoundary
                   fallback={<HighlightCardSkeleton />}
+                  hide
                   key={index}
                >
                   {isSpark ? (
@@ -51,7 +56,6 @@ export const HighlightsGrid = () => {
                </SuspenseWithBoundary>
             )
          })}
-         <LiveStreamDialogExtended />
       </Box>
    )
 }

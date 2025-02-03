@@ -1,4 +1,4 @@
-import { UserData } from "../../../users"
+import { AdditionalUserRecommendationInfo, UserData } from "../../../users"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
 import { RankedSparkRepository } from "./RankedSparkRepository"
 
@@ -6,7 +6,8 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    constructor(
       limit: number,
       private readonly user: UserData,
-      private readonly rankedSparkRepo: RankedSparkRepository
+      private readonly rankedSparkRepo: RankedSparkRepository,
+      private readonly userAdditionalInfo: AdditionalUserRecommendationInfo
    ) {
       super(limit)
    }
@@ -63,6 +64,22 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
             )
          )
       }
+
+      return this
+   }
+
+   public userStudyBackground() {
+      this.userAdditionalInfo.studyBackgrounds?.forEach((studyBackground) => {
+         if (studyBackground.fieldOfStudy?.id) {
+            // Fetch the top recommended sparks based on the user's field of study
+            this.addResults(
+               this.rankedSparkRepo.getSparksBasedOnFieldOfStudies(
+                  [studyBackground.fieldOfStudy.id],
+                  this.limit
+               )
+            )
+         }
+      })
 
       return this
    }

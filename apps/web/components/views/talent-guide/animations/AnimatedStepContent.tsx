@@ -1,7 +1,7 @@
 import FramerBox from "components/views/common/FramerBox"
 import { AnimatePresence, Variants } from "framer-motion"
 import React, { ReactElement, useCallback, useRef } from "react"
-import { useProgressHeaderHeight } from "../components/TalentGuideProgress"
+import { useProgressHeaderHeight } from "../hooks/useProgressHeaderHeight"
 
 const containerVariants: Variants = {
    hidden: { opacity: 0 },
@@ -67,13 +67,21 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
 
    return (
       <FramerBox
+         id="talent-guide-step-content"
          variants={containerVariants}
          initial="hidden"
          animate="visible"
+         sx={{
+            gap: "24px",
+            display: "flex",
+            flexDirection: "column",
+         }}
       >
          <AnimatePresence mode="sync">
             {React.Children.map(children, (child, index) => {
-               const isLastStep = index === React.Children.count(children) - 1
+               const numberOfSteps = React.Children.count(children)
+               const isLastStep = index === numberOfSteps - 1
+
                return (
                   <FramerBox
                      key={child.key}
@@ -82,9 +90,11 @@ export const AnimatedStepContent = ({ children }: AnimatedStepContentProps) => {
                      initial="hidden"
                      animate="visible"
                      exit="exit"
-                     onAnimationComplete={() =>
+                     data-testid={`levels-step-${index}`}
+                     onAnimationComplete={() => {
+                        if (numberOfSteps === 1) return // Don't scroll if there is only one step rendered
                         handleAnimationComplete(isLastStep)
-                     }
+                     }}
                   >
                      {child}
                   </FramerBox>

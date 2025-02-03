@@ -549,9 +549,13 @@ export class SparkFunctionsRepository
          userRepo,
          sparkRepo
       )
-      const recommendationService = await SparkRecommendationService.create(
-         dataFetcher
-      )
+
+      const [studyBackgrounds, recommendationService] = await Promise.all([
+         userRepo.getUserStudyBackgrounds(userId),
+         SparkRecommendationService.create(dataFetcher),
+      ])
+
+      recommendationService.setStudyBackgrounds(studyBackgrounds)
 
       const recommendedSparkIds =
          await recommendationService.getRecommendations(this.TARGET_SPARK_COUNT)

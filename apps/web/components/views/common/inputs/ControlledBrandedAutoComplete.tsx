@@ -15,7 +15,7 @@ import {
    useController,
    UseControllerProps,
 } from "react-hook-form"
-import BrandedCheckbox from "./BrandedCheckbox"
+import { BrandedCheckbox } from "./BrandedCheckbox"
 import BrandedTextField from "./BrandedTextField"
 
 export type Option = {

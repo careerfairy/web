@@ -20,6 +20,7 @@ import talentGuideReducer from "./talentGuideReducer"
 import talentProfileReducer from "./talentProfileReducer"
 import todosReducer from "./todosReducer"
 import userDataSetReducer from "./userDataSetReducer"
+import userSignUpReducer from "./userSignUpReducer"
 
 const reducers = {
    auth: authReducer,
@@ -42,6 +43,7 @@ const reducers = {
    talentProfile: talentProfileReducer,
    talentGuide: talentGuideReducer,
    profileSettings: profileSettingsReducer,
+   userSignUp: userSignUpReducer,
 } as const // only way to get type inference on firebaseReducer
 
 export default combineReducers<typeof reducers>(reducers)

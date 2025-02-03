@@ -29,7 +29,7 @@ export class ManualTemplatedEmailBuilder {
             },
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "app-launch",
+         Tag: "levels-teaser",
       })
    }
 

@@ -8,7 +8,7 @@ export type FlagKeys =
    | "jobHubV1"
    | "mentorsV1"
    | "talentProfileV1"
-
+   | "levelsV1"
 export type FeatureFlag = {
    /**
     * Initial state for the flag, usually disabled (false)

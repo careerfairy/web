@@ -9,7 +9,7 @@ import {
    BrandedAutocompleteProps,
    FormBrandedAutocomplete,
 } from "components/views/common/inputs/BrandedAutocomplete"
-import BrandedCheckbox from "components/views/common/inputs/BrandedCheckbox"
+import { BrandedCheckbox } from "components/views/common/inputs/BrandedCheckbox"
 import { BrandedTextFieldProps } from "components/views/common/inputs/BrandedTextField"
 import { useFormikContext } from "formik"
 import {

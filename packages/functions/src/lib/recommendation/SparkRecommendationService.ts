@@ -16,7 +16,11 @@ import {
    SharedSparks,
    SparkStats,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { UserData } from "@careerfairy/shared-lib/users"
+import {
+   AdditionalUserRecommendationInfo,
+   StudyBackground,
+   UserData,
+} from "@careerfairy/shared-lib/users"
 import { Timestamp } from "../../api/firestoreAdmin"
 import { SparksDataFetcher } from "./services/DataFetcherRecommendations"
 import { SparkBasedRecommendationsBuilder } from "./services/SparkBasedRecommendationsBuilder"
@@ -26,6 +30,10 @@ export default class SparkRecommendationService
    extends RecommendationSparksServiceCore
    implements IRecommendationSparksService
 {
+   private additionalUserInfo: AdditionalUserRecommendationInfo = {
+      studyBackgrounds: [],
+   }
+
    constructor(
       private readonly user: UserData,
       private readonly participatedEvents: LivestreamEvent[],
@@ -55,6 +63,7 @@ export default class SparkRecommendationService
                this.getRecommendedSparksBasedOnUserData(
                   this.user,
                   this.allSparks,
+                  this.additionalUserInfo,
                   limit
                )
             )
@@ -227,6 +236,20 @@ export default class SparkRecommendationService
          .mostCommonCompanySizes()
          .mostCommonCompanyCountryCode()
          .get()
+   }
+
+   public setAdditionalUserInfo(
+      additionalUserInfo: AdditionalUserRecommendationInfo
+   ): SparkRecommendationService {
+      this.additionalUserInfo = additionalUserInfo
+      return this
+   }
+
+   public setStudyBackgrounds(
+      studyBackgrounds: StudyBackground[]
+   ): SparkRecommendationService {
+      this.additionalUserInfo.studyBackgrounds = studyBackgrounds
+      return this
    }
 
    static async create(

@@ -1,10 +1,9 @@
-import ConditionalWrapper from "../ConditionalWrapper"
 import { Chip, Tooltip } from "@mui/material"
-import React from "react"
-import { SxProps } from "@mui/system"
-import { Theme } from "@mui/material/styles"
 import { ChipProps } from "@mui/material/Chip/Chip"
+import { Theme } from "@mui/material/styles"
+import { SxProps } from "@mui/system"
 import { combineStyles, sxStyles } from "types/commonTypes"
+import { ConditionalWrapper } from "../ConditionalWrapper"
 
 const styles = sxStyles({
    chipNormal: {

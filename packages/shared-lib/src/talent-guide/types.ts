@@ -11,6 +11,11 @@ export enum TalentGuideModuleCategory {
 export interface TalentGuideProgress extends Identifiable {
    userAuthUid: string
    moduleHygraphId: string
+   /**
+    * The url slug of the level, eg "1", "2", "3"
+    * Used for debugging pages
+    */
+   levelSlug: string
 
    // Core progress tracking
    currentStepIndex: number
@@ -30,6 +35,7 @@ export interface TalentGuideProgress extends Identifiable {
    // Engagement metrics
    totalVisits: number
    lastVisitedAt: Timestamp | null
+   restartCount: number
 }
 
 export const QUIZ_STATE = {
@@ -62,4 +68,75 @@ export interface TalentGuideQuiz extends Identifiable {
    attemptedAt: Timestamp | null
 
    lastUpdated: Timestamp | null
+}
+
+export const FEEDBACK_TAG_CATEGORY = {
+   RELEVANCE: {
+      id: "relevance",
+      label: {
+         en: "Relevance",
+         de: "Relevanz",
+      },
+   },
+   INTERACTIONS: {
+      id: "interactions",
+      label: {
+         en: "Interactions",
+         de: "Interaktive",
+      },
+   },
+   PACE: {
+      id: "pace",
+      label: {
+         en: "Pace",
+         de: "Zeitaufwand",
+      },
+   },
+   DIFFICULTY: {
+      id: "difficulty",
+      label: {
+         en: "Difficulty",
+         de: "Schwierigskeitgrad",
+      },
+   },
+   CLARITY: {
+      id: "clarity",
+      label: {
+         en: "Clarity",
+         de: "Klarheit",
+      },
+   },
+   STRUCTURE: {
+      id: "structure",
+      label: {
+         en: "Structure",
+         de: "Struktur",
+      },
+   },
+   OTHERS: {
+      id: "others",
+      label: {
+         en: "Others",
+         de: "Anderes",
+      },
+   },
+} as const
+
+export type FEEDBACK_TAG_CATEGORY =
+   (typeof FEEDBACK_TAG_CATEGORY)[keyof typeof FEEDBACK_TAG_CATEGORY]["id"]
+
+export type TalentGuideRating = 1 | 2 | 3 | 4 | 5
+
+// Collection path: talentGuideFeedback/{userAuthUid}_{moduleHygraphId}
+export interface TalentGuideFeedback extends Identifiable {
+   userAuthUid: string
+   moduleHygraphId: string
+
+   rating: TalentGuideRating
+
+   selectedTagIds: FEEDBACK_TAG_CATEGORY[]
+
+   // Metadata
+   submittedAt: Timestamp
+   lastUpdated: Timestamp
 }

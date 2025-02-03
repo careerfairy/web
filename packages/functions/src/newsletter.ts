@@ -96,7 +96,7 @@ export const manualNewsletter = onRequest(runtimeSettings, async (req, res) => {
 export const manualTemplatedEmail = onRequest(
    runtimeSettings,
    async (req, res) => {
-      logger.info("manualTemplatedEmail: v14.0 - App live announcement")
+      logger.info("manualTemplatedEmail: v17.0 - Levels teaser")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -117,13 +117,11 @@ export const manualTemplatedEmail = onRequest(
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("App live announcement email sent to everyone.")
+         res.status(200).send("Levels teaser email sent to everyone.")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "App live announcement email sent to " +
-               receivedEmails.join(", ") +
-               "."
+            "Levels teaser email sent to " + receivedEmails.join(", ") + "."
          )
       }
    }
@@ -170,7 +168,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      logger.info("App live announcement email already sent, skipping")
+      logger.info("Levels teaser email already sent, skipping execution")
       return
    }
 
@@ -194,7 +192,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   logger.info("App live announcement email execution done")
+   logger.info("Levels teaser email execution done")
 }
 
 /**

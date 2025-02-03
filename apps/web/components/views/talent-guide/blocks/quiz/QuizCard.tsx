@@ -6,7 +6,7 @@ import { Fragment, useRef } from "react"
 import { toggleQuizAnswer } from "store/reducers/talentGuideReducer"
 import { useQuizState } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
-import { useProgressHeaderHeight } from "../../components/TalentGuideProgress"
+import { useProgressHeaderHeight } from "../../hooks/useProgressHeaderHeight"
 import { AnswerButton } from "./AnswerButton"
 
 const styles = sxStyles({
@@ -34,7 +34,7 @@ type AnswerVariant = "default" | "selected" | "correct" | "correction" | "wrong"
 
 type Props = QuizModelType
 
-export const QuizCard = ({ question, correction, answers, id }: Props) => {
+export const QuizCard = ({ question, answers, id }: Props) => {
    const quizState = useQuizState(id)
    const dispatch = useAppDispatch()
    const correctionRef = useRef<HTMLDivElement>(null)
@@ -48,6 +48,15 @@ export const QuizCard = ({ question, correction, answers, id }: Props) => {
    const handleButtonClick = (answerId: string) => {
       dispatch(toggleQuizAnswer({ quizId: id, answerId }))
    }
+
+   // Selected Answers will always be an array of length 1 or 0
+   // To provide support for multiple selected answers in the future, we need to change this
+   const selectedAnswer = quizState.selectedAnswerIds[0]
+
+   // Find the correction for the selected answer
+   const correctionText = answers.find(
+      (answer) => answer.id === selectedAnswer
+   )?.correction
 
    return (
       <Fragment>
@@ -87,15 +96,16 @@ export const QuizCard = ({ question, correction, answers, id }: Props) => {
             <Box ref={correctionRef} sx={styles.correction}>
                <Typography component="p" variant="small">
                   <Box component="span" sx={styles.correctionText}>
-                     Correction:
+                     Inkorrekt:
                   </Box>{" "}
-                  {correction}
+                  {correctionText}
                </Typography>
             </Box>
          </Collapse>
       </Fragment>
    )
 }
+
 type GetAnswerVariantOptions = {
    quizHasBeenAttempted: boolean
    isCorrect: boolean

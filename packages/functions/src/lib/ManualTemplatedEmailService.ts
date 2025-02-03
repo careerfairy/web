@@ -3,40 +3,7 @@ import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { ManualTemplatedEmailBuilder } from "./ManualTemplatedEmailBuilder"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
 
-const EUROPEAN_COUNTRY_CODES = [
-   "AT",
-   "AD",
-   "BE",
-   "BG",
-   "CH",
-   "CZ",
-   "DE",
-   "DK",
-   "EE",
-   "ES",
-   "FI",
-   "FR",
-   "GB",
-   "GR",
-   "HR",
-   "HU",
-   "IE",
-   "IT",
-   "LI",
-   "LU",
-   "MC",
-   "MT",
-   "NL",
-   "NO",
-   "PL",
-   "PT",
-   "RO",
-   "RS",
-   "SE",
-   "SI",
-   "SK",
-   "SM",
-]
+const AUDIENCE = ["CH", "DE"]
 
 /**
  * Gathers all the required data to build the release email
@@ -64,14 +31,14 @@ export class ManualTemplatedEmailService {
          overrideUsers
       )
 
-      const europeanUsers = users.filter((user) =>
-         EUROPEAN_COUNTRY_CODES.includes(user.universityCountryCode)
+      const audience = users?.filter((user) =>
+         AUDIENCE.includes(user.universityCountryCode)
       )
 
-      this.subscribedUsers = convertDocArrayToDict(europeanUsers)
+      this.subscribedUsers = convertDocArrayToDict(audience)
 
       this.logger.info(
-         "Total Users for app live announcement - ",
+         "Total Users for levels teaser - ",
          Object.keys(this.subscribedUsers || {}).length
       )
 

@@ -49,10 +49,11 @@ const SparkCard = ({ spark, index }: SparkCardProps) => {
    } = useHighlights()
 
    const sparkPresenter = useMemo(() => {
+      if (!sparkData) return null
       return SparkPresenter.createFromFirebaseObject(sparkData)
    }, [sparkData])
 
-   if (!sparkData) return null
+   if (!sparkPresenter) return null
 
    return (
       <>

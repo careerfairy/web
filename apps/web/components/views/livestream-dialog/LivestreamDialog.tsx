@@ -80,6 +80,13 @@ const styles = sxStyles({
    },
 })
 
+export const AllDialogSettings = {
+   Levels: "Levels",
+   SparksFeed: "SparksFeed",
+} as const
+
+export type DialogSetting = keyof typeof AllDialogSettings
+
 type Props = {
    serverSideLivestream?: LivestreamEvent
    livestreamId: string
@@ -112,6 +119,7 @@ type Props = {
    speakerId?: string
    isDiscoverCompanySparksOpen?: boolean
    handleDiscoverCompanySparks?: () => void
+   setting?: DialogSetting
    appear?: boolean
 }
 
@@ -247,6 +255,7 @@ const Content: FC<ContentProps> = ({
    currentSparkId,
    jobId,
    speakerId,
+   setting,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -431,6 +440,7 @@ const Content: FC<ContentProps> = ({
          currentSparkId,
          isDiscoverCompanySparksOpen,
          handleDiscoverCompanySparks,
+         setting,
       }),
       [
          goToView,
@@ -452,6 +462,7 @@ const Content: FC<ContentProps> = ({
          currentSparkId,
          isDiscoverCompanySparksOpen,
          handleDiscoverCompanySparks,
+         setting,
       ]
    )
 
@@ -547,6 +558,11 @@ type DialogContextType = {
    currentSparkId?: string
    isDiscoverCompanySparksOpen: boolean
    handleDiscoverCompanySparks: () => void
+   /**
+    * Setting in which the dialog is shown. Used for conditional rendering, like showing
+    * different text based on the dialog being shown on the levels page or the sparks feed.
+    * */
+   setting?: DialogSetting
 }
 
 const getPageIndex = (page: Props["page"]): number => {
@@ -582,6 +598,7 @@ const DialogContext = createContext<DialogContextType>({
    currentSparkId: null,
    isDiscoverCompanySparksOpen: false,
    handleDiscoverCompanySparks: () => {},
+   setting: null,
 })
 
 export const useLiveStreamDialog = () => {
