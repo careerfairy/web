@@ -19,7 +19,7 @@ const styles = sxStyles({
    },
 })
 
-export const RestartModuleButton = () => {
+export const RestartLevelButton = () => {
    const dispatch = useAppDispatch()
    const [showConfirmation, setShowConfirmation] = useState(false)
    const isLoading = useIsRestartingModule()
@@ -33,18 +33,18 @@ export const RestartModuleButton = () => {
                variant="outlined"
                startIcon={<RestartIcon />}
             >
-               Restart Level
+               Level neustarten
             </FloatingButton>
          )}
 
          <ConfirmationDialog
             open={showConfirmation}
             handleClose={() => setShowConfirmation(false)}
-            title="Restart module now?"
-            description="Are you sure you want to restart this module? Your progress will be reset, but you can always come back to complete it again."
+            title="Level neustarten?"
+            description="Bist du dir sicher? Dein Fortschritt wird nicht gespeichert, aber du kannst jederzeit zurückkommen und den Level abschliessen."
             icon={<Box component={RestartIcon} sx={styles.icon} />}
             primaryAction={{
-               text: "Restart",
+               text: "Neustarten",
                callback: () => {
                   dispatch(restartModule())
                   setShowConfirmation(false)
@@ -55,7 +55,7 @@ export const RestartModuleButton = () => {
                loading: isLoading,
             }}
             secondaryAction={{
-               text: "Cancel",
+               text: "Zurück",
                callback: () => setShowConfirmation(false),
                color: "grey",
                variant: "outlined",

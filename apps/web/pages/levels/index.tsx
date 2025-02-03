@@ -14,14 +14,18 @@ import {
 
 interface TalentGuidePageProps {
    pages: Page<TalentGuideModule>[]
+   rootPage: Page
 }
 
-const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ pages }) => {
+const TalentGuidePage: NextPage<TalentGuidePageProps> = ({
+   pages,
+   rootPage,
+}) => {
    const { isPreview } = useRouter()
 
    return (
       <Fragment>
-         <SEO {...getTalentGuideOverviewSeoProps(pages, isPreview)} />
+         <SEO {...getTalentGuideOverviewSeoProps(rootPage, pages)} />
          <GenericDashboardLayout pageDisplayName="Levels">
             <LevelsContainer pages={pages} />
             {Boolean(isPreview) && <PreviewModeAlert />}
@@ -43,10 +47,12 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
    const service = preview ? tgBackendPreviewService : tgBackendService
 
    const pages = await service.getAllTalentGuideModulePages()
+   const rootPage = await service.getTalentGuideRootPage()
 
    return {
       props: {
          pages,
+         rootPage,
       },
       revalidate: process.env.NODE_ENV === "development" ? false : 60,
    }

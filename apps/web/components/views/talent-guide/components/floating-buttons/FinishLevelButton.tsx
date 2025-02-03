@@ -3,7 +3,7 @@ import { proceedToNextStep } from "store/reducers/talentGuideReducer"
 import { useIsLoadingNextStep } from "store/selectors/talentGuideSelectors"
 import { FloatingButton } from "./FloatingButton"
 
-export const FinishModuleButton = () => {
+export const FinishLevelButton = () => {
    const dispatch = useAppDispatch()
    const isLoadingNextStep = useIsLoadingNextStep()
 
@@ -16,7 +16,7 @@ export const FinishModuleButton = () => {
          variant="outlined"
          loading={isLoadingNextStep}
       >
-         Finish Level
+         Level abschliessen
       </FloatingButton>
    )
 }

@@ -7,12 +7,10 @@ import {
    useModuleId,
    useQuizState,
 } from "store/selectors/talentGuideSelectors"
-import { FinishModuleButton } from "./FinishModuleButton"
+import { FinishLevelButton } from "./FinishLevelButton"
 import { NextButton } from "./NextButton"
 import { QuizButton } from "./QuizButton"
-import { RestartModuleButton } from "./RestartModuleButton"
-
-export const completedQuizIds = ["abc", "def", "ghi"] // TODO: store and get from firestore
+import { RestartLevelButton } from "./RestartLevelButton"
 
 export const StepActionButton = () => {
    const currentStep = useCurrentStep()
@@ -27,20 +25,20 @@ export const StepActionButton = () => {
 
    // Show restart button if module is completed
    if (isModuleCompleted) {
-      return <RestartModuleButton />
+      return <RestartLevelButton />
    }
 
    if (currentQuiz) {
       const quizIsAttempted = quizState.state !== QUIZ_STATE.NOT_ATTEMPTED
 
-      if (quizIsAttempted && isLastStep) return <FinishModuleButton />
+      if (quizIsAttempted && isLastStep) return <FinishLevelButton />
 
       if (quizIsAttempted) return <NextButton />
 
       return <QuizButton quiz={currentQuiz} quizStatus={quizState} />
    }
 
-   if (isLastStep) return <FinishModuleButton />
+   if (isLastStep) return <FinishLevelButton />
 
    return <NextButton />
 }

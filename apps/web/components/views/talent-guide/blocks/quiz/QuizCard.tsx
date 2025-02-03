@@ -49,9 +49,13 @@ export const QuizCard = ({ question, answers, id }: Props) => {
       dispatch(toggleQuizAnswer({ quizId: id, answerId }))
    }
 
-   // Find the correction text from the correct answer
-   const correctAnswerCorrection = answers.find(
-      (answer) => answer.isCorrect
+   // Selected Answers will always be an array of length 1 or 0
+   // To provide support for multiple selected answers in the future, we need to change this
+   const selectedAnswer = quizState.selectedAnswerIds[0]
+
+   // Find the correction for the selected answer
+   const correctionText = answers.find(
+      (answer) => answer.id === selectedAnswer
    )?.correction
 
    return (
@@ -92,9 +96,9 @@ export const QuizCard = ({ question, answers, id }: Props) => {
             <Box ref={correctionRef} sx={styles.correction}>
                <Typography component="p" variant="small">
                   <Box component="span" sx={styles.correctionText}>
-                     Correction:
+                     Inkorrekt:
                   </Box>{" "}
-                  {correctAnswerCorrection}
+                  {correctionText}
                </Typography>
             </Box>
          </Collapse>

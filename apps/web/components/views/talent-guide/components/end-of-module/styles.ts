@@ -8,6 +8,7 @@ export const layoutStyles = sxStyles({
       justifyContent: "center",
       minHeight: "100dvh",
       position: "relative",
+      overflow: "hidden",
    },
 })
 

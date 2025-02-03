@@ -154,7 +154,11 @@ export const NextModuleSection = ({ nextModule }: Props) => {
                   }))
                }}
                sx={{
-                  paddingBottom: isShortScreen ? 2 : isMobile ? undefined : 10,
+                  paddingBottom: isShortScreen
+                     ? 2
+                     : isMobile
+                     ? undefined
+                     : "20%",
                }}
             >
                <FramerBox
@@ -210,15 +214,15 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
             sx={nextModuleStyles.bottomTitle}
             component="h3"
          >
-            Ready for More?
+            Bock auf mehr?
          </Typography>
          <Typography
             variant="medium"
             sx={nextModuleStyles.bottomText}
             component="p"
          >
-            Fantastic work on clearing this level! Click below to continue your
-            learning journey and tackle the next challenge.
+            Top! Mit nur einem Klick geht&apos;s weiter auf deiner persönlichen
+            Job Journey.
          </Typography>
          <Button
             color="primary"
@@ -231,7 +235,7 @@ const BottomContent = ({ nextModule }: BottomContentProps) => {
             href={nextModule ? `/levels/${nextModule.slug}` : "/levels"}
             sx={nextModuleStyles.bottomButton}
          >
-            Start next level
+            Nächstes Level starten
          </Button>
       </Fragment>
    )

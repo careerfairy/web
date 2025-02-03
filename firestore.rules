@@ -230,11 +230,9 @@ service cloud.firestore {
                 && request.resource.data.completedStepIds is list
                 && request.resource.data.percentageComplete >= 0
                 && request.resource.data.percentageComplete <= 100
-                && request.resource.data.totalVisits >= resource.data.totalVisits
                 && request.resource.data.lastUpdated is timestamp
                 && request.resource.data.lastVisitedAt is timestamp
                 && (request.resource.data.completedAt is timestamp || request.resource.data.completedAt == null)
-                && request.resource.data.restartCount >= resource.data.restartCount;
 
             // Only allow admins to delete progress for demo purposes
             allow delete: if isCFAdmin();
