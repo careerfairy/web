@@ -5,6 +5,8 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    datePicker: {
+      backgroundColor: (theme) => theme.brand.white[300],
+      borderRadius: "8px",
       width: "100%",
       "& .MuiOutlinedInput-root": {
          "& fieldset": {
@@ -17,7 +19,8 @@ const styles = sxStyles({
          },
          "&.Mui-focused fieldset": {
             // focused border (when clicked/opened)
-            borderColor: "#EDE7FD",
+            borderWidth: "1px",
+            borderColor: (theme) => theme.brand.purple[200],
          },
          "&.Mui-disabled fieldset": {
             borderColor: (theme) => theme.brand.purple[50],
@@ -61,21 +64,24 @@ export const AcademicDatePicker = ({
          slotProps={{
             textField: {
                onClick: () => setIsOpen(true),
-               placeholder: label,
+               // placeholder: label,
                error: Boolean(fieldState.error),
                helperText:
                   fieldState.error?.type == "typeError"
                      ? `${label} is required`
                      : undefined,
+               label: label,
             },
+
             actionBar: {
                actions: ["clear"],
             },
          }}
+         format="MMMM, yyyy"
          disableOpenPicker
          disabled={disabled}
          views={["month", "year"]}
-         label={label}
+         // label={label}
          closeOnSelect
          value={fieldValue}
          onChange={(value) => {
