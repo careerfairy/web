@@ -11,7 +11,7 @@ const styles = sxStyles({
          "& fieldset": {
             borderRadius: "8px",
             border: (theme) => `1px solid ${theme.brand.purple[100]}`,
-            backgroundColor: (theme) => theme.brand.white[300],
+            backgroundColor: "#F7F8FC",
          },
          "&:hover fieldset": {
             borderRadius: "8px",
@@ -24,9 +24,16 @@ const styles = sxStyles({
             border: (theme) => `1px solid ${theme.brand.purple[300]}`,
             backgroundColor: (theme) => theme.brand.white[300],
          },
-         "&.Mui-disabled fieldset": {
-            borderColor: (theme) => theme.brand.purple[50],
+      },
+      ".Mui-disabled": {
+         borderColor: (theme) => theme.brand.purple[50],
+         backgroundColor: "#F7F8FC",
+         opacity: 0.5,
+         "&:hover": {
+            backgroundColor: "#F7F8FC",
+            borderColor: (theme) => `${theme.brand.purple[50]} !important`,
          },
+         cursor: "not-allowed",
       },
    },
 })
@@ -60,7 +67,7 @@ export const AcademicDatePicker = ({
          }}
          slotProps={{
             textField: {
-               onClick: () => setIsOpen(true),
+               onClick: disabled ? undefined : () => setIsOpen(true),
                error: Boolean(fieldState.error),
                helperText:
                   fieldState.error?.type == "typeError"
@@ -75,7 +82,7 @@ export const AcademicDatePicker = ({
          format="MMMM, yyyy"
          disableOpenPicker
          disabled={disabled}
-         views={["month", "year"]}
+         views={["year", "month"]}
          closeOnSelect
          value={fieldValue}
          onChange={(value) => {

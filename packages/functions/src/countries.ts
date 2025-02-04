@@ -119,11 +119,12 @@ export const searchCities = functions
    .https.onCall((data: SearchCityOptions) => {
       const { searchValue, countryId } = data
 
-      const cities: CityOption[] = City.getCitiesOfCountry(countryId)
-         .map((city) => ({
-            name: city.name,
-            id: generateCityId(city),
-            stateIsoCode: city.stateCode,
+      const states = State.getStatesOfCountry(countryId)
+      const cities: CityOption[] = states
+         .map((state) => ({
+            name: state.name,
+            id: state.isoCode,
+            stateIsoCode: state.isoCode,
          }))
          .sort((cityA, cityB) => cityA.name.localeCompare(cityB.name))
 
@@ -147,6 +148,33 @@ export const fetchCountryCitiesList = functions
             name: city.name,
             id: generateCityId(city),
             stateIsoCode: city.stateCode,
+         })) ?? []
+
+      const citiesMap: Record<string, CityOption> = cities
+         .sort((cityA, cityB) => cityA.name.localeCompare(cityB.name))
+         .reduce(
+            (acc, city) => ({
+               ...acc,
+               [city.id]: city,
+            }),
+            {} as Record<string, CityOption>
+         )
+
+      return citiesMap
+   })
+
+export const fetchCountryStatesList = functions
+   .region(config.region)
+   .https.onCall((data: CountryCitiesOptions) => {
+      const { countryCode } = data
+
+      const states = State.getStatesOfCountry(countryCode)
+
+      const cities: CityOption[] =
+         states.map((state) => ({
+            name: state.name,
+            id: state.isoCode,
+            stateIsoCode: state.isoCode,
          })) ?? []
 
       const citiesMap: Record<string, CityOption> = cities
@@ -200,7 +228,6 @@ export const fetchCityData = functions
    .region(config.region)
    .https.onCall((data: CityDataOptions) => {
       const { generatedCityId } = data
-      console.log("🚀 ~ .https.onCall ~ generatedCityId:", generatedCityId)
 
       let cityResult: CityOption | null = null
 

@@ -20,6 +20,8 @@ import {
    Switch,
    Typography,
 } from "@mui/material"
+import { usePreFetchCityById } from "components/custom-hook/countries/useCityById"
+import { usePreFetchCitySearch } from "components/custom-hook/countries/useCitySearch"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useUserLanguages } from "components/custom-hook/user/useUserLanguages"
@@ -126,6 +128,10 @@ const LocationInformation = () => {
    const hasSelectedAllLanguages =
       userLanguages.length === languageOptionCodes.length
 
+   // Warming up city related cloud functions (Used in LocationInformation)
+   usePreFetchCityById(null)
+   usePreFetchCitySearch("CH", "Zurich")
+
    const updateFields = useCallback(
       async (fieldToUpdate) => {
          try {
@@ -231,7 +237,7 @@ const LocationInformation = () => {
       if (!talentProfileV1) return
       const isDisabled =
          !userData.countryIsoCode ||
-         !userData.cityIsoCode ||
+         !userData.stateName ||
          !userData.stateIsoCode ||
          !userLanguages?.length
       dispatch(
@@ -242,7 +248,7 @@ const LocationInformation = () => {
       )
    }, [
       userData.countryIsoCode,
-      userData.cityIsoCode,
+      userData.stateName,
       userData.stateIsoCode,
       userLanguages?.length,
       dispatch,

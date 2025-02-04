@@ -1442,7 +1442,7 @@ export class FirebaseUserRepository
          | "lastName"
          | "countryIsoCode"
          | "stateIsoCode"
-         | "cityIsoCode"
+         | "stateName"
       > = {
          ...personalInfo,
       }
