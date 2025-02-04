@@ -1,34 +1,31 @@
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    datePicker: {
-      backgroundColor: (theme) => theme.brand.white[300],
-      borderRadius: "8px",
       width: "100%",
       "& .MuiOutlinedInput-root": {
          "& fieldset": {
-            // default border
-            borderColor: (theme) => theme.brand.purple[100],
+            borderRadius: "8px",
+            border: (theme) => `1px solid ${theme.brand.purple[100]}`,
+            backgroundColor: (theme) => theme.brand.white[300],
          },
          "&:hover fieldset": {
-            // hover border
-            borderColor: (theme) => theme.brand.purple[200],
+            borderRadius: "8px",
+            border: (theme) => `1px solid ${theme.brand.purple[200]}`,
+            backgroundColor: (theme) => theme.brand.white[400],
          },
          "&.Mui-focused fieldset": {
             // focused border (when clicked/opened)
-            borderWidth: "1px",
-            borderColor: (theme) => theme.brand.purple[200],
+            borderRadius: "8px",
+            border: (theme) => `1px solid ${theme.brand.purple[300]}`,
+            backgroundColor: (theme) => theme.brand.white[300],
          },
          "&.Mui-disabled fieldset": {
             borderColor: (theme) => theme.brand.purple[50],
-         },
-      },
-      "& .MuiInputLabel-root": {
-         "&.Mui-focused": {
-            color: (theme) => theme.brand.purple[500],
          },
       },
    },
@@ -48,23 +45,22 @@ export const AcademicDatePicker = ({
    disabled,
 }: Props) => {
    const [isOpen, setIsOpen] = useState(false)
-
    const { setValue, getFieldState } = useFormContext()
-
    const fieldValue: Date = useWatch({
       name: fieldName,
    })
-
    const fieldState = getFieldState(fieldName)
 
    return (
       <DatePicker
          open={isOpen}
          onClose={() => setIsOpen(false)}
+         slots={{
+            textField: BrandedTextField,
+         }}
          slotProps={{
             textField: {
                onClick: () => setIsOpen(true),
-               // placeholder: label,
                error: Boolean(fieldState.error),
                helperText:
                   fieldState.error?.type == "typeError"
@@ -72,7 +68,6 @@ export const AcademicDatePicker = ({
                      : undefined,
                label: label,
             },
-
             actionBar: {
                actions: ["clear"],
             },
@@ -81,7 +76,6 @@ export const AcademicDatePicker = ({
          disableOpenPicker
          disabled={disabled}
          views={["month", "year"]}
-         // label={label}
          closeOnSelect
          value={fieldValue}
          onChange={(value) => {
