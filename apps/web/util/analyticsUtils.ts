@@ -1,5 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
+import CookiesUtil from "./CookiesUtil"
 
 // Only import types, will not be part of the bundle, real package is loaded by GTM
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
@@ -83,7 +84,20 @@ export const analyticsTrackEvent = (
 ) => {
    if (typeof window === "undefined") return
 
-   window["analytics"].push(["track", eventName, properties])
+   const enrichedProperties = { ...properties }
+
+   // Incase cookies are not available, we don't want to crash the analytics tracking
+   try {
+      const utmParams = CookiesUtil.getUTMParams()
+
+      if (utmParams) {
+         enrichedProperties.acquisition_utm_params = utmParams
+      }
+   } catch (error) {
+      console.error("Failed to retrieve UTM params:", error)
+   }
+
+   window["analytics"].push(["track", eventName, enrichedProperties])
 }
 
 /**
