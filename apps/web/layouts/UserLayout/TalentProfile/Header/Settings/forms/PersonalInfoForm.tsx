@@ -120,7 +120,7 @@ const CountriesDropdown = () => {
       setValue,
    } = useFormContext<PersonalInfoSchemaType>()
 
-   const { data: countriesList } = useCountriesList()
+   const { data: countriesList, isLoading } = useCountriesList(false)
 
    return (
       <ControlledBrandedAutoComplete
@@ -136,10 +136,12 @@ const CountriesDropdown = () => {
                },
             },
          }}
+         loading={isLoading}
          autocompleteProps={{
             id: "countryIsoCode",
             disabled: isSubmitting,
             disableClearable: true,
+            loadingText: "Fetching countries..",
             autoHighlight: true,
             selectOnFocus: false,
             getOptionLabel: (option) =>
