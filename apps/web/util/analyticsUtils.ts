@@ -4,6 +4,7 @@ import CookiesUtil from "./CookiesUtil"
 
 // Only import types, will not be part of the bundle, real package is loaded by GTM
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
+import { AnalyticsEvent } from "./analytics/types"
 
 /**
  * Push an event to the GTM DataLayer
@@ -11,7 +12,10 @@ import { type GroupTraits } from "@customerio/cdp-analytics-browser"
  * @param eventName
  * @param optionalVariables
  */
-export const dataLayerEvent = (eventName: string, optionalVariables = {}) => {
+export const dataLayerEvent = (
+   eventName: AnalyticsEvent,
+   optionalVariables = {}
+) => {
    dataLayerWrapper({
       event: eventName,
       ...optionalVariables,
@@ -50,7 +54,7 @@ const dataLayerWrapper = (event: object) => {
  * @param optionalVariables
  */
 export const dataLayerLivestreamEvent = (
-   eventName: string,
+   eventName: AnalyticsEvent,
    livestream: LivestreamEvent,
    optionalVariables = {}
 ) => {
@@ -79,7 +83,7 @@ export const dataLayerLivestreamEvent = (
  * @param properties Optional properties for the event
  */
 export const analyticsTrackEvent = (
-   eventName: string,
+   eventName: AnalyticsEvent,
    properties: Record<string, any> = {}
 ) => {
    if (typeof window === "undefined") return
