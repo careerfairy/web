@@ -80,7 +80,7 @@ const styles = sxStyles({
       padding: "3.5px 4.083px 3.5px 3.5px",
    },
    startAdornmentSchoolName: {
-      fontSize: "16px !important",
+      fontSize: "14px !important",
       fontWeight: "400 !important",
       color: (theme) => `${theme.palette.neutral[900]} !important`,
       textOverflow: "ellipsis",
