@@ -32,11 +32,6 @@ const styles = sxStyles({
          md: "0px 4px 16px rgba(0, 0, 0, 0.08)",
       },
    },
-   dropdownPaper: {
-      // width: "100dvw !important",
-      // backgroundColor: (theme) => theme.brand.white[50],
-      // pt: "85px",
-   },
    schoolIcon: {
       width: "40px",
       height: "40px",
@@ -64,6 +59,64 @@ const styles = sxStyles({
    universityOptionCountry: {
       fontWeight: 400,
       color: (theme) => theme.palette.neutral[500],
+   },
+   startAdornmentRoot: {
+      pt: "4px",
+      pb: "8px",
+      "&.MuiInputAdornment-root": {
+         display: { xs: "none", md: "flex" },
+         ".Mui-focused &": { display: "none" },
+      },
+      "& .MuiTypography-root": {
+         fontSize: "12px",
+         lineHeight: "16px",
+         fontWeight: 400,
+         color: "#525252",
+      },
+   },
+   startAdornmentSchoolIcon: {
+      width: "28px",
+      height: "28px",
+      padding: "3.5px 4.083px 3.5px 3.5px",
+   },
+   startAdornmentSchoolName: {
+      fontSize: "16px !important",
+      fontWeight: "400 !important",
+      color: (theme) => `${theme.palette.neutral[900]} !important`,
+      textOverflow: "ellipsis",
+      overflow: "hidden",
+      whiteSpace: "nowrap",
+      maxWidth: {
+         xs: "200px",
+         sm: "310px",
+         md: "580px",
+      },
+   },
+   textField: {
+      "& input": {
+         width: 0,
+         p: 0,
+         "&:focus": {
+            width: "100%",
+            p: "16.5px 14px",
+         },
+      },
+   },
+   autocomplete: {
+      ".Mui-disabled": {
+         backgroundColor: "#F7F8FC",
+         borderColor: (theme) => theme.brand.purple[50],
+         opacity: 0.5,
+         "&:hover": {
+            backgroundColor: "#F7F8FC",
+            borderColor: (theme) => `${theme.brand.purple[50]} !important`,
+
+            cursor: "not-allowed",
+         },
+      },
+      ".MuiFormHelperText-root.Mui-disabled": {
+         backgroundColor: "unset",
+      },
    },
 })
 
@@ -122,8 +175,6 @@ const SelectUniversitiesDropDown = ({
    ) => {
       setValue(name, option?.id, { shouldValidate: true })
       setIsFocused(false)
-      // const target = event.target as HTMLElement
-      // target.blur()
 
       const inputElement = document.querySelector(
          "#selectUniversity"
@@ -152,47 +203,17 @@ const SelectUniversitiesDropDown = ({
                         direction="row"
                         spacing={1}
                         alignItems="center"
-                        sx={{
-                           pt: "4px",
-                           pb: "8px",
-                           "&.MuiInputAdornment-root": {
-                              display: { xs: "none", md: "flex" },
-                              ".Mui-focused &": { display: "none" },
-                           },
-                           "& .MuiTypography-root": {
-                              fontSize: "12px",
-                              lineHeight: "16px",
-                              fontWeight: 400,
-                              color: "#525252",
-                           },
-                        }}
+                        sx={styles.startAdornmentRoot}
                      >
                         <SchoolIcon
                            sx={[
                               styles.schoolIcon,
-                              {
-                                 width: "28px",
-                                 height: "28px",
-                                 padding: "3.5px 4.083px 3.5px 3.5px",
-                              },
+                              styles.startAdornmentSchoolIcon,
                            ]}
                         />
                         <Typography
                            variant="medium"
-                           sx={{
-                              fontSize: "16px !important",
-                              fontWeight: "400 !important",
-                              color: (theme) =>
-                                 `${theme.palette.neutral[900]} !important`,
-                              textOverflow: "ellipsis",
-                              overflow: "hidden",
-                              whiteSpace: "nowrap",
-                              maxWidth: {
-                                 xs: "200px",
-                                 sm: "310px",
-                                 md: "580px",
-                              },
-                           }}
+                           sx={styles.startAdornmentSchoolName}
                         >
                            {selectedValue.value}
                         </Typography>
@@ -200,20 +221,7 @@ const SelectUniversitiesDropDown = ({
                   )
                })(),
             },
-            sx: [
-               !isFocused
-                  ? {
-                       "& input": {
-                          width: 0,
-                          p: 0,
-                          "&:focus": {
-                             width: "100%",
-                             p: "16.5px 14px",
-                          },
-                       },
-                    }
-                  : null,
-            ],
+            sx: [!isFocused ? styles.textField : null],
          }}
          autocompleteProps={{
             id: "selectUniversity",
@@ -223,27 +231,8 @@ const SelectUniversitiesDropDown = ({
                universityCountriesMap[selectedCountryCode] === "None",
             autoHighlight: true,
             disableClearable: false,
-            PaperComponent: ({ children }) => (
-               <Box sx={styles.dropdownPaper}>{children}</Box>
-            ),
-            sx: {
-               // height: "72px !important",
-               ".Mui-disabled": {
-                  backgroundColor: "#F7F8FC",
-                  borderColor: (theme) => theme.brand.purple[50],
-                  opacity: 0.5,
-                  "&:hover": {
-                     backgroundColor: "#F7F8FC",
-                     borderColor: (theme) =>
-                        `${theme.brand.purple[50]} !important`,
-
-                     cursor: "not-allowed",
-                  },
-               },
-               ".MuiFormHelperText-root.Mui-disabled": {
-                  backgroundColor: "unset",
-               },
-            },
+            PaperComponent: ({ children }) => <Box>{children}</Box>,
+            sx: styles.autocomplete,
             selectOnFocus: false,
             onFocus: () => {
                setIsFocused(true)
