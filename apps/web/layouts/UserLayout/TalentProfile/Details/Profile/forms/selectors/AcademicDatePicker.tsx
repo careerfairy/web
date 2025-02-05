@@ -26,10 +26,10 @@ const styles = sxStyles({
       },
       ".Mui-disabled": {
          borderColor: (theme) => theme.brand.purple[50],
-         backgroundColor: "#F7F8FC",
+         backgroundColor: "#F7F8FC !important",
          opacity: 0.5,
          "&:hover": {
-            backgroundColor: "#F7F8FC",
+            backgroundColor: "#F7F8FC !important",
             borderColor: (theme) => `${theme.brand.purple[50]} !important`,
          },
          cursor: "not-allowed",
