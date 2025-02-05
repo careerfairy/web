@@ -1,0 +1,32 @@
+{
+   "fields": [
+      {
+         "name": "userAuthUid",
+         "type": "string"
+      },
+      {
+         "name": "moduleHygraphId",
+         "type": "string"
+      },
+      {
+         "name": "quizHygraphId",
+         "type": "string"
+      },
+      {
+         "name": "selectedAnswerIds",
+         "type": "array"
+      },
+      {
+         "name": "state",
+         "type": "string"
+      },
+      {
+         "name": "attemptedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "lastUpdated",
+         "type": "timestamp"
+      }
+   ]
+}
