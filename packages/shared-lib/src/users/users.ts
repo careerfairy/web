@@ -137,7 +137,7 @@ export interface UserData extends Identifiable {
 
    countryIsoCode?: string
    stateIsoCode?: string
-   cityIsoCode?: string
+   stateName?: string
 }
 
 export type ValidUserTagFields =
@@ -153,7 +153,7 @@ export type UserReadableGroupQuestionsWithAnswerMap = Record<
 
 export type UserDataPersonalInfo = Pick<
    UserData,
-   "firstName" | "lastName" | "countryIsoCode" | "stateIsoCode" | "cityIsoCode"
+   "firstName" | "lastName" | "countryIsoCode" | "stateIsoCode" | "stateName"
 >
 
 export type UserAccountCreationAdditionalData = {
