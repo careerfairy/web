@@ -127,12 +127,15 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
       }
    } catch (error) {
       console.error(error)
-      Sentry.captureException(error, {
-         extra: {
-            slug,
-            error: error instanceof Error ? error.message : String(error),
-         },
-      })
+      Sentry.captureException(
+         new Error(`Failed to fetch talent guide level ${slug}`),
+         {
+            extra: {
+               slug,
+               error: error instanceof Error ? error.message : String(error),
+            },
+         }
+      )
 
       return { notFound: true }
    }

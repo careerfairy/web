@@ -25,6 +25,7 @@ import {
    useIsSpyMode,
    useSidePanel,
 } from "store/selectors/streamingAppSelectors"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 type StreamContextProps = {
    livestreamId: string
@@ -147,6 +148,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
                livestreamId={livestreamId}
                agoraUserId={agoraUserId}
                joinToken={response.token}
+               isHost={isHost}
             />
          )}
       </StreamContext.Provider>
@@ -156,6 +158,7 @@ interface JoinComponentProps {
    livestreamId: string
    agoraUserId: string
    joinToken: string
+   isHost: boolean
 }
 
 /**
@@ -167,13 +170,21 @@ const JoinComponent = ({
    livestreamId,
    agoraUserId,
    joinToken,
+   isHost,
 }: JoinComponentProps) => {
-   useJoin({
+   const { error } = useJoin({
       appid: agoraCredentials.appID,
       channel: livestreamId,
       token: joinToken,
       uid: agoraUserId,
    })
+
+   useEffect(() => {
+      if (error && isHost) {
+         errorLogAndNotify(error)
+      }
+   }, [error, isHost, livestreamId, agoraUserId])
+
    return null
 }
 
