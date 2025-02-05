@@ -11,7 +11,6 @@ const styles = sxStyles({
          "& fieldset": {
             borderRadius: "8px",
             border: (theme) => `1px solid ${theme.brand.purple[100]}`,
-            backgroundColor: "#F7F8FC",
          },
          "&:hover fieldset": {
             borderRadius: "8px",
