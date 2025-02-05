@@ -51,11 +51,12 @@ const dataLayerWrapper = (event: object) => {
  * Data layer event that receives a livestream object and sends extra metadata as variables
  * @param eventName
  * @param livestream
- * @param optionalVariables
+ * @param optionalVariables Additional properties that are not already in LivestreamEvent
  */
 export const dataLayerLivestreamEvent = (
    eventName: AnalyticsEvent,
-   livestream: LivestreamEvent,
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   { triGrams, ...livestream }: LivestreamEvent,
    optionalVariables = {}
 ) => {
    dataLayerEvent(
@@ -65,8 +66,9 @@ export const dataLayerLivestreamEvent = (
          {
             livestreamId: livestream?.id,
             livestreamTitle: livestream?.title,
+            livestreamCompanyName: livestream?.company,
          },
-         optionalVariables
+         { ...optionalVariables, livestream }
       )
    )
 }

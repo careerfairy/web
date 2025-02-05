@@ -1,6 +1,4 @@
 export const AnalyticsEvents = {
-   HubspotMeetingBooked: "hubspot_meeting_booked",
-   LivestreamOpenSupport: "livestream_open_support",
    LivestreamJobOpen: "livestream_job_open",
    LivestreamJobApplicationComplete: "livestream_job_application_complete",
    LivestreamSpeakerLinkedinClick: "livestream_speaker_linkedin_click",
@@ -67,6 +65,7 @@ export const AnalyticsEvents = {
    LevelsJobApplied: "levels_job_applied",
    LevelsMentorView: "levels_mentor_view",
    LevelsMentorLinkedinClick: "levels_mentor_linkedin_click",
+   LivestreamOpenSupport: "livestream_open_support",
 } as const
 
 export type AnalyticsEvent =
