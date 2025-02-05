@@ -3,22 +3,11 @@ import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { chunkArray } from "@careerfairy/shared-lib/dist/utils"
 import * as cliProgress from "cli-progress"
-import * as levenshtein from "fast-levenshtein"
 import Counter from "../../lib/Counter"
 import { firestore } from "../../lib/firebase"
 import { fieldOfStudyRepo, userRepo } from "../../repositories"
 import { logAction } from "../../util/logger"
 import { getCLIBarOptions } from "../../util/misc"
-
-/**
- * Values less than 5 are not recommended, as for some it will not to be able to find a match.
- *
- * Based on Production data copy - 17337 users have invalid fields of study.
- *  - With a levenshtein distance of 4, 9527 users were unable to be reconciled.
- *  - With a levenshtein distance of 3, 9986 users were unable to be reconciled.
- *  - ...
- */
-const MIN_LEVEN_DISTANCE = 5
 
 const counter = new Counter()
 
@@ -30,7 +19,7 @@ const dedupeProgressBar = new cliProgress.SingleBar(
    cliProgress.Presets.shades_classic
 )
 
-const PERFORM_UPDATE = false
+const PERFORM_UPDATE = true
 const SHOW_LONG_LOG = false
 
 export async function run() {
@@ -52,6 +41,12 @@ export async function run() {
          "Getting all fields of study"
       )
 
+      const fieldsOfStudyMap: Record<string, FieldOfStudy> =
+         fieldsOfStudy.reduce((acc, fieldOfStudy) => {
+            acc[fieldOfStudy.id] = fieldOfStudy
+            return acc
+         }, {})
+
       const usersWithInvalidFieldsOfStudy = getUsersWithInvalidFieldsOfStudy(
          allUsers,
          fieldsOfStudy
@@ -63,25 +58,15 @@ export async function run() {
 
       const userBatches = chunkArray(usersWithInvalidFieldsOfStudy, 200)
 
-      let failedReconciles = 0
-
       dedupeProgressBar.start(userBatches.length, 0)
 
       for (const userBatch of userBatches) {
          for (const user of userBatch) {
-            const newFieldOfStudy = reconcileFieldOfStudy(
-               user.fieldOfStudy,
-               fieldsOfStudy
-            )
+            const newFieldOfStudy = fieldsOfStudyMap[user.fieldOfStudy.id]
+
             if (PERFORM_UPDATE && newFieldOfStudy) {
                const docRef = firestore.collection("userData").doc(user.id)
-
                bulkWriter.update(docRef, { fieldOfStudy: newFieldOfStudy })
-               counter.writeIncrement()
-            }
-
-            if (!newFieldOfStudy) {
-               failedReconciles++
             }
 
             if (SHOW_LONG_LOG) {
@@ -91,12 +76,12 @@ export async function run() {
                   newFieldOfStudy: newFieldOfStudy,
                })
             }
+
+            counter.writeIncrement()
          }
 
          await bulkWriter.flush().then(() => dedupeProgressBar.increment())
       }
-
-      console.log(`\nFailed reconciles: ${failedReconciles}`)
 
       dedupeProgressBar.stop()
       await logAction(() => bulkWriter.close(), "Closing BulkWriter")
@@ -120,25 +105,4 @@ const getUsersWithInvalidFieldsOfStudy = (
       )
       return !hasMatchingFieldOfStudy
    })
-}
-
-/**
- * Reconciles the field of study of a user with the valid fields of study (documents in /fieldsOfStudy collection)
- * using the levenshtein distance algorithm.
- *
- * The Levenshtein distance between two words is the minimum number of single-character
- * edits (insertions, deletions or substitutions) required to change one word into the other
- * @param fieldOfStudy The field of study of the user
- * @param validFieldsOfStudy The valid fields of study
- * @returns The field of study that is the closest match to the user's invalid field of study
- */
-const reconcileFieldOfStudy = (
-   fieldOfStudy: FieldOfStudy,
-   validFieldsOfStudy: FieldOfStudy[]
-) => {
-   return validFieldsOfStudy?.find(
-      (validFieldOfStudy) =>
-         levenshtein.get(validFieldOfStudy.name, fieldOfStudy.name) <=
-         MIN_LEVEN_DISTANCE
-   )
 }
