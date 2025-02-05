@@ -3,12 +3,7 @@
 This script goes through all the users and and fields of study, filtering users using invalid fields of study
 both in terms of `id` and `name`.
 
-Users with invalid fields of study are then reconciled with the fields of study in the `fieldsOfStudy` collection, using
-the levenshtein distance algorithm.
-
-Constant `MIN_LEVEN_DISTANCE` is used to determine the minimum distance between the user's field of study and the fields of study in the `fieldsOfStudy` collection. **A default value of 5 is used.**
-
-[Levenshtein distance algorithm info](https://en.wikipedia.org/wiki/Levenshtein_distance)
+Users with invalid fields of study are then reconciled based on the `id` field.
 
 ## Usage
 
