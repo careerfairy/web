@@ -9,22 +9,33 @@ import { useStreamingContext } from "../context"
  * Component responsible for tracking host-related behaviors within the streaming application.
  */
 export const HostTrackers = () => {
-   const { livestreamId } = useStreamingContext()
+   const { livestreamId, agoraUserId } = useStreamingContext()
    const { isOpen, activeView } = useSidePanel()
+
    const rtcClient = useRTCClient()
+
+   useClientEvent(
+      rtcClient,
+      "connection-state-change",
+      (currentState, prevState, reason) => {
+         if (
+            reason !== "LEAVE" &&
+            (currentState === "DISCONNECTED" ||
+               currentState === "DISCONNECTING")
+         ) {
+            errorLogAndNotify(
+               new Error(
+                  `RTC - Connection state changed to ${currentState} from ${prevState} with reason ${reason} for user ${agoraUserId} for livestream ${livestreamId}`
+               )
+            )
+         }
+      }
+   )
 
    useHandRaiseNotificationTracker(
       livestreamId,
       isOpen && activeView === ActiveViews.HAND_RAISE
    )
-
-   useClientEvent(rtcClient, "exception", ({ code, msg, uid }) => {
-      errorLogAndNotify(
-         new Error(
-            `Agora exception: Message: ${msg}, Code: ${code}, UID: ${uid}`
-         )
-      )
-   })
 
    return null
 }
