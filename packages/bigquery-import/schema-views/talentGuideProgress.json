@@ -1,0 +1,64 @@
+{
+   "fields": [
+      {
+         "name": "userAuthUid",
+         "type": "string"
+      },
+      {
+         "name": "moduleHygraphId",
+         "type": "string"
+      },
+      {
+         "name": "levelSlug",
+         "type": "string"
+      },
+      {
+         "name": "currentStepIndex",
+         "type": "number"
+      },
+      {
+         "name": "completedStepIds",
+         "type": "array"
+      },
+      {
+         "name": "moduleName",
+         "type": "string"
+      },
+      {
+         "name": "moduleCategory",
+         "type": "string"
+      },
+      {
+         "name": "totalSteps",
+         "type": "number"
+      },
+      {
+         "name": "percentageComplete",
+         "type": "number"
+      },
+      {
+         "name": "startedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "lastUpdated",
+         "type": "timestamp"
+      },
+      {
+         "name": "completedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "totalVisits",
+         "type": "number"
+      },
+      {
+         "name": "lastVisitedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "restartCount",
+         "type": "number"
+      }
+   ]
+}
