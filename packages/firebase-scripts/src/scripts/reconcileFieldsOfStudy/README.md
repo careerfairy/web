@@ -10,10 +10,6 @@ Constant `MIN_LEVEN_DISTANCE` is used to determine the minimum distance between 
 
 [Levenshtein distance algorithm info](https://en.wikipedia.org/wiki/Levenshtein_distance)
 
-## Current production data (as of 2025-02-05)
-
--  Around 17339 users have invalid fields of study.
-
 ## Usage
 
 To run the script, use the following command:
