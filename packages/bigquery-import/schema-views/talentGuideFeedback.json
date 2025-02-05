@@ -1,0 +1,28 @@
+{
+   "fields": [
+      {
+         "name": "userAuthUid",
+         "type": "string"
+      },
+      {
+         "name": "moduleHygraphId",
+         "type": "string"
+      },
+      {
+         "name": "rating",
+         "type": "number"
+      },
+      {
+         "name": "selectedTagIds",
+         "type": "array"
+      },
+      {
+         "name": "submittedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "lastUpdated",
+         "type": "timestamp"
+      }
+   ]
+}

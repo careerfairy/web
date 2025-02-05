@@ -34,6 +34,7 @@ To update a schema file (adding/changing/removing fields):
 npx @firebaseextensions/fs-bq-schema-views \
                   --non-interactive \
                   --project=careerfairy-e1fd9 \
+                  --big-query-project=careerfairy-e1fd9 \
                   --dataset=firestore_export \
                   --table-name-prefix=livestreams \
                   --schema-files=./packages/bigquery-import/schema-views/livestreams.json
