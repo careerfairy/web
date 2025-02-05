@@ -10,6 +10,14 @@ import { fieldOfStudyRepo, userRepo } from "../../repositories"
 import { logAction } from "../../util/logger"
 import { getCLIBarOptions } from "../../util/misc"
 
+/**
+ * Values less than 5 are not recommended, as for some it will not to be able to find a match.
+ *
+ * Based on Production data copy - 17337 users have invalid fields of study.
+ *  - With a levenshtein distance of 4, 9527 users were unable to be reconciled.
+ *  - With a levenshtein distance of 3, 9986 users were unable to be reconciled.
+ *  - ...
+ */
 const MIN_LEVEN_DISTANCE = 5
 
 const counter = new Counter()
@@ -35,7 +43,7 @@ export async function run() {
          "Getting all users"
       )
 
-      const allUsers = users //.slice(0, 10)
+      const allUsers = users
 
       counter.addToReadCount(allUsers.length)
 
@@ -53,24 +61,27 @@ export async function run() {
          `Users with invalid fields of study: ${usersWithInvalidFieldsOfStudy.length}`
       )
 
-      const userBatches = chunkArray(
-         usersWithInvalidFieldsOfStudy.slice(0, 2),
-         100
-      )
+      const userBatches = chunkArray(usersWithInvalidFieldsOfStudy, 200)
+
+      let failedReconciles = 0
 
       dedupeProgressBar.start(userBatches.length, 0)
+
       for (const userBatch of userBatches) {
          for (const user of userBatch) {
             const newFieldOfStudy = reconcileFieldOfStudy(
                user.fieldOfStudy,
                fieldsOfStudy
             )
-
-            if (PERFORM_UPDATE) {
+            if (PERFORM_UPDATE && newFieldOfStudy) {
                const docRef = firestore.collection("userData").doc(user.id)
 
                bulkWriter.update(docRef, { fieldOfStudy: newFieldOfStudy })
                counter.writeIncrement()
+            }
+
+            if (!newFieldOfStudy) {
+               failedReconciles++
             }
 
             if (SHOW_LONG_LOG) {
@@ -84,6 +95,8 @@ export async function run() {
 
          await bulkWriter.flush().then(() => dedupeProgressBar.increment())
       }
+
+      console.log(`\nFailed reconciles: ${failedReconciles}`)
 
       dedupeProgressBar.stop()
       await logAction(() => bulkWriter.close(), "Closing BulkWriter")
