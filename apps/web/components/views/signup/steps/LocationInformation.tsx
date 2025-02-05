@@ -321,7 +321,7 @@ const LocationInformation = () => {
                               variant="brandedBody"
                               sx={styles.languageName}
                            >
-                              {languageOptionCodesMap[language.id].name}
+                              {languageOptionCodesMap[language.id]?.name}
                            </Typography>
                            <Typography
                               variant="xsmall"
