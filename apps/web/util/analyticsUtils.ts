@@ -95,7 +95,7 @@ export const analyticsTrackEvent = (
       const utmParams = CookiesUtil.getUTMParams()
 
       if (utmParams) {
-         enrichedProperties.acquisition_utm_params = utmParams
+         enrichedProperties.engagement_origin_params = utmParams
       }
    } catch (error) {
       console.error("Failed to retrieve UTM params:", error)
