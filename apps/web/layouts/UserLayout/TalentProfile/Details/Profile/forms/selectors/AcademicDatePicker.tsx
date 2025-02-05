@@ -34,6 +34,9 @@ const styles = sxStyles({
          },
          cursor: "not-allowed",
       },
+      ".Mui-focused": {
+         backgroundColor: "#F7F8FC !important",
+      },
    },
 })
 
