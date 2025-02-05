@@ -48,6 +48,11 @@ import {
 
 export const sendReminderEmailToRegistrants = functions
    .region(config.region)
+   .runWith({
+      // when sending large batches, this function can take a while to finish
+      timeoutSeconds: 540,
+      memory: "8GB",
+   })
    .https.onRequest(async (req, res) => {
       setCORSHeaders(req, res)
 
@@ -99,6 +104,11 @@ export const sendReminderEmailToRegistrants = functions
 
 export const sendReminderEmailAboutApplicationLink = functions
    .region(config.region)
+   .runWith({
+      // when sending large batches, this function can take a while to finish
+      timeoutSeconds: 540,
+      memory: "8GB",
+   })
    .https.onCall(async (data) => {
       functions.logger.log("data", data)
       const email = {
@@ -209,7 +219,7 @@ export const scheduleReminderEmails = functions
    .region(config.region)
    .runWith({
       // when sending large batches, this function can take a while to finish
-      timeoutSeconds: 300,
+      timeoutSeconds: 540,
       memory: "8GB",
    })
    .pubsub.schedule("every 15 minutes")
@@ -369,7 +379,7 @@ export const sendReminderToNonAttendees = functions
    .region(config.region)
    .runWith({
       // when sending large batches, this function can take a while to finish
-      timeoutSeconds: 300,
+      timeoutSeconds: 540,
       memory: "8GB",
    })
    .pubsub.schedule("0 11 * * *")
@@ -382,7 +392,7 @@ export const sendReminderToAttendees = functions
    .region(config.region)
    .runWith({
       // when sending large batches, this function can take a while to finish
-      timeoutSeconds: 300,
+      timeoutSeconds: 540,
       memory: "8GB",
    })
    .pubsub.schedule("0 11 * * *")
@@ -409,6 +419,11 @@ export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
  */
 export const sendReminderForNonAttendeesByStreamId = functions
    .region(config.region)
+   .runWith({
+      // when sending large batches, this function can take a while to finish
+      timeoutSeconds: 540,
+      memory: "8GB",
+   })
    .https.onRequest(async (req, res) => {
       setCORSHeaders(req, res)
       const livestreamId = req.query.eventId as string
