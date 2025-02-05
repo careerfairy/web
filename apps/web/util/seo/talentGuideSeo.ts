@@ -8,7 +8,7 @@ export const getTalentGuideLevelSeoProps = (
       title: data.seo?.title,
       description: data.seo?.description,
       image: data.seo?.image,
-      keywords: data.seo?.keywords?.join(", "),
+      keywords: data.seo?.keywords,
       noIndex: data.seo?.noIndex,
       openGraph: {
          title: data.seo?.title,
@@ -52,7 +52,7 @@ export const getTalentGuideOverviewSeoProps = (
       title: rootPage.seo?.title,
       description,
       image: rootPage.seo?.image,
-      keywords: rootPage.seo?.keywords?.join(", "),
+      keywords: rootPage.seo?.keywords,
       noIndex: rootPage.seo?.noIndex,
       openGraph: {
          title: rootPage.seo?.title,

@@ -118,7 +118,7 @@ export type SeoComponentType = {
    id: string
    title: string
    description: string
-   keywords: string[]
+   keywords: string
    image: ImageAssetType
    noIndex: boolean
 }
