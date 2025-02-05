@@ -341,6 +341,11 @@ export interface IUserRepository {
    getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]>
 
    getUserLanguages(userId: string): Promise<ProfileLanguage[]>
+
+   getUsersByUniversity(
+      countryId: string,
+      universityCode: string
+   ): Promise<UserData[]>
 }
 
 export class FirebaseUserRepository
@@ -1277,6 +1282,19 @@ export class FirebaseUserRepository
       return querySnapshot.empty
          ? []
          : querySnapshot.docs.map((doc) => doc.data() as ProfileLanguage)
+   }
+
+   async getUsersByUniversity(
+      countryId: string,
+      universityCode: string
+   ): Promise<UserData[]> {
+      const snapshot = await this.firestore
+         .collection("userData")
+         .where("universityCountryCode", "==", countryId)
+         .where("university.code", "==", universityCode)
+         .get()
+
+      return mapFirestoreDocuments<UserData>(snapshot)
    }
 
    async createUserLink(userId: string, link: ProfileLink): Promise<void> {
