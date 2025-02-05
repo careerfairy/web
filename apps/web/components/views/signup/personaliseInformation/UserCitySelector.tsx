@@ -1,10 +1,9 @@
 import { CityOption } from "@careerfairy/shared-lib/countries/types"
 import { FormHelperText } from "@mui/material"
-import useCityById from "components/custom-hook/countries/useCityById"
 import { CityAutoComplete } from "components/views/countries/CityAutoComplete"
 import { userRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 export const UserCitySelector = () => {
    const { userData } = useAuth()
@@ -12,16 +11,21 @@ export const UserCitySelector = () => {
    const [userCountryCode, setUserCountryCode] = useState<string | null>(
       userData.countryIsoCode
    )
-   const { data: userCityOption, isLoading } = useCityById(
-      userData.cityIsoCode,
-      false
-   )
+
+   const userCityOption = useMemo(() => {
+      return userData.stateName && userData.stateIsoCode
+         ? {
+              id: userData.stateIsoCode,
+              name: userData.stateName,
+           }
+         : null
+   }, [userData.stateName, userData.stateIsoCode])
 
    const handleSelectedCityChange = useCallback(
-      async (city: CityOption | null) => {
+      async (state: CityOption | null) => {
          await userRepo.updateUserData(userData.id, {
-            cityIsoCode: city?.id ?? null,
-            stateIsoCode: city?.stateIsoCode ?? null,
+            stateIsoCode: state?.id ?? null,
+            stateName: state?.name ?? null,
          })
       },
       [userData.id]
@@ -39,15 +43,11 @@ export const UserCitySelector = () => {
          <CityAutoComplete
             value={userCityOption}
             disabled={!userData.countryIsoCode}
-            loading={isLoading}
             countryId={userData.countryIsoCode}
             onFocus={() => setHasFocused(true)}
             handleSelectedCityChange={handleSelectedCityChange}
          />
-         {userData.countryIsoCode &&
-         !isLoading &&
-         !userCityOption &&
-         hasFocused ? (
+         {userData.countryIsoCode && !userCityOption && hasFocused ? (
             <FormHelperText sx={{ color: "error.main", ml: 2 }}>
                Please select the city you are currently located in.
             </FormHelperText>

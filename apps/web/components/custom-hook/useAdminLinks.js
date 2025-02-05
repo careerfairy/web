@@ -126,7 +126,7 @@ const useAdminLinks = () => {
             },
             {
                href: `/admin/company-plans`,
-               icon: CompanyIcon,
+               icon: () => <CompanyIcon fill="none" />,
                title: "Companies",
                basePath: `/admin/company-plans`,
             },
