@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material"
 import useUniversitiesByCountryCodes from "components/custom-hook/useUniversities"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
-import { SyntheticEvent, useMemo } from "react"
+import { SyntheticEvent, useMemo, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { SchoolIcon } from "../common/icons/SchoolIcon"
@@ -15,6 +15,22 @@ const styles = sxStyles({
          sm: "100dvh",
          md: "228px",
       },
+      width: {
+         xs: "100dvw !important",
+         sm: "100dvw !important",
+         md: "670px !important",
+      },
+      ml: {
+         xs: -3,
+         sm: -3,
+         md: -0.2,
+      },
+      borderRadius: "8px",
+      my: 1.5,
+      boxShadow: {
+         sm: "none",
+         md: "0px 4px 16px rgba(0, 0, 0, 0.08)",
+      },
    },
    schoolIcon: {
       width: "40px",
@@ -25,9 +41,9 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.palette.neutral[50],
    },
    universityOptionRoot: {
-      backgroundColor: (theme) => theme.brand.white[50],
+      backgroundColor: (theme) => `${theme.brand.white[50]} !important`,
       "&:hover": {
-         backgroundColor: (theme) => theme.brand.black[100],
+         backgroundColor: (theme) => `${theme.brand.black[100]} !important`,
       },
    },
    selectedUniversityOption: {
@@ -44,6 +60,64 @@ const styles = sxStyles({
       fontWeight: 400,
       color: (theme) => theme.palette.neutral[500],
    },
+   startAdornmentRoot: {
+      pt: "4px",
+      pb: "8px",
+      "&.MuiInputAdornment-root": {
+         display: { xs: "none", md: "flex" },
+         ".Mui-focused &": { display: "none" },
+      },
+      "& .MuiTypography-root": {
+         fontSize: "12px",
+         lineHeight: "16px",
+         fontWeight: 400,
+         color: "#525252",
+      },
+   },
+   startAdornmentSchoolIcon: {
+      width: "28px",
+      height: "28px",
+      padding: "3.5px 4.083px 3.5px 3.5px",
+   },
+   startAdornmentSchoolName: {
+      fontSize: "14px !important",
+      fontWeight: "400 !important",
+      color: (theme) => `${theme.palette.neutral[900]} !important`,
+      textOverflow: "ellipsis",
+      overflow: "hidden",
+      whiteSpace: "nowrap",
+      maxWidth: {
+         xs: "200px",
+         sm: "310px",
+         md: "580px",
+      },
+   },
+   textField: {
+      "& input": {
+         width: 0,
+         p: 0,
+         "&:focus": {
+            width: "100%",
+            p: "16.5px 14px",
+         },
+      },
+   },
+   autocomplete: {
+      ".Mui-disabled": {
+         backgroundColor: "#F7F8FC",
+         borderColor: (theme) => theme.brand.purple[50],
+         opacity: 0.5,
+         "&:hover": {
+            backgroundColor: "#F7F8FC",
+            borderColor: (theme) => `${theme.brand.purple[50]} !important`,
+
+            cursor: "not-allowed",
+         },
+      },
+      ".MuiFormHelperText-root.Mui-disabled": {
+         backgroundColor: "unset",
+      },
+   },
 })
 
 type Props = {
@@ -59,6 +133,7 @@ const SelectUniversitiesDropDown = ({
    placeholder,
    countryCodeFieldName,
 }: Props) => {
+   const [isFocused, setIsFocused] = useState(false)
    const {
       formState: { isSubmitting },
       setValue,
@@ -66,6 +141,10 @@ const SelectUniversitiesDropDown = ({
 
    const selectedCountryCode = useWatch({
       name: countryCodeFieldName,
+   })
+
+   const universityId = useWatch({
+      name: name,
    })
 
    const countryCode = useMemo(() => {
@@ -91,10 +170,18 @@ const SelectUniversitiesDropDown = ({
    }, [options])
 
    const onChangeHandler = (
-      _: SyntheticEvent,
+      event: SyntheticEvent,
       option: { id: string; value: string }
    ) => {
       setValue(name, option?.id, { shouldValidate: true })
+      setIsFocused(false)
+
+      const inputElement = document.querySelector(
+         "#selectUniversity"
+      ) as HTMLElement
+      if (inputElement) {
+         inputElement.blur()
+      }
    }
 
    return (
@@ -104,7 +191,37 @@ const SelectUniversitiesDropDown = ({
          options={options}
          textFieldProps={{
             requiredText: "(required)",
-            placeholder: placeholder,
+            placeholder: universityId ? "" : placeholder,
+            InputProps: {
+               startAdornment: (() => {
+                  const selectedValue = options.find(
+                     (opt) => opt.id === universityId
+                  )
+                  if (!selectedValue || isFocused) return null
+                  return (
+                     <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        sx={styles.startAdornmentRoot}
+                     >
+                        <SchoolIcon
+                           sx={[
+                              styles.schoolIcon,
+                              styles.startAdornmentSchoolIcon,
+                           ]}
+                        />
+                        <Typography
+                           variant="medium"
+                           sx={styles.startAdornmentSchoolName}
+                        >
+                           {selectedValue.value}
+                        </Typography>
+                     </Stack>
+                  )
+               })(),
+            },
+            sx: [!isFocused ? styles.textField : null],
          }}
          autocompleteProps={{
             id: "selectUniversity",
@@ -114,24 +231,14 @@ const SelectUniversitiesDropDown = ({
                universityCountriesMap[selectedCountryCode] === "None",
             autoHighlight: true,
             disableClearable: false,
-            sx: {
-               ".Mui-disabled": {
-                  backgroundColor: "#F7F8FC",
-                  borderColor: (theme) => theme.brand.purple[50],
-                  opacity: 0.5,
-                  "&:hover": {
-                     backgroundColor: "#F7F8FC",
-                     borderColor: (theme) =>
-                        `${theme.brand.purple[50]} !important`,
-
-                     cursor: "not-allowed",
-                  },
-               },
-               ".MuiFormHelperText-root.Mui-disabled": {
-                  backgroundColor: "unset",
-               },
-            },
+            PaperComponent: ({ children }) => <Box>{children}</Box>,
+            sx: styles.autocomplete,
             selectOnFocus: false,
+            onFocus: () => {
+               setIsFocused(true)
+            },
+            onBlur: () => setIsFocused(false),
+            openOnFocus: true,
             renderOption: (props, option, { selected }) => {
                return getOptionEl(props, option, selectedCountryCode, selected)
             },
@@ -139,12 +246,12 @@ const SelectUniversitiesDropDown = ({
                sx: styles.listBox,
             },
             getOptionLabel: (option: { id: string; value: string }) => {
+               if (!isFocused) return ""
                const optionId = typeof option === "string" ? option : option.id
+
                return universitiesMap[optionId] || ""
             },
             isOptionEqualToValue: (option, value) => {
-               console.log("🚀 ~ value:", value)
-               console.log("🚀 ~ option:", option)
                const optionValue = value as any as string
                return option.id == optionValue
             },

@@ -14,7 +14,7 @@ export const UserCountrySelector = () => {
    ) => {
       await userRepo.updateUserData(userData.id, {
          countryIsoCode: country?.id ?? null,
-         cityIsoCode: null,
+         stateName: null,
          stateIsoCode: null,
       })
    }
