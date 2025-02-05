@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs"
 import { PreviewModeAlert } from "components/views/talent-guide/components/PreviewModeAlert"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
@@ -46,15 +47,29 @@ export const getStaticProps: GetStaticProps<TalentGuidePageProps> = async ({
 
    const service = preview ? tgBackendPreviewService : tgBackendService
 
-   const pages = await service.getAllTalentGuideModulePages()
-   const rootPage = await service.getTalentGuideRootPage()
+   try {
+      const pages = await service.getAllTalentGuideModulePages()
+      const rootPage = await service.getTalentGuideRootPage()
 
-   return {
-      props: {
-         pages,
-         rootPage,
-      },
-      revalidate: process.env.NODE_ENV === "development" ? false : 60,
+      return {
+         props: {
+            pages,
+            rootPage,
+         },
+         revalidate: process.env.NODE_ENV === "development" ? false : 60,
+      }
+   } catch (error) {
+      console.error(error)
+      Sentry.captureException(
+         new Error(`Failed to fetch talent guide overview page`),
+         {
+            extra: {
+               error: error instanceof Error ? error.message : String(error),
+            },
+         }
+      )
+
+      return { notFound: true }
    }
 }
 
