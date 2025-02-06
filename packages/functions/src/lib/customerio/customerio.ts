@@ -6,8 +6,11 @@ import {
 import { UserData } from "@careerfairy/shared-lib/users"
 import { logger } from "firebase-functions/v2"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
+import { onRequest } from "firebase-functions/v2/https"
+import { userRepo } from "src/api/repositories"
 import { isLocalEnvironment } from "../../util"
 import { trackingClient } from "./client"
+import { CustomerIOWebhookEvent } from "./types"
 
 /**
  * Set to false when running backfill
@@ -119,3 +122,54 @@ const hasCustomerIODataChanged = (
    if (!oldData) return true
    return JSON.stringify(oldData) !== JSON.stringify(newData)
 }
+
+/**
+ * Handles Customer.io webhook events for unsubscribes, subscribes. To add other events, go to:
+ * https://fly.customer.io/workspaces/175425/journeys/integrations/reporting-webhooks
+ *
+ * Webhook URL should be configured with the secret as a query parameter:
+ * https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/customerIOWebhook?secret=your-secret-here
+ */
+export const customerIOWebhook = onRequest(async (request, response) => {
+   if (request.method !== "POST") {
+      response.status(405).send("Method Not Allowed")
+      return
+   }
+
+   // Verify webhook secret from query parameter
+   const secret = request.query.secret
+   if (!secret || secret !== process.env.CUSTOMERIO_WEBHOOK_SECRET) {
+      logger.error("Invalid or missing webhook secret")
+      response.status(401).send("Unauthorized")
+      return
+   }
+
+   const event = request.body as CustomerIOWebhookEvent
+
+   try {
+      switch (event.metric) {
+         case "subscribed":
+         case "unsubscribed": {
+            const userEmail = event.data.identifiers.email
+            // Update the user's subscription status in Firebase
+            await userRepo.updateUserData(userEmail, {
+               unsubscribed: event.metric === "unsubscribed",
+            })
+
+            logger.info(
+               `Updated subscription status for user ${userEmail} to ${event.metric}`
+            )
+            response.status(200).send("OK")
+            break
+         }
+         default: {
+            // Acknowledge other events but don't process them
+            logger.info(`Received unhandled event type: ${event.metric}`)
+            response.status(200).send("OK")
+         }
+      }
+   } catch (error) {
+      logger.error(`Error processing ${event.metric} webhook`, error)
+      response.status(500).send("Internal Server Error")
+   }
+})
