@@ -35,7 +35,9 @@
       "native-build": "npm run native-build:preview",
       "native-build:preview": "cd apps/mobile && npm run build:preview",
       "native-build:develop": "cd apps/mobile && npm run build:develop",
-      "native-build:prod": "cd apps/mobile && npm run build:prod"
+      "native-build:prod": "cd apps/mobile && npm run build:prod",
+      "native-run:ios": "cd apps/mobile && npm run run:ios",
+      "native-run:android": "cd apps/mobile && npm run run:android"
    },
    "dependencies": {
       "@emotion/cache": "^11.7.1",
