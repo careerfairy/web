@@ -1,4 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material"
+import { speakerPlaceholder } from "components/util/constants"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { AuthorPromotionComponentType } from "data/hygraph/types"
 import { ReactNode } from "react"
@@ -46,7 +47,7 @@ export const AuthorPromotion = ({
          sx={[
             styles.root,
             {
-               backgroundColor: backgroundColor.hex,
+               backgroundColor: backgroundColor?.hex || "white",
             },
          ]}
       >
@@ -56,7 +57,7 @@ export const AuthorPromotion = ({
             </Typography>
             <Stack sx={styles.wrapper} direction="row">
                <CircularLogo
-                  src={authorAvatar.url}
+                  src={authorAvatar?.url || speakerPlaceholder}
                   alt={authorName}
                   size={40}
                />
