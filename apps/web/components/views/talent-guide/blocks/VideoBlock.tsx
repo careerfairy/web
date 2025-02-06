@@ -1,21 +1,24 @@
-import { Stack, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import PlayIcon from "components/views/common/icons/PlayIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { VideoBlockType } from "data/hygraph/types"
 import ReactPlayer from "react-player"
 import { sxStyles } from "types/commonTypes"
+import { AuthorPromotion } from "./AuthorPromotion"
 
 const styles = sxStyles({
    root: {
-      "& .react-player": {
-         borderRadius: "8px",
-         overflow: "hidden",
-         border: (theme) => `1px solid ${theme.palette.neutral["50"]}`,
-         height: {
-            xs: "173px !important",
-            md: "285px !important",
-         },
-         maxWidth: "100%",
+      maxWidth: "100%",
+   },
+   videoContainer: {
+      border: (theme) => `1px solid ${theme.palette.neutral["50"]}`,
+      borderRadius: "8px",
+      overflow: "hidden",
+      display: "flex",
+      alignItems: "center",
+      aspectRatio: "16 / 9",
+      "& .react-player__preview": {
+         backgroundSize: "contain !important",
       },
    },
    playIcon: {
@@ -40,40 +43,56 @@ const styles = sxStyles({
 
 type Props = VideoBlockType
 
-export const VideoBlock = ({
-   video,
-   videoThumbnail,
-   avatar,
-   label,
-   videoTitle,
-}: Props) => {
+const Content = (props: Props) => {
+   const { video, videoThumbnail, avatar, label, videoTitle } = props
+
    return (
       <Stack data-testid="talent-guide-video-block" gap={1} sx={styles.root}>
-         <ReactPlayer
-            url={video.url}
-            className="react-player"
-            playsinline
-            playing
-            playIcon={<PlayIcon sx={styles.playIcon} />}
-            light={videoThumbnail.url}
-            config={{
-               file: {
-                  attributes: {
-                     controlsList: "nodownload",
+         <Box sx={styles.videoContainer}>
+            <ReactPlayer
+               url={video.url}
+               className="react-player"
+               playsinline
+               playing
+               playIcon={<PlayIcon sx={styles.playIcon} />}
+               light={videoThumbnail.url}
+               config={{
+                  file: {
+                     attributes: {
+                        controlsList: "nodownload",
+                     },
                   },
-               },
-            }}
-            controls
-         />
-         <Stack sx={styles.avatarContainer}>
-            <CircularLogo src={avatar.url} alt={avatar.alt} size={28} />
-            <Typography variant="small" sx={styles.avatarLabel}>
-               {label}
-            </Typography>
-         </Stack>
-         <Typography variant="brandedBody" sx={styles.videoTitle}>
+               }}
+               controls
+            />
+         </Box>
+         {Boolean(!props.promotionData) && (
+            <Stack sx={styles.avatarContainer}>
+               <CircularLogo src={avatar.url} alt={avatar.alt} size={28} />
+               <Typography variant="small" sx={styles.avatarLabel}>
+                  {label}
+               </Typography>
+            </Stack>
+         )}
+         <Typography
+            variant="brandedBody"
+            sx={[
+               styles.videoTitle,
+               props.promotionData ? { paddingBottom: "4px" } : {},
+            ]}
+         >
             {videoTitle}
          </Typography>
       </Stack>
+   )
+}
+
+export const VideoBlock = (props: Props) => {
+   return props.promotionData ? (
+      <AuthorPromotion {...props.promotionData}>
+         <Content {...props} />
+      </AuthorPromotion>
+   ) : (
+      <Content {...props} />
    )
 }
