@@ -4,6 +4,7 @@ import {
    transformUserDataForCustomerIO,
 } from "@careerfairy/shared-lib/customerio"
 import { UserData } from "@careerfairy/shared-lib/users"
+import * as crypto from "crypto"
 import { logger } from "firebase-functions/v2"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
@@ -126,9 +127,6 @@ const hasCustomerIODataChanged = (
 /**
  * Handles Customer.io webhook events for unsubscribes, subscribes. To add other events, go to:
  * https://fly.customer.io/workspaces/175425/journeys/integrations/reporting-webhooks
- *
- * Webhook URL should be configured with the secret as a query parameter:
- * https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/customerIOWebhook?secret=your-secret-here
  */
 export const customerIOWebhook = onRequest(async (request, response) => {
    if (request.method !== "POST") {
@@ -136,11 +134,33 @@ export const customerIOWebhook = onRequest(async (request, response) => {
       return
    }
 
-   // Verify webhook secret from query parameter
-   const secret = request.query.secret
-   if (!secret || secret !== process.env.CUSTOMERIO_WEBHOOK_SECRET) {
-      logger.error("Invalid or missing webhook secret")
+   // Verify webhook signature
+   const signature = request.headers["x-cio-signature"] as string
+   const timestamp = request.headers["x-cio-timestamp"] as string
+
+   if (!signature || !timestamp) {
+      logger.error("Missing required headers")
       response.status(401).send("Unauthorized")
+      return
+   }
+
+   if (!process.env.CUSTOMERIO_SIGNING_KEY) {
+      logger.error("Missing CUSTOMERIO_SIGNING_KEY environment variable")
+      response.status(500).send("Server configuration error")
+      return
+   }
+
+   // Verify the webhook signature using the signing key according to the Customer.io docs
+   // https://docs.customer.io/journeys/webhooks-action/#securely-verify-requests
+   const payload = request.rawBody
+   const stringToSign = `v0:${timestamp}:${payload}`
+
+   const hmac = crypto.createHmac("sha256", process.env.CUSTOMERIO_SIGNING_KEY)
+   const calculatedSignature = hmac.update(stringToSign).digest("hex")
+
+   if (calculatedSignature !== signature) {
+      logger.error("Invalid webhook signature")
+      response.status(401).send("Invalid signature")
       return
    }
 
