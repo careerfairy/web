@@ -26,7 +26,9 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({
 
    return (
       <Fragment>
-         <SEO {...getTalentGuideOverviewSeoProps(rootPage, pages)} />
+         {rootPage.seo ? (
+            <SEO {...getTalentGuideOverviewSeoProps(rootPage, pages)} />
+         ) : null}
          <GenericDashboardLayout pageDisplayName="Levels">
             <LevelsContainer pages={pages} />
             {Boolean(isPreview) && <PreviewModeAlert />}
