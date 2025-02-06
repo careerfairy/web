@@ -72,6 +72,17 @@ export enum PageType {
    TALENT_GUIDE_ROOT_PAGE = "TALENT_GUIDE_ROOT_PAGE",
 }
 
+export type HygraphColor = {
+   hex: string
+   rgba: {
+      r: string
+      g: string
+      b: string
+      a: string
+   }
+   css: string
+}
+
 // Assets
 
 export type ImageAssetType = {
@@ -123,6 +134,18 @@ export type SeoComponentType = {
    noIndex: boolean
 }
 
+export type AuthorPromotionComponentType = {
+   __typename: "AuthorPromotion"
+   id: string
+   authorName: string
+   authorAvatar: ImageAssetType
+   backgroundColor: HygraphColor
+}
+
+type AuthorPromotionData = {
+   promotionData: AuthorPromotionComponentType
+}
+
 // Models
 export type HeaderBlockType = {
    __typename: "HeaderBlock"
@@ -135,10 +158,11 @@ export type ArticleBlockType = {
    __typename: "ArticleBlock"
    id: string
    title: string
+   authorName: string
+   authorAvatar: ImageAssetType
    illustration: ImageAssetType
-   companyName: string
    articleUrl: string
-}
+} & AuthorPromotionData
 
 export type FollowCompaniesBlockType = {
    __typename: "FollowCompaniesBlock"
@@ -151,7 +175,7 @@ export type HighlightsBlockType = {
    id: string
    shouldFetchBasedOnUserData: boolean
    highlights: (HighlightComponentType | SparkComponentType)[]
-}
+} & AuthorPromotionData
 
 export type JobsBlockType = {
    __typename: "JobsBlock"
@@ -187,7 +211,7 @@ export type VideoBlockType = {
    avatar: ImageAssetType
    label: string
    videoTitle: string
-}
+} & AuthorPromotionData
 
 export type CopyTemplateBlockType = {
    __typename: "CopyTemplateBlock"
