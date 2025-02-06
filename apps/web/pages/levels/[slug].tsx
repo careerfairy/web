@@ -63,7 +63,7 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       }
    }, [isLoggedOut, asPath, replace])
 
-   const seo = <SEO {...getTalentGuideLevelSeoProps(data)} />
+   const seo = data ? <SEO {...getTalentGuideLevelSeoProps(data)} /> : null
 
    if (!isLoggedIn) {
       return (
