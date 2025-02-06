@@ -1,5 +1,16 @@
+import { Timestamp } from "../firebaseTypes"
 import { UserData } from "../users"
 import { CustomerIOUserData } from "./types"
+
+/**
+ * Converts a Firebase timestamp to Unix timestamp (seconds since epoch).
+ * Uses Math.floor() as CustomerIO requires integer timestamps and does not accept decimal values.
+ * @param timestamp Firebase timestamp
+ */
+function toUnixTimestamp(timestamp: Timestamp): number | undefined {
+   if (!timestamp) return undefined
+   return Math.floor(timestamp.toDate().getTime() / 1000)
+}
 
 /**
  * Helper function to transform UserData to CustomerIO format
@@ -15,9 +26,9 @@ export function transformUserDataForCustomerIO(
       last_name: userData.lastName,
       is_admin: !!userData.isAdmin,
       is_student: !!userData.isStudent,
-      created_at: userData.createdAt?.toDate()?.getTime() / 1000,
-      last_activity_at: userData.lastActivityAt?.toDate()?.getTime() / 1000,
-      last_sign_in_at: userData.lastSignInAt?.toDate()?.getTime() / 1000,
+      created_at: toUnixTimestamp(userData.createdAt),
+      last_activity_at: toUnixTimestamp(userData.lastActivityAt),
+      last_sign_in_at: toUnixTimestamp(userData.lastSignInAt),
       timezone: userData.timezone,
 
       // Education
