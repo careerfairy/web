@@ -1,5 +1,5 @@
 import { AuthorPromotionComponentType } from "data/hygraph/types"
-import { ReactNode } from "react"
+import { ReactNode, useMemo } from "react"
 import { AuthorPromotion } from "./AuthorPromotion"
 
 type WithPromotionProps = {
@@ -11,7 +11,15 @@ export const BlockWithAuthorPromotion = ({
    promotionData,
    children,
 }: WithPromotionProps) => {
-   return promotionData ? (
+   const isAuthorPromotion = useMemo(() => {
+      return (
+         promotionData?.authorName &&
+         promotionData?.authorAvatar &&
+         promotionData?.backgroundColor
+      )
+   }, [promotionData])
+
+   return isAuthorPromotion ? (
       <AuthorPromotion {...promotionData}>{children}</AuthorPromotion>
    ) : (
       <>{children}</>
