@@ -185,13 +185,16 @@ test.describe("New Streaming Interactions", () => {
       // Streamer starts to share a pdf
       await streamerPage.sharePDF()
 
+      const presentationCanvas = viewerPage.page.locator(
+         ".react-pdf__Page__canvas"
+      )
       // Viewer should see the action on their end
-      await expect(viewerPage.page.locator("canvas")).toBeVisible()
+      await expect(presentationCanvas).toBeVisible()
 
       // Stop sharing
       await streamerPage.stopSharingPDF()
       await sleep(1500) // give some time for action to propagate between agora and viewer
-      await expect(viewerPage.page.locator("canvas")).not.toBeVisible()
+      await expect(presentationCanvas).not.toBeVisible()
    })
 })
 
