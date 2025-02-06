@@ -9,7 +9,7 @@ const styles = sxStyles({
    root: (theme) => ({
       borderRadius: "12px",
       color: theme.palette.common.white,
-      zIndex: theme.zIndex.drawer + 1,
+      zIndex: theme.zIndex.appBar + 1,
       position: "absolute",
 
       "& button": {

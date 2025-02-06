@@ -274,7 +274,7 @@ const ProfileMenu = () => {
             sx={combineStyles(styles.menuItem, sx)}
          >
             <ListItemIcon>
-               <CompanyIcon sx={styles.icon} fill="none" />
+               <CompanyIcon sx={styles.icon} />
             </ListItemIcon>
             <Typography color={"text.secondary"} sx={styles.menuItemText}>
                Followed Companies

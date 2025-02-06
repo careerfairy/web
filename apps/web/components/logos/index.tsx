@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react"
 import { Box, SvgIcon, SvgIconProps, SxProps } from "@mui/material"
 import { styled, Theme } from "@mui/material/styles"
 import Link from "components/views/common/Link"
-import { MobileUtils } from "../../util/mobile.utils";
+import { useEffect, useState } from "react"
+import { MobileUtils } from "../../util/mobile.utils"
 
 const LogoImage = styled("img")({
    cursor: "pointer",
@@ -10,20 +10,10 @@ const LogoImage = styled("img")({
    display: "inline-block",
 })
 export const MainLogo = ({ white, className, sx }: MainLogoProps) => {
-   const [logoHref, setLogoHref] = useState("/");
-
-   useEffect(() => {
-      if (MobileUtils.webViewPresence()) {
-         setLogoHref("/portal");
-      } else {
-         setLogoHref("/");
-      }
-   }, []);
-   
    return (
       <Box
          component={Link}
-         href={logoHref}
+         href={"/portal"}
          sx={{
             display: "flex",
          }}
@@ -39,15 +29,15 @@ export const MainLogo = ({ white, className, sx }: MainLogoProps) => {
 }
 
 export const MiniLogo = ({ size = 30 }: MiniLogoProps) => {
-   const [logoHref, setLogoHref] = useState("/");
+   const [logoHref, setLogoHref] = useState("/")
 
    useEffect(() => {
       if (MobileUtils.webViewPresence()) {
-         setLogoHref("/portal");
+         setLogoHref("/portal")
       } else {
-         setLogoHref("/");
+         setLogoHref("/")
       }
-   }, []);
+   }, [])
 
    return (
       <Link href={logoHref}>

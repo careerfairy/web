@@ -1,6 +1,4 @@
 import { LivestreamVideo } from "@careerfairy/shared-lib/livestreams"
-import MuteIcon from "@mui/icons-material/VolumeOff"
-import UnmuteIcon from "@mui/icons-material/VolumeUp"
 import Backdrop from "@mui/material/Backdrop"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
@@ -13,6 +11,7 @@ import ReactPlayer, { ReactPlayerProps } from "react-player"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import DateUtil from "util/DateUtil"
+import { useSpotlight } from "../SpotlightProvider"
 
 const styles = sxStyles({
    root: (theme) => ({
@@ -37,7 +36,7 @@ const styles = sxStyles({
    },
    backdrop: (theme) => ({
       color: theme.palette.common.white,
-      zIndex: theme.zIndex.drawer + 1,
+      zIndex: theme.zIndex.appBar + 1,
       position: "absolute",
    }),
 })
@@ -51,6 +50,7 @@ type Props = {
 export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
    const { trigger: updateVideoState } =
       useUpdateLivestreamVideoState(livestreamId)
+   const { isMuted, setIsMuted, setShowMute } = useSpotlight()
 
    const isVideoSharer = video.updater === userId
 
@@ -61,8 +61,7 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
       !navigator?.userActivation?.hasBeenActive
    )
 
-   // If you have not interacted with the page before, you are muted
-   const [muted, setMuted] = useState(autoPlayFailed)
+   const muted = autoPlayFailed ? true : isMuted
 
    const [reactPlayerInstance, setReactPlayerInstance] =
       useState<ReactPlayer | null>(null)
@@ -90,6 +89,13 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
          )
       }
    }, [reactPlayerInstance])
+
+   /**
+    * Initializes the mute overlay control
+    */
+   useEffect(() => {
+      setShowMute(Boolean(!isVideoSharer && reactPlayerInstance))
+   }, [isVideoSharer, reactPlayerInstance, setShowMute])
 
    const videoPaused = video.state === "paused"
 
@@ -136,13 +142,9 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
       setReactPlayerInstance(player)
    }
 
-   const handleToggleMute = () => {
-      setMuted((prev) => !prev)
-   }
-
    const handleClickToEnableAudio = () => {
       setAutoPlayFailed(false)
-      setMuted(false)
+      setIsMuted(false)
    }
 
    return (
@@ -174,15 +176,6 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
                      Click for audio
                   </Button>
                </Backdrop>
-            )}
-            {Boolean(!isVideoSharer && reactPlayerInstance) && (
-               <Button
-                  sx={styles.muteButton}
-                  startIcon={muted ? <MuteIcon /> : <UnmuteIcon />}
-                  onClick={handleToggleMute}
-               >
-                  {muted ? "Unmute" : "Mute"}
-               </Button>
             )}
          </Box>
       </Fragment>
