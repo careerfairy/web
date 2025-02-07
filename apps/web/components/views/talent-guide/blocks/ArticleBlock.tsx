@@ -79,7 +79,7 @@ const Content = ({
    authorName,
 }: Props) => {
    return (
-      <Box sx={styles.root}>
+      <Box sx={styles.root} component={Link} href={articleUrl}>
          <Box
             sx={[
                styles.imageContainer,
@@ -108,12 +108,7 @@ const Content = ({
             <Box sx={styles.titleContainer}>
                <Typography variant="small">{title}</Typography>
                <Box sx={styles.iconButtonContainer}>
-                  <IconButton
-                     sx={styles.iconButton}
-                     size="small"
-                     component={Link}
-                     href={articleUrl}
-                  >
+                  <IconButton sx={styles.iconButton} size="small">
                      <ChevronRight size={15} />
                   </IconButton>
                </Box>
