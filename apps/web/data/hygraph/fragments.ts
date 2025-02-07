@@ -1,5 +1,18 @@
 import { gql } from "graphql-request"
 
+export const colorFragment = gql`
+   {
+      hex
+      rgba {
+         r
+         g
+         b
+         a
+      }
+      css
+   }
+`
+
 // ==================
 //       Assets
 // ==================
@@ -76,6 +89,16 @@ export const seoComponentFragment = gql`
    }
 `
 
+// Component API ID: AuthorPromotion
+export const promotionComponentFragment = gql`
+   {
+      id
+      authorName
+      authorAvatar ${imageAssetFragment}
+      backgroundColor ${colorFragment}
+   }
+`
+
 // ==================
 //       Models
 // ==================
@@ -96,9 +119,11 @@ export const articleBlockFragment = gql`
       __typename
       id
       title
+      authorName
+      authorAvatar ${imageAssetFragment}
       illustration ${imageAssetFragment}
-      companyName
       articleUrl
+      promotionData ${promotionComponentFragment}
    }
 `
 
@@ -121,6 +146,7 @@ export const highlightsBlockFragment = gql`
         ... on Highlight ${highlightComponentFragment}
         ... on Spark ${sparkComponentFragment}
       }
+      promotionData ${promotionComponentFragment}
    }
 `
 // Model API ID: JobsBlock
@@ -173,6 +199,7 @@ export const videoBlockFragment = gql`
       avatar ${imageAssetFragment}
       videoTitle: title
       label
+      promotionData ${promotionComponentFragment}
    }
 `
 
