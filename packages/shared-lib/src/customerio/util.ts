@@ -51,9 +51,7 @@ export function transformUserDataForCustomerIO(
       regions_of_interest: userData.regionsOfInterest,
 
       // Marketing & Analytics
-      ...(userData.unsubscribed !== undefined && {
-         unsubscribed: !!userData.unsubscribed,
-      }),
+      unsubscribed: userData.unsubscribed ?? true,
       referral_code: userData.referralCode,
       referred_by_code: userData.referredBy?.referralCode,
       account_creation_utm: userData.accountCreationUTMParams,
