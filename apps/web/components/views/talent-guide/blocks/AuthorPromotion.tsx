@@ -52,7 +52,7 @@ export const AuthorPromotion = ({
          ]}
       >
          <Stack sx={styles.wrapper} direction="column">
-            <Typography variant="desktopBrandedH3" sx={styles.authorName}>
+            <Typography variant="medium" sx={styles.authorName}>
                Exklusive Einblicke von:
             </Typography>
             <Stack sx={styles.wrapper} direction="row">
