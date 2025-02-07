@@ -52,7 +52,7 @@ export interface CustomerIOUserData {
    regions_of_interest: string[]
 
    // Marketing & Analytics
-   unsubscribed: boolean
+   unsubscribed?: boolean
    referral_code: string
    referred_by_code: string
    account_creation_utm: UTMParams | null
