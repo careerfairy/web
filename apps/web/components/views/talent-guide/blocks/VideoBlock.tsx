@@ -17,6 +17,9 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       aspectRatio: "16 / 9",
+      "& .react-player": {
+         height: "100% !important",
+      },
       "& .react-player__preview": {
          backgroundSize: "contain !important",
       },
