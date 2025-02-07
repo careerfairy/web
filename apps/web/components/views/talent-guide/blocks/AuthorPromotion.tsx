@@ -53,7 +53,7 @@ export const AuthorPromotion = ({
       >
          <Stack sx={styles.wrapper} direction="column">
             <Typography variant="desktopBrandedH3" sx={styles.authorName}>
-               Exclusive insights by:
+               Exklusive Einblicke von:
             </Typography>
             <Stack sx={styles.wrapper} direction="row">
                <CircularLogo
