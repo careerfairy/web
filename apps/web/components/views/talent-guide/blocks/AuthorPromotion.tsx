@@ -47,7 +47,9 @@ export const AuthorPromotion = ({
          sx={[
             styles.root,
             {
-               backgroundColor: backgroundColor?.hex || "white",
+               backgroundColor: backgroundColor
+                  ? `rgba(${backgroundColor.rgba.r}, ${backgroundColor.rgba.g}, ${backgroundColor.rgba.b}, ${backgroundColor.rgba.a})`
+                  : "white",
             },
          ]}
       >
