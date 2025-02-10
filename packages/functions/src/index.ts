@@ -274,6 +274,7 @@ exports.onWriteSpark = onWriteTriggers.onWriteSpark
 exports.onWriteCustomJobs = onWriteTriggers.onWriteCustomJobs
 exports.onWriteCustomJobsSendNotifications =
    onWriteTriggers.onWriteCustomJobsSendNotifications
+exports.onWriteStudyBackground = onWriteTriggers.onWriteStudyBackground
 
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
