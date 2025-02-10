@@ -5,16 +5,19 @@ import { hasCustomJobsGroupMetaDataChanged } from "@careerfairy/shared-lib/group
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { hasMetadataChanged as hasGroupMetadataChanged } from "@careerfairy/shared-lib/livestreams/metadata"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { UserStats } from "@careerfairy/shared-lib/src/users"
+import { StudyBackground, UserStats } from "@careerfairy/shared-lib/src/users"
 import { firestore } from "./api/firestoreAdmin"
 import {
    customJobRepo,
    groupRepo,
    livestreamsRepo,
    sparkRepo,
+   universityRepo,
    userRepo,
 } from "./api/repositories"
 
+import { levelsOfStudyOrderMap } from "@careerfairy/shared-lib/fieldOfStudy"
+import { DateTime } from "luxon"
 import config from "./config"
 import { handleUserStatsBadges } from "./lib/badge"
 import { rewardSideEffectsUserStats } from "./lib/reward"
@@ -561,6 +564,98 @@ export const onWriteCustomJobsSendNotifications = functions
                `${newCustomJob.id} job update was not newly published. Skipping notifications.`
             )
          }
+      }
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onWriteStudyBackground = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("userData/{userId}/studyBackgrounds/{studyBackgroundId}")
+   .onWrite(async (change, context) => {
+      const { userId } = context.params
+      const changeTypes = getChangeTypes(change)
+
+      logStart({
+         changeTypes,
+         context,
+         message: "syncStudyBackgroundOnWrite",
+      })
+
+      // Get current study backgrounds
+      const allUserStudyBackgrounds =
+         (await userRepo.getUserStudyBackgrounds(userId)) || []
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // If its delete we need to remove the study background from the user
+      // before calculating the effective study background
+      const userStudyBackgrounds =
+         changeTypes.isCreate || changeTypes.isUpdate
+            ? [
+                 ...allUserStudyBackgrounds,
+                 change.after.data() as StudyBackground,
+              ]
+            : allUserStudyBackgrounds.filter(
+                 (studyBackground) => studyBackground.id !== change.after.id
+              )
+
+      // Sort the study backgrounds by the endedAt date and then by the level of study
+      const sortedStudyBackgrounds = userStudyBackgrounds.sort((a, b) => {
+         if (!a.endedAt) {
+            return 1
+         }
+
+         if (!b.endedAt) {
+            return -1
+         }
+
+         const aDate = DateTime.fromJSDate(a.endedAt?.toDate()).startOf("month")
+         const bDate = DateTime.fromJSDate(b.endedAt?.toDate()).startOf("month")
+
+         if (aDate.equals(bDate)) {
+            return (
+               levelsOfStudyOrderMap[b.levelOfStudy.id] -
+               levelsOfStudyOrderMap[a.levelOfStudy.id]
+            )
+         }
+
+         return bDate > aDate ? 1 : -1
+      })
+
+      // If there are no study backgrounds, we need to update the user data to remove the study background
+      if (!sortedStudyBackgrounds.length) {
+         sideEffectPromises.push(
+            userRepo.updateUserData(userId, {
+               fieldOfStudy: null,
+               levelOfStudy: null,
+               universityCountryCode: null,
+               university: null,
+            })
+         )
+      } else {
+         // If there are study backgrounds, we need to update the user data to the first effective study background
+         const effectiveStudyBackground = sortedStudyBackgrounds.at(0)
+
+         const university = await universityRepo.getUniversityById(
+            effectiveStudyBackground.universityCountryCode,
+            effectiveStudyBackground.universityId
+         )
+
+         sideEffectPromises.push(
+            userRepo.updateUserData(userId, {
+               fieldOfStudy: effectiveStudyBackground.fieldOfStudy,
+               levelOfStudy: effectiveStudyBackground.levelOfStudy,
+               universityCountryCode:
+                  effectiveStudyBackground.universityCountryCode,
+               university: {
+                  ...university,
+                  code: university.id,
+               },
+            })
+         )
       }
 
       return handleSideEffects(sideEffectPromises)
