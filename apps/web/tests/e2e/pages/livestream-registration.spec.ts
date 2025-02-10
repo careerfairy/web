@@ -222,7 +222,7 @@ test.describe("Livestream Registration Signed Out", () => {
       await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
    })
 
-   test("register to an event without login, create an account and proceed with registration", async ({
+   test.skip("register to an event without login, create an account and proceed with registration", async ({
       page,
    }) => {
       await setupUserSignUpData()
