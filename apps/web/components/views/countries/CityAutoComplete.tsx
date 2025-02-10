@@ -76,7 +76,7 @@ export const CityAutoComplete = ({
          renderInput={(params) => (
             <TextField
                {...params}
-               label="And your city?"
+               label="And your Region / State / Canton?"
                className="registrationInput"
             />
          )}

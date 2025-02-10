@@ -79,7 +79,7 @@ export const flagsInitialState = {
       enabled: true,
    },
    talentProfileV1: {
-      enabled: false,
+      enabled: true,
    },
    levelsV1: {
       enabled: false,

@@ -1,12 +1,10 @@
 import { CountryOption } from "@careerfairy/shared-lib/countries/types"
 import { Autocomplete, TextField } from "@mui/material"
-import { universityCountriesMap } from "components/util/constants/universityCountries"
+import {
+   countryOptions,
+   universityCountriesMap,
+} from "components/util/constants/universityCountries"
 import { useState } from "react"
-
-const countries = Object.keys(universityCountriesMap).map((key) => ({
-   id: key,
-   name: universityCountriesMap[key],
-}))
 
 type CountryAutoCompleteProps = {
    countryValueId?: string
@@ -34,7 +32,7 @@ export const CountryAutoComplete = ({
       <Autocomplete
          value={country}
          disabled={disabled}
-         options={countries}
+         options={countryOptions}
          onChange={(_, value) => {
             setCountry(value ?? null)
             handleSelectedCountryChange(value ?? null)

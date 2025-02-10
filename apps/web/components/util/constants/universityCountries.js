@@ -215,3 +215,10 @@ export const universityCountries = Object.keys(universityCountriesMap)
       name: universityCountriesMap[key],
    }))
    .filter(({ code }) => code)
+
+export const countryOptions = Object.keys(universityCountriesMap).map(
+   (key) => ({
+      id: key,
+      name: universityCountriesMap[key],
+   })
+)
