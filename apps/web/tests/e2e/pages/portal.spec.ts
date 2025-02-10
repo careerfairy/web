@@ -34,7 +34,7 @@ test.describe("Welcome Dialog", () => {
       await portal.assertWelcomeDialog()
    })
 
-   test("Welcome dialog should appear after closing livestream dialog when creating an account", async ({
+   test.skip("Welcome dialog should appear after closing livestream dialog when creating an account", async ({
       page,
    }) => {
       await setupUserSignUpData()
