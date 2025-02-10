@@ -363,14 +363,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         ) : (
                            Boolean(title) && title
                         )}
-                        <Typography
-                           variant={allStyles.titleVariant}
-                           sx={allStyles.title}
-                           fontWeight={"600"}
-                           color="black"
-                        >
-                           {title}
-                        </Typography>
                      </Box>
                   </ConditionalWrapper>
                   <Stack sx={styles.previewContent}>
