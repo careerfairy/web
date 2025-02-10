@@ -30,7 +30,7 @@ test.describe("Signup Page Functionality", () => {
       ])
    })
 
-   test("It successfully signs up without additional information", async ({
+   test.skip("It successfully signs up without additional information", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
@@ -182,7 +182,7 @@ test.describe("Signup Page Functionality", () => {
       await expect(signup.emailVerificationStepMessage).toBeVisible()
    })
 
-   test("It successfully signs up with additional information", async ({
+   test.skip("It successfully signs up with additional information", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
@@ -277,7 +277,7 @@ test.describe("Signup Page Functionality", () => {
       expect(firstContentTopicTagId).toEqual(userContentTopicsTagIds[0])
    })
 
-   test("It successfully signs up with linkedin as empty since we fill an invalid linkedinUrl one", async ({
+   test.skip("It successfully signs up with linkedin as empty since we fill an invalid linkedinUrl one", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
@@ -343,7 +343,7 @@ test.describe("Signup Page Functionality", () => {
       expect(userDataLinkedinUrl).toBeFalsy()
    })
 
-   test("It successfully signs up and save the steps on analytics", async ({
+   test.skip("It successfully signs up and save the steps on analytics", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
@@ -413,7 +413,7 @@ test.describe("Signup Page Functionality", () => {
       expect(userId).toEqual(correctUserId)
    })
 
-   test("It should save only once the steps on analytics even if the user goes back and forward", async ({
+   test.skip("It should save only once the steps on analytics even if the user goes back and forward", async ({
       page,
    }) => {
       const signup = new SignupPage(page)

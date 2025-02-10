@@ -1,9 +1,9 @@
 import { Button, Skeleton, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useCountryCityData from "components/custom-hook/countries/useCountryCityData"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { universityCountriesMap } from "components/util/constants/universityCountries"
 import { useRouter } from "next/router"
 import { Fragment, useMemo, useState } from "react"
 import { Settings } from "react-feather"
@@ -162,18 +162,16 @@ export const TalentProfileHeader = () => {
 
 const UserLocation = () => {
    const { userData } = useAuth()
-   const { data } = useCountryCityData(
-      userData?.countryIsoCode,
-      userData?.cityIsoCode
-   )
 
-   if (!data?.city && !data?.country) return null
+   if (!userData?.stateName && !userData?.countryIsoCode) return null
 
    return (
       <Typography sx={styles.userLocation}>
-         {data?.city?.name
-            ? `${data.city.name}, ${data?.country?.name}`
-            : data?.country?.name}
+         {userData?.stateName
+            ? `${userData.stateName}, ${
+                 universityCountriesMap[userData.countryIsoCode]
+              }`
+            : universityCountriesMap[userData.countryIsoCode]}
       </Typography>
    )
 }

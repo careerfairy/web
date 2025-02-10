@@ -2,7 +2,7 @@ import { UserData } from "@careerfairy/shared-lib/users"
 import { Box, Skeleton, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCountriesList from "components/custom-hook/countries/useCountriesList"
-import useCountryCities from "components/custom-hook/countries/useCountryCities"
+import useCountryStates from "components/custom-hook/countries/useCountryStates"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
@@ -91,18 +91,7 @@ export const PersonalInfoFormFields = () => {
          >
             <CountriesDropdown />
          </SuspenseWithBoundary>
-
-         <SuspenseWithBoundary
-            fallback={
-               <Skeleton
-                  variant="rectangular"
-                  height={56}
-                  sx={{ borderRadius: 1.5 }}
-               />
-            }
-         >
-            <CitiesDropdown />
-         </SuspenseWithBoundary>
+         <CitiesDropdown />
 
          <Box>
             <ControlledBrandedTextField
@@ -131,7 +120,7 @@ const CountriesDropdown = () => {
       setValue,
    } = useFormContext<PersonalInfoSchemaType>()
 
-   const { data: countriesList } = useCountriesList()
+   const { data: countriesList, isLoading } = useCountriesList(false)
 
    return (
       <ControlledBrandedAutoComplete
@@ -147,17 +136,20 @@ const CountriesDropdown = () => {
                },
             },
          }}
+         loading={isLoading}
          autocompleteProps={{
             id: "countryIsoCode",
             disabled: isSubmitting,
             disableClearable: true,
+            loadingText: "Fetching countries..",
             autoHighlight: true,
             selectOnFocus: false,
             getOptionLabel: (option) =>
                (option && countriesList[option]?.name) || "",
             isOptionEqualToValue: (option, value) => option === value,
             onChange: () => {
-               setValue("cityIsoCode", "")
+               setValue("stateName", "")
+               setValue("stateIsoCode", "")
             },
          }}
       />
@@ -173,13 +165,17 @@ const CitiesDropdown = () => {
 
    const countryIsoCode = watch("countryIsoCode")
 
-   const { data: countryCities } = useCountryCities(countryIsoCode)
+   const { data: countryStates, isLoading } = useCountryStates(
+      countryIsoCode,
+      false
+   )
 
    return (
       <ControlledBrandedAutoComplete
-         label={"City"}
-         name={"cityIsoCode"}
-         options={Object.keys(countryCities)}
+         label={"Region / State / Canton"}
+         name={"stateIsoCode"}
+         options={!isLoading ? Object.keys(countryStates) : []}
+         loading={isLoading}
          textFieldProps={{
             requiredText: null,
             placeholder: "E.g, Zurich",
@@ -190,19 +186,22 @@ const CitiesDropdown = () => {
             },
          }}
          autocompleteProps={{
-            id: "cityIsoCode",
+            loadingText: "Loading cities..",
+            id: "stateIsoCode",
             disabled: isSubmitting,
             disableClearable: true,
             autoHighlight: true,
             selectOnFocus: false,
             getOptionLabel: (option) =>
-               (option && countryCities[option]?.name) || "",
+               (option && countryStates[option]?.name) || "",
             isOptionEqualToValue: (option, value) => option === value,
             onChange: (_, value: string) => {
-               setValue("cityIsoCode", value, { shouldValidate: true })
+               setValue("stateName", countryStates[value]?.name, {
+                  shouldValidate: true,
+               })
                setValue(
                   "stateIsoCode",
-                  countryCities[value]?.stateIsoCode || ""
+                  countryStates[value]?.stateIsoCode || ""
                )
             },
          }}
