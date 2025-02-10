@@ -172,7 +172,7 @@ const CitiesDropdown = () => {
 
    return (
       <ControlledBrandedAutoComplete
-         label={"City"}
+         label={"Region / State / Canton"}
          name={"stateIsoCode"}
          options={!isLoading ? Object.keys(countryStates) : []}
          loading={isLoading}
