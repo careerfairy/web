@@ -596,7 +596,7 @@ export const onWriteStudyBackground = functions
          changeTypes.isCreate || changeTypes.isUpdate
             ? allUserStudyBackgrounds
             : allUserStudyBackgrounds.filter(
-                 (studyBackground) => studyBackground.id !== change.after.id
+                 (studyBackground) => studyBackground.id !== change.before.id
               )
 
       // Sort the study backgrounds by the endedAt date and then by the level of study
