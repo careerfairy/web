@@ -1,46 +1,47 @@
 import {
-   FirebaseGroupRepository,
-   IGroupRepository,
-} from "@careerfairy/shared-lib/groups/GroupRepository"
+   createCompatGenericConverter,
+   mapFirestoreDocuments,
+} from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { FieldOfStudyCategory } from "@careerfairy/shared-lib/fieldOfStudy"
 import {
    FilterCompanyOptions,
-   Group,
    GROUP_DASHBOARD_ROLE,
+   Group,
    GroupAdmin,
    GroupPlanType,
    GroupQuestion,
 } from "@careerfairy/shared-lib/groups"
-import { GroupDashboardInvite } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
-import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
-import {
-   createCompatGenericConverter,
-   mapFirestoreDocuments,
-} from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
-import { Change } from "firebase-functions"
-import { firestore } from "firebase-admin"
-import { OperationsToMake } from "./stats/util"
+import { GroupDashboardInvite } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
+import {
+   FirebaseGroupRepository,
+   IGroupRepository,
+} from "@careerfairy/shared-lib/groups/GroupRepository"
+import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
 import { createGroupStatsDoc } from "@careerfairy/shared-lib/groups/stats"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
+import { Logger } from "@careerfairy/shared-lib/utils/types"
+import { firestore } from "firebase-admin"
+import { UserRecord } from "firebase-admin/auth"
+import * as functions from "firebase-functions"
+import { Change } from "firebase-functions"
 import { cloneDeep, isEmpty, union } from "lodash"
+import { DateTime } from "luxon"
+import { ServerClient } from "postmark"
+import { Timestamp, auth } from "../api/firestoreAdmin"
+import type { FunctionsLogger } from "../util"
 import {
    addGroupStatsOperations,
    addOperationsToDecrementGroupStatsOperations,
    addOperationsToOnlyIncrementGroupStatsOperations,
 } from "./stats/group"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import type { FunctionsLogger } from "../util"
+import { OperationsToMake } from "./stats/util"
 
 import DocumentSnapshot = firestore.DocumentSnapshot
-import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
-import { auth, Timestamp } from "../api/firestoreAdmin"
-import { UserRecord } from "firebase-admin/auth"
-import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
-import * as functions from "firebase-functions"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { ServerClient } from "postmark"
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
-import { DateTime } from "luxon"
-import { Logger } from "@careerfairy/shared-lib/utils/types"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -194,6 +195,11 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
       group: Group,
       client: ServerClient
    ): Promise<void>
+
+   getFeaturedGroups(
+      fieldOfStudyCategory: FieldOfStudyCategory,
+      countryId: string
+   ): Promise<Group[]>
 }
 
 export class GroupFunctionsRepository
@@ -696,6 +702,26 @@ export class GroupFunctionsRepository
             "Error sending sparks trial plan creation period near to end reminder:",
          companyName: group.universityName,
       })
+   }
+
+   async getFeaturedGroups(
+      fieldOfStudyCategory: FieldOfStudyCategory,
+      countryId: string
+   ): Promise<Group[]> {
+      const snaps = await this.firestore
+         .collection("careerCenterData")
+         .where(
+            "featured.targetAudience",
+            "array-contains",
+            fieldOfStudyCategory
+         )
+         .withConverter(createCompatGenericConverter<Group>())
+         .get()
+
+      const docs = mapFirestoreDocuments<Group>(snaps) || []
+      return docs.filter((group) =>
+         group.featured.targetCountries.includes(countryId)
+      )
    }
 }
 
