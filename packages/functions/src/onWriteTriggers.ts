@@ -588,9 +588,6 @@ export const onWriteStudyBackground = functions
       const allUserStudyBackgrounds =
          (await userRepo.getUserStudyBackgrounds(userId)) || []
 
-      // An array of promise side effects to be executed in parallel
-      const sideEffectPromises: Promise<unknown>[] = []
-
       // If its delete we need to remove the study background from the user
       // before calculating the effective study background
       const userStudyBackgrounds =
@@ -625,14 +622,12 @@ export const onWriteStudyBackground = functions
 
       // If there are no study backgrounds, we need to update the user data to remove the study background
       if (!sortedStudyBackgrounds.length) {
-         sideEffectPromises.push(
-            userRepo.updateUserData(userId, {
-               fieldOfStudy: null,
-               levelOfStudy: null,
-               universityCountryCode: null,
-               university: null,
-            })
-         )
+         await userRepo.updateUserData(userId, {
+            fieldOfStudy: null,
+            levelOfStudy: null,
+            universityCountryCode: null,
+            university: null,
+         })
       } else {
          // If there are study backgrounds, we need to update the user data to the first effective study background
          const effectiveStudyBackground = sortedStudyBackgrounds.at(0)
@@ -657,19 +652,15 @@ export const onWriteStudyBackground = functions
 
          functions.logger.log("🚀 ~ Effective university:", userId, university)
 
-         sideEffectPromises.push(
-            userRepo.updateUserData(userId, {
-               fieldOfStudy: effectiveStudyBackground.fieldOfStudy,
-               levelOfStudy: effectiveStudyBackground.levelOfStudy,
-               universityCountryCode:
-                  effectiveStudyBackground.universityCountryCode,
-               university: {
-                  ...university,
-                  code: university.id,
-               },
-            })
-         )
+         await userRepo.updateUserData(userId, {
+            fieldOfStudy: effectiveStudyBackground.fieldOfStudy,
+            levelOfStudy: effectiveStudyBackground.levelOfStudy,
+            universityCountryCode:
+               effectiveStudyBackground.universityCountryCode,
+            university: {
+               ...university,
+               code: university.id,
+            },
+         })
       }
-
-      return handleSideEffects(sideEffectPromises)
    })
