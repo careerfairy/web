@@ -155,10 +155,15 @@ const SelectUniversitiesDropDown = ({
 
    const options = useMemo(() => {
       return (
-         universities?.map((university) => ({
-            id: university.id,
-            value: university.name,
-         })) || []
+         universities
+            ?.concat({
+               id: "other",
+               name: "Other",
+            })
+            ?.map((university) => ({
+               id: university.id,
+               value: university.name,
+            })) || []
       )
    }, [universities])
 
