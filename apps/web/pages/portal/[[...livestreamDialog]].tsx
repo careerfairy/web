@@ -34,7 +34,7 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
-import { FeaturedCompanies } from "components/views/portal/companies/FeaturedCompanies"
+import { FeaturedCompanies } from "components/views/portal/companies/featured/FeaturedCompanies"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
