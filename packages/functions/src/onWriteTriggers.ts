@@ -17,6 +17,7 @@ import {
 } from "./api/repositories"
 
 import { levelsOfStudyOrderMap } from "@careerfairy/shared-lib/fieldOfStudy"
+import { University } from "@careerfairy/shared-lib/universities/universities"
 import { DateTime } from "luxon"
 import config from "./config"
 import { handleUserStatsBadges } from "./lib/badge"
@@ -622,11 +623,6 @@ export const onWriteStudyBackground = functions
          return bDate > aDate ? 1 : -1
       })
 
-      functions.logger.log(
-         "🚀 ~ Sorted study backgrounds:",
-         userId,
-         sortedStudyBackgrounds
-      )
       // If there are no study backgrounds, we need to update the user data to remove the study background
       if (!sortedStudyBackgrounds.length) {
          sideEffectPromises.push(
@@ -641,16 +637,24 @@ export const onWriteStudyBackground = functions
          // If there are study backgrounds, we need to update the user data to the first effective study background
          const effectiveStudyBackground = sortedStudyBackgrounds.at(0)
 
-         const university = await universityRepo.getUniversityById(
-            effectiveStudyBackground.universityCountryCode,
-            effectiveStudyBackground.universityId
-         )
+         const university: University =
+            effectiveStudyBackground.universityId.toLocaleLowerCase() ===
+            "other"
+               ? {
+                    id: "other",
+                    name: "Other",
+                 }
+               : await universityRepo.getUniversityById(
+                    effectiveStudyBackground.universityCountryCode,
+                    effectiveStudyBackground.universityId
+                 )
 
          functions.logger.log(
             "🚀 ~ Effective study background:",
             userId,
             effectiveStudyBackground
          )
+
          functions.logger.log("🚀 ~ Effective university:", userId, university)
 
          sideEffectPromises.push(
