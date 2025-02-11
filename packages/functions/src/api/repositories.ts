@@ -11,6 +11,10 @@ import {
    IRewardRepository,
 } from "@careerfairy/shared-lib/rewards/RewardRepository"
 import {
+   FirebaseUniversityRepository,
+   IUniversityRepository,
+} from "@careerfairy/shared-lib/universities/UniversityRepository"
+import {
    ILivestreamFunctionsRepository,
    LivestreamFunctionsRepository,
 } from "../lib/LivestreamFunctionsRepository"
@@ -69,6 +73,9 @@ export const rewardsRepo: IRewardRepository = new FirebaseRewardRepository(
 
 export const fieldOfStudyRepo: IFieldOfStudyRepository =
    new FirebaseFieldOfStudyRepository(firestore as any)
+
+export const universityRepo: IUniversityRepository =
+   new FirebaseUniversityRepository(firestore as any)
 
 export const livestreamsRepo: ILivestreamFunctionsRepository =
    new LivestreamFunctionsRepository(firestore as any, FieldValue)

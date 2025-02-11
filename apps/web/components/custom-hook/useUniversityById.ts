@@ -15,7 +15,10 @@ export const useUniversityById = (
 
    if (!universityCountryData) return null
 
-   const countryUniversities = universityCountryData.universities
+   const countryUniversities = universityCountryData.universities?.concat({
+      id: "other",
+      name: "Other",
+   })
 
    return countryUniversities
       ?.filter((university) => university.id === universityId)
