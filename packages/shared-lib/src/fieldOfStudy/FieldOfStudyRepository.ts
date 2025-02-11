@@ -3,8 +3,8 @@ import {
    convertDocArrayToDict,
    mapFirestoreDocuments,
 } from "../BaseFirebaseRepository"
-import { FieldOfStudy } from "./fieldOfStudy"
 import { GroupQuestion } from "../groups"
+import { FieldOfStudy } from "./fieldOfStudy"
 
 export interface IFieldOfStudyRepository {
    getAllFieldsOfStudy(): Promise<FieldOfStudy[]>
@@ -14,6 +14,8 @@ export interface IFieldOfStudyRepository {
    getFieldsOfStudyAsGroupQuestion(
       categoryType: "fieldOfStudy" | "levelOfStudy"
    ): Promise<GroupQuestion>
+
+   getById(id: string): Promise<FieldOfStudy>
 }
 
 export class FirebaseFieldOfStudyRepository implements IFieldOfStudyRepository {
@@ -42,5 +44,14 @@ export class FirebaseFieldOfStudyRepository implements IFieldOfStudyRepository {
          questionType: isFieldOfStudy ? "fieldOfStudy" : "levelOfStudy",
          options: convertDocArrayToDict(categories),
       }
+   }
+
+   async getById(id: string): Promise<FieldOfStudy> {
+      const snapshot = await this.firestore
+         .collection("fieldsOfStudy")
+         .doc(id)
+         .get()
+
+      return snapshot.data() as FieldOfStudy
    }
 }
