@@ -1,9 +1,11 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Box } from "@mui/material"
+import { Box, Divider, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFeaturedCompanies from "components/custom-hook/group/useFeaturedCompanies"
 import { useFieldOfStudyById } from "components/custom-hook/useCollection"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { ChevronRight } from "react-feather"
+import { FeaturedCompaniesCarousel } from "./FeaturedCompaniesCarousel"
 import { FeaturedCompaniesHeader } from "./FeaturedCompaniesHeader"
 
 const styles = sxStyles({
@@ -11,6 +13,7 @@ const styles = sxStyles({
       mx: 2,
       borderRadius: 2,
       background: "linear-gradient(125deg, #5A86E2 0%, #5F9BD9 100%)",
+      mb: "40px",
    },
 })
 
@@ -51,6 +54,16 @@ const FeaturedCompaniesComponent = ({
             onPreviousClick={() => {}}
             onNextClick={() => {}}
          />
+         <FeaturedCompaniesCarousel companies={featuredCompanies} />
+         {isMobile ? (
+            <Box>
+               <Divider />
+               <Stack direction="row">
+                  <Typography>Explore more companies</Typography>
+                  <Box component={ChevronRight} />
+               </Stack>
+            </Box>
+         ) : null}
       </Box>
    )
 }
