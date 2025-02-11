@@ -84,7 +84,7 @@
                "displayName": "CareerFairy",
                "scheme": "fb2046877438758567",
                "advertiserIDCollectionEnabled": true,
-               "autoLogAppEventsEnabled": false,
+               "autoLogAppEventsEnabled": true,
                "isAutoInitEnabled": true,
                "iosUserTrackingPermission": "This allows us to provide you with a better experience and more relevant content."
             }
