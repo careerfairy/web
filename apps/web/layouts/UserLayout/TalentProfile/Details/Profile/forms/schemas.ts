@@ -6,10 +6,7 @@ import {
    BusinessFunctionsTags,
    ContentTopicsTags,
 } from "@careerfairy/shared-lib/constants/tags"
-import {
-   FieldOfStudy,
-   LevelOfStudy,
-} from "@careerfairy/shared-lib/fieldOfStudy"
+import { LevelOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import {
    ProfileInterest,
    ProfileLanguage,
@@ -122,7 +119,11 @@ export type StudyBackgroundFormValues = {
    id?: string
    universityCountryCode: string
    universityId: string
-   fieldOfStudy: FieldOfStudy
+   fieldOfStudy: {
+      id: string
+      name: string
+      value?: string
+   }
    levelOfStudy: LevelOfStudy
    startedAt?: Date
    endedAt?: Date
