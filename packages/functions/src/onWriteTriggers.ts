@@ -622,6 +622,11 @@ export const onWriteStudyBackground = functions
          return bDate > aDate ? 1 : -1
       })
 
+      functions.logger.log(
+         "🚀 ~ Sorted study backgrounds:",
+         userId,
+         sortedStudyBackgrounds
+      )
       // If there are no study backgrounds, we need to update the user data to remove the study background
       if (!sortedStudyBackgrounds.length) {
          sideEffectPromises.push(
@@ -640,6 +645,13 @@ export const onWriteStudyBackground = functions
             effectiveStudyBackground.universityCountryCode,
             effectiveStudyBackground.universityId
          )
+
+         functions.logger.log(
+            "🚀 ~ Effective study background:",
+            userId,
+            effectiveStudyBackground
+         )
+         functions.logger.log("🚀 ~ Effective university:", userId, university)
 
          sideEffectPromises.push(
             userRepo.updateUserData(userId, {
