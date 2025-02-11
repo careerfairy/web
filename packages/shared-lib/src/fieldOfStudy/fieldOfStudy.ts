@@ -6,6 +6,12 @@ export type FieldOfStudy = Identifiable & {
 
 export type LevelOfStudy = FieldOfStudy
 
+export const levelsOfStudyOrderMap: Record<string, number> = {
+   bachelor: 1,
+   master: 2,
+   phd: 3,
+}
+
 export const mapPartnershipFieldsOfStudy = (
    partnerFieldOfStudy: string
 ): string[] => {
