@@ -1,10 +1,17 @@
+import {
+   swissGermanCountryFilters,
+   userIsTargetedLevels,
+} from "@careerfairy/shared-lib/countries/filters"
 import { Container, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import FramerBox from "components/views/common/FramerBox"
 import { Page, TalentGuideModule } from "data/hygraph/types"
 import { Variants } from "framer-motion"
+import { useAuth } from "HOCs/AuthProvider"
 import { useGenericDashboard } from "layouts/GenericDashboardLayout"
-import { useState } from "react"
+import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { ModuleCard } from "../../talent-guide/components/module-card/ModuleCard"
 import { CourseOverview } from "./course-overview/CourseOverview"
@@ -55,11 +62,26 @@ type Props = {
 }
 
 export const LevelsContainer = ({ pages }: Props) => {
+   const router = useRouter()
    const isMobile = useIsMobile()
    const { drawerOpen } = useGenericDashboard()
+   const { userData, isLoadingUserData } = useAuth()
+   const { userCountryCode, isLoading: isLoadingCountry } = useUserCountryCode()
    const [hasStaggerFinished, setHasStaggerFinished] = useState(false)
 
    const cardsAreMobile = useIsMobile(drawerOpen ? 1110 : undefined)
+
+   useEffect(() => {
+      if (isLoadingUserData || isLoadingCountry) return
+
+      const showLevels = userData
+         ? userIsTargetedLevels(userData)
+         : swissGermanCountryFilters.includes(userCountryCode)
+
+      if (!showLevels) {
+         router.push("/campaigns/levels-teaser-en")
+      }
+   }, [router, userData, userCountryCode, isLoadingUserData, isLoadingCountry])
 
    return (
       <FramerBox
