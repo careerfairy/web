@@ -169,6 +169,43 @@ npm run native-build:prod
 
 Note: If you are running a build for a new release on the app store, you will need to bump the version on the app.json file.
 
+### Installing Development Builds
+
+After creating a development build, you can install it directly to your connected device or simulator using the `eas build:run` command. Here's what you need to do:
+
+#### Prerequisites
+
+1. For iOS:
+
+   -  Xcode installed
+   -  iOS device connected via USB or simulator running
+
+2. For Android:
+   -  Android Studio installed
+   -  Android device connected via USB (with USB debugging enabled) or emulator running
+
+#### Installing the Build
+
+Run one of the following commands based on your platform:
+
+```bash
+# For iOS
+eas build:run -p ios
+# or from mobile directory
+npm run run:ios
+# or from project root
+npm run native-run:ios
+
+# For Android
+eas build:run -p android
+# or from mobile directory
+npm run run:android
+# or from project root
+npm run native-run:android
+```
+
+The command will automatically download the latest development build for your platform and install it on your connected device or running simulator.
+
 ---
 
 ### Local Development Build
