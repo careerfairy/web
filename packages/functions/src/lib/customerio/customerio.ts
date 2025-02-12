@@ -174,14 +174,19 @@ export const customerIOWebhook = onRequest(async (request, response) => {
             logger.info(
                `Updating subscription status for user ${userEmail} to ${event.metric}`
             )
-            // Update the user's subscription status in Firebase
-            await userRepo.updateUserData(userEmail, {
-               unsubscribed: event.metric === "unsubscribed",
-            })
-
-            logger.info(
-               `Updated subscription status for user ${userEmail} to ${event.metric}`
-            )
+            try {
+               await userRepo.updateUserData(userEmail, {
+                  unsubscribed: event.metric === "unsubscribed",
+               })
+               logger.info(
+                  `Updated subscription status for user ${userEmail} to ${event.metric}`
+               )
+            } catch (error) {
+               logger.warn(
+                  `Failed to update subscription status for user ${userEmail}`,
+                  error
+               )
+            }
             response.status(200).send("OK")
             break
          }
