@@ -2,7 +2,7 @@
    "expo": {
       "name": "CareerFairy",
       "slug": "careerfairy-mobile-app",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "orientation": "portrait",
       "icon": "./assets/images/AppIcon.png",
       "scheme": "careerfairy",
@@ -72,7 +72,25 @@
          "output": "static",
          "favicon": "./assets/images/AppIcon.png"
       },
-      "plugins": ["expo-router", "expo-secure-store", "expo-font"],
+      "plugins": [
+         "expo-router",
+         "expo-secure-store",
+         "expo-font",
+         [
+            "react-native-fbsdk-next",
+            {
+               "appID": "2046877438758567",
+               "clientToken": "35e8df5c8632dd59271c98f2b44b99e2",
+               "displayName": "CareerFairy",
+               "scheme": "fb2046877438758567",
+               "advertiserIDCollectionEnabled": true,
+               "autoLogAppEventsEnabled": true,
+               "isAutoInitEnabled": true,
+               "iosUserTrackingPermission": "This allows us to provide you with a better experience and more relevant content."
+            }
+         ],
+         "expo-tracking-transparency"
+      ],
       "experiments": {
          "typedRoutes": true
       },

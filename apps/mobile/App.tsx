@@ -1,25 +1,25 @@
-import { useEffect, useState } from "react"
+import { PROJECT_ID } from "@env"
 import {
+   Poppins_400Regular,
+   Poppins_600SemiBold,
+   useFonts,
+} from "@expo-google-fonts/poppins"
+import NetInfo from "@react-native-community/netinfo"
+import * as Notifications from "expo-notifications"
+import * as SecureStore from "expo-secure-store"
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
+import React, { useEffect, useState } from "react"
+import {
+   Image,
    Platform,
    SafeAreaView,
    Text,
    TouchableOpacity,
-   Image,
 } from "react-native"
 import WebViewComponent from "./components/WebView"
-import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
-import { app, db, auth } from "./firebase"
-import * as SecureStore from "expo-secure-store"
-import * as Notifications from "expo-notifications"
-import { signInWithEmailAndPassword } from "firebase/auth"
-import { PROJECT_ID } from "@env"
-import NetInfo from "@react-native-community/netinfo"
-import React from "react"
-import {
-   useFonts,
-   Poppins_400Regular,
-   Poppins_600SemiBold,
-} from "@expo-google-fonts/poppins"
+import { app, auth, db } from "./firebase"
+import { initializeFacebookTracking } from "./utils/facebook-tracking"
 
 const styles: any = {
    image: {
@@ -66,6 +66,10 @@ export default function Native() {
       PoppinsRegular: Poppins_400Regular,
       PoppinsSemiBold: Poppins_600SemiBold,
    })
+
+   useEffect(() => {
+      initializeFacebookTracking()
+   }, [])
 
    useEffect(() => {
       const unsubscribe = NetInfo.addEventListener((state) => {
