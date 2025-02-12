@@ -1,3 +1,11 @@
+import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
+import { Box, Button, Collapse, IconButton, TextField } from "@mui/material"
+import { grey } from "@mui/material/colors"
+import { alpha } from "@mui/material/styles"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { SystemStyleObject } from "@mui/system/styleFunctionSx/styleFunctionSx"
+import firebase from "firebase/compat/app"
 import React, {
    KeyboardEventHandler,
    useCallback,
@@ -6,35 +14,28 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { Box, Button, Collapse, IconButton, TextField } from "@mui/material"
+import { useDispatch } from "react-redux"
+import { Dispatch } from "redux"
+import { AnalyticsEvents } from "util/analytics/types"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { MAX_STREAM_CHAT_ENTRIES } from "../../../../../constants/streams"
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
+import { useCurrentStream } from "../../../../../context/stream/StreamContext"
+import TutorialContext from "../../../../../context/tutorials/TutorialContext"
 import {
    TooltipText,
    TooltipTitle,
    WhiteTooltip,
 } from "../../../../../materialUI/GlobalTooltips"
-import { sxStyles } from "../../../../../types/commonTypes"
-import { alpha } from "@mui/material/styles"
-import { grey } from "@mui/material/colors"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
-import { useDispatch } from "react-redux"
-import TutorialContext from "../../../../../context/tutorials/TutorialContext"
-import useStreamRef from "../../../../custom-hook/useStreamRef"
-import { MAX_STREAM_CHAT_ENTRIES } from "../../../../../constants/streams"
 import * as actions from "../../../../../store/actions"
-import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
+import { sxStyles } from "../../../../../types/commonTypes"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
-import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
-import { useCurrentStream } from "../../../../../context/stream/StreamContext"
-import { Dispatch } from "redux"
-import firebase from "firebase/compat/app"
+import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
+import useStreamRef from "../../../../custom-hook/useStreamRef"
 import CustomScrollToBottom from "../../../../util/CustomScrollToBottom"
+import ConfirmDeleteModal from "../../modal/ConfirmDeleteModal"
 import ChatEntryContainer from "./ChatEntryContainer"
 import EmotesModal from "./EmotesModal"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
-import { SystemStyleObject } from "@mui/system/styleFunctionSx/styleFunctionSx"
-import ConfirmDeleteModal from "../../modal/ConfirmDeleteModal"
-import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import DocumentChange = firebase.firestore.DocumentChange
 
 const styles = sxStyles({
@@ -159,6 +160,7 @@ const ChatWidget = ({
          )
          return () => unsubscribe()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [currentLivestream.id])
 
    useEffect(() => {
@@ -169,12 +171,14 @@ const ChatWidget = ({
          return prevMissedEntries
       })
       setNumberOfLatestChanges(0)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [numberOfLatestChanges])
 
    useEffect(() => {
       if (tutorialSteps.streamerReady) {
          setNumberOfMissedEntries?.(3) // resets the missed entries back to 3
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [tutorialSteps.streamerReady])
 
    const isStreamAdmin = useMemo(
@@ -199,7 +203,7 @@ const ChatWidget = ({
    }
 
    const getAuthorName = () => {
-      let name = "anonymous"
+      const name = "anonymous"
       if (currentLivestream.openStream) return name
       if (userData) {
          return userData.firstName + " " + userData.lastName.charAt(0)
@@ -209,7 +213,7 @@ const ChatWidget = ({
    }
 
    const getAuthorEmail = () => {
-      let name = "anonymous"
+      const name = "anonymous"
       if (currentLivestream.openStream) return name
       if (authenticatedUser.email) return authenticatedUser.email
       if (isStreamer || currentLivestream.test) return "Streamer"
@@ -250,7 +254,7 @@ const ChatWidget = ({
          onChatEntryAdded?.()
 
          dataLayerLivestreamEvent(
-            "livestream_chat_new_message",
+            AnalyticsEvents.LivestreamChatNewMessage,
             currentLivestream
          )
       }
@@ -344,7 +348,7 @@ const ChatWidget = ({
                         marginTop: 3,
                         padding: "0 0.8em",
                      }}
-                     in={focused && !isStreamer}
+                     in={focused ? !isStreamer : null}
                   >
                      For questions, please use the Q&A tool!
                   </Collapse>
@@ -355,7 +359,7 @@ const ChatWidget = ({
             chatEntry={currentEntry}
             onClose={handleClearCurrentEntry}
          />
-         {chatEntryIdToDelete && (
+         {Boolean(chatEntryIdToDelete) && (
             <ConfirmDeleteModal
                description={
                   <>

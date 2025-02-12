@@ -1,15 +1,18 @@
 import { Box, CircularProgress, Fab } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
+import { useLivestreamData } from "components/custom-hook/streaming"
+import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { Send } from "react-feather"
 import { Controller } from "react-hook-form"
+import { useOpenStream } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import * as Yup from "yup"
 import { useStreamingContext } from "../../context"
-import { useAuth } from "HOCs/AuthProvider"
-import { livestreamService } from "data/firebase/LivestreamService"
-import { useOpenStream } from "store/selectors/streamingAppSelectors"
-import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { getStreamerDisplayName } from "../../util"
 import { StreamInput } from "../StreamInput"
 
@@ -59,7 +62,7 @@ export const ChatInput = ({ onMessageSend }: Props) => {
    const { livestreamId, isHost, agoraUserId } = useStreamingContext()
    const { authenticatedUser, userData } = useAuth()
    const { data: streamerDetails } = useStreamerDetails(agoraUserId)
-
+   const currentLivestream = useLivestreamData()
    const isOpenStream = useOpenStream()
 
    const { control, handleSubmit, reset, formState } = useYupForm({
@@ -110,6 +113,11 @@ export const ChatInput = ({ onMessageSend }: Props) => {
             agoraUserId,
             userUid: authenticatedUser.uid || "",
          })
+
+         dataLayerLivestreamEvent(
+            AnalyticsEvents.LivestreamChatNewMessage,
+            currentLivestream
+         )
       } catch (error) {
          errorNotification(
             error,

@@ -1,6 +1,13 @@
 import { Box, Stack, Typography } from "@mui/material"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useCallback, useState } from "react"
+import { AnalyticsEvents } from "util/analytics/types"
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../types/commonTypes"
+import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
+import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import BaseDialogView, {
    HeroContent,
@@ -9,12 +16,6 @@ import BaseDialogView, {
 } from "../../BaseDialogView"
 import { useLiveStreamDialog, ViewKey } from "../../LivestreamDialog"
 import { PrimarySecondaryButtons } from "../data-consent/RegisterDataConsentView"
-import { useCallback, useState } from "react"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
-import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
-import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
-import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
    contentOffset: {
@@ -70,7 +71,7 @@ const RegisterJoinTalentPoolView = () => {
          setIsJoiningTalentPool(true)
          await joinCompanyTalentPool(livestream.companyId, userData, livestream)
          dataLayerLivestreamEvent(
-            "event_registration_talentpool_join",
+            AnalyticsEvents.EventRegistrationTalentpoolJoin,
             livestream
          )
 
@@ -88,7 +89,10 @@ const RegisterJoinTalentPoolView = () => {
    ])
 
    const handleCancel = useCallback(() => {
-      dataLayerLivestreamEvent("event_registration_talentpool_skip", livestream)
+      dataLayerLivestreamEvent(
+         AnalyticsEvents.EventRegistrationTalentpoolSkip,
+         livestream
+      )
       goToView(NEXT_VIEW)
    }, [goToView, livestream])
 

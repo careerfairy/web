@@ -1,6 +1,9 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { livestreamService } from "data/firebase/LivestreamService"
 import useSWR from "swr"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 /**
@@ -8,26 +11,26 @@ import { errorLogAndNotify } from "util/CommonUtil"
  * This method updates Firestore to reflect a user's participation status in a livestream.
  * It sets user data and stats in the `userLivestreamData` collection.
  *
- * @param {string} livestreamId - The ID of the livestream.
+ * @param {LivestreamEvent} livestream - The livestream.
  * @param {UserData} userData - The user's data.
  * @param {UserStats} userStats - The user's statistics.
  * @returns An object containing a function to trigger the participation status update and the mutation key.
  */
 export const useTrackUserParticipation = (
-   livestreamId: string,
+   livestream: LivestreamEvent,
    userData: UserData,
    userStats: UserStats
 ) => {
    const fetcher = async () =>
-      livestreamService.setUserIsParticipating(
-         livestreamId,
-         userData,
-         userStats
-      )
+      livestreamService
+         .setUserIsParticipating(livestream.id, userData, userStats)
+         .then(() => {
+            dataLayerLivestreamEvent(AnalyticsEvents.AttendEvent, livestream)
+         })
 
    return useSWR(
-      userData
-         ? `set-user-${userData.userEmail}-participating-${livestreamId}`
+      userData && livestream
+         ? `set-user-${userData.userEmail}-participating-${livestream.id}`
          : null,
       fetcher,
       {
