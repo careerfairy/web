@@ -33,6 +33,7 @@
          "package": "com.admin_product_team.careerfairymobileapp",
          "googleServicesFile": "./google-services.json",
          "permissions": [
+            "AD_ID",
             "NOTIFICATIONS",
             "CAMERA",
             "RECORD_AUDIO",
