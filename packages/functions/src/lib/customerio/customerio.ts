@@ -171,6 +171,9 @@ export const customerIOWebhook = onRequest(async (request, response) => {
          case "subscribed":
          case "unsubscribed": {
             const userEmail = event.data.identifiers.email
+            logger.info(
+               `Updating subscription status for user ${userEmail} to ${event.metric}`
+            )
             // Update the user's subscription status in Firebase
             await userRepo.updateUserData(userEmail, {
                unsubscribed: event.metric === "unsubscribed",
