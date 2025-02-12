@@ -21,6 +21,8 @@ import {
    NextPage,
 } from "next"
 import React from "react"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerGroupEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
 import SEO from "../../../components/util/SEO"
 import CompanyPageOverview from "../../../components/views/company-page"
@@ -60,7 +62,12 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    const viewRef = useTrackPageView({
       trackDocumentId: id,
       handleTrack: ({ id, visitorId }: TrackProps) =>
-         trackCompanyPageView(id, visitorId),
+         trackCompanyPageView(id, visitorId).then(() =>
+            dataLayerGroupEvent(
+               AnalyticsEvents.CompanyPageVisit,
+               serverSideGroup
+            )
+         ),
    }) as unknown as React.RefObject<HTMLDivElement>
 
    return (
