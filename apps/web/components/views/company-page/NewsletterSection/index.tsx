@@ -2,6 +2,7 @@ import { IUserReminder, UserReminderType } from "@careerfairy/shared-lib/users"
 import { Box, Button, Typography } from "@mui/material"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
+import { AnalyticsEvents } from "util/analytics/types"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { PillsBackground } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
@@ -34,7 +35,7 @@ const NewsletterSection = () => {
    const { errorNotification } = useSnackbarNotifications()
 
    const handleAcceptNewsletter = useCallback(async () => {
-      dataLayerEvent(`newsletter_accepted_on_company_page`)
+      dataLayerEvent(AnalyticsEvents.NewsletterAcceptedOnCompanyPage)
       try {
          // If it was accepted we should set it as completed
          const reminder: IUserReminder = {

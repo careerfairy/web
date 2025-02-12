@@ -21,6 +21,8 @@ import { Speaker } from "@careerfairy/shared-lib/livestreams"
 import useCreatorPublicContent from "components/custom-hook/creator/useCreatorPublicContent"
 import useTrackPageView from "components/custom-hook/useTrackDetailPageView"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerMentorEvent } from "util/analyticsUtils"
 import useRegistrationHandler from "../../useRegistrationHandler"
 import ActionButton from "../livestream-details/action-button/ActionButton"
 import Speakers from "../livestream-details/main-content/Speakers"
@@ -108,7 +110,9 @@ const SpeakerDetails = ({ speaker }: Props) => {
    const viewRef = useTrackPageView({
       trackDocumentId: creator.groupId,
       handleTrack: ({ id, visitorId, extraData }) =>
-         trackMentorPageView(id, extraData.creatorId, visitorId),
+         trackMentorPageView(id, extraData.creatorId, visitorId).then(() =>
+            dataLayerMentorEvent(AnalyticsEvents.MentorPageVisit, creator)
+         ),
       extraData: {
          creatorId: creator.id,
       },

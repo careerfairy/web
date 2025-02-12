@@ -3,6 +3,8 @@ import { UserData } from "@careerfairy/shared-lib/users"
 import CookiesUtil from "./CookiesUtil"
 
 // Only import types, will not be part of the bundle, real package is loaded by GTM
+import { Group } from "@careerfairy/shared-lib/groups"
+import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
 import { AnalyticsEvent } from "./analytics/types"
 
@@ -55,8 +57,7 @@ const dataLayerWrapper = (event: object) => {
  */
 export const dataLayerLivestreamEvent = (
    eventName: AnalyticsEvent,
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   { triGrams, ...livestream }: LivestreamEvent,
+   livestream: LivestreamEvent,
    optionalVariables = {}
 ) => {
    dataLayerEvent(
@@ -64,13 +65,50 @@ export const dataLayerLivestreamEvent = (
       Object.assign(
          {},
          {
-            livestreamId: livestream?.id,
-            livestreamTitle: livestream?.title,
-            livestreamCompanyName: livestream?.company,
+            livestreamId: livestream?.id, // GTM Variable
+            livestreamTitle: livestream?.title, // GTM Variable
+            livestreamCompanyName: livestream?.company, // GTM Variable
          },
          { ...optionalVariables, livestream }
       )
    )
+}
+
+/**
+ * Data layer event that receives a group object and sends extra metadata as variables
+ * @param eventName
+ * @param group
+ */
+export const dataLayerGroupEvent = (
+   eventName: AnalyticsEvent,
+   group: Partial<Group>,
+   optionalVariables = {}
+) => {
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      companyName: group.universityName, // GTM Variable
+      companyId: group.id, // GTM Variable
+      group,
+   })
+}
+
+/**
+ * Data layer event that receives a mentor object and sends extra metadata as variables
+ * @param eventName
+ * @param mentor
+ */
+export const dataLayerMentorEvent = (
+   eventName: AnalyticsEvent,
+   mentor: Creator | PublicCreator,
+   optionalVariables = {}
+) => {
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      mentorId: mentor.id, // GTM Variable
+      mentorName: `${mentor.firstName} ${mentor.lastName}`, // GTM Variable
+      companyId: mentor.groupId, // GTM Variable
+      mentor,
+   })
 }
 
 /**
