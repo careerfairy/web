@@ -1,9 +1,34 @@
-import { FieldOfStudyCategory } from "@careerfairy/shared-lib/fieldOfStudy"
+import {
+   FieldOfStudyCategories,
+   FieldOfStudyCategory,
+} from "@careerfairy/shared-lib/fieldOfStudy"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "react-feather"
+
+const styles = sxStyles({
+   chevron: {
+      cursor: "pointer",
+      color: (theme) => theme.brand.white[100],
+      borderRadius: "36px",
+      p: "8px",
+      background: "rgba(235, 235, 239, 0.35)",
+      backdropFilter: "blur(100px)",
+      width: "32px",
+      height: "32px",
+      transition: "background-color 0.2s ease-in-out",
+      "& svg": {
+         width: "16px",
+         height: "16px",
+      },
+      "&:hover": {
+         background: "rgba(235, 235, 239, 0.6)",
+      },
+   },
+})
 
 type FeaturedCompaniesHeader = {
    category: FieldOfStudyCategory
@@ -18,26 +43,65 @@ export const FeaturedCompaniesHeader = ({
 }: FeaturedCompaniesHeader) => {
    const isMobile = useIsMobile()
 
-   const MobileHeader = (
-      <Typography variant="h6">Featured Companies: {category}</Typography>
+   const MobileHeader = () => (
+      <Typography
+      // sx={{maxWidth: isMobile ? "70%" : "auto"}}
+      >
+         <Typography
+            variant="brandedH5"
+            fontWeight={400}
+            sx={{ color: (theme) => theme.brand.white[100] }}
+         >
+            Featured companies
+         </Typography>{" "}
+         <Typography
+            variant="mobileBrandedH3"
+            fontWeight={700}
+            sx={{ color: (theme) => theme.brand.white[100] }}
+         >
+            hiring
+            {" "
+               .concat(FieldOfStudyCategories[category].name)
+               .concat(" students")}
+         </Typography>
+      </Typography>
    )
 
+   if (!category) return null
+
    return (
-      <ConditionalWrapper condition={!isMobile} fallback={MobileHeader}>
+      <ConditionalWrapper condition={!isMobile} fallback={<MobileHeader />}>
          <Stack
             direction="row"
             alignItems="center"
             justifyContent="space-between"
          >
-            <Typography variant="h6">
-               Featured Companies v2: {category}
-            </Typography>
-            <Stack direction="row" alignItems="center" gap={1}>
-               <Link href={`/portal/companies/featured/${category}`}>
-                  <Typography>Sell all companies</Typography>
+            <MobileHeader />
+            <Stack direction="row" alignItems="flex-end" gap={1}>
+               <Link
+                  href={`/companies?featured=true&category=${category}`}
+                  target="_blank"
+               >
+                  <Typography
+                     variant="small"
+                     sx={{
+                        color: (theme) => theme.brand.white[100],
+                        textDecoration: "underline",
+                     }}
+                  >
+                     Sell all companies
+                  </Typography>
                </Link>
-               <Box component={ChevronLeft} onClick={onPreviousClick} />
-               <Box component={ChevronRight} onClick={onNextClick} />
+               <Box
+                  sx={styles.chevron}
+                  component={ChevronLeft}
+                  onClick={onPreviousClick}
+               />
+               <Box
+                  sx={styles.chevron}
+                  component={ChevronRight}
+                  onClick={onNextClick}
+               />
             </Stack>
          </Stack>
       </ConditionalWrapper>
