@@ -9,8 +9,10 @@ export const AnalyticsEvents = {
    EventRegistrationQuestionSubmit: "event_registration_question_submit",
    EventRegistrationRemoved: "event_registration_removed",
    EventRegistrationStarted: "event_registration_started",
-   EventRegistrationStartedLoginRequire:
-      "event_registration_started_login_require",
+   EventRegistrationStartedFromFooterButton:
+      "event_registration_started_from_footer_button",
+   EventRegistrationStartedLoginRequired:
+      "event_registration_started_login_required",
    EventRegistrationStartedProfileIncomplete:
       "event_registration_started_profile_incomplete",
    EventRegistrationTalentpoolJoin: "event_registration_talentpool_join",
@@ -66,6 +68,9 @@ export const AnalyticsEvents = {
    LevelsMentorView: "levels_mentor_view",
    LevelsMentorLinkedinClick: "levels_mentor_linkedin_click",
    LivestreamOpenSupport: "livestream_open_support",
+   LivestreamSpeakerSave: "livestream_speaker_save",
+   LivestreamChatNewMessage: "livestream_chat_new_message",
+   LivestreamChatOpen: "livestream_chat_open",
 } as const
 
 export type AnalyticsEvent =

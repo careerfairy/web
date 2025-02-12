@@ -6,8 +6,16 @@ import {
 } from "@careerfairy/shared-lib/utils/utils"
 import { Avatar } from "@mui/material"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
-import { memo, useCallback, useMemo, useState } from "react"
+import {
+   memo,
+   ReactNode,
+   SyntheticEvent,
+   useCallback,
+   useMemo,
+   useState,
+} from "react"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analytics/types"
 import { MobileUtils } from "util/mobile.utils"
 import {
    appleIcon,
@@ -20,7 +28,7 @@ import {
    errorLogAndNotify,
    shouldUseEmulators,
 } from "../../../../util/CommonUtil"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { dataLayerLivestreamEvent } from "../../../../util/analyticsUtils"
 import BrandedResponsiveMenu, {
    MenuOption,
 } from "../inputs/BrandedResponsiveMenu"
@@ -60,7 +68,7 @@ const CalendarLink = memo(function CalendarLink({
 })
 
 type Props = {
-   children: (handler: (event: any) => void) => void
+   children: (handler: (event: SyntheticEvent) => void) => ReactNode
    event: LivestreamEvent
    filename: string
    /**
@@ -103,10 +111,13 @@ export const AddToCalendar = memo(function AddToCalendar({
       }
    }, [event])
 
-   const handleClick = useCallback((event) => {
-      dataLayerEvent("event_add_to_calendar")
-      setAnchorEl(event.currentTarget)
-   }, [])
+   const handleClick = useCallback(
+      (e: SyntheticEvent) => {
+         dataLayerLivestreamEvent(AnalyticsEvents.EventAddToCalendar, event)
+         setAnchorEl(e.currentTarget)
+      },
+      [event]
+   )
 
    const handleClose = useCallback(() => {
       setAnchorEl(null)

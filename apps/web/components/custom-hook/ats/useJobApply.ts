@@ -1,12 +1,16 @@
-import { useState, useCallback, useEffect, useMemo } from "react"
-import * as Sentry from "@sentry/nextjs"
-import { userAlreadyAppliedForJob } from "@careerfairy/shared-lib/dist/users"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import {
+   userAlreadyAppliedForJob,
+   UserData,
+} from "@careerfairy/shared-lib/dist/users"
+import * as Sentry from "@sentry/nextjs"
+import { livestreamService } from "data/firebase/LivestreamService"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { AnalyticsEvents } from "util/analytics/types"
 import { atsServiceInstance } from "../../../data/firebase/ATSService"
-import { dataLayerEvent } from "../../../util/analyticsUtils"
-import useUserATSRelations from "../useUserATSRelations"
+import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
 import useSnackbarNotifications from "../useSnackbarNotifications"
+import useUserATSRelations from "../useUserATSRelations"
 
 type UseJobApply = {
    /**
@@ -51,29 +55,36 @@ const useJobApply = (
    }, [isApplied, atsRelations, job.id, handleAlreadyApply])
 
    // Apply to the job
-   const applyJob = useCallback(() => {
+   const applyJob = useCallback(async () => {
       setIsLoading(true)
-      atsServiceInstance
-         .applyToAJob(livestreamId, job.id)
-         .then(() => {
-            handleAlreadyApply(true)
-            successNotification(
-               "You have successfully applied to the job!",
-               "Congrats"
+      try {
+         await atsServiceInstance.applyToAJob(livestreamId, job.id)
+         handleAlreadyApply(true)
+         successNotification(
+            "You have successfully applied to the job!",
+            "Congrats"
+         )
+      } catch (e) {
+         console.error(e)
+         Sentry.captureException(e)
+         errorNotification("Sorry! Something failed, maybe try again later")
+      } finally {
+         setIsLoading(false)
+
+         try {
+            const livestream = await livestreamService.getById(livestreamId)
+            dataLayerLivestreamEvent(
+               AnalyticsEvents.LivestreamJobApplicationComplete,
+               livestream,
+               {
+                  jobId: job?.id,
+                  jobName: job?.name,
+               }
             )
-         })
-         .catch((e) => {
+         } catch (e) {
             console.error(e)
-            Sentry.captureException(e)
-            errorNotification("Sorry! Something failed, maybe try again later")
-         })
-         .finally(() => {
-            setIsLoading(false)
-            dataLayerEvent("livestream_job_application_complete", {
-               jobId: job?.id,
-               jobName: job?.name,
-            })
-         })
+         }
+      }
    }, [
       livestreamId,
       job.id,

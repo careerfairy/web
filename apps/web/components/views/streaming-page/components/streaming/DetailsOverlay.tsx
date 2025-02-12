@@ -2,8 +2,12 @@ import { Box, Grow, Stack, Typography } from "@mui/material"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { Info, MicOff } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
+import { useStreamingContext } from "../../context"
 import { StreamerInfoDialog } from "../../streamer-info/StreamerInfoDialog"
 import { getStreamerDisplayName } from "../../util"
 import { FloatingContent } from "./VideoTrackWrapper"
@@ -45,6 +49,7 @@ export const DetailsOverlay = ({
 }: Props) => {
    const [isStreamerInfoDialogOpen, handleDialogOpen, handleDialogClose] =
       useDialogStateHandler(false)
+   const { livestreamId } = useStreamingContext()
 
    const displayName = getStreamerDisplayName(
       streamerDetails.firstName,
@@ -81,7 +86,23 @@ export const DetailsOverlay = ({
                      </Grow>
                      <Box
                         component={Info}
-                        onClick={handleDialogOpen}
+                        onClick={async () => {
+                           handleDialogOpen()
+
+                           livestreamService
+                              .getById(livestreamId)
+                              .then((livestream) => {
+                                 dataLayerLivestreamEvent(
+                                    AnalyticsEvents.LivestreamSpeakerLinkedinClick,
+                                    livestream,
+                                    {
+                                       speakerId: streamerDetails.id,
+                                       speakerName: displayName,
+                                    }
+                                 )
+                              })
+                              .catch(console.error)
+                        }}
                         sx={styles.detailsButton}
                         size={20}
                      />

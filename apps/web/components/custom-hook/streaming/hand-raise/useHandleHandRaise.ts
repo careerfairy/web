@@ -1,6 +1,9 @@
 import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
-import { useEffect } from "react"
+import { livestreamService } from "data/firebase/LivestreamService"
+import { useEffect, useRef } from "react"
 import { usePrevious } from "react-use"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useUpdateUserHandRaiseState } from "./useUpdateUserHandRaiseState"
 
 type UseHandleHandRaiseParams = {
@@ -24,6 +27,9 @@ export const useHandleHandRaise = (props: UseHandleHandRaiseParams) => {
       useUpdateUserHandRaiseState(livestreamId)
    const prevIsPublishingTracks = usePrevious(isPublishingTracks)
 
+   const livestreamIdRef = useRef(livestreamId)
+   livestreamIdRef.current = livestreamId
+
    useEffect(() => {
       if (disabled) {
          return
@@ -34,6 +40,16 @@ export const useHandleHandRaise = (props: UseHandleHandRaiseParams) => {
             state: HandRaiseState.connected,
             handRaiseId: agoraUserId,
          })
+
+         livestreamService
+            .getById(livestreamIdRef.current)
+            .then((livestream) => {
+               dataLayerLivestreamEvent(
+                  AnalyticsEvents.LivestreamViewerHandRaiser,
+                  livestream
+               )
+            })
+            .catch(console.error)
       } else if (isPublishingTracks && !prevIsPublishingTracks) {
          triggerUserHandRaiseState({
             state: HandRaiseState.connecting,

@@ -7,10 +7,12 @@ import { Skeleton, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
+import { useLivestreamData } from "components/custom-hook/streaming"
 import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import JobCard from "components/views/common/jobs/JobCard"
 import { useCallback, useState } from "react"
-import { dataLayerEvent } from "util/analyticsUtils"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useStreamingContext } from "../../context"
 import { JobCardSkeleton } from "../jobs/JobListSkeleton"
 import { EndOfStreamContainer } from "./Container"
@@ -38,6 +40,7 @@ type ContentProps = {
 }
 export const Content = ({ groupId }: ContentProps) => {
    const { livestreamId } = useStreamingContext()
+   const livestream = useLivestreamData()
    const jobsToShow = useGroupCustomJobs(groupId, {
       livestreamId: livestreamId,
    })
@@ -47,13 +50,20 @@ export const Content = ({ groupId }: ContentProps) => {
       setSelectedJob(null)
    }
 
-   const handleClick = useCallback((job: CustomJob) => {
-      setSelectedJob(job)
-      dataLayerEvent("livestream_job_open", {
-         jobId: job.id,
-         jobName: job.title,
-      })
-   }, [])
+   const handleClick = useCallback(
+      (job: CustomJob) => {
+         setSelectedJob(job)
+         dataLayerLivestreamEvent(
+            AnalyticsEvents.LivestreamJobOpen,
+            livestream,
+            {
+               jobId: job.id,
+               jobName: job.title,
+            }
+         )
+      },
+      [livestream]
+   )
 
    if (!jobsToShow) return null // we Need to fetch the jobs before even rendering the Header
 

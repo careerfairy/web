@@ -1,16 +1,18 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
 import {
    ListItem,
    ListItemButton,
    ListItemIcon,
    ListItemText,
 } from "@mui/material"
-import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
 import Typography from "@mui/material/Typography"
-import React, { memo, useCallback } from "react"
+import { memo, useCallback } from "react"
+import { AnalyticsEvents } from "util/analytics/types"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { dataLayerLivestreamEvent } from "../../../../../../util/analyticsUtils"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 
 const styles = sxStyles({
@@ -31,8 +33,9 @@ const styles = sxStyles({
 type Props = {
    job: Job | CustomJob
    handleSelectJob: (job: Job | CustomJob) => void
+   livestream: LivestreamEvent
 }
-const JobItem = ({ job, handleSelectJob }: Props) => {
+const JobItem = ({ job, handleSelectJob, livestream }: Props) => {
    const isAtsJob = useIsAtsJob(job)
 
    let hiringManager: string, jobName: string
@@ -46,11 +49,11 @@ const JobItem = ({ job, handleSelectJob }: Props) => {
 
    const handleClick = useCallback(() => {
       handleSelectJob(job)
-      dataLayerEvent("livestream_job_open", {
+      dataLayerLivestreamEvent(AnalyticsEvents.LivestreamJobOpen, livestream, {
          jobId: job.id,
          jobName: jobName,
       })
-   }, [handleSelectJob, job, jobName])
+   }, [handleSelectJob, job, jobName, livestream])
 
    return (
       <ListItem
@@ -68,7 +71,7 @@ const JobItem = ({ job, handleSelectJob }: Props) => {
                   {jobName}
                </Typography>
 
-               {Boolean(hiringManager) ? (
+               {hiringManager ? (
                   <Typography variant="body2" mt={1} fontStyle="italic">
                      {`Posted by ${hiringManager}`}
                   </Typography>

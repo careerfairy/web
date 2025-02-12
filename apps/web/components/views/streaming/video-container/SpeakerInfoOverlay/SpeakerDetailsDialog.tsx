@@ -1,4 +1,5 @@
-import { useCurrentStream } from "../../../../../context/stream/StreamContext"
+import CloseIcon from "@mui/icons-material/Close"
+import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import {
    Button,
    CardActions,
@@ -10,16 +11,15 @@ import {
    Typography,
 } from "@mui/material"
 import Card from "@mui/material/Card"
-import ColorizedAvatar from "../../../common/ColorizedAvatar"
-import LinkedInIcon from "@mui/icons-material/LinkedIn"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import React from "react"
-import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
-import { SaveRecruiterButton } from "./SaveRecruiterButton"
+import { AnalyticsEvents } from "util/analytics/types"
+import { useCurrentStream } from "../../../../../context/stream/StreamContext"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { dataLayerEvent } from "../../../../../util/analyticsUtils"
 import { makeExternalLink } from "../../../../helperFunctions/HelperFunctions"
+import ColorizedAvatar from "../../../common/ColorizedAvatar"
+import { SaveRecruiterButton } from "./SaveRecruiterButton"
 
 const styles = sxStyles({
    dialogClose: {
@@ -115,7 +115,7 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
                      marginBottom: "15px",
                   }}
                >
-                  {speaker.linkedIn && (
+                  {Boolean(speaker.linkedIn) && (
                      <Tooltip title={`Go to LinkedIn profile`}>
                         <Button
                            startIcon={<LinkedInIcon />}
@@ -127,7 +127,9 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
                         </Button>
                      </Tooltip>
                   )}
-                  {canSave && <SaveRecruiterButton speaker={matchedSpeaker} />}
+                  {Boolean(canSave) && (
+                     <SaveRecruiterButton speaker={matchedSpeaker} />
+                  )}
                </CardActions>
             </Card>
          </DialogContent>
@@ -137,7 +139,7 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
 
 const handleLinkedInClick = (url) => {
    window.open(makeExternalLink(url), "_blank")
-   dataLayerEvent("livestream_speaker_linkedin_click")
+   dataLayerEvent(AnalyticsEvents.LivestreamSpeakerLinkedinClick)
 }
 
 /**
