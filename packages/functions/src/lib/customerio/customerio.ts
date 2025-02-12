@@ -189,7 +189,10 @@ export const customerIOWebhook = onRequest(async (request, response) => {
          }
       }
    } catch (error) {
-      logger.error(`Error processing ${event.metric} webhook`, error)
+      logger.error(
+         `Error processing ${event.metric} webhook for user ${event.data?.identifiers?.email}`,
+         error
+      )
       response.status(500).send("Internal Server Error")
    }
 })
