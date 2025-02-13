@@ -40,7 +40,9 @@ const SparkJobButton = ({ spark }: Props) => {
 
    const handleClick = (event: React.MouseEvent) => {
       handleOpenDialog()
-      trackEvent(SparkEventActions.Click_JobCTA)
+      trackEvent(SparkEventActions.Click_JobCTA, {
+         jobIds: jobs?.map((job) => job.id) || [],
+      })
       event.stopPropagation()
    }
 
