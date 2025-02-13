@@ -80,42 +80,45 @@ const FeaturedCompaniesCarousel = forwardRef<ChildRefType, Props>((props) => {
    const { companies, emblaRef } = props
    const isMobile = useIsMobile()
 
+   const MobileCompanies = () => (
+      <Stack direction="column" spacing={2}>
+         <ChunkCompaniesView companies={chunkArray(companies, 2)?.at(0)} />
+         <ChunkCompaniesView companies={chunkArray(companies, 2)?.at(1)} />
+      </Stack>
+   )
+
    return (
       <Box sx={styles.carouselRoot} ref={emblaRef}>
-         <Stack direction="row" spacing={"32px"}>
-            <ConditionalWrapper
-               condition={!isMobile}
-               fallback={
-                  <MobileCompaniesList companies={companies} ref={emblaRef} />
-               }
-            >
+         <ConditionalWrapper condition={isMobile}>
+            <MobileCompanies />
+         </ConditionalWrapper>
+         <ConditionalWrapper condition={!isMobile}>
+            <Stack direction={"row"} spacing={"32px"}>
                {companies.map((company) => (
                   <FeatureCompanyCard key={company.id} company={company} />
                ))}
-            </ConditionalWrapper>
-         </Stack>
+            </Stack>
+         </ConditionalWrapper>
       </Box>
    )
 })
 
 type CompaniesListProps = {
    companies: GroupPresenter[]
-   ref: React.RefObject<HTMLDivElement>
 }
 
-const MobileCompaniesList = ({ companies, ref }: CompaniesListProps) => {
-   const companyChunks = chunkArray(companies, 2)
+const ChunkCompaniesView = ({ companies }: CompaniesListProps) => {
+   if (!companies.length) return null
 
    return (
-      <Box ref={ref}>
-         {companyChunks.map((chunk, idx) => (
-            <Stack direction="row" spacing={2} key={idx}>
-               {chunk.map((company) => (
-                  <FeatureCompanyCard key={company.id} company={company} />
-               ))}
-            </Stack>
-         ))}
-      </Box>
+      <Stack direction="row" spacing={2}>
+         {companies.at(0) ? (
+            <FeatureCompanyCard company={companies.at(0)} />
+         ) : null}
+         {companies.at(1) ? (
+            <FeatureCompanyCard company={companies.at(1)} />
+         ) : null}
+      </Stack>
    )
 }
 
