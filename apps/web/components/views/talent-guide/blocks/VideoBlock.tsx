@@ -3,7 +3,10 @@ import PlayIcon from "components/views/common/icons/PlayIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { VideoBlockType } from "data/hygraph/types"
 import ReactPlayer from "react-player"
+import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLevelEvent } from "util/analyticsUtils"
 import { AuthorPromotion } from "./AuthorPromotion"
 
 const styles = sxStyles({
@@ -47,7 +50,19 @@ const styles = sxStyles({
 type Props = VideoBlockType
 
 const Content = (props: Props) => {
-   const { video, videoThumbnail, avatar, label, videoTitle } = props
+   const { video, videoThumbnail, avatar, label, videoTitle, id } = props
+   const talentGuideState = useTalentGuideState()
+
+   const handlePlay = () => {
+      dataLayerLevelEvent(
+         AnalyticsEvents.LevelsProgressVideo,
+         talentGuideState,
+         {
+            videoId: id,
+            videoTitle,
+         }
+      )
+   }
 
    return (
       <Stack data-testid="talent-guide-video-block" gap={1} sx={styles.root}>
@@ -67,6 +82,8 @@ const Content = (props: Props) => {
                   },
                }}
                controls
+               onPlay={handlePlay}
+               progressInterval={250}
             />
          </Box>
          {Boolean(!props.promotionData) && (
