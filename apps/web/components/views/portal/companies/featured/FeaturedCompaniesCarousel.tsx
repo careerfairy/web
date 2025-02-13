@@ -57,13 +57,14 @@ const styles = sxStyles({
       whiteSpace: "nowrap",
    },
    followButton: {
-      width: "fit-content",
+      width: "78px",
       p: "4px 12px",
       borderRadius: "18px",
       background: "rgba(252, 252, 254, 0.43)",
       backdropFilter: "blur(100px)",
       boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
       border: "1px solid transparent",
+      transition: "all 0.2s ease-in-out",
       "&:hover": {
          borderRadius: "18px",
          border: "1px solid #FFF",
@@ -73,6 +74,7 @@ const styles = sxStyles({
       },
    },
    followingButton: {
+      width: "92px",
       background: "rgba(37, 37, 37, 0.43)",
       border: "none",
       "&:hover": {
