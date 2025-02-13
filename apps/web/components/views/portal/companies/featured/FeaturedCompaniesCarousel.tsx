@@ -1,9 +1,6 @@
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { chunkArray } from "@careerfairy/shared-lib/utils"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { forwardRef } from "react"
 
 const styles = sxStyles({
@@ -26,6 +23,11 @@ const styles = sxStyles({
    },
    carouselRoot: {
       overflow: "hidden",
+      px: 2,
+   },
+   companyLogo: {
+      width: "64px",
+      height: "64px",
    },
    companyName: {
       color: (theme) => theme.brand.white[100],
@@ -78,51 +80,19 @@ type Props = {
 
 const FeaturedCompaniesCarousel = forwardRef<ChildRefType, Props>((props) => {
    const { companies, emblaRef } = props
-   const isMobile = useIsMobile()
-
-   const MobileCompanies = () => (
-      <Stack direction="column" spacing={2}>
-         <ChunkCompaniesView companies={chunkArray(companies, 2)?.at(0)} />
-         <ChunkCompaniesView companies={chunkArray(companies, 2)?.at(1)} />
-      </Stack>
-   )
 
    return (
       <Box sx={styles.carouselRoot} ref={emblaRef}>
-         <ConditionalWrapper condition={isMobile}>
-            <MobileCompanies />
-         </ConditionalWrapper>
-         <ConditionalWrapper condition={!isMobile}>
-            <Stack direction={"row"} spacing={"32px"}>
-               {companies.map((company) => (
-                  <FeatureCompanyCard key={company.id} company={company} />
-               ))}
-            </Stack>
-         </ConditionalWrapper>
+         <Stack direction={"row"} spacing={"32px"}>
+            {companies.map((company) => (
+               <FeaturedCompanyCard key={company.id} company={company} />
+            ))}
+         </Stack>
       </Box>
    )
 })
 
-type CompaniesListProps = {
-   companies: GroupPresenter[]
-}
-
-const ChunkCompaniesView = ({ companies }: CompaniesListProps) => {
-   if (!companies.length) return null
-
-   return (
-      <Stack direction="row" spacing={2}>
-         {companies.at(0) ? (
-            <FeatureCompanyCard company={companies.at(0)} />
-         ) : null}
-         {companies.at(1) ? (
-            <FeatureCompanyCard company={companies.at(1)} />
-         ) : null}
-      </Stack>
-   )
-}
-
-const FeatureCompanyCard = ({ company }: { company: GroupPresenter }) => {
+const FeaturedCompanyCard = ({ company }: { company: GroupPresenter }) => {
    const industries = company.companyIndustries
       .map((industry) => industry.name)
       .join(", ")
@@ -134,7 +104,7 @@ const FeatureCompanyCard = ({ company }: { company: GroupPresenter }) => {
          sx={styles.companyCardRoot}
          alignItems={"center"}
       >
-         <Avatar src={company.logoUrl} sx={{ width: "64px", height: "64px" }} />
+         <Avatar src={company.logoUrl} sx={styles.companyLogo} />
          <Stack sx={{ flex: 1, minWidth: 0 }}>
             <Typography variant="medium" sx={styles.companyName}>
                {company.universityName}
@@ -160,5 +130,7 @@ const FeatureCompanyCard = ({ company }: { company: GroupPresenter }) => {
 }
 
 FeaturedCompaniesCarousel.displayName = "FeaturedCompaniesCarousel"
+
+export { FeaturedCompanyCard }
 
 export default FeaturedCompaniesCarousel

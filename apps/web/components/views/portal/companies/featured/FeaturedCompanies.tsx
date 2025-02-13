@@ -7,12 +7,13 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
-import React, { useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import { ChevronRight } from "react-feather"
 import FeaturedCompaniesCarousel, {
    ChildRefType,
 } from "./FeaturedCompaniesCarousel"
 import { FeaturedCompaniesHeader } from "./FeaturedCompaniesHeader"
+import { MobileFeaturedCompaniesCarousel } from "./MobileFeaturedCompaniesCarousel"
 
 const styles = sxStyles({
    root: {
@@ -20,7 +21,11 @@ const styles = sxStyles({
       borderRadius: 2,
       background: "linear-gradient(125deg, #5A86E2 0%, #5F9BD9 100%)",
       mb: "40px",
-      p: "24px 16px",
+      p: {
+         xs: "24px 0px",
+         sm: "24px 0px",
+         md: "24px 0px",
+      },
    },
    mobileRoot: {
       borderRadius: 0,
@@ -105,6 +110,10 @@ const FeaturedCompaniesComponent = ({
       },
    }))
 
+   useEffect(() => {
+      console.log("SLIDES: ", emblaApi?.slidesInView())
+   })
+
    if (!featuredCompanies) return null
 
    return (
@@ -115,13 +124,17 @@ const FeaturedCompaniesComponent = ({
                onPreviousClick={onClickPrev}
                onNextClick={onClickNext}
             />
-            <FeaturedCompaniesCarousel
-               companies={featuredCompanies}
-               emblaRef={emblaRef}
-            />
+            {isMobile ? (
+               <MobileFeaturedCompaniesCarousel companies={featuredCompanies} />
+            ) : (
+               <FeaturedCompaniesCarousel
+                  companies={featuredCompanies}
+                  emblaRef={emblaRef}
+               />
+            )}
          </Stack>
          {isMobile ? (
-            <Box>
+            <Box sx={{ px: { xs: 2, sm: 2, md: 0 } }}>
                <Divider sx={styles.divider} />
                <Link
                   href={`/companies?featured=true&category=${fieldOfStudy?.category}`}
