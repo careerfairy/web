@@ -8,6 +8,7 @@ import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
+import { Page, TalentGuideModule } from "data/hygraph/types"
 import { AnalyticsEvent } from "./analytics/types"
 
 /**
@@ -80,6 +81,7 @@ export const dataLayerLivestreamEvent = (
  * Data layer event that receives a group object and sends extra metadata as variables
  * @param eventName
  * @param company
+ * @param optionalVariables Additional properties that are not already in the company object
  */
 export const dataLayerCompanyEvent = (
    eventName: AnalyticsEvent,
@@ -98,6 +100,7 @@ export const dataLayerCompanyEvent = (
  * Data layer event that receives a mentor object and sends extra metadata as variables
  * @param eventName
  * @param mentor
+ * @param optionalVariables Additional properties that are not already in the mentor object
  */
 export const dataLayerMentorEvent = (
    eventName: AnalyticsEvent,
@@ -113,6 +116,12 @@ export const dataLayerMentorEvent = (
    })
 }
 
+/**
+ * Data layer event that receives a spark object and sends extra metadata as variables
+ * @param eventName
+ * @param spark
+ * @param optionalVariables Additional properties that are not already in the spark object
+ */
 export const dataLayerSparkEvent = (
    eventName: AnalyticsEvent,
    spark: Spark | SparkPresenter,
@@ -125,6 +134,20 @@ export const dataLayerSparkEvent = (
       categoryId: spark.category.id, // GTM Variable
       mentorId: spark.creator?.id, // GTM Variable
       spark,
+   })
+}
+
+export const dataLayerLevelEvent = (
+   eventName: AnalyticsEvent,
+   level: Page<TalentGuideModule>,
+   optionalVariables = {}
+) => {
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      levelSlug: level.slug, // GTM Variable
+      levelName: level.content?.moduleName, // GTM Variable
+      levelId: level.content?.id, // GTM Variable
+      level,
    })
 }
 
