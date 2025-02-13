@@ -1,11 +1,13 @@
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useGroup from "components/custom-hook/group/useGroup"
 import { useUserFollowingCompanies } from "components/custom-hook/user/useUserFollowingCompanies"
 import { groupRepo } from "data/RepositoryInstances"
-import { forwardRef, useCallback } from "react"
+import Link from "next/link"
+import { useCallback } from "react"
 
 const styles = sxStyles({
    companyCardRoot: {
@@ -80,18 +82,12 @@ const styles = sxStyles({
    },
 })
 
-export type ChildRefType = {
-   goNext: () => void
-   goPrev: () => void
-}
-
 type Props = {
    companies: GroupPresenter[]
    emblaRef
 }
 
-const FeaturedCompaniesCarousel = forwardRef<ChildRefType, Props>((props) => {
-   const { companies, emblaRef } = props
+export const FeaturedCompaniesCarousel = ({ companies, emblaRef }: Props) => {
    const followingCompanies = useUserFollowingCompanies()
 
    return (
@@ -111,14 +107,14 @@ const FeaturedCompaniesCarousel = forwardRef<ChildRefType, Props>((props) => {
          </Stack>
       </Box>
    )
-})
+}
 
 type FeaturedCompanyCardProps = {
    company: GroupPresenter
    following: boolean
 }
 
-const FeaturedCompanyCard = ({
+export const FeaturedCompanyCard = ({
    company,
    following,
 }: FeaturedCompanyCardProps) => {
@@ -144,46 +140,45 @@ const FeaturedCompanyCard = ({
    )
 
    return (
-      <Stack
-         direction="row"
-         spacing={2}
-         sx={styles.companyCardRoot}
-         alignItems={"center"}
+      <Link
+         href={`/company/${companyNameSlugify(company.universityName)}`}
+         target="_blank"
       >
-         <Avatar src={company.logoUrl} sx={styles.companyLogo} />
-         <Stack sx={{ flex: 1, minWidth: 0 }}>
-            <Typography variant="medium" sx={styles.companyName}>
-               {company.universityName}
-            </Typography>
-            <Typography variant="small" sx={styles.companyIndustries}>
-               {industries}
-            </Typography>
-            <Typography variant="small" sx={styles.companyCountry}>
-               {company.companyCountry?.name}
-            </Typography>
-         </Stack>
-         <Button
-            variant="contained"
-            sx={[
-               styles.followButton,
-               following ? styles.followingButton : null,
-            ]}
-            onClick={(e) => toggleFollow(e, company.id)}
+         <Stack
+            direction="row"
+            spacing={2}
+            sx={styles.companyCardRoot}
+            alignItems={"center"}
          >
-            <Typography
-               variant="small"
-               fontWeight={400}
-               sx={{ color: (theme) => theme.brand.white[100] }}
+            <Avatar src={company.logoUrl} sx={styles.companyLogo} />
+            <Stack sx={{ flex: 1, minWidth: 0 }}>
+               <Typography variant="medium" sx={styles.companyName}>
+                  {company.universityName}
+               </Typography>
+               <Typography variant="small" sx={styles.companyIndustries}>
+                  {industries}
+               </Typography>
+               <Typography variant="small" sx={styles.companyCountry}>
+                  {company.companyCountry?.name}
+               </Typography>
+            </Stack>
+            <Button
+               variant="contained"
+               sx={[
+                  styles.followButton,
+                  following ? styles.followingButton : null,
+               ]}
+               onClick={(e) => toggleFollow(e, company.id)}
             >
-               {following ? "Unfollow" : "Follow"}
-            </Typography>
-         </Button>
-      </Stack>
+               <Typography
+                  variant="small"
+                  fontWeight={400}
+                  sx={{ color: (theme) => theme.brand.white[100] }}
+               >
+                  {following ? "Unfollow" : "Follow"}
+               </Typography>
+            </Button>
+         </Stack>
+      </Link>
    )
 }
-
-FeaturedCompaniesCarousel.displayName = "FeaturedCompaniesCarousel"
-
-export { FeaturedCompanyCard }
-
-export default FeaturedCompaniesCarousel
