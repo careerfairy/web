@@ -5,6 +5,7 @@ import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useGroup from "components/custom-hook/group/useGroup"
 import { useUserFollowingCompanies } from "components/custom-hook/user/useUserFollowingCompanies"
+import FeaturedCompanySparksBadge from "components/views/common/icons/FeaturedCompanySparksBadge"
 import { groupRepo } from "data/RepositoryInstances"
 import Link from "next/link"
 import { useCallback } from "react"
@@ -41,6 +42,7 @@ const styles = sxStyles({
       textOverflow: "ellipsis",
       overflow: "hidden",
       whiteSpace: "nowrap",
+      maxWidth: "75%",
    },
    companyIndustries: {
       color: (theme) => theme.brand.white[400],
@@ -81,6 +83,10 @@ const styles = sxStyles({
          background: "rgba(37, 37, 37, 0.43)",
          border: "none",
       },
+   },
+   badge: {
+      width: 24,
+      height: 24,
    },
 })
 
@@ -154,9 +160,14 @@ export const FeaturedCompanyCard = ({
          >
             <Avatar src={company.logoUrl} sx={styles.companyLogo} />
             <Stack sx={{ flex: 1, minWidth: 0 }}>
-               <Typography variant="medium" sx={styles.companyName}>
-                  {company.universityName}
-               </Typography>
+               <Stack direction={"row"} spacing={0.5} alignItems={"center"}>
+                  <Typography variant="medium" sx={styles.companyName}>
+                     {company.universityName}
+                  </Typography>
+                  {company.publicSparks ? (
+                     <FeaturedCompanySparksBadge sx={styles.badge} />
+                  ) : null}
+               </Stack>
                <Typography variant="small" sx={styles.companyIndustries}>
                   {industries}
                </Typography>
