@@ -5,6 +5,8 @@ import CookiesUtil from "./CookiesUtil"
 // Only import types, will not be part of the bundle, real package is loaded by GTM
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
 import { AnalyticsEvent } from "./analytics/types"
 
@@ -77,18 +79,18 @@ export const dataLayerLivestreamEvent = (
 /**
  * Data layer event that receives a group object and sends extra metadata as variables
  * @param eventName
- * @param group
+ * @param company
  */
-export const dataLayerGroupEvent = (
+export const dataLayerCompanyEvent = (
    eventName: AnalyticsEvent,
-   group: Partial<Group>,
+   company: Partial<Group>,
    optionalVariables = {}
 ) => {
    dataLayerEvent(eventName, {
       ...optionalVariables,
-      companyName: group.universityName, // GTM Variable
-      companyId: group.id, // GTM Variable
-      group,
+      companyName: company.universityName, // GTM Variable
+      companyId: company.id, // GTM Variable
+      company,
    })
 }
 
@@ -108,6 +110,21 @@ export const dataLayerMentorEvent = (
       mentorName: `${mentor.firstName} ${mentor.lastName}`, // GTM Variable
       companyId: mentor.groupId, // GTM Variable
       mentor,
+   })
+}
+
+export const dataLayerSparkEvent = (
+   eventName: AnalyticsEvent,
+   spark: Spark | SparkPresenter,
+   optionalVariables = {}
+) => {
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      sparkId: spark.id, // GTM Variable
+      companyId: spark.group.id, // GTM Variable
+      categoryId: spark.category.id, // GTM Variable
+      mentorId: spark.creator?.id, // GTM Variable
+      spark,
    })
 }
 

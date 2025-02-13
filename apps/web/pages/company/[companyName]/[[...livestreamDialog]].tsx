@@ -22,7 +22,7 @@ import {
 } from "next"
 import React from "react"
 import { AnalyticsEvents } from "util/analytics/types"
-import { dataLayerGroupEvent } from "util/analyticsUtils"
+import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
 import SEO from "../../../components/util/SEO"
 import CompanyPageOverview from "../../../components/views/company-page"
@@ -63,7 +63,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
       trackDocumentId: id,
       handleTrack: ({ id, visitorId }: TrackProps) =>
          trackCompanyPageView(id, visitorId).then(() =>
-            dataLayerGroupEvent(
+            dataLayerCompanyEvent(
                AnalyticsEvents.CompanyPageVisit,
                serverSideGroup
             )
