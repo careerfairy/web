@@ -1,6 +1,6 @@
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon"
 
-export const CompanyIcon = ({ fill, ...props }: SvgIconProps) => {
+export const CompanyIcon = ({ fill = "none", ...props }: SvgIconProps) => {
    return (
       <SvgIcon viewBox="0 0 20 20" fill={fill} {...props}>
          <svg

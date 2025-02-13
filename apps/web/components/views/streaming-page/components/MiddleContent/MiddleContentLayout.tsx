@@ -4,6 +4,7 @@ import { combineStyles, sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    root: {
       overflowY: "auto",
+      overflowX: "hidden",
       display: "flex",
       flexDirection: "column",
    },
