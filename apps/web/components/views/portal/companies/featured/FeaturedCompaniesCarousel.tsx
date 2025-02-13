@@ -1,7 +1,11 @@
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
-import { forwardRef } from "react"
+import { useAuth } from "HOCs/AuthProvider"
+import useGroup from "components/custom-hook/group/useGroup"
+import { useUserFollowingCompanies } from "components/custom-hook/user/useUserFollowingCompanies"
+import { groupRepo } from "data/RepositoryInstances"
+import { forwardRef, useCallback } from "react"
 
 const styles = sxStyles({
    companyCardRoot: {
@@ -66,6 +70,14 @@ const styles = sxStyles({
          backdropFilter: "blur(100px)",
       },
    },
+   followingButton: {
+      background: "rgba(37, 37, 37, 0.43)",
+      border: "none",
+      "&:hover": {
+         background: "rgba(37, 37, 37, 0.43)",
+         border: "none",
+      },
+   },
 })
 
 export type ChildRefType = {
@@ -80,22 +92,56 @@ type Props = {
 
 const FeaturedCompaniesCarousel = forwardRef<ChildRefType, Props>((props) => {
    const { companies, emblaRef } = props
+   const followingCompanies = useUserFollowingCompanies()
 
    return (
       <Box sx={styles.carouselRoot} ref={emblaRef}>
          <Stack direction={"row"} spacing={"32px"}>
             {companies.map((company) => (
-               <FeaturedCompanyCard key={company.id} company={company} />
+               <FeaturedCompanyCard
+                  key={company.id}
+                  company={company}
+                  following={Boolean(
+                     followingCompanies.find(
+                        (data) => data.groupId === company.id
+                     )
+                  )}
+               />
             ))}
          </Stack>
       </Box>
    )
 })
 
-const FeaturedCompanyCard = ({ company }: { company: GroupPresenter }) => {
+type FeaturedCompanyCardProps = {
+   company: GroupPresenter
+   following: boolean
+}
+
+const FeaturedCompanyCard = ({
+   company,
+   following,
+}: FeaturedCompanyCardProps) => {
+   const { userData } = useAuth()
+   const { data: group } = useGroup(company.id, true)
+
    const industries = company.companyIndustries
       .map((industry) => industry.name)
       .join(", ")
+
+   const toggleFollow = useCallback(
+      async (e: React.MouseEvent, groupId: string) => {
+         e.stopPropagation()
+         e.preventDefault()
+
+         if (following) {
+            await groupRepo.unfollowCompany(userData.id, groupId)
+         } else {
+            await groupRepo.followCompany(userData, group)
+         }
+      },
+      [userData, group, following]
+   )
 
    return (
       <Stack
@@ -116,13 +162,20 @@ const FeaturedCompanyCard = ({ company }: { company: GroupPresenter }) => {
                {company.companyCountry?.name}
             </Typography>
          </Stack>
-         <Button variant="contained" sx={styles.followButton}>
+         <Button
+            variant="contained"
+            sx={[
+               styles.followButton,
+               following ? styles.followingButton : null,
+            ]}
+            onClick={(e) => toggleFollow(e, company.id)}
+         >
             <Typography
                variant="small"
                fontWeight={400}
                sx={{ color: (theme) => theme.brand.white[100] }}
             >
-               Follow
+               {following ? "Unfollow" : "Follow"}
             </Typography>
          </Button>
       </Stack>

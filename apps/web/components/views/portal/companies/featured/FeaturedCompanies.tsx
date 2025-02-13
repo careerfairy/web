@@ -7,7 +7,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
-import React, { useEffect, useRef } from "react"
+import React, { useRef } from "react"
 import { ChevronRight } from "react-feather"
 import FeaturedCompaniesCarousel, {
    ChildRefType,
@@ -96,8 +96,6 @@ const FeaturedCompaniesComponent = ({
       childRef?.current?.goNext()
    }
 
-   console.log("TEST", emblaApi?.slideNodes())
-
    React.useImperativeHandle(childRef, () => ({
       goNext() {
          if (!emblaApi.canScrollPrev()) {
@@ -109,10 +107,6 @@ const FeaturedCompaniesComponent = ({
          emblaApi.scrollPrev()
       },
    }))
-
-   useEffect(() => {
-      console.log("SLIDES: ", emblaApi?.slidesInView())
-   })
 
    if (!featuredCompanies) return null
 

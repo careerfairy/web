@@ -4,10 +4,10 @@ import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 /**
  * Custom hook to get a group from the database
  **/
-const useGroup = (groupId: string) => {
+const useGroup = (groupId: string, disableSuspense?: boolean) => {
    return useFirestoreDocument<Group>("careerCenterData", [groupId], {
       idField: "id",
-      suspense: true,
+      suspense: !disableSuspense,
    })
 }
 
