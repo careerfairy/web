@@ -13,6 +13,7 @@ import { useGenericDashboard } from "layouts/GenericDashboardLayout"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
+import { shouldUseEmulators } from "util/CommonUtil"
 import { ModuleCard } from "../../talent-guide/components/module-card/ModuleCard"
 import { CourseOverview } from "./course-overview/CourseOverview"
 
@@ -72,7 +73,7 @@ export const LevelsContainer = ({ pages }: Props) => {
    const cardsAreMobile = useIsMobile(drawerOpen ? 1110 : undefined)
 
    useEffect(() => {
-      if (isLoadingUserData || isLoadingCountry) return
+      if (isLoadingUserData || isLoadingCountry || shouldUseEmulators()) return
 
       const showLevels = userData
          ? userIsTargetedLevels(userData)

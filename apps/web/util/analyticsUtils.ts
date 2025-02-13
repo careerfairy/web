@@ -8,7 +8,8 @@ import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
-import { Page, TalentGuideModule } from "data/hygraph/types"
+import { TalentGuideState } from "store/reducers/talentGuideReducer"
+import { getProgressPercentage } from "util/levels"
 import { AnalyticsEvent } from "./analytics/types"
 
 /**
@@ -139,15 +140,21 @@ export const dataLayerSparkEvent = (
 
 export const dataLayerLevelEvent = (
    eventName: AnalyticsEvent,
-   level: Page<TalentGuideModule>,
+   levelsState: TalentGuideState,
    optionalVariables = {}
 ) => {
    dataLayerEvent(eventName, {
       ...optionalVariables,
-      levelSlug: level.slug, // GTM Variable
-      levelName: level.content?.moduleName, // GTM Variable
-      levelId: level.content?.id, // GTM Variable
-      level,
+      levelSlug: levelsState.moduleData.slug, // GTM Variable
+      levelName: levelsState.moduleData.content.moduleName, // GTM Variable
+      levelId: levelsState.moduleData.content.id, // GTM Variable
+      currentStepIndex: levelsState.currentStepIndex, // GTM Variable
+      progressPercentage: Math.round(
+         getProgressPercentage(
+            levelsState.currentStepIndex,
+            levelsState.moduleData
+         )
+      ),
    })
 }
 

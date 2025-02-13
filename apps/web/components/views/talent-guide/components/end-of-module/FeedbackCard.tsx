@@ -49,7 +49,7 @@ export const FeedbackCard = ({
    onFeedbackSubmitted,
 }: Props) => {
    const [hover, setHover] = useState(-1)
-   const { moduleData, userAuthUid } = useTalentGuideState()
+   const talentGuideState = useTalentGuideState()
    const { errorNotification } = useSnackbarNotifications()
    const {
       handleSubmit,
@@ -68,8 +68,8 @@ export const FeedbackCard = ({
    const onSubmit = async (data: FeedbackFormData) => {
       try {
          await talentGuideProgressService.submitFeedback(
-            moduleData.content.id,
-            userAuthUid,
+            talentGuideState.moduleData.content.id,
+            talentGuideState.userAuthUid,
             data.rating as TalentGuideFeedback["rating"],
             data.tags as FEEDBACK_TAG_CATEGORY[]
          )
@@ -77,7 +77,7 @@ export const FeedbackCard = ({
 
          dataLayerLevelEvent(
             AnalyticsEvents.LevelsFeedbackSubmitted,
-            moduleData,
+            talentGuideState,
             {
                rating: data.rating,
                feedbackTags: data.tags,

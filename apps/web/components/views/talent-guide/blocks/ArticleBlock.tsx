@@ -3,7 +3,10 @@ import CircularLogo from "components/views/common/logos/CircularLogo"
 import { ArticleBlockType } from "data/hygraph/types"
 import Link from "next/link"
 import { ChevronRight, Circle } from "react-feather"
+import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLevelEvent } from "util/analyticsUtils"
 import { BlockWithAuthorPromotion } from "./BlockWithAuthorPromotions"
 
 const ILLUSTRATION_WIDTH = "108px"
@@ -77,9 +80,27 @@ const Content = ({
    articleUrl,
    authorAvatar,
    authorName,
+   id,
 }: Props) => {
+   const talentGuideState = useTalentGuideState()
+
    return (
-      <Box sx={styles.root} component={Link} href={articleUrl}>
+      <Box
+         sx={styles.root}
+         component={Link}
+         onClick={() => {
+            dataLayerLevelEvent(
+               AnalyticsEvents.LevelsProgressArticle,
+               talentGuideState,
+               {
+                  articleId: id,
+                  articleUrl: articleUrl,
+               }
+            )
+         }}
+         href={articleUrl}
+         target="_blank"
+      >
          <Box
             sx={[
                styles.imageContainer,

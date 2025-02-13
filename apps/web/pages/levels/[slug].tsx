@@ -9,10 +9,11 @@ import { Page, TalentGuideModule } from "data/hygraph/types"
 import { useAuth } from "HOCs/AuthProvider"
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
-import { Fragment, useEffect } from "react"
+import { Fragment, useEffect, useRef } from "react"
 import {
    loadTalentGuide,
    resetTalentGuide,
+   trackLevelsLeave,
 } from "store/reducers/talentGuideReducer"
 import {
    useIsLoadingTalentGuide,
@@ -37,6 +38,9 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const showEndOfModuleExperience = useShowEndOfModuleExperience()
    // const [layoutKey, setLayoutKey] = useState(0)
 
+   const isLoggedOutRef = useRef(isLoggedOut)
+   isLoggedOutRef.current = isLoggedOut
+
    useEffect(() => {
       if (!authenticatedUser.uid) {
          return
@@ -50,9 +54,10 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       )
 
       return () => {
+         dispatch(trackLevelsLeave())
          dispatch(resetTalentGuide())
       }
-   }, [dispatch, authenticatedUser.uid, data])
+   }, [dispatch, authenticatedUser.uid, data, isLoggedOut])
 
    useEffect(() => {
       if (isLoggedOut) {

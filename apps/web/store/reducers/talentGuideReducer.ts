@@ -17,7 +17,7 @@ export type QuizStatus = {
    state: QuizState
 }
 
-type TalentGuideState = {
+export type TalentGuideState = {
    visibleSteps: number[]
    currentStepIndex: number
    moduleData: Page<TalentGuideModule> | null
@@ -251,6 +251,9 @@ const talentGuideReducer = createSlice({
             // ])
          }
       },
+      trackLevelsLeave: (state) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsLeave, state)
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -261,10 +264,7 @@ const talentGuideReducer = createSlice({
             if (!action.payload) {
                // If there is no next step, we've completed the module
                state.showEndOfModuleExperience = true
-               dataLayerLevelEvent(
-                  AnalyticsEvents.LevelsComplete,
-                  state.moduleData
-               )
+               // dataLayerLevelEvent(AnalyticsEvents.LevelsComplete, state)
             } else {
                const { nextStepIndex } = action.payload
                state.currentStepIndex = nextStepIndex
@@ -344,7 +344,7 @@ const talentGuideReducer = createSlice({
                },
                {} as Record<string, QuizStatus>
             )
-            dataLayerLevelEvent(AnalyticsEvents.LevelsStart, moduleData)
+            dataLayerLevelEvent(AnalyticsEvents.LevelsStart, state)
          })
          .addCase(loadTalentGuide.rejected, (state, action) => {
             state.isLoadingTalentGuide = false
@@ -370,6 +370,11 @@ const talentGuideReducer = createSlice({
             state.quizStatuses[quizId].state = passed
                ? QUIZ_STATE.PASSED
                : QUIZ_STATE.FAILED
+
+            dataLayerLevelEvent(AnalyticsEvents.LevelsProgressQuiz, state, {
+               quizId,
+               quizPassed: passed,
+            })
          })
          .addCase(attemptQuiz.rejected, (state, action) => {
             state.isLoadingAttemptQuiz = false
@@ -442,7 +447,7 @@ const talentGuideReducer = createSlice({
                },
                {} as Record<string, QuizStatus>
             )
-            dataLayerLevelEvent(AnalyticsEvents.LevelsStart, state.moduleData)
+            dataLayerLevelEvent(AnalyticsEvents.LevelsStart, state)
          })
          .addCase(restartModule.rejected, (state, action) => {
             state.isRestartingModule = false
@@ -459,6 +464,7 @@ const talentGuideReducer = createSlice({
    },
 })
 
-export const { resetTalentGuide, toggleQuizAnswer } = talentGuideReducer.actions
+export const { resetTalentGuide, toggleQuizAnswer, trackLevelsLeave } =
+   talentGuideReducer.actions
 
 export default talentGuideReducer.reducer
