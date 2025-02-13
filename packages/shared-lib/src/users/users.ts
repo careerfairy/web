@@ -139,6 +139,14 @@ export interface UserData extends Identifiable {
    stateIsoCode?: string
    stateName?: string
 
+   /**
+    * Dates of the user's effective study background.
+    *
+    * When a user updates his study backgrounds, an on write trigger determines which one
+    * is the effective background and updates the user data (university, field of study, level of study and university country code).
+    *
+    * These two new Timestamps capture in the same nature the effective background start and end dates.
+    */
    studyBackgroundStartedAt?: Timestamp
    studyBackgroundEndedAt?: Timestamp
 }
