@@ -45,7 +45,10 @@ export const FeaturedCompaniesHeader = ({
 
    const MobileHeader = () => (
       <Typography
-      // sx={{maxWidth: isMobile ? "70%" : "auto"}}
+         // sx={{maxWidth: isMobile ? "70%" : "auto"}}
+         sx={{
+            px: { xs: 2, sm: 2, md: 0 },
+         }}
       >
          <Typography
             variant="brandedH5"
@@ -75,6 +78,7 @@ export const FeaturedCompaniesHeader = ({
             direction="row"
             alignItems="center"
             justifyContent="space-between"
+            sx={{ px: 2 }}
          >
             <MobileHeader />
             <Stack direction="row" alignItems="flex-end" gap={1}>
