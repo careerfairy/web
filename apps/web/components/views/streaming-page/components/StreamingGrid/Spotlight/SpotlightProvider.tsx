@@ -1,8 +1,14 @@
 import { UserStream } from "components/views/streaming-page/types"
-import { ReactNode, createContext, useContext, useMemo } from "react"
+import { ReactNode, createContext, useContext, useMemo, useState } from "react"
 
 type SpotlightContextValue = {
    stream: UserStream | null
+   // Add video-specific state
+   showMute?: boolean
+   isMuted?: boolean
+   handleToggleMute?: () => void
+   setShowMute?: (showMute: boolean) => void
+   setIsMuted?: (isMuted: boolean) => void
 }
 
 const SpotlightContext = createContext<SpotlightContextValue | undefined>(null)
@@ -14,9 +20,23 @@ type Props = {
 }
 
 export const SpotlightProvider = ({ stream, children }: Props) => {
+   const [isMuted, setIsMuted] = useState(false)
+   const [showMute, setShowMute] = useState(false)
+
+   const handleToggleMute = () => {
+      setIsMuted((prev) => !prev)
+   }
+
    const contextValue = useMemo<SpotlightContextValue>(
-      () => ({ stream }),
-      [stream]
+      () => ({
+         stream,
+         isMuted,
+         setIsMuted,
+         handleToggleMute,
+         showMute,
+         setShowMute,
+      }),
+      [stream, isMuted, showMute]
    )
 
    return (
