@@ -28,6 +28,16 @@ const styles = sxStyles({
          background: "rgba(235, 235, 239, 0.6)",
       },
    },
+   mobileHeader: {
+      px: { xs: 2, sm: 2, md: 0 },
+   },
+   sellAllCompanies: {
+      color: (theme) => theme.brand.white[100],
+      textDecoration: "underline",
+   },
+   desktopHeader: {
+      px: 2,
+   },
 })
 
 type FeaturedCompaniesHeader = {
@@ -44,12 +54,7 @@ export const FeaturedCompaniesHeader = ({
    const isMobile = useIsMobile()
 
    const MobileHeader = () => (
-      <Typography
-         // sx={{maxWidth: isMobile ? "70%" : "auto"}}
-         sx={{
-            px: { xs: 2, sm: 2, md: 0 },
-         }}
-      >
+      <Typography sx={styles.mobileHeader}>
          <Typography
             variant="brandedH5"
             fontWeight={400}
@@ -78,7 +83,7 @@ export const FeaturedCompaniesHeader = ({
             direction="row"
             alignItems="center"
             justifyContent="space-between"
-            sx={{ px: 2 }}
+            sx={styles.desktopHeader}
          >
             <MobileHeader />
             <Stack direction="row" alignItems="flex-end" gap={1}>
@@ -86,13 +91,7 @@ export const FeaturedCompaniesHeader = ({
                   href={`/companies?featured=true&category=${category}`}
                   target="_blank"
                >
-                  <Typography
-                     variant="small"
-                     sx={{
-                        color: (theme) => theme.brand.white[100],
-                        textDecoration: "underline",
-                     }}
-                  >
+                  <Typography variant="small" sx={styles.sellAllCompanies}>
                      Sell all companies
                   </Typography>
                </Link>
