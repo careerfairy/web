@@ -23,6 +23,8 @@ import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifica
 import { StarIcon } from "components/views/common/icons/StarIcon"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
 import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLevelEvent } from "util/analyticsUtils"
 import { FeedbackFormData, feedbackSchema } from "../../schema"
 
 export const ratingTitles: Record<TalentGuideFeedback["rating"], string> = {
@@ -72,6 +74,16 @@ export const FeedbackCard = ({
             data.tags as FEEDBACK_TAG_CATEGORY[]
          )
          reset()
+
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsFeedbackSubmitted,
+            moduleData,
+            {
+               rating: data.rating,
+               feedbackTags: data.tags,
+            }
+         )
+
          onFeedbackSubmitted?.()
       } catch (error) {
          errorNotification(

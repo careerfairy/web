@@ -8,6 +8,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
 import { Page, QuizModelType, TalentGuideModule } from "data/hygraph/types"
 import { RootState } from "store"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLevelEvent } from "util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 export type QuizStatus = {
@@ -259,6 +261,10 @@ const talentGuideReducer = createSlice({
             if (!action.payload) {
                // If there is no next step, we've completed the module
                state.showEndOfModuleExperience = true
+               dataLayerLevelEvent(
+                  AnalyticsEvents.LevelsComplete,
+                  state.moduleData
+               )
             } else {
                const { nextStepIndex } = action.payload
                state.currentStepIndex = nextStepIndex
@@ -338,6 +344,7 @@ const talentGuideReducer = createSlice({
                },
                {} as Record<string, QuizStatus>
             )
+            dataLayerLevelEvent(AnalyticsEvents.LevelsStart, moduleData)
          })
          .addCase(loadTalentGuide.rejected, (state, action) => {
             state.isLoadingTalentGuide = false
@@ -435,6 +442,7 @@ const talentGuideReducer = createSlice({
                },
                {} as Record<string, QuizStatus>
             )
+            dataLayerLevelEvent(AnalyticsEvents.LevelsStart, state.moduleData)
          })
          .addCase(restartModule.rejected, (state, action) => {
             state.isRestartingModule = false
