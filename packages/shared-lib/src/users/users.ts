@@ -138,6 +138,9 @@ export interface UserData extends Identifiable {
    countryIsoCode?: string
    stateIsoCode?: string
    stateName?: string
+
+   studyBackgroundStartedAt?: Timestamp
+   studyBackgroundEndedAt?: Timestamp
 }
 
 export type ValidUserTagFields =
