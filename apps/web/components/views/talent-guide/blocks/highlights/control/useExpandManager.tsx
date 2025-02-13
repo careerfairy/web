@@ -2,6 +2,9 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useLockBodyScroll } from "react-use"
+import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
+import { AnalyticsEvents } from "util/analytics/types"
+import { dataLayerLevelEvent } from "util/analyticsUtils"
 import { useIsLiveStreamDialogOpen } from "../../live-stream/useIsLiveStreamDialogOpen"
 import { HighlightsContextType } from "./HighlightsBlockContext"
 
@@ -15,6 +18,7 @@ export const useExpandManager = (
    expandedPlayingIndex: HighlightsContextType["expandedPlayingIndex"]
    setExpandedPlayingIndex: HighlightsContextType["setExpandedPlayingIndex"]
 } => {
+   const talentGuideState = useTalentGuideState()
    const router = useRouter()
    const isMobile = useIsMobile()
    const isLiveStreamDialogOpen = useIsLiveStreamDialogOpen()
@@ -65,9 +69,18 @@ export const useExpandManager = (
                   shallow: true,
                }
             )
+
+            dataLayerLevelEvent(
+               AnalyticsEvents.LevelsProgressHighlight,
+               talentGuideState,
+               {
+                  highlightId: highlights[index].id,
+                  type: highlights[index].__typename,
+               }
+            )
          }
       },
-      [router, highlights]
+      [router, highlights, talentGuideState]
    )
 
    useEffect(() => {

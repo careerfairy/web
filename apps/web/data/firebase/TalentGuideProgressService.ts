@@ -26,6 +26,7 @@ import {
 } from "firebase/firestore"
 import { Functions } from "firebase/functions"
 import CookiesUtil from "util/CookiesUtil"
+import { getProgressPercentage } from "util/levels"
 import {
    FirestoreInstance,
    FunctionsInstance,
@@ -386,9 +387,10 @@ export class TalentGuideProgressService {
          completedStepIds: arrayUnion(
             moduleData.content.moduleSteps[currentStepIndex].id
          ),
-         percentageComplete:
-            ((currentStepIndex + 1) / moduleData.content.moduleSteps.length) *
-            100,
+         percentageComplete: getProgressPercentage(
+            currentStepIndex,
+            moduleData
+         ),
          totalSteps: moduleData.content.moduleSteps.length,
          moduleName: moduleData.content.moduleName,
          moduleCategory: moduleData.content.category,
