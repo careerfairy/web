@@ -141,7 +141,10 @@ export const SparksFeedTrackerProvider: FC<{
             case SparkEventActions.Register_Event:
                dataLayerSparkEvent(
                   AnalyticsEvents.SparkRegisterEvent,
-                  currentSpark
+                  currentSpark,
+                  {
+                     livestreamId: optionalVariables?.livestreamId,
+                  }
                )
                break
             case SparkEventActions.Like:
@@ -178,6 +181,10 @@ export const SparksFeedTrackerProvider: FC<{
                   currentSparkId,
                   "numberTimesCompletelyWatched"
                )
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkWatchedComplete,
+                  currentSpark
+               )
                break
             case SparkEventActions.Click_DiscoverLivestreamCTA:
                dataLayerSparkEvent(
@@ -191,7 +198,10 @@ export const SparksFeedTrackerProvider: FC<{
             case SparkEventActions.Click_JobCTA:
                dataLayerSparkEvent(
                   AnalyticsEvents.SparkClickJobCTA,
-                  currentSpark
+                  currentSpark,
+                  {
+                     jobIds: optionalVariables?.jobIds,
+                  }
                )
                break
             case SparkEventActions.Click_MentorPageCTA:
@@ -207,13 +217,49 @@ export const SparksFeedTrackerProvider: FC<{
                )
                break
             case SparkEventActions.Share_Clipboard:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareClipboard,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_Email:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareEmail,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_Facebook:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareFacebook,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_LinkedIn:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareLinkedIn,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_Mobile:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareMobile,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_X:
+               dataLayerSparkEvent(AnalyticsEvents.SparkShareX, currentSpark)
+            // falls through
             case SparkEventActions.Share_WhatsApp:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareWhatsApp,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_Other:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareOther,
+                  currentSpark
+               )
                sparkService.incrementSparkCount(currentSparkId, "shareCTA")
                break
          }
