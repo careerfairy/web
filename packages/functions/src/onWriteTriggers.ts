@@ -627,10 +627,23 @@ export const onWriteStudyBackground = functions
             levelOfStudy: null,
             universityCountryCode: null,
             university: null,
+            studyBackgroundStartedAt: null,
+            studyBackgroundEndedAt: null,
          })
       } else {
          // If there are study backgrounds, we need to update the user data to the first effective study background
          const effectiveStudyBackground = sortedStudyBackgrounds.at(0)
+
+         functions.logger.log(
+            "🚀 ~ Effective study background:",
+            userId,
+            effectiveStudyBackground
+         )
+
+         effectiveStudyBackground.universityId =
+            effectiveStudyBackground.universityId
+               ? effectiveStudyBackground.universityId
+               : "other"
 
          const university: University =
             effectiveStudyBackground.universityId.toLocaleLowerCase() ===
@@ -644,12 +657,6 @@ export const onWriteStudyBackground = functions
                     effectiveStudyBackground.universityId
                  )
 
-         functions.logger.log(
-            "🚀 ~ Effective study background:",
-            userId,
-            effectiveStudyBackground
-         )
-
          functions.logger.log("🚀 ~ Effective university:", userId, university)
 
          await userRepo.updateUserData(userId, {
@@ -661,6 +668,8 @@ export const onWriteStudyBackground = functions
                ...university,
                code: university.id,
             },
+            studyBackgroundStartedAt: effectiveStudyBackground.startedAt,
+            studyBackgroundEndedAt: effectiveStudyBackground.endedAt,
          })
       }
    })
