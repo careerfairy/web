@@ -48,8 +48,6 @@ const styles = sxStyles({
 const carouselEmblaOptions: EmblaOptionsType = {
    dragFree: true,
    slidesToScroll: 2,
-   inViewThreshold: 0.5,
-   align: "start",
 }
 
 export const FeaturedCompanies = () => {
@@ -93,7 +91,7 @@ const FeaturedCompaniesComponent = ({
       childRef?.current?.goNext()
    }
 
-   console.log("TEST", emblaApi.slideNodes())
+   console.log("TEST", emblaApi?.slideNodes())
 
    React.useImperativeHandle(childRef, () => ({
       goNext() {
