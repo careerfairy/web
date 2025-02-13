@@ -46,7 +46,9 @@ export const SparksEventNotification = ({ spark }: Props) => {
    const discoverHandleClick = useCallback(() => {
       dispatch(setEventToRegisterTo(eventNotification?.eventId))
       dispatch(showEventDetailsDialog(true))
-      trackEvent(SparkEventActions.Click_DiscoverLivestreamCTA)
+      trackEvent(SparkEventActions.Click_DiscoverLivestreamCTA, {
+         livestreamId: eventNotification?.eventId,
+      })
    }, [dispatch, eventNotification?.eventId, trackEvent])
 
    const cancelHandleClick = useCallback(

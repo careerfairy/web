@@ -10,7 +10,7 @@ import { useMountedState } from "react-use"
 import useSWRMutation from "swr/mutation"
 import { CompanySearchResult } from "types/algolia"
 import { AnalyticsEvents } from "util/analytics/types"
-import { dataLayerGroupEvent } from "util/analyticsUtils"
+import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
@@ -56,7 +56,7 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
                successNotification(
                   `You are now following ${group.universityName}`
                )
-               dataLayerGroupEvent(AnalyticsEvents.CompanyFollow, group)
+               dataLayerCompanyEvent(AnalyticsEvents.CompanyFollow, group)
             } else {
                successNotification("You have unfollowed this company")
             }
