@@ -7,11 +7,8 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
-import React, { useRef } from "react"
 import { ChevronRight } from "react-feather"
-import FeaturedCompaniesCarousel, {
-   ChildRefType,
-} from "./FeaturedCompaniesCarousel"
+import { FeaturedCompaniesCarousel } from "./FeaturedCompaniesCarousel"
 import { FeaturedCompaniesHeader } from "./FeaturedCompaniesHeader"
 import { MobileFeaturedCompaniesCarousel } from "./MobileFeaturedCompaniesCarousel"
 
@@ -21,11 +18,7 @@ const styles = sxStyles({
       borderRadius: 2,
       background: "linear-gradient(125deg, #5A86E2 0%, #5F9BD9 100%)",
       mb: "40px",
-      p: {
-         xs: "24px 0px",
-         sm: "24px 0px",
-         md: "24px 0px",
-      },
+      py: "24px",
    },
    mobileRoot: {
       borderRadius: 0,
@@ -83,30 +76,16 @@ const FeaturedCompaniesComponent = ({
    const { data: featuredCompanies } = useFeaturedCompanies(suspense)
    const { data: fieldOfStudy } = useFieldOfStudyById(fieldOfStudyId, suspense)
 
-   const childRef = useRef<ChildRefType | null>(null)
-
    const [emblaRef, emblaApi] = useEmblaCarousel(carouselEmblaOptions, [
       WheelGesturesPlugin(),
    ])
 
    const onClickPrev = () => {
-      childRef?.current?.goPrev()
+      emblaApi?.scrollPrev()
    }
    const onClickNext = () => {
-      childRef?.current?.goNext()
+      emblaApi?.scrollNext()
    }
-
-   React.useImperativeHandle(childRef, () => ({
-      goNext() {
-         if (!emblaApi.canScrollPrev()) {
-            emblaApi.scrollNext()
-         }
-         emblaApi.scrollNext()
-      },
-      goPrev() {
-         emblaApi.scrollPrev()
-      },
-   }))
 
    if (!featuredCompanies) return null
 
