@@ -139,15 +139,6 @@ export const dataLayerSparkEvent = (
 }
 
 /**
- * Creates a safe copy of an object for analytics by removing undefined values and circular references
- * @param obj The object to sanitize
- * @returns A sanitized copy of the object
- */
-const sanitizeForAnalytics = <T>(obj: T): T => {
-   return JSON.parse(JSON.stringify(obj))
-}
-
-/**
  * Sends analytics events for talent guide interactions.
  * Requires a valid talent guide state to execute.
  *
@@ -322,4 +313,13 @@ export const analyticsTrackPageView = () => {
    if (typeof window === "undefined") return
 
    window["analytics"].push(["page"])
+}
+
+/**
+ * Creates a safe copy of an object for analytics by removing undefined values and circular references
+ * @param obj The object to sanitize
+ * @returns A sanitized copy of the object
+ */
+const sanitizeForAnalytics = <T>(obj: T): T => {
+   return JSON.parse(JSON.stringify(obj))
 }
