@@ -6,7 +6,7 @@ import {
 import * as Sentry from "@sentry/nextjs"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { atsServiceInstance } from "../../../data/firebase/ATSService"
 import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
 import useSnackbarNotifications from "../useSnackbarNotifications"

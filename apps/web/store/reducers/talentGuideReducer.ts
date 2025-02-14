@@ -8,7 +8,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
 import { Page, QuizModelType, TalentGuideModule } from "data/hygraph/types"
 import { RootState } from "store"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLevelEvent } from "util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 

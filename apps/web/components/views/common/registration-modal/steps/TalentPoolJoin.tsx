@@ -10,7 +10,7 @@ import {
 } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
 import { useContext, useState } from "react"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { connectedIcon } from "../../../../../constants/svgs"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"

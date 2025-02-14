@@ -12,7 +12,7 @@ import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetail
 import JobCard from "components/views/common/jobs/JobCard"
 import { useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useStreamingContext } from "../../context"
 import { EmptyJobsView } from "./EmptyJobsView"

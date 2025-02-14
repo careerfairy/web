@@ -16,7 +16,7 @@ import React, {
 } from "react"
 import { useDispatch } from "react-redux"
 import { Dispatch } from "redux"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { MAX_STREAM_CHAT_ENTRIES } from "../../../../../constants/streams"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"

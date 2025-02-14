@@ -10,7 +10,7 @@ import {
 } from "@mui/material"
 import Typography from "@mui/material/Typography"
 import { memo, useCallback } from "react"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { dataLayerLivestreamEvent } from "../../../../../../util/analyticsUtils"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"

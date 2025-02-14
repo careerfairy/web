@@ -15,7 +15,7 @@ import React, {
    useReducer,
    useState,
 } from "react"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../HOCs/AuthProvider"
 import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer"
 import { sparkService } from "../../data/firebase/SparksService"
