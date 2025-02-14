@@ -1,22 +1,23 @@
-import React, { FC } from "react"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import { useFormik } from "formik"
 import {
    maxQuestionLength,
    minQuestionLength,
 } from "@careerfairy/shared-lib/constants/forms"
-import { useRouter } from "next/router"
-import { Box, Button, CircularProgress, TextField } from "@mui/material"
-import { useDispatch } from "react-redux"
-import * as actions from "store/actions"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import {
    LivestreamEvent,
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
-import { errorLogAndNotify } from "../../../../util/CommonUtil"
+import { Box, Button, CircularProgress, TextField } from "@mui/material"
 import { livestreamService } from "data/firebase/LivestreamService"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { useFormik } from "formik"
+import { useRouter } from "next/router"
+import { FC } from "react"
+import { useDispatch } from "react-redux"
+import * as actions from "store/actions"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const styles = {
    root: {
@@ -70,7 +71,7 @@ const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
             )
             onQuestionAdded(newlyCreatedQuestion)
             resetForm()
-            dataLayerEvent("event_question_submit", {
+            dataLayerEvent(AnalyticsEvents.EventQuestionSubmit, {
                livestreamId: livestream.id,
             })
 

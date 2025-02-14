@@ -4,8 +4,19 @@ export const AnalyticsEvents = {
    LivestreamSpeakerLinkedinClick: "livestream_speaker_linkedin_click",
    LivestreamViewerHandRaiser: "livestream_viewer_hand_raiser",
    LivestreamViewerSelectJobs: "livestream_viewer_select_jobs",
+   LivestreamViewerSelectQuestions: "livestream_viewer_select_questions",
+   LivestreamViewerSelectPolls: "livestream_viewer_select_polls",
+   LivestreamViewerSelectChat: "livestream_viewer_select_chat",
+   LivestreamViewerSelectSupport: "livestream_viewer_select_support",
+   LivestreamViewerSelectHand: "livestream_viewer_select_hand",
+   LivestreamViewerReactionClap: "livestream_viewer_reaction_clap",
+   LivestreamViewerReactionConfused: "livestream_viewer_reaction_confused",
+   LivestreamViewerReactionHeart: "livestream_viewer_reaction_heart",
+   LivestreamViewerReactionLike: "livestream_viewer_reaction_like",
+   LivestreamViewerShowAudienceTab: "livestream_viewer_show_audience_tab",
    EventAddToCalendar: "event_add_to_calendar",
    EventRegistrationComplete: "event_registration_complete",
+   EventRegistrationQuestionSkip: "event_registration_question_skip",
    EventRegistrationQuestionSubmit: "event_registration_question_submit",
    EventRegistrationRemoved: "event_registration_removed",
    EventRegistrationStarted: "event_registration_started",
@@ -23,9 +34,14 @@ export const AnalyticsEvents = {
    NewsletterDeniedOn1stReminder: "newsletter_denied_on_1st_reminder",
    NewsletterDeniedOn2ndReminder: "newsletter_denied_on_2nd_reminder",
    NewsletterDeniedOnSignup: "newsletter_denied_on_signup",
+
+   LoginComplete: "login_complete",
+   LoginFailed: "login_failed",
+   Logout: "logout",
    SignupCredentialsCompleted: "signup_credentials_completed",
    SignupPinComplete: "signup_pin_complete",
    SignupStarted: "signup_started",
+   SignupCompleteRedirect: "signup_complete_redirect",
    AttendEvent: "attend_event",
    CompanyPageVisit: "company_page_visit",
    MentorPageVisit: "mentor_page_visit",
@@ -36,6 +52,23 @@ export const AnalyticsEvents = {
    TalentPoolLeave: "talent_pool_leave",
    TalentPoolJoinLogin: "talent_pool_join_login",
    CustomJobApplicationComplete: "custom_job_application_complete",
+   CustomJobApplicationRemovalComplete:
+      "custom_job_application_removal_complete",
+   EventShare: "event_share",
+   SparksShare: "sparks_share",
+   ReferralCopyLink: "referral_copy_link",
+   ReferralShareWhatsapp: "referral_share_whatsapp",
+   ReferralShareTwitter: "referral_share_twitter",
+   ReferralShareLinkedin: "referral_share_linkedin",
+
+   /**
+    * Copied the displayed link in the company page share dialog
+    */
+   CompanyPageShare: "company_page_share",
+   /**
+    * Clicked on one of the company page social icons in the company page share dialog
+    */
+   Company_Page: "company_page",
    SparkClickCompanyPageCTA: "spark_click_company_page_cta",
    SparkClickDiscoverEventCTA: "spark_click_discover_event_cta",
    SparkClickJobCTA: "spark_click_job_cta",
@@ -81,6 +114,15 @@ export const AnalyticsEvents = {
    LivestreamSpeakerSave: "livestream_speaker_save",
    LivestreamChatNewMessage: "livestream_chat_new_message",
    LivestreamChatOpen: "livestream_chat_open",
+   ToggleTheme: "toggle_theme",
+
+   /**
+    * Deprecated events
+    */
+   HighlightVideoPlay: "highlight_video_play",
+   HighlightVideoSignedOut: "highlight_video_signed_out",
+   HighlightVideoRestricted: "highlight_video_restricted",
+   EventQuestionSubmit: "event_question_submit",
 } as const
 
 export type AnalyticsEvent =

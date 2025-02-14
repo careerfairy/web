@@ -143,7 +143,10 @@ const QuestionCreateForm = () => {
          // go to next talent pool step
          handleNext()
       }
-      dataLayerLivestreamEvent("event_registration_question_skip", livestream)
+      dataLayerLivestreamEvent(
+         AnalyticsEvents.EventRegistrationQuestionSkip,
+         livestream
+      )
    }
 
    return (

@@ -1,6 +1,7 @@
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import useSWRMutation from "swr/mutation"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import useSnackbarNotifications from "../useSnackbarNotifications"
@@ -31,10 +32,13 @@ const useRemoveUserCustomJob = (job: PublicCustomJob) => {
             onSuccess: () => {
                successNotification("You have removed the job!")
 
-               dataLayerEvent("custom_job_application_removal_complete", {
-                  jobId: job.id,
-                  userId: userData?.id,
-               })
+               dataLayerEvent(
+                  AnalyticsEvents.CustomJobApplicationRemovalComplete,
+                  {
+                     jobId: job.id,
+                     userId: userData?.id,
+                  }
+               )
             },
          }
       )
