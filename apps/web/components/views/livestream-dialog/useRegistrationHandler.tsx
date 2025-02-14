@@ -5,10 +5,13 @@ import {
 } from "@careerfairy/shared-lib/src/livestreams"
 import { UserReminderType } from "@careerfairy/shared-lib/src/users"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useRefetchRegisteredStreams } from "components/custom-hook/useRegisteredStreams"
+import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
+import { trackLevelsLivestreamRegistrationCompleted } from "store/reducers/talentGuideReducer"
 import { AnalyticsEvents } from "util/analytics/types"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useUserReminders } from "../../../HOCs/UserReminderProvider"
@@ -31,7 +34,8 @@ export default function useRegistrationHandler() {
    const { forceShowReminder } = useUserReminders()
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
-
+   const isInTalentGuidePage = useIsInTalentGuide()
+   const dispatch = useAppDispatch()
    const firebase = useFirebaseService()
    const {
       registerToLivestream,
@@ -241,6 +245,15 @@ export default function useRegistrationHandler() {
                   AnalyticsEvents.EventRegistrationComplete,
                   livestream
                )
+
+               if (isInTalentGuidePage) {
+                  dispatch(
+                     trackLevelsLivestreamRegistrationCompleted({
+                        livestreamId: livestream.id,
+                        livestreamTitle: livestream.title,
+                     })
+                  )
+               }
             }
 
             // after registration, remove from this user's sparks notification the existing notification related to this event

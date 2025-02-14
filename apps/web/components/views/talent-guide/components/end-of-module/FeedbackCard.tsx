@@ -19,12 +19,12 @@ import { AnimatedCollapse } from "../../animations/AnimatedCollapse"
 import { ratingTitleAnimation } from "./animations"
 import { feedbackStyles } from "./styles"
 
+import { useAppDispatch } from "components/custom-hook/store"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { StarIcon } from "components/views/common/icons/StarIcon"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
+import { trackLevelsFeedback } from "store/reducers/talentGuideReducer"
 import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
-import { AnalyticsEvents } from "util/analytics/types"
-import { dataLayerLevelEvent } from "util/analyticsUtils"
 import { FeedbackFormData, feedbackSchema } from "../../schema"
 
 export const ratingTitles: Record<TalentGuideFeedback["rating"], string> = {
@@ -51,6 +51,8 @@ export const FeedbackCard = ({
    const [hover, setHover] = useState(-1)
    const talentGuideState = useTalentGuideState()
    const { errorNotification } = useSnackbarNotifications()
+   const dispatch = useAppDispatch()
+
    const {
       handleSubmit,
       watch,
@@ -75,13 +77,11 @@ export const FeedbackCard = ({
          )
          reset()
 
-         dataLayerLevelEvent(
-            AnalyticsEvents.LevelsFeedbackSubmitted,
-            talentGuideState,
-            {
+         dispatch(
+            trackLevelsFeedback({
                rating: data.rating,
                feedbackTags: data.tags,
-            }
+            })
          )
 
          onFeedbackSubmitted?.()

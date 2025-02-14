@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, useMediaQuery, Zoom } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import { AnimatePresence } from "framer-motion"
 import { useAuth } from "HOCs/AuthProvider"
 import { useNextTalentGuideModule } from "hooks/useNextTalentGuideModule"
 import { useRouter } from "next/router"
 import { useEffect, useRef, useState } from "react"
+import { trackLevelsComplete } from "store/reducers/talentGuideReducer"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { BackButton } from "../floating-buttons/BackButton"
@@ -41,6 +43,7 @@ export const TalentGuideEndLayout = () => {
    const [someTimeHasPassed, setSomeTimeHasPassed] = useState(false)
    const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
    const [isRedirectingToOverview, setIsRedirectingToOverview] = useState(false)
+   const dispatch = useAppDispatch()
    const isShorterScreen = useMediaQuery("(max-height: 590px)")
 
    const { data: nextModule, isLoading: isLoadingNextModule } =
@@ -57,15 +60,21 @@ export const TalentGuideEndLayout = () => {
       })
 
    useEffect(() => {
-      if (!isLoadingNextModule && nextModule === null && feedbackSubmitted) {
-         setIsRedirectingToOverview(true)
-         push("/levels")
+      const hasCompletedAllLevels = !isLoadingNextModule && nextModule === null
+
+      if (hasCompletedAllLevels) {
+         dispatch(trackLevelsComplete())
+
+         if (feedbackSubmitted) {
+            setIsRedirectingToOverview(true)
+            push("/levels")
+         }
 
          return () => {
             setIsRedirectingToOverview(false)
          }
       }
-   }, [nextModule, isLoadingNextModule, push, feedbackSubmitted])
+   }, [nextModule, isLoadingNextModule, push, feedbackSubmitted, dispatch])
 
    useEffect(() => {
       const timer = setTimeout(() => {

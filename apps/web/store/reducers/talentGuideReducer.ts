@@ -254,6 +254,133 @@ const talentGuideReducer = createSlice({
       trackLevelsLeave: (state) => {
          dataLayerLevelEvent(AnalyticsEvents.LevelsLeave, state)
       },
+      trackLevelsComplete: (state) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsComplete, state)
+      },
+      trackLevelsFeedback: (
+         state,
+         action: PayloadAction<{ rating: number; feedbackTags: string[] }>
+      ) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsFeedbackSubmitted, state, {
+            rating: action.payload.rating,
+            feedbackTags: action.payload.feedbackTags,
+         })
+      },
+      trackLevelsHighlightClick: (
+         state,
+         action: PayloadAction<{
+            highlightId: string
+            type: "Spark" | "Highlight"
+         }>
+      ) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsHighlightClick, state, {
+            highlightId: action.payload.highlightId,
+            type: action.payload.type,
+         })
+      },
+      trackLevelsArticleClick: (
+         state,
+         action: PayloadAction<{
+            articleId: string
+            articleUrl: string
+            articleTitle: string
+         }>
+      ) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsArticleClick, state, {
+            articleId: action.payload.articleId,
+            articleUrl: action.payload.articleUrl,
+            articleTitle: action.payload.articleTitle,
+         })
+      },
+      trackLevelsVideoPlay: (
+         state,
+         action: PayloadAction<{ videoId: string; videoTitle: string }>
+      ) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsVideoPlay, state, {
+            videoId: action.payload.videoId,
+            videoTitle: action.payload.videoTitle,
+         })
+      },
+      trackLevelsLivestreamOpened: (
+         state,
+         action: PayloadAction<{
+            livestreamId: string
+            livestreamTitle: string
+         }>
+      ) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsLivestreamOpened, state, {
+            livestreamId: action.payload.livestreamId,
+            livestreamTitle: action.payload.livestreamTitle,
+         })
+      },
+      trackLevelsLivestreamRegistrationCompleted: (
+         state,
+         action: PayloadAction<{
+            livestreamId: string
+            livestreamTitle: string
+         }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsLivestreamRegistrationCompleted,
+            state,
+            {
+               livestreamId: action.payload.livestreamId,
+               livestreamTitle: action.payload.livestreamTitle,
+            }
+         )
+      },
+      trackLevelsJobClick: (
+         state,
+         action: PayloadAction<{
+            jobId: string
+            jobName: string
+         }>
+      ) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsJobClick, state, {
+            jobId: action.payload.jobId,
+            jobName: action.payload.jobName,
+         })
+      },
+      trackLevelsJobApplied: (
+         state,
+         action: PayloadAction<{
+            jobId: string
+            jobName: string
+         }>
+      ) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsJobApplied, state, {
+            jobId: action.payload.jobId,
+            jobName: action.payload.jobName,
+         })
+      },
+      trackLevelsMentorView: (
+         state,
+         action: PayloadAction<{
+            mentorId: string
+            mentorName: string
+            companyId: string
+         }>
+      ) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsMentorView, state, {
+            mentorId: action.payload.mentorId,
+            mentorName: action.payload.mentorName,
+            companyId: action.payload.companyId,
+         })
+      },
+      trackLevelsMentorClick: (
+         state,
+         action: PayloadAction<{
+            mentorId: string
+            mentorName: string
+            companyId: string
+         }>
+      ) => {
+         dataLayerLevelEvent(AnalyticsEvents.LevelsMentorClick, state, {
+            mentorId: action.payload.mentorId,
+            mentorName: action.payload.mentorName,
+            companyId: action.payload.companyId,
+         })
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -371,7 +498,7 @@ const talentGuideReducer = createSlice({
                ? QUIZ_STATE.PASSED
                : QUIZ_STATE.FAILED
 
-            dataLayerLevelEvent(AnalyticsEvents.LevelsProgressQuiz, state, {
+            dataLayerLevelEvent(AnalyticsEvents.LevelsQuizAttempt, state, {
                quizId,
                quizPassed: passed,
             })
@@ -447,7 +574,6 @@ const talentGuideReducer = createSlice({
                },
                {} as Record<string, QuizStatus>
             )
-            dataLayerLevelEvent(AnalyticsEvents.LevelsStart, state)
          })
          .addCase(restartModule.rejected, (state, action) => {
             state.isRestartingModule = false
@@ -464,7 +590,21 @@ const talentGuideReducer = createSlice({
    },
 })
 
-export const { resetTalentGuide, toggleQuizAnswer, trackLevelsLeave } =
-   talentGuideReducer.actions
+export const {
+   resetTalentGuide,
+   toggleQuizAnswer,
+   trackLevelsLeave,
+   trackLevelsComplete,
+   trackLevelsFeedback,
+   trackLevelsHighlightClick,
+   trackLevelsArticleClick,
+   trackLevelsVideoPlay,
+   trackLevelsLivestreamOpened,
+   trackLevelsLivestreamRegistrationCompleted,
+   trackLevelsJobClick,
+   trackLevelsJobApplied,
+   trackLevelsMentorView,
+   trackLevelsMentorClick,
+} = talentGuideReducer.actions
 
 export default talentGuideReducer.reducer

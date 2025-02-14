@@ -9,8 +9,8 @@ import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
 import { TalentGuideState } from "store/reducers/talentGuideReducer"
-import { getProgressPercentage } from "util/levels"
 import { AnalyticsEvent } from "./analytics/types"
+import { getProgressPercentage } from "./levels"
 
 /**
  * Push an event to the GTM DataLayer
@@ -138,23 +138,56 @@ export const dataLayerSparkEvent = (
    })
 }
 
+/**
+ * Creates a safe copy of an object for analytics by removing undefined values and circular references
+ * @param obj The object to sanitize
+ * @returns A sanitized copy of the object
+ */
+const sanitizeForAnalytics = <T>(obj: T): T => {
+   return JSON.parse(JSON.stringify(obj))
+}
+
+/**
+ * Sends analytics events for talent guide interactions.
+ * Requires a valid talent guide state to execute.
+ *
+ * @param eventName Analytics event name
+ * @param levelsState Current talent guide state
+ * @param optionalVariables Additional event properties
+ */
 export const dataLayerLevelEvent = (
    eventName: AnalyticsEvent,
    levelsState: TalentGuideState,
    optionalVariables = {}
 ) => {
+   if (!levelsState.moduleData.content) return
+
+   const currentStepIndex = levelsState.currentStepIndex
+   const currentStep =
+      levelsState.moduleData?.content?.moduleSteps?.[currentStepIndex]
+
    dataLayerEvent(eventName, {
       ...optionalVariables,
       levelSlug: levelsState.moduleData.slug, // GTM Variable
-      levelName: levelsState.moduleData.content.moduleName, // GTM Variable
-      levelId: levelsState.moduleData.content.id, // GTM Variable
-      currentStepIndex: levelsState.currentStepIndex, // GTM Variable
+      levelName: levelsState.moduleData.content?.moduleName, // GTM Variable
+      levelId: levelsState.moduleData.content?.id, // GTM Variable
+      currentStepIndex: currentStepIndex, // GTM Variable
+      totalSteps: levelsState.moduleData.content?.moduleSteps?.length, // GTM Variable
       progressPercentage: Math.round(
-         getProgressPercentage(
-            levelsState.currentStepIndex,
-            levelsState.moduleData
-         )
-      ),
+         getProgressPercentage(currentStepIndex, levelsState.moduleData)
+      ), // GTM Variable
+      currentStepId: currentStep?.content?.id, // GTM Variable
+      currentStepType: currentStep?.content?.__typename, // GTM Variable
+      currentStepRichTextContent:
+         currentStep?.content?.__typename === "RichTextBlock"
+            ? currentStep?.content?.content?.references.map(
+                 sanitizeForAnalytics
+              )
+            : null,
+      currentStepQuizContent:
+         currentStep?.content?.__typename === "Quiz"
+            ? sanitizeForAnalytics(currentStep?.content)
+            : null,
    })
 }
 
