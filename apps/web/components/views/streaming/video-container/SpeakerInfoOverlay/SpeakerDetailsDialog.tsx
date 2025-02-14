@@ -12,7 +12,7 @@ import {
 } from "@mui/material"
 import Card from "@mui/material/Card"
 import IconButton from "@mui/material/IconButton"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../types/commonTypes"

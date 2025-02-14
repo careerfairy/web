@@ -9,7 +9,7 @@ import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
 import { TalentGuideState } from "store/reducers/talentGuideReducer"
-import { AnalyticsEvent } from "./analytics/types"
+import { AnalyticsEvent } from "./analyticsConstants"
 import { getProgressPercentage } from "./levels"
 
 /**

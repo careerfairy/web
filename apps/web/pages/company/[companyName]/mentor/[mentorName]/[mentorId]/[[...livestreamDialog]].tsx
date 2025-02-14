@@ -29,7 +29,7 @@ import {
    InferGetStaticPropsType,
    NextPage,
 } from "next"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerMentorEvent } from "util/analyticsUtils"
 import { getLivestreamsAndDialogData, mapFromServerSide } from "util/serverUtil"
 

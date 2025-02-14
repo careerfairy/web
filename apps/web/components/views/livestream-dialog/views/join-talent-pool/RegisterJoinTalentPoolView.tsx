@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { useCallback, useState } from "react"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../types/commonTypes"

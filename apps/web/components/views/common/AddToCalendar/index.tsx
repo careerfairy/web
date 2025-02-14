@@ -15,7 +15,7 @@ import {
    useState,
 } from "react"
 import { sxStyles } from "types/commonTypes"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { MobileUtils } from "util/mobile.utils"
 import {
    appleIcon,

@@ -6,7 +6,7 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { useRouter } from "next/router"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 
 type Props = {

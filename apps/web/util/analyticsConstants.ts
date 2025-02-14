@@ -60,12 +60,9 @@ export const AnalyticsEvents = {
     */
    LevelsStart: "levels_start",
    /**
-    * Dispatched upon level complete
+    * Dispatched upon all levels completed
     */
    LevelsComplete: "levels_complete",
-   /**
-    * Dispatched upon feedback submission
-    */
    LevelsFeedbackSubmitted: "levels_feedback_submitted",
    LevelsArticleClick: "levels_article_click",
    LevelsHighlightClick: "levels_highlight_click",

@@ -2,7 +2,7 @@ import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useEffect, useRef } from "react"
 import { usePrevious } from "react-use"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useUpdateUserHandRaiseState } from "./useUpdateUserHandRaiseState"
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useUserLivestreamData } from "../streaming/useUserLivestreamData"
 

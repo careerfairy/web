@@ -2,7 +2,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { livestreamService } from "data/firebase/LivestreamService"
 import useSWR from "swr"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 

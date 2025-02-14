@@ -21,7 +21,7 @@ import {
    NextPage,
 } from "next"
 import React from "react"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
 import SEO from "../../../components/util/SEO"

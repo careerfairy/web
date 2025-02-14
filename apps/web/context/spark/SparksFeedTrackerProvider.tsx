@@ -18,7 +18,7 @@ import {
    originalSparkIdSelector,
 } from "store/selectors/sparksFeedSelectors"
 import CookiesUtil from "util/CookiesUtil"
-import { AnalyticsEvents } from "util/analytics/types"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerSparkEvent } from "util/analyticsUtils"
 import { v4 as uuidv4 } from "uuid"
 import useFingerPrint from "../../components/custom-hook/useFingerPrint"
