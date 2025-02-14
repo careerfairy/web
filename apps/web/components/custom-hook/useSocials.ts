@@ -1,17 +1,18 @@
+import EmailIcon from "@mui/icons-material/Email"
+import FacebookIcon from "@mui/icons-material/Facebook"
+import LinkedInIcon from "@mui/icons-material/LinkedIn"
+import ShareIcon from "@mui/icons-material/ShareOutlined"
+import TwitterIcon from "@mui/icons-material/Twitter"
+import WhatsAppIcon from "@mui/icons-material/WhatsApp"
+import FacebookRoundedIcon from "components/views/common/icons/FacebookRoundedIcon"
+import LinkedInRoundedIcon from "components/views/common/icons/LinkedInRoundedIcon"
+import WhatsAppRoundedIcon from "components/views/common/icons/WhatsAppRoundedIcon"
+import XRoundedIcon from "components/views/common/icons/XRoundedIcon"
 import { useEffect, useMemo, useState } from "react"
 import { useCopyToClipboard } from "react-use"
-import LinkedInIcon from "@mui/icons-material/LinkedIn"
-import FacebookIcon from "@mui/icons-material/Facebook"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { facebookAppId } from "../../constants/links"
-import TwitterIcon from "@mui/icons-material/Twitter"
-import EmailIcon from "@mui/icons-material/Email"
-import ShareIcon from "@mui/icons-material/ShareOutlined"
-import WhatsAppIcon from "@mui/icons-material/WhatsApp"
 import { dataLayerEvent } from "../../util/analyticsUtils"
-import WhatsAppRoundedIcon from "components/views/common/icons/WhatsAppRoundedIcon"
-import LinkedInRoundedIcon from "components/views/common/icons/LinkedInRoundedIcon"
-import FacebookRoundedIcon from "components/views/common/icons/FacebookRoundedIcon"
-import XRoundedIcon from "components/views/common/icons/XRoundedIcon"
 
 export const SocialPlatformObject = {
    Facebook: "facebook",
@@ -82,7 +83,10 @@ const useSocials = ({
       const twitterLink = `https://twitter.com/intent/tweet?url=${encodedUrlBase}utm_source=X${encodedUrlParameters}&via=CareerFairy&related=CareerFairy&text=${encodedMessage}`
       const whatsappLink = `https://api.whatsapp.com/send?text=${encodedMessage}%20${encodedUrlBase}utm_source=WhatsApp${encodedUrlParameters}`
 
-      const eventName = `${dataLayerEntityName}_share`
+      const eventName =
+         dataLayerEntityName === "company_page"
+            ? AnalyticsEvents.CompanyPageShare
+            : AnalyticsEvents.SparksShare
       const socials: SocialIconProps[] = [
          {
             icon: LinkedInIcon,

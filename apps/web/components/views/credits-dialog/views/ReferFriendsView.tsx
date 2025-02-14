@@ -1,4 +1,19 @@
+import LinkedInIcon from "@mui/icons-material/LinkedIn"
+import TwitterIcon from "@mui/icons-material/Twitter"
+import WhatsAppIcon from "@mui/icons-material/WhatsApp"
+import { ButtonBase, Fab, Typography } from "@mui/material"
+import Stack from "@mui/material/Stack"
 import { FC, useEffect } from "react"
+import { useCopyToClipboard } from "react-use"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { sxStyles } from "../../../../types/commonTypes"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { makeReferralUrl } from "../../../../util/makeUrls"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import LinkedInShare from "../../common/socials/LinkedInShare"
+import TwitterShare from "../../common/socials/TwitterShare"
+import WhatsAppShare from "../../common/socials/WhatsAppShare"
 import BaseDialogView, {
    LeftContent,
    RightContent,
@@ -6,20 +21,6 @@ import BaseDialogView, {
    TitleText,
 } from "../BaseDialogView"
 import { useCreditsDialogContext } from "../CreditsDialog"
-import Stack from "@mui/material/Stack"
-import { sxStyles } from "../../../../types/commonTypes"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import { ButtonBase, Fab, Typography } from "@mui/material"
-import { makeReferralUrl } from "../../../../util/makeUrls"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { useCopyToClipboard } from "react-use"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
-import WhatsAppIcon from "@mui/icons-material/WhatsApp"
-import LinkedInIcon from "@mui/icons-material/LinkedIn"
-import TwitterIcon from "@mui/icons-material/Twitter"
-import WhatsAppShare from "../../common/socials/WhatsAppShare"
-import LinkedInShare from "../../common/socials/LinkedInShare"
-import TwitterShare from "../../common/socials/TwitterShare"
 
 const styles = sxStyles({
    root: {
@@ -112,7 +113,7 @@ const CopyUserReferralLinkButton = () => {
    const handleCopy = () => {
       copyReferralLinkToClipboard(referralLink)
       successNotification("Link has been copied to your clipboard")
-      dataLayerEvent("referral_copy_link")
+      dataLayerEvent(AnalyticsEvents.ReferralCopyLink)
    }
 
    return (
@@ -147,19 +148,18 @@ const SocialButtons = () => {
 
    const title = "CareerFairy - Find your dream job"
    const handleWhatsappShare = () => {
-      dataLayerEvent("referral_share_whatsapp", {
+      dataLayerEvent(AnalyticsEvents.ReferralShareWhatsapp, {
          social: "whatsapp",
       })
    }
 
    const handleTwitterShare = () => {
-      dataLayerEvent("referral_share_twitter", {
+      dataLayerEvent(AnalyticsEvents.ReferralShareTwitter, {
          social: "twitter",
       })
    }
-
    const handleLinkedinShare = () => {
-      dataLayerEvent("referral_share_linkedin", {
+      dataLayerEvent(AnalyticsEvents.ReferralShareLinkedin, {
          social: "linkedin",
       })
    }

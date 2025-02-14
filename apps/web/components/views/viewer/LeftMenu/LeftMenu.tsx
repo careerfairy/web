@@ -1,27 +1,28 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { alpha, useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
-import SwipeableViews from "react-swipeable-views"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
 import { Drawer, Fab } from "@mui/material"
-import QuestionCategory from "../../streaming/sharedComponents/QuestionCategory"
-import PollCategory from "./categories/PollCategory"
-import HandRaiseCategory from "./categories/HandRaiseCategory"
-import ChatCategory from "../../streaming/LeftMenu/categories/ChatCategory"
+import { alpha, useTheme } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
 import clsx from "clsx"
-import { useAuth } from "../../../../HOCs/AuthProvider"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import SwipeableViews from "react-swipeable-views"
 import * as actions from "store/actions"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
+import { CurrentStreamContextInterface } from "../../../../context/stream/StreamContext"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 import {
    focusModeEnabledSelector,
    leftMenuOpenSelector,
 } from "../../../../store/selectors/streamSelectors"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import ChatCategory from "../../streaming/LeftMenu/categories/ChatCategory"
 import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
 import GenericCategoryInactive from "../../streaming/sharedComponents/GenericCategoryInactive"
-import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { CurrentStreamContextInterface } from "../../../../context/stream/StreamContext"
+import QuestionCategory from "../../streaming/sharedComponents/QuestionCategory"
+import HandRaiseCategory from "./categories/HandRaiseCategory"
+import PollCategory from "./categories/PollCategory"
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -225,13 +226,33 @@ const LeftMenu = ({
          if (meta?.reason !== "swipe") return
          const state = views[newIndex].state
          setSelectedState(state)
-         dataLayerEvent("livestream_viewer_select_" + state)
+
+         switch (state) {
+            case "questions":
+               dataLayerEvent(AnalyticsEvents.LivestreamViewerSelectQuestions)
+               break
+            case "polls":
+               dataLayerEvent(AnalyticsEvents.LivestreamViewerSelectPolls)
+               break
+            case "chat":
+               dataLayerEvent(AnalyticsEvents.LivestreamViewerSelectChat)
+               break
+            case "hand":
+               dataLayerEvent(AnalyticsEvents.LivestreamViewerSelectHand)
+               break
+            case "jobs":
+               dataLayerEvent(AnalyticsEvents.LivestreamViewerSelectJobs)
+               break
+            case "support":
+               dataLayerEvent(AnalyticsEvents.LivestreamViewerSelectSupport)
+               break
+         }
       },
       [views, setSelectedState]
    )
 
    useEffect(() => {
-      let newSelectedIndex = views.findIndex(
+      const newSelectedIndex = views.findIndex(
          (item) => item.state === selectedState
       )
       if (value !== newSelectedIndex && newSelectedIndex !== -1) {
@@ -246,7 +267,7 @@ const LeftMenu = ({
 
    const content = (
       <>
-         {isMobile && showMenu && (
+         {Boolean(isMobile && showMenu) && (
             <Fab
                className={classes.closeBtn}
                size="large"
