@@ -146,7 +146,6 @@ export const FeaturedCompanyCard = ({
                dataLayerEvent("featured_company_follow", {
                   companyId: groupId,
                   companyName: company.universityName,
-                  userId: userData.id,
                })
             })
          }
@@ -160,7 +159,6 @@ export const FeaturedCompanyCard = ({
             dataLayerEvent("featured_company_view", {
                companyId: company.id,
                companyName: company.universityName,
-               userId: userData.id,
             })
          }}
          href={`/company/${companyNameSlugify(company.universityName)}`}
