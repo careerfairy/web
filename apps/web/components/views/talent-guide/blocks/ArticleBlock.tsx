@@ -1,12 +1,11 @@
 import { Box, IconButton, Typography } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { ArticleBlockType } from "data/hygraph/types"
 import Link from "next/link"
 import { ChevronRight, Circle } from "react-feather"
-import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
+import { trackLevelsArticleClick } from "store/reducers/talentGuideReducer"
 import { sxStyles } from "types/commonTypes"
-import { AnalyticsEvents } from "util/analytics/types"
-import { dataLayerLevelEvent } from "util/analyticsUtils"
 import { BlockWithAuthorPromotion } from "./BlockWithAuthorPromotions"
 
 const ILLUSTRATION_WIDTH = "108px"
@@ -82,20 +81,19 @@ const Content = ({
    authorName,
    id,
 }: Props) => {
-   const talentGuideState = useTalentGuideState()
+   const dispatch = useAppDispatch()
 
    return (
       <Box
          sx={styles.root}
          component={Link}
          onClick={() => {
-            dataLayerLevelEvent(
-               AnalyticsEvents.LevelsProgressArticle,
-               talentGuideState,
-               {
+            dispatch(
+               trackLevelsArticleClick({
                   articleId: id,
                   articleUrl: articleUrl,
-               }
+                  articleTitle: title,
+               })
             )
          }}
          href={articleUrl}

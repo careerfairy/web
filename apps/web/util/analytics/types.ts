@@ -35,6 +35,7 @@ export const AnalyticsEvents = {
    TalentPoolJoined: "talent_pool_joined",
    TalentPoolLeave: "talent_pool_leave",
    TalentPoolJoinLogin: "talent_pool_join_login",
+   CustomJobApplicationComplete: "custom_job_application_complete",
    SparkClickCompanyPageCTA: "spark_click_company_page_cta",
    SparkClickDiscoverEventCTA: "spark_click_discover_event_cta",
    SparkClickJobCTA: "spark_click_job_cta",
@@ -54,20 +55,30 @@ export const AnalyticsEvents = {
    SparkShareWhatsApp: "spark_share_whatsapp",
    SparkShareX: "spark_share_x",
    SparkWatchedComplete: "spark_watched_complete",
+   /**
+    * Dispatched upon level start
+    */
    LevelsStart: "levels_start",
+   /**
+    * Dispatched upon level complete
+    */
    LevelsComplete: "levels_complete",
+   /**
+    * Dispatched upon feedback submission
+    */
    LevelsFeedbackSubmitted: "levels_feedback_submitted",
-   LevelsProgressArticle: "levels_progress_article",
-   LevelsProgressHighlight: "levels_progress_highlight",
-   LevelsProgressQuiz: "levels_progress_quiz",
-   LevelsProgressVideo: "levels_progress_video",
+   LevelsArticleClick: "levels_article_click",
+   LevelsHighlightClick: "levels_highlight_click",
+   LevelsQuizAttempt: "levels_quiz_attempt",
+   LevelsVideoPlay: "levels_video_play",
    LevelsLeave: "levels_leave",
    LevelsLivestreamOpened: "levels_livestream_opened",
    LevelsLivestreamRegistrationCompleted:
       "levels_livestream_registration_completed",
-   LevelsJobViewed: "levels_job_viewed",
+   LevelsJobClick: "levels_job_click",
    LevelsJobApplied: "levels_job_applied",
    LevelsMentorView: "levels_mentor_view",
+   LevelsMentorClick: "levels_mentor_click",
    LevelsMentorLinkedinClick: "levels_mentor_linkedin_click",
    LivestreamOpenSupport: "livestream_open_support",
    LivestreamSpeakerSave: "livestream_speaker_save",

@@ -4,6 +4,7 @@ import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
 import Link from "next/link"
+import { MouseEventHandler } from "react"
 
 const CARD_WIDTH = 254
 
@@ -118,6 +119,7 @@ type Props = {
    companyName: string
    companyLogoUrl: string
    mentorPageLink: string
+   onClick?: MouseEventHandler
 }
 
 export const MentorCard = ({
@@ -128,6 +130,7 @@ export const MentorCard = ({
    companyName,
    companyLogoUrl,
    mentorPageLink,
+   onClick,
 }: Props) => {
    // const handleFollowClick = useCallback((event: SyntheticEvent) => {
    //    event.preventDefault()
@@ -137,16 +140,23 @@ export const MentorCard = ({
    // }, [])
 
    return (
-      <Stack sx={styles.root} component={Link} href={mentorPageLink} prefetch>
+      <Stack
+         onClick={onClick}
+         sx={styles.root}
+         component={Link}
+         href={mentorPageLink}
+      >
          <Box sx={styles.bannerContainer}>
             <Box sx={styles.bannerEffect} />
             <Box sx={styles.bannerEffectColor} />
-            <Image
-               src={bannerUrl}
-               alt={"banner"}
-               fill
-               style={styles.bannerImage}
-            />
+            {Boolean(bannerUrl) && (
+               <Image
+                  src={bannerUrl}
+                  alt={"banner"}
+                  fill
+                  style={styles.bannerImage}
+               />
+            )}
          </Box>
          <Stack sx={styles.dataContainer}>
             <Box sx={styles.avatar}>
