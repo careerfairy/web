@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack"
 import { MainLogo } from "../../components/logos"
 import { sxStyles } from "../../types/commonTypes"
 import BottomLinks from "../common/BottomLinks"
-import GenericNavList from "./GenericNavList"
+import { GenericNavList } from "./GenericNavList"
 
 const styles = sxStyles({
    logoWrapper: {
