@@ -3,6 +3,7 @@ import { Box, Divider, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useFeaturedCompanies from "components/custom-hook/group/useFeaturedCompanies"
 import { useFieldOfStudyById } from "components/custom-hook/useCollection"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
@@ -50,10 +51,12 @@ const carouselEmblaOptions: EmblaOptionsType = {
 
 export const FeaturedCompanies = () => {
    const { userData } = useAuth()
+   const { contentPlacementV1 } = useFeatureFlags()
 
    // Possibly return null if user also does not have a field of study
    // Checking field of study, as the copy of the header is based on the field of study
-   if (!userData || !userData.fieldOfStudy?.id) return null
+   if (!contentPlacementV1 || !userData || !userData.fieldOfStudy?.id)
+      return null
 
    return (
       <FeaturedCompaniesComponent
