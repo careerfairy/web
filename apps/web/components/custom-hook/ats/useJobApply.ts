@@ -4,11 +4,10 @@ import {
    UserData,
 } from "@careerfairy/shared-lib/dist/users"
 import * as Sentry from "@sentry/nextjs"
-import { livestreamService } from "data/firebase/LivestreamService"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { atsServiceInstance } from "../../../data/firebase/ATSService"
-import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
 import useSnackbarNotifications from "../useSnackbarNotifications"
 import useUserATSRelations from "../useUserATSRelations"
 
@@ -72,15 +71,10 @@ const useJobApply = (
          setIsLoading(false)
 
          try {
-            const livestream = await livestreamService.getById(livestreamId)
-            dataLayerLivestreamEvent(
-               AnalyticsEvents.LivestreamJobApplicationComplete,
-               livestream,
-               {
-                  jobId: job?.id,
-                  jobName: job?.name,
-               }
-            )
+            dataLayerEvent(AnalyticsEvents.LivestreamJobApplicationComplete, {
+               jobId: job?.id,
+               jobName: job?.name,
+            })
          } catch (e) {
             console.error(e)
          }

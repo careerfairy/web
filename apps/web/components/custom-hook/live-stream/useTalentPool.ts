@@ -50,17 +50,13 @@ const useTalentPool = (livestream: LivestreamEvent) => {
                const companyId = livestream.companyId
                await joinCompanyTalentPool(companyId, userData, livestream)
 
-               if (livestream.groupIds) {
-                  livestream.groupIds.forEach((companyId) => {
-                     dataLayerLivestreamEvent(
-                        AnalyticsEvents.TalentPoolJoined,
-                        livestream,
-                        {
-                           companyId,
-                        }
-                     )
-                  })
-               }
+               dataLayerLivestreamEvent(
+                  AnalyticsEvents.TalentPoolJoined,
+                  livestream,
+                  {
+                     companyIds: livestream.groupIds,
+                  }
+               )
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             } finally {
