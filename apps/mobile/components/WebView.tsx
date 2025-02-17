@@ -322,7 +322,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             SecureStore.setItemAsync("userId", data.userId),
             SecureStore.setItemAsync("userPassword", data.userPassword),
          ])
-         onTokenInjected(data)
+         onTokenInjected()
       } catch (error) {
          console.error("Failed to store auth data:", error)
       }
