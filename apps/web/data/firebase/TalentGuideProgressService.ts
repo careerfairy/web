@@ -121,6 +121,7 @@ export class TalentGuideProgressService {
    incrementTotalVisits(moduleId: string, userAuthUid: string) {
       return this.updateModuleProgress(moduleId, userAuthUid, {
          totalVisits: increment(1),
+         lastVisitedAt: Timestamp.now(),
       })
    }
 
