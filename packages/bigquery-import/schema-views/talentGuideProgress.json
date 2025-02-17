@@ -59,6 +59,32 @@
       {
          "name": "restartCount",
          "type": "number"
+      },
+      {
+         "name": "moduleDiscoveryUTM",
+         "type": "map",
+         "fields": [
+            {
+               "name": "utm_source",
+               "type": "string"
+            },
+            {
+               "name": "utm_medium",
+               "type": "string"
+            },
+            {
+               "name": "utm_campaign",
+               "type": "string"
+            },
+            {
+               "name": "utm_term",
+               "type": "string"
+            },
+            {
+               "name": "utm_content",
+               "type": "string"
+            }
+         ]
       }
    ]
 }
