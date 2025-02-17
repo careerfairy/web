@@ -1,10 +1,13 @@
 import {
    CONSOLE,
    HAPTIC,
+   IDENTIFY_CUSTOMER,
    MESSAGING_TYPE,
    NativeEvent,
    NativeEventStringified,
    PERMISSIONS,
+   TRACK_EVENT,
+   TRACK_SCREEN,
    USER_AUTH,
 } from "@careerfairy/shared-lib/src/messaging"
 import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
@@ -26,6 +29,7 @@ import {
    StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
+import { customerIO } from "../utils/customerio-tracking"
 
 const injectedCSS = `
     body :not(input):not(textarea) {
@@ -263,11 +267,51 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
                return handlePermissions(data)
             case MESSAGING_TYPE.LOGOUT:
                return handleLogout()
+            case MESSAGING_TYPE.CLEAR_CUSTOMER:
+               return handleClearCustomer()
+            case MESSAGING_TYPE.IDENTIFY_CUSTOMER:
+               return handleIdentifyCustomer(data)
+            case MESSAGING_TYPE.TRACK_EVENT:
+               return handleTrackEvent(data)
+            case MESSAGING_TYPE.TRACK_SCREEN:
+               return handleTrackScreen(data)
             default:
                break
          }
       } catch (error) {
          console.error("Failed to parse message from WebView:", error)
+      }
+   }
+
+   const handleClearCustomer = async () => {
+      try {
+         await customerIO.clearCustomer()
+      } catch (error) {
+         console.error(`Failed to clear customer: ${error}`)
+      }
+   }
+
+   const handleIdentifyCustomer = async (data: IDENTIFY_CUSTOMER) => {
+      try {
+         await customerIO.identifyCustomer(data.userAuthId)
+      } catch (error) {
+         console.error(`Failed to identify customer: ${error}`)
+      }
+   }
+
+   const handleTrackEvent = async (data: TRACK_EVENT) => {
+      try {
+         await customerIO.trackEvent(data.eventName, data.properties)
+      } catch (error) {
+         console.error(`Failed to track event: ${error}`)
+      }
+   }
+
+   const handleTrackScreen = async (data: TRACK_SCREEN) => {
+      try {
+         await customerIO.trackScreen(data.screenName, data.properties)
+      } catch (error) {
+         console.error(`Failed to track screen: ${error}`)
       }
    }
 
@@ -277,7 +321,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             SecureStore.setItemAsync("authToken", data.token),
             SecureStore.setItemAsync("userId", data.userId),
             SecureStore.setItemAsync("userPassword", data.userPassword),
-            SecureStore.setItemAsync("userAuthId", data.userAuthId),
          ])
          onTokenInjected(data)
       } catch (error) {

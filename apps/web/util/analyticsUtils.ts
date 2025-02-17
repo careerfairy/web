@@ -5,6 +5,12 @@ import CookiesUtil from "./CookiesUtil"
 // Only import types, will not be part of the bundle, real package is loaded by GTM
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { TRACK_EVENT } from "@careerfairy/shared-lib/messaging"
+import {
+   IDENTIFY_CUSTOMER,
+   MESSAGING_TYPE,
+   TRACK_SCREEN,
+} from "@careerfairy/shared-lib/messaging/messaging"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
@@ -17,6 +23,7 @@ import {
 import { AnalyticsEvent } from "./analyticsConstants"
 import { errorLogAndNotify } from "./CommonUtil"
 import { getProgressPercentage } from "./levels"
+import { MobileUtils } from "./mobile.utils"
 
 /**
  * Push an event to the GTM DataLayer
@@ -241,6 +248,13 @@ export const analyticsTrackEvent = (
       console.error("Failed to retrieve UTM params:", error)
    }
 
+   if (MobileUtils.webViewPresence()) {
+      return MobileUtils.send<TRACK_EVENT>(MESSAGING_TYPE.TRACK_EVENT, {
+         eventName,
+         properties: enrichedProperties,
+      })
+   }
+
    window["analytics"].push(["track", eventName, enrichedProperties])
 }
 
@@ -250,6 +264,15 @@ export const analyticsTrackEvent = (
  */
 export const analyticsSetUser = async (userAuthId: string) => {
    if (typeof window === "undefined") return
+
+   if (MobileUtils.webViewPresence()) {
+      return MobileUtils.send<IDENTIFY_CUSTOMER>(
+         MESSAGING_TYPE.IDENTIFY_CUSTOMER,
+         {
+            userAuthId,
+         }
+      )
+   }
 
    // Link anonymous user's activity to their new account after setting the user
    if (typeof window["analytics"] !== "undefined" && window["analytics"].user) {
@@ -276,6 +299,10 @@ export const analyticsSetUser = async (userAuthId: string) => {
  */
 export const analyticsResetUser = async () => {
    if (typeof window === "undefined") return
+
+   if (MobileUtils.webViewPresence()) {
+      return MobileUtils.send(MESSAGING_TYPE.CLEAR_CUSTOMER, null)
+   }
 
    window["analytics"].push(["reset"])
 }
@@ -340,6 +367,18 @@ export const analyticsRemoveUserAssociationFromEntity = (
  */
 export const analyticsTrackPageView = () => {
    if (typeof window === "undefined") return
+
+   if (MobileUtils.webViewPresence()) {
+      return MobileUtils.send<TRACK_SCREEN>(MESSAGING_TYPE.TRACK_SCREEN, {
+         screenName: window.location.pathname,
+         properties: {
+            url: window.location.href,
+            title: document.title,
+            referrer: document.referrer,
+            search: window.location.search,
+         },
+      })
+   }
 
    window["analytics"].push(["page"])
 }

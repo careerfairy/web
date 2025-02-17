@@ -62,7 +62,7 @@ class CustomerIOService {
          await this.initialize()
       }
 
-      const { CustomerIO } = await import("customerio-reactnative")
+      const CustomerIO = await getCustomerIO()
       await CustomerIO.identify({
          userId: userAuthId,
       })
@@ -76,8 +76,22 @@ class CustomerIOService {
          await this.initialize()
       }
 
-      const { CustomerIO } = await import("customerio-reactnative")
+      const CustomerIO = await getCustomerIO()
       await CustomerIO.track(event, data)
+   }
+
+   async trackScreen(
+      screenName: string,
+      data: Record<string, any>
+   ): Promise<void> {
+      if (this.isExpoGo) return
+
+      if (!this.initialized) {
+         await this.initialize()
+      }
+
+      const CustomerIO = await getCustomerIO()
+      await CustomerIO.screen(screenName, data)
    }
 
    async clearCustomer(): Promise<void> {
@@ -87,10 +101,15 @@ class CustomerIOService {
          await this.initialize()
       }
 
-      const { CustomerIO } = await import("customerio-reactnative")
+      const CustomerIO = await getCustomerIO()
       await CustomerIO.clearIdentify()
       console.log("Cleared customer")
    }
+}
+
+const getCustomerIO = async () => {
+   const { CustomerIO } = await import("customerio-reactnative")
+   return CustomerIO
 }
 
 export const customerIO = CustomerIOService.getInstance()

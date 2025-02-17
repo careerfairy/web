@@ -1,4 +1,3 @@
-import { USER_AUTH } from "@careerfairy/shared-lib/src/messaging/messaging"
 import { PROJECT_ID } from "@env"
 import {
    Poppins_400Regular,
@@ -131,15 +130,6 @@ export default function Native() {
       }
    }
 
-   const onTokenInjected = async (data: USER_AUTH) => {
-      getPushToken()
-      try {
-         await customerIO.identifyCustomer(data.userAuthId)
-      } catch (e) {
-         console.log(`Error with identifying customer: ${e}`)
-      }
-   }
-
    const getPushToken = async () => {
       try {
          if (Platform.OS === "android") {
@@ -168,15 +158,9 @@ export default function Native() {
       userToken: string | null
    ) => {
       try {
-         resetFireStoreData(userId, userPassword, userToken)
+         return resetFireStoreData(userId, userPassword, userToken)
       } catch (e) {
-         console.log(`Error with resetting firestore data: ${e}`)
-      }
-
-      try {
-         await customerIO.clearCustomer()
-      } catch (e) {
-         console.log(`Error with clearing customer: ${e}`)
+         console.log("Error with resetting firestore data", e)
       }
    }
 
@@ -195,7 +179,7 @@ export default function Native() {
             await SecureStore.setItemAsync("pushToken", pushToken)
          }
       } catch (error) {
-         console.error(`Failed to send data to the Firestore: ${error}`)
+         console.error("Failed to send data to the Firestore:", error)
       }
    }
 
@@ -260,6 +244,6 @@ export default function Native() {
    }
 
    return (
-      <WebViewComponent onTokenInjected={onTokenInjected} onLogout={onLogout} />
+      <WebViewComponent onTokenInjected={getPushToken} onLogout={onLogout} />
    )
 }
