@@ -71,7 +71,7 @@ export const dataLayerLivestreamEvent = (
          {
             livestreamId: livestream?.id, // GTM Variable
             livestreamTitle: livestream?.title, // GTM Variable
-            livestreamCompanyName: livestream?.company, // GTM Variable
+            companyName: livestream?.company, // GTM Variable
          },
          { ...optionalVariables, livestream }
       )
@@ -169,16 +169,12 @@ export const dataLayerLevelEvent = (
       ), // GTM Variable
       currentStepId: currentStep?.content?.id, // GTM Variable
       currentStepType: currentStep?.content?.__typename, // GTM Variable
-      currentStepRichTextContent:
+      currentStepContent:
          currentStep?.content?.__typename === "RichTextBlock"
             ? currentStep?.content?.content?.references.map(
                  sanitizeForAnalytics
               )
-            : null,
-      currentStepQuizContent:
-         currentStep?.content?.__typename === "Quiz"
-            ? sanitizeForAnalytics(currentStep?.content)
-            : null,
+            : [sanitizeForAnalytics(currentStep?.content)],
    })
 }
 
