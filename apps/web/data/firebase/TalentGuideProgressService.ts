@@ -92,6 +92,8 @@ export class TalentGuideProgressService {
       userAuthUid: string,
       moduleData: Page<TalentGuideModule>
    ) {
+      const now = Timestamp.now()
+
       return setDoc(this.getModuleProgressRef(moduleId, userAuthUid), {
          id: this.getModuleCompositeId(userAuthUid, moduleId),
          moduleHygraphId: moduleId,
@@ -102,9 +104,9 @@ export class TalentGuideProgressService {
          moduleCategory: moduleData.content.category,
          totalSteps: moduleData.content.moduleSteps.length,
          percentageComplete: 0,
-         startedAt: Timestamp.now(),
-         lastUpdated: null,
-         lastVisitedAt: Timestamp.now(),
+         startedAt: now,
+         lastUpdated: now,
+         lastVisitedAt: now,
          totalVisits: 1,
          completedAt: null,
          restartCount: 0,
