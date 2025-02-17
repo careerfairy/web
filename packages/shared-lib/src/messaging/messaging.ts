@@ -13,6 +13,7 @@ export enum MESSAGING_TYPE {
 export type USER_AUTH = {
    token: string
    userId: string
+   userAuthId: string
    userPassword: string
 }
 

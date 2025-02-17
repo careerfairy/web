@@ -1,6 +1,5 @@
 import Constants from "expo-constants"
 import { requestTrackingPermissionsAsync } from "expo-tracking-transparency"
-import { AppEventsLogger, Settings } from "react-native-fbsdk-next"
 
 /**
  * Initializes Facebook tracking SDK for marketing analytics.
@@ -35,13 +34,17 @@ export const initializeFacebookTracking = async () => {
          return
       }
 
+      // Dynamically import Facebook SDK only when needed
+      const { AppEventsLogger, Settings } = await import(
+         "react-native-fbsdk-next"
+      )
+
       /**
        * Request permission to track user data (email, device ID, ad ID etc).
        * iOS 14.5+ requires explicit user consent. Permission persists until app reinstall.
        * Always granted on Android, web and iOS 13 or below.
        */
       const { status } = await requestTrackingPermissionsAsync()
-
       Settings.initializeSDK()
 
       if (status === "granted") {

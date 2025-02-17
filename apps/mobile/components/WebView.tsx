@@ -47,7 +47,7 @@ Notifications.setNotificationHandler({
 })
 
 interface WebViewScreenProps {
-   onTokenInjected: () => void
+   onTokenInjected: (data: USER_AUTH) => void
    onLogout: (
       userId: string,
       userPassword: string,
@@ -277,8 +277,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
             SecureStore.setItemAsync("authToken", data.token),
             SecureStore.setItemAsync("userId", data.userId),
             SecureStore.setItemAsync("userPassword", data.userPassword),
+            SecureStore.setItemAsync("userAuthId", data.userAuthId),
          ])
-         onTokenInjected()
+         onTokenInjected(data)
       } catch (error) {
          console.error("Failed to store auth data:", error)
       }

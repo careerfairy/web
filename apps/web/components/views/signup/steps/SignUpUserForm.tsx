@@ -195,6 +195,7 @@ function SignUpUserForm() {
                      MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
                         token,
                         userId: values.email,
+                        userAuthId: userCred.user.uid,
                         userPassword: values.password,
                      })
                      await userRepo.updateUserReminder(values.email, reminder)
