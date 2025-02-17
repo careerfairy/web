@@ -51,7 +51,7 @@ Notifications.setNotificationHandler({
 })
 
 interface WebViewScreenProps {
-   onTokenInjected: (data: USER_AUTH) => void
+   onTokenInjected: () => void
    onLogout: (
       userId: string,
       userPassword: string,
