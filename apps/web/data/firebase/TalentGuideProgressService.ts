@@ -25,6 +25,7 @@ import {
    writeBatch,
 } from "firebase/firestore"
 import { Functions } from "firebase/functions"
+import CookiesUtil from "util/CookiesUtil"
 import {
    FirestoreInstance,
    FunctionsInstance,
@@ -92,6 +93,8 @@ export class TalentGuideProgressService {
       userAuthUid: string,
       moduleData: Page<TalentGuideModule>
    ) {
+      const utmParams = CookiesUtil.getUTMParams()
+
       const now = Timestamp.now()
 
       return setDoc(this.getModuleProgressRef(moduleId, userAuthUid), {
@@ -111,6 +114,7 @@ export class TalentGuideProgressService {
          completedAt: null,
          restartCount: 0,
          levelSlug: moduleData.slug,
+         moduleDiscoveryUTM: utmParams || null,
       })
    }
 
