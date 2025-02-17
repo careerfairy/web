@@ -151,7 +151,7 @@ export const dataLayerLevelEvent = (
    levelsState: TalentGuideState,
    optionalVariables = {}
 ) => {
-   if (!levelsState.moduleData.content) return
+   if (!levelsState.moduleData?.content) return
 
    const currentStepIndex = levelsState.currentStepIndex
    const currentStep =
