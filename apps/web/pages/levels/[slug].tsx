@@ -54,10 +54,15 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
       )
 
       return () => {
-         dispatch(trackLevelsLeave())
          dispatch(resetTalentGuide())
       }
    }, [dispatch, authenticatedUser.uid, data, isLoggedOut])
+
+   useEffect(() => {
+      return () => {
+         dispatch(trackLevelsLeave())
+      }
+   }, [dispatch])
 
    useEffect(() => {
       if (isLoggedOut) {

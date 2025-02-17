@@ -62,13 +62,10 @@ export const TalentGuideEndLayout = () => {
    useEffect(() => {
       const hasCompletedAllLevels = !isLoadingNextModule && nextModule === null
 
-      if (hasCompletedAllLevels) {
+      if (hasCompletedAllLevels && feedbackSubmitted) {
          dispatch(trackLevelsComplete())
-
-         if (feedbackSubmitted) {
-            setIsRedirectingToOverview(true)
-            push("/levels")
-         }
+         setIsRedirectingToOverview(true)
+         push("/levels")
 
          return () => {
             setIsRedirectingToOverview(false)
