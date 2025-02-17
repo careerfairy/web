@@ -1,4 +1,4 @@
-import { Identifiable } from "../commonTypes"
+import { Identifiable, UTMParams } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
 
 export enum TalentGuideModuleCategory {
@@ -36,6 +36,9 @@ export interface TalentGuideProgress extends Identifiable {
    totalVisits: number
    lastVisitedAt: Timestamp | null
    restartCount: number
+
+   // UTM Attribution for how the user initially discovered/started this module
+   moduleDiscoveryUTM?: UTMParams | null
 }
 
 export const QUIZ_STATE = {
