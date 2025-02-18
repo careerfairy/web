@@ -92,7 +92,7 @@ export const FeaturedCompaniesHeader = ({
                   target="_blank"
                >
                   <Typography variant="small" sx={styles.sellAllCompanies}>
-                     Sell all companies
+                     See all companies
                   </Typography>
                </Link>
                <Box
