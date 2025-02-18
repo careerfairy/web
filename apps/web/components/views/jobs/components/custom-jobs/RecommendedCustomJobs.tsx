@@ -48,7 +48,7 @@ export const RecommendedCustomJobs = () => {
    const { isLoggedOut } = useAuth()
    if (!featureFlags.jobHubV1) return null
    return (
-      <Stack spacing={0} sx={styles.wrapper}>
+      <Stack spacing={0} sx={styles.wrapper} id="highlighted-jobs">
          <Typography
             variant="brandedH4"
             sx={styles.heading}

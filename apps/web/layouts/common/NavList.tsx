@@ -3,6 +3,7 @@ import React, { useMemo } from "react"
 
 // material-ui
 import {
+   Chip,
    List,
    ListItemButton,
    ListItemIcon,
@@ -15,6 +16,7 @@ import Link from "../../components/views/common/Link"
 
 // project imports
 import Collapse from "@mui/material/Collapse"
+import { LevelsNewChip } from "layouts/GenericDashboardLayout/GenericNavList"
 import { sxStyles } from "../../types/commonTypes"
 import type { INavLink } from "../types"
 
@@ -68,6 +70,18 @@ export const styles = sxStyles({
       color: "inherit",
       lineHeight: "20px",
    },
+   newChip: (theme) => ({
+      backgroundColor: theme.palette.error.main,
+      border: `1px solid ${theme.brand.white[100]}`,
+      height: "unset",
+      "& .MuiChip-label": {
+         padding: "0px 6px",
+         fontWeight: 400,
+         fontSize: "10px",
+         lineHeight: "16px",
+         color: theme.brand.white[100],
+      },
+   }),
 })
 
 type NavListProps = {
@@ -148,9 +162,24 @@ export const NavLink = ({
                {shrunk ? null : (
                   <ListItemText
                      primary={
-                        <Typography variant={"small"} sx={styles.label}>
-                           {title}
-                        </Typography>
+                        <Stack
+                           direction={"row"}
+                           alignItems={"center"}
+                           spacing={0.75}
+                        >
+                           <Typography variant={"small"} sx={styles.label}>
+                              {title}
+                           </Typography>
+                           {title == "Levels" ? (
+                              <LevelsNewChip>
+                                 <Chip
+                                    label={"New"}
+                                    size="small"
+                                    sx={styles.newChip}
+                                 />
+                              </LevelsNewChip>
+                           ) : null}
+                        </Stack>
                      }
                   />
                )}
