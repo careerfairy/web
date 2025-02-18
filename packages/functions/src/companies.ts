@@ -101,6 +101,11 @@ export const getFeaturedCompanies = functions
                     )
                   : []
 
+            functions.logger.info(
+               `Featured groups: ${countryId} ${fieldOfStudyId}`,
+               featuredGroups?.map((group) => group.id)
+            )
+
             // 3. Return the featured groups
             return featuredGroups
                .slice(0, MAX_FEATURED_COMPANIES)

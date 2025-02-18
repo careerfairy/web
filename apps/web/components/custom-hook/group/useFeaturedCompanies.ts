@@ -23,10 +23,10 @@ const useFeaturedCompanies = (suspense = true) => {
    const fetcher = useFunctionsSWR<GroupPresenter[]>()
    const options = useMemo(() => {
       return {
-         countryId: userData?.universityCountryCode,
+         countryId: userData?.countryIsoCode,
          fieldOfStudyId: userData?.fieldOfStudy?.id,
       }
-   }, [userData?.universityCountryCode, userData?.fieldOfStudy?.id])
+   }, [userData?.countryIsoCode, userData?.fieldOfStudy?.id])
 
    return useSWR<GroupPresenter[]>(["getFeaturedCompanies", options], fetcher, {
       ...swrOptions,
