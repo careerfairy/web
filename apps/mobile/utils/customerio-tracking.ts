@@ -1,5 +1,9 @@
+import { CUSTOMERIO_CDP_API_KEY, CUSTOMERIO_SITE_ID } from "@env"
 import { type CioConfig } from "customerio-reactnative"
 import Constants from "expo-constants"
+
+const cdpApiKey = CUSTOMERIO_CDP_API_KEY || "unknown"
+const siteId = CUSTOMERIO_SITE_ID || "unknown"
 
 class CustomerIOService {
    private static instance: CustomerIOService
@@ -32,12 +36,12 @@ class CustomerIOService {
          } = await import("customerio-reactnative")
 
          const config: CioConfig = {
-            cdpApiKey: "88de3d45fa1d11ab1e47",
+            cdpApiKey,
             region: CioRegion.EU,
             logLevel: CioLogLevel.Debug,
             trackApplicationLifecycleEvents: true,
             inApp: {
-               siteId: "5204b4d7db48dceb65e5",
+               siteId,
             },
             push: {
                android: {
@@ -83,7 +87,7 @@ class CustomerIOService {
          const CustomerIO = await getCustomerIO()
          await CustomerIO.track(event, data)
       } catch (error) {
-         console.error("Error tracking event", error)
+         console.error(`Error tracking event: ${error}`)
       }
    }
 
