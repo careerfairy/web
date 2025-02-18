@@ -1,22 +1,19 @@
 import { Box } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
-import { GridCarousel } from "../GridCarousel"
-import { LayoutGrid } from "../LayoutGrid"
+import { useStreamIsLandscape } from "components/custom-hook/streaming"
 import { UserStream } from "components/views/streaming-page/types"
-import { UserStreamComponent } from "./UserStreamComponent"
-import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
-import {
-   useStreamIsLandscape,
-   useStreamIsMobile,
-} from "components/custom-hook/streaming"
-import { useGalleryLayout } from "./useGalleryLayout"
-import { useSortedStreams } from "../useSortedStreams"
 import { useMemo } from "react"
-import { getPaginatedGridLayout } from "../util"
+import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
 import {
    GradientProvider,
    calculateGradientControl,
 } from "../../streaming/LinearGradient"
+import { GridCarousel } from "../GridCarousel"
+import { LayoutGrid } from "../LayoutGrid"
+import { useSortedStreams } from "../useSortedStreams"
+import { getPaginatedGridLayout } from "../util"
+import { useGalleryLayout } from "./useGalleryLayout"
+import { UserStreamComponent } from "./UserStreamComponent"
 
 const dynamicStyles = (spacing: number) =>
    sxStyles({
@@ -30,24 +27,15 @@ const dynamicStyles = (spacing: number) =>
          // Shrink the height of the gallery to make space for the spotlight
          height: {
             xs: `calc(132px - ${theme.spacing(spacing)})`,
-            tablet: `calc(160px - ${theme.spacing(spacing)})`,
+            tablet: "18%",
          },
+         minHeight: { xs: "97px", tablet: "120px" },
       }),
       spotlightActiveLandscape: (theme) => ({
          // Shrink the width of the gallery to make space for the spotlight
          width: `calc(208px - ${theme.spacing(spacing)})`,
       }),
    })
-
-const calculateGridItemMaxWidth = (
-   isSingleRowMode: boolean,
-   isMobile: boolean
-) => {
-   if (isSingleRowMode) {
-      return isMobile ? "180px !important" : "320px !important"
-   }
-   return undefined
-}
 
 type Props = {
    streams: UserStream[]
@@ -57,7 +45,6 @@ type Props = {
 export const Gallery = ({ streams, spacing }: Props) => {
    const isSpotlightMode = useIsSpotlightMode()
    const isLandscape = useStreamIsLandscape()
-   const isMobile = useStreamIsMobile()
 
    const layout = useGalleryLayout(streams.length)
    const pageSize = layout.rows * layout.columns
@@ -97,9 +84,8 @@ export const Gallery = ({ streams, spacing }: Props) => {
                      <LayoutGrid.Item
                         key={stream.user.uid}
                         layoutColumns={layout.columns}
-                        maxWidth={calculateGridItemMaxWidth(
-                           isSingleRowMode,
-                           isMobile
+                        isSpotlightMode={Boolean(
+                           !isLandscape && isSpotlightMode
                         )}
                      >
                         <GradientProvider
