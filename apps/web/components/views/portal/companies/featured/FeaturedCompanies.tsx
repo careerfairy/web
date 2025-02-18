@@ -90,7 +90,7 @@ const FeaturedCompaniesComponent = ({
       emblaApi?.scrollNext()
    }
 
-   if (!featuredCompanies) return null
+   if (!featuredCompanies?.length) return null
 
    return (
       <Box sx={[styles.root, isMobile ? styles.mobileRoot : null]}>
