@@ -13,7 +13,7 @@ import AdminGenericLayout from "../AdminGenericLayout"
 import CreditsDialogLayout from "../CreditsDialogLayout"
 import { INavLink } from "../types"
 import TabsNavigator from "./DropdownNavigator"
-import GenericNavList from "./GenericNavList"
+import { GenericNavList } from "./GenericNavList"
 import NavBar from "./NavBar"
 import TopBar from "./TopBar"
 
