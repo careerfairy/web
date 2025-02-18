@@ -31,7 +31,7 @@ const styles = sxStyles({
    mobileHeader: {
       px: { xs: 2, sm: 2, md: 0 },
    },
-   sellAllCompanies: {
+   seeAllCompanies: {
       color: (theme) => theme.brand.white[100],
       textDecoration: "underline",
    },
@@ -91,7 +91,7 @@ export const FeaturedCompaniesHeader = ({
                   href={`/companies?featured=true&category=${category}`}
                   target="_blank"
                >
-                  <Typography variant="small" sx={styles.sellAllCompanies}>
+                  <Typography variant="small" sx={styles.seeAllCompanies}>
                      See all companies
                   </Typography>
                </Link>
