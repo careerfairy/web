@@ -13,6 +13,7 @@ import { dataLayerEvent } from "util/analyticsUtils"
 
 const styles = sxStyles({
    companyCardRoot: {
+      py: 2,
       width: {
          xs: "317px !important",
          sm: "317px !important",

@@ -15,15 +15,17 @@ import { MobileFeaturedCompaniesCarousel } from "./MobileFeaturedCompaniesCarous
 
 const styles = sxStyles({
    root: {
-      mx: 2,
-      borderRadius: 2,
+      borderRadius: "16px",
       background: "linear-gradient(125deg, #5A86E2 0%, #5F9BD9 100%)",
       mb: "40px",
       py: "24px",
+      "@media (max-width: 1540px)": {
+         m: "0px 16px 24px 16px",
+      },
    },
    mobileRoot: {
       borderRadius: 0,
-      mx: 0,
+      mx: "0px !important",
    },
    divider: {
       my: 2,
