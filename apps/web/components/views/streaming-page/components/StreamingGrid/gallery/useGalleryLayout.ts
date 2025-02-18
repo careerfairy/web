@@ -5,8 +5,8 @@ import {
 } from "components/custom-hook/streaming"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useMemo } from "react"
-import { Layout } from "../types"
 import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
+import { Layout } from "../types"
 
 /**
  * A custom hook that calculates the layout for a gallery based on various conditions.
