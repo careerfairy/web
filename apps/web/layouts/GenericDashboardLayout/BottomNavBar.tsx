@@ -7,6 +7,7 @@ import useIsMobile from "../../components/custom-hook/useIsMobile"
 import Link from "../../components/views/common/Link"
 import { sxStyles } from "../../types/commonTypes"
 import { INavLink } from "../types"
+import { LevelsNewChip } from "./GenericNavList"
 
 const styles = sxStyles({
    wrapper: {
@@ -87,17 +88,29 @@ const BottomNavBar = ({ links, isDark = false }: Props) => {
    return (
       <Tabs
          sx={[styles.wrapper, isDark && styles.wrapperDark]}
-         value={activeTab}
+         value={activeTab > -1 ? activeTab : false}
       >
          {links.map(({ id, href, Icon, title, mobileTitle }, index) => (
             <Tab
                key={id}
                icon={
-                  <Box sx={styles.icon}>
-                     <Icon
-                        fill={activeTab === index ? "currentColor" : "none"}
-                     />
-                  </Box>
+                  id == "levels" ? (
+                     <LevelsNewChip>
+                        <Box sx={styles.icon}>
+                           <Icon
+                              fill={
+                                 activeTab === index ? "currentColor" : "none"
+                              }
+                           />
+                        </Box>
+                     </LevelsNewChip>
+                  ) : (
+                     <Box sx={styles.icon}>
+                        <Icon
+                           fill={activeTab === index ? "currentColor" : "none"}
+                        />
+                     </Box>
+                  )
                }
                component={Link}
                href={href}
