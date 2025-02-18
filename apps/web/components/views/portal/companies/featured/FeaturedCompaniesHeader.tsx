@@ -86,7 +86,7 @@ export const FeaturedCompaniesHeader = ({
             sx={styles.desktopHeader}
          >
             <MobileHeader />
-            <Stack direction="row" alignItems="flex-end" gap={1}>
+            <Stack direction="row" alignItems="flex-end" gap={2}>
                <Link
                   href={`/companies?featured=true&category=${category}`}
                   target="_blank"
@@ -95,16 +95,18 @@ export const FeaturedCompaniesHeader = ({
                      See all companies
                   </Typography>
                </Link>
-               <Box
-                  sx={styles.chevron}
-                  component={ChevronLeft}
-                  onClick={onPreviousClick}
-               />
-               <Box
-                  sx={styles.chevron}
-                  component={ChevronRight}
-                  onClick={onNextClick}
-               />
+               <Stack direction="row" gap={1}>
+                  <Box
+                     sx={styles.chevron}
+                     component={ChevronLeft}
+                     onClick={onPreviousClick}
+                  />
+                  <Box
+                     sx={styles.chevron}
+                     component={ChevronRight}
+                     onClick={onNextClick}
+                  />
+               </Stack>
             </Stack>
          </Stack>
       </ConditionalWrapper>
