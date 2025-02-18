@@ -8,6 +8,7 @@ import {
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { Box, CircularProgress, Grid, Stack } from "@mui/material"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
+import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
 import {
    FilterOptions,
    useCompanySearchAlgolia,
@@ -98,6 +99,8 @@ const CompanySearch = () => {
       rootMargin: "0px 0px 200px 0px",
    })
 
+   const { data: featuredGroups } = useFeaturedGroupsSWR()
+
    useDebounce(
       () => {
          setDebouncedInputValue(inputValue)
@@ -127,7 +130,11 @@ const CompanySearch = () => {
             companyIndustriesIdTags: companyIndustries,
             companySize,
          },
-
+         excludeArrayFilters: {
+            ...(featuredGroups?.length > 0 && {
+               objectID: featuredGroups?.map((group) => group.id),
+            }),
+         },
          booleanFilters: {
             ...(publicSparks && {
                publicSparks,
@@ -136,7 +143,13 @@ const CompanySearch = () => {
             publicProfile: true,
          },
       }),
-      [companyCountries, companyIndustries, companySize, publicSparks]
+      [
+         companyCountries,
+         companyIndustries,
+         companySize,
+         publicSparks,
+         featuredGroups,
+      ]
    )
 
    const { data, setSize, isValidating } = useCompanySearchAlgolia(

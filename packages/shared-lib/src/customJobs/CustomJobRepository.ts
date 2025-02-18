@@ -159,6 +159,10 @@ export interface ICustomJobRepository {
     */
    getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]>
 
+   groupHasPublishedCustomJobs(
+      groupId: string,
+      limit?: number
+   ): Promise<boolean>
    /**
     * Update all custom jobs that are expired for more than 30 days to be permanently expired
     */
@@ -551,6 +555,24 @@ export class FirebaseCustomJobRepository
       }
 
       return this.addIdToDocs<CustomJob>(docs.docs)
+   }
+
+   async groupHasPublishedCustomJobs(groupId: string): Promise<boolean> {
+      const snapshot = await this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("groupId", "==", groupId)
+         .where("isPermanentlyExpired", "==", false)
+         .where("deadline", ">=", new Date())
+         .get()
+
+      return (
+         !snapshot.empty &&
+         Boolean(
+            mapFirestoreDocuments<CustomJob>(snapshot).find(
+               (job) => !job.deleted
+            )
+         )
+      )
    }
 
    async getCustomJobsByLinkedContentIds(

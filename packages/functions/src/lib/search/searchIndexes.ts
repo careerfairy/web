@@ -24,7 +24,10 @@ import {
    TransformedSpark,
 } from "@careerfairy/shared-lib/sparks/search"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { removeDuplicates } from "@careerfairy/shared-lib/utils"
+import {
+   generateFeaturedCompanyPriority,
+   removeDuplicates,
+} from "@careerfairy/shared-lib/utils"
 import { Index } from "./searchIndexGenerator"
 
 const livestreamIndex = {
@@ -95,6 +98,7 @@ const companyIndex = {
       companyCountryId: data.companyCountry?.id ?? null,
       companyIndustriesIdTags:
          data.companyIndustries?.map((industry) => industry.id) ?? [],
+      featuredCompanyPriority: generateFeaturedCompanyPriority(data),
    }),
    settings: {
       attributesForFaceting: COMPANY_FILTERING_FIELDS,

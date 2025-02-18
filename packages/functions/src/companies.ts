@@ -1,14 +1,23 @@
+import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { GroupsDataParser } from "@careerfairy/shared-lib/groups/GroupRepository"
-import { isWithinNormalizationLimit } from "@careerfairy/shared-lib/utils/utils"
+import {
+   chunkArray,
+   isWithinNormalizationLimit,
+} from "@careerfairy/shared-lib/utils/utils"
 import * as functions from "firebase-functions"
 import { InferType, array, boolean, object, string } from "yup"
-import { fieldOfStudyRepo, groupRepo } from "./api/repositories"
+import { firestore } from "./api/firestoreAdmin"
+import {
+   customJobRepo,
+   groupRepo,
+   livestreamsRepo,
+   sparkRepo,
+} from "./api/repositories"
 import config from "./config"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation } from "./middlewares/validations"
-
-const MAX_FEATURED_COMPANIES = 4
+import { processInBatches } from "./util"
 
 const FilterCompaniesOptionsSchema = {
    publicSparks: boolean(),
@@ -25,18 +34,9 @@ const FilterCompaniesOptionsSchema = {
       .optional(),
 }
 
-const FilterFeaturedCompaniesOptionsSchema = {
-   countryId: string(),
-   fieldOfStudyId: string(),
-}
-
 const schema = object().shape(FilterCompaniesOptionsSchema)
 
-const featuredSchema = object().shape(FilterFeaturedCompaniesOptionsSchema)
-
 type FilterCompanyOptions = InferType<typeof schema>
-
-type FilterFeaturedCompanyOptions = InferType<typeof featuredSchema>
 
 export const fetchCompanies = functions.region(config.region).https.onCall(
    middlewares(
@@ -80,36 +80,96 @@ export const fetchCompanies = functions.region(config.region).https.onCall(
    )
 )
 
-export const getFeaturedCompanies = functions
+// functions
+// .region(config.region)
+// .runWith(runtimeSettings)
+// .https.onCall(
+export const syncFeaturedCompaniesData = functions
    .region(config.region)
-   .https.onCall(
-      middlewares(
-         dataValidation(FilterFeaturedCompaniesOptionsSchema),
-         async (data: FilterFeaturedCompanyOptions) => {
-            const { countryId, fieldOfStudyId } = data
+   .runWith({
+      // when sending large batches, this function can take a while to finish
+      timeoutSeconds: 540,
+      memory: "8GB",
+   })
+   // .pubsub.schedule("every 30 minutes")
+   // .timeZone("Europe/Zurich")
+   // .onRun(async () => {
+   .https.onRequest(async (req, res) => {
+      const bulkWriter = firestore.bulkWriter()
+      // Get all companies
+      const groups = await groupRepo.fetchCompanies({})
+      const groupsRecord: Record<string, Group> = groups.reduce(
+         (acc, group) => ({
+            ...acc,
+            [group.id]: group,
+         }),
+         {}
+      )
 
-            // 1. Get the user field of study category
-            const fieldOfStudy = await fieldOfStudyRepo.getById(fieldOfStudyId)
-            const fieldOfStudyCategory = fieldOfStudy.category
+      const groupUpdateData: Record<
+         string,
+         Pick<Group, "hasJobs" | "hasSparks" | "hasUpcomingEvents">
+      > = {}
 
-            // 2. Get the featured groups that match the user field of study category and country
-            const featuredGroups =
-               fieldOfStudyCategory && countryId
-                  ? await groupRepo.getFeaturedGroups(
-                       fieldOfStudyCategory,
-                       countryId
-                    )
-                  : []
-
-            functions.logger.info(
-               `Featured groups: ${countryId} ${fieldOfStudyId}`,
-               featuredGroups?.map((group) => group.id)
+      await processInBatches(
+         groups,
+         25,
+         async (group) => {
+            const hasJobsPromise = customJobRepo.groupHasPublishedCustomJobs(
+               group.id
             )
 
-            // 3. Return the featured groups
-            return featuredGroups
-               .slice(0, MAX_FEATURED_COMPANIES)
-               .map(GroupPresenter.createFromDocument)
-         }
+            const hasSparksPromise = sparkRepo.groupHasPublishedSparks(group.id)
+
+            const hasUpcomingEventsPromise = livestreamsRepo
+               .getFutureLivestreamsQuery(group.id)
+               .get()
+               .then((data) => !data.empty)
+
+            const [hasJobs, hasSparks, hasUpcomingEvents] = await Promise.all([
+               hasJobsPromise,
+               hasSparksPromise,
+               hasUpcomingEventsPromise,
+            ])
+
+            groupUpdateData[group.id] = {
+               hasJobs,
+               hasSparks,
+               hasUpcomingEvents,
+            }
+         },
+         functions.logger
       )
-   )
+
+      functions.logger.info("syncFeaturedCompaniesData", groupUpdateData)
+
+      const chunkedGroupUpdateData = chunkArray(
+         Object.entries(groupUpdateData),
+         25
+      )
+
+      for (const batch of chunkedGroupUpdateData) {
+         for (const [groupId, groupData] of batch) {
+            if (
+               groupsRecord[groupId].hasJobs === groupData.hasJobs &&
+               groupsRecord[groupId].hasSparks === groupData.hasSparks &&
+               groupsRecord[groupId].hasUpcomingEvents ===
+                  groupData.hasUpcomingEvents
+            ) {
+               functions.logger.info("skipping, no data changes", groupId)
+               continue
+            }
+            const docRef = firestore.collection("careerCenterData").doc(groupId)
+
+            void bulkWriter.update(docRef, {
+               hasJobs: groupData.hasJobs,
+               hasSparks: groupData.hasSparks,
+               hasUpcomingEvents: groupData.hasUpcomingEvents,
+            })
+         }
+
+         await bulkWriter.flush()
+      }
+
+      res.status(200).send()
+   })
