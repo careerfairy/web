@@ -51,7 +51,7 @@ class CustomerIOService {
          this.initialized = true
          console.log("CustomerIO initialized")
       } catch (error) {
-         console.error("Error initializing CustomerIO", error)
+         console.error(`Error initializing CustomerIO: ${error}`)
       }
    }
 
@@ -62,11 +62,14 @@ class CustomerIOService {
          await this.initialize()
       }
 
-      const CustomerIO = await getCustomerIO()
-      await CustomerIO.identify({
-         userId: userAuthId,
-      })
-      console.log("Identified customer", userAuthId)
+      try {
+         const CustomerIO = await getCustomerIO()
+         await CustomerIO.identify({
+            userId: userAuthId,
+         })
+      } catch (error) {
+         console.error(`Error identifying customer: ${error}`)
+      }
    }
 
    async trackEvent(event: string, data: Record<string, any>): Promise<void> {
@@ -76,8 +79,12 @@ class CustomerIOService {
          await this.initialize()
       }
 
-      const CustomerIO = await getCustomerIO()
-      await CustomerIO.track(event, data)
+      try {
+         const CustomerIO = await getCustomerIO()
+         await CustomerIO.track(event, data)
+      } catch (error) {
+         console.error("Error tracking event", error)
+      }
    }
 
    async trackScreen(
@@ -90,8 +97,12 @@ class CustomerIOService {
          await this.initialize()
       }
 
-      const CustomerIO = await getCustomerIO()
-      await CustomerIO.screen(screenName, data)
+      try {
+         const CustomerIO = await getCustomerIO()
+         await CustomerIO.screen(screenName, data)
+      } catch (error) {
+         console.error(`Error tracking screen: ${error}`)
+      }
    }
 
    async clearCustomer(): Promise<void> {
@@ -101,9 +112,13 @@ class CustomerIOService {
          await this.initialize()
       }
 
-      const CustomerIO = await getCustomerIO()
-      await CustomerIO.clearIdentify()
-      console.log("Cleared customer")
+      try {
+         const CustomerIO = await getCustomerIO()
+         await CustomerIO.clearIdentify()
+         console.log("Cleared customer")
+      } catch (error) {
+         console.error(`Error clearing customer: ${error}`)
+      }
    }
 }
 

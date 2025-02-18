@@ -1,0 +1,135 @@
+import { ConfigContext, ExpoConfig } from "expo/config"
+
+export default ({ config }: ConfigContext): ExpoConfig => ({
+   ...config,
+   name: "CareerFairy",
+   slug: "careerfairy-mobile-app",
+   version: "1.0.3",
+   orientation: "portrait",
+   icon: "./assets/images/AppIcon.png",
+   scheme: "careerfairy",
+   userInterfaceStyle: "automatic",
+   splash: {
+      image: "./assets/images/MainSplashScreen.png",
+      resizeMode: "contain",
+      backgroundColor: "#ffffff",
+   },
+   androidStatusBar: {
+      barStyle: "dark-content",
+      translucent: true,
+   },
+   ios: {
+      supportsTablet: true,
+      infoPlist: {
+         NSCameraUsageDescription:
+            "CareerFairy only uses the camera if you decide to actively participate in a live stream.",
+         NSMicrophoneUsageDescription:
+            "CareerFairy only uses the microphone if you decide to actively participate in a live stream.",
+         NSUserNotificationUsageDescription:
+            "CareerFairy uses notifications to keep you up-to-date with your live streams.",
+      },
+      associatedDomains: [
+         "applinks:www.careerfairy.io",
+         "applinks:staging.careerfairy.io",
+      ],
+      bundleIdentifier: "io.careerfairy",
+   },
+   android: {
+      package: "com.admin_product_team.careerfairymobileapp",
+      googleServicesFile: "./google-services.json",
+      permissions: [
+         "AD_ID",
+         "NOTIFICATIONS",
+         "CAMERA",
+         "RECORD_AUDIO",
+         "RECEIVE_BOOT_COMPLETED",
+         "VIBRATE",
+      ],
+      adaptiveIcon: {
+         foregroundImage: "./assets/images/AppIcon.png",
+         backgroundColor: "#ffffff",
+      },
+      intentFilters: [
+         {
+            action: "VIEW",
+            autoVerify: true,
+            data: [
+               {
+                  scheme: "https",
+                  host: "www.careerfairy.io",
+               },
+               {
+                  scheme: "https",
+                  host: "staging.careerfairy.io",
+               },
+            ],
+            category: ["BROWSABLE", "DEFAULT"],
+         },
+      ],
+   },
+   notification: {
+      icon: "./assets/images/icon.png",
+      color: "#ffffff",
+      androidMode: "default",
+      androidCollapsedTitle: "New notifications",
+   },
+   web: {
+      bundler: "metro",
+      output: "static",
+      favicon: "./assets/images/AppIcon.png",
+   },
+   plugins: [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font",
+      [
+         "react-native-fbsdk-next",
+         {
+            appID: "2046877438758567",
+            clientToken: "35e8df5c8632dd59271c98f2b44b99e2",
+            displayName: "CareerFairy",
+            scheme: "fb2046877438758567",
+            advertiserIDCollectionEnabled: true,
+            autoLogAppEventsEnabled: true,
+            isAutoInitEnabled: true,
+            iosUserTrackingPermission:
+               "This allows us to provide you with a better experience and more relevant content.",
+         },
+      ],
+      "expo-tracking-transparency",
+      [
+         "expo-build-properties",
+         {
+            ios: {
+               deploymentTarget: "15.1",
+            },
+         },
+      ],
+      [
+         "customerio-expo-plugin",
+         {
+            android: {
+               googleServicesFile: "./google-services.json",
+            },
+            ios: {
+               pushNotification: {
+                  useRichPush: true,
+                  env: {
+                     cdpApiKey: "88de3d45fa1d11ab1e47",
+                     region: "eu",
+                  },
+               },
+            },
+         },
+      ],
+   ],
+   experiments: {
+      typedRoutes: true,
+   },
+   extra: {
+      eas: {
+         projectId: "52368a9d-be31-4ef9-be0a-3e9e1de4e098",
+      },
+   },
+   owner: "admin_product_team",
+})
