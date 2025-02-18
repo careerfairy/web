@@ -101,20 +101,6 @@ export const getFeaturedCompanies = functions
                     )
                   : []
 
-            if (featuredGroups.length < MAX_FEATURED_COMPANIES) {
-               const availableSlots =
-                  MAX_FEATURED_COMPANIES - featuredGroups.length
-
-               // TODO: Improve available slots fill based on requirements (tbd)
-               const randomGroups = await groupRepo.getGroupsByIds([
-                  "i8NjOiRu85ohJWDuFPwo",
-                  "FvPXsjLbvUplyIgXQjdB",
-                  "G9rXGe70iYuCVIWac6f7",
-                  "GgZYSTdoWiHqXGxGzntn",
-               ])
-               featuredGroups.push(...randomGroups.slice(0, availableSlots))
-            }
-
             // 3. Return the featured groups
             return featuredGroups
                .slice(0, MAX_FEATURED_COMPANIES)
