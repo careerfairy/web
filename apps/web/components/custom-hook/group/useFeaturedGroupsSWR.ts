@@ -45,6 +45,7 @@ export const useFeaturedGroupsSWR = (options?: Options) => {
                   userData?.fieldOfStudy?.category
                )
             )
+            ?.sort(() => Math.random() - 0.5)
       },
       {
          ...reducedRemoteCallsOptions,
