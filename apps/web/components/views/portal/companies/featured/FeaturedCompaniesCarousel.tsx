@@ -1,4 +1,4 @@
-import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { Group } from "@careerfairy/shared-lib/groups"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
@@ -96,7 +96,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   companies: GroupPresenter[]
+   companies: Group[]
    emblaRef
 }
 
@@ -123,7 +123,7 @@ export const FeaturedCompaniesCarousel = ({ companies, emblaRef }: Props) => {
 }
 
 type FeaturedCompanyCardProps = {
-   company: GroupPresenter
+   company: Group
    following: boolean
 }
 

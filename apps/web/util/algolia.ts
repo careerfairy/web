@@ -1,6 +1,6 @@
-import { DeserializeTimestamps } from "types/algolia"
-import firebase from "firebase/compat/app"
 import { Hit } from "@algolia/client-search"
+import firebase from "firebase/compat/app"
+import { DeserializeTimestamps } from "types/algolia"
 
 /**
  * Converts an Algolia search hit to a deserialized result type, transforming any timestamp objects
@@ -56,26 +56,39 @@ export const deserializeAlgoliaSearchResponse = <
  * @returns {string} The constructed filter string.
  */
 export const generateArrayFilterString = (
-   arrayFilters: Record<string, string[]>
+   arrayFilters: Record<string, string[]>,
+   exclude: boolean = false
 ): string => {
    if (!arrayFilters) return ""
    const filters = []
    // Go through each filter type (e.g., "tags", "categories").
    Object.entries(arrayFilters).forEach(([filterName, filterValues]) => {
       if (filterValues && filterValues.length > 0) {
-         // Combine options within a type using "OR" (any option works).
-         const filterValueString = filterValues
-            .filter(Boolean) // Use only valid options.
-            .map((filterValue) => `${filterName}:${filterValue}`)
-            .join(" OR ") // Link options with "OR".
+         if (exclude) {
+            // For exclusion, create a single NOT condition for the OR group
+            const filterValueString = filterValues
+               .filter(Boolean)
+               .map((filterValue) => `NOT ${filterName}:${filterValue}`)
+               .join(" AND ")
 
-         if (filterValueString) {
-            filters.push(`(${filterValueString})`) // Enclose in parenthesis to ensure proper grouping
+            if (filterValueString) {
+               filters.push(`(${filterValueString})`)
+            }
+         } else {
+            // Original inclusion logic with OR
+            const filterValueString = filterValues
+               .filter(Boolean)
+               .map((filterValue) => `${filterName}:${filterValue}`)
+               .join(" OR ")
+
+            if (filterValueString) {
+               filters.push(`(${filterValueString})`)
+            }
          }
       }
    })
 
-   // Link different filter types with "AND" (all conditions must be met).
+   // Link different filter types with "AND"
    return filters.join(" AND ")
 }
 

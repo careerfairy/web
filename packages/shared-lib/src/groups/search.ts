@@ -7,6 +7,7 @@ import { Group } from "."
 export type TransformedGroup = Group & {
    companyIndustriesIdTags: string[]
    companyCountryId: string
+   featuredCompanyPriority: number
 }
 
 export const COMPANY_FIELDS_TO_INDEX = [
@@ -40,6 +41,7 @@ export const COMPANY_FIELDS_TO_INDEX = [
    "companyCountryId",
    "companySize",
    "publicProfile",
+   "featuredCompanyPriority",
 ] satisfies (keyof TransformedGroup)[]
 
 export type CompanyFieldToIndexType = (typeof COMPANY_FIELDS_TO_INDEX)[number]
@@ -72,8 +74,9 @@ type FilterFieldType = (typeof COMPANY_FILTERING_FIELDS)[number]
 
 export type ArrayFilterFieldType = Extract<
    FilterFieldType,
-   "companySize" | "companyIndustriesIdTags" | "companyCountryId"
->
+   "companySize" | "companyIndustriesIdTags" | "companyCountryId" | "id"
+> &
+   "objectID"
 
 export type BooleanFilterFieldType = Extract<
    FilterFieldType,

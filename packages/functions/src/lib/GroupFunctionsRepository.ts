@@ -3,7 +3,6 @@ import {
    mapFirestoreDocuments,
 } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
-import { FieldOfStudyCategory } from "@careerfairy/shared-lib/fieldOfStudy"
 import {
    FilterCompanyOptions,
    GROUP_DASHBOARD_ROLE,
@@ -195,11 +194,6 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
       group: Group,
       client: ServerClient
    ): Promise<void>
-
-   getFeaturedGroups(
-      fieldOfStudyCategory: FieldOfStudyCategory,
-      countryId: string
-   ): Promise<Group[]>
 }
 
 export class GroupFunctionsRepository
@@ -702,26 +696,6 @@ export class GroupFunctionsRepository
             "Error sending sparks trial plan creation period near to end reminder:",
          companyName: group.universityName,
       })
-   }
-
-   async getFeaturedGroups(
-      fieldOfStudyCategory: FieldOfStudyCategory,
-      countryId: string
-   ): Promise<Group[]> {
-      const snaps = await this.firestore
-         .collection("careerCenterData")
-         .where(
-            "featured.targetAudience",
-            "array-contains",
-            fieldOfStudyCategory
-         )
-         .withConverter(createCompatGenericConverter<Group>())
-         .get()
-
-      const docs = mapFirestoreDocuments<Group>(snaps) || []
-      return docs.filter((group) =>
-         group.featured.targetCountries.includes(countryId)
-      )
    }
 }
 
