@@ -1,4 +1,5 @@
 import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
+import { Group } from "../groups"
 import { LivestreamEvent } from "../livestreams"
 import { SparkStats } from "../sparks/sparks"
 import {
@@ -429,6 +430,15 @@ export const findElementsWithDuplicatePropertiesInArray = <T>(
       .filter((obj) => duplicateProperties.includes(getPropertyString(obj)))
       .sort(dynamicSort(sortBy))
 }
+
+export const generateFeaturedCompanyPriority = (group: Group): number => {
+   if (group.hasJobs && group.hasUpcomingEvents) return 4
+   if (group.hasUpcomingEvents && !group.hasJobs) return 3
+   if (group.hasJobs && !group.hasUpcomingEvents) return 2
+   if (!group.hasJobs && !group.hasUpcomingEvents && group.hasSparks) return 1
+   return 0
+}
+
 /**
  * @description
  * Creates a lookup object from an array of objects based on the given property name.

@@ -71,7 +71,9 @@ export interface Group extends Identifiable {
    plan?: GroupPlan
 
    featured?: FeaturedGroup
-
+   hasJobs?: boolean
+   hasSparks?: boolean
+   hasUpcomingEvents?: boolean
    /**
     * Deprecated
     * */

@@ -334,6 +334,8 @@ export interface IGroupRepository {
     * @returns A Promise that resolves with an array of user ids.
     */
    getFollowingUsers(groupId: string): Promise<string[]>
+
+   updateGroupData(groupId: string, data: Partial<Group>)
 }
 
 export class FirebaseGroupRepository
@@ -409,6 +411,13 @@ export class FirebaseGroupRepository
          .collection("userAdminGroups")
          .get()
       return mapFirestoreDocuments<UserAdminGroup>(snaps)
+   }
+
+   updateGroupData(groupId: string, data: Partial<Group>) {
+      return this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .update(data)
    }
 
    /*

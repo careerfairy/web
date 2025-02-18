@@ -1,7 +1,7 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Divider, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import useFeaturedCompanies from "components/custom-hook/group/useFeaturedCompanies"
+import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
 import { useFieldOfStudyById } from "components/custom-hook/useCollection"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -78,7 +78,7 @@ const FeaturedCompaniesComponent = ({
    suspense = true,
 }: Props) => {
    const isMobile = useIsMobile()
-   const { data: featuredCompanies } = useFeaturedCompanies(suspense)
+   const { data: featuredCompanies } = useFeaturedGroupsSWR()
    const { data: fieldOfStudy } = useFieldOfStudyById(fieldOfStudyId, suspense)
 
    const [emblaRef, emblaApi] = useEmblaCarousel(carouselEmblaOptions, [

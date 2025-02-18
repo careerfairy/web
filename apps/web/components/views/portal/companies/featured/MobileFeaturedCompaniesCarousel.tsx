@@ -1,4 +1,4 @@
-import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { Group } from "@careerfairy/shared-lib/groups"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
@@ -14,7 +14,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   companies: GroupPresenter[]
+   companies: Group[]
 }
 
 export const MobileFeaturedCompaniesCarousel = ({ companies }: Props) => {
