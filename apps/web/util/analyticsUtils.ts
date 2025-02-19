@@ -372,6 +372,7 @@ export const analyticsTrackPageView = () => {
       return MobileUtils.send<TRACK_SCREEN>(MESSAGING_TYPE.TRACK_SCREEN, {
          screenName: window.location.pathname,
          properties: {
+            path: window.location.pathname,
             url: window.location.href,
             title: document.title,
             referrer: document.referrer,
