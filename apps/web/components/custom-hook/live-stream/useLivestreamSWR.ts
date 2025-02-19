@@ -1,6 +1,6 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { collection, getDocs, query } from "firebase/firestore"
+import { collection, getDocs, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -18,7 +18,8 @@ export const useLivestreamSWR = (livestreamId: string, options?: Options) => {
       livestreamId ? `livestream-${livestreamId}` : null,
       async () => {
          const livestreamsQuery = query(
-            collection(firestore, "livestreams", livestreamId)
+            collection(firestore, "livestreams"),
+            where("id", "==", livestreamId)
          ).withConverter(createGenericConverter<LivestreamEvent>())
 
          const querySnapshot = await getDocs(livestreamsQuery)
