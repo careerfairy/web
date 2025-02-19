@@ -30,6 +30,7 @@ import {
 } from "react-native"
 import { WebView } from "react-native-webview"
 import { customerIO } from "../utils/customerio-tracking"
+import { SECURE_STORE_KEYS } from "../utils/secure-store-constants"
 
 const injectedCSS = `
     body :not(input):not(textarea) {
@@ -55,7 +56,7 @@ interface WebViewScreenProps {
    onLogout: (
       userId: string,
       userPassword: string,
-      userToken: string | null
+      customerioPushToken: string | null
    ) => void
 }
 
@@ -153,8 +154,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    useEffect(() => {
       const getInitialUrl = async () => {
          const response = await Notifications.getLastNotificationResponseAsync()
-         if (response && response.notification.request.content.data.url) {
-            setBaseUrl(response.notification.request.content.data.url)
+         const url = extractLink(response)
+         if (url) {
+            setBaseUrl(url)
          }
       }
 
@@ -176,9 +178,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
       const responseListener =
          Notifications.addNotificationResponseReceivedListener((response) => {
-            const url = response.notification.request.content.data.url
-            if (url) {
-               navigateToNewUrl(url)
+            const link = extractLink(response)
+            if (link) {
+               navigateToNewUrl(link)
             }
          })
 
@@ -192,12 +194,14 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    useEffect(() => {
       const getDefaultBrowser = async () => {
-         const browsers =
-            await WebBrowser.getCustomTabsSupportingBrowsersAsync()
-         if (browsers.browserPackages?.length > 0) {
-            setDefaultBrowser(
-               browsers.defaultBrowserPackage || browsers.browserPackages[0]
-            )
+         if (Platform.OS === "android") {
+            const browsers =
+               await WebBrowser.getCustomTabsSupportingBrowsersAsync()
+            if (browsers.browserPackages?.length > 0) {
+               setDefaultBrowser(
+                  browsers.defaultBrowserPackage || browsers.browserPackages[0]
+               )
+            }
          }
       }
       getDefaultBrowser()
@@ -256,7 +260,7 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
          const { type, data } = receivedData as NativeEvent
 
-         console.debug(`🚀 ~ handleMessage ~ type: ${type} ~ data: ${data}`)
+         console.debug(`~ handleMessage ~ type: ${type} ~ data: ${data}`)
          switch (type) {
             case MESSAGING_TYPE.CONSOLE:
                return handleWebAppConsoleMessage(data)
@@ -319,9 +323,12 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    const handleUserAuth = async (data: USER_AUTH) => {
       try {
          await Promise.all([
-            SecureStore.setItemAsync("authToken", data.token),
-            SecureStore.setItemAsync("userId", data.userId),
-            SecureStore.setItemAsync("userPassword", data.userPassword),
+            SecureStore.setItemAsync(SECURE_STORE_KEYS.AUTH_TOKEN, data.token),
+            SecureStore.setItemAsync(SECURE_STORE_KEYS.USER_ID, data.userId),
+            SecureStore.setItemAsync(
+               SECURE_STORE_KEYS.USER_PASSWORD,
+               data.userPassword
+            ),
          ])
          onTokenInjected()
       } catch (error) {
@@ -337,15 +344,22 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const handleLogout = async () => {
       try {
-         const userId = await SecureStore.getItemAsync("userId")
-         const userPassword = await SecureStore.getItemAsync("userPassword")
-         const userToken = await SecureStore.getItemAsync("pushToken")
+         const userId = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.USER_ID
+         )
+         const userPassword = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.USER_PASSWORD
+         )
+
+         const customerioPushToken = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN
+         )
          if (userId && userPassword) {
-            onLogout(userId, userPassword, userToken)
+            onLogout(userId, userPassword, customerioPushToken)
          }
-         await SecureStore.deleteItemAsync("authToken")
-         await SecureStore.deleteItemAsync("userId")
-         await SecureStore.deleteItemAsync("userPassword")
+         await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.AUTH_TOKEN)
+         await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.USER_ID)
+         await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.USER_PASSWORD)
       } catch (error) {
          console.log(error)
       }
@@ -420,8 +434,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       try {
          const urlObj = new URL(request.url)
          // Check if the URL is within your domain
-         return !urlObj.hostname.includes(SEARCH_CRITERIA) && request.loading
-      } catch {
+         const result =
+            !urlObj.hostname.includes(SEARCH_CRITERIA) && request.loading
+         return result
+      } catch (error) {
          return false // Invalid URL
       }
    }
@@ -442,7 +458,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          if (isAndroid && defaultBrowser) {
             options.browserPackage = defaultBrowser
          }
-
          WebBrowser.openBrowserAsync(url, options)
       },
       [defaultBrowser, isAgoraPage]
@@ -572,6 +587,18 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
       handleScreenOrientation()
    }, [isAgoraPage, baseUrl])
+
+   const extractLink = (
+      response: Notifications.NotificationResponse | null
+   ): string | undefined => {
+      if (Platform.OS === "ios") {
+         // @ts-ignore
+         return response?.notification?.request?.trigger?.payload?.CIO?.push
+            ?.link
+      }
+      // Android
+      return response?.notification?.request?.content?.data?.link
+   }
 
    return (
       <SafeAreaView style={styles.container}>

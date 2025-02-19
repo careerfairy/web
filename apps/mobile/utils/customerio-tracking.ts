@@ -1,14 +1,17 @@
 import { CUSTOMERIO_CDP_API_KEY, CUSTOMERIO_SITE_ID } from "@env"
-import { type CioConfig } from "customerio-reactnative"
-import Constants from "expo-constants"
+import {
+   CioLogLevel,
+   CioRegion,
+   CustomerIO,
+   PushClickBehaviorAndroid,
+   type CioConfig,
+} from "customerio-reactnative"
 
 const cdpApiKey = CUSTOMERIO_CDP_API_KEY || "unknown"
 const siteId = CUSTOMERIO_SITE_ID || "unknown"
 
 class CustomerIOService {
    private static instance: CustomerIOService
-   private initialized = false
-   private isExpoGo = Constants.appOwnership === "expo"
 
    private constructor() {}
 
@@ -20,115 +23,90 @@ class CustomerIOService {
    }
 
    async initialize(): Promise<void> {
-      if (this.isExpoGo) {
-         console.log("CustomerIO not available in Expo Go")
-         return
+      if (CustomerIO.isInitialized()) return
+
+      const config: CioConfig = {
+         cdpApiKey,
+         region: CioRegion.EU,
+         logLevel:
+            process.env.NODE_ENV === "development"
+               ? CioLogLevel.Debug
+               : CioLogLevel.Error,
+         trackApplicationLifecycleEvents: true,
+         inApp: {
+            siteId,
+         },
+         push: {
+            android: {
+               pushClickBehavior:
+                  PushClickBehaviorAndroid.ActivityPreventRestart,
+            },
+         },
       }
 
-      if (this.initialized) return
-
-      try {
-         const {
-            CioLogLevel,
-            CioRegion,
-            CustomerIO,
-            PushClickBehaviorAndroid,
-         } = await import("customerio-reactnative")
-
-         const config: CioConfig = {
-            cdpApiKey,
-            region: CioRegion.EU,
-            logLevel: CioLogLevel.Debug,
-            trackApplicationLifecycleEvents: true,
-            inApp: {
-               siteId,
-            },
-            push: {
-               android: {
-                  pushClickBehavior:
-                     PushClickBehaviorAndroid.ActivityPreventRestart,
-               },
-            },
-         }
-
-         await CustomerIO.initialize(config)
-         this.initialized = true
-         console.log("CustomerIO initialized")
-      } catch (error) {
-         console.error(`Error initializing CustomerIO: ${error}`)
-      }
+      return CustomerIO.initialize(config)
    }
 
    async identifyCustomer(userAuthId: string): Promise<void> {
-      if (this.isExpoGo) return
-
-      if (!this.initialized) {
+      if (!CustomerIO.isInitialized()) {
          await this.initialize()
       }
 
-      try {
-         const CustomerIO = await getCustomerIO()
-         await CustomerIO.identify({
-            userId: userAuthId,
-         })
-      } catch (error) {
-         console.error(`Error identifying customer: ${error}`)
-      }
+      return CustomerIO.identify({
+         userId: userAuthId,
+      })
    }
 
    async trackEvent(event: string, data: Record<string, any>): Promise<void> {
-      if (this.isExpoGo) return
-
-      if (!this.initialized) {
+      if (!CustomerIO.isInitialized()) {
          await this.initialize()
       }
 
-      try {
-         const CustomerIO = await getCustomerIO()
-         await CustomerIO.track(event, data)
-      } catch (error) {
-         console.error(`Error tracking event: ${error}`)
-      }
+      return CustomerIO.track(event, data)
    }
 
    async trackScreen(
       screenName: string,
       data: Record<string, any>
    ): Promise<void> {
-      if (this.isExpoGo) return
-
-      if (!this.initialized) {
+      if (!CustomerIO.isInitialized()) {
          await this.initialize()
       }
 
-      try {
-         const CustomerIO = await getCustomerIO()
-         await CustomerIO.screen(screenName, data)
-      } catch (error) {
-         console.error(`Error tracking screen: ${error}`)
-      }
+      return CustomerIO.screen(screenName, data)
    }
 
    async clearCustomer(): Promise<void> {
-      if (this.isExpoGo) return
-
-      if (!this.initialized) {
+      if (!CustomerIO.isInitialized()) {
          await this.initialize()
       }
 
-      try {
-         const CustomerIO = await getCustomerIO()
-         await CustomerIO.clearIdentify()
-         console.log("Cleared customer")
-      } catch (error) {
-         console.error(`Error clearing customer: ${error}`)
-      }
+      return CustomerIO.clearIdentify()
    }
-}
 
-const getCustomerIO = async () => {
-   const { CustomerIO } = await import("customerio-reactnative")
-   return CustomerIO
+   async getPushToken(): Promise<string> {
+      if (!CustomerIO.isInitialized()) {
+         await this.initialize()
+      }
+
+      return CustomerIO.pushMessaging.getRegisteredDeviceToken()
+   }
+
+   async getPushPermissionStatus() {
+      if (!CustomerIO.isInitialized()) {
+         await this.initialize()
+      }
+
+      return CustomerIO.pushMessaging.getPushPermissionStatus()
+   }
+
+   async showPromptForPushNotifications() {
+      if (!CustomerIO.isInitialized()) {
+         await this.initialize()
+      }
+
+      return CustomerIO.pushMessaging.showPromptForPushNotifications()
+   }
 }
 
 export const customerIO = CustomerIOService.getInstance()

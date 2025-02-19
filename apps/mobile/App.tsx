@@ -1,4 +1,3 @@
-import { PROJECT_ID } from "@env"
 import {
    Poppins_400Regular,
    Poppins_600SemiBold,
@@ -21,6 +20,7 @@ import WebViewComponent from "./components/WebView"
 import { app, auth, db } from "./firebase"
 import { customerIO } from "./utils/customerio-tracking"
 import { initializeFacebookTracking } from "./utils/facebook-tracking"
+import { SECURE_STORE_KEYS } from "./utils/secure-store-constants"
 
 const styles: any = {
    image: {
@@ -73,7 +73,7 @@ export default function Native() {
    }, [])
 
    useEffect(() => {
-      customerIO.initialize()
+      customerIO.initialize().catch(console.error)
    }, [])
 
    useEffect(() => {
@@ -109,10 +109,13 @@ export default function Native() {
    }, [])
 
    const checkToken = async () => {
-      const token = await SecureStore.getItemAsync("authToken")
+      const token = await SecureStore.getItemAsync(SECURE_STORE_KEYS.AUTH_TOKEN)
       if (token) {
-         const pushToken = await SecureStore.getItemAsync("pushToken")
-         if (!pushToken) {
+         const customerioPushToken = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN
+         )
+
+         if (!customerioPushToken) {
             getPushToken()
          }
       }
@@ -120,12 +123,11 @@ export default function Native() {
 
    const getTokenAndSave = async () => {
       try {
-         const tokenData = await Notifications.getExpoPushTokenAsync({
-            projectId: PROJECT_ID,
-         })
-         const token = tokenData.data
-         saveUserPushTokenToFirestore(token)
+         const customerioPushToken = await customerIO.getPushToken()
+
+         saveUserPushTokenToFirestore(customerioPushToken)
       } catch (e) {
+         alert(`Error getting push token: ${e}`)
          console.log(e)
       }
    }
@@ -141,8 +143,9 @@ export default function Native() {
             })
          }
 
-         const { status } = await Notifications.requestPermissionsAsync()
-         if (status === "granted") {
+         const status = await customerIO.showPromptForPushNotifications()
+
+         if (status === "GRANTED") {
             getTokenAndSave()
          } else {
             console.log("Notification permissions not granted")
@@ -155,28 +158,38 @@ export default function Native() {
    const onLogout = async (
       userId: string,
       userPassword: string,
-      userToken: string | null
+      customerioPushToken: string | null
    ) => {
       try {
-         return resetFireStoreData(userId, userPassword, userToken)
+         return resetFireStoreData(userId, userPassword, customerioPushToken)
       } catch (e) {
          console.log("Error with resetting firestore data", e)
       }
    }
 
-   async function saveUserPushTokenToFirestore(pushToken: string) {
+   async function saveUserPushTokenToFirestore(customerioPushToken: string) {
       try {
-         const userId = await SecureStore.getItemAsync("userId")
-         const userPassword = await SecureStore.getItemAsync("userPassword")
+         const userId = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.USER_ID
+         )
+         const userPassword = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.USER_PASSWORD
+         )
 
          if (userId && userPassword) {
             await signInWithEmailAndPassword(auth, userId, userPassword)
             if (auth.currentUser?.email) {
                const userDocRef = doc(db, "userData", auth.currentUser.email)
 
-               await updateDoc(userDocRef, { fcmTokens: arrayUnion(pushToken) })
+               await updateDoc(userDocRef, {
+                  cioPushTokens: arrayUnion(customerioPushToken),
+               })
             }
-            await SecureStore.setItemAsync("pushToken", pushToken)
+
+            await SecureStore.setItemAsync(
+               SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN,
+               customerioPushToken
+            )
          }
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
@@ -186,10 +199,10 @@ export default function Native() {
    async function resetFireStoreData(
       userId: string,
       userPassword: string,
-      userToken: string | null
+      customerioPushToken: string | null
    ) {
       try {
-         if (!userToken) {
+         if (!customerioPushToken) {
             return
          }
          if (!auth.currentUser?.email) {
@@ -201,9 +214,15 @@ export default function Native() {
          }
 
          const userDocRef = doc(db, "userData", auth.currentUser.email)
-         await updateDoc(userDocRef, { fcmTokens: arrayRemove(userToken) })
+         await updateDoc(userDocRef, {
+            cioPushTokens: arrayRemove(customerioPushToken),
+         })
 
-         await SecureStore.deleteItemAsync("pushToken")
+         await SecureStore.deleteItemAsync(
+            SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN
+         )
+
+         await customerIO.clearCustomer()
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
       }

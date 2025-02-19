@@ -32,6 +32,7 @@
       "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions",
       "native": "cd apps/mobile && npm run start",
       "native:cache": "cd apps/mobile && npm run start:cache",
+      "native:tunnel": "cd apps/mobile && npm run start:tunnel",
       "native-build": "npm run native-build:preview",
       "native-build:preview": "cd apps/mobile && npm run build:preview",
       "native-build:develop": "cd apps/mobile && npm run build:develop",
