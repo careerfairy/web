@@ -1,17 +1,17 @@
 import functions = require("firebase-functions")
 import { RemoveNotificationFromUserData } from "@careerfairy/shared-lib/sparks/sparks"
+import { RuntimeOptions } from "firebase-functions"
 import { string } from "yup"
+import { firestore } from "./api/firestoreAdmin"
 import config from "./config"
-import { logAndThrow } from "./lib/validations"
-import { middlewares } from "./middlewares/middlewares"
-import { dataValidation } from "./middlewares/validations"
+import { handleCreatePublicSparksNotifications } from "./lib/sparks/notifications/publicNotifications"
 import {
    handleCreateUsersSparksNotifications,
    removeUserNotificationsAndSyncSparksNotifications,
 } from "./lib/sparks/notifications/userNotifications"
-import { handleCreatePublicSparksNotifications } from "./lib/sparks/notifications/publicNotifications"
-import { firestore } from "./api/firestoreAdmin"
-import { RuntimeOptions } from "firebase-functions"
+import { logAndThrow } from "./lib/validations"
+import { middlewares } from "./middlewares/middlewares"
+import { dataValidation } from "./middlewares/validations"
 
 const removeNotificationFromUserValidator = {
    userId: string().required(),
@@ -23,7 +23,7 @@ const removeNotificationFromUserValidator = {
  */
 const runtimeSettings: RuntimeOptions = {
    // we may load some data
-   memory: "512MB",
+   memory: "1GB",
 }
 
 /**
