@@ -1,4 +1,5 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { FieldOfStudyCategoryMap } from "@careerfairy/shared-lib/fieldOfStudy"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { useAuth } from "HOCs/AuthProvider"
 import { collection, getDocs, limit, query, where } from "firebase/firestore"
@@ -21,7 +22,10 @@ export const useFeaturedGroupsSWR = (options?: Options) => {
    const { totalItems = 4 } = options || {}
 
    const disabled =
-      !userData?.countryIsoCode || !userData?.fieldOfStudy?.category
+      !userData?.countryIsoCode ||
+      !userData?.fieldOfStudy?.id ||
+      (userData?.fieldOfStudy?.id &&
+         !FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id])
 
    return useSWR(
       disabled ? null : [`get-featured-groups-${userData.authId}`, totalItems],
@@ -42,7 +46,7 @@ export const useFeaturedGroupsSWR = (options?: Options) => {
             .map((doc) => doc.data())
             ?.filter((group) =>
                group.featured?.targetAudience?.includes(
-                  userData?.fieldOfStudy?.category
+                  FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id]
                )
             )
             ?.sort(() => Math.random() - 0.5)

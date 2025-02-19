@@ -2,7 +2,6 @@ import { Identifiable, OptionGroup } from "../commonTypes"
 
 export type FieldOfStudy = Identifiable & {
    name: string
-   category?: FieldOfStudyCategory
 }
 
 export type LevelOfStudy = FieldOfStudy
@@ -108,4 +107,34 @@ export const mapPartnershipFieldsOfStudy = (
       default:
          return []
    }
+}
+
+export const FieldOfStudyCategoryMap: Record<string, FieldOfStudyCategory> = {
+   business_administration_economics: "business_plus",
+   finance: "business_plus",
+   law: "business_plus",
+   luxury_fashion: "business_plus",
+   marketing: "business_plus",
+   military_sciences: "business_plus",
+   public_administration: "business_plus",
+   transportation: "business_plus",
+   business_engineering: "stem",
+   chemical_engineering: "stem",
+   civil_engineering: "stem",
+   electrical_engineering: "stem",
+   materials_science_and_engineering: "stem",
+   mechanical_engineering: "stem",
+   space_sciences: "stem",
+   computer_science: "stem",
+   mathematics: "stem",
+   astronomy: "stem",
+   biology: "stem",
+   chemistry: "stem",
+   earth_sciences: "stem",
+   environmental_studies_and_forestry: "stem",
+   geography: "stem",
+   life_sciences: "stem",
+   medicine: "stem",
+   physics: "stem",
+   systems_science: "stem",
 }
