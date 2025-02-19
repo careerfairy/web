@@ -6,7 +6,6 @@ import { useAuth } from "HOCs/AuthProvider"
 import { useNextTalentGuideModule } from "hooks/useNextTalentGuideModule"
 import { useRouter } from "next/router"
 import { useEffect, useRef, useState } from "react"
-import { trackLevelsComplete } from "store/reducers/talentGuideReducer"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { BackButton } from "../floating-buttons/BackButton"
@@ -63,7 +62,6 @@ export const TalentGuideEndLayout = () => {
       const hasCompletedAllLevels = !isLoadingNextModule && nextModule === null
 
       if (hasCompletedAllLevels && feedbackSubmitted) {
-         dispatch(trackLevelsComplete())
          setIsRedirectingToOverview(true)
          push("/levels")
 

@@ -26,6 +26,8 @@ import { PlusCircle, Trash2 } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { useDebounce, useLocalStorage } from "react-use"
 import { errorLogAndNotify, getIconUrl } from "util/CommonUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerEvent } from "util/analyticsUtils"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
 import { userRepo } from "../../../../data/RepositoryInstances"
@@ -133,6 +135,8 @@ const SocialInformation = () => {
                currentUser.email,
                fieldToUpdate
             )
+
+            dataLayerEvent(AnalyticsEvents.ProfileLinkedinUpload)
          } catch (error) {
             errorLogAndNotify(error, {
                message: "Error updating social information in SignUp",
@@ -292,6 +296,9 @@ const UserLinkedInLink = () => {
          .updateAdditionalInformation(userData.id, {
             linkedinUrl: debouncedLink ?? null,
          })
+         .then(() => {
+            dataLayerEvent(AnalyticsEvents.ProfileLinkedinUpload)
+         })
          .catch((error) =>
             errorLogAndNotify(
                error,
@@ -381,23 +388,6 @@ const UserOtherLinks = () => {
       }
    })
 
-   const handleLinkSubmit = useCallback(
-      async (link: ProfileLink) => {
-         if (!userData.linkedinUrl && isLinkedInUrl(link.url)) {
-            await userRepo
-               .updateAdditionalInformation(userData.id, {
-                  linkedinUrl: link.url,
-               })
-               .catch(errorLogAndNotify)
-         } else {
-            await userRepo
-               .createUserLink(userData.id, link)
-               .catch(errorLogAndNotify)
-         }
-      },
-      [userData.linkedinUrl, userData.id]
-   )
-
    const handleLinkDelete = useCallback(
       async (linkId: string) => {
          await userRepo.deleteLink(userData.id, linkId).catch(errorLogAndNotify)
@@ -421,10 +411,7 @@ const UserOtherLinks = () => {
          <ConditionalWrapper
             condition={!isLinkFormOpen}
             fallback={
-               <ProfileLinkForm
-                  onClose={() => setIsLinkFormOpen(false)}
-                  onSubmit={handleLinkSubmit}
-               />
+               <ProfileLinkForm onClose={() => setIsLinkFormOpen(false)} />
             }
          >
             <Stack
@@ -447,7 +434,6 @@ const UserOtherLinks = () => {
 
 type ProfileLinkFormProps = {
    onClose: () => void
-   onSubmit: (link: ProfileLink) => Promise<void>
 }
 
 const ProfileLinkForm = ({ onClose }: ProfileLinkFormProps) => {
@@ -486,10 +472,16 @@ const LinkForm = ({ onClose }: LinkFormProps) => {
             .updateAdditionalInformation(userData.id, {
                linkedinUrl: link.url,
             })
+            .then(() => {
+               dataLayerEvent(AnalyticsEvents.ProfileLinkedinUpload)
+            })
             .catch(errorLogAndNotify)
       } else {
          await userRepo
             .createUserLink(userData.id, link)
+            .then(() => {
+               dataLayerEvent(AnalyticsEvents.ProfileLinkUpload)
+            })
             .catch(errorLogAndNotify)
       }
    }
