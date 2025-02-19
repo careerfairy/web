@@ -28,6 +28,8 @@ import {
 } from "store/selectors/talentProfileSelectors"
 import { sxStyles } from "types/commonTypes"
 import { getIconUrl } from "util/CommonUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerEvent } from "util/analyticsUtils"
 import { ConfirmDeleteItemDialog } from "../ConfirmDeleteItemDialog"
 import { EmptyItemView } from "./EmptyItemView"
 import { ProfileItemCard } from "./ProfileItemCard"
@@ -150,6 +152,7 @@ const FormDialogWrapper = () => {
             await userRepo.updateAdditionalInformation(userData.id, {
                linkedinUrl: data.url,
             })
+            dataLayerEvent(AnalyticsEvents.ProfileLinkedinUpload)
          } else {
             if (data?.id === "linkedin") {
                // User is updating their linkedin url, leaving it as a valid linkedin url or
@@ -162,9 +165,14 @@ const FormDialogWrapper = () => {
                   linkedinUrl: isValidLinkedinUrl ? data.url : "",
                })
 
+               if (isValidLinkedinUrl) {
+                  dataLayerEvent(AnalyticsEvents.ProfileLinkedinUpload)
+               }
+
                if (!isValidLinkedinUrl) {
                   // Since the linkedin url is not valid anymore, we create a new user link
                   await userRepo.createUserLink(userData.id, newLink)
+                  dataLayerEvent(AnalyticsEvents.ProfileLinkUpload)
                }
             } else {
                // User is creating/updating a non-linkedin link
@@ -173,6 +181,7 @@ const FormDialogWrapper = () => {
                } else {
                   await userRepo.updateUserLink(userData.id, newLink)
                }
+               dataLayerEvent(AnalyticsEvents.ProfileLinkUpload)
             }
          }
 

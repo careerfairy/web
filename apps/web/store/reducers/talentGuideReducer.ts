@@ -254,9 +254,6 @@ const talentGuideReducer = createSlice({
       trackLevelsLeave: (state) => {
          dataLayerLevelEvent(AnalyticsEvents.LevelsLeave, state)
       },
-      trackLevelsComplete: (state) => {
-         dataLayerLevelEvent(AnalyticsEvents.LevelsComplete, state)
-      },
       trackLevelsFeedback: (
          state,
          action: PayloadAction<{ rating: number; feedbackTags: string[] }>
@@ -391,7 +388,7 @@ const talentGuideReducer = createSlice({
             if (!action.payload) {
                // If there is no next step, we've completed the module
                state.showEndOfModuleExperience = true
-               // dataLayerLevelEvent(AnalyticsEvents.LevelsComplete, state)
+               dataLayerLevelEvent(AnalyticsEvents.LevelsComplete, state)
             } else {
                const { nextStepIndex } = action.payload
                state.currentStepIndex = nextStepIndex
@@ -594,7 +591,6 @@ export const {
    resetTalentGuide,
    toggleQuizAnswer,
    trackLevelsLeave,
-   trackLevelsComplete,
    trackLevelsFeedback,
    trackLevelsHighlightClick,
    trackLevelsArticleClick,

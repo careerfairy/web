@@ -42,6 +42,12 @@ export const AnalyticsEvents = {
    SignupPinComplete: "signup_pin_complete",
    SignupStarted: "signup_started",
    SignupCompleteRedirect: "signup_complete_redirect",
+
+   ProfileCvUpload: "profile_cv_upload",
+   ProfileLinkedinUpload: "profile_linkedin_upload",
+   ProfileLinkUpload: "profile_link_upload",
+   ProfileAvatarUpload: "profile_avatar_upload",
+   ProfileBannerUpload: "profile_banner_upload",
    AttendEvent: "attend_event",
    CompanyPageVisit: "company_page_visit",
    MentorPageVisit: "mentor_page_visit",

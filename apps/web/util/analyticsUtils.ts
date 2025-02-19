@@ -8,8 +8,10 @@ import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
+import { ModuleStepType, RichTextBlockType } from "data/hygraph/types"
 import { TalentGuideState } from "store/reducers/talentGuideReducer"
 import { AnalyticsEvent } from "./analyticsConstants"
+import { errorLogAndNotify } from "./CommonUtil"
 import { getProgressPercentage } from "./levels"
 
 /**
@@ -138,6 +140,32 @@ export const dataLayerSparkEvent = (
    })
 }
 
+const getRichTextLastReference = (content: RichTextBlockType) => {
+   const references = content?.content?.references || []
+   return references[references.length - 1]
+}
+
+const getStepContent = (currentStep: ModuleStepType) => {
+   if (currentStep?.content?.__typename === "RichTextBlock") {
+      return currentStep?.content?.content?.references.map(sanitizeForAnalytics)
+   }
+   return [sanitizeForAnalytics(currentStep?.content)]
+}
+
+const getLastContentId = (currentStep: ModuleStepType) => {
+   if (currentStep?.content?.__typename === "RichTextBlock") {
+      return getRichTextLastReference(currentStep?.content)?.id
+   }
+   return currentStep?.content?.id
+}
+
+const getLastContentType = (currentStep: ModuleStepType) => {
+   if (currentStep?.content?.__typename === "RichTextBlock") {
+      return getRichTextLastReference(currentStep?.content)?.__typename
+   }
+   return currentStep?.content?.__typename
+}
+
 /**
  * Sends analytics events for talent guide interactions.
  * Requires a valid talent guide state to execute.
@@ -151,7 +179,13 @@ export const dataLayerLevelEvent = (
    levelsState: TalentGuideState,
    optionalVariables = {}
 ) => {
-   if (!levelsState.moduleData?.content) return
+   if (!levelsState.moduleData?.content) {
+      const message = `Missing module data for level event ${eventName} - event not sent. Consider using dataLayerEvent() if level state not required`
+      console.error(message, levelsState)
+      errorLogAndNotify(new Error(message))
+
+      return
+   }
 
    const currentStepIndex = levelsState.currentStepIndex
    const currentStep =
@@ -159,22 +193,19 @@ export const dataLayerLevelEvent = (
 
    dataLayerEvent(eventName, {
       ...optionalVariables,
-      levelSlug: levelsState.moduleData.slug, // GTM Variable
-      levelName: levelsState.moduleData.content?.moduleName, // GTM Variable
-      levelId: levelsState.moduleData.content?.id, // GTM Variable
-      currentStepIndex: currentStepIndex, // GTM Variable
-      totalSteps: levelsState.moduleData.content?.moduleSteps?.length, // GTM Variable
+      levelSlug: levelsState.moduleData.slug,
+      levelName: levelsState.moduleData.content?.moduleName,
+      levelId: levelsState.moduleData.content?.id,
+      currentStepIndex: currentStepIndex,
+      totalSteps: levelsState.moduleData.content?.moduleSteps?.length,
       progressPercentage: Math.round(
          getProgressPercentage(currentStepIndex, levelsState.moduleData)
-      ), // GTM Variable
-      currentStepId: currentStep?.content?.id, // GTM Variable
-      currentStepType: currentStep?.content?.__typename, // GTM Variable
-      currentStepContent:
-         currentStep?.content?.__typename === "RichTextBlock"
-            ? currentStep?.content?.content?.references.map(
-                 sanitizeForAnalytics
-              )
-            : [sanitizeForAnalytics(currentStep?.content)],
+      ),
+      currentStepId: currentStep?.content?.id,
+      currentStepType: currentStep?.content?.__typename,
+      currentStepContent: getStepContent(currentStep),
+      lastContentId: getLastContentId(currentStep),
+      lastContentType: getLastContentType(currentStep),
    })
 }
 
@@ -193,6 +224,10 @@ export const analyticsTrackEvent = (
    eventName: AnalyticsEvent,
    properties: Record<string, any> = {}
 ) => {
+   console.log("🚀", {
+      eventName,
+      properties,
+   })
    if (typeof window === "undefined") return
 
    const enrichedProperties = { ...properties }

@@ -1,9 +1,9 @@
-import { TextField } from "@mui/material"
-import React, { useCallback } from "react"
-import { useDebounce } from "react-use"
 import { linkedInRegex } from "@careerfairy/shared-lib/constants/forms"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { TextField } from "@mui/material"
+import { useCallback } from "react"
+import { useDebounce } from "react-use"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 
 const LinkedInInput = ({
    name,
