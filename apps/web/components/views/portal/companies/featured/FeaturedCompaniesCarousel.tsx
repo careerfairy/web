@@ -37,6 +37,8 @@ const styles = sxStyles({
    companyLogo: {
       width: "64px",
       height: "64px",
+      borderRadius: "70px",
+      border: (theme) => `1.5px solid ${theme.brand.white[400]}`,
    },
    companyName: {
       color: (theme) => theme.brand.white[100],
@@ -44,7 +46,6 @@ const styles = sxStyles({
       textOverflow: "ellipsis",
       overflow: "hidden",
       whiteSpace: "nowrap",
-      maxWidth: "75%",
    },
    companyIndustries: {
       color: (theme) => theme.brand.white[400],
@@ -163,7 +164,6 @@ export const FeaturedCompanyCard = ({
             })
          }}
          href={`/company/${companyNameSlugify(company.universityName)}`}
-         target="_blank"
       >
          <Stack
             direction="row"
