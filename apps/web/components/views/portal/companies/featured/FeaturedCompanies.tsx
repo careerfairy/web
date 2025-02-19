@@ -15,6 +15,7 @@ import { MobileFeaturedCompaniesCarousel } from "./MobileFeaturedCompaniesCarous
 
 const styles = sxStyles({
    root: {
+      ml: 2,
       borderRadius: "16px",
       background: "linear-gradient(125deg, #5A86E2 0%, #5F9BD9 100%)",
       mb: "40px",
