@@ -35,7 +35,7 @@ import { ChangeType, getChangeTypeEnum, getChangeTypes } from "./util"
 import { validateGroupSparks } from "./util/sparks"
 
 export const syncLivestreams = functions
-   .runWith({ ...defaultTriggerRunTimeConfig, memory: "1GB" })
+   .runWith({ ...defaultTriggerRunTimeConfig, memory: "2GB" })
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
    .onWrite(async (change, context) => {
@@ -537,7 +537,7 @@ export const onWriteCustomJobs = functions
    })
 
 export const onWriteCustomJobsSendNotifications = functions
-   .runWith({ ...defaultTriggerRunTimeConfig, memory: "512MB" })
+   .runWith({ ...defaultTriggerRunTimeConfig, memory: "1GB" })
    .region(config.region)
    .firestore.document("customJobs/{jobId}")
    .onWrite(async (change, context) => {
