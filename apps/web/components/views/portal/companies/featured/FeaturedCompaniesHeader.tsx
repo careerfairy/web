@@ -13,19 +13,27 @@ const styles = sxStyles({
    chevron: {
       cursor: "pointer",
       color: (theme) => theme.brand.white[100],
-      borderRadius: "36px",
       p: "8px",
-      background: "rgba(235, 235, 239, 0.35)",
-      backdropFilter: "blur(100px)",
       width: "32px",
       height: "32px",
-      transition: "background-color 0.2s ease-in-out",
+      borderRadius: "36px",
+      background: "rgba(235, 235, 239, 0.35)",
+      backdropFilter: "blur(10px)",
+      transition: "all 0.2s ease-in-out",
       "& svg": {
          width: "16px",
          height: "16px",
       },
       "&:hover": {
-         background: "rgba(235, 235, 239, 0.6)",
+         borderRadius: "36px",
+         background: "rgba(235, 235, 239, 0.55)",
+         backdropFilter: "blur(10px)",
+      },
+      "&:active": {
+         borderRadius: "36px",
+         border: "1px solid rgba(255, 255, 255, 0.60)",
+         background: "rgba(235, 235, 239, 0.55)",
+         backdropFilter: "blur(10px)",
       },
    },
    mobileHeader: {
