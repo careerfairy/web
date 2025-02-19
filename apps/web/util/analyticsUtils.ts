@@ -161,7 +161,9 @@ const getLastContentId = (currentStep: ModuleStepType) => {
 
 const getLastContentType = (currentStep: ModuleStepType) => {
    if (currentStep?.content?.__typename === "RichTextBlock") {
-      return getRichTextLastReference(currentStep?.content)?.__typename
+      return (
+         getRichTextLastReference(currentStep?.content)?.__typename || "Text"
+      )
    }
    return currentStep?.content?.__typename
 }
@@ -224,10 +226,6 @@ export const analyticsTrackEvent = (
    eventName: AnalyticsEvent,
    properties: Record<string, any> = {}
 ) => {
-   console.log("🚀", {
-      eventName,
-      properties,
-   })
    if (typeof window === "undefined") return
 
    const enrichedProperties = { ...properties }
