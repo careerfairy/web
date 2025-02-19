@@ -1,6 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { Box, Skeleton, Stack, Typography } from "@mui/material"
-import useLivestream from "components/custom-hook/live-stream/useLivestream"
+import { Box, Stack, Typography } from "@mui/material"
+import { useLivestreamSWR } from "components/custom-hook/live-stream/useLivestreamSWR"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { HighlightComponentType } from "data/hygraph/types"
 import Link from "next/link"
@@ -130,8 +130,8 @@ export const ExpandedHeader = ({
 
    const { handleLiveStreamDialogOpen } = useHighlights()
 
-   const { data: livestream } = useLivestream(
-      highlight.liveStreamIdentifier.identifier
+   const { data: livestream } = useLivestreamSWR(
+      highlight.liveStreamIdentifier?.identifier
    )
 
    const handleLivestreamTitleClick = useCallback(
@@ -181,16 +181,16 @@ export const ExpandedHeader = ({
          <Typography variant="small" sx={styles.highlightTitle}>
             {highlight.title}
          </Typography>
-         <Stack
-            direction="row"
-            gap={1}
-            alignItems="center"
-            onClick={handleLivestreamTitleClick}
-         >
-            <Box sx={styles.iconWrapper}>
-               <Video strokeWidth={1.5} />
-            </Box>
-            {livestream ? (
+         {livestream ? (
+            <Stack
+               direction="row"
+               gap={1}
+               alignItems="center"
+               onClick={handleLivestreamTitleClick}
+            >
+               <Box sx={styles.iconWrapper}>
+                  <Video strokeWidth={1.5} />
+               </Box>
                <Box sx={styles.liveStreamTitleContainer} ref={parentRef}>
                   <Typography
                      ref={titleRef}
@@ -200,10 +200,8 @@ export const ExpandedHeader = ({
                      {livestream?.title}
                   </Typography>
                </Box>
-            ) : (
-               <Skeleton variant="text" width="100%" height={14} />
-            )}
-         </Stack>
+            </Stack>
+         ) : null}
       </Box>
    )
 }
