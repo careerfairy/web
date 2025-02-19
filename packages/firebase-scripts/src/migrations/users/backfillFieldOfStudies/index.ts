@@ -35,7 +35,10 @@ export async function run() {
 
       const fieldOfStudyLookup: Record<string, FieldOfStudy> =
          allFieldOfStudies.reduce((acc, fieldOfStudy) => {
-            acc[fieldOfStudy.id] = fieldOfStudy
+            acc[fieldOfStudy.id] = {
+               ...fieldOfStudy,
+               category: fieldOfStudy.category ?? "",
+            }
             return acc
          }, {})
 
@@ -66,20 +69,19 @@ const cascadeUserFieldOfStudies = async (
       usersChunk.forEach((user) => {
          writeProgressBar.increment() // Increment progress bar
 
-         console.log(
-            `Updating field of study for user ${user.id}: ${
-               fieldOfStudyLookup[user.fieldOfStudy.id].id
-            },${fieldOfStudyLookup[user.fieldOfStudy.id].name},${
-               fieldOfStudyLookup[user.fieldOfStudy.id].category
-            }`
-         )
-         //   const userRef = firestore.collection("userData").doc(user.id)
+         const fieldOfStudy = fieldOfStudyLookup[user.fieldOfStudy.id]
 
-         //   const toUpdate: Pick<UserData, "fieldOfStudy"> = {
-         //     fieldOfStudy: fieldOfStudyLookup[user.fieldOfStudy.id]
-         //   }
+         if (!fieldOfStudy.category) return
 
-         //   batch.update(userRef, toUpdate)
+         counter.writeIncrement()
+
+         const userRef = firestore.collection("userData").doc(user.id)
+
+         const toUpdate: Pick<UserData, "fieldOfStudy"> = {
+            fieldOfStudy: fieldOfStudy,
+         }
+
+         batch.update(userRef, toUpdate)
       })
 
       await batch.commit() // Wait for batch to commit
