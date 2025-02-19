@@ -1,5 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { Box, Skeleton, Stack, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import { useLivestreamSWR } from "components/custom-hook/live-stream/useLivestreamSWR"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { HighlightComponentType } from "data/hygraph/types"
@@ -181,16 +181,21 @@ export const ExpandedHeader = ({
          <Typography variant="small" sx={styles.highlightTitle}>
             {highlight.title}
          </Typography>
-         <Stack
-            direction="row"
-            gap={1}
-            alignItems="center"
-            onClick={handleLivestreamTitleClick}
-         >
-            <Box sx={styles.iconWrapper}>
-               <Video strokeWidth={1.5} />
-            </Box>
-            {livestream ? (
+         {livestream ? (
+            <Stack
+               direction="row"
+               gap={1}
+               alignItems="center"
+               onClick={handleLivestreamTitleClick}
+            >
+               {livestream ? (
+                  <Box sx={styles.iconWrapper}>
+                     <Video strokeWidth={1.5} />
+                  </Box>
+               ) : null}
+               <Box sx={styles.iconWrapper}>
+                  <Video strokeWidth={1.5} />
+               </Box>
                <Box sx={styles.liveStreamTitleContainer} ref={parentRef}>
                   <Typography
                      ref={titleRef}
@@ -200,10 +205,8 @@ export const ExpandedHeader = ({
                      {livestream?.title}
                   </Typography>
                </Box>
-            ) : (
-               <Skeleton variant="text" width="100%" height={14} />
-            )}
-         </Stack>
+            </Stack>
+         ) : null}
       </Box>
    )
 }
