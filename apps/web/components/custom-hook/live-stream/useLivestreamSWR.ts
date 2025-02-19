@@ -4,6 +4,7 @@ import { collection, getDocs, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 type Options = {
    suspense?: boolean
@@ -27,6 +28,7 @@ export const useLivestreamSWR = (livestreamId: string, options?: Options) => {
          return querySnapshot.docs?.at(0)?.data()
       },
       {
+         ...reducedRemoteCallsOptions,
          suspense,
          onError: (error) =>
             errorLogAndNotify(error, {
