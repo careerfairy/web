@@ -188,11 +188,6 @@ export const ExpandedHeader = ({
                alignItems="center"
                onClick={handleLivestreamTitleClick}
             >
-               {livestream ? (
-                  <Box sx={styles.iconWrapper}>
-                     <Video strokeWidth={1.5} />
-                  </Box>
-               ) : null}
                <Box sx={styles.iconWrapper}>
                   <Video strokeWidth={1.5} />
                </Box>
