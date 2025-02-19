@@ -588,6 +588,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       handleScreenOrientation()
    }, [isAgoraPage, baseUrl])
 
+   /**
+    * Customerio push notifications payload have a different structure for iOS and Android
+    * see: https://docs.customer.io/sdk/expo/push-notifications/push/#test-rich-push
+    */
    const extractLink = (
       response: Notifications.NotificationResponse | null
    ): string | undefined => {

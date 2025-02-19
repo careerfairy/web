@@ -41,6 +41,7 @@ export const initializeFacebookTracking = async () => {
        * Always granted on Android, web and iOS 13 or below.
        */
       const { status } = await requestTrackingPermissionsAsync()
+
       Settings.initializeSDK()
 
       if (status === "granted") {
