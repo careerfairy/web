@@ -19,7 +19,9 @@ const styles = sxStyles({
       borderRadius: "36px",
       background: "rgba(235, 235, 239, 0.35)",
       backdropFilter: "blur(10px)",
-      transition: "all 0.2s ease-in-out",
+      transition: "border 0.2s ease-in-out",
+      boxSizing: "border-box",
+      border: "1px solid transparent",
       "& svg": {
          width: "16px",
          height: "16px",
@@ -95,10 +97,7 @@ export const FeaturedCompaniesHeader = ({
          >
             <MobileHeader />
             <Stack direction="row" alignItems="flex-end" gap={2}>
-               <Link
-                  href={`/companies?featured=true&category=${category}`}
-                  target="_blank"
-               >
+               <Link href={`/companies?featured=true&category=${category}`}>
                   <Typography variant="small" sx={styles.seeAllCompanies}>
                      See all companies
                   </Typography>
