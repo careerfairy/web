@@ -6,7 +6,6 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import useUserCountryCode from "../useUserCountryCode"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 type Options = {
@@ -17,17 +16,17 @@ type Options = {
    disabled?: boolean
 }
 
-export const useFeaturedGroupsSWR = (options?: Options) => {
+export const useFeaturedGroupsSWR = (
+   countryCode: string,
+   options?: Options
+) => {
    const { userData, isLoggedIn } = useAuth()
-   const { userCountryCode } = useUserCountryCode()
-
-   const countryCode = !isLoggedIn ? userCountryCode : userData?.countryIsoCode
 
    const { totalItems = 4 } = options || {}
 
    const disabled =
       options?.disabled ||
-      !countryCode ||
+      !countryCode?.length ||
       (isLoggedIn &&
          (!userData?.fieldOfStudy?.id ||
             (userData?.fieldOfStudy?.id &&

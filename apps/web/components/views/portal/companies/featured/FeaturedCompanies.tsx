@@ -5,6 +5,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
@@ -55,23 +56,29 @@ const carouselEmblaOptions: EmblaOptionsType = {
 export const FeaturedCompanies = () => {
    const { userData } = useAuth()
    const { contentPlacementV1 } = useFeatureFlags()
+   const { userCountryCode } = useUserCountryCode()
 
    // Possibly return null if user also does not have a field of study
    // Checking field of study, as the copy of the header is based on the field of study
    if (!contentPlacementV1) return null
 
    return (
-      <FeaturedCompaniesComponent fieldOfStudyId={userData?.fieldOfStudy?.id} />
+      <FeaturedCompaniesComponent
+         fieldOfStudyId={userData?.fieldOfStudy?.id}
+         countryCode={userData?.countryIsoCode || userCountryCode}
+      />
    )
 }
 
 type Props = {
    fieldOfStudyId?: string
+   countryCode?: string
 }
 
-const FeaturedCompaniesComponent = ({ fieldOfStudyId }: Props) => {
+const FeaturedCompaniesComponent = ({ fieldOfStudyId, countryCode }: Props) => {
    const isMobile = useIsMobile()
-   const { data: featuredCompanies } = useFeaturedGroupsSWR()
+
+   const { data: featuredCompanies } = useFeaturedGroupsSWR(countryCode)
 
    const [emblaRef, emblaApi] = useEmblaCarousel(carouselEmblaOptions, [
       WheelGesturesPlugin(),
@@ -111,7 +118,11 @@ const FeaturedCompaniesComponent = ({ fieldOfStudyId }: Props) => {
             <Box sx={{ px: { xs: 2, sm: 2, md: 0 } }}>
                <Divider sx={styles.divider} />
                <Link
-                  href={`/companies?featured=true&category=${FieldOfStudyCategoryMap[fieldOfStudyId]}`}
+                  href={`/companies?featured=true&category=${
+                     fieldOfStudyId
+                        ? FieldOfStudyCategoryMap[fieldOfStudyId]
+                        : ""
+                  }`}
                   target="_blank"
                >
                   <Stack direction="row" spacing={0.5}>
