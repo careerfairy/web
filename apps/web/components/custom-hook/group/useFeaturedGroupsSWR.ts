@@ -50,13 +50,19 @@ export const useFeaturedGroupsSWR = (
 
          return querySnapshot.docs
             .map((doc) => doc.data())
-            ?.filter((group) =>
-               isLoggedIn
-                  ? group.featured?.targetAudience?.includes(
-                       FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id]
-                    )
-                  : true
-            )
+            ?.filter((group) => {
+               if (isLoggedIn && userData?.fieldOfStudy?.id) {
+                  return group.featured?.targetAudience?.includes(
+                     FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id]
+                  )
+               }
+
+               if (isLoggedIn && !userData?.fieldOfStudy?.id) {
+                  return false
+               }
+
+               return !isLoggedIn
+            })
             ?.sort(() => Math.random() - 0.5)
       },
       {
