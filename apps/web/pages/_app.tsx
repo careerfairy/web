@@ -8,23 +8,24 @@ import { Provider } from "react-redux"
 import { ReactReduxFirebaseProvider } from "react-redux-firebase"
 import { actionTypes, createFirestoreInstance } from "redux-firestore"
 import "styles.css"
+import { AuthProvider } from "../HOCs/AuthProvider"
 import Notifier from "../components/views/notifier"
 import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
 import firebaseApp, {
    AuthInstance,
-   firebaseConfig,
    FirestoreInstance,
    FunctionsInstance,
+   firebaseConfig,
 } from "../data/firebase/FirebaseInstance"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
-import { AuthProvider } from "../HOCs/AuthProvider"
 import { brandedLightTheme } from "../materialUI"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import { store, wrapper } from "../store"
 
 import { useTrackWebviewResumedCount } from "components/custom-hook/utils/useTrackWebviewResumed"
 import { useWebviewConsoleProxy } from "components/custom-hook/utils/useWebviewConsoleProxy"
+import FeaturedCompaniesTrackerProvider from "context/group/FeaturedCompaniesTrackerProvider"
 import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
 import { Fragment } from "react"
 import {
@@ -34,14 +35,14 @@ import {
    AuthProvider as ReactFireAuthProvider,
 } from "reactfire"
 import { MobileUtils } from "util/mobile.utils"
-import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
-import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
-import { useTrackPageViews } from "../components/custom-hook/utils/useTrackPageViews"
 import ErrorProvider from "../HOCs/ErrorProvider"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import TutorialProvider from "../HOCs/TutorialProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
 import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
+import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
+import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
+import { useTrackPageViews } from "../components/custom-hook/utils/useTrackPageViews"
 import "../util/FirebaseUtils"
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -114,7 +115,11 @@ function MyApp(props) {
                                           <ErrorProvider>
                                              <UserRewardsNotifications>
                                                 <SparksFeedTrackerProvider>
-                                                   <Component {...pageProps} />
+                                                   <FeaturedCompaniesTrackerProvider>
+                                                      <Component
+                                                         {...pageProps}
+                                                      />
+                                                   </FeaturedCompaniesTrackerProvider>
                                                 </SparksFeedTrackerProvider>
                                              </UserRewardsNotifications>
                                              <Notifier />

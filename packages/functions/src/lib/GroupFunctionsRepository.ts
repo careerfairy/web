@@ -19,6 +19,7 @@ import {
 } from "@careerfairy/shared-lib/groups/GroupRepository"
 import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
 import { createGroupStatsDoc } from "@careerfairy/shared-lib/groups/stats"
+import { GroupEventServer } from "@careerfairy/shared-lib/groups/telemetry"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
@@ -33,6 +34,7 @@ import { DateTime } from "luxon"
 import { ServerClient } from "postmark"
 import { Timestamp, auth } from "../api/firestoreAdmin"
 import type { FunctionsLogger } from "../util"
+import BigQueryCreateInsertService from "./bigQuery/BigQueryCreateInsertService"
 import {
    addGroupStatsOperations,
    addOperationsToDecrementGroupStatsOperations,
@@ -194,12 +196,22 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
       group: Group,
       client: ServerClient
    ): Promise<void>
+
+   trackGroupEvents(events: GroupEventServer[]): Promise<void>
 }
 
 export class GroupFunctionsRepository
    extends FirebaseGroupRepository
    implements IGroupFunctionsRepository
 {
+   private groupEventsHandler: BigQueryCreateInsertService<GroupEventServer>
+   setGroupEventsHandler(
+      handler: BigQueryCreateInsertService<GroupEventServer>
+   ) {
+      this.groupEventsHandler = handler
+      return this
+   }
+
    async getAllCompaniesFollowers(): Promise<CompanyFollowed[] | null> {
       const docs = await this.firestore
          .collectionGroup("companiesUserFollows")
@@ -696,6 +708,14 @@ export class GroupFunctionsRepository
             "Error sending sparks trial plan creation period near to end reminder:",
          companyName: group.universityName,
       })
+   }
+
+   async trackGroupEvents(groupEvents: GroupEventServer[]) {
+      if (!this.groupEventsHandler) {
+         throw new Error("Group events handler not set")
+      }
+
+      return this.groupEventsHandler.insertData(groupEvents)
    }
 }
 
