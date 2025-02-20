@@ -8,11 +8,13 @@ import {
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { Box, CircularProgress, Grid, Stack } from "@mui/material"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
+import { useAuth } from "HOCs/AuthProvider"
 import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
 import {
    FilterOptions,
    useCompanySearchAlgolia,
 } from "components/custom-hook/group/useGroupSearchAlgolia"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -89,6 +91,8 @@ const getQueryVariables = (query: ParsedUrlQuery): FilterCompanyOptions => {
 }
 
 const CompanySearch = () => {
+   const { userData } = useAuth()
+   const { userCountryCode } = useUserCountryCode()
    const [inputValue, setInputValue] = useState("")
    const [debouncedInputValue, setDebouncedInputValue] = useState("")
    const { push, query } = useRouter()
@@ -108,9 +112,10 @@ const CompanySearch = () => {
       )
    }, [companyCountries, companyIndustries, companySize, publicSparks])
 
-   const { data: featuredGroups } = useFeaturedGroupsSWR({
-      disabled: hasFilters,
-   })
+   const { data: featuredGroups } = useFeaturedGroupsSWR(
+      userData?.countryIsoCode || userCountryCode,
+      { disabled: hasFilters }
+   )
 
    useDebounce(
       () => {

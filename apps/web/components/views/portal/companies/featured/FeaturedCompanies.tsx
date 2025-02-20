@@ -65,7 +65,7 @@ export const FeaturedCompanies = () => {
    return (
       <FeaturedCompaniesComponent
          fieldOfStudyId={userData?.fieldOfStudy?.id}
-         countryCode={userData?.countryIsoCode || userCountryCode}
+         countryCode={userData?.countryIsoCode || userCountryCode || ""}
       />
    )
 }
