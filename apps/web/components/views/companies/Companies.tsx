@@ -1,6 +1,8 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Grid } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { FC, useMemo } from "react"
 import { CompanySearchResult } from "types/algolia"
 import { sxStyles } from "../../../types/commonTypes"
@@ -21,9 +23,14 @@ type Props = {
 }
 
 const Companies: FC<Props> = ({ companies, hasFilters }) => {
-   const { data: featuredGroups } = useFeaturedGroupsSWR({
-      disabled: hasFilters,
-   })
+   const { userData } = useAuth()
+   const { userCountryCode } = useUserCountryCode()
+   const { data: featuredGroups } = useFeaturedGroupsSWR(
+      userData?.countryIsoCode || userCountryCode,
+      {
+         disabled: hasFilters,
+      }
+   )
 
    const allCompanies = useMemo(() => {
       return (featuredGroups || []).concat((companies as Group[]) || [])
