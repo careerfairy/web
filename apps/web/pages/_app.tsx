@@ -23,6 +23,7 @@ import { brandedLightTheme } from "../materialUI"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import { store, wrapper } from "../store"
 
+import { useSubscribeToWebviewMessages } from "components/custom-hook/utils/useSubscribeToWebviewMessages"
 import { useTrackWebviewResumedCount } from "components/custom-hook/utils/useTrackWebviewResumed"
 import { useWebviewConsoleProxy } from "components/custom-hook/utils/useWebviewConsoleProxy"
 import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
@@ -81,6 +82,7 @@ function MyApp(props) {
    useTrackPageViews()
 
    const webviewResumedCount = useTrackWebviewResumedCount()
+   useSubscribeToWebviewMessages()
 
    return (
       // Only re-render the entire app if its a webview, and the webview has resumed

@@ -17,7 +17,13 @@ import * as Notifications from "expo-notifications"
 import * as ScreenOrientation from "expo-screen-orientation"
 import * as SecureStore from "expo-secure-store"
 import * as WebBrowser from "expo-web-browser"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, {
+   RefObject,
+   useCallback,
+   useEffect,
+   useRef,
+   useState,
+} from "react"
 import {
    AppState,
    AppStateStatus,
@@ -31,6 +37,7 @@ import {
 import { WebView } from "react-native-webview"
 import { customerIO } from "../utils/customerio-tracking"
 import { SECURE_STORE_KEYS } from "../utils/secure-store-constants"
+import { sendToWebView } from "../utils/webview.utils"
 
 const injectedCSS = `
     body :not(input):not(textarea) {
@@ -58,6 +65,7 @@ interface WebViewScreenProps {
       userPassword: string,
       customerioPushToken: string | null
    ) => void
+   webViewRef: RefObject<WebView>
 }
 
 type InterceptedRequest = {
@@ -112,13 +120,13 @@ const isLocalHost = (url: string) => {
    )
 }
 
-const WebViewComponent: React.FC<WebViewScreenProps> = ({
+const WebViewComponent = ({
    onTokenInjected,
    onLogout,
-}) => {
+   webViewRef,
+}: WebViewScreenProps) => {
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const [currentUrl, setCurrentUrl] = useState(baseUrl)
-   const webViewRef = useRef<WebView>(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
    const [refreshKey, setRefreshKey] = useState(0)
@@ -555,16 +563,11 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const refreshWebAppOnResume = () => {
-      if (!webViewRef.current) return
-
       // Send message to web app that the app has resumed from external link
-      const message: NativeEvent = {
+      sendToWebView(webViewRef, {
          type: MESSAGING_TYPE.WEBVIEW_RESUMED,
          data: null,
-      }
-      const messageString = JSON.stringify(message)
-
-      webViewRef.current.postMessage(messageString)
+      })
    }
 
    /**

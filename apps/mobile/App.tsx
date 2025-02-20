@@ -1,3 +1,4 @@
+import { MESSAGING_TYPE } from "@careerfairy/shared-lib/src/messaging"
 import {
    Poppins_400Regular,
    Poppins_600SemiBold,
@@ -8,7 +9,7 @@ import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {
    Image,
    Platform,
@@ -16,11 +17,13 @@ import {
    Text,
    TouchableOpacity,
 } from "react-native"
+import WebView from "react-native-webview"
 import WebViewComponent from "./components/WebView"
 import { app, auth, db } from "./firebase"
 import { customerIO } from "./utils/customerio-tracking"
 import { initializeFacebookTracking } from "./utils/facebook-tracking"
 import { SECURE_STORE_KEYS } from "./utils/secure-store-constants"
+import { sendToWebView } from "./utils/webview.utils"
 
 const styles: any = {
    image: {
@@ -62,6 +65,7 @@ const styles: any = {
 }
 
 export default function Native() {
+   const webViewRef = useRef<WebView>(null)
    const [isConnected, setIsConnected] = useState<boolean | null>(true)
    const [fontsLoaded] = useFonts({
       PoppinsRegular: Poppins_400Regular,
@@ -110,14 +114,32 @@ export default function Native() {
 
    const checkToken = async () => {
       const token = await SecureStore.getItemAsync(SECURE_STORE_KEYS.AUTH_TOKEN)
+
       if (token) {
-         const customerioPushToken = await SecureStore.getItemAsync(
+         const savedCustomerioPushToken = await SecureStore.getItemAsync(
             SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN
          )
 
-         if (!customerioPushToken) {
+         const currentPushToken = await customerIO.getPushToken()
+
+         if (
+            !savedCustomerioPushToken ||
+            currentPushToken !== savedCustomerioPushToken
+         ) {
+            console.log(
+               `🚀 ~ checkToken ~ currentPushToken: ${currentPushToken} customerioPushToken: ${savedCustomerioPushToken} are equal: ${
+                  currentPushToken === savedCustomerioPushToken
+               }`
+            )
             getPushToken()
          }
+      } else {
+         // If there is no token it means the user is not considered logged in on mobile
+         // So we need to log them out on web to ensure consistency
+         sendToWebView(webViewRef, {
+            type: MESSAGING_TYPE.LOGOUT_WEB_VIEW,
+            data: null,
+         })
       }
    }
 
@@ -127,7 +149,6 @@ export default function Native() {
 
          saveUserPushTokenToFirestore(customerioPushToken)
       } catch (e) {
-         alert(`Error getting push token: ${e}`)
          console.log(e)
       }
    }
@@ -144,6 +165,8 @@ export default function Native() {
          }
 
          const status = await customerIO.showPromptForPushNotifications()
+
+         console.log(`🚀 ~ status from prompt ~ status: ${status}`)
 
          if (status === "GRANTED") {
             getTokenAndSave()
@@ -269,6 +292,10 @@ export default function Native() {
    }
 
    return (
-      <WebViewComponent onTokenInjected={getPushToken} onLogout={onLogout} />
+      <WebViewComponent
+         onTokenInjected={getPushToken}
+         onLogout={onLogout}
+         webViewRef={webViewRef}
+      />
    )
 }
