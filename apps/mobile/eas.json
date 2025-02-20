@@ -25,10 +25,7 @@
       },
       "development-isolated": {
          "extends": "development",
-         "developmentClient": false,
-         "env": {
-            "EAS_BUILD_DISABLE_COCOAPODS_CACHE": "1"
-         }
+         "developmentClient": false
       }
    },
    "submit": {
