@@ -17,10 +17,13 @@ const styles = sxStyles({
 
 type Props = {
    companies?: (Group | CompanySearchResult)[]
+   hasFilters?: boolean
 }
 
-const Companies: FC<Props> = ({ companies }) => {
-   const { data: featuredGroups } = useFeaturedGroupsSWR()
+const Companies: FC<Props> = ({ companies, hasFilters }) => {
+   const { data: featuredGroups } = useFeaturedGroupsSWR({
+      disabled: hasFilters,
+   })
 
    const allCompanies = useMemo(() => {
       return (featuredGroups || []).concat((companies as Group[]) || [])

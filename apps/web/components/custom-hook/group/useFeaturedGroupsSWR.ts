@@ -13,7 +13,7 @@ type Options = {
    /**
     * Prevents the hook from fetching the sparks
     **/
-   // disabled?: boolean
+   disabled?: boolean
 }
 
 export const useFeaturedGroupsSWR = (options?: Options) => {
@@ -22,10 +22,13 @@ export const useFeaturedGroupsSWR = (options?: Options) => {
    const { totalItems = 4 } = options || {}
 
    const disabled =
+      options?.disabled ||
       !userData?.countryIsoCode ||
       !userData?.fieldOfStudy?.id ||
       (userData?.fieldOfStudy?.id &&
          !FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id])
+
+   console.log("🚀 ~ useFeaturedGroupsSWR ~ disabled:", disabled)
 
    return useSWR(
       disabled ? null : [`get-featured-groups-${userData.authId}`, totalItems],
