@@ -58,16 +58,15 @@ export const FeaturedCompanies = () => {
 
    // Possibly return null if user also does not have a field of study
    // Checking field of study, as the copy of the header is based on the field of study
-   if (!contentPlacementV1 || !userData || !userData.fieldOfStudy?.id)
-      return null
+   if (!contentPlacementV1) return null
 
    return (
-      <FeaturedCompaniesComponent fieldOfStudyId={userData.fieldOfStudy.id} />
+      <FeaturedCompaniesComponent fieldOfStudyId={userData?.fieldOfStudy?.id} />
    )
 }
 
 type Props = {
-   fieldOfStudyId: string
+   fieldOfStudyId?: string
 }
 
 const FeaturedCompaniesComponent = ({ fieldOfStudyId }: Props) => {
@@ -91,7 +90,11 @@ const FeaturedCompaniesComponent = ({ fieldOfStudyId }: Props) => {
       <Box sx={[styles.root, isMobile ? styles.mobileRoot : null]}>
          <Stack spacing={2}>
             <FeaturedCompaniesHeader
-               category={FieldOfStudyCategoryMap[fieldOfStudyId]}
+               category={
+                  fieldOfStudyId
+                     ? FieldOfStudyCategoryMap[fieldOfStudyId]
+                     : null
+               }
                onPreviousClick={onClickPrev}
                onNextClick={onClickNext}
             />

@@ -6,6 +6,7 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
+import useUserCountryCode from "../useUserCountryCode"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 type Options = {
@@ -17,30 +18,33 @@ type Options = {
 }
 
 export const useFeaturedGroupsSWR = (options?: Options) => {
-   const { userData } = useAuth()
+   const { userData, isLoggedIn } = useAuth()
+   const { userCountryCode } = useUserCountryCode()
+
+   const countryCode = !isLoggedIn ? userCountryCode : userData?.countryIsoCode
 
    const { totalItems = 4 } = options || {}
 
    const disabled =
       options?.disabled ||
-      !userData?.countryIsoCode ||
-      !userData?.fieldOfStudy?.id ||
-      (userData?.fieldOfStudy?.id &&
-         !FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id])
-
-   console.log("🚀 ~ useFeaturedGroupsSWR ~ disabled:", disabled)
+      !countryCode ||
+      (isLoggedIn &&
+         (!userData?.fieldOfStudy?.id ||
+            (userData?.fieldOfStudy?.id &&
+               !FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id])))
 
    return useSWR(
-      disabled ? null : [`get-featured-groups-${userData.authId}`, totalItems],
+      disabled
+         ? null
+         : [
+              `get-featured-groups-${countryCode}-${userData?.authId}`,
+              totalItems,
+           ],
       async () => {
          const querySnapshot = await getDocs(
             query(
                collection(FirestoreInstance, "careerCenterData"),
-               where(
-                  "featured.targetCountries",
-                  "array-contains",
-                  userData?.countryIsoCode
-               ),
+               where("featured.targetCountries", "array-contains", countryCode),
                ...(totalItems ? [limit(totalItems)] : [])
             ).withConverter(createGenericConverter<Group>())
          )
@@ -48,9 +52,11 @@ export const useFeaturedGroupsSWR = (options?: Options) => {
          return querySnapshot.docs
             .map((doc) => doc.data())
             ?.filter((group) =>
-               group.featured?.targetAudience?.includes(
-                  FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id]
-               )
+               isLoggedIn
+                  ? group.featured?.targetAudience?.includes(
+                       FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id]
+                    )
+                  : true
             )
             ?.sort(() => Math.random() - 0.5)
       },
