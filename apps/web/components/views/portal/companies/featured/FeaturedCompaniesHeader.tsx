@@ -78,14 +78,14 @@ export const FeaturedCompaniesHeader = ({
             sx={{ color: (theme) => theme.brand.white[100] }}
          >
             hiring
-            {" "
-               .concat(FieldOfStudyCategories[category].name)
-               .concat(" students")}
+            {" ".concat(
+               category
+                  ? FieldOfStudyCategories[category].name.concat(" students")
+                  : " right now"
+            )}
          </Typography>
       </Typography>
    )
-
-   if (!category) return null
 
    return (
       <ConditionalWrapper condition={!isMobile} fallback={<MobileHeader />}>

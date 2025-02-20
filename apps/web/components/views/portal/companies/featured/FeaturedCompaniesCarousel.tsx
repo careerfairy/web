@@ -8,6 +8,7 @@ import { useUserFollowingCompanies } from "components/custom-hook/user/useUserFo
 import FeaturedCompanySparksBadge from "components/views/common/icons/FeaturedCompanySparksBadge"
 import { groupRepo } from "data/RepositoryInstances"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerCompanyEvent, dataLayerEvent } from "util/analyticsUtils"
@@ -131,7 +132,8 @@ export const FeaturedCompanyCard = ({
    company,
    following,
 }: FeaturedCompanyCardProps) => {
-   const { userData } = useAuth()
+   const router = useRouter()
+   const { userData, isLoggedIn } = useAuth()
    const { data: group } = useGroup(company.id, true)
 
    const industries = company.companyIndustries
@@ -139,10 +141,7 @@ export const FeaturedCompanyCard = ({
       .join(", ")
 
    const toggleFollow = useCallback(
-      async (e: React.MouseEvent, groupId: string) => {
-         e.stopPropagation()
-         e.preventDefault()
-
+      async (groupId: string) => {
          if (following) {
             await groupRepo.unfollowCompany(userData.id, groupId)
          } else {
@@ -196,7 +195,19 @@ export const FeaturedCompanyCard = ({
                   styles.followButton,
                   following ? styles.followingButton : null,
                ]}
-               onClick={(e) => toggleFollow(e, company.id)}
+               onClick={(e) => {
+                  e.stopPropagation()
+                  e.preventDefault()
+
+                  if (isLoggedIn) {
+                     toggleFollow(company.id)
+                  } else {
+                     router.push({
+                        pathname: "/login",
+                        query: `absolutePath=${router.asPath}`,
+                     })
+                  }
+               }}
             >
                <Typography
                   variant="small"
