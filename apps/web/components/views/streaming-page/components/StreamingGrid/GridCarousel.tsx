@@ -1,9 +1,3 @@
-import { useState, useEffect, useCallback, useMemo, ReactNode } from "react"
-import useEmblaCarousel, {
-   EmblaCarouselType,
-   EmblaOptionsType,
-} from "embla-carousel-react"
-import { combineStyles, sxStyles } from "types/commonTypes"
 import {
    Box,
    ButtonBase,
@@ -13,14 +7,20 @@ import {
    IconButton,
    Stack,
 } from "@mui/material"
+import useEmblaCarousel, {
+   EmblaCarouselType,
+   EmblaOptionsType,
+} from "embla-carousel-react"
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
-import { ChevronLeft, ChevronRight } from "react-feather"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+import { ChevronLeft, ChevronRight } from "react-feather"
 
 const SLIDE_SIZE = "100%"
 
 export const MOBILE_SPACING = 0.75
-export const DESKTOP_SPACING = 2
+export const DESKTOP_SPACING = 1
 
 const styles = sxStyles({
    root: {
