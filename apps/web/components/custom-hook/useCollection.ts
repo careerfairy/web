@@ -6,7 +6,6 @@ import { useEffect, useState } from "react"
 import { Interest } from "types/interests"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import { Identifiable } from "../../types/commonTypes"
-import { useFirestoreDocument } from "./utils/useFirestoreDocument"
 
 /**
  * Fetch a Firestore collection
@@ -91,20 +90,6 @@ export const useFieldsOfStudy = (realtime: boolean = false) => {
       return a.name.localeCompare(b.name)
    })
    return { data: sortedData, error, isLoading }
-}
-
-export const useFieldOfStudyById = (
-   fieldOfStudyId: string,
-   suspense: boolean = true
-) => {
-   return useFirestoreDocument<FieldOfStudy>(
-      "fieldsOfStudy",
-      [fieldOfStudyId],
-      {
-         idField: "id",
-         suspense: suspense,
-      }
-   )
 }
 
 // use university countries
