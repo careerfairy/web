@@ -99,7 +99,18 @@ const CompanySearch = () => {
       rootMargin: "0px 0px 200px 0px",
    })
 
-   const { data: featuredGroups } = useFeaturedGroupsSWR()
+   const hasFilters = useMemo(() => {
+      return (
+         companyCountries?.length > 0 ||
+         companyIndustries?.length > 0 ||
+         companySize?.length > 0 ||
+         publicSparks
+      )
+   }, [companyCountries, companyIndustries, companySize, publicSparks])
+
+   const { data: featuredGroups } = useFeaturedGroupsSWR({
+      disabled: hasFilters,
+   })
 
    useDebounce(
       () => {
@@ -244,7 +255,7 @@ const CompanySearch = () => {
             </Box>
          </Stack>
          <Grid item xs={12}>
-            <Companies companies={infiniteCompanies} />
+            <Companies companies={infiniteCompanies} hasFilters={hasFilters} />
          </Grid>
 
          {Boolean(isValidating) && (
