@@ -27,7 +27,7 @@ export const MiddleContentLayout = ({ children, sxProps }: Props) => {
          sx={combineStyles(styles.root, styles.fullHeight, sxProps)}
          maxWidth="xl"
       >
-         <Stack sx={[styles.fullHeight, styles.inner]} spacing={0.75}>
+         <Stack sx={[styles.fullHeight, styles.inner]} spacing={1.5}>
             {children}
          </Stack>
       </Container>

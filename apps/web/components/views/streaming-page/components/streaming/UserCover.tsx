@@ -1,12 +1,13 @@
 import { Avatar, Box, Typography, alpha } from "@mui/material"
+import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import Image from "next/image"
+import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { FloatingContent } from "./VideoTrackWrapper"
-import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 
 const MOBILE_AVATAR_SIZE = 65
 const DESKTOP_AVATAR_SIZE = 100
-
+const DESKTOP_SPOTLIGHT_AVATAR_SIZE = 75
 const styles = sxStyles({
    root: {
       display: "flex",
@@ -21,6 +22,16 @@ const styles = sxStyles({
       height: {
          xs: MOBILE_AVATAR_SIZE,
          tablet: DESKTOP_AVATAR_SIZE,
+      },
+   },
+   spotlightImage: {
+      width: {
+         xs: MOBILE_AVATAR_SIZE,
+         tablet: DESKTOP_SPOTLIGHT_AVATAR_SIZE,
+      },
+      height: {
+         xs: MOBILE_AVATAR_SIZE,
+         tablet: DESKTOP_SPOTLIGHT_AVATAR_SIZE,
       },
    },
    border: {
@@ -49,10 +60,14 @@ export interface UserCoverProps {
  */
 export const UserCover = ({ streamerDetails }: UserCoverProps) => {
    const { avatarUrl, firstName, lastName } = streamerDetails
+   const isSpotlightMode = useIsSpotlightMode()
+
    return (
       <FloatingContent sx={styles.root}>
          <Box sx={styles.border}>
-            <Avatar sx={styles.image}>
+            <Avatar
+               sx={[styles.image, isSpotlightMode && styles.spotlightImage]}
+            >
                {avatarUrl ? (
                   <Image
                      alt="cover"

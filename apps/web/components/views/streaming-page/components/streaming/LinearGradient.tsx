@@ -1,6 +1,6 @@
-import React, { ReactNode, createContext, useContext, useMemo } from "react"
-import { FloatingContent } from "./VideoTrackWrapper"
+import { ReactNode, createContext, useContext, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
+import { FloatingContent } from "./VideoTrackWrapper"
 
 const styles = sxStyles({
    root: {

@@ -69,7 +69,7 @@ export const DetailsOverlay = ({
                      </Typography>
                   )}
                   {Boolean(streamerDetails.role) && (
-                     <Typography sx={styles.role} variant="small">
+                     <Typography sx={styles.role} variant="xsmall">
                         {streamerDetails.role}
                      </Typography>
                   )}
@@ -77,12 +77,13 @@ export const DetailsOverlay = ({
                {Boolean(showIcons) && (
                   <Stack direction="row" spacing={1.5}>
                      <Grow in={!micActive} unmountOnExit>
-                        <Box sx={styles.micOff} component={MicOff} />
+                        <Box sx={styles.micOff} component={MicOff} size={20} />
                      </Grow>
                      <Box
                         component={Info}
                         onClick={handleDialogOpen}
                         sx={styles.detailsButton}
+                        size={20}
                      />
                   </Stack>
                )}
