@@ -673,6 +673,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const contextProps = useMemo(() => {
          return {
             onClick: () => {
+               if (!props.event?.id) {
+                  return
+               }
+
                if (isInTalentGuidePage) {
                   dispatch(
                      trackLevelsLivestreamOpened({
@@ -689,8 +693,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       }, [
          isInTalentGuidePage,
          livestreamDialogContext,
-         props.event.id,
-         props.event.title,
+         props.event?.id,
+         props.event?.title,
          dispatch,
       ])
 
