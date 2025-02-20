@@ -177,7 +177,11 @@ export default function Native() {
          )
 
          if (userId && userPassword) {
-            await signInWithEmailAndPassword(auth, userId, userPassword)
+            const credentials = await signInWithEmailAndPassword(
+               auth,
+               userId,
+               userPassword
+            )
             if (auth.currentUser?.email) {
                const userDocRef = doc(db, "userData", auth.currentUser.email)
 
@@ -190,6 +194,8 @@ export default function Native() {
                SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN,
                customerioPushToken
             )
+
+            await customerIO.identifyCustomer(credentials.user.uid)
          }
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
