@@ -24,10 +24,8 @@ import {
    TransformedSpark,
 } from "@careerfairy/shared-lib/sparks/search"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import {
-   generateFeaturedCompanyPriority,
-   removeDuplicates,
-} from "@careerfairy/shared-lib/utils"
+import { removeDuplicates } from "@careerfairy/shared-lib/utils"
+import { generateFeaturedCompanyPriority } from "@careerfairy/shared-lib/utils/groups"
 import { Index } from "./searchIndexGenerator"
 
 const livestreamIndex = {
