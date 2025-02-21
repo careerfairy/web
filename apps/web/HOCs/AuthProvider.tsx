@@ -11,6 +11,7 @@ import {
 import * as Sentry from "@sentry/nextjs"
 import Loader from "components/views/loader/Loader"
 import { userRepo } from "data/RepositoryInstances"
+import { auth as authInstance } from "data/firebase/FirebaseInstance"
 import { clearFirestoreCache } from "data/util/authUtil"
 import { useRouter } from "next/router"
 import nookies from "nookies"
@@ -165,12 +166,10 @@ const AuthProvider = ({ children }) => {
    }, [userData])
 
    const refetchClaims = useCallback(async () => {
-      if (!firebaseService.auth.currentUser) return null
-      const token = await firebaseService.auth.currentUser.getIdTokenResult(
-         true
-      )
+      if (!authInstance.currentUser) return null
+      const token = await authInstance.currentUser.getIdTokenResult(true)
       setClaims(token.claims || null)
-   }, [firebaseService.auth.currentUser])
+   }, [])
 
    useEffect(() => {
       // get claims from auth
@@ -210,20 +209,20 @@ const AuthProvider = ({ children }) => {
     * Listen for when user actually logs out
     */
    useEffect(() => {
-      return firebaseService.auth.onIdTokenChanged(async (user) => {
+      return authInstance.onIdTokenChanged(async (user) => {
          if (!user && auth.uid) {
             // If previous user was signed in, send logout event
             dataLayerEvent(AnalyticsEvents.Logout)
             analyticsResetUser()
          }
       })
-   }, [auth.uid, firebaseService.auth])
+   }, [auth.uid])
 
    /**
     * Listen for auth changes and update claims
     */
    useEffect(() => {
-      return firebaseService.auth.onAuthStateChanged(async (user) => {
+      return authInstance.onAuthStateChanged(async (user) => {
          if (!user) {
             setIsLoggedIn(false)
             setIsLoggedOut(true)
@@ -250,7 +249,7 @@ const AuthProvider = ({ children }) => {
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
       })
-   }, [firebaseService.auth, auth.uid])
+   }, [])
 
    /**
     * Update user activity when there are new claims
