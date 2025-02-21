@@ -10,11 +10,12 @@ import { signInWithCustomToken } from "firebase/auth"
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
 import React, { useEffect, useRef, useState } from "react"
 import {
+   Button,
    Image,
    Platform,
    SafeAreaView,
    Text,
-   TouchableOpacity,
+   TouchableOpacity
 } from "react-native"
 import WebView from "react-native-webview"
 import WebViewComponent from "./components/WebView"
@@ -23,6 +24,9 @@ import { customerIO } from "./utils/customerio-tracking"
 import { initializeFacebookTracking } from "./utils/facebook-tracking"
 import { handleVerifyToken } from "./utils/firebase"
 import { SECURE_STORE_KEYS } from "./utils/secure-store-constants"
+import { initSentry } from "./utils/sentry"
+
+const sentry = initSentry()
 
 const styles: any = {
    image: {
@@ -63,7 +67,7 @@ const styles: any = {
    },
 }
 
-export default function Native() {
+function Native() {
    const webViewRef = useRef<WebView>(null)
    const [isConnected, setIsConnected] = useState<boolean | null>(true)
    const [fontsLoaded] = useFonts({
@@ -170,6 +174,7 @@ export default function Native() {
    ) => {
       try {
          return resetFireStoreData(idToken, customerioPushToken)
+         sentry.setUser(null)
       } catch (e) {
          console.log("Error with resetting firestore data", e)
       }
@@ -285,10 +290,20 @@ export default function Native() {
    }
 
    return (
+      <>
+      <Button
+         title="Press me"
+         onPress={() => {
+            throw new Error("Hello, again, Sentry!")
+         }}
+      />
       <WebViewComponent
          onTokenInjected={getPushToken}
          onLogout={onLogout}
-         webViewRef={webViewRef}
-      />
+            webViewRef={webViewRef}
+         />
+      </>
    )
 }
+
+export default sentry.wrap(Native)
