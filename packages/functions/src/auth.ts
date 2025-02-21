@@ -651,8 +651,11 @@ export const verifyToken = functions
    .https.onCall(async (data) => {
       try {
          const { idToken } = data
+         functions.logger.info("starting verifyToken", idToken)
          const decodedToken = await auth.verifyIdToken(idToken)
+         functions.logger.info("decoded token", decodedToken)
          const customToken = await auth.createCustomToken(decodedToken.uid)
+         functions.logger.info("customToken", customToken)
 
          return {
             uid: decodedToken.uid,
