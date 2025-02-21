@@ -144,7 +144,12 @@ export const livestreamRegistrationConfirmationEmail = functions
          .get()
       const livestream = livestreamDoc.data() as LivestreamEvent
 
-      const group = await groupRepo.getGroupById(livestream.groupIds.at(0))
+      const eventGroups = await groupRepo.getGroupsByIds(livestream.groupIds)
+
+      const groupWithoutUniCode = eventGroups.find(
+         (group) => !group.universityCode
+      )
+      const group = groupWithoutUniCode ?? eventGroups.at(0)
 
       const livestreamSpeakers = livestream.speakers ?? []
       const livestreamJobs = livestream.hasJobs
