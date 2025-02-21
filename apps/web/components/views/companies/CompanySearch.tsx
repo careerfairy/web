@@ -105,12 +105,19 @@ const CompanySearch = () => {
 
    const hasFilters = useMemo(() => {
       return (
+         inputValue?.length > 0 ||
          companyCountries?.length > 0 ||
          companyIndustries?.length > 0 ||
          companySize?.length > 0 ||
          publicSparks
       )
-   }, [companyCountries, companyIndustries, companySize, publicSparks])
+   }, [
+      companyCountries,
+      companyIndustries,
+      companySize,
+      publicSparks,
+      inputValue,
+   ])
 
    const { data: featuredGroups } = useFeaturedGroupsSWR(
       userData?.countryIsoCode || userCountryCode,

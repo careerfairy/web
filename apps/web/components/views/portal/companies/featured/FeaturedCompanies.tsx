@@ -56,7 +56,7 @@ const carouselEmblaOptions: EmblaOptionsType = {
 
 export const FeaturedCompanies = () => {
    return (
-      <SuspenseWithBoundary>
+      <SuspenseWithBoundary fallback={<></>}>
          <FeaturedCompaniesView />
       </SuspenseWithBoundary>
    )

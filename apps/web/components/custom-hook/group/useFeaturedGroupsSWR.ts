@@ -63,7 +63,6 @@ export const useFeaturedGroupsSWR = (
 
                return !isLoggedIn
             })
-            ?.sort(() => Math.random() - 0.5)
       },
       {
          ...reducedRemoteCallsOptions,

@@ -80,10 +80,6 @@ export const fetchCompanies = functions.region(config.region).https.onCall(
    )
 )
 
-// functions
-// .region(config.region)
-// .runWith(runtimeSettings)
-// .https.onCall(
 export const syncFeaturedCompaniesData = functions
    .region(config.region)
    .runWith({
@@ -91,10 +87,9 @@ export const syncFeaturedCompaniesData = functions
       timeoutSeconds: 540,
       memory: "8GB",
    })
-   // .pubsub.schedule("every 30 minutes")
-   // .timeZone("Europe/Zurich")
-   // .onRun(async () => {
-   .https.onRequest(async (req, res) => {
+   .pubsub.schedule("every 30 minutes")
+   .timeZone("Europe/Zurich")
+   .onRun(async () => {
       const bulkWriter = firestore.bulkWriter()
       // Get all companies
       const groups = await groupRepo.fetchCompanies({})
@@ -170,6 +165,4 @@ export const syncFeaturedCompaniesData = functions
 
          await bulkWriter.flush()
       }
-
-      res.status(200).send()
    })
