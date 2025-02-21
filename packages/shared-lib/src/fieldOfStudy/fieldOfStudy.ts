@@ -1,7 +1,8 @@
-import { Identifiable } from "../commonTypes"
+import { Identifiable, OptionGroup } from "../commonTypes"
 
 export type FieldOfStudy = Identifiable & {
    name: string
+   category?: FieldOfStudyCategory
 }
 
 export type LevelOfStudy = FieldOfStudy
@@ -11,6 +12,20 @@ export const levelsOfStudyOrderMap: Record<string, number> = {
    master: 2,
    phd: 3,
 }
+
+export type FieldOfStudyCategory = "stem" | "business_plus"
+
+export const FieldOfStudyCategories: Record<FieldOfStudyCategory, OptionGroup> =
+   {
+      stem: {
+         id: "stem",
+         name: "STEM",
+      },
+      business_plus: {
+         id: "business_plus",
+         name: "Business+",
+      },
+   }
 
 export const mapPartnershipFieldsOfStudy = (
    partnerFieldOfStudy: string

@@ -2,6 +2,7 @@ import firebase from "firebase/compat/app"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { MergeExtraRequiredData } from "../ats/merge/MergeResponseTypes"
 import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
+import { FieldOfStudyCategory } from "../fieldOfStudy"
 import { UserData } from "../users"
 import { dynamicSort } from "../utils"
 
@@ -69,12 +70,21 @@ export interface Group extends Identifiable {
     * */
    plan?: GroupPlan
 
+   featured?: FeaturedGroup
+
    /**
     * Deprecated
     * */
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
+}
+
+type FeaturedGroup = {
+   // country iso code
+   targetCountries: string[]
+   // category, i.e: 'stem' or 'business_plus'
+   targetAudience: FieldOfStudyCategory[]
 }
 
 /**
