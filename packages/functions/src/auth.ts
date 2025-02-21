@@ -648,25 +648,23 @@ const getRandomInt = (max: number) => {
 
 export const verifyToken = functions
    .region(config.region)
-   .https.onCall(async (data) => {
+   .https.onRequest(async (req, res) => {
       try {
-         const { idToken } = data
+         const { idToken } = req.body
          functions.logger.info("starting verifyToken", idToken)
          const decodedToken = await auth.verifyIdToken(idToken)
          functions.logger.info("decoded token", decodedToken)
          const customToken = await auth.createCustomToken(decodedToken.uid)
          functions.logger.info("customToken", customToken)
 
-         return {
+         res.json({
             uid: decodedToken.uid,
             email: decodedToken.email,
             claims: decodedToken.customClaims || {},
             customToken,
-         }
+         })
       } catch (error) {
-         throw new functions.https.HttpsError(
-            "unauthenticated",
-            "Invalid token"
-         )
+         functions.logger.info("error verifying token", error)
+         res.status(401).json(JSON.stringify(error))
       }
    })

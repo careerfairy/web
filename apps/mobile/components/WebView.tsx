@@ -264,7 +264,6 @@ const WebViewComponent = ({
 
          const { type, data } = receivedData as NativeEvent
 
-         console.debug(`~ handleMessage ~ type: ${type} ~ data: ${data}`)
          switch (type) {
             case MESSAGING_TYPE.CONSOLE:
                return handleWebAppConsoleMessage(data)

@@ -22,6 +22,10 @@ class CustomerIOService {
       return CustomerIOService.instance
    }
 
+   /**
+    * Initializes the customerio sdk
+    * @returns A promise that resolves when the customerio sdk is initialized
+    */
    async initialize(): Promise<void> {
       if (CustomerIO.isInitialized()) return
 
@@ -47,6 +51,11 @@ class CustomerIOService {
       return CustomerIO.initialize(config)
    }
 
+   /**
+    * Associates a user with their customerio user, all previous anonymous tracked events/screens before identifying will be associated with the user
+    * @param userAuthId - The user's auth id
+    * @returns A promise that resolves when the customer is identified
+    */
    async identifyCustomer(userAuthId: string): Promise<void> {
       if (!CustomerIO.isInitialized()) {
          await this.initialize()
@@ -57,6 +66,12 @@ class CustomerIOService {
       })
    }
 
+   /**
+    * Tracks an event for customerio in the context of a Mobile App not a web app
+    * @param event - The event to track
+    * @param data - The data to track
+    * @returns A promise that resolves when the event is tracked
+    */
    async trackEvent(event: string, data: Record<string, any>): Promise<void> {
       if (!CustomerIO.isInitialized()) {
          await this.initialize()
@@ -65,6 +80,13 @@ class CustomerIOService {
       return CustomerIO.track(event, data)
    }
 
+   /**
+    * Tracks a screen for customerio in the context of a Mobile App not a web app
+    * Screen is the mobile alternative for page in customerio
+    * @param screenName - The screen name to track
+    * @param data - The data to track
+    * @returns A promise that resolves when the screen is tracked
+    */
    async trackScreen(
       screenName: string,
       data: Record<string, any>
@@ -76,6 +98,9 @@ class CustomerIOService {
       return CustomerIO.screen(screenName, data)
    }
 
+   /**
+    * Clears the identity of the customer all future events will be tracked as an anonymous user
+    */
    async clearCustomer(): Promise<void> {
       if (!CustomerIO.isInitialized()) {
          await this.initialize()
@@ -84,6 +109,10 @@ class CustomerIOService {
       return CustomerIO.clearIdentify()
    }
 
+   /**
+    * Gets the customerio generated push token for the current device
+    * @returns A promise that resolves with the push token
+    */
    async getPushToken(): Promise<string> {
       if (!CustomerIO.isInitialized()) {
          await this.initialize()
@@ -92,6 +121,10 @@ class CustomerIOService {
       return CustomerIO.pushMessaging.getRegisteredDeviceToken()
    }
 
+   /**
+    * Gets the current push permission status for the current device
+    * @returns A promise that resolves with the current push permission status
+    */
    async getPushPermissionStatus() {
       if (!CustomerIO.isInitialized()) {
          await this.initialize()
@@ -100,6 +133,10 @@ class CustomerIOService {
       return CustomerIO.pushMessaging.getPushPermissionStatus()
    }
 
+   /**
+    * Requests push permission on the user's device
+    * @returns A promise that resolves with the push permission status
+    */
    async showPromptForPushNotifications() {
       if (!CustomerIO.isInitialized()) {
          await this.initialize()
