@@ -9,6 +9,7 @@ export type FlagKeys =
    | "mentorsV1"
    | "talentProfileV1"
    | "levelsV1"
+   | "contentPlacementV1"
 export type FeatureFlag = {
    /**
     * Initial state for the flag, usually disabled (false)
