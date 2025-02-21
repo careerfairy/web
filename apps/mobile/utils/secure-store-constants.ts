@@ -1,7 +1,5 @@
 export const SECURE_STORE_KEYS = {
-   AUTH_TOKEN: "authToken",
-   USER_ID: "userId",
-   USER_PASSWORD: "userPassword",
+   FIREBASE_ID_TOKEN: "firebaseIdToken",
    EXPO_PUSH_TOKEN: "pushToken",
    CUSTOMERIO_PUSH_TOKEN: "customerioPushToken",
 } as const

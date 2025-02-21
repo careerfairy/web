@@ -645,3 +645,25 @@ const getRandomInt = (max: number) => {
       return variable
    }
 }
+
+export const verifyToken = functions
+   .region(config.region)
+   .https.onCall(async (data) => {
+      try {
+         const { idToken } = data
+         const decodedToken = await auth.verifyIdToken(idToken)
+         const customToken = await auth.createCustomToken(decodedToken.uid)
+
+         return {
+            uid: decodedToken.uid,
+            email: decodedToken.email,
+            claims: decodedToken.customClaims || {},
+            customToken,
+         }
+      } catch (error) {
+         throw new functions.https.HttpsError(
+            "unauthenticated",
+            "Invalid token"
+         )
+      }
+   })

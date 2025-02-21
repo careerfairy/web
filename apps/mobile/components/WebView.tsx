@@ -5,10 +5,10 @@ import {
    MESSAGING_TYPE,
    NativeEvent,
    NativeEventStringified,
+   ON_AUTH_MOUNTED,
    PERMISSIONS,
    TRACK_EVENT,
    TRACK_SCREEN,
-   USER_AUTH,
 } from "@careerfairy/shared-lib/src/messaging"
 import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
 import { Audio } from "expo-av"
@@ -60,11 +60,7 @@ Notifications.setNotificationHandler({
 
 interface WebViewScreenProps {
    onTokenInjected: () => void
-   onLogout: (
-      userId: string,
-      userPassword: string,
-      customerioPushToken: string | null
-   ) => void
+   onLogout: (idToken: string, customerioPushToken: string | null) => void
    webViewRef: RefObject<WebView>
 }
 
@@ -272,8 +268,6 @@ const WebViewComponent = ({
          switch (type) {
             case MESSAGING_TYPE.CONSOLE:
                return handleWebAppConsoleMessage(data)
-            case MESSAGING_TYPE.USER_AUTH:
-               return handleUserAuth(data)
             case MESSAGING_TYPE.HAPTIC:
                return handleHaptic(data)
             case MESSAGING_TYPE.PERMISSIONS:
@@ -288,11 +282,26 @@ const WebViewComponent = ({
                return handleTrackEvent(data)
             case MESSAGING_TYPE.TRACK_SCREEN:
                return handleTrackScreen(data)
+            case MESSAGING_TYPE.ON_AUTH_MOUNTED:
+               return handleOnAuthMounted(data)
             default:
                break
          }
       } catch (error) {
          console.error("Failed to parse message from WebView:", error)
+      }
+   }
+
+   const handleOnAuthMounted = async (data: ON_AUTH_MOUNTED) => {
+      try {
+         await SecureStore.setItemAsync(
+            SECURE_STORE_KEYS.FIREBASE_ID_TOKEN,
+            data.idToken
+         )
+
+         onTokenInjected()
+      } catch (error) {
+         console.error("Failed to store auth token:", error)
       }
    }
 
@@ -328,22 +337,6 @@ const WebViewComponent = ({
       }
    }
 
-   const handleUserAuth = async (data: USER_AUTH) => {
-      try {
-         await Promise.all([
-            SecureStore.setItemAsync(SECURE_STORE_KEYS.AUTH_TOKEN, data.token),
-            SecureStore.setItemAsync(SECURE_STORE_KEYS.USER_ID, data.userId),
-            SecureStore.setItemAsync(
-               SECURE_STORE_KEYS.USER_PASSWORD,
-               data.userPassword
-            ),
-         ])
-         onTokenInjected()
-      } catch (error) {
-         console.error("Failed to store auth data:", error)
-      }
-   }
-
    const handleHaptic = (data: HAPTIC) => {
       // Handling the haptic on mobile device
    }
@@ -352,22 +345,17 @@ const WebViewComponent = ({
 
    const handleLogout = async () => {
       try {
-         const userId = await SecureStore.getItemAsync(
-            SECURE_STORE_KEYS.USER_ID
-         )
-         const userPassword = await SecureStore.getItemAsync(
-            SECURE_STORE_KEYS.USER_PASSWORD
+         const idToken = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.FIREBASE_ID_TOKEN
          )
 
          const customerioPushToken = await SecureStore.getItemAsync(
             SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN
          )
-         if (userId && userPassword) {
-            onLogout(userId, userPassword, customerioPushToken)
+         if (idToken) {
+            onLogout(idToken, customerioPushToken)
          }
-         await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.AUTH_TOKEN)
-         await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.USER_ID)
-         await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.USER_PASSWORD)
+         await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.FIREBASE_ID_TOKEN)
       } catch (error) {
          console.log(error)
       }

@@ -5,7 +5,6 @@ export enum MESSAGING_TYPE {
     * ------------------------------------------------------------
     */
 
-   "USER_AUTH" = "USER_AUTH",
    "HAPTIC" = "HAPTIC",
    "PERMISSIONS" = "PERMISSIONS",
    "LOGOUT" = "LOGOUT",
@@ -14,6 +13,7 @@ export enum MESSAGING_TYPE {
    "TRACK_SCREEN" = "TRACK_SCREEN",
    "CLEAR_CUSTOMER" = "CLEAR_CUSTOMER",
    "IDENTIFY_CUSTOMER" = "IDENTIFY_CUSTOMER",
+   "ON_AUTH_MOUNTED" = "ON_AUTH_MOUNTED",
 
    /**
     * ------------------------------------------------------------
@@ -28,10 +28,8 @@ export enum MESSAGING_TYPE {
    "LOGOUT_WEB_VIEW" = "LOGOUT_WEB_VIEW",
 }
 
-export type USER_AUTH = {
-   token: string
-   userId: string
-   userPassword: string
+export type ON_AUTH_MOUNTED = {
+   idToken: string
 }
 
 export type HAPTIC = {
@@ -67,7 +65,6 @@ export type IDENTIFY_CUSTOMER = {
 export type NativeEventStringified = { nativeEvent: { data: string } }
 
 export type NativeEvent =
-   | { type: MESSAGING_TYPE.USER_AUTH; data: USER_AUTH }
    | { type: MESSAGING_TYPE.HAPTIC; data: HAPTIC }
    | { type: MESSAGING_TYPE.PERMISSIONS; data: PERMISSIONS }
    | { type: MESSAGING_TYPE.CONSOLE; data: CONSOLE }
@@ -76,6 +73,7 @@ export type NativeEvent =
    | { type: MESSAGING_TYPE.TRACK_SCREEN; data: TRACK_SCREEN }
    | { type: MESSAGING_TYPE.CLEAR_CUSTOMER; data: null }
    | { type: MESSAGING_TYPE.IDENTIFY_CUSTOMER; data: IDENTIFY_CUSTOMER }
+   | { type: MESSAGING_TYPE.ON_AUTH_MOUNTED; data: ON_AUTH_MOUNTED }
 
 export type WebEvent =
    | { type: MESSAGING_TYPE.LOGOUT_WEB_VIEW; data: null }

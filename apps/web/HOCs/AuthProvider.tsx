@@ -4,6 +4,10 @@ import {
    UserStats,
 } from "@careerfairy/shared-lib/dist/users"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import {
+   MESSAGING_TYPE,
+   ON_AUTH_MOUNTED,
+} from "@careerfairy/shared-lib/messaging"
 import * as Sentry from "@sentry/nextjs"
 import Loader from "components/views/loader/Loader"
 import { userRepo } from "data/RepositoryInstances"
@@ -28,6 +32,7 @@ import { usePreviousDistinct } from "react-use"
 import { isAdminPath, isSecurePath, isSignupPath } from "util/AuthUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { AnalyticsEvents } from "util/analyticsConstants"
+import { MobileUtils } from "util/mobile.utils"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { RootState } from "../store"
 import CookiesUtil from "../util/CookiesUtil"
@@ -232,6 +237,15 @@ const AuthProvider = ({ children }) => {
             const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
 
             setClaims(tokenResult.claims)
+
+            if (MobileUtils.webViewPresence()) {
+               MobileUtils.send<ON_AUTH_MOUNTED>(
+                  MESSAGING_TYPE.ON_AUTH_MOUNTED,
+                  {
+                     idToken: tokenResult.token,
+                  }
+               )
+            }
 
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
