@@ -148,6 +148,10 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
    const handleSubmit = useCallback(
       async (values: FormikValues, helpers: FormikHelpers<FormikValues>) => {
          try {
+            await firebase.signInWithEmailAndPassword(
+               values.email,
+               values.password
+            )
             await firebase.setAnonymousJobApplicationsUserId(
                values.email,
                fingerPrintId

@@ -112,22 +112,39 @@ export default function Native() {
    }, [])
 
    const checkToken = async () => {
+      console.log("🚀 Checking Firebase ID token...")
       const firebaseIdToken = await SecureStore.getItemAsync(
          SECURE_STORE_KEYS.FIREBASE_ID_TOKEN
       )
+      console.log(
+         "🚀 Firebase ID token:",
+         firebaseIdToken ? "exists" : "not found"
+      )
 
       if (firebaseIdToken) {
+         console.log("🚀 Getting saved CustomerIO push token...")
          const savedCustomerioPushToken = await SecureStore.getItemAsync(
             SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN
          )
+         console.log(
+            "🚀 Saved CustomerIO push token:",
+            savedCustomerioPushToken || "not found"
+         )
 
+         console.log("🚀 Getting current push token...")
          const currentPushToken = await customerIO.getPushToken()
+         console.log("🚀 Current push token:", currentPushToken)
 
          if (
             !savedCustomerioPushToken ||
             currentPushToken !== savedCustomerioPushToken
          ) {
+            console.log(
+               "🚀 Push token mismatch or missing - getting new token..."
+            )
             getPushToken()
+         } else {
+            console.log("🚀 Push tokens match - no update needed")
          }
       }
    }
@@ -178,28 +195,47 @@ export default function Native() {
 
    async function saveUserPushTokenToFirestore(customerioPushToken: string) {
       try {
+         console.log("🔑 Getting Firebase ID token from secure store...")
          const idToken = await SecureStore.getItemAsync(
             SECURE_STORE_KEYS.FIREBASE_ID_TOKEN
          )
+         console.log(
+            "📱 Firebase ID token retrieved:",
+            idToken ? "✅ Found" : "❌ Not found"
+         )
 
          if (idToken) {
+            console.log("🔍 Verifying token...")
             const credentials = await handleVerifyToken(idToken)
+            console.log("✅ Token verified, got credentials")
 
+            console.log("🔐 Signing in with custom token...")
             await signInWithCustomToken(auth, credentials.customToken)
+            console.log("✅ Signed in successfully")
+
             if (auth.currentUser?.email) {
+               console.log(
+                  "📝 Updating Firestore for user:",
+                  auth.currentUser.email
+               )
                const userDocRef = doc(db, "userData", auth.currentUser.email)
 
                await updateDoc(userDocRef, {
                   cioPushTokens: arrayUnion(customerioPushToken),
                })
+               console.log("✅ Updated push token in Firestore")
             }
 
+            console.log("💾 Saving CustomerIO push token to secure store...")
             await SecureStore.setItemAsync(
                SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN,
                customerioPushToken
             )
+            console.log("✅ CustomerIO push token saved")
 
+            console.log("🔄 Identifying customer with CustomerIO...")
             await customerIO.identifyCustomer(credentials.uid)
+            console.log("✅ Customer identified with CustomerIO")
          }
       } catch (error) {
          console.error("Failed to send data to the Firestore:", error)
