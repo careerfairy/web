@@ -15,7 +15,7 @@ import {
    Platform,
    SafeAreaView,
    Text,
-   TouchableOpacity
+   TouchableOpacity,
 } from "react-native"
 import WebView from "react-native-webview"
 import WebViewComponent from "./components/WebView"
@@ -24,7 +24,7 @@ import { customerIO } from "./utils/customerio-tracking"
 import { initializeFacebookTracking } from "./utils/facebook-tracking"
 import { handleVerifyToken } from "./utils/firebase"
 import { SECURE_STORE_KEYS } from "./utils/secure-store-constants"
-import { initSentry } from "./utils/sentry"
+import { errorLogAndNotify, initSentry } from "./utils/sentry"
 
 const sentry = initSentry()
 
@@ -173,7 +173,7 @@ function Native() {
       customerioPushToken: string | null
    ) => {
       try {
-         return resetFireStoreData(idToken, customerioPushToken)
+         await resetFireStoreData(idToken, customerioPushToken)
          sentry.setUser(null)
       } catch (e) {
          console.log("Error with resetting firestore data", e)
@@ -205,6 +205,10 @@ function Native() {
             )
 
             await customerIO.identifyCustomer(credentials.uid)
+            sentry.setUser({
+               id: credentials.uid,
+               email: credentials.email,
+            })
          }
       } catch (error) {
          console.error(
@@ -291,15 +295,37 @@ function Native() {
 
    return (
       <>
-      <Button
-         title="Press me"
-         onPress={() => {
-            throw new Error("Hello, again, Sentry!")
-         }}
-      />
-      <WebViewComponent
-         onTokenInjected={getPushToken}
-         onLogout={onLogout}
+         <SafeAreaView
+            style={{
+               position: "absolute",
+               top: "50%",
+               left: 0,
+               right: 0,
+               zIndex: 1000,
+               alignItems: "center",
+            }}
+         >
+            <Button
+               title="Press me to crash"
+               onPress={() => {
+                  throw new Error("Hello, again, Sentry!")
+               }}
+            />
+            <Button
+               title="Press me to log error"
+               onPress={() => {
+                  errorLogAndNotify(
+                     new Error("Hello, this is the error message"),
+                     {
+                        message: "Hello, this is extra message!",
+                     }
+                  )
+               }}
+            />
+         </SafeAreaView>
+         <WebViewComponent
+            onTokenInjected={getPushToken}
+            onLogout={onLogout}
             webViewRef={webViewRef}
          />
       </>
