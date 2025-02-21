@@ -13,7 +13,7 @@
       "test": "jest --passWithNoTests",
       "build:preview": "eas build --profile preview",
       "build:develop": "eas build --profile development",
-      "build:develop-isolated": "eas build --profile development-isolated",
+      "build:staging": "eas build --profile staging",
       "build:prod": "eas build --profile production",
       "lint": "expo lint",
       "run:ios": "eas build:run -p ios",

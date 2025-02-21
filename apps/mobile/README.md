@@ -143,16 +143,16 @@ or from the root
 npm run native-build:develop
 ```
 
-2. Development Isolated (for PR testing): After running the command, choose which platforms, Android, iOS or both
+2. Staging (for PR testing): After running the command, choose which platforms, Android, iOS or both
 
 ```bash
-eas build --profile development-isolated
+eas build --profile staging
 ```
 
 or from the root
 
 ```bash
-npm run native-build:develop-isolated
+npm run native-build:staging
 ```
 
 The isolated development build is primarily used for testing PRs remotely. Unlike regular development builds:

@@ -23,7 +23,7 @@
             "EAS_BUILD_DISABLE_COCOAPODS_CACHE": "1"
          }
       },
-      "development-isolated": {
+      "staging": {
          "extends": "development",
          "developmentClient": false
       }
