@@ -13,7 +13,6 @@ const BATCH_SIZE = 10 // Maximum number of events that can be batched
 const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
 
 type GroupEventTrackerProviderProps = {
-   // TODO: Type interactionSource
    trackEvent: (
       groupId: string,
       event: GroupEventActionType,
@@ -25,13 +24,12 @@ const GroupEventTrackerContext = createContext<GroupEventTrackerProviderProps>({
    trackEvent: () => {},
 })
 
-export const FeaturedCompaniesTrackerProvider: FC<{
+export const CompaniesTrackerProvider: FC<{
    children: React.ReactNode
 }> = ({ children }) => {
-   const { userData } = useAuth()
+   const { userData, isLoadingUserData } = useAuth()
    const { data: visitorId } = useFingerPrint()
 
-   // TODO: check if needed
    const addEventToBatch = useBatchedEvents<GroupEventClient>(
       (data) => groupService.trackGroupEvents(data),
       BATCH_SIZE,
@@ -45,6 +43,10 @@ export const FeaturedCompaniesTrackerProvider: FC<{
          event: GroupEventActionType,
          interactionSource?: string
       ) => {
+         if (isLoadingUserData) {
+            return
+         }
+
          // Get UTM parameters from cookies
          const utmParams = CookiesUtil.getUTMParams() || {}
 
@@ -72,7 +74,7 @@ export const FeaturedCompaniesTrackerProvider: FC<{
 
          addEventToBatch(options)
       },
-      [addEventToBatch, userData?.authId, visitorId]
+      [addEventToBatch, userData?.authId, visitorId, isLoadingUserData]
    )
 
    const value = useMemo(() => ({ trackEvent }), [trackEvent])
@@ -84,14 +86,14 @@ export const FeaturedCompaniesTrackerProvider: FC<{
    )
 }
 
-export const useFeaturedCompaniesTracker = () => {
+export const useCompaniesTracker = () => {
    const context = useContext(GroupEventTrackerContext)
    if (context === undefined) {
       throw new Error(
-         "useFeaturedCompaniesTracker must be used within a FeaturedCompaniesTrackerProvider"
+         "useCompaniesTracker must be used within a CompaniesTrackerProvider"
       )
    }
    return context
 }
 
-export default FeaturedCompaniesTrackerProvider
+export default CompaniesTrackerProvider

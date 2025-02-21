@@ -51,7 +51,7 @@
       "name": "actionType",
       "type": "STRING",
       "mode": "REQUIRED",
-      "description": "Type of action (Featured_Company_Page_View, Featured_Company_Follow, Featured_Company_Talent_Reached, Company_Page_View, Company_Follow, Company_Talent_Reached)"
+      "description": "Type of action (Follow, Page_view, Impression)"
    },
    {
       "name": "countryCode",

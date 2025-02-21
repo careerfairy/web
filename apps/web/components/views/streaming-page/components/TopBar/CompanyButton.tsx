@@ -1,4 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import {
    Box,
    Button,
@@ -239,7 +240,13 @@ const Content = ({ company }: Props) => {
                   : isMobile && styles.textAlign,
             ]}
          >
-            <Link href={makeGroupCompanyPageUrl(company)} target="_blank">
+            <Link
+               href={makeGroupCompanyPageUrl(
+                  company.universityName,
+                  InteractionSources.Streaming_Page
+               )}
+               target="_blank"
+            >
                <CompanyLogo
                   src={company.logoUrl}
                   alt={company.universityName}
@@ -316,13 +323,17 @@ const ActionButtons = ({ company }: { company: Group }) => {
             size="small"
             sx={styles.followButton}
             group={company}
+            interactionSource={InteractionSources.Streaming_Page}
          />
          <Button
             variant="text"
             size="small"
             sx={styles.visitButton}
             endIcon={<ExternalLink />}
-            href={makeGroupCompanyPageUrl(company)}
+            href={makeGroupCompanyPageUrl(
+               company.universityName,
+               InteractionSources.Streaming_Page
+            )}
             target="_blank"
          >
             Company page

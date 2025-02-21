@@ -1,4 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Grid } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
@@ -48,7 +49,10 @@ const Companies: FC<Props> = ({ companies, hasFilters }) => {
                lg={4}
                xl={3}
             >
-               <CompanyCard company={company} />
+               <CompanyCard
+                  company={company}
+                  interactionSource={InteractionSources.Companies_Overview_Page}
+               />
             </Grid>
          ))}
       </Grid>

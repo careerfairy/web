@@ -9,7 +9,7 @@ export class GroupService {
    constructor(private readonly functions: Functions) {}
 
    /**
-    * Calls the trackSparkEvents cloud function with the provided data.
+    * Calls the trackGroupEvents cloud function with the provided data.
     * @param data - The data to send to the cloud function.
     */
    async trackGroupEvents(data: GroupEventClient[]) {

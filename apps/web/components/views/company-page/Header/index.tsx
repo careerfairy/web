@@ -1,3 +1,4 @@
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import {
    AppBar,
    Avatar,
@@ -381,6 +382,7 @@ const ActionButtons = () => {
                color="primary"
                size="medium"
                group={group}
+               interactionSource={InteractionSources.Company_Page}
             />
          ) : null}
          {showShareButton ? <ShareButton /> : null}
