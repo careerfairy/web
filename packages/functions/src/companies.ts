@@ -209,6 +209,8 @@ export const trackGroupEvents = functions.region(config.region).https.onCall(
                      timestamp = new Date() // Fallback to current time
                   }
 
+                  delete groupEvent.stringTimestamp
+
                   return {
                      ...groupEvent,
                      countryCode,
@@ -217,14 +219,7 @@ export const trackGroupEvents = functions.region(config.region).https.onCall(
                }
             )
 
-            functions.logger.info(
-               "🚀 ~ constgroupEvents:GroupEventServer[]=data.events.map ~ groupEvents:",
-               groupEvents
-            )
-
-            // await groupRepo.trackGroupEvents(groupEvents)
-
-            return "OK"
+            return groupRepo.trackGroupEvents(groupEvents)
          } catch (error) {
             logAndThrow("Error in tracking group event", {
                data,
