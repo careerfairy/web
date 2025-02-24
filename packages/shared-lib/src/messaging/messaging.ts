@@ -73,6 +73,7 @@ export type NativeEvent =
    | { type: MESSAGING_TYPE.TRACK_SCREEN; data: TRACK_SCREEN }
    | { type: MESSAGING_TYPE.CLEAR_CUSTOMER; data: null }
    | { type: MESSAGING_TYPE.ON_AUTH_MOUNTED; data: ON_AUTH_MOUNTED }
+   | { type: MESSAGING_TYPE.IDENTIFY_CUSTOMER; data: IDENTIFY_CUSTOMER }
 
 export type WebEvent =
    | { type: MESSAGING_TYPE.LOGOUT_WEB_VIEW; data: null }

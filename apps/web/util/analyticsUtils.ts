@@ -7,6 +7,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { TRACK_EVENT } from "@careerfairy/shared-lib/messaging"
 import {
+   IDENTIFY_CUSTOMER,
    MESSAGING_TYPE,
    TRACK_SCREEN,
 } from "@careerfairy/shared-lib/messaging/messaging"
@@ -265,7 +266,12 @@ export const analyticsSetUser = async (userAuthId: string) => {
    if (typeof window === "undefined") return
 
    if (MobileUtils.webViewPresence()) {
-      return // We handle this in the webview ON_AUTH_MOUNTED event
+      return MobileUtils.send<IDENTIFY_CUSTOMER>(
+         MESSAGING_TYPE.IDENTIFY_CUSTOMER,
+         {
+            userAuthId,
+         }
+      )
    }
 
    // Link anonymous user's activity to their new account after setting the user
