@@ -884,9 +884,11 @@ const sendAttendeesReminder = async (
 
          await Promise.all(
             livestreamsToRemind.map((event) =>
-               groupRepo
-                  .getGroupById(event.groupIds.at(0))
-                  .then((group) => (groupsByEventIds[event.id] = group))
+               groupRepo.getGroupsByIds(event.groupIds).then((groups) => {
+                  groupsByEventIds[event.id] =
+                     groups.find((group) => !group.universityCode) ??
+                     groups.at(0)
+               })
             )
          )
 
