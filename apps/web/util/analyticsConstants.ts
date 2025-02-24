@@ -123,14 +123,6 @@ export const AnalyticsEvents = {
    LivestreamChatNewMessage: "livestream_chat_new_message",
    LivestreamChatOpen: "livestream_chat_open",
    ToggleTheme: "toggle_theme",
-
-   /**
-    * Deprecated events
-    */
-   HighlightVideoPlay: "highlight_video_play",
-   HighlightVideoSignedOut: "highlight_video_signed_out",
-   HighlightVideoRestricted: "highlight_video_restricted",
-   EventQuestionSubmit: "event_question_submit",
 } as const
 
 export type AnalyticsEvent =

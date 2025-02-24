@@ -4,10 +4,8 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { useRouter } from "next/router"
 import { useEffect, useMemo, useState } from "react"
-import { AnalyticsEvents } from "util/analyticsConstants"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../constants/routes"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import { dataLayerEvent } from "../../../util/analyticsUtils"
 import useCanWatchHighlights from "../../custom-hook/useCanWatchHighlights"
 import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
 import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
@@ -60,10 +58,8 @@ const HighlightsCarousel = ({
       if (isOnLandingPage || canWatchAll) {
          setVideoUrl(videoUrl)
          setUserTimeoutWithCookie()
-         dataLayerEvent(AnalyticsEvents.HighlightVideoPlay)
       } else {
          if (isLoggedOut) {
-            dataLayerEvent(AnalyticsEvents.HighlightVideoSignedOut)
             return push({
                pathname: "/login",
                query: {
@@ -74,7 +70,6 @@ const HighlightsCarousel = ({
          }
          if (videoUrl) handleCloseVideoDialog()
          handleOpenHighlightsRestrictedDialog()
-         dataLayerEvent(AnalyticsEvents.HighlightVideoRestricted)
       }
    }
 

@@ -14,9 +14,7 @@ import { useRouter } from "next/router"
 import { FC } from "react"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
-import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const styles = {
@@ -71,9 +69,6 @@ const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
             )
             onQuestionAdded(newlyCreatedQuestion)
             resetForm()
-            dataLayerEvent(AnalyticsEvents.EventQuestionSubmit, {
-               livestreamId: livestream.id,
-            })
 
             recommendationServiceInstance.createdQuestion(livestream, userData)
          } catch (e) {
