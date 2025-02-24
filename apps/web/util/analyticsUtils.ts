@@ -75,7 +75,7 @@ export const dataLayerLivestreamEvent = (
             livestreamTitle: livestream?.title, // GTM Variable
             companyName: livestream?.company, // GTM Variable
          },
-         { ...optionalVariables, livestream }
+         optionalVariables
       )
    )
 }
@@ -95,7 +95,6 @@ export const dataLayerCompanyEvent = (
       ...optionalVariables,
       companyName: company.universityName, // GTM Variable
       companyId: company.id, // GTM Variable
-      company,
    })
 }
 
@@ -115,7 +114,6 @@ export const dataLayerMentorEvent = (
       mentorId: mentor.id, // GTM Variable
       mentorName: `${mentor.firstName} ${mentor.lastName}`, // GTM Variable
       companyId: mentor.groupId, // GTM Variable
-      mentor,
    })
 }
 
@@ -136,7 +134,6 @@ export const dataLayerSparkEvent = (
       companyId: spark.group.id, // GTM Variable
       categoryId: spark.category.id, // GTM Variable
       mentorId: spark.creator?.id, // GTM Variable
-      spark,
    })
 }
 
