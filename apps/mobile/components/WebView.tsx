@@ -275,8 +275,6 @@ const WebViewComponent = ({
                return handleLogout()
             case MESSAGING_TYPE.CLEAR_CUSTOMER:
                return handleClearCustomer()
-            case MESSAGING_TYPE.IDENTIFY_CUSTOMER:
-               return handleIdentifyCustomer(data)
             case MESSAGING_TYPE.TRACK_EVENT:
                return handleTrackEvent(data)
             case MESSAGING_TYPE.TRACK_SCREEN:
