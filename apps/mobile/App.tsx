@@ -155,6 +155,10 @@ export default function Native() {
          const status = await customerIO.showPromptForPushNotifications()
 
          if (status === "GRANTED") {
+            await customerIO.updateDeviceAttributes({
+               push_enabled: true,
+            })
+
             getTokenAndSave()
          } else {
             console.log("Notification permissions not granted")
