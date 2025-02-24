@@ -9,7 +9,8 @@ import FeaturedCompanySparksBadge from "components/views/common/icons/FeaturedCo
 import { groupRepo } from "data/RepositoryInstances"
 import Link from "next/link"
 import { useCallback } from "react"
-import { dataLayerEvent } from "util/analyticsUtils"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerCompanyEvent, dataLayerEvent } from "util/analyticsUtils"
 
 const styles = sxStyles({
    companyCardRoot: {
@@ -146,20 +147,20 @@ export const FeaturedCompanyCard = ({
             await groupRepo.unfollowCompany(userData.id, groupId)
          } else {
             await groupRepo.followCompany(userData, group).then(() => {
-               dataLayerEvent("featured_company_follow", {
-                  companyId: groupId,
-                  companyName: company.universityName,
-               })
+               dataLayerCompanyEvent(
+                  AnalyticsEvents.FeaturedCompanyFollow,
+                  group
+               )
             })
          }
       },
-      [userData, group, following, company.universityName]
+      [userData, group, following]
    )
 
    return (
       <Link
          onClick={() => {
-            dataLayerEvent("featured_company_view", {
+            dataLayerEvent(AnalyticsEvents.FeaturedCompanyView, {
                companyId: company.id,
                companyName: company.universityName,
             })

@@ -75,6 +75,8 @@ export const AnalyticsEvents = {
     * Clicked on one of the company page social icons in the company page share dialog
     */
    Company_Page: "company_page",
+   FeaturedCompanyView: "featured_company_view",
+   FeaturedCompanyFollow: "featured_company_follow",
    SparkClickCompanyPageCTA: "spark_click_company_page_cta",
    SparkClickDiscoverEventCTA: "spark_click_discover_event_cta",
    SparkClickJobCTA: "spark_click_job_cta",
