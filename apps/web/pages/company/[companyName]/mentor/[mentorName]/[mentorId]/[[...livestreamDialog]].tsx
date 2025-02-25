@@ -29,6 +29,8 @@ import {
    InferGetStaticPropsType,
    NextPage,
 } from "next"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerMentorEvent } from "util/analyticsUtils"
 import { getLivestreamsAndDialogData, mapFromServerSide } from "util/serverUtil"
 
 const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
@@ -44,7 +46,9 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    const viewRef = useTrackPageView({
       trackDocumentId: serverSideGroup.groupId,
       handleTrack: ({ id, visitorId, extraData }) =>
-         trackMentorPageView(id, extraData.creatorId, visitorId),
+         trackMentorPageView(id, extraData.creatorId, visitorId).then(() =>
+            dataLayerMentorEvent(AnalyticsEvents.MentorPageVisit, creator)
+         ),
       extraData: {
          creatorId: creator.id,
       },

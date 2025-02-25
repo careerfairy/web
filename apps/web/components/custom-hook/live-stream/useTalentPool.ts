@@ -1,9 +1,11 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useUserLivestreamData } from "../streaming/useUserLivestreamData"
 
@@ -14,7 +16,7 @@ import { useUserLivestreamData } from "../streaming/useUserLivestreamData"
  * @param livestream
  * @returns An object with handlers and information on the operation
  */
-const useTalentPool = (livestream) => {
+const useTalentPool = (livestream: LivestreamEvent) => {
    const { push, asPath } = useRouter()
    const { userData, isLoggedOut } = useAuth()
    const dispatch = useDispatch()
@@ -35,7 +37,10 @@ const useTalentPool = (livestream) => {
          joinTalentPool: async () => {
             try {
                if (isLoggedOut) {
-                  dataLayerLivestreamEvent("talent_pool_join_login", livestream)
+                  dataLayerLivestreamEvent(
+                     AnalyticsEvents.TalentPoolJoinLogin,
+                     livestream
+                  )
                   return push({
                      query: { absolutePath: asPath },
                      pathname: "/login",
@@ -44,7 +49,14 @@ const useTalentPool = (livestream) => {
                setLoading(true)
                const companyId = livestream.companyId
                await joinCompanyTalentPool(companyId, userData, livestream)
-               dataLayerLivestreamEvent("talent_pool_joined", livestream)
+
+               dataLayerLivestreamEvent(
+                  AnalyticsEvents.TalentPoolJoined,
+                  livestream,
+                  {
+                     companyIds: livestream.groupIds,
+                  }
+               )
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             } finally {
@@ -63,7 +75,18 @@ const useTalentPool = (livestream) => {
                const companyId = livestream.companyId
 
                await leaveCompanyTalentPool(companyId, userData, livestream)
-               dataLayerLivestreamEvent("talent_pool_leave", livestream)
+
+               if (livestream.groupIds) {
+                  livestream.groupIds.forEach((companyId) => {
+                     dataLayerLivestreamEvent(
+                        AnalyticsEvents.TalentPoolLeave,
+                        livestream,
+                        {
+                           companyId,
+                        }
+                     )
+                  })
+               }
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             } finally {

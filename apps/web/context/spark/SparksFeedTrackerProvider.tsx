@@ -18,6 +18,8 @@ import {
    originalSparkIdSelector,
 } from "store/selectors/sparksFeedSelectors"
 import CookiesUtil from "util/CookiesUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerSparkEvent } from "util/analyticsUtils"
 import { v4 as uuidv4 } from "uuid"
 import useFingerPrint from "../../components/custom-hook/useFingerPrint"
 
@@ -25,7 +27,10 @@ const BATCH_SIZE = 10 // Maximum number of events that can be batched
 const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
 
 type SparkEventTrackerProviderProps = {
-   trackEvent: (event: SparkEventActionType) => void
+   trackEvent: (
+      event: SparkEventActionType,
+      optionalVariables?: Record<string, any>
+   ) => void
    trackSecondsWatched: (secondsWatched: number) => void
 }
 
@@ -60,10 +65,11 @@ export const SparksFeedTrackerProvider: FC<{
    const { data: visitorId } = useFingerPrint()
 
    const currentSparkId = useSelector(currentSparkIdSelector)
+   const currentSpark = useSelector(activeSparkSelector)
    const originalSparkId = useSelector(originalSparkIdSelector)
    const isFirstSpark = useSelector(isOnFirstSparkSelector)
-   const categoryId = useSelector(activeSparkSelector)?.category?.id || null
-   const groupId = useSelector(activeSparkSelector)?.group.id || null
+   const categoryId = currentSpark?.category?.id || null
+   const groupId = currentSpark?.group.id || null
    const interactionSource = useSelector(interactionSourceSelector) || null
 
    const addEventToBatch = useBatchedEvents<SparkEventClient>(
@@ -85,7 +91,10 @@ export const SparksFeedTrackerProvider: FC<{
    }, [currentSparkId, visitorId])
 
    const trackEvent = useCallback(
-      (event: SparkEventActionType) => {
+      (
+         event: SparkEventActionType,
+         optionalVariables?: Record<string, any>
+      ) => {
          if (!currentSparkId || !visitorId) return
 
          const referrer = document?.referrer || null
@@ -129,22 +138,42 @@ export const SparksFeedTrackerProvider: FC<{
          }
 
          switch (options.actionType) {
+            case SparkEventActions.Register_Event:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkRegisterEvent,
+                  currentSpark,
+                  {
+                     livestreamId: optionalVariables?.livestreamId,
+                  }
+               )
+               break
             case SparkEventActions.Like:
                sparkService.incrementSparkCount(currentSparkId, "likes")
+               dataLayerSparkEvent(AnalyticsEvents.SparkLike, currentSpark)
                break
             case SparkEventActions.Unlike:
                sparkService.incrementSparkCount(currentSparkId, "likes", -1)
+               dataLayerSparkEvent(AnalyticsEvents.SparkUnlike, currentSpark)
                break
             case SparkEventActions.Impression:
                sparkService.incrementSparkCount(currentSparkId, "impressions")
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkFeedImpression,
+                  currentSpark
+               )
                break
             case SparkEventActions.Played_Spark:
                sparkService.incrementSparkCount(currentSparkId, "plays")
+               dataLayerSparkEvent(AnalyticsEvents.SparkPlayed, currentSpark)
                break
             case SparkEventActions.Click_CompanyPageCTA:
                sparkService.incrementSparkCount(
                   currentSparkId,
                   "numberOfCompanyPageClicks"
+               )
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkClickCompanyPageCTA,
+                  currentSpark
                )
                break
             case SparkEventActions.Watched_CompleteSpark:
@@ -152,15 +181,85 @@ export const SparksFeedTrackerProvider: FC<{
                   currentSparkId,
                   "numberTimesCompletelyWatched"
                )
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkWatchedComplete,
+                  currentSpark
+               )
+               break
+            case SparkEventActions.Click_DiscoverLivestreamCTA:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkClickDiscoverEventCTA,
+                  currentSpark,
+                  {
+                     livestreamId: optionalVariables?.livestreamId,
+                  }
+               )
+               break
+            case SparkEventActions.Click_JobCTA:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkClickJobCTA,
+                  currentSpark,
+                  {
+                     jobIds: optionalVariables?.jobIds,
+                  }
+               )
+               break
+            case SparkEventActions.Click_MentorPageCTA:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkClickMentorPageCTA,
+                  currentSpark
+               )
+               break
+            case SparkEventActions.Click_ReachOut_LinkedIn:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkClickReachOutLinkedIn,
+                  currentSpark
+               )
                break
             case SparkEventActions.Share_Clipboard:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareClipboard,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_Email:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareEmail,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_Facebook:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareFacebook,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_LinkedIn:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareLinkedIn,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_Mobile:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareMobile,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_X:
+               dataLayerSparkEvent(AnalyticsEvents.SparkShareX, currentSpark)
+            // falls through
             case SparkEventActions.Share_WhatsApp:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareWhatsApp,
+                  currentSpark
+               )
+            // falls through
             case SparkEventActions.Share_Other:
+               dataLayerSparkEvent(
+                  AnalyticsEvents.SparkShareOther,
+                  currentSpark
+               )
                sparkService.incrementSparkCount(currentSparkId, "shareCTA")
                break
          }
@@ -181,8 +280,9 @@ export const SparksFeedTrackerProvider: FC<{
          userData?.university?.code,
          userData?.university?.name,
          sessionId,
-         addEventToBatch,
          interactionSource,
+         addEventToBatch,
+         currentSpark,
       ]
    )
 

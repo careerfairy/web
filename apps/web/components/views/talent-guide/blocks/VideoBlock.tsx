@@ -1,8 +1,10 @@
 import { Box, Stack, Typography } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import PlayIcon from "components/views/common/icons/PlayIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { VideoBlockType } from "data/hygraph/types"
 import ReactPlayer from "react-player"
+import { trackLevelsVideoPlay } from "store/reducers/talentGuideReducer"
 import { sxStyles } from "types/commonTypes"
 import { AuthorPromotion } from "./AuthorPromotion"
 
@@ -47,7 +49,17 @@ const styles = sxStyles({
 type Props = VideoBlockType
 
 const Content = (props: Props) => {
-   const { video, videoThumbnail, avatar, label, videoTitle } = props
+   const { video, videoThumbnail, avatar, label, videoTitle, id } = props
+   const dispatch = useAppDispatch()
+
+   const handlePlay = () => {
+      dispatch(
+         trackLevelsVideoPlay({
+            videoId: id,
+            videoTitle,
+         })
+      )
+   }
 
    return (
       <Stack data-testid="talent-guide-video-block" gap={1} sx={styles.root}>
@@ -67,6 +79,8 @@ const Content = (props: Props) => {
                   },
                }}
                controls
+               onPlay={handlePlay}
+               progressInterval={250}
             />
          </Box>
          {Boolean(!props.promotionData) && (

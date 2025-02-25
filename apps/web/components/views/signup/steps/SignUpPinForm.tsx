@@ -21,6 +21,7 @@ import { Fragment, useContext, useState } from "react"
 import { useDispatch } from "react-redux"
 import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
 import * as actions from "store/actions"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { errorLogAndNotify } from "util/CommonUtil"
 import * as yup from "yup"
 import { useAuth } from "../../../../HOCs/AuthProvider"
@@ -101,7 +102,7 @@ const SignUpPinForm = () => {
          await reloadAuth(dispatch, firebase.app) // redux action
 
          updateActiveStep()
-         dataLayerEvent("signup_pin_complete")
+         dataLayerEvent(AnalyticsEvents.SignupPinComplete)
       } catch (error) {
          console.log("error", error)
          setIncorrectPin(true)

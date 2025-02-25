@@ -5,10 +5,14 @@ import {
 } from "@careerfairy/shared-lib/src/livestreams"
 import { UserReminderType } from "@careerfairy/shared-lib/src/users"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useRefetchRegisteredStreams } from "components/custom-hook/useRegisteredStreams"
+import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
+import { trackLevelsLivestreamRegistrationCompleted } from "store/reducers/talentGuideReducer"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useUserReminders } from "../../../HOCs/UserReminderProvider"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
@@ -30,7 +34,8 @@ export default function useRegistrationHandler() {
    const { forceShowReminder } = useUserReminders()
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
-
+   const isInTalentGuidePage = useIsInTalentGuide()
+   const dispatch = useAppDispatch()
    const firebase = useFirebaseService()
    const {
       registerToLivestream,
@@ -46,7 +51,10 @@ export default function useRegistrationHandler() {
     */
    const initRegistrationProcess = useCallback(
       (floating: boolean) => {
-         dataLayerLivestreamEvent("event_registration_started", livestream)
+         dataLayerLivestreamEvent(
+            AnalyticsEvents.EventRegistrationStarted,
+            livestream
+         )
 
          if (floating) {
             dataLayerLivestreamEvent(
@@ -99,7 +107,10 @@ export default function useRegistrationHandler() {
          userData.authId
       )
 
-      dataLayerLivestreamEvent("event_registration_removed", livestream)
+      dataLayerLivestreamEvent(
+         AnalyticsEvents.EventRegistrationRemoved,
+         livestream
+      )
 
       // after de-register from a livestream we want to update the user sparks notifications for this user
       await sparkService.createUserSparksFeedEventNotifications(
@@ -158,7 +169,7 @@ export default function useRegistrationHandler() {
          try {
             if (status === "login_required") {
                dataLayerLivestreamEvent(
-                  "event_registration_started_login_required",
+                  AnalyticsEvents.EventRegistrationStartedLoginRequired,
                   livestream
                )
 
@@ -231,9 +242,18 @@ export default function useRegistrationHandler() {
                recommendationServiceInstance.registerEvent(livestream, userData)
 
                dataLayerLivestreamEvent(
-                  "event_registration_complete",
+                  AnalyticsEvents.EventRegistrationComplete,
                   livestream
                )
+
+               if (isInTalentGuidePage) {
+                  dispatch(
+                     trackLevelsLivestreamRegistrationCompleted({
+                        livestreamId: livestream.id,
+                        livestreamTitle: livestream.title,
+                     })
+                  )
+               }
             }
 
             // after registration, remove from this user's sparks notification the existing notification related to this event

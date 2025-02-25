@@ -13,6 +13,7 @@ import {
    useMemo,
    useState,
 } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { brandedDarkTheme, brandedLightTheme } from "../../materialUI"
 import { dataLayerEvent } from "../../util/analyticsUtils"
 
@@ -74,7 +75,7 @@ const ThemeProviderWrapper = ({
 
       localStorage.setItem("themeMode", newTheme.palette.mode)
       setTheme(responsiveFontSizes(newTheme))
-      dataLayerEvent("toggle_theme")
+      dataLayerEvent(AnalyticsEvents.ToggleTheme)
    }, [theme])
 
    const useStyles = makeStyles({

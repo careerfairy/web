@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { RootState } from "store"
 import { userSignUpStepContinueDisabledSelector } from "store/selectors/userSignUpSelectors"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { calculateUserValue } from "util/userValueScoring"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
@@ -179,7 +180,7 @@ const SignupForm = () => {
 
          const value = calculateUserValue(userData, userCountryCode)
 
-         dataLayerEvent("signup_complete_redirect", {
+         dataLayerEvent(AnalyticsEvents.SignupCompleteRedirect, {
             value,
             currency: "CHF",
          })

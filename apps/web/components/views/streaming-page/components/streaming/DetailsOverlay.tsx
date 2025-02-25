@@ -1,9 +1,12 @@
 import { Box, Grow, Stack, Typography } from "@mui/material"
+import { useLivestreamData } from "components/custom-hook/streaming"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { Info, MicOff } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { StreamerInfoDialog } from "../../streamer-info/StreamerInfoDialog"
 import { getStreamerDisplayName } from "../../util"
 import { FloatingContent } from "./VideoTrackWrapper"
@@ -79,11 +82,10 @@ export const DetailsOverlay = ({
                      <Grow in={!micActive} unmountOnExit>
                         <Box sx={styles.micOff} component={MicOff} size={20} />
                      </Grow>
-                     <Box
-                        component={Info}
-                        onClick={handleDialogOpen}
-                        sx={styles.detailsButton}
-                        size={20}
+                     <InfoButton
+                        streamerDetails={streamerDetails}
+                        displayName={displayName}
+                        handleDialogOpen={handleDialogOpen}
                      />
                   </Stack>
                )}
@@ -95,5 +97,41 @@ export const DetailsOverlay = ({
             streamerDetails={streamerDetails}
          />
       </>
+   )
+}
+
+type InfoButtonProps = {
+   streamerDetails: StreamerDetails
+   displayName: string
+   handleDialogOpen: () => void
+}
+
+const InfoButton = ({
+   streamerDetails,
+   displayName,
+   handleDialogOpen,
+}: InfoButtonProps) => {
+   const livestream = useLivestreamData()
+
+   return (
+      <Box
+         component={Info}
+         onClick={async () => {
+            handleDialogOpen()
+
+            if (livestream) {
+               dataLayerLivestreamEvent(
+                  AnalyticsEvents.LivestreamSpeakerLinkedinClick,
+                  livestream,
+                  {
+                     speakerId: streamerDetails.id,
+                     speakerName: displayName,
+                  }
+               )
+            }
+         }}
+         sx={styles.detailsButton}
+         size={20}
+      />
    )
 }

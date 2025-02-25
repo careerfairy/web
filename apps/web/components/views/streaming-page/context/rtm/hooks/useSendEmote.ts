@@ -5,6 +5,7 @@ import { livestreamService } from "data/firebase/LivestreamService"
 import { addEmote } from "store/reducers/streamingAppReducer"
 import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerEvent } from "util/analyticsUtils"
 import { useRTMChannel, useRTMClient } from "../providers"
 
@@ -36,16 +37,16 @@ export const useSendEmote = (livestreamId: string, agoraUserId: string) => {
 
       switch (opts.arg.emoteType) {
          case "clapping":
-            dataLayerEvent("livestream_viewer_reaction_clap")
+            dataLayerEvent(AnalyticsEvents.LivestreamViewerReactionClap)
             break
          case "confused":
-            dataLayerEvent("livestream_viewer_reaction_confused")
+            dataLayerEvent(AnalyticsEvents.LivestreamViewerReactionConfused)
             break
          case "heart":
-            dataLayerEvent("livestream_viewer_reaction_heart")
+            dataLayerEvent(AnalyticsEvents.LivestreamViewerReactionHeart)
             break
          case "like":
-            dataLayerEvent("livestream_viewer_reaction_like")
+            dataLayerEvent(AnalyticsEvents.LivestreamViewerReactionLike)
             break
       }
 

@@ -15,6 +15,7 @@ import React, {
    useReducer,
    useState,
 } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../HOCs/AuthProvider"
 import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer"
 import { sparkService } from "../../data/firebase/SparksService"
@@ -382,7 +383,7 @@ export function RegistrationContextProvider({
                      }
                   )
                   dataLayerLivestreamEvent(
-                     "event_registration_complete",
+                     AnalyticsEvents.EventRegistrationComplete,
                      livestream
                   )
                   // after registration, remove from this user's sparks notification the existing notification related to this event

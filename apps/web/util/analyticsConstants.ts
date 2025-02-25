@@ -1,0 +1,129 @@
+export const AnalyticsEvents = {
+   LivestreamJobOpen: "livestream_job_open",
+   LivestreamJobApplicationComplete: "livestream_job_application_complete",
+   LivestreamSpeakerLinkedinClick: "livestream_speaker_linkedin_click",
+   LivestreamViewerHandRaiser: "livestream_viewer_hand_raiser",
+   LivestreamViewerSelectJobs: "livestream_viewer_select_jobs",
+   LivestreamViewerSelectQuestions: "livestream_viewer_select_questions",
+   LivestreamViewerSelectPolls: "livestream_viewer_select_polls",
+   LivestreamViewerSelectChat: "livestream_viewer_select_chat",
+   LivestreamViewerSelectSupport: "livestream_viewer_select_support",
+   LivestreamViewerSelectHand: "livestream_viewer_select_hand",
+   LivestreamViewerReactionClap: "livestream_viewer_reaction_clap",
+   LivestreamViewerReactionConfused: "livestream_viewer_reaction_confused",
+   LivestreamViewerReactionHeart: "livestream_viewer_reaction_heart",
+   LivestreamViewerReactionLike: "livestream_viewer_reaction_like",
+   LivestreamViewerShowAudienceTab: "livestream_viewer_show_audience_tab",
+   EventAddToCalendar: "event_add_to_calendar",
+   EventRegistrationComplete: "event_registration_complete",
+   EventRegistrationQuestionSkip: "event_registration_question_skip",
+   EventRegistrationQuestionSubmit: "event_registration_question_submit",
+   EventRegistrationRemoved: "event_registration_removed",
+   EventRegistrationStarted: "event_registration_started",
+   EventRegistrationStartedFromFooterButton:
+      "event_registration_started_from_footer_button",
+   EventRegistrationStartedLoginRequired:
+      "event_registration_started_login_required",
+   EventRegistrationStartedProfileIncomplete:
+      "event_registration_started_profile_incomplete",
+   EventRegistrationTalentpoolJoin: "event_registration_talentpool_join",
+   EventRegistrationTalentpoolSkip: "event_registration_talentpool_skip",
+   NewsletterAcceptedOn1stReminder: "newsletter_accepted_on_1st_reminder",
+   NewsletterAcceptedOn2ndReminder: "newsletter_accepted_on_2nd_reminder",
+   NewsletterAcceptedOnSignup: "newsletter_accepted_on_signup",
+   NewsletterDeniedOn1stReminder: "newsletter_denied_on_1st_reminder",
+   NewsletterDeniedOn2ndReminder: "newsletter_denied_on_2nd_reminder",
+   NewsletterDeniedOnSignup: "newsletter_denied_on_signup",
+
+   LoginComplete: "login_complete",
+   LoginFailed: "login_failed",
+   Logout: "logout",
+   SignupCredentialsCompleted: "signup_credentials_completed",
+   SignupPinComplete: "signup_pin_complete",
+   SignupStarted: "signup_started",
+   SignupCompleteRedirect: "signup_complete_redirect",
+
+   ProfileCvUpload: "profile_cv_upload",
+   ProfileLinkedinUpload: "profile_linkedin_upload",
+   ProfileLinkUpload: "profile_link_upload",
+   ProfileAvatarUpload: "profile_avatar_upload",
+   ProfileBannerUpload: "profile_banner_upload",
+   AttendEvent: "attend_event",
+   CompanyPageVisit: "company_page_visit",
+   MentorPageVisit: "mentor_page_visit",
+   CompanyFollow: "company_follow",
+   NewsletterAcceptedOnCompanyPage: "newsletter_accepted_on_company_page",
+   RecommendedEventImpression: "recommended_event_impression",
+   TalentPoolJoined: "talent_pool_joined",
+   TalentPoolLeave: "talent_pool_leave",
+   TalentPoolJoinLogin: "talent_pool_join_login",
+   CustomJobApplicationComplete: "custom_job_application_complete",
+   CustomJobApplicationRemovalComplete:
+      "custom_job_application_removal_complete",
+   EventShare: "event_share",
+   SparksShare: "sparks_share",
+   ReferralCopyLink: "referral_copy_link",
+   ReferralShareWhatsapp: "referral_share_whatsapp",
+   ReferralShareTwitter: "referral_share_twitter",
+   ReferralShareLinkedin: "referral_share_linkedin",
+
+   /**
+    * Copied the displayed link in the company page share dialog
+    */
+   CompanyPageShare: "company_page_share",
+   /**
+    * Clicked on one of the company page social icons in the company page share dialog
+    */
+   Company_Page: "company_page",
+   FeaturedCompanyView: "featured_company_view",
+   FeaturedCompanyFollow: "featured_company_follow",
+   SparkClickCompanyPageCTA: "spark_click_company_page_cta",
+   SparkClickDiscoverEventCTA: "spark_click_discover_event_cta",
+   SparkClickJobCTA: "spark_click_job_cta",
+   SparkClickMentorPageCTA: "spark_click_mentor_page_cta",
+   SparkClickReachOutLinkedIn: "spark_click_reach_out_linkedin",
+   SparkFeedImpression: "spark_feed_impression",
+   SparkLike: "spark_like",
+   SparkUnlike: "spark_unlike",
+   SparkPlayed: "spark_played",
+   SparkRegisterEvent: "spark_register_event",
+   SparkShareClipboard: "spark_share_clipboard",
+   SparkShareFacebook: "spark_share_facebook",
+   SparkShareLinkedIn: "spark_share_linkedin",
+   SparkShareMobile: "spark_share_mobile",
+   SparkShareEmail: "spark_share_email",
+   SparkShareOther: "spark_share_other",
+   SparkShareWhatsApp: "spark_share_whatsapp",
+   SparkShareX: "spark_share_x",
+   SparkWatchedComplete: "spark_watched_complete",
+   /**
+    * Dispatched upon level start
+    */
+   LevelsStart: "levels_start",
+   /**
+    * Dispatched upon all levels completed
+    */
+   LevelsComplete: "levels_complete",
+   LevelsFeedbackSubmitted: "levels_feedback_submitted",
+   LevelsArticleClick: "levels_article_click",
+   LevelsHighlightClick: "levels_highlight_click",
+   LevelsQuizAttempt: "levels_quiz_attempt",
+   LevelsVideoPlay: "levels_video_play",
+   LevelsLeave: "levels_leave",
+   LevelsLivestreamOpened: "levels_livestream_opened",
+   LevelsLivestreamRegistrationCompleted:
+      "levels_livestream_registration_completed",
+   LevelsJobClick: "levels_job_click",
+   LevelsJobApplied: "levels_job_applied",
+   LevelsMentorView: "levels_mentor_view",
+   LevelsMentorClick: "levels_mentor_click",
+   LevelsMentorLinkedinClick: "levels_mentor_linkedin_click",
+   LivestreamOpenSupport: "livestream_open_support",
+   LivestreamSpeakerSave: "livestream_speaker_save",
+   LivestreamChatNewMessage: "livestream_chat_new_message",
+   LivestreamChatOpen: "livestream_chat_open",
+   ToggleTheme: "toggle_theme",
+} as const
+
+export type AnalyticsEvent =
+   (typeof AnalyticsEvents)[keyof typeof AnalyticsEvents]
