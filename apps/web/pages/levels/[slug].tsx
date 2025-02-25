@@ -38,6 +38,8 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
    const showEndOfModuleExperience = useShowEndOfModuleExperience()
    // const [layoutKey, setLayoutKey] = useState(0)
 
+   const moduleDataRef = useRef(data)
+   moduleDataRef.current = data
    const isLoggedOutRef = useRef(isLoggedOut)
    isLoggedOutRef.current = isLoggedOut
 
@@ -56,7 +58,10 @@ const TalentGuidePage: NextPage<TalentGuidePageProps> = ({ data }) => {
 
    useEffect(() => {
       return () => {
-         dispatch(trackLevelsLeave())
+         // Only track levels leave for logged in users
+         if (!isLoggedOutRef.current) {
+            dispatch(trackLevelsLeave(moduleDataRef.current))
+         }
          dispatch(resetTalentGuide())
       }
    }, [dispatch])
