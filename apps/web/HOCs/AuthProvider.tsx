@@ -27,6 +27,7 @@ import {
 import { usePreviousDistinct } from "react-use"
 import { isAdminPath, isSecurePath, isSignupPath } from "util/AuthUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { RootState } from "../store"
 import CookiesUtil from "../util/CookiesUtil"
@@ -207,7 +208,7 @@ const AuthProvider = ({ children }) => {
       return firebaseService.auth.onIdTokenChanged(async (user) => {
          if (!user && auth.uid) {
             // If previous user was signed in, send logout event
-            dataLayerEvent("logout")
+            dataLayerEvent(AnalyticsEvents.Logout)
             analyticsResetUser()
          }
       })

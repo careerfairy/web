@@ -13,6 +13,8 @@ import { FilePlus, FileText } from "react-feather"
 import useSWRMutation from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerEvent } from "util/analyticsUtils"
 
 const styles = sxStyles({
    emptyDetailsRoot: {
@@ -73,6 +75,7 @@ export const YourCV = () => {
       {
          onSuccess: () => {
             successNotification("CV uploaded successfully")
+            dataLayerEvent(AnalyticsEvents.ProfileCvUpload)
          },
          onError: (err) => {
             errorNotification(

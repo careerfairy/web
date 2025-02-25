@@ -1,4 +1,5 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useAuth } from "HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import {
@@ -9,6 +10,7 @@ import {
    useMemo,
    useState,
 } from "react"
+import { trackLevelsJobClick } from "store/reducers/talentGuideReducer"
 
 export type JobsBlockContextType = {
    selectedJob: CustomJob
@@ -35,6 +37,7 @@ export const JobsBlockProvider = ({
    blockId,
 }: JobsBlockProviderProps) => {
    const { userData } = useAuth()
+   const dispatch = useAppDispatch()
    const router = useRouter()
    const userBusinessFunctions = userData?.businessFunctionsTagIds || []
 
@@ -62,8 +65,15 @@ export const JobsBlockProvider = ({
                shallow: true,
             }
          )
+
+         dispatch(
+            trackLevelsJobClick({
+               jobId: job.id,
+               jobName: job.title,
+            })
+         )
       },
-      [router]
+      [router, dispatch]
    )
 
    const handleCloseJobDialog = useCallback(() => {

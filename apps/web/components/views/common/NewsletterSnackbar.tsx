@@ -1,4 +1,9 @@
 import {
+   IUserReminder,
+   UserReminderType,
+} from "@careerfairy/shared-lib/dist/users"
+import CloseIcon from "@mui/icons-material/Close"
+import {
    Button,
    Grid,
    Slide,
@@ -6,21 +11,17 @@ import {
    SnackbarContent,
    Typography,
 } from "@mui/material"
-import React, { useCallback, useState } from "react"
-import CloseIcon from "@mui/icons-material/Close"
+import CircularProgress from "@mui/material/CircularProgress"
 import IconButton from "@mui/material/IconButton"
-import useIsMobile from "../../custom-hook/useIsMobile"
-import { sxStyles } from "../../../types/commonTypes"
+import { useCallback, useState } from "react"
+import { useDispatch } from "react-redux"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { userRepo } from "../../../data/RepositoryInstances"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import {
-   IUserReminder,
-   UserReminderType,
-} from "@careerfairy/shared-lib/dist/users"
-import CircularProgress from "@mui/material/CircularProgress"
 import { sendGeneralError } from "../../../store/actions"
-import { useDispatch } from "react-redux"
+import { sxStyles } from "../../../types/commonTypes"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    closeBtnWrapper: {
@@ -66,11 +67,12 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
 
    const handleAcceptNewsletter = useCallback(async () => {
       setIsSubmitting(true)
-      dataLayerEvent(
-         `newsletter_accepted_on_${
-            isFirstReminder ? "1st_reminder" : "2nd_reminder"
-         }`
-      )
+
+      const eventName = isFirstReminder
+         ? AnalyticsEvents.NewsletterAcceptedOn1stReminder
+         : AnalyticsEvents.NewsletterAcceptedOn2ndReminder
+
+      dataLayerEvent(eventName)
       try {
          // If it was accepted we should set it as completed
          const reminder = {
@@ -93,11 +95,11 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
    }, [dispatch, isFirstReminder, userData?.id])
 
    const handleDeclineNewsletter = useCallback(async () => {
-      dataLayerEvent(
-         `newsletter_denied_on_${
-            isFirstReminder ? "1st_reminder" : "2nd_reminder"
-         }`
-      )
+      const eventName = isFirstReminder
+         ? AnalyticsEvents.NewsletterDeniedOn1stReminder
+         : AnalyticsEvents.NewsletterDeniedOn2ndReminder
+
+      dataLayerEvent(eventName)
 
       try {
          // If this is the first reminder, we should wait another 15 days for the next reminder
@@ -139,7 +141,7 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
          open={open}
          TransitionComponent={TransitionDown}
          key={"newsletter"}
-         sx={isMobile && { left: 26, right: 26, bottom: 36 }}
+         sx={isMobile ? { left: 26, right: 26, bottom: 36 } : {}}
       >
          <SnackbarContent
             style={{ backgroundColor: "white" }}
@@ -203,7 +205,7 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
                               size="large"
                               sx={{ py: 1 }}
                               startIcon={
-                                 isSubmitting && (
+                                 Boolean(isSubmitting) && (
                                     <CircularProgress
                                        color={"inherit"}
                                        size={15}

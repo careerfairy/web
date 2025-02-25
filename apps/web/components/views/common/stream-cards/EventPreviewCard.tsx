@@ -15,6 +15,7 @@ import { usePartnership } from "HOCs/PartnershipProvider"
 import useCustomJobsCount from "components/custom-hook/custom-job/useCustomJobsCount"
 import { useUserHasParticipated } from "components/custom-hook/live-stream/useUserHasParticipated"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
 import {
    getMaxLineStyles,
@@ -34,6 +35,7 @@ import React, {
 } from "react"
 import { Globe } from "react-feather"
 import { useInView } from "react-intersection-observer"
+import { trackLevelsLivestreamOpened } from "store/reducers/talentGuideReducer"
 import { checkIfPast } from "util/streamUtil"
 import { placeholderBanner } from "../../../../constants/images"
 import { gradientAnimation } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
@@ -650,6 +652,7 @@ CardContent.displayName = "CardContent"
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (props, ref) => {
       const router = useRouter()
+      const dispatch = useAppDispatch()
       const { pathname } = router
 
       const { inView: cardInView, ref: cardInViewRef } = useInView({
@@ -670,12 +673,30 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const contextProps = useMemo(() => {
          return {
             onClick: () => {
+               if (!props.event?.id) {
+                  return
+               }
+
+               if (isInTalentGuidePage) {
+                  dispatch(
+                     trackLevelsLivestreamOpened({
+                        livestreamId: props.event.id,
+                        livestreamTitle: props.event.title,
+                     })
+                  )
+               }
                livestreamDialogContext.handleLiveStreamDialogOpen(
                   props.event.id
                )
             },
          }
-      }, [props.event?.id, livestreamDialogContext])
+      }, [
+         isInTalentGuidePage,
+         livestreamDialogContext,
+         props.event?.id,
+         props.event?.title,
+         dispatch,
+      ])
 
       const { getPartnerEventLink } = usePartnership()
 

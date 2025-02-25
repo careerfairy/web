@@ -1,18 +1,17 @@
-import React, { useEffect, useMemo, useState } from "react"
-import HighlightItem from "./HighlightItem"
-import HighlightVideoDialog from "./HighlightVideoDialog"
+import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
 import Box from "@mui/material/Box"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
+import { useRouter } from "next/router"
+import { useEffect, useMemo, useState } from "react"
+import { MARKETING_LANDING_PAGE_PATH } from "../../../constants/routes"
+import { useAuth } from "../../../HOCs/AuthProvider"
 import useCanWatchHighlights from "../../custom-hook/useCanWatchHighlights"
 import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
+import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
+import HighlightItem from "./HighlightItem"
 import HighlightsRestrictedDialog from "./HighlightsRestrictedDialog"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import { useRouter } from "next/router"
-import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
-import { MARKETING_LANDING_PAGE_PATH } from "../../../constants/routes"
-import { dataLayerEvent } from "../../../util/analyticsUtils"
+import HighlightVideoDialog from "./HighlightVideoDialog"
 
 const styles = {
    root: {
@@ -27,7 +26,10 @@ const HighlightsCarousel = ({
    const {
       breakpoints: { up },
    } = useTheme()
-   const [highlights] = useState<HighLight[]>(serverSideHighlights)
+   const highlights = useMemo(
+      () => serverSideHighlights,
+      [serverSideHighlights]
+   )
    const { push, query, pathname } = useRouter()
    const [
       highlightsRestrictedDialogOpen,
@@ -56,10 +58,8 @@ const HighlightsCarousel = ({
       if (isOnLandingPage || canWatchAll) {
          setVideoUrl(videoUrl)
          setUserTimeoutWithCookie()
-         dataLayerEvent("highlight_video_play")
       } else {
          if (isLoggedOut) {
-            dataLayerEvent("highlight_video_signed_out")
             return push({
                pathname: "/login",
                query: {
@@ -70,7 +70,6 @@ const HighlightsCarousel = ({
          }
          if (videoUrl) handleCloseVideoDialog()
          handleOpenHighlightsRestrictedDialog()
-         dataLayerEvent("highlight_video_restricted")
       }
    }
 
@@ -126,13 +125,13 @@ const HighlightsCarousel = ({
                </Box>
             ))}
          </CustomButtonCarousel>
-         {videoUrl && (
+         {Boolean(videoUrl) && (
             <HighlightVideoDialog
                videoUrl={videoUrl}
                handleClose={handleCloseVideoDialog}
             />
          )}
-         {highlightsRestrictedDialogOpen && (
+         {Boolean(highlightsRestrictedDialogOpen) && (
             <HighlightsRestrictedDialog
                open={highlightsRestrictedDialogOpen}
                handleClose={handleCloseHighlightsRestrictedDialog}
@@ -146,7 +145,7 @@ const HighlightsCarousel = ({
 
 interface Props {
    serverSideHighlights: HighLight[]
-   showHighlights: Boolean
+   showHighlights: boolean
 }
 
 export default HighlightsCarousel

@@ -4,13 +4,17 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
+import { trackLevelsJobApplied } from "store/reducers/talentGuideReducer"
 import useSWRMutation from "swr/mutation"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { customJobRepo } from "../../../data/RepositoryInstances"
 import { customJobServiceInstance } from "../../../data/firebase/CustomJobService"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
+import { useAppDispatch } from "../store"
 import useFingerPrint from "../useFingerPrint"
 import useSnackbarNotifications from "../useSnackbarNotifications"
+import { useIsInTalentGuide } from "../utils/useIsInTalentGuide"
 import useCustomJob from "./useCustomJob"
 import useUserJobApplication from "./useUserJobApplication"
 
@@ -20,7 +24,8 @@ const useCustomJobApply = (
 ) => {
    const { userData } = useAuth()
    const { data: fingerPrintId } = useFingerPrint()
-
+   const isInTalentGuide = useIsInTalentGuide()
+   const dispatch = useAppDispatch()
    const { alreadyApplied, applicationInitiatedOnly } = useUserJobApplication(
       userData?.id,
       job.id
@@ -59,10 +64,19 @@ const useCustomJobApply = (
                   "Congrats"
                )
 
-               dataLayerEvent("custom_job_application_complete", {
+               dataLayerEvent(AnalyticsEvents.CustomJobApplicationComplete, {
                   jobId: job.id,
                   jobName: job.title,
                })
+
+               if (isInTalentGuide) {
+                  dispatch(
+                     trackLevelsJobApplied({
+                        jobId: job.id,
+                        jobName: job.title,
+                     })
+                  )
+               }
             },
          }
       )

@@ -24,6 +24,7 @@ import { DateTime } from "luxon"
 import { useRouter } from "next/router"
 import React, { Fragment, useContext, useEffect, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import * as yup from "yup"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -122,10 +123,10 @@ function SignUpUserForm() {
    const [open, setOpen] = React.useState(false)
 
    useEffect(() => {
-      dataLayerEvent("signup_started")
+      dataLayerEvent(AnalyticsEvents.SignupStarted)
    }, [])
 
-   const submitting = (isSubmitting) => {
+   const submitting = (isSubmitting: boolean) => {
       return isSubmitting || emailSent || generalLoading
    }
 
@@ -170,11 +171,13 @@ function SignUpUserForm() {
                   // in case the subscribed input is not checked
                   try {
                      if (values.subscribed) {
-                        dataLayerEvent("newsletter_accepted_on_signup")
+                        dataLayerEvent(
+                           AnalyticsEvents.NewsletterAcceptedOnSignup
+                        )
                         return
                      }
 
-                     dataLayerEvent("newsletter_denied_on_signup")
+                     dataLayerEvent(AnalyticsEvents.NewsletterDeniedOnSignup)
 
                      const sevenDaysFromNow = new Date(
                         new Date().setDate(new Date().getDate() + 7)
@@ -211,7 +214,7 @@ function SignUpUserForm() {
                   // the useEffect moves to the step 1 because the user is logged in but not confirmed
                   // if we would do nextStep() here, it would move to step 2 instead of 1
                   setCurrentStep(1)
-                  dataLayerEvent("signup_credentials_completed")
+                  dataLayerEvent(AnalyticsEvents.SignupCredentialsCompleted)
                })
                .catch((e) => {
                   errorLogAndNotify(e, {

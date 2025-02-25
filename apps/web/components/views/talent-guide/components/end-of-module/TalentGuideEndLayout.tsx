@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, useMediaQuery, Zoom } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import { AnimatePresence } from "framer-motion"
 import { useAuth } from "HOCs/AuthProvider"
 import { useNextTalentGuideModule } from "hooks/useNextTalentGuideModule"
@@ -41,6 +42,7 @@ export const TalentGuideEndLayout = () => {
    const [someTimeHasPassed, setSomeTimeHasPassed] = useState(false)
    const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
    const [isRedirectingToOverview, setIsRedirectingToOverview] = useState(false)
+   const dispatch = useAppDispatch()
    const isShorterScreen = useMediaQuery("(max-height: 590px)")
 
    const { data: nextModule, isLoading: isLoadingNextModule } =
@@ -57,7 +59,9 @@ export const TalentGuideEndLayout = () => {
       })
 
    useEffect(() => {
-      if (!isLoadingNextModule && nextModule === null && feedbackSubmitted) {
+      const hasCompletedAllLevels = !isLoadingNextModule && nextModule === null
+
+      if (hasCompletedAllLevels && feedbackSubmitted) {
          setIsRedirectingToOverview(true)
          push("/levels")
 
@@ -65,7 +69,7 @@ export const TalentGuideEndLayout = () => {
             setIsRedirectingToOverview(false)
          }
       }
-   }, [nextModule, isLoadingNextModule, push, feedbackSubmitted])
+   }, [nextModule, isLoadingNextModule, push, feedbackSubmitted, dispatch])
 
    useEffect(() => {
       const timer = setTimeout(() => {

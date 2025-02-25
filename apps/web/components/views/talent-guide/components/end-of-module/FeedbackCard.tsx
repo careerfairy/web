@@ -19,9 +19,11 @@ import { AnimatedCollapse } from "../../animations/AnimatedCollapse"
 import { ratingTitleAnimation } from "./animations"
 import { feedbackStyles } from "./styles"
 
+import { useAppDispatch } from "components/custom-hook/store"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { StarIcon } from "components/views/common/icons/StarIcon"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
+import { trackLevelsFeedback } from "store/reducers/talentGuideReducer"
 import { useTalentGuideState } from "store/selectors/talentGuideSelectors"
 import { FeedbackFormData, feedbackSchema } from "../../schema"
 
@@ -47,8 +49,10 @@ export const FeedbackCard = ({
    onFeedbackSubmitted,
 }: Props) => {
    const [hover, setHover] = useState(-1)
-   const { moduleData, userAuthUid } = useTalentGuideState()
+   const talentGuideState = useTalentGuideState()
    const { errorNotification } = useSnackbarNotifications()
+   const dispatch = useAppDispatch()
+
    const {
       handleSubmit,
       watch,
@@ -66,12 +70,20 @@ export const FeedbackCard = ({
    const onSubmit = async (data: FeedbackFormData) => {
       try {
          await talentGuideProgressService.submitFeedback(
-            moduleData.content.id,
-            userAuthUid,
+            talentGuideState.moduleData.content.id,
+            talentGuideState.userAuthUid,
             data.rating as TalentGuideFeedback["rating"],
             data.tags as FEEDBACK_TAG_CATEGORY[]
          )
          reset()
+
+         dispatch(
+            trackLevelsFeedback({
+               rating: data.rating,
+               feedbackTags: data.tags,
+            })
+         )
+
          onFeedbackSubmitted?.()
       } catch (error) {
          errorNotification(

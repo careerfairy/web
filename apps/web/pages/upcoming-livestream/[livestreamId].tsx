@@ -14,6 +14,7 @@ import { omit } from "lodash"
 import { GetServerSidePropsContext } from "next"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../HOCs/AuthProvider"
 import useRedirectToEventRoom from "../../components/custom-hook/live-stream/useRedirectToEventRoom"
 import useTrackLivestreamView from "../../components/custom-hook/live-stream/useTrackLivestreamView"
@@ -240,15 +241,14 @@ const UpcomingLivestreamPage = ({
 
    const startRegistrationProcess = useCallback(
       async (fromFooterButton = false) => {
-         dataLayerLivestreamEvent(
-            `event_registration_started${
-               fromFooterButton ? "_from_footer_button" : ""
-            }`,
-            stream
-         )
+         const eventName = fromFooterButton
+            ? AnalyticsEvents.EventRegistrationStartedFromFooterButton
+            : AnalyticsEvents.EventRegistrationStarted
+
+         dataLayerLivestreamEvent(eventName, stream)
          if (isLoggedOut || !auth?.currentUser?.emailVerified) {
             dataLayerLivestreamEvent(
-               "event_registration_started_login_required",
+               AnalyticsEvents.EventRegistrationStartedLoginRequired,
                stream
             )
             return push(
@@ -263,7 +263,7 @@ const UpcomingLivestreamPage = ({
 
          if (!userData || !UserUtil.userProfileIsComplete(userData)) {
             dataLayerLivestreamEvent(
-               "event_registration_started_profile_incomplete",
+               AnalyticsEvents.EventRegistrationStartedProfileIncomplete,
                stream
             )
             return push({
@@ -294,7 +294,10 @@ const UpcomingLivestreamPage = ({
             stream.id,
             userData.authId
          )
-         dataLayerLivestreamEvent("event_registration_removed", stream)
+         dataLayerLivestreamEvent(
+            AnalyticsEvents.EventRegistrationRemoved,
+            stream
+         )
          return deregisterFromLivestream(stream?.id, userData)
       }
    }, [

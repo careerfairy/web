@@ -6,6 +6,8 @@ import ColorizedAvatar from "components/views/common/ColorizedAvatar"
 import { userRepo } from "data/RepositoryInstances"
 import useSWRMutation from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerEvent } from "util/analyticsUtils"
 import { v4 as uuid } from "uuid"
 import { ProfileImageUploadButton } from "./ProfileImageUploadButton"
 
@@ -53,6 +55,7 @@ export const ProfileAvatar = () => {
             successNotification(
                "Profile avatar image has been successfully updated"
             )
+            dataLayerEvent(AnalyticsEvents.ProfileAvatarUpload)
          },
          onError: (err) => {
             errorNotification(err.message)

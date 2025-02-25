@@ -6,7 +6,6 @@ import useCountLivestreamAttendanceMinutes from "components/custom-hook/useCount
 import { usePreFetchRecommendedEvents } from "components/custom-hook/useRecommendedEvents"
 import useRewardLivestreamAttendance from "components/custom-hook/useRewardLivestreamAttendance"
 import { useRtcConnectionState } from "store/selectors/streamingAppSelectors"
-import { useStreamingContext } from "../context"
 
 /**
  * Component responsible for tracking viewer-related behaviors within the streaming application.
@@ -17,13 +16,12 @@ import { useStreamingContext } from "../context"
  */
 export const ViewerTrackers = () => {
    const { userData, userStats } = useAuth()
-   const { livestreamId } = useStreamingContext()
    const livestream = useLivestreamData()
    const rtcConnectionState = useRtcConnectionState()
 
    const { currentState, reason } = rtcConnectionState || {}
 
-   useTrackUserParticipation(livestreamId, userData, userStats)
+   useTrackUserParticipation(livestream, userData, userStats)
    usePreFetchRecommendedEvents()
    usePrefetchUserSparks()
    useCountLivestreamAttendanceMinutes(livestream, currentState, reason)

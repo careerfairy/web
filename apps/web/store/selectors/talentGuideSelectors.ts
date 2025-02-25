@@ -1,5 +1,6 @@
 import { useAppSelector } from "components/custom-hook/store"
 import { RootState } from "store"
+import { getProgressPercentage } from "util/levels"
 
 export const useVisibleSteps = () =>
    useAppSelector((state) =>
@@ -28,10 +29,9 @@ export const useIsLastStep = () =>
 export const useProgress = () =>
    useAppSelector((state) => {
       if (!state.talentGuide.moduleData?.content.moduleSteps) return 0
-      return (
-         ((state.talentGuide.currentStepIndex + 1) /
-            state.talentGuide.moduleData.content.moduleSteps.length) *
-         100
+      return getProgressPercentage(
+         state.talentGuide.currentStepIndex,
+         state.talentGuide.moduleData
       )
    })
 

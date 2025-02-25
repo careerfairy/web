@@ -1,8 +1,10 @@
 import { Box, IconButton, Typography } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { ArticleBlockType } from "data/hygraph/types"
 import Link from "next/link"
 import { ChevronRight, Circle } from "react-feather"
+import { trackLevelsArticleClick } from "store/reducers/talentGuideReducer"
 import { sxStyles } from "types/commonTypes"
 import { BlockWithAuthorPromotion } from "./BlockWithAuthorPromotions"
 
@@ -77,9 +79,26 @@ const Content = ({
    articleUrl,
    authorAvatar,
    authorName,
+   id,
 }: Props) => {
+   const dispatch = useAppDispatch()
+
    return (
-      <Box sx={styles.root} component={Link} href={articleUrl}>
+      <Box
+         sx={styles.root}
+         component={Link}
+         onClick={() => {
+            dispatch(
+               trackLevelsArticleClick({
+                  articleId: id,
+                  articleUrl: articleUrl,
+                  articleTitle: title,
+               })
+            )
+         }}
+         href={articleUrl}
+         target="_blank"
+      >
          <Box
             sx={[
                styles.imageContainer,

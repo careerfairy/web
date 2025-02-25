@@ -7,11 +7,13 @@ import { Box, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
+import { useLivestreamData } from "components/custom-hook/streaming"
 import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import JobCard from "components/views/common/jobs/JobCard"
 import { useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { dataLayerEvent } from "util/analyticsUtils"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useStreamingContext } from "../../context"
 import { EmptyJobsView } from "./EmptyJobsView"
 import { JobCardSkeleton, JobListSkeleton } from "./JobListSkeleton"
@@ -50,6 +52,7 @@ const ContentWrapper = () => {
 
 const Content = ({ livestreamId, isHost, hostCompanyId }) => {
    const [selectedJob, setSelectedJob] = useState<CustomJob>(null)
+   const livestream = useLivestreamData()
 
    const jobsToShow = useGroupCustomJobs(hostCompanyId, {
       livestreamId: livestreamId,
@@ -59,13 +62,20 @@ const Content = ({ livestreamId, isHost, hostCompanyId }) => {
       setSelectedJob(null)
    }, [])
 
-   const handleJobClick = useCallback((job: CustomJob) => {
-      setSelectedJob(job)
-      dataLayerEvent("livestream_job_open", {
-         jobId: job.id,
-         jobName: job.title,
-      })
-   }, [])
+   const handleJobClick = useCallback(
+      (job: CustomJob) => {
+         setSelectedJob(job)
+         dataLayerLivestreamEvent(
+            AnalyticsEvents.LivestreamJobOpen,
+            livestream,
+            {
+               jobId: job.id,
+               jobName: job.title,
+            }
+         )
+      },
+      [livestream]
+   )
 
    if (isHost && jobsToShow.length == 0) {
       return <EmptyJobsView />

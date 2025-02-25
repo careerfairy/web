@@ -20,6 +20,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import * as yup from "yup"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { BLACKLISTED_ABSOLUTE_PATHS } from "../../../constants/routes"
@@ -168,7 +169,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                userId: values.email,
                userPassword: values.password,
             })
-            dataLayerEvent("login_complete")
+            dataLayerEvent(AnalyticsEvents.LoginComplete)
          } catch (error) {
             switch (error.code) {
                case "auth/wrong-password":
@@ -191,7 +192,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                      email: values.email,
                   })
             }
-            dataLayerEvent("login_failed")
+            dataLayerEvent(AnalyticsEvents.LoginFailed)
          }
          helpers.setSubmitting(false)
       },
