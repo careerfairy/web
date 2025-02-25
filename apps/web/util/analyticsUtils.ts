@@ -8,8 +8,12 @@ import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
-import { ModuleStepType, RichTextBlockType } from "data/hygraph/types"
-import { TalentGuideState } from "store/reducers/talentGuideReducer"
+import {
+   ModuleStepType,
+   Page,
+   RichTextBlockType,
+   TalentGuideModule,
+} from "data/hygraph/types"
 import { AnalyticsEvent } from "./analyticsConstants"
 import { errorLogAndNotify } from "./CommonUtil"
 import { getProgressPercentage } from "./levels"
@@ -159,7 +163,8 @@ const getLastContentId = (currentStep: ModuleStepType) => {
 const getLastContentType = (currentStep: ModuleStepType) => {
    if (currentStep?.content?.__typename === "RichTextBlock") {
       return (
-         getRichTextLastReference(currentStep?.content)?.__typename || "Text"
+         getRichTextLastReference(currentStep?.content)?.__typename ||
+         "RichText"
       )
    }
    return currentStep?.content?.__typename
@@ -175,30 +180,28 @@ const getLastContentType = (currentStep: ModuleStepType) => {
  */
 export const dataLayerLevelEvent = (
    eventName: AnalyticsEvent,
-   levelsState: TalentGuideState,
+   moduleData: Page<TalentGuideModule>,
+   currentStepIndex: number,
    optionalVariables = {}
 ) => {
-   if (!levelsState.moduleData?.content) {
+   if (!moduleData?.content) {
       const message = `Missing module data for level event ${eventName} - event not sent. Consider using dataLayerEvent() if level state not required`
-      console.error(message, levelsState)
+      console.error(message, moduleData)
       errorLogAndNotify(new Error(message))
-
       return
    }
 
-   const currentStepIndex = levelsState.currentStepIndex
-   const currentStep =
-      levelsState.moduleData?.content?.moduleSteps?.[currentStepIndex]
+   const currentStep = moduleData.content?.moduleSteps?.[currentStepIndex]
 
    dataLayerEvent(eventName, {
       ...optionalVariables,
-      levelSlug: levelsState.moduleData.slug,
-      levelName: levelsState.moduleData.content?.moduleName,
-      levelId: levelsState.moduleData.content?.id,
+      levelSlug: moduleData.slug,
+      levelName: moduleData.content?.moduleName,
+      levelId: moduleData.content?.id,
       currentStepIndex: currentStepIndex,
-      totalSteps: levelsState.moduleData.content?.moduleSteps?.length,
+      totalSteps: moduleData.content?.moduleSteps?.length,
       progressPercentage: Math.round(
-         getProgressPercentage(currentStepIndex, levelsState.moduleData)
+         getProgressPercentage(currentStepIndex, moduleData)
       ),
       currentStepId: currentStep?.content?.id,
       currentStepType: currentStep?.content?.__typename,
