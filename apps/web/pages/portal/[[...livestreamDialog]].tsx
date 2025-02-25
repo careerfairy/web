@@ -157,7 +157,7 @@ const PortalPage = ({
                            >
                               <EventsPreviewCarousel
                                  id={"past-events"}
-                                 title={"Past live streams"}
+                                 title={"Recordings"}
                                  type={EventsTypes.PAST_EVENTS}
                                  events={events}
                                  seeMoreLink={"/past-livestreams"}

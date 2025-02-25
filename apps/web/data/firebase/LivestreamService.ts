@@ -525,6 +525,7 @@ export class LivestreamService {
             transaction.update(livestreamRef, {
                hasEnded: true,
                hasStarted: false,
+               endedAt: Timestamp.now(),
             })
          }
       })
