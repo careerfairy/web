@@ -18,7 +18,16 @@ import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import ical from "ical-generator"
 import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
-import { customJobRepo, groupRepo, sparkRepo } from "./api/repositories"
+import {
+   customJobRepo,
+   groupRepo,
+   notificationRepo,
+   sparkRepo,
+} from "./api/repositories"
+import {
+   CUSTOMERIO_EMAIL_TEMPLATES,
+   EmailAttachment,
+} from "./lib/notifications/EmailTypes"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)
@@ -137,6 +146,7 @@ export const livestreamRegistrationConfirmationEmail = functions
       logger.info("🚀 ~ Livestream registration confirmation email: v4.0")
       const host =
          context?.rawRequest?.headers?.origin || "https://careerfairy.io"
+      const userAuthId = context?.auth?.uid
       // Fetch the live stream data
       const livestreamDoc = await firestore
          .collection("livestreams")
@@ -253,50 +263,53 @@ export const livestreamRegistrationConfirmationEmail = functions
          "dd LLLL yyyy 'at' hh:mm a '(GMT' Z')'"
       )
 
-      const email: any = {
-         TemplateId:
-            process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
-         From: "CareerFairy <noreply@careerfairy.io>",
-         To: data.recipientEmail,
-         TemplateModel: {
-            livestream: {
-               title: livestream.title,
-               company: group.universityName,
-               start: formattedStartDate,
-               companyBannerImageUrl: group.bannerImageUrl,
-            },
-            user: {
-               firstName: data.user_first_name,
-            },
-            jobs: emailJobs,
-            speakers: emailSpeakers,
-            sparks: emailSparks,
-            calendar: emailCalendar,
+      const attachments: EmailAttachment[] = [
+         {
+            filename: `${livestream.title.replace(/[^a-z0-9]/gi, "_")}.ics`,
+            content: Buffer.from(icsContent).toString("base64"),
          },
-         Attachments: [
-            {
-               // Replace any character that is not alphanumeric with an underscore
-               Name: `${livestream.title.replace(/[^a-z0-9]/gi, "_")}.ics`,
-               Content: Buffer.from(icsContent).toString("base64"),
-               ContentType: "text/calendar",
-            },
-         ],
-      }
+      ]
 
-      // Not awaiting on purpose, as it was this way and I believe to make the registration dialog go by quicker
-      client.sendEmailWithTemplate(email).then(
-         () => {
-            logger.info("🚀 ~ Livestream registration confirmation email sent")
-            return {
-               status: 200,
-               data: "Livestream registration confirmation email sent",
-            }
-         },
-         (error) => {
-            logger.error("Error sending registration confirmation email", error)
-            return { status: 500, error: error }
+      try {
+         // Send email using notification repository
+         const result = await notificationRepo.sendEmailNotifications([
+            {
+               templateType:
+                  CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION.type,
+               templateData: {
+                  livestream: {
+                     title: livestream.title,
+                     company: group.universityName,
+                     start: formattedStartDate,
+                     companyBannerImageUrl: group.bannerImageUrl,
+                  },
+                  jobs: emailJobs,
+                  speakers: emailSpeakers,
+                  sparks: emailSparks,
+                  calendar: emailCalendar,
+                  livestreamUrl: data.livestream_link,
+               },
+               userAuthId,
+               to: data.recipientEmail,
+               attachments,
+            },
+         ])
+
+         logger.info(
+            "🚀 ~ Livestream registration confirmation email sent",
+            result
+         )
+         return {
+            status: 200,
+            data: "Livestream registration confirmation email sent",
          }
-      )
+      } catch (error) {
+         logger.error(
+            "Error sending registration confirmation email",
+            JSON.stringify(error, null, 2)
+         )
+         return { status: 500, error: error }
+      }
    })
 
 export const sendPhysicalEventRegistrationConfirmationEmail = functions

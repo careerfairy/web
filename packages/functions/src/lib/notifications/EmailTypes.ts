@@ -60,6 +60,11 @@ export type CustomerIoEmailMessageData = {
       .type]: LivestreamRegistrationTemplateData
 }
 
+export type EmailAttachment = {
+   filename: string
+   content: Buffer | string
+}
+
 export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
    {
       /**
@@ -78,10 +83,7 @@ export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
        * Optional attachments for the email
        * Each attachment should be an object with filename and content (base64 encoded)
        */
-      attachments?: Array<{
-         filename: string
-         content: Buffer | string
-      }>
+      attachments?: EmailAttachment[]
    } & Omit<
       SendEmailRequestOptions,
       "transactional_message_id" | "message_data" | "identifiers"
