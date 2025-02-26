@@ -27,6 +27,16 @@ type SendRequestResponse = {
  */
 export interface INotificationRepository {
    /**
+    * Sends email notifications in batches to multiple users
+    *
+    * @param notificationsData - Array of notification data objects
+    * @returns Object with counts of successful and failed notifications
+    */
+   sendEmailNotifications<T extends CustomerIoEmailMessageType>(
+      notificationsData: EmailNotificationRequestData<T>[]
+   ): Promise<SendRequestResponse>
+
+   /**
     * Sends push notifications in batches to multiple users
     *
     * @param notificationsData - Array of notification data objects
