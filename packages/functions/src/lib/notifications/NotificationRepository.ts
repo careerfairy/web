@@ -6,7 +6,7 @@ import {
    PushNotificationRequestData,
 } from "./PushNotificationTypes"
 
-type SendPushRequestResponse = {
+type SendRequestResponse = {
    /**
     * The number of notifications that were sent successfully
     */
@@ -22,14 +22,14 @@ type SendPushRequestResponse = {
  */
 export interface INotificationRepository {
    /**
-    * Helper method to send push notifications to multiple users
+    * Sends push notifications in batches to multiple users
     *
-    * @param notificationsData - Array of notification data objects containing userAuthId, templateType, and templateData
+    * @param notificationsData - Array of notification data objects
     * @returns Object with counts of successful and failed notifications
     */
    sendPushNotifications<T extends CustomerIoPushMessageType>(
       notificationsData: PushNotificationRequestData<T>[]
-   ): Promise<SendPushRequestResponse>
+   ): Promise<SendRequestResponse>
 }
 
 /**
@@ -37,6 +37,7 @@ export interface INotificationRepository {
  */
 export class NotificationRepository implements INotificationRepository {
    private cioApi: APIClient
+   protected batchSize = 250
 
    constructor(cioApi: APIClient) {
       this.cioApi = cioApi
@@ -44,23 +45,95 @@ export class NotificationRepository implements INotificationRepository {
 
    async sendPushNotifications<T extends CustomerIoPushMessageType>(
       notificationsData: PushNotificationRequestData<T>[]
-   ): Promise<SendPushRequestResponse> {
-      const notificationPromises = notificationsData.map((notificationData) => {
-         const requestData = createPushNotificationRequestData(notificationData)
+   ): Promise<SendRequestResponse> {
+      return this.processBatches(
+         notificationsData,
+         (data) => {
+            const requestData = createPushNotificationRequestData(data)
+            const request = new SendPushRequest(requestData)
+            return {
+               id: data.userAuthId,
+               promise: this.cioApi.sendPush(request),
+            }
+         },
+         `push notifications for ${notificationsData[0].templateType}`
+      )
+   }
 
-         const request = new SendPushRequest(requestData)
+   /**
+    * Generic method to process items in batches
+    *
+    * @param items - Array of items to process
+    * @param processItem - Function to process a single item and return a promise
+    * @param itemType - Type of items being processed (for logging)
+    * @returns Object with counts of successful and failed items
+    */
+   protected async processBatches<T, R>(
+      items: T[],
+      processItem: (item: T) => { id: string; promise: Promise<R> },
+      itemType: string
+   ): Promise<SendRequestResponse> {
+      // If no items to process, return early
+      if (items.length === 0) {
+         return { successful: 0, failed: 0 }
+      }
 
-         return {
-            userAuthId: notificationData.userAuthId,
-            promise: this.cioApi.sendPush(request),
-         }
-      })
+      // Process items in batches
+      const batches: T[][] = []
+
+      for (let i = 0; i < items.length; i += this.batchSize) {
+         batches.push(items.slice(i, i + this.batchSize))
+      }
+
+      functions.logger.info(
+         `Processing ${items.length} ${itemType} in ${batches.length} batches`
+      )
+
+      let totalSuccessful = 0
+      let totalFailed = 0
+
+      // Process each batch
+      for (let i = 0; i < batches.length; i++) {
+         const batch = batches[i]
+         functions.logger.info(
+            `Processing batch ${i + 1}/${batches.length} with ${
+               batch.length
+            } ${itemType}`
+         )
+
+         const batchResult = await this.processSingleBatch(
+            batch,
+            processItem,
+            itemType
+         )
+
+         totalSuccessful += batchResult.successful
+         totalFailed += batchResult.failed
+      }
+
+      return { successful: totalSuccessful, failed: totalFailed }
+   }
+
+   /**
+    * Process a single batch of items
+    *
+    * @param batch - Batch of items to process
+    * @param processItem - Function to process a single item and return a promise
+    * @param itemType - Type of items being processed (for logging)
+    * @returns Object with counts of successful and failed items for this batch
+    */
+   private async processSingleBatch<T, R>(
+      batch: T[],
+      processItem: (item: T) => { id: string; promise: Promise<R> },
+      itemType: string
+   ): Promise<SendRequestResponse> {
+      const itemPromises = batch.map(processItem)
 
       const results = await Promise.allSettled(
-         notificationPromises.map(({ userAuthId, promise }) =>
+         itemPromises.map(({ id, promise }) =>
             promise.catch((error) => {
                functions.logger.error(
-                  `Error sending notification to user ${userAuthId}:`,
+                  `Error sending ${itemType} to ${id}:`,
                   error
                )
                return null
