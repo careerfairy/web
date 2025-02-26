@@ -143,7 +143,7 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
 export const livestreamRegistrationConfirmationEmail = functions
    .region(config.region)
    .https.onCall(async (data, context) => {
-      logger.info("🚀 ~ Livestream registration confirmation email: v4.0")
+      logger.info("🚀 ~ Livestream registration confirmation email: v6.0")
       const host =
          context?.rawRequest?.headers?.origin || "https://careerfairy.io"
       const userAuthId = context?.auth?.uid
