@@ -21,6 +21,12 @@ type SendPushRequestResponse = {
  * Interface for notification services
  */
 export interface INotificationRepository {
+   /**
+    * Helper method to send push notifications to multiple users
+    *
+    * @param notificationsData - Array of notification data objects containing userAuthId, templateType, and templateData
+    * @returns Object with counts of successful and failed notifications
+    */
    sendPushNotifications<T extends CustomerIoPushMessageType>(
       notificationsData: PushNotificationRequestData<T>[]
    ): Promise<SendPushRequestResponse>
@@ -36,23 +42,14 @@ export class NotificationRepository implements INotificationRepository {
       this.cioApi = cioApi
    }
 
-   /**
-    * Helper method to send push notifications to multiple users
-    *
-    * @param notificationsData - Array of notification data objects containing userAuthId, messageType, and messageData
-    * @returns Object with counts of successful and failed notifications
-    */
    async sendPushNotifications<T extends CustomerIoPushMessageType>(
       notificationsData: PushNotificationRequestData<T>[]
    ): Promise<SendPushRequestResponse> {
-      // Process all notifications at once
       const notificationPromises = notificationsData.map((notificationData) => {
-         // Create a notification request using Customer.io with type safety
          const requestData = createPushNotificationRequestData(notificationData)
 
          const request = new SendPushRequest(requestData)
 
-         // Send the notification
          return {
             userAuthId: notificationData.userAuthId,
             promise: this.cioApi.sendPush(request),
