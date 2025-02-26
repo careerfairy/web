@@ -63,7 +63,7 @@ export const notifyUsersOnLivestreamStart = onDocumentUpdated(
 
             if (registeredUsers.length === 0) {
                functions.logger.log(
-                  "No registered users found for live stream ${livestream.id} - skipping notifications"
+                  `No registered users found for live stream ${livestream.id} - skipping notifications`
                )
                return
             }
