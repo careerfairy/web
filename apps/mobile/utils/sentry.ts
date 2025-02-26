@@ -2,8 +2,8 @@ import { SENTRY_DSN } from "@env"
 import * as Sentry from "@sentry/react-native"
 import { isRunningInExpoGo } from "expo"
 
-const isSentryDisabled = () => {
-   return isRunningInExpoGo() || (__DEV__ && process.env.IS_STAGING !== "true")
+export const isSentryDisabled = () => {
+   return isRunningInExpoGo() || __DEV__
 }
 
 export const initSentry = () => {
@@ -16,17 +16,4 @@ export const initSentry = () => {
    })
 
    return Sentry
-}
-
-export const errorLogAndNotify = (
-   error: Error,
-   extra?: Record<string, any>
-) => {
-   console.error(error.toString(), JSON.stringify(extra, null, 2))
-
-   if (!isSentryDisabled()) {
-      Sentry.captureException(error, {
-         extra,
-      })
-   }
 }

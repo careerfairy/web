@@ -25,10 +25,7 @@
       },
       "staging": {
          "extends": "development",
-         "developmentClient": false,
-         "env": {
-            "IS_STAGING": "true"
-         }
+         "developmentClient": false
       }
    },
    "submit": {

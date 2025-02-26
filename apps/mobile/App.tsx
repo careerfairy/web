@@ -21,10 +21,11 @@ import WebView from "react-native-webview"
 import WebViewComponent from "./components/WebView"
 import { app, auth, db } from "./firebase"
 import { customerIO } from "./utils/customerio-tracking"
+import { errorLogAndNotify } from "./utils/error-handler"
 import { initializeFacebookTracking } from "./utils/facebook-tracking"
 import { handleVerifyToken } from "./utils/firebase"
 import { SECURE_STORE_KEYS } from "./utils/secure-store-constants"
-import { errorLogAndNotify, initSentry } from "./utils/sentry"
+import { initSentry } from "./utils/sentry"
 
 const sentry = initSentry()
 
