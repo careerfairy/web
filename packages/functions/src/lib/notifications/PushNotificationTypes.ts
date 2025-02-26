@@ -5,7 +5,7 @@ import { SendPushRequestOptions } from "customerio-node/dist/lib/api/requests"
  */
 export const CUSTOMERIO_PUSH_TEMPLATES = {
    LIVESTREAM_START: {
-      messageId: process.env.CUSTOMERIO_LIVESTREAM_START_MESSAGE_ID,
+      messageId: process.env.CUSTOMERIO_PUSH_TEMPLATE_LIVESTREAM_START,
       type: "LIVESTREAM_START",
    },
 } as const satisfies Record<string, { messageId: string; type: string }>
