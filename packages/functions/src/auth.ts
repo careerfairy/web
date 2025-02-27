@@ -645,3 +645,26 @@ const getRandomInt = (max: number) => {
       return variable
    }
 }
+
+export const verifyToken = functions
+   .region(config.region)
+   .https.onRequest(async (req, res) => {
+      try {
+         const { idToken } = req.body
+         functions.logger.info("starting verifyToken", idToken)
+         const decodedToken = await auth.verifyIdToken(idToken)
+         functions.logger.info("decoded token", decodedToken)
+         const customToken = await auth.createCustomToken(decodedToken.uid)
+         functions.logger.info("customToken", customToken)
+
+         res.json({
+            uid: decodedToken.uid,
+            email: decodedToken.email,
+            claims: decodedToken.customClaims || {},
+            customToken,
+         })
+      } catch (error) {
+         functions.logger.info("error verifying token", error)
+         res.status(401).json(JSON.stringify(error))
+      }
+   })

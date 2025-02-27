@@ -2,7 +2,7 @@
    "expo": {
       "name": "CareerFairy",
       "slug": "careerfairy-mobile-app",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "orientation": "portrait",
       "icon": "./assets/images/AppIcon.png",
       "scheme": "careerfairy",
@@ -90,14 +90,51 @@
                "iosUserTrackingPermission": "This allows us to provide you with a better experience and more relevant content."
             }
          ],
-         "expo-tracking-transparency"
+         "expo-tracking-transparency",
+         [
+            "expo-build-properties",
+            {
+               "ios": {
+                  "deploymentTarget": "15.1"
+               }
+            }
+         ],
+         [
+            "customerio-expo-plugin",
+            {
+               "android": {
+                  "googleServicesFile": "./google-services.json"
+               },
+               "ios": {
+                  "pushNotification": {
+                     "useRichPush": true,
+                     "env": {
+                        "cdpApiKey": "88de3d45fa1d11ab1e47",
+                        "region": "eu"
+                     }
+                  }
+               }
+            }
+         ]
       ],
       "experiments": {
          "typedRoutes": true
       },
       "extra": {
          "eas": {
-            "projectId": "52368a9d-be31-4ef9-be0a-3e9e1de4e098"
+            "projectId": "52368a9d-be31-4ef9-be0a-3e9e1de4e098",
+            "build": {
+               "experimental": {
+                  "ios": {
+                     "appExtensions": [
+                        {
+                           "targetName": "NotificationService",
+                           "bundleIdentifier": "io.careerfairy.richpush"
+                        }
+                     ]
+                  }
+               }
+            }
          }
       },
       "owner": "admin_product_team"

@@ -1,4 +1,3 @@
-import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
 import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded"
 import MicOutlinedIcon from "@mui/icons-material/MicOutlined"
 import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded"
@@ -149,7 +148,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
    const handleSubmit = useCallback(
       async (values: FormikValues, helpers: FormikHelpers<FormikValues>) => {
          try {
-            const userCred = await firebase.signInWithEmailAndPassword(
+            await firebase.signInWithEmailAndPassword(
                values.email,
                values.password
             )
@@ -163,12 +162,6 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                })
                .catch(console.error) // fail silently
             helpers.setErrors({})
-            const token = userCred.user.multiFactor["user"].accessToken || ""
-            MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
-               token,
-               userId: values.email,
-               userPassword: values.password,
-            })
             dataLayerEvent(AnalyticsEvents.LoginComplete)
          } catch (error) {
             switch (error.code) {

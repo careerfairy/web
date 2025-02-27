@@ -10,4 +10,6 @@ declare module "@env" {
    export const FIREBASE_STORAGE_BUCKET: string
    export const FIREBASE_MESSAGING_SENDER_ID: string
    export const FIREBASE_APPS_ID: string
+   export const CUSTOMERIO_CDP_API_KEY: string
+   export const CUSTOMERIO_SITE_ID: string
 }

@@ -1,5 +1,4 @@
 import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
-import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
 import {
    IUserReminder,
    UserAccountCreationAdditionalData,
@@ -30,7 +29,6 @@ import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
 import CookiesUtil from "../../../../util/CookiesUtil"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { MobileUtils } from "../../../../util/mobile.utils"
 import GenericDropdown from "../../common/GenericDropdown"
 import {
    IMultiStepContext,
@@ -166,7 +164,7 @@ function SignUpUserForm() {
          .then(() => {
             firebase
                .signInWithEmailAndPassword(values.email, values.password)
-               .then(async (userCred) => {
+               .then(async () => {
                   // To create a newsletter reminder for 7 days in the future
                   // in case the subscribed input is not checked
                   try {
@@ -190,13 +188,6 @@ function SignUpUserForm() {
                         isFirstReminder: true,
                      } as IUserReminder
 
-                     const token =
-                        userCred.user.multiFactor["user"].accessToken || ""
-                     MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
-                        token,
-                        userId: values.email,
-                        userPassword: values.password,
-                     })
                      await userRepo.updateUserReminder(values.email, reminder)
                   } catch (e) {
                      errorLogAndNotify(e, {

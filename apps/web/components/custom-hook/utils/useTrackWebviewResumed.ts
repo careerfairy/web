@@ -1,4 +1,4 @@
-import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
+import { MESSAGING_TYPE, WebEvent } from "@careerfairy/shared-lib/messaging"
 import { useEffect, useState } from "react"
 import { MobileUtils } from "../../../util/mobile.utils"
 
@@ -25,7 +25,7 @@ export const useTrackWebviewResumedCount = () => {
                return
             }
 
-            const message = JSON.parse(event.data)
+            const message: WebEvent = JSON.parse(event.data)
             if (message && message.type === MESSAGING_TYPE.WEBVIEW_RESUMED) {
                setWebviewResumedCount((prev) => prev + 1)
             }
