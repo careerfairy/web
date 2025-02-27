@@ -83,6 +83,7 @@ import notificationOnboardings = require("./notificationOnboarding")
 import user = require("./user")
 import countries = require("./countries")
 import levels = require("./levels")
+import remindersNew = require("./reminders-new")
 
 // Auth
 exports.createNewUserAccount_v3 = auth.createNewUserAccount
@@ -387,3 +388,11 @@ exports.getFollowedCreators = levels.getFollowedCreators
 // CustomerIO
 exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
 exports.customerIOWebhook = customerio.customerIOWebhook
+
+// Reminders
+exports.schedule5MinutesReminderEmails =
+   remindersNew.schedule5MinutesReminderEmails
+exports.schedule1HourReminderEmails = remindersNew.schedule1HourReminderEmails
+exports.schedule24HoursReminderEmails =
+   remindersNew.schedule24HoursReminderEmails
+exports.testReminder = remindersNew.testReminder
