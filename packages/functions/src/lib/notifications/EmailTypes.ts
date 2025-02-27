@@ -20,20 +20,20 @@ export interface LivestreamRegistrationTemplateData {
       start: string
       companyBannerImageUrl: string
    }
-   jobs?: {
+   jobs: {
       url: string
       title: string
       jobType: string
       businessFunctionsTags?: string
       deadline?: string
    }[]
-   speakers?: {
+   speakers: {
       name: string
       position: string
       avatarUrl: string
       url: string
    }[]
-   sparks?: {
+   sparks: {
       question: string
       category_id: string
       thumbnailUrl: string
@@ -44,7 +44,6 @@ export interface LivestreamRegistrationTemplateData {
       outlook: string
       apple: string
    }
-   livestreamUrl?: string
 }
 
 /**

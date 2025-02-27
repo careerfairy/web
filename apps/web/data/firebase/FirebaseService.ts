@@ -51,6 +51,7 @@ import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
 import { DateTime } from "luxon"
+import { FirebaseReducer } from "react-redux-firebase"
 import DateUtil from "util/DateUtil"
 import { v4 as uuidv4 } from "uuid"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
@@ -274,7 +275,11 @@ class FirebaseService {
       return handleGetLivestreamReportData(data)
    }
 
-   sendRegistrationConfirmationEmail = (user, userData, livestream) => {
+   sendRegistrationConfirmationEmail = (
+      user: FirebaseReducer.AuthState,
+      userData: UserData,
+      livestream: LivestreamEvent
+   ) => {
       if (livestream.isHybrid) {
          return this.sendHybridEventEmailRegistrationConfirmation(
             user,
@@ -297,18 +302,24 @@ class FirebaseService {
    }
 
    sendLivestreamEmailRegistrationConfirmation = (
-      user,
-      userData,
-      livestream
+      user: FirebaseReducer.AuthState,
+      userData: UserData,
+      livestream: LivestreamEvent
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
             "sendLivestreamRegistrationConfirmationEmail_v6"
          )
 
-      const calendarEvent = createCalendarEvent(livestream, undefined, {
-         overrideBaseUrl: getBaseUrl(),
-      })
+      const calendarEvent = createCalendarEvent(
+         livestream,
+         {
+            campaign: "fromcalendarevent-mail",
+         },
+         {
+            overrideBaseUrl: getBaseUrl(),
+         }
+      )
 
       const urls = makeUrls(calendarEvent, errorLogAndNotify)
 
@@ -316,23 +327,15 @@ class FirebaseService {
          eventCalendarUrls: urls,
          livestream_id: livestream.id,
          recipientEmail: user.email,
-         user_first_name: userData.firstName,
          user_time_zone: userData.timezone,
-         timezone: userData.timezone,
-         regular_date: livestream.start.toDate().toString(),
-         duration_date: livestream.duration,
-         livestream_date: DateUtil.getPrettyDateWithoutHour(
-            livestream.start.toDate()
-         ),
-         company_name: livestream.company,
-         company_logo_url: livestream.companyLogoUrl,
-         company_background_image_url: livestream.backgroundImageUrl,
-         livestream_title: livestream.title,
-         livestream_link: calendarEvent.location,
       })
    }
 
-   sendPhysicalEventEmailRegistrationConfirmation = (user, userData, event) => {
+   sendPhysicalEventEmailRegistrationConfirmation = (
+      user: FirebaseReducer.AuthState,
+      userData: UserData,
+      event: LivestreamEvent
+   ) => {
       const sendPhysicalEventRegistrationConfirmation =
          this.functions.httpsCallable(
             "sendPhysicalEventRegistrationConfirmationEmail_eu"
@@ -348,7 +351,11 @@ class FirebaseService {
       })
    }
 
-   sendHybridEventEmailRegistrationConfirmation = (user, userData, event) => {
+   sendHybridEventEmailRegistrationConfirmation = (
+      user: FirebaseReducer.AuthState,
+      userData: UserData,
+      event: LivestreamEvent
+   ) => {
       const sendHybridEventEmailRegistrationConfirmation =
          this.functions.httpsCallable(
             "sendHybridEventRegistrationConfirmationEmail_eu"
