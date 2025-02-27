@@ -274,8 +274,7 @@ export const livestreamRegistrationConfirmationEmail = functions
          // Send email using notification repository
          const result = await notificationRepo.sendEmailNotifications([
             {
-               templateType:
-                  CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION.type,
+               templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION,
                templateData: {
                   livestream: {
                      title: livestream.title,

@@ -83,7 +83,7 @@ export class NotificationRepository implements INotificationRepository {
                promise: this.cioApi.sendEmail(request),
             }
          },
-         `email notifications for ${notificationsData[0].templateType}`
+         `email notifications for ${notificationsData[0].templateId}`
       )
    }
 
