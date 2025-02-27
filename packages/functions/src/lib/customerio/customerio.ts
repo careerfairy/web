@@ -171,14 +171,22 @@ export const customerIOWebhook = onRequest(async (request, response) => {
          case "subscribed":
          case "unsubscribed": {
             const userEmail = event.data.identifiers.email
-            // Update the user's subscription status in Firebase
-            await userRepo.updateUserData(userEmail, {
-               unsubscribed: event.metric === "unsubscribed",
-            })
-
             logger.info(
-               `Updated subscription status for user ${userEmail} to ${event.metric}`
+               `Updating subscription status for user ${userEmail} to ${event.metric}`
             )
+            try {
+               await userRepo.updateUserData(userEmail, {
+                  unsubscribed: event.metric === "unsubscribed",
+               })
+               logger.info(
+                  `Updated subscription status for user ${userEmail} to ${event.metric}`
+               )
+            } catch (error) {
+               logger.warn(
+                  `Failed to update subscription status for user ${userEmail}`,
+                  error
+               )
+            }
             response.status(200).send("OK")
             break
          }
@@ -189,7 +197,11 @@ export const customerIOWebhook = onRequest(async (request, response) => {
          }
       }
    } catch (error) {
-      logger.error(`Error processing ${event.metric} webhook`, error)
+      logger.error(
+         `Error processing ${event.metric} webhook for user ${event.data?.identifiers?.email}`,
+         event,
+         error
+      )
       response.status(500).send("Internal Server Error")
    }
 })
