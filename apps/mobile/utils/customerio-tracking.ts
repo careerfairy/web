@@ -122,19 +122,6 @@ class CustomerIOService {
    }
 
    /**
-    * Updates the device attributes for the current device
-    * @param attributes - The attributes to update
-    * @returns A promise that resolves when the attributes are updated
-    */
-   async updateDeviceAttributes(attributes: { push_enabled: boolean }) {
-      if (!CustomerIO.isInitialized()) {
-         await this.initialize()
-      }
-
-      return CustomerIO.setDeviceAttributes(attributes)
-   }
-
-   /**
     * Gets the current push permission status for the current device
     * @returns A promise that resolves with the current push permission status
     */
