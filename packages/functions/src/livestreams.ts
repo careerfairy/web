@@ -266,7 +266,7 @@ export const livestreamRegistrationConfirmationEmail = functions
       const attachments: EmailAttachment[] = [
          {
             filename: `${livestream.title.replace(/[^a-z0-9]/gi, "_")}.ics`,
-            content: Buffer.from(icsContent).toString("base64"),
+            content: icsContent,
          },
       ]
 
