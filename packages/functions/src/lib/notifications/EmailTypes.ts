@@ -90,33 +90,12 @@ export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
    >
 
 /**
- * Type-safe function to create a email request
- * @param params Object containing message type, data and user ID
- * @param params.messageType The type of message to create
- * @param params.data The message data specific to the message ID
- * @param params.userAuthId The user ID to send the notification to
- * @param params.attachments Optional array of attachments (filename and content)
- * @returns An object with the correctly typed message data
- *
- * @example
- * // Example of sending an email with an attachment
- * const emailData: EmailNotificationRequestData<typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_START.type> = {
- *   templateType: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_START.type,
- *   templateData: {
- *     url: "https://example.com/livestream",
- *     company_logo_url: "https://example.com/logo.png",
- *     live_stream_title: "Exciting Livestream"
- *   },
- *   userAuthId: "user123",
- *   attachments: [
- *     {
- *       filename: "schedule.pdf",
- *       content: fs.readFileSync("path/to/schedule.pdf")
- *     }
- *   ]
- * };
- *
- * await notificationRepository.sendEmailNotifications([emailData]);
+ * Creates a type-safe email notification request
+ * @param params.templateType Type of message to create
+ * @param params.templateData Message data for the template
+ * @param params.userAuthId User ID to send to
+ * @param params.attachments Optional email attachments
+ * @returns Email request options object
  */
 export function createEmailNotificationRequestData<
    T extends CustomerIoEmailMessageType
