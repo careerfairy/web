@@ -56,7 +56,7 @@ export class NotificationRepository implements INotificationRepository {
                promise: this.cioApi.sendPush(request),
             }
          },
-         `push notifications for ${notificationsData[0].templateType}`
+         `push notifications for ${notificationsData[0].templateId}`
       )
    }
 

@@ -4,14 +4,11 @@ import { SendPushRequestOptions } from "customerio-node/dist/lib/api/requests"
  * Customer.io transactional message IDs
  */
 export const CUSTOMERIO_PUSH_TEMPLATES = {
-   LIVESTREAM_START: {
-      messageId: process.env.CUSTOMERIO_PUSH_TEMPLATE_LIVESTREAM_START,
-      type: "LIVESTREAM_START",
-   },
-} as const satisfies Record<string, { messageId: string; type: string }>
+   LIVESTREAM_START: "live_stream_start",
+} as const satisfies Record<string, string>
 
 export type CustomerIoPushMessageType =
-   (typeof CUSTOMERIO_PUSH_TEMPLATES)[keyof typeof CUSTOMERIO_PUSH_TEMPLATES]["type"]
+   (typeof CUSTOMERIO_PUSH_TEMPLATES)[keyof typeof CUSTOMERIO_PUSH_TEMPLATES]
 
 /**
  * Base interface for all message data
@@ -32,15 +29,14 @@ export interface LivestreamStartPushMessageData extends BasePushMessageData {
  * Union type of all possible message data types
  */
 export type CustomerIoPushMessageData = {
-   [CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START
-      .type]: LivestreamStartPushMessageData
+   [CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START]: LivestreamStartPushMessageData
 }
 
 export type PushNotificationRequestData<T extends CustomerIoPushMessageType> = {
    /**
     * The type of message to create
     */
-   templateType: T
+   templateId: T
    /**
     * Custom data you would like to send to the message template
     */
@@ -65,15 +61,14 @@ export type PushNotificationRequestData<T extends CustomerIoPushMessageType> = {
 export function createPushNotificationRequestData<
    T extends CustomerIoPushMessageType
 >({
-   templateType,
+   templateId,
    templateData,
    userAuthId,
    ...rest
 }: PushNotificationRequestData<T>): SendPushRequestOptions {
    return {
       ...rest,
-      transactional_message_id:
-         CUSTOMERIO_PUSH_TEMPLATES[templateType].messageId,
+      transactional_message_id: templateId,
       message_data: templateData,
       identifiers: {
          id: userAuthId,

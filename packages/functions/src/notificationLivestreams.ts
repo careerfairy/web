@@ -8,7 +8,7 @@ import { CUSTOMERIO_PUSH_TEMPLATES } from "./lib/notifications/PushNotificationT
 import { logAndThrow } from "./lib/validations"
 
 /**
- * Sends push notifications to registered users when a live stream starts
+ * Sends expo push notifications to registered users when a live stream starts
  */
 export const notifyUsersWhenLivestreamStarts = onDocumentUpdated(
    {
@@ -39,6 +39,9 @@ export const notifyUsersWhenLivestreamStarts = onDocumentUpdated(
    }
 )
 
+/**
+ * Sends customer.io push notifications to registered users when a live stream starts
+ */
 export const notifyUsersOnLivestreamStart = onDocumentUpdated(
    {
       document: "livestreams/{livestreamId}",
@@ -80,8 +83,7 @@ export const notifyUsersOnLivestreamStart = onDocumentUpdated(
                await notificationRepo.sendPushNotifications(
                   registeredUsers.map((user) => ({
                      userAuthId: user.user?.authId,
-                     templateType:
-                        CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START.type,
+                     templateId: CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START,
                      templateData: {
                         live_stream_title: livestream.title,
                         company_logo_url: livestream.companyLogoUrl,
