@@ -148,6 +148,16 @@ const reminderScheduleRange = 20
 // Maximum size of each email chunk
 const emailMaxChunkSize = 950
 
+type LivestreamFollowUpAdditionalData = {
+   groups: {
+      groupsByLivestreamId: Record<string, Group>
+      groupSparks: Record<string, Spark[]>
+   }
+   livestream: {
+      jobsByLivestreamId: Record<string, CustomJob[]>
+   }
+}
+
 export type ReminderData = {
    timeMessage?: string
    minutesBefore?: number
@@ -160,15 +170,14 @@ export type ReminderData = {
    template: string
 }
 
-type LivestreamFollowUpAdditionalData = {
-   groups: {
-      groupsByLivestreamId: Record<string, Group>
-      groupSparks: Record<string, Spark[]>
+export type EmailChunks = Record<
+   string,
+   {
+      reminderKey: ReminderData["key"]
+      streamId: string
+      chunks: EmailChunk["chunk"][]
    }
-   livestream: {
-      jobsByLivestreamId: Record<string, CustomJob[]>
-   }
-}
+>
 
 export const ReminderCampaignMap: Record<ReminderData["key"], string> = {
    reminder5Minutes: "reminder-5min",
@@ -501,12 +510,13 @@ const handleReminder = async (
             reminder.timeMessage
          }`
       )
+
       const allGroups = await Promise.all(
          streams.map((stream) =>
-            groupRepo.getGroupById(stream.groupIds.at(0)).then((group) => {
+            groupRepo.getGroupsByIds(stream.groupIds).then((groups) => {
                return {
                   streamId: stream.id,
-                  group: group,
+                  group: groups.find((g) => !g.universityCode) || groups[0],
                }
             })
          )
@@ -550,18 +560,24 @@ const handleReminder = async (
    }
 }
 
+type EmailChunk = {
+   reminderKey: ReminderData["key"]
+   streamId: string
+   chunk: `${number}of${number}`
+}
+
 /**
  * It creates emailData based on the stream and the reminder information and sends the email to all the streams that are not FaceToFace.
  *
  */
-const handleSendEmail = (
+const handleSendEmail = async (
    streams: LiveStreamEventWithUsersLivestreamData[],
    reminder: ReminderData,
    handleGenerateEmailData: (
       props: Omit<IGenerateEmailDataProps, "streamGroup">
    ) => MailgunMessageData[]
 ) => {
-   const promiseArrayToSendMessages = []
+   const promiseArrayToSendMessages: Promise<EmailChunk>[] = []
    const { minutesBefore } = reminder
 
    streams.forEach((stream) => {
@@ -587,7 +603,7 @@ const handleSendEmail = (
          )
 
          emailsData.forEach((emailData, index) => {
-            const currentChunk = `${index + 1}of${emailsData.length}`
+            const currentChunk = `${index + 1}of${emailsData.length}` as const
 
             // We only want to send the current email chunk reminder if it hasn't already been sent
             if (wasEmailChunkNotYetSent(stream, reminder.key, currentChunk)) {
@@ -609,11 +625,9 @@ const handleSendEmail = (
    }
 
    return Promise.allSettled(promiseArrayToSendMessages).then((results) => {
-      return results.reduce((acc: any, currentResult: any) => {
-         const { status, value, reason } = currentResult
-
-         if (status === "fulfilled") {
-            const { reminderKey, streamId, chunk } = value
+      return results.reduce<EmailChunks>((acc, currentResult) => {
+         if (currentResult.status === "fulfilled") {
+            const { reminderKey, streamId, chunk } = currentResult.value
 
             functions.logger.log(
                `Email ${reminderKey} with chunk ${chunk} was sent successfully for the stream ${streamId}`
@@ -628,9 +642,8 @@ const handleSendEmail = (
                      : [chunk],
                },
             }
-         }
-         if (status === "rejected") {
-            functions.logger.error(reason)
+         } else {
+            functions.logger.error(currentResult.reason)
          }
          return acc
       }, {})
@@ -769,27 +782,26 @@ const getPostmarkTemplateMessages = (
  * To create sendEmail promise and handling the possible error
  *
  */
-const createSendEmailPromise = (
+const createSendEmailPromise = async (
    emailData: MailgunMessageData,
    reminder: ReminderData,
    stream: LiveStreamEventWithUsersLivestreamData,
-   currentChunk: string
+   currentChunk: `${number}of${number}`
 ) => {
    const { id } = stream
    const { key } = reminder
 
-   return sendIndividualMessages(emailData)
-      .then(() => {
-         functions.logger.log(
-            `Email ${key} with chunk ${currentChunk} was sent for stream ${id}`
-         )
-         return { reminderKey: key, streamId: id, chunk: currentChunk }
-      })
-      .catch((error) => {
-         throw new Error(
-            `Email ${key} with chunk ${currentChunk} was not sent for stream ${id} with the error ${error?.message}`
-         )
-      })
+   try {
+      await sendIndividualMessages(emailData)
+      functions.logger.log(
+         `Email ${key} with chunk ${currentChunk} was sent for stream ${id}`
+      )
+      return { reminderKey: key, streamId: id, chunk: currentChunk }
+   } catch (error) {
+      throw new Error(
+         `Email ${key} with chunk ${currentChunk} was not sent for stream ${id} with the error ${error?.message}`
+      )
+   }
 }
 
 /**

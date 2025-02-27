@@ -2,7 +2,7 @@ import { APIClient, SendEmailRequest, SendPushRequest } from "customerio-node"
 import * as functions from "firebase-functions"
 import {
    createEmailNotificationRequestData,
-   CustomerIoEmailMessageType,
+   CustomerIoEmailTemplateId,
    EmailNotificationRequestData,
 } from "./EmailTypes"
 import {
@@ -23,6 +23,50 @@ type SendRequestResponse = {
 }
 
 /**
+ * Progress information for batch processing
+ */
+export type ProgressInfo = {
+   /**
+    * The current batch index (0-based)
+    */
+   batchIndex: number
+   /**
+    * The total number of batches
+    */
+   totalBatches: number
+   /**
+    * The number of successful items in the current batch
+    */
+   batchSuccessful: number
+   /**
+    * The number of failed items in the current batch
+    */
+   batchFailed: number
+   /**
+    * The total number of successful items across all processed batches
+    */
+   totalSuccessful: number
+   /**
+    * The total number of failed items across all processed batches
+    */
+   totalFailed: number
+   /**
+    * The total number of items being processed
+    */
+   totalItems: number
+
+   /**
+    * The type of items being processed
+    */
+   itemType: string
+}
+
+/**
+ * Callback function for tracking progress of batch processing
+ */
+export type OnBatchCompleteCallback = (progress: ProgressInfo) => void
+
+/**
  * Interface for notification services
  */
 export interface INotificationRepository {
@@ -30,20 +74,24 @@ export interface INotificationRepository {
     * Sends email notifications in batches to multiple users
     *
     * @param notificationsData - Array of notification data objects
+    * @param progressCallback - Optional callback for tracking progress
     * @returns Object with counts of successful and failed notifications
     */
-   sendEmailNotifications<T extends CustomerIoEmailMessageType>(
-      notificationsData: EmailNotificationRequestData<T>[]
+   sendEmailNotifications<T extends CustomerIoEmailTemplateId>(
+      notificationsData: EmailNotificationRequestData<T>[],
+      progressCallback?: OnBatchCompleteCallback
    ): Promise<SendRequestResponse>
 
    /**
     * Sends push notifications in batches to multiple users
     *
     * @param notificationsData - Array of notification data objects
+    * @param progressCallback - Optional callback for tracking progress
     * @returns Object with counts of successful and failed notifications
     */
    sendPushNotifications<T extends CustomerIoPushMessageType>(
-      notificationsData: PushNotificationRequestData<T>[]
+      notificationsData: PushNotificationRequestData<T>[],
+      progressCallback?: OnBatchCompleteCallback
    ): Promise<SendRequestResponse>
 }
 
@@ -58,8 +106,9 @@ export class NotificationRepository implements INotificationRepository {
       this.cioApi = cioApi
    }
 
-   async sendEmailNotifications<T extends CustomerIoEmailMessageType>(
-      notificationsData: EmailNotificationRequestData<T>[]
+   async sendEmailNotifications<T extends CustomerIoEmailTemplateId>(
+      notificationsData: EmailNotificationRequestData<T>[],
+      onBatchCompleteCallback?: OnBatchCompleteCallback
    ): Promise<SendRequestResponse> {
       return this.processBatches(
          notificationsData,
@@ -72,10 +121,6 @@ export class NotificationRepository implements INotificationRepository {
                data.attachments.forEach((attachment) => {
                   request.attach(attachment.filename, attachment.content)
                })
-
-               functions.logger.info(
-                  `Added ${data.attachments.length} attachments to email for user ${data.userAuthId}`
-               )
             }
 
             return {
@@ -83,12 +128,16 @@ export class NotificationRepository implements INotificationRepository {
                promise: this.cioApi.sendEmail(request),
             }
          },
-         `email notifications for ${notificationsData[0].templateId}`
+         `email notifications for ${
+            notificationsData[0]?.templateId || "unknown template"
+         }`,
+         onBatchCompleteCallback
       )
    }
 
    async sendPushNotifications<T extends CustomerIoPushMessageType>(
-      notificationsData: PushNotificationRequestData<T>[]
+      notificationsData: PushNotificationRequestData<T>[],
+      onBatchCompleteCallback?: OnBatchCompleteCallback
    ): Promise<SendRequestResponse> {
       return this.processBatches(
          notificationsData,
@@ -100,7 +149,10 @@ export class NotificationRepository implements INotificationRepository {
                promise: this.cioApi.sendPush(request),
             }
          },
-         `push notifications for ${notificationsData[0].templateId}`
+         `push notifications for ${
+            notificationsData[0]?.templateId || "unknown template"
+         }`,
+         onBatchCompleteCallback
       )
    }
 
@@ -110,12 +162,14 @@ export class NotificationRepository implements INotificationRepository {
     * @param items - Array of items to process
     * @param processItem - Function to process a single item and return a promise
     * @param itemType - Type of items being processed (for logging)
+    * @param onBatchComplete - Optional callback for tracking progress
     * @returns Object with counts of successful and failed items
     */
    protected async processBatches<T, R>(
       items: T[],
       processItem: (item: T) => { id: string; promise: Promise<R> },
-      itemType: string
+      itemType: string,
+      onBatchCompleteCallback?: OnBatchCompleteCallback
    ): Promise<SendRequestResponse> {
       // If no items to process, return early
       if (items.length === 0) {
@@ -153,6 +207,20 @@ export class NotificationRepository implements INotificationRepository {
 
          totalSuccessful += batchResult.successful
          totalFailed += batchResult.failed
+
+         // Call the progress callback if provided
+         if (onBatchCompleteCallback) {
+            onBatchCompleteCallback({
+               batchIndex: i,
+               totalBatches: batches.length,
+               batchSuccessful: batchResult.successful,
+               batchFailed: batchResult.failed,
+               totalSuccessful,
+               totalFailed,
+               totalItems: items.length,
+               itemType,
+            })
+         }
       }
 
       return { successful: totalSuccessful, failed: totalFailed }
