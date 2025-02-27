@@ -345,13 +345,22 @@ export const makeUrls = function (
    }
 }
 
+type GetLivestreamICSDownloadUrlOptions = {
+   utmCampaign?: string
+}
+
 export const getLivestreamICSDownloadUrl = (
    streamId: string,
-   isLocal: boolean
+   isLocal: boolean,
+   options: GetLivestreamICSDownloadUrlOptions = {}
 ) => {
+   const utmCampaignQueryParam = options.utmCampaign
+      ? `&utm_campaign=${options.utmCampaign}`
+      : ""
+
    return isLocal
-      ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${streamId}`
-      : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${streamId}`
+      ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${streamId}${utmCampaignQueryParam}`
+      : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${streamId}${utmCampaignQueryParam}`
 }
 
 type OptionsCreateCalendarEvent = {

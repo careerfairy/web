@@ -35,7 +35,7 @@ export const getLivestreamICalendarEvent = functions
    .https.onRequest(async (req, res) => {
       setCORSHeaders(req, res)
       const livestreamId = req.query.eventId as string
-
+      const campaign = req.query.utm_campaign as string
       if (livestreamId) {
          try {
             // get the live stream
@@ -50,9 +50,11 @@ export const getLivestreamICalendarEvent = functions
                // create calendar event
                const calendarEventProperties = generateCalendarEventProperties(
                   livestream,
-                  {
-                     campaign: "fromcalendarevent-mail",
-                  }
+                  campaign
+                     ? {
+                          campaign,
+                       }
+                     : undefined
                )
 
                const cal = ical({
@@ -190,7 +192,10 @@ export const livestreamRegistrationConfirmationEmail = functions
          outlook: data.eventCalendarUrls.outlook,
          apple: getLivestreamICSDownloadUrl(
             livestream.id,
-            isLocalEnvironment()
+            isLocalEnvironment(),
+            {
+               utmCampaign: "fromcalendarevent-mail",
+            }
          ),
       }
 
