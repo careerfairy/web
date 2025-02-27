@@ -8,10 +8,12 @@ import {
    FIREBASE_APPS_ID,
    FIREBASE_AUTH_DOMAIN,
    FIREBASE_DATABASE_URL,
-   FIREBASE_PROJECT_ID,
    FIREBASE_MESSAGING_SENDER_ID,
+   FIREBASE_PROJECT_ID,
    FIREBASE_STORAGE_BUCKET,
 } from "@env"
+
+export const FUNCTIONS_REGION = "europe-west1"
 
 const firebaseConfig = {
    apiKey: FIREBASE_API_KEY,
@@ -28,4 +30,4 @@ const auth = getAuth(app)
 const db = getFirestore(app)
 
 // Export the Firestore instance
-export { db, app, auth }
+export { app, auth, db }

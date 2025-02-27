@@ -93,6 +93,7 @@ exports.sendPostmarkResetPasswordEmail_eu = auth.sendPostmarkResetPasswordEmail
 exports.resendPostmarkEmailVerificationEmailWithPin_eu =
    auth.resendPostmarkEmailVerificationEmailWithPin
 exports.deleteLoggedInUserAccount_v2 = auth.deleteLoggedInUserAccount
+exports.verifyToken = auth.verifyToken
 
 // Agora
 exports.fetchAgoraRtcToken_v2 = agora.fetchAgoraRtcToken
