@@ -115,6 +115,14 @@
                   }
                }
             }
+         ],
+         [
+            "@sentry/react-native/expo",
+            {
+               "organization": "careerfairy",
+               "project": "careerfairy-app",
+               "url": "https://sentry.io/"
+            }
          ]
       ],
       "experiments": {

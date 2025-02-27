@@ -23,6 +23,9 @@ import { customerIO } from "./utils/customerio-tracking"
 import { initializeFacebookTracking } from "./utils/facebook-tracking"
 import { handleVerifyToken } from "./utils/firebase"
 import { SECURE_STORE_KEYS } from "./utils/secure-store-constants"
+import { initSentry } from "./utils/sentry"
+
+const sentry = initSentry()
 
 const styles: any = {
    image: {
@@ -63,7 +66,7 @@ const styles: any = {
    },
 }
 
-export default function Native() {
+function Native() {
    const webViewRef = useRef<WebView>(null)
    const [isConnected, setIsConnected] = useState<boolean | null>(true)
    const [fontsLoaded] = useFonts({
@@ -169,7 +172,8 @@ export default function Native() {
       customerioPushToken: string | null
    ) => {
       try {
-         return resetFireStoreData(idToken, customerioPushToken)
+         await resetFireStoreData(idToken, customerioPushToken)
+         sentry.setUser(null)
       } catch (e) {
          console.log("Error with resetting firestore data", e)
       }
@@ -200,6 +204,10 @@ export default function Native() {
             )
 
             await customerIO.identifyCustomer(credentials.uid)
+            sentry.setUser({
+               id: credentials.uid,
+               email: credentials.email,
+            })
          }
       } catch (error) {
          console.error(
@@ -292,3 +300,5 @@ export default function Native() {
       />
    )
 }
+
+export default sentry.wrap(Native)
