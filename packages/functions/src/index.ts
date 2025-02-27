@@ -147,6 +147,8 @@ exports.manualTemplatedEmail = newsletter.manualTemplatedEmail
 // Notification Livestreams
 exports.notifyUsersWhenLivestreamStarts =
    notificationLivestreams.notifyUsersWhenLivestreamStarts
+exports.notifyUsersOnLivestreamStart =
+   notificationLivestreams.notifyUsersOnLivestreamStart
 
 // Notification Onboarding
 exports.notificationOnboarding = notificationOnboardings.notificationOnboarding
