@@ -245,10 +245,7 @@ export const livestreamRegistrationConfirmationEmail = functions
             data: "Livestream registration confirmation email sent",
          }
       } catch (error) {
-         logger.error(
-            "Error sending registration confirmation email",
-            JSON.stringify(error, null, 2)
-         )
+         logger.error("Error sending registration confirmation email", error)
          return { status: 500, error: error }
       }
    })
