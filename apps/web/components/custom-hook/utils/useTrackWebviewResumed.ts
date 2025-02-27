@@ -19,9 +19,19 @@ export const useTrackWebviewResumedCount = () => {
       if (!MobileUtils.webViewPresence()) return
 
       const handleWebViewMessage = (event: MessageEvent) => {
-         const message = JSON.parse(event.data)
-         if (message.type === MESSAGING_TYPE.WEBVIEW_RESUMED) {
-            setWebviewResumedCount((prev) => prev + 1)
+         try {
+            // Check if event.data is a valid string before parsing
+            if (typeof event?.data !== "string") {
+               return
+            }
+
+            const message = JSON.parse(event.data)
+            if (message && message.type === MESSAGING_TYPE.WEBVIEW_RESUMED) {
+               setWebviewResumedCount((prev) => prev + 1)
+            }
+         } catch (error) {
+            // Silently handle JSON parse errors
+            console.debug("Error parsing WebView message:", error)
          }
       }
 
