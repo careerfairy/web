@@ -60,9 +60,23 @@ export type CustomerIoEmailMessageData = {
       .type]: LivestreamRegistrationTemplateData
 }
 
+/**
+ * Represents an email attachment to be sent with an email notification.
+ * @remarks
+ * The content of the attachment must be a base64 encoded string.
+ */
 export type EmailAttachment = {
+   /**
+    * The filename of the attachment, including extension.
+    * Special characters will be handled by the email service.
+    */
    filename: string
-   content: Buffer | string
+
+   /**
+    * The content of the attachment.
+    * Must be a base64 encoded string.
+    */
+   content: string
 }
 
 export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
@@ -80,8 +94,10 @@ export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
        */
       userAuthId: string
       /**
-       * Optional attachments for the email
-       * Each attachment should be an object with filename and content (base64 encoded)
+       * Optional attachments for the email.
+       * Each attachment should have a filename and content.
+       * Content can be provided as either a Buffer or a string.
+       * All content will be automatically encoded to base64 before sending.
        */
       attachments?: EmailAttachment[]
    } & Omit<
