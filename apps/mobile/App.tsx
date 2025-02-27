@@ -10,7 +10,6 @@ import { signInWithCustomToken } from "firebase/auth"
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
 import React, { useEffect, useRef, useState } from "react"
 import {
-   Button,
    Image,
    Platform,
    SafeAreaView,
@@ -21,7 +20,6 @@ import WebView from "react-native-webview"
 import WebViewComponent from "./components/WebView"
 import { app, auth, db } from "./firebase"
 import { customerIO } from "./utils/customerio-tracking"
-import { errorLogAndNotify } from "./utils/error-handler"
 import { initializeFacebookTracking } from "./utils/facebook-tracking"
 import { handleVerifyToken } from "./utils/firebase"
 import { SECURE_STORE_KEYS } from "./utils/secure-store-constants"
@@ -295,41 +293,11 @@ function Native() {
    }
 
    return (
-      <>
-         <SafeAreaView
-            style={{
-               position: "absolute",
-               top: "50%",
-               left: 0,
-               right: 0,
-               zIndex: 1000,
-               alignItems: "center",
-            }}
-         >
-            <Button
-               title="Press me to crash"
-               onPress={() => {
-                  throw new Error("Hello, again, Sentry!")
-               }}
-            />
-            <Button
-               title="Press me to log error"
-               onPress={() => {
-                  errorLogAndNotify(
-                     new Error("Hello, this is the error message"),
-                     {
-                        message: "Hello, this is extra message!",
-                     }
-                  )
-               }}
-            />
-         </SafeAreaView>
-         <WebViewComponent
-            onTokenInjected={getPushToken}
-            onLogout={onLogout}
-            webViewRef={webViewRef}
-         />
-      </>
+      <WebViewComponent
+         onTokenInjected={getPushToken}
+         onLogout={onLogout}
+         webViewRef={webViewRef}
+      />
    )
 }
 
