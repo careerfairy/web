@@ -4,19 +4,14 @@ import { SendEmailRequestOptions } from "customerio-node/dist/lib/api/requests"
  * Customer.io transactional message IDs
  */
 export const CUSTOMERIO_EMAIL_TEMPLATES = {
-   LIVESTREAM_REGISTRATION: {
-      messageId:
-         process.env
-            .CUSTOMERIO_EMAIL_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
-      type: "LIVESTREAM_REGISTRATION",
-   },
-} as const satisfies Record<string, { messageId: string; type: string }>
+   LIVESTREAM_REGISTRATION: "live_stream_registration_confirmation",
+} as const satisfies Record<string, string>
 
 export type CustomerIoEmailMessageType =
-   (typeof CUSTOMERIO_EMAIL_TEMPLATES)[keyof typeof CUSTOMERIO_EMAIL_TEMPLATES]["type"]
+   (typeof CUSTOMERIO_EMAIL_TEMPLATES)[keyof typeof CUSTOMERIO_EMAIL_TEMPLATES]
 
 /**
- * Message data for livestream start notifications
+ * Message data for livestream registration confirmation emails
  */
 export interface LivestreamRegistrationTemplateData {
    livestream: {
@@ -56,8 +51,7 @@ export interface LivestreamRegistrationTemplateData {
  * Union type of all possible message data types
  */
 export type CustomerIoEmailMessageData = {
-   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION
-      .type]: LivestreamRegistrationTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION]: LivestreamRegistrationTemplateData
 }
 
 /**
@@ -84,7 +78,7 @@ export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
       /**
        * The type of message to create
        */
-      templateType: T
+      templateId: T
       /**
        * Custom data you would like to send to the message template
        */
@@ -107,7 +101,7 @@ export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
 
 /**
  * Creates a type-safe email notification request
- * @param params.templateType Type of message to create
+ * @param params.templateId Type of message to create
  * @param params.templateData Message data for the template
  * @param params.userAuthId User ID to send to
  * @param params.attachments Optional email attachments
@@ -116,15 +110,14 @@ export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
 export function createEmailNotificationRequestData<
    T extends CustomerIoEmailMessageType
 >({
-   templateType,
+   templateId,
    templateData,
    userAuthId,
    ...rest
 }: EmailNotificationRequestData<T>): SendEmailRequestOptions {
    return {
       ...rest,
-      transactional_message_id:
-         CUSTOMERIO_EMAIL_TEMPLATES[templateType].messageId,
+      transactional_message_id: templateId,
       message_data: templateData,
       identifiers: {
          id: userAuthId,
