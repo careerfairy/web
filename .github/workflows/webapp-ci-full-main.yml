@@ -158,11 +158,12 @@ jobs:
          - name: Install uuid-runtime
            run: sudo apt-get install uuid-runtime
          - name: Generate UUID
-           run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
+           id: generate_uuid
+           run: echo "uuid=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_OUTPUT
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
+              NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ steps.generate_uuid.outputs.uuid }}
               NODE_ENV: test
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
