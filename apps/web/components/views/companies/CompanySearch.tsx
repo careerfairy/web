@@ -178,7 +178,7 @@ const CompanySearch = () => {
    const { data, setSize, isValidating } = useCompanySearchAlgolia(
       debouncedInputValue,
       filterOptions,
-      COMPANY_REPLICAS.NAME_ASC
+      COMPANY_REPLICAS.PRIORITY_DESC
    )
 
    const numberOfResults = data?.[0]?.nbHits || 0
