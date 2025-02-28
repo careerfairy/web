@@ -150,7 +150,7 @@ export const syncFeaturedCompaniesData = onSchedule(
                groupsRecord[groupId].hasUpcomingEvents ===
                   groupData.hasUpcomingEvents
             ) {
-               functions.logger.info("skipping, no data changes", groupId)
+               logger.info("skipping, no data changes", groupId)
                continue
             }
             const docRef = firestore.collection("careerCenterData").doc(groupId)
