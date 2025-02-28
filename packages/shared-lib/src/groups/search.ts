@@ -85,6 +85,7 @@ export type BooleanFilterFieldType = Extract<
 
 export const COMPANY_REPLICAS = {
    NAME_ASC: "companies_universityName_asc",
+   PRIORITY_DESC: "companies_featuredCompanyPriority_desc",
 } as const
 
 export type CompanyReplicaType =

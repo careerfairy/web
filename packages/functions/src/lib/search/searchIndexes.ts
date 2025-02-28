@@ -101,7 +101,7 @@ const companyIndex = {
    settings: {
       attributesForFaceting: COMPANY_FILTERING_FIELDS,
       searchableAttributes: COMPANY_SEARCHABLE_ATTRIBUTES,
-      replicas: [COMPANY_REPLICAS.NAME_ASC],
+      replicas: [COMPANY_REPLICAS.NAME_ASC, COMPANY_REPLICAS.PRIORITY_DESC],
    },
 } satisfies Index<Group, TransformedGroup>
 
