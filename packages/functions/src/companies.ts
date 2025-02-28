@@ -6,6 +6,8 @@ import {
    isWithinNormalizationLimit,
 } from "@careerfairy/shared-lib/utils/utils"
 import * as functions from "firebase-functions"
+import { logger } from "firebase-functions/v2"
+import { onSchedule } from "firebase-functions/v2/scheduler"
 import { InferType, array, boolean, object, string } from "yup"
 import { firestore } from "./api/firestoreAdmin"
 import {
@@ -80,16 +82,13 @@ export const fetchCompanies = functions.region(config.region).https.onCall(
    )
 )
 
-export const syncFeaturedCompaniesData = functions
-   .region(config.region)
-   .runWith({
-      // when sending large batches, this function can take a while to finish
+export const syncFeaturedCompaniesData = onSchedule(
+   {
+      schedule: "every 30 minutes",
       timeoutSeconds: 540,
-      memory: "8GB",
-   })
-   .pubsub.schedule("every 30 minutes")
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+      memory: "8GiB",
+   },
+   async () => {
       const bulkWriter = firestore.bulkWriter()
       // Get all companies
       const groups = await groupRepo.fetchCompanies({})
@@ -133,10 +132,10 @@ export const syncFeaturedCompaniesData = functions
                hasUpcomingEvents,
             }
          },
-         functions.logger
+         logger
       )
 
-      functions.logger.info("syncFeaturedCompaniesData", groupUpdateData)
+      logger.info("syncFeaturedCompaniesData", groupUpdateData)
 
       const chunkedGroupUpdateData = chunkArray(
          Object.entries(groupUpdateData),
@@ -165,4 +164,5 @@ export const syncFeaturedCompaniesData = functions
 
          await bulkWriter.flush()
       }
-   })
+   }
+)
