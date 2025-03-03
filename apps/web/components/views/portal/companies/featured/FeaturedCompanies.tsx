@@ -4,7 +4,6 @@ import { Box, Divider, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
@@ -64,14 +63,13 @@ export const FeaturedCompanies = () => {
 
 export const FeaturedCompaniesView = () => {
    const { userData } = useAuth()
-   const { contentPlacementV1 } = useFeatureFlags()
    const { userCountryCode } = useUserCountryCode()
 
    const countryCode = userData?.countryIsoCode || userCountryCode
 
    // Possibly return null if user also does not have a field of study
    // Checking field of study, as the copy of the header is based on the field of study
-   if (!contentPlacementV1 || !countryCode?.length) return null
+   if (!countryCode?.length) return null
 
    return (
       <FeaturedCompaniesComponent
