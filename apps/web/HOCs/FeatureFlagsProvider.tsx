@@ -85,7 +85,7 @@ export const flagsInitialState = {
       enabled: false,
    },
    contentPlacementV1: {
-      enabled: false,
+      enabled: true,
    },
 } satisfies FeatureFlagsDetails
 
