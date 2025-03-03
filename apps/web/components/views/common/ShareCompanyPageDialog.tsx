@@ -68,7 +68,7 @@ const ShareCompanyPageDialog: FC<Props> = ({
 
    const socials = useSocials({
       title: group.universityName,
-      url: makeGroupCompanyPageUrl(group),
+      url: makeGroupCompanyPageUrl(group.universityName),
       dataLayerEntityName: AnalyticsEvents.Company_Page,
       message: `Check out ${group.universityName}'s company page on CareerFairy!`,
       platforms: [
@@ -80,7 +80,7 @@ const ShareCompanyPageDialog: FC<Props> = ({
    })
 
    const companyPageLink = useMemo(() => {
-      return makeGroupCompanyPageUrl(group)
+      return makeGroupCompanyPageUrl(group.universityName)
    }, [group])
 
    const copyCompanyPageLinkToClipboard = (link: string) => {

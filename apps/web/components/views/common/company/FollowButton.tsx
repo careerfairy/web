@@ -1,9 +1,14 @@
 import { Group } from "@careerfairy/shared-lib/groups"
+import {
+   GroupEventActions,
+   InteractionSourcesType,
+} from "@careerfairy/shared-lib/groups/telemetry"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import FollowIcon from "@mui/icons-material/AddRounded"
 import FollowedIcon from "@mui/icons-material/CheckRounded"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { Button, ButtonProps } from "@mui/material"
+import { useCompaniesTracker } from "context/group/CompaniesTrackerProvider"
 import { useRouter } from "next/router"
 import { FC, useMemo } from "react"
 import { useMountedState } from "react-use"
@@ -42,11 +47,17 @@ const toggleFollowCompany = async (
 
 type Props = {
    group: Group | CompanySearchResult
+   interactionSource?: InteractionSourcesType
 } & Omit<ButtonProps, "onClick">
-const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
+const AuthedFollowButton: FC<Props> = ({
+   group,
+   disabled,
+   interactionSource,
+   ...buttonProps
+}) => {
    const { userData, authenticatedUser } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
-
+   const { trackEvent } = useCompaniesTracker()
    const { trigger, isMutating } = useSWRMutation(
       `toggle-follow-company-${group.id}`,
       toggleFollowCompany,
@@ -57,6 +68,7 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
                   `You are now following ${group.universityName}`
                )
                dataLayerCompanyEvent(AnalyticsEvents.CompanyFollow, group)
+               trackEvent(group.id, GroupEventActions.Follow, interactionSource)
             } else {
                successNotification("You have unfollowed this company")
             }
@@ -136,7 +148,11 @@ const NonAuthedFollowButton: FC<Props> = ({ group, ...buttonProps }) => {
    )
 }
 
-const FollowButton: FC<Props> = ({ group, ...buttonProps }) => {
+const FollowButton: FC<Props> = ({
+   group,
+   interactionSource,
+   ...buttonProps
+}) => {
    const { isLoggedIn, isLoadingAuth } = useAuth()
 
    const mergedProps = useMemo(
@@ -149,7 +165,13 @@ const FollowButton: FC<Props> = ({ group, ...buttonProps }) => {
    }
 
    if (isLoggedIn) {
-      return <AuthedFollowButton group={group} {...mergedProps} />
+      return (
+         <AuthedFollowButton
+            group={group}
+            interactionSource={interactionSource}
+            {...mergedProps}
+         />
+      )
    }
    return <NonAuthedFollowButton group={group} {...mergedProps} />
 }

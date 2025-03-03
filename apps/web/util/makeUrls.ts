@@ -1,11 +1,15 @@
-import { Group } from "@careerfairy/shared-lib/groups"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
 
-export const makeGroupCompanyPageUrl = (group: Group) => {
-   return `${getBaseUrl()}/company/${companyNameSlugify(group.universityName)}`
+export const makeGroupCompanyPageUrl = (
+   groupName: string,
+   interactionSource?: string
+) => {
+   return `${getBaseUrl()}/company/${companyNameSlugify(groupName)}${
+      interactionSource ? `?interactionSource=${interactionSource}` : ""
+   }`
 }
 
 export const makeLivestreamEventDetailsInviteUrl = (

@@ -1,6 +1,6 @@
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
@@ -10,6 +10,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import Link from "components/views/common/Link"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { FC, useMemo } from "react"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { sxStyles } from "../../../../../types/commonTypes"
 
 const styles = sxStyles({
@@ -68,7 +69,10 @@ const HostInfoComponent: FC<HostInfoProps> = ({ presenter }) => {
             size={73}
             href={
                isCompanyPagePublic
-                  ? `/company/${companyNameSlugify(company.universityName)}`
+                  ? makeGroupCompanyPageUrl(
+                       company.universityName,
+                       InteractionSources.Live_Stream_Details
+                    )
                   : null
             }
          />
@@ -81,9 +85,10 @@ const HostInfoComponent: FC<HostInfoProps> = ({ presenter }) => {
                <Box
                   component={Link}
                   noLinkStyle
-                  href={`/company/${companyNameSlugify(
-                     company.universityName
-                  )}`}
+                  href={makeGroupCompanyPageUrl(
+                     company.universityName,
+                     InteractionSources.Live_Stream_Details
+                  )}
                   sx={{ color: "white" }}
                >
                   {companyName}

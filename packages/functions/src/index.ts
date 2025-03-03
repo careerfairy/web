@@ -351,6 +351,7 @@ exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
 // Company | Group Functions
 exports.fetchCompanies = companies.fetchCompanies
 exports.syncFeaturedCompaniesData = companies.syncFeaturedCompaniesData
+exports.trackGroupEvents = companies.trackGroupEvents
 
 // Streaming
 exports.deleteLivestreamChatEntry = streaming.deleteLivestreamChatEntry

@@ -1,7 +1,7 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { CardContent, CardMedia, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Card from "@mui/material/Card"
@@ -12,6 +12,7 @@ import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
 import { FC, useMemo } from "react"
 import { ChevronRight as MoreIcon } from "react-feather"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useGroupsByIds from "../../../../../custom-hook/useGroupsByIds"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
@@ -180,9 +181,10 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                         <Box
                            component={Link}
                            noLinkStyle
-                           href={`/company/${companyNameSlugify(
-                              company.universityName
-                           )}`}
+                           href={makeGroupCompanyPageUrl(
+                              company.universityName,
+                              InteractionSources.Live_Stream_Details
+                           )}
                            sx={{ color: "white" }}
                         >
                            {companyName}
@@ -228,9 +230,10 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                   <Box
                      display="flex"
                      component={Link}
-                     href={`/company/${companyNameSlugify(
-                        company.universityName
-                     )}`}
+                     href={makeGroupCompanyPageUrl(
+                        company.universityName,
+                        InteractionSources.Live_Stream_Details
+                     )}
                      alignItems={"center"}
                      noLinkStyle
                      color={"primary.main"}
@@ -282,6 +285,7 @@ const FollowCompanyButton: FC<{
             startIcon={null}
             sx={styles.followButton}
             group={company}
+            interactionSource={InteractionSources.Live_Stream_Details}
          />
       </span>
    )
