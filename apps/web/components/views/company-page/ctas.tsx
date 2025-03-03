@@ -1,18 +1,19 @@
-import React, { FC, useMemo } from "react"
-import { sxStyles } from "../../../types/commonTypes"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, Button, Collapse, Grid, Paper, Typography } from "@mui/material"
-import Stack from "@mui/material/Stack"
-import FollowButton from "../common/company/FollowButton"
-import { useCompanyPage } from "./index"
-import { useRouter } from "next/router"
-import Link from "../common/Link"
 import Avatar from "@mui/material/Avatar"
+import Stack from "@mui/material/Stack"
 import Image from "next/legacy/image"
+import { useRouter } from "next/router"
+import React, { FC, useMemo } from "react"
 import { placeholderAvatar } from "../../../constants/images"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import useCollection from "../../custom-hook/useCollection"
 import { userRepo } from "../../../data/RepositoryInstances"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import { sxStyles } from "../../../types/commonTypes"
+import useCollection from "../../custom-hook/useCollection"
 import BulletPoints from "../common/BulletPoints"
+import FollowButton from "../common/company/FollowButton"
+import Link from "../common/Link"
+import { useCompanyPage } from "./index"
 
 const styles = sxStyles({
    root: {
@@ -66,7 +67,11 @@ export const FollowCompany = () => {
                </Typography>
                <BulletPoints points={followPoints} />
                <span>
-                  <FollowButton color="primary" group={group} />
+                  <FollowButton
+                     color="primary"
+                     group={group}
+                     interactionSource={InteractionSources.Company_Page}
+                  />
                </span>
             </Stack>
          </CTACard>

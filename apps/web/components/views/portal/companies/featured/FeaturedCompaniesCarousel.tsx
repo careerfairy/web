@@ -1,17 +1,22 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import {
+   GroupEventActions,
+   InteractionSources,
+} from "@careerfairy/shared-lib/groups/telemetry"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useGroup from "components/custom-hook/group/useGroup"
 import { useUserFollowingCompanies } from "components/custom-hook/user/useUserFollowingCompanies"
 import FeaturedCompanySparksBadge from "components/views/common/icons/FeaturedCompanySparksBadge"
+import { useCompaniesTracker } from "context/group/CompaniesTrackerProvider"
 import { groupRepo } from "data/RepositoryInstances"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { AnalyticsEvents } from "util/analyticsConstants"
-import { dataLayerCompanyEvent, dataLayerEvent } from "util/analyticsUtils"
+import { dataLayerEvent } from "util/analyticsUtils"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 
 const styles = sxStyles({
    companyCardRoot: {
@@ -135,7 +140,7 @@ export const FeaturedCompanyCard = ({
    const router = useRouter()
    const { userData, isLoggedIn } = useAuth()
    const { data: group } = useGroup(company.id, true)
-
+   const { trackEvent } = useCompaniesTracker()
    const industries = company.companyIndustries
       .map((industry) => industry.name)
       .join(", ")
@@ -146,14 +151,19 @@ export const FeaturedCompanyCard = ({
             await groupRepo.unfollowCompany(userData.id, groupId)
          } else {
             await groupRepo.followCompany(userData, group).then(() => {
-               dataLayerCompanyEvent(
-                  AnalyticsEvents.FeaturedCompanyFollow,
-                  group
+               trackEvent(
+                  group.id,
+                  GroupEventActions.Follow,
+                  InteractionSources.Portal_Page_Featured_Company
                )
+               dataLayerEvent("featured_company_follow", {
+                  companyId: groupId,
+                  companyName: company.universityName,
+               })
             })
          }
       },
-      [userData, group, following]
+      [userData, group, following, company.universityName, trackEvent]
    )
 
    return (
@@ -164,7 +174,10 @@ export const FeaturedCompanyCard = ({
                companyName: company.universityName,
             })
          }}
-         href={`/company/${companyNameSlugify(company.universityName)}`}
+         href={makeGroupCompanyPageUrl(
+            company.universityName,
+            InteractionSources.Portal_Page_Featured_Company
+         )}
       >
          <Stack
             direction="row"

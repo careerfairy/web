@@ -45,6 +45,7 @@ import {
    CustomJobFunctionsRepository,
    ICustomJobFunctionsRepository,
 } from "../lib/CustomJobFunctionsRepository"
+import { groupEventsHandler } from "../lib/bigQuery/group/GroupBigQueryServices"
 import {
    sparkEventsHandler,
    sparkSecondsWatchedHanlder,
@@ -62,7 +63,10 @@ import { FieldValue, Timestamp, firestore, storage } from "./firestoreAdmin"
 import logger = require("firebase-functions/logger")
 
 export const groupRepo: IGroupFunctionsRepository =
-   new GroupFunctionsRepository(firestore as any, FieldValue)
+   new GroupFunctionsRepository(
+      firestore as any,
+      FieldValue
+   ).setGroupEventsHandler(groupEventsHandler)
 
 export const userRepo: IUserFunctionsRepository = new UserFunctionsRepository(
    firestore as any,
