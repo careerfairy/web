@@ -147,6 +147,9 @@ const NextLiveStreamsWithFilter = ({
             ...(initialTabValue === "upcomingEvents" && {
                hasEnded: false,
             }),
+            ...(initialTabValue === "pastEvents" && {
+               hasEnded: true,
+            }),
          },
          dateFilter: hasPastEvents ? "past" : "future",
       }),
