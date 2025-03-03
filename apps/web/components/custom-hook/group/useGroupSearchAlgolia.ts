@@ -31,6 +31,7 @@ type Key = [
 
 export type FilterOptions = {
    arrayFilters?: Partial<Record<ArrayFilterFieldType, string[]>>
+   excludeArrayFilters?: Partial<Record<ArrayFilterFieldType, string[]>>
    booleanFilters?: Partial<Record<BooleanFilterFieldType, boolean | undefined>>
 }
 
@@ -42,13 +43,16 @@ export type FilterOptions = {
 const buildAlgoliaFilterString = (options: FilterOptions): string => {
    const filters = []
 
-   const { arrayFilters, booleanFilters } = options
+   const { arrayFilters, booleanFilters, excludeArrayFilters } = options
 
    // Handle arrayFilters
    filters.push(generateArrayFilterString(arrayFilters))
 
    // Handle booleanFilters
    filters.push(generateBooleanFilterStrings(booleanFilters))
+
+   // Handle excludeArrayFilters
+   filters.push(generateArrayFilterString(excludeArrayFilters, true))
 
    return filters.filter(Boolean).join(" AND ")
 }

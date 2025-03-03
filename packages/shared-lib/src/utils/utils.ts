@@ -429,6 +429,7 @@ export const findElementsWithDuplicatePropertiesInArray = <T>(
       .filter((obj) => duplicateProperties.includes(getPropertyString(obj)))
       .sort(dynamicSort(sortBy))
 }
+
 /**
  * @description
  * Creates a lookup object from an array of objects based on the given property name.

@@ -11,7 +11,7 @@ export const useUserFollowingCompanies = () => {
    const [companies, setCompanies] = useState<CompanyFollowed[]>([])
 
    useEffect(() => {
-      if (userData.id) {
+      if (userData?.id) {
          const cachedCompanies = sessionStorage.getItem(
             `companies-${userData.id}`
          )
@@ -44,7 +44,7 @@ export const useUserFollowingCompanies = () => {
             setCompanies([])
          }
       }
-   }, [userData.id, firestore])
+   }, [userData?.id, firestore])
 
    return companies
 }

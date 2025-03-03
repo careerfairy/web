@@ -1,6 +1,9 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Grid } from "@mui/material"
-import { FC } from "react"
+import { useAuth } from "HOCs/AuthProvider"
+import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
+import { FC, useMemo } from "react"
 import { CompanySearchResult } from "types/algolia"
 import { sxStyles } from "../../../types/commonTypes"
 import CompanyCard from "./CompanyCard"
@@ -16,12 +19,26 @@ const styles = sxStyles({
 
 type Props = {
    companies?: (Group | CompanySearchResult)[]
+   hasFilters?: boolean
 }
 
-const Companies: FC<Props> = ({ companies }) => {
+const Companies: FC<Props> = ({ companies, hasFilters }) => {
+   const { userData } = useAuth()
+   const { userCountryCode } = useUserCountryCode()
+   const { data: featuredGroups } = useFeaturedGroupsSWR(
+      userData?.countryIsoCode || userCountryCode,
+      {
+         disabled: hasFilters,
+      }
+   )
+
+   const allCompanies = useMemo(() => {
+      return (featuredGroups || []).concat((companies as Group[]) || [])
+   }, [companies, featuredGroups])
+
    return (
       <Grid sx={styles.root} container spacing={2}>
-         {companies?.map((company) => (
+         {allCompanies?.map((company) => (
             <Grid
                sx={styles.flexItem}
                key={company.id}

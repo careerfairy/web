@@ -237,6 +237,7 @@ export interface ISparkFunctionsRepository {
 
    getSparksByGroupId(groupId: string): Promise<Spark[]>
 
+   groupHasPublishedSparks(groupId: string, limit?: number): Promise<boolean>
    /**
     * Get all user sparks feed metrics
     *
@@ -943,6 +944,18 @@ export class SparkFunctionsRepository
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async groupHasPublishedSparks(groupId: string, limit = 1): Promise<boolean> {
+      const snapshot = await this.firestore
+         .collection("sparks")
+         .withConverter<Spark>(createGenericConverter())
+         .where("group.id", "==", groupId)
+         .limit(limit)
+         .orderBy("createdAt", "desc")
+         .get()
+
+      return !snapshot.empty
    }
 
    async getAllUserSparksFeedMetrics(): Promise<UserSparksFeedMetrics[]> {
