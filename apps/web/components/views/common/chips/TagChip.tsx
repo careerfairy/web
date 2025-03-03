@@ -1,7 +1,8 @@
-import { Chip, Tooltip } from "@mui/material"
+import { Chip } from "@mui/material"
 import { ChipProps } from "@mui/material/Chip/Chip"
 import { Theme } from "@mui/material/styles"
 import { SxProps } from "@mui/system"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { ConditionalWrapper } from "../ConditionalWrapper"
 
@@ -30,9 +31,14 @@ const WhiteTagChip = ({
       <ConditionalWrapper
          condition={Boolean(tooltipText)}
          wrapper={(children) => (
-            <Tooltip placement="top" arrow title={tooltipText}>
+            <BrandedTooltip
+               placement="top"
+               arrow
+               title={tooltipText}
+               sx={{ maxWidth: "300px" }}
+            >
                {children}
-            </Tooltip>
+            </BrandedTooltip>
          )}
       >
          <Chip

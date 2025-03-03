@@ -4,6 +4,7 @@ import calendar from "dayjs/plugin/calendar"
 import duration from "dayjs/plugin/duration"
 import relativeTime from "dayjs/plugin/relativeTime"
 import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
+import updateLocale from "dayjs/plugin/updateLocale"
 import utc from "dayjs/plugin/utc"
 
 dayjs.extend(utc)
@@ -12,6 +13,26 @@ dayjs.extend(advancedFormat)
 dayjs.extend(calendar)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
+dayjs.extend(updateLocale)
+
+// Configure relative time formatting
+dayjs.updateLocale("en", {
+   relativeTime: {
+      future: "in %s",
+      past: "%s ago",
+      s: "a few seconds",
+      m: "1 minute",
+      mm: "%d minutes",
+      h: "1 hour",
+      hh: "%d hours",
+      d: "1 day",
+      dd: "%d days",
+      M: "1 month",
+      MM: "%d months",
+      y: "1 year",
+      yy: "%d years",
+   },
+})
 
 export default class DateUtil {
    static getJobApplicationDate(JSDate: Date) {
@@ -358,10 +379,14 @@ export default class DateUtil {
     * @param {number | Date} startedAt - The start time as a timestamp or Date object.
     * @return {string} - The formatted elapsed time.
     */
-   static formatElapsedTime(startedAt: number | Date): string {
+   static formatElapsedTime(
+      startedAt: number | Date,
+      endedAt?: number | Date
+   ): string {
       const now = dayjs()
       const start = dayjs(startedAt)
-      const difference = now.diff(start)
+      const end = endedAt ? dayjs(endedAt) : now
+      const difference = end.diff(start)
 
       // Calculate total hours, minutes and remaining seconds
       const totalHours = Math.floor(difference / (1000 * 60 * 60))
