@@ -22,8 +22,6 @@ export const useFeaturedGroupsSWR = (
 ) => {
    const { userData, isLoggedIn } = useAuth()
 
-   const { totalItems = 4 } = options || {}
-
    const disabled =
       options?.disabled ||
       !countryCode?.length ||
@@ -35,10 +33,7 @@ export const useFeaturedGroupsSWR = (
    return useSWR(
       disabled
          ? null
-         : [
-              `get-featured-groups-${countryCode}-${userData?.authId}`,
-              totalItems,
-           ],
+         : [`get-featured-groups-${countryCode}-${userData?.authId}`],
       async () => {
          const querySnapshot = await getDocs(
             query(
@@ -62,14 +57,12 @@ export const useFeaturedGroupsSWR = (
 
                return !isLoggedIn
             })
-            ?.slice(0, totalItems)
       },
       {
          ...reducedRemoteCallsOptions,
          onError: (error, key) => {
             errorLogAndNotify(error, {
                key,
-               totalItems,
             })
          },
       }
