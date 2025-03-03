@@ -174,10 +174,9 @@ export const FeaturedCompanyCard = ({
                companyName: company.universityName,
             })
          }}
-         href={makeGroupCompanyPageUrl(
-            company.universityName,
-            InteractionSources.Portal_Page_Featured_Company
-         )}
+         href={makeGroupCompanyPageUrl(company.universityName, {
+            interactionSource: InteractionSources.Portal_Page_Featured_Company,
+         })}
       >
          <Stack
             direction="row"

@@ -166,10 +166,9 @@ export const ExpandedHeader = ({
             <Box
                component={Link}
                onClick={handleGroupClick}
-               href={makeGroupCompanyPageUrl(
-                  group.universityName,
-                  InteractionSources.Talent_Guide
-               )}
+               href={makeGroupCompanyPageUrl(group.universityName, {
+                  interactionSource: InteractionSources.Talent_Guide,
+               })}
                target="_blank"
                sx={styles.companyLogoContainer}
             >

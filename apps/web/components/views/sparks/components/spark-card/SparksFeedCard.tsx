@@ -208,10 +208,9 @@ const SparksFeedCard: FC<Props> = ({
    const { onSparkPercentagePlayed } = useLinkedInNotificationStateManagement()
 
    const companyPageLink = spark.group.publicProfile
-      ? makeGroupCompanyPageUrl(
-           spark.group.universityName,
-           InteractionSources.Sparks_Feed
-        )
+      ? makeGroupCompanyPageUrl(spark.group.universityName, {
+           interactionSource: InteractionSources.Sparks_Feed,
+        })
       : undefined
 
    const mentorPageLink = buildMentorPageLink({
