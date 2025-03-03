@@ -241,10 +241,9 @@ const Content = ({ company }: Props) => {
             ]}
          >
             <Link
-               href={makeGroupCompanyPageUrl(
-                  company.universityName,
-                  InteractionSources.Streaming_Page
-               )}
+               href={makeGroupCompanyPageUrl(company.universityName, {
+                  interactionSource: InteractionSources.Streaming_Page,
+               })}
                target="_blank"
             >
                <CompanyLogo
@@ -330,10 +329,9 @@ const ActionButtons = ({ company }: { company: Group }) => {
             size="small"
             sx={styles.visitButton}
             endIcon={<ExternalLink />}
-            href={makeGroupCompanyPageUrl(
-               company.universityName,
-               InteractionSources.Streaming_Page
-            )}
+            href={makeGroupCompanyPageUrl(company.universityName, {
+               interactionSource: InteractionSources.Streaming_Page,
+            })}
             target="_blank"
          >
             Company page
