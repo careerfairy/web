@@ -313,7 +313,9 @@ const LinkToCompanyPage: FC<{
 }> = ({ companyName, children, interactionSource }) => {
    return (
       <CardActionArea
-         href={makeGroupCompanyPageUrl(companyName, interactionSource)}
+         href={makeGroupCompanyPageUrl(companyName, {
+            interactionSource,
+         })}
          sx={styles.actionArea}
          component={Link}
       >
