@@ -1,19 +1,18 @@
+import { InferGetServerSidePropsType, NextPage } from "next"
+import SEO from "../../components/util/SEO"
 import NextLiveStreamsWithFilter from "../../components/views/common/NextLivestreams/NextLiveStreamsWithFilter"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
-import React from "react"
-import SEO from "../../components/util/SEO"
-import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
-import { InferGetServerSidePropsType, NextPage } from "next"
 import {
    LivestreamDialogLayout,
    livestreamDialogSSP,
 } from "../../components/views/livestream-dialog"
+import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 const PastLivestreamsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = (props) => {
    return (
-      <GenericDashboardLayout pageDisplayName={"Past live streams"}>
+      <GenericDashboardLayout pageDisplayName={"Recordings"}>
          <LivestreamDialogLayout
             livestreamDialogData={props.livestreamDialogData}
          >

@@ -1,5 +1,10 @@
-import { APIClient, SendPushRequest } from "customerio-node"
+import { APIClient, SendEmailRequest, SendPushRequest } from "customerio-node"
 import * as functions from "firebase-functions"
+import {
+   createEmailNotificationRequestData,
+   CustomerIoEmailMessageType,
+   EmailNotificationRequestData,
+} from "./EmailTypes"
 import {
    createPushNotificationRequestData,
    CustomerIoPushMessageType,
@@ -22,6 +27,16 @@ type SendRequestResponse = {
  */
 export interface INotificationRepository {
    /**
+    * Sends email notifications in batches to multiple users
+    *
+    * @param notificationsData - Array of notification data objects
+    * @returns Object with counts of successful and failed notifications
+    */
+   sendEmailNotifications<T extends CustomerIoEmailMessageType>(
+      notificationsData: EmailNotificationRequestData<T>[]
+   ): Promise<SendRequestResponse>
+
+   /**
     * Sends push notifications in batches to multiple users
     *
     * @param notificationsData - Array of notification data objects
@@ -41,6 +56,35 @@ export class NotificationRepository implements INotificationRepository {
 
    constructor(cioApi: APIClient) {
       this.cioApi = cioApi
+   }
+
+   async sendEmailNotifications<T extends CustomerIoEmailMessageType>(
+      notificationsData: EmailNotificationRequestData<T>[]
+   ): Promise<SendRequestResponse> {
+      return this.processBatches(
+         notificationsData,
+         (data) => {
+            const requestData = createEmailNotificationRequestData(data)
+            const request = new SendEmailRequest(requestData)
+
+            // Add attachments if they exist
+            if (data.attachments && data.attachments.length > 0) {
+               data.attachments.forEach((attachment) => {
+                  request.attach(attachment.filename, attachment.content)
+               })
+
+               functions.logger.info(
+                  `Added ${data.attachments.length} attachments to email for user ${data.userAuthId}`
+               )
+            }
+
+            return {
+               id: data.userAuthId,
+               promise: this.cioApi.sendEmail(request),
+            }
+         },
+         `email notifications for ${notificationsData[0].templateId}`
+      )
    }
 
    async sendPushNotifications<T extends CustomerIoPushMessageType>(

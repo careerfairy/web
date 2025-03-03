@@ -18,14 +18,24 @@ import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import ical from "ical-generator"
 import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
-import { customJobRepo, groupRepo, sparkRepo } from "./api/repositories"
+import {
+   customJobRepo,
+   groupRepo,
+   livestreamsRepo,
+   notificationRepo,
+   sparkRepo,
+} from "./api/repositories"
+import {
+   CUSTOMERIO_EMAIL_TEMPLATES,
+   EmailAttachment,
+} from "./lib/notifications/EmailTypes"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)
    .https.onRequest(async (req, res) => {
       setCORSHeaders(req, res)
       const livestreamId = req.query.eventId as string
-
+      const campaign = req.query.utm_campaign as string
       if (livestreamId) {
          try {
             // get the live stream
@@ -38,8 +48,14 @@ export const getLivestreamICalendarEvent = functions
                const livestream = querySnapshot.data() as LivestreamEvent
 
                // create calendar event
-               const calendarEventProperties =
-                  generateCalendarEventProperties(livestream)
+               const calendarEventProperties = generateCalendarEventProperties(
+                  livestream,
+                  campaign
+                     ? {
+                          campaign,
+                       }
+                     : undefined
+               )
 
                const cal = ical({
                   events: [calendarEventProperties],
@@ -60,89 +76,23 @@ export const getLivestreamICalendarEvent = functions
       }
    })
 
-export const sendLivestreamRegistrationConfirmationEmail = functions
-   .region(config.region)
-   .https.onCall(async (data) => {
-      // Fetch the live stream data
-      const livestreamDoc = await firestore
-         .collection("livestreams")
-         .doc(data.livestream_id)
-         .get()
-      const livestream = livestreamDoc.data() as LivestreamEvent
-
-      // Generate ICS file content
-      const cal = ical()
-
-      const calendarEventProperties =
-         generateCalendarEventProperties(livestream)
-
-      cal.createEvent(calendarEventProperties)
-
-      const icsContent = cal.toString()
-
-      const email: any = {
-         TemplateId:
-            process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
-         From: "CareerFairy <noreply@careerfairy.io>",
-         To: data.recipientEmail,
-         TemplateModel: {
-            user_first_name: data.user_first_name,
-            livestream_date: data.livestream_date,
-            company_name: data.company_name,
-            company_logo_url: data.company_logo_url,
-            company_background_image_url: data.company_background_image_url,
-            livestream_title: data.livestream_title,
-            livestream_link: addUtmTagsToLink({
-               link: data.livestream_link,
-               campaign: "eventRegistration",
-               content: data.livestream_title,
-            }),
-            next_livestreams_link: addUtmTagsToLink({
-               link: "https://careerfairy.io/next-livestreams",
-               campaign: "eventRegistration",
-               content: data.livestream_title,
-            }),
-            calendar_event_i_calendar: getLivestreamICSDownloadUrl(
-               data.livestream_id,
-               isLocalEnvironment()
-            ),
-            calendar_event_google: data.eventCalendarUrls.google,
-            calendar_event_outlook: data.eventCalendarUrls.outlook,
-            calendar_event_yahoo: data.eventCalendarUrls.yahoo,
-         },
-         Attachments: [
-            {
-               // Replace any character that is not alphanumeric with an underscore
-               Name: `${livestream.title.replace(/[^a-z0-9]/gi, "_")}.ics`,
-               Content: Buffer.from(icsContent).toString("base64"),
-               ContentType: "text/calendar",
-            },
-         ],
-      }
-
-      client.sendEmailWithTemplate(email).then(
-         () => {
-            return { status: 200 }
-         },
-         (error) => {
-            console.log("error:" + error)
-            return { status: 500, error: error }
-         }
-      )
-   })
-
 export const livestreamRegistrationConfirmationEmail = functions
    .region(config.region)
    .https.onCall(async (data, context) => {
-      logger.info("🚀 ~ Livestream registration confirmation email: v4.0")
+      logger.info("🚀 ~ Livestream registration confirmation email: v6.0")
       const host =
          context?.rawRequest?.headers?.origin || "https://careerfairy.io"
+      const userAuthId = context?.auth?.uid
       // Fetch the live stream data
-      const livestreamDoc = await firestore
-         .collection("livestreams")
-         .doc(data.livestream_id)
-         .get()
-      const livestream = livestreamDoc.data() as LivestreamEvent
+      const livestream = await livestreamsRepo.getById(data.livestream_id)
+
+      if (!livestream) {
+         logger.error("Livestream not found")
+         return {
+            status: 404,
+            message: "Livestream not found",
+         }
+      }
 
       const eventGroups = await groupRepo.getGroupsByIds(livestream.groupIds)
 
@@ -170,7 +120,7 @@ export const livestreamRegistrationConfirmationEmail = functions
                source: "careerfairy",
                medium: "email",
                campaign: "eventRegistration",
-               content: data.livestream_title,
+               content: livestream.title,
             }),
          }
       })
@@ -192,7 +142,7 @@ export const livestreamRegistrationConfirmationEmail = functions
                source: "careerfairy",
                medium: "email",
                campaign: "eventRegistration",
-               content: data.livestream_title,
+               content: livestream.title,
             }),
          }
       })
@@ -218,7 +168,7 @@ export const livestreamRegistrationConfirmationEmail = functions
                   source: "careerfairy",
                   medium: "email",
                   campaign: "eventRegistration",
-                  content: data.livestream_title,
+                  content: livestream.title,
                }),
             }
          })
@@ -226,8 +176,12 @@ export const livestreamRegistrationConfirmationEmail = functions
       // Generate ICS file content
       const cal = ical()
 
-      const calendarEventProperties =
-         generateCalendarEventProperties(livestream)
+      const calendarEventProperties = generateCalendarEventProperties(
+         livestream,
+         {
+            campaign: "fromcalendarevent-mail",
+         }
+      )
 
       cal.createEvent(calendarEventProperties)
 
@@ -237,8 +191,11 @@ export const livestreamRegistrationConfirmationEmail = functions
          google: data.eventCalendarUrls.google,
          outlook: data.eventCalendarUrls.outlook,
          apple: getLivestreamICSDownloadUrl(
-            data.livestream_id,
-            isLocalEnvironment()
+            livestream.id,
+            isLocalEnvironment(),
+            {
+               utmCampaign: "fromcalendarevent-mail",
+            }
          ),
       }
 
@@ -253,50 +210,49 @@ export const livestreamRegistrationConfirmationEmail = functions
          "dd LLLL yyyy 'at' hh:mm a '(GMT' Z')'"
       )
 
-      const email: any = {
-         TemplateId:
-            process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
-         From: "CareerFairy <noreply@careerfairy.io>",
-         To: data.recipientEmail,
-         TemplateModel: {
-            livestream: {
-               title: livestream.title,
-               company: group.universityName,
-               start: formattedStartDate,
-               companyBannerImageUrl: group.bannerImageUrl,
-            },
-            user: {
-               firstName: data.user_first_name,
-            },
-            jobs: emailJobs,
-            speakers: emailSpeakers,
-            sparks: emailSparks,
-            calendar: emailCalendar,
+      const attachments: EmailAttachment[] = [
+         {
+            filename: `${livestream.title.replace(/[^a-z0-9]/gi, "_")}.ics`,
+            content: icsContent,
          },
-         Attachments: [
-            {
-               // Replace any character that is not alphanumeric with an underscore
-               Name: `${livestream.title.replace(/[^a-z0-9]/gi, "_")}.ics`,
-               Content: Buffer.from(icsContent).toString("base64"),
-               ContentType: "text/calendar",
-            },
-         ],
-      }
+      ]
 
-      // Not awaiting on purpose, as it was this way and I believe to make the registration dialog go by quicker
-      client.sendEmailWithTemplate(email).then(
-         () => {
-            logger.info("🚀 ~ Livestream registration confirmation email sent")
-            return {
-               status: 200,
-               data: "Livestream registration confirmation email sent",
-            }
-         },
-         (error) => {
-            logger.error("Error sending registration confirmation email", error)
-            return { status: 500, error: error }
+      try {
+         // Send email using notification repository
+         const result = await notificationRepo.sendEmailNotifications([
+            {
+               templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION,
+               templateData: {
+                  livestream: {
+                     title: livestream.title,
+                     company: group.universityName,
+                     start: formattedStartDate,
+                     companyBannerImageUrl:
+                        livestream.backgroundImageUrl || group.bannerImageUrl,
+                  },
+                  jobs: emailJobs,
+                  speakers: emailSpeakers,
+                  sparks: emailSparks,
+                  calendar: emailCalendar,
+               },
+               userAuthId,
+               to: data.recipientEmail,
+               attachments,
+            },
+         ])
+
+         logger.info(
+            "🚀 ~ Livestream registration confirmation email sent",
+            result
+         )
+         return {
+            status: 200,
+            data: "Livestream registration confirmation email sent",
          }
-      )
+      } catch (error) {
+         logger.error("Error sending registration confirmation email", error)
+         return { status: 500, error: error }
+      }
    })
 
 export const sendPhysicalEventRegistrationConfirmationEmail = functions

@@ -10,7 +10,7 @@ export const tooltipStyles = sxStyles({
       py: 1,
    },
    wrapper: {
-      lineHeight: 0,
+      display: "flex",
    },
 })
 
