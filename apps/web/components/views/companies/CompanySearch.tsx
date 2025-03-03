@@ -8,10 +8,13 @@ import {
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { Box, CircularProgress, Grid, Stack } from "@mui/material"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
+import { useAuth } from "HOCs/AuthProvider"
+import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
 import {
    FilterOptions,
    useCompanySearchAlgolia,
 } from "components/custom-hook/group/useGroupSearchAlgolia"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -88,6 +91,8 @@ const getQueryVariables = (query: ParsedUrlQuery): FilterCompanyOptions => {
 }
 
 const CompanySearch = () => {
+   const { userData } = useAuth()
+   const { userCountryCode } = useUserCountryCode()
    const [inputValue, setInputValue] = useState("")
    const [debouncedInputValue, setDebouncedInputValue] = useState("")
    const { push, query } = useRouter()
@@ -97,6 +102,27 @@ const CompanySearch = () => {
    const { inView, ref } = useInView({
       rootMargin: "0px 0px 200px 0px",
    })
+
+   const hasFilters = useMemo(() => {
+      return (
+         inputValue?.length > 0 ||
+         companyCountries?.length > 0 ||
+         companyIndustries?.length > 0 ||
+         companySize?.length > 0 ||
+         publicSparks
+      )
+   }, [
+      companyCountries,
+      companyIndustries,
+      companySize,
+      publicSparks,
+      inputValue,
+   ])
+
+   const { data: featuredGroups } = useFeaturedGroupsSWR(
+      userData?.countryIsoCode || userCountryCode,
+      { disabled: hasFilters }
+   )
 
    useDebounce(
       () => {
@@ -127,7 +153,11 @@ const CompanySearch = () => {
             companyIndustriesIdTags: companyIndustries,
             companySize,
          },
-
+         excludeArrayFilters: {
+            ...(featuredGroups?.length > 0 && {
+               objectID: featuredGroups?.map((group) => group.id),
+            }),
+         },
          booleanFilters: {
             ...(publicSparks && {
                publicSparks,
@@ -136,13 +166,19 @@ const CompanySearch = () => {
             publicProfile: true,
          },
       }),
-      [companyCountries, companyIndustries, companySize, publicSparks]
+      [
+         companyCountries,
+         companyIndustries,
+         companySize,
+         publicSparks,
+         featuredGroups,
+      ]
    )
 
    const { data, setSize, isValidating } = useCompanySearchAlgolia(
       debouncedInputValue,
       filterOptions,
-      COMPANY_REPLICAS.NAME_ASC
+      COMPANY_REPLICAS.PRIORITY_DESC
    )
 
    const numberOfResults = data?.[0]?.nbHits || 0
@@ -231,7 +267,7 @@ const CompanySearch = () => {
             </Box>
          </Stack>
          <Grid item xs={12}>
-            <Companies companies={infiniteCompanies} />
+            <Companies companies={infiniteCompanies} hasFilters={hasFilters} />
          </Grid>
 
          {Boolean(isValidating) && (
