@@ -8,10 +8,40 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    LIVESTREAM_REMINDER_24H: "live_stream_reminder_24h",
    LIVESTREAM_REMINDER_1H: "live_stream_reminder_1h",
    LIVESTREAM_REMINDER_5M: "live_stream_reminder_5min",
+   LIVESTREAM_FOLLOWUP_ATTENDEES: "live_stream_followup_attendees",
+   LIVESTREAM_FOLLOWUP_NON_ATTENDEES: "live_stream_followup_non_attendees",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
    (typeof CUSTOMERIO_EMAIL_TEMPLATES)[keyof typeof CUSTOMERIO_EMAIL_TEMPLATES]
+
+type JobData = {
+   url: string
+   title: string
+   jobType: string
+   businessFunctionsTags?: string
+   deadline?: string
+}
+
+type SpeakerData = {
+   name: string
+   position: string
+   avatarUrl: string
+   url: string
+}
+
+type SparkData = {
+   question: string
+   category_id: string
+   thumbnailUrl: string
+   url: string
+}
+
+type CalendarData = {
+   google: string
+   outlook: string
+   apple: string
+}
 
 /**
  * Message data for livestream registration confirmation emails
@@ -23,30 +53,10 @@ export interface LivestreamRegistrationTemplateData {
       start: string
       companyBannerImageUrl: string
    }
-   jobs: {
-      url: string
-      title: string
-      jobType: string
-      businessFunctionsTags?: string
-      deadline?: string
-   }[]
-   speakers: {
-      name: string
-      position: string
-      avatarUrl: string
-      url: string
-   }[]
-   sparks: {
-      question: string
-      category_id: string
-      thumbnailUrl: string
-      url: string
-   }[]
-   calendar: {
-      google: string
-      outlook: string
-      apple: string
-   }
+   jobs: JobData[]
+   speakers: SpeakerData[]
+   sparks: SparkData[]
+   calendar: CalendarData
 }
 
 /**
@@ -69,6 +79,18 @@ export interface ReminderTemplateData {
    }
 }
 
+type ReminderFollowUpTemplateData = {
+   livestream: {
+      details_url: string
+      company: string
+      companyBannerImageUrl: string
+   }
+   speakers: SpeakerData[]
+   jobs: JobData[]
+   sparks: SparkData[]
+   allowsRecording: boolean
+}
+
 /**
  * Union type of all possible message data types
  */
@@ -77,6 +99,8 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_1H]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_5M]: ReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES]: ReminderFollowUpTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES]: ReminderFollowUpTemplateData
 }
 
 /**

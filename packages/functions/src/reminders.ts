@@ -28,6 +28,7 @@ import {
    customJobRepo,
    groupRepo,
    livestreamsRepo,
+   notificationRepo,
    sparkRepo,
 } from "./api/repositories"
 import config from "./config"
@@ -35,6 +36,10 @@ import {
    getStreamsByDateWithRegisteredStudents,
    updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
+import {
+   CUSTOMERIO_EMAIL_TEMPLATES,
+   EmailNotificationRequestData,
+} from "./lib/notifications/EmailTypes"
 import { logAndThrow } from "./lib/validations"
 import {
    IGenerateEmailDataProps,
@@ -650,17 +655,22 @@ const handleSendEmail = async (
    })
 }
 
+type FollowUpTemplateId =
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES
+
 const getPostmarkTemplateMessages = (
    baseMessage: TemplatedMessage,
    streams: LiveStreamEventWithUsersLivestreamData[],
    reminder: ReminderData,
    additionalData: LivestreamFollowUpAdditionalData
-): TemplatedMessage[] => {
+): EmailNotificationRequestData<FollowUpTemplateId>[] => {
    const host = isLocalEnvironment()
       ? "http://localhost:3000"
       : "https://careerfairy.io"
 
-   const templateMessages: TemplatedMessage[] = []
+   const templateMessages: EmailNotificationRequestData<FollowUpTemplateId>[] =
+      []
 
    streams.forEach((stream) => {
       const streamGroup = additionalData.groups.groupsByLivestreamId[stream.id]
@@ -749,10 +759,11 @@ const getPostmarkTemplateMessages = (
 
          templateMessages.push({
             ...baseMessage,
-            To: streamUserData.user.userEmail,
-            TemplateModel: {
+            to: streamUserData.user.userEmail,
+            templateId: reminder.key,
+            userAuthId: streamUserData.user.id,
+            templateData: {
                livestream: {
-                  document_id: stream.id,
                   company: streamGroup.universityName,
                   companyBannerImageUrl: streamGroup.bannerImageUrl,
                   details_url: addUtmTagsToLink({
@@ -763,15 +774,11 @@ const getPostmarkTemplateMessages = (
                      content: stream.title,
                   }),
                },
-               user: {
-                  firstName: streamUserData.user.firstName,
-               },
                jobs: streamJobs,
                speakers: speakers,
                sparks: groupSparks,
                allowsRecording: !stream.denyRecordingAccess,
             },
-            Tag: reminder.key,
          })
       })
    })
@@ -933,6 +940,8 @@ const sendAttendeesReminder = async (
                jobsByLivestreamId: livestreamJobs,
             },
          }
+
+         await notificationRepo.sendEmailNotifications()
 
          const emailTemplates: TemplatedMessage[] = getPostmarkTemplateMessages(
             BASE_TEMPLATE_MESSAGE,
