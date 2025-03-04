@@ -84,7 +84,7 @@ import user = require("./user")
 import countries = require("./countries")
 import levels = require("./levels")
 import remindersNew = require("./reminders-new")
-
+import followups = require("./followups")
 // Auth
 exports.createNewUserAccount_v3 = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
@@ -120,19 +120,15 @@ exports.changeRole_eu = groupAdmin.changeRole
 exports.kickFromDashboard_eu = groupAdmin.kickFromDashboard
 
 // Reminders
-exports.sendReminderEmailToRegistrants =
-   reminders.sendReminderEmailToRegistrants
-exports.sendReminderEmailAboutApplicationLink_eu =
-   reminders.sendReminderEmailAboutApplicationLink
+exports.sendReminderEmailAboutApplicationLink_v2 =
+   followups.sendReminderEmailAboutApplicationLink
 exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
 // Not to be deployed
-exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
-exports.sendReminderToAttendees = reminders.sendReminderToAttendees
+exports.sendReminderToNonAttendees = followups.sendReminderToNonAttendees
+exports.sendReminderToAttendees = followups.sendReminderToAttendees
 // Not to be deployed
 exports.testSendReminderToNonAttendees =
-   reminders.testSendReminderToNonAttendees
-exports.sendReminderForNonAttendeesByStreamId =
-   reminders.sendReminderForNonAttendeesByStreamId
+   followups.testSendReminderToNonAttendees
 
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
