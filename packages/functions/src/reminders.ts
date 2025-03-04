@@ -211,11 +211,6 @@ const Reminder24Hours: ReminderData = {
    key: "reminder24Hours",
 }
 
-const ReminderTodayMorning = {
-   template: "reminder_for_recording",
-   key: "reminderTodayMorning",
-} satisfies ReminderData
-
 const ReminderRecordingNow = {
    template: "reminder_for_recording",
    key: "reminderRecordingNow",
@@ -397,7 +392,9 @@ export const sendReminderToNonAttendees = functions
    .pubsub.schedule("0 11 * * *")
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      await sendAttendeesReminder(ReminderTodayMorning)
+      await sendAttendeesReminder(
+         CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES
+      )
    })
 
 export const sendReminderToAttendees = functions
@@ -410,7 +407,9 @@ export const sendReminderToAttendees = functions
    .pubsub.schedule("0 11 * * *")
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      await sendAttendeesReminder(ReminderTodayMorning, true)
+      await sendAttendeesReminder(
+         CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
+      )
    })
 
 export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
@@ -421,7 +420,10 @@ export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
    ])
 
    // Toggle between attendees or non-attendees
-   await sendAttendeesReminder(ReminderTodayMorning, false, testEvents)
+   await sendAttendeesReminder(
+      CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES,
+      testEvents
+   )
 
    res.status(200).send("Test non attendees done")
 })
@@ -825,8 +827,7 @@ const wasEmailChunkNotYetSent = (
 }
 
 const sendAttendeesReminder = async (
-   reminderData: ReminderData,
-   attendees?: boolean,
+   templateId: FollowUpTemplateId,
    events?: LivestreamEvent[]
 ) => {
    try {
@@ -850,9 +851,11 @@ const sendAttendeesReminder = async (
                   `Detected livestream ${livestreamPresenter.title} has ended yesterday`
                )
 
-               const attendeesData = attendees
-                  ? await livestreamsRepo.getAttendees(livestream.id)
-                  : await livestreamsRepo.getNonAttendees(livestream.id)
+               const attendeesData =
+                  templateId ===
+                  CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
+                     ? await livestreamsRepo.getAttendees(livestream.id)
+                     : await livestreamsRepo.getNonAttendees(livestream.id)
 
                if (attendeesData.length) {
                   const livestreamAttendees = {
@@ -877,10 +880,6 @@ const sendAttendeesReminder = async (
             }
             return await acc
          }, Promise.resolve([]))
-
-         const templateId = attendees
-            ? CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
-            : CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES
 
          const groupsByEventIds: Record<string, Group> = {}
 
