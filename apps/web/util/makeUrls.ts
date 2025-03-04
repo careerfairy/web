@@ -5,11 +5,14 @@ import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
 
 export const makeGroupCompanyPageUrl = (
    groupName: string,
-   interactionSource?: string
+   {
+      interactionSource,
+      absoluteUrl,
+   }: { interactionSource?: string; absoluteUrl?: boolean } = {}
 ) => {
-   return `${getBaseUrl()}/company/${companyNameSlugify(groupName)}${
-      interactionSource ? `?interactionSource=${interactionSource}` : ""
-   }`
+   return `${absoluteUrl ? getBaseUrl() : ""}/company/${companyNameSlugify(
+      groupName
+   )}${interactionSource ? `?interactionSource=${interactionSource}` : ""}`
 }
 
 export const makeLivestreamEventDetailsInviteUrl = (

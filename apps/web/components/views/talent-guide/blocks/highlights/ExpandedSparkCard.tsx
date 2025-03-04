@@ -113,10 +113,9 @@ export const ExpandedSparkCard = ({ spark, playing, onClose }: Props) => {
    const [dialogRef, { width: dialogWidth }] = useMeasure()
 
    const companyPageLink = spark.group.publicProfile
-      ? makeGroupCompanyPageUrl(
-           spark.group.universityName,
-           InteractionSources.Talent_Guide
-        )
+      ? makeGroupCompanyPageUrl(spark.group.universityName, {
+           interactionSource: InteractionSources.Talent_Guide,
+        })
       : undefined
 
    const mentorPageLink = buildMentorPageLink({

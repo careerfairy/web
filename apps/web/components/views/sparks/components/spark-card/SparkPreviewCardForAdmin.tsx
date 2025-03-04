@@ -44,6 +44,7 @@ const SparkPreviewCardForAdmin: FC<Props> = ({
             preview: !preview,
             muted: false,
          }}
+         autoPlaying={type === "fullScreen"}
       >
          <Box px={cardPadding} pt={cardPadding}>
             <SparkHeader showAdminOptions={preview} spark={spark} />

@@ -183,7 +183,10 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                            noLinkStyle
                            href={makeGroupCompanyPageUrl(
                               company.universityName,
-                              InteractionSources.Live_Stream_Details
+                              {
+                                 interactionSource:
+                                    InteractionSources.Live_Stream_Details,
+                              }
                            )}
                            sx={{ color: "white" }}
                         >
@@ -230,10 +233,10 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                   <Box
                      display="flex"
                      component={Link}
-                     href={makeGroupCompanyPageUrl(
-                        company.universityName,
-                        InteractionSources.Live_Stream_Details
-                     )}
+                     href={makeGroupCompanyPageUrl(company.universityName, {
+                        interactionSource:
+                           InteractionSources.Live_Stream_Details,
+                     })}
                      alignItems={"center"}
                      noLinkStyle
                      color={"primary.main"}
