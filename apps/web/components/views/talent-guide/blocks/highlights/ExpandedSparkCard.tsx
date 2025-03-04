@@ -1,6 +1,6 @@
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { Box, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
@@ -20,6 +20,7 @@ import { sparkService } from "data/firebase/SparksService"
 import { SyntheticEvent, useCallback, useEffect, useMemo, useRef } from "react"
 import { useMeasure } from "react-use"
 import { sxStyles } from "types/commonTypes"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { buildMentorPageLink } from "util/routes"
 import { ExpandedCard } from "./ExpandedCard"
 
@@ -112,7 +113,9 @@ export const ExpandedSparkCard = ({ spark, playing, onClose }: Props) => {
    const [dialogRef, { width: dialogWidth }] = useMeasure()
 
    const companyPageLink = spark.group.publicProfile
-      ? `/company/${companyNameSlugify(spark.group.universityName)}`
+      ? makeGroupCompanyPageUrl(spark.group.universityName, {
+           interactionSource: InteractionSources.Talent_Guide,
+        })
       : undefined
 
    const mentorPageLink = buildMentorPageLink({

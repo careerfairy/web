@@ -1,5 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import { InteractionSourcesType } from "@careerfairy/shared-lib/groups/telemetry"
 import {
    Box,
    Card,
@@ -14,6 +14,7 @@ import Image from "next/legacy/image"
 import { FC } from "react"
 import { useInView } from "react-intersection-observer"
 import { CompanySearchResult } from "types/algolia"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { sxStyles } from "../../../types/commonTypes"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
 import {
@@ -107,9 +108,10 @@ const styles = sxStyles({
 
 type Props = {
    company: Group | CompanySearchResult
+   interactionSource: InteractionSourcesType
 }
 
-const CompanyCard: FC<Props> = ({ company }) => {
+const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
    const [ref, inView] = useInView({
       triggerOnce: true, // Only fetch the next livestreams when the card is in view
    })
@@ -124,7 +126,10 @@ const CompanyCard: FC<Props> = ({ company }) => {
                alt={company.universityName}
                objectFit="cover"
             />
-            <LinkToCompanyPage companyName={company.universityName} />
+            <LinkToCompanyPage
+               companyName={company.universityName}
+               interactionSource={interactionSource}
+            />
          </CardMedia>
          <CardContent sx={styles.content}>
             <Box sx={styles.companyLogoWrapper}>
@@ -141,6 +146,7 @@ const CompanyCard: FC<Props> = ({ company }) => {
                      size={"small"}
                      sx={styles.followButton}
                      startIcon={null}
+                     interactionSource={interactionSource}
                   />
                ) : (
                   <Skeleton variant="rectangular" width={100} height={30} />
@@ -184,7 +190,10 @@ const CompanyCard: FC<Props> = ({ company }) => {
                   <UpcomingLivestreamSkeleton />
                )}
             </Stack>
-            <LinkToCompanyPage companyName={company.universityName} />
+            <LinkToCompanyPage
+               companyName={company.universityName}
+               interactionSource={interactionSource}
+            />
          </CardContent>
          {/*<script*/}
          {/*   type="application/ld+json"*/}
@@ -300,10 +309,13 @@ const LivestreamTitle: FC<{
 const LinkToCompanyPage: FC<{
    companyName: string
    children?: React.ReactNode
-}> = ({ companyName, children }) => {
+   interactionSource: InteractionSourcesType
+}> = ({ companyName, children, interactionSource }) => {
    return (
       <CardActionArea
-         href={`/company/${companyNameSlugify(companyName)}`}
+         href={makeGroupCompanyPageUrl(companyName, {
+            interactionSource,
+         })}
          sx={styles.actionArea}
          component={Link}
       >

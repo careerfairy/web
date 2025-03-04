@@ -8,6 +8,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { talentGuideProgressService } from "data/firebase/TalentGuideProgressService"
 import { Page, QuizModelType, TalentGuideModule } from "data/hygraph/types"
 import { RootState } from "store"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerLevelEvent } from "util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 export type QuizStatus = {
@@ -15,7 +17,7 @@ export type QuizStatus = {
    state: QuizState
 }
 
-type TalentGuideState = {
+export type TalentGuideState = {
    visibleSteps: number[]
    currentStepIndex: number
    moduleData: Page<TalentGuideModule> | null
@@ -249,6 +251,186 @@ const talentGuideReducer = createSlice({
             // ])
          }
       },
+      trackLevelsLeave: (
+         state,
+         action: PayloadAction<Page<TalentGuideModule>>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsLeave,
+            action.payload,
+            state.currentStepIndex
+         )
+      },
+      trackLevelsFeedback: (
+         state,
+         action: PayloadAction<{ rating: number; feedbackTags: string[] }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsFeedbackSubmitted,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               rating: action.payload.rating,
+               feedbackTags: action.payload.feedbackTags,
+            }
+         )
+      },
+      trackLevelsHighlightClick: (
+         state,
+         action: PayloadAction<{
+            highlightId: string
+            type: "Spark" | "Highlight"
+         }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsHighlightClick,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               highlightId: action.payload.highlightId,
+               type: action.payload.type,
+            }
+         )
+      },
+      trackLevelsArticleClick: (
+         state,
+         action: PayloadAction<{
+            articleId: string
+            articleUrl: string
+            articleTitle: string
+         }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsArticleClick,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               articleId: action.payload.articleId,
+               articleUrl: action.payload.articleUrl,
+               articleTitle: action.payload.articleTitle,
+            }
+         )
+      },
+      trackLevelsVideoPlay: (
+         state,
+         action: PayloadAction<{ videoId: string; videoTitle: string }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsVideoPlay,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               videoId: action.payload.videoId,
+               videoTitle: action.payload.videoTitle,
+            }
+         )
+      },
+      trackLevelsLivestreamOpened: (
+         state,
+         action: PayloadAction<{
+            livestreamId: string
+            livestreamTitle: string
+         }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsLivestreamOpened,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               livestreamId: action.payload.livestreamId,
+               livestreamTitle: action.payload.livestreamTitle,
+            }
+         )
+      },
+      trackLevelsLivestreamRegistrationCompleted: (
+         state,
+         action: PayloadAction<{
+            livestreamId: string
+            livestreamTitle: string
+         }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsLivestreamRegistrationCompleted,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               livestreamId: action.payload.livestreamId,
+               livestreamTitle: action.payload.livestreamTitle,
+            }
+         )
+      },
+      trackLevelsJobClick: (
+         state,
+         action: PayloadAction<{
+            jobId: string
+            jobName: string
+         }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsJobClick,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               jobId: action.payload.jobId,
+               jobName: action.payload.jobName,
+            }
+         )
+      },
+      trackLevelsJobApplied: (
+         state,
+         action: PayloadAction<{
+            jobId: string
+            jobName: string
+         }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsJobApplied,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               jobId: action.payload.jobId,
+               jobName: action.payload.jobName,
+            }
+         )
+      },
+      trackLevelsMentorView: (
+         state,
+         action: PayloadAction<{
+            mentorId: string
+            mentorName: string
+            companyId: string
+         }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsMentorView,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               mentorId: action.payload.mentorId,
+               mentorName: action.payload.mentorName,
+               companyId: action.payload.companyId,
+            }
+         )
+      },
+      trackLevelsMentorClick: (
+         state,
+         action: PayloadAction<{
+            mentorId: string
+            mentorName: string
+            companyId: string
+         }>
+      ) => {
+         dataLayerLevelEvent(
+            AnalyticsEvents.LevelsMentorClick,
+            state.moduleData,
+            state.currentStepIndex,
+            {
+               mentorId: action.payload.mentorId,
+               mentorName: action.payload.mentorName,
+               companyId: action.payload.companyId,
+            }
+         )
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -259,6 +441,11 @@ const talentGuideReducer = createSlice({
             if (!action.payload) {
                // If there is no next step, we've completed the module
                state.showEndOfModuleExperience = true
+               dataLayerLevelEvent(
+                  AnalyticsEvents.LevelsComplete,
+                  state.moduleData,
+                  state.currentStepIndex
+               )
             } else {
                const { nextStepIndex } = action.payload
                state.currentStepIndex = nextStepIndex
@@ -338,6 +525,11 @@ const talentGuideReducer = createSlice({
                },
                {} as Record<string, QuizStatus>
             )
+            dataLayerLevelEvent(
+               AnalyticsEvents.LevelsStart,
+               state.moduleData,
+               state.currentStepIndex
+            )
          })
          .addCase(loadTalentGuide.rejected, (state, action) => {
             state.isLoadingTalentGuide = false
@@ -363,6 +555,16 @@ const talentGuideReducer = createSlice({
             state.quizStatuses[quizId].state = passed
                ? QUIZ_STATE.PASSED
                : QUIZ_STATE.FAILED
+
+            dataLayerLevelEvent(
+               AnalyticsEvents.LevelsQuizAttempt,
+               state.moduleData,
+               state.currentStepIndex,
+               {
+                  quizId,
+                  quizPassed: passed,
+               }
+            )
          })
          .addCase(attemptQuiz.rejected, (state, action) => {
             state.isLoadingAttemptQuiz = false
@@ -451,6 +653,20 @@ const talentGuideReducer = createSlice({
    },
 })
 
-export const { resetTalentGuide, toggleQuizAnswer } = talentGuideReducer.actions
+export const {
+   resetTalentGuide,
+   toggleQuizAnswer,
+   trackLevelsLeave,
+   trackLevelsFeedback,
+   trackLevelsHighlightClick,
+   trackLevelsArticleClick,
+   trackLevelsVideoPlay,
+   trackLevelsLivestreamOpened,
+   trackLevelsLivestreamRegistrationCompleted,
+   trackLevelsJobClick,
+   trackLevelsJobApplied,
+   trackLevelsMentorView,
+   trackLevelsMentorClick,
+} = talentGuideReducer.actions
 
 export default talentGuideReducer.reducer

@@ -131,19 +131,7 @@ cd apps/mobile
 
 Run following commands for environments:
 
-1. Preview (apk): After running the command, choose which platforms, Android, iOS or both
-
-```bash
-eas build --profile preview
-```
-
-or from the root
-
-```bash
-npm run native-build:preview
-```
-
-2. Development (dev build): After running the command, choose which platforms, Android, iOS or both
+1. Development (dev build): After running the command, choose which platforms, Android, iOS or both
 
 ```bash
 eas build --profile development
@@ -154,6 +142,25 @@ or from the root
 ```bash
 npm run native-build:develop
 ```
+
+2. Staging (for PR testing): After running the command, choose which platforms, Android, iOS or both
+
+```bash
+eas build --profile staging
+```
+
+or from the root
+
+```bash
+npm run native-build:staging
+```
+
+The isolated development build is primarily used for testing PRs remotely. Unlike regular development builds:
+
+-  No connection to Expo dev client/CLI required
+-  Can be distributed to testers without tunneling setup
+-  No hot-reload functionality (trade-off for easier distribution)
+-  Perfect for getting feedback from testers who don't need development environment access
 
 3. Production (app/play store build): After running the command, choose which platforms, Android, iOS or both
 

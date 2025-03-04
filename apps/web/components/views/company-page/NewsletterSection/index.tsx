@@ -2,11 +2,12 @@ import { IUserReminder, UserReminderType } from "@careerfairy/shared-lib/users"
 import { Box, Button, Typography } from "@mui/material"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { PillsBackground } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
 import { sxStyles } from "../../../../types/commonTypes"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { dataLayerCompanyEvent } from "../../../../util/analyticsUtils"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import Link from "../../common/Link"
 import { useCompanyPage } from "../index"
@@ -29,12 +30,15 @@ const styles = sxStyles({
 
 const NewsletterSection = () => {
    const { userData, isLoggedIn } = useAuth()
-   const { editMode } = useCompanyPage()
+   const { editMode, group } = useCompanyPage()
    const { asPath } = useRouter()
    const { errorNotification } = useSnackbarNotifications()
 
    const handleAcceptNewsletter = useCallback(async () => {
-      dataLayerEvent(`newsletter_accepted_on_company_page`)
+      dataLayerCompanyEvent(
+         AnalyticsEvents.NewsletterAcceptedOnCompanyPage,
+         group
+      )
       try {
          // If it was accepted we should set it as completed
          const reminder: IUserReminder = {
@@ -51,7 +55,7 @@ const NewsletterSection = () => {
       } catch (e) {
          errorNotification(e.message)
       }
-   }, [errorNotification, userData?.id])
+   }, [errorNotification, userData?.id, group])
 
    if (editMode || (isLoggedIn && !userData?.unsubscribed)) {
       return null

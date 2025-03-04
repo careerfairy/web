@@ -1,9 +1,9 @@
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, Grid, Typography } from "@mui/material"
-import { sxStyles } from "../../../../types/commonTypes"
-import React from "react"
 import Image from "next/legacy/image"
-import { useCompanyPage } from "../index"
+import { sxStyles } from "../../../../types/commonTypes"
 import FollowButton from "../../common/company/FollowButton"
+import { useCompanyPage } from "../index"
 
 const styles = sxStyles({
    wrapper: {
@@ -48,6 +48,7 @@ const StayUpToDateBanner = () => {
                         group={group}
                         color={"secondary"}
                         startIcon={null}
+                        interactionSource={InteractionSources.Company_Page}
                      />
                   </Grid>
                </Grid>

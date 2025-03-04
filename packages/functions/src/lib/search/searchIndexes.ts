@@ -25,6 +25,7 @@ import {
 } from "@careerfairy/shared-lib/sparks/search"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { removeDuplicates } from "@careerfairy/shared-lib/utils"
+import { generateFeaturedCompanyPriority } from "@careerfairy/shared-lib/utils/groups"
 import { Index } from "./searchIndexGenerator"
 
 const livestreamIndex = {
@@ -95,11 +96,12 @@ const companyIndex = {
       companyCountryId: data.companyCountry?.id ?? null,
       companyIndustriesIdTags:
          data.companyIndustries?.map((industry) => industry.id) ?? [],
+      featuredCompanyPriority: generateFeaturedCompanyPriority(data),
    }),
    settings: {
       attributesForFaceting: COMPANY_FILTERING_FIELDS,
       searchableAttributes: COMPANY_SEARCHABLE_ATTRIBUTES,
-      replicas: [COMPANY_REPLICAS.NAME_ASC],
+      replicas: [COMPANY_REPLICAS.NAME_ASC, COMPANY_REPLICAS.PRIORITY_DESC],
    },
 } satisfies Index<Group, TransformedGroup>
 

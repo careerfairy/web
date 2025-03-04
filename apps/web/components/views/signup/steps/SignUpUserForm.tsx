@@ -1,5 +1,4 @@
 import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
-import { MESSAGING_TYPE, USER_AUTH } from "@careerfairy/shared-lib/messaging"
 import {
    IUserReminder,
    UserAccountCreationAdditionalData,
@@ -24,12 +23,12 @@ import { DateTime } from "luxon"
 import { useRouter } from "next/router"
 import React, { Fragment, useContext, useEffect, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import * as yup from "yup"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
 import CookiesUtil from "../../../../util/CookiesUtil"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { MobileUtils } from "../../../../util/mobile.utils"
 import GenericDropdown from "../../common/GenericDropdown"
 import {
    IMultiStepContext,
@@ -122,10 +121,10 @@ function SignUpUserForm() {
    const [open, setOpen] = React.useState(false)
 
    useEffect(() => {
-      dataLayerEvent("signup_started")
+      dataLayerEvent(AnalyticsEvents.SignupStarted)
    }, [])
 
-   const submitting = (isSubmitting) => {
+   const submitting = (isSubmitting: boolean) => {
       return isSubmitting || emailSent || generalLoading
    }
 
@@ -165,16 +164,18 @@ function SignUpUserForm() {
          .then(() => {
             firebase
                .signInWithEmailAndPassword(values.email, values.password)
-               .then(async (userCred) => {
+               .then(async () => {
                   // To create a newsletter reminder for 7 days in the future
                   // in case the subscribed input is not checked
                   try {
                      if (values.subscribed) {
-                        dataLayerEvent("newsletter_accepted_on_signup")
+                        dataLayerEvent(
+                           AnalyticsEvents.NewsletterAcceptedOnSignup
+                        )
                         return
                      }
 
-                     dataLayerEvent("newsletter_denied_on_signup")
+                     dataLayerEvent(AnalyticsEvents.NewsletterDeniedOnSignup)
 
                      const sevenDaysFromNow = new Date(
                         new Date().setDate(new Date().getDate() + 7)
@@ -187,13 +188,6 @@ function SignUpUserForm() {
                         isFirstReminder: true,
                      } as IUserReminder
 
-                     const token =
-                        userCred.user.multiFactor["user"].accessToken || ""
-                     MobileUtils.send<USER_AUTH>(MESSAGING_TYPE.USER_AUTH, {
-                        token,
-                        userId: values.email,
-                        userPassword: values.password,
-                     })
                      await userRepo.updateUserReminder(values.email, reminder)
                   } catch (e) {
                      errorLogAndNotify(e, {
@@ -211,7 +205,7 @@ function SignUpUserForm() {
                   // the useEffect moves to the step 1 because the user is logged in but not confirmed
                   // if we would do nextStep() here, it would move to step 2 instead of 1
                   setCurrentStep(1)
-                  dataLayerEvent("signup_credentials_completed")
+                  dataLayerEvent(AnalyticsEvents.SignupCredentialsCompleted)
                })
                .catch((e) => {
                   errorLogAndNotify(e, {

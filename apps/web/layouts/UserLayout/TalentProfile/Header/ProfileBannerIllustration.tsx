@@ -7,6 +7,8 @@ import { userRepo } from "data/RepositoryInstances"
 import Image from "next/image"
 import useSWRMutation from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerEvent } from "util/analyticsUtils"
 import { v4 as uuid } from "uuid"
 import { ProfileBannerUploadButton } from "./ProfileBannerUploadButton"
 
@@ -76,6 +78,7 @@ export const ProfileBannerIllustration = () => {
             successNotification(
                "Profile banner image has been successfully updated"
             )
+            dataLayerEvent(AnalyticsEvents.ProfileBannerUpload)
          },
          onError: (err) => {
             errorNotification(err.message)

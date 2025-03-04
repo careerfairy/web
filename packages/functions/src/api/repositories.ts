@@ -45,10 +45,16 @@ import {
    CustomJobFunctionsRepository,
    ICustomJobFunctionsRepository,
 } from "../lib/CustomJobFunctionsRepository"
+import { groupEventsHandler } from "../lib/bigQuery/group/GroupBigQueryServices"
 import {
    sparkEventsHandler,
    sparkSecondsWatchedHanlder,
 } from "../lib/bigQuery/sparks/SparksBigQueryServices"
+import { apiClient } from "../lib/customerio/client"
+import {
+   INotificationRepository,
+   NotificationRepository,
+} from "../lib/notifications/NotificationRepository"
 import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
 import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
 import bigQueryClient from "./bigQueryClient"
@@ -57,7 +63,10 @@ import { FieldValue, Timestamp, firestore, storage } from "./firestoreAdmin"
 import logger = require("firebase-functions/logger")
 
 export const groupRepo: IGroupFunctionsRepository =
-   new GroupFunctionsRepository(firestore as any, FieldValue)
+   new GroupFunctionsRepository(
+      firestore as any,
+      FieldValue
+   ).setGroupEventsHandler(groupEventsHandler)
 
 export const userRepo: IUserFunctionsRepository = new UserFunctionsRepository(
    firestore as any,
@@ -79,6 +88,9 @@ export const universityRepo: IUniversityRepository =
 
 export const livestreamsRepo: ILivestreamFunctionsRepository =
    new LivestreamFunctionsRepository(firestore as any, FieldValue)
+
+export const notificationRepo: INotificationRepository =
+   new NotificationRepository(apiClient)
 
 export const atsRepo = (
    apiKey: string,

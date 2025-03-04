@@ -1,15 +1,16 @@
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import { useRouter } from "next/router"
-import { useAuth } from "HOCs/AuthProvider"
-import { useCallback, useState } from "react"
-import { useDispatch } from "react-redux"
-import { getLinkToStream } from "util/streamUtil"
-import * as actions from "store/actions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { UserReminderType } from "@careerfairy/shared-lib/dist/users"
+import { useAuth } from "HOCs/AuthProvider"
 import { useUserReminders } from "HOCs/UserReminderProvider"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { useRouter } from "next/router"
+import { useCallback, useState } from "react"
+import { useDispatch } from "react-redux"
+import * as actions from "store/actions"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { getLinkToStream } from "util/streamUtil"
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 
 const useRegistrationModal = (
    // if redirected to signup when clicking
@@ -49,7 +50,10 @@ const useRegistrationModal = (
          groups: any[],
          hasRegistered: boolean
       ) => {
-         dataLayerLivestreamEvent("event_registration_started", event)
+         dataLayerLivestreamEvent(
+            AnalyticsEvents.EventRegistrationStarted,
+            event
+         )
          try {
             if (hasRegistered) {
                await firebase.deregisterFromLivestream(event.id, userData)
@@ -57,12 +61,15 @@ const useRegistrationModal = (
                   event.id,
                   userData.authId
                )
-               dataLayerLivestreamEvent("event_registration_removed", event)
+               dataLayerLivestreamEvent(
+                  AnalyticsEvents.EventRegistrationRemoved,
+                  event
+               )
             } else {
                const emailVerified = firebase.auth?.currentUser?.emailVerified
                if (!isLoggedIn || !emailVerified) {
                   dataLayerLivestreamEvent(
-                     "event_registration_started_login_required",
+                     AnalyticsEvents.EventRegistrationStartedLoginRequired,
                      event
                   )
                   return push({

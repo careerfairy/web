@@ -5,6 +5,6 @@ export const useIsInTalentGuide = () => {
    const router = useRouter()
 
    return useMemo(() => {
-      return router.pathname.includes("/levels")
+      return router.pathname.startsWith("/levels")
    }, [router.pathname])
 }

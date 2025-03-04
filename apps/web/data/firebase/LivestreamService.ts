@@ -101,6 +101,13 @@ export type SetModeOptionsType<Mode extends LivestreamMode> =
 export class LivestreamService {
    constructor(private readonly functions: Functions) {}
 
+   async getById(livestreamId: string) {
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+      const livestream = await getDoc(livestreamRef)
+
+      return livestream.data()
+   }
+
    /**
     * Validates category data for a live stream, determining if a certain user as answered and performed all steps
     * for a live stream registration and accepted all policies if any. Current logic is a migration of the validation done in the old streaming application.
@@ -525,6 +532,7 @@ export class LivestreamService {
             transaction.update(livestreamRef, {
                hasEnded: true,
                hasStarted: false,
+               endedAt: Timestamp.now(),
             })
          }
       })

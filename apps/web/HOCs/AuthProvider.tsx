@@ -4,9 +4,14 @@ import {
    UserStats,
 } from "@careerfairy/shared-lib/dist/users"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import {
+   MESSAGING_TYPE,
+   ON_AUTH_MOUNTED,
+} from "@careerfairy/shared-lib/messaging"
 import * as Sentry from "@sentry/nextjs"
 import Loader from "components/views/loader/Loader"
 import { userRepo } from "data/RepositoryInstances"
+import { auth as authInstance } from "data/firebase/FirebaseInstance"
 import { clearFirestoreCache } from "data/util/authUtil"
 import { useRouter } from "next/router"
 import nookies from "nookies"
@@ -27,6 +32,8 @@ import {
 import { usePreviousDistinct } from "react-use"
 import { isAdminPath, isSecurePath, isSignupPath } from "util/AuthUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { MobileUtils } from "util/mobile.utils"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { RootState } from "../store"
 import CookiesUtil from "../util/CookiesUtil"
@@ -159,12 +166,10 @@ const AuthProvider = ({ children }) => {
    }, [userData])
 
    const refetchClaims = useCallback(async () => {
-      if (!firebaseService.auth.currentUser) return null
-      const token = await firebaseService.auth.currentUser.getIdTokenResult(
-         true
-      )
+      if (!authInstance.currentUser) return null
+      const token = await authInstance.currentUser.getIdTokenResult(true)
       setClaims(token.claims || null)
-   }, [firebaseService.auth.currentUser])
+   }, [])
 
    useEffect(() => {
       // get claims from auth
@@ -204,20 +209,20 @@ const AuthProvider = ({ children }) => {
     * Listen for when user actually logs out
     */
    useEffect(() => {
-      return firebaseService.auth.onIdTokenChanged(async (user) => {
+      return authInstance.onIdTokenChanged(async (user) => {
          if (!user && auth.uid) {
             // If previous user was signed in, send logout event
-            dataLayerEvent("logout")
+            dataLayerEvent(AnalyticsEvents.Logout)
             analyticsResetUser()
          }
       })
-   }, [auth.uid, firebaseService.auth])
+   }, [auth.uid])
 
    /**
     * Listen for auth changes and update claims
     */
    useEffect(() => {
-      return firebaseService.auth.onAuthStateChanged(async (user) => {
+      return authInstance.onAuthStateChanged(async (user) => {
          if (!user) {
             setIsLoggedIn(false)
             setIsLoggedOut(true)
@@ -232,10 +237,19 @@ const AuthProvider = ({ children }) => {
 
             setClaims(tokenResult.claims)
 
+            if (MobileUtils.webViewPresence()) {
+               MobileUtils.send<ON_AUTH_MOUNTED>(
+                  MESSAGING_TYPE.ON_AUTH_MOUNTED,
+                  {
+                     idToken: tokenResult.token,
+                  }
+               )
+            }
+
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
       })
-   }, [firebaseService.auth, auth.uid])
+   }, [])
 
    /**
     * Update user activity when there are new claims

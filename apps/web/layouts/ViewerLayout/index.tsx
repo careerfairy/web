@@ -14,6 +14,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { isLoaded } from "react-redux-firebase"
 import * as actions from "store/actions"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../HOCs/AuthProvider"
 import useCountLivestreamAttendanceMinutes from "../../components/custom-hook/useCountLivestreamAttendanceMinutes"
@@ -356,7 +357,7 @@ const ViewerLayout = (props) => {
 
    const showAudience = useCallback(() => {
       setAudienceDrawerOpen(true)
-      dataLayerEvent("livestream_viewer_show_audience_tab")
+      dataLayerEvent(AnalyticsEvents.LivestreamViewerShowAudienceTab)
    }, [])
 
    const hideAudience = useCallback(() => {

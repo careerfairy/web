@@ -16,6 +16,7 @@ import SanitizedHTML from "components/util/SanitizedHTML"
 import Image from "next/legacy/image"
 import { useSnackbar } from "notistack"
 import { FC, useMemo } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { sxStyles } from "../../../types/commonTypes"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import { makeGroupCompanyPageUrl } from "../../../util/makeUrls"
@@ -58,7 +59,6 @@ type Props = {
    isGroupAdmin?: boolean
 }
 
-const datalayerEntityName = "company_page"
 const ShareCompanyPageDialog: FC<Props> = ({
    group,
    handleClose,
@@ -66,10 +66,16 @@ const ShareCompanyPageDialog: FC<Props> = ({
 }) => {
    const { enqueueSnackbar } = useSnackbar()
 
+   const companyPageLink = useMemo(() => {
+      return makeGroupCompanyPageUrl(group.universityName, {
+         absoluteUrl: true,
+      })
+   }, [group])
+
    const socials = useSocials({
       title: group.universityName,
-      url: makeGroupCompanyPageUrl(group),
-      dataLayerEntityName: datalayerEntityName,
+      url: companyPageLink,
+      dataLayerEntityName: AnalyticsEvents.Company_Page,
       message: `Check out ${group.universityName}'s company page on CareerFairy!`,
       platforms: [
          SocialPlatformObject.Linkedin,
@@ -79,17 +85,13 @@ const ShareCompanyPageDialog: FC<Props> = ({
       ],
    })
 
-   const companyPageLink = useMemo(() => {
-      return makeGroupCompanyPageUrl(group)
-   }, [group])
-
    const copyCompanyPageLinkToClipboard = (link: string) => {
       copyStringToClipboard(link)
       enqueueSnackbar("Link has been copied to your clipboard", {
          variant: "success",
          preventDuplicate: true,
       })
-      dataLayerEvent(datalayerEntityName, {
+      dataLayerEvent(AnalyticsEvents.CompanyPageShare, {
          medium: "Copy Link",
       })
    }

@@ -1,6 +1,9 @@
-import { useRef, useEffect, useCallback } from "react"
+import { useCallback, useEffect, useRef } from "react"
 
-type InUseStorageKeys = "unsentSparkEvents" | "unsentSparkSecondsWatched"
+type InUseStorageKeys =
+   | "unsentSparkEvents"
+   | "unsentSparkSecondsWatched"
+   | "unsentGroupEvents"
 
 /**
  * A custom hook to batch events and send them either when the batch size is reached or at a specified interval.

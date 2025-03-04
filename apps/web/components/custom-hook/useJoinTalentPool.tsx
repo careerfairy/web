@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/router"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useRouter } from "next/router"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { useDispatch } from "react-redux"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useCurrentStream } from "../../context/stream/StreamContext"
-import { useDispatch } from "react-redux"
 import * as actions from "../../store/actions"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 
@@ -48,6 +49,7 @@ const useJoinTalentPool = () => {
       } else {
          setUserIsInTalentPool(false)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       livestreamId,
       userData?.userEmail,
@@ -63,7 +65,7 @@ const useJoinTalentPool = () => {
             try {
                if (!userData) {
                   dataLayerLivestreamEvent(
-                     "talent_pool_join_login",
+                     AnalyticsEvents.TalentPoolJoinLogin,
                      currentLivestream
                   )
                   return push({
@@ -82,7 +84,13 @@ const useJoinTalentPool = () => {
                   userData,
                   currentLivestream
                )
-               dataLayerLivestreamEvent("talent_pool_joined", currentLivestream)
+               dataLayerLivestreamEvent(
+                  AnalyticsEvents.TalentPoolJoined,
+                  currentLivestream,
+                  {
+                     companyIds: currentLivestream.groupIds,
+                  }
+               )
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             }
@@ -108,13 +116,24 @@ const useJoinTalentPool = () => {
                   userData,
                   currentLivestream
                )
-               dataLayerLivestreamEvent("talent_pool_leave", currentLivestream)
+               if (currentLivestream.groupIds) {
+                  currentLivestream.groupIds.forEach((companyId) => {
+                     dataLayerLivestreamEvent(
+                        AnalyticsEvents.TalentPoolLeave,
+                        currentLivestream,
+                        {
+                           companyId,
+                        }
+                     )
+                  })
+               }
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             }
             setLoading(false)
          },
       }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [
          livestreamId,
          userData,

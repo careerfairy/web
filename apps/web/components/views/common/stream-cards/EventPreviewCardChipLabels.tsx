@@ -4,6 +4,7 @@ import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
 import { Box, Chip, Stack, Typography } from "@mui/material"
 import { Briefcase, CheckCircle } from "react-feather"
 import { sxStyles } from "../../../../types/commonTypes"
+import { useEventPreviewCardContext } from "./EventPreviewCardContext"
 
 const styles = sxStyles({
    wrapper: {
@@ -45,22 +46,12 @@ const styles = sxStyles({
 })
 
 type Props = {
-   hasParticipated: boolean
-   isPast: boolean
-   isLive: boolean
-   hasRegistered: boolean
-   hasJobToApply: boolean
    recordingAvailableDays?: number
 }
 
-const EventPreviewCardChipLabels = ({
-   hasParticipated,
-   isPast,
-   isLive,
-   hasRegistered,
-   hasJobToApply,
-   recordingAvailableDays,
-}: Props) => {
+const EventPreviewCardChipLabels = ({ recordingAvailableDays }: Props) => {
+   const { isPast, isLive, hasJobsToApply, hasParticipated, hasRegistered } =
+      useEventPreviewCardContext()
    const leftChips = []
    let rightChip
 
@@ -100,7 +91,7 @@ const EventPreviewCardChipLabels = ({
       )
    }
 
-   if (hasJobToApply && !(isLive && hasRegistered)) {
+   if (hasJobsToApply && !(isLive && hasRegistered)) {
       // registered tag takes precedence over hiring tag if it's live
       leftChips.push(
          <Chip

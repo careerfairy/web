@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerEvent } from "util/analyticsUtils"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { userRepo } from "../../../data/RepositoryInstances"
 import { rewardService } from "../../../data/firebase/RewardService"
@@ -45,6 +47,7 @@ const useUploadCV = ({ onSuccess }: UseUploadCVOptions = {}) => {
             await userRepo.updateResume(userData?.userEmail, url)
             rewardService.userAction("USER_CV_UPLOAD").catch(errorLogAndNotify)
             successNotification("Your CV was uploaded!")
+            dataLayerEvent(AnalyticsEvents.ProfileCvUpload)
             onSuccess && onSuccess()
          } catch (error) {
             errorNotification(error)
