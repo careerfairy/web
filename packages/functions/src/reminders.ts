@@ -13,7 +13,6 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import {
    addUtmTagsToLink,
-   chunkArray,
    companyNameSlugify,
 } from "@careerfairy/shared-lib/utils"
 import { WriteBatch } from "firebase-admin/firestore"
@@ -47,7 +46,6 @@ import {
    generateNonAttendeesReminder,
    generateReminderEmailData,
    isLocalEnvironment,
-   processInBatches,
    setCORSHeaders,
 } from "./util"
 
@@ -213,15 +211,15 @@ const Reminder24Hours: ReminderData = {
    key: "reminder24Hours",
 }
 
-const ReminderTodayMorning: ReminderData = {
+const ReminderTodayMorning = {
    template: "reminder_for_recording",
    key: "reminderTodayMorning",
-}
+} satisfies ReminderData
 
-const ReminderRecordingNow: ReminderData = {
+const ReminderRecordingNow = {
    template: "reminder_for_recording",
    key: "reminderRecordingNow",
-}
+} satisfies ReminderData
 
 /**
  * Runs every {reminderScheduleRange} minutes to handle all the 5 minutes, 1 hour and 1 day livestream email reminders
@@ -659,10 +657,9 @@ type FollowUpTemplateId =
    | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
    | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES
 
-const getPostmarkTemplateMessages = (
-   baseMessage: TemplatedMessage,
+const getCustomerioTemplateMessages = (
+   templateId: FollowUpTemplateId,
    streams: LiveStreamEventWithUsersLivestreamData[],
-   reminder: ReminderData,
    additionalData: LivestreamFollowUpAdditionalData
 ): EmailNotificationRequestData<FollowUpTemplateId>[] => {
    const host = isLocalEnvironment()
@@ -758,9 +755,8 @@ const getPostmarkTemplateMessages = (
          }))
 
          templateMessages.push({
-            ...baseMessage,
             to: streamUserData.user.userEmail,
-            templateId: reminder.key,
+            templateId: templateId,
             userAuthId: streamUserData.user.id,
             templateData: {
                livestream: {
@@ -883,17 +879,8 @@ const sendAttendeesReminder = async (
          }, Promise.resolve([]))
 
          const templateId = attendees
-            ? Number(process.env.POSTMARK_TEMPLATE_ATTENDEES_REMINDER)
-            : Number(process.env.POSTMARK_TEMPLATE_NON_ATTENDEES_REMINDER)
-
-         const BASE_TEMPLATE_MESSAGE: TemplatedMessage = {
-            From: "CareerFairy <noreply@careerfairy.io>",
-            To: null,
-            TemplateId: templateId,
-            TemplateModel: null,
-            MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-            Tag: null,
-         }
+            ? CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
+            : CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES
 
          const groupsByEventIds: Record<string, Group> = {}
 
@@ -941,35 +928,13 @@ const sendAttendeesReminder = async (
             },
          }
 
-         await notificationRepo.sendEmailNotifications()
-
-         const emailTemplates: TemplatedMessage[] = getPostmarkTemplateMessages(
-            BASE_TEMPLATE_MESSAGE,
+         const emailTemplates = getCustomerioTemplateMessages(
+            templateId,
             livestreamsToRemind,
-            reminderData,
             additionalData
          )
 
-         const chunks = chunkArray(emailTemplates, 499) || []
-
-         await processInBatches(
-            chunks,
-            chunks.length,
-            (template) => {
-               return client.sendEmailBatchWithTemplates(template, (err) => {
-                  if (err) {
-                     functions.logger.error(
-                        "Unable to send reminder to attendees with Postmark",
-                        {
-                           error: err,
-                        }
-                     )
-                     return
-                  }
-               })
-            },
-            functions.logger
-         )
+         await notificationRepo.sendEmailNotifications(emailTemplates)
 
          functions.logger.log("attendees reminders sent")
       } else {
