@@ -10,6 +10,8 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    LIVESTREAM_REMINDER_5M: "live_stream_reminder_5min",
    LIVESTREAM_FOLLOWUP_ATTENDEES: "live_stream_followup_attendees",
    LIVESTREAM_FOLLOWUP_NON_ATTENDEES: "live_stream_followup_non_attendees",
+   LIVESTREAM_FOLLOWUP_APPLICATION_LINK:
+      "live_stream_followup_application_link",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
@@ -46,7 +48,7 @@ type CalendarData = {
 /**
  * Message data for livestream registration confirmation emails
  */
-export interface LivestreamRegistrationTemplateData {
+export type LivestreamRegistrationTemplateData = {
    livestream: {
       title: string
       company: string
@@ -62,7 +64,7 @@ export interface LivestreamRegistrationTemplateData {
 /**
  * Message data for livestream reminder email template
  */
-export interface ReminderTemplateData {
+export type ReminderTemplateData = {
    livestream: {
       company: string
       bannerImageUrl: string
@@ -91,6 +93,11 @@ type ReminderFollowUpTemplateData = {
    allowsRecording: boolean
 }
 
+type ApplicationLinkFollowUpTemplateData = {
+   application_link: string
+   position_name: string
+}
+
 /**
  * Union type of all possible message data types
  */
@@ -101,6 +108,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_5M]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES]: ReminderFollowUpTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES]: ReminderFollowUpTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_APPLICATION_LINK]: ApplicationLinkFollowUpTemplateData
 }
 
 /**

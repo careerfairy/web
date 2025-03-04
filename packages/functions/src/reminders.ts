@@ -13,6 +13,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import {
    addUtmTagsToLink,
+   chunkArray,
    companyNameSlugify,
 } from "@careerfairy/shared-lib/utils"
 import { WriteBatch } from "firebase-admin/firestore"
@@ -27,7 +28,6 @@ import {
    customJobRepo,
    groupRepo,
    livestreamsRepo,
-   notificationRepo,
    sparkRepo,
 } from "./api/repositories"
 import config from "./config"
@@ -35,10 +35,6 @@ import {
    getStreamsByDateWithRegisteredStudents,
    updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
-import {
-   CUSTOMERIO_EMAIL_TEMPLATES,
-   EmailNotificationRequestData,
-} from "./lib/notifications/EmailTypes"
 import { logAndThrow } from "./lib/validations"
 import {
    IGenerateEmailDataProps,
@@ -46,6 +42,7 @@ import {
    generateNonAttendeesReminder,
    generateReminderEmailData,
    isLocalEnvironment,
+   processInBatches,
    setCORSHeaders,
 } from "./util"
 
@@ -211,10 +208,15 @@ const Reminder24Hours: ReminderData = {
    key: "reminder24Hours",
 }
 
-const ReminderRecordingNow = {
+const ReminderTodayMorning: ReminderData = {
+   template: "reminder_for_recording",
+   key: "reminderTodayMorning",
+}
+
+const ReminderRecordingNow: ReminderData = {
    template: "reminder_for_recording",
    key: "reminderRecordingNow",
-} satisfies ReminderData
+}
 
 /**
  * Runs every {reminderScheduleRange} minutes to handle all the 5 minutes, 1 hour and 1 day livestream email reminders
@@ -392,9 +394,7 @@ export const sendReminderToNonAttendees = functions
    .pubsub.schedule("0 11 * * *")
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      await sendAttendeesReminder(
-         CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES
-      )
+      await sendAttendeesReminder(ReminderTodayMorning)
    })
 
 export const sendReminderToAttendees = functions
@@ -407,9 +407,7 @@ export const sendReminderToAttendees = functions
    .pubsub.schedule("0 11 * * *")
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      await sendAttendeesReminder(
-         CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
-      )
+      await sendAttendeesReminder(ReminderTodayMorning, true)
    })
 
 export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
@@ -420,10 +418,7 @@ export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
    ])
 
    // Toggle between attendees or non-attendees
-   await sendAttendeesReminder(
-      CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES,
-      testEvents
-   )
+   await sendAttendeesReminder(ReminderTodayMorning, false, testEvents)
 
    res.status(200).send("Test non attendees done")
 })
@@ -655,21 +650,17 @@ const handleSendEmail = async (
    })
 }
 
-type FollowUpTemplateId =
-   | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
-   | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES
-
-const getCustomerioTemplateMessages = (
-   templateId: FollowUpTemplateId,
+const getPostmarkTemplateMessages = (
+   baseMessage: TemplatedMessage,
    streams: LiveStreamEventWithUsersLivestreamData[],
+   reminder: ReminderData,
    additionalData: LivestreamFollowUpAdditionalData
-): EmailNotificationRequestData<FollowUpTemplateId>[] => {
+): TemplatedMessage[] => {
    const host = isLocalEnvironment()
       ? "http://localhost:3000"
       : "https://careerfairy.io"
 
-   const templateMessages: EmailNotificationRequestData<FollowUpTemplateId>[] =
-      []
+   const templateMessages: TemplatedMessage[] = []
 
    streams.forEach((stream) => {
       const streamGroup = additionalData.groups.groupsByLivestreamId[stream.id]
@@ -757,11 +748,11 @@ const getCustomerioTemplateMessages = (
          }))
 
          templateMessages.push({
-            to: streamUserData.user.userEmail,
-            templateId: templateId,
-            userAuthId: streamUserData.user.id,
-            templateData: {
+            ...baseMessage,
+            To: streamUserData.user.userEmail,
+            TemplateModel: {
                livestream: {
+                  document_id: stream.id,
                   company: streamGroup.universityName,
                   companyBannerImageUrl: streamGroup.bannerImageUrl,
                   details_url: addUtmTagsToLink({
@@ -772,11 +763,15 @@ const getCustomerioTemplateMessages = (
                      content: stream.title,
                   }),
                },
+               user: {
+                  firstName: streamUserData.user.firstName,
+               },
                jobs: streamJobs,
                speakers: speakers,
                sparks: groupSparks,
                allowsRecording: !stream.denyRecordingAccess,
             },
+            Tag: reminder.key,
          })
       })
    })
@@ -827,7 +822,8 @@ const wasEmailChunkNotYetSent = (
 }
 
 const sendAttendeesReminder = async (
-   templateId: FollowUpTemplateId,
+   reminderData: ReminderData,
+   attendees?: boolean,
    events?: LivestreamEvent[]
 ) => {
    try {
@@ -851,11 +847,9 @@ const sendAttendeesReminder = async (
                   `Detected livestream ${livestreamPresenter.title} has ended yesterday`
                )
 
-               const attendeesData =
-                  templateId ===
-                  CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
-                     ? await livestreamsRepo.getAttendees(livestream.id)
-                     : await livestreamsRepo.getNonAttendees(livestream.id)
+               const attendeesData = attendees
+                  ? await livestreamsRepo.getAttendees(livestream.id)
+                  : await livestreamsRepo.getNonAttendees(livestream.id)
 
                if (attendeesData.length) {
                   const livestreamAttendees = {
@@ -880,6 +874,19 @@ const sendAttendeesReminder = async (
             }
             return await acc
          }, Promise.resolve([]))
+
+         const templateId = attendees
+            ? Number(process.env.POSTMARK_TEMPLATE_ATTENDEES_REMINDER)
+            : Number(process.env.POSTMARK_TEMPLATE_NON_ATTENDEES_REMINDER)
+
+         const BASE_TEMPLATE_MESSAGE: TemplatedMessage = {
+            From: "CareerFairy <noreply@careerfairy.io>",
+            To: null,
+            TemplateId: templateId,
+            TemplateModel: null,
+            MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+            Tag: null,
+         }
 
          const groupsByEventIds: Record<string, Group> = {}
 
@@ -927,13 +934,33 @@ const sendAttendeesReminder = async (
             },
          }
 
-         const emailTemplates = getCustomerioTemplateMessages(
-            templateId,
+         const emailTemplates: TemplatedMessage[] = getPostmarkTemplateMessages(
+            BASE_TEMPLATE_MESSAGE,
             livestreamsToRemind,
+            reminderData,
             additionalData
          )
 
-         await notificationRepo.sendEmailNotifications(emailTemplates)
+         const chunks = chunkArray(emailTemplates, 499) || []
+
+         await processInBatches(
+            chunks,
+            chunks.length,
+            (template) => {
+               return client.sendEmailBatchWithTemplates(template, (err) => {
+                  if (err) {
+                     functions.logger.error(
+                        "Unable to send reminder to attendees with Postmark",
+                        {
+                           error: err,
+                        }
+                     )
+                     return
+                  }
+               })
+            },
+            functions.logger
+         )
 
          functions.logger.log("attendees reminders sent")
       } else {
