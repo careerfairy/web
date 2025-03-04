@@ -10,7 +10,7 @@ export const makeGroupCompanyPageUrl = (
       absoluteUrl,
    }: { interactionSource?: string; absoluteUrl?: boolean } = {}
 ) => {
-   return `${absoluteUrl ? "" : getBaseUrl()}/company/${companyNameSlugify(
+   return `${absoluteUrl ? getBaseUrl() : ""}/company/${companyNameSlugify(
       groupName
    )}${interactionSource ? `?interactionSource=${interactionSource}` : ""}`
 }
