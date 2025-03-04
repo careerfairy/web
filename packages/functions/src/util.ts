@@ -28,7 +28,6 @@ import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { customAlphabet } from "nanoid"
 import { promisify } from "util"
 import * as zlib from "zlib"
-import { EmailNotificationRequestData } from "./lib/notifications/EmailTypes"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
 import DocumentSnapshot = firestore.DocumentSnapshot
@@ -161,9 +160,7 @@ export const generateNonAttendeesReminder = ({
    stream,
    emailMaxChunkSize,
    reminder,
-}: IGenerateEmailDataProps): EmailNotificationRequestData<
-   "live_stream_followup_non_attendees" | "live_stream_followup_attendees"
->[] => {
+}: IGenerateEmailDataProps): MailgunMessageData[] => {
    const { timezone, usersLivestreamData, company } = stream
 
    const sendReminderNow = reminder.key === "reminderRecordingNow"
