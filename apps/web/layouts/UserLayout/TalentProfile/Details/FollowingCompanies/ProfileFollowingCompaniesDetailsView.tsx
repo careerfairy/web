@@ -162,10 +162,9 @@ type FollowingCompanyCardProps = {
 const FollowingCompanyCard = ({ group }: FollowingCompanyCardProps) => {
    const { userData } = useAuth()
 
-   const companyLink = makeGroupCompanyPageUrl(
-      group.universityName,
-      InteractionSources.Talent_Profile
-   )
+   const companyLink = makeGroupCompanyPageUrl(group.universityName, {
+      interactionSource: InteractionSources.Talent_Profile,
+   })
 
    const handleUnfollow = useCallback(
       async (e: React.MouseEvent) => {

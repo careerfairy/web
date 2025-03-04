@@ -311,6 +311,9 @@ export const truncate = (str, n) => {
  * • http://localhost:3000 - development
  */
 export const getBaseUrl = () => {
+   if (typeof window !== "undefined") {
+      return window.location.origin
+   }
    return process.env.NEXT_PUBLIC_URL || "https://careerfairy.io"
 }
 

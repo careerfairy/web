@@ -84,9 +84,6 @@ export const flagsInitialState = {
    levelsV1: {
       enabled: false,
    },
-   contentPlacementV1: {
-      enabled: true,
-   },
 } satisfies FeatureFlagsDetails
 
 /**

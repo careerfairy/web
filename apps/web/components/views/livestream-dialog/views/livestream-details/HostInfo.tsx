@@ -69,10 +69,10 @@ const HostInfoComponent: FC<HostInfoProps> = ({ presenter }) => {
             size={73}
             href={
                isCompanyPagePublic
-                  ? makeGroupCompanyPageUrl(
-                       company.universityName,
-                       InteractionSources.Live_Stream_Details
-                    )
+                  ? makeGroupCompanyPageUrl(company.universityName, {
+                       interactionSource:
+                          InteractionSources.Live_Stream_Details,
+                    })
                   : null
             }
          />
@@ -85,10 +85,9 @@ const HostInfoComponent: FC<HostInfoProps> = ({ presenter }) => {
                <Box
                   component={Link}
                   noLinkStyle
-                  href={makeGroupCompanyPageUrl(
-                     company.universityName,
-                     InteractionSources.Live_Stream_Details
-                  )}
+                  href={makeGroupCompanyPageUrl(company.universityName, {
+                     interactionSource: InteractionSources.Live_Stream_Details,
+                  })}
                   sx={{ color: "white" }}
                >
                   {companyName}
