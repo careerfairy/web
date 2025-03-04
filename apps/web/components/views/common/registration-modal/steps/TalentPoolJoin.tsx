@@ -1,6 +1,3 @@
-import React, { useContext, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import GroupLogo from "../common/GroupLogo"
 import {
    Button,
    CircularProgress,
@@ -11,12 +8,16 @@ import {
    Grid,
    Grow,
 } from "@mui/material"
-import { RegistrationContext } from "../../../../../context/registration/RegistrationContext"
-import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
+import makeStyles from "@mui/styles/makeStyles"
+import { useContext, useState } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { connectedIcon } from "../../../../../constants/svgs"
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
+import { RegistrationContext } from "../../../../../context/registration/RegistrationContext"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
-import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import GroupLogo from "../common/GroupLogo"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -65,9 +66,14 @@ const TalentPoolJoin = () => {
          await joinCompanyTalentPool(livestream.companyId, userData, livestream)
 
          handleNext()
-      } catch (e) {}
+      } catch (e) {
+         errorLogAndNotify(e)
+      }
       setJoiningTalentPool(false)
-      dataLayerLivestreamEvent("event_registration_talentpool_join", livestream)
+      dataLayerLivestreamEvent(
+         AnalyticsEvents.EventRegistrationTalentpoolJoin,
+         livestream
+      )
    }
    if (!livestream) return null
 
@@ -86,6 +92,7 @@ const TalentPoolJoin = () => {
                   in
                >
                   <div className={classes.imgWrapper}>
+                     {/* eslint-disable-next-line @next/next/no-img-element */}
                      <img src={connectedIcon} alt="talent pool illustration" />
                   </div>
                </Grow>
@@ -116,7 +123,7 @@ const TalentPoolJoin = () => {
                      onClick={() => {
                         handleNext()
                         dataLayerLivestreamEvent(
-                           "event_registration_talentpool_skip",
+                           AnalyticsEvents.EventRegistrationTalentpoolSkip,
                            livestream
                         )
                      }}

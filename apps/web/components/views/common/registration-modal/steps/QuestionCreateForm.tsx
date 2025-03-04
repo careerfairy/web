@@ -1,6 +1,7 @@
-import React, { useContext } from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import GroupLogo from "../common/GroupLogo"
+import {
+   maxQuestionLength,
+   minQuestionLength,
+} from "@careerfairy/shared-lib/constants/forms"
 import {
    Button,
    DialogActions,
@@ -10,19 +11,19 @@ import {
    Slide,
    TextField,
 } from "@mui/material"
-import { RegistrationContext } from "../../../../../context/registration/RegistrationContext"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { useRouter } from "next/router"
-import { useFormik } from "formik"
-import { questionIcon } from "../../../../../constants/svgs"
-import {
-   maxQuestionLength,
-   minQuestionLength,
-} from "@careerfairy/shared-lib/constants/forms"
-import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
+import makeStyles from "@mui/styles/makeStyles"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import { rewardService } from "data/firebase/RewardService"
-import { livestreamService } from "data/firebase/LivestreamService"
+import { useFormik } from "formik"
+import { useRouter } from "next/router"
+import { useContext } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { questionIcon } from "../../../../../constants/svgs"
+import { RegistrationContext } from "../../../../../context/registration/RegistrationContext"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
+import GroupLogo from "../common/GroupLogo"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -108,7 +109,7 @@ const QuestionCreateForm = () => {
             customHandleNext()
 
             dataLayerLivestreamEvent(
-               "event_registration_question_submit",
+               AnalyticsEvents.EventRegistrationQuestionSubmit,
                livestream
             )
          } catch (e) {
@@ -142,7 +143,10 @@ const QuestionCreateForm = () => {
          // go to next talent pool step
          handleNext()
       }
-      dataLayerLivestreamEvent("event_registration_question_skip", livestream)
+      dataLayerLivestreamEvent(
+         AnalyticsEvents.EventRegistrationQuestionSkip,
+         livestream
+      )
    }
 
    return (

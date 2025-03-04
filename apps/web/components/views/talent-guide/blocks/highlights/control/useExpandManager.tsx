@@ -1,7 +1,9 @@
+import { useAppDispatch } from "components/custom-hook/store"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useLockBodyScroll } from "react-use"
+import { trackLevelsHighlightClick } from "store/reducers/talentGuideReducer"
 import { useIsLiveStreamDialogOpen } from "../../live-stream/useIsLiveStreamDialogOpen"
 import { HighlightsContextType } from "./HighlightsBlockContext"
 
@@ -18,6 +20,7 @@ export const useExpandManager = (
    const router = useRouter()
    const isMobile = useIsMobile()
    const isLiveStreamDialogOpen = useIsLiveStreamDialogOpen()
+   const dispatch = useAppDispatch()
 
    const [isBodyScrollLockedForMobile, setIsBodyScrollLockedForMobile] =
       useState<boolean>(false)
@@ -65,9 +68,16 @@ export const useExpandManager = (
                   shallow: true,
                }
             )
+
+            dispatch(
+               trackLevelsHighlightClick({
+                  highlightId: highlights[index].id,
+                  type: highlights[index].__typename,
+               })
+            )
          }
       },
-      [router, highlights]
+      [router, highlights, dispatch]
    )
 
    useEffect(() => {

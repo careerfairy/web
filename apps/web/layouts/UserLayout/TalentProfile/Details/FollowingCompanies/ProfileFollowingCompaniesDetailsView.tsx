@@ -1,6 +1,6 @@
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { CompanyFollowed } from "@careerfairy/shared-lib/users"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { Box, Button, Divider, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useUserFollowingCompanies } from "components/custom-hook/user/useUserFollowingCompanies"
@@ -12,6 +12,7 @@ import Link from "next/link"
 import { Fragment, useCallback } from "react"
 import { MapPin, Tag, Users } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { EmptyItemView } from "../Profile/EmptyItemView"
 import { ProfileSection } from "../Profile/ProfileSection"
 
@@ -161,7 +162,9 @@ type FollowingCompanyCardProps = {
 const FollowingCompanyCard = ({ group }: FollowingCompanyCardProps) => {
    const { userData } = useAuth()
 
-   const companyLink = `/company/${companyNameSlugify(group.universityName)}`
+   const companyLink = makeGroupCompanyPageUrl(group.universityName, {
+      interactionSource: InteractionSources.Talent_Profile,
+   })
 
    const handleUnfollow = useCallback(
       async (e: React.MouseEvent) => {

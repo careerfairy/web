@@ -1,11 +1,14 @@
 import {
    CONSOLE,
    HAPTIC,
+   IDENTIFY_CUSTOMER,
    MESSAGING_TYPE,
    NativeEvent,
    NativeEventStringified,
+   ON_AUTH_MOUNTED,
    PERMISSIONS,
-   USER_AUTH,
+   TRACK_EVENT,
+   TRACK_SCREEN,
 } from "@careerfairy/shared-lib/src/messaging"
 import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
 import { Audio } from "expo-av"
@@ -14,7 +17,13 @@ import * as Notifications from "expo-notifications"
 import * as ScreenOrientation from "expo-screen-orientation"
 import * as SecureStore from "expo-secure-store"
 import * as WebBrowser from "expo-web-browser"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, {
+   RefObject,
+   useCallback,
+   useEffect,
+   useRef,
+   useState,
+} from "react"
 import {
    AppState,
    AppStateStatus,
@@ -26,6 +35,9 @@ import {
    StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
+import { customerIO } from "../utils/customerio-tracking"
+import { SECURE_STORE_KEYS } from "../utils/secure-store-constants"
+import { sendToWebView } from "../utils/webview.utils"
 
 const injectedCSS = `
     body :not(input):not(textarea) {
@@ -48,11 +60,8 @@ Notifications.setNotificationHandler({
 
 interface WebViewScreenProps {
    onTokenInjected: () => void
-   onLogout: (
-      userId: string,
-      userPassword: string,
-      userToken: string | null
-   ) => void
+   onLogout: (idToken: string, customerioPushToken: string | null) => void
+   webViewRef: RefObject<WebView>
 }
 
 type InterceptedRequest = {
@@ -107,13 +116,13 @@ const isLocalHost = (url: string) => {
    )
 }
 
-const WebViewComponent: React.FC<WebViewScreenProps> = ({
+const WebViewComponent = ({
    onTokenInjected,
    onLogout,
-}) => {
+   webViewRef,
+}: WebViewScreenProps) => {
    const [baseUrl, setBaseUrl] = useState(BASE_URL + "/portal")
    const [currentUrl, setCurrentUrl] = useState(baseUrl)
-   const webViewRef = useRef<WebView>(null)
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
    const [refreshKey, setRefreshKey] = useState(0)
@@ -149,8 +158,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    useEffect(() => {
       const getInitialUrl = async () => {
          const response = await Notifications.getLastNotificationResponseAsync()
-         if (response && response.notification.request.content.data.url) {
-            setBaseUrl(response.notification.request.content.data.url)
+         const url = extractLink(response)
+         if (url) {
+            setBaseUrl(url)
          }
       }
 
@@ -172,9 +182,9 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
       const responseListener =
          Notifications.addNotificationResponseReceivedListener((response) => {
-            const url = response.notification.request.content.data.url
-            if (url) {
-               navigateToNewUrl(url)
+            const link = extractLink(response)
+            if (link) {
+               navigateToNewUrl(link)
             }
          })
 
@@ -188,12 +198,14 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    useEffect(() => {
       const getDefaultBrowser = async () => {
-         const browsers =
-            await WebBrowser.getCustomTabsSupportingBrowsersAsync()
-         if (browsers.browserPackages?.length > 0) {
-            setDefaultBrowser(
-               browsers.defaultBrowserPackage || browsers.browserPackages[0]
-            )
+         if (Platform.OS === "android") {
+            const browsers =
+               await WebBrowser.getCustomTabsSupportingBrowsersAsync()
+            if (browsers.browserPackages?.length > 0) {
+               setDefaultBrowser(
+                  browsers.defaultBrowserPackage || browsers.browserPackages[0]
+               )
+            }
          }
       }
       getDefaultBrowser()
@@ -255,14 +267,22 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          switch (type) {
             case MESSAGING_TYPE.CONSOLE:
                return handleWebAppConsoleMessage(data)
-            case MESSAGING_TYPE.USER_AUTH:
-               return handleUserAuth(data)
             case MESSAGING_TYPE.HAPTIC:
                return handleHaptic(data)
             case MESSAGING_TYPE.PERMISSIONS:
                return handlePermissions(data)
             case MESSAGING_TYPE.LOGOUT:
                return handleLogout()
+            case MESSAGING_TYPE.CLEAR_CUSTOMER:
+               return handleClearCustomer()
+            case MESSAGING_TYPE.IDENTIFY_CUSTOMER:
+               return handleIdentifyCustomer(data)
+            case MESSAGING_TYPE.TRACK_EVENT:
+               return handleTrackEvent(data)
+            case MESSAGING_TYPE.TRACK_SCREEN:
+               return handleTrackScreen(data)
+            case MESSAGING_TYPE.ON_AUTH_MOUNTED:
+               return handleOnAuthMounted(data)
             default:
                break
          }
@@ -271,16 +291,48 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       }
    }
 
-   const handleUserAuth = async (data: USER_AUTH) => {
+   const handleOnAuthMounted = async (data: ON_AUTH_MOUNTED) => {
       try {
-         await Promise.all([
-            SecureStore.setItemAsync("authToken", data.token),
-            SecureStore.setItemAsync("userId", data.userId),
-            SecureStore.setItemAsync("userPassword", data.userPassword),
-         ])
+         await SecureStore.setItemAsync(
+            SECURE_STORE_KEYS.FIREBASE_ID_TOKEN,
+            data.idToken
+         )
+
          onTokenInjected()
       } catch (error) {
-         console.error("Failed to store auth data:", error)
+         console.error("Failed to store auth token:", error)
+      }
+   }
+
+   const handleClearCustomer = async () => {
+      try {
+         await customerIO.clearCustomer()
+      } catch (error) {
+         console.error(`Failed to clear customer: ${error}`)
+      }
+   }
+
+   const handleIdentifyCustomer = async (data: IDENTIFY_CUSTOMER) => {
+      try {
+         await customerIO.identifyCustomer(data.userAuthId)
+      } catch (error) {
+         console.error(`Failed to identify customer: ${error}`)
+      }
+   }
+
+   const handleTrackEvent = async (data: TRACK_EVENT) => {
+      try {
+         await customerIO.trackEvent(data.eventName, data.properties)
+      } catch (error) {
+         console.error(`Failed to track event: ${error}`)
+      }
+   }
+
+   const handleTrackScreen = async (data: TRACK_SCREEN) => {
+      try {
+         await customerIO.trackScreen(data.screenName, data.properties)
+      } catch (error) {
+         console.error(`Failed to track screen: ${error}`)
       }
    }
 
@@ -292,15 +344,17 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
    const handleLogout = async () => {
       try {
-         const userId = await SecureStore.getItemAsync("userId")
-         const userPassword = await SecureStore.getItemAsync("userPassword")
-         const userToken = await SecureStore.getItemAsync("pushToken")
-         if (userId && userPassword) {
-            onLogout(userId, userPassword, userToken)
+         const idToken = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.FIREBASE_ID_TOKEN
+         )
+
+         const customerioPushToken = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN
+         )
+         if (idToken) {
+            onLogout(idToken, customerioPushToken)
          }
-         await SecureStore.deleteItemAsync("authToken")
-         await SecureStore.deleteItemAsync("userId")
-         await SecureStore.deleteItemAsync("userPassword")
+         await SecureStore.deleteItemAsync(SECURE_STORE_KEYS.FIREBASE_ID_TOKEN)
       } catch (error) {
          console.log(error)
       }
@@ -375,8 +429,10 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
       try {
          const urlObj = new URL(request.url)
          // Check if the URL is within your domain
-         return !urlObj.hostname.includes(SEARCH_CRITERIA) && request.loading
-      } catch {
+         const result =
+            !urlObj.hostname.includes(SEARCH_CRITERIA) && request.loading
+         return result
+      } catch (error) {
          return false // Invalid URL
       }
    }
@@ -397,7 +453,6 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
          if (isAndroid && defaultBrowser) {
             options.browserPackage = defaultBrowser
          }
-
          WebBrowser.openBrowserAsync(url, options)
       },
       [defaultBrowser, isAgoraPage]
@@ -495,16 +550,11 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
    }
 
    const refreshWebAppOnResume = () => {
-      if (!webViewRef.current) return
-
       // Send message to web app that the app has resumed from external link
-      const message: NativeEvent = {
+      sendToWebView(webViewRef, {
          type: MESSAGING_TYPE.WEBVIEW_RESUMED,
          data: null,
-      }
-      const messageString = JSON.stringify(message)
-
-      webViewRef.current.postMessage(messageString)
+      })
    }
 
    /**
@@ -527,6 +577,22 @@ const WebViewComponent: React.FC<WebViewScreenProps> = ({
 
       handleScreenOrientation()
    }, [isAgoraPage, baseUrl])
+
+   /**
+    * Customerio push notifications payload have a different structure for iOS and Android
+    * see: https://docs.customer.io/sdk/expo/push-notifications/push/#test-rich-push
+    */
+   const extractLink = (
+      response: Notifications.NotificationResponse | null
+   ): string | undefined => {
+      if (Platform.OS === "ios") {
+         // @ts-ignore
+         return response?.notification?.request?.trigger?.payload?.CIO?.push
+            ?.link
+      }
+      // Android
+      return response?.notification?.request?.content?.data?.link
+   }
 
    return (
       <SafeAreaView style={styles.container}>

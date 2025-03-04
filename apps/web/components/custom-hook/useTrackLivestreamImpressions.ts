@@ -6,6 +6,7 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { useRouter } from "next/router"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 
 type Props = {
@@ -35,12 +36,16 @@ const useTrackLivestreamImpressions = ({
       onChange: (inView) => {
          if (inView && event && !disableTracking) {
             // Fire a tracking event to your tracking service of choice.
-            dataLayerLivestreamEvent("recommended_event_impression", event, {
-               positionInResults,
-               numberOfResults,
-               pathname,
-               location,
-            })
+            dataLayerLivestreamEvent(
+               AnalyticsEvents.RecommendedEventImpression,
+               event,
+               {
+                  positionInResults,
+                  numberOfResults,
+                  pathname,
+                  location,
+               }
+            )
 
             // Store the impression in the database.
             // This is a good place to use the `metaData` object.

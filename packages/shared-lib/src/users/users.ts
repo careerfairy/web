@@ -32,7 +32,12 @@ export interface UserData extends Identifiable {
    }
    badges?: string[]
    groupIds: string[]
+   /**
+    * @deprecated
+    * We have to migrate off expo-push-notifications and use the new customer.io push notifications
+    */
    fcmTokens?: string[]
+   cioPushTokens?: string[]
    linkedinUrl: string
    isAdmin?: boolean
    /**

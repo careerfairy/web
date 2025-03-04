@@ -1,8 +1,29 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
+import CookiesUtil from "./CookiesUtil"
 
 // Only import types, will not be part of the bundle, real package is loaded by GTM
+import { Group } from "@careerfairy/shared-lib/groups"
+import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { TRACK_EVENT } from "@careerfairy/shared-lib/messaging"
+import {
+   IDENTIFY_CUSTOMER,
+   MESSAGING_TYPE,
+   TRACK_SCREEN,
+} from "@careerfairy/shared-lib/messaging/messaging"
+import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { type GroupTraits } from "@customerio/cdp-analytics-browser"
+import {
+   ModuleStepType,
+   Page,
+   RichTextBlockType,
+   TalentGuideModule,
+} from "data/hygraph/types"
+import { AnalyticsEvent } from "./analyticsConstants"
+import { errorLogAndNotify } from "./CommonUtil"
+import { getProgressPercentage } from "./levels"
+import { MobileUtils } from "./mobile.utils"
 
 /**
  * Push an event to the GTM DataLayer
@@ -10,7 +31,10 @@ import { type GroupTraits } from "@customerio/cdp-analytics-browser"
  * @param eventName
  * @param optionalVariables
  */
-export const dataLayerEvent = (eventName: string, optionalVariables = {}) => {
+export const dataLayerEvent = (
+   eventName: AnalyticsEvent,
+   optionalVariables = {}
+) => {
    dataLayerWrapper({
       event: eventName,
       ...optionalVariables,
@@ -46,10 +70,10 @@ const dataLayerWrapper = (event: object) => {
  * Data layer event that receives a livestream object and sends extra metadata as variables
  * @param eventName
  * @param livestream
- * @param optionalVariables
+ * @param optionalVariables Additional properties that are not already in LivestreamEvent
  */
 export const dataLayerLivestreamEvent = (
-   eventName: string,
+   eventName: AnalyticsEvent,
    livestream: LivestreamEvent,
    optionalVariables = {}
 ) => {
@@ -58,12 +82,140 @@ export const dataLayerLivestreamEvent = (
       Object.assign(
          {},
          {
-            livestreamId: livestream?.id,
-            livestreamTitle: livestream?.title,
+            livestreamId: livestream?.id, // GTM Variable
+            livestreamTitle: livestream?.title, // GTM Variable
+            companyName: livestream?.company, // GTM Variable
          },
          optionalVariables
       )
    )
+}
+
+/**
+ * Data layer event that receives a group object and sends extra metadata as variables
+ * @param eventName
+ * @param company
+ * @param optionalVariables Additional properties that are not already in the company object
+ */
+export const dataLayerCompanyEvent = (
+   eventName: AnalyticsEvent,
+   company: Partial<Group>,
+   optionalVariables = {}
+) => {
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      companyName: company.universityName, // GTM Variable
+      companyId: company.id, // GTM Variable
+   })
+}
+
+/**
+ * Data layer event that receives a mentor object and sends extra metadata as variables
+ * @param eventName
+ * @param mentor
+ * @param optionalVariables Additional properties that are not already in the mentor object
+ */
+export const dataLayerMentorEvent = (
+   eventName: AnalyticsEvent,
+   mentor: Creator | PublicCreator,
+   optionalVariables = {}
+) => {
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      mentorId: mentor.id, // GTM Variable
+      mentorName: `${mentor.firstName} ${mentor.lastName}`, // GTM Variable
+      companyId: mentor.groupId, // GTM Variable
+   })
+}
+
+/**
+ * Data layer event that receives a spark object and sends extra metadata as variables
+ * @param eventName
+ * @param spark
+ * @param optionalVariables Additional properties that are not already in the spark object
+ */
+export const dataLayerSparkEvent = (
+   eventName: AnalyticsEvent,
+   spark: Spark | SparkPresenter,
+   optionalVariables = {}
+) => {
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      sparkId: spark.id, // GTM Variable
+      companyId: spark.group.id, // GTM Variable
+      categoryId: spark.category.id, // GTM Variable
+      mentorId: spark.creator?.id, // GTM Variable
+   })
+}
+
+const getRichTextLastReference = (content: RichTextBlockType) => {
+   const references = content?.content?.references || []
+   return references[references.length - 1]
+}
+
+const getStepContent = (currentStep: ModuleStepType) => {
+   if (currentStep?.content?.__typename === "RichTextBlock") {
+      return currentStep?.content?.content?.references.map(sanitizeForAnalytics)
+   }
+   return [sanitizeForAnalytics(currentStep?.content)]
+}
+
+const getLastContentId = (currentStep: ModuleStepType) => {
+   if (currentStep?.content?.__typename === "RichTextBlock") {
+      return getRichTextLastReference(currentStep?.content)?.id
+   }
+   return currentStep?.content?.id
+}
+
+const getLastContentType = (currentStep: ModuleStepType) => {
+   if (currentStep?.content?.__typename === "RichTextBlock") {
+      return (
+         getRichTextLastReference(currentStep?.content)?.__typename ||
+         "RichText"
+      )
+   }
+   return currentStep?.content?.__typename
+}
+
+/**
+ * Sends analytics events for talent guide interactions.
+ * Requires a valid talent guide state to execute.
+ *
+ * @param eventName Analytics event name
+ * @param levelsState Current talent guide state
+ * @param optionalVariables Additional event properties
+ */
+export const dataLayerLevelEvent = (
+   eventName: AnalyticsEvent,
+   moduleData: Page<TalentGuideModule>,
+   currentStepIndex: number,
+   optionalVariables = {}
+) => {
+   if (!moduleData?.content) {
+      const message = `Missing module data for level event ${eventName} - event not sent. Consider using dataLayerEvent() if level state not required`
+      console.error(message, moduleData)
+      errorLogAndNotify(new Error(message))
+      return
+   }
+
+   const currentStep = moduleData.content?.moduleSteps?.[currentStepIndex]
+
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      levelSlug: moduleData.slug,
+      levelName: moduleData.content?.moduleName,
+      levelId: moduleData.content?.id,
+      currentStepIndex: currentStepIndex,
+      totalSteps: moduleData.content?.moduleSteps?.length,
+      progressPercentage: Math.round(
+         getProgressPercentage(currentStepIndex, moduleData)
+      ),
+      currentStepId: currentStep?.content?.id,
+      currentStepType: currentStep?.content?.__typename,
+      currentStepContent: getStepContent(currentStep),
+      lastContentId: getLastContentId(currentStep),
+      lastContentType: getLastContentType(currentStep),
+   })
 }
 
 /**
@@ -78,12 +230,32 @@ export const dataLayerLivestreamEvent = (
  * @param properties Optional properties for the event
  */
 export const analyticsTrackEvent = (
-   eventName: string,
+   eventName: AnalyticsEvent,
    properties: Record<string, any> = {}
 ) => {
    if (typeof window === "undefined") return
 
-   window["analytics"].push(["track", eventName, properties])
+   const enrichedProperties = { ...properties }
+
+   // Incase cookies are not available, we don't want to crash the analytics tracking
+   try {
+      const utmParams = CookiesUtil.getUTMParams()
+
+      if (utmParams) {
+         enrichedProperties.engagement_origin_params = utmParams
+      }
+   } catch (error) {
+      console.error("Failed to retrieve UTM params:", error)
+   }
+
+   if (MobileUtils.webViewPresence()) {
+      return MobileUtils.send<TRACK_EVENT>(MESSAGING_TYPE.TRACK_EVENT, {
+         eventName,
+         properties: enrichedProperties,
+      })
+   }
+
+   window["analytics"].push(["track", eventName, enrichedProperties])
 }
 
 /**
@@ -92,6 +264,15 @@ export const analyticsTrackEvent = (
  */
 export const analyticsSetUser = async (userAuthId: string) => {
    if (typeof window === "undefined") return
+
+   if (MobileUtils.webViewPresence()) {
+      return MobileUtils.send<IDENTIFY_CUSTOMER>(
+         MESSAGING_TYPE.IDENTIFY_CUSTOMER,
+         {
+            userAuthId,
+         }
+      )
+   }
 
    // Link anonymous user's activity to their new account after setting the user
    if (typeof window["analytics"] !== "undefined" && window["analytics"].user) {
@@ -118,6 +299,10 @@ export const analyticsSetUser = async (userAuthId: string) => {
  */
 export const analyticsResetUser = async () => {
    if (typeof window === "undefined") return
+
+   if (MobileUtils.webViewPresence()) {
+      return MobileUtils.send(MESSAGING_TYPE.CLEAR_CUSTOMER, null)
+   }
 
    window["analytics"].push(["reset"])
 }
@@ -183,5 +368,27 @@ export const analyticsRemoveUserAssociationFromEntity = (
 export const analyticsTrackPageView = () => {
    if (typeof window === "undefined") return
 
+   if (MobileUtils.webViewPresence()) {
+      return MobileUtils.send<TRACK_SCREEN>(MESSAGING_TYPE.TRACK_SCREEN, {
+         screenName: window.location.pathname,
+         properties: {
+            path: window.location.pathname,
+            url: window.location.href,
+            title: document.title,
+            referrer: document.referrer,
+            search: window.location.search,
+         },
+      })
+   }
+
    window["analytics"].push(["page"])
+}
+
+/**
+ * Creates a safe copy of an object for analytics by removing undefined values and circular references
+ * @param obj The object to sanitize
+ * @returns A sanitized copy of the object
+ */
+const sanitizeForAnalytics = <T>(obj: T): T => {
+   return JSON.parse(JSON.stringify(obj))
 }

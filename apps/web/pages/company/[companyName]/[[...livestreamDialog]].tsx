@@ -5,6 +5,7 @@ import {
    PublicCreator,
    pickPublicDataFromCreator,
 } from "@careerfairy/shared-lib/groups/creators"
+import { GroupEventActions } from "@careerfairy/shared-lib/groups/telemetry"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
@@ -14,13 +15,17 @@ import {
    CustomJobDialogLayout,
 } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
+import { useCompaniesTracker } from "context/group/CompaniesTrackerProvider"
 import {
    GetStaticPaths,
    GetStaticProps,
    InferGetStaticPropsType,
    NextPage,
 } from "next"
-import React from "react"
+import { useRouter } from "next/router"
+import React, { useEffect } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
 import SEO from "../../../components/util/SEO"
 import CompanyPageOverview from "../../../components/views/company-page"
@@ -54,13 +59,27 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    customJobDialogData,
    groupCreators,
 }) => {
+   const { query, isReady } = useRouter()
    const { trackCompanyPageView } = useFirebaseService()
+   const { trackEvent } = useCompaniesTracker()
    const { universityName, id } = deserializeGroupClient(serverSideGroup)
+
+   const interactionSource = query.interactionSource?.toString() || null
+
+   useEffect(() => {
+      if (!isReady) return
+      trackEvent(id, GroupEventActions.Page_View, interactionSource)
+   }, [query.interactionSource, isReady, interactionSource, id, trackEvent])
 
    const viewRef = useTrackPageView({
       trackDocumentId: id,
       handleTrack: ({ id, visitorId }: TrackProps) =>
-         trackCompanyPageView(id, visitorId),
+         trackCompanyPageView(id, visitorId).then(() =>
+            dataLayerCompanyEvent(
+               AnalyticsEvents.CompanyPageVisit,
+               serverSideGroup
+            )
+         ),
    }) as unknown as React.RefObject<HTMLDivElement>
 
    return (

@@ -99,17 +99,20 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       dispatch(setEventToRegisterTo(null))
    }, [dispatch])
 
+   const livestreamId =
+      eventNotification?.eventId ||
+      cardNotification?.eventId ||
+      eventToRegisterToId
+
    const handleSuccessfulEventRegistration = () => {
-      trackEvent(SparkEventActions.Register_Event)
+      trackEvent(SparkEventActions.Register_Event, {
+         livestreamId,
+      })
    }
 
    return eventDetailsDialogVisibility ? (
       <LivestreamDialog
-         livestreamId={
-            eventNotification?.eventId ||
-            cardNotification?.eventId ||
-            eventToRegisterToId
-         }
+         livestreamId={livestreamId}
          handleClose={handleCloseDialog}
          open={eventDetailsDialogVisibility}
          page={jobToOpenId ? "job-details" : "details"}

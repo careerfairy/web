@@ -21,4 +21,8 @@ export const useTrackPageViews = () => {
          router.events.off("routeChangeComplete", handleRouteChange)
       }
    }, [router.events])
+
+   useEffect(() => {
+      analyticsTrackPageView()
+   }, [])
 }

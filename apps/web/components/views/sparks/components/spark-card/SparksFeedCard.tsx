@@ -1,9 +1,9 @@
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import {
    SparkCardNotificationTypes,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { Button, Fade, Grow, Stack } from "@mui/material"
 import Box from "@mui/material/Box"
@@ -31,6 +31,7 @@ import {
    videosMuttedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { sxStyles } from "types/commonTypes"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { buildMentorPageLink } from "util/routes"
 import FullCardNotification from "./Notifications/FullCardNotification"
 import { SparksPopUpNotificationManager } from "./Notifications/SparksPopUpNotificationManager"
@@ -207,7 +208,9 @@ const SparksFeedCard: FC<Props> = ({
    const { onSparkPercentagePlayed } = useLinkedInNotificationStateManagement()
 
    const companyPageLink = spark.group.publicProfile
-      ? `/company/${companyNameSlugify(spark.group.universityName)}`
+      ? makeGroupCompanyPageUrl(spark.group.universityName, {
+           interactionSource: InteractionSources.Sparks_Feed,
+        })
       : undefined
 
    const mentorPageLink = buildMentorPageLink({

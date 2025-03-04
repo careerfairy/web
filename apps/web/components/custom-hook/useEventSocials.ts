@@ -1,15 +1,16 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import EmailIcon from "@mui/icons-material/Email"
+import FacebookIcon from "@mui/icons-material/Facebook"
+import LinkedInIcon from "@mui/icons-material/LinkedIn"
+import ShareIcon from "@mui/icons-material/ShareOutlined"
+import TwitterIcon from "@mui/icons-material/Twitter"
 import { useEffect, useMemo, useState } from "react"
 import { useCopyToClipboard } from "react-use"
-import LinkedInIcon from "@mui/icons-material/LinkedIn"
-import FacebookIcon from "@mui/icons-material/Facebook"
+import { AnalyticsEvents } from "util/analyticsConstants"
 import { facebookAppId } from "../../constants/links"
-import TwitterIcon from "@mui/icons-material/Twitter"
-import EmailIcon from "@mui/icons-material/Email"
-import ShareIcon from "@mui/icons-material/ShareOutlined"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { makeLivestreamEventDetailsInviteUrl } from "../../util/makeUrls"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { makeLivestreamEventDetailsInviteUrl } from "../../util/makeUrls"
 import { SocialIconProps, SocialPlatformObject } from "./useSocials"
 
 const useEventSocials = (event: LivestreamEvent) => {
@@ -49,7 +50,7 @@ const useEventSocials = (event: LivestreamEvent) => {
             name: "LinkedIn",
             onClick: () => {
                window.open(linkedinLink, "_blank").focus()
-               dataLayerLivestreamEvent("event_share", event, {
+               dataLayerLivestreamEvent(AnalyticsEvents.EventShare, event, {
                   medium: "LinkedIn",
                })
             },

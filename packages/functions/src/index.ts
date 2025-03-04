@@ -93,6 +93,7 @@ exports.sendPostmarkResetPasswordEmail_eu = auth.sendPostmarkResetPasswordEmail
 exports.resendPostmarkEmailVerificationEmailWithPin_eu =
    auth.resendPostmarkEmailVerificationEmailWithPin
 exports.deleteLoggedInUserAccount_v2 = auth.deleteLoggedInUserAccount
+exports.verifyToken = auth.verifyToken
 
 // Agora
 exports.fetchAgoraRtcToken_v2 = agora.fetchAgoraRtcToken
@@ -146,6 +147,8 @@ exports.manualTemplatedEmail = newsletter.manualTemplatedEmail
 // Notification Livestreams
 exports.notifyUsersWhenLivestreamStarts =
    notificationLivestreams.notifyUsersWhenLivestreamStarts
+exports.notifyUsersOnLivestreamStart =
+   notificationLivestreams.notifyUsersOnLivestreamStart
 
 // Notification Onboarding
 exports.notificationOnboarding = notificationOnboardings.notificationOnboarding
@@ -163,9 +166,7 @@ exports.fetchStripePrice = stripe.fetchStripePrice
 exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
 
 // Livestreams
-exports.sendLivestreamRegistrationConfirmationEmail_v3 =
-   livestreams.sendLivestreamRegistrationConfirmationEmail
-exports.sendLivestreamRegistrationConfirmationEmail_v5 =
+exports.sendLivestreamRegistrationConfirmationEmail_v6 =
    livestreams.livestreamRegistrationConfirmationEmail
 exports.sendPhysicalEventRegistrationConfirmationEmail_eu =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail
@@ -347,6 +348,8 @@ exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
 
 // Company | Group Functions
 exports.fetchCompanies = companies.fetchCompanies
+exports.syncFeaturedCompaniesData = companies.syncFeaturedCompaniesData
+exports.trackGroupEvents = companies.trackGroupEvents
 
 // Streaming
 exports.deleteLivestreamChatEntry = streaming.deleteLivestreamChatEntry

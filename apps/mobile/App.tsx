@@ -1,4 +1,3 @@
-import { PROJECT_ID } from "@env"
 import {
    Poppins_400Regular,
    Poppins_600SemiBold,
@@ -7,9 +6,9 @@ import {
 import NetInfo from "@react-native-community/netinfo"
 import * as Notifications from "expo-notifications"
 import * as SecureStore from "expo-secure-store"
-import { signInWithEmailAndPassword } from "firebase/auth"
+import { signInWithCustomToken } from "firebase/auth"
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {
    Image,
    Platform,
@@ -17,9 +16,16 @@ import {
    Text,
    TouchableOpacity,
 } from "react-native"
+import WebView from "react-native-webview"
 import WebViewComponent from "./components/WebView"
 import { app, auth, db } from "./firebase"
+import { customerIO } from "./utils/customerio-tracking"
 import { initializeFacebookTracking } from "./utils/facebook-tracking"
+import { handleVerifyToken } from "./utils/firebase"
+import { SECURE_STORE_KEYS } from "./utils/secure-store-constants"
+import { initSentry } from "./utils/sentry"
+
+const sentry = initSentry()
 
 const styles: any = {
    image: {
@@ -60,7 +66,8 @@ const styles: any = {
    },
 }
 
-export default function Native() {
+function Native() {
+   const webViewRef = useRef<WebView>(null)
    const [isConnected, setIsConnected] = useState<boolean | null>(true)
    const [fontsLoaded] = useFonts({
       PoppinsRegular: Poppins_400Regular,
@@ -69,6 +76,10 @@ export default function Native() {
 
    useEffect(() => {
       initializeFacebookTracking()
+   }, [])
+
+   useEffect(() => {
+      customerIO.initialize().catch(console.error)
    }, [])
 
    useEffect(() => {
@@ -104,10 +115,20 @@ export default function Native() {
    }, [])
 
    const checkToken = async () => {
-      const token = await SecureStore.getItemAsync("authToken")
-      if (token) {
-         const pushToken = await SecureStore.getItemAsync("pushToken")
-         if (!pushToken) {
+      const firebaseIdToken = await SecureStore.getItemAsync(
+         SECURE_STORE_KEYS.FIREBASE_ID_TOKEN
+      )
+
+      if (firebaseIdToken) {
+         const savedCustomerioPushToken = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN
+         )
+         const currentPushToken = await customerIO.getPushToken()
+
+         if (
+            !savedCustomerioPushToken ||
+            currentPushToken !== savedCustomerioPushToken
+         ) {
             getPushToken()
          }
       }
@@ -115,11 +136,9 @@ export default function Native() {
 
    const getTokenAndSave = async () => {
       try {
-         const tokenData = await Notifications.getExpoPushTokenAsync({
-            projectId: PROJECT_ID,
-         })
-         const token = tokenData.data
-         saveUserPushTokenToFirestore(token)
+         const customerioPushToken = await customerIO.getPushToken()
+
+         saveUserPushTokenToFirestore(customerioPushToken)
       } catch (e) {
          console.log(e)
       }
@@ -136,8 +155,9 @@ export default function Native() {
             })
          }
 
-         const { status } = await Notifications.requestPermissionsAsync()
-         if (status === "granted") {
+         const status = await customerIO.showPromptForPushNotifications()
+
+         if (status === "GRANTED") {
             getTokenAndSave()
          } else {
             console.log("Notification permissions not granted")
@@ -148,47 +168,69 @@ export default function Native() {
    }
 
    const onLogout = async (
-      userId: string,
-      userPassword: string,
-      userToken: string | null
+      idToken: string,
+      customerioPushToken: string | null
    ) => {
       try {
-         return resetFireStoreData(userId, userPassword, userToken)
+         await resetFireStoreData(idToken, customerioPushToken)
+         sentry.setUser(null)
       } catch (e) {
          console.log("Error with resetting firestore data", e)
       }
    }
 
-   async function saveUserPushTokenToFirestore(pushToken: string) {
+   async function saveUserPushTokenToFirestore(customerioPushToken: string) {
       try {
-         const userId = await SecureStore.getItemAsync("userId")
-         const userPassword = await SecureStore.getItemAsync("userPassword")
+         const idToken = await SecureStore.getItemAsync(
+            SECURE_STORE_KEYS.FIREBASE_ID_TOKEN
+         )
 
-         if (userId && userPassword) {
-            await signInWithEmailAndPassword(auth, userId, userPassword)
+         if (idToken) {
+            const credentials = await handleVerifyToken(idToken)
+
+            await signInWithCustomToken(auth, credentials.customToken)
+
             if (auth.currentUser?.email) {
                const userDocRef = doc(db, "userData", auth.currentUser.email)
 
-               await updateDoc(userDocRef, { fcmTokens: arrayUnion(pushToken) })
+               await updateDoc(userDocRef, {
+                  cioPushTokens: arrayUnion(customerioPushToken),
+               })
             }
-            await SecureStore.setItemAsync("pushToken", pushToken)
+
+            await SecureStore.setItemAsync(
+               SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN,
+               customerioPushToken
+            )
+
+            await customerIO.identifyCustomer(credentials.uid)
+            sentry.setUser({
+               id: credentials.uid,
+               email: credentials.email,
+            })
          }
       } catch (error) {
-         console.error("Failed to send data to the Firestore:", error)
+         console.error(
+            `Failed to send data to the Firestore: ${JSON.stringify(
+               error,
+               null,
+               2
+            )}`
+         )
       }
    }
 
    async function resetFireStoreData(
-      userId: string,
-      userPassword: string,
-      userToken: string | null
+      idToken: string,
+      customerioPushToken: string | null
    ) {
       try {
-         if (!userToken) {
+         if (!customerioPushToken) {
             return
          }
          if (!auth.currentUser?.email) {
-            await signInWithEmailAndPassword(auth, userId, userPassword)
+            const credentials = await handleVerifyToken(idToken)
+            await signInWithCustomToken(auth, credentials.customToken)
             // If there is still no current user after authentication, we are exiting the method
             if (!auth.currentUser?.email) {
                return
@@ -196,11 +238,23 @@ export default function Native() {
          }
 
          const userDocRef = doc(db, "userData", auth.currentUser.email)
-         await updateDoc(userDocRef, { fcmTokens: arrayRemove(userToken) })
+         await updateDoc(userDocRef, {
+            cioPushTokens: arrayRemove(customerioPushToken),
+         })
 
-         await SecureStore.deleteItemAsync("pushToken")
+         await SecureStore.deleteItemAsync(
+            SECURE_STORE_KEYS.CUSTOMERIO_PUSH_TOKEN
+         )
+
+         await customerIO.clearCustomer()
       } catch (error) {
-         console.error("Failed to send data to the Firestore:", error)
+         console.error(
+            `Failed to send data to the Firestore: ${JSON.stringify(
+               error,
+               null,
+               2
+            )}`
+         )
       }
    }
 
@@ -239,6 +293,12 @@ export default function Native() {
    }
 
    return (
-      <WebViewComponent onTokenInjected={getPushToken} onLogout={onLogout} />
+      <WebViewComponent
+         onTokenInjected={getPushToken}
+         onLogout={onLogout}
+         webViewRef={webViewRef}
+      />
    )
 }
+
+export default sentry.wrap(Native)

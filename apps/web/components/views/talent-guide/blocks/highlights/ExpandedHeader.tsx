@@ -1,4 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, Stack, Typography } from "@mui/material"
 import { useLivestreamSWR } from "components/custom-hook/live-stream/useLivestreamSWR"
 import CircularLogo from "components/views/common/logos/CircularLogo"
@@ -165,7 +166,9 @@ export const ExpandedHeader = ({
             <Box
                component={Link}
                onClick={handleGroupClick}
-               href={makeGroupCompanyPageUrl(group)}
+               href={makeGroupCompanyPageUrl(group.universityName, {
+                  interactionSource: InteractionSources.Talent_Guide,
+               })}
                target="_blank"
                sx={styles.companyLogoContainer}
             >
