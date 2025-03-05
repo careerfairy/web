@@ -271,7 +271,6 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
                      text={company.companyIndustries
                         ?.map(({ name }) => name)
                         .join(", ")}
-                     iconSize={19}
                      fontSize="16px"
                      sx={styles.companyTag}
                      // It would make more sense to not be conditional, as cards with long industry names would force
