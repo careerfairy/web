@@ -13,7 +13,6 @@ type Props = {
    fontSize?: string
    sx?: SxProps<Theme>
    typographySx?: SxProps<Theme>
-   iconSize?: number
 }
 const CompanyTag: FC<Props> = ({
    icon,
@@ -58,15 +57,10 @@ export const CompanyIndustryTag: FC<CustomTagProps> = ({
    fontSize = "1rem",
    sx,
    typographySx,
-   iconSize,
 }) => {
    return (
       <CompanyTag
-         icon={
-            <CompanyIndustryIcon
-               size={iconSize ? iconSize : `calc(${fontSize} * 1.3)`}
-            />
-         }
+         icon={<CompanyIndustryIcon size={`calc(${fontSize} * 1.3)`} />}
          fontSize={fontSize}
          text={text}
          sx={sx}
