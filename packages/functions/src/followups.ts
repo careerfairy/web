@@ -103,7 +103,7 @@ type LivestreamFollowUpAdditionalData = {
 /**
  * Every day at 9 AM, check all the livestreams that ended the day before and send a reminder to all the non-attendees at 11 AM.
  */
-export const sendReminderToNonAttendees = onSchedule(
+export const sendFollowupToNonAttendees = onSchedule(
    {
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 540,
@@ -118,7 +118,7 @@ export const sendReminderToNonAttendees = onSchedule(
    }
 )
 
-export const sendReminderToAttendees = onSchedule(
+export const sendFollowupToAttendees = onSchedule(
    {
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 540,

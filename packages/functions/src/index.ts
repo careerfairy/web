@@ -119,15 +119,8 @@ exports.createGroup_eu = groupAdmin.createGroup
 exports.changeRole_eu = groupAdmin.changeRole
 exports.kickFromDashboard_eu = groupAdmin.kickFromDashboard
 
-// Reminders
+// Reminders (Old) TODO: delete functions in file after testing new reminders
 exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
-
-// Followups
-exports.sendReminderToNonAttendees = followups.sendReminderToNonAttendees
-exports.sendReminderToAttendees = followups.sendReminderToAttendees
-exports.sendManualFollowup = followups.sendManualFollowup
-exports.sendReminderEmailAboutApplicationLink_v2 =
-   followups.sendReminderEmailAboutApplicationLink
 
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
@@ -389,6 +382,12 @@ exports.schedule5MinutesReminderEmails =
 exports.schedule1HourReminderEmails = remindersNew.schedule1HourReminderEmails
 exports.schedule24HoursReminderEmails =
    remindersNew.schedule24HoursReminderEmails
-
 // For testing
 exports.manualReminderEmails = remindersNew.manualReminderEmails
+
+// Followups
+exports.sendFollowupToNonAttendees = followups.sendFollowupToNonAttendees
+exports.sendFollowupToAttendees = followups.sendFollowupToAttendees
+exports.sendManualFollowup = followups.sendManualFollowup
+exports.sendReminderEmailAboutApplicationLink_v2 =
+   followups.sendReminderEmailAboutApplicationLink
