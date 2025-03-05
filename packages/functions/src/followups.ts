@@ -29,6 +29,7 @@ import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailNotificationRequestData,
 } from "./lib/notifications/EmailTypes"
+import { getJobEmailData } from "./lib/notifications/util"
 import { isLocalEnvironment } from "./util"
 
 type FollowUpTemplateId =
@@ -44,12 +45,12 @@ export const sendReminderEmailAboutApplicationLink = onCall(
       const data = request.data
       log("data", data)
 
-      const { livestreamId, userUid, jobId } = data
+      const { livestreamId, userUid, jobId, userEmail } = data
 
-      if (!userUid) {
+      if (!userUid || !userEmail) {
          throw new functions.https.HttpsError(
             "unauthenticated",
-            "User not authenticated"
+            "userUid or userEmail is missing"
          )
       }
 
@@ -70,19 +71,18 @@ export const sendReminderEmailAboutApplicationLink = onCall(
 
       await notificationRepo.sendEmailNotifications([
          {
-            to: data.recipient,
+            to: userEmail,
             templateId: CUSTOMERIO_EMAIL_TEMPLATES.APPLY_TO_JOB_LATER,
             userAuthId: userUid,
             templateData: {
-               job: {
-                  url: addUtmTagsToLink({
-                     link: job.postingUrl,
+               job: getJobEmailData(job, {
+                  baseUrl: request.rawRequest.headers?.origin,
+                  livestreamId: livestream.id,
+                  utmParams: {
                      campaign: "jobApplication",
-                     content: job.title,
-                  }),
-                  title: job.title,
-                  jobType: job.jobType,
-               },
+                     content: livestream.title,
+                  },
+               }),
                companyName: livestream.company,
             },
          },

@@ -17,29 +17,29 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
 export type CustomerIoEmailTemplateId =
    (typeof CUSTOMERIO_EMAIL_TEMPLATES)[keyof typeof CUSTOMERIO_EMAIL_TEMPLATES]
 
-type JobData = {
+export type JobData = {
    url: string
    title: string
    jobType: JobType
-   businessFunctionsTags?: string
-   deadline?: string
+   businessFunctionsTags: string
+   deadline: string
 }
 
-type SpeakerData = {
+export type SpeakerData = {
    name: string
    position: string
    avatarUrl: string
    url: string
 }
 
-type SparkData = {
+export type SparkData = {
    question: string
    category_id: string
    thumbnailUrl: string
    url: string
 }
 
-type CalendarData = {
+export type CalendarData = {
    google: string
    outlook: string
    apple: string
@@ -81,7 +81,7 @@ export type ReminderTemplateData = {
    }
 }
 
-type ReminderFollowUpTemplateData = {
+export type ReminderFollowUpTemplateData = {
    livestream: {
       details_url: string
       company: string
@@ -93,7 +93,7 @@ type ReminderFollowUpTemplateData = {
    allowsRecording: boolean
 }
 
-type ApplicationLinkFollowUpTemplateData = {
+export type ApplicationLinkFollowUpTemplateData = {
    companyName: string
    job: JobData
 }
