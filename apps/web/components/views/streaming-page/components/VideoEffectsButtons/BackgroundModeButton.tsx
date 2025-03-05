@@ -13,7 +13,7 @@ import { BrandedTooltip } from "../BrandedTooltip"
 
 const styles = sxStyles({
    buttonWrapper: {
-      width: "inherit",
+      width: "100%",
    },
    root: (theme) => ({
       display: "flex",
