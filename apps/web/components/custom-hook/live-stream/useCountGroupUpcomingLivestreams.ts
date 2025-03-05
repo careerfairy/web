@@ -1,5 +1,5 @@
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
-import { collection, limit, query, where } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import useCountQuery from "../useCountQuery"
 
@@ -17,8 +17,7 @@ const useCountGroupUpcomingLivestreams = (groupId: string) => {
          where("groupIds", "array-contains", groupId),
          where("start", ">", now),
          where("test", "==", false),
-         where("hidden", "==", false),
-         limit(1)
+         where("hidden", "==", false)
       )
    }, [groupId])
 
