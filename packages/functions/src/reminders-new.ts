@@ -33,9 +33,8 @@ import { OnBatchCompleteCallback } from "./lib/notifications/NotificationReposit
 import { addMinutesDate, dateFormatOffset, isLocalEnvironment } from "./util"
 
 // delay to be sure that the reminder is sent at the time
-const reminderDateDelay = 20
+const reminderBufferMinutes = 20
 
-// range to how many minutes we will search
 const reminderScheduleRange = 20
 
 type ReminderTemplates = Pick<
@@ -48,27 +47,46 @@ type ReminderTemplates = Pick<
 type ReminderTemplateId = ReminderTemplates[keyof ReminderTemplates]
 
 export type ReminderConfig = {
+   /**
+    * How many minutes before the livestream starts the email should be sent
+    */
    scheduleEmailMinutesBefore: number
+   /**
+    * The template ID to use for the reminder email
+    */
    templateId: ReminderTemplateId
+   /**
+    * The UTM campaign to use for the reminder email
+    */
    reminderUtmCampaign: string
+   /**
+    * Returns the date from which to begin fetching livestream events
+    */
+   getStartDate: () => Date
 }
 
 const Reminder5Min = {
    templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_5M,
    scheduleEmailMinutesBefore: 5,
    reminderUtmCampaign: "reminder-5min",
+   // 20 minutes before the livestream starts
+   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes),
 } as const satisfies ReminderConfig
 
 const Reminder1Hour = {
    templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_1H,
    scheduleEmailMinutesBefore: 60,
    reminderUtmCampaign: "reminder-1h",
+   // 1 hour before the livestream starts
+   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 60),
 } as const satisfies ReminderConfig
 
 const Reminder24Hours = {
    templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H,
    scheduleEmailMinutesBefore: 1440,
    reminderUtmCampaign: "reminder-24h",
+   // 1 day before the livestream starts
+   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 1440),
 } as const satisfies ReminderConfig
 
 const reminderConfigs = {
@@ -94,10 +112,16 @@ export const schedule5MinutesReminderEmails = onSchedule(
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
-      // Streams that will start between 20 minutes from now and 40 minutes from now
-      const streams = await getStreams(Reminder5Min)
+      const fromDate = Reminder5Min.getStartDate()
+      const toDate = addMinutesDate(fromDate, reminderScheduleRange)
 
-      await handleReminder(streams, Reminder5Min)
+      // Streams that will start between 20 minutes from now and 40 minutes from now
+      const streams = await getStreamsByDateWithRegisteredStudents(
+         fromDate,
+         toDate
+      )
+
+      return handleReminder(streams, Reminder5Min)
    }
 )
 
@@ -111,8 +135,14 @@ export const schedule1HourReminderEmails = onSchedule(
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
+      const fromDate = Reminder1Hour.getStartDate()
+      const toDate = addMinutesDate(fromDate, reminderScheduleRange)
+
       // Streams that will start between 1 hour 20 minutes from now and 1 hour 40 minutes from now
-      const streams = await getStreams(Reminder1Hour)
+      const streams = await getStreamsByDateWithRegisteredStudents(
+         fromDate,
+         toDate
+      )
 
       await handleReminder(streams, Reminder1Hour)
    }
@@ -128,54 +158,17 @@ export const schedule24HoursReminderEmails = onSchedule(
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
-      // Streams that will start between 1 day 20 minutes from now and 1 day 40 minutes from now
-      const streams = await getStreams(Reminder24Hours)
+      const fromDate = Reminder24Hours.getStartDate()
+      const toDate = addMinutesDate(fromDate, reminderScheduleRange)
+
+      const streams = await getStreamsByDateWithRegisteredStudents(
+         fromDate,
+         toDate
+      )
 
       await handleReminder(streams, Reminder24Hours)
    }
 )
-
-const getStreams = async (reminder: ReminderConfig) => {
-   const dateStart = addMinutesDate(new Date(), reminderDateDelay)
-
-   const filterStartDate = addMinutesDate(
-      dateStart,
-      reminder.scheduleEmailMinutesBefore
-   )
-
-   const filterEndDate = addMinutesDate(filterStartDate, reminderScheduleRange)
-
-   const streams = await getStreamsByDateWithRegisteredStudents(
-      filterStartDate,
-      filterEndDate
-   )
-
-   const numberOfStreams = streams.length
-
-   const streamIds = streams.map((s) => s.id)
-
-   const startDate = filterStartDate.toLocaleString()
-   const endDate = filterEndDate.toLocaleString()
-
-   if (numberOfStreams === 0) {
-      log(
-         `No streams found for reminder ${
-            reminder.templateId
-         } from ${startDate} to ${endDate} (current time: ${new Date().toLocaleString()}) skipping`
-      )
-      return []
-   }
-
-   log(
-      `Found ${numberOfStreams} stream with ids ${streamIds.join(
-         ", "
-      )} that will start between ${startDate} and ${endDate} we will be sending the reminder for ${
-         reminder.templateId
-      }`
-   )
-
-   return streams
-}
 
 /**
  * Test the reminder by running it manually
@@ -183,7 +176,7 @@ const getStreams = async (reminder: ReminderConfig) => {
  *
  * eg: {functionUrl}?reminderTemplateId=live_stream_reminder_1h
  */
-export const testReminder = onRequest(
+export const manualReminderEmails = onRequest(
    {
       memory: scheduleOptions.memory,
       timeoutSeconds: scheduleOptions.timeoutSeconds,
@@ -203,7 +196,13 @@ export const testReminder = onRequest(
          return
       }
 
-      const streams = await getStreams(reminder)
+      const fromDate = reminder.getStartDate()
+      const toDate = addMinutesDate(fromDate, reminderScheduleRange)
+
+      const streams = await getStreamsByDateWithRegisteredStudents(
+         fromDate,
+         toDate // Can replace with arbitrary date in the future to increase the range of streams to be fetched
+      )
 
       await handleReminder(streams, reminder)
 
@@ -217,6 +216,19 @@ const handleReminder = async (
    streams: LiveStreamEventWithUsersLivestreamData[],
    reminder: ReminderConfig
 ) => {
+   if (streams.length === 0) {
+      log(`No streams found for reminder ${reminder.templateId}, skipping`)
+      return
+   } else {
+      log(
+         `live streams (${streams
+            .map((s) => s.id)
+            .join(", ")}) found for reminder ${
+            reminder.templateId
+         } scheduling emails`
+      )
+   }
+
    try {
       const allGroups = await Promise.all(
          streams.map((stream) =>
@@ -439,11 +451,11 @@ const handleSendEmails = async (
                : "failed"
 
          log(
-            `Completed scheduling ${result.successful}/${
+            `[${stream.id}] Reminder emails scheduled: ${
+               result.successful
+            } successful, ${result.failed} failed out of ${
                notificationRequests.length
-            } emails for ${
-               stream.id
-            } current time: ${new Date().toLocaleString()}`
+            } total (${new Date().toLocaleString()})`
          )
       } catch (err) {
          error(

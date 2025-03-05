@@ -126,7 +126,6 @@ exports.sendReminderEmailAboutApplicationLink_eu =
    reminders.sendReminderEmailAboutApplicationLink
 exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
 // Not to be deployed
-exports.manualReminderEmails = reminders.manualReminderEmails
 exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
 exports.sendReminderToAttendees = reminders.sendReminderToAttendees
 // Not to be deployed
@@ -395,4 +394,6 @@ exports.schedule5MinutesReminderEmails =
 exports.schedule1HourReminderEmails = remindersNew.schedule1HourReminderEmails
 exports.schedule24HoursReminderEmails =
    remindersNew.schedule24HoursReminderEmails
-exports.testReminder = remindersNew.testReminder
+
+// For testing
+exports.manualReminderEmails = remindersNew.manualReminderEmails
