@@ -133,18 +133,30 @@ export const sendReminderToAttendees = onSchedule(
    }
 )
 
-export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
-   // Update ids according to testing data
-   const testEvents = await livestreamsRepo.getLivestreamsByIds([
-      "LQTy4JdeRBqGUtULeNir",
-      // "6UX9IBp6otoVwGwis8EJ",
-   ])
+export const sendManualFollowup = onRequest(async (req, res) => {
+   if (!req.body.livestreamIds) {
+      res.status(400).send("request.body.livestreamIds is required")
+      return
+   }
 
-   // Toggle between attendees or non-attendees
-   await sendAttendeesReminder(
-      CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES,
-      testEvents
-   )
+   if (
+      req.body.templateId !==
+         CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES &&
+      req.body.templateId !==
+         CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
+   ) {
+      res.status(400).send(
+         `Invalid request.body.templateId: ${req.body.templateId} please use one of the following: ${CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES} or ${CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES}`
+      )
+      return
+   }
+
+   const livestreamIds = req.body.livestreamIds.split(",")
+
+   // Update ids according to testing data
+   const events = await livestreamsRepo.getLivestreamsByIds(livestreamIds)
+
+   await sendAttendeesReminder(req.body.templateId, events)
 
    res.status(200).send("Test non attendees done")
 })
