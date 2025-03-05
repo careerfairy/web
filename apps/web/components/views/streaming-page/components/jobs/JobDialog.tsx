@@ -332,17 +332,17 @@ const JobDialogActions = ({
    const isAtsJob = useIsAtsJob(job)
    const [isSendingEmail, setIsSendingEmail] = useState(false)
    const firebaseService = useFirebaseService()
-   const { userData, authenticatedUser } = useAuth()
+   const { authenticatedUser } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
    const sendEmailReminderForApplication = async () => {
       setIsSendingEmail(true)
       try {
          await firebaseService.sendReminderEmailAboutApplicationLink({
-            recipient: authenticatedUser.email,
-            recipient_name: userData.firstName,
-            position_name: job.title,
-            application_link: job.postingUrl,
+            userEmail: authenticatedUser.email,
+            userUid: authenticatedUser.uid,
+            jobId: job.id,
+            livestreamId: livestreamId,
          })
          successNotification(
             "We just sent you an email so that you can complete your application after this live stream."

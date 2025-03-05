@@ -1,3 +1,4 @@
+import { JobType } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SendEmailRequestOptions } from "customerio-node/dist/lib/api/requests"
 
 /**
@@ -10,8 +11,7 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    LIVESTREAM_REMINDER_5M: "live_stream_reminder_5min",
    LIVESTREAM_FOLLOWUP_ATTENDEES: "live_stream_followup_attendees",
    LIVESTREAM_FOLLOWUP_NON_ATTENDEES: "live_stream_followup_non_attendees",
-   LIVESTREAM_FOLLOWUP_APPLICATION_LINK:
-      "live_stream_followup_application_link",
+   APPLY_TO_JOB_LATER: "apply_to_job_later",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
@@ -20,7 +20,7 @@ export type CustomerIoEmailTemplateId =
 type JobData = {
    url: string
    title: string
-   jobType: string
+   jobType: JobType
    businessFunctionsTags?: string
    deadline?: string
 }
@@ -94,8 +94,8 @@ type ReminderFollowUpTemplateData = {
 }
 
 type ApplicationLinkFollowUpTemplateData = {
-   application_link: string
-   position_name: string
+   companyName: string
+   job: JobData
 }
 
 /**
@@ -108,7 +108,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_5M]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES]: ReminderFollowUpTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES]: ReminderFollowUpTemplateData
-   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_APPLICATION_LINK]: ApplicationLinkFollowUpTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.APPLY_TO_JOB_LATER]: ApplicationLinkFollowUpTemplateData
 }
 
 /**
