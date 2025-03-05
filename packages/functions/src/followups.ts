@@ -134,31 +134,39 @@ export const sendFollowupToAttendees = onSchedule(
 )
 
 export const sendManualFollowup = onRequest(async (req, res) => {
-   if (!req.body.livestreamIds) {
-      res.status(400).send("request.body.livestreamIds is required")
+   if (!req.query.livestreamId) {
+      res.status(400).send("request.query.livestreamId is required")
       return
    }
 
    if (
-      req.body.templateId !==
+      req.query.templateId !==
          CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES &&
-      req.body.templateId !==
+      req.query.templateId !==
          CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
    ) {
       res.status(400).send(
-         `Invalid request.body.templateId: ${req.body.templateId} please use one of the following: ${CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES} or ${CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES}`
+         `Invalid request.query.templateId: ${req.query.templateId} please use one of the following: ${CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES} or ${CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES}`
       )
       return
    }
 
-   const livestreamIds = req.body.livestreamIds.split(",")
+   const livestreamId = req.query.livestreamId as string
 
-   // Update ids according to testing data
-   const events = await livestreamsRepo.getLivestreamsByIds(livestreamIds)
+   const livestream = await livestreamsRepo.getById(livestreamId)
 
-   await sendAttendeesReminder(req.body.templateId, events)
+   if (!livestream) {
+      res.status(400).send("request.query.livestreamId is not valid")
+      return
+   }
 
-   res.status(200).send("Test non attendees done")
+   await sendAttendeesReminder(req.query.templateId as FollowUpTemplateId, [
+      livestream,
+   ])
+
+   res.status(200).send(
+      `Sent followups with the template ${req.query.templateId} to ${req.query.livestreamId}`
+   )
 })
 
 const getEmailTemplateMessages = (
@@ -393,9 +401,13 @@ const sendAttendeesReminder = async (
             additionalData
          )
 
-         await notificationRepo.sendEmailNotifications(emailTemplates)
+         const result = await notificationRepo.sendEmailNotifications(
+            emailTemplates
+         )
 
-         functions.logger.log("attendees reminders sent")
+         functions.logger.info(
+            `Sent followup emails for ${livestreamsToRemind.length} livestreams. Success: ${result.successful}, Failed: ${result.failed}`
+         )
       } else {
          functions.logger.log("No livestream has ended yesterday")
       }
