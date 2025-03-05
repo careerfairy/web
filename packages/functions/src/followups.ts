@@ -42,29 +42,48 @@ export const sendReminderEmailAboutApplicationLink = onCall(
    },
    async (request) => {
       const data = request.data
-      const uid = request.auth?.uid
       log("data", data)
 
-      if (!uid) {
+      const { livestreamId, userUid, jobId } = data
+
+      if (!userUid) {
          throw new functions.https.HttpsError(
             "unauthenticated",
             "User not authenticated"
          )
       }
 
+      const livestream = await livestreamsRepo.getById(livestreamId)
+
+      if (!livestream) {
+         throw new functions.https.HttpsError(
+            "not-found",
+            "Livestream not found"
+         )
+      }
+
+      const job = await customJobRepo.getCustomJobById(jobId)
+
+      if (!job) {
+         throw new functions.https.HttpsError("not-found", "Job not found")
+      }
+
       await notificationRepo.sendEmailNotifications([
          {
             to: data.recipient,
-            templateId:
-               CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_APPLICATION_LINK,
-            userAuthId: uid,
+            templateId: CUSTOMERIO_EMAIL_TEMPLATES.APPLY_TO_JOB_LATER,
+            userAuthId: userUid,
             templateData: {
-               application_link: addUtmTagsToLink({
-                  link: data.application_link,
-                  campaign: "jobApplication",
-                  content: data.position_name,
-               }),
-               position_name: data.position_name,
+               job: {
+                  url: addUtmTagsToLink({
+                     link: job.postingUrl,
+                     campaign: "jobApplication",
+                     content: job.title,
+                  }),
+                  title: job.title,
+                  jobType: job.jobType,
+               },
+               companyName: livestream.company,
             },
          },
       ])
