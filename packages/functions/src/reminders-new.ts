@@ -18,7 +18,7 @@ import {
 import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import { error, info, log } from "firebase-functions/logger"
 import { HttpsError, onRequest } from "firebase-functions/v2/https"
-import { onSchedule } from "firebase-functions/v2/scheduler"
+import { onSchedule, ScheduleOptions } from "firebase-functions/v2/scheduler"
 import ical from "ical-generator"
 import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
@@ -77,17 +77,20 @@ const reminderConfigs = {
    [Reminder24Hours.templateId]: Reminder24Hours,
 } as const
 
+const scheduleOptions = {
+   memory: "8GiB",
+   timeoutSeconds: 540,
+   schedule: "every 15 minutes",
+   timeZone: "Europe/Zurich",
+} as const satisfies ScheduleOptions
+
 /**
  * Runs every 15 minutes and does the following:
  *  - Fetches livestreams that will start between 20 minutes from now and 40 minutes from now
  *  - Schedules emails to be sent 5 minutes before the livestream starts
  */
 export const schedule5MinutesReminderEmails = onSchedule(
-   {
-      memory: "8GiB",
-      timeoutSeconds: 540,
-      schedule: "every 15 minutes",
-   },
+   scheduleOptions,
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
@@ -104,11 +107,7 @@ export const schedule5MinutesReminderEmails = onSchedule(
  *  - Schedules emails to be sent 1 hour before the livestream starts
  */
 export const schedule1HourReminderEmails = onSchedule(
-   {
-      memory: "8GiB",
-      timeoutSeconds: 540,
-      schedule: "every 15 minutes",
-   },
+   scheduleOptions,
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
@@ -125,11 +124,7 @@ export const schedule1HourReminderEmails = onSchedule(
  *  - Schedules emails to be sent 1 day before the livestream starts
  */
 export const schedule24HoursReminderEmails = onSchedule(
-   {
-      memory: "8GiB",
-      timeoutSeconds: 540,
-      schedule: "every 15 minutes",
-   },
+   scheduleOptions,
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
@@ -190,8 +185,8 @@ const getStreams = async (reminder: ReminderConfig) => {
  */
 export const testReminder = onRequest(
    {
-      memory: "8GiB",
-      timeoutSeconds: 540,
+      memory: scheduleOptions.memory,
+      timeoutSeconds: scheduleOptions.timeoutSeconds,
    },
    async (req, res) => {
       const reminderTemplateId = req.query
