@@ -269,7 +269,7 @@ const getEmailTemplateMessages = (
          templateMessages.push({
             to: streamUserData.user.userEmail,
             templateId: templateId,
-            userAuthId: streamUserData.user.id,
+            userAuthId: streamUserData.user.authId ?? streamUserData.user.id,
             templateData: {
                livestream: {
                   company: streamGroup.universityName,
