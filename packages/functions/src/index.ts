@@ -120,15 +120,14 @@ exports.changeRole_eu = groupAdmin.changeRole
 exports.kickFromDashboard_eu = groupAdmin.kickFromDashboard
 
 // Reminders
-exports.sendReminderEmailAboutApplicationLink_v2 =
-   followups.sendReminderEmailAboutApplicationLink
 exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
-// Not to be deployed
+
+// Followups
 exports.sendReminderToNonAttendees = followups.sendReminderToNonAttendees
 exports.sendReminderToAttendees = followups.sendReminderToAttendees
-// Not to be deployed
-exports.testSendReminderToNonAttendees =
-   followups.testSendReminderToNonAttendees
+exports.sendManualFollowup = followups.sendManualFollowup
+exports.sendReminderEmailAboutApplicationLink_v2 =
+   followups.sendReminderEmailAboutApplicationLink
 
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
