@@ -173,12 +173,13 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
    const theme = useTheme()
 
    const isHiringNow = company?.hasJobs
-   const hasUpcomingLivestreams = company?.hasUpcomingEvents
    const isFeaturedCompany = Boolean(company?.featured?.targetCountries?.length)
 
    const { count: upcomingLivestreamCount } = useCountGroupUpcomingLivestreams(
       company.id
    )
+
+   const hasUpcomingLivestreams = upcomingLivestreamCount > 0
 
    return (
       <Card ref={ref} sx={[styles.root]}>
@@ -297,7 +298,10 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
                      })}#livesStreams-section`}
                   >
                      <Typography variant="medium" color={theme.brand.info[600]}>
-                        {upcomingLivestreamCount} upcoming livestreams
+                        {upcomingLivestreamCount} upcoming{" "}
+                        {upcomingLivestreamCount === 1
+                           ? "livestream"
+                           : "livestreams"}
                      </Typography>
                   </Button>
                ) : null}
