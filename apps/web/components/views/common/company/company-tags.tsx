@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material"
+import { SxProps, Theme, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import { FC, ReactNode } from "react"
 import {
@@ -11,15 +11,25 @@ type Props = {
    icon: JSX.Element
    text: string | ReactNode
    fontSize?: string
+   sx?: SxProps<Theme>
+   typographySx?: SxProps<Theme>
+   iconSize?: number
 }
-const CompanyTag: FC<Props> = ({ icon, text, fontSize = "1rem" }) => {
+const CompanyTag: FC<Props> = ({
+   icon,
+   text,
+   fontSize = "1rem",
+   sx,
+   typographySx,
+}) => {
    return (
-      <Box display="flex" alignItems="center" color="neutral.700">
+      <Box display="flex" alignItems="center" color="neutral.700" sx={sx}>
          {icon}
          <Typography
             variant="small"
             fontSize={`${fontSize} !important`}
             ml={"0.5rem"}
+            sx={typographySx}
          >
             {text}
          </Typography>
@@ -31,12 +41,14 @@ type CustomTagProps = Omit<Props, "icon">
 export const CompanyCountryTag: FC<CustomTagProps> = ({
    text,
    fontSize = "1rem",
+   sx,
 }) => {
    return (
       <CompanyTag
          icon={<CompanyLocationIcon size={`calc(${fontSize} * 1.3)`} />}
          fontSize={fontSize}
          text={text}
+         sx={sx}
       />
    )
 }
@@ -44,12 +56,21 @@ export const CompanyCountryTag: FC<CustomTagProps> = ({
 export const CompanyIndustryTag: FC<CustomTagProps> = ({
    text,
    fontSize = "1rem",
+   sx,
+   typographySx,
+   iconSize,
 }) => {
    return (
       <CompanyTag
-         icon={<CompanyIndustryIcon size={`calc(${fontSize} * 1.3)`} />}
+         icon={
+            <CompanyIndustryIcon
+               size={iconSize ? iconSize : `calc(${fontSize} * 1.3)`}
+            />
+         }
          fontSize={fontSize}
          text={text}
+         sx={sx}
+         typographySx={typographySx}
       />
    )
 }
@@ -57,12 +78,14 @@ export const CompanyIndustryTag: FC<CustomTagProps> = ({
 export const CompanySizeTag: FC<CustomTagProps> = ({
    text,
    fontSize = "1rem",
+   sx,
 }) => {
    return (
       <CompanyTag
          icon={<CompanySizeIcon size={`calc(${fontSize} * 1.3)`} />}
          fontSize={fontSize}
          text={text}
+         sx={sx}
       />
    )
 }
