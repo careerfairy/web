@@ -382,7 +382,7 @@ exports.schedule5MinutesReminderEmails =
 exports.schedule1HourReminderEmails = remindersNew.schedule1HourReminderEmails
 exports.schedule24HoursReminderEmails =
    remindersNew.schedule24HoursReminderEmails
-// For testing
+// For testing Reminders
 exports.manualReminderEmails = remindersNew.manualReminderEmails
 
 // Followups
