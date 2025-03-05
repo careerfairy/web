@@ -1,7 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    addUtmTagsToLink,
-   companyNameSlugify,
    getLivestreamICSDownloadUrl,
 } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
@@ -10,7 +9,6 @@ import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
 import { isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
-import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import { logger } from "firebase-functions/v2"
@@ -29,6 +27,11 @@ import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailAttachment,
 } from "./lib/notifications/EmailTypes"
+import {
+   getJobEmailData,
+   getSparkEmailData,
+   getSpeakerEmailData,
+} from "./lib/notifications/util"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)
@@ -111,67 +114,46 @@ export const livestreamRegistrationConfirmationEmail = functions
          : []
 
       const emailSpeakers = livestreamSpeakers.slice(0, 4).map((speaker) => {
-         return {
-            name: `${speaker.firstName} ${speaker.lastName}`,
-            position: speaker.position,
-            avatarUrl: speaker.avatar,
-            url: addUtmTagsToLink({
-               link: `${host}/portal/livestream/${livestream.id}/speaker-details/${speaker.id}`,
+         return getSpeakerEmailData(speaker, {
+            baseUrl: host,
+            livestreamId: livestream.id,
+            utmParams: {
                source: "careerfairy",
                medium: "email",
                campaign: "eventRegistration",
                content: livestream.title,
-            }),
-         }
+            },
+         })
       })
 
-      const emailJobs = livestreamJobs.slice(0, 5).map((job) => {
-         return {
-            title: job.title,
-            jobType: job.jobType,
-            businessFunctionsTags: (
-               job.businessFunctionsTagIds?.map(
-                  (tag) => TagValuesLookup[tag]
-               ) ?? []
-            ).join(", "),
-            deadline: DateTime.fromJSDate(job.deadline.toDate()).toFormat(
-               "dd LLL yyyy"
-            ),
-            url: addUtmTagsToLink({
-               link: `${host}/portal/livestream/${livestream.id}/job-details/${job.id}`,
+      const emailJobs = livestreamJobs.slice(0, 5).map((job) =>
+         getJobEmailData(job, {
+            baseUrl: host,
+            livestreamId: livestream.id,
+            utmParams: {
                source: "careerfairy",
                medium: "email",
                campaign: "eventRegistration",
                content: livestream.title,
-            }),
-         }
-      })
+            },
+         })
+      )
 
       const emailSparks = groupSparks
          .sort((sparkA, sparkB) => {
             return sparkB.publishedAt.toMillis() - sparkA.publishedAt.toMillis()
          })
          .slice(0, 3)
-         .map((spark) => {
-            return {
-               question: spark.question,
-               category_id: spark.category.name,
-               thumbnailUrl: spark.video.thumbnailUrl,
-               url: addUtmTagsToLink({
-                  link: `${host}/sparks/${
-                     spark.id
-                  }?companyName=${companyNameSlugify(
-                     group.universityName
-                  )}&groupId=${group.id}&interactionSource=${
-                     SparkInteractionSources.RegistrationEmail
-                  }`,
-                  source: "careerfairy",
-                  medium: "email",
+         .map((spark) =>
+            getSparkEmailData(spark, {
+               baseUrl: host,
+               interactionSource: SparkInteractionSources.RegistrationEmail,
+               utmParams: {
                   campaign: "eventRegistration",
                   content: livestream.title,
-               }),
-            }
-         })
+               },
+            })
+         )
 
       // Generate ICS file content
       const cal = ical()

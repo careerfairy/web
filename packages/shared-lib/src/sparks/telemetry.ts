@@ -158,3 +158,6 @@ export const SparkInteractionSources = {
    RegistrationEmail: "registration-email",
    Livestream_Follow_Up: "livestream_follow_up",
 } as const
+
+export type SparkInteractionSource =
+   (typeof SparkInteractionSources)[keyof typeof SparkInteractionSources]
