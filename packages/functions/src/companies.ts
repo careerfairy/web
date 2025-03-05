@@ -178,7 +178,7 @@ const groupEventClientSchema: SchemaOf<GroupClientEventsPayload> =
       events: array().of(
          object().shape({
             authId: string().optional().nullable(),
-            visitorId: string().optional(),
+            visitorId: string().optional().nullable(),
             stringTimestamp: string().required(),
             utm_source: string().nullable(),
             utm_medium: string().nullable(),
