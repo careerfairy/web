@@ -17,6 +17,7 @@ import {
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import useCountGroupUpcomingLivestreams from "components/custom-hook/live-stream/useCountGroupUpcomingLivestreams"
+import useIsUserFeaturedCompany from "components/custom-hook/user/useIsUserFeaturedCompany"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import Image from "next/legacy/image"
 import { FC } from "react"
@@ -173,7 +174,7 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
    const theme = useTheme()
 
    const isHiringNow = company?.hasJobs
-   const isFeaturedCompany = Boolean(company?.featured?.targetCountries?.length)
+   const isFeaturedCompany = useIsUserFeaturedCompany(company)
 
    const { count: upcomingLivestreamCount } = useCountGroupUpcomingLivestreams(
       company.id
