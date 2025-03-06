@@ -7,6 +7,7 @@ import { Group, GroupQuestion } from "@careerfairy/shared-lib/groups"
 import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
+import { CircularProgress } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
@@ -286,7 +287,7 @@ type Props = {
 const LivestreamFormikProvider = ({ livestream, group, children }: Props) => {
    const { userData } = useAuth()
    const { data: creators } = useGroupCreators(group?.id)
-   const { groupQuestions } = useGroupQuestions(group?.id)
+   const { groupQuestions, questionsLoaded } = useGroupQuestions(group?.id)
    const { feedbackQuestions } = useFeedbackQuestions(
       livestream.id,
       livestream.isDraft ? "draftLivestreams" : "livestreams"
@@ -307,6 +308,10 @@ const LivestreamFormikProvider = ({ livestream, group, children }: Props) => {
            userData,
         })
       : formInitialValues
+
+   if (!questionsLoaded) {
+      return <CircularProgress />
+   }
 
    return (
       <Formik<LivestreamFormValues>
