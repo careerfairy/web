@@ -286,7 +286,7 @@ const handleSendEmails = async (
 
       // Check if this reminder has already been sent for this stream
       if (
-         stream.reminderEmailsStatus?.[reminder.templateId]?.sentAt &&
+         stream.reminderEmailsStatus?.[reminder.templateId]?.scheduledAt &&
          stream.reminderEmailsStatus?.[reminder.templateId]?.status !== "failed"
       ) {
          log(
@@ -342,7 +342,7 @@ const handleSendEmails = async (
          successful: 0,
          failed: 0,
          status: "failed", // Initial status, will be updated after sending
-         sentAt: null,
+         scheduledAt: null,
       }
 
       const livestreamStartDateTime = DateTime.fromJSDate(
@@ -481,7 +481,7 @@ export const updateLiveStreamsWithEmailStatus = async (
       const toUpdate: Record<string, ReminderEmailStatus> = {
          [`reminderEmailsStatus.${status.templateId}`]: {
             ...status,
-            sentAt: FieldValue.serverTimestamp() as Timestamp,
+            scheduledAt: FieldValue.serverTimestamp() as Timestamp,
          },
       }
 
