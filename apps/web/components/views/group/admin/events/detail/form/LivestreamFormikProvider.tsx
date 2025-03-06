@@ -151,6 +151,18 @@ const buildRegistrationQuestions = (
    })
 }
 
+const buildRegistrationQuestionOptions = (
+   groupQuestions: GroupQuestion[],
+   group: Group
+): LivestreamFormQuestionsTabValues["registrationQuestions"]["options"] => {
+   return groupQuestions.map((question) => ({
+      ...question,
+      groupId: group.id,
+      groupName: group.universityName,
+      universityCode: group.universityCode,
+   }))
+}
+
 type ConvertLivestreamObjectToFormArgs = {
    livestream: LivestreamEvent
    group: Group
@@ -264,7 +276,7 @@ const convertLivestreamObjectToForm = ({
                userData.isAdmin,
                group
             ),
-            options: groupQuestions,
+            options: buildRegistrationQuestionOptions(groupQuestions, group),
          },
          feedbackQuestions:
             feedbackQuestions ||
