@@ -432,7 +432,7 @@ export interface ReminderEmailStatus {
    /**
     * Timestamp when the reminder was sent
     */
-   sentAt: FirebaseFirestore.Timestamp
+   scheduledAt: FirebaseFirestore.Timestamp
    /**
     * Total number of recipients the reminder was sent to
     */
