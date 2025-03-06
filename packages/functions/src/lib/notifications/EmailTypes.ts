@@ -30,6 +30,7 @@ export type SpeakerData = {
    position: string
    avatarUrl: string
    url: string
+   linkedInUrl: string
 }
 
 export type SparkData = {

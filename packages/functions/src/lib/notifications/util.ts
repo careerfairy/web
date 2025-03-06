@@ -97,5 +97,6 @@ export const getSpeakerEmailData = (
          }/speaker-details/${speaker.id}`,
          ...options.utmParams,
       }),
+      linkedInUrl: speaker.linkedInUrl,
    }
 }
