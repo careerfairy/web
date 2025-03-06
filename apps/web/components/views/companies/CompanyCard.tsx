@@ -144,7 +144,6 @@ const styles = sxStyles({
       zIndex: (theme) => theme.zIndex.appBar - 1,
    },
    upcomingLivestreamButton: {
-      zIndex: (theme) => theme.zIndex.appBar - 1,
       background: (theme) => theme.brand.info[50],
       p: "8px 2px",
       borderRadius: "8px",
