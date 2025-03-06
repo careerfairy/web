@@ -11,6 +11,7 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
 import { useMemo } from "react"
 import { ChevronRight } from "react-feather"
+import { getRandom } from "util/CommonUtil"
 import { FeaturedCompaniesCarousel } from "./FeaturedCompaniesCarousel"
 import { FeaturedCompaniesHeader } from "./FeaturedCompaniesHeader"
 import { MobileFeaturedCompaniesCarousel } from "./MobileFeaturedCompaniesCarousel"
@@ -92,7 +93,7 @@ const FeaturedCompaniesComponent = ({ fieldOfStudyId, countryCode }: Props) => {
    // Add shuffled version of featuredCompanies
    const shuffledCompanies = useMemo(() => {
       if (!featuredCompanies) return []
-      return [...featuredCompanies].sort(() => Math.random() - 0.5)
+      return getRandom(featuredCompanies, featuredCompanies.length)
    }, [featuredCompanies])
 
    const [emblaRef, emblaApi] = useEmblaCarousel(carouselEmblaOptions, [
