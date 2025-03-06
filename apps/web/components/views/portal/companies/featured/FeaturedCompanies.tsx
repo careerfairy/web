@@ -9,7 +9,9 @@ import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
+import { useMemo } from "react"
 import { ChevronRight } from "react-feather"
+import { getRandom } from "util/CommonUtil"
 import { FeaturedCompaniesCarousel } from "./FeaturedCompaniesCarousel"
 import { FeaturedCompaniesHeader } from "./FeaturedCompaniesHeader"
 import { MobileFeaturedCompaniesCarousel } from "./MobileFeaturedCompaniesCarousel"
@@ -86,8 +88,13 @@ type Props = {
 
 const FeaturedCompaniesComponent = ({ fieldOfStudyId, countryCode }: Props) => {
    const isMobile = useIsMobile()
-
    const { data: featuredCompanies } = useFeaturedGroupsSWR(countryCode)
+
+   // Add shuffled version of featuredCompanies
+   const shuffledCompanies = useMemo(() => {
+      if (!featuredCompanies) return []
+      return getRandom(featuredCompanies, featuredCompanies.length)
+   }, [featuredCompanies])
 
    const [emblaRef, emblaApi] = useEmblaCarousel(carouselEmblaOptions, [
       WheelGesturesPlugin(),
@@ -115,10 +122,10 @@ const FeaturedCompaniesComponent = ({ fieldOfStudyId, countryCode }: Props) => {
                onNextClick={onClickNext}
             />
             {isMobile ? (
-               <MobileFeaturedCompaniesCarousel companies={featuredCompanies} />
+               <MobileFeaturedCompaniesCarousel companies={shuffledCompanies} />
             ) : (
                <FeaturedCompaniesCarousel
-                  companies={featuredCompanies}
+                  companies={shuffledCompanies}
                   emblaRef={emblaRef}
                />
             )}
