@@ -97,7 +97,7 @@ export const BackgroundModeButton = forwardRef<HTMLButtonElement, Props>(
             PopperProps={{
                sx: styles.tooltipPopper,
             }}
-            sx={styles.tooltip}
+            wrapperStyles={styles.tooltip}
             title={getButtonTooltip(mode, error)}
             slotProps={customSlotProps}
          >
