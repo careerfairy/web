@@ -1,6 +1,5 @@
 import functions = require("firebase-functions")
 import { EUROPEAN_COUNTRY_CODES } from "@careerfairy/shared-lib/constants/forms"
-import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
 import {
@@ -10,14 +9,10 @@ import {
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
-import {
-   addUtmTagsToLink,
-   companyNameSlugify,
-} from "@careerfairy/shared-lib/utils"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { log } from "firebase-functions/logger"
 import { onCall, onRequest } from "firebase-functions/v2/https"
 import { onSchedule } from "firebase-functions/v2/scheduler"
-import { DateTime } from "luxon"
 import {
    customJobRepo,
    groupRepo,
@@ -29,7 +24,11 @@ import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailNotificationRequestData,
 } from "./lib/notifications/EmailTypes"
-import { getJobEmailData } from "./lib/notifications/util"
+import {
+   getJobEmailData,
+   getSparkEmailData,
+   getSpeakerEmailData,
+} from "./lib/notifications/util"
 import { isLocalEnvironment } from "./util"
 
 type FollowUpTemplateId =
@@ -190,68 +189,40 @@ const getEmailTemplateMessages = (
             return sparkB.publishedAt.toMillis() - sparkA.publishedAt.toMillis()
          })
          .slice(0, 3)
-         .map((spark) => {
-            return {
-               question: spark.question,
-               category_id: spark.category.name,
-               thumbnailUrl: spark.video.thumbnailUrl,
-               url: addUtmTagsToLink({
-                  link: `${host}/sparks/${
-                     spark.id
-                  }?companyName=${companyNameSlugify(
-                     streamGroup.universityName
-                  )}&groupId=${streamGroup.id}&interactionSource=${
-                     SparkInteractionSources.Livestream_Follow_Up
-                  }`,
-                  source: "careerfairy",
-                  medium: "email",
+         .map((spark) =>
+            getSparkEmailData(spark, {
+               baseUrl: host,
+               interactionSource: SparkInteractionSources.Livestream_Follow_Up,
+               utmParams: {
                   campaign: "event-followup",
                   content: stream.title,
-               }),
-            }
-         })
+               },
+            })
+         )
 
-      const streamSpeakers = speakers.slice(0, 4).map((speaker) => {
-         const speakerLink = addUtmTagsToLink({
-            link: `${host}/portal/livestream/${stream.id}/speaker-details/${speaker.id}`,
-            source: "careerfairy",
-            medium: "email",
-            campaign: "event-followup",
-            content: stream.title,
+      const streamSpeakers = speakers.slice(0, 4).map((speaker) =>
+         getSpeakerEmailData(speaker, {
+            baseUrl: host,
+            livestreamId: stream.id,
+            utmParams: {
+               campaign: "event-followup",
+               content: stream.title,
+            },
          })
-
-         return {
-            name: `${speaker.firstName} ${speaker.lastName}`,
-            position: speaker.position,
-            avatarUrl: speaker.avatar,
-            url: speakerLink,
-            linkedInUrl: speaker.linkedInUrl,
-         }
-      })
+      )
 
       const streamJobs = additionalData.livestream.jobsByLivestreamId[
          stream.id
-      ].map((job) => {
-         return {
-            title: job.title,
-            jobType: job.jobType,
-            businessFunctionsTags: (
-               job.businessFunctionsTagIds?.map(
-                  (tag) => TagValuesLookup[tag]
-               ) ?? []
-            ).join(", "),
-            deadline: DateTime.fromJSDate(job.deadline.toDate()).toFormat(
-               "dd LLL yyyy"
-            ),
-            url: addUtmTagsToLink({
-               link: `${host}/portal/livestream/${stream.id}/job-details/${job.id}`,
-               source: "careerfairy",
-               medium: "email",
+      ].map((job) =>
+         getJobEmailData(job, {
+            baseUrl: host,
+            livestreamId: stream.id,
+            utmParams: {
                campaign: "event-followup",
                content: stream.title,
-            }),
-         }
-      })
+            },
+         })
+      )
 
       stream.usersLivestreamData.forEach((streamUserData) => {
          const userInEU = EUROPEAN_COUNTRY_CODES.includes(
