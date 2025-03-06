@@ -1,4 +1,5 @@
 import { Tooltip, TooltipProps, styled, tooltipClasses } from "@mui/material"
+import { CSSProperties } from "react"
 import { sxStyles } from "types/commonTypes"
 
 export const tooltipStyles = sxStyles({
@@ -15,7 +16,13 @@ export const tooltipStyles = sxStyles({
 })
 
 export const BrandedTooltip = styled(
-   ({ className, placement = "top", children, ...props }: TooltipProps) => (
+   ({
+      className,
+      placement = "top",
+      children,
+      wrapperStyles,
+      ...props
+   }: TooltipProps & { wrapperStyles?: CSSProperties }) => (
       <Tooltip
          {...props}
          componentsProps={{
@@ -25,8 +32,11 @@ export const BrandedTooltip = styled(
          }}
          placement={placement}
          classes={{ popper: className }}
+         id="tooltip-background-mode-button"
       >
-         <span style={tooltipStyles.wrapper}>{children}</span>
+         <span style={{ ...tooltipStyles.wrapper, ...wrapperStyles }}>
+            {children}
+         </span>
       </Tooltip>
    )
 )({
