@@ -1,5 +1,4 @@
 import { FieldOfStudyCategoryMap } from "@careerfairy/shared-lib/fieldOfStudy"
-import { shuffle } from "@careerfairy/shared-lib/utils"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Divider, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
@@ -12,6 +11,7 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
 import { useMemo } from "react"
 import { ChevronRight } from "react-feather"
+import { getRandom } from "util/CommonUtil"
 import { FeaturedCompaniesCarousel } from "./FeaturedCompaniesCarousel"
 import { FeaturedCompaniesHeader } from "./FeaturedCompaniesHeader"
 import { MobileFeaturedCompaniesCarousel } from "./MobileFeaturedCompaniesCarousel"
@@ -93,9 +93,7 @@ const FeaturedCompaniesComponent = ({ fieldOfStudyId, countryCode }: Props) => {
    // Add shuffled version of featuredCompanies
    const shuffledCompanies = useMemo(() => {
       if (!featuredCompanies) return []
-
-      shuffle([...featuredCompanies])
-      return featuredCompanies
+      return getRandom(featuredCompanies, featuredCompanies.length)
    }, [featuredCompanies])
 
    const [emblaRef, emblaApi] = useEmblaCarousel(carouselEmblaOptions, [
