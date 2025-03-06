@@ -9,14 +9,16 @@ const useIsUserFeaturedCompany = (group: Group | CompanySearchResult) => {
    const { userData, isLoggedIn } = useAuth()
 
    const countryCode = userData?.countryIsoCode || userCountryCode
+   const inTargetCountries =
+      countryCode && group?.featured?.targetCountries?.includes(countryCode)
+
+   if (!isLoggedIn && countryCode) return inTargetCountries
 
    if (!isLoggedIn || !userData?.fieldOfStudy?.id || !countryCode) return false
 
    const inTargetAudience = group?.featured?.targetAudience?.includes(
       FieldOfStudyCategoryMap[userData?.fieldOfStudy?.id]
    )
-   const inTargetCountries =
-      group?.featured?.targetCountries?.includes(countryCode)
 
    return inTargetAudience && inTargetCountries
 }
