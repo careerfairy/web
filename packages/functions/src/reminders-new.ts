@@ -30,7 +30,7 @@ import {
    EmailNotificationRequestData,
 } from "./lib/notifications/EmailTypes"
 import { OnBatchCompleteCallback } from "./lib/notifications/NotificationRepository"
-import { addMinutesDate, dateFormatOffset, isLocalEnvironment } from "./util"
+import { addMinutesDate, isLocalEnvironment } from "./util"
 
 // delay to be sure that the reminder is sent at the time
 const reminderBufferMinutes = 20
@@ -196,12 +196,9 @@ export const manualReminderEmails = onRequest(
          return
       }
 
-      const fromDate = reminder.getStartDate()
-      const toDate = addMinutesDate(fromDate, reminderScheduleRange)
-
       const streams = await getStreamsByDateWithRegisteredStudents(
-         fromDate,
-         toDate // Can replace with arbitrary date in the future to increase the range of streams to be fetched
+         DateTime.now().toJSDate(),
+         DateTime.now().plus({ days: 1 }).toJSDate() // Can replace with arbitrary date in the future to increase the range of streams to be fetched
       )
 
       await handleReminder(streams, reminder)
@@ -352,10 +349,6 @@ const handleSendEmails = async (
          }
       )
 
-      const livestreamFormattedStartDate = dateFormatOffset(
-         livestreamStartDateTime.toLocaleString(DateTime.DATETIME_FULL)
-      ) // eg: "28/02/2025 10:00 (CET)"
-
       const upcomingStreamLink = stream.externalEventLink
          ? stream.externalEventLink
          : makeLivestreamEventDetailsUrl(stream.id)
@@ -372,53 +365,58 @@ const handleSendEmails = async (
 
       const deliveryTimeInUnix = Math.floor(emailDeliveryTime.toSeconds())
 
+      type EmailRequest = EmailNotificationRequestData<ReminderTemplateId>
+
       // Create notification requests for all users
-      const notificationRequests = registeredUsers.map<
-         EmailNotificationRequestData<ReminderTemplateId>
-      >((userLivestreamData) => ({
-         templateId: reminder.templateId,
-         templateData: {
-            livestream: {
-               company: streamGroup.universityName,
-               bannerImageUrl: streamGroup.bannerImageUrl,
-               companyLogoUrl: stream.companyLogoUrl,
-               start: livestreamFormattedStartDate,
-               title: stream.title,
-               url: addUtmTagsToLink({
-                  link: upcomingStreamLink,
-                  source: "careerfairy",
-                  medium: "email",
-                  campaign: reminder.reminderUtmCampaign,
-                  content: stream.title,
-               }),
-               companyPageUrl: companyPageUrl
-                  ? addUtmTagsToLink({
-                       link: companyPageUrl,
-                       source: "careerfairy",
-                       medium: "email",
-                       campaign: reminder.reminderUtmCampaign,
-                       content: stream.title,
-                    })
-                  : "",
+      const notificationRequests = registeredUsers.map<EmailRequest>(
+         (userLivestreamData) => ({
+            templateId: reminder.templateId,
+            templateData: {
+               livestream: {
+                  company: streamGroup.universityName,
+                  bannerImageUrl: streamGroup.bannerImageUrl,
+                  companyLogoUrl: stream.companyLogoUrl,
+                  start: formatLivestreamDate(
+                     stream.start.toDate(),
+                     userLivestreamData.user.timezone || "Europe/Zurich"
+                  ),
+                  title: stream.title,
+                  url: addUtmTagsToLink({
+                     link: upcomingStreamLink,
+                     source: "careerfairy",
+                     medium: "email",
+                     campaign: reminder.reminderUtmCampaign,
+                     content: stream.title,
+                  }),
+                  companyPageUrl: companyPageUrl
+                     ? addUtmTagsToLink({
+                          link: companyPageUrl,
+                          source: "careerfairy",
+                          medium: "email",
+                          campaign: reminder.reminderUtmCampaign,
+                          content: stream.title,
+                       })
+                     : "",
+               },
+               calendar: {
+                  google: urls.google,
+                  apple: getLivestreamICSDownloadUrl(
+                     stream.id,
+                     isLocalEnvironment(),
+                     {
+                        utmCampaign: "fromcalendarevent-mail",
+                     }
+                  ),
+                  outlook: urls.outlook,
+               },
             },
-            calendar: {
-               google: urls.google,
-               apple: getLivestreamICSDownloadUrl(
-                  stream.id,
-                  isLocalEnvironment(),
-                  {
-                     utmCampaign: "fromcalendarevent-mail",
-                  }
-               ),
-               outlook: urls.outlook,
-            },
-         },
-         userAuthId:
-            userLivestreamData.userId || userLivestreamData.user.authId,
-         to: userLivestreamData.user.userEmail || userLivestreamData.id,
-         attachments,
-         send_at: deliveryTimeInUnix,
-      }))
+            userAuthId:
+               userLivestreamData.user.authId || userLivestreamData.userId,
+            to: userLivestreamData.user.userEmail || userLivestreamData.id,
+            attachments,
+            send_at: deliveryTimeInUnix,
+         })
+      )
 
       // Create a progress callback for this stream
       const onBatchCompleteCallback: OnBatchCompleteCallback = (
@@ -467,6 +465,12 @@ const handleSendEmails = async (
 
    // Return the status for all streams
    return emailStatus
+}
+
+const formatLivestreamDate = (date: Date, timezone: string) => {
+   return DateTime.fromJSDate(date, {
+      zone: timezone,
+   }).toFormat("d MMMM yyyy 'at' h:mm a '('ZZZZ')'")
 }
 
 /**
