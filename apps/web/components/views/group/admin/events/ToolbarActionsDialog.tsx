@@ -81,7 +81,7 @@ const ToolbarActionsDialogContent = ({
       const studentPage = makeGroupCompanyPageUrl(group.universityName, {
          interactionSource: SparkInteractionSources.Group_Admin_Events_Table,
       })
-      window?.open?.(studentPage, "_blank")
+      window?.open?.(`${studentPage}#livesStreams-section`, "_blank")
    }
 
    return (
