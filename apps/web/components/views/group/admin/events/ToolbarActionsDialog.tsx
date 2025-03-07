@@ -1,3 +1,5 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import StudentViewIcon from "@mui/icons-material/FaceRounded"
 import {
    Dialog,
@@ -13,15 +15,21 @@ import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import PropTypes from "prop-types"
 import { useState } from "react"
 import { Film as StreamIcon } from "react-feather"
-import { getBaseUrl } from "../../../../helperFunctions/HelperFunctions"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import HintIcon from "../../../common/HintIcon"
 import { useLivestreamRouting } from "./useLivestreamRouting"
+
+type ToolbarActionsDialogContentProps = {
+   handleClose: () => void
+   handleOpenNewStreamModal: () => void
+   group: Group
+}
 
 const ToolbarActionsDialogContent = ({
    handleClose,
    handleOpenNewStreamModal,
    group,
-}) => {
+}: ToolbarActionsDialogContentProps) => {
    const featureFlags = useFeatureFlags()
    const { createDraftLivestream } = useLivestreamRouting()
 
@@ -53,21 +61,26 @@ const ToolbarActionsDialogContent = ({
          icon: <StreamIcon />,
          description: "New live stream creation form!",
       },
-      {
-         name: "See your upcoming streams as a student",
-         onClick: () => {
-            handleOpenStudentView()
-            handleClose()
-         },
-         icon: <StudentViewIcon />,
-         description:
-            "Go to your public group page and see your events as a student.",
-      },
+      ...(group.publicProfile
+         ? [
+              {
+                 name: "See your upcoming streams as a student",
+                 onClick: () => {
+                    handleOpenStudentView()
+                    handleClose()
+                 },
+                 icon: <StudentViewIcon />,
+                 description:
+                    "Go to your public group page and see your events as a student.",
+              },
+           ]
+         : []),
    ])
 
    const handleOpenStudentView = () => {
-      const baseUrl = getBaseUrl()
-      const studentPage = `${baseUrl}/next-livestreams/${group.id}`
+      const studentPage = makeGroupCompanyPageUrl(group.universityName, {
+         interactionSource: SparkInteractionSources.Group_Admin_Events_Table,
+      })
       window?.open?.(studentPage, "_blank")
    }
 
