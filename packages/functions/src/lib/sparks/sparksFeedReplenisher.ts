@@ -3,7 +3,12 @@ import {
    UserSparksFeedMetrics,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { Firestore, Timestamp } from "../../api/firestoreAdmin"
-import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
+import {
+   groupRepo,
+   livestreamsRepo,
+   sparkRepo,
+   userRepo,
+} from "../../api/repositories"
 import { addAddedToFeedAt } from "../../util/sparks"
 import SparkRecommendationService from "../recommendation/SparkRecommendationService"
 import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
@@ -107,7 +112,8 @@ export class SparksFeedReplenisher {
             userId,
             livestreamsRepo,
             userRepo,
-            sparkRepo
+            sparkRepo,
+            groupRepo
          )
 
          const [studyBackgrounds, recommendationService] = await Promise.all([

@@ -71,4 +71,8 @@ export class RankedSpark {
    removePoints(points: number) {
       this.points -= points
    }
+
+   setPoints(points: number) {
+      this.points = points
+   }
 }
