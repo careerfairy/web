@@ -3,11 +3,7 @@ import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
-import {
-   Group,
-   GroupOption,
-   GroupQuestion,
-} from "@careerfairy/shared-lib/groups"
+import { Group, GroupOption } from "@careerfairy/shared-lib/groups"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
    LivestreamEvent,
@@ -52,7 +48,7 @@ export type LivestreamFormSpeakersTabValues = {
 export type LivestreamFormQuestionsTabValues = {
    registrationQuestions: {
       values: RegistrationQuestionFormValues[]
-      options: GroupQuestion[]
+      options: RegistrationQuestionFormValues[]
    }
    feedbackQuestions: FeedbackQuestionFormValues[]
    hosts: Group[]
