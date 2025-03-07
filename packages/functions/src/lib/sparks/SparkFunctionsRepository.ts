@@ -47,6 +47,7 @@ import {
 } from "../../api/firestoreAdmin"
 import {
    customJobRepo,
+   groupRepo,
    livestreamsRepo,
    sparkRepo,
    userRepo,
@@ -548,7 +549,8 @@ export class SparkFunctionsRepository
          userId,
          livestreamsRepo,
          userRepo,
-         sparkRepo
+         sparkRepo,
+         groupRepo
       )
 
       const [studyBackgrounds, recommendationService] = await Promise.all([

@@ -1,4 +1,5 @@
 import { combineRankedDocuments } from "../../BaseFirebaseRepository"
+import { Group } from "../../groups"
 import { SparkStats } from "../../sparks/sparks"
 import {
    AdditionalUserRecommendationInfo,
@@ -34,7 +35,7 @@ export interface IRecommendationSparksService {
 export default class RecommendationSparksServiceCore {
    constructor(
       protected log?: Logger | undefined,
-      protected debug: boolean = false
+      protected debug: boolean = true
    ) {}
 
    /**
@@ -78,8 +79,14 @@ export default class RecommendationSparksServiceCore {
 
       // Return the top {limit} events
       const recommendedIds = sortedRecommendedSparks
+
          .map((event) => event.id)
          .slice(0, limit)
+
+      console.log(
+         "🚀 ~ RecommendationSparksServiceCore ~ recommendedIds:",
+         recommendedIds
+      )
 
       if (this.debug) {
          this.log?.info(
@@ -97,7 +104,8 @@ export default class RecommendationSparksServiceCore {
       userData: UserData,
       sparks: SparkStats[],
       additionalUserInfo: AdditionalUserRecommendationInfo,
-      limit: number
+      limit: number,
+      sparkGroups: { [sparkId: string]: Group }
    ): RankedSpark[] {
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
@@ -112,6 +120,7 @@ export default class RecommendationSparksServiceCore {
          .userUniversityCode()
          .userFieldOfStudy()
          .userStudyBackground()
+         .userFeaturedGroups(sparkGroups)
          .get()
    }
 }
