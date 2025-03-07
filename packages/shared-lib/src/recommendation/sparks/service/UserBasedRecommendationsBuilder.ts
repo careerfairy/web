@@ -1,6 +1,11 @@
+import { FieldOfStudyCategoryMap } from "../../../fieldOfStudy"
+import { Group } from "../../../groups"
 import { AdditionalUserRecommendationInfo, UserData } from "../../../users"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
-import { RankedSparkRepository } from "./RankedSparkRepository"
+import {
+   FEATURED_GROUP_SPARK_POINTS_MULTIPLIER,
+   RankedSparkRepository,
+} from "./RankedSparkRepository"
 
 export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    constructor(
@@ -78,6 +83,35 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
                   this.limit
                )
             )
+         }
+      })
+
+      return this
+   }
+
+   public userFeaturedGroups(groups: { [sparkId: string]: Group }) {
+      this.results?.forEach((rankedSpark) => {
+         const group = groups[rankedSpark.model.spark.group.id]
+
+         if (
+            group?.featured?.targetCountries?.length &&
+            group.featured?.targetAudience?.length
+         ) {
+            const belongsToTargetAudience = group.featured.targetAudience.some(
+               (audience) =>
+                  audience ===
+                  FieldOfStudyCategoryMap[this.user.fieldOfStudy?.id]
+            )
+            const belongsToTargetCountry = group.featured.targetCountries.some(
+               (country) => country === this.user.countryIsoCode
+            )
+
+            if (belongsToTargetAudience && belongsToTargetCountry) {
+               rankedSpark.setPoints(
+                  rankedSpark.getPoints() *
+                     FEATURED_GROUP_SPARK_POINTS_MULTIPLIER
+               )
+            }
          }
       })
 
