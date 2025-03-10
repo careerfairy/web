@@ -3,11 +3,11 @@ import { ICameraVideoTrack } from "agora-rtc-react"
 import { useAppDispatch } from "components/custom-hook/store"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { getBaseUrl, sleep } from "components/helperFunctions/HelperFunctions"
-import { agoraVirtualBackgroundExtension } from "data/agora/AgoraService"
 import { useCallback } from "react"
 import { setVirtualBackgroundMode } from "store/reducers/streamingAppReducer"
 import useSWRMutation from "swr/mutation"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { agoraVirtualBackgroundExtension } from "../../config/agoraExtensions"
 import { VirtualBackgroundMode } from "../../types"
 
 /**

@@ -24,6 +24,7 @@ import {
    useState,
 } from "react"
 import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
+import { useNoiseSuppression } from "../hooks/useNoiseSuppression"
 import { type LocalUser } from "../types"
 import { useAgoraDevices } from "./AgoraDevices"
 import { useStreamingContext } from "./Streaming"
@@ -104,6 +105,8 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       microphoneId: firstMicId,
       encoderConfig: withHighQuality ? "high_quality_stereo" : undefined,
    })
+
+   useNoiseSuppression(microphoneTrack.localMicrophoneTrack, shouldStream)
 
    const {
       activeDeviceId: activeMicrophoneId,
