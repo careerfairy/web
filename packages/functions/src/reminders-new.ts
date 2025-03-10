@@ -1,4 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import {
    LiveStreamEventWithUsersLivestreamData,
    ReminderEmailStatus,
@@ -356,7 +357,9 @@ const handleSendEmails = async (
       const companyPageUrl = streamGroup.publicProfile
          ? `${getHost()}/company/${companyNameSlugify(
               streamGroup.universityName
-           )}`
+           )}?interactionSource=${
+              InteractionSources.Email_Live_Stream_Reminder_24h
+           }`
          : ""
 
       const emailDeliveryTime = livestreamStartDateTime.minus({
