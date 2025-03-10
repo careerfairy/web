@@ -12,7 +12,7 @@ type RankSparkArgs = {
    pointsPerMissingMatch?: number
 }
 
-export const FEATURED_GROUP_SPARK_POINTS_MULTIPLIER = 10.5
+export const FEATURED_GROUP_SPARK_POINTS_MULTIPLIER = 100
 /**
  * Repository that fetches sparks accordingly with some filters and ranks them
  *
