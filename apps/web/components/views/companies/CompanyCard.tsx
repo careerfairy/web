@@ -75,6 +75,10 @@ const styles = sxStyles({
          background: "rgba(0, 0, 0, 0.20)",
          zIndex: 1,
       },
+      "& a": {
+         zIndex: 2,
+         cursor: "pointer",
+      },
    },
    content: {
       px: 2,
