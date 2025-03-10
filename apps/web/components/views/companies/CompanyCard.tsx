@@ -161,6 +161,7 @@ const styles = sxStyles({
       "&:hover": {
          background: (theme) => theme.brand.info[100],
       },
+      zIndex: 3,
    },
 })
 
