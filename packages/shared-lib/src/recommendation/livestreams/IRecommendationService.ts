@@ -192,7 +192,9 @@ export const applyFeaturedGroupPoints = (
    rankedLivestream: RankedLivestreamEvent,
    userFeaturedGroups?: { [groupId: string]: Group }
 ) => {
-   const allFeaturedGroupIds = Object.keys(userFeaturedGroups) || []
+   const allFeaturedGroupIds = userFeaturedGroups
+      ? Object.keys(userFeaturedGroups)
+      : []
 
    if (
       allFeaturedGroupIds.find((id) =>
