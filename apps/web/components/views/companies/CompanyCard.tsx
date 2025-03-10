@@ -158,13 +158,6 @@ const styles = sxStyles({
          background: (theme) => theme.brand.info[100],
       },
    },
-   ellipsisTypography: {
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-      flex: 1,
-      minWidth: 0,
-   },
 })
 
 type Props = {
