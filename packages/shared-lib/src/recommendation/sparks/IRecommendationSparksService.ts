@@ -83,11 +83,6 @@ export default class RecommendationSparksServiceCore {
          .map((event) => event.id)
          .slice(0, limit)
 
-      console.log(
-         "🚀 ~ RecommendationSparksServiceCore ~ recommendedIds:",
-         recommendedIds
-      )
-
       if (this.debug) {
          this.log?.info(
             `Recommended spark IDs for user ${user?.id}: ${recommendedIds}`
@@ -120,7 +115,6 @@ export default class RecommendationSparksServiceCore {
          .userUniversityCode()
          .userFieldOfStudy()
          .userStudyBackground()
-         .userFeaturedGroups(sparkGroups)
-         .get()
+         .get(sparkGroups, userData)
    }
 }
