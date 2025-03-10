@@ -266,26 +266,22 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
                   <CompanyCountryTag
                      fontSize="16px"
                      text={company.companyCountry?.name}
-                     sx={styles.companyTag}
+                     color={theme.palette.neutral[900]}
                   />
                   <CompanyIndustryTag
                      text={company.companyIndustries
                         ?.map(({ name }) => name)
                         .join(", ")}
                      fontSize="16px"
-                     sx={styles.companyTag}
+                     color={theme.palette.neutral[900]}
                      // It would make more sense to not be conditional, as cards with long industry names would force
                      // other cards to be taller even if no upcoming streams, with the ellipsis all card heights would be the same.
-                     typographySx={
-                        hasUpcomingLivestreams
-                           ? styles.ellipsisTypography
-                           : null
-                     }
+                     disableMultiline={hasUpcomingLivestreams}
                   />
                   <CompanySizeTag
                      text={company.companySize}
                      fontSize="16px"
-                     sx={styles.companyTag}
+                     color={theme.palette.neutral[900]}
                   />
                </Stack>
                {hasUpcomingLivestreams ? (

@@ -4,6 +4,12 @@ import { useAuth } from "HOCs/AuthProvider"
 import { CompanySearchResult } from "types/algolia"
 import useUserCountryCode from "../useUserCountryCode"
 
+/**
+ * Custom hook which fetches a list of featured companies, based
+ * on the current logged in user. The match for the featured companies
+ * is based on the user's field of study category and country relative to the
+ * featured group target countries and audience.
+ */
 const useIsUserFeaturedCompany = (group: Group | CompanySearchResult) => {
    const { userCountryCode } = useUserCountryCode()
    const { userData, isLoggedIn } = useAuth()
