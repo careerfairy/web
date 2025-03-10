@@ -107,11 +107,29 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
             )
 
             if (belongsToTargetAudience && belongsToTargetCountry) {
-               rankedSpark.setPoints(
+               const points =
                   rankedSpark.getPoints() *
-                     FEATURED_GROUP_SPARK_POINTS_MULTIPLIER
+                  FEATURED_GROUP_SPARK_POINTS_MULTIPLIER
+               console.log(
+                  "🚀 ~ UserBasedRecommendationsBuilder ~ userFeaturedGroups ~ spark id, points, multiplied:",
+                  rankedSpark.model.spark.id,
+                  rankedSpark.getPoints(),
+                  points
+               )
+               rankedSpark.setPoints(points)
+            } else {
+               console.log(
+                  "🚀 ~ UserBasedRecommendationsBuilder ~ userFeaturedGroups ~ spark id, points, not multiplied:",
+                  rankedSpark.model.spark.id,
+                  rankedSpark.getPoints()
                )
             }
+         } else {
+            console.log(
+               "🚀 ~ UserBasedRecommendationsBuilder ~ userFeaturedGroups ~ spark id, points, group not featured:",
+               rankedSpark.model.spark.id,
+               rankedSpark.getPoints()
+            )
          }
       })
 
