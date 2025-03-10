@@ -2,6 +2,7 @@ import functions = require("firebase-functions")
 import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import RecommendationServiceCore, {
    IRecommendationService,
+   applyFeaturedGroupPoints,
 } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
 import {
    AdditionalUserRecommendationInfo,
@@ -9,6 +10,7 @@ import {
    UserData,
 } from "@careerfairy/shared-lib/users"
 
+import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
@@ -29,6 +31,7 @@ export default class UserEventRecommendationService
    implements IRecommendationService
 {
    private additionalUserData: AdditionalUserRecommendationInfo
+   private featuredGroups?: { [groupId: string]: Group }
 
    constructor(
       private readonly user: UserData,
@@ -61,7 +64,8 @@ export default class UserEventRecommendationService
                   this.futureLivestreams,
                   limit,
                   this.implicitData,
-                  this.additionalUserData
+                  this.additionalUserData,
+                  this.featuredGroups
                )
             )
          ),
@@ -81,6 +85,13 @@ export default class UserEventRecommendationService
          this.futureLivestreams,
          this.user
       )
+   }
+
+   public setFeaturedGroups(featuredGroups: {
+      [groupId: string]: Group
+   }): UserEventRecommendationService {
+      this.featuredGroups = featuredGroups
+      return this
    }
 
    public setAdditionalData(
@@ -139,13 +150,20 @@ export default class UserEventRecommendationService
             new RankedLivestreamRepository(this.futureLivestreams)
          )
 
+      // TODO: Add featured groups
+
       return livestreamBasedRecommendations
          .mostCommonInterests()
          .mostCommonFieldsOfStudy()
          .mostCommonCountries()
          .mostCommonIndustries()
          .mostCommonCompanySizes()
-         .get()
+         .get((rankedLivestream) => {
+            return applyFeaturedGroupPoints(
+               rankedLivestream,
+               this.featuredGroups
+            )
+         })
    }
 
    static async create(
@@ -167,13 +185,24 @@ export default class UserEventRecommendationService
          dataFetcher.getUserLanguages(),
       ])
 
-      const [watchedSparks, interactedEvents, appliedJobs, followedCompanies] =
-         await Promise.all([
-            dataFetcher.getWatchedSparks(user.userEmail),
-            dataFetcher.getInteractedLivestreams(user.userEmail),
-            dataFetcher.getAppliedJobs(user.userEmail),
-            dataFetcher.getFollowedCompanies(user.userEmail),
-         ])
+      const [
+         watchedSparks,
+         interactedEvents,
+         appliedJobs,
+         followedCompanies,
+         featuredGroups,
+      ] = await Promise.all([
+         dataFetcher.getWatchedSparks(user.userEmail),
+         dataFetcher.getInteractedLivestreams(user.userEmail),
+         dataFetcher.getAppliedJobs(user.userEmail),
+         dataFetcher.getFollowedCompanies(user.userEmail),
+         dataFetcher.getUserFeaturedGroups(user),
+      ])
+
+      const userFeaturedGroups = featuredGroups.reduce(
+         (acc, group) => ({ ...acc, [group.id]: group }),
+         {}
+      )
 
       const implicitData: ImplicitLivestreamRecommendationData = {
          watchedSparks: watchedSparks,
@@ -190,6 +219,8 @@ export default class UserEventRecommendationService
          registeredLivestreams
       )
 
-      return instance.setAdditionalData({ studyBackgrounds, languages })
+      return instance
+         .setAdditionalData({ studyBackgrounds, languages })
+         .setFeaturedGroups(userFeaturedGroups)
    }
 }

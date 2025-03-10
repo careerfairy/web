@@ -1,4 +1,5 @@
 import { removeDuplicateDocuments } from "../../BaseFirebaseRepository"
+import { Group } from "../../groups"
 import { LivestreamEvent } from "../../livestreams"
 import { AdditionalUserRecommendationInfo, UserData } from "../../users"
 import { Logger } from "../../utils/types"
@@ -6,6 +7,7 @@ import { sortDocumentByPopularity } from "../../utils/utils"
 import { sortRankedByPoints } from "../utils"
 import { ImplicitLivestreamRecommendationData } from "./ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "./RankedLivestreamEvent"
+import { RECOMMENDATION_POINTS } from "./constants"
 import { RankedLivestreamRepository } from "./services/RankedLivestreamRepository"
 import { UserBasedRecommendationsBuilder } from "./services/UserBasedRecommendationsBuilder"
 
@@ -136,8 +138,11 @@ export default class RecommendationServiceCore {
       livestreams: LivestreamEvent[],
       limit: number,
       implicitData?: ImplicitLivestreamRecommendationData,
-      additionalUserData?: AdditionalUserRecommendationInfo
+      additionalUserData?: AdditionalUserRecommendationInfo,
+      userFeaturedGroups?: { [groupId: string]: Group }
    ): RankedLivestreamEvent[] {
+      console.log("🚀 ~ RecommendationServiceCore ~ userId:", userData.id)
+
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
          userData,
@@ -174,6 +179,42 @@ export default class RecommendationServiceCore {
          .userImplicitAppliedJobsCompanySize()
          .userStudyBackground()
          .userLanguages()
-         .get()
+         .get((rankedLivestream) => {
+            return applyFeaturedGroupPoints(
+               rankedLivestream,
+               userFeaturedGroups
+            )
+         })
+   }
+}
+
+export const applyFeaturedGroupPoints = (
+   rankedLivestream: RankedLivestreamEvent,
+   userFeaturedGroups?: { [groupId: string]: Group }
+) => {
+   const allFeaturedGroupIds = Object.keys(userFeaturedGroups) || []
+
+   if (
+      allFeaturedGroupIds.find((id) =>
+         rankedLivestream.getGroupIds()?.includes(id)
+      )
+   ) {
+      const featuredGroupPoints =
+         rankedLivestream.getPoints() *
+         RECOMMENDATION_POINTS.FEATURED_GROUP_LIVESTREAM_POINTS_MULTIPLIER
+      console.log(
+         "🚀 live stream id, points, applied points: ",
+         rankedLivestream.model.id,
+         rankedLivestream.getPoints(),
+         featuredGroupPoints
+      )
+
+      rankedLivestream.setPoints(featuredGroupPoints)
+   } else {
+      console.log(
+         "🚀 live stream id, points, ignored: ",
+         rankedLivestream.model.id,
+         rankedLivestream.getPoints()
+      )
    }
 }
