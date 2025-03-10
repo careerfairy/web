@@ -68,6 +68,13 @@ const styles = sxStyles({
    media: {
       height: 120,
       position: "relative",
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         inset: 0,
+         background: "rgba(0, 0, 0, 0.20)",
+         zIndex: 1,
+      },
    },
    content: {
       px: 2,
