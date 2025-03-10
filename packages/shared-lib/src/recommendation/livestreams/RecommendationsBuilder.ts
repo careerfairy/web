@@ -14,7 +14,6 @@ export class RecommendationsBuilder {
    public get(
       applyCustomPoints?: (rankedLivestream: RankedLivestreamEvent) => void
    ): RankedLivestreamEvent[] {
-      // TODO: Add featured groups
       const uniqueEvents = removeDuplicateDocuments(
          this.results.filter(Boolean).flat()
       )
