@@ -150,8 +150,6 @@ export default class UserEventRecommendationService
             new RankedLivestreamRepository(this.futureLivestreams)
          )
 
-      // TODO: Add featured groups
-
       return livestreamBasedRecommendations
          .mostCommonInterests()
          .mostCommonFieldsOfStudy()
