@@ -8,6 +8,11 @@ import { useEffect, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { agoraNoiseSuppression } from "../config/agoraExtensions"
 
+type UseNoiseSuppressionOptions = {
+   enabled: boolean
+   onError?: () => void
+}
+
 let processor: AIDenoiserProcessor | null = null
 
 /**
@@ -19,8 +24,9 @@ let processor: AIDenoiserProcessor | null = null
  */
 export const useNoiseSuppression = (
    audioTrack: IMicrophoneAudioTrack | null,
-   enabled: boolean
+   options: UseNoiseSuppressionOptions
 ) => {
+   const { enabled, onError } = options
    const [isError, setIsError] = useState(false)
 
    // Initialize the processor once
@@ -64,6 +70,7 @@ export const useNoiseSuppression = (
                   message: "Noise suppression processor load error",
                })
                setIsError(true)
+               onError?.()
             }
 
             processor.on("overload", handleOverload)
@@ -87,7 +94,7 @@ export const useNoiseSuppression = (
             }
          }
       }
-   }, [])
+   }, [onError])
 
    // Handle audio track and enabled state changes
    useEffect(() => {

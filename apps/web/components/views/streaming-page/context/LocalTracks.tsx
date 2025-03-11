@@ -24,6 +24,7 @@ import {
    useState,
 } from "react"
 import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
+import { agoraNoiseSuppression } from "../config/agoraExtensions"
 import { useNoiseSuppression } from "../hooks/useNoiseSuppression"
 import { type LocalUser } from "../types"
 import { useAgoraDevices } from "./AgoraDevices"
@@ -53,6 +54,8 @@ type LocalTracksContextProps = {
    microphoneDevices: MediaDeviceInfo[]
    localUser: LocalUser
    readyToPublish: boolean
+   noiseSuppressionEnabled: boolean
+   toggleNoiseSuppression: () => void
 }
 
 const LocalTracksContext = createContext<LocalTracksContextProps | undefined>(
@@ -71,8 +74,10 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    const currentUserUID = useCurrentUID()
 
    const [cameraOn, setCameraOn] = useState(true)
-
    const [microphoneMuted, setMicrophoneMuted] = useState(false)
+   const [noiseSuppressionEnabled, setNoiseSuppressionEnabled] = useState(
+      agoraNoiseSuppression.checkCompatibility()
+   )
 
    const { cameras, microphones, fetchCamerasError, fetchMicsError } =
       useAgoraDevices()
@@ -106,7 +111,14 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       encoderConfig: withHighQuality ? "high_quality_stereo" : undefined,
    })
 
-   useNoiseSuppression(microphoneTrack.localMicrophoneTrack, shouldStream)
+   const disableNoiseSuppression = useCallback(() => {
+      setNoiseSuppressionEnabled(false)
+   }, [])
+
+   useNoiseSuppression(microphoneTrack.localMicrophoneTrack, {
+      enabled: noiseSuppressionEnabled,
+      onError: disableNoiseSuppression,
+   })
 
    const {
       activeDeviceId: activeMicrophoneId,
@@ -160,6 +172,10 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       ]
    )
 
+   const toggleNoiseSuppression = useCallback(() => {
+      setNoiseSuppressionEnabled((prev) => !prev)
+   }, [])
+
    const value = useMemo<LocalTracksContextProps>(
       () => ({
          localCameraTrack: cameraTrack,
@@ -181,6 +197,8 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          microphoneDevices: microphones,
          localUser,
          readyToPublish,
+         noiseSuppressionEnabled,
+         toggleNoiseSuppression,
       }),
       [
          cameraTrack,
@@ -200,18 +218,20 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          microphones,
          localUser,
          readyToPublish,
+         noiseSuppressionEnabled,
+         toggleNoiseSuppression,
       ]
    )
 
    return (
       <LocalTracksContext.Provider value={value}>
+         {children}
          {Boolean(readyToPublish) && (
             <PublishComponent
                microphoneTrack={microphoneTrack}
                cameraTrack={cameraTrack}
             />
          )}
-         {children}
       </LocalTracksContext.Provider>
    )
 }
