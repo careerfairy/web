@@ -308,7 +308,8 @@ export class RankedSparkRepository {
                ) &&
                rankedSpark.model.spark.group?.featured?.targetCountries?.includes(
                   countryIsoCode
-               )
+               ) &&
+               rankedSpark.getPoints() > 0
             ) {
                rankedSpark.setPoints(
                   rankedSpark.getPoints() *
