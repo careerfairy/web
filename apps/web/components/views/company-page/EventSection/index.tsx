@@ -165,6 +165,7 @@ const EventSection = () => {
                   type={EventsTypes.PAST_EVENTS}
                   seeMoreLink={`/past-livestreams?${query}`}
                   styling={eventsCarouselStyling}
+                  preventPaddingSlide
                />
             </ConditionalWrapper>
          </Stack>

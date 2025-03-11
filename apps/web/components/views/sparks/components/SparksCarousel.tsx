@@ -5,7 +5,7 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import SparkPreviewCard from "./spark-card/SparkPreviewCard"
 
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { useAutoPlaySparks } from "components/custom-hook/spark/useAutoPlaySparks"
+import { useAutoPlayCarousel } from "components/custom-hook/embla-carousel/useAutoPlayCarousel"
 import { ReactNode } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
@@ -46,7 +46,7 @@ export const SparksCarousel = ({
       [WheelGesturesPlugin()]
    )
 
-   const { shouldDisableAutoPlay, moveToNextSlide, ref } = useAutoPlaySparks(
+   const { shouldDisableAutoPlay, moveToNextSlide, ref } = useAutoPlayCarousel(
       sparks.length,
       emblaApi
    )

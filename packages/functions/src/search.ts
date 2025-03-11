@@ -12,6 +12,7 @@ import { onRequest } from "firebase-functions/v2/https"
 import { firestore } from "./api/firestoreAdmin"
 import { getData } from "./lib/search/searchIndexGenerator"
 import { configureSettings, initAlgoliaIndex } from "./lib/search/util"
+import { defaultTriggerRunTimeConfigV2 } from "./lib/triggers/util"
 
 const DOCS_PER_INDEXING = 250
 
@@ -29,10 +30,7 @@ const DOCS_PER_INDEXING = 250
  * 1. ALGOLIA_FULL_SYNC_SECRET_KEY in the .env file in functions package
  */
 export const fullIndexSync = onRequest(
-   {
-      memory: "256MiB",
-      timeoutSeconds: 540,
-   },
+   defaultTriggerRunTimeConfigV2,
    async (req, res) => {
       if (req.method !== "GET") {
          res.status(405).send("Method Not Allowed")

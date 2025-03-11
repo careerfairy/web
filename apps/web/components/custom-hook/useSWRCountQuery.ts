@@ -44,7 +44,9 @@ export type CountQuery = {
    refetch: KeyedMutator<number>
 }
 
-type Options = SWRConfiguration<number>
+type Options = SWRConfiguration<number> & {
+   disabled?: boolean
+}
 
 /**
  * Retrieves the count of documents matching a query.
@@ -66,7 +68,9 @@ const useSWRCountQuery = (q: Query, options?: Options): CountQuery => {
    }
 
    const { data, error, isLoading, mutate } = useSWR(
-      q ? ["countQuery", getUniqueIdForFirestoreQuery(q)] : null,
+      q && !options?.disabled
+         ? ["countQuery", getUniqueIdForFirestoreQuery(q)]
+         : null,
       () => fetchCount(q),
       mergedOptions
    )
