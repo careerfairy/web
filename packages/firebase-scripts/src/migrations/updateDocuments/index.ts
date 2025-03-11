@@ -16,7 +16,7 @@ interface UpdateDocumentsConfig {
    waitTimeBetweenBatches?: number
 }
 
-const FIELD_TO_ORDER_BY = "test"
+const FIELD_TO_ORDER_BY = "universityName"
 
 // Configure your update here
 const config: UpdateDocumentsConfig = {
