@@ -199,7 +199,8 @@ export const applyFeaturedGroupPoints = (
    if (
       allFeaturedGroupIds.find((id) =>
          rankedLivestream.getGroupIds()?.includes(id)
-      )
+      ) &&
+      rankedLivestream.getPoints() > 0
    ) {
       const featuredGroupPoints =
          rankedLivestream.getPoints() *
