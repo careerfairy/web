@@ -2,29 +2,14 @@ import AgoraRTC, {
    AgoraRTCProvider,
    AgoraRTCScreenShareProvider,
 } from "agora-rtc-react"
+import { agoraVirtualBackgroundExtension } from "data/agora/AgoraService"
 import { ReactNode, useEffect, useMemo } from "react"
-import {
-   agoraNoiseSuppression,
-   agoraVirtualBackgroundExtension,
-} from "../config/agora-extensions"
 
 type Props = {
    children: ReactNode
 }
 
-type Extension = Parameters<typeof AgoraRTC.registerExtensions>[0][number]
-
-const registerExtensions = () => {
-   const extensions: Extension[] = [agoraVirtualBackgroundExtension]
-
-   if (agoraNoiseSuppression.checkCompatibility()) {
-      extensions.push(agoraNoiseSuppression)
-   }
-
-   AgoraRTC.registerExtensions(extensions)
-}
-
-registerExtensions()
+AgoraRTC.registerExtensions([agoraVirtualBackgroundExtension])
 
 export const UserClientProvider = ({ children }: Props) => {
    const client = useMemo(

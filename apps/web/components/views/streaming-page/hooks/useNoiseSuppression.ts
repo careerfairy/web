@@ -1,26 +1,26 @@
 import {
+   AIDenoiserExtension,
    AIDenoiserProcessor,
    AIDenoiserProcessorLevel,
    AIDenoiserProcessorMode,
 } from "agora-extension-ai-denoiser"
 import { IMicrophoneAudioTrack } from "agora-rtc-react"
-import { useCallback, useEffect, useState } from "react"
+import AgoraRTC from "agora-rtc-sdk-ng"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { agoraNoiseSuppression } from "../config/agora-extensions"
 
 type UseNoiseSuppressionOptions = {
    enabled: boolean
    onError?: () => void
 }
 
-let processor: AIDenoiserProcessor | null = null
-
 /**
  * Hook to manage noise suppression for a microphone audio track
  *
  * This hook provides functionality to enable or disable noise suppression
- * on a microphone audio track. It handles processor initialization
- * and maintains a single processor instance throughout the lifecycle.
+ * on a microphone audio track. It handles extension initialization, processor creation,
+ * and maintains appropriate state throughout the component lifecycle.
  */
 export const useNoiseSuppression = (
    audioTrack: IMicrophoneAudioTrack | null,
@@ -28,112 +28,124 @@ export const useNoiseSuppression = (
 ) => {
    const { enabled, onError } = options
    const [error, setError] = useState<Error | null>(null)
+   const extensionRef = useRef<AIDenoiserExtension | null>(null)
+   const processorRef = useRef<AIDenoiserProcessor | null>(null)
+   const [isActive, setIsActive] = useState(false)
+   const [isCompatible, setIsCompatible] = useState(true)
 
    const handleError = useCallback(
-      (error: Error, message: string, shouldDisableProcessor = true) => {
-         console.error(message, error)
+      (error: Error, message: string) => {
          errorLogAndNotify(error, { message })
-
          setError(error)
          onError?.()
-
-         if (shouldDisableProcessor && processor) {
-            try {
-               processor.disable()
-            } catch (disableError) {
-               console.error(
-                  `Error disabling noise suppression processor: ${disableError}`
-               )
-            }
-         }
       },
       [onError]
    )
 
    /**
-    * Initialize the processor once
-    *
-    * This effect initializes the processor once and sets up event listeners.
-    * It also handles processor overload and load errors.
+    * Initialize the extension and processor only once
     */
    useEffect(() => {
-      if (!processor) {
+      const initializeExtension = async () => {
          try {
-            processor = agoraNoiseSuppression.createProcessor()
+            // Create the extension if it doesn't exist
+            if (!extensionRef.current) {
+               extensionRef.current = new AIDenoiserExtension({
+                  assetsPath: `${getBaseUrl()}/wasms/denoiser/external`,
+               })
 
-            // Handle processor overload (when processing is taking too long)
-            const handleOverload = async (elapsedTimeInMs: number) => {
-               console.warn(
-                  "Noise suppression processor overload!",
-                  elapsedTimeInMs
+               // Register the extension with AgoraRTC
+               AgoraRTC.registerExtensions([extensionRef.current])
+
+               // Check compatibility
+               if (!extensionRef.current.checkCompatibility()) {
+                  console.error(
+                     "This device does not support AI Noise Suppression"
+                  )
+                  setIsCompatible(false)
+                  return
+               }
+            }
+
+            // Create the processor if it doesn't exist and is compatible
+            if (!processorRef.current && isCompatible) {
+               processorRef.current = extensionRef.current.createProcessor()
+
+               // Set up event listeners for processor
+               processorRef.current.on(
+                  "overload",
+                  async (elapsedTimeInMs: number) => {
+                     console.warn(
+                        `Noise suppression processor overload: ${elapsedTimeInMs}ms`
+                     )
+
+                     // If it's been more than 2 seconds, disable the processor
+                     if (elapsedTimeInMs > 2000) {
+                        console.warn(
+                           `Noise suppression took too long to process: ${elapsedTimeInMs}ms, disabling`
+                        )
+
+                        handleError(
+                           new Error("Noise suppression processor overload"),
+                           "Noise suppression processor overload"
+                        )
+                        await processorRef.current?.disable()
+                        setIsActive(false)
+                     } else if (elapsedTimeInMs > 1000) {
+                        // If processing is taking too long, switch to less demanding mode
+                        try {
+                           await processorRef.current?.setMode(
+                              AIDenoiserProcessorMode.STATIONARY_NS
+                           )
+                        } catch (error) {
+                           handleError(
+                              error as Error,
+                              "Failed to set noise suppression mode after overload"
+                           )
+                        }
+                     }
+                  }
                )
 
-               // First try to switch to a less demanding mode
-               if (elapsedTimeInMs > 1000 && elapsedTimeInMs <= 2000) {
-                  console.warn(
-                     `Processing took too long (${elapsedTimeInMs}ms), switching to stationary mode`
-                  )
-                  try {
-                     await processor?.setMode(
-                        AIDenoiserProcessorMode.STATIONARY_NS
-                     )
-                  } catch (error) {
-                     handleError(
-                        error as Error,
-                        "Failed to set stationary noise suppression mode"
-                     )
+               processorRef.current.on("loaderror", (error: Error) => {
+                  handleError(error, "Noise suppression processor load error")
+                  setIsCompatible(false)
+                  setIsActive(false)
+                  if (processorRef.current) {
+                     processorRef.current.disable()
                   }
-               }
-
-               // If it's extremely slow, disable it completely
-               else if (elapsedTimeInMs > 2000) {
-                  console.warn(
-                     `Processing took too long (${elapsedTimeInMs}ms), disabling noise suppression`
-                  )
-                  handleError(
-                     new Error(
-                        "Failed to disable noise suppression after overload"
-                     ),
-                     "Failed to disable noise suppression after overload"
-                  )
-               }
+               })
             }
-
-            // Handle load errors
-            const handleLoadError = (error: Error) => {
-               handleError(error, "Noise suppression processor load error")
-            }
-
-            processor.on("overload", handleOverload)
-            processor.on("loaderror", handleLoadError)
          } catch (error) {
             handleError(
-               error,
-               "Failed to create noise suppression processor",
-               false // Don't try to disable a processor that failed to create
+               error as Error,
+               "Failed to initialize AI Noise Suppression"
             )
          }
       }
 
-      // Cleanup only when component unmounts
+      void initializeExtension()
+
+      // Clean up when component unmounts
       return () => {
-         if (processor) {
+         if (processorRef.current) {
             try {
-               processor.disable()
+               processorRef.current.disable()
             } catch (error) {
                console.error("Error disabling processor during cleanup:", error)
             }
          }
       }
-   }, [handleError, onError])
+   }, [handleError, isCompatible])
 
    // Handle audio track and enabled state changes
    useEffect(() => {
       const setupAudioPipeline = async () => {
-         if (!audioTrack || !processor || error) return
+         if (!audioTrack || !processorRef.current || error || !isCompatible)
+            return
 
          try {
-            // Ensure audio track is unpiped before setting up new pipeline
+            // Clean up any existing pipeline
             try {
                audioTrack.unpipe()
             } catch (e) {
@@ -141,14 +153,20 @@ export const useNoiseSuppression = (
             }
 
             // Set up the audio pipeline
-            audioTrack.pipe(processor).pipe(audioTrack.processorDestination)
+            audioTrack
+               .pipe(processorRef.current)
+               .pipe(audioTrack.processorDestination)
 
             if (enabled) {
-               await processor.setMode(AIDenoiserProcessorMode.NSNG)
-               await processor.setLevel(AIDenoiserProcessorLevel.SOFT)
-               await processor.enable()
+               await processorRef.current.setMode(AIDenoiserProcessorMode.NSNG)
+               await processorRef.current.setLevel(
+                  AIDenoiserProcessorLevel.SOFT
+               )
+               await processorRef.current.enable()
+               setIsActive(true)
             } else {
-               await processor.disable()
+               await processorRef.current.disable()
+               setIsActive(false)
             }
 
             setError(null)
@@ -164,7 +182,7 @@ export const useNoiseSuppression = (
 
       setupAudioPipeline()
 
-      // Cleanup pipeline when audio track changes
+      // Clean up pipeline when audio track changes
       return () => {
          if (audioTrack) {
             try {
@@ -174,11 +192,44 @@ export const useNoiseSuppression = (
             }
          }
       }
-   }, [enabled, audioTrack, error, handleError])
+   }, [enabled, audioTrack, error, handleError, isCompatible])
+
+   // Functions to change noise reduction mode and level
+   const changeNoiseReductionMode = useCallback(
+      (mode: AIDenoiserProcessorMode) => {
+         if (!isCompatible) return
+
+         try {
+            processorRef.current?.setMode(mode)
+         } catch (error) {
+            handleError(error as Error, "Failed to change noise reduction mode")
+         }
+      },
+      [handleError, isCompatible]
+   )
+
+   const changeNoiseReductionLevel = useCallback(
+      (level: AIDenoiserProcessorLevel) => {
+         if (!isCompatible) return
+
+         try {
+            processorRef.current?.setLevel(level)
+         } catch (error) {
+            handleError(
+               error as Error,
+               "Failed to change noise reduction level"
+            )
+         }
+      },
+      [handleError, isCompatible]
+   )
 
    return {
-      isEnabled: Boolean(processor?.enabled),
+      isActive,
+      isCompatible,
       error,
       reset: () => setError(null),
+      changeNoiseReductionMode,
+      changeNoiseReductionLevel,
    }
 }

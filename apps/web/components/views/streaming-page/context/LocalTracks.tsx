@@ -24,7 +24,6 @@ import {
    useState,
 } from "react"
 import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
-import { agoraNoiseSuppression } from "../config/agora-extensions"
 import { useNoiseSuppression } from "../hooks/useNoiseSuppression"
 import { type LocalUser } from "../types"
 import { useAgoraDevices } from "./AgoraDevices"
@@ -77,14 +76,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    const [cameraOn, setCameraOn] = useState(true)
    const [microphoneMuted, setMicrophoneMuted] = useState(false)
 
-   const isNoiseSuppressionSupported = useMemo(
-      () => agoraNoiseSuppression.checkCompatibility(),
-      []
-   )
-
-   const [noiseSuppressionEnabled, setNoiseSuppressionEnabled] = useState(
-      isNoiseSuppressionSupported
-   )
+   const [noiseSuppressionEnabled, setNoiseSuppressionEnabled] = useState(true)
 
    const { cameras, microphones, fetchCamerasError, fetchMicsError } =
       useAgoraDevices()
@@ -118,14 +110,12 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       encoderConfig: withHighQuality ? "high_quality_stereo" : undefined,
    })
 
-   const disableNoiseSuppression = useCallback(() => {
-      setNoiseSuppressionEnabled(false)
-   }, [])
-
-   useNoiseSuppression(microphoneTrack.localMicrophoneTrack, {
-      enabled: noiseSuppressionEnabled,
-      onError: disableNoiseSuppression,
-   })
+   const { isCompatible } = useNoiseSuppression(
+      microphoneTrack.localMicrophoneTrack,
+      {
+         enabled: noiseSuppressionEnabled,
+      }
+   )
 
    const {
       activeDeviceId: activeMicrophoneId,
@@ -205,7 +195,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          localUser,
          readyToPublish,
          noiseSuppressionEnabled,
-         isNoiseSuppressionSupported,
+         isNoiseSuppressionSupported: isCompatible,
          toggleNoiseSuppression,
       }),
       [
@@ -228,7 +218,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          readyToPublish,
          noiseSuppressionEnabled,
          toggleNoiseSuppression,
-         isNoiseSuppressionSupported,
+         isCompatible,
       ]
    )
 
