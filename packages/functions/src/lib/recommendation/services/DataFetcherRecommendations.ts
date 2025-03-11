@@ -1,6 +1,4 @@
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { IGroupRepository } from "@careerfairy/shared-lib/groups/GroupRepository"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import {
@@ -206,8 +204,7 @@ export class SparksDataFetcher {
       private readonly userId: string,
       private readonly livestreamRepo: ILivestreamRepository,
       private readonly userRepo: IUserRepository,
-      private readonly sparksRepo: ISparkFunctionsRepository,
-      private readonly groupRepo: IGroupRepository
+      private readonly sparksRepo: ISparkFunctionsRepository
    ) {
       this.loader = new BundleLoader()
    }
@@ -226,16 +223,6 @@ export class SparksDataFetcher {
    async getAllSparksStats(): Promise<SparkStats[]> {
       await this.loader.fetch("allSparksStats")
       return this.loader.getDocs<SparkStats>("all-sparks-stats")
-   }
-
-   async getSparkGroups(
-      groupIds: string[]
-   ): Promise<{ [sparkId: string]: Group }> {
-      const groups = await this.groupRepo.getGroupsByIds(groupIds)
-      return groups.reduce((acc, group) => {
-         acc[group.id] = group
-         return acc
-      }, {})
    }
 
    // Get shared sparks for the user

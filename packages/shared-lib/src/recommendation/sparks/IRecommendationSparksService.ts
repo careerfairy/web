@@ -1,5 +1,4 @@
 import { combineRankedDocuments } from "../../BaseFirebaseRepository"
-import { Group } from "../../groups"
 import { SparkStats } from "../../sparks/sparks"
 import {
    AdditionalUserRecommendationInfo,
@@ -99,8 +98,7 @@ export default class RecommendationSparksServiceCore {
       userData: UserData,
       sparks: SparkStats[],
       additionalUserInfo: AdditionalUserRecommendationInfo,
-      limit: number,
-      sparkGroups: { [sparkId: string]: Group }
+      limit: number
    ): RankedSpark[] {
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
@@ -115,6 +113,7 @@ export default class RecommendationSparksServiceCore {
          .userUniversityCode()
          .userFieldOfStudy()
          .userStudyBackground()
-         .get(sparkGroups, userData)
+         .userFeaturedGroups()
+         .get()
    }
 }
