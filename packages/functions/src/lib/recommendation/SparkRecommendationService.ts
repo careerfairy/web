@@ -1,5 +1,5 @@
 import { combineRankedDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { Group, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import RecommendationSparksServiceCore, {
    IRecommendationSparksService,
@@ -40,8 +40,7 @@ export default class SparkRecommendationService
       private readonly likedSparkIds: string[],
       private readonly seenSparkIds: string[],
       private readonly sharedSparkIds: string[],
-      private readonly allSparks: SparkStats[],
-      private readonly sparkGroups: { [sparkId: string]: Group }
+      private readonly allSparks: SparkStats[]
    ) {
       super(functions.logger)
    }
@@ -65,8 +64,7 @@ export default class SparkRecommendationService
                   this.user,
                   this.allSparks,
                   this.additionalUserInfo,
-                  limit,
-                  this.sparkGroups
+                  limit
                )
             )
          )
@@ -277,18 +275,13 @@ export default class SparkRecommendationService
       const seenSparkIds = getSortedSparkIds(userSeenSparks)
       const sharedSparkIds = getSortedSparkIds(userSharedSparks)
 
-      const sparkGroups = await dataFetcher.getSparkGroups(
-         allSparksStats.map((spark) => spark.spark.group.id)
-      )
-
       return new SparkRecommendationService(
          user,
          participatedEvents,
          likedSparkIds,
          seenSparkIds,
          sharedSparkIds,
-         allSparksStats,
-         sparkGroups
+         allSparksStats
       )
    }
 }

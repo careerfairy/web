@@ -1,3 +1,4 @@
+import { FieldOfStudyCategory } from "../../../fieldOfStudy"
 import { GroupOption, PublicGroup } from "../../../groups"
 import { Spark, SparkStats } from "../../../sparks/sparks"
 import { sortSparkStats } from "../../../utils/utils"
@@ -12,7 +13,6 @@ type RankSparkArgs = {
    pointsPerMissingMatch?: number
 }
 
-export const FEATURED_GROUP_SPARK_POINTS_MULTIPLIER = 100
 /**
  * Repository that fetches sparks accordingly with some filters and ranks them
  *
@@ -20,6 +20,7 @@ export const FEATURED_GROUP_SPARK_POINTS_MULTIPLIER = 100
  * update it to fetch the data from a data bundle
  */
 export class RankedSparkRepository {
+   private readonly featuredGroupSparkPointsMultiplier = 100
    // from userData
    private readonly pointsPerTargetedCountryMatch = 5
    private readonly pointsPerTargetedFieldOfStudyMatch = 5
@@ -283,6 +284,41 @@ export class RankedSparkRepository {
          targetUserIds: categoryIds,
          targetSparkIdsGetter: (spark) => [spark.getCategoryId()],
       })
+   }
+
+   /**
+    * Apply featured group spark points multiplier, if the spark belongs to a featured group and
+    * the user belongs to the target audience and country.
+    *
+    * @param sparks - Array of ranked sparks
+    * @param countryIsoCode - Country ISO code
+    * @param fieldOfStudyCategory - Field of study category
+    * @returns Array of ranked sparks after applying the multiplier
+    */
+   public applyFeaturedGroupSparkPointsMultiplier(
+      sparks: RankedSpark[],
+      countryIsoCode: string,
+      fieldOfStudyCategory: FieldOfStudyCategory
+   ): RankedSpark[] {
+      if (countryIsoCode && fieldOfStudyCategory) {
+         sparks.forEach((rankedSpark) => {
+            if (
+               rankedSpark.model.spark.group?.featured?.targetAudience?.includes(
+                  fieldOfStudyCategory
+               ) &&
+               rankedSpark.model.spark.group?.featured?.targetCountries?.includes(
+                  countryIsoCode
+               )
+            ) {
+               rankedSpark.setPoints(
+                  rankedSpark.getPoints() *
+                     this.featuredGroupSparkPointsMultiplier
+               )
+            }
+         })
+      }
+
+      return sparks
    }
 
    /**
