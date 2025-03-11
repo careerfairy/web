@@ -80,6 +80,8 @@ export const LIVESTREAM_FIELDS_TO_INDEX = [
    "fieldOfStudyNameTags",
    "levelOfStudyNameTags",
    "startTimeMs",
+   "startedAt",
+   "endedAt",
    "companyIndustryNameTags",
    "businessFunctionsTagIds",
    "contentTopicsTagIds",

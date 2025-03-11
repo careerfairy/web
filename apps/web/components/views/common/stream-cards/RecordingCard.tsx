@@ -1,8 +1,9 @@
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
-import { CardActionArea } from "@mui/material"
+import { CardActionArea, Skeleton } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import { alpha } from "@mui/material/styles"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import React, { forwardRef, useCallback } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import useTrackLivestreamImpressions from "../../../custom-hook/useTrackLivestreamImpressions"
@@ -110,7 +111,11 @@ const RecordingCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                <Stack sx={[styles.mainContentWrapper]}>
                   {selectInput || null}
 
-                  <HeroRecording />
+                  <SuspenseWithBoundary
+                     fallback={<Skeleton variant="rectangular" height={200} />}
+                  >
+                     <HeroRecording />
+                  </SuspenseWithBoundary>
 
                   <Stack sx={[styles.contentWrapper]} gap={1}>
                      <CompanyName />

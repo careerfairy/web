@@ -9,7 +9,7 @@ type ReturnType = {
    ref: (node?: Element | null) => void
 }
 
-export const useAutoPlaySparks = (
+export const useAutoPlayCarousel = (
    numberOfElementsToPlay: number | null,
    emblaApi: EmblaCarouselType
 ): ReturnType => {

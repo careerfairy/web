@@ -4,6 +4,8 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { Box, Grid, LinearProgress, Typography } from "@mui/material"
+import { useAutoPlayGrid } from "components/custom-hook/utils/useAutoPlayGrid"
+import { isLivestreamDialogOpen } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import { useRouter } from "next/router"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { InView } from "react-intersection-observer"
@@ -46,11 +48,12 @@ const GroupStreams = ({
    isPastLivestreams,
    noResultsComponent,
 }: GroupStreamsProps) => {
-   const {
-      query: { groupId },
-   } = useRouter()
+   const { query } = useRouter()
+   const { groupId } = query
    const { joinGroupModalData, handleCloseJoinModal } = useRegistrationModal()
    const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
+   const isLSDialogOpen = isLivestreamDialogOpen(query)
+
    const searchedButNoResults = useMemo(
       () => !searching && !livestreams?.length,
       [livestreams?.length, searching]
@@ -60,6 +63,13 @@ const GroupStreams = ({
       6,
       3
    )
+
+   const {
+      shouldDisableAutoPlay,
+      moveToNextElement,
+      ref: autoPlayRef,
+      handleInViewChange,
+   } = useAutoPlayGrid()
 
    useEffect(() => {
       if (globalCardHighlighted) {
@@ -106,6 +116,14 @@ const GroupStreams = ({
                                  totalElements={arr.length}
                                  location={location}
                                  event={livestream}
+                                 disableAutoPlay={
+                                    isLSDialogOpen ||
+                                    (isPastLivestreams
+                                       ? shouldDisableAutoPlay(index)
+                                       : true)
+                                 }
+                                 onGoNext={moveToNextElement}
+                                 onViewChange={handleInViewChange(index)}
                               />
                            ) : (
                               <EventPreviewCard ref={ref} loading />
@@ -116,12 +134,20 @@ const GroupStreams = ({
                )
             }
          }),
-      [location, slicedLivestreams]
+      [
+         location,
+         slicedLivestreams,
+         isPastLivestreams,
+         handleInViewChange,
+         shouldDisableAutoPlay,
+         moveToNextElement,
+         isLSDialogOpen,
+      ]
    )
 
    return (
       <>
-         <Box sx={{ p: { xs: 0, md: 2 }, width: "100%" }}>
+         <Box sx={{ p: { xs: 0, md: 2 }, width: "100%" }} ref={autoPlayRef}>
             <Grid container spacing={2}>
                {groupData.id || listenToUpcoming ? (
                   searching ? (

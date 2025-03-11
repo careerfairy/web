@@ -1,6 +1,6 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
-import { useAutoPlaySparks } from "components/custom-hook/spark/useAutoPlaySparks"
+import { useAutoPlayCarousel } from "components/custom-hook/embla-carousel/useAutoPlayCarousel"
 import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
 import SparkPreviewCardForAdmin from "components/views/sparks/components/spark-card/SparkPreviewCardForAdmin"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
@@ -53,7 +53,7 @@ const SparksCarousel = ({
       WheelGesturesPlugin(),
    ])
 
-   const { shouldDisableAutoPlay, moveToNextSlide, ref } = useAutoPlaySparks(
+   const { shouldDisableAutoPlay, moveToNextSlide, ref } = useAutoPlayCarousel(
       sparks?.length ?? null,
       emblaApi
    )
