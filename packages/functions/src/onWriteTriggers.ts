@@ -368,7 +368,7 @@ export const syncGroupFollowingUserDataOnChange = functions
    })
 
 export const onWriteSpark = functions
-   .runWith({ ...defaultTriggerRunTimeConfig, memory: "512MB" })
+   .runWith({ ...defaultTriggerRunTimeConfig, memory: "1GB" })
    .region(config.region)
    .firestore.document("sparks/{sparkId}")
    .onWrite(async (change, context) => {

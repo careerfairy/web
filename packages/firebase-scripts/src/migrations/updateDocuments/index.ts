@@ -23,7 +23,8 @@ const config: UpdateDocumentsConfig = {
    // Example: collection query
    query: firestore
       .collection("careerCenterData")
-      .where(FIELD_TO_ORDER_BY, "!=", true)
+      // Keep this commented out for now as an example
+      // .where(FIELD_TO_ORDER_BY, "!=", true)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
    updateData: { migrationTrigger: Date.now() },
    batchSize: 25,
