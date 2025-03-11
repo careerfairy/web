@@ -34,7 +34,7 @@ export interface IRecommendationSparksService {
 export default class RecommendationSparksServiceCore {
    constructor(
       protected log?: Logger | undefined,
-      protected debug: boolean = true
+      protected debug: boolean = false
    ) {}
 
    /**
