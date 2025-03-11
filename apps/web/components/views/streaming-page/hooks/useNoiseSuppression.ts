@@ -27,11 +27,13 @@ export const useNoiseSuppression = (
    options: UseNoiseSuppressionOptions
 ) => {
    const { enabled, onError } = options
+
    const [error, setError] = useState<Error | null>(null)
-   const extensionRef = useRef<AIDenoiserExtension | null>(null)
-   const processorRef = useRef<AIDenoiserProcessor | null>(null)
    const [isActive, setIsActive] = useState(false)
    const [isCompatible, setIsCompatible] = useState(true)
+
+   const extensionRef = useRef<AIDenoiserExtension | null>(null)
+   const processorRef = useRef<AIDenoiserProcessor | null>(null)
 
    const handleError = useCallback(
       (error: Error, message: string) => {

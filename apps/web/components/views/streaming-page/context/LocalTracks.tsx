@@ -110,10 +110,15 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       encoderConfig: withHighQuality ? "high_quality_stereo" : undefined,
    })
 
+   const disableNoiseSuppression = useCallback(() => {
+      setNoiseSuppressionEnabled(false)
+   }, [])
+
    const { isCompatible } = useNoiseSuppression(
       microphoneTrack.localMicrophoneTrack,
       {
          enabled: noiseSuppressionEnabled,
+         onError: disableNoiseSuppression,
       }
    )
 
