@@ -4,9 +4,9 @@ import {
    AIDenoiserProcessorMode,
 } from "agora-extension-ai-denoiser"
 import { IMicrophoneAudioTrack } from "agora-rtc-react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { agoraNoiseSuppression } from "../config/agoraExtensions"
+import { agoraNoiseSuppression } from "../config/agora-extensions"
 
 type UseNoiseSuppressionOptions = {
    enabled: boolean
@@ -27,60 +27,91 @@ export const useNoiseSuppression = (
    options: UseNoiseSuppressionOptions
 ) => {
    const { enabled, onError } = options
-   const [isError, setIsError] = useState(false)
+   const [error, setError] = useState<Error | null>(null)
 
-   // Initialize the processor once
+   const handleError = useCallback(
+      (error: Error, message: string, shouldDisableProcessor = true) => {
+         console.error(message, error)
+         errorLogAndNotify(error, { message })
+
+         setError(error)
+         onError?.()
+
+         if (shouldDisableProcessor && processor) {
+            try {
+               processor.disable()
+            } catch (disableError) {
+               console.error(
+                  `Error disabling noise suppression processor: ${disableError}`
+               )
+            }
+         }
+      },
+      [onError]
+   )
+
+   /**
+    * Initialize the processor once
+    *
+    * This effect initializes the processor once and sets up event listeners.
+    * It also handles processor overload and load errors.
+    */
    useEffect(() => {
       if (!processor) {
          try {
             processor = agoraNoiseSuppression.createProcessor()
-            // Set up event listeners
+
+            // Handle processor overload (when processing is taking too long)
             const handleOverload = async (elapsedTimeInMs: number) => {
                console.warn(
                   "Noise suppression processor overload!",
                   elapsedTimeInMs
                )
 
-               if (elapsedTimeInMs > 1000) {
+               // First try to switch to a less demanding mode
+               if (elapsedTimeInMs > 1000 && elapsedTimeInMs <= 2000) {
                   console.warn(
-                     `Took too long to load (took ${elapsedTimeInMs}ms), setting noise suppression mode to stationary`
+                     `Processing took too long (${elapsedTimeInMs}ms), switching to stationary mode`
                   )
                   try {
                      await processor?.setMode(
                         AIDenoiserProcessorMode.STATIONARY_NS
                      )
                   } catch (error) {
-                     console.warn("Failed to set stationary mode:", error)
-                     await processor?.disable()
-                     setIsError(true)
+                     handleError(
+                        error as Error,
+                        "Failed to set stationary noise suppression mode"
+                     )
                   }
                }
 
-               if (elapsedTimeInMs > 2000) {
+               // If it's extremely slow, disable it completely
+               else if (elapsedTimeInMs > 2000) {
                   console.warn(
-                     `Took too long to load (took ${elapsedTimeInMs}ms), disabling noise suppression`
+                     `Processing took too long (${elapsedTimeInMs}ms), disabling noise suppression`
                   )
-                  await processor?.disable()
-                  setIsError(true)
+                  handleError(
+                     new Error(
+                        "Failed to disable noise suppression after overload"
+                     ),
+                     "Failed to disable noise suppression after overload"
+                  )
                }
             }
 
+            // Handle load errors
             const handleLoadError = (error: Error) => {
-               errorLogAndNotify(error, {
-                  message: "Noise suppression processor load error",
-               })
-               setIsError(true)
-               onError?.()
+               handleError(error, "Noise suppression processor load error")
             }
 
             processor.on("overload", handleOverload)
             processor.on("loaderror", handleLoadError)
          } catch (error) {
-            console.error(
-               "Failed to create noise suppression processor:",
-               error
+            handleError(
+               error,
+               "Failed to create noise suppression processor",
+               false // Don't try to disable a processor that failed to create
             )
-            setIsError(true)
          }
       }
 
@@ -94,12 +125,12 @@ export const useNoiseSuppression = (
             }
          }
       }
-   }, [onError])
+   }, [handleError, onError])
 
    // Handle audio track and enabled state changes
    useEffect(() => {
       const setupAudioPipeline = async () => {
-         if (!audioTrack || !processor || isError) return
+         if (!audioTrack || !processor || error) return
 
          try {
             // Ensure audio track is unpiped before setting up new pipeline
@@ -120,14 +151,14 @@ export const useNoiseSuppression = (
                await processor.disable()
             }
 
-            setIsError(false)
+            setError(null)
          } catch (error) {
-            errorLogAndNotify(error, {
-               message: enabled
+            handleError(
+               error as Error,
+               enabled
                   ? "Failed to enable noise suppression"
-                  : "Failed to disable noise suppression",
-            })
-            setIsError(true)
+                  : "Failed to disable noise suppression"
+            )
          }
       }
 
@@ -143,11 +174,11 @@ export const useNoiseSuppression = (
             }
          }
       }
-   }, [enabled, audioTrack, isError])
+   }, [enabled, audioTrack, error, handleError])
 
    return {
       isEnabled: Boolean(processor?.enabled),
-      isError,
-      reset: () => setIsError(false),
+      error,
+      reset: () => setError(null),
    }
 }

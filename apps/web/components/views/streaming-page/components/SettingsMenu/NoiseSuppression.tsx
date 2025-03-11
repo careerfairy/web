@@ -13,7 +13,13 @@ const styles = sxStyles({
 })
 
 export const NoiseSuppression = () => {
-   const { noiseSuppressionEnabled, toggleNoiseSuppression } = useLocalTracks()
+   const {
+      noiseSuppressionEnabled,
+      toggleNoiseSuppression,
+      isNoiseSuppressionSupported,
+   } = useLocalTracks()
+
+   if (!isNoiseSuppressionSupported) return null
 
    return (
       <Stack

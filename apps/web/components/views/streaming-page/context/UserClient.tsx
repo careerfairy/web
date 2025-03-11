@@ -6,7 +6,7 @@ import { ReactNode, useEffect, useMemo } from "react"
 import {
    agoraNoiseSuppression,
    agoraVirtualBackgroundExtension,
-} from "../config/agoraExtensions"
+} from "../config/agora-extensions"
 
 type Props = {
    children: ReactNode

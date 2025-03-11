@@ -7,7 +7,7 @@ import { useCallback } from "react"
 import { setVirtualBackgroundMode } from "store/reducers/streamingAppReducer"
 import useSWRMutation from "swr/mutation"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { agoraVirtualBackgroundExtension } from "../../config/agoraExtensions"
+import { agoraVirtualBackgroundExtension } from "../../config/agora-extensions"
 import { VirtualBackgroundMode } from "../../types"
 
 /**

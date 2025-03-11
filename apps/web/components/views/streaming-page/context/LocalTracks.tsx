@@ -24,7 +24,7 @@ import {
    useState,
 } from "react"
 import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
-import { agoraNoiseSuppression } from "../config/agoraExtensions"
+import { agoraNoiseSuppression } from "../config/agora-extensions"
 import { useNoiseSuppression } from "../hooks/useNoiseSuppression"
 import { type LocalUser } from "../types"
 import { useAgoraDevices } from "./AgoraDevices"
@@ -55,6 +55,7 @@ type LocalTracksContextProps = {
    localUser: LocalUser
    readyToPublish: boolean
    noiseSuppressionEnabled: boolean
+   isNoiseSuppressionSupported: boolean
    toggleNoiseSuppression: () => void
 }
 
@@ -75,8 +76,14 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const [cameraOn, setCameraOn] = useState(true)
    const [microphoneMuted, setMicrophoneMuted] = useState(false)
+
+   const isNoiseSuppressionSupported = useMemo(
+      () => agoraNoiseSuppression.checkCompatibility(),
+      []
+   )
+
    const [noiseSuppressionEnabled, setNoiseSuppressionEnabled] = useState(
-      agoraNoiseSuppression.checkCompatibility()
+      isNoiseSuppressionSupported
    )
 
    const { cameras, microphones, fetchCamerasError, fetchMicsError } =
@@ -198,6 +205,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          localUser,
          readyToPublish,
          noiseSuppressionEnabled,
+         isNoiseSuppressionSupported,
          toggleNoiseSuppression,
       }),
       [
@@ -220,6 +228,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          readyToPublish,
          noiseSuppressionEnabled,
          toggleNoiseSuppression,
+         isNoiseSuppressionSupported,
       ]
    )
 
