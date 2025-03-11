@@ -41,7 +41,7 @@ const ChipsLine = ({ livestream }: { livestream: LivestreamEvent }) => {
    }, [xl, xs])
 
    return (
-      <Box mt={{ xs: 1, sm: 2 }}>
+      <Box mt={{ xs: 1, sm: 2 }} display={"inline-flex"}>
          {livestream?.language?.code ? (
             <WhiteTagChip
                icon={<LanguageIcon />}

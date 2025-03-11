@@ -1,6 +1,7 @@
 import { collection, query, where } from "firebase/firestore"
+import { useMemo } from "react"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import useCountQuery from "../useCountQuery"
+import useSWRCountQuery from "../useSWRCountQuery"
 
 type Options = {
    totalItems?: number
@@ -9,11 +10,15 @@ type Options = {
    disabled?: boolean
    livestreamId?: string
 }
+
 const useCustomJobsCount = (options?: Options) => {
    const { businessFunctionTagIds } = options
+
+   const now = useMemo(() => new Date(), [])
+
    const countQuery = query(
       collection(FirestoreInstance, "customJobs"),
-      where("deadline", ">", new Date()),
+      where("deadline", ">", now),
       where("published", "==", true),
       ...(businessFunctionTagIds.length
          ? [
@@ -29,7 +34,9 @@ const useCustomJobsCount = (options?: Options) => {
          : [])
    )
 
-   return useCountQuery(countQuery)
+   return useSWRCountQuery(countQuery, {
+      disabled: options?.disabled,
+   })
 }
 
 export default useCustomJobsCount
