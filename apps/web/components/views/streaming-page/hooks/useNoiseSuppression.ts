@@ -14,6 +14,10 @@ type UseNoiseSuppressionOptions = {
    onError?: () => void
 }
 
+const extension = new AIDenoiserExtension({
+   assetsPath: `${getBaseUrl()}/wasms/denoiser/external`,
+})
+
 /**
  * Hook to manage noise suppression for a microphone audio track
  *
@@ -29,10 +33,13 @@ export const useNoiseSuppression = (
 
    const [error, setError] = useState<Error | null>(null)
    const [isActive, setIsActive] = useState(false)
-   const [isCompatible, setIsCompatible] = useState(true)
+   const [isCompatible, setIsCompatible] = useState(
+      extension.checkCompatibility()
+   )
 
-   const extensionRef = useRef<AIDenoiserExtension | null>(null)
    const processorRef = useRef<AIDenoiserProcessor | null>(null)
+
+   const hasAudioTrack = Boolean(audioTrack)
 
    const handleError = useCallback(
       (error: Error, message: string) => {
@@ -49,28 +56,21 @@ export const useNoiseSuppression = (
    useEffect(() => {
       const initializeExtension = async () => {
          try {
-            // Create the extension if it doesn't exist
-            if (!extensionRef.current) {
-               extensionRef.current = new AIDenoiserExtension({
-                  assetsPath: `${getBaseUrl()}/wasms/denoiser/external`,
-               })
+            // Register the extension with AgoraRTC
+            AgoraRTC.registerExtensions([extension])
 
-               // Register the extension with AgoraRTC
-               AgoraRTC.registerExtensions([extensionRef.current])
-
-               // Check compatibility
-               if (!extensionRef.current.checkCompatibility()) {
-                  console.error(
-                     "This device does not support AI Noise Suppression"
-                  )
-                  setIsCompatible(false)
-                  return
-               }
+            // Check compatibility
+            if (!extension.checkCompatibility()) {
+               console.error(
+                  "This device does not support AI Noise Suppression"
+               )
+               setIsCompatible(false)
+               return
             }
 
             // Create the processor if it doesn't exist and is compatible
-            if (!processorRef.current && isCompatible) {
-               processorRef.current = extensionRef.current.createProcessor()
+            if (!processorRef.current && isCompatible && hasAudioTrack) {
+               processorRef.current = extension.createProcessor()
 
                // Set up event listeners for processor
                processorRef.current.on(
@@ -117,6 +117,13 @@ export const useNoiseSuppression = (
                   }
                })
             }
+
+            if (processorRef.current && !hasAudioTrack) {
+               processorRef.current.removeAllListeners()
+               processorRef.current.disable()
+               processorRef.current = null
+               setIsActive(false)
+            }
          } catch (error) {
             handleError(
                error as Error,
@@ -135,7 +142,7 @@ export const useNoiseSuppression = (
             console.error("Error disabling processor during cleanup:", error)
          }
       }
-   }, [handleError, isCompatible])
+   }, [handleError, isCompatible, hasAudioTrack])
 
    // Handle audio track and enabled state changes
    useEffect(() => {
