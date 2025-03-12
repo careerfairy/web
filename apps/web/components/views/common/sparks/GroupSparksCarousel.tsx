@@ -3,6 +3,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SxProps, Theme, Typography } from "@mui/material"
 import useGroup from "components/custom-hook/group/useGroup"
 import useSparks from "components/custom-hook/spark/useSparks"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { SparksCarousel } from "components/views/sparks/components/SparksCarousel"
 import Link from "next/link"
 import { ReactNode } from "react"
@@ -20,7 +21,7 @@ export const GroupSparksCarousel = ({
    ...props
 }: Props & { groupId: string }) => {
    const { data: group } = useGroup(props.groupId)
-
+   const isMobile = useIsMobile()
    const { data: groupSparks } = useSparks({
       totalItems: 8,
       groupId: props.groupId,
@@ -48,7 +49,7 @@ export const GroupSparksCarousel = ({
          containerSx={sx}
          {...props}
          headerSx={headerSx}
-         seeAll={SeeAll}
+         seeAll={isMobile ? null : SeeAll}
       />
    )
 }
