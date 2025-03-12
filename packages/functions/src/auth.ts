@@ -13,8 +13,14 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
 import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
-import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
+import {
+   groupRepo,
+   marketingUsersRepo,
+   notificationRepo,
+   userRepo,
+} from "./api/repositories"
 import config from "./config"
+import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import { userUpdateFields } from "./lib/user"
 import { logAndThrow } from "./lib/validations"
 import { generateReferralCode } from "./util"
@@ -131,21 +137,19 @@ export const createNewUserAccount = functions
                })
                .then(async () => {
                   console.log(`Starting sending email for ${recipientEmail}`)
-                  const email = {
-                     TemplateId: Number(
-                        process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION
-                     ),
-                     From: "CareerFairy <noreply@careerfairy.io>",
-                     To: recipientEmail,
-                     TemplateModel: { pinCode: pinCode },
-                  }
                   try {
-                     const response = await client.sendEmailWithTemplate(email)
+                     await notificationRepo.sendEmailNotifications([
+                        {
+                           templateId:
+                              CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY,
+                           templateData: null,
+                           userAuthId: user.uid,
+                           to: recipientEmail,
+                        },
+                     ])
                      console.log(
                         `Sent email successfully for ${recipientEmail}`
                      )
-
-                     return response
                   } catch (error) {
                      console.error(
                         `Error sending PIN email to ${recipientEmail}`,
