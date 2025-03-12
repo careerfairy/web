@@ -270,7 +270,7 @@ exports.onCreateLivestreamPopularityEvents =
    onCreateTriggers.onCreateLivestreamPopularityEvents
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
-exports.onCreateUserData = onCreateTriggers.onCreateUserData
+exports.onCreateUserData_v2 = onCreateTriggers.onCreateUserData
 exports.onUpdateUserData = onCreateTriggers.onUpdateUserData
 exports.onCreateReward = onCreateTriggers.onCreateReward
 exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
