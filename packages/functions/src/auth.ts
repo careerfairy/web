@@ -71,33 +71,36 @@ export const createNewUserAccount = onCall(async (request) => {
             ? { accountCreationUTMParams }
             : {}
 
+      const userData: UserData = {
+         authId: user.uid,
+         id: recipientEmail,
+         validationPin: pinCode,
+         firstName: firstName,
+         lastName: lastName,
+         userEmail: recipientEmail,
+         university: university,
+         universityCountryCode: universityCountryCode,
+         unsubscribed: !subscribed,
+         referralCode: generateReferralCode(),
+         gender: gender,
+         fieldOfStudy,
+         levelOfStudy,
+         isStudent: true,
+         credits: INITIAL_CREDITS,
+         welcomeDialogComplete: false,
+         lastActivityAt: FieldValue.serverTimestamp() as Timestamp,
+         createdAt: FieldValue.serverTimestamp() as Timestamp,
+         linkedinUrl: "",
+         userResume: "",
+         backFills: [],
+         ...registrationUTMsToSave,
+      }
+
       try {
          await firestore
             .collection("userData")
             .doc(recipientEmail)
-            .set(
-               Object.assign({
-                  authId: user.uid,
-                  id: recipientEmail,
-                  validationPin: pinCode,
-                  firstName: firstName,
-                  lastName: lastName,
-                  userEmail: recipientEmail,
-                  university: university,
-                  universityCountryCode: universityCountryCode,
-                  unsubscribed: !subscribed,
-                  referralCode: generateReferralCode(),
-                  gender: gender,
-                  fieldOfStudy,
-                  levelOfStudy,
-                  isStudent: true,
-                  credits: INITIAL_CREDITS,
-                  welcomeDialogComplete: false,
-                  lastActivityAt: FieldValue.serverTimestamp(),
-                  createdAt: FieldValue.serverTimestamp(),
-                  ...registrationUTMsToSave,
-               } as UserData)
-            )
+            .set(userData)
 
          if (additionalData?.studyBackground) {
             const studyBackgroundRef = firestore
