@@ -19,9 +19,12 @@ import {
 import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import { Expo, ExpoPushMessage } from "expo-server-sdk"
 import * as functions from "firebase-functions"
+import { logger } from "firebase-functions/v2"
 import firebase from "firebase/compat"
 import { DateTime } from "luxon"
 import { livestreamsRepo } from "../api/repositories"
+import { CUSTOMERIO_EMAIL_TEMPLATES } from "./notifications/EmailTypes"
+import { INotificationService } from "./notifications/NotificationService"
 
 const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 
@@ -82,6 +85,12 @@ export interface IUserFunctionsRepository extends IUserRepository {
    ): Promise<RegisteredLivestreams[]>
 
    getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]>
+
+   /**
+    * Sends a welcome email to a user
+    * @param user The user to send the welcome email to
+    */
+   sendWelcomeEmail(user: Pick<UserData, "userEmail" | "authId">): Promise<void>
 }
 
 export class UserFunctionsRepository
@@ -92,10 +101,12 @@ export class UserFunctionsRepository
    constructor(
       readonly firestore: firebase.firestore.Firestore,
       readonly fieldValue: typeof firebase.firestore.FieldValue,
-      readonly timestamp: typeof firebase.firestore.Timestamp
+      readonly timestamp: typeof firebase.firestore.Timestamp,
+      readonly notificationService: INotificationService
    ) {
       super(firestore, fieldValue, timestamp)
       this.expo = new Expo()
+      this.notificationService = notificationService
    }
 
    async getSubscribedUsers(
@@ -464,5 +475,20 @@ export class UserFunctionsRepository
       return querySnapshot.empty
          ? []
          : querySnapshot.docs.map((doc) => doc.data() as StudyBackground)
+   }
+
+   async sendWelcomeEmail(
+      user: Pick<UserData, "userEmail" | "authId">
+   ): Promise<void> {
+      logger.info(`Sending welcome email to ${user.userEmail}`)
+
+      await this.notificationService.sendEmailNotification({
+         templateId: CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY,
+         templateData: null,
+         userAuthId: user.authId,
+         to: user.userEmail,
+      })
+
+      logger.info(`Welcome email sent to ${user.userEmail}`)
    }
 }
