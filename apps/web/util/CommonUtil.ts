@@ -204,7 +204,7 @@ export const capitalizeFirstLetter = (string: string) => {
  */
 export const errorLogAndNotify = (error: Error, metadata?: any) => {
    console.error("error", error)
-   Sentry.captureException(error, metadata ? { data: metadata } : undefined)
+   Sentry.captureException(error, metadata ? { extra: metadata } : undefined)
 }
 /**
  * Check if the emulators are enabled or if we're running locally
