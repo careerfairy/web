@@ -14,8 +14,14 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { onCall } from "firebase-functions/v2/https"
 import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
-import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
+import {
+   groupRepo,
+   marketingUsersRepo,
+   notificationService,
+   userRepo,
+} from "./api/repositories"
 import config from "./config"
+import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import { userUpdateFields } from "./lib/user"
 import { logAndThrow } from "./lib/validations"
 import { generateReferralCode } from "./util"
@@ -282,11 +288,9 @@ export const createNewGroupAdminUserAccount = functions
       }
    })
 
-// eslint-disable-next-line camelcase
-export const resendPostmarkEmailVerificationEmailWithPin = functions
-   .region(config.region)
-   .https.onCall(async (data) => {
-      const recipientEmail = data.recipientEmail
+export const resendPostmarkEmailVerificationEmailWithPin = onCall(
+   async (request) => {
+      const { recipientEmail, recipientAuthId } = request.data
       const pinCode = getRandomInt(9999)
 
       await firestore
@@ -294,18 +298,20 @@ export const resendPostmarkEmailVerificationEmailWithPin = functions
          .doc(recipientEmail)
          .update({ validationPin: pinCode })
 
-      const email = {
-         TemplateId: Number(process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION),
-         From: "CareerFairy <noreply@careerfairy.io>",
-         To: recipientEmail,
-         TemplateModel: { pinCode: pinCode },
-      }
       try {
-         await client.sendEmailWithTemplate(email)
+         await notificationService.sendEmailNotification({
+            templateId: CUSTOMERIO_EMAIL_TEMPLATES.PIN_VALIDATION,
+            templateData: {
+               pinCode: pinCode.toString(),
+            },
+            userAuthId: recipientAuthId,
+            to: recipientEmail,
+         })
       } catch (e) {
          throw new functions.https.HttpsError("invalid-argument", e)
       }
-   })
+   }
+)
 
 export const validateUserEmailWithPin = functions
    .region(config.region)

@@ -201,10 +201,11 @@ class FirebaseService {
    }
    resendPostmarkEmailVerificationEmailWithPin = async (data: {
       recipientEmail: string
+      recipientAuthId: string
    }) => {
       const resendPostmarkEmailVerificationEmailWithPin =
          this.functions.httpsCallable(
-            "resendPostmarkEmailVerificationEmailWithPin_eu"
+            "resendPostmarkEmailVerificationEmailWithPin_v2"
          )
       return resendPostmarkEmailVerificationEmailWithPin(data)
    }

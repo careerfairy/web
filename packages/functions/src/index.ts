@@ -91,7 +91,7 @@ exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
 exports.backfillUserData_eu = auth.backfillUserData
 exports.validateUserEmailWithPin_eu = auth.validateUserEmailWithPin
 exports.sendPostmarkResetPasswordEmail_eu = auth.sendPostmarkResetPasswordEmail
-exports.resendPostmarkEmailVerificationEmailWithPin_eu =
+exports.resendPostmarkEmailVerificationEmailWithPin_v2 =
    auth.resendPostmarkEmailVerificationEmailWithPin
 exports.deleteLoggedInUserAccount_v2 = auth.deleteLoggedInUserAccount
 exports.verifyToken = auth.verifyToken
