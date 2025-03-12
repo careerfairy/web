@@ -1,27 +1,34 @@
 import { Stack } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import { useCompanyPage } from ".."
 import AboutSection from "../AboutSection"
+import EventSection from "../EventSection"
+import JobsSection from "../JobsSection"
+import SparksSection from "../SparksSection"
+import { FollowCompany, SignUp } from "../ctas"
 
-export const Overview = () => {
+type Props = {
+   showJobs?: boolean
+   editMode?: boolean
+}
+
+export const Overview = ({ showJobs, editMode }: Props) => {
+   const { isLoggedIn, isLoggedOut } = useAuth()
+   const { group } = useCompanyPage()
+
+   const showFollowCompanyCta = isLoggedIn && !editMode
+   const showSignUpCta = isLoggedOut && !editMode
+
    return (
-      <Stack px={2} spacing={{ xs: 2, md: 5 }}>
+      <Stack spacing={{ xs: 2, md: 5 }}>
          <AboutSection />
-         {/* {showJobs ? <JobsSection /> : null}
-            {group.publicSparks ? (
-                <SparksSection key={group.id} groupId={group.id} />
-            ) : null}
-            {showFollowCompanyCta ? <FollowCompany /> : null}
-            {showSignUpCta ? <SignUp /> : null}
-            {isMobile && !editMode ? (
-                <>
-                    <EventSection />
-                    <TestimonialsOrMentorsSection />
-                </>
-            ) : (
-                <>
-                    <TestimonialsOrMentorsSection />
-                    <EventSection />
-                </>
-            )} */}
+         {showJobs ? <JobsSection /> : null}
+         {group.publicSparks ? (
+            <SparksSection key={group.id} groupId={group.id} />
+         ) : null}
+         {showFollowCompanyCta ? <FollowCompany /> : null}
+         {showSignUpCta ? <SignUp /> : null}
+         <EventSection />
       </Stack>
    )
 }

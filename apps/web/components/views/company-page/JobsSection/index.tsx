@@ -1,4 +1,4 @@
-import { Box, Skeleton, Stack, Typography } from "@mui/material"
+import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useMountedState } from "react-use"
 import { sxStyles } from "types/commonTypes"
@@ -13,6 +13,15 @@ const styles = sxStyles({
    },
    wrapper: {
       position: "relative",
+   },
+   checkAllJobsButton: {
+      mt: 2,
+      borderRadius: "24px",
+      border: (theme) => `1px solid ${theme.brand.tq[600]}`,
+      background: (theme) => theme.brand.white[200],
+      "&:hover": {
+         background: (theme) => theme.palette.primary[50],
+      },
    },
 })
 
@@ -42,6 +51,13 @@ const JobsSection = () => {
                      <Header />
                   </Box>
                   <GroupJobsList jobs={customJobs} />
+                  <Button
+                     variant="outlined"
+                     color="primary"
+                     sx={styles.checkAllJobsButton}
+                  >
+                     Check all job openings
+                  </Button>
                </Stack>
             </SuspenseWithBoundary>
          ) : (
