@@ -38,7 +38,6 @@ import { DocumentSnapshot } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
-import { FunctionsLogger, getChangeTypes } from "src/util"
 import {
    FieldValue,
    Firestore,
@@ -51,6 +50,7 @@ import {
    sparkRepo,
    userRepo,
 } from "../../api/repositories"
+import { FunctionsLogger, getChangeTypes } from "../../util"
 import { createGenericConverter } from "../../util/firestore-admin"
 import { addAddedToFeedAt } from "../../util/sparks"
 import BigQueryCreateInsertService from "../bigQuery/BigQueryCreateInsertService"
