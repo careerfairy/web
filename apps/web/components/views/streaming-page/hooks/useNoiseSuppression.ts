@@ -4,8 +4,7 @@ import {
    AIDenoiserProcessorLevel,
    AIDenoiserProcessorMode,
 } from "agora-extension-ai-denoiser"
-import { IMicrophoneAudioTrack } from "agora-rtc-react"
-import AgoraRTC from "agora-rtc-sdk-ng"
+import AgoraRTC, { IMicrophoneAudioTrack } from "agora-rtc-react"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -130,12 +129,10 @@ export const useNoiseSuppression = (
 
       // Clean up when component unmounts
       return () => {
-         if (processorRef.current) {
-            try {
-               processorRef.current.disable()
-            } catch (error) {
-               console.error("Error disabling processor during cleanup:", error)
-            }
+         try {
+            processorRef.current?.disable()
+         } catch (error) {
+            console.error("Error disabling processor during cleanup:", error)
          }
       }
    }, [handleError, isCompatible])
