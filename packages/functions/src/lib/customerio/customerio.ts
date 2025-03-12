@@ -8,8 +8,8 @@ import * as crypto from "crypto"
 import { logger } from "firebase-functions/v2"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
+import { isLocalEnvironment } from "src/util"
 import { userRepo } from "../../api/repositories"
-import { isLocalEnvironment } from "../../util"
 import { trackingClient } from "./client"
 import { CustomerIOWebhookEvent } from "./types"
 
@@ -26,7 +26,9 @@ export const syncUserToCustomerIO = onDocumentWritten(
    },
    async (event) => {
       if (isLocalEnvironment()) {
-         logger.info("Skipping CustomerIO sync in local environment")
+         logger.info(
+            "Skipping CustomerIO sync in local environment, remove this check if you want to sync to CustomerIO dev workspace"
+         )
          return
       }
 

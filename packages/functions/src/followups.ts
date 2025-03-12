@@ -17,7 +17,7 @@ import {
    customJobRepo,
    groupRepo,
    livestreamsRepo,
-   notificationRepo,
+   notificationService,
    sparkRepo,
 } from "./api/repositories"
 import {
@@ -68,7 +68,7 @@ export const sendReminderEmailAboutApplicationLink = onCall(
          throw new functions.https.HttpsError("not-found", "Job not found")
       }
 
-      await notificationRepo.sendEmailNotifications([
+      await notificationService.sendEmailNotifications([
          {
             to: userEmail,
             templateId: CUSTOMERIO_EMAIL_TEMPLATES.APPLY_TO_JOB_LATER,
@@ -372,7 +372,7 @@ const sendAttendeesReminder = async (
             additionalData
          )
 
-         const result = await notificationRepo.sendEmailNotifications(
+         const result = await notificationService.sendEmailNotifications(
             emailTemplates
          )
 

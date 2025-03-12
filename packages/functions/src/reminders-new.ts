@@ -23,14 +23,14 @@ import { onSchedule, ScheduleOptions } from "firebase-functions/v2/scheduler"
 import ical from "ical-generator"
 import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
-import { groupRepo, notificationRepo } from "./api/repositories"
+import { groupRepo, notificationService } from "./api/repositories"
 import { getStreamsByDateWithRegisteredStudents } from "./lib/livestream"
 import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailAttachment,
    EmailNotificationRequestData,
 } from "./lib/notifications/EmailTypes"
-import { OnBatchCompleteCallback } from "./lib/notifications/NotificationRepository"
+import { OnBatchCompleteCallback } from "./lib/notifications/NotificationService"
 import { addMinutesDate, isLocalEnvironment } from "./util"
 
 // delay to be sure that the reminder is sent at the time
@@ -436,7 +436,7 @@ const handleSendEmails = async (
 
       // Send notifications with progress tracking
       try {
-         const result = await notificationRepo.sendEmailNotifications(
+         const result = await notificationService.sendEmailNotifications(
             notificationRequests,
             onBatchCompleteCallback
          )

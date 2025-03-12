@@ -14,14 +14,8 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { onCall } from "firebase-functions/v2/https"
 import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
-import {
-   groupRepo,
-   marketingUsersRepo,
-   notificationRepo,
-   userRepo,
-} from "./api/repositories"
+import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
 import config from "./config"
-import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import { userUpdateFields } from "./lib/user"
 import { logAndThrow } from "./lib/validations"
 import { generateReferralCode } from "./util"
@@ -134,34 +128,6 @@ export const createNewUserAccount = onCall(async (request) => {
             functions.logger.warn(
                `Unable to deleting marketing user: ${recipientEmail}, could be because it doesn't exist`,
                e
-            )
-         }
-
-         console.log(`Starting sending email for ${recipientEmail}`)
-         try {
-            await notificationRepo.sendEmailNotifications([
-               {
-                  templateId: CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY,
-                  templateData: null,
-                  userAuthId: user.uid,
-                  to: recipientEmail,
-               },
-            ])
-            console.log(`Sent email successfully for ${recipientEmail}`)
-         } catch (error) {
-            console.error(
-               `Error sending welcome email to ${recipientEmail}`,
-               error
-            )
-            console.error(
-               `Starting auth and firestore user deletion ${recipientEmail}`,
-               error
-            )
-            await auth.deleteUser(user.uid)
-            await firestore.collection("userData").doc(recipientEmail).delete()
-            throw new functions.https.HttpsError(
-               "resource-exhausted",
-               "Error sending out welcome email"
             )
          }
       } catch (error) {

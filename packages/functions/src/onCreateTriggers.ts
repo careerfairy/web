@@ -6,6 +6,8 @@ import { PopularityEventData } from "@careerfairy/shared-lib/livestreams/popular
 import { RewardDoc } from "@careerfairy/shared-lib/rewards"
 import { UserData, pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import * as functions from "firebase-functions"
+import { logger } from "firebase-functions/v2"
+import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
 import config from "./config"
 import { rewardApply, rewardLivestreamRegistrant } from "./lib/reward"
@@ -68,20 +70,20 @@ export const onCreateLivestreamRatingAnswer = functions
       return handleSideEffects(sideEffectPromises)
    })
 
-export const onCreateUserData = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("userData/{userId}")
-   .onCreate(async (snapshot, context) => {
-      functions.logger.info(context.params)
+export const onCreateUserData = onDocumentCreated(
+   "userData/{userId}",
+   async (event) => {
+      logger.info(event.params)
 
       const userData: UserData = {
-         ...(snapshot.data() as UserData),
-         id: snapshot.id,
+         ...(event.data.data() as UserData),
+         id: event.params.userId,
       }
 
       // An array of promise side effects to be executed in parallel
-      const sideEffectPromises: Promise<unknown>[] = []
+      const sideEffectPromises: Promise<unknown>[] = [
+         userRepo.sendWelcomeEmail(userData),
+      ]
 
       // Run side effects for every new userData doc
       sideEffectPromises.push(
@@ -99,7 +101,8 @@ export const onCreateUserData = functions
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
 export const onUpdateUserData = functions
    .runWith(defaultTriggerRunTimeConfig)
