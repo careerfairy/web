@@ -1,8 +1,8 @@
-import CompanyPhotos from "./CompanyPhotos"
-import CompanyVideo from "./CompanyVideo"
+import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
-import Box from "@mui/material/Box"
+import CompanyPhotos from "./CompanyPhotos"
+import CompanyVideo from "./CompanyVideo"
 
 const MediaSection = () => {
    const {
@@ -23,7 +23,6 @@ const MediaSection = () => {
             }}
             p={3}
             spacing={3}
-            mr={3}
             ml={{
                xs: 3,
                md: 0,

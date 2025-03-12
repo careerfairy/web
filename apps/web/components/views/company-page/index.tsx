@@ -1,11 +1,17 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { FeatureFlagsState } from "@careerfairy/shared-lib/feature-flags/types"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Container, Grid, Stack } from "@mui/material"
+import {
+   Box,
+   Container,
+   Stack,
+   Tab,
+   TabScrollButton,
+   Tabs,
+} from "@mui/material"
 import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGroupAvailableCustomJobs"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -18,6 +24,7 @@ import {
    useEffect,
    useMemo,
    useRef,
+   useState,
 } from "react"
 import { useFirestoreDocData } from "reactfire"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -25,16 +32,14 @@ import { groupRepo } from "../../../data/RepositoryInstances"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import useListenToStreams from "../../custom-hook/useListenToStreams"
-import AboutSection from "./AboutSection"
 import EventSection from "./EventSection"
 import Header from "./Header"
 import JobsSection from "./JobsSection"
 import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
+import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
 import SparksSection from "./SparksSection"
-import { TestimonialsOrMentorsSection } from "./TestimonialsOrMentorsSection"
-import { FollowCompany, SignUp } from "./ctas"
 
 type Props = {
    group: Group
@@ -46,32 +51,40 @@ type Props = {
 }
 
 export const TabValue = {
+   overview: "overview-section",
+   jobs: "jobs-section",
+   sparks: "sparks-section",
+   livesStreams: "livesStreams-section",
+   recordings: "recordings-section",
+
    profile: "profile-section",
    media: "media-section",
    testimonialsOrMentors: "testimonials-or-mentors-section",
-   livesStreams: "livesStreams-section",
+
    banner: "banner-section",
    video: "video-section",
-   jobs: "jobs-section",
 } as const
 
 export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
 
-export const getTabLabel = (
-   tabId: TabValueType,
-   featureFlags: FeatureFlagsState
-) => {
+export const getTabLabel = (tabId: TabValueType) => {
    switch (tabId) {
-      case TabValue.profile:
-         return "About"
+      case TabValue.overview:
+         return "Overview"
       case TabValue.jobs:
          return "Jobs"
-      case TabValue.media:
-         return "Media"
-      case TabValue.testimonialsOrMentors:
-         return featureFlags.mentorsV1 ? "Mentors" : "Testimonials"
+      case TabValue.sparks:
+         return "Sparks"
       case TabValue.livesStreams:
-         return "Live Streams"
+         return "Live streams"
+      case TabValue.recordings:
+         return "Recordings"
+      // case TabValue.media:
+      //    return "Media"
+      // case TabValue.testimonialsOrMentors:
+      //    return featureFlags.mentorsV1 ? "Mentors" : "Testimonials"
+      // case TabValue.livesStreams:
+      //    return "Live Streams"
       default:
          return ""
    }
@@ -131,6 +144,8 @@ const CompanyPageOverview = ({
          ),
       [group.id]
    )
+
+   const [value, setValue] = useState<TabValueType>(TabValue.overview)
 
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
       initialData: group,
@@ -221,49 +236,171 @@ const CompanyPageOverview = ({
    )
 
    const showFollowCompanyCta = isLoggedIn && !editMode
+   console.log("🚀 ~ showFollowCompanyCta:", showFollowCompanyCta)
    const showSignUpCta = isLoggedOut && !editMode
+   console.log("🚀 ~ showSignUpCta:", showSignUpCta)
 
    const showJobs = featureFlags.jobHubV1 && customJobs?.length
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
-         <Box height={"100%"} pb={5}>
+         <Box
+            height={"100%"}
+            pb={5}
+            px={isMobile ? 0 : 4}
+            bgcolor={isMobile ? "white" : "transparent"}
+         >
             {editMode ? <ProgressBanner /> : null}
-            <Box mb={{ xs: 4, md: 10 }}>
+            <Box
+               mb={{ xs: 1, md: 2 }}
+               sx={{ borderRadius: isMobile ? "12px 12px 0 0" : "12px" }}
+            >
                <Header />
             </Box>
             <Container disableGutters maxWidth="lg">
-               <Grid container spacing={4}>
-                  <Grid item xs={12} md={6}>
-                     <Stack px={3} spacing={{ xs: 2, md: 5 }}>
-                        <AboutSection />
-                        {showJobs ? <JobsSection /> : null}
-                        {group.publicSparks ? (
-                           <SparksSection key={group.id} groupId={group.id} />
-                        ) : null}
-                        {showFollowCompanyCta ? <FollowCompany /> : null}
-                        {showSignUpCta ? <SignUp /> : null}
-                        {isMobile && !editMode ? (
-                           <>
-                              <EventSection />
-                              <TestimonialsOrMentorsSection />
-                           </>
-                        ) : (
-                           <>
-                              <TestimonialsOrMentorsSection />
-                              <EventSection />
-                           </>
-                        )}
-                     </Stack>
+               <Stack
+                  direction={isMobile ? "column" : "row"}
+                  spacing={2}
+                  justifyItems={"space-between"}
+                  width={"100%"}
+               >
+                  <Box>
+                     <Box sx={{ position: "relative" }}>
+                        <Tabs
+                           variant="scrollable"
+                           scrollButtons
+                           allowScrollButtonsMobile
+                           value={value}
+                           onChange={(_, newValue) => setValue(newValue)}
+                           ScrollButtonComponent={CustomScrollButton}
+                           sx={{
+                              borderRadius: "12px 12px 0 0",
+                              backgroundColor: "#FEFEFE",
+                              position: "relative",
+                              "& .MuiTab-root": {
+                                 textTransform: "none",
+                                 fontFamily: "Poppins",
+                                 fontSize: "16px",
+                                 color: (theme) => theme.palette.neutral[500],
+                                 fontWeight: 400,
+                                 minWidth: "auto",
+                                 px: 2,
+                              },
+                              "& .Mui-selected": {
+                                 color: (theme) => theme.brand.tq[600],
+                                 fontWeight: 600,
+                              },
+                              "& .MuiTabs-scroller": {
+                                 // px: 4,
+                                 zIndex: 0,
+                              },
+                              "& .MuiTabs-flexContainer": {
+                                 // gap: 4
+                              },
+                           }}
+                        >
+                           <Tab
+                              label={getTabLabel(TabValue.overview)}
+                              value={TabValue.overview}
+                           />
+                           {showJobs ? (
+                              <Tab
+                                 label={getTabLabel(TabValue.jobs)}
+                                 value={TabValue.jobs}
+                              />
+                           ) : null}
+                           {group.publicProfile ? (
+                              <Tab
+                                 label={getTabLabel(TabValue.sparks)}
+                                 value={TabValue.sparks}
+                              />
+                           ) : null}
+                           <Tab
+                              label={getTabLabel(TabValue.livesStreams)}
+                              value={TabValue.livesStreams}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.recordings)}
+                              value={TabValue.recordings}
+                           />
+                        </Tabs>
+                        <Box
+                           sx={{
+                              backgroundColor: "#FEFEFE",
+                              borderRadius: "0 0 12px 12px",
+                           }}
+                           pt={"20px"}
+                           pb="24px"
+                        >
+                           {value === TabValue.overview && <Overview />}
+                           {value === TabValue.jobs && <JobsSection />}
+                           {value === TabValue.sparks && (
+                              <SparksSection
+                                 key={group.id}
+                                 groupId={group.id}
+                              />
+                           )}
+                           {value === TabValue.livesStreams && <EventSection />}
+                           {/* {value === TabValue.recordings && <RecordingsSection />} */}
+                        </Box>
+                     </Box>
+                  </Box>
+                  <MediaSection />
+               </Stack>
+               {/* <Grid container spacing={2}>
+                  <Grid item xs={12} md={6} >
+                     
                   </Grid>
                   <Grid item xs={12} md={6}>
                      <MediaSection />
                   </Grid>
-               </Grid>
+               </Grid> */}
             </Container>
             <NewsletterSection />
          </Box>
       </CompanyPageContext.Provider>
+   )
+}
+
+const CustomScrollButton = ({
+   direction,
+   onClick,
+   disabled,
+}: {
+   direction: "left" | "right"
+   onClick: () => void
+   disabled: boolean
+}) => {
+   return (
+      <Box
+         sx={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            [direction]: 0,
+            display: "flex",
+            alignItems: "center",
+            background: `linear-gradient(to ${
+               direction === "left" ? "right" : "left"
+            }, #FEFEFE 30%, rgba(254, 254, 254, 0.8) 75%, rgba(254, 254, 254, 0.4) 85%, transparent)`,
+            opacity: disabled ? 0 : 1,
+            transition: "opacity 0.2s ease",
+            zIndex: 1,
+            pointerEvents: disabled ? "none" : "auto",
+         }}
+      >
+         <TabScrollButton
+            direction={direction}
+            orientation="horizontal"
+            onClick={onClick}
+            disabled={disabled}
+            sx={{
+               px: 1,
+               justifyContent: direction === "left" ? "flex-start" : "flex-end",
+               width: "70px",
+            }}
+         />
+      </Box>
    )
 }
 
