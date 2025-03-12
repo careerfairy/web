@@ -55,7 +55,7 @@ const SignUpPinForm = () => {
 
    const { trigger: deleteUser, isMutating: isDeletingUser } =
       useDeleteCurrentUser({
-         onSuccess: () => {
+         onFinish: () => {
             previousStep()
          },
       })
