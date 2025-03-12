@@ -951,8 +951,10 @@ export class SparkFunctionsRepository
          .collection("sparks")
          .withConverter<Spark>(createGenericConverter())
          .where("group.id", "==", groupId)
-         .limit(limit)
+         .where("group.publicSparks", "==", true)
+         .where("published", "==", true)
          .orderBy("createdAt", "desc")
+         .limit(limit)
          .get()
 
       return !snapshot.empty
