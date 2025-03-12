@@ -23,6 +23,7 @@ const styles = sxStyles({
 
 type SparksCarouselProps = {
    header?: ReactNode
+   seeAll?: ReactNode
    handleSparksClicked?: (spark: Spark) => void
    containerSx?: SxProps<Theme>
    headerSx?: SxProps<Theme>
@@ -32,6 +33,7 @@ type SparksCarouselProps = {
 
 export const SparksCarousel = ({
    header,
+   seeAll,
    sparks,
    handleSparksClicked,
    containerSx,
@@ -61,6 +63,7 @@ export const SparksCarousel = ({
             }}
             viewportSx={styles.viewport}
             headerSx={headerSx}
+            seeAll={seeAll}
          >
             {sparks.map((spark, index) => (
                <SparkPreviewCard

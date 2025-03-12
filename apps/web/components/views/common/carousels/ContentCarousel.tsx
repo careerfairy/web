@@ -27,6 +27,7 @@ const styles = sxStyles({
 type ContentCarouselProps = Pick<GenericCarouselProps, "children"> & {
    slideWidth?: number
    headerTitle?: ReactNode | string
+   seeAll?: ReactNode
    viewportSx?: SxProps
    containerSx?: SxProps
    headerSx?: SxProps
@@ -47,6 +48,7 @@ export const ContentCarousel = ({
    headerSx,
    emblaProps,
    disableArrows = false,
+   seeAll,
 }: ContentCarouselProps) => {
    const carouselContainerRef = useRef<HTMLDivElement>(null)
 
@@ -84,11 +86,14 @@ export const ContentCarousel = ({
                ) : (
                   Boolean(headerTitle) && headerTitle
                )}
-               {shouldShowArrows() && (
-                  <GenericCarousel.Arrows
-                     emblaApi={emblaProps?.emblaApi || emblaApi}
-                  />
-               )}
+               <Stack direction="row" alignItems="flex-end" spacing={2}>
+                  {seeAll}
+                  {shouldShowArrows() && (
+                     <GenericCarousel.Arrows
+                        emblaApi={emblaProps?.emblaApi || emblaApi}
+                     />
+                  )}
+               </Stack>
             </Stack>
          ) : null}
          <GenericCarousel

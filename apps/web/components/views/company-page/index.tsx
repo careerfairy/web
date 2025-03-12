@@ -27,7 +27,7 @@ import {
    useState,
 } from "react"
 import { useFirestoreDocData } from "reactfire"
-import { useAuth } from "../../../HOCs/AuthProvider"
+import { sxStyles } from "types/commonTypes"
 import { groupRepo } from "../../../data/RepositoryInstances"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
@@ -41,6 +41,35 @@ import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
 import SparksSection from "./SparksSection"
 
+const styles = sxStyles({
+   tabs: {
+      borderRadius: "12px 12px 0 0",
+      backgroundColor: "#FEFEFE",
+      position: "relative",
+      borderBottom: "1px solid",
+      borderColor: "divider",
+      "& .MuiTab-root": {
+         textTransform: "none",
+         fontFamily: "Poppins",
+         fontSize: "16px",
+         color: (theme) => theme.palette.neutral[500],
+         fontWeight: 400,
+         minWidth: "auto",
+         px: 2,
+      },
+      "& .Mui-selected": {
+         color: (theme) => theme.brand.tq[600],
+         fontWeight: 600,
+      },
+      "& .MuiTabs-indicator": {
+         height: "1px",
+      },
+      "& .MuiTabs-scroller": {
+         zIndex: 0,
+      },
+   },
+})
+
 type Props = {
    group: Group
    editMode: boolean
@@ -48,6 +77,7 @@ type Props = {
    pastLivestreams: LivestreamEvent[]
    groupCreators: PublicCreator[]
    customJobs: CustomJob[]
+   tab?: TabValueType
 }
 
 export const TabValue = {
@@ -133,9 +163,9 @@ const CompanyPageOverview = ({
    pastLivestreams,
    customJobs,
    groupCreators,
+   tab,
 }: Props) => {
    const featureFlags = useFeatureFlags()
-   const { isLoggedIn, isLoggedOut } = useAuth()
    const isMobile = useIsMobile()
    const groupRef = useMemo(
       () =>
@@ -145,7 +175,7 @@ const CompanyPageOverview = ({
       [group.id]
    )
 
-   const [value, setValue] = useState<TabValueType>(TabValue.overview)
+   const [value, setValue] = useState<TabValueType>(tab ?? TabValue.overview)
 
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
       initialData: group,
@@ -235,12 +265,7 @@ const CompanyPageOverview = ({
       ]
    )
 
-   const showFollowCompanyCta = isLoggedIn && !editMode
-   console.log("🚀 ~ showFollowCompanyCta:", showFollowCompanyCta)
-   const showSignUpCta = isLoggedOut && !editMode
-   console.log("🚀 ~ showSignUpCta:", showSignUpCta)
-
-   const showJobs = featureFlags.jobHubV1 && customJobs?.length
+   const showJobs = Boolean(featureFlags.jobHubV1 && customJobs?.length)
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
@@ -257,14 +282,16 @@ const CompanyPageOverview = ({
             >
                <Header />
             </Box>
-            <Container disableGutters maxWidth="lg">
+            <Container disableGutters sx={{ maxWidth: "100% !important" }}>
                <Stack
                   direction={isMobile ? "column" : "row"}
                   spacing={2}
                   justifyItems={"space-between"}
                   width={"100%"}
+                  // bgcolor={isMobile ? "transparent" : "white"}
+                  bgcolor={isMobile ? "#F5F5F5" : "transparent"}
                >
-                  <Box>
+                  <Box maxWidth={isMobile ? "100%" : "50%"}>
                      <Box sx={{ position: "relative" }}>
                         <Tabs
                            variant="scrollable"
@@ -273,31 +300,7 @@ const CompanyPageOverview = ({
                            value={value}
                            onChange={(_, newValue) => setValue(newValue)}
                            ScrollButtonComponent={CustomScrollButton}
-                           sx={{
-                              borderRadius: "12px 12px 0 0",
-                              backgroundColor: "#FEFEFE",
-                              position: "relative",
-                              "& .MuiTab-root": {
-                                 textTransform: "none",
-                                 fontFamily: "Poppins",
-                                 fontSize: "16px",
-                                 color: (theme) => theme.palette.neutral[500],
-                                 fontWeight: 400,
-                                 minWidth: "auto",
-                                 px: 2,
-                              },
-                              "& .Mui-selected": {
-                                 color: (theme) => theme.brand.tq[600],
-                                 fontWeight: 600,
-                              },
-                              "& .MuiTabs-scroller": {
-                                 // px: 4,
-                                 zIndex: 0,
-                              },
-                              "& .MuiTabs-flexContainer": {
-                                 // gap: 4
-                              },
-                           }}
+                           sx={styles.tabs}
                         >
                            <Tab
                               label={getTabLabel(TabValue.overview)}
@@ -327,12 +330,20 @@ const CompanyPageOverview = ({
                         <Box
                            sx={{
                               backgroundColor: "#FEFEFE",
-                              borderRadius: "0 0 12px 12px",
+                              borderRadius: isMobile
+                                 ? "0 0 8px 8px"
+                                 : "0 0 12px 12px",
                            }}
                            pt={"20px"}
                            pb="24px"
+                           px={2}
                         >
-                           {value === TabValue.overview && <Overview />}
+                           {value === TabValue.overview && (
+                              <Overview
+                                 showJobs={showJobs}
+                                 editMode={editMode}
+                              />
+                           )}
                            {value === TabValue.jobs && <JobsSection />}
                            {value === TabValue.sparks && (
                               <SparksSection
@@ -345,7 +356,9 @@ const CompanyPageOverview = ({
                         </Box>
                      </Box>
                   </Box>
-                  <MediaSection />
+                  <Box mt={0}>
+                     <MediaSection />
+                  </Box>
                </Stack>
                {/* <Grid container spacing={2}>
                   <Grid item xs={12} md={6} >

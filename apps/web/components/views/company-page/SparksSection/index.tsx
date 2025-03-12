@@ -67,7 +67,8 @@ const SparksSection: FC<Props> = ({ groupId }) => {
                   header={<CarouselHeader />}
                   groupId={groupId}
                   handleSparksClicked={handleSparksClicked}
-                  sx={{ pl: 0 }}
+                  sx={{ pl: 0, mr: -2 }}
+                  headerSx={{ mr: 2 }}
                />
             </SuspenseWithBoundary>
          ) : (
