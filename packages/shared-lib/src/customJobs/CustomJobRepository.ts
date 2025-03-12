@@ -563,6 +563,7 @@ export class FirebaseCustomJobRepository
          .where("groupId", "==", groupId)
          .where("isPermanentlyExpired", "==", false)
          .where("deadline", ">=", new Date())
+         .where("published", "==", true)
          .get()
 
       return (
