@@ -32,7 +32,6 @@ export const useNoiseSuppression = (
    const { enabled, onError } = options
 
    const [error, setError] = useState<Error | null>(null)
-   const [isActive, setIsActive] = useState(false)
    const [isCompatible, setIsCompatible] = useState(
       extension.checkCompatibility()
    )
@@ -91,7 +90,6 @@ export const useNoiseSuppression = (
                            "Noise suppression processor overload"
                         )
                         await processorRef.current?.disable()
-                        setIsActive(false)
                      } else if (elapsedTimeInMs > 1000) {
                         // If processing is taking too long, switch to less demanding mode
                         try {
@@ -111,18 +109,17 @@ export const useNoiseSuppression = (
                processorRef.current.on("loaderror", (error: Error) => {
                   handleError(error, "Noise suppression processor load error")
                   setIsCompatible(false)
-                  setIsActive(false)
                   if (processorRef.current) {
                      processorRef.current.disable()
                   }
                })
             }
 
+            // Clean up processor when audio track is lost due to network issues
             if (processorRef.current && !hasAudioTrack) {
                processorRef.current.removeAllListeners()
                processorRef.current.disable()
                processorRef.current = null
-               setIsActive(false)
             }
          } catch (error) {
             handleError(
@@ -169,10 +166,8 @@ export const useNoiseSuppression = (
                   AIDenoiserProcessorLevel.SOFT
                )
                await processorRef.current.enable()
-               setIsActive(true)
             } else {
                await processorRef.current.disable()
-               setIsActive(false)
             }
 
             setError(null)
@@ -231,7 +226,7 @@ export const useNoiseSuppression = (
    )
 
    return {
-      isActive,
+      isActive: Boolean(processorRef.current?.enabled),
       isCompatible,
       error,
       reset: () => setError(null),
