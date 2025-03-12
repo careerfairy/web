@@ -556,13 +556,11 @@ export const isDefinedAndEqual = <T>(
  * @returns New array containing only differing elements
  */
 export const getArrayDifference = (array1: unknown[], array2: unknown[]) => {
-   if (!array1?.length) return array2 ?? []
-
-   if (!array2?.length) return array1 ?? []
-
-   return array2.filter((element) => {
-      return !array1.includes(element)
-   })
+   return (
+      array2?.filter((element) => {
+         return !array1?.includes(element)
+      }) ?? []
+   )
 }
 
 /**
