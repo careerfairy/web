@@ -12,6 +12,7 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    LIVESTREAM_FOLLOWUP_ATTENDEES: "live_stream_followup_attendees",
    LIVESTREAM_FOLLOWUP_NON_ATTENDEES: "live_stream_followup_non_attendees",
    APPLY_TO_JOB_LATER: "apply_to_job_later",
+   WELCOME_TO_CAREERFAIRY: "welcome_to_careerfairy",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
@@ -110,6 +111,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES]: ReminderFollowUpTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES]: ReminderFollowUpTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.APPLY_TO_JOB_LATER]: ApplicationLinkFollowUpTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY]: null
 }
 
 /**
