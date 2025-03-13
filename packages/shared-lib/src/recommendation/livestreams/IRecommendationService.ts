@@ -141,8 +141,6 @@ export default class RecommendationServiceCore {
       additionalUserData?: AdditionalUserRecommendationInfo,
       userFeaturedGroups?: { [groupId: string]: Group }
    ): RankedLivestreamEvent[] {
-      console.log("🚀 ~ RecommendationServiceCore ~ userId:", userData.id)
-
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
          userData,
@@ -205,19 +203,7 @@ export const applyFeaturedGroupPoints = (
       const featuredGroupPoints =
          rankedLivestream.getPoints() *
          RECOMMENDATION_POINTS.FEATURED_GROUP_LIVESTREAM_POINTS_MULTIPLIER
-      console.log(
-         "🚀 live stream id, points, applied points: ",
-         rankedLivestream.model.id,
-         rankedLivestream.getPoints(),
-         featuredGroupPoints
-      )
 
       rankedLivestream.setPoints(featuredGroupPoints)
-   } else {
-      console.log(
-         "🚀 live stream id, points, ignored: ",
-         rankedLivestream.model.id,
-         rankedLivestream.getPoints()
-      )
    }
 }
