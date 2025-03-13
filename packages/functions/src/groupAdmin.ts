@@ -15,6 +15,7 @@ import {
    fieldOfStudyRepo,
    groupRepo,
    livestreamsRepo,
+   notificationService,
 } from "./api/repositories"
 
 import {
@@ -27,6 +28,7 @@ import { array, boolean, mixed, object, string } from "yup"
 import { auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
 import config from "./config"
+import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import {
    logAndThrow,
    validateData,
@@ -507,6 +509,17 @@ export const sendDashboardInviteEmail = functions
             inviteId: newInvite.id,
             origin: context.rawRequest.headers.origin,
             onBoardingFlow: authUser ? "login" : "signup",
+         })
+
+         await notificationService.sendEmailNotification({
+            templateId: CUSTOMERIO_EMAIL_TEMPLATES.GROUP_INVITATION,
+            templateData: {
+               group_link: inviteLink,
+               group_name: groupName,
+               sender_first_name: senderFirstName,
+            },
+            userAuthId: authUser?.uid,
+            to: targetEmail,
          })
 
          const email = {
