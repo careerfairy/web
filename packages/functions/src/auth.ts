@@ -14,14 +14,8 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { onCall } from "firebase-functions/v2/https"
 import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
-import {
-   groupRepo,
-   marketingUsersRepo,
-   notificationService,
-   userRepo,
-} from "./api/repositories"
+import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
 import config from "./config"
-import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import { userUpdateFields } from "./lib/user"
 import { logAndThrow } from "./lib/validations"
 import { generateReferralCode } from "./util"
@@ -134,6 +128,32 @@ export const createNewUserAccount = onCall(async (request) => {
             functions.logger.warn(
                `Unable to deleting marketing user: ${recipientEmail}, could be because it doesn't exist`,
                e
+            )
+         }
+
+         console.log(`Starting sending email for ${recipientEmail}`)
+
+         try {
+            const response = await userRepo.sendEmailVerificationEmail({
+               userEmail: recipientEmail,
+               authId: user.uid,
+               validationPin: pinCode,
+            })
+
+            console.log(`Sent email successfully for ${recipientEmail}`)
+
+            return response
+         } catch (error) {
+            console.error(`Error sending PIN email to ${recipientEmail}`, error)
+            console.error(
+               `Starting auth and firestore user deletion ${recipientEmail}`,
+               error
+            )
+            await auth.deleteUser(user.uid)
+            await firestore.collection("userData").doc(recipientEmail).delete()
+            throw new functions.https.HttpsError(
+               "resource-exhausted",
+               "Error sending out PIN email"
             )
          }
       } catch (error) {
@@ -303,13 +323,10 @@ export const resendPostmarkEmailVerificationEmailWithPin = onCall(
          .update(toUpdate)
 
       try {
-         await notificationService.sendEmailNotification({
-            templateId: CUSTOMERIO_EMAIL_TEMPLATES.PIN_VALIDATION,
-            templateData: {
-               pinCode: pinCode.toString(),
-            },
-            userAuthId: recipientAuthId,
-            to: recipientEmail,
+         await userRepo.sendEmailVerificationEmail({
+            userEmail: recipientEmail,
+            authId: recipientAuthId,
+            validationPin: pinCode,
          })
       } catch (e) {
          throw new functions.https.HttpsError("invalid-argument", e)
@@ -317,15 +334,18 @@ export const resendPostmarkEmailVerificationEmailWithPin = onCall(
    }
 )
 
-export const validateUserEmailWithPin = functions
-   .region(config.region)
-   .runWith({
+type ValidateUserEmailWithPinRequest = {
+   recipientEmail: string
+   pinCode: number
+   fingerPrintId: string
+}
+
+export const validateUserEmailWithPin = onCall<ValidateUserEmailWithPinRequest>(
+   {
       minInstances: 1,
-   })
-   .https.onCall(async (data) => {
-      const recipientEmail = data.userInfo.recipientEmail
-      const pinCode = data.userInfo.pinCode
-      const fingerPrintId = data.userInfo.fingerPrintId
+   },
+   async (request) => {
+      const { recipientEmail, pinCode, fingerPrintId } = request.data
 
       let error: any
 
@@ -339,7 +359,7 @@ export const validateUserEmailWithPin = functions
             .doc(recipientEmail)
             .get()
          if (querySnapshot.exists) {
-            const user = querySnapshot.data()
+            const user = querySnapshot.data() as UserData
             functions.logger.log(`Acquired user data for ${recipientEmail}`)
             if (user.validationPin === pinCode) {
                functions.logger.log(
@@ -361,29 +381,16 @@ export const validateUserEmailWithPin = functions
                functions.logger.log(
                   `Starting sending welcome email to  ${recipientEmail}`
                )
-               const email = {
-                  TemplateId: Number(
-                     process.env.POSTMARK_TEMPLATE_WELCOME_EMAIL
-                  ),
-                  From: "CareerFairy <noreply@careerfairy.io>",
-                  To: recipientEmail,
-                  TemplateModel: {
-                     user_name: user.firstName,
-                  },
-               }
 
                try {
-                  const response = await client.sendEmailWithTemplate(email)
+                  await userRepo.sendWelcomeEmail({
+                     authId: user.authId,
+                     userEmail: recipientEmail,
+                  })
 
-                  if (response.ErrorCode) {
-                     functions.logger.error(
-                        `An error has occurred sending welcome email to ${recipientEmail}`
-                     )
-                  } else {
-                     functions.logger.log(
-                        `The welcome email was sent successfully to ${recipientEmail}`
-                     )
-                  }
+                  functions.logger.log(
+                     `The welcome email was sent successfully to ${recipientEmail}`
+                  )
                } catch (error) {
                   functions.logger.error(
                      `An error has occurred sending welcome email to ${recipientEmail}`
@@ -441,7 +448,8 @@ export const validateUserEmailWithPin = functions
          throw new functions.https.HttpsError(error.code, error.message)
       }
       return null
-   })
+   }
+)
 
 export const sendPostmarkResetPasswordEmail = functions
    .region(config.region)

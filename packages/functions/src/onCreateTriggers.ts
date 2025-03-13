@@ -81,9 +81,7 @@ export const onCreateUserData = onDocumentCreated(
       }
 
       // An array of promise side effects to be executed in parallel
-      const sideEffectPromises: Promise<unknown>[] = [
-         userRepo.sendWelcomeEmail(userData),
-      ]
+      const sideEffectPromises: Promise<unknown>[] = []
 
       // Run side effects for every new userData doc
       sideEffectPromises.push(

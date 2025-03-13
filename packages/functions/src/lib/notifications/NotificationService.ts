@@ -66,7 +66,7 @@ export type ProgressInfo = {
  */
 export type OnBatchCompleteCallback = (progress: ProgressInfo) => void
 
-type SendResponse = Record<string, any>
+export type NotificationSendResponse = Record<string, any>
 
 /**
  * Interface for notification services
@@ -80,7 +80,7 @@ export interface INotificationService {
     */
    sendEmailNotification<T extends CustomerIoEmailTemplateId>(
       notificationData: EmailNotificationRequestData<T>
-   ): Promise<SendResponse>
+   ): Promise<NotificationSendResponse>
 
    /**
     * Sends a push notification to a single user
@@ -90,7 +90,7 @@ export interface INotificationService {
     */
    sendPushNotification<T extends CustomerIoPushMessageType>(
       notificationData: PushNotificationRequestData<T>
-   ): Promise<SendResponse>
+   ): Promise<NotificationSendResponse>
 
    /**
     * Sends email notifications in batches to multiple users
@@ -136,7 +136,7 @@ export class NotificationService implements INotificationService {
     */
    async sendEmailNotification<T extends CustomerIoEmailTemplateId>(
       notificationData: EmailNotificationRequestData<T>
-   ): Promise<SendResponse> {
+   ): Promise<NotificationSendResponse> {
       const requestData = createEmailNotificationRequestData(notificationData)
       const request = new SendEmailRequest(requestData)
 
@@ -161,7 +161,7 @@ export class NotificationService implements INotificationService {
     */
    async sendPushNotification<T extends CustomerIoPushMessageType>(
       notificationData: PushNotificationRequestData<T>
-   ): Promise<SendResponse> {
+   ): Promise<NotificationSendResponse> {
       const requestData = createPushNotificationRequestData(notificationData)
       const request = new SendPushRequest(requestData)
 

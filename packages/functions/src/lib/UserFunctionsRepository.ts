@@ -19,12 +19,14 @@ import {
 import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import { Expo, ExpoPushMessage } from "expo-server-sdk"
 import * as functions from "firebase-functions"
-import { logger } from "firebase-functions/v2"
 import firebase from "firebase/compat"
 import { DateTime } from "luxon"
 import { livestreamsRepo } from "../api/repositories"
 import { CUSTOMERIO_EMAIL_TEMPLATES } from "./notifications/EmailTypes"
-import { INotificationService } from "./notifications/NotificationService"
+import {
+   INotificationService,
+   NotificationSendResponse,
+} from "./notifications/NotificationService"
 
 const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 
@@ -90,7 +92,17 @@ export interface IUserFunctionsRepository extends IUserRepository {
     * Sends a welcome email to a user
     * @param user The user to send the welcome email to
     */
-   sendWelcomeEmail(user: Pick<UserData, "userEmail" | "authId">): Promise<void>
+   sendWelcomeEmail(
+      user: Pick<UserData, "userEmail" | "authId">
+   ): Promise<NotificationSendResponse>
+
+   /**
+    * Sends an email verification email to a user
+    * @param user The user to send the email verification email to
+    */
+   sendEmailVerificationEmail(
+      user: Pick<UserData, "userEmail" | "authId" | "validationPin">
+   ): Promise<NotificationSendResponse>
 }
 
 export class UserFunctionsRepository
@@ -479,16 +491,25 @@ export class UserFunctionsRepository
 
    async sendWelcomeEmail(
       user: Pick<UserData, "userEmail" | "authId">
-   ): Promise<void> {
-      logger.info(`Sending welcome email to ${user.userEmail}`)
-
-      await this.notificationService.sendEmailNotification({
+   ): Promise<NotificationSendResponse> {
+      return this.notificationService.sendEmailNotification({
          templateId: CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY,
          templateData: null,
          userAuthId: user.authId,
          to: user.userEmail,
       })
+   }
 
-      logger.info(`Welcome email sent to ${user.userEmail}`)
+   async sendEmailVerificationEmail(
+      user: Pick<UserData, "userEmail" | "authId" | "validationPin">
+   ): Promise<NotificationSendResponse> {
+      return this.notificationService.sendEmailNotification({
+         templateId: CUSTOMERIO_EMAIL_TEMPLATES.PIN_VALIDATION,
+         templateData: {
+            pinCode: user.validationPin.toString(),
+         },
+         userAuthId: user.authId,
+         to: user.userEmail,
+      })
    }
 }

@@ -184,11 +184,15 @@ class FirebaseService {
       return sendDraftApprovalRequestEmail(data)
    }
 
-   validateUserEmailWithPin = async (userInfo) => {
+   validateUserEmailWithPin = async (userInfo: {
+      recipientEmail: string
+      pinCode: number
+      fingerPrintId: string
+   }) => {
       const validateUserEmailWithPin = this.functions.httpsCallable(
-         "validateUserEmailWithPin_eu"
+         "validateUserEmailWithPin_v2"
       )
-      return validateUserEmailWithPin({ userInfo })
+      return validateUserEmailWithPin(userInfo)
    }
    sendPasswordResetEmail = async (data: {
       recipientEmail: string
