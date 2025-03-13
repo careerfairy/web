@@ -212,7 +212,7 @@ class FirebaseService {
    sendReminderEmailAboutApplicationLink = async (data) => {
       const sendReminderEmailAboutApplicationLink =
          this.functions.httpsCallable(
-            "sendReminderEmailAboutApplicationLink_eu"
+            "sendReminderEmailAboutApplicationLink_v2"
          )
       return sendReminderEmailAboutApplicationLink(data)
    }

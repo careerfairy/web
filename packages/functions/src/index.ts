@@ -84,7 +84,7 @@ import user = require("./user")
 import countries = require("./countries")
 import levels = require("./levels")
 import remindersNew = require("./reminders-new")
-
+import followups = require("./followups")
 // Auth
 exports.createNewUserAccount_v3 = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
@@ -119,20 +119,8 @@ exports.createGroup_eu = groupAdmin.createGroup
 exports.changeRole_eu = groupAdmin.changeRole
 exports.kickFromDashboard_eu = groupAdmin.kickFromDashboard
 
-// Reminders
-exports.sendReminderEmailToRegistrants =
-   reminders.sendReminderEmailToRegistrants
-exports.sendReminderEmailAboutApplicationLink_eu =
-   reminders.sendReminderEmailAboutApplicationLink
+// Reminders (Old) TODO: delete functions in file after testing new reminders
 exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
-// Not to be deployed
-exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
-exports.sendReminderToAttendees = reminders.sendReminderToAttendees
-// Not to be deployed
-exports.testSendReminderToNonAttendees =
-   reminders.testSendReminderToNonAttendees
-exports.sendReminderForNonAttendeesByStreamId =
-   reminders.sendReminderForNonAttendeesByStreamId
 
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
@@ -394,6 +382,12 @@ exports.schedule5MinutesReminderEmails =
 exports.schedule1HourReminderEmails = remindersNew.schedule1HourReminderEmails
 exports.schedule24HoursReminderEmails =
    remindersNew.schedule24HoursReminderEmails
-
-// For testing
+// For testing Reminders
 exports.manualReminderEmails = remindersNew.manualReminderEmails
+
+// Followups
+exports.sendFollowupToNonAttendees = followups.sendFollowupToNonAttendees
+exports.sendFollowupToAttendees = followups.sendFollowupToAttendees
+exports.sendManualFollowup = followups.sendManualFollowup
+exports.sendReminderEmailAboutApplicationLink_v2 =
+   followups.sendReminderEmailAboutApplicationLink

@@ -1,3 +1,4 @@
+import { JobType } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SendEmailRequestOptions } from "customerio-node/dist/lib/api/requests"
 
 /**
@@ -8,51 +9,63 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    LIVESTREAM_REMINDER_24H: "live_stream_reminder_24h",
    LIVESTREAM_REMINDER_1H: "live_stream_reminder_1h",
    LIVESTREAM_REMINDER_5M: "live_stream_reminder_5min",
+   LIVESTREAM_FOLLOWUP_ATTENDEES: "live_stream_followup_attendees",
+   LIVESTREAM_FOLLOWUP_NON_ATTENDEES: "live_stream_followup_non_attendees",
+   APPLY_TO_JOB_LATER: "apply_to_job_later",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
    (typeof CUSTOMERIO_EMAIL_TEMPLATES)[keyof typeof CUSTOMERIO_EMAIL_TEMPLATES]
 
+export type JobData = {
+   url: string
+   title: string
+   jobType: JobType
+   businessFunctionsTags: string
+   deadline: string
+}
+
+export type SpeakerData = {
+   name: string
+   position: string
+   avatarUrl: string
+   url: string
+   linkedInUrl: string
+}
+
+export type SparkData = {
+   question: string
+   category_id: string
+   thumbnailUrl: string
+   url: string
+}
+
+export type CalendarData = {
+   google: string
+   outlook: string
+   apple: string
+}
+
 /**
  * Message data for livestream registration confirmation emails
  */
-export interface LivestreamRegistrationTemplateData {
+export type LivestreamRegistrationTemplateData = {
    livestream: {
       title: string
       company: string
       start: string
       companyBannerImageUrl: string
    }
-   jobs: {
-      url: string
-      title: string
-      jobType: string
-      businessFunctionsTags?: string
-      deadline?: string
-   }[]
-   speakers: {
-      name: string
-      position: string
-      avatarUrl: string
-      url: string
-   }[]
-   sparks: {
-      question: string
-      category_id: string
-      thumbnailUrl: string
-      url: string
-   }[]
-   calendar: {
-      google: string
-      outlook: string
-      apple: string
-   }
+   jobs: JobData[]
+   speakers: SpeakerData[]
+   sparks: SparkData[]
+   calendar: CalendarData
 }
 
 /**
  * Message data for livestream reminder email template
  */
-export interface ReminderTemplateData {
+export type ReminderTemplateData = {
    livestream: {
       company: string
       bannerImageUrl: string
@@ -69,6 +82,23 @@ export interface ReminderTemplateData {
    }
 }
 
+export type ReminderFollowUpTemplateData = {
+   livestream: {
+      details_url: string
+      company: string
+      companyBannerImageUrl: string
+   }
+   speakers: SpeakerData[]
+   jobs: JobData[]
+   sparks: SparkData[]
+   allowsRecording: boolean
+}
+
+export type ApplicationLinkFollowUpTemplateData = {
+   companyName: string
+   job: JobData
+}
+
 /**
  * Union type of all possible message data types
  */
@@ -77,6 +107,9 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_1H]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_5M]: ReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES]: ReminderFollowUpTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES]: ReminderFollowUpTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.APPLY_TO_JOB_LATER]: ApplicationLinkFollowUpTemplateData
 }
 
 /**
