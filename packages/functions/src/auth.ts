@@ -485,8 +485,10 @@ export const sendPostmarkResetPasswordEmail = onCall<{
          templateData: {
             action_url: addUtmTagsToLink({ link: link }),
          },
-         userAuthId: recipientEmail,
          to: recipientEmail,
+         identifiers: {
+            email: recipientEmail,
+         },
       })
    } catch (e) {
       functions.logger.error(

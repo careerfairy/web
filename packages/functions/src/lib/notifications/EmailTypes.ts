@@ -168,10 +168,6 @@ export type EmailNotificationRequestData<T extends CustomerIoEmailTemplateId> =
        */
       templateData: CustomerIoEmailMessageData[T]
       /**
-       * The users auth ID to send the notification to
-       */
-      userAuthId: string
-      /**
        * Optional attachments for the email.
        * Each attachment should have a filename and content.
        * Content can be provided as either a Buffer or a string.
@@ -180,7 +176,7 @@ export type EmailNotificationRequestData<T extends CustomerIoEmailTemplateId> =
       attachments?: EmailAttachment[]
    } & Omit<
       SendEmailRequestOptions,
-      "transactional_message_id" | "message_data" | "identifiers"
+      "transactional_message_id" | "message_data"
    >
 
 /**
@@ -196,15 +192,11 @@ export function createEmailNotificationRequestData<
 >({
    templateId,
    templateData,
-   userAuthId,
    ...rest
 }: EmailNotificationRequestData<T>): SendEmailRequestOptions {
    return {
       ...rest,
       transactional_message_id: templateId,
       message_data: templateData,
-      identifiers: {
-         id: userAuthId,
-      },
    }
 }
