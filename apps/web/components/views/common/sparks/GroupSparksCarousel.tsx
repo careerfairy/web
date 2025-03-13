@@ -1,11 +1,11 @@
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { SxProps, Theme, Typography } from "@mui/material"
+import { SxProps, Theme } from "@mui/material"
 import useGroup from "components/custom-hook/group/useGroup"
 import useSparks from "components/custom-hook/spark/useSparks"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { SeeAllLink } from "components/views/company-page/Overview/SeeAllLink"
 import { SparksCarousel } from "components/views/sparks/components/SparksCarousel"
-import Link from "next/link"
 import { ReactNode } from "react"
 
 type Props = {
@@ -27,29 +27,23 @@ export const GroupSparksCarousel = ({
       groupId: props.groupId,
    })
 
-   const SeeAll = (
-      <Link
-         href={`/sparks/${groupSparks?.at(0)?.id}?interactionSource=${
-            InteractionSources.Company_Page
-         }&companyName=${group?.universityName}&groupId=${props.groupId}`}
-      >
-         <Typography
-            variant="xsmall"
-            color="neutral.600"
-            sx={{ textDecoration: "underline", fontWeight: 400 }}
-         >
-            See all
-         </Typography>
-      </Link>
-   )
-
    return (
       <SparksCarousel
          sparks={groupSparks}
          containerSx={sx}
          {...props}
          headerSx={headerSx}
-         seeAll={isMobile ? null : SeeAll}
+         seeAll={
+            isMobile ? null : (
+               <SeeAllLink
+                  href={`/sparks/${groupSparks?.at(0)?.id}?interactionSource=${
+                     InteractionSources.Company_Page
+                  }&companyName=${group?.universityName}&groupId=${
+                     props.groupId
+                  }`}
+               />
+            )
+         }
       />
    )
 }

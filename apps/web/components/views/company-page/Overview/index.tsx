@@ -4,6 +4,7 @@ import { useCompanyPage } from ".."
 import AboutSection from "../AboutSection"
 import EventSection from "../EventSection"
 import JobsSection from "../JobsSection"
+import { MentorsSection } from "../MentorsSection"
 import SparksSection from "../SparksSection"
 import { FollowCompany, SignUp } from "../ctas"
 
@@ -20,14 +21,15 @@ export const Overview = ({ showJobs, editMode }: Props) => {
    const showSignUpCta = isLoggedOut && !editMode
 
    return (
-      <Stack spacing={{ xs: 2, md: 5 }}>
+      <Stack spacing={{ xs: 2, md: 3 }}>
          <AboutSection />
          {showJobs ? <JobsSection /> : null}
-         {group.publicSparks ? (
+         {group.publicSparks && group.hasSparks ? (
             <SparksSection key={group.id} groupId={group.id} />
          ) : null}
-         {showFollowCompanyCta ? <FollowCompany /> : null}
          {showSignUpCta ? <SignUp /> : null}
+         <MentorsSection />
+         {showFollowCompanyCta ? <FollowCompany /> : null}
          <EventSection />
       </Stack>
    )

@@ -8,12 +8,13 @@ import { ContentCarousel } from "components/views/common/carousels/ContentCarous
 import { useCallback, useEffect, useState } from "react"
 import { useMountedState } from "react-use"
 import { useCompanyPage } from ".."
+import { SeeAllLink } from "../Overview/SeeAllLink"
 import { CreatorFormLayout } from "./CreatorFormLayout"
 import { MentorCard } from "./MentorCard"
 import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
-   const { editMode, groupCreators } = useCompanyPage()
+   const { editMode, groupCreators, group } = useCompanyPage()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
 
@@ -75,6 +76,7 @@ export const MentorsSection = () => {
                   Mentors
                </Typography>
             }
+            seeAll={<SeeAllLink href={`/mentors/${group.id}`} />}
             viewportSx={{
                // hack to ensure shadows are not cut off
                padding: "16px",
