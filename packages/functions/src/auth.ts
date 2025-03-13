@@ -308,31 +308,26 @@ export const createNewGroupAdminUserAccount = functions
       }
    })
 
-export const resendPostmarkEmailVerificationEmailWithPin = onCall(
-   async (request) => {
-      const { recipientEmail, recipientAuthId } = request.data
-      const pinCode = getRandomInt(9999)
+export const resendEmailVerificationEmailWithPin = onCall(async (request) => {
+   const { recipientEmail, recipientAuthId } = request.data
+   const pinCode = getRandomInt(9999)
 
-      const toUpdate: Pick<UserData, "validationPin"> = {
-         validationPin: pinCode,
-      }
-
-      await firestore
-         .collection("userData")
-         .doc(recipientEmail)
-         .update(toUpdate)
-
-      try {
-         await userRepo.sendEmailVerificationEmail({
-            userEmail: recipientEmail,
-            authId: recipientAuthId,
-            validationPin: pinCode,
-         })
-      } catch (e) {
-         throw new functions.https.HttpsError("invalid-argument", e)
-      }
+   const toUpdate: Pick<UserData, "validationPin"> = {
+      validationPin: pinCode,
    }
-)
+
+   await firestore.collection("userData").doc(recipientEmail).update(toUpdate)
+
+   try {
+      await userRepo.sendEmailVerificationEmail({
+         userEmail: recipientEmail,
+         authId: recipientAuthId,
+         validationPin: pinCode,
+      })
+   } catch (e) {
+      throw new functions.https.HttpsError("invalid-argument", e)
+   }
+})
 
 type ValidateUserEmailWithPinRequest = {
    recipientEmail: string

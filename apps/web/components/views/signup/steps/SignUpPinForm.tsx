@@ -69,7 +69,7 @@ const SignUpPinForm = () => {
    async function resendVerificationEmail() {
       setGeneralLoading(true)
       try {
-         await firebase.resendPostmarkEmailVerificationEmailWithPin({
+         await firebase.resendEmailVerificationEmailWithPin({
             recipientEmail: user.email,
             recipientAuthId: user.uid,
          })

@@ -203,15 +203,14 @@ class FirebaseService {
       )
       return sendPasswordResetEmail(data)
    }
-   resendPostmarkEmailVerificationEmailWithPin = async (data: {
+   resendEmailVerificationEmailWithPin = async (data: {
       recipientEmail: string
       recipientAuthId: string
    }) => {
-      const resendPostmarkEmailVerificationEmailWithPin =
-         this.functions.httpsCallable(
-            "resendPostmarkEmailVerificationEmailWithPin_v2"
-         )
-      return resendPostmarkEmailVerificationEmailWithPin(data)
+      const resendEmailVerificationEmailWithPin = this.functions.httpsCallable(
+         "resendEmailVerificationEmailWithPin"
+      )
+      return resendEmailVerificationEmailWithPin(data)
    }
 
    sendReminderEmailAboutApplicationLink = async (data) => {
