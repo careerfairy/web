@@ -71,6 +71,7 @@ const SignUpPinForm = () => {
       try {
          await firebase.resendPostmarkEmailVerificationEmailWithPin({
             recipientEmail: user.email,
+            recipientAuthId: user.uid,
          })
          setIncorrectPin(false)
          setGeneralLoading(false)
