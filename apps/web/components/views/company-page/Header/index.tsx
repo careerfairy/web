@@ -78,7 +78,7 @@ const Header = () => {
                <Box bgcolor={NAV_BG_COLOR} flex={1} />
                <Container
                   disableGutters
-                  maxWidth="lg"
+                  maxWidth={false}
                   sx={[styles.navigatorWrapper]}
                >
                   <Stack
