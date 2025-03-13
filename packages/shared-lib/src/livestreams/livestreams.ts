@@ -190,6 +190,7 @@ export interface LivestreamEvent extends Identifiable {
    timezone?: string
    isFaceToFace?: boolean
    reminderEmailsSent?: IEmailSent
+   reminderEmailsStatus?: Record<string, ReminderEmailStatus>
 
    /*
     * Breakout rooms
@@ -421,6 +422,35 @@ export interface IEmailSent {
    reminder5Minutes: boolean
    reminder1Hour: boolean
    reminder24Hours: boolean
+}
+
+/**
+ * Status of an email reminder
+ */
+export interface ReminderEmailStatus {
+   templateId: string
+   /**
+    * Timestamp when the reminder was sent
+    */
+   scheduledAt: FirebaseFirestore.Timestamp
+   /**
+    * Total number of recipients the reminder was sent to
+    */
+   totalRecipients: number
+   /**
+    * Number of successful email deliveries
+    */
+   successful: number
+   /**
+    * Number of failed email deliveries
+    */
+   failed: number
+   /**
+    * Overall status of the reminder
+    */
+   status: "complete" | "partial" | "failed"
+
+   livestreamId: string
 }
 
 export interface LiveStreamEventWithUsersLivestreamData

@@ -5,9 +5,12 @@ import { SendEmailRequestOptions } from "customerio-node/dist/lib/api/requests"
  */
 export const CUSTOMERIO_EMAIL_TEMPLATES = {
    LIVESTREAM_REGISTRATION: "live_stream_registration_confirmation",
+   LIVESTREAM_REMINDER_24H: "live_stream_reminder_24h",
+   LIVESTREAM_REMINDER_1H: "live_stream_reminder_1h",
+   LIVESTREAM_REMINDER_5M: "live_stream_reminder_5min",
 } as const satisfies Record<string, string>
 
-export type CustomerIoEmailMessageType =
+export type CustomerIoEmailTemplateId =
    (typeof CUSTOMERIO_EMAIL_TEMPLATES)[keyof typeof CUSTOMERIO_EMAIL_TEMPLATES]
 
 /**
@@ -47,10 +50,33 @@ export interface LivestreamRegistrationTemplateData {
 }
 
 /**
+ * Message data for livestream reminder email template
+ */
+export interface ReminderTemplateData {
+   livestream: {
+      company: string
+      bannerImageUrl: string
+      companyLogoUrl: string
+      start: string
+      title: string
+      url: string
+      companyPageUrl: string
+   }
+   calendar: {
+      google: string
+      outlook: string
+      apple: string
+   }
+}
+
+/**
  * Union type of all possible message data types
  */
 export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION]: LivestreamRegistrationTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H]: ReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_1H]: ReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_5M]: ReminderTemplateData
 }
 
 /**
@@ -72,7 +98,7 @@ export type EmailAttachment = {
    content: string
 }
 
-export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
+export type EmailNotificationRequestData<T extends CustomerIoEmailTemplateId> =
    {
       /**
        * The type of message to create
@@ -107,7 +133,7 @@ export type EmailNotificationRequestData<T extends CustomerIoEmailMessageType> =
  * @returns Email request options object
  */
 export function createEmailNotificationRequestData<
-   T extends CustomerIoEmailMessageType
+   T extends CustomerIoEmailTemplateId
 >({
    templateId,
    templateData,
