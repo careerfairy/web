@@ -142,6 +142,10 @@ export class RankedLivestreamEvent {
    getPoints() {
       return this.points
    }
+
+   setPoints(points: number) {
+      this.points = points
+   }
 }
 
 export function getMostCommonFieldsOfStudies(
