@@ -14,6 +14,7 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    APPLY_TO_JOB_LATER: "apply_to_job_later",
    WELCOME_TO_CAREERFAIRY: "welcome_to_careerfairy",
    PIN_VALIDATION: "pin_validation",
+   PASSWORD_RESET: "password_reset",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
@@ -115,6 +116,13 @@ export type PinValidationTemplateData = {
 }
 
 /**
+ * Reset url for password reset email template
+ */
+export type PasswordResetTemplateData = {
+   action_url: string
+}
+
+/**
  * Union type of all possible message data types
  */
 export type CustomerIoEmailMessageData = {
@@ -127,6 +135,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.APPLY_TO_JOB_LATER]: ApplicationLinkFollowUpTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY]: null
    [CUSTOMERIO_EMAIL_TEMPLATES.PIN_VALIDATION]: PinValidationTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PASSWORD_RESET]: PasswordResetTemplateData
 }
 
 /**
