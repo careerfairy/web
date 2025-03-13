@@ -45,5 +45,5 @@ export const RECOMMENDATION_POINTS = {
    },
 
    // Multiplies live stream points if the user is in the featured group target (implies live stream is from a featured group)
-   FEATURED_GROUP_LIVESTREAM_POINTS_MULTIPLIER: 100, // TODO: Replace with actual value: 1.5
+   FEATURED_GROUP_LIVESTREAM_POINTS_MULTIPLIER: 1.25,
 }

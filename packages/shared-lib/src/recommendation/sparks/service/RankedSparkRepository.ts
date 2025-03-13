@@ -20,7 +20,7 @@ type RankSparkArgs = {
  * update it to fetch the data from a data bundle
  */
 export class RankedSparkRepository {
-   private readonly featuredGroupSparkPointsMultiplier = 100
+   private readonly featuredGroupSparkPointsMultiplier = 1.25
    // from userData
    private readonly pointsPerTargetedCountryMatch = 5
    private readonly pointsPerTargetedFieldOfStudyMatch = 5
