@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { mainProductionDomainWithProtocol } from "@careerfairy/shared-lib/utils/urls"
 import { isEmpty } from "lodash/fp"
 import { v4 as uuidv4 } from "uuid"
 import { LONG_NUMBER } from "../util/constants"
@@ -314,7 +315,7 @@ export const getBaseUrl = () => {
    if (typeof window !== "undefined") {
       return window.location.origin
    }
-   return process.env.NEXT_PUBLIC_URL || "https://careerfairy.io"
+   return process.env.NEXT_PUBLIC_URL || mainProductionDomainWithProtocol
 }
 
 export const maybePluralize = (count, noun, suffix = "s") =>
