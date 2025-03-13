@@ -293,10 +293,14 @@ export const resendPostmarkEmailVerificationEmailWithPin = onCall(
       const { recipientEmail, recipientAuthId } = request.data
       const pinCode = getRandomInt(9999)
 
+      const toUpdate: Pick<UserData, "validationPin"> = {
+         validationPin: pinCode,
+      }
+
       await firestore
          .collection("userData")
          .doc(recipientEmail)
-         .update({ validationPin: pinCode })
+         .update(toUpdate)
 
       try {
          await notificationService.sendEmailNotification({
