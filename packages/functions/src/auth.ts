@@ -451,7 +451,7 @@ export const validateUserEmailWithPin = onCall<ValidateUserEmailWithPinRequest>(
    }
 )
 
-export const sendPostmarkResetPasswordEmail = onCall<{
+export const sendPasswordResetEmail = onCall<{
    recipientEmail: string
    redirectLink: string
 }>(async (request) => {
