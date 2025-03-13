@@ -91,22 +91,6 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
          this.results.filter(Boolean).flat()
       )
 
-      console.log(
-         "🚀 Sparks recommendation engine: featured groups for: ",
-         this.user.id
-      )
-
-      console.log(
-         "🚀 Sparks recommendation engine: results before applying featured groups scoring: ",
-         this.user.id,
-         allResults?.map((spark) => {
-            return {
-               id: spark.model.spark.id,
-               points: spark.getPoints(),
-            }
-         })
-      )
-
       this.setResults(
          this.rankedSparkRepo.applyFeaturedGroupSparkPointsMultiplier(
             allResults,
@@ -115,17 +99,6 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
                ? FieldOfStudyCategoryMap[this.user.fieldOfStudy.id]
                : undefined
          )
-      )
-
-      console.log(
-         "🚀 Sparks recommendation engine: featured groups results for: ",
-         this.user.id,
-         allResults?.map((spark) => {
-            return {
-               id: spark.model.spark.id,
-               points: spark.getPoints(),
-            }
-         })
       )
 
       return this

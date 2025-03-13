@@ -1242,17 +1242,13 @@ export class LivestreamService {
     * 1. Events the user is already registered for.
     * 2. Events that have already ended.
     */
-   async getRecommendedEvents(
-      limit: number,
-      userId: string,
-      talentProfileV1: boolean
-   ) {
+   async getRecommendedEvents(limit: number, userId: string) {
       const { data: eventIds } = await httpsCallable<
          { limit: number },
          string[]
       >(
          this.functions,
-         talentProfileV1 ? "getRecommendedEvents_v5" : "getRecommendedEvents_v4"
+         "getRecommendedEvents_v6"
       )({ limit })
 
       const recommendedLivestreams: LivestreamEvent[] = []

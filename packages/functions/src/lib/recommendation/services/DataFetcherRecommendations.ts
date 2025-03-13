@@ -1,4 +1,7 @@
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { FieldOfStudyCategoryMap } from "@careerfairy/shared-lib/fieldOfStudy"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { IGroupRepository } from "@careerfairy/shared-lib/groups/GroupRepository"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import {
@@ -43,6 +46,8 @@ export interface IRecommendationDataFetcher {
    getUserStudyBackgrounds(): Promise<StudyBackground[]>
 
    getUserLanguages(): Promise<ProfileLanguage[]>
+
+   getUserFeaturedGroups(user: UserData): Promise<Group[]>
 }
 
 /**
@@ -109,6 +114,12 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
       throw new Error("Not implemented")
    }
 
+   async getUserFeaturedGroups(user: UserData): Promise<Group[]> {
+      // Not implemented for newsletter, since data fetching would be per
+      // user meaning an excess number requests would be made for each subscribed user
+      throw new Error("Not implemented: " + user?.id)
+   }
+
    static async create(): Promise<NewsletterDataFetcher> {
       const loader = new BundleLoader()
 
@@ -133,7 +144,8 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
       private readonly userId: string,
       private readonly livestreamRepo: ILivestreamRepository,
       private readonly userRepo: IUserRepository,
-      private readonly sparksRepo: ISparkFunctionsRepository
+      private readonly sparksRepo: ISparkFunctionsRepository,
+      private readonly groupRepo: IGroupRepository
    ) {
       this.loader = new BundleLoader()
    }
@@ -195,6 +207,19 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
 
    async getUserLanguages(): Promise<ProfileLanguage[]> {
       return this.userRepo.getUserLanguages(this.userId)
+   }
+
+   async getUserFeaturedGroups(user: UserData): Promise<Group[]> {
+      if (!user?.fieldOfStudy?.id || !user?.countryIsoCode) return []
+
+      const featuredGroupsByCountry =
+         (await this.groupRepo.getFeaturedGroups(user.countryIsoCode)) ?? []
+
+      return featuredGroupsByCountry.filter((group) =>
+         group.featured?.targetAudience?.includes(
+            FieldOfStudyCategoryMap[user.fieldOfStudy.id]
+         )
+      )
    }
 }
 
