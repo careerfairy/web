@@ -1,3 +1,5 @@
+import { removeDuplicateDocuments } from "../../../BaseFirebaseRepository"
+import { FieldOfStudyCategoryMap } from "../../../fieldOfStudy"
 import { AdditionalUserRecommendationInfo, UserData } from "../../../users"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
 import { RankedSparkRepository } from "./RankedSparkRepository"
@@ -80,6 +82,51 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
             )
          }
       })
+
+      return this
+   }
+
+   public userFeaturedGroups() {
+      const allResults = removeDuplicateDocuments(
+         this.results.filter(Boolean).flat()
+      )
+
+      console.log(
+         "🚀 Sparks recommendation engine: featured groups for: ",
+         this.user.id
+      )
+
+      console.log(
+         "🚀 Sparks recommendation engine: results before applying featured groups scoring: ",
+         this.user.id,
+         allResults?.map((spark) => {
+            return {
+               id: spark.model.spark.id,
+               points: spark.getPoints(),
+            }
+         })
+      )
+
+      this.setResults(
+         this.rankedSparkRepo.applyFeaturedGroupSparkPointsMultiplier(
+            allResults,
+            this.user?.countryIsoCode,
+            this.user?.fieldOfStudy?.id
+               ? FieldOfStudyCategoryMap[this.user.fieldOfStudy.id]
+               : undefined
+         )
+      )
+
+      console.log(
+         "🚀 Sparks recommendation engine: featured groups results for: ",
+         this.user.id,
+         allResults?.map((spark) => {
+            return {
+               id: spark.model.spark.id,
+               points: spark.getPoints(),
+            }
+         })
+      )
 
       return this
    }

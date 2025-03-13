@@ -78,6 +78,7 @@ export default class RecommendationSparksServiceCore {
 
       // Return the top {limit} events
       const recommendedIds = sortedRecommendedSparks
+
          .map((event) => event.id)
          .slice(0, limit)
 
@@ -112,6 +113,7 @@ export default class RecommendationSparksServiceCore {
          .userUniversityCode()
          .userFieldOfStudy()
          .userStudyBackground()
+         .userFeaturedGroups()
          .get()
    }
 }

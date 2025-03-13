@@ -1,4 +1,3 @@
-import { CUTOFF_DATE } from "@careerfairy/shared-lib/dist/customerio"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import { firestore } from "../../lib/firebase"
@@ -17,18 +16,19 @@ interface UpdateDocumentsConfig {
    waitTimeBetweenBatches?: number
 }
 
-const FIELD_TO_ORDER_BY = "lastActivityAt"
+const FIELD_TO_ORDER_BY = "universityName"
 
 // Configure your update here
 const config: UpdateDocumentsConfig = {
    // Example: collection query
    query: firestore
-      .collection("userData")
-      .where(FIELD_TO_ORDER_BY, ">", CUTOFF_DATE)
+      .collection("careerCenterData")
+      // Keep this commented out for now as an example
+      // .where(FIELD_TO_ORDER_BY, "!=", true)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
    updateData: { migrationTrigger: Date.now() },
-   batchSize: 1_000,
-   waitTimeBetweenBatches: 5000,
+   batchSize: 25,
+   waitTimeBetweenBatches: 5_000,
 }
 
 const getTotalDocumentCount = async (query: Query) => {
