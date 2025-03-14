@@ -1,11 +1,11 @@
 import { Box, Button, Drawer, Stack, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import Link from "next/link"
 import { FC, useState } from "react"
 import { Menu } from "react-feather"
-import B2CDrawer from "./B2CDrawer"
-import Link from "next/link"
 import { sxStyles } from "types/commonTypes"
-import { useAuth } from "HOCs/AuthProvider"
+import B2CDrawer from "./B2CDrawer"
 
 const styles = sxStyles({
    wrapper: {
@@ -48,17 +48,33 @@ const MenuBurger: FC<Props> = ({ id }) => {
          <Button onClick={() => setOpen(true)}>
             <Menu />
          </Button>
-         <Drawer open={open} anchor="right" onClose={() => setOpen(false)}>
+         <Drawer
+            open={open}
+            anchor="right"
+            onClose={() => setOpen(false)}
+            // PaperProps={{ sx: { backgroundColor: "black !important" } }}
+         >
             <Box sx={styles.drawer}>
                {isB2C ? (
                   <B2CDrawer onCloseDrawer={() => setOpen(false)} />
                ) : (
                   <Link href={"/employers"}>
-                     <Typography variant="brandedBody" color={"neutral.700"}>
+                     <Typography variant="brandedBody" color="black !important">
                         For employers
                      </Typography>
                   </Link>
                )}
+
+               <Link href={"/employers"}>
+                  <Typography variant="brandedBody" color="black !important">
+                     Career guide
+                  </Typography>
+               </Link>
+               <Link href={"/employers"}>
+                  <Typography variant="brandedBody" color="black !important">
+                     Who&apos;s hiring
+                  </Typography>
+               </Link>
 
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <Stack spacing={1.5} sx={styles.actions}>
@@ -66,7 +82,6 @@ const MenuBurger: FC<Props> = ({ id }) => {
                         sx={styles.secondaryBtn}
                         fullWidth
                         variant="outlined"
-                        color="grey"
                         href={"/login"}
                         component={Link}
                      >
