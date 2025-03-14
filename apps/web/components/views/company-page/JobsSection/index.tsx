@@ -26,7 +26,7 @@ const styles = sxStyles({
 
 const Header = () => {
    return (
-      <Typography variant="h4" fontWeight={"600"} color="black">
+      <Typography variant="brandedH3" fontWeight={"600"} color="black">
          Jobs
       </Typography>
    )
@@ -38,6 +38,8 @@ const JobsSection = () => {
       customJobs,
    } = useCompanyPage()
 
+   if (!customJobs?.length) return null
+
    return (
       <Box sx={styles.wrapper}>
          <SectionAnchor ref={jobsSectionRef} tabValue={TabValue.jobs} />
@@ -47,13 +49,15 @@ const JobsSection = () => {
                   <Header />
                </Box>
                <GroupJobsList jobs={customJobs} />
-               <Button
-                  variant="outlined"
-                  color="primary"
-                  sx={styles.checkAllJobsButton}
-               >
-                  Check all job openings
-               </Button>
+               {customJobs?.length ? (
+                  <Button
+                     variant="outlined"
+                     color="primary"
+                     sx={styles.checkAllJobsButton}
+                  >
+                     Check all job openings
+                  </Button>
+               ) : null}
             </Stack>
          </SuspenseWithBoundary>
       </Box>

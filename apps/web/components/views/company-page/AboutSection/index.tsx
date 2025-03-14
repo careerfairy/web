@@ -1,19 +1,19 @@
-import { useCallback, useMemo } from "react"
 import { Box, Button, CircularProgress, Typography } from "@mui/material"
+import { useCallback, useMemo } from "react"
 import { SectionAnchor, TabValue, useCompanyPage } from "../index"
 
 import { sxStyles } from "../../../../types/commonTypes"
 // react feather
+import SanitizedHTML from "components/util/SanitizedHTML"
+import dynamic from "next/dynamic"
 import {
    Edit2 as EditIcon,
    MapPin as MapPinIcon,
    Tag as TagIcon,
    Users as UsersIcon,
 } from "react-feather"
-import EditDialog from "../EditDialog"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import SanitizedHTML from "components/util/SanitizedHTML"
-import dynamic from "next/dynamic"
+import EditDialog from "../EditDialog"
 
 const styles = sxStyles({
    wrapper: {
@@ -38,8 +38,10 @@ const styles = sxStyles({
    },
 })
 
-const AboutDialog = dynamic(() => import('./AboutDialog'), { ssr: false, loading: () => <CircularProgress /> });
-
+const AboutDialog = dynamic(() => import("./AboutDialog"), {
+   ssr: false,
+   loading: () => <CircularProgress />,
+})
 
 const AboutSection = () => {
    const {
@@ -97,7 +99,7 @@ const AboutSection = () => {
          <Box sx={styles.wrapper}>
             <SectionAnchor ref={aboutSectionRef} tabValue={TabValue.profile} />
             <Box sx={styles.titleSection}>
-               <Typography variant="h4" fontWeight={"600"} color="black">
+               <Typography variant="brandedH3" fontWeight={"600"} color="black">
                   About
                </Typography>
                {editMode ? (

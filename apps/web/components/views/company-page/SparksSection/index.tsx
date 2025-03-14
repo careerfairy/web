@@ -17,7 +17,7 @@ type Props = {
 
 const CarouselHeader = () => {
    return (
-      <Typography variant="h4" fontWeight={"600"} color="black">
+      <Typography variant="brandedH3" fontWeight={"600"} color="black">
          Sparks
       </Typography>
    )
