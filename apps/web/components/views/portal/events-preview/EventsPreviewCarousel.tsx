@@ -346,7 +346,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               </Link>
                            </ConditionalWrapper>
                         </Box>
-                        <Stack
+                        {/* <Stack
                            spacing={1}
                            direction={"row"}
                            justifyContent="space-between"
@@ -358,14 +358,14 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               {seeMoreComponent}
                            </ConditionalWrapper>
                            {(!isMobile && arrowsComponent) || null}
-                        </Stack>
+                        </Stack> */}
                      </Box>
                   </ConditionalWrapper>
 
                   <ConditionalWrapper
                      condition={!isEmbedded && !allStyles.compact}
                   >
-                     <Box sx={allStyles.eventsHeader}>
+                     <Stack direction="row" justifyContent="space-between">
                         {typeof title === "string" ? (
                            <Typography
                               variant={allStyles.titleVariant}
@@ -378,7 +378,18 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         ) : (
                            Boolean(title) && title
                         )}
-                     </Box>
+                        <Stack
+                           direction="row"
+                           spacing={2}
+                           justifyContent="flex-end"
+                           alignItems="flex-end"
+                           // mt={1}
+                           // mb={1}
+                        >
+                           {seeMoreComponent}
+                           {(!isMobile && arrowsComponent) || null}
+                        </Stack>
+                     </Stack>
                   </ConditionalWrapper>
                   <Stack sx={styles.previewContent}>
                      <ConditionalWrapper
@@ -400,13 +411,13 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            </Box>
                         </Stack>
                      </ConditionalWrapper>
-                     <ConditionalWrapper
+                     {/* <ConditionalWrapper
                         condition={!isEmbedded && !allStyles.compact}
                      >
                         <Stack
                            direction="row"
                            spacing={2}
-                           justifyContent="space-between"
+                           justifyContent="flex-end"
                            alignItems="flex-end"
                            mt={1}
                            mb={1}
@@ -414,7 +425,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            <Box>{seeMoreComponent}</Box>
                            {arrowsComponent}
                         </Stack>
-                     </ConditionalWrapper>
+                     </ConditionalWrapper> */}
                      {subtitle}
                      <Box ref={autoPlayRef}>
                         <Box id={id} sx={allStyles.viewportSx} ref={emblaRef}>

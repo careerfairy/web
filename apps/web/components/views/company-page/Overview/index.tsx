@@ -28,8 +28,8 @@ export const Overview = ({ showJobs, editMode }: Props) => {
             <SparksSection key={group.id} groupId={group.id} />
          ) : null}
          {showSignUpCta ? <SignUp /> : null}
-         <MentorsSection />
          {showFollowCompanyCta ? <FollowCompany /> : null}
+         <MentorsSection />
          <EventSection />
       </Stack>
    )

@@ -1,6 +1,5 @@
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useMountedState } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { SectionAnchor, TabValue, useCompanyPage } from ".."
 import GroupJobsList from "./GroupJobsList"
@@ -39,30 +38,24 @@ const JobsSection = () => {
       customJobs,
    } = useCompanyPage()
 
-   const isMounted = useMountedState()
-
    return (
       <Box sx={styles.wrapper}>
          <SectionAnchor ref={jobsSectionRef} tabValue={TabValue.jobs} />
-         {isMounted() ? (
-            <SuspenseWithBoundary>
-               <Stack width={"100%"} spacing={2}>
-                  <Box sx={styles.titleSection}>
-                     <Header />
-                  </Box>
-                  <GroupJobsList jobs={customJobs} />
-                  <Button
-                     variant="outlined"
-                     color="primary"
-                     sx={styles.checkAllJobsButton}
-                  >
-                     Check all job openings
-                  </Button>
-               </Stack>
-            </SuspenseWithBoundary>
-         ) : (
-            <JobsSectionDetailsSkeleton />
-         )}
+         <SuspenseWithBoundary fallback={<JobsSectionDetailsSkeleton />}>
+            <Stack width={"100%"} spacing={2}>
+               <Box sx={styles.titleSection}>
+                  <Header />
+               </Box>
+               <GroupJobsList jobs={customJobs} />
+               <Button
+                  variant="outlined"
+                  color="primary"
+                  sx={styles.checkAllJobsButton}
+               >
+                  Check all job openings
+               </Button>
+            </Stack>
+         </SuspenseWithBoundary>
       </Box>
    )
 }
