@@ -169,6 +169,7 @@ export type EventsCarouselStyling = {
    titleVariant?: TypographyProps["variant"]
    eventsHeader?: SxProps
    mainWrapperBoxSx?: unknown
+   headerRightSx?: SxProps
 }
 export type ChildRefType = {
    goNext: () => void
@@ -383,8 +384,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            spacing={2}
                            justifyContent="flex-end"
                            alignItems="flex-end"
-                           // mt={1}
-                           // mb={1}
+                           sx={allStyles.headerRightSx}
                         >
                            {seeMoreComponent}
                            {(!isMobile && arrowsComponent) || null}

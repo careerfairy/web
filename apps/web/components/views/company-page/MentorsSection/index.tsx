@@ -72,7 +72,12 @@ export const MentorsSection = () => {
          <ContentCarousel
             slideWidth={MentorCard.width}
             headerTitle={
-               <Typography variant="h4" fontWeight={"600"} color="black" mb={1}>
+               <Typography
+                  variant="brandedH3"
+                  fontWeight={"600"}
+                  color="black"
+                  mb={1}
+               >
                   Mentors
                </Typography>
             }
@@ -82,6 +87,12 @@ export const MentorsSection = () => {
                padding: "16px",
                margin: "-16px",
                width: "calc(100% + 16px)",
+            }}
+            headerRightSx={{
+               mr: "16px",
+            }}
+            rootSx={{
+               mr: "-16px",
             }}
             emblaProps={{
                emblaOptions: {

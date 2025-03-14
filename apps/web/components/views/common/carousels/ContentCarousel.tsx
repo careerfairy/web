@@ -31,6 +31,8 @@ type ContentCarouselProps = Pick<GenericCarouselProps, "children"> & {
    viewportSx?: SxProps
    containerSx?: SxProps
    headerSx?: SxProps
+   rootSx?: SxProps
+   headerRightSx?: SxProps
    emblaProps?: {
       emblaRef?: UseEmblaCarouselType[0]
       emblaApi?: UseEmblaCarouselType[1]
@@ -49,6 +51,8 @@ export const ContentCarousel = ({
    emblaProps,
    disableArrows = false,
    seeAll,
+   rootSx,
+   headerRightSx,
 }: ContentCarouselProps) => {
    const carouselContainerRef = useRef<HTMLDivElement>(null)
 
@@ -73,7 +77,7 @@ export const ContentCarousel = ({
    }, [isDesktop, carouselContainerRef, disableArrows])
 
    return (
-      <Stack display="grid" gap="16px">
+      <Stack display="grid" gap="16px" sx={rootSx}>
          {Boolean(headerTitle) || shouldShowArrows() ? (
             <Stack
                direction="row"
@@ -86,7 +90,12 @@ export const ContentCarousel = ({
                ) : (
                   Boolean(headerTitle) && headerTitle
                )}
-               <Stack direction="row" alignItems="flex-end" spacing={2}>
+               <Stack
+                  direction="row"
+                  alignItems="flex-end"
+                  spacing={2}
+                  sx={headerRightSx}
+               >
                   {seeAll}
                   {shouldShowArrows() && (
                      <GenericCarousel.Arrows

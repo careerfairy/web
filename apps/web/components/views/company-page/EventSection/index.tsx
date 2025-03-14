@@ -43,11 +43,11 @@ const styles = sxStyles({
    //    },
    // },
    eventTitle: {
-      fontFamily: "Poppins",
-      fontStyle: "normal",
-      fontWeight: "600",
-      color: "black",
-      lineHeight: "27px",
+      // fontFamily: "Poppins",
+      // fontStyle: "normal",
+      // fontWeight: "600",
+      // color: "black",
+      // lineHeight: "27px",
    },
    eventsHeader: {
       display: "flex",
@@ -112,6 +112,15 @@ const EventSection = () => {
       title: styles.eventTitle,
       eventsHeader: styles.eventsHeader,
       padding: false,
+      // mainWrapperBoxSx: {
+      //    mr: "-16px",
+      // },
+      mainWrapperBoxSx: {
+         mr: "-16px !important",
+      },
+      headerRightSx: {
+         mr: "16px !important",
+      },
    }
 
    return isMounted() ? (
@@ -127,7 +136,7 @@ const EventSection = () => {
                   <StayUpToDateComponent
                      title="Next Live Streams"
                      seeMoreLink={`/next-livestreams?${query}`}
-                     titleAsLink={isMobile}
+                     // titleAsLink={isMobile}
                   />
                }
             >
@@ -136,7 +145,7 @@ const EventSection = () => {
                      <Typography
                         variant="brandedH3"
                         fontWeight={"600"}
-                        color="neutral.900"
+                        color="black"
                      >
                         Next Live Streams
                      </Typography>
@@ -153,7 +162,11 @@ const EventSection = () => {
             <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
                <EventsPreviewCarousel
                   title={
-                     <Typography variant="h4" fontWeight={"600"} color="black">
+                     <Typography
+                        variant="brandedH3"
+                        fontWeight={"600"}
+                        color="black"
+                     >
                         Past Live Streams
                      </Typography>
                   }
@@ -203,7 +216,7 @@ export const StayUpToDateComponent: FC<StayUpToDateProps> = ({
 
    const titleComponent = (
       <Typography
-         variant={"h4"}
+         variant={"brandedH3"}
          sx={[styles.eventTitle, showTitleAsLink ? styles.underlined : null]}
          fontWeight={"600"}
          color="black"
