@@ -5,7 +5,7 @@ import EventsPreviewCarousel, {
    EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { FC, useCallback, useMemo, useState } from "react"
+import { FC, useCallback, useState } from "react"
 import { useMountedState } from "react-use"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -25,23 +25,23 @@ const styles = sxStyles({
       mt: 2,
       mb: 2,
    },
-   titleSection: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-   },
-   addEvent: {
-      borderRadius: "10px",
-      height: (theme) => theme.spacing(40),
-      width: (theme) => theme.spacing(35),
-      border: "dashed",
-      borderColor: (theme) => theme.palette.grey.A400,
-      fontSize: "16px",
+   // titleSection: {
+   //    display: "flex",
+   //    justifyContent: "space-between",
+   //    alignItems: "center",
+   // },
+   // addEvent: {
+   //    borderRadius: "10px",
+   //    height: (theme) => theme.spacing(40),
+   //    width: (theme) => theme.spacing(35),
+   //    border: "dashed",
+   //    borderColor: (theme) => theme.palette.grey.A400,
+   //    fontSize: "16px",
 
-      "&:hover": {
-         border: "dashed",
-      },
-   },
+   //    "&:hover": {
+   //       border: "dashed",
+   //    },
+   // },
    eventTitle: {
       fontFamily: "Poppins",
       fontStyle: "normal",
@@ -60,12 +60,12 @@ const styles = sxStyles({
       textDecoration: "underline",
       color: "#2ABAA5",
    },
-   description: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingTop: 2,
-   },
+   // description: {
+   //    display: "flex",
+   //    justifyContent: "space-between",
+   //    alignItems: "center",
+   //    paddingTop: 2,
+   // },
    titleLink: {
       color: "#000",
       "&:hover": {
@@ -104,19 +104,6 @@ const EventSection = () => {
       [handleOpenDialog]
    )
 
-   const upcomingEventsDescription = useMemo(() => {
-      if (editMode) {
-         return "Below are your published live streams, these will be shown on your company page."
-      }
-      return "Watch live streams. Discover new career ideas, interesting jobs, internships and programmes for students. Get hired."
-   }, [editMode])
-   const pastEventsDescription = useMemo(() => {
-      if (editMode) {
-         return "Here are the recordings of your previous live streams, which will be featured on your company page."
-      }
-      return `Have you missed a live stream from ${group.universityName}? Don't worry, you can re-watch them all here.`
-   }, [editMode, group.universityName])
-
    const eventsCarouselStyling: EventsCarouselStyling = {
       compact: isMobile,
       seeMoreSx: styles.seeMoreText,
@@ -133,22 +120,28 @@ const EventSection = () => {
             ref={eventSectionRef}
             tabValue={TabValue.livesStreams}
          />
-         <Stack spacing={4} sx={isMobile ? styles.eventsWrapper : null}>
+         <Stack spacing={"8px"} sx={isMobile ? styles.eventsWrapper : null}>
             <ConditionalWrapper
                condition={Boolean(upcomingLivestreams?.length)}
                fallback={
                   <StayUpToDateComponent
                      title="Next Live Streams"
-                     description={upcomingEventsDescription}
                      seeMoreLink={`/next-livestreams?${query}`}
                      titleAsLink={isMobile}
                   />
                }
             >
                <EventsPreviewCarousel
-                  title="Next Live Streams"
+                  title={
+                     <Typography
+                        variant="brandedH3"
+                        fontWeight={"600"}
+                        color="neutral.900"
+                     >
+                        Next Live Streams
+                     </Typography>
+                  }
                   events={upcomingLivestreams ?? []}
-                  eventDescription={upcomingEventsDescription}
                   type={EventsTypes.COMING_UP}
                   seeMoreLink={`/next-livestreams?${query}`}
                   styling={eventsCarouselStyling}
@@ -159,9 +152,12 @@ const EventSection = () => {
             </ConditionalWrapper>
             <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
                <EventsPreviewCarousel
-                  title="Past Live Streams"
+                  title={
+                     <Typography variant="h4" fontWeight={"600"} color="black">
+                        Past Live Streams
+                     </Typography>
+                  }
                   events={pastLivestreams ?? []}
-                  eventDescription={pastEventsDescription}
                   type={EventsTypes.PAST_EVENTS}
                   seeMoreLink={`/past-livestreams?${query}`}
                   styling={eventsCarouselStyling}
@@ -189,7 +185,7 @@ const EventSection = () => {
 }
 type StayUpToDateProps = {
    title: string
-   description: string
+   description?: string
    titleAsLink?: boolean
    seeMoreLink?: string
 }
@@ -200,7 +196,6 @@ type StayUpToDateProps = {
  */
 export const StayUpToDateComponent: FC<StayUpToDateProps> = ({
    title,
-   description,
    titleAsLink,
    seeMoreLink,
 }) => {
@@ -227,21 +222,6 @@ export const StayUpToDateComponent: FC<StayUpToDateProps> = ({
                titleComponent
             )}
          </Box>
-
-         {(!showTitleAsLink && (
-            <Stack mb={2}>
-               <Box sx={styles.description}>
-                  <Typography
-                     variant="h6"
-                     fontWeight={"400"}
-                     color="textSecondary"
-                  >
-                     {description}
-                  </Typography>
-               </Box>
-            </Stack>
-         )) ||
-            null}
          <StayUpToDateBanner />
       </Box>
    )
