@@ -1,8 +1,4 @@
-import {
-   Group,
-   GROUP_DASHBOARD_ROLE,
-   GroupAdmin,
-} from "@careerfairy/shared-lib/groups"
+import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import {
    getPdfCategoryChartData,
@@ -23,10 +19,11 @@ import {
    WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { mainProductionDomainWithProtocol } from "@careerfairy/shared-lib/utils/urls"
 import { UserRecord } from "firebase-admin/auth"
-import { array, boolean, mixed, object, string } from "yup"
+import { onCall } from "firebase-functions/v2/https"
+import { array, boolean, InferType, mixed, object, string } from "yup"
 import { auth, firestore } from "./api/firestoreAdmin"
-import { client } from "./api/postmark"
 import config from "./config"
 import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import {
@@ -39,144 +36,10 @@ import {
    getDateString,
    getRatingsAverage,
    makeRequestingGroupIdFirst,
-   onCallWrapper,
+   onCallWrapperV2,
    partition,
 } from "./util"
 import functions = require("firebase-functions")
-
-export const sendDraftApprovalRequestEmail = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      try {
-         const {
-            senderName,
-            livestream,
-            submitTime,
-            // TODO Update the cloud function to send the sender an email of the draft they submitted
-            // senderEmail,
-         } = data
-
-         const admins: GroupAdmin[] = []
-
-         if (livestream.groupIds) {
-            for (const groupId of livestream.groupIds) {
-               const newAdmins = await groupRepo.getGroupAdmins(groupId)
-               if (newAdmins) {
-                  admins.push(...newAdmins)
-               }
-            }
-         }
-
-         const origin =
-            context?.rawRequest?.headers?.origin || "https://careerfairy.io"
-
-         const adminsInfo = admins.map((admin) => {
-            return {
-               groupId: admin.groupId,
-               email: admin.email,
-               eventDashboardLink: `${origin}/group/${admin.groupId}/admin/events?eventId=${livestream.id}`,
-               nextLivestreamsLink: `${origin}/next-livestreams/${admin.groupId}?livestreamId=${livestream.id}`,
-            }
-         })
-
-         functions.logger.log("admins Info in approval request", adminsInfo)
-
-         const emails = adminsInfo.map(({ email, eventDashboardLink }) => ({
-            TemplateId: Number(
-               process.env.POSTMARK_TEMPLATE_DRAFT_STREAM_APPROVAL_REQUEST
-            ),
-            From: "CareerFairy <noreply@careerfairy.io>",
-            To: email,
-            TemplateModel: {
-               sender_name: senderName,
-               livestream_title: livestream.title,
-               livestream_company_name: livestream.company,
-               draft_stream_link: addUtmTagsToLink({
-                  link: eventDashboardLink,
-               }),
-               submit_time: submitTime,
-            },
-         }))
-
-         client.sendEmailBatchWithTemplates(emails).then(
-            (responses) => {
-               responses.forEach((response) =>
-                  functions.logger.log(
-                     "sent batch DraftApprovalRequestEmail email with response:",
-                     response
-                  )
-               )
-            },
-            (error) => {
-               functions.logger.error("error:" + error)
-            }
-         )
-      } catch (e) {
-         functions.logger.error("e:" + e)
-         throw new functions.https.HttpsError("unknown", e)
-      }
-   })
-
-export const sendNewlyPublishedEventEmail = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      try {
-         const { senderName, stream, submitTime } = data
-
-         const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(
-            stream.id,
-            context.rawRequest.headers.origin
-         )
-
-         functions.logger.log(
-            "admins Info in newly published event",
-            adminsInfo
-         )
-
-         const emails = adminsInfo.map(
-            ({ email, eventDashboardLink, nextLivestreamsLink }) => ({
-               TemplateId: Number(
-                  process.env.POSTMARK_TEMPLATE_NEWLY_PUBLISHED_EVENT
-               ),
-               From: "CareerFairy <noreply@careerfairy.io>",
-               To: email,
-               TemplateModel: {
-                  sender_name: senderName,
-                  dashboard_link: addUtmTagsToLink({
-                     link: eventDashboardLink,
-                  }),
-                  next_livestreams_link: addUtmTagsToLink({
-                     link: nextLivestreamsLink,
-                     campaign: "shareEvents",
-                  }),
-                  livestream_title: stream.title,
-                  livestream_company_name: stream.company,
-                  submit_time: submitTime,
-               },
-            })
-         )
-
-         client.sendEmailBatchWithTemplates(emails).then(
-            (responses) => {
-               responses.forEach((response) =>
-                  functions.logger.log(
-                     "sent batch newlyPublishedEventEmail email with response:",
-                     response
-                  )
-               )
-            },
-            (error) => {
-               functions.logger.error(
-                  "sendEmailBatchWithTemplates error:" + error
-               )
-               throw new functions.https.HttpsError("unknown", error)
-            }
-         )
-      } catch (e) {
-         functions.logger.error("e:" + e)
-         throw new functions.https.HttpsError("unknown", e)
-      }
-   })
 
 export const getLivestreamReportData = functions
    .region(config.region)
@@ -448,96 +311,84 @@ export const getLivestreamReportData = functions
       // If use users stats only once per report data, once a users stats are used, flag them as already used
    })
 
-export const sendDashboardInviteEmail = functions
-   .region(config.region)
-   .https.onCall(
-      onCallWrapper(async (data, context) => {
-         // user needs to be signed in
+const schema = object({
+   recipientEmail: string().email().required(),
+   groupName: string().required(),
+   senderFirstName: string().required(),
+   groupId: string().required(),
+   role: mixed<GROUP_DASHBOARD_ROLE>()
+      .oneOf(Object.values(GROUP_DASHBOARD_ROLE))
+      .required(),
+})
 
-         await validateData(
-            data,
-            object({
-               recipientEmail: string().email().required(),
-               groupName: string().required(),
-               senderFirstName: string().required(),
-               groupId: string().required(),
-               role: mixed<GROUP_DASHBOARD_ROLE>()
-                  .oneOf(Object.values(GROUP_DASHBOARD_ROLE))
-                  .required(),
-            })
+type SendDashboardInviteEmailData = InferType<typeof schema>
+
+export const sendDashboardInviteEmail = onCall<SendDashboardInviteEmailData>(
+   onCallWrapperV2(async (request) => {
+      // user needs to be signed in
+      const data = request.data
+      const context = request.auth
+
+      await validateData(data, schema)
+
+      const { recipientEmail, groupName, senderFirstName, groupId, role } = data
+
+      const targetEmail = recipientEmail.trim().toLowerCase()
+
+      const userEmail = context.token.email
+      await validateUserIsGroupAdminOwnerRole(userEmail, groupId)
+
+      // Check if the user exists in our platform, allow fail
+      const authUser = await auth.getUserByEmail(targetEmail).catch(() => null)
+
+      if (authUser) {
+         const isAlreadyGroupMember = checkIfAuthUserHasGroupAdminRole(
+            authUser,
+            groupId
          )
 
-         const { recipientEmail, groupName, senderFirstName, groupId, role } =
-            data
-
-         const targetEmail = recipientEmail.trim().toLowerCase()
-
-         const userEmail = context.auth.token.email
-         await validateUserIsGroupAdminOwnerRole(userEmail, groupId)
-
-         // Check if the user exists in our platform, allow fail
-         const authUser = await auth
-            .getUserByEmail(targetEmail)
-            .catch(() => null)
-
-         if (authUser) {
-            const isAlreadyGroupMember = checkIfAuthUserHasGroupAdminRole(
-               authUser,
-               groupId
+         // If the user exists and is already a member of the group, throw an error
+         if (isAlreadyGroupMember) {
+            logAndThrow(
+               `A member with email ${targetEmail} is already a member of group`,
+               {
+                  groupId,
+               }
             )
-
-            // If the user exists and is already a member of the group, throw an error
-            if (isAlreadyGroupMember) {
-               logAndThrow(
-                  `A member with email ${targetEmail} is already a member of group`,
-                  {
-                     groupId,
-                  }
-               )
-            }
          }
+      }
 
-         // If the user does not exist, send an invitation email
+      // If the user does not exist, send an invitation email
+      const newInvite = await groupRepo.createGroupDashboardInvite(
+         groupId,
+         targetEmail,
+         role
+      )
 
-         const newInvite = await groupRepo.createGroupDashboardInvite(
-            groupId,
-            targetEmail,
-            role
-         )
+      const baseUrl =
+         request.rawRequest.headers.origin || mainProductionDomainWithProtocol
 
-         const inviteLink = buildInviteLink({
-            inviteId: newInvite.id,
-            origin: context.rawRequest.headers.origin,
-            onBoardingFlow: authUser ? "login" : "signup",
-         })
-
-         await notificationService.sendEmailNotification({
-            templateId: CUSTOMERIO_EMAIL_TEMPLATES.GROUP_INVITATION,
-            templateData: {
-               group_link: inviteLink,
-               group_name: groupName,
-               sender_first_name: senderFirstName,
-            },
-            userAuthId: authUser?.uid,
-            to: targetEmail,
-         })
-
-         const email = {
-            TemplateId: Number(
-               process.env.POSTMARK_TEMPLATE_GROUP_ADMIN_INVITATION
-            ),
-            From: "CareerFairy <noreply@careerfairy.io>",
-            To: targetEmail,
-            TemplateModel: {
-               sender_first_name: senderFirstName,
-               group_name: groupName,
-               invite_link: addUtmTagsToLink({ link: inviteLink }),
-            },
-         }
-
-         return client.sendEmailWithTemplate(email)
+      const inviteLink = buildInviteLink({
+         inviteId: newInvite.id,
+         origin: baseUrl,
+         onBoardingFlow: authUser ? "login" : "signup",
       })
-   )
+
+      return notificationService.sendEmailNotification({
+         templateId: CUSTOMERIO_EMAIL_TEMPLATES.GROUP_INVITATION,
+         templateData: {
+            invite_link: addUtmTagsToLink({ link: inviteLink }),
+            group_name: groupName,
+            group_link: `${baseUrl}/group/${groupId}/admin`,
+            sender_first_name: senderFirstName,
+         },
+         identifiers: {
+            email: targetEmail,
+         },
+         to: targetEmail,
+      })
+   })
+)
 
 export const joinGroupDashboard = functions
    .region(config.region)

@@ -21,6 +21,7 @@ import * as crypto from "crypto"
 import { firestore } from "firebase-admin"
 import type { Change } from "firebase-functions"
 import { https, Request, Response } from "firebase-functions"
+import { CallableRequest } from "firebase-functions/v2/https"
 import { ClientError } from "graphql-request"
 import ical from "ical-generator"
 import { DateTime } from "luxon"
@@ -532,6 +533,35 @@ export const onCallWrapper = (handler: onCallFnHandler): onCallFnHandler => {
    return async (data, context) => {
       try {
          return await handler(data, context)
+      } catch (e) {
+         if (e.name === "AxiosError") {
+            logAxiosError(e)
+            const errorData = e.toJSON()
+            const requestData = `${errorData?.status} - ${errorData?.config?.method} ${errorData?.config?.baseURL}${errorData?.config.url}`
+            const error = new Error(
+               `Failed to make outbound HTTP request via Axios: ${requestData}`
+            )
+            error.stack = e.stack
+            throw error
+         }
+
+         throw e
+      }
+   }
+}
+
+/**
+ * Function wrapper for Firebase Functions v2 onCall
+ * Catches errors and improves logging for axios exceptions
+ *
+ * @param handler Function that accepts a CallableRequest
+ */
+export const onCallWrapperV2 = <T>(
+   handler: (request: CallableRequest<T>) => any | Promise<any>
+) => {
+   return async (request: CallableRequest<T>) => {
+      try {
+         return await handler(request)
       } catch (e) {
          if (e.name === "AxiosError") {
             logAxiosError(e)

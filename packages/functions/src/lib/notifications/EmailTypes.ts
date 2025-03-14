@@ -129,6 +129,7 @@ export type PasswordResetTemplateData = {
 export type GroupInvitationTemplateData = {
    group_link: string
    group_name: string
+   invite_link: string
    sender_first_name: string
 }
 
