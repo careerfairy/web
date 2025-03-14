@@ -27,6 +27,9 @@ const styles = sxStyles({
    actions: {
       mt: 3,
    },
+   link: {
+      color: "black !important",
+   },
 })
 
 type Props = {
@@ -48,30 +51,24 @@ const MenuBurger: FC<Props> = ({ id }) => {
          <Button onClick={() => setOpen(true)}>
             <Menu />
          </Button>
-         <Drawer
-            open={open}
-            anchor="right"
-            onClose={() => setOpen(false)}
-            // PaperProps={{ sx: { backgroundColor: "black !important" } }}
-         >
+         <Drawer open={open} anchor="right" onClose={() => setOpen(false)}>
             <Box sx={styles.drawer}>
                {isB2C ? (
                   <B2CDrawer onCloseDrawer={() => setOpen(false)} />
                ) : (
                   <Link href={"/employers"}>
-                     <Typography variant="brandedBody" color="black !important">
+                     <Typography variant="brandedBody" sx={styles.link}>
                         For employers
                      </Typography>
                   </Link>
                )}
-
-               <Link href={"/employers"}>
-                  <Typography variant="brandedBody" color="black !important">
+               <Link href={"/levels"}>
+                  <Typography variant="brandedBody" sx={styles.link}>
                      Career guide
                   </Typography>
                </Link>
-               <Link href={"/employers"}>
-                  <Typography variant="brandedBody" color="black !important">
+               <Link href={"/whos-hiring"}>
+                  <Typography variant="brandedBody" sx={styles.link}>
                      Who&apos;s hiring
                   </Typography>
                </Link>
@@ -87,7 +84,6 @@ const MenuBurger: FC<Props> = ({ id }) => {
                      >
                         Log in
                      </Button>
-
                      <Button
                         fullWidth
                         variant="contained"
