@@ -24,6 +24,7 @@ import { UserRecord } from "firebase-admin/auth"
 import { onCall } from "firebase-functions/v2/https"
 import { array, boolean, InferType, mixed, object, string } from "yup"
 import { auth, firestore } from "./api/firestoreAdmin"
+import { client } from "./api/postmark"
 import config from "./config"
 import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import {
@@ -40,6 +41,63 @@ import {
    partition,
 } from "./util"
 import functions = require("firebase-functions")
+
+export const sendNewlyPublishedEventEmail = functions
+   .region(config.region)
+   .https.onCall(async (data, context) => {
+      try {
+         const { senderName, stream, submitTime } = data
+         const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(
+            stream.id,
+            context.rawRequest.headers.origin
+         )
+         functions.logger.log(
+            "admins Info in newly published event",
+            adminsInfo
+         )
+         const emails = adminsInfo.map(
+            ({ email, eventDashboardLink, nextLivestreamsLink }) => ({
+               TemplateId: Number(
+                  process.env.POSTMARK_TEMPLATE_NEWLY_PUBLISHED_EVENT
+               ),
+               From: "CareerFairy <noreply@careerfairy.io>",
+               To: email,
+               TemplateModel: {
+                  sender_name: senderName,
+                  dashboard_link: addUtmTagsToLink({
+                     link: eventDashboardLink,
+                  }),
+                  next_livestreams_link: addUtmTagsToLink({
+                     link: nextLivestreamsLink,
+                     campaign: "shareEvents",
+                  }),
+                  livestream_title: stream.title,
+                  livestream_company_name: stream.company,
+                  submit_time: submitTime,
+               },
+            })
+         )
+         client.sendEmailBatchWithTemplates(emails).then(
+            (responses) => {
+               responses.forEach((response) =>
+                  functions.logger.log(
+                     "sent batch newlyPublishedEventEmail email with response:",
+                     response
+                  )
+               )
+            },
+            (error) => {
+               functions.logger.error(
+                  "sendEmailBatchWithTemplates error:" + error
+               )
+               throw new functions.https.HttpsError("unknown", error)
+            }
+         )
+      } catch (e) {
+         functions.logger.error("e:" + e)
+         throw new functions.https.HttpsError("unknown", e)
+      }
+   })
 
 export const getLivestreamReportData = functions
    .region(config.region)

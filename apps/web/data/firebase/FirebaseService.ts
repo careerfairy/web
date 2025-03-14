@@ -171,6 +171,12 @@ class FirebaseService {
       return this.functions.httpsCallable("kickFromDashboard_eu")(args)
    }
 
+   sendNewlyPublishedEventEmail = async (emailData) => {
+      const sendNewlyPublishedEventEmail = this.functions.httpsCallable(
+         "sendNewlyPublishedEventEmail_v2"
+      )
+      return sendNewlyPublishedEventEmail(emailData)
+   }
    sendDraftApprovalRequestEmail = async (data) => {
       const sendDraftApprovalRequestEmail = this.functions.httpsCallable(
          "sendDraftApprovalRequestEmail_eu"

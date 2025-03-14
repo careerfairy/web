@@ -1,6 +1,7 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
+import { prettyLocalizedDate } from "components/helperFunctions/HelperFunctions"
 import { StreamCreationProvider } from "components/views/draftStreamForm/StreamForm/StreamCreationProvider"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -18,11 +19,12 @@ export const useLivestreamDialog = (group: Group) => {
    const [openNewStreamModal, setOpenNewStreamModal] = useState(false)
    const [isPublishing, setIsPublishing] = useState(false)
    const [currentStream, setCurrentStream] = useState<LivestreamEvent>(null)
-   const { authenticatedUser } = useAuth()
+   const { userData, authenticatedUser } = useAuth()
    const dispatch = useDispatch()
    const { replace } = useRouter()
 
-   const { deleteLivestream, addLivestream } = useFirebaseService()
+   const { sendNewlyPublishedEventEmail, deleteLivestream, addLivestream } =
+      useFirebaseService()
 
    const handleOpenNewStreamModal = useCallback(() => {
       setOpenNewStreamModal(true)
@@ -75,6 +77,16 @@ export const useLivestreamDialog = (group: Group) => {
             )
             newStream.id = publishedStreamId
 
+            const submitTime = prettyLocalizedDate(new Date())
+
+            const senderName = `${userData.firstName} ${userData.lastName}`
+
+            await sendNewlyPublishedEventEmail({
+               senderName,
+               stream: newStream,
+               submitTime,
+            })
+
             await customJobServiceInstance.transferCustomJobsFromDraftToPublishedLivestream(
                streamObj.id,
                publishedStreamId,
@@ -90,7 +102,17 @@ export const useLivestreamDialog = (group: Group) => {
             dispatch(actions.sendGeneralError(e))
          }
       },
-      [getAuthor, addLivestream, deleteLivestream, replace, group?.id, dispatch]
+      [
+         getAuthor,
+         addLivestream,
+         userData?.firstName,
+         userData?.lastName,
+         sendNewlyPublishedEventEmail,
+         deleteLivestream,
+         replace,
+         group?.id,
+         dispatch,
+      ]
    )
 
    const StreamCreationDialog = useMemo(() => {
