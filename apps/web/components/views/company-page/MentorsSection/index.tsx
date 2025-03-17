@@ -4,7 +4,6 @@ import {
 } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { useCallback, useEffect, useState } from "react"
 import { useMountedState } from "react-use"
@@ -15,7 +14,6 @@ import { MentorCard } from "./MentorCard"
 import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
-   const isMobile = useIsMobile()
    const { editMode, groupCreators, setActiveTab } = useCompanyPage()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -73,21 +71,12 @@ export const MentorsSection = () => {
          <ContentCarousel
             slideWidth={MentorCard.width}
             headerTitle={
-               <Typography
-                  variant="brandedH3"
-                  fontWeight={"600"}
-                  color="black"
-                  mb={1}
-               >
+               <Typography variant="brandedH3" fontWeight={"600"} color="black">
                   Mentors
                </Typography>
             }
             seeAll={
-               isMobile ? null : (
-                  <SeeAllLink
-                     handleClick={() => setActiveTab(TabValue.mentors)}
-                  />
-               )
+               <SeeAllLink handleClick={() => setActiveTab(TabValue.mentors)} />
             }
             viewportSx={{
                // hack to ensure shadows are not cut off

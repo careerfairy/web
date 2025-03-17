@@ -23,7 +23,7 @@ const styles = sxStyles({
       minHeight: (theme) => theme.spacing(50),
    },
    eventsWrapper: {
-      mt: 2,
+      mt: 1,
       mb: 2,
    },
    // titleSection: {

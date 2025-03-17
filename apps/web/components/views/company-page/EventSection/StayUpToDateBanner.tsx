@@ -11,6 +11,7 @@ const styles = sxStyles({
       border: "1px solid rgba(103, 73, 234, 0.30)",
       borderRadius: "12px",
       p: 4,
+      mt: 1,
    },
 })
 

@@ -1,6 +1,7 @@
 import { Testimonial } from "@careerfairy/shared-lib/groups"
 import Add from "@mui/icons-material/Add"
 import { Box, IconButton, Typography } from "@mui/material"
+import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import AutoHeight from "embla-carousel-auto-height"
 import useEmblaCarousel, {
@@ -8,7 +9,6 @@ import useEmblaCarousel, {
    EmblaPluginType,
 } from "embla-carousel-react"
 import React, { useCallback, useMemo, useState } from "react"
-import { ArrowLeft, ArrowRight } from "react-feather"
 import { useMountedState } from "react-use"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
@@ -19,6 +19,7 @@ import TestimonialDialog from "./TestimonialDialog"
 
 const styles = sxStyles({
    titleSection: {
+      mt: "24px !important",
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
@@ -41,9 +42,7 @@ const styles = sxStyles({
    },
    slide: {
       flex: "0 0 100%",
-      "&:not(:first-of-type)": {
-         paddingX: 2,
-      },
+      mr: 2,
    },
 })
 
@@ -101,7 +100,11 @@ const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
    return isMounted() ? (
       <>
          <Box sx={styles.titleSection}>
-            <Typography variant="h4" fontWeight={"600"} color="black" mb={1}>
+            <Typography
+               variant="brandedH3"
+               fontWeight={"600"}
+               color="neutral.900"
+            >
                Testimonials
             </Typography>
             <>
@@ -117,31 +120,12 @@ const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
                   <> </>
                )}
                {group?.testimonials?.length > 1 ? (
-                  <Box>
-                     <IconButton
-                        color="inherit"
-                        sx={styles.arrowIcon}
-                        onClick={() => {
-                           if (emblaApi.canScrollPrev()) emblaApi.scrollPrev()
-                        }}
-                     >
-                        <ArrowLeft fontSize={"large"} />
-                     </IconButton>
-                     <IconButton
-                        color="inherit"
-                        sx={styles.arrowIcon}
-                        onClick={() => {
-                           if (emblaApi.canScrollNext()) emblaApi.scrollNext()
-                        }}
-                     >
-                        <ArrowRight fontSize={"large"} />
-                     </IconButton>
-                  </Box>
+                  <GenericCarousel.Arrows emblaApi={emblaApi} />
                ) : null}
             </>
          </Box>
 
-         <Box mt={1}>
+         <Box mt={"16px !important"}>
             {group?.testimonials?.length > 0 ? (
                <Box sx={styles.viewport} ref={emblaRef}>
                   <Box sx={styles.container}>
