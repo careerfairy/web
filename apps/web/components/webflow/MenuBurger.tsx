@@ -66,16 +66,26 @@ const MenuBurger: FC<Props> = ({ id }) => {
                {isB2C ? (
                   <B2CDrawer onCloseDrawer={() => setOpen(false)} />
                ) : (
-                  <Typography variant="brandedBody" sx={styles.link}>
-                     <Link href={"/employers"}>For employers</Link>
-                  </Typography>
+                  <Link href={"/employers"}>
+                     <Box sx={styles.link}>
+                        <Typography variant="brandedBody">
+                           For employers
+                        </Typography>
+                     </Box>
+                  </Link>
                )}
-               <Typography variant="brandedBody" sx={styles.link}>
-                  <Link href={"/levels"}>Career guide</Link>
-               </Typography>
-               <Typography variant="brandedBody" sx={styles.link}>
-                  <Link href={"/whos-hiring"}>Who&apos;s hiring</Link>
-               </Typography>
+               <Link href={"/levels"}>
+                  <Box sx={styles.link}>
+                     <Typography variant="brandedBody">Career guide</Typography>
+                  </Box>
+               </Link>
+               <Link href={"/whos-hiring"}>
+                  <Box sx={styles.link}>
+                     <Typography variant="brandedBody">
+                        Who&apos;s hiring
+                     </Typography>
+                  </Box>
+               </Link>
 
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <Stack spacing={1.5} sx={styles.actions}>
