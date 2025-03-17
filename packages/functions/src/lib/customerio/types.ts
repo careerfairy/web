@@ -1,4 +1,4 @@
-export interface CustomerIOWebhookIdentifiers {
+export type CustomerIOWebhookIdentifiers = {
    /**
     * User's Auth ID in firebase
     */
@@ -13,7 +13,7 @@ export interface CustomerIOWebhookIdentifiers {
    email: string
 }
 
-export interface CustomerIOWebhookData {
+export type CustomerIOWebhookData = {
    customer_id: string
    identifiers: CustomerIOWebhookIdentifiers
    /**
@@ -22,7 +22,7 @@ export interface CustomerIOWebhookData {
    email_address: string
 }
 
-export interface CustomerIOWebhookEvent {
+export type CustomerIOWebhookEvent = {
    data: CustomerIOWebhookData
    /**
     * The id of the reporting webhook instance
@@ -31,4 +31,12 @@ export interface CustomerIOWebhookEvent {
    object_type: "customer"
    metric: "subscribed" | "unsubscribed"
    timestamp: number
+}
+
+export type CustomerIORecommendedLivestreamWebhookData = {
+   url: string
+   title: string
+   company: string
+   start: string
+   backgroundImageUrl: string
 }

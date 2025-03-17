@@ -50,6 +50,14 @@ export type CalendarData = {
    apple: string
 }
 
+export type LivestreamData = {
+   title: string
+   company: string
+   start: string
+   imageUrl: string
+   url: string
+}
+
 /**
  * Message data for livestream registration confirmation emails
  */

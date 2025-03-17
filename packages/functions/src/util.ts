@@ -15,6 +15,7 @@ import {
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import {
    getHost,
+   mainProductionDomainWithProtocol,
    makeLivestreamEventDetailsUrl,
 } from "@careerfairy/shared-lib/utils/urls"
 import * as crypto from "crypto"
@@ -674,6 +675,18 @@ export const dateFormatOffset = (dateString: string) => {
    return dateString
 }
 
+/**
+ * Formats a date for a livestream event with timezone information
+ * @param date The date to format
+ * @param timezone The timezone to use for formatting
+ * @returns Formatted date string with timezone information
+ */
+export const formatLivestreamDate = (date: Date, timezone: string) => {
+   return DateTime.fromJSDate(date, {
+      zone: timezone,
+   }).toFormat("d MMMM yyyy 'at' h:mm a '('ZZZZ')'")
+}
+
 export const getChangeTypes = (
    change: Change<DocumentSnapshot>
 ): {
@@ -764,4 +777,11 @@ export const processInBatches = async <T, R>(
    }
 
    return results
+}
+
+export const getWebBaseUrl = () => {
+   if (isLocalEnvironment()) {
+      return "http://localhost:3000"
+   }
+   return mainProductionDomainWithProtocol
 }

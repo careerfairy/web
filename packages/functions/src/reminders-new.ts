@@ -31,7 +31,11 @@ import {
    EmailNotificationRequestData,
 } from "./lib/notifications/EmailTypes"
 import { OnBatchCompleteCallback } from "./lib/notifications/NotificationService"
-import { addMinutesDate, isLocalEnvironment } from "./util"
+import {
+   addMinutesDate,
+   formatLivestreamDate,
+   isLocalEnvironment,
+} from "./util"
 
 // delay to be sure that the reminder is sent at the time
 const reminderBufferMinutes = 20
@@ -469,12 +473,6 @@ const handleSendEmails = async (
 
    // Return the status for all streams
    return emailStatus
-}
-
-const formatLivestreamDate = (date: Date, timezone: string) => {
-   return DateTime.fromJSDate(date, {
-      zone: timezone,
-   }).toFormat("d MMMM yyyy 'at' h:mm a '('ZZZZ')'")
 }
 
 /**

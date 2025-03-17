@@ -373,6 +373,8 @@ exports.getFollowedCreators = levels.getFollowedCreators
 // CustomerIO
 exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
 exports.customerIOWebhook = customerio.customerIOWebhook
+exports.customerIORecommendedLivestreamsWebhook =
+   customerio.customerIORecommendedLivestreamsWebhook
 
 // Reminders
 exports.schedule5MinutesReminderEmails =
