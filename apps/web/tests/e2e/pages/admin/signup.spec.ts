@@ -1,11 +1,11 @@
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import { expect } from "@playwright/test"
-import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
-import { waitForData } from "../../utils"
-import ProfilePage from "../../page-object-models/ProfilePage"
-import { AdminSignupPage } from "../../page-object-models/AdminSignupPage"
 import { groupAdminFixture as test } from "../../fixtures"
+import { AdminSignupPage } from "../../page-object-models/AdminSignupPage"
+import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
+import ProfilePage from "../../page-object-models/ProfilePage"
+import { waitForData } from "../../utils"
 
 test.describe("Admin Signup", () => {
    test("Sign in with a group admin account should redirect to the group dashboard page", async ({
@@ -23,7 +23,7 @@ test.describe("Admin Signup", () => {
       await profilePage.openGroups()
 
       await expect(
-         groupPage.page.getByRole("heading", { name: group.universityName })
+         groupPage.page.getByText(group.universityName, { exact: true })
       ).toBeVisible()
    })
 
