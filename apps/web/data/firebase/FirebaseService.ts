@@ -199,7 +199,7 @@ class FirebaseService {
       redirectLink: string
    }) => {
       const sendPasswordResetEmail = this.functions.httpsCallable(
-         "sendPostmarkResetPasswordEmail_eu"
+         "sendPasswordResetEmail"
       )
       return sendPasswordResetEmail(data)
    }

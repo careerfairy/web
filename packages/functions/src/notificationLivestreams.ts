@@ -82,12 +82,14 @@ export const notifyUsersOnLivestreamStart = onDocumentUpdated(
             const { successful, failed } =
                await notificationService.sendPushNotifications(
                   registeredUsers.map((user) => ({
-                     userAuthId: user.user?.authId,
                      templateId: CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START,
                      templateData: {
                         live_stream_title: livestream.title,
                         company_logo_url: livestream.companyLogoUrl,
                         url: livestreamUrl,
+                     },
+                     identifiers: {
+                        id: user.user?.authId,
                      },
                   }))
                )

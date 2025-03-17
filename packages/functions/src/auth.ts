@@ -13,9 +13,14 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
 import { onCall } from "firebase-functions/v2/https"
 import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
-import { client } from "./api/postmark"
-import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
+import {
+   groupRepo,
+   marketingUsersRepo,
+   notificationService,
+   userRepo,
+} from "./api/repositories"
 import config from "./config"
+import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import { userUpdateFields } from "./lib/user"
 import { logAndThrow } from "./lib/validations"
 import { generateReferralCode } from "./util"
@@ -446,60 +451,53 @@ export const validateUserEmailWithPin = onCall<ValidateUserEmailWithPinRequest>(
    }
 )
 
-export const sendPostmarkResetPasswordEmail = functions
-   .region(config.region)
-   .https.onCall(async (data) => {
-      const recipientEmail = data?.recipientEmail?.trim()
+export const sendPasswordResetEmail = onCall<{
+   recipientEmail: string
+   redirectLink: string
+}>(async (request) => {
+   const { recipientEmail, redirectLink } = request.data
 
-      if (!recipientEmail) {
-         functions.logger.error(
-            `Invalid email address: ${recipientEmail}`,
-            data
-         )
+   if (!recipientEmail) {
+      functions.logger.error(
+         `Invalid email address: ${recipientEmail}`,
+         request.data
+      )
 
-         // someone bypassed the client side validation
-         return null
+      // someone bypassed the client side validation
+      return null
+   }
+
+   try {
+      const actionCodeSettings = {
+         url: redirectLink,
       }
 
-      try {
-         const redirectLink = data.redirectLink
+      functions.logger.info("recipientEmail", recipientEmail)
+      functions.logger.info("actionCodeSettings", actionCodeSettings)
 
-         const actionCodeSettings = {
-            url: redirectLink,
-         }
+      const link = await auth.generatePasswordResetLink(
+         recipientEmail,
+         actionCodeSettings
+      )
 
-         functions.logger.info("recipientEmail", recipientEmail)
-         functions.logger.info("actionCodeSettings", actionCodeSettings)
-
-         const link = await auth.generatePasswordResetLink(
-            recipientEmail,
-            actionCodeSettings
-         )
-
-         const email = {
-            TemplateId: Number(process.env.POSTMARK_TEMPLATE_PASSWORD_RESET),
-            From: "CareerFairy <noreply@careerfairy.io>",
-            To: recipientEmail,
-            TemplateModel: { action_url: addUtmTagsToLink({ link: link }) },
-         }
-
-         const response = await client.sendEmailWithTemplate(email)
-         functions.logger.info("response", response)
-
-         if (response.ErrorCode) {
-            functions.logger.error(
-               "error in sendEmailWithTemplate response",
-               response
-            )
-         }
-      } catch (e) {
-         functions.logger.error(
-            `Error in sending password reset link with email ${recipientEmail}`,
-            e
-         )
-         // The client should not know if this request was successful or not, so we just log it on the server
-      }
-   })
+      await notificationService.sendEmailNotification({
+         templateId: CUSTOMERIO_EMAIL_TEMPLATES.PASSWORD_RESET,
+         templateData: {
+            action_url: addUtmTagsToLink({ link: link }),
+         },
+         to: recipientEmail,
+         identifiers: {
+            email: recipientEmail,
+         },
+      })
+   } catch (e) {
+      functions.logger.error(
+         `Error in sending password reset link with email ${recipientEmail}`,
+         e
+      )
+      // The client should not know if this request was successful or not, so we just log it on the server
+   }
+})
 
 export const backfillUserData = functions
    .region(config.region)

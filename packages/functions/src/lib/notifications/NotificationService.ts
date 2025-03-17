@@ -61,6 +61,14 @@ export type ProgressInfo = {
    itemType: string
 }
 
+export type Identifiers =
+   | {
+        id: string | number
+     }
+   | {
+        email: string
+     }
+
 /**
  * Callback function for tracking progress of batch processing
  */
@@ -186,7 +194,7 @@ export class NotificationService implements INotificationService {
             }
 
             return {
-               id: data.userAuthId,
+               identifiers: data.identifiers,
                promise: this.cioApi.sendEmail(request),
             }
          },
@@ -207,7 +215,7 @@ export class NotificationService implements INotificationService {
             const requestData = createPushNotificationRequestData(data)
             const request = new SendPushRequest(requestData)
             return {
-               id: data.userAuthId,
+               identifiers: data.identifiers,
                promise: this.cioApi.sendPush(request),
             }
          },
@@ -229,7 +237,10 @@ export class NotificationService implements INotificationService {
     */
    protected async processBatches<T, R>(
       items: T[],
-      processItem: (item: T) => { id: string; promise: Promise<R> },
+      processItem: (item: T) => {
+         identifiers: Identifiers
+         promise: Promise<R>
+      },
       itemType: string,
       onBatchCompleteCallback?: OnBatchCompleteCallback
    ): Promise<SendRequestResponse> {
@@ -298,16 +309,23 @@ export class NotificationService implements INotificationService {
     */
    private async processSingleBatch<T, R>(
       batch: T[],
-      processItem: (item: T) => { id: string; promise: Promise<R> },
+      processItem: (item: T) => {
+         identifiers: Identifiers
+         promise: Promise<R>
+      },
       itemType: string
    ): Promise<SendRequestResponse> {
       const itemPromises = batch.map(processItem)
 
       const results = await Promise.allSettled(
-         itemPromises.map(({ id, promise }) =>
+         itemPromises.map(({ identifiers, promise }) =>
             promise.catch((error) => {
                functions.logger.error(
-                  `Error sending ${itemType} to ${id}:`,
+                  `Error sending ${itemType} to ${JSON.stringify(
+                     identifiers,
+                     null,
+                     2
+                  )}:`,
                   error
                )
                return null

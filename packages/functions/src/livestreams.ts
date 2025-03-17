@@ -217,7 +217,9 @@ export const livestreamRegistrationConfirmationEmail = functions
                   sparks: emailSparks,
                   calendar: emailCalendar,
                },
-               userAuthId,
+               identifiers: {
+                  id: userAuthId,
+               },
                to: data.recipientEmail,
                attachments,
             },
