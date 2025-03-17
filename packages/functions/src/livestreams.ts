@@ -20,7 +20,7 @@ import {
    customJobRepo,
    groupRepo,
    livestreamsRepo,
-   notificationRepo,
+   notificationService,
    sparkRepo,
 } from "./api/repositories"
 import {
@@ -201,7 +201,7 @@ export const livestreamRegistrationConfirmationEmail = functions
 
       try {
          // Send email using notification repository
-         const result = await notificationRepo.sendEmailNotifications([
+         const result = await notificationService.sendEmailNotifications([
             {
                templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION,
                templateData: {

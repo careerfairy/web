@@ -3,7 +3,7 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import * as functions from "firebase-functions"
 import { onDocumentUpdated } from "firebase-functions/v2/firestore"
-import { livestreamsRepo, notificationRepo } from "./api/repositories"
+import { livestreamsRepo, notificationService } from "./api/repositories"
 import { CUSTOMERIO_PUSH_TEMPLATES } from "./lib/notifications/PushNotificationTypes"
 import { logAndThrow } from "./lib/validations"
 
@@ -80,7 +80,7 @@ export const notifyUsersOnLivestreamStart = onDocumentUpdated(
             })
 
             const { successful, failed } =
-               await notificationRepo.sendPushNotifications(
+               await notificationService.sendPushNotifications(
                   registeredUsers.map((user) => ({
                      userAuthId: user.user?.authId,
                      templateId: CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START,

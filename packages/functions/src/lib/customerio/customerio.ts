@@ -26,7 +26,9 @@ export const syncUserToCustomerIO = onDocumentWritten(
    },
    async (event) => {
       if (isLocalEnvironment()) {
-         logger.info("Skipping CustomerIO sync in local environment")
+         logger.info(
+            "Skipping CustomerIO sync in local environment, remove this check if you want to sync to CustomerIO dev workspace"
+         )
          return
       }
 

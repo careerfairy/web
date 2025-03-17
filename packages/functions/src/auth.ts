@@ -11,6 +11,7 @@ import {
 } from "@careerfairy/shared-lib/users"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
+import { onCall } from "firebase-functions/v2/https"
 import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
 import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
@@ -19,176 +20,165 @@ import { userUpdateFields } from "./lib/user"
 import { logAndThrow } from "./lib/validations"
 import { generateReferralCode } from "./util"
 
-export const createNewUserAccount = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      if (context.auth) {
-         // Throwing an HttpsError so that the client gets the error details.
-         throw new functions.https.HttpsError(
-            "failed-precondition",
-            "The function must be called while logged out."
-         )
-      }
+export const createNewUserAccount = onCall(async (request) => {
+   if (request.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+         "failed-precondition",
+         "The function must be called while logged out."
+      )
+   }
 
-      const userData = data.userData
-      const additionalData: UserAccountCreationAdditionalData =
-         data.additionalData
+   const { data } = request
 
-      const recipientEmail = data.userData.email.toLowerCase().trim()
-      const pinCode = getRandomInt(9999)
-      const {
-         password,
-         firstName,
-         lastName,
-         university,
-         universityCountryCode,
-         subscribed,
-         gender = "",
-         fieldOfStudy = null,
-         levelOfStudy = null,
-         accountCreationUTMParams = {},
-      } = userData
+   const userData = data.userData
+   const additionalData: UserAccountCreationAdditionalData = data.additionalData
+
+   const recipientEmail = data.userData.email.toLowerCase().trim()
+   const pinCode = getRandomInt(9999)
+   const {
+      password,
+      firstName,
+      lastName,
+      university,
+      universityCountryCode,
+      subscribed,
+      gender = "",
+      fieldOfStudy = null,
+      levelOfStudy = null,
+      accountCreationUTMParams = {},
+   } = userData
+
+   console.log(`Starting auth account creation process for ${recipientEmail}`)
+   try {
+      const user = await auth.createUser({
+         email: recipientEmail,
+         password: password,
+      })
 
       console.log(
-         `Starting auth account creation process for ${recipientEmail}`
+         `Starting firestore account creation process for ${recipientEmail}`
       )
-      await auth
-         .createUser({ email: recipientEmail, password: password })
-         .then(async (user) => {
-            console.log(
-               `Starting firestore account creation process for ${recipientEmail}`
-            )
 
-            const registrationUTMsToSave =
-               Object.keys(accountCreationUTMParams).length > 0
-                  ? { accountCreationUTMParams }
-                  : {}
+      const registrationUTMsToSave =
+         Object.keys(accountCreationUTMParams).length > 0
+            ? { accountCreationUTMParams }
+            : {}
 
-            await firestore
+      const userData: UserData = {
+         authId: user.uid,
+         id: recipientEmail,
+         validationPin: pinCode,
+         firstName: firstName,
+         lastName: lastName,
+         userEmail: recipientEmail,
+         university: university,
+         universityCountryCode: universityCountryCode,
+         unsubscribed: !subscribed,
+         referralCode: generateReferralCode(),
+         gender: gender,
+         fieldOfStudy,
+         levelOfStudy,
+         isStudent: true,
+         credits: INITIAL_CREDITS,
+         welcomeDialogComplete: false,
+         lastActivityAt: FieldValue.serverTimestamp() as Timestamp,
+         createdAt: FieldValue.serverTimestamp() as Timestamp,
+         linkedinUrl: "",
+         userResume: "",
+         backFills: [],
+         ...registrationUTMsToSave,
+      }
+
+      try {
+         await firestore
+            .collection("userData")
+            .doc(recipientEmail)
+            .set(userData)
+
+         if (additionalData?.studyBackground) {
+            const studyBackgroundRef = firestore
                .collection("userData")
                .doc(recipientEmail)
-               .set(
-                  Object.assign({
-                     authId: user.uid,
-                     id: recipientEmail,
-                     validationPin: pinCode,
-                     firstName: firstName,
-                     lastName: lastName,
-                     userEmail: recipientEmail,
-                     university: university,
-                     universityCountryCode: universityCountryCode,
-                     unsubscribed: !subscribed,
-                     referralCode: generateReferralCode(),
-                     gender: gender,
-                     fieldOfStudy,
-                     levelOfStudy,
-                     isStudent: true,
-                     credits: INITIAL_CREDITS,
-                     welcomeDialogComplete: false,
-                     lastActivityAt: FieldValue.serverTimestamp(),
-                     createdAt: FieldValue.serverTimestamp(),
-                     ...registrationUTMsToSave,
-                  } as UserData)
-               )
-               .then(async () => {
-                  if (additionalData?.studyBackground) {
-                     const studyBackgroundRef = firestore
-                        .collection("userData")
-                        .doc(recipientEmail)
-                        .collection("studyBackgrounds")
-                        .doc()
+               .collection("studyBackgrounds")
+               .doc()
 
-                     const studyBackground: StudyBackground = {
-                        ...additionalData.studyBackground,
-                        id: studyBackgroundRef.id,
-                        authId: user.uid,
-                        startedAt: additionalData.studyBackground.startedAt
-                           ? Timestamp.fromDate(
-                                new Date(
-                                   additionalData.studyBackground.startedAt
-                                )
-                             )
-                           : null,
-                        endedAt: additionalData.studyBackground.endedAt
-                           ? Timestamp.fromDate(
-                                new Date(additionalData.studyBackground.endedAt)
-                             )
-                           : null,
-                     }
+            const studyBackground: StudyBackground = {
+               ...additionalData.studyBackground,
+               id: studyBackgroundRef.id,
+               authId: user.uid,
+               startedAt: additionalData.studyBackground.startedAt
+                  ? Timestamp.fromDate(
+                       new Date(additionalData.studyBackground.startedAt)
+                    )
+                  : null,
+               endedAt: additionalData.studyBackground.endedAt
+                  ? Timestamp.fromDate(
+                       new Date(additionalData.studyBackground.endedAt)
+                    )
+                  : null,
+            }
 
-                     await studyBackgroundRef.set(studyBackground)
-                  }
-               })
-               .then(async () => {
-                  try {
-                     await marketingUsersRepo.delete(recipientEmail)
-                  } catch (e) {
-                     functions.logger.warn(
-                        `Unable to deleting marketing user: ${recipientEmail}, could be because it doesn't exist`,
-                        e
-                     )
-                  }
-               })
-               .then(async () => {
-                  console.log(`Starting sending email for ${recipientEmail}`)
-                  const email = {
-                     TemplateId: Number(
-                        process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION
-                     ),
-                     From: "CareerFairy <noreply@careerfairy.io>",
-                     To: recipientEmail,
-                     TemplateModel: { pinCode: pinCode },
-                  }
-                  try {
-                     const response = await client.sendEmailWithTemplate(email)
-                     console.log(
-                        `Sent email successfully for ${recipientEmail}`
-                     )
+            await studyBackgroundRef.set(studyBackground)
+         }
 
-                     return response
-                  } catch (error) {
-                     console.error(
-                        `Error sending PIN email to ${recipientEmail}`,
-                        error
-                     )
-                     console.error(
-                        `Starting auth and firestore user deletion ${recipientEmail}`,
-                        error
-                     )
-                     await auth.deleteUser(user.uid)
-                     await firestore
-                        .collection("userData")
-                        .doc(recipientEmail)
-                        .delete()
-                     throw new functions.https.HttpsError(
-                        "resource-exhausted",
-                        "Error sending out PIN email"
-                     )
-                  }
-               })
-               .catch(async (error) => {
-                  if (error.code !== "resource-exhausted") {
-                     console.error(
-                        `Starting auth user deletion ${recipientEmail}`,
-                        error
-                     )
-                     await auth.deleteUser(user.uid)
-                  }
-                  console.error(
-                     `Error creating user ${recipientEmail} in firestore`,
-                     error
-                  )
-                  throw new functions.https.HttpsError("internal", error)
-               })
-         })
-         .catch(async (error) => {
+         try {
+            await marketingUsersRepo.delete(recipientEmail)
+         } catch (e) {
+            functions.logger.warn(
+               `Unable to deleting marketing user: ${recipientEmail}, could be because it doesn't exist`,
+               e
+            )
+         }
+
+         console.log(`Starting sending email for ${recipientEmail}`)
+
+         try {
+            const response = await userRepo.sendEmailVerificationEmail({
+               userEmail: recipientEmail,
+               authId: user.uid,
+               validationPin: pinCode,
+            })
+
+            console.log(`Sent email successfully for ${recipientEmail}`)
+
+            return response
+         } catch (error) {
+            console.error(`Error sending PIN email to ${recipientEmail}`, error)
             console.error(
-               `Error creating user ${recipientEmail} in firebase auth`,
+               `Starting auth and firestore user deletion ${recipientEmail}`,
                error
             )
-            throw new functions.https.HttpsError("internal", error)
-         })
-   })
+            await auth.deleteUser(user.uid)
+            await firestore.collection("userData").doc(recipientEmail).delete()
+            throw new functions.https.HttpsError(
+               "resource-exhausted",
+               "Error sending out PIN email"
+            )
+         }
+      } catch (error) {
+         if (error.code !== "resource-exhausted") {
+            console.error(
+               `Starting auth user deletion ${recipientEmail}`,
+               error
+            )
+            await auth.deleteUser(user.uid)
+         }
+         console.error(
+            `Error creating user ${recipientEmail} in firestore`,
+            error
+         )
+         throw new functions.https.HttpsError("internal", error)
+      }
+   } catch (error) {
+      console.error(
+         `Error creating user ${recipientEmail} in firebase auth`,
+         error
+      )
+      throw new functions.https.HttpsError("internal", error)
+   }
+})
+
 export const createNewGroupAdminUserAccount = functions
    .region(config.region)
    .https.onCall(async (data, context) => {
@@ -318,40 +308,39 @@ export const createNewGroupAdminUserAccount = functions
       }
    })
 
-// eslint-disable-next-line camelcase
-export const resendPostmarkEmailVerificationEmailWithPin = functions
-   .region(config.region)
-   .https.onCall(async (data) => {
-      const recipientEmail = data.recipientEmail
-      const pinCode = getRandomInt(9999)
+export const resendEmailVerificationEmailWithPin = onCall(async (request) => {
+   const { recipientEmail, recipientAuthId } = request.data
+   const pinCode = getRandomInt(9999)
 
-      await firestore
-         .collection("userData")
-         .doc(recipientEmail)
-         .update({ validationPin: pinCode })
+   const toUpdate: Pick<UserData, "validationPin"> = {
+      validationPin: pinCode,
+   }
 
-      const email = {
-         TemplateId: Number(process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION),
-         From: "CareerFairy <noreply@careerfairy.io>",
-         To: recipientEmail,
-         TemplateModel: { pinCode: pinCode },
-      }
-      try {
-         await client.sendEmailWithTemplate(email)
-      } catch (e) {
-         throw new functions.https.HttpsError("invalid-argument", e)
-      }
-   })
+   await firestore.collection("userData").doc(recipientEmail).update(toUpdate)
 
-export const validateUserEmailWithPin = functions
-   .region(config.region)
-   .runWith({
+   try {
+      await userRepo.sendEmailVerificationEmail({
+         userEmail: recipientEmail,
+         authId: recipientAuthId,
+         validationPin: pinCode,
+      })
+   } catch (e) {
+      throw new functions.https.HttpsError("invalid-argument", e)
+   }
+})
+
+type ValidateUserEmailWithPinRequest = {
+   recipientEmail: string
+   pinCode: number
+   fingerPrintId: string
+}
+
+export const validateUserEmailWithPin = onCall<ValidateUserEmailWithPinRequest>(
+   {
       minInstances: 1,
-   })
-   .https.onCall(async (data) => {
-      const recipientEmail = data.userInfo.recipientEmail
-      const pinCode = data.userInfo.pinCode
-      const fingerPrintId = data.userInfo.fingerPrintId
+   },
+   async (request) => {
+      const { recipientEmail, pinCode, fingerPrintId } = request.data
 
       let error: any
 
@@ -365,7 +354,7 @@ export const validateUserEmailWithPin = functions
             .doc(recipientEmail)
             .get()
          if (querySnapshot.exists) {
-            const user = querySnapshot.data()
+            const user = querySnapshot.data() as UserData
             functions.logger.log(`Acquired user data for ${recipientEmail}`)
             if (user.validationPin === pinCode) {
                functions.logger.log(
@@ -387,29 +376,16 @@ export const validateUserEmailWithPin = functions
                functions.logger.log(
                   `Starting sending welcome email to  ${recipientEmail}`
                )
-               const email = {
-                  TemplateId: Number(
-                     process.env.POSTMARK_TEMPLATE_WELCOME_EMAIL
-                  ),
-                  From: "CareerFairy <noreply@careerfairy.io>",
-                  To: recipientEmail,
-                  TemplateModel: {
-                     user_name: user.firstName,
-                  },
-               }
 
                try {
-                  const response = await client.sendEmailWithTemplate(email)
+                  await userRepo.sendWelcomeEmail({
+                     authId: user.authId,
+                     userEmail: recipientEmail,
+                  })
 
-                  if (response.ErrorCode) {
-                     functions.logger.error(
-                        `An error has occurred sending welcome email to ${recipientEmail}`
-                     )
-                  } else {
-                     functions.logger.log(
-                        `The welcome email was sent successfully to ${recipientEmail}`
-                     )
-                  }
+                  functions.logger.log(
+                     `The welcome email was sent successfully to ${recipientEmail}`
+                  )
                } catch (error) {
                   functions.logger.error(
                      `An error has occurred sending welcome email to ${recipientEmail}`
@@ -467,7 +443,8 @@ export const validateUserEmailWithPin = functions
          throw new functions.https.HttpsError(error.code, error.message)
       }
       return null
-   })
+   }
+)
 
 export const sendPostmarkResetPasswordEmail = functions
    .region(config.region)

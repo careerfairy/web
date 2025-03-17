@@ -31,7 +31,10 @@ export interface UserData extends Identifiable {
       questions?: UserReadableGroupQuestionsWithAnswerMap
    }
    badges?: string[]
-   groupIds: string[]
+   /**
+    * @deprecated
+    */
+   groupIds?: string[]
    /**
     * @deprecated
     * We have to migrate off expo-push-notifications and use the new customer.io push notifications

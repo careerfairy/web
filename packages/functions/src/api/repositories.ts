@@ -52,9 +52,9 @@ import {
 } from "../lib/bigQuery/sparks/SparksBigQueryServices"
 import { apiClient } from "../lib/customerio/client"
 import {
-   INotificationRepository,
-   NotificationRepository,
-} from "../lib/notifications/NotificationRepository"
+   INotificationService,
+   NotificationService,
+} from "../lib/notifications/NotificationService"
 import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
 import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
 import bigQueryClient from "./bigQueryClient"
@@ -68,10 +68,14 @@ export const groupRepo: IGroupFunctionsRepository =
       FieldValue
    ).setGroupEventsHandler(groupEventsHandler)
 
+export const notificationService: INotificationService =
+   new NotificationService(apiClient)
+
 export const userRepo: IUserFunctionsRepository = new UserFunctionsRepository(
    firestore as any,
    FieldValue,
-   Timestamp
+   Timestamp,
+   notificationService
 )
 
 export const rewardsRepo: IRewardRepository = new FirebaseRewardRepository(
@@ -88,9 +92,6 @@ export const universityRepo: IUniversityRepository =
 
 export const livestreamsRepo: ILivestreamFunctionsRepository =
    new LivestreamFunctionsRepository(firestore as any, FieldValue)
-
-export const notificationRepo: INotificationRepository =
-   new NotificationRepository(apiClient)
 
 export const atsRepo = (
    apiKey: string,
