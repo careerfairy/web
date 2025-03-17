@@ -133,7 +133,7 @@ class FirebaseService {
       additionalData?: UserAccountCreationAdditionalData
    ) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
-         "createNewUserAccount_v3"
+         "createNewUserAccount_v4"
       )
       return createUserInAuthAndFirebase({ userData, additionalData })
    }
@@ -184,11 +184,15 @@ class FirebaseService {
       return sendDraftApprovalRequestEmail(data)
    }
 
-   validateUserEmailWithPin = async (userInfo) => {
+   validateUserEmailWithPin = async (userInfo: {
+      recipientEmail: string
+      pinCode: number
+      fingerPrintId: string
+   }) => {
       const validateUserEmailWithPin = this.functions.httpsCallable(
-         "validateUserEmailWithPin_eu"
+         "validateUserEmailWithPin_v2"
       )
-      return validateUserEmailWithPin({ userInfo })
+      return validateUserEmailWithPin(userInfo)
    }
    sendPasswordResetEmail = async (data: {
       recipientEmail: string
@@ -199,14 +203,14 @@ class FirebaseService {
       )
       return sendPasswordResetEmail(data)
    }
-   resendPostmarkEmailVerificationEmailWithPin = async (data: {
+   resendEmailVerificationEmailWithPin = async (data: {
       recipientEmail: string
+      recipientAuthId: string
    }) => {
-      const resendPostmarkEmailVerificationEmailWithPin =
-         this.functions.httpsCallable(
-            "resendPostmarkEmailVerificationEmailWithPin_eu"
-         )
-      return resendPostmarkEmailVerificationEmailWithPin(data)
+      const resendEmailVerificationEmailWithPin = this.functions.httpsCallable(
+         "resendEmailVerificationEmailWithPin"
+      )
+      return resendEmailVerificationEmailWithPin(data)
    }
 
    sendReminderEmailAboutApplicationLink = async (data) => {

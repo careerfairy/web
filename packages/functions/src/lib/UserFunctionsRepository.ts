@@ -22,6 +22,11 @@ import * as functions from "firebase-functions"
 import firebase from "firebase/compat"
 import { DateTime } from "luxon"
 import { livestreamsRepo } from "../api/repositories"
+import { CUSTOMERIO_EMAIL_TEMPLATES } from "./notifications/EmailTypes"
+import {
+   INotificationService,
+   NotificationSendResponse,
+} from "./notifications/NotificationService"
 
 const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 
@@ -82,6 +87,22 @@ export interface IUserFunctionsRepository extends IUserRepository {
    ): Promise<RegisteredLivestreams[]>
 
    getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]>
+
+   /**
+    * Sends a welcome email to a user
+    * @param user The user to send the welcome email to
+    */
+   sendWelcomeEmail(
+      user: Pick<UserData, "userEmail" | "authId">
+   ): Promise<NotificationSendResponse>
+
+   /**
+    * Sends an email verification email to a user
+    * @param user The user to send the email verification email to
+    */
+   sendEmailVerificationEmail(
+      user: Pick<UserData, "userEmail" | "authId" | "validationPin">
+   ): Promise<NotificationSendResponse>
 }
 
 export class UserFunctionsRepository
@@ -92,10 +113,12 @@ export class UserFunctionsRepository
    constructor(
       readonly firestore: firebase.firestore.Firestore,
       readonly fieldValue: typeof firebase.firestore.FieldValue,
-      readonly timestamp: typeof firebase.firestore.Timestamp
+      readonly timestamp: typeof firebase.firestore.Timestamp,
+      readonly notificationService: INotificationService
    ) {
       super(firestore, fieldValue, timestamp)
       this.expo = new Expo()
+      this.notificationService = notificationService
    }
 
    async getSubscribedUsers(
@@ -464,5 +487,29 @@ export class UserFunctionsRepository
       return querySnapshot.empty
          ? []
          : querySnapshot.docs.map((doc) => doc.data() as StudyBackground)
+   }
+
+   async sendWelcomeEmail(
+      user: Pick<UserData, "userEmail" | "authId">
+   ): Promise<NotificationSendResponse> {
+      return this.notificationService.sendEmailNotification({
+         templateId: CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY,
+         templateData: null,
+         userAuthId: user.authId,
+         to: user.userEmail,
+      })
+   }
+
+   async sendEmailVerificationEmail(
+      user: Pick<UserData, "userEmail" | "authId" | "validationPin">
+   ): Promise<NotificationSendResponse> {
+      return this.notificationService.sendEmailNotification({
+         templateId: CUSTOMERIO_EMAIL_TEMPLATES.PIN_VALIDATION,
+         templateData: {
+            pinCode: user.validationPin.toString(),
+         },
+         userAuthId: user.authId,
+         to: user.userEmail,
+      })
    }
 }

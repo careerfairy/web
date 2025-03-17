@@ -15,12 +15,12 @@ import { usePreFetchCityById } from "components/custom-hook/countries/useCityByI
 import { usePreFetchCitySearch } from "components/custom-hook/countries/useCitySearch"
 import { useAppSelector } from "components/custom-hook/store"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
+import { useDeleteCurrentUser } from "components/custom-hook/user/useDeleteCurrentUser"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { Formik } from "formik"
 import { Fragment, useContext, useState } from "react"
 import { useDispatch } from "react-redux"
 import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
-import * as actions from "store/actions"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { errorLogAndNotify } from "util/CommonUtil"
 import * as yup from "yup"
@@ -53,12 +53,15 @@ const SignUpPinForm = () => {
    const dispatch = useDispatch()
    const { data: fingerPrintId } = useFingerPrint()
 
-   const { loading } = useAppSelector((state) => state.auth)
+   const { trigger: deleteUser, isMutating: isDeletingUser } =
+      useDeleteCurrentUser({
+         onFinish: () => {
+            previousStep()
+         },
+      })
 
-   const handleBack = () => {
-      dispatch(actions.deleteUser())
-      previousStep()
-   }
+   const loading =
+      useAppSelector((state) => state.auth.loading) || isDeletingUser
 
    // Warming up city related cloud functions (Used in LocationInformation)
    usePreFetchCityById(null)
@@ -66,8 +69,9 @@ const SignUpPinForm = () => {
    async function resendVerificationEmail() {
       setGeneralLoading(true)
       try {
-         await firebase.resendPostmarkEmailVerificationEmailWithPin({
+         await firebase.resendEmailVerificationEmailWithPin({
             recipientEmail: user.email,
+            recipientAuthId: user.uid,
          })
          setIncorrectPin(false)
          setGeneralLoading(false)
@@ -187,7 +191,7 @@ const SignUpPinForm = () => {
                   </Box>
                   <Stack justifyContent="flex-end" direction="row" spacing={1}>
                      <LoadingButton
-                        onClick={handleBack}
+                        onClick={() => deleteUser()}
                         variant="text"
                         color="primary"
                         loading={loading}

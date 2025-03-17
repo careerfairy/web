@@ -66,10 +66,32 @@ export type ProgressInfo = {
  */
 export type OnBatchCompleteCallback = (progress: ProgressInfo) => void
 
+export type NotificationSendResponse = Record<string, any>
+
 /**
  * Interface for notification services
  */
-export interface INotificationRepository {
+export interface INotificationService {
+   /**
+    * Sends an email notification to a single user
+    *
+    * @param notificationData - The notification data object
+    * @returns Promise from the Customer.io API
+    */
+   sendEmailNotification<T extends CustomerIoEmailTemplateId>(
+      notificationData: EmailNotificationRequestData<T>
+   ): Promise<NotificationSendResponse>
+
+   /**
+    * Sends a push notification to a single user
+    *
+    * @param notificationData - The notification data object
+    * @returns Promise from the Customer.io API
+    */
+   sendPushNotification<T extends CustomerIoPushMessageType>(
+      notificationData: PushNotificationRequestData<T>
+   ): Promise<NotificationSendResponse>
+
    /**
     * Sends email notifications in batches to multiple users
     *
@@ -98,12 +120,52 @@ export interface INotificationRepository {
 /**
  * Implementation of notifications using Customer.io
  */
-export class NotificationRepository implements INotificationRepository {
+export class NotificationService implements INotificationService {
    private cioApi: APIClient
    protected batchSize = 250
 
    constructor(cioApi: APIClient) {
       this.cioApi = cioApi
+   }
+
+   /**
+    * Sends an email notification to a single user
+    *
+    * @param notificationData - The notification data object
+    * @returns Promise from the Customer.io API
+    */
+   async sendEmailNotification<T extends CustomerIoEmailTemplateId>(
+      notificationData: EmailNotificationRequestData<T>
+   ): Promise<NotificationSendResponse> {
+      const requestData = createEmailNotificationRequestData(notificationData)
+      const request = new SendEmailRequest(requestData)
+
+      // Add attachments if they exist
+      if (
+         notificationData.attachments &&
+         notificationData.attachments.length > 0
+      ) {
+         notificationData.attachments.forEach((attachment) => {
+            request.attach(attachment.filename, attachment.content)
+         })
+      }
+
+      return this.cioApi.sendEmail(request)
+   }
+
+   /**
+    * Sends a push notification to a single user
+    *
+    * @param notificationData - The notification data object
+    * @returns Promise from the Customer.io API
+    */
+   async sendPushNotification<T extends CustomerIoPushMessageType>(
+      notificationData: PushNotificationRequestData<T>
+   ): Promise<NotificationSendResponse> {
+      const requestData = createPushNotificationRequestData(notificationData)
+      const request = new SendPushRequest(requestData)
+
+      return this.cioApi.sendPush(request)
    }
 
    async sendEmailNotifications<T extends CustomerIoEmailTemplateId>(

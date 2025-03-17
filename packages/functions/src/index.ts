@@ -86,13 +86,13 @@ import levels = require("./levels")
 import remindersNew = require("./reminders-new")
 import followups = require("./followups")
 // Auth
-exports.createNewUserAccount_v3 = auth.createNewUserAccount
+exports.createNewUserAccount_v4 = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
 exports.backfillUserData_eu = auth.backfillUserData
-exports.validateUserEmailWithPin_eu = auth.validateUserEmailWithPin
+exports.validateUserEmailWithPin_v2 = auth.validateUserEmailWithPin
 exports.sendPostmarkResetPasswordEmail_eu = auth.sendPostmarkResetPasswordEmail
-exports.resendPostmarkEmailVerificationEmailWithPin_eu =
-   auth.resendPostmarkEmailVerificationEmailWithPin
+exports.resendEmailVerificationEmailWithPin =
+   auth.resendEmailVerificationEmailWithPin
 exports.deleteLoggedInUserAccount_v2 = auth.deleteLoggedInUserAccount
 exports.verifyToken = auth.verifyToken
 
@@ -270,7 +270,7 @@ exports.onCreateLivestreamPopularityEvents =
    onCreateTriggers.onCreateLivestreamPopularityEvents
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
-exports.onCreateUserData = onCreateTriggers.onCreateUserData
+exports.onCreateUserData_v2 = onCreateTriggers.onCreateUserData
 exports.onUpdateUserData = onCreateTriggers.onUpdateUserData
 exports.onCreateReward = onCreateTriggers.onCreateReward
 exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
