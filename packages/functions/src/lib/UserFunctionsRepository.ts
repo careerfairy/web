@@ -495,7 +495,9 @@ export class UserFunctionsRepository
       return this.notificationService.sendEmailNotification({
          templateId: CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY,
          templateData: null,
-         userAuthId: user.authId,
+         identifiers: {
+            id: user.authId,
+         },
          to: user.userEmail,
       })
    }
@@ -508,7 +510,9 @@ export class UserFunctionsRepository
          templateData: {
             pinCode: user.validationPin.toString(),
          },
-         userAuthId: user.authId,
+         identifiers: {
+            id: user.authId,
+         },
          to: user.userEmail,
       })
    }

@@ -413,8 +413,9 @@ const handleSendEmails = async (
                   outlook: urls.outlook,
                },
             },
-            userAuthId:
-               userLivestreamData.user.authId || userLivestreamData.userId,
+            identifiers: {
+               id: userLivestreamData.user.authId || userLivestreamData.userId,
+            },
             to: userLivestreamData.user.userEmail || userLivestreamData.id,
             attachments,
             send_at: deliveryTimeInUnix,

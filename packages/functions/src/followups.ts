@@ -72,7 +72,9 @@ export const sendReminderEmailAboutApplicationLink = onCall(
          {
             to: userEmail,
             templateId: CUSTOMERIO_EMAIL_TEMPLATES.APPLY_TO_JOB_LATER,
-            userAuthId: userUid,
+            identifiers: {
+               id: userUid,
+            },
             templateData: {
                job: getJobEmailData(job, {
                   baseUrl: request.rawRequest.headers?.origin,
@@ -240,7 +242,9 @@ const getEmailTemplateMessages = (
          templateMessages.push({
             to: streamUserData.user.userEmail,
             templateId: templateId,
-            userAuthId: streamUserData.user.authId ?? streamUserData.user.id,
+            identifiers: {
+               id: streamUserData.user.authId ?? streamUserData.user.id,
+            },
             templateData: {
                livestream: {
                   company: streamGroup.universityName,
