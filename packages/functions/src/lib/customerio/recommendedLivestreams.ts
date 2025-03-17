@@ -95,7 +95,9 @@ export const customerIORecommendedLivestreamsWebhook = onRequest(
                ),
             }))
 
-         response.status(200).json(recommendedLivestreams.slice(0, 3))
+         response.status(200).json({
+            livestreams: recommendedLivestreams.slice(0, 3),
+         })
       } catch (error) {
          logger.error("Error processing recommended livestreams webhook", error)
          response.status(500).send("Internal Server Error")
