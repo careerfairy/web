@@ -108,12 +108,10 @@ exports.sendBasicTemplateEmail_v3 = admin.sendBasicTemplateEmail
 exports.unsubscribeFromMarketingEmails_eu = admin.unsubscribeFromMarketingEmails
 
 // Group Admin
-exports.sendDraftApprovalRequestEmail_eu =
-   groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail_v2 =
    groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_v2 = groupAdmin.getLivestreamReportData
-exports.sendDashboardInviteEmail_eu = groupAdmin.sendDashboardInviteEmail
+exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
 exports.joinGroupDashboard_eu = groupAdmin.joinGroupDashboard
 exports.createGroup_eu = groupAdmin.createGroup
 exports.changeRole_eu = groupAdmin.changeRole

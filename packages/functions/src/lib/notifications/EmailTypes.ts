@@ -15,6 +15,7 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    WELCOME_TO_CAREERFAIRY: "welcome_to_careerfairy",
    PIN_VALIDATION: "pin_validation",
    PASSWORD_RESET: "password_reset",
+   GROUP_INVITATION: "group_invitation",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
@@ -123,6 +124,16 @@ export type PasswordResetTemplateData = {
 }
 
 /**
+ * Message data for group invitation email template
+ */
+export type GroupInvitationTemplateData = {
+   group_link: string
+   group_name: string
+   invite_link: string
+   sender_first_name: string
+}
+
+/**
  * Union type of all possible message data types
  */
 export type CustomerIoEmailMessageData = {
@@ -136,6 +147,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY]: null
    [CUSTOMERIO_EMAIL_TEMPLATES.PIN_VALIDATION]: PinValidationTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.PASSWORD_RESET]: PasswordResetTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.GROUP_INVITATION]: GroupInvitationTemplateData
 }
 
 /**

@@ -1,5 +1,7 @@
-import React from "react"
-import { GlassDialog } from "../../../../../materialUI/GlobalModals"
+import {
+   Group,
+   GROUP_DASHBOARD_ROLE,
+} from "@careerfairy/shared-lib/dist/groups"
 import {
    Button,
    CircularProgress,
@@ -14,14 +16,11 @@ import {
 import { Formik, FormikHelpers } from "formik"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
-import {
-   Group,
-   GROUP_DASHBOARD_ROLE,
-} from "@careerfairy/shared-lib/dist/groups"
+import { GlassDialog } from "../../../../../materialUI/GlobalModals"
 
+import Grid from "@mui/material/Grid"
 import * as yup from "yup"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
-import Grid from "@mui/material/Grid"
 
 interface AddMemberModalProps {
    open: boolean
@@ -58,7 +57,7 @@ const AddMemberModal = ({
       { resetForm, setFieldError }: FormikHelpers<AddMemberModalProps>
    ) => {
       try {
-         let successMessage = `An invitation email has been sent to ${values.email}`
+         const successMessage = `An invitation email has been sent to ${values.email}`
 
          await sendGroupAdminInviteEmail({
             groupName: group.universityName,
@@ -156,7 +155,7 @@ const AddMemberModal = ({
                         variant="contained"
                         type="submit"
                         endIcon={
-                           isSubmitting && (
+                           Boolean(isSubmitting) && (
                               <CircularProgress size={20} color="inherit" />
                            )
                         }
