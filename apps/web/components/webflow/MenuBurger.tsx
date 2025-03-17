@@ -87,7 +87,7 @@ const MenuBurger: FC<Props> = ({ id }) => {
    return (
       <Box sx={[styles.wrapper]}>
          <Button onClick={() => setOpen(true)}>
-            <Menu color="black" />
+            <Menu color={isB2C ? "white" : "black"} />
          </Button>
          <Drawer open={open} anchor="right" onClose={() => setOpen(false)}>
             <Box sx={styles.drawer}>
