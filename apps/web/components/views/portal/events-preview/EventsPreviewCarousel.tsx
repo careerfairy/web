@@ -169,7 +169,6 @@ export type EventsCarouselStyling = {
    titleVariant?: TypographyProps["variant"]
    eventsHeader?: SxProps
    mainWrapperBoxSx?: unknown
-   headerRightSx?: SxProps
 }
 export type ChildRefType = {
    goNext: () => void
@@ -182,6 +181,7 @@ export type EventsProps = {
    seeMoreLink?: string
    title?: ReactNode | string
    subtitle?: ReactNode | string
+   header?: ReactNode
    loading?: boolean
    hidePreview?: boolean
    type: EventsTypes
@@ -226,6 +226,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          disableClick,
          onCardClick,
          disableTracking,
+         header,
          preventPaddingSlide = false,
       } = props
 
@@ -324,49 +325,58 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          <>
             <ConditionalWrapper condition={!hidePreview}>
                <Box sx={mainBoxSxStyles}>
-                  <ConditionalWrapper
-                     condition={!isEmbedded && allStyles.compact}
-                  >
-                     <Box sx={allStyles.eventsHeader}>
-                        <Box>
-                           <ConditionalWrapper
-                              condition={
-                                 seeMoreLink !== undefined &&
-                                 (allStyles.headerAsLink || isMobile)
-                              }
-                              fallback={getHeading(
-                                 [allStyles.title],
-                                 allStyles.titleVariant
-                              )}
-                           >
-                              <Link href={seeMoreLink} style={styles.titleLink}>
-                                 {getHeading(
-                                    [allStyles.title, styles.underlined],
+                  {header ? (
+                     header
+                  ) : (
+                     <ConditionalWrapper
+                        condition={!isEmbedded && allStyles.compact}
+                     >
+                        <Box sx={allStyles.eventsHeader}>
+                           <Box>
+                              <ConditionalWrapper
+                                 condition={
+                                    seeMoreLink !== undefined &&
+                                    (allStyles.headerAsLink || isMobile)
+                                 }
+                                 fallback={getHeading(
+                                    [allStyles.title],
                                     allStyles.titleVariant
                                  )}
-                              </Link>
-                           </ConditionalWrapper>
-                        </Box>
-                        {/* <Stack
-                           spacing={1}
-                           direction={"row"}
-                           justifyContent="space-between"
-                           alignItems="flex-end"
-                        >
-                           <ConditionalWrapper
-                              condition={!allStyles.headerAsLink && !isMobile}
+                              >
+                                 <Link
+                                    href={seeMoreLink}
+                                    style={styles.titleLink}
+                                 >
+                                    {getHeading(
+                                       [allStyles.title, styles.underlined],
+                                       allStyles.titleVariant
+                                    )}
+                                 </Link>
+                              </ConditionalWrapper>
+                           </Box>
+                           <Stack
+                              spacing={1}
+                              direction={"row"}
+                              justifyContent="space-between"
+                              alignItems="flex-end"
                            >
-                              {seeMoreComponent}
-                           </ConditionalWrapper>
-                           {(!isMobile && arrowsComponent) || null}
-                        </Stack> */}
-                     </Box>
-                  </ConditionalWrapper>
+                              <ConditionalWrapper
+                                 condition={
+                                    !allStyles.headerAsLink && !isMobile
+                                 }
+                              >
+                                 {seeMoreComponent}
+                              </ConditionalWrapper>
+                              {(!isMobile && arrowsComponent) || null}
+                           </Stack>
+                        </Box>
+                     </ConditionalWrapper>
+                  )}
 
                   <ConditionalWrapper
                      condition={!isEmbedded && !allStyles.compact}
                   >
-                     <Stack direction="row" justifyContent="space-between">
+                     <Box sx={allStyles.eventsHeader}>
                         {typeof title === "string" ? (
                            <Typography
                               variant={allStyles.titleVariant}
@@ -379,17 +389,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         ) : (
                            Boolean(title) && title
                         )}
-                        <Stack
-                           direction="row"
-                           spacing={2}
-                           justifyContent="flex-end"
-                           alignItems="flex-end"
-                           sx={allStyles.headerRightSx}
-                        >
-                           {seeMoreComponent}
-                           {(!isMobile && arrowsComponent) || null}
-                        </Stack>
-                     </Stack>
+                     </Box>
                   </ConditionalWrapper>
                   <Stack sx={styles.previewContent}>
                      <ConditionalWrapper
@@ -411,13 +411,13 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            </Box>
                         </Stack>
                      </ConditionalWrapper>
-                     {/* <ConditionalWrapper
+                     <ConditionalWrapper
                         condition={!isEmbedded && !allStyles.compact}
                      >
                         <Stack
                            direction="row"
                            spacing={2}
-                           justifyContent="flex-end"
+                           justifyContent="space-between"
                            alignItems="flex-end"
                            mt={1}
                            mb={1}
@@ -425,7 +425,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            <Box>{seeMoreComponent}</Box>
                            {arrowsComponent}
                         </Stack>
-                     </ConditionalWrapper> */}
+                     </ConditionalWrapper>
                      {subtitle}
                      <Box ref={autoPlayRef}>
                         <Box id={id} sx={allStyles.viewportSx} ref={emblaRef}>

@@ -34,16 +34,13 @@ export const GroupSparksCarousel = ({
          {...props}
          headerSx={headerSx}
          seeAll={
-            isMobile ? null : (
-               <SeeAllLink
-                  href={`/sparks/${groupSparks?.at(0)?.id}?interactionSource=${
-                     InteractionSources.Company_Page
-                  }&companyName=${group?.universityName}&groupId=${
-                     props.groupId
-                  }`}
-               />
-            )
+            <SeeAllLink
+               href={`/sparks/${groupSparks?.at(0)?.id}?interactionSource=${
+                  InteractionSources.Company_Page
+               }&companyName=${group?.universityName}&groupId=${props.groupId}`}
+            />
          }
+         disableArrows={isMobile}
       />
    )
 }
