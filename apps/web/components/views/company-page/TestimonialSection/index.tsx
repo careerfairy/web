@@ -1,6 +1,7 @@
 import { Testimonial } from "@careerfairy/shared-lib/groups"
 import Add from "@mui/icons-material/Add"
-import { Box, IconButton, Typography } from "@mui/material"
+import { Box, IconButton, Stack, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import AutoHeight from "embla-carousel-auto-height"
@@ -9,11 +10,11 @@ import useEmblaCarousel, {
    EmblaPluginType,
 } from "embla-carousel-react"
 import React, { useCallback, useMemo, useState } from "react"
-import { useMountedState } from "react-use"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import EditDialog from "../EditDialog"
-import { useCompanyPage } from "../index"
+import { SeeAllLink } from "../Overview/SeeAllLink"
+import { TabValue, useCompanyPage } from "../index"
 import TestimonialCard from "./TestimonialCard"
 import TestimonialDialog from "./TestimonialDialog"
 
@@ -47,13 +48,11 @@ const styles = sxStyles({
 })
 
 const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
-   const { group, editMode } = useCompanyPage()
+   const { group, editMode, setActiveTab } = useCompanyPage()
    const [testimonialToEdit, setTestimonialToEdit] = useState(null)
-
+   const isMobile = useIsMobile()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
-
-   const isMounted = useMountedState()
 
    const handleCloseDialogClick = useCallback(() => {
       handleCloseDialog()
@@ -97,7 +96,7 @@ const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
       return null
    }
 
-   return isMounted() ? (
+   return (
       <>
          <Box sx={styles.titleSection}>
             <Typography
@@ -120,7 +119,16 @@ const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
                   <> </>
                )}
                {group?.testimonials?.length > 1 ? (
-                  <GenericCarousel.Arrows emblaApi={emblaApi} />
+                  <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                     <SeeAllLink
+                        handleClick={() =>
+                           setActiveTab?.(TabValue.testimonials)
+                        }
+                     />
+                     {!isMobile ? (
+                        <GenericCarousel.Arrows emblaApi={emblaApi} />
+                     ) : null}
+                  </Stack>
                ) : null}
             </>
          </Box>
@@ -170,7 +178,7 @@ const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
             </EditDialog>
          ) : null}
       </>
-   ) : null
+   )
 })
 TestimonialSection.displayName = "TestimonialSection"
 export default TestimonialSection
