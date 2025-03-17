@@ -11,6 +11,9 @@ import { useCompanyPage } from ".."
 
 const CARD_WIDTH = 214
 
+const mentorsCardBackground =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fmentors-card-background.png?alt=media&token=a38f0348-61db-4317-a65e-392dbc44b38a"
+
 const styles = sxStyles({
    container: (theme) => ({
       position: "relative",
@@ -29,11 +32,34 @@ const styles = sxStyles({
       cursor: "pointer",
       textDecoration: "none",
       color: "inherit",
+      overflow: "hidden",
    }),
+   topBackground: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "66px",
+      // backgroundImage: `url('https://s3-alpha-sig.figma.com/img/041b/a4cc/3d0dad7075076d7972d304647350b416?Expires=1743379200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=nI2WKqmLE~JV5-4GqWDokwawr0UONd3D2pleJ50hlsz426LQhFK~fK7f3Gq~QCEMmvkmCxYR6K8MR3WTeePNSR01OfHgBZW2QWiuzCoPav0mBxcOtgfdjs0ZCcg2RFLd-lISCqDHzqwDEWg6HRC9a~QhKFRbI7C-9Pywke~KnQxdeln76YNHOn9fXAGw1O6KBqjmyqxXfizbHC7aB1y09GfmSPusFLdwtXhCPcKmWsMnd10uASu0HScoclrVwgyRd92QoaO0gDGiVa9EC~zjHJEhKmC9PSE9nczy4G3bXA6cIWXi5ExB2gamIy3MHaSYWlmoSlNsjl8awP3-MUeJJQ__')`,
+      backgroundImage: `url(${mentorsCardBackground})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      zIndex: 0,
+      "&::before": {
+         content: "''",
+         position: "absolute",
+         top: 0,
+         left: 0,
+         width: "100%",
+         height: "100%",
+         background: "rgba(142, 142, 142, 0.10)",
+         backdropFilter: "blur(10px)",
+      },
+   },
    creator: {
       name: {
          width: "100%",
-         fontWeight: 600,
+         fontWeight: 700,
          textAlign: "center",
          textOverflow: "ellipsis",
          overflow: "hidden",
@@ -44,17 +70,29 @@ const styles = sxStyles({
          fontWeight: 400,
          lineHeight: "21px",
          textAlign: "center",
-         color: "neutral.400",
-         ...getMaxLineStyles(2),
+         color: "neutral.600",
          // css hack to ensure text is not cut off
          paddingBottom: 1,
          marginBottom: -1,
+         ...getMaxLineStyles(2),
       },
    },
    edit: {
       position: "absolute",
       right: 4,
       top: 4,
+   },
+   logoOverlay: {
+      position: "absolute",
+      bottom: 1,
+      right: 2,
+      zIndex: 2,
+      border: (theme) => `2px solid ${theme.brand.white[100]}`,
+      borderRadius: "50%",
+   },
+   avatarContainer: {
+      position: "relative",
+      zIndex: 1,
    },
 })
 
@@ -95,6 +133,7 @@ export const MentorCard = ({
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
 
+   const { group } = useCompanyPage()
    const _handleEdit = (ev: SyntheticEvent) => {
       ev.preventDefault()
       ev.stopPropagation()
@@ -103,23 +142,43 @@ export const MentorCard = ({
 
    return (
       <Container creator={creator}>
+         <Box sx={styles.topBackground} />
          {Boolean(isEditMode) && (
             <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.palette.neutral[700]} />
             </IconButton>
          )}
-         <CircularLogo
-            size={80}
-            src={creator.avatarUrl}
-            alt={`Picture of creator ${creatorName}`}
-            objectFit="cover"
-            key={creator.avatarUrl}
-         />
-         <Typography variant="brandedH4" sx={styles.creator.name}>
+         <Box sx={styles.avatarContainer}>
+            <CircularLogo
+               size={84}
+               src={creator.avatarUrl}
+               alt={`Picture of creator ${creatorName}`}
+               objectFit="cover"
+               key={creator.avatarUrl}
+            />
+            {group?.logoUrl ? (
+               <CircularLogo
+                  size={28}
+                  src={group.logoUrl}
+                  alt={`Logo of ${group.universityName}`}
+                  objectFit="cover"
+                  sx={styles.logoOverlay}
+               />
+            ) : null}
+         </Box>
+         <Typography
+            variant="brandedH5"
+            sx={[styles.creator.name, { position: "relative", zIndex: 1 }]}
+         >
             {creatorName}
          </Typography>
-         <Typography sx={styles.creator.position}>
-            {creator.position}
+         <Typography
+            sx={[styles.creator.position, { position: "relative", zIndex: 1 }]}
+         >
+            {creator.position.concat(" at ")}
+            <Typography fontWeight={600} color={"neutral.600"}>
+               {group?.universityName}
+            </Typography>
          </Typography>
       </Container>
    )
