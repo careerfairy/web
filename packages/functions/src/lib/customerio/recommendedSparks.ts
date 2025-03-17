@@ -16,7 +16,7 @@ type RecommendedSparksRequest = {
 /**
  * Type definition for the response format
  */
-export type CustomerIORecommendedSparkWebhookData = {
+type CustomerIORecommendedSparkWebhookData = {
    question: string
    company: string
    category_id: string
