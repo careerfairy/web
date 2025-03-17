@@ -32,12 +32,3 @@ export type CustomerIOWebhookEvent = {
    metric: "subscribed" | "unsubscribed"
    timestamp: number
 }
-
-export type CustomerIORecommendedLivestreamWebhookData = {
-   url: string
-   title: string
-   company: string
-   start: string
-   backgroundImageUrl: string
-   companyLogoUrl: string
-}

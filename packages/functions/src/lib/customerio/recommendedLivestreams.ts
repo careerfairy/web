@@ -9,14 +9,25 @@ import {
 import { formatLivestreamDate, getWebBaseUrl } from "../../util"
 import { UserDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
 import UserEventRecommendationService from "../recommendation/UserEventRecommendationService"
-import { CustomerIORecommendedLivestreamWebhookData } from "./types"
 import { validateCustomerIOWebhookSignature } from "./utils"
 
 /**
  * Type definition for the request body from Customer.io
  */
-interface RecommendedLivestreamsRequest {
+type RecommendedLivestreamsRequest = {
    userAuthId: string
+}
+
+/**
+ * Type definition for the response format
+ */
+type CustomerIORecommendedLivestreamWebhookData = {
+   url: string
+   title: string
+   company: string
+   start: string
+   backgroundImageUrl: string
+   companyLogoUrl: string
 }
 
 /**
