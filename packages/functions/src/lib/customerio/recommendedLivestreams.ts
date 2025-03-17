@@ -31,7 +31,6 @@ export const customerIORecommendedLivestreamsWebhook = onRequest(
          return
       }
 
-      // Verify webhook signature
       const isSignatureValid = validateCustomerIOWebhookSignature(
          request,
          process.env.CUSTOMERIO_WEBHOOK_SIGNING_KEY
