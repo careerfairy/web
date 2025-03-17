@@ -257,7 +257,7 @@ const MobileMenuItem: FC<MobileMenuItemProps> = ({ option, handleClose }) => {
             [
                styles.drawerMenuItem,
                option.loading && styles.listItemLoading,
-               option.color && { color: option.color },
+               !!option.color && { color: option.color },
             ],
             option.menuItemSxProps
          )}

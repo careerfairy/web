@@ -6,9 +6,6 @@ import { sxStyles } from "types/commonTypes"
 import { useLocalTracks } from "../../context"
 
 const styles = sxStyles({
-   volumeLabel: {
-      color: "neutral.400",
-   },
    indicator: {
       borderRadius: "50%",
       width: 14,
@@ -51,7 +48,7 @@ export const MicVolume = () => {
 
    return (
       <Stack spacing={1.5}>
-         <Typography sx={styles.volumeLabel} variant="small">
+         <Typography color="neutral.800" variant="small">
             Input level
          </Typography>
          <Stack maxWidth={571} direction="row" justifyContent="space-around">
