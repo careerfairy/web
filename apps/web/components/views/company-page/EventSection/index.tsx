@@ -7,13 +7,15 @@ import EventsPreviewCarousel, {
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useCallback, useState } from "react"
 import { useMountedState } from "react-use"
-import { SectionAnchor, TabValue, useCompanyPage } from "../"
+import { SectionAnchor, TabValue, TabValueType, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { useRouter } from "next/router"
+import { SeeAllLink } from "../Overview/SeeAllLink"
 import StayUpToDateBanner from "./StayUpToDateBanner"
 
 const styles = sxStyles({
@@ -54,11 +56,14 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 0,
-      pb: 2,
+      pb: 1,
    },
    seeMoreText: {
       textDecoration: "underline",
-      color: "#2ABAA5",
+      fontSize: "14px",
+      mr: 1,
+      color: "neutral.600",
+      fontWeight: "400",
    },
    // description: {
    //    display: "flex",
@@ -89,8 +94,20 @@ const EventSection = () => {
       editMode,
    } = useCompanyPage()
    const query = `companyId=${group.id}`
+
    const isMounted = useMountedState()
    const isMobile = useIsMobile()
+   const router = useRouter()
+
+   const recordingsLink = {
+      pathname: router.pathname,
+      query: { ...router.query, tab: TabValue.recordings },
+   }
+
+   const eventsLink = {
+      pathname: router.pathname,
+      query: { ...router.query, tab: TabValue.livesStreams },
+   }
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -104,23 +121,36 @@ const EventSection = () => {
       [handleOpenDialog]
    )
 
+   const handleSetTabValue = (value: TabValueType) => {
+      router.push({
+         pathname: router.pathname,
+         query: { ...router.query, tab: value },
+      })
+   }
    const eventsCarouselStyling: EventsCarouselStyling = {
-      compact: isMobile,
-      seeMoreSx: styles.seeMoreText,
+      mainWrapperBoxSx: {
+         mt: 2,
+         mr: "-16px !important",
+         ml: "-16px !important",
+      },
       showArrows: isMobile,
-      headerAsLink: isMobile,
-      title: styles.eventTitle,
-      eventsHeader: styles.eventsHeader,
-      padding: false,
+      seeMoreSx: styles.seeMoreText,
+      // compact: isMobile,
+      // seeMoreSx: styles.seeMoreText,
+      // showArrows: isMobile,
+      headerAsLink: false,
+      // title: styles.eventTitle,
+      // eventsHeader: styles.eventsHeader,
+      // padding: false,
       // mainWrapperBoxSx: {
       //    mr: "-16px",
       // },
-      mainWrapperBoxSx: {
-         mr: "-16px !important",
-      },
-      headerRightSx: {
-         mr: "16px !important",
-      },
+      // mainWrapperBoxSx: {
+      //    mr: "-16px !important",
+      // },
+      // headerRightSx: {
+      //    mr: "16px !important",
+      // },
    }
 
    return isMounted() ? (
@@ -147,12 +177,24 @@ const EventSection = () => {
                         fontWeight={"600"}
                         color="black"
                      >
-                        Next Live Streams
+                        Live streams
                      </Typography>
+                  }
+                  header={
+                     isMobile ? (
+                        <EventSectionHeader
+                           title="Live streams"
+                           seeAllClick={() =>
+                              handleSetTabValue?.(TabValue.livesStreams)
+                           }
+                        />
+                     ) : null
                   }
                   events={upcomingLivestreams ?? []}
                   type={EventsTypes.COMING_UP}
-                  seeMoreLink={`/next-livestreams?${query}`}
+                  seeMoreLink={`${eventsLink.pathname}?${new URLSearchParams(
+                     eventsLink.query as Record<string, string>
+                  )}`}
                   styling={eventsCarouselStyling}
                   hideChipLabels={editMode}
                   showManageButton={editMode}
@@ -167,12 +209,26 @@ const EventSection = () => {
                         fontWeight={"600"}
                         color="black"
                      >
-                        Past Live Streams
+                        Recordings
                      </Typography>
+                  }
+                  header={
+                     isMobile ? (
+                        <EventSectionHeader
+                           title="Recordings"
+                           seeAllClick={() =>
+                              handleSetTabValue?.(TabValue.recordings)
+                           }
+                        />
+                     ) : null
                   }
                   events={pastLivestreams ?? []}
                   type={EventsTypes.PAST_EVENTS}
-                  seeMoreLink={`/past-livestreams?${query}`}
+                  seeMoreLink={`${
+                     recordingsLink.pathname
+                  }?${new URLSearchParams(
+                     recordingsLink.query as Record<string, string>
+                  )}`}
                   styling={eventsCarouselStyling}
                   preventPaddingSlide
                />
@@ -195,6 +251,31 @@ const EventSection = () => {
          ) : null}
       </Box>
    ) : null
+}
+
+type EventSectionHeaderProps = {
+   title: string
+   seeAllClick?: () => void
+}
+const EventSectionHeader = ({
+   title,
+   seeAllClick,
+}: EventSectionHeaderProps) => {
+   return (
+      <Stack
+         sx={styles.eventsHeader}
+         direction="row"
+         justifyContent="space-between"
+         alignItems="center"
+      >
+         <Typography variant="brandedH3" fontWeight={"600"} color="black">
+            {title}
+         </Typography>
+         <Box mr={2}>
+            <SeeAllLink handleClick={seeAllClick} />
+         </Box>
+      </Stack>
+   )
 }
 type StayUpToDateProps = {
    title: string

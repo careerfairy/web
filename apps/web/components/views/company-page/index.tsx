@@ -16,6 +16,7 @@ import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGr
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { doc } from "firebase/firestore"
+import { useRouter } from "next/router"
 import {
    MutableRefObject,
    createContext,
@@ -24,7 +25,6 @@ import {
    useEffect,
    useMemo,
    useRef,
-   useState,
 } from "react"
 import { useFirestoreDocData } from "reactfire"
 import { sxStyles } from "types/commonTypes"
@@ -175,7 +175,10 @@ const CompanyPageOverview = ({
       [group.id]
    )
 
-   const [value, setValue] = useState<TabValueType>(tab ?? TabValue.overview)
+   const router = useRouter()
+   // const [tabValue, setTabValue] = useState<TabValueType>(
+   //    (router.query.tab as TabValueType) ?? tab ?? TabValue.overview
+   // )
 
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
       initialData: group,
@@ -288,7 +291,6 @@ const CompanyPageOverview = ({
                   spacing={2}
                   justifyItems={"space-between"}
                   width={"100%"}
-                  // bgcolor={isMobile ? "transparent" : "white"}
                   bgcolor={isMobile ? "#F5F5F5" : "transparent"}
                >
                   <Box maxWidth={isMobile ? "100%" : "50%"}>
@@ -297,8 +299,13 @@ const CompanyPageOverview = ({
                            variant="scrollable"
                            scrollButtons
                            allowScrollButtonsMobile
-                           value={value}
-                           onChange={(_, newValue) => setValue(newValue)}
+                           value={tab}
+                           onChange={(_, newValue) => {
+                              router.push({
+                                 pathname: router.pathname,
+                                 query: { ...router.query, tab: newValue },
+                              })
+                           }}
                            ScrollButtonComponent={CustomScrollButton}
                            sx={styles.tabs}
                         >
@@ -338,20 +345,20 @@ const CompanyPageOverview = ({
                            pb="24px"
                            px={2}
                         >
-                           {value === TabValue.overview && (
+                           {tab === TabValue.overview && (
                               <Overview
                                  showJobs={showJobs}
                                  editMode={editMode}
                               />
                            )}
-                           {value === TabValue.jobs && <JobsSection />}
-                           {value === TabValue.sparks && (
+                           {tab === TabValue.jobs && <JobsSection />}
+                           {tab === TabValue.sparks && (
                               <SparksSection
                                  key={group.id}
                                  groupId={group.id}
                               />
                            )}
-                           {value === TabValue.livesStreams && <EventSection />}
+                           {tab === TabValue.livesStreams && <EventSection />}
                            {/* {value === TabValue.recordings && <RecordingsSection />} */}
                         </Box>
                      </Box>
@@ -360,14 +367,6 @@ const CompanyPageOverview = ({
                      <MediaSection />
                   </Box>
                </Stack>
-               {/* <Grid container spacing={2}>
-                  <Grid item xs={12} md={6} >
-                     
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                     <MediaSection />
-                  </Grid>
-               </Grid> */}
             </Container>
             <NewsletterSection />
          </Box>

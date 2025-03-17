@@ -4,6 +4,7 @@ import {
 } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { useCallback, useEffect, useState } from "react"
 import { useMountedState } from "react-use"
@@ -14,6 +15,7 @@ import { MentorCard } from "./MentorCard"
 import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
+   const isMobile = useIsMobile()
    const { editMode, groupCreators, group } = useCompanyPage()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -81,7 +83,9 @@ export const MentorsSection = () => {
                   Mentors
                </Typography>
             }
-            seeAll={<SeeAllLink href={`/mentors/${group.id}`} />}
+            seeAll={
+               isMobile ? null : <SeeAllLink href={`/mentors/${group.id}`} />
+            }
             viewportSx={{
                // hack to ensure shadows are not cut off
                padding: "16px",

@@ -10,6 +10,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
+import { TabValue } from "components/views/company-page"
 import {
    CustomJobDialogData,
    CustomJobDialogLayout,
@@ -23,12 +24,14 @@ import {
    NextPage,
 } from "next"
 import { useRouter } from "next/router"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
 import SEO from "../../../components/util/SEO"
-import CompanyPageOverview from "../../../components/views/company-page"
+import CompanyPageOverview, {
+   TabValueType,
+} from "../../../components/views/company-page"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
@@ -64,6 +67,10 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    const { trackEvent } = useCompaniesTracker()
    const { universityName, id } = deserializeGroupClient(serverSideGroup)
 
+   const [tabValue, setTabValue] = useState<TabValueType>(
+      (query.tab as TabValueType) ?? TabValue.overview
+   )
+
    const interactionSource = query.interactionSource?.toString() || null
 
    useEffect(() => {
@@ -81,6 +88,14 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             )
          ),
    }) as unknown as React.RefObject<HTMLDivElement>
+
+   // Add effect to update tab value when query param changes
+   useEffect(() => {
+      const queryTab = query.tab as TabValueType
+      if (queryTab && Object.values(TabValue).includes(queryTab)) {
+         setTabValue(queryTab)
+      }
+   }, [query.tab])
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
@@ -112,6 +127,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                         serverSideCustomJobs
                      )}
                      editMode={false}
+                     tab={tabValue}
                   />
                </Box>
             </GenericDashboardLayout>
