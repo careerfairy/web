@@ -29,6 +29,16 @@ const styles = sxStyles({
    },
    link: {
       color: "black !important",
+      px: 1.5,
+      py: 1,
+      "& a": {
+         color: "inherit",
+         textDecoration: "none",
+      },
+      "&:hover, &:active": {
+         backgroundColor: "rgba(230, 230, 230, 0.5)",
+         borderRadius: "12px",
+      },
    },
 })
 
@@ -49,29 +59,23 @@ const MenuBurger: FC<Props> = ({ id }) => {
    return (
       <Box sx={[styles.wrapper]}>
          <Button onClick={() => setOpen(true)}>
-            <Menu />
+            <Menu color="black" />
          </Button>
          <Drawer open={open} anchor="right" onClose={() => setOpen(false)}>
             <Box sx={styles.drawer}>
                {isB2C ? (
                   <B2CDrawer onCloseDrawer={() => setOpen(false)} />
                ) : (
-                  <Link href={"/employers"}>
-                     <Typography variant="brandedBody" sx={styles.link}>
-                        For employers
-                     </Typography>
-                  </Link>
+                  <Typography variant="brandedBody" sx={styles.link}>
+                     <Link href={"/employers"}>For employers</Link>
+                  </Typography>
                )}
-               <Link href={"/levels"}>
-                  <Typography variant="brandedBody" sx={styles.link}>
-                     Career guide
-                  </Typography>
-               </Link>
-               <Link href={"/whos-hiring"}>
-                  <Typography variant="brandedBody" sx={styles.link}>
-                     Who&apos;s hiring
-                  </Typography>
-               </Link>
+               <Typography variant="brandedBody" sx={styles.link}>
+                  <Link href={"/levels"}>Career guide</Link>
+               </Typography>
+               <Typography variant="brandedBody" sx={styles.link}>
+                  <Link href={"/whos-hiring"}>Who&apos;s hiring</Link>
+               </Typography>
 
                {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                   <Stack spacing={1.5} sx={styles.actions}>
