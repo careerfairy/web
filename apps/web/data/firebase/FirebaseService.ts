@@ -228,7 +228,7 @@ class FirebaseService {
       groupId: string
       role: GROUP_DASHBOARD_ROLE
    }) => {
-      return this.functions.httpsCallable("sendDashboardInviteEmail_eu")(args)
+      return this.functions.httpsCallable("sendDashboardInviteEmail")(args)
    }
 
    sendBasicTemplateEmail = async ({
