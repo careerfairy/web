@@ -375,6 +375,8 @@ exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
 exports.customerIOWebhook = customerio.customerIOWebhook
 exports.customerIORecommendedLivestreamsWebhook =
    customerio.customerIORecommendedLivestreamsWebhook
+exports.customerIORecommendedSparksWebhook =
+   customerio.customerIORecommendedSparksWebhook
 
 // Reminders
 exports.schedule5MinutesReminderEmails =
