@@ -28,7 +28,9 @@ export const SeeAllLink = ({ handleClick }: Props) => {
          direction="row"
          alignItems="center"
          spacing={"6px"}
-         onClick={() => handleClick?.()}
+         onClick={() => {
+            handleClick?.()
+         }}
          sx={styles.root}
       >
          <Typography

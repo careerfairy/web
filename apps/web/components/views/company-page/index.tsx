@@ -16,15 +16,16 @@ import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGr
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { doc } from "firebase/firestore"
-import { useRouter } from "next/router"
 import {
    MutableRefObject,
    createContext,
    forwardRef,
+   useCallback,
    useContext,
    useEffect,
    useMemo,
    useRef,
+   useState,
 } from "react"
 import { useFirestoreDocData } from "reactfire"
 import { sxStyles } from "types/commonTypes"
@@ -32,14 +33,15 @@ import { groupRepo } from "../../../data/RepositoryInstances"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import useListenToStreams from "../../custom-hook/useListenToStreams"
-import EventSection from "./EventSection"
 import Header from "./Header"
-import JobsSection from "./JobsSection"
 import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
 import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
-import SparksSection from "./SparksSection"
+import EventsTab from "./Tabs/EventsTab"
+import JobsTab from "./Tabs/JobsTab"
+import MentorsTab from "./Tabs/MentorsTab"
+import SparksTab from "./Tabs/SparksTab"
 
 const styles = sxStyles({
    tabs: {
@@ -86,6 +88,7 @@ export const TabValue = {
    sparks: "sparks-section",
    livesStreams: "livesStreams-section",
    recordings: "recordings-section",
+   mentors: "mentors-section",
 
    profile: "profile-section",
    media: "media-section",
@@ -109,6 +112,8 @@ export const getTabLabel = (tabId: TabValueType) => {
          return "Live streams"
       case TabValue.recordings:
          return "Recordings"
+      case TabValue.mentors:
+         return "Mentors"
       // case TabValue.media:
       //    return "Media"
       // case TabValue.testimonialsOrMentors:
@@ -137,6 +142,8 @@ type ICompanyPageContext = {
    pastLivestreams: LivestreamEvent[]
    customJobs: CustomJob[]
    sectionRefs: SectionRefs
+   activeTab: TabValueType
+   setActiveTab: (tab: TabValueType) => void
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -154,6 +161,8 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
       mediaSectionRef: null,
       testimonialOrMentorsSectionRef: null,
    },
+   activeTab: TabValue.overview,
+   setActiveTab: () => {},
 })
 
 const CompanyPageOverview = ({
@@ -175,10 +184,9 @@ const CompanyPageOverview = ({
       [group.id]
    )
 
-   const router = useRouter()
-   // const [tabValue, setTabValue] = useState<TabValueType>(
-   //    (router.query.tab as TabValueType) ?? tab ?? TabValue.overview
-   // )
+   const [tabValue, setTabValue] = useState<TabValueType>(
+      tab ?? TabValue.overview
+   )
 
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
       initialData: group,
@@ -237,6 +245,13 @@ const CompanyPageOverview = ({
       }
    }, [contextGroup, editMode, presenter])
 
+   const setActiveTab = useCallback(
+      (tab: TabValueType) => {
+         setTabValue(tab)
+      },
+      [setTabValue]
+   )
+
    const contextValue = useMemo<ICompanyPageContext>(
       () => ({
          group: contextGroup,
@@ -253,6 +268,8 @@ const CompanyPageOverview = ({
             eventSectionRef,
             mediaSectionRef,
          },
+         activeTab: tabValue,
+         setActiveTab,
       }),
       [
          contextGroup,
@@ -265,6 +282,8 @@ const CompanyPageOverview = ({
          pastLivestreams,
          contextGroupAvailableJobs,
          customJobs,
+         tabValue,
+         setActiveTab,
       ]
    )
 
@@ -299,13 +318,8 @@ const CompanyPageOverview = ({
                            variant="scrollable"
                            scrollButtons
                            allowScrollButtonsMobile
-                           value={tab}
-                           onChange={(_, newValue) => {
-                              router.push({
-                                 pathname: router.pathname,
-                                 query: { ...router.query, tab: newValue },
-                              })
-                           }}
+                           value={tabValue}
+                           onChange={(_, newValue) => setActiveTab(newValue)}
                            ScrollButtonComponent={CustomScrollButton}
                            sx={styles.tabs}
                         >
@@ -333,6 +347,10 @@ const CompanyPageOverview = ({
                               label={getTabLabel(TabValue.recordings)}
                               value={TabValue.recordings}
                            />
+                           <Tab
+                              label={getTabLabel(TabValue.mentors)}
+                              value={TabValue.mentors}
+                           />
                         </Tabs>
                         <Box
                            sx={{
@@ -345,27 +363,34 @@ const CompanyPageOverview = ({
                            pb="24px"
                            px={2}
                         >
-                           {tab === TabValue.overview && (
+                           {tabValue === TabValue.jobs ? (
+                              <SectionAnchor
+                                 ref={jobsSectionRef}
+                                 tabValue={TabValue.overview}
+                              />
+                           ) : null}
+
+                           {tabValue === TabValue.overview && (
                               <Overview
                                  showJobs={showJobs}
                                  editMode={editMode}
                               />
                            )}
-                           {tab === TabValue.jobs && <JobsSection />}
-                           {tab === TabValue.sparks && (
-                              <SparksSection
-                                 key={group.id}
-                                 groupId={group.id}
-                              />
+                           {tabValue === TabValue.jobs && <JobsTab />}
+                           {tabValue === TabValue.sparks && (
+                              <SparksTab key={group.id} groupId={group.id} />
                            )}
-                           {tab === TabValue.livesStreams && <EventSection />}
-                           {/* {value === TabValue.recordings && <RecordingsSection />} */}
+                           {tabValue === TabValue.livesStreams && <EventsTab />}
+                           {tabValue === TabValue.recordings && <EventsTab />}
+                           {tabValue === TabValue.mentors && <MentorsTab />}
                         </Box>
                      </Box>
                   </Box>
-                  <Box mt={0}>
-                     <MediaSection />
-                  </Box>
+                  {tabValue === TabValue.overview ? (
+                     <Box mt={0}>
+                        <MediaSection />
+                     </Box>
+                  ) : null}
                </Stack>
             </Container>
             <NewsletterSection />

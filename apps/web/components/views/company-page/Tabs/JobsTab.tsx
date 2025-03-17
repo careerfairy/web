@@ -2,8 +2,8 @@ import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useEffect } from "react"
 import { sxStyles } from "types/commonTypes"
-import { SectionAnchor, TabValue, useCompanyPage } from ".."
-import GroupJobsList from "./GroupJobsList"
+import { TabValue, useCompanyPage } from ".."
+import GroupJobsList from "../JobsSection/GroupJobsList"
 
 const styles = sxStyles({
    titleSection: {
@@ -33,7 +33,7 @@ const Header = () => {
    )
 }
 
-const JobsSection = () => {
+const JobsTab = () => {
    const {
       sectionRefs: { jobsSectionRef },
       customJobs,
@@ -51,7 +51,7 @@ const JobsSection = () => {
 
    return (
       <Box sx={styles.wrapper}>
-         <SectionAnchor ref={jobsSectionRef} tabValue={TabValue.jobs} />
+         {/* <SectionAnchor ref={jobsSectionRef} tabValue={TabValue.jobs} /> */}
          <SuspenseWithBoundary fallback={<JobsSectionDetailsSkeleton />}>
             <Stack width={"100%"} spacing={2}>
                <Box sx={styles.titleSection}>
@@ -65,7 +65,7 @@ const JobsSection = () => {
                      sx={styles.checkAllJobsButton}
                      onClick={() => setActiveTab(TabValue.jobs)}
                   >
-                     Check all job openings
+                     Check all job openings v2
                   </Button>
                ) : null}
             </Stack>
@@ -86,4 +86,4 @@ const JobsSectionDetailsSkeleton = () => {
    )
 }
 
-export default JobsSection
+export default JobsTab
