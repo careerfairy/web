@@ -7,14 +7,13 @@ import EventsPreviewCarousel, {
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useCallback, useState } from "react"
 import { useMountedState } from "react-use"
-import { SectionAnchor, TabValue, TabValueType, useCompanyPage } from "../"
+import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import { useRouter } from "next/router"
 import { SeeAllLink } from "../Overview/SeeAllLink"
 import StayUpToDateBanner from "./StayUpToDateBanner"
 
@@ -64,6 +63,7 @@ const styles = sxStyles({
       mr: 1,
       color: "neutral.600",
       fontWeight: "400",
+      cursor: "pointer",
    },
    // description: {
    //    display: "flex",
@@ -97,17 +97,8 @@ const EventSection = () => {
 
    const isMounted = useMountedState()
    const isMobile = useIsMobile()
-   const router = useRouter()
 
-   const recordingsLink = {
-      pathname: router.pathname,
-      query: { ...router.query, tab: TabValue.recordings },
-   }
-
-   const eventsLink = {
-      pathname: router.pathname,
-      query: { ...router.query, tab: TabValue.livesStreams },
-   }
+   const { setActiveTab } = useCompanyPage()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -121,12 +112,6 @@ const EventSection = () => {
       [handleOpenDialog]
    )
 
-   const handleSetTabValue = (value: TabValueType) => {
-      router.push({
-         pathname: router.pathname,
-         query: { ...router.query, tab: value },
-      })
-   }
    const eventsCarouselStyling: EventsCarouselStyling = {
       mainWrapperBoxSx: {
          mt: 2,
@@ -185,16 +170,17 @@ const EventSection = () => {
                         <EventSectionHeader
                            title="Live streams"
                            seeAllClick={() =>
-                              handleSetTabValue?.(TabValue.livesStreams)
+                              setActiveTab?.(TabValue.livesStreams)
                            }
                         />
                      ) : null
                   }
                   events={upcomingLivestreams ?? []}
                   type={EventsTypes.COMING_UP}
-                  seeMoreLink={`${eventsLink.pathname}?${new URLSearchParams(
-                     eventsLink.query as Record<string, string>
-                  )}`}
+                  seeMoreLink={""}
+                  onClickSeeMore={() => {
+                     setActiveTab?.(TabValue.livesStreams)
+                  }}
                   styling={eventsCarouselStyling}
                   hideChipLabels={editMode}
                   showManageButton={editMode}
@@ -217,18 +203,17 @@ const EventSection = () => {
                         <EventSectionHeader
                            title="Recordings"
                            seeAllClick={() =>
-                              handleSetTabValue?.(TabValue.recordings)
+                              setActiveTab?.(TabValue.recordings)
                            }
                         />
                      ) : null
                   }
                   events={pastLivestreams ?? []}
                   type={EventsTypes.PAST_EVENTS}
-                  seeMoreLink={`${
-                     recordingsLink.pathname
-                  }?${new URLSearchParams(
-                     recordingsLink.query as Record<string, string>
-                  )}`}
+                  seeMoreLink={""}
+                  onClickSeeMore={() => {
+                     setActiveTab?.(TabValue.recordings)
+                  }}
                   styling={eventsCarouselStyling}
                   preventPaddingSlide
                />

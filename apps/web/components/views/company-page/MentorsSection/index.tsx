@@ -8,7 +8,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { useCallback, useEffect, useState } from "react"
 import { useMountedState } from "react-use"
-import { useCompanyPage } from ".."
+import { TabValue, useCompanyPage } from ".."
 import { SeeAllLink } from "../Overview/SeeAllLink"
 import { CreatorFormLayout } from "./CreatorFormLayout"
 import { MentorCard } from "./MentorCard"
@@ -16,10 +16,9 @@ import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
    const isMobile = useIsMobile()
-   const { editMode, groupCreators, group } = useCompanyPage()
+   const { editMode, groupCreators, setActiveTab } = useCompanyPage()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
-
    const isMounted = useMountedState()
 
    const [mentors, setMentors] = useState<PublicCreator[]>(groupCreators)
@@ -84,7 +83,11 @@ export const MentorsSection = () => {
                </Typography>
             }
             seeAll={
-               isMobile ? null : <SeeAllLink href={`/mentors/${group.id}`} />
+               isMobile ? null : (
+                  <SeeAllLink
+                     handleClick={() => setActiveTab(TabValue.mentors)}
+                  />
+               )
             }
             viewportSx={{
                // hack to ensure shadows are not cut off

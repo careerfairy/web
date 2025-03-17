@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { useCompanyPage } from ".."
+import { TabValue, useCompanyPage } from ".."
 import AboutSection from "../AboutSection"
 import EventSection from "../EventSection"
 import JobsSection from "../JobsSection"
@@ -15,7 +15,7 @@ type Props = {
 
 export const Overview = ({ showJobs, editMode }: Props) => {
    const { isLoggedIn, isLoggedOut } = useAuth()
-   const { group } = useCompanyPage()
+   const { group, setActiveTab } = useCompanyPage()
 
    const showFollowCompanyCta = isLoggedIn && !editMode
    const showSignUpCta = isLoggedOut && !editMode
@@ -25,7 +25,13 @@ export const Overview = ({ showJobs, editMode }: Props) => {
          <AboutSection />
          {showJobs ? <JobsSection /> : null}
          {group.publicSparks && group.hasSparks ? (
-            <SparksSection key={group.id} groupId={group.id} />
+            <SparksSection
+               key={group.id}
+               groupId={group.id}
+               onSeeAllClick={() => {
+                  setActiveTab(TabValue.sparks)
+               }}
+            />
          ) : null}
          {showSignUpCta ? <SignUp /> : null}
          {showFollowCompanyCta ? <FollowCompany /> : null}

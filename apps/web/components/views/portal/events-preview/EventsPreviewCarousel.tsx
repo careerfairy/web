@@ -179,6 +179,7 @@ export type EventsProps = {
    events: LivestreamEvent[]
    eventDescription?: string
    seeMoreLink?: string
+   onClickSeeMore?: () => void
    title?: ReactNode | string
    subtitle?: ReactNode | string
    header?: ReactNode
@@ -227,6 +228,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          onCardClick,
          disableTracking,
          header,
+         onClickSeeMore,
          preventPaddingSlide = false,
       } = props
 
@@ -276,9 +278,15 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          <ConditionalWrapper
             condition={events?.length > 1 && seeMoreLink !== undefined}
          >
-            <Link href={seeMoreLink}>
-               <Typography sx={allStyles.seeMoreSx}>See all</Typography>
-            </Link>
+            {onClickSeeMore ? (
+               <Typography sx={allStyles.seeMoreSx} onClick={onClickSeeMore}>
+                  See all
+               </Typography>
+            ) : (
+               <Link href={seeMoreLink}>
+                  <Typography sx={allStyles.seeMoreSx}>See all</Typography>
+               </Link>
+            )}
          </ConditionalWrapper>
       )
       const arrowsComponent = (

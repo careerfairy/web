@@ -28,7 +28,7 @@ const Loader = () => {
    return <FallbackComponent header={<CarouselHeader />} />
 }
 
-const SparksSection: FC<Props> = ({ groupId, onSeeAllClick }) => {
+const SparksTab: FC<Props> = ({ groupId, onSeeAllClick }) => {
    const dispatch = useDispatch()
 
    const {
@@ -84,4 +84,4 @@ const SparksSection: FC<Props> = ({ groupId, onSeeAllClick }) => {
    )
 }
 
-export default SparksSection
+export default SparksTab

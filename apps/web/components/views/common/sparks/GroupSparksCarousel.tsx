@@ -1,7 +1,5 @@
-import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SxProps, Theme } from "@mui/material"
-import useGroup from "components/custom-hook/group/useGroup"
 import useSparks from "components/custom-hook/spark/useSparks"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { SeeAllLink } from "components/views/company-page/Overview/SeeAllLink"
@@ -13,14 +11,15 @@ type Props = {
    handleSparksClicked: (spark: Spark) => void
    sx?: SxProps<Theme>
    headerSx?: SxProps<Theme>
+   onSeeAllClick?: () => void
 }
 
 export const GroupSparksCarousel = ({
    sx,
    headerSx,
+   onSeeAllClick,
    ...props
 }: Props & { groupId: string }) => {
-   const { data: group } = useGroup(props.groupId)
    const isMobile = useIsMobile()
    const { data: groupSparks } = useSparks({
       totalItems: 8,
@@ -33,13 +32,7 @@ export const GroupSparksCarousel = ({
          containerSx={sx}
          {...props}
          headerSx={headerSx}
-         seeAll={
-            <SeeAllLink
-               href={`/sparks/${groupSparks?.at(0)?.id}?interactionSource=${
-                  InteractionSources.Company_Page
-               }&companyName=${group?.universityName}&groupId=${props.groupId}`}
-            />
-         }
+         seeAll={<SeeAllLink handleClick={onSeeAllClick} />}
          disableArrows={isMobile}
       />
    )
