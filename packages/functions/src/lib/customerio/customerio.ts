@@ -4,7 +4,6 @@ import {
    transformUserDataForCustomerIO,
 } from "@careerfairy/shared-lib/customerio"
 import { UserData } from "@careerfairy/shared-lib/users"
-import * as crypto from "crypto"
 import { logger } from "firebase-functions/v2"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
@@ -12,6 +11,7 @@ import { userRepo } from "../../api/repositories"
 import { isLocalEnvironment } from "../../util"
 import { trackingClient } from "./client"
 import { CustomerIOWebhookEvent } from "./types"
+import { validateCustomerIOWebhookSignature } from "./utils"
 
 /**
  * Set to false when running backfill
@@ -137,32 +137,16 @@ export const customerIOWebhook = onRequest(async (request, response) => {
    }
 
    // Verify webhook signature
-   const signature = request.headers["x-cio-signature"] as string
-   const timestamp = request.headers["x-cio-timestamp"] as string
+   const isSignatureValid = validateCustomerIOWebhookSignature(
+      request,
+      process.env.CUSTOMERIO_REPORTING_SIGNING_KEY
+   )
 
-   if (!signature || !timestamp) {
-      logger.error("Missing required headers")
+   if (!isSignatureValid) {
+      logger.error(
+         "CustomerIO: Invalid webhook signature for subscription events"
+      )
       response.status(401).send("Unauthorized")
-      return
-   }
-
-   if (!process.env.CUSTOMERIO_SIGNING_KEY) {
-      logger.error("Missing CUSTOMERIO_SIGNING_KEY environment variable")
-      response.status(500).send("Server configuration error")
-      return
-   }
-
-   // Verify the webhook signature using the signing key according to the Customer.io docs
-   // https://docs.customer.io/journeys/webhooks-action/#securely-verify-requests
-   const payload = request.rawBody
-   const stringToSign = `v0:${timestamp}:${payload}`
-
-   const hmac = crypto.createHmac("sha256", process.env.CUSTOMERIO_SIGNING_KEY)
-   const calculatedSignature = hmac.update(stringToSign).digest("hex")
-
-   if (calculatedSignature !== signature) {
-      logger.error("Invalid webhook signature")
-      response.status(401).send("Invalid signature")
       return
    }
 
