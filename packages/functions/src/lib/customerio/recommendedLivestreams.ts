@@ -86,6 +86,7 @@ export const customerIORecommendedLivestreamsWebhook = onRequest(
             livestreams.map((livestream) => ({
                title: livestream.title,
                backgroundImageUrl: livestream.backgroundImageUrl,
+               companyLogoUrl: livestream.companyLogoUrl,
                url: `${getWebBaseUrl()}/portal/livestream/${livestream.id}`,
                company: livestream.company,
                start: formatLivestreamDate(

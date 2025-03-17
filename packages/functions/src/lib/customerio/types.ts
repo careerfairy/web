@@ -39,4 +39,5 @@ export type CustomerIORecommendedLivestreamWebhookData = {
    company: string
    start: string
    backgroundImageUrl: string
+   companyLogoUrl: string
 }
