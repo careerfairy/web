@@ -323,7 +323,13 @@ const CompanyPageOverview = ({
                   width={"100%"}
                   bgcolor={isMobile ? "#F5F5F5" : "transparent"}
                >
-                  <Box maxWidth={isMobile ? "100%" : "50%"}>
+                  <Box
+                     maxWidth={
+                        isMobile || tabValue !== TabValue.overview
+                           ? "100%"
+                           : "50%"
+                     }
+                  >
                      <Box sx={{ position: "relative" }}>
                         <Tabs
                            variant="scrollable"

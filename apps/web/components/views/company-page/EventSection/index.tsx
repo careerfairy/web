@@ -6,7 +6,6 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useCallback, useState } from "react"
-import { useMountedState } from "react-use"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
@@ -26,30 +25,6 @@ const styles = sxStyles({
       mt: 1,
       mb: 2,
    },
-   // titleSection: {
-   //    display: "flex",
-   //    justifyContent: "space-between",
-   //    alignItems: "center",
-   // },
-   // addEvent: {
-   //    borderRadius: "10px",
-   //    height: (theme) => theme.spacing(40),
-   //    width: (theme) => theme.spacing(35),
-   //    border: "dashed",
-   //    borderColor: (theme) => theme.palette.grey.A400,
-   //    fontSize: "16px",
-
-   //    "&:hover": {
-   //       border: "dashed",
-   //    },
-   // },
-   eventTitle: {
-      // fontFamily: "Poppins",
-      // fontStyle: "normal",
-      // fontWeight: "600",
-      // color: "black",
-      // lineHeight: "27px",
-   },
    eventsHeader: {
       display: "flex",
       justifyContent: "space-between",
@@ -65,12 +40,6 @@ const styles = sxStyles({
       fontWeight: "400",
       cursor: "pointer",
    },
-   // description: {
-   //    display: "flex",
-   //    justifyContent: "space-between",
-   //    alignItems: "center",
-   //    paddingTop: 2,
-   // },
    titleLink: {
       color: "#000",
       "&:hover": {
@@ -94,8 +63,6 @@ const EventSection = () => {
       editMode,
    } = useCompanyPage()
    const query = `companyId=${group.id}`
-
-   const isMounted = useMountedState()
    const isMobile = useIsMobile()
 
    const { setActiveTab } = useCompanyPage()
@@ -120,25 +87,10 @@ const EventSection = () => {
       },
       showArrows: isMobile,
       seeMoreSx: styles.seeMoreText,
-      // compact: isMobile,
-      // seeMoreSx: styles.seeMoreText,
-      // showArrows: isMobile,
       headerAsLink: false,
-      // title: styles.eventTitle,
-      // eventsHeader: styles.eventsHeader,
-      // padding: false,
-      // mainWrapperBoxSx: {
-      //    mr: "-16px",
-      // },
-      // mainWrapperBoxSx: {
-      //    mr: "-16px !important",
-      // },
-      // headerRightSx: {
-      //    mr: "16px !important",
-      // },
    }
 
-   return isMounted() ? (
+   return (
       <Box sx={styles.root}>
          <SectionAnchor
             ref={eventSectionRef}
@@ -235,7 +187,7 @@ const EventSection = () => {
             </StreamCreationProvider>
          ) : null}
       </Box>
-   ) : null
+   )
 }
 
 type EventSectionHeaderProps = {
@@ -283,7 +235,7 @@ export const StayUpToDateComponent: FC<StayUpToDateProps> = ({
    const titleComponent = (
       <Typography
          variant={"brandedH3"}
-         sx={[styles.eventTitle, showTitleAsLink ? styles.underlined : null]}
+         sx={showTitleAsLink ? styles.underlined : null}
          fontWeight={"600"}
          color="black"
       >

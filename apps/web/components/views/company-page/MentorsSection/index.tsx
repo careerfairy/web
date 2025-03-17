@@ -6,7 +6,6 @@ import { Box, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { useCallback, useEffect, useState } from "react"
-import { useMountedState } from "react-use"
 import { TabValue, useCompanyPage } from ".."
 import { SeeAllLink } from "../Overview/SeeAllLink"
 import { CreatorFormLayout } from "./CreatorFormLayout"
@@ -17,7 +16,6 @@ export const MentorsSection = () => {
    const { editMode, groupCreators, setActiveTab } = useCompanyPage()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
-   const isMounted = useMountedState()
 
    const [mentors, setMentors] = useState<PublicCreator[]>(groupCreators)
    const [selectedMentor, setSelectedMentor] = useState<PublicCreator | null>(
@@ -63,8 +61,6 @@ export const MentorsSection = () => {
    }, [editMode, groupCreators])
 
    if (!groupCreators?.length) return null
-
-   if (!isMounted()) return null
 
    return (
       <Box>
