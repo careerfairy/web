@@ -82,9 +82,6 @@ const styles = sxStyles({
          sm: "0 0 8px 8px",
          md: "0 0 12px 12px",
       },
-      // borderRadius: isMobile
-      //    ? "0 0 8px 8px"
-      //    : "0 0 12px 12px",
    },
 })
 
@@ -107,12 +104,6 @@ export const TabValue = {
    mentors: "mentors-section",
    testimonials: "testimonials-section",
    benefits: "benefits-section",
-
-   profile: "profile-section",
-   media: "media-section",
-   testimonialsOrMentors: "testimonials-or-mentors-section",
-   banner: "banner-section",
-   video: "video-section",
 } as const
 
 export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
@@ -135,24 +126,12 @@ export const getTabLabel = (tabId: TabValueType) => {
          return "Testimonials"
       case TabValue.benefits:
          return "Benefits"
-      // case TabValue.media:
-      //    return "Media"
-      // case TabValue.testimonialsOrMentors:
-      //    return featureFlags.mentorsV1 ? "Mentors" : "Testimonials"
-      // case TabValue.livesStreams:
-      //    return "Live Streams"
       default:
          return ""
    }
 }
 
 export type SectionRefs = {
-   // aboutSectionRef: MutableRefObject<HTMLElement>
-   // jobsSectionRef: MutableRefObject<HTMLElement>
-   // testimonialOrMentorsSectionRef: MutableRefObject<HTMLElement>
-   // eventSectionRef: MutableRefObject<HTMLElement>
-   // mediaSectionRef: MutableRefObject<HTMLElement>
-
    overviewSectionRef: MutableRefObject<HTMLElement>
    jobsSectionRef: MutableRefObject<HTMLElement>
    sparksSectionRef: MutableRefObject<HTMLElement>
@@ -326,14 +305,6 @@ const CompanyPageOverview = ({
       ]
    )
 
-   const showJobs = Boolean(featureFlags.jobHubV1 && customJobs?.length)
-
-   const hasSparks = group.publicProfile && group.hasSparks
-   const hasUpcomingEvents = Boolean(upcomingLivestreams?.length)
-   const hasPastEvents = Boolean(pastLivestreams?.length)
-   const hasMentors = Boolean(groupCreators?.length)
-   const hasTestimonials = Boolean(group.testimonials?.length)
-   const hasBenefits = true // TODO: add benefits
    const tabsSectionRefsMap = useMemo(() => {
       return {
          [TabValue.overview]: overviewSectionRef,
@@ -355,6 +326,14 @@ const CompanyPageOverview = ({
       testimonialsSectionRef,
       benefitsSectionRef,
    ])
+
+   useEffect(() => {
+      if (tabValue && tabsSectionRefsMap[tabValue].current) {
+         tabsSectionRefsMap[tabValue].current.scrollIntoView({
+            behavior: "smooth",
+         })
+      }
+   }, [tabValue, tabsSectionRefsMap])
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
@@ -400,48 +379,36 @@ const CompanyPageOverview = ({
                               label={getTabLabel(TabValue.overview)}
                               value={TabValue.overview}
                            />
-                           {showJobs ? (
-                              <Tab
-                                 label={getTabLabel(TabValue.jobs)}
-                                 value={TabValue.jobs}
-                              />
-                           ) : null}
-                           {hasSparks ? (
+                           <Tab
+                              label={getTabLabel(TabValue.jobs)}
+                              value={TabValue.jobs}
+                           />
+                           {group.publicProfile && group.hasSparks ? (
                               <Tab
                                  label={getTabLabel(TabValue.sparks)}
                                  value={TabValue.sparks}
                               />
                            ) : null}
-                           {hasUpcomingEvents ? (
-                              <Tab
-                                 label={getTabLabel(TabValue.livesStreams)}
-                                 value={TabValue.livesStreams}
-                              />
-                           ) : null}
-                           {hasPastEvents ? (
-                              <Tab
-                                 label={getTabLabel(TabValue.recordings)}
-                                 value={TabValue.recordings}
-                              />
-                           ) : null}
-                           {hasMentors ? (
-                              <Tab
-                                 label={getTabLabel(TabValue.mentors)}
-                                 value={TabValue.mentors}
-                              />
-                           ) : null}
-                           {hasTestimonials ? (
-                              <Tab
-                                 label={getTabLabel(TabValue.testimonials)}
-                                 value={TabValue.testimonials}
-                              />
-                           ) : null}
-                           {hasBenefits ? (
-                              <Tab
-                                 label={getTabLabel(TabValue.benefits)}
-                                 value={TabValue.benefits}
-                              />
-                           ) : null}
+                           <Tab
+                              label={getTabLabel(TabValue.livesStreams)}
+                              value={TabValue.livesStreams}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.recordings)}
+                              value={TabValue.recordings}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.mentors)}
+                              value={TabValue.mentors}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.testimonials)}
+                              value={TabValue.testimonials}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.benefits)}
+                              value={TabValue.benefits}
+                           />
                         </Tabs>
                         <Box sx={styles.tabContent}>
                            {tabValue !== TabValue.overview && (
@@ -451,10 +418,7 @@ const CompanyPageOverview = ({
                               />
                            )}
                            {tabValue === TabValue.overview && (
-                              <Overview
-                                 showJobs={showJobs}
-                                 editMode={editMode}
-                              />
+                              <Overview editMode={editMode} />
                            )}
                            {tabValue === TabValue.jobs && <JobsTab />}
                            {tabValue === TabValue.sparks && (

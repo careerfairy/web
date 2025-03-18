@@ -1,6 +1,5 @@
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useEffect } from "react"
 import { sxStyles } from "types/commonTypes"
 import { TabValue, useCompanyPage } from ".."
 import GroupJobsList from "../JobsSection/GroupJobsList"
@@ -34,24 +33,12 @@ const Header = () => {
 }
 
 const JobsTab = () => {
-   const {
-      sectionRefs: { jobsSectionRef },
-      customJobs,
-      setActiveTab,
-      activeTab,
-   } = useCompanyPage()
-
-   useEffect(() => {
-      if (activeTab === TabValue.jobs && jobsSectionRef.current) {
-         jobsSectionRef.current.scrollIntoView({ behavior: "smooth" })
-      }
-   }, [activeTab, jobsSectionRef])
+   const { customJobs, setActiveTab } = useCompanyPage()
 
    if (!customJobs?.length) return null
 
    return (
       <Box sx={styles.wrapper}>
-         {/* <SectionAnchor ref={jobsSectionRef} tabValue={TabValue.jobs} /> */}
          <SuspenseWithBoundary fallback={<JobsSectionDetailsSkeleton />}>
             <Stack width={"100%"} spacing={2}>
                <Box sx={styles.titleSection}>
