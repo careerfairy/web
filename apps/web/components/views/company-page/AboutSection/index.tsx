@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, Typography } from "@mui/material"
 import { useCallback, useMemo } from "react"
-import { SectionAnchor, TabValue, useCompanyPage } from "../index"
+import { useCompanyPage } from "../index"
 
 import { sxStyles } from "../../../../types/commonTypes"
 // react feather
@@ -44,11 +44,7 @@ const AboutDialog = dynamic(() => import("./AboutDialog"), {
 })
 
 const AboutSection = () => {
-   const {
-      group,
-      editMode,
-      sectionRefs: { aboutSectionRef },
-   } = useCompanyPage()
+   const { group, editMode } = useCompanyPage()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -97,7 +93,6 @@ const AboutSection = () => {
    return (
       <>
          <Box sx={styles.wrapper}>
-            <SectionAnchor ref={aboutSectionRef} tabValue={TabValue.profile} />
             <Box sx={styles.titleSection}>
                <Typography variant="brandedH3" fontWeight={"600"} color="black">
                   About

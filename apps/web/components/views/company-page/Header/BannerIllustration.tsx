@@ -8,7 +8,7 @@ import useFirebaseUpload from "../../../custom-hook/useFirebaseUpload"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import BackgroundImage from "../../../views/common/BackgroundImage"
-import { SectionAnchor, TabValue, useCompanyPage } from "../index"
+import { useCompanyPage } from "../index"
 import BannerUploadButton from "./BannerUploadButton"
 
 const styles = sxStyles({
@@ -63,7 +63,6 @@ const BannerIllustration = () => {
 
    return (
       <Box sx={styles.imageWrapper}>
-         <SectionAnchor tabValue={TabValue.banner} />
          {isUploading ? (
             <LinearProgress
                sx={styles.progress}

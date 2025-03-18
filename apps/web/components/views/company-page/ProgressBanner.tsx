@@ -95,26 +95,12 @@ const ProgressBanner = () => {
 
    const getSectionId = useCallback(
       (
-         step: ReturnType<
+         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+         _: ReturnType<
             typeof groupPresenter.getCompanyPageSteps
          >[number]["section"]
       ): TabValueType => {
-         switch (step) {
-            case "profile":
-               return TabValue.profile
-            case "banner":
-               return TabValue.banner
-            case "photos":
-               return TabValue.media
-            case "videos":
-               return TabValue.video
-            case "testimonialsOrMentors":
-               return TabValue.testimonialsOrMentors
-            case "livestreams":
-               return TabValue.livesStreams
-            default:
-               return TabValue.profile
-         }
+         return TabValue.overview
       },
       [groupPresenter]
    )
