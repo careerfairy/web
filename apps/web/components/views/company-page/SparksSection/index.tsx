@@ -6,10 +6,10 @@ import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import { GroupSparksCarousel } from "components/views/common/sparks/GroupSparksCarousel"
 import { FallbackComponent } from "components/views/portal/sparks/FallbackComponent"
 import { useRouter } from "next/router"
-import { FC, useCallback, useEffect } from "react"
+import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
 import { setCameFromPageLink } from "store/reducers/sparksFeedReducer"
-import { SectionAnchor, TabValue, useCompanyPage } from ".."
+import { useCompanyPage } from ".."
 
 type Props = {
    groupId: string
@@ -31,19 +31,9 @@ const Loader = () => {
 const SparksSection: FC<Props> = ({ groupId, onSeeAllClick }) => {
    const dispatch = useDispatch()
 
-   const {
-      group,
-      sectionRefs: { eventSectionRef },
-      activeTab,
-   } = useCompanyPage()
+   const { group } = useCompanyPage()
    const router = useRouter()
    const isMounted = useIsMounted()
-
-   useEffect(() => {
-      if (activeTab === TabValue.sparks && eventSectionRef.current) {
-         eventSectionRef.current.scrollIntoView({ behavior: "smooth" })
-      }
-   }, [activeTab, eventSectionRef])
 
    const handleSparksClicked = useCallback(
       (spark: Spark) => {
@@ -65,7 +55,6 @@ const SparksSection: FC<Props> = ({ groupId, onSeeAllClick }) => {
 
    return (
       <Box>
-         <SectionAnchor ref={eventSectionRef} tabValue={TabValue.sparks} />
          {isMounted ? (
             <SuspenseWithBoundary fallback={<Loader />}>
                <GroupSparksCarousel
