@@ -38,7 +38,6 @@ import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
 import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
-import BenefitsTab from "./Tabs/BenefitsTab"
 import { PastEventsTab, UpcomingEventsTab } from "./Tabs/EventsTab"
 import JobsTab from "./Tabs/JobsTab"
 import MentorsTab from "./Tabs/MentorsTab"
@@ -402,14 +401,6 @@ const CompanyPageOverview = ({
                               label={getTabLabel(TabValue.mentors)}
                               value={TabValue.mentors}
                            />
-                           {/* <Tab
-                              label={getTabLabel(TabValue.testimonials)}
-                              value={TabValue.testimonials}
-                           /> */}
-                           <Tab
-                              label={getTabLabel(TabValue.benefits)}
-                              value={TabValue.benefits}
-                           />
                         </Tabs>
                         <Box sx={styles.tabContent}>
                            {tabValue !== TabValue.overview && (
@@ -432,10 +423,6 @@ const CompanyPageOverview = ({
                               <PastEventsTab />
                            )}
                            {tabValue === TabValue.mentors && <MentorsTab />}
-                           {/* {tabValue === TabValue.testimonials && (
-                              <TestimonialsTab />
-                           )} */}
-                           {tabValue === TabValue.benefits && <BenefitsTab />}
                         </Box>
                      </Box>
                   </Box>
