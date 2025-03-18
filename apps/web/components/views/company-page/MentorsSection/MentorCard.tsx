@@ -145,7 +145,7 @@ export const MentorCard = ({
          <Box sx={styles.topBackground} />
          {Boolean(isEditMode) && (
             <IconButton sx={styles.edit} onClick={_handleEdit}>
-               <Edit2 size={20} color={theme.palette.neutral[700]} />
+               <Edit2 size={20} color={theme.brand.white[100]} />
             </IconButton>
          )}
          <Box sx={styles.avatarContainer}>
