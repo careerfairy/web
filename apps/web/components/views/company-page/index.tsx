@@ -38,6 +38,7 @@ import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
 import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
+import BenefitsTab from "./Tabs/BenefitsTab"
 import EventsTab from "./Tabs/EventsTab"
 import JobsTab from "./Tabs/JobsTab"
 import MentorsTab from "./Tabs/MentorsTab"
@@ -71,6 +72,20 @@ const styles = sxStyles({
          zIndex: 0,
       },
    },
+   tabContent: {
+      backgroundColor: "#FEFEFE",
+      pt: "20px",
+      pb: "24px",
+      px: 2,
+      borderRadius: {
+         xs: "0 0 8px 8px",
+         sm: "0 0 8px 8px",
+         md: "0 0 12px 12px",
+      },
+      // borderRadius: isMobile
+      //    ? "0 0 8px 8px"
+      //    : "0 0 12px 12px",
+   },
 })
 
 type Props = {
@@ -91,10 +106,11 @@ export const TabValue = {
    recordings: "recordings-section",
    mentors: "mentors-section",
    testimonials: "testimonials-section",
+   benefits: "benefits-section",
+
    profile: "profile-section",
    media: "media-section",
    testimonialsOrMentors: "testimonials-or-mentors-section",
-
    banner: "banner-section",
    video: "video-section",
 } as const
@@ -117,6 +133,8 @@ export const getTabLabel = (tabId: TabValueType) => {
          return "Mentors"
       case TabValue.testimonials:
          return "Testimonials"
+      case TabValue.benefits:
+         return "Benefits"
       // case TabValue.media:
       //    return "Media"
       // case TabValue.testimonialsOrMentors:
@@ -129,11 +147,20 @@ export const getTabLabel = (tabId: TabValueType) => {
 }
 
 export type SectionRefs = {
-   aboutSectionRef: MutableRefObject<HTMLElement>
+   // aboutSectionRef: MutableRefObject<HTMLElement>
+   // jobsSectionRef: MutableRefObject<HTMLElement>
+   // testimonialOrMentorsSectionRef: MutableRefObject<HTMLElement>
+   // eventSectionRef: MutableRefObject<HTMLElement>
+   // mediaSectionRef: MutableRefObject<HTMLElement>
+
+   overviewSectionRef: MutableRefObject<HTMLElement>
    jobsSectionRef: MutableRefObject<HTMLElement>
-   testimonialOrMentorsSectionRef: MutableRefObject<HTMLElement>
-   eventSectionRef: MutableRefObject<HTMLElement>
-   mediaSectionRef: MutableRefObject<HTMLElement>
+   sparksSectionRef: MutableRefObject<HTMLElement>
+   livesStreamsSectionRef: MutableRefObject<HTMLElement>
+   recordingsSectionRef: MutableRefObject<HTMLElement>
+   mentorsSectionRef: MutableRefObject<HTMLElement>
+   testimonialsSectionRef: MutableRefObject<HTMLElement>
+   benefitsSectionRef: MutableRefObject<HTMLElement>
 }
 
 type ICompanyPageContext = {
@@ -158,11 +185,14 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
    pastLivestreams: [],
    customJobs: [],
    sectionRefs: {
-      aboutSectionRef: null,
+      overviewSectionRef: null,
       jobsSectionRef: null,
-      eventSectionRef: null,
-      mediaSectionRef: null,
-      testimonialOrMentorsSectionRef: null,
+      sparksSectionRef: null,
+      livesStreamsSectionRef: null,
+      recordingsSectionRef: null,
+      mentorsSectionRef: null,
+      testimonialsSectionRef: null,
+      benefitsSectionRef: null,
    },
    activeTab: TabValue.overview,
    setActiveTab: () => {},
@@ -206,11 +236,14 @@ const CompanyPageOverview = ({
 
    const contextGroupAvailableJobs = useGroupAvailableCustomJobs(group.groupId)
 
-   const aboutSectionRef = useRef<HTMLElement>(null)
-   const testimonialOrMentorsSectionRef = useRef<HTMLElement>(null)
-   const eventSectionRef = useRef<HTMLElement>(null)
-   const mediaSectionRef = useRef<HTMLElement>(null)
+   const overviewSectionRef = useRef<HTMLElement>(null)
    const jobsSectionRef = useRef<HTMLElement>(null)
+   const sparksSectionRef = useRef<HTMLElement>(null)
+   const livesStreamsSectionRef = useRef<HTMLElement>(null)
+   const recordingsSectionRef = useRef<HTMLElement>(null)
+   const mentorsSectionRef = useRef<HTMLElement>(null)
+   const testimonialsSectionRef = useRef<HTMLElement>(null)
+   const benefitsSectionRef = useRef<HTMLElement>(null)
 
    const presenter = useMemo(() => {
       const presenter = GroupPresenter.createFromDocument(contextGroup)
@@ -265,11 +298,14 @@ const CompanyPageOverview = ({
          pastLivestreams: contextPastLivestreams || pastLivestreams,
          customJobs: contextGroupAvailableJobs || customJobs,
          sectionRefs: {
-            aboutSectionRef,
+            overviewSectionRef,
             jobsSectionRef,
-            testimonialOrMentorsSectionRef,
-            eventSectionRef,
-            mediaSectionRef,
+            sparksSectionRef,
+            livesStreamsSectionRef,
+            recordingsSectionRef,
+            mentorsSectionRef,
+            testimonialsSectionRef,
+            benefitsSectionRef,
          },
          activeTab: tabValue,
          setActiveTab,
@@ -293,13 +329,33 @@ const CompanyPageOverview = ({
    const showJobs = Boolean(featureFlags.jobHubV1 && customJobs?.length)
 
    const hasSparks = group.publicProfile && group.hasSparks
-
    const hasUpcomingEvents = Boolean(upcomingLivestreams?.length)
    const hasPastEvents = Boolean(pastLivestreams?.length)
-
    const hasMentors = Boolean(groupCreators?.length)
-
    const hasTestimonials = Boolean(group.testimonials?.length)
+   const hasBenefits = true // TODO: add benefits
+   const tabsSectionRefsMap = useMemo(() => {
+      return {
+         [TabValue.overview]: overviewSectionRef,
+         [TabValue.jobs]: jobsSectionRef,
+         [TabValue.sparks]: sparksSectionRef,
+         [TabValue.livesStreams]: livesStreamsSectionRef,
+         [TabValue.recordings]: recordingsSectionRef,
+         [TabValue.mentors]: mentorsSectionRef,
+         [TabValue.testimonials]: testimonialsSectionRef,
+         [TabValue.benefits]: benefitsSectionRef,
+      }
+   }, [
+      overviewSectionRef,
+      jobsSectionRef,
+      sparksSectionRef,
+      livesStreamsSectionRef,
+      recordingsSectionRef,
+      mentorsSectionRef,
+      testimonialsSectionRef,
+      benefitsSectionRef,
+   ])
+
    return (
       <CompanyPageContext.Provider value={contextValue}>
          <Box
@@ -380,25 +436,20 @@ const CompanyPageOverview = ({
                                  value={TabValue.testimonials}
                               />
                            ) : null}
-                        </Tabs>
-                        <Box
-                           sx={{
-                              backgroundColor: "#FEFEFE",
-                              borderRadius: isMobile
-                                 ? "0 0 8px 8px"
-                                 : "0 0 12px 12px",
-                           }}
-                           pt={"20px"}
-                           pb="24px"
-                           px={2}
-                        >
-                           {tabValue === TabValue.jobs ? (
-                              <SectionAnchor
-                                 ref={jobsSectionRef}
-                                 tabValue={TabValue.overview}
+                           {hasBenefits ? (
+                              <Tab
+                                 label={getTabLabel(TabValue.benefits)}
+                                 value={TabValue.benefits}
                               />
                            ) : null}
-
+                        </Tabs>
+                        <Box sx={styles.tabContent}>
+                           {tabValue !== TabValue.overview && (
+                              <SectionAnchor
+                                 ref={tabsSectionRefsMap[tabValue]}
+                                 tabValue={tabValue}
+                              />
+                           )}
                            {tabValue === TabValue.overview && (
                               <Overview
                                  showJobs={showJobs}
@@ -415,11 +466,12 @@ const CompanyPageOverview = ({
                            {tabValue === TabValue.testimonials && (
                               <TestimonialsTab />
                            )}
+                           {tabValue === TabValue.benefits && <BenefitsTab />}
                         </Box>
                      </Box>
                   </Box>
                   {tabValue === TabValue.overview ? (
-                     <Box mt={0}>
+                     <Box mt={0} width={"100%"}>
                         <MediaSection />
                      </Box>
                   ) : null}

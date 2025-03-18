@@ -6,7 +6,7 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useCallback, useState } from "react"
-import { SectionAnchor, TabValue, useCompanyPage } from "../"
+import { TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
@@ -55,13 +55,8 @@ const styles = sxStyles({
 })
 
 const EventSection = () => {
-   const {
-      group,
-      upcomingLivestreams,
-      pastLivestreams,
-      sectionRefs: { eventSectionRef },
-      editMode,
-   } = useCompanyPage()
+   const { group, upcomingLivestreams, pastLivestreams, editMode } =
+      useCompanyPage()
    const query = `companyId=${group.id}`
    const isMobile = useIsMobile()
 
@@ -92,10 +87,6 @@ const EventSection = () => {
 
    return (
       <Box sx={styles.root}>
-         <SectionAnchor
-            ref={eventSectionRef}
-            tabValue={TabValue.livesStreams}
-         />
          <Stack spacing={"8px"} sx={isMobile ? styles.eventsWrapper : null}>
             <ConditionalWrapper
                condition={Boolean(upcomingLivestreams?.length)}
@@ -103,7 +94,6 @@ const EventSection = () => {
                   <StayUpToDateComponent
                      title="Next Live Streams"
                      seeMoreLink={`/next-livestreams?${query}`}
-                     // titleAsLink={isMobile}
                   />
                }
             >
