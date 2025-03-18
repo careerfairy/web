@@ -13,8 +13,7 @@ import React, { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import EditDialog from "../EditDialog"
-import { SeeAllLink } from "../Overview/SeeAllLink"
-import { TabValue, useCompanyPage } from "../index"
+import { useCompanyPage } from "../index"
 import TestimonialCard from "./TestimonialCard"
 import TestimonialDialog from "./TestimonialDialog"
 
@@ -48,7 +47,7 @@ const styles = sxStyles({
 })
 
 const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
-   const { group, editMode, setActiveTab } = useCompanyPage()
+   const { group, editMode } = useCompanyPage()
    const [testimonialToEdit, setTestimonialToEdit] = useState(null)
    const isMobile = useIsMobile()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
@@ -120,13 +119,18 @@ const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
                )}
                {group?.testimonials?.length > 1 ? (
                   <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                     <SeeAllLink
+                     {/* <SeeAllLink
                         handleClick={() =>
                            setActiveTab?.(TabValue.testimonials)
                         }
-                     />
+                     /> */}
                      {!isMobile ? (
-                        <GenericCarousel.Arrows emblaApi={emblaApi} />
+                        <GenericCarousel.Arrows
+                           emblaApi={emblaApi}
+                           // leftIcon={<ArrowLeft size={32} strokeWidth={3} />}
+                           // rightIcon={<ArrowRight size={32} strokeWidth={3} />}
+                           // arrowIconProps={{ sx: { backgroundColor: "transparent" } }}
+                        />
                      ) : null}
                   </Stack>
                ) : null}

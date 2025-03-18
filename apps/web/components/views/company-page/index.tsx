@@ -39,11 +39,10 @@ import NewsletterSection from "./NewsletterSection"
 import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
 import BenefitsTab from "./Tabs/BenefitsTab"
-import EventsTab from "./Tabs/EventsTab"
+import { PastEventsTab, UpcomingEventsTab } from "./Tabs/EventsTab"
 import JobsTab from "./Tabs/JobsTab"
 import MentorsTab from "./Tabs/MentorsTab"
 import SparksTab from "./Tabs/SparksTab"
-import TestimonialsTab from "./Tabs/TestimonialsTab"
 
 const styles = sxStyles({
    tabs: {
@@ -403,10 +402,10 @@ const CompanyPageOverview = ({
                               label={getTabLabel(TabValue.mentors)}
                               value={TabValue.mentors}
                            />
-                           <Tab
+                           {/* <Tab
                               label={getTabLabel(TabValue.testimonials)}
                               value={TabValue.testimonials}
-                           />
+                           /> */}
                            <Tab
                               label={getTabLabel(TabValue.benefits)}
                               value={TabValue.benefits}
@@ -426,12 +425,16 @@ const CompanyPageOverview = ({
                            {tabValue === TabValue.sparks && (
                               <SparksTab key={group.id} groupId={group.id} />
                            )}
-                           {tabValue === TabValue.livesStreams && <EventsTab />}
-                           {tabValue === TabValue.recordings && <EventsTab />}
-                           {tabValue === TabValue.mentors && <MentorsTab />}
-                           {tabValue === TabValue.testimonials && (
-                              <TestimonialsTab />
+                           {tabValue === TabValue.livesStreams && (
+                              <UpcomingEventsTab />
                            )}
+                           {tabValue === TabValue.recordings && (
+                              <PastEventsTab />
+                           )}
+                           {tabValue === TabValue.mentors && <MentorsTab />}
+                           {/* {tabValue === TabValue.testimonials && (
+                              <TestimonialsTab />
+                           )} */}
                            {tabValue === TabValue.benefits && <BenefitsTab />}
                         </Box>
                      </Box>
