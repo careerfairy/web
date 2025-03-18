@@ -10,13 +10,12 @@ import TestimonialSection from "../TestimonialSection"
 import { FollowCompany, SignUp } from "../ctas"
 
 type Props = {
-   showJobs?: boolean
    editMode?: boolean
 }
 
-export const Overview = ({ showJobs, editMode }: Props) => {
+export const Overview = ({ editMode }: Props) => {
    const { isLoggedIn, isLoggedOut } = useAuth()
-   const { group, setActiveTab } = useCompanyPage()
+   const { group, setActiveTab, customJobs } = useCompanyPage()
 
    const showFollowCompanyCta = isLoggedIn && !editMode
    const showSignUpCta = isLoggedOut && !editMode
@@ -24,7 +23,7 @@ export const Overview = ({ showJobs, editMode }: Props) => {
    return (
       <Stack spacing={{ xs: 2, md: 3 }}>
          <AboutSection />
-         {showJobs ? <JobsSection /> : null}
+         {customJobs?.length ? <JobsSection /> : null}
          {group.publicSparks && group.hasSparks ? (
             <SparksSection
                key={group.id}

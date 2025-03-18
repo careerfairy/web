@@ -3,25 +3,13 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useSparks from "components/custom-hook/spark/useSparks"
 import SparksCarouselSkeleton from "components/views/admin/sparks/general-sparks-view/SparksCarouselSkeleton"
 import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
-import { FC, useEffect } from "react"
-import { TabValue, useCompanyPage } from ".."
+import { FC } from "react"
 
 type Props = {
    groupId: string
 }
 
 const SparksTab: FC<Props> = ({ groupId }) => {
-   const {
-      sectionRefs: { sparksSectionRef },
-      activeTab,
-   } = useCompanyPage()
-
-   useEffect(() => {
-      if (activeTab === TabValue.sparks && sparksSectionRef.current) {
-         sparksSectionRef.current.scrollIntoView({ behavior: "smooth" })
-      }
-   }, [activeTab, sparksSectionRef])
-
    return (
       <Box>
          <SuspenseWithBoundary fallback={<SparksCarouselSkeleton />}>
