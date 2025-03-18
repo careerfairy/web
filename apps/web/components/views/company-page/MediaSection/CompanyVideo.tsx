@@ -1,12 +1,11 @@
-import React from "react"
-import Stack from "@mui/material/Stack"
-import { Typography } from "@mui/material"
-import LoadingButton from "@mui/lab/LoadingButton"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-import { SectionAnchor, TabValue, useCompanyPage } from "../index"
+import LoadingButton from "@mui/lab/LoadingButton"
+import { Typography } from "@mui/material"
+import Stack from "@mui/material/Stack"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import VideoDialog from "./VideoDialog"
+import { useCompanyPage } from "../index"
 import VideoComponent from "./VideoComponent"
+import VideoDialog from "./VideoDialog"
 
 const CompanyVideo = () => {
    const { editMode, group } = useCompanyPage()
@@ -20,7 +19,6 @@ const CompanyVideo = () => {
 
    return (
       <Stack position={"relative"} spacing={2}>
-         <SectionAnchor tabValue={TabValue.video} />
          <Stack
             justifyContent={"space-between"}
             alignItems={"center"}
