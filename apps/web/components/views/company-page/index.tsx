@@ -16,6 +16,7 @@ import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGr
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { doc } from "firebase/firestore"
+import { useRouter } from "next/router"
 import {
    MutableRefObject,
    createContext,
@@ -188,6 +189,8 @@ const CompanyPageOverview = ({
 }: Props) => {
    const featureFlags = useFeatureFlags()
    const isMobile = useIsMobile()
+   const router = useRouter()
+
    const groupRef = useMemo(
       () =>
          doc(FirestoreInstance, "careerCenterData", group.id).withConverter(
@@ -260,11 +263,36 @@ const CompanyPageOverview = ({
       }
    }, [contextGroup, editMode, presenter])
 
+   // Add effect to sync URL query param changes with tab state
+   useEffect(() => {
+      const tabFromQuery = router.query.tab as TabValueType
+      if (tabFromQuery) {
+         setTabValue(tabFromQuery)
+      } else {
+         // When there's no tab query param, default to overview
+         setTabValue(TabValue.overview)
+      }
+   }, [router.query.tab])
+
    const setActiveTab = useCallback(
       (tab: TabValueType) => {
          setTabValue(tab)
+         // Update URL with new tab value, remove tab param if overview
+         router.push(
+            {
+               pathname: router.pathname,
+               query: {
+                  ...router.query,
+                  ...(tab === TabValue.overview || !tab
+                     ? { tab: TabValue.overview }
+                     : { tab }),
+               },
+            },
+            undefined,
+            { shallow: true }
+         )
       },
-      [setTabValue]
+      [router]
    )
 
    const contextValue = useMemo<ICompanyPageContext>(
