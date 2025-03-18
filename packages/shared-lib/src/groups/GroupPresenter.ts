@@ -96,11 +96,6 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
    }
 
    static createFromDocument(group: Group) {
-      if (!group) {
-         console.log("🚀 ~ GroupPresenter ~ group is null:", group)
-         return null
-      }
-
       return new GroupPresenter(
          group.groupId,
          group.description,
