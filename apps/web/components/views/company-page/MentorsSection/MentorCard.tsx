@@ -40,7 +40,6 @@ const styles = sxStyles({
       left: 0,
       width: "100%",
       height: "66px",
-      // backgroundImage: `url('https://s3-alpha-sig.figma.com/img/041b/a4cc/3d0dad7075076d7972d304647350b416?Expires=1743379200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=nI2WKqmLE~JV5-4GqWDokwawr0UONd3D2pleJ50hlsz426LQhFK~fK7f3Gq~QCEMmvkmCxYR6K8MR3WTeePNSR01OfHgBZW2QWiuzCoPav0mBxcOtgfdjs0ZCcg2RFLd-lISCqDHzqwDEWg6HRC9a~QhKFRbI7C-9Pywke~KnQxdeln76YNHOn9fXAGw1O6KBqjmyqxXfizbHC7aB1y09GfmSPusFLdwtXhCPcKmWsMnd10uASu0HScoclrVwgyRd92QoaO0gDGiVa9EC~zjHJEhKmC9PSE9nczy4G3bXA6cIWXi5ExB2gamIy3MHaSYWlmoSlNsjl8awP3-MUeJJQ__')`,
       backgroundImage: `url(${mentorsCardBackground})`,
       backgroundSize: "cover",
       backgroundPosition: "center",
