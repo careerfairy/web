@@ -364,6 +364,7 @@ const CompanyPageOverview = ({
                            ? "100%"
                            : "50%"
                      }
+                     width={"100%"}
                   >
                      <Box sx={{ position: "relative" }}>
                         <Tabs
