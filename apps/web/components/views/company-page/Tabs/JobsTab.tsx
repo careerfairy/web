@@ -24,18 +24,8 @@ const styles = sxStyles({
    },
 })
 
-// export const JobsTabView = () => {
-//    return (
-//       <SuspenseWithBoundary>
-//          <JobsTab />
-//       </SuspenseWithBoundary>
-//    )
-// }
-
 export const JobsTab = () => {
    const { customJobs } = useCompanyPage()
-
-   if (!customJobs?.length) return null
 
    return (
       <Box sx={styles.wrapper}>
