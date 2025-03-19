@@ -32,12 +32,14 @@ setGlobalOptions({
 })
 
 import { bundles } from "./bundles"
+import * as examples from "./examples"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import * as customerio from "./lib/customerio"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import * as streaming from "./lib/streaming"
+import * as warming from "./lib/warming"
 
 // Imported Individual Cloud functions
 import auth = require("./auth")
@@ -393,3 +395,9 @@ exports.sendFollowupToAttendees = followups.sendFollowupToAttendees
 exports.sendManualFollowup = followups.sendManualFollowup
 exports.sendReminderEmailAboutApplicationLink_v2 =
    followups.sendReminderEmailAboutApplicationLink
+
+// Keep-warm function
+exports.keepFunctionsWarm = warming.keepFunctionsWarm
+
+// Example warmable function
+exports.exampleHttpFunction = examples.exampleHttpFunction
