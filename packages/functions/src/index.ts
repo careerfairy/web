@@ -31,6 +31,7 @@ setGlobalOptions({
    region: config.region,
 })
 
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import { bundles } from "./bundles"
 import * as examples from "./examples"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
@@ -375,9 +376,9 @@ exports.getFollowedCreators = levels.getFollowedCreators
 // CustomerIO
 exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
 exports.customerIOWebhook = customerio.customerIOWebhook
-exports.customerIORecommendedLivestreamsWebhook =
+exports[FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook] =
    customerio.customerIORecommendedLivestreamsWebhook
-exports.customerIORecommendedSparksWebhook =
+exports[FUNCTION_NAMES.customerIORecommendedSparksWebhook] =
    customerio.customerIORecommendedSparksWebhook
 
 // Reminders
@@ -400,4 +401,4 @@ exports.sendReminderEmailAboutApplicationLink_v2 =
 exports.keepFunctionsWarm = warming.keepFunctionsWarm
 
 // Example warmable function
-exports.exampleHttpFunction = examples.exampleHttpFunction
+exports[FUNCTION_NAMES.exampleHttp] = examples.exampleHttpFunction
