@@ -5,7 +5,11 @@ import {
 import useFingerPrint from "../useFingerPrint"
 import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 
-const useUserJobApplication = (userId: string, jobId: string) => {
+const useUserJobApplication = (
+   userId: string,
+   jobId: string,
+   suspense: boolean = false
+) => {
    const { data: fingerPrintId } = useFingerPrint()
    const jobApplicationId = `${jobId}_${userId}`
    const anonApplicationId = `${jobId}_${fingerPrintId}`
@@ -15,6 +19,7 @@ const useUserJobApplication = (userId: string, jobId: string) => {
       [jobApplicationId],
       {
          idField: "id",
+         suspense,
       }
    )
 
@@ -24,6 +29,7 @@ const useUserJobApplication = (userId: string, jobId: string) => {
          [anonApplicationId],
          {
             idField: "id",
+            suspense,
          }
       )
 

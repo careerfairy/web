@@ -39,7 +39,7 @@ import NewsletterSection from "./NewsletterSection"
 import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
 import { PastEventsTab, UpcomingEventsTab } from "./Tabs/EventsTab"
-import JobsTab from "./Tabs/JobsTab"
+import { JobsTab } from "./Tabs/JobsTab"
 import MentorsTab from "./Tabs/MentorsTab"
 import SparksTab from "./Tabs/SparksTab"
 
@@ -402,6 +402,7 @@ const CompanyPageOverview = ({
                               value={TabValue.mentors}
                            />
                         </Tabs>
+
                         <Box sx={styles.tabContent}>
                            {tabValue !== TabValue.overview && (
                               <SectionAnchor
