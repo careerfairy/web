@@ -85,13 +85,13 @@ const styles = sxStyles({
       position: "absolute",
       bottom: 1,
       right: 2,
-      zIndex: 2,
+      zIndex: 3,
       border: (theme) => `2px solid ${theme.brand.white[100]}`,
       borderRadius: "50%",
    },
    avatarContainer: {
       position: "relative",
-      zIndex: 1,
+      zIndex: 2,
    },
 })
 
