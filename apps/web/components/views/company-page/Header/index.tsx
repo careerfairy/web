@@ -1,3 +1,4 @@
+import { CompanySizesCodes } from "@careerfairy/shared-lib/constants/forms"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, Container, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
@@ -137,13 +138,24 @@ const Header = () => {
                            ?.join(", ")}
                         fontSize="14px"
                      />
-                     <CompanySizeTag text={group.companySize} fontSize="14px" />
+                     <CompanySizeTag
+                        text={getCompanySizeLabel(group.companySize)}
+                        fontSize="14px"
+                     />
                   </Stack>
                </Stack>
             </Box>
          </Box>
       </>
    )
+}
+
+const getCompanySizeLabel = (companySize: string) => {
+   if (!companySize) return ""
+
+   return CompanySizesCodes.find(
+      (size) => size.id === companySize
+   )?.label?.replace(" employees", "")
 }
 
 const ActionButtons = () => {

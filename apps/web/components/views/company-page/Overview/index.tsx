@@ -6,7 +6,6 @@ import EventSection from "../EventSection"
 import JobsSection from "../JobsSection"
 import { MentorsSection } from "../MentorsSection"
 import SparksSection from "../SparksSection"
-import TestimonialSection from "../TestimonialSection"
 import { FollowCompany, SignUp } from "../ctas"
 
 type Props = {
@@ -33,7 +32,6 @@ export const Overview = ({ editMode }: Props) => {
                }}
             />
          ) : null}
-         <TestimonialSection />
          {showSignUpCta ? <SignUp /> : null}
          {showFollowCompanyCta ? <FollowCompany /> : null}
          <MentorsSection />

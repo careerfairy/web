@@ -1,17 +1,11 @@
 import { Box, Button, CircularProgress, Typography } from "@mui/material"
-import { useCallback, useMemo } from "react"
 import { useCompanyPage } from "../index"
 
 import { sxStyles } from "../../../../types/commonTypes"
 // react feather
 import SanitizedHTML from "components/util/SanitizedHTML"
 import dynamic from "next/dynamic"
-import {
-   Edit2 as EditIcon,
-   MapPin as MapPinIcon,
-   Tag as TagIcon,
-   Users as UsersIcon,
-} from "react-feather"
+import { Edit2 as EditIcon } from "react-feather"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import EditDialog from "../EditDialog"
 
@@ -49,46 +43,7 @@ const AboutSection = () => {
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
 
-   const { companyCountry, companyIndustries, companySize, extraInfo } = group
-
-   const showIcons = useMemo(
-      () => companySize || companyIndustries?.length || companyCountry?.name,
-      [companyCountry?.name, companyIndustries?.length, companySize]
-   )
-
-   const renderIcons = useCallback(
-      () => (
-         <Box sx={styles.iconsWrapper}>
-            {companyCountry?.name ? (
-               <Box sx={styles.tag}>
-                  <MapPinIcon size={20} />
-                  <Typography variant="body1" color="black" ml={1}>
-                     {companyCountry.name}
-                  </Typography>
-               </Box>
-            ) : null}
-
-            {companyIndustries?.length ? (
-               <Box sx={styles.tag}>
-                  <TagIcon size={20} />
-                  <Typography variant="body1" color="black" ml={1}>
-                     {companyIndustries.map(({ name }) => name).join(", ")}
-                  </Typography>
-               </Box>
-            ) : null}
-
-            {companySize ? (
-               <Box sx={styles.tag}>
-                  <UsersIcon size={20} />
-                  <Typography variant="body1" color="black" ml={1}>
-                     {companySize}
-                  </Typography>
-               </Box>
-            ) : null}
-         </Box>
-      ),
-      [companyCountry?.name, companyIndustries, companySize]
-   )
+   const { extraInfo } = group
 
    return (
       <>
@@ -109,7 +64,6 @@ const AboutSection = () => {
                   </Button>
                ) : null}
             </Box>
-            {showIcons ? renderIcons() : null}
             <Box mt={2}>
                <Typography variant="h6" fontWeight={"400"} color="black">
                   <SanitizedHTML htmlString={extraInfo} />
