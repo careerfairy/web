@@ -32,6 +32,11 @@ export default class UserEventRecommendationService
 {
    private additionalUserData: AdditionalUserRecommendationInfo
    private featuredGroups?: { [groupId: string]: Group }
+   /**
+    * The filtered livestreams to consider for recommendations
+    * This is the futureLivestreams filtered out of ended livestreams and registered livestreams
+    */
+   private filteredLivestreams: LivestreamEvent[] = []
 
    constructor(
       private readonly user: UserData,
@@ -53,6 +58,24 @@ export default class UserEventRecommendationService
     * @returns A promise that resolves to an array of recommended event IDs
     */
    async getRecommendations(limit = 10): Promise<string[]> {
+      // Filter out ended livestreams and registered livestreams
+      this.filteredLivestreams = this.futureLivestreams.filter((livestream) => {
+         // Filter out livestreams that have ended
+         if (livestream.hasEnded) {
+            return false
+         }
+
+         // Filter out registered livestreams if there are any
+         if (
+            this.registeredLivestreams?.registeredLivestreams &&
+            this.registeredLivestreams.registeredLivestreams[livestream.id]
+         ) {
+            return false
+         }
+
+         return true
+      })
+
       const promises: Promise<RankedLivestreamEvent[]>[] = []
 
       if (this.user) {
@@ -61,7 +84,7 @@ export default class UserEventRecommendationService
             Promise.resolve(
                this.getRecommendedEventsBasedOnUserData(
                   this.user,
-                  this.futureLivestreams,
+                  this.filteredLivestreams,
                   limit,
                   this.implicitData,
                   this.additionalUserData,
@@ -82,7 +105,7 @@ export default class UserEventRecommendationService
       return this.process(
          recommendedEvents,
          limit,
-         this.futureLivestreams,
+         this.filteredLivestreams,
          this.user
       )
    }
@@ -147,7 +170,7 @@ export default class UserEventRecommendationService
          new LivestreamBasedRecommendationsBuilder(
             limit,
             livestreamsUserRegistered,
-            new RankedLivestreamRepository(this.futureLivestreams)
+            new RankedLivestreamRepository(this.filteredLivestreams)
          )
 
       return livestreamBasedRecommendations
