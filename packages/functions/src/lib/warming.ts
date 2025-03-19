@@ -1,30 +1,14 @@
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import axios from "axios"
-import { Request, Response } from "firebase-functions/v1"
 import { logger } from "firebase-functions/v2"
 import { onSchedule } from "firebase-functions/v2/scheduler"
 import config from "../config"
-
-// Flag to identify warming requests
-export const KEEP_WARM_HEADER = "x-keepwarm"
-
-/**
- * Utility function to check if a request is a warming request
- * @param req Express request object
- * @param res Express response object
- * @returns boolean indicating if the request was handled as a warming request
- */
-export const handleWarmingRequest = (req: Request, res: Response): boolean => {
-   // Check if the warming header is present
-   if (req.get(KEEP_WARM_HEADER) === "true") {
-      logger.info("Handling keep-warm request")
-      res.status(200).send("Function is warm")
-      return true
-   }
-   return false
-}
+import { KEEP_WARM_HEADER } from "../middlewares-gen2/validations-onRequest"
 
 const functionsToWarm = [
-   "exampleHttpFunction",
+   FUNCTION_NAMES.exampleHttp,
+   FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook,
+   FUNCTION_NAMES.customerIORecommendedSparksWebhook,
    // Add more functions as needed
 ]
 
