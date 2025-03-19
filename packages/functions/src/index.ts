@@ -398,7 +398,7 @@ exports.sendReminderEmailAboutApplicationLink_v2 =
    followups.sendReminderEmailAboutApplicationLink
 
 // Keep-warm function
-exports.keepFunctionsWarm = warming.keepFunctionsWarm
+exports[FUNCTION_NAMES.keepFunctionsWarm] = warming.keepFunctionsWarm
 
 // Example warmable function
 exports[FUNCTION_NAMES.exampleHttp] = examples.exampleHttpFunction

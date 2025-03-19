@@ -10,9 +10,13 @@ export const FUNCTION_NAMES = {
    customerIORecommendedLivestreamsWebhook:
       "customerIORecommendedLivestreamsWebhook",
    customerIORecommendedSparksWebhook: "customerIORecommendedSparksWebhook",
+
    // Auth functions
    // createNewUserAccount: "createNewUserAccount_v4",
 
    // Streaming functions
    // fetchAgoraRtcToken: "fetchAgoraRtcToken_v2",
+
+   // Utility functions
+   keepFunctionsWarm: "keepFunctionsWarm",
 } as const
