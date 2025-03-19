@@ -1,6 +1,9 @@
 import { onRequest } from "firebase-functions/v2/https"
-import { withMiddlewares } from "../middlewares-gen2/onRequest"
-import { warmingMiddleware } from "../middlewares-gen2/validations-onRequest"
+import {
+   warmingMiddleware,
+   withMiddlewares,
+} from "../middlewares-gen2/onRequest"
+
 /**
  * Example HTTP function that uses the warming utility
  *

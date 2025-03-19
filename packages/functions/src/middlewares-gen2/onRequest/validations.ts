@@ -1,5 +1,5 @@
 import { logger } from "firebase-functions/v2"
-import { Middleware } from "./onRequest"
+import { Middleware } from "./middleware"
 
 export const KEEP_WARM_HEADER = "x-keepwarm"
 

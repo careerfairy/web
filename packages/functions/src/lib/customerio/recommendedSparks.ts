@@ -1,6 +1,10 @@
 import { logger } from "firebase-functions/v2"
 import { onRequest } from "firebase-functions/v2/https"
 import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
+import {
+   warmingMiddleware,
+   withMiddlewares,
+} from "../../middlewares-gen2/onRequest"
 import { getWebBaseUrl } from "../../util"
 import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
 import SparkRecommendationService from "../recommendation/SparkRecommendationService"
@@ -29,7 +33,7 @@ type CustomerIORecommendedSparkWebhookData = {
  * This endpoint will be called by Customer.io during their onboarding journey.
  */
 export const customerIORecommendedSparksWebhook = onRequest(
-   async (request, response) => {
+   withMiddlewares([warmingMiddleware], async (request, response) => {
       if (request.method !== "POST") {
          response.status(405).send("Method Not Allowed")
          return
@@ -102,5 +106,5 @@ export const customerIORecommendedSparksWebhook = onRequest(
          logger.error("Error processing recommended Sparks webhook", error)
          response.status(500).send("Internal Server Error")
       }
-   }
+   })
 )

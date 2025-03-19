@@ -1,11 +1,11 @@
 import express from "express"
 import { Request } from "firebase-functions/v2/https"
-import { withMiddlewares, type Middleware } from "../onRequest"
+import { withMiddlewares, type Middleware } from "../middleware"
 import {
    KEEP_WARM_HEADER,
    validateDataExists,
    warmingMiddleware,
-} from "../validations-onRequest"
+} from "../validations"
 
 type Response = express.Response
 

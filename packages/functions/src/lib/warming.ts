@@ -3,7 +3,7 @@ import axios from "axios"
 import { logger } from "firebase-functions/v2"
 import { onSchedule } from "firebase-functions/v2/scheduler"
 import config from "../config"
-import { KEEP_WARM_HEADER } from "../middlewares-gen2/validations-onRequest"
+import { KEEP_WARM_HEADER } from "../middlewares-gen2/onRequest/validations"
 
 const functionsToWarm = [
    FUNCTION_NAMES.exampleHttp,

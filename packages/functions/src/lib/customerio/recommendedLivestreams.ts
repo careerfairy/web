@@ -6,6 +6,10 @@ import {
    sparkRepo,
    userRepo,
 } from "../../api/repositories"
+import {
+   warmingMiddleware,
+   withMiddlewares,
+} from "../../middlewares-gen2/onRequest"
 import { formatLivestreamDate, getWebBaseUrl } from "../../util"
 import { UserDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
 import UserEventRecommendationService from "../recommendation/UserEventRecommendationService"
@@ -35,7 +39,7 @@ type CustomerIORecommendedLivestreamWebhookData = {
  * This endpoint will be called by Customer.io during their onboarding journey.
  */
 export const customerIORecommendedLivestreamsWebhook = onRequest(
-   async (request, response) => {
+   withMiddlewares([warmingMiddleware], async (request, response) => {
       // Only accept POST requests
       if (request.method !== "POST") {
          response.status(405).send("Method Not Allowed")
@@ -113,5 +117,5 @@ export const customerIORecommendedLivestreamsWebhook = onRequest(
          logger.error("Error processing recommended livestreams webhook", error)
          response.status(500).send("Internal Server Error")
       }
-   }
+   })
 )
