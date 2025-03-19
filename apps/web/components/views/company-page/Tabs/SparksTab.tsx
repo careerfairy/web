@@ -53,15 +53,9 @@ const SparksGrid = ({ groupId }: SparksGridProps) => {
    )
 
    return (
-      <Grid
-         container
-         spacing={2}
-         sx={{
-            justifyContent: "center",
-         }}
-      >
+      <Grid container spacing={2}>
          {groupSparks?.map((spark) => (
-            <Grid item key={spark.id} xs={6} sm={4} md={4} lg={3}>
+            <Grid item key={spark.id} xs={12} sm={4} md={4} lg={3}>
                <SparkPreviewCard
                   key={spark.id}
                   spark={spark}
