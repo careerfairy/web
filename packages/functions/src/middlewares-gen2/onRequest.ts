@@ -31,7 +31,7 @@ export type Middleware = (
  * // Using middlewares with a handler
  * export const myFunction = onRequest(
  *   withMiddlewares(
- *     [authMiddleware, loggingMiddleware],
+ *     [authMiddleware],
  *     async (request, response) => {
  *       response.status(200).json({ message: "Success!" })
  *     }

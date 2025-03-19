@@ -17,23 +17,15 @@ export type Middleware<T = unknown, Return = unknown> = (
  * // Example authentication middleware
  * const authMiddleware: Middleware = async (request, next) => {
  *   if (!request.auth) {
- *     throw new Error('Unauthorized')
+ *     throw new HttpsError("unauthenticated")
  *   }
  *   return next(request)
  * }
  *
- * // Example logging middleware
- * const loggingMiddleware: Middleware = async (request, next) => {
- *   console.log('Request received:', request.data)
- *   const result = await next(request)
- *   console.log('Response sent:', result)
- *   return result
- * }
- *
  * // Using middlewares with a handler
- * export const myFunction = onCall(
+ * export const mySecureFunction = onCall(
  *   withMiddlewares(
- *     [authMiddleware, loggingMiddleware],
+ *     [authMiddleware],
  *     async (request) => {
  *       return { message: "Success!" }
  *     }

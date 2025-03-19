@@ -27,3 +27,14 @@ export const warmingMiddleware: Middleware = async (
    // Not a warming request, continue to the next middleware
    return next(request, response)
 }
+
+export const validateDataExists: Middleware = (request, response, next) => {
+   if (!request.body?.data) {
+      response.status(401).json({
+         error: "Unauthorized",
+         message: "Missing data field",
+      })
+      return
+   }
+   return next(request, response)
+}

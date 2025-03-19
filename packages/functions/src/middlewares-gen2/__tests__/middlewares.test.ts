@@ -1,7 +1,11 @@
 import express from "express"
 import { Request } from "firebase-functions/v2/https"
 import { withMiddlewares, type Middleware } from "../onRequest"
-import { KEEP_WARM_HEADER, warmingMiddleware } from "../validations-onRequest"
+import {
+   KEEP_WARM_HEADER,
+   validateDataExists,
+   warmingMiddleware,
+} from "../validations-onRequest"
 
 type Response = express.Response
 
@@ -13,7 +17,11 @@ const createMockResponse = () => {
       json: jest.fn().mockReturnThis(),
       headersSent: false,
       locals: {},
-   } as unknown as Response
+   } as unknown as Response & {
+      status: jest.Mock
+      send: jest.Mock
+      json: jest.Mock
+   }
    return res
 }
 
@@ -58,7 +66,7 @@ test("Second middleware should be executed", async () => {
    expect(handlerSpy).toHaveBeenCalled()
 })
 
-test("First middleware throws and circuits the chain", async () => {
+test("First middleware returns 401 and circuits the chain if data is missing", async () => {
    // arrange
    const mockRequest = { body: { data: {} } } as unknown as Request
    const mockResponse = createMockResponse()
@@ -72,11 +80,16 @@ test("First middleware throws and circuits the chain", async () => {
 
    // reset
    handlerSpy.mockReset()
+   mockResponse.status.mockClear()
+   mockResponse.json.mockClear()
 
-   // expect it to throw with invalid data
-   await expect(async () => {
-      await chain({ body: { data: null } } as unknown as Request, mockResponse)
-   }).rejects.toThrow("data field must be preset")
+   // expect it to return 401 with invalid data
+   await chain({ body: { data: null } } as unknown as Request, mockResponse)
+   expect(mockResponse.status).toHaveBeenCalledWith(401)
+   expect(mockResponse.json).toHaveBeenCalledWith({
+      error: "Unauthorized",
+      message: "Missing data field",
+   })
    expect(handlerSpy).not.toHaveBeenCalled()
 })
 
@@ -165,13 +178,6 @@ test("Middleware can modify request data for next middleware", async () => {
 | Utility Middlewares
 |--------------------------------------------------------------------------
 */
-const validateDataExists: Middleware = (request, response, next) => {
-   if (!request.body?.data) {
-      throw new Error("data field must be preset")
-   }
-
-   return next(request, response)
-}
 
 const earlyResponse: Middleware = (request, response) => {
    response.status(200).json({ message: "Early response" })
