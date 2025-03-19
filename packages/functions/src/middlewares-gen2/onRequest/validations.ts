@@ -1,3 +1,4 @@
+import crypto from "crypto"
 import { logger } from "firebase-functions/v2"
 import { Middleware } from "./middleware"
 
@@ -37,4 +38,57 @@ export const validateDataExists: Middleware = (request, response, next) => {
       return
    }
    return next(request, response)
+}
+
+/**
+ * Middleware that validates Customer.io webhook signatures
+ * If the request contains an invalid signature, it will respond with 401 and stop the middleware chain
+ * Otherwise, it will continue to the next middleware
+ *
+ * Required headers:
+ * - x-cio-signature: The signature from Customer.io
+ * - x-cio-timestamp: The timestamp from Customer.io
+ */
+export const customerIOWebhookSignatureMiddleware = (
+   signingKey: string
+): Middleware => {
+   return async (request, response, next) => {
+      // Check if we have required headers and signing key
+      const signature = request.headers["x-cio-signature"] as string
+      const timestamp = request.headers["x-cio-timestamp"] as string
+
+      if (!signature) {
+         logger.error("CustomerIO: Missing x-cio-signature header")
+         response.status(401).send("Unauthorized")
+         return
+      }
+
+      if (!timestamp) {
+         logger.error("CustomerIO: Missing x-cio-timestamp header")
+         response.status(401).send("Unauthorized")
+         return
+      }
+
+      if (!signingKey) {
+         logger.error("CustomerIO: Missing signing key")
+         response.status(401).send("Unauthorized")
+         return
+      }
+
+      // Verify the webhook signature using the signing key
+      const payload = request.rawBody
+      const stringToSign = `v0:${timestamp}:${payload}`
+
+      const hmac = crypto.createHmac("sha256", signingKey)
+      const calculatedSignature = hmac.update(stringToSign).digest("hex")
+
+      if (calculatedSignature !== signature) {
+         logger.error("CustomerIO: Signature verification failed")
+         response.status(401).send("Unauthorized")
+         return
+      }
+
+      // Signature is valid, continue to next middleware
+      return next(request, response)
+   }
 }
