@@ -342,6 +342,7 @@ const CompanyPageOverview = ({
             pb={5}
             px={isMobile ? 0 : 4}
             bgcolor={isMobile ? "white" : "transparent"}
+            borderRadius={isMobile ? "12px" : "0"}
          >
             {editMode ? <ProgressBanner /> : null}
             <Box
@@ -356,7 +357,7 @@ const CompanyPageOverview = ({
                   spacing={2}
                   justifyItems={"space-between"}
                   width={"100%"}
-                  bgcolor={isMobile ? "#F5F5F5" : "transparent"}
+                  bgcolor={isMobile ? "#F7F8FC" : "transparent"}
                >
                   <Box
                      maxWidth={
