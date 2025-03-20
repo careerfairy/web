@@ -91,7 +91,7 @@ import followups = require("./followups")
 // Auth
 exports.createNewUserAccount_v4 = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
-exports.backfillUserData_eu = auth.backfillUserData
+exports.backfillUserData = auth.backfillUserData
 exports.validateUserEmailWithPin_v2 = auth.validateUserEmailWithPin
 exports.sendPasswordResetEmail = auth.sendPasswordResetEmail
 exports.resendEmailVerificationEmailWithPin =

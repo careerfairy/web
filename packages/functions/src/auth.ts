@@ -536,7 +536,7 @@ export const backfillUserData = functions
          functions.logger.info("Adding time zone to user")
       }
 
-      if (!userData.emailVerified) {
+      if (userData.emailVerified === undefined) {
          dataToUpdate.emailVerified = userRecord.emailVerified
          functions.logger.info("Adding emailVerifiedAt to user")
       }
