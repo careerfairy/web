@@ -1,4 +1,4 @@
-import { Box, Link, Stack, Typography } from "@mui/material"
+import { Box, Button, Link, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
 import EventsPreviewCarousel, {
@@ -13,6 +13,8 @@ import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamC
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
+import { Plus } from "react-feather"
 import { SeeAllLink } from "../Overview/SeeAllLink"
 import StayUpToDateBanner from "./StayUpToDateBanner"
 
@@ -52,11 +54,36 @@ const styles = sxStyles({
    stayUpWrapper: {
       pb: 1,
    },
+   createStreamButton: {
+      mt: 2,
+      backgroundColor: (theme) => theme.brand.white[200],
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
+      borderRadius: "16px",
+      width: "360px",
+      height: "322px",
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.white[400],
+      },
+   },
+   createStreamIcon: {
+      color: (theme) => theme.palette.secondary.main,
+      width: "44px !important",
+      height: "44px !important",
+   },
 })
+
+const SectionTitle = ({ title }: { title: string }) => {
+   return (
+      <Typography variant="brandedH3" fontWeight={"600"} color="black">
+         {title}
+      </Typography>
+   )
+}
 
 const EventSection = () => {
    const { group, upcomingLivestreams, pastLivestreams, editMode } =
       useCompanyPage()
+
    const query = `companyId=${group.id}`
    const isMobile = useIsMobile()
 
@@ -91,22 +118,18 @@ const EventSection = () => {
             <ConditionalWrapper
                condition={Boolean(upcomingLivestreams?.length)}
                fallback={
-                  <StayUpToDateComponent
-                     title="Next Live Streams"
-                     seeMoreLink={`/next-livestreams?${query}`}
-                  />
+                  editMode ? (
+                     <CreateStreamButton />
+                  ) : (
+                     <StayUpToDateComponent
+                        title="Next Live Streams"
+                        seeMoreLink={`/next-livestreams?${query}`}
+                     />
+                  )
                }
             >
                <EventsPreviewCarousel
-                  title={
-                     <Typography
-                        variant="brandedH3"
-                        fontWeight={"600"}
-                        color="black"
-                     >
-                        Live streams
-                     </Typography>
-                  }
+                  title={<SectionTitle title="Live streams" />}
                   header={
                      isMobile ? (
                         <EventSectionHeader
@@ -117,7 +140,7 @@ const EventSection = () => {
                         />
                      ) : null
                   }
-                  events={upcomingLivestreams ?? []}
+                  events={upcomingLivestreams}
                   type={EventsTypes.COMING_UP}
                   seeMoreLink={""}
                   onClickSeeMore={() => {
@@ -131,15 +154,7 @@ const EventSection = () => {
             </ConditionalWrapper>
             <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
                <EventsPreviewCarousel
-                  title={
-                     <Typography
-                        variant="brandedH3"
-                        fontWeight={"600"}
-                        color="black"
-                     >
-                        Recordings
-                     </Typography>
-                  }
+                  title={<SectionTitle title="Recordings" />}
                   header={
                      isMobile ? (
                         <EventSectionHeader
@@ -245,6 +260,29 @@ export const StayUpToDateComponent: FC<StayUpToDateProps> = ({
          </Box>
          <StayUpToDateBanner />
       </Box>
+   )
+}
+
+const CreateStreamButton = () => {
+   const { createDraftLivestream } = useLivestreamRouting()
+
+   return (
+      <Stack>
+         <SectionTitle title="Live streams" />
+         <Button
+            variant="contained"
+            color="primary"
+            onClick={createDraftLivestream}
+            sx={styles.createStreamButton}
+         >
+            <Stack alignItems="center">
+               <Box component={Plus} sx={styles.createStreamIcon} />
+               <Typography variant="medium" color={"neutral.800"}>
+                  Create new live stream
+               </Typography>
+            </Stack>
+         </Button>
+      </Stack>
    )
 }
 export const MAX_UPCOMING_STREAMS = 10
