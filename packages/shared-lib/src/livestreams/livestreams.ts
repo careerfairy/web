@@ -684,6 +684,12 @@ export const pickPublicDataFromLivestream = (
    }
 }
 
+export const getAuthUidFromUserLivestreamData = (
+   userLivestreamData: UserLivestreamData
+) => {
+   return userLivestreamData.user.authId ?? userLivestreamData.userId
+}
+
 export interface LivestreamEventSerialized
    extends Omit<
       LivestreamEvent,

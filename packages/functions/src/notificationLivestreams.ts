@@ -1,4 +1,7 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   getAuthUidFromUserLivestreamData,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import * as functions from "firebase-functions"
@@ -89,7 +92,7 @@ export const notifyUsersOnLivestreamStart = onDocumentUpdated(
                         url: livestreamUrl,
                      },
                      identifiers: {
-                        id: user.user?.authId,
+                        id: getAuthUidFromUserLivestreamData(user),
                      },
                   }))
                )
