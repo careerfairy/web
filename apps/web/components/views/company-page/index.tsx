@@ -199,6 +199,8 @@ const CompanyPageOverview = ({
       [group.id]
    )
 
+   // Track if this is the initial render
+   const isInitialRender = useRef(true)
    const [tabValue, setTabValue] = useState<TabValueType>(
       tab ?? TabValue.overview
    )
@@ -263,13 +265,17 @@ const CompanyPageOverview = ({
       }
    }, [contextGroup, editMode, presenter])
 
-   // Add effect to sync URL query param changes with tab state
+   // Modify the effect to only sync with URL after initial render
    useEffect(() => {
+      if (isInitialRender.current) {
+         isInitialRender.current = false
+         return
+      }
+
       const tabFromQuery = router.query.tab as TabValueType
       if (tabFromQuery) {
          setTabValue(tabFromQuery)
       } else {
-         // When there's no tab query param, default to overview
          setTabValue(TabValue.overview)
       }
    }, [router.query.tab])
