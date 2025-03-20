@@ -172,18 +172,18 @@ const SignupForm = () => {
          // set a loading state in the Finalise button, the next page may take some seconds to render
          setIsLoadingRedirectPage(true)
 
-         if (absolutePath) {
-            void push(absolutePath as any)
-         } else {
-            void push(fallbackSignupRedirectPath)
-         }
-
          const value = calculateUserValue(userData, userCountryCode)
 
          dataLayerEvent(AnalyticsEvents.SignupCompleteRedirect, {
             value,
             currency: "CHF",
          })
+
+         if (absolutePath) {
+            void push(absolutePath as any)
+         } else {
+            void push(fallbackSignupRedirectPath)
+         }
       } else {
          setCurrentStep((prev) => prev + 1)
       }
