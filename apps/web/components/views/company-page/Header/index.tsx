@@ -18,7 +18,7 @@ import FollowButton from "../../common/company/FollowButton"
 import BannerIllustration from "./BannerIllustration"
 import ShareButton from "./ShareButton"
 
-const LOGO_SIZE = 112
+const LOGO_SIZE = 84
 const DESKTOP_LOGO_SIZE = LOGO_SIZE * 1.5
 const NAV_BG_COLOR = "#FEFEFE"
 
@@ -32,10 +32,9 @@ const styles = sxStyles({
       width: { xs: LOGO_SIZE, md: DESKTOP_LOGO_SIZE },
       height: { xs: LOGO_SIZE, md: DESKTOP_LOGO_SIZE },
       marginRight: "-5px",
-      marginLeft: { xs: "10px", md: 3 },
    },
    navigatorWrapper: {
-      marginTop: { xs: "-60px", md: "-100px" },
+      marginTop: { xs: "-45px", md: "-65px" },
       display: "flex",
       width: "-webkit-fill-available",
       flexDirection: { xs: "column", md: "row" },
@@ -90,12 +89,14 @@ const Header = () => {
                      bgcolor={isMobile ? "white" : NAV_BG_COLOR}
                      pl={2}
                   >
-                     <CircularLogo
-                        sx={styles.logo}
-                        alt={`${universityName} logo`}
-                        src={logoUrl || companyLogoPlaceholder}
-                        size={DESKTOP_LOGO_SIZE}
-                     />
+                     <Box sx={{ pb: { xs: 2, md: 0 } }}>
+                        <CircularLogo
+                           sx={styles.logo}
+                           alt={`${universityName} logo`}
+                           src={logoUrl || companyLogoPlaceholder}
+                           size={DESKTOP_LOGO_SIZE}
+                        />
+                     </Box>
                      {isMobile ? (
                         <span>
                            <ActionButtons />
@@ -150,7 +151,7 @@ const Header = () => {
    )
 }
 
-const getCompanySizeLabel = (companySize: string) => {
+export const getCompanySizeLabel = (companySize: string) => {
    if (!companySize) return ""
 
    return CompanySizesCodes.find(
@@ -166,7 +167,7 @@ const ActionButtons = () => {
    const showShareButton = groupPresenter.companyPageIsReady()
 
    return (
-      <Stack spacing={1} pr={2} direction={"row"} mt={isMobile ? 1 : 12.5}>
+      <Stack spacing={1} pr={2} direction={"row"} mt={isMobile ? 1 : 9}>
          {showFollowButton ? (
             <FollowButton
                sx={{

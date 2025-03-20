@@ -39,6 +39,7 @@ import {
 } from "../common/company/company-tags"
 import PublicSparksBadge from "../common/icons/PublicSparksBadge"
 import CircularLogo from "../common/logos/CircularLogo"
+import { getCompanySizeLabel } from "../company-page/Header"
 
 const LOGO_SIZE = 75
 
@@ -284,7 +285,7 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
                      disableMultiline={hasUpcomingLivestreams}
                   />
                   <CompanySizeTag
-                     text={company.companySize}
+                     text={getCompanySizeLabel(company.companySize)}
                      fontSize="16px"
                      color={theme.palette.neutral[900]}
                   />
