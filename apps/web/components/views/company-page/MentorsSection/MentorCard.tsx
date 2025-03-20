@@ -11,9 +11,6 @@ import { useCompanyPage } from ".."
 
 const CARD_WIDTH = 214
 
-const mentorsCardBackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fmentors-card-background.png?alt=media&token=a38f0348-61db-4317-a65e-392dbc44b38a"
-
 const styles = sxStyles({
    container: (theme) => ({
       position: "relative",
@@ -33,27 +30,32 @@ const styles = sxStyles({
       textDecoration: "none",
       color: "inherit",
       overflow: "hidden",
+      transform: "translateZ(0)",
    }),
-   topBackground: {
+   bannerContainer: {
       position: "absolute",
       top: 0,
       left: 0,
       width: "100%",
       height: "66px",
-      backgroundImage: `url(${mentorsCardBackground})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      zIndex: 0,
+      overflow: "hidden",
+      zIndex: 1,
       "&::before": {
-         content: "''",
+         content: '""',
          position: "absolute",
          top: 0,
          left: 0,
          width: "100%",
          height: "100%",
          background: "rgba(142, 142, 142, 0.10)",
+         WebkitBackdropFilter: "blur(10px)",
          backdropFilter: "blur(10px)",
       },
+   },
+   bannerImage: {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
    },
    creator: {
       name: {
@@ -70,7 +72,6 @@ const styles = sxStyles({
          lineHeight: "21px",
          textAlign: "center",
          color: "neutral.600",
-         // css hack to ensure text is not cut off
          paddingBottom: 1,
          marginBottom: -1,
          ...getMaxLineStyles(2),
@@ -92,6 +93,7 @@ const styles = sxStyles({
    avatarContainer: {
       position: "relative",
       zIndex: 2,
+      transform: "translateZ(0)",
    },
 })
 
@@ -131,8 +133,8 @@ export const MentorCard = ({
 }: MentorCardProps) => {
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
-
    const { group } = useCompanyPage()
+
    const _handleEdit = (ev: SyntheticEvent) => {
       ev.preventDefault()
       ev.stopPropagation()
@@ -141,7 +143,16 @@ export const MentorCard = ({
 
    return (
       <Container creator={creator}>
-         <Box sx={styles.topBackground} />
+         {group?.bannerImageUrl ? (
+            <Box sx={styles.bannerContainer}>
+               <Box
+                  component="img"
+                  src={group.bannerImageUrl}
+                  alt=""
+                  sx={styles.bannerImage}
+               />
+            </Box>
+         ) : null}
          {Boolean(isEditMode) && (
             <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.brand.white[100]} />
