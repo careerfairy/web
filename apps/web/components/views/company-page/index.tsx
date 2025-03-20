@@ -397,10 +397,12 @@ const CompanyPageOverview = ({
                               label={getTabLabel(TabValue.recordings)}
                               value={TabValue.recordings}
                            />
-                           <Tab
-                              label={getTabLabel(TabValue.mentors)}
-                              value={TabValue.mentors}
-                           />
+                           {groupCreators?.length ? (
+                              <Tab
+                                 label={getTabLabel(TabValue.mentors)}
+                                 value={TabValue.mentors}
+                              />
+                           ) : null}
                         </Tabs>
 
                         <Box sx={styles.tabContent}>
