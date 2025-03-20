@@ -243,7 +243,7 @@ const getEmailTemplateMessages = (
             to: streamUserData.user.userEmail,
             templateId: templateId,
             identifiers: {
-               id: streamUserData.user.authId ?? streamUserData.user.id,
+               id: streamUserData.user?.authId ?? streamUserData.userId,
             },
             templateData: {
                livestream: {
