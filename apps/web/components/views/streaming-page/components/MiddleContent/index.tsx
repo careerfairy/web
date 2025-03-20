@@ -55,7 +55,13 @@ export const MiddleContent = () => {
                isLandscape,
                bannerActive: handRaiseEnabled && isHost,
             }),
-            pb: isLandscape ? 3.125 : isMobile ? 2 : isSpotlightMode ? 2 : 2,
+            pb: isLandscape
+               ? 3.125
+               : isMobile
+               ? 2
+               : isSpotlightMode
+               ? 2
+               : 5.875,
          }}
       >
          <HandRaiseActiveBanner />

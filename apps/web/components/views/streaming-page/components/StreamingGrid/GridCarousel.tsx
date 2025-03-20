@@ -20,7 +20,7 @@ import { ChevronLeft, ChevronRight } from "react-feather"
 const SLIDE_SIZE = "100%"
 
 export const MOBILE_SPACING = 0.75
-export const DESKTOP_SPACING = 1
+export const DESKTOP_SPACING = 2
 
 const styles = sxStyles({
    root: {
@@ -39,6 +39,7 @@ const styles = sxStyles({
    viewport: {
       overflow: "hidden",
       flex: 1,
+      height: "100%",
    },
    container: {
       backfaceVisibility: "hidden",

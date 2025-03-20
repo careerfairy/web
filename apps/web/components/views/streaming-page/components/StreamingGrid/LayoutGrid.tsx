@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material"
+import { Box, Grid, GridProps } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { ReactNode, memo } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -9,11 +9,6 @@ const styles = sxStyles({
       width: "100%",
       borderRadius: "10px",
       height: "100%",
-   },
-   gridItemSpotlight: {
-      flex: "none !important",
-      height: "100%",
-      aspectRatio: "16 / 9",
    },
 })
 
@@ -79,20 +74,16 @@ export const LayoutGrid = <ElementType,>({
 type GalleryGridItemProps = {
    children: ReactNode
    layoutColumns: number
+   maxWidth: GridProps["maxWidth"]
    /**
     * Key is mandatory as it is being rendered in a list
     */
    key: string | number
-   isSpotlightMode: boolean
 }
 
 const LayoutGridItem = memo(
-   ({ children, layoutColumns, isSpotlightMode }: GalleryGridItemProps) => (
-      <Grid
-         xs={12 / layoutColumns}
-         item
-         sx={isSpotlightMode ? styles.gridItemSpotlight : {}}
-      >
+   ({ children, layoutColumns, maxWidth }: GalleryGridItemProps) => (
+      <Grid xs={12 / layoutColumns} item maxWidth={maxWidth}>
          <Box sx={styles.item}>{children}</Box>
       </Grid>
    )
