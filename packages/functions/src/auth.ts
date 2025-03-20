@@ -251,9 +251,11 @@ export const createNewGroupAdminUserAccount = functions
             userEmail: recipientEmail,
             unsubscribed: !subscribed,
             referralCode: generateReferralCode(),
-            lastActivityAt: FieldValue.serverTimestamp(),
-            createdAt: FieldValue.serverTimestamp(),
-         }
+            lastActivityAt: FieldValue.serverTimestamp() as Timestamp,
+            createdAt: FieldValue.serverTimestamp() as Timestamp,
+            emailVerified: true, // Admin users are verified by default
+         } satisfies Partial<UserData>
+
          // create the user in firestore, if it fails, delete the user from firebase auth
          await firestore
             .collection("userData")
@@ -368,6 +370,10 @@ export const validateUserEmailWithPin = onCall<ValidateUserEmailWithPinRequest>(
                const userRecord = await auth.getUserByEmail(recipientEmail)
 
                const updatedUserRecord = await auth.updateUser(userRecord.uid, {
+                  emailVerified: true,
+               })
+
+               await userRepo.updateUserData(recipientEmail, {
                   emailVerified: true,
                })
 
@@ -516,6 +522,7 @@ export const backfillUserData = functions
       }
 
       const userData = await userRepo.getUserDataById(email)
+      const userRecord = await auth.getUserByEmail(email)
       const dataToUpdate: Partial<UserData> = {}
 
       if (!userData.referralCode) {
@@ -527,6 +534,11 @@ export const backfillUserData = functions
       if (!userData.timezone) {
          dataToUpdate.timezone = timezone
          functions.logger.info("Adding time zone to user")
+      }
+
+      if (!userData.emailVerified) {
+         dataToUpdate.emailVerified = userRecord.emailVerified
+         functions.logger.info("Adding emailVerifiedAt to user")
       }
 
       if (Object.keys(dataToUpdate).length > 0) {

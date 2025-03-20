@@ -101,7 +101,8 @@ export const syncUserToCustomerIO = onDocumentWritten(
 const shouldSyncUser = (user: UserData) => {
    return (
       user.lastActivityAt && // User has an activity date
-      user.lastActivityAt.toDate() >= CUTOFF_DATE // User is active since before Sept 2023
+      user.lastActivityAt.toDate() >= CUTOFF_DATE && // User is active since before Sept 2023
+      user.emailVerified
    )
 }
 

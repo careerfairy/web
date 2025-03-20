@@ -144,7 +144,10 @@ export interface IGroupRepository {
     * */
    setGroupAdminRoleInFirestore(
       group: Group,
-      userData: Pick<UserData, "id" | "userEmail" | "firstName" | "lastName">,
+      userData: Pick<
+         UserData,
+         "id" | "userEmail" | "firstName" | "lastName" | "emailVerified"
+      >,
       role?: GROUP_DASHBOARD_ROLE
    ): Promise<void>
 
