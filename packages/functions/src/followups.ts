@@ -344,7 +344,8 @@ const sendAttendeesReminder = async (
          const groupSparksPromises = Object.values(groupsByEventIds).map(
             async (group) => {
                groupSparks[group.id] = group.publicSparks
-                  ? (await sparkRepo.getSparksByGroupId(group.id)) ?? []
+                  ? (await sparkRepo.getPublishedSparksByGroupId(group.id)) ??
+                    []
                   : []
             }
          )
