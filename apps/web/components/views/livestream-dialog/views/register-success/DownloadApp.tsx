@@ -4,7 +4,10 @@ import Stack from "@mui/material/Stack"
 import Image from "next/legacy/image"
 import { FC, useEffect } from "react"
 import { Download } from "react-feather"
-import { appQrCode, confetti } from "../../../../../constants/images"
+import {
+   appQrCodeLSRegistration,
+   confetti,
+} from "../../../../../constants/images"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { responsiveConfetti } from "../../../../util/confetti"
@@ -178,7 +181,12 @@ export const DownloadApp: FC = () => {
 const ActionsDesktop = () => {
    return (
       <Box sx={styles.actionsDesktop}>
-         <Image src={appQrCode} alt="App QR code" width={147} height={147} />
+         <Image
+            src={appQrCodeLSRegistration}
+            alt="App QR code"
+            width={147}
+            height={147}
+         />
          <Box sx={styles.actionsDesktopContent}>
             <Typography variant="brandedH5" sx={styles.actionsDesktopTitle}>
                Scan to download CareerFairy App!
