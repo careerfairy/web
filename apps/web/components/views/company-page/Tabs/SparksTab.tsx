@@ -53,20 +53,22 @@ const SparksGrid = ({ groupId }: SparksGridProps) => {
    )
 
    return (
-      <Grid container spacing={2}>
-         {groupSparks?.map((spark) => (
-            <Grid item key={spark.id} xs={12} sm={4} md={4} lg={3}>
-               <SparkPreviewCard
-                  key={spark.id}
-                  spark={spark}
-                  questionLimitLines={true}
-                  onClick={handleSparksClicked}
-                  muted
-                  type="gallery"
-               />
-            </Grid>
-         ))}
-      </Grid>
+      <Box alignItems="center" justifyContent="center">
+         <Grid container spacing={2}>
+            {groupSparks?.map((spark) => (
+               <Grid item key={spark.id} xs={6} sm={4} md={3} lg={2} xl={2}>
+                  <SparkPreviewCard
+                     key={spark.id}
+                     spark={spark}
+                     questionLimitLines={true}
+                     onClick={handleSparksClicked}
+                     muted
+                     type="gallery"
+                  />
+               </Grid>
+            ))}
+         </Grid>
+      </Box>
    )
 }
 
