@@ -57,13 +57,21 @@ const SparksGrid = ({ groupId }: SparksGridProps) => {
          <Grid container spacing={2}>
             {groupSparks?.map((spark) => (
                <Grid item key={spark.id} xs={6} sm={4} md={3} lg={2} xl={2}>
-                  <SparkPreviewCard
-                     key={spark.id}
-                     spark={spark}
-                     questionLimitLines={true}
-                     onClick={handleSparksClicked}
-                     muted
-                     type="gallery"
+                  <Box
+                     component={() => (
+                        <SparkPreviewCard
+                           key={spark.id}
+                           spark={spark}
+                           questionLimitLines={true}
+                           onClick={handleSparksClicked}
+                           muted
+                           type="gallery"
+                        />
+                     )}
+                     sx={{
+                        minWidth: "200px !important",
+                        maxWidth: "232px !important",
+                     }}
                   />
                </Grid>
             ))}
