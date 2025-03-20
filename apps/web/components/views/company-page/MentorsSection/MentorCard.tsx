@@ -1,6 +1,5 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
-import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
 import Link from "next/link"
@@ -59,7 +58,6 @@ const styles = sxStyles({
          fontWeight: 700,
          textAlign: "center",
          textOverflow: "ellipsis",
-         overflow: "hidden",
          whiteSpace: "nowrap",
       },
       position: {
@@ -70,7 +68,8 @@ const styles = sxStyles({
          color: "neutral.600",
          paddingBottom: 1,
          marginBottom: -1,
-         ...getMaxLineStyles(2),
+         textOverflow: "ellipsis",
+         whiteSpace: "nowrap",
       },
    },
    edit: {
