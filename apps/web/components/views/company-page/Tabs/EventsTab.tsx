@@ -2,6 +2,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Grid } from "@mui/material"
 import { EmptyItemsView } from "components/views/common/EmptyItemsView"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
+import { Radio } from "react-feather"
 import { useCompanyPage } from ".."
 
 type Props = {
@@ -12,7 +13,13 @@ type Props = {
 
 const EventsTab = ({ events, title, description }: Props) => {
    if (!events?.length) {
-      return <EmptyItemsView title={title} description={description} />
+      return (
+         <EmptyItemsView
+            title={title}
+            description={description}
+            icon={<Radio width={"44px"} height={"44px"} />}
+         />
+      )
    }
 
    return (

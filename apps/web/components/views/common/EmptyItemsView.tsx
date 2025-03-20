@@ -1,4 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material"
+import { ReactNode } from "react"
 import { Briefcase } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -22,7 +23,7 @@ const styles = sxStyles({
 type Props = {
    title: string
    description: string
-   icon?: React.ReactNode
+   icon?: ReactNode
 }
 
 export const EmptyItemsView = ({ title, description, icon }: Props) => {
