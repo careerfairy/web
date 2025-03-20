@@ -179,11 +179,18 @@ const SignupForm = () => {
             currency: "CHF",
          })
 
-         if (absolutePath) {
-            void push(absolutePath as any)
-         } else {
-            void push(fallbackSignupRedirectPath)
-         }
+         // wait for 300ms to ensure the dataLayerEvent is sent
+         new Promise((resolve) => {
+            setTimeout(() => {
+               resolve(true)
+            }, 300)
+         }).then(() => {
+            if (absolutePath) {
+               void push(absolutePath as any)
+            } else {
+               void push(fallbackSignupRedirectPath)
+            }
+         })
       } else {
          setCurrentStep((prev) => prev + 1)
       }
