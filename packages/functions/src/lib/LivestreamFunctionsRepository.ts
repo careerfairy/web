@@ -15,6 +15,7 @@ import {
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamQueryOptions,
+   LivestreamReminderTask,
    Speaker,
    UserLivestreamData,
    getEarliestEventBufferTime,
@@ -63,6 +64,7 @@ import {
 } from "../api/firestoreAdmin"
 import { customJobRepo } from "../api/repositories"
 import { FunctionsLogger, getChangeTypes } from "../util"
+import { CUSTOMERIO_EMAIL_TEMPLATES } from "./notifications/EmailTypes"
 import { addOperations } from "./stats/livestream"
 import type { OperationsToMake } from "./stats/util"
 import { syncCustomJobLinkedContentTags } from "./tagging/tags"
@@ -285,6 +287,40 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       afterJob: CustomJob,
       beforeJob: CustomJob
    ): Promise<void>
+
+   /**
+    * Creates a reminder task for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param scheduledFor - The date and time the reminder task is scheduled for
+    * @returns A promise that resolves when the task has been created
+    */
+   createReminderTask(
+      livestreamId: string,
+      scheduledFor: Timestamp
+   ): Promise<void>
+
+   /**
+    * Updates a reminder task for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param taskId - The ID of the reminder task to update
+    * @param reminderTask - Updated data for the reminder task
+    * @returns A promise that resolves when the task has been updated
+    */
+   updateReminderTask(
+      livestreamId: string,
+      taskId: string,
+      reminderTask: Pick<
+         LivestreamReminderTask,
+         "status" | "completedAt" | "results"
+      >
+   ): Promise<void>
+
+   /**
+    * Checks if a reminder task exists for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @returns A promise that resolves to true if the task exists, false otherwise
+    */
+   checkReminderTaskExists(livestreamId: string): Promise<boolean>
 }
 
 export class LivestreamFunctionsRepository
@@ -1216,5 +1252,54 @@ export class LivestreamFunctionsRepository
       })
 
       await batch.commit()
+   }
+
+   async createReminderTask(
+      livestreamId: string,
+      scheduledFor: Timestamp
+   ): Promise<void> {
+      const reminderTask: LivestreamReminderTask = {
+         status: "waiting",
+         scheduledFor: scheduledFor,
+         createdAt: Timestamp.now(),
+         completedAt: null,
+         cancelledAt: null,
+         results: null,
+         id: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW,
+      }
+
+      return this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("reminderTasks")
+         .doc(reminderTask.id)
+         .set(reminderTask)
+   }
+
+   async updateReminderTask(
+      livestreamId: string,
+      taskId: string,
+      reminderTask: Pick<
+         LivestreamReminderTask,
+         "status" | "completedAt" | "results"
+      >
+   ): Promise<void> {
+      return this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("reminderTasks")
+         .doc(taskId)
+         .update(reminderTask)
+   }
+
+   async checkReminderTaskExists(livestreamId: string): Promise<boolean> {
+      const taskDoc = await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("reminderTasks")
+         .doc("joinReminder")
+         .get()
+
+      return taskDoc.exists
    }
 }

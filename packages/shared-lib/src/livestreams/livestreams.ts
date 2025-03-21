@@ -780,6 +780,45 @@ export enum ImpressionLocation {
    unknown = "unknown",
 }
 
+/**
+ * Reminder task for livestream join reminders
+ * Document Path: livestreams/{livestreamId}/reminderTasks/joinReminder
+ */
+export interface LivestreamReminderTask extends Identifiable {
+   /**
+    * Current status of the reminder task
+    */
+   status: "waiting" | "completed" | "cancelled"
+
+   /**
+    * When the reminder is scheduled to be sent
+    */
+   scheduledFor: Timestamp
+
+   /**
+    * When the reminder task was created
+    */
+   createdAt: Timestamp
+
+   /**
+    * When the reminder task was completed (only present if status is "completed")
+    */
+   completedAt: Timestamp | null
+
+   /**
+    * When the reminder task was cancelled (only present if status is "cancelled")
+    */
+   cancelledAt: Timestamp | null
+
+   /**
+    * Results of sending the reminders (only present if status is "completed")
+    */
+   results: null | {
+      successful: number
+      failed: number
+   }
+}
+
 export function getEarliestEventBufferTime() {
    return new Date(
       Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST

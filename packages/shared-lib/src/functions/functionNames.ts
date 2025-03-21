@@ -17,6 +17,12 @@ export const FUNCTION_NAMES = {
    // Streaming functions
    // fetchAgoraRtcToken: "fetchAgoraRtcToken_v2",
 
+   // Reminders functions
+   onLivestreamStartScheduleJoinReminders:
+      "onLivestreamStartScheduleJoinReminders",
+   sendLivestreamNoShowReminderWithDelay:
+      "sendLivestreamNoShowReminderWithDelay",
+
    // Utility functions
    keepFunctionsWarm: "keepFunctionsWarm",
 } as const

@@ -49,6 +49,7 @@ import backup = require("./backup")
 import groupAdmin = require("./groupAdmin")
 import admin = require("./admin")
 import reminders = require("./reminders")
+import remindersPost = require("./reminders-post")
 import livestreams = require("./livestreams")
 import analytics = require("./analytics")
 import breakoutRooms = require("./breakoutRooms")
@@ -396,6 +397,12 @@ exports.sendFollowupToAttendees = followups.sendFollowupToAttendees
 exports.sendManualFollowup = followups.sendManualFollowup
 exports.sendReminderEmailAboutApplicationLink_v2 =
    followups.sendReminderEmailAboutApplicationLink
+
+// Reminders Post
+exports[FUNCTION_NAMES.onLivestreamStartScheduleJoinReminders] =
+   remindersPost.onLivestreamStartScheduleJoinReminders
+exports[FUNCTION_NAMES.sendLivestreamNoShowReminderWithDelay] =
+   remindersPost.sendLivestreamNoShowReminderWithDelay
 
 // Keep-warm function
 exports[FUNCTION_NAMES.keepFunctionsWarm] = warming.keepFunctionsWarm

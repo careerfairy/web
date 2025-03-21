@@ -9,6 +9,7 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    LIVESTREAM_REMINDER_24H: "live_stream_reminder_24h",
    LIVESTREAM_REMINDER_1H: "live_stream_reminder_1h",
    LIVESTREAM_REMINDER_5M: "live_stream_reminder_5min",
+   LIVESTREAM_REMINDER_NO_SHOW: "live_stream_reminder_no_show",
    LIVESTREAM_FOLLOWUP_ATTENDEES: "live_stream_followup_attendees",
    LIVESTREAM_FOLLOWUP_NON_ATTENDEES: "live_stream_followup_non_attendees",
    APPLY_TO_JOB_LATER: "apply_to_job_later",
@@ -79,6 +80,7 @@ export type ReminderTemplateData = {
       url: string
       companyPageUrl: string
    }
+   speakers: SpeakerData[]
    calendar: {
       google: string
       outlook: string
@@ -148,6 +150,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.PIN_VALIDATION]: PinValidationTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.PASSWORD_RESET]: PasswordResetTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.GROUP_INVITATION]: GroupInvitationTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW]: ReminderTemplateData
 }
 
 /**

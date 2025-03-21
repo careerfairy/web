@@ -136,6 +136,8 @@ export interface ILivestreamRepository {
       elapsedMinutes: number
    ): Promise<void>
 
+   getLivestreamNoShowUsers(livestreamId: string): Promise<UserLivestreamData[]>
+
    getLivestreamUsers(
       eventId: string,
       userType: LivestreamUserAction
@@ -937,6 +939,15 @@ export class FirebaseLivestreamRepository
             ? new Date(serializedEvent.lastUpdatedDateString)
             : null,
       }
+   }
+
+   async getLivestreamNoShowUsers(
+      livestreamId: string
+   ): Promise<UserLivestreamData[]> {
+      return this.livestreamUsersQuery(livestreamId, "registered")
+         .where("participated", "==", null)
+         .get()
+         .then(mapFirestoreDocuments<UserLivestreamData>)
    }
 
    async getLivestreamUsers(
