@@ -24,6 +24,7 @@ export const DESKTOP_SPACING = 1
 
 const styles = sxStyles({
    root: {
+      height: "100%",
       flex: 1,
       display: "flex",
       flexDirection: "column",
@@ -37,6 +38,7 @@ const styles = sxStyles({
       mb: -2,
    },
    viewport: {
+      height: "100%",
       overflow: "hidden",
       flex: 1,
    },
@@ -51,6 +53,7 @@ const styles = sxStyles({
       height: "100%",
    },
    slide: {
+      height: "100%",
       flex: `0 0 ${SLIDE_SIZE}`,
       minWidth: "0",
       position: "relative",
