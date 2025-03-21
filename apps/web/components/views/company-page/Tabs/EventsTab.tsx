@@ -2,23 +2,21 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Grid } from "@mui/material"
 import { EmptyItemsView } from "components/views/common/EmptyItemsView"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
-import { Radio } from "react-feather"
+import { ReactNode } from "react"
+import { Radio, Video } from "react-feather"
 import { useCompanyPage } from ".."
 
 type Props = {
    events: LivestreamEvent[]
    title: string
    description: string
+   icon?: ReactNode
 }
 
-const EventsTab = ({ events, title, description }: Props) => {
+const EventsTab = ({ events, title, description, icon }: Props) => {
    if (!events?.length) {
       return (
-         <EmptyItemsView
-            title={title}
-            description={description}
-            icon={<Radio width={"44px"} height={"44px"} />}
-         />
+         <EmptyItemsView title={title} description={description} icon={icon} />
       )
    }
 
@@ -53,6 +51,7 @@ export const PastEventsTab = () => {
          events={pastLivestreams}
          title={EMPTY_PAST_EVENTS_TITLE}
          description={EMPTY_PAST_EVENTS_DESCRIPTION}
+         icon={<Video width={"44px"} height={"44px"} />}
       />
    )
 }
@@ -64,6 +63,7 @@ export const UpcomingEventsTab = () => {
          events={upcomingLivestreams}
          title={EMPTY_UPCOMING_EVENTS_TITLE}
          description={EMPTY_UPCOMING_EVENTS_DESCRIPTION}
+         icon={<Radio width={"44px"} height={"44px"} />}
       />
    )
 }
