@@ -9,7 +9,7 @@ import { sxStyles } from "types/commonTypes"
 import { buildMentorPageLink } from "util/routes"
 import { useCompanyPage } from ".."
 
-const CARD_WIDTH = 214
+const CARD_WIDTH = 240
 
 const styles = sxStyles({
    container: (theme) => ({
@@ -54,11 +54,12 @@ const styles = sxStyles({
    },
    creator: {
       name: {
-         width: "100%",
+         maxWidth: "200px",
          fontWeight: 700,
          textAlign: "center",
          textOverflow: "ellipsis",
          whiteSpace: "nowrap",
+         overflow: "hidden",
       },
       position: {
          fontSize: "14px",
@@ -191,7 +192,7 @@ export const MentorCard = ({
             sx={[styles.creator.position, { position: "relative", zIndex: 1 }]}
          >
             {creator.position.concat(" at ")}
-            <Typography fontWeight={600} color={"neutral.600"}>
+            <Typography component="span" fontWeight={600} color={"neutral.600"}>
                {group?.universityName}
             </Typography>
          </Typography>
