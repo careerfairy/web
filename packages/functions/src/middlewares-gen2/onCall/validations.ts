@@ -1,15 +1,15 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { UserData } from "@careerfairy/shared-lib/users"
+import { logger } from "firebase-functions/v2"
 import { CallableRequest, HttpsError } from "firebase-functions/v2/https"
 import { validateUserIsGroupAdmin as validateUserIsGroupAdminFn } from "../../lib/validations"
 import { Middleware } from "./middleware"
 
-// Define the shape of data added by the middleware
-export interface WithGroupAdminData {
+type WithGroupAdminData = {
    middlewareData: {
       groupAdmin: {
          group: Group
-         userData?: UserData
+         userData: UserData
       }
    }
 }
@@ -29,6 +29,7 @@ export function userIsGroupAdminMiddleware<
    return async (request: CallableRequest<TInput>, next) => {
       // Check if user is authenticated
       if (!request.auth) {
+         logger.error("User is not authenticated")
          throw new HttpsError("unauthenticated", "User must be authenticated")
       }
 

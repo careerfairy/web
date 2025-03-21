@@ -54,17 +54,11 @@ export const sendNewlyPublishedEventEmail = onCall(
       [userIsGroupAdminMiddleware<SendNewlyPublishedEventEmailFnArgs>()],
       async (request) => {
          try {
-            const { livestreamId, groupId } = request.data
-            console.log("🚀 ~ groupId:", groupId)
+            const { livestreamId } = request.data
 
-            // Types are automatically inferred, no type assertion needed
-            const groupFromMiddleware =
-               request.data.middlewareData.groupAdmin.group
+            const group = request.data.middlewareData.groupAdmin.group
 
             const stream = await livestreamsRepo.getById(livestreamId)
-
-            // Use group from middleware - no need to fetch it again
-            const group = groupFromMiddleware
 
             if (!stream) {
                throw new HttpsError("not-found", "Livestream not found")
@@ -81,10 +75,10 @@ export const sendNewlyPublishedEventEmail = onCall(
             await notificationService.sendEmailNotifications(
                adminsInfo.map<
                   EmailNotificationRequestData<
-                     typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISHED
+                     typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISH
                   >
                >(({ email, eventDashboardLink, nextLivestreamsLink }) => ({
-                  templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISHED,
+                  templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISH,
                   templateData: {
                      dashboardUrl: addUtmTagsToLink({
                         link: eventDashboardLink,

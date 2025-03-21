@@ -102,7 +102,7 @@ export const useLivestreamDialog = (group: Group) => {
          sendNewlyPublishedEventEmail,
          deleteLivestream,
          replace,
-         group.id,
+         group?.id,
          dispatch,
       ]
    )
