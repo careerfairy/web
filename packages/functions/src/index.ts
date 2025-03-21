@@ -31,13 +31,16 @@ setGlobalOptions({
    region: config.region,
 })
 
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import { bundles } from "./bundles"
+import * as examples from "./examples"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import * as customerio from "./lib/customerio"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import * as streaming from "./lib/streaming"
+import * as warming from "./lib/warming"
 
 // Imported Individual Cloud functions
 import auth = require("./auth")
@@ -373,9 +376,9 @@ exports.getFollowedCreators = levels.getFollowedCreators
 // CustomerIO
 exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
 exports.customerIOWebhook = customerio.customerIOWebhook
-exports.customerIORecommendedLivestreamsWebhook =
+exports[FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook] =
    customerio.customerIORecommendedLivestreamsWebhook
-exports.customerIORecommendedSparksWebhook =
+exports[FUNCTION_NAMES.customerIORecommendedSparksWebhook] =
    customerio.customerIORecommendedSparksWebhook
 
 // Reminders
@@ -393,3 +396,9 @@ exports.sendFollowupToAttendees = followups.sendFollowupToAttendees
 exports.sendManualFollowup = followups.sendManualFollowup
 exports.sendReminderEmailAboutApplicationLink_v2 =
    followups.sendReminderEmailAboutApplicationLink
+
+// Keep-warm function
+exports[FUNCTION_NAMES.keepFunctionsWarm] = warming.keepFunctionsWarm
+
+// Example warmable function
+exports[FUNCTION_NAMES.exampleHttp] = examples.exampleHttpFunction
