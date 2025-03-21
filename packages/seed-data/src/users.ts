@@ -1,17 +1,17 @@
-import { auth, firestore } from "./lib/firebase"
+import * as admin from "firebase-admin"
 import { CreateRequest, UserImportRecord } from "firebase-admin/auth"
 import { v4 as uuidv4 } from "uuid"
-import * as admin from "firebase-admin"
+import { auth, firestore } from "./lib/firebase"
 
-import { capitalizeFirstLetter, getRandomInt } from "./utils/utils"
 import {
    CompanyFollowed,
    SavedRecruiter,
    UserData,
    UserDataAnalytics,
 } from "@careerfairy/shared-lib/dist/users"
-import { faker } from "@faker-js/faker"
 import { chunkArray } from "@careerfairy/shared-lib/dist/utils"
+import { faker } from "@faker-js/faker"
+import { capitalizeFirstLetter, getRandomInt } from "./utils/utils"
 
 interface UserSeed {
    /**
@@ -32,6 +32,7 @@ interface UserSeed {
 
    getUserData(email: string): Promise<UserData | null>
 
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    deleteUser(email: string): Promise<any>
 
    addSavedRecruiter(
@@ -103,6 +104,7 @@ class UserFirebaseSeed implements UserSeed {
             unsubscribed: false,
             referralCode: uuidv4(),
             welcomeDialogComplete: true, // hidden
+            emailVerified: extraAuthData?.emailVerified ?? true,
          } as UserData,
          extraUserData
       ) as UserData
@@ -119,6 +121,7 @@ class UserFirebaseSeed implements UserSeed {
    async deleteUser(email: string) {
       const userSnap = await firestore.collection("userData").doc(email).get()
       const authId = userSnap.data()?.authId
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const promises: Promise<any>[] = [
          firestore.collection("userData").doc(email).delete(),
       ]

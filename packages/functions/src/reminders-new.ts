@@ -1,6 +1,7 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import {
+   getAuthUidFromUserLivestreamData,
    LiveStreamEventWithUsersLivestreamData,
    ReminderEmailStatus,
 } from "@careerfairy/shared-lib/livestreams"
@@ -418,7 +419,7 @@ const handleSendEmails = async (
                },
             },
             identifiers: {
-               id: userLivestreamData.user.authId || userLivestreamData.userId,
+               id: getAuthUidFromUserLivestreamData(userLivestreamData),
             },
             to: userLivestreamData.user.userEmail || userLivestreamData.id,
             attachments,

@@ -5,6 +5,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LiveStreamEventWithUsersLivestreamData,
    LivestreamEvent,
+   getAuthUidFromUserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
@@ -243,7 +244,7 @@ const getEmailTemplateMessages = (
             to: streamUserData.user.userEmail,
             templateId: templateId,
             identifiers: {
-               id: streamUserData.user?.authId ?? streamUserData.userId,
+               id: getAuthUidFromUserLivestreamData(streamUserData),
             },
             templateData: {
                livestream: {
@@ -343,7 +344,8 @@ const sendAttendeesReminder = async (
          const groupSparksPromises = Object.values(groupsByEventIds).map(
             async (group) => {
                groupSparks[group.id] = group.publicSparks
-                  ? (await sparkRepo.getSparksByGroupId(group.id)) ?? []
+                  ? (await sparkRepo.getPublishedSparksByGroupId(group.id)) ??
+                    []
                   : []
             }
          )

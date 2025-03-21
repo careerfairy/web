@@ -110,7 +110,7 @@ export const livestreamRegistrationConfirmationEmail = functions
            []
          : []
       const groupSparks = group.publicSparks
-         ? (await sparkRepo.getSparksByGroupId(livestream.groupIds.at(0))) ?? []
+         ? (await sparkRepo.getPublishedSparksByGroupId(group.id)) ?? []
          : []
 
       const emailSpeakers = livestreamSpeakers.slice(0, 4).map((speaker) => {

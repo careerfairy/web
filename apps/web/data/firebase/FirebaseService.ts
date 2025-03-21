@@ -148,7 +148,7 @@ class FirebaseService {
    }): Promise<{
       readonly data: Group
    }> => {
-      return this.functions.httpsCallable("createNewGroupAdminUserAccount_eu")(
+      return this.functions.httpsCallable("createNewGroupAdminUserAccount")(
          args
       )
    }
@@ -3252,7 +3252,7 @@ class FirebaseService {
 
    // Backfill user data
    backfillUserData = async ({ timezone }: Pick<UserData, "timezone">) => {
-      return this.functions.httpsCallable("backfillUserData_eu")({ timezone })
+      return this.functions.httpsCallable("backfillUserData")({ timezone })
    }
 
    // DB functions
