@@ -17,6 +17,7 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    PIN_VALIDATION: "pin_validation",
    PASSWORD_RESET: "password_reset",
    GROUP_INVITATION: "group_invitation",
+   LIVE_STREAM_PUBLISHED: "live_stream_published",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
@@ -152,6 +153,16 @@ export type GroupInvitationTemplateData = {
 }
 
 /**
+ * Message data for livestream published email template
+ */
+export type LivestreamPublishedTemplateData = {
+   livestream: BaseLivestreamData & {
+      companyBannerImageUrl: string
+   }
+   dashboardUrl: string
+}
+
+/**
  * Union type of all possible message data types
  */
 export type CustomerIoEmailMessageData = {
@@ -167,6 +178,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.PASSWORD_RESET]: PasswordResetTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.GROUP_INVITATION]: GroupInvitationTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW]: NoShowReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISHED]: LivestreamPublishedTemplateData
 }
 
 /**

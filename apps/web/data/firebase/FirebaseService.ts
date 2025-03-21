@@ -6,7 +6,9 @@ import {
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
 import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
+import { SendNewlyPublishedEventEmailFnArgs } from "@careerfairy/shared-lib/functions/types"
 import {
    GROUP_DASHBOARD_ROLE,
    Group,
@@ -70,7 +72,6 @@ import { recommendationServiceInstance } from "./RecommendationService"
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
-
 class FirebaseService {
    public readonly app: firebase.app.App
    public readonly firestore: firebase.firestore.Firestore
@@ -171,9 +172,11 @@ class FirebaseService {
       return this.functions.httpsCallable("kickFromDashboard_eu")(args)
    }
 
-   sendNewlyPublishedEventEmail = async (emailData) => {
+   sendNewlyPublishedEventEmail = async (
+      emailData: SendNewlyPublishedEventEmailFnArgs
+   ) => {
       const sendNewlyPublishedEventEmail = this.functions.httpsCallable(
-         "sendNewlyPublishedEventEmail_v2"
+         FUNCTION_NAMES.sendNewlyPublishedEventEmail
       )
       return sendNewlyPublishedEventEmail(emailData)
    }

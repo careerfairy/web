@@ -11,6 +11,9 @@ export const FUNCTION_NAMES = {
       "customerIORecommendedLivestreamsWebhook",
    customerIORecommendedSparksWebhook: "customerIORecommendedSparksWebhook",
 
+   // Group Admin functions
+   sendNewlyPublishedEventEmail: "sendNewlyPublishedEventEmail",
+
    // Auth functions
    // createNewUserAccount: "createNewUserAccount_v4",
 

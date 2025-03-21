@@ -111,7 +111,7 @@ exports.sendBasicTemplateEmail_v3 = admin.sendBasicTemplateEmail
 exports.unsubscribeFromMarketingEmails_eu = admin.unsubscribeFromMarketingEmails
 
 // Group Admin
-exports.sendNewlyPublishedEventEmail_v2 =
+exports[FUNCTION_NAMES.sendNewlyPublishedEventEmail] =
    groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_v2 = groupAdmin.getLivestreamReportData
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
