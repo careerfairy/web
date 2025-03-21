@@ -31,25 +31,22 @@ type ExtractMiddlewareOutput<M> = M extends Middleware<any, infer O, any>
    : never
 
 /**
- * Infers types from a middleware array
- * M1 transforms TInput to T1
- * M2 transforms T1 to T2
- * etc.
+ * Infers the input/output types from a middleware chain recursively
+ * This supports any number of middlewares, unlike the previous implementation
  */
-type InferMiddlewareChainIO<
-   TArray extends any[],
+type InferMiddlewareChain<
+   TMiddlewares extends any[],
    TReturn = unknown
-> = TArray extends [infer M1]
-   ? [ExtractMiddlewareInput<M1>, ExtractMiddlewareOutput<M1>, TReturn]
-   : TArray extends [infer M1, infer M2]
-   ? [ExtractMiddlewareInput<M1>, ExtractMiddlewareOutput<M2>, TReturn]
-   : TArray extends [infer M1, infer M2, infer M3]
-   ? [ExtractMiddlewareInput<M1>, ExtractMiddlewareOutput<M3>, TReturn]
-   : TArray extends [infer M1, infer M2, infer M3, infer M4]
-   ? [ExtractMiddlewareInput<M1>, ExtractMiddlewareOutput<M4>, TReturn]
-   : TArray extends [infer M1, infer M2, infer M3, infer M4, infer M5]
-   ? [ExtractMiddlewareInput<M1>, ExtractMiddlewareOutput<M5>, TReturn]
-   : [unknown, unknown, TReturn]
+> = TMiddlewares extends []
+   ? [unknown, unknown] // Empty array case
+   : TMiddlewares extends [infer M]
+   ? [ExtractMiddlewareInput<M>, ExtractMiddlewareOutput<M>] // Single middleware case
+   : TMiddlewares extends [infer First, ...infer Rest]
+   ? [
+        ExtractMiddlewareInput<First>,
+        InferMiddlewareChain<Rest, TReturn> extends [any, infer O] ? O : unknown
+     ]
+   : [unknown, unknown] // Fallback
 
 /**
  * Middleware function type for handling callable function requests
@@ -94,11 +91,8 @@ export function withMiddlewares<
    TReturn = unknown
 >(
    middlewares: [...TMiddlewareArray],
-   handler: Handler<
-      InferMiddlewareChainIO<TMiddlewareArray, TReturn>[1],
-      TReturn
-   >
-): Handler<InferMiddlewareChainIO<TMiddlewareArray, TReturn>[0], TReturn> {
+   handler: Handler<InferMiddlewareChain<TMiddlewareArray>[1], TReturn>
+): Handler<InferMiddlewareChain<TMiddlewareArray>[0], TReturn> {
    return (initialRequest): Promise<TReturn> => {
       // Function to chain middlewares from left to right
       const chainMiddleware = (
@@ -119,7 +113,8 @@ export function withMiddlewares<
    }
 }
 
-// Simpler version with generic array of middlewares (less type-safe but more flexible)
+// We no longer need withMiddlewaresGeneric as our main implementation is now more flexible
+// Keeping it for backward compatibility, but implementation uses the main function
 export function withMiddlewaresGeneric<
    TInput = unknown,
    TOutput = unknown,
@@ -128,17 +123,5 @@ export function withMiddlewaresGeneric<
    middlewares: Middleware<any, any, TReturn>[],
    handler: Handler<TOutput, TReturn>
 ): Handler<TInput, TReturn> {
-   return (request: CallableRequest<TInput>): Promise<TReturn> => {
-      const chainMiddlewares = ([
-         firstMiddleware,
-         ...restOfMiddlewares
-      ]: Middleware<any, any, TReturn>[]): Handler<any, TReturn> => {
-         if (firstMiddleware)
-            return (request: CallableRequest<any>): Promise<TReturn> =>
-               firstMiddleware(request, chainMiddlewares(restOfMiddlewares))
-         else return handler as Handler<any, TReturn>
-      }
-
-      return chainMiddlewares(middlewares)(request)
-   }
+   return withMiddlewares(middlewares, handler) as Handler<TInput, TReturn>
 }
