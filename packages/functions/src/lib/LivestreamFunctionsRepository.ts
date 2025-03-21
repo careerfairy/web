@@ -313,10 +313,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    updateReminderTask(
       livestreamId: string,
       taskId: string,
-      reminderTask: Pick<
-         LivestreamReminderTask,
-         "status" | "completedAt" | "results"
-      >
+      reminderTask: Partial<LivestreamReminderTask>
    ): Promise<void>
 
    /**
@@ -1290,10 +1287,7 @@ export class LivestreamFunctionsRepository
    async updateReminderTask(
       livestreamId: string,
       taskId: string,
-      reminderTask: Pick<
-         LivestreamReminderTask,
-         "status" | "completedAt" | "results"
-      >
+      reminderTask: Partial<LivestreamReminderTask>
    ): Promise<void> {
       return this.firestore
          .collection("livestreams")

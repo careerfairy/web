@@ -3,6 +3,7 @@ import {
    getAuthUidFromUserLivestreamData,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { Timestamp } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
@@ -21,7 +22,7 @@ const JOIN_REMINDER_DELAY_MINUTES = 7
 /**
  * Schedules reminder emails for users who haven't joined a newly started livestream
  */
-export const onLivestreamStartScheduleJoinReminders = onDocumentUpdated(
+export const onLivestreamStartScheduleNoShowReminder = onDocumentUpdated(
    "livestreams/{livestreamId}",
    async (event) => {
       try {
@@ -58,12 +59,12 @@ export const onLivestreamStartScheduleJoinReminders = onDocumentUpdated(
 
             // Call the HTTP function that will handle the waiting and sending
             void functionsAxios.post(
-               `/${FUNCTION_NAMES.sendLivestreamNoShowReminderWithDelay}`,
+               `/${FUNCTION_NAMES.sendLivestreamNoShowReminder}`,
                { livestreamId }
             )
 
             functions.logger.info(
-               `Successfully triggered reminder function for livestream ${livestreamId}`
+               `Triggered reminder function for livestream ${livestreamId}`
             )
          }
 
@@ -78,7 +79,7 @@ export const onLivestreamStartScheduleJoinReminders = onDocumentUpdated(
  * HTTP function that waits for 7 minutes and then sends reminder emails
  * to users who registered for a livestream but haven't joined yet.
  */
-export const sendLivestreamNoShowReminderWithDelay = onRequest(
+export const sendLivestreamNoShowReminder = onRequest(
    {
       timeoutSeconds: 3600, // 1 hour timeout (Gen2 functions support up to 1 hour)
    },
@@ -87,6 +88,22 @@ export const sendLivestreamNoShowReminderWithDelay = onRequest(
       try {
          if (!livestreamId) {
             res.status(400).send("Missing livestreamId in request body")
+            return
+         }
+
+         // Check if a reminder task already exists for this livestream
+         const existingTask = await livestreamsRepo.getReminderTask(
+            livestreamId,
+            CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW
+         )
+
+         if (existingTask) {
+            functions.logger.info(
+               `Reminder task already exists for livestream ${livestreamId} to be sent in ${existingTask.scheduledFor
+                  .toDate()
+                  .toLocaleString()}, skipping reminder function`
+            )
+            res.status(200).send("Reminder task already exists")
             return
          }
 
@@ -118,6 +135,29 @@ export const sendLivestreamNoShowReminderWithDelay = onRequest(
 
          if (!livestream) {
             res.status(404).send(`Livestream ${livestreamId} not found`)
+            return
+         }
+
+         const livestreamPresenter =
+            LivestreamPresenter.createFromDocument(livestream)
+
+         if (!livestreamPresenter.isLive()) {
+            functions.logger.info(
+               `Livestream ${livestreamId} is not live, cancelling reminder task`
+            )
+
+            await livestreamsRepo.updateReminderTask(
+               livestreamId,
+               CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW,
+               {
+                  status: "cancelled",
+                  cancelledAt: Timestamp.now(),
+               }
+            )
+
+            res.status(200).send(
+               "Livestream is not live, cancelling reminder task"
+            )
             return
          }
 
