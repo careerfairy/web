@@ -39,6 +39,7 @@ export const InteractionSources = {
    Talent_Profile: "Talent_Profile",
    Sparks_Feed: "Sparks_Feed",
    Talent_Guide: "Talent_Guide",
+   Job_Header: "Job_Header",
 } as const
 
 export type InteractionSourcesType =
