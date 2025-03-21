@@ -148,7 +148,7 @@ class FirebaseService {
    }): Promise<{
       readonly data: Group
    }> => {
-      return this.functions.httpsCallable("createNewGroupAdminUserAccount_eu")(
+      return this.functions.httpsCallable("createNewGroupAdminUserAccount")(
          args
       )
    }
