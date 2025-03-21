@@ -14,6 +14,7 @@ import {
    notificationService,
 } from "./api/repositories"
 
+import { SendNewlyPublishedEventEmailFnArgs } from "@careerfairy/shared-lib/functions/types"
 import {
    GroupDashboardInvite,
    WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
@@ -47,16 +48,10 @@ import {
 } from "./util"
 import functions = require("firebase-functions")
 
-// Define the input type with required fields for the functions
-interface SendEventEmailInput {
-   groupId: string
-   livestreamId: string
-}
-
 // Using the improved type-inferring middleware system
 export const sendNewlyPublishedEventEmail = onCall(
    withMiddlewares(
-      [userIsGroupAdminMiddleware<SendEventEmailInput>()],
+      [userIsGroupAdminMiddleware<SendNewlyPublishedEventEmailFnArgs>()],
       async (request) => {
          try {
             const { livestreamId, groupId } = request.data

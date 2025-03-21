@@ -24,7 +24,7 @@ export interface WithGroupAdminData {
  * This middleware preserves the original input type while adding WithGroupAdminData
  */
 export function userIsGroupAdminMiddleware<
-   TInput extends { groupId: string } = { groupId: string }
+   TInput extends { groupId: string }
 >(): Middleware<TInput, TInput & WithGroupAdminData> {
    return async (request: CallableRequest<TInput>, next) => {
       // Check if user is authenticated
