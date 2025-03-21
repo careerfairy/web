@@ -1,7 +1,10 @@
+const REGION = "europe-west1"
+const PROJECT_ID = "careerfairy-e1fd9"
+
 const config = {
    // Closest to our Firestore region
    // https://firebase.google.com/docs/functions/locations#selecting-regions_firestore-storage
-   region: "europe-west1",
+   region: REGION,
 
    // https://api.slack.com/apps/A0344EKBJ8Z/incoming-webhooks
    slackWebhooks: {
@@ -13,6 +16,8 @@ const config = {
 
    // Firebase Hosting Domain
    hostingUrl: "https://cdn.careerfairy.io",
+
+   functionsBaseUrl: `https://${REGION}-${PROJECT_ID}.cloudfunctions.net`,
 }
 
 if (process.env.NODE_ENV !== "production") {
@@ -27,6 +32,7 @@ if (process.env.NODE_ENV !== "production") {
    // Target the firebase functions emulator when loading the bundles
    // locally, no need to use cache (firebase hosting)
    config.hostingUrl = `http://127.0.0.1:5001/careerfairy-e1fd9/${config.region}/`
+   config.functionsBaseUrl = `http://127.0.0.1:5001/${PROJECT_ID}/${REGION}`
 }
 
 export default config
