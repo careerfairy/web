@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { CallableRequest } from "firebase-functions/v2/https"
 
 // Input type -> Output type
@@ -32,7 +31,6 @@ type ExtractMiddlewareOutput<M> = M extends Middleware<any, infer O, any>
 
 /**
  * Infers the input/output types from a middleware chain recursively
- * This supports any number of middlewares, unlike the previous implementation
  */
 type InferMiddlewareChain<
    TMiddlewares extends any[],
@@ -84,8 +82,6 @@ type InferMiddlewareChain<
  * )
  * ```
  */
-
-// Type-safe middleware composition with automatic type inference
 export function withMiddlewares<
    TMiddlewareArray extends Middleware<any, any, any>[],
    TReturn = unknown
@@ -111,17 +107,4 @@ export function withMiddlewares<
       // Execute the chain
       return wrappedHandler(initialRequest)
    }
-}
-
-// We no longer need withMiddlewaresGeneric as our main implementation is now more flexible
-// Keeping it for backward compatibility, but implementation uses the main function
-export function withMiddlewaresGeneric<
-   TInput = unknown,
-   TOutput = unknown,
-   TReturn = unknown
->(
-   middlewares: Middleware<any, any, TReturn>[],
-   handler: Handler<TOutput, TReturn>
-): Handler<TInput, TReturn> {
-   return withMiddlewares(middlewares, handler) as Handler<TInput, TReturn>
 }

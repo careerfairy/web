@@ -110,6 +110,7 @@ describe("Gen2 Middleware Tests", () => {
          }
       }
 
+      // Act
       const chain = withMiddlewares(
          [addA(), addB()],
          async (request: CallableRequest<CombinedMiddleware>) => {
@@ -121,6 +122,8 @@ describe("Gen2 Middleware Tests", () => {
       )
 
       const result = await chain({ data: {} } as CallableRequest<unknown>)
+
+      // Assert
       expect(result).toEqual({ a: "value-a", b: 42 })
    })
 

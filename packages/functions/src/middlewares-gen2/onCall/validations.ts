@@ -43,7 +43,7 @@ export function userIsGroupAdminMiddleware<
       const nextRequest: CallableRequest<TInput & WithGroupAdminData> = {
          ...request,
          data: {
-            ...request.data, // Preserve ALL original fields from TInput
+            ...request.data, // Preserve ALL original fields
             middlewareData: {
                ...(request.data as any).middlewareData,
                groupAdmin: { group, userData },
