@@ -54,7 +54,7 @@ interface SendEventEmailInput {
 }
 
 // Using the improved type-inferring middleware system
-export const sendNewlyPublishedEventEmail = onCall<SendEventEmailInput>(
+export const sendNewlyPublishedEventEmail = onCall(
    withMiddlewares(
       [userIsGroupAdminMiddleware<SendEventEmailInput>()],
       async (request) => {
