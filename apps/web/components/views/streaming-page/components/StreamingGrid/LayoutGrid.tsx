@@ -5,10 +5,17 @@ import { sxStyles } from "types/commonTypes"
 import { DESKTOP_SPACING, MOBILE_SPACING } from "./GridCarousel"
 
 const styles = sxStyles({
+   gridContainer: {
+      height: "100%",
+      marginTop: 0,
+   },
    item: {
       width: "100%",
       borderRadius: "10px",
       height: "100%",
+   },
+   gridItem: {
+      pt: "0 !important",
    },
    gridItemSpotlight: {
       flex: "none !important",
@@ -69,6 +76,7 @@ export const LayoutGrid = <ElementType,>({
             container
             spacing={spacingValue}
             justifyContent={isLastButNotFirstPage ? "flex-start" : "center"}
+            sx={styles.gridContainer}
          >
             {elements.map(renderGridItem)}
          </Grid>
@@ -91,7 +99,7 @@ const LayoutGridItem = memo(
       <Grid
          xs={12 / layoutColumns}
          item
-         sx={isSpotlightMode ? styles.gridItemSpotlight : {}}
+         sx={[styles.gridItem, isSpotlightMode ? styles.gridItemSpotlight : {}]}
       >
          <Box sx={styles.item}>{children}</Box>
       </Grid>
