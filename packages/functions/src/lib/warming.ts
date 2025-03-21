@@ -1,8 +1,7 @@
 import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
-import axios from "axios"
 import { logger } from "firebase-functions/v2"
 import { onSchedule } from "firebase-functions/v2/scheduler"
-import config from "../config"
+import functionsAxios from "../api/axios"
 import { KEEP_WARM_HEADER } from "../middlewares-gen2/onRequest/validations"
 
 const functionsToWarm = [
@@ -11,11 +10,6 @@ const functionsToWarm = [
    FUNCTION_NAMES.customerIORecommendedSparksWebhook,
    // Add more functions as needed
 ]
-
-// Base URL for your Firebase functions
-const getFunctionUrl = (functionName: string): string => {
-   return `${config.functionsBaseUrl}/${functionName}`
-}
 
 /**
  * Scheduled function that pings all functions in the list every 5 minutes
@@ -28,9 +22,8 @@ export const keepFunctionsWarm = onSchedule(
       logger.info("Starting keep-warm cycle")
 
       const requests = functionsToWarm.map(async (functionName) => {
-         const url = getFunctionUrl(functionName)
          try {
-            await axios.get(url, {
+            await functionsAxios.get(`/${functionName}`, {
                headers: {
                   [KEEP_WARM_HEADER]: "true",
                },

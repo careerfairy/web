@@ -4,7 +4,6 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import { Timestamp } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { onDocumentUpdated } from "firebase-functions/v2/firestore"
@@ -14,6 +13,7 @@ import functionsAxios from "./api/axios"
 import { livestreamsRepo, notificationService } from "./api/repositories"
 import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import { logAndThrow } from "./lib/validations"
+import { getWebBaseUrl } from "./util"
 
 // Magic numbers for reminder timing
 const JOIN_REMINDER_DELAY_MINUTES = 7
@@ -22,11 +22,7 @@ const JOIN_REMINDER_DELAY_MINUTES = 7
  * Schedules reminder emails for users who haven't joined a newly started livestream
  */
 export const onLivestreamStartScheduleJoinReminders = onDocumentUpdated(
-   {
-      document: "livestreams/{livestreamId}",
-      memory: "1GiB",
-      timeoutSeconds: 60,
-   },
+   "livestreams/{livestreamId}",
    async (event) => {
       try {
          const previousValue = event.data.before.data() as LivestreamEvent
@@ -36,19 +32,20 @@ export const onLivestreamStartScheduleJoinReminders = onDocumentUpdated(
          // Only proceed if livestream has just started and it's not a test
          if (
             !previousValue.hasStarted &&
-            newValue.hasStarted
-            // !newValue.test
+            newValue.hasStarted &&
+            !newValue.test
          ) {
             functions.logger.info(
                `Livestream ${livestreamId} has started, checking if reminder task already exists`
             )
 
             // Check if a reminder task already exists for this livestream
-            const taskExists = await livestreamsRepo.checkReminderTaskExists(
-               livestreamId
+            const task = await livestreamsRepo.getReminderTask(
+               livestreamId,
+               CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW
             )
 
-            if (taskExists) {
+            if (task) {
                functions.logger.info(
                   `Reminder task already exists for livestream ${livestreamId}, skipping reminder function`
                )
@@ -60,16 +57,10 @@ export const onLivestreamStartScheduleJoinReminders = onDocumentUpdated(
             )
 
             // Call the HTTP function that will handle the waiting and sending
-            const response = await functionsAxios.post(
+            void functionsAxios.post(
                `/${FUNCTION_NAMES.sendLivestreamNoShowReminderWithDelay}`,
                { livestreamId }
             )
-
-            if (response.status !== 200) {
-               throw new Error(
-                  `Failed to trigger reminder function: ${response.statusText}`
-               )
-            }
 
             functions.logger.info(
                `Successfully triggered reminder function for livestream ${livestreamId}`
@@ -89,7 +80,6 @@ export const onLivestreamStartScheduleJoinReminders = onDocumentUpdated(
  */
 export const sendLivestreamNoShowReminderWithDelay = onRequest(
    {
-      memory: "1GiB",
       timeoutSeconds: 3600, // 1 hour timeout (Gen2 functions support up to 1 hour)
    },
    async (req, res) => {
@@ -108,10 +98,11 @@ export const sendLivestreamNoShowReminderWithDelay = onRequest(
          const now = DateTime.now()
          const scheduledFor = now.plus({ minutes: JOIN_REMINDER_DELAY_MINUTES })
 
-         await livestreamsRepo.createReminderTask(
-            livestreamId,
-            Timestamp.fromDate(scheduledFor.toJSDate())
-         )
+         await livestreamsRepo.createReminderTask(livestreamId, {
+            scheduledFor: Timestamp.fromDate(scheduledFor.toJSDate()),
+            reminderTaskId:
+               CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW,
+         })
 
          // Wait for the specified minutes
          await new Promise((resolve) =>
@@ -135,7 +126,7 @@ export const sendLivestreamNoShowReminderWithDelay = onRequest(
             livestreamId
          )
 
-         if (usersToNotify.length === 0) {
+         if (!usersToNotify) {
             functions.logger.log(
                `No users to notify for livestream ${livestreamId} - all registered users have joined`
             )
@@ -156,9 +147,7 @@ export const sendLivestreamNoShowReminderWithDelay = onRequest(
          }
 
          const livestreamUrl = addUtmTagsToLink({
-            link: `${getHost()}/portal/livestream/${livestreamId}`,
-            source: "careerfairy",
-            medium: "email",
+            link: `${getWebBaseUrl()}/portal/livestream/${livestreamId}`,
             content: livestream.title,
             campaign: "reminder-no-show",
          })
@@ -172,23 +161,16 @@ export const sendLivestreamNoShowReminderWithDelay = onRequest(
                         CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW,
                      templateData: {
                         livestream: {
-                           company: livestream.company || "",
-                           bannerImageUrl: livestream.backgroundImageUrl || "",
-                           companyLogoUrl: livestream.companyLogoUrl || "",
-                           start: new Date(
-                              livestream.start.toMillis()
-                           ).toISOString(),
-                           title: livestream.title || "Livestream Event",
+                           company: livestream.company,
+                           companyLogoUrl: livestream.companyLogoUrl,
+                           title: livestream.title,
                            url: livestreamUrl,
-                           companyPageUrl: `${getHost()}/portal/companies/${
-                              livestream.companyId || ""
-                           }`,
                         },
-                        speakers: [],
-                        calendar: {
-                           google: "",
-                           outlook: "",
-                           apple: "",
+                        speaker1: {
+                           firstName: livestream.speakers?.[0]?.firstName || "",
+                        },
+                        speaker2: {
+                           firstName: livestream.speakers?.[1]?.firstName || "",
                         },
                      },
                      identifiers: {

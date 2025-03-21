@@ -51,6 +51,13 @@ export type CalendarData = {
    apple: string
 }
 
+type BaseLivestreamData = {
+   title: string
+   company: string
+   companyLogoUrl: string
+   url: string
+}
+
 /**
  * Message data for livestream registration confirmation emails
  */
@@ -80,11 +87,20 @@ export type ReminderTemplateData = {
       url: string
       companyPageUrl: string
    }
-   speakers: SpeakerData[]
    calendar: {
       google: string
       outlook: string
       apple: string
+   }
+}
+
+export type NoShowReminderTemplateData = {
+   livestream: BaseLivestreamData
+   speaker1: {
+      firstName: string
+   }
+   speaker2: {
+      firstName: string
    }
 }
 
@@ -150,7 +166,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.PIN_VALIDATION]: PinValidationTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.PASSWORD_RESET]: PasswordResetTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.GROUP_INVITATION]: GroupInvitationTemplateData
-   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW]: ReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW]: NoShowReminderTemplateData
 }
 
 /**
