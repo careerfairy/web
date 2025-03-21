@@ -144,7 +144,11 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       if (!userData) return
 
-      const missingFields = ["referralCode", "timezone"]
+      const missingFields: (keyof UserData)[] = [
+         "referralCode",
+         "timezone",
+         "emailVerified",
+      ]
 
       const missingFromUserData = missingFields.filter(
          (missing) => !userData[missing]

@@ -59,6 +59,12 @@ export interface UserData extends Identifiable {
    interestsIds?: string[]
 
    /**
+    * Timestamp when the user's email was verified
+    * Used to trigger CustomerIO sync
+    */
+   emailVerified?: boolean
+
+   /**
     * Content Tag IDs
     * e.g: ["BusinessDevelopment", "Consulting"]
     */
