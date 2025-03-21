@@ -33,7 +33,6 @@ setGlobalOptions({
 
 import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import { bundles } from "./bundles"
-import * as examples from "./examples"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import * as customerio from "./lib/customerio"
@@ -406,6 +405,3 @@ exports[FUNCTION_NAMES.sendLivestreamNoShowReminder] =
 
 // Keep-warm function
 exports[FUNCTION_NAMES.keepFunctionsWarm] = warming.keepFunctionsWarm
-
-// Example warmable function
-exports[FUNCTION_NAMES.exampleHttp] = examples.exampleHttpFunction

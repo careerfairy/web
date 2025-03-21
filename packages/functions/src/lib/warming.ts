@@ -5,7 +5,6 @@ import functionsAxios from "../api/axios"
 import { KEEP_WARM_HEADER } from "../middlewares-gen2/onRequest/validations"
 
 const functionsToWarm = [
-   FUNCTION_NAMES.exampleHttp,
    FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook,
    FUNCTION_NAMES.customerIORecommendedSparksWebhook,
    // Add more functions as needed
