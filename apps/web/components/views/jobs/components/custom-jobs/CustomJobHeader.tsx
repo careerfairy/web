@@ -3,11 +3,14 @@ import {
    CustomJob,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useRouter } from "next/router"
 import { FC } from "react"
 import { Briefcase, Edit, Zap } from "react-feather"
+import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 
@@ -28,6 +31,9 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "flex-start",
       gap: "4px",
+   },
+   headerCompanyLink: {
+      cursor: "pointer",
    },
    jobTitle: {
       fontWeight: 700,
@@ -89,6 +95,7 @@ const CustomJobHeader = ({
    handleClick,
 }: Props) => {
    const isMobile = useIsMobile()
+   const { push } = useRouter()
 
    const businessFunctionTags = (job.businessFunctionsTagIds || [])
       .map((tagId) => TagValuesLookup[tagId])
@@ -120,6 +127,15 @@ const CustomJobHeader = ({
                         alignItems={"center"}
                         spacing={1}
                         mb={"8px"}
+                        sx={styles.headerCompanyLink}
+                        onClick={() => {
+                           push(
+                              makeGroupCompanyPageUrl(companyName, {
+                                 interactionSource:
+                                    InteractionSources.Job_Header,
+                              })
+                           )
+                        }}
                      >
                         <CircularLogo
                            src={getResizedUrl(companyLogoUrl, "lg")}
