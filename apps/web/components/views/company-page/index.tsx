@@ -22,6 +22,7 @@ import {
    MutableRefObject,
    createContext,
    forwardRef,
+   useCallback,
    useContext,
    useEffect,
    useMemo,
@@ -173,6 +174,7 @@ type ICompanyPageContext = {
    pastLivestreams: LivestreamEvent[]
    customJobs: CustomJob[]
    sectionRefs: SectionRefs
+   getCompanyPageTabLink: (tab: TabValueType) => string
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -193,6 +195,7 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
       testimonialsSectionRef: null,
       benefitsSectionRef: null,
    },
+   getCompanyPageTabLink: (tab: TabValueType) => tab,
 })
 
 const CompanyPageOverview = ({
@@ -257,6 +260,13 @@ const CompanyPageOverview = ({
       upcomingLivestreams,
    ])
 
+   const getCompanyPageTabLink = useCallback(
+      (tab: TabValueType) => {
+         return getTabLink(basePath, tab)
+      },
+      [basePath]
+   )
+
    useEffect(() => {
       const isPublicProfile = presenter.companyPageIsReady()
 
@@ -296,6 +306,7 @@ const CompanyPageOverview = ({
             testimonialsSectionRef,
             benefitsSectionRef,
          },
+         getCompanyPageTabLink,
       }),
       [
          contextGroup,
@@ -308,6 +319,7 @@ const CompanyPageOverview = ({
          pastLivestreams,
          contextGroupAvailableJobs,
          customJobs,
+         getCompanyPageTabLink,
       ]
    )
 
