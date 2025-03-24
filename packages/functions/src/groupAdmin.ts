@@ -27,10 +27,7 @@ import { HttpsError, onCall } from "firebase-functions/v2/https"
 import { array, boolean, InferType, mixed, object, string } from "yup"
 import { auth, firestore } from "./api/firestoreAdmin"
 import config from "./config"
-import {
-   CUSTOMERIO_EMAIL_TEMPLATES,
-   EmailNotificationRequestData,
-} from "./lib/notifications/EmailTypes"
+import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import {
    logAndThrow,
    validateData,
@@ -73,15 +70,11 @@ export const sendNewlyPublishedEventEmail = onCall(
             logger.log("admins Info in newly published event", adminsInfo)
 
             await notificationService.sendEmailNotifications(
-               adminsInfo.map<
-                  EmailNotificationRequestData<
-                     typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISH
-                  >
-               >(({ email, eventDashboardLink, nextLivestreamsLink }) => ({
+               adminsInfo.map((admin) => ({
                   templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISH,
                   templateData: {
                      dashboardUrl: addUtmTagsToLink({
-                        link: eventDashboardLink,
+                        link: admin.eventDashboardLink,
                      }),
                      livestream: {
                         company: stream.company,
@@ -89,15 +82,15 @@ export const sendNewlyPublishedEventEmail = onCall(
                         companyBannerImageUrl: group.bannerImageUrl,
                         title: stream.title,
                         url: addUtmTagsToLink({
-                           link: nextLivestreamsLink,
+                           link: admin.nextLivestreamsLink,
                            campaign: "shareEvents",
                         }),
                      },
                   },
                   identifiers: {
-                     email,
+                     email: admin.email,
                   },
-                  to: email,
+                  to: admin.email,
                }))
             )
             return { success: true }
