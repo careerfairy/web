@@ -167,8 +167,8 @@ describe("Gen2 Middleware Tests", () => {
          async (request) => {
             // Return data from the middleware
             return {
-               group: request.data.middlewareData.groupAdmin.group,
-               userData: request.data.middlewareData.groupAdmin.userData,
+               group: request.data.group,
+               userData: request.data.userData,
             }
          }
       )

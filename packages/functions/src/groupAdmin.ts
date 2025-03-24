@@ -56,7 +56,7 @@ export const sendNewlyPublishedEventEmail = onCall(
          try {
             const { livestreamId } = request.data
 
-            const group = request.data.middlewareData.groupAdmin.group
+            const group = request.data.group
 
             const stream = await livestreamsRepo.getById(livestreamId)
 
