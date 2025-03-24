@@ -208,7 +208,7 @@ const ActionsMobile = () => {
                variant="contained"
                component="a"
                href={
-                  "/install-mobile-application?utm_source=careerfairy&utm_campaign=AppDownloadQ12025&utm_medium=lsregistersuccess&utm_content=appdownload"
+                  "/install-mobile-application?utm_source=careerfairy&utm_campaign=AppDownloadQ12025&utm_medium=lsregistrationbutton&utm_content=appdownload"
                }
                target="_blank"
                startIcon={<Download />}
