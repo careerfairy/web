@@ -2,8 +2,8 @@ import { Logger } from "@careerfairy/shared-lib/utils/types"
 import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailNotificationRequestData,
-} from "src/lib/notifications/EmailTypes"
-import { INotificationService } from "src/lib/notifications/NotificationService"
+} from "../../notifications/EmailTypes"
+import { INotificationService } from "../../notifications/NotificationService"
 import { SparksEndOfTrialTemplateModel } from "../trialEnd"
 
 export type SparksEndOfTrialData = SparksEndOfTrialTemplateModel & {
