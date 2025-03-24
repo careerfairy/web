@@ -130,7 +130,8 @@ exports.manualOnboardingNewsletter =
    onboardingNewsletter.manualOnboardingNewsletter
 exports.manualEndOfSparksTrialEmails =
    endOfSparksTrials.manualEndOfSparksTrialEmails
-exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
+exports[FUNCTION_NAMES.endOfSparksTrialEmails] =
+   endOfSparksTrials.endOfSparksTrialEmails
 exports.manualTemplatedEmail = newsletter.manualTemplatedEmail
 
 // Notification Livestreams
@@ -323,7 +324,7 @@ exports.setRemoveUserJobApplication = customJobs.setRemoveUserJobApplication
 
 // Group Subscription Plan Functions
 exports[FUNCTION_NAMES.startPlan] = groupPlans.startPlan
-exports.sendReminderToNearEndSparksTrialPlanCreationPeriod =
+exports[FUNCTION_NAMES.sendReminderToNearEndSparksTrialPlanCreationPeriod] =
    groupPlans.sendReminderToNearEndSparksTrialPlanCreationPeriod
 exports.checkExpiredPlans = groupPlans.checkExpiredPlans
 exports.manualCheckExpiredPlans = groupPlans.manualCheckExpiredPlans
