@@ -5,6 +5,7 @@ import {
    DialogContent,
    DialogTitle,
    SxProps,
+   Theme,
 } from "@mui/material"
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
@@ -50,6 +51,7 @@ type ResponsiveDialogProps = {
    handleClose?: () => unknown
    open: boolean
    children: ReactNode
+   drawerSx?: SxProps<Theme>
 }
 
 /**
@@ -59,6 +61,7 @@ export const ResponsiveDialogLayout = ({
    children,
    open,
    handleClose,
+   drawerSx,
 }: ResponsiveDialogProps) => {
    const isMobile = useIsMobile()
 
@@ -68,7 +71,7 @@ export const ResponsiveDialogLayout = ({
             open={open}
             anchor="bottom"
             PaperProps={{
-               sx: styles.drawer,
+               sx: combineStyles(styles.drawer, drawerSx),
             }}
             onOpen={() => {}}
             onClose={handleClose}
