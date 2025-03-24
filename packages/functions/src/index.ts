@@ -128,7 +128,7 @@ exports.manualNewsletter = newsletter.manualNewsletter
 exports.onboardingNewsletter = onboardingNewsletter.onboardingNewsletter
 exports.manualOnboardingNewsletter =
    onboardingNewsletter.manualOnboardingNewsletter
-exports.manualEndOfSparksTrialEmails =
+exports[FUNCTION_NAMES.manualEndOfSparksTrialEmails] =
    endOfSparksTrials.manualEndOfSparksTrialEmails
 exports[FUNCTION_NAMES.endOfSparksTrialEmails] =
    endOfSparksTrials.endOfSparksTrialEmails

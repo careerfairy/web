@@ -3,14 +3,18 @@ import { SchemaOf, mixed, object, string } from "yup"
 
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
-import { middlewares } from "./middlewares/middlewares"
 
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
 import { RuntimeOptions } from "firebase-functions"
+import { onCall } from "firebase-functions/v2/https"
 import { groupRepo, notificationService } from "./api/repositories"
-import { dataValidation, userShouldBeCFAdmin } from "./middlewares/validations"
+import { withMiddlewares } from "./middlewares-gen2/onCall"
+import {
+   dataValidationMiddleware,
+   userIsCFAdminMiddleware,
+} from "./middlewares-gen2/onCall/validations"
 import { validateGroupSparks } from "./util/sparks"
 
 /**
@@ -25,34 +29,41 @@ const setGroupPlanSchema: SchemaOf<StartPlanData> = object().shape({
    groupId: string().required(),
 })
 
-export const startPlan = functions.region(config.region).https.onCall(
-   middlewares(
-      dataValidation(setGroupPlanSchema),
-      userShouldBeCFAdmin(),
-      async (data: StartPlanData, context) => {
+export const startPlan = onCall(
+   withMiddlewares(
+      [
+         dataValidationMiddleware<StartPlanData>(setGroupPlanSchema),
+         userIsCFAdminMiddleware<StartPlanData>(),
+      ],
+      async (request) => {
          try {
-            const group = await groupRepo.getGroupById(data.groupId)
+            const group = await groupRepo.getGroupById(request.data.groupId)
 
-            await groupRepo.startPlan(data.groupId, data.planType)
+            const adminName = request.data.userData.firstName
 
-            functions.logger.info(
-               `Successfully set group plan for group ${data.groupId} to ${data.planType}`
+            await groupRepo.startPlan(
+               request.data.groupId,
+               request.data.planType
             )
 
-            if (data.planType === GroupPlanTypes.Trial) {
+            functions.logger.info(
+               `Successfully set group plan for group ${request.data.groupId} to ${request.data.planType} by ${adminName}`
+            )
+
+            if (request.data.planType === GroupPlanTypes.Trial) {
                functions.logger.info("Sending out trial welcome emails")
 
                await groupRepo.sendTrialWelcomeEmail(
-                  data.groupId,
+                  request.data.groupId,
                   group.universityName,
                   notificationService
                )
             }
          } catch (error) {
             logAndThrow("Error in setting group plan", {
-               data,
+               data: request.data,
                error,
-               context,
+               context: request,
             })
          }
       }
