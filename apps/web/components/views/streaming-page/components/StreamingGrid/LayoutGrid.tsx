@@ -14,13 +14,11 @@ const styles = sxStyles({
       borderRadius: "10px",
       height: "100%",
    },
-   gridItem: {
-      pt: "0 !important",
-   },
    gridItemSpotlight: {
       flex: "none !important",
       height: "100%",
       aspectRatio: "16 / 9",
+      pt: "0 !important",
    },
 })
 
@@ -99,7 +97,7 @@ const LayoutGridItem = memo(
       <Grid
          xs={12 / layoutColumns}
          item
-         sx={[styles.gridItem, isSpotlightMode ? styles.gridItemSpotlight : {}]}
+         sx={isSpotlightMode ? styles.gridItemSpotlight : {}}
       >
          <Box sx={styles.item}>{children}</Box>
       </Grid>
