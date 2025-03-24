@@ -29,7 +29,7 @@ type TrackProps = {
    visitorId: string
 }
 
-const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+const MentorsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -92,7 +92,7 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                         serverSideCustomJobs
                      )}
                      editMode={false}
-                     tab={TabValue.jobs}
+                     tab={TabValue.mentors}
                   />
                </Box>
             </GenericDashboardLayout>
@@ -115,4 +115,4 @@ export const getStaticPaths: GetStaticPaths = () => ({
    fallback: "blocking",
 })
 
-export default JobsPage
+export default MentorsPage
