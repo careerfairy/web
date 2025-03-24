@@ -4,6 +4,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import {
    Box,
    Container,
@@ -16,17 +17,15 @@ import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGr
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { doc } from "firebase/firestore"
-import { useRouter } from "next/router"
+import Link from "next/link"
 import {
    MutableRefObject,
    createContext,
    forwardRef,
-   useCallback,
    useContext,
    useEffect,
    useMemo,
    useRef,
-   useState,
 } from "react"
 import { useFirestoreDocData } from "reactfire"
 import { sxStyles } from "types/commonTypes"
@@ -132,6 +131,28 @@ export const getTabLabel = (tabId: TabValueType) => {
    }
 }
 
+const getTabLink = (basePath: string, tab: TabValueType) => {
+   switch (tab) {
+      case TabValue.overview:
+         return `${basePath}`
+      case TabValue.jobs:
+         return `${basePath}/jobs`
+      case TabValue.sparks:
+         return `${basePath}/sparks`
+      case TabValue.livesStreams:
+         return `${basePath}/livestreams`
+      case TabValue.recordings:
+         return `${basePath}/recordings`
+      case TabValue.mentors:
+         return `${basePath}/mentors`
+      // TBD: Benefits tab in the future
+      case TabValue.benefits:
+         return `${basePath}/benefits`
+      default:
+         return ""
+   }
+}
+
 export type SectionRefs = {
    overviewSectionRef: MutableRefObject<HTMLElement>
    jobsSectionRef: MutableRefObject<HTMLElement>
@@ -152,8 +173,6 @@ type ICompanyPageContext = {
    pastLivestreams: LivestreamEvent[]
    customJobs: CustomJob[]
    sectionRefs: SectionRefs
-   activeTab: TabValueType
-   setActiveTab: (tab: TabValueType) => void
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -174,8 +193,6 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
       testimonialsSectionRef: null,
       benefitsSectionRef: null,
    },
-   activeTab: TabValue.overview,
-   setActiveTab: () => {},
 })
 
 const CompanyPageOverview = ({
@@ -189,7 +206,6 @@ const CompanyPageOverview = ({
 }: Props) => {
    const featureFlags = useFeatureFlags()
    const isMobile = useIsMobile()
-   const router = useRouter()
 
    const groupRef = useMemo(
       () =>
@@ -199,11 +215,7 @@ const CompanyPageOverview = ({
       [group.id]
    )
 
-   // Track if this is the initial render
-   const isInitialRender = useRef(true)
-   const [tabValue, setTabValue] = useState<TabValueType>(
-      tab ?? TabValue.overview
-   )
+   const basePath = `/company/${companyNameSlugify(group.universityName)}`
 
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
       initialData: group,
@@ -265,42 +277,6 @@ const CompanyPageOverview = ({
       }
    }, [contextGroup, editMode, presenter])
 
-   // Modify the effect to only sync with URL after initial render
-   useEffect(() => {
-      if (isInitialRender.current) {
-         isInitialRender.current = false
-         return
-      }
-
-      const tabFromQuery = router.query.tab as TabValueType
-      if (tabFromQuery) {
-         setTabValue(tabFromQuery)
-      } else {
-         setTabValue(TabValue.overview)
-      }
-   }, [router.query.tab])
-
-   const setActiveTab = useCallback(
-      (tab: TabValueType) => {
-         setTabValue(tab)
-         // Update URL with new tab value, remove tab param if overview
-         router.push(
-            {
-               pathname: router.pathname,
-               query: {
-                  ...router.query,
-                  ...(tab === TabValue.overview || !tab
-                     ? { tab: TabValue.overview }
-                     : { tab }),
-               },
-            },
-            undefined,
-            { shallow: true }
-         )
-      },
-      [router]
-   )
-
    const contextValue = useMemo<ICompanyPageContext>(
       () => ({
          group: contextGroup,
@@ -320,8 +296,6 @@ const CompanyPageOverview = ({
             testimonialsSectionRef,
             benefitsSectionRef,
          },
-         activeTab: tabValue,
-         setActiveTab,
       }),
       [
          contextGroup,
@@ -334,8 +308,6 @@ const CompanyPageOverview = ({
          pastLivestreams,
          contextGroupAvailableJobs,
          customJobs,
-         tabValue,
-         setActiveTab,
       ]
    )
 
@@ -362,12 +334,12 @@ const CompanyPageOverview = ({
    ])
 
    useEffect(() => {
-      if (tabValue && tabsSectionRefsMap[tabValue].current) {
-         tabsSectionRefsMap[tabValue].current.scrollIntoView({
+      if (tab && tabsSectionRefsMap[tab].current) {
+         tabsSectionRefsMap[tab].current.scrollIntoView({
             behavior: "smooth",
          })
       }
-   }, [tabValue, tabsSectionRefsMap])
+   }, [tab, tabsSectionRefsMap])
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
@@ -395,9 +367,7 @@ const CompanyPageOverview = ({
                >
                   <Box
                      maxWidth={
-                        isMobile || tabValue !== TabValue.overview
-                           ? "100%"
-                           : "50%"
+                        isMobile || tab !== TabValue.overview ? "100%" : "50%"
                      }
                      width={"100%"}
                   >
@@ -406,66 +376,75 @@ const CompanyPageOverview = ({
                            variant="scrollable"
                            scrollButtons
                            allowScrollButtonsMobile
-                           value={tabValue}
-                           onChange={(_, newValue) => setActiveTab(newValue)}
+                           value={tab}
                            ScrollButtonComponent={CustomScrollButton}
                            sx={styles.tabs}
                         >
                            <Tab
                               label={getTabLabel(TabValue.overview)}
                               value={TabValue.overview}
+                              href={getTabLink(basePath, TabValue.overview)}
+                              LinkComponent={Link}
                            />
                            <Tab
                               label={getTabLabel(TabValue.jobs)}
                               value={TabValue.jobs}
+                              href={getTabLink(basePath, TabValue.jobs)}
+                              LinkComponent={Link}
                            />
                            {group.publicProfile && group.hasSparks ? (
                               <Tab
                                  label={getTabLabel(TabValue.sparks)}
                                  value={TabValue.sparks}
+                                 href={getTabLink(basePath, TabValue.sparks)}
+                                 LinkComponent={Link}
                               />
                            ) : null}
                            <Tab
                               label={getTabLabel(TabValue.livesStreams)}
                               value={TabValue.livesStreams}
+                              href={getTabLink(basePath, TabValue.livesStreams)}
+                              LinkComponent={Link}
                            />
                            <Tab
                               label={getTabLabel(TabValue.recordings)}
                               value={TabValue.recordings}
+                              href={getTabLink(basePath, TabValue.recordings)}
+                              LinkComponent={Link}
                            />
                            {groupCreators?.length ? (
                               <Tab
                                  label={getTabLabel(TabValue.mentors)}
                                  value={TabValue.mentors}
+                                 href={getTabLink(basePath, TabValue.mentors)}
+                                 LinkComponent={Link}
                               />
                            ) : null}
                         </Tabs>
 
                         <Box sx={styles.tabContent}>
-                           {tabValue !== TabValue.overview && (
+                           {tab !== TabValue.overview && (
                               <SectionAnchor
-                                 ref={tabsSectionRefsMap[tabValue]}
-                                 tabValue={tabValue}
+                                 ref={tabsSectionRefsMap[tab]}
+                                 tabValue={tab}
                               />
                            )}
-                           {tabValue === TabValue.overview && (
+                           {tab === TabValue.overview && (
                               <Overview editMode={editMode} />
                            )}
-                           {tabValue === TabValue.jobs && <JobsTab />}
-                           {tabValue === TabValue.sparks && (
+                           {tab === TabValue.jobs && <JobsTab />}
+                           {tab === TabValue.sparks && (
                               <SparksTab key={group.id} groupId={group.id} />
                            )}
-                           {tabValue === TabValue.livesStreams && (
+                           {tab === TabValue.livesStreams && (
                               <UpcomingEventsTab />
                            )}
-                           {tabValue === TabValue.recordings && (
-                              <PastEventsTab />
-                           )}
-                           {tabValue === TabValue.mentors && <MentorsTab />}
+                           {tab === TabValue.recordings && <PastEventsTab />}
+                           {tab === TabValue.mentors && <MentorsTab />}
                         </Box>
                      </Box>
                   </Box>
-                  {tabValue === TabValue.overview ? (
+                  {tab === TabValue.overview ? (
                      <Box mt={0} width={"100%"}>
                         <MediaSection />
                      </Box>

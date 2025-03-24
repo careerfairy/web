@@ -122,101 +122,114 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    )
 }
 
-export const getStaticProps: GetStaticProps<{
+type CompanyPageData = {
    serverSideGroup: SerializedGroup
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   serverSideUpcomingLivestreams: { [p: string]: any }[]
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   serverSidePastLivestreams: { [p: string]: any }[]
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   serverSideCustomJobs: { [p: string]: any }[]
+   serverSideUpcomingLivestreams: ReturnType<
+      typeof LivestreamPresenter.serializeDocument
+   >[]
+   serverSidePastLivestreams: ReturnType<
+      typeof LivestreamPresenter.serializeDocument
+   >[]
+   serverSideCustomJobs: ReturnType<
+      typeof CustomJobsPresenter.serializeDocument
+   >[]
    livestreamDialogData: LiveStreamDialogData
    customJobDialogData: CustomJobDialogData
    groupCreators: PublicCreator[]
-}> = async (ctx) => {
-   const { params } = ctx
-   const { companyName: companyNameSlug } = params
-   const companyName = companyNameUnSlugify(companyNameSlug as string)
+}
 
-   if (companyName) {
-      const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
+type GetCompanyPageDataParams = {
+   companyNameSlug: string
+   ctx: Parameters<GetStaticProps>[0]
+   parameterSource?: string
+}
 
-      if (serverSideGroup) {
-         if (serverSideGroup.publicProfile) {
-            const [
-               {
-                  serverSideUpcomingLivestreams,
-                  serverSidePastLivestreams,
-                  serverSideGroupAvailableCustomJobs,
-                  livestreamDialogData,
-               },
-               customJobDialogData,
-               creators,
-            ] = await Promise.all([
-               getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx, {
-                  hideHidden: true,
-                  limit: undefined,
-               }),
-               getCustomJobDialogData(ctx, PARAMETER_SOURCE),
-               groupRepo.getCreatorsWithPublicContent(serverSideGroup),
-            ])
+export async function getCompanyPageData({
+   companyNameSlug,
+   ctx,
+   parameterSource = PARAMETER_SOURCE,
+}: GetCompanyPageDataParams): Promise<{
+   props?: CompanyPageData
+   notFound: boolean
+   revalidate: number
+}> {
+   const companyName = companyNameUnSlugify(companyNameSlug)
 
-            return {
-               props: {
-                  serverSideGroup: serializeGroup(serverSideGroup),
-                  serverSideUpcomingLivestreams:
-                     serverSideUpcomingLivestreams?.map(
-                        LivestreamPresenter.serializeDocument
-                     ) || [],
-
-                  serverSidePastLivestreams:
-                     serverSidePastLivestreams?.map(
-                        LivestreamPresenter.serializeDocument
-                     ) || [],
-                  serverSideCustomJobs:
-                     serverSideGroupAvailableCustomJobs?.map(
-                        CustomJobsPresenter.serializeDocument
-                     ) || [],
-                  livestreamDialogData,
-                  customJobDialogData,
-                  groupCreators: creators?.map(pickPublicDataFromCreator) || [],
-               },
-               revalidate: 60,
-            }
-         }
-
-         Sentry.captureException(
-            new Error(
-               `Company page ${companyName} for groupId ${serverSideGroup.id} is not ready yet`
-            ),
-            {
-               extra: {
-                  serverSideGroup,
-                  companyNameSlug,
-               },
-            }
-         )
-
-         // The page is not ready, return notFound to trigger a 404
-         return {
-            notFound: true,
-            revalidate: 60, // <- ISR, interval in seconds between revalidations
-         }
-      }
+   if (!companyName) {
+      Sentry.captureException(new Error(`Company ${companyName} not found`), {
+         extra: { companyNameSlug, companyName },
+      })
+      return { notFound: true, revalidate: 60 }
    }
 
-   Sentry.captureException(new Error(`Company ${companyName} not found`), {
-      extra: {
-         companyNameSlug,
-         companyName,
+   const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
+
+   if (!serverSideGroup) {
+      Sentry.captureException(new Error(`Company ${companyName} not found`), {
+         extra: { companyNameSlug, companyName },
+      })
+      return { notFound: true, revalidate: 60 }
+   }
+
+   if (!serverSideGroup.publicProfile) {
+      Sentry.captureException(
+         new Error(
+            `Company page ${companyName} for groupId ${serverSideGroup.id} is not ready yet`
+         ),
+         { extra: { serverSideGroup, companyNameSlug } }
+      )
+      return { notFound: true, revalidate: 60 }
+   }
+
+   const [
+      {
+         serverSideUpcomingLivestreams,
+         serverSidePastLivestreams,
+         serverSideGroupAvailableCustomJobs,
+         livestreamDialogData,
       },
-   })
+      customJobDialogData,
+      creators,
+   ] = await Promise.all([
+      getLivestreamsAndDialogData(serverSideGroup.groupId, ctx, {
+         hideHidden: true,
+         limit: undefined,
+      }),
+      getCustomJobDialogData(ctx, parameterSource),
+      groupRepo.getCreatorsWithPublicContent(serverSideGroup),
+   ])
 
-   // The company is not found, return notFound to trigger a 404
    return {
-      notFound: true,
-      revalidate: 60, // <- ISR, interval in seconds between revalidations
+      props: {
+         serverSideGroup: serializeGroup(serverSideGroup),
+         serverSideUpcomingLivestreams:
+            serverSideUpcomingLivestreams?.map(
+               LivestreamPresenter.serializeDocument
+            ) || [],
+         serverSidePastLivestreams:
+            serverSidePastLivestreams?.map(
+               LivestreamPresenter.serializeDocument
+            ) || [],
+         serverSideCustomJobs:
+            serverSideGroupAvailableCustomJobs?.map(
+               CustomJobsPresenter.serializeDocument
+            ) || [],
+         livestreamDialogData,
+         customJobDialogData,
+         groupCreators: creators?.map(pickPublicDataFromCreator) || [],
+      },
+      notFound: false,
+      revalidate: 60,
    }
+}
+
+export const getStaticProps = async (ctx) => {
+   const { companyName: companyNameSlug } = ctx.params || {}
+
+   return getCompanyPageData({
+      companyNameSlug: companyNameSlug as string,
+      ctx,
+   })
 }
 
 export const getStaticPaths: GetStaticPaths = () => ({
