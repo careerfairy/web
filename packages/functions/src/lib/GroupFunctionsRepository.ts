@@ -820,7 +820,7 @@ const sendSparksTrialPlanEmail = async ({
                   campaign: "sparks",
                   content,
                }),
-               ...(companyName && { company_name: companyName }),
+               company_name: companyName,
                company_plan: "Sparks",
             },
             templateId,
