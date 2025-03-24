@@ -112,13 +112,6 @@ export const CustomJobDialogLayout: FC<Props> = ({
             isOpen={dialogOpen}
             onClose={handleClose}
             source={source}
-            // heroContent={
-            //    <Box display={"flex"} flexDirection={"row-reverse"} p={0} m={0}>
-            //       <IconButton onClick={handleClose}>
-            //          <CloseOutlined />
-            //       </IconButton>
-            //    </Box>
-            // }
             heroSx={styles.heroSx}
             paperPropsSx={hasPaperProps ? styles.profilePaperProps : null}
             hideApplicationConfirmation={hideApplicationConfirmation}
