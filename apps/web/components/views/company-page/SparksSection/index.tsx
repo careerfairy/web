@@ -9,11 +9,10 @@ import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
 import { setCameFromPageLink } from "store/reducers/sparksFeedReducer"
-import { useCompanyPage } from ".."
+import { TabValue, useCompanyPage } from ".."
 
 type Props = {
    groupId: string
-   onSeeAllClick?: () => void
 }
 
 const CarouselHeader = () => {
@@ -28,10 +27,10 @@ const Loader = () => {
    return <FallbackComponent header={<CarouselHeader />} />
 }
 
-const SparksSection: FC<Props> = ({ groupId, onSeeAllClick }) => {
+const SparksSection: FC<Props> = ({ groupId }) => {
    const dispatch = useDispatch()
 
-   const { group } = useCompanyPage()
+   const { group, getCompanyPageTabLink } = useCompanyPage()
    const router = useRouter()
    const isMounted = useIsMounted()
 
@@ -61,7 +60,7 @@ const SparksSection: FC<Props> = ({ groupId, onSeeAllClick }) => {
                   header={<CarouselHeader />}
                   groupId={groupId}
                   handleSparksClicked={handleSparksClicked}
-                  onSeeAllClick={onSeeAllClick}
+                  seeAllHref={getCompanyPageTabLink(TabValue.sparks)}
                   sx={{ pl: 0, mr: -2 }}
                   headerSx={{ mr: 2 }}
                />
