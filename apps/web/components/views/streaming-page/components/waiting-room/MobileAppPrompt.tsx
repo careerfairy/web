@@ -3,7 +3,7 @@ import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
-import { appQrCode, cfMobileIcon } from "constants/images"
+import { appQrCodeLSRoom, cfMobileIcon } from "constants/images"
 import Image from "next/image"
 import { Download } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -49,7 +49,7 @@ export const MobileAppPrompt = () => {
          pt={streamIsLandscape ? 3.125 : streamIsMobile ? 3 : 7.75}
       >
          <Image
-            src={appQrCode}
+            src={appQrCodeLSRoom}
             alt="App QR code"
             width={147}
             height={147}
