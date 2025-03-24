@@ -3,8 +3,6 @@ import {
    CustomJobApplicationSource,
    CustomJobApplicationSourceTypes,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { CloseOutlined } from "@mui/icons-material"
-import { Box, IconButton } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import { fromDate } from "data/firebase/FirebaseInstance"
@@ -24,6 +22,15 @@ const styles = sxStyles({
       maxHeight: "85vh", // Allow content to dictate the height
       height: "auto", // Dynamically adjust the height based on content
       borderRadius: "12px 12px 0 0", // Optional rounded corners at the top
+   },
+   heroSx: {
+      m: 0,
+      py: "0px !important",
+      pt: {
+         xs: "5px !important",
+         md: "24px !important",
+      },
+      px: "10px !important",
    },
 })
 
@@ -105,14 +112,14 @@ export const CustomJobDialogLayout: FC<Props> = ({
             isOpen={dialogOpen}
             onClose={handleClose}
             source={source}
-            heroContent={
-               <Box display={"flex"} flexDirection={"row-reverse"} p={0} m={0}>
-                  <IconButton onClick={handleClose}>
-                     <CloseOutlined />
-                  </IconButton>
-               </Box>
-            }
-            heroSx={{ m: 0, py: "0px !important", px: "10px !important" }}
+            // heroContent={
+            //    <Box display={"flex"} flexDirection={"row-reverse"} p={0} m={0}>
+            //       <IconButton onClick={handleClose}>
+            //          <CloseOutlined />
+            //       </IconButton>
+            //    </Box>
+            // }
+            heroSx={styles.heroSx}
             paperPropsSx={hasPaperProps ? styles.profilePaperProps : null}
             hideApplicationConfirmation={hideApplicationConfirmation}
          />
