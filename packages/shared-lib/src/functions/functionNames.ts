@@ -13,6 +13,7 @@ export const FUNCTION_NAMES = {
 
    // Group Admin functions
    sendNewlyPublishedEventEmail: "sendNewlyPublishedEventEmail",
+   startPlan: "startPlan_v4",
 
    // Auth functions
    // createNewUserAccount: "createNewUserAccount_v4",

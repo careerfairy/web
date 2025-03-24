@@ -322,7 +322,7 @@ exports.fetchCustomJobGroupNames = customJobs.getCustomJobGroupNames
 exports.setRemoveUserJobApplication = customJobs.setRemoveUserJobApplication
 
 // Group Subscription Plan Functions
-exports.startPlan_v3 = groupPlans.startPlan
+exports[FUNCTION_NAMES.startPlan] = groupPlans.startPlan
 exports.sendReminderToNearEndSparksTrialPlanCreationPeriod =
    groupPlans.sendReminderToNearEndSparksTrialPlanCreationPeriod
 exports.checkExpiredPlans = groupPlans.checkExpiredPlans

@@ -6,14 +6,12 @@ import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
-import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
-import { dataValidation, userShouldBeCFAdmin } from "./middlewares/validations"
-import { groupRepo } from "./api/repositories"
-import { client } from "./api/postmark"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { validateGroupSparks } from "./util/sparks"
+import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
 import { RuntimeOptions } from "firebase-functions"
-
+import { groupRepo, notificationService } from "./api/repositories"
+import { dataValidation, userShouldBeCFAdmin } from "./middlewares/validations"
+import { validateGroupSparks } from "./util/sparks"
 
 /**
  * functions runtime settings
@@ -21,8 +19,6 @@ import { RuntimeOptions } from "firebase-functions"
 const runtimeSettings: RuntimeOptions = {
    memory: "256MB",
 }
-
-
 
 const setGroupPlanSchema: SchemaOf<StartPlanData> = object().shape({
    planType: mixed().oneOf(Object.values(GroupPlanTypes)).required(),
@@ -35,6 +31,8 @@ export const startPlan = functions.region(config.region).https.onCall(
       userShouldBeCFAdmin(),
       async (data: StartPlanData, context) => {
          try {
+            const group = await groupRepo.getGroupById(data.groupId)
+
             await groupRepo.startPlan(data.groupId, data.planType)
 
             functions.logger.info(
@@ -44,7 +42,11 @@ export const startPlan = functions.region(config.region).https.onCall(
             if (data.planType === GroupPlanTypes.Trial) {
                functions.logger.info("Sending out trial welcome emails")
 
-               await groupRepo.sendTrialWelcomeEmail(data.groupId, client)
+               await groupRepo.sendTrialWelcomeEmail(
+                  data.groupId,
+                  group.universityName,
+                  notificationService
+               )
             }
          } catch (error) {
             logAndThrow("Error in setting group plan", {
@@ -89,9 +91,9 @@ export const manualCheckExpiredPlans = functions
 async function updateExpiredGroupPlans() {
    const types = [
       GroupPlanTypes.Trial,
-      GroupPlanTypes.Tier1, 
+      GroupPlanTypes.Tier1,
       GroupPlanTypes.Tier2,
-      GroupPlanTypes.Tier3
+      GroupPlanTypes.Tier3,
    ]
 
    try {
@@ -124,6 +126,7 @@ async function updateExpiredGroupPlans() {
       )
    }
 }
+
 /**
  * Every day at 9 AM, notify all the groups that are near to the end of their Sparks trial plan creation period and haven't met the publishing criteria yet
  */
@@ -153,7 +156,7 @@ export const sendReminderToNearEndSparksTrialPlanCreationPeriod = functions
          filteredGroups.forEach((group) => {
             void groupRepo.sendTrialPlanCreationPeriodInCriticalStateReminder(
                group,
-               client
+               notificationService
             )
          })
       } catch (error) {

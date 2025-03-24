@@ -1,6 +1,9 @@
 import { RuntimeOptions } from "firebase-functions"
-import { PostmarkEmailSender } from "./api/postmark"
-import { emailNotificationsRepo, groupRepo } from "./api/repositories"
+import {
+   emailNotificationsRepo,
+   groupRepo,
+   notificationService,
+} from "./api/repositories"
 import config from "./config"
 import { TrialService } from "./lib/trials/services/TrialService"
 import { SparkTrialEndEmailBuilder } from "./lib/trials/sparks/SparksTrialEndEmailBuilder"
@@ -50,7 +53,7 @@ export const manualEndOfSparksTrialEmails = functions
 
 async function sendEndOfSparksTrialEmails() {
    const emailBuilder = new SparkTrialEndEmailBuilder(
-      PostmarkEmailSender.create(),
+      notificationService,
       functions.logger
    )
    const trialService = new TrialService(

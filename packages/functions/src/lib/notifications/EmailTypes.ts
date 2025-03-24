@@ -18,6 +18,9 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    PASSWORD_RESET: "password_reset",
    GROUP_INVITATION: "group_invitation",
    LIVE_STREAM_PUBLISH: "live_stream_publish",
+   SPARKS_START_SUBSCRIPTION: "sparks_start_subscription",
+   SPARKS_END_SUBSCRIPTION: "sparks_end_subscription",
+   SPARKS_END_CONTENT_CREATION_PERIOD: "sparks_end_content_creation_period",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
@@ -162,6 +165,12 @@ export type LivestreamPublishedTemplateData = {
    dashboardUrl: string
 }
 
+export type SparksPlanTemplateData = {
+   company_name: string
+   company_plan: string
+   company_sparks_link: string
+}
+
 /**
  * Union type of all possible message data types
  */
@@ -179,6 +188,9 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.GROUP_INVITATION]: GroupInvitationTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW]: NoShowReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISH]: LivestreamPublishedTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_START_SUBSCRIPTION]: SparksPlanTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION]: SparksPlanTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_CONTENT_CREATION_PERIOD]: SparksPlanTemplateData
 }
 
 /**

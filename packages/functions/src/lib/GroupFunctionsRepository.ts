@@ -27,21 +27,24 @@ import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { firestore } from "firebase-admin"
 import { UserRecord } from "firebase-admin/auth"
-import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
 import { cloneDeep, isEmpty, union } from "lodash"
 import { DateTime } from "luxon"
-import { ServerClient } from "postmark"
 import { Timestamp, auth } from "../api/firestoreAdmin"
 import type { FunctionsLogger } from "../util"
+import { getWebBaseUrl } from "../util"
 import BigQueryCreateInsertService from "./bigQuery/BigQueryCreateInsertService"
+import {
+   CUSTOMERIO_EMAIL_TEMPLATES,
+   EmailNotificationRequestData,
+} from "./notifications/EmailTypes"
+import { INotificationService } from "./notifications/NotificationService"
 import {
    addGroupStatsOperations,
    addOperationsToDecrementGroupStatsOperations,
    addOperationsToOnlyIncrementGroupStatsOperations,
 } from "./stats/group"
 import { OperationsToMake } from "./stats/util"
-
 import DocumentSnapshot = firestore.DocumentSnapshot
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
@@ -161,7 +164,11 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @param client - The Postmark client.
     * @returns A promise that resolves when the email was sent.
     */
-   sendTrialWelcomeEmail(groupId: string, client: ServerClient): Promise<void>
+   sendTrialWelcomeEmail(
+      groupId: string,
+      companyName: string,
+      client: INotificationService
+   ): Promise<void>
 
    /**
     * Fetches all groups that are on a plan.
@@ -194,7 +201,7 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     */
    sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
-      client: ServerClient
+      client: INotificationService
    ): Promise<void>
 
    trackGroupEvents(events: GroupEventServer[]): Promise<void>
@@ -641,17 +648,17 @@ export class GroupFunctionsRepository
 
    async sendTrialWelcomeEmail(
       groupId: string,
-      client: ServerClient
+      companyName: string,
+      client: INotificationService
    ): Promise<void> {
       const admins = await this.getGroupAdmins(groupId)
 
-      sendSparksTrialPlanEmail({
+      return sendSparksTrialPlanEmail({
          client,
          admins,
-         templateId: process.env.POSTMARK_TEMPLATE_SPARKS_TRIAL_WELCOME,
+         templateId: CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_START_SUBSCRIPTION,
          content: "trial_welcome",
-         successMessage: "Successfully sent batch sparks trial welcome email",
-         errorMessage: "Error sending sparks trial welcome email:",
+         companyName,
       })
    }
 
@@ -691,22 +698,17 @@ export class GroupFunctionsRepository
 
    async sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
-      client: ServerClient
+      client: INotificationService
    ): Promise<void> {
       const admins = await this.getGroupAdmins(group.id)
 
-      sendSparksTrialPlanEmail({
+      return sendSparksTrialPlanEmail({
          client,
          admins,
          templateId:
-            process.env
-               .POSTMARK_TEMPLATE_SPARKS_TRIAL_PLAN_CREATION_PERIOD_NEAR_TO_END,
-         content: "trial_contentcreation_end",
-         successMessage:
-            "Successfully sent batch sparks trial plan creation period near to end reminder",
-         errorMessage:
-            "Error sending sparks trial plan creation period near to end reminder:",
+            CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_CONTENT_CREATION_PERIOD,
          companyName: group.universityName,
+         content: "trial_contentcreation_end",
       })
    }
 
@@ -789,46 +791,48 @@ const formatToOptionArray = (
       .filter(({ id }) => selectedIds?.includes(id))
 }
 
+type ValidTemplateId =
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_START_SUBSCRIPTION
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_CONTENT_CREATION_PERIOD
+
 type SendSparksTrialPlanEmailProps = {
-   client: ServerClient
+   client: INotificationService
    admins: GroupAdmin[]
-   templateId: string | undefined
+   templateId: ValidTemplateId
    content: string
-   successMessage: string
-   errorMessage: string
-   companyName?: string
+   companyName: string
 }
 
-const sendSparksTrialPlanEmail = ({
+const sendSparksTrialPlanEmail = async ({
    client,
    admins,
    templateId,
    content,
-   successMessage,
-   errorMessage,
    companyName,
-}: SendSparksTrialPlanEmailProps): void => {
-   const emails = admins?.map(({ email, firstName, groupId }) => ({
-      TemplateId: Number(templateId),
-      From: "CareerFairy <noreply@careerfairy.io>",
-      To: email,
-      TemplateModel: {
-         user_name: firstName,
-         company_sparks_link: addUtmTagsToLink({
-            link: `https://www.careerfairy.io/group/${groupId}/admin/sparks`,
-            campaign: "sparks",
-            content: content,
-         }),
-         ...(companyName && { company_name: companyName }),
-      },
-   }))
+}: SendSparksTrialPlanEmailProps) => {
+   if (admins) {
+      const emails = admins.map<EmailNotificationRequestData<ValidTemplateId>>(
+         ({ email, groupId }) => ({
+            templateData: {
+               company_sparks_link: addUtmTagsToLink({
+                  link: `${getWebBaseUrl()}/group/${groupId}/admin/sparks`,
+                  campaign: "sparks",
+                  content,
+               }),
+               ...(companyName && { company_name: companyName }),
+               company_plan: "Sparks",
+            },
+            templateId,
+            to: email,
+            identifiers: {
+               email,
+            },
+         })
+      )
 
-   client.sendEmailBatchWithTemplates(emails).then(
-      (responses) => {
-         responses.forEach(() => functions.logger.log(successMessage))
-      },
-      (error) => {
-         functions.logger.error(errorMessage + error)
-      }
-   )
+      await client.sendEmailNotifications(emails)
+   }
+
+   return
 }

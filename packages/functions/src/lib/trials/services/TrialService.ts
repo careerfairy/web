@@ -7,8 +7,8 @@ import { IEmailNotificationRepository } from "@careerfairy/shared-lib/notificati
 import { EmailNotificationDetails } from "@careerfairy/shared-lib/notifications/notifications"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { getHost } from "@careerfairy/shared-lib/utils/urls"
-import { IGroupFunctionsRepository } from "src/lib/GroupFunctionsRepository"
+import { IGroupFunctionsRepository } from "../../../lib/GroupFunctionsRepository"
+import { getWebBaseUrl } from "../../../util"
 import {
    SparkTrialEndEmailBuilder,
    SparksEndOfTrialData,
@@ -146,7 +146,7 @@ export class TrialService {
    }
 
    private adminToSparksTrialData(admin: GroupAdmin): SparksEndOfTrialData {
-      const link = `${getHost()}/group/${admin.groupId}/admin/sparks`
+      const link = `${getWebBaseUrl()}/group/${admin.groupId}/admin/sparks`
 
       return {
          user_name: admin.firstName,
