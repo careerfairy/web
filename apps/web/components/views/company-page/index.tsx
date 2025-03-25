@@ -47,7 +47,9 @@ const styles = sxStyles({
    tabs: {
       borderRadius: "12px 12px 0 0",
       backgroundColor: "#FEFEFE",
-      position: "relative",
+      position: "sticky",
+      top: 0,
+      zIndex: 10,
       borderBottom: "1px solid",
       borderColor: "divider",
       "& .MuiTab-root": {
