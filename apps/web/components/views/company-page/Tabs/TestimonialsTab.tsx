@@ -7,7 +7,6 @@ const TestimonialsTab = () => {
 
    const testimonials = group?.testimonials
 
-   // if (!testimonials) return <EmptyItemsView />
    return (
       <Box>
          <Grid container spacing={2}>
