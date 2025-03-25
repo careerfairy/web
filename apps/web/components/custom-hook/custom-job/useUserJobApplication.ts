@@ -5,14 +5,19 @@ import {
 import useFingerPrint from "../useFingerPrint"
 import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 
+type Options = {
+   suspense?: boolean
+}
+
 const useUserJobApplication = (
    userId: string,
    jobId: string,
-   suspense: boolean = false
+   options?: Options
 ) => {
    const { data: fingerPrintId } = useFingerPrint()
    const jobApplicationId = `${jobId}_${userId}`
    const anonApplicationId = `${jobId}_${fingerPrintId}`
+   const { suspense = false } = options || {}
 
    const { data } = useFirestoreDocument<CustomJobApplicant>(
       "jobApplications",

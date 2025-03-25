@@ -119,18 +119,8 @@ const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
                )}
                {group?.testimonials?.length > 1 ? (
                   <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                     {/* <SeeAllLink
-                        handleClick={() =>
-                           setActiveTab?.(TabValue.testimonials)
-                        }
-                     /> */}
                      {!isMobile ? (
-                        <GenericCarousel.Arrows
-                           emblaApi={emblaApi}
-                           // leftIcon={<ArrowLeft size={32} strokeWidth={3} />}
-                           // rightIcon={<ArrowRight size={32} strokeWidth={3} />}
-                           // arrowIconProps={{ sx: { backgroundColor: "transparent" } }}
-                        />
+                        <GenericCarousel.Arrows emblaApi={emblaApi} />
                      ) : null}
                   </Stack>
                ) : null}
