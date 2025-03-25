@@ -44,6 +44,8 @@ import { JobsTab } from "./Tabs/JobsTab"
 import MentorsTab from "./Tabs/MentorsTab"
 import SparksTab from "./Tabs/SparksTab"
 
+const isTest = isTestEnvironment()
+
 const styles = sxStyles({
    tabs: {
       borderRadius: "12px 12px 0 0",
@@ -323,36 +325,6 @@ const CompanyPageOverview = ({
       ]
    )
 
-   const tabsSectionRefsMap = useMemo(() => {
-      return {
-         [TabValue.overview]: overviewSectionRef,
-         [TabValue.jobs]: jobsSectionRef,
-         [TabValue.sparks]: sparksSectionRef,
-         [TabValue.livesStreams]: livesStreamsSectionRef,
-         [TabValue.recordings]: recordingsSectionRef,
-         [TabValue.mentors]: mentorsSectionRef,
-         [TabValue.testimonials]: testimonialsSectionRef,
-         [TabValue.benefits]: benefitsSectionRef,
-      }
-   }, [
-      overviewSectionRef,
-      jobsSectionRef,
-      sparksSectionRef,
-      livesStreamsSectionRef,
-      recordingsSectionRef,
-      mentorsSectionRef,
-      testimonialsSectionRef,
-      benefitsSectionRef,
-   ])
-
-   useEffect(() => {
-      if (tab && tabsSectionRefsMap[tab].current) {
-         tabsSectionRefsMap[tab].current.scrollIntoView({
-            behavior: "smooth",
-         })
-      }
-   }, [tab, tabsSectionRefsMap])
-
    return (
       <CompanyPageContext.Provider value={contextValue}>
          <Box
@@ -395,7 +367,7 @@ const CompanyPageOverview = ({
                            <Tab
                               label={getTabLabel(TabValue.overview)}
                               value={TabValue.overview}
-                              {...(!isTestEnvironment && {
+                              {...(!isTest && {
                                  href: getTabLink(basePath, TabValue.overview),
                                  LinkComponent: Link,
                               })}
@@ -403,7 +375,7 @@ const CompanyPageOverview = ({
                            <Tab
                               label={getTabLabel(TabValue.jobs)}
                               value={TabValue.jobs}
-                              {...(!isTestEnvironment && {
+                              {...(!isTest && {
                                  href: getTabLink(basePath, TabValue.jobs),
                                  LinkComponent: Link,
                               })}
@@ -412,7 +384,7 @@ const CompanyPageOverview = ({
                               <Tab
                                  label={getTabLabel(TabValue.sparks)}
                                  value={TabValue.sparks}
-                                 {...(!isTestEnvironment && {
+                                 {...(!isTest && {
                                     href: getTabLink(basePath, TabValue.sparks),
                                     LinkComponent: Link,
                                  })}
@@ -421,7 +393,7 @@ const CompanyPageOverview = ({
                            <Tab
                               label={getTabLabel(TabValue.livesStreams)}
                               value={TabValue.livesStreams}
-                              {...(!isTestEnvironment && {
+                              {...(!isTest && {
                                  href: getTabLink(
                                     basePath,
                                     TabValue.livesStreams
@@ -432,7 +404,7 @@ const CompanyPageOverview = ({
                            <Tab
                               label={getTabLabel(TabValue.recordings)}
                               value={TabValue.recordings}
-                              {...(!isTestEnvironment && {
+                              {...(!isTest && {
                                  href: getTabLink(
                                     basePath,
                                     TabValue.recordings
@@ -444,7 +416,7 @@ const CompanyPageOverview = ({
                               <Tab
                                  label={getTabLabel(TabValue.mentors)}
                                  value={TabValue.mentors}
-                                 {...(!isTestEnvironment && {
+                                 {...(!isTest && {
                                     href: getTabLink(
                                        basePath,
                                        TabValue.mentors
@@ -456,12 +428,6 @@ const CompanyPageOverview = ({
                         </Tabs>
 
                         <Box sx={styles.tabContent}>
-                           {tab !== TabValue.overview && (
-                              <SectionAnchor
-                                 ref={tabsSectionRefsMap[tab]}
-                                 tabValue={tab}
-                              />
-                           )}
                            {tab === TabValue.overview && (
                               <Overview editMode={editMode} />
                            )}

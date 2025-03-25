@@ -69,12 +69,12 @@ const SparksPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             dialogSource={PARAMETER_SOURCE}
          >
             <SEO
-               id={`CareerFairy | ${universityName} | Jobs`}
-               title={`CareerFairy | ${universityName} | Jobs`}
-               description={`Find your dream job at ${universityName} with CareerFairy`}
+               id={`CareerFairy | ${universityName} | Sparks`}
+               title={`CareerFairy | ${universityName} | Sparks`}
+               description={`Discover ${universityName} with CareerFairy sparks`}
             />
 
-            <GenericDashboardLayout pageDisplayName={""} headerFixed>
+            <GenericDashboardLayout pageDisplayName={""}>
                <Box
                   sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
                   ref={viewRef}
