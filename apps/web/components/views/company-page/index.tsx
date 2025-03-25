@@ -32,7 +32,7 @@ import { useFirestoreDocData } from "reactfire"
 import { sxStyles } from "types/commonTypes"
 import { groupRepo } from "../../../data/RepositoryInstances"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { errorLogAndNotify } from "../../../util/CommonUtil"
+import { errorLogAndNotify, isTestEnvironment } from "../../../util/CommonUtil"
 import useListenToStreams from "../../custom-hook/useListenToStreams"
 import Header from "./Header"
 import MediaSection from "./MediaSection"
@@ -395,41 +395,62 @@ const CompanyPageOverview = ({
                            <Tab
                               label={getTabLabel(TabValue.overview)}
                               value={TabValue.overview}
-                              href={getTabLink(basePath, TabValue.overview)}
-                              LinkComponent={Link}
+                              {...(!isTestEnvironment && {
+                                 href: getTabLink(basePath, TabValue.overview),
+                                 LinkComponent: Link,
+                              })}
                            />
                            <Tab
                               label={getTabLabel(TabValue.jobs)}
                               value={TabValue.jobs}
-                              href={getTabLink(basePath, TabValue.jobs)}
-                              LinkComponent={Link}
+                              {...(!isTestEnvironment && {
+                                 href: getTabLink(basePath, TabValue.jobs),
+                                 LinkComponent: Link,
+                              })}
                            />
                            {group.publicProfile && group.hasSparks ? (
                               <Tab
                                  label={getTabLabel(TabValue.sparks)}
                                  value={TabValue.sparks}
-                                 href={getTabLink(basePath, TabValue.sparks)}
-                                 LinkComponent={Link}
+                                 {...(!isTestEnvironment && {
+                                    href: getTabLink(basePath, TabValue.sparks),
+                                    LinkComponent: Link,
+                                 })}
                               />
                            ) : null}
                            <Tab
                               label={getTabLabel(TabValue.livesStreams)}
                               value={TabValue.livesStreams}
-                              href={getTabLink(basePath, TabValue.livesStreams)}
-                              LinkComponent={Link}
+                              {...(!isTestEnvironment && {
+                                 href: getTabLink(
+                                    basePath,
+                                    TabValue.livesStreams
+                                 ),
+                                 LinkComponent: Link,
+                              })}
                            />
                            <Tab
                               label={getTabLabel(TabValue.recordings)}
                               value={TabValue.recordings}
-                              href={getTabLink(basePath, TabValue.recordings)}
-                              LinkComponent={Link}
+                              {...(!isTestEnvironment && {
+                                 href: getTabLink(
+                                    basePath,
+                                    TabValue.recordings
+                                 ),
+                                 LinkComponent: Link,
+                              })}
                            />
                            {groupCreators?.length ? (
                               <Tab
                                  label={getTabLabel(TabValue.mentors)}
                                  value={TabValue.mentors}
-                                 href={getTabLink(basePath, TabValue.mentors)}
-                                 LinkComponent={Link}
+                                 {...(!isTestEnvironment && {
+                                    href: getTabLink(
+                                       basePath,
+                                       TabValue.mentors
+                                    ),
+                                    LinkComponent: Link,
+                                 })}
                               />
                            ) : null}
                         </Tabs>
