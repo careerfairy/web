@@ -74,7 +74,7 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                description={`Find your dream job at ${universityName} with CareerFairy`}
             />
 
-            <GenericDashboardLayout pageDisplayName={""} headerFixed>
+            <GenericDashboardLayout pageDisplayName={""}>
                <Box
                   sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
                   ref={viewRef}
