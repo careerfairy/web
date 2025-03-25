@@ -29,9 +29,7 @@ type TrackProps = {
    visitorId: string
 }
 
-const LivestreamsPage: NextPage<
-   InferGetStaticPropsType<typeof getStaticProps>
-> = ({
+const MentorsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -71,12 +69,12 @@ const LivestreamsPage: NextPage<
             dialogSource={PARAMETER_SOURCE}
          >
             <SEO
-               id={`CareerFairy | ${universityName} | Jobs`}
-               title={`CareerFairy | ${universityName} | Jobs`}
-               description={`Find your dream job at ${universityName} with CareerFairy`}
+               id={`CareerFairy | ${universityName} | Mentors`}
+               title={`CareerFairy | ${universityName} | Mentors`}
+               description={`Meet mentors of ${universityName} with CareerFairy`}
             />
 
-            <GenericDashboardLayout pageDisplayName={""} headerFixed>
+            <GenericDashboardLayout pageDisplayName={""}>
                <Box
                   sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
                   ref={viewRef}
@@ -94,7 +92,7 @@ const LivestreamsPage: NextPage<
                         serverSideCustomJobs
                      )}
                      editMode={false}
-                     tab={TabValue.livesStreams}
+                     tab={TabValue.mentors}
                   />
                </Box>
             </GenericDashboardLayout>
@@ -117,4 +115,4 @@ export const getStaticPaths: GetStaticPaths = () => ({
    fallback: "blocking",
 })
 
-export default LivestreamsPage
+export default MentorsPage

@@ -71,12 +71,12 @@ const RecordingsPage: NextPage<
             dialogSource={PARAMETER_SOURCE}
          >
             <SEO
-               id={`CareerFairy | ${universityName} | Jobs`}
-               title={`CareerFairy | ${universityName} | Jobs`}
-               description={`Find your dream job at ${universityName} with CareerFairy`}
+               id={`CareerFairy | ${universityName} | Live stream recordings`}
+               title={`CareerFairy | ${universityName} | Live stream recordings`}
+               description={`Watch live stream recordings of ${universityName} with CareerFairy`}
             />
 
-            <GenericDashboardLayout pageDisplayName={""} headerFixed>
+            <GenericDashboardLayout pageDisplayName={""}>
                <Box
                   sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
                   ref={viewRef}
