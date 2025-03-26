@@ -1,0 +1,46 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { logger } from "firebase-functions/v2"
+import { HttpsError } from "firebase-functions/v2/https"
+import { validateUserIsGroupAdmin as validateUserIsGroupAdminFn } from "../../lib/validations"
+import { Middleware } from "./middleware"
+
+type WithGroupAdminData = {
+   group: Group
+   userData: UserData
+}
+
+/**
+ * Middleware to validate if the user is a group admin or CF admin
+ *
+ * Throws an exception if user is not allowed
+ *
+ * Assumes request.data.groupId exists
+ *
+ * This middleware preserves the original input type while adding WithGroupAdminData
+ */
+export function userIsGroupAdminMiddleware<
+   TInput extends { groupId: string }
+>(): Middleware<TInput, TInput & WithGroupAdminData> {
+   return async (request, next) => {
+      // Check if user is authenticated
+      if (!request.auth) {
+         logger.error("User is not authenticated")
+         throw new HttpsError("unauthenticated", "User must be authenticated")
+      }
+
+      const { group, userData } = await validateUserIsGroupAdminFn(
+         request.data.groupId,
+         request.auth.token.email
+      )
+
+      return next({
+         ...request,
+         data: {
+            ...request.data,
+            group,
+            userData,
+         },
+      })
+   }
+}

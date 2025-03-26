@@ -14,6 +14,7 @@ import {
    notificationService,
 } from "./api/repositories"
 
+import { SendNewlyPublishedEventEmailFnArgs } from "@careerfairy/shared-lib/functions/types"
 import {
    GroupDashboardInvite,
    WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
@@ -21,10 +22,10 @@ import {
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { mainProductionDomainWithProtocol } from "@careerfairy/shared-lib/utils/urls"
 import { UserRecord } from "firebase-admin/auth"
-import { onCall } from "firebase-functions/v2/https"
+import { logger } from "firebase-functions/v2"
+import { HttpsError, onCall } from "firebase-functions/v2/https"
 import { array, boolean, InferType, mixed, object, string } from "yup"
 import { auth, firestore } from "./api/firestoreAdmin"
-import { client } from "./api/postmark"
 import config from "./config"
 import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import {
@@ -33,6 +34,8 @@ import {
    validateUserAuthExists,
    validateUserIsGroupAdminOwnerRole,
 } from "./lib/validations"
+import { withMiddlewares } from "./middlewares-gen2/onCall"
+import { userIsGroupAdminMiddleware } from "./middlewares-gen2/onCall/validations"
 import {
    getDateString,
    getRatingsAverage,
@@ -42,62 +45,62 @@ import {
 } from "./util"
 import functions = require("firebase-functions")
 
-export const sendNewlyPublishedEventEmail = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      try {
-         const { senderName, stream, submitTime } = data
-         const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(
-            stream.id,
-            context.rawRequest.headers.origin
-         )
-         functions.logger.log(
-            "admins Info in newly published event",
-            adminsInfo
-         )
-         const emails = adminsInfo.map(
-            ({ email, eventDashboardLink, nextLivestreamsLink }) => ({
-               TemplateId: Number(
-                  process.env.POSTMARK_TEMPLATE_NEWLY_PUBLISHED_EVENT
-               ),
-               From: "CareerFairy <noreply@careerfairy.io>",
-               To: email,
-               TemplateModel: {
-                  sender_name: senderName,
-                  dashboard_link: addUtmTagsToLink({
-                     link: eventDashboardLink,
-                  }),
-                  next_livestreams_link: addUtmTagsToLink({
-                     link: nextLivestreamsLink,
-                     campaign: "shareEvents",
-                  }),
-                  livestream_title: stream.title,
-                  livestream_company_name: stream.company,
-                  submit_time: submitTime,
-               },
-            })
-         )
-         client.sendEmailBatchWithTemplates(emails).then(
-            (responses) => {
-               responses.forEach((response) =>
-                  functions.logger.log(
-                     "sent batch newlyPublishedEventEmail email with response:",
-                     response
-                  )
-               )
-            },
-            (error) => {
-               functions.logger.error(
-                  "sendEmailBatchWithTemplates error:" + error
-               )
-               throw new functions.https.HttpsError("unknown", error)
+// Using the improved type-inferring middleware system
+export const sendNewlyPublishedEventEmail = onCall(
+   withMiddlewares(
+      [userIsGroupAdminMiddleware<SendNewlyPublishedEventEmailFnArgs>()],
+      async (request) => {
+         try {
+            const { livestreamId } = request.data
+
+            const group = request.data.group
+
+            const stream = await livestreamsRepo.getById(livestreamId)
+
+            if (!stream) {
+               throw new HttpsError("not-found", "Livestream not found")
             }
-         )
-      } catch (e) {
-         functions.logger.error("e:" + e)
-         throw new functions.https.HttpsError("unknown", e)
+
+            const adminsInfo =
+               await livestreamsRepo.getAllGroupAdminInfoByStream(
+                  stream.id,
+                  request.rawRequest.headers.origin
+               )
+
+            logger.log("admins Info in newly published event", adminsInfo)
+
+            await notificationService.sendEmailNotifications(
+               adminsInfo.map((admin) => ({
+                  templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISH,
+                  templateData: {
+                     dashboardUrl: addUtmTagsToLink({
+                        link: admin.eventDashboardLink,
+                     }),
+                     livestream: {
+                        company: stream.company,
+                        companyLogoUrl: stream.companyLogoUrl,
+                        companyBannerImageUrl: group.bannerImageUrl,
+                        title: stream.title,
+                        url: addUtmTagsToLink({
+                           link: admin.nextLivestreamsLink,
+                           campaign: "shareEvents",
+                        }),
+                     },
+                  },
+                  identifiers: {
+                     email: admin.email,
+                  },
+                  to: admin.email,
+               }))
+            )
+            return { success: true }
+         } catch (e) {
+            logger.error("e:" + e)
+            throw new HttpsError("unknown", e)
+         }
       }
-   })
+   )
+)
 
 export const getLivestreamReportData = functions
    .region(config.region)
