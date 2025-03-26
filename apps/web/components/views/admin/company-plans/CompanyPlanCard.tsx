@@ -73,11 +73,7 @@ type Props = {
 const CompanyPlanCard = React.memo(({ presenter, setGroupToManage }: Props) => {
    const [isBoostedDialogOpen, setIsBoostedDialogOpen] = useState(false)
    const isFeaturedGroup = presenter.isFeaturedGroup()
-   console.log(
-      "🚀 ~ CompanyPlanCard ~ name, isFeaturedGroup:",
-      presenter.universityName,
-      isFeaturedGroup
-   )
+
    return (
       <Box sx={styles.root}>
          <Box sx={styles.logoContainer}>
@@ -120,6 +116,7 @@ const CompanyPlanCard = React.memo(({ presenter, setGroupToManage }: Props) => {
             </Button>
          </Stack>
          <BoostedCompanyDialog
+            featuredData={presenter.featured}
             open={isBoostedDialogOpen}
             onClose={() => setIsBoostedDialogOpen(false)}
          />

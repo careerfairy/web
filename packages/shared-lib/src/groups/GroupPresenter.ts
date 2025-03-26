@@ -1,7 +1,6 @@
 import { ImageType } from "../commonTypes"
 import { IFeatureFlagsConsumer } from "../feature-flags/IFeatureFlagsConsumer"
 import { FeatureFlagsState } from "../feature-flags/types"
-import { FieldOfStudyCategoryMap } from "../fieldOfStudy"
 import { toDate } from "../firebaseTypes"
 import { UserData } from "../users"
 import { IMAGE_CONSTANTS } from "../utils/image"
@@ -128,23 +127,6 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
       return Boolean(
          this.featured?.targetAudience?.length &&
             this.featured?.targetCountries?.length
-      )
-   }
-
-   /**
-    * Could be useful.
-    *
-    *
-    * Determines if the group is featured for a specific user.
-    * @param user The user to check if the group is featured for
-    * @returns true if the group is featured for the user, false otherwise
-    */
-   isFeaturedGroupForUser(user: UserData): boolean {
-      return (
-         this.isFeaturedGroup() &&
-         this.featured?.targetAudience?.includes(
-            FieldOfStudyCategoryMap[user?.fieldOfStudy?.id]
-         )
       )
    }
 
