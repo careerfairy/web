@@ -813,7 +813,7 @@ export class LivestreamFunctionsRepository
                groupId,
                email: adminData.email,
                eventDashboardLink: `${origin}/group/${groupId}/admin/events?eventId=${streamId}`,
-               nextLivestreamsLink: `${origin}/next-livestreams/group/${groupId}/livestream/${streamId}`,
+               nextLivestreamsLink: `${origin}/next-livestreams/livestream/${streamId}?companyId=${groupId}`,
             })
          })
       }
