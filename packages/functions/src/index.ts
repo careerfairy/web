@@ -33,7 +33,6 @@ setGlobalOptions({
 
 import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import { bundles } from "./bundles"
-import * as examples from "./examples"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import * as customerio from "./lib/customerio"
@@ -49,6 +48,7 @@ import backup = require("./backup")
 import groupAdmin = require("./groupAdmin")
 import admin = require("./admin")
 import reminders = require("./reminders")
+import remindersNoShow = require("./reminders-no-show")
 import livestreams = require("./livestreams")
 import analytics = require("./analytics")
 import breakoutRooms = require("./breakoutRooms")
@@ -397,8 +397,11 @@ exports.sendManualFollowup = followups.sendManualFollowup
 exports.sendReminderEmailAboutApplicationLink_v2 =
    followups.sendReminderEmailAboutApplicationLink
 
+// Reminders Post
+exports[FUNCTION_NAMES.onLivestreamStartScheduleNoShowReminder] =
+   remindersNoShow.onLivestreamStartScheduleNoShowReminder
+exports[FUNCTION_NAMES.sendLivestreamNoShowReminder] =
+   remindersNoShow.sendLivestreamNoShowReminder
+
 // Keep-warm function
 exports[FUNCTION_NAMES.keepFunctionsWarm] = warming.keepFunctionsWarm
-
-// Example warmable function
-exports[FUNCTION_NAMES.exampleHttp] = examples.exampleHttpFunction

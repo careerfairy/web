@@ -5,7 +5,6 @@ import {
    LiveStreamEventWithUsersLivestreamData,
    ReminderEmailStatus,
 } from "@careerfairy/shared-lib/livestreams"
-import { createCalendarEvent } from "@careerfairy/shared-lib/utils"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import {
    getHost,
@@ -14,8 +13,6 @@ import {
 import {
    addUtmTagsToLink,
    companyNameSlugify,
-   getLivestreamICSDownloadUrl,
-   makeUrls,
 } from "@careerfairy/shared-lib/utils/utils"
 import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import { error, info, log } from "firebase-functions/logger"
@@ -25,6 +22,7 @@ import ical from "ical-generator"
 import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
 import { groupRepo, notificationService } from "./api/repositories"
+import { generateCalendarData } from "./lib/calendar-helpers"
 import { getStreamsByDateWithRegisteredStudents } from "./lib/livestream"
 import {
    CUSTOMERIO_EMAIL_TEMPLATES,
@@ -32,11 +30,7 @@ import {
    EmailNotificationRequestData,
 } from "./lib/notifications/EmailTypes"
 import { OnBatchCompleteCallback } from "./lib/notifications/NotificationService"
-import {
-   addMinutesDate,
-   formatLivestreamDate,
-   isLocalEnvironment,
-} from "./util"
+import { addMinutesDate, formatLivestreamDate } from "./util"
 
 // delay to be sure that the reminder is sent at the time
 const reminderBufferMinutes = 20
@@ -333,10 +327,6 @@ const handleSendEmails = async (
          })
       }
 
-      const calendarEvent = createCalendarEvent(stream)
-
-      const urls = makeUrls(calendarEvent)
-
       // Initialize status tracking for this stream
       emailStatus[stream.id] = {
          templateId: reminder.templateId,
@@ -375,6 +365,12 @@ const handleSendEmails = async (
 
       type EmailRequest = EmailNotificationRequestData<ReminderTemplateId>
 
+      // Generate calendar data
+      const calendarData = generateCalendarData(
+         stream,
+         "fromcalendarevent-mail"
+      )
+
       // Create notification requests for all users
       const notificationRequests = registeredUsers.map<EmailRequest>(
          (userLivestreamData) => ({
@@ -406,17 +402,7 @@ const handleSendEmails = async (
                        })
                      : "",
                },
-               calendar: {
-                  google: urls.google,
-                  apple: getLivestreamICSDownloadUrl(
-                     stream.id,
-                     isLocalEnvironment(),
-                     {
-                        utmCampaign: "fromcalendarevent-mail",
-                     }
-                  ),
-                  outlook: urls.outlook,
-               },
+               calendar: calendarData,
             },
             identifiers: {
                id: getAuthUidFromUserLivestreamData(userLivestreamData),

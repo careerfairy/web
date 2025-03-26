@@ -15,6 +15,7 @@ import {
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamQueryOptions,
+   LivestreamReminderTask,
    Speaker,
    UserLivestreamData,
    getEarliestEventBufferTime,
@@ -285,6 +286,46 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       afterJob: CustomJob,
       beforeJob: CustomJob
    ): Promise<void>
+
+   /**
+    * Creates a reminder task for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param options - Configuration options for the reminder task
+    * @param options.scheduledFor - The date and time the reminder task is scheduled for
+    * @param options.reminderTaskId - The ID of the reminder task
+    * @returns A promise that resolves when the task has been created
+    */
+   createReminderTask(
+      livestreamId: string,
+      options: {
+         scheduledFor: Timestamp
+         reminderTaskId: string
+      }
+   ): Promise<void>
+
+   /**
+    * Updates a reminder task for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param taskId - The ID of the reminder task to update
+    * @param reminderTask - Updated data for the reminder task
+    * @returns A promise that resolves when the task has been updated
+    */
+   updateReminderTask(
+      livestreamId: string,
+      taskId: string,
+      reminderTask: Partial<LivestreamReminderTask>
+   ): Promise<void>
+
+   /**
+    * Checks if a reminder task exists for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param reminderTaskId - The ID of the reminder task
+    * @returns A promise that resolves to true if the task exists, false otherwise
+    */
+   getReminderTask(
+      livestreamId: string,
+      reminderTaskId: string
+   ): Promise<LivestreamReminderTask | null>
 }
 
 export class LivestreamFunctionsRepository
@@ -1216,5 +1257,61 @@ export class LivestreamFunctionsRepository
       })
 
       await batch.commit()
+   }
+
+   async createReminderTask(
+      livestreamId: string,
+      options: {
+         scheduledFor: Timestamp
+         reminderTaskId: string
+      }
+   ): Promise<void> {
+      const reminderTask: LivestreamReminderTask = {
+         status: "waiting",
+         scheduledFor: options.scheduledFor,
+         createdAt: Timestamp.now(),
+         completedAt: null,
+         cancelledAt: null,
+         results: null,
+         id: options.reminderTaskId,
+      }
+
+      return this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("reminderTasks")
+         .doc(reminderTask.id)
+         .set(reminderTask)
+   }
+
+   async updateReminderTask(
+      livestreamId: string,
+      taskId: string,
+      reminderTask: Partial<LivestreamReminderTask>
+   ): Promise<void> {
+      return this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("reminderTasks")
+         .doc(taskId)
+         .update(reminderTask)
+   }
+
+   async getReminderTask(
+      livestreamId: string,
+      reminderTaskId: string
+   ): Promise<LivestreamReminderTask | null> {
+      const taskDoc = await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("reminderTasks")
+         .doc(reminderTaskId)
+         .get()
+
+      if (!taskDoc.exists) {
+         return null
+      }
+
+      return taskDoc.data() as LivestreamReminderTask
    }
 }
