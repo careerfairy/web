@@ -23,7 +23,6 @@ type Props = {
 
 const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
    const router = useRouter()
-
    const isMobile = useIsMobile("lg")
 
    if (!groupCustomJobs?.length) return null
@@ -33,8 +32,13 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
          {groupCustomJobs.map((customJob, idx) => {
             return (
                <Link
-                  href={`/company/${router.query.companyName}/jobs?${DIALOG_JOB_ID_QUERY_PARAM}=${customJob.id}`}
-                  // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+                  href={{
+                     pathname: router.pathname,
+                     query: {
+                        ...router.query,
+                        [DIALOG_JOB_ID_QUERY_PARAM]: customJob.id,
+                     },
+                  }}
                   shallow
                   passHref
                   // Prevents the page from scrolling to the top when the link is clicked
