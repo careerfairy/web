@@ -130,44 +130,33 @@ const Slide = ({ children, slideWidth, sx, ...props }: SlideProps) => {
 }
 
 GenericCarousel.Slide = Slide
-type ArrowIconProps = {
-   sx?: SxProps
-}
 
 type ArrowsProps = {
    emblaApi: UseEmblaCarouselType[1]
-   leftIcon?: ReactElement
-   rightIcon?: ReactElement
-   arrowIconProps?: ArrowIconProps
 }
 
-const Arrows = ({
-   emblaApi,
-   leftIcon,
-   rightIcon,
-   arrowIconProps,
-}: ArrowsProps) => {
+const Arrows = ({ emblaApi }: ArrowsProps) => {
    return (
       <Stack direction={"row"} spacing={1.2}>
          <IconButton
             color="inherit"
-            sx={combineStyles(styles.arrowIcon, arrowIconProps?.sx)}
+            sx={styles.arrowIcon}
             disableRipple
             onClick={() => {
                if (emblaApi && emblaApi.canScrollPrev()) emblaApi.scrollPrev()
             }}
          >
-            {leftIcon || <ChevronLeft size={16} strokeWidth={3} />}
+            <ChevronLeft size={16} strokeWidth={3} />
          </IconButton>
          <IconButton
             color="inherit"
-            sx={combineStyles(styles.arrowIcon, arrowIconProps?.sx)}
+            sx={styles.arrowIcon}
             disableRipple
             onClick={() => {
                if (emblaApi && emblaApi.canScrollNext()) emblaApi.scrollNext()
             }}
          >
-            {rightIcon || <ChevronRight size={16} strokeWidth={3} />}
+            <ChevronRight size={16} strokeWidth={3} />
          </IconButton>
       </Stack>
    )
