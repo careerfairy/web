@@ -351,7 +351,7 @@ const CompanyPageOverview = ({
             >
                <Header />
             </Box>
-            <Container disableGutters sx={{ maxWidth: "100% !important" }}>
+            <Container disableGutters maxWidth="xl">
                <Stack
                   direction={isMobile ? "column" : "row"}
                   spacing={2}

@@ -2,6 +2,7 @@ import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import Image from "next/image"
 import Link from "next/link"
 import { ReactNode, SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
@@ -40,7 +41,7 @@ const styles = sxStyles({
       height: "66px",
       overflow: "hidden",
       zIndex: 1,
-      "&::before": {
+      "&::after": {
          content: '""',
          position: "absolute",
          top: 0,
@@ -51,11 +52,6 @@ const styles = sxStyles({
          WebkitBackdropFilter: "blur(10px)",
          backdropFilter: "blur(10px)",
       },
-   },
-   bannerImage: {
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
    },
    creator: {
       name: {
@@ -145,11 +141,18 @@ export const MentorCard = ({
       <Container creator={creator}>
          {group?.bannerImageUrl ? (
             <Box sx={styles.bannerContainer}>
-               <Box
-                  component="img"
+               <Image
                   src={group.bannerImageUrl}
                   alt=""
-                  sx={styles.bannerImage}
+                  objectFit="cover"
+                  className="bannerImage"
+                  priority
+                  fill
+                  style={{
+                     width: "100%",
+                     height: "100%",
+                     objectFit: "cover",
+                  }}
                />
             </Box>
          ) : null}
