@@ -178,13 +178,16 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    getAllGroupsWithAPlan(): Promise<Group[]>
 
    /**
-    * Retrieves all groups which have a plan expiring, taking into account a number of days as buffer. The retrieves groups shall be
-    * those which have plan.expiresAt <= Now() + days.
-    * @param type Type of plan to restrict groups by
-    * @param ignoreGroupIds List of groups to be ignored from query results (not in)
+    * Retrieves all groups that have a plan expiring within a specific time window.
+    * The query looks for plans expiring exactly N days from now, in a 24-hour window.
+    * For example, if days=7, it will find plans expiring between day 7 and day 8 from now.
+    *
+    * @param days - Number of days from now to check for plan expiration
+    * @param logger - Logger instance used for debugging query parameters
+    * @param ignoreGroupIds - Optional array of group IDs to exclude from results
+    * @returns Promise resolving to array of Group objects with expiring plans
     */
    getAllGroupsWithAPlanExpiring(
-      types: GroupPlanType[],
       days: number,
       logger: Logger,
       ignoreGroupIds?: string[]
@@ -673,24 +676,34 @@ export class GroupFunctionsRepository
    }
 
    async getAllGroupsWithAPlanExpiring(
-      types: GroupPlanType[],
       days: number,
       logger: Logger,
       ignoreGroupIds: string[] = []
    ): Promise<Group[]> {
-      const preExpirationDate = DateTime.now().plus({ days: days }).toJSDate()
+      // Calculate the start date (exactly 7 days from now)
+      const startDate = DateTime.now().plus({ days }).startOf("day").toJSDate()
+
+      // Calculate the end date (exactly 8 days from now - exactly 24 hour window)
+      const endDate = DateTime.now()
+         .plus({ days: days + 1 })
+         .startOf("day")
+         .toJSDate()
+
       logger.info(
-         " - getAllGroupsWithAPlanExpiring using expiration date -> ",
-         preExpirationDate
+         ` - getAllGroupsWithAPlanExpiring checking plans expiring exactly ${days} days from now -> `,
+         { startDate, endDate }
       )
+
       const query = this.firestore
          .collection("careerCenterData")
-         .where("plan.type", "in", types)
-         .where("plan.expiresAt", "<=", preExpirationDate)
-      const snaps = await query
+         .where("plan.expiresAt", ">=", startDate)
+         .where("plan.expiresAt", "<", endDate)
          .orderBy("plan.expiresAt")
+
+      const snaps = await query
          .withConverter(createCompatGenericConverter<Group>())
          .get()
+
       return mapFirestoreDocuments<Group>(snaps)?.filter(
          (group) => !ignoreGroupIds.includes(group.groupId)
       )

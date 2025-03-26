@@ -1,8 +1,4 @@
-import {
-   Group,
-   GroupAdmin,
-   GroupPlanTypes,
-} from "@careerfairy/shared-lib/groups"
+import { Group, GroupAdmin } from "@careerfairy/shared-lib/groups"
 import { IEmailNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 import { EmailNotificationDetails } from "@careerfairy/shared-lib/notifications/notifications"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
@@ -40,28 +36,9 @@ export class TrialService {
    async fetchData(): Promise<void> {
       this.logger.info(" - Retrieving base data")
 
-      const sentTrialNotifications =
-         await this.notificationsRepo.getNotifications("endOfSparksTrial")
-
-      // Checking if at least one group HR has received the notification and if so, ignore those groups
-      const alreadyNotifiedGroups = sentTrialNotifications
-         .filter((notification) => Boolean(notification.details.groupId))
-         .map((notification) => notification.details.groupId)
-
-      const ignoreGroups = [...new Set(alreadyNotifiedGroups)]
-
-      this.logger.info(" - ignore groups: ", ignoreGroups)
-
       this.groups = await this.groupRepo.getAllGroupsWithAPlanExpiring(
-         [
-            GroupPlanTypes.Trial,
-            GroupPlanTypes.Tier1,
-            GroupPlanTypes.Tier2,
-            GroupPlanTypes.Tier3,
-         ],
          SPARKS_TRIAL_EXPIRE_NOTIFICATION_DAYS,
-         this.logger,
-         ignoreGroups
+         this.logger
       )
    }
 

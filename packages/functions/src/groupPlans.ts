@@ -100,16 +100,8 @@ export const manualCheckExpiredPlans = functions
    })
 
 async function updateExpiredGroupPlans() {
-   const types = [
-      GroupPlanTypes.Trial,
-      GroupPlanTypes.Tier1,
-      GroupPlanTypes.Tier2,
-      GroupPlanTypes.Tier3,
-   ]
-
    try {
       const expiringGroups = await groupRepo.getAllGroupsWithAPlanExpiring(
-         types,
          0,
          functions.logger
       )
