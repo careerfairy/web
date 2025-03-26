@@ -14,7 +14,6 @@ const styles = sxStyles({
    root: {
       position: "absolute",
       inset: 0,
-      borderRadius: "8px",
       overflow: "hidden",
    },
    playerWrapper: {
@@ -47,12 +46,17 @@ const styles = sxStyles({
       width: "100%",
       [`& .${linearProgressClasses.bar}`]: {
          bgcolor: "primary.600",
+         borderRadius: "0px 34px 34px 34px",
       },
-      zIndex: 2,
-      height: 4.5,
+      [`&.${linearProgressClasses.colorPrimary}`]: {
+         backgroundColor: "rgba(205, 205, 205, 0.95)",
+      },
+      height: 6,
    },
    thumbnailOverlay: {
       position: "absolute",
+      top: 0,
+      left: 0,
       width: "100%",
       height: "100%",
       display: "flex",
@@ -70,6 +74,13 @@ const styles = sxStyles({
             "linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%)",
       },
    },
+   playerContainer: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+   },
 })
 
 type Props = {
@@ -84,6 +95,7 @@ type Props = {
    preview?: boolean
    onSecondPassed?: (secondsPassed: number) => void
    onVideoEnded?: () => void
+   startAt?: number
 }
 
 const RecordingCardPlayer: FC<Props> = ({
@@ -97,6 +109,7 @@ const RecordingCardPlayer: FC<Props> = ({
    preview,
    onSecondPassed,
    onVideoEnded,
+   startAt,
 }) => {
    const playerRef = useRef<ReactPlayer | null>(null)
    const [isVideoReady, setIsVideoReady] = useState(false)
@@ -140,32 +153,36 @@ const RecordingCardPlayer: FC<Props> = ({
    useEffect(() => {
       if (autoPlaying) {
          // if previewing, tease at 10% of the video, otherwise skip initial 8 seconds loading time
-         playerRef.current?.seekTo(preview ? 0.1 : 8)
+         if (startAt && !preview) {
+            playerRef.current?.seekTo(startAt)
+         } else if (preview) {
+            playerRef.current?.seekTo(0.1)
+         } else {
+            playerRef.current?.seekTo(8)
+         }
       }
-   }, [autoPlaying, preview])
+   }, [preview, autoPlaying, startAt])
 
    return (
       <Box sx={[styles.root]}>
          <Box sx={styles.playerWrapper}>
-            {Boolean(playingVideo) && ( // only render the video player when playing for better performance
-               <Fade in={isVideoReady} timeout={200}>
-                  <Box height="100%">
-                     <RecordingPlayer
-                        videoUrl={videoUrl}
-                        playerRef={playerRef}
-                        isVideoReady={isVideoReady}
-                        setIsVideoReady={setIsVideoReady}
-                        playingVideo={playingVideo}
-                        muted={muted}
-                        preview={preview}
-                        onSecondPassed={onSecondPassed}
-                        onVideoEnded={onVideoEnded}
-                     />
-                  </Box>
-               </Fade>
-            )}
+            <Fade in={isVideoReady} timeout={200}>
+               <Box sx={styles.playerContainer}>
+                  <RecordingPlayer
+                     videoUrl={videoUrl}
+                     playerRef={playerRef}
+                     isVideoReady={isVideoReady}
+                     setIsVideoReady={setIsVideoReady}
+                     playingVideo={playingVideo}
+                     muted={muted}
+                     preview={preview}
+                     onSecondPassed={onSecondPassed}
+                     onVideoEnded={onVideoEnded}
+                  />
+               </Box>
+            </Fade>
             <Fade in={!isVideoReady || !playingVideo} timeout={200}>
-               <Box height="100%">
+               <Box sx={styles.thumbnailOverlay}>
                   <ThumbnailOverlay src={thumbnailUrl} />
                </Box>
             </Fade>
@@ -227,6 +244,10 @@ const RecordingPlayer = ({
       },
       [videoUrl]
    )
+
+   // Avoid unnecessary fetching until the user plays the video
+   const playerUrl = playingVideo ? videoUrl : null
+
    return (
       <>
          <ReactPlayer
@@ -242,7 +263,7 @@ const RecordingPlayer = ({
             onError={handleError}
             onEnded={onVideoEnded}
             progressInterval={1000}
-            url={videoUrl}
+            url={playerUrl}
             muted={muted}
             style={{
                borderRadius: "8px",
@@ -254,7 +275,7 @@ const RecordingPlayer = ({
             <LinearProgress
                sx={styles.progress}
                variant="determinate"
-               value={progress}
+               value={progress > 1 ? progress : 1}
             />
          )}
       </>
