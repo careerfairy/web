@@ -1,4 +1,7 @@
 import Box from "@mui/material/Box"
+import LinearProgress, {
+   linearProgressClasses,
+} from "@mui/material/LinearProgress"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import React, { FC, useCallback } from "react"
 import { Volume2, VolumeX } from "react-feather"
@@ -18,6 +21,7 @@ const styles = sxStyles({
       flexDirection: "column",
       overflow: "hidden",
       aspectRatio: "16/9",
+      borderRadius: "8px",
    },
    cardContent: {
       zIndex: 1,
@@ -45,6 +49,22 @@ const styles = sxStyles({
       color: (theme) => theme.brand.white[100],
       backdropFilter: "none !important",
    },
+   progress: {
+      background: "none",
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      width: "100%",
+      [`& .${linearProgressClasses.bar}`]: {
+         bgcolor: "primary.600",
+         borderRadius: "0px 34px 34px 34px",
+      },
+      [`&.${linearProgressClasses.colorPrimary}`]: {
+         backgroundColor: "rgba(205, 205, 205, 0.95)",
+      },
+      zIndex: 2,
+      height: 6,
+   },
 })
 
 type Props = {
@@ -54,6 +74,8 @@ type Props = {
       thumbnailUrl: string
       url: string
       preview: boolean
+      startAt?: number
+      percentWatched?: number
    }
    onVideoEnded?: () => void
    autoPlaying?: boolean
@@ -115,7 +137,15 @@ const RecordingPreviewCardContainer: FC<Props> = ({
             preview={video.preview}
             onSecondPassed={onSecondPassed}
             onVideoEnded={onVideoEnded}
+            startAt={video.startAt}
          />
+         {!video.preview && video?.percentWatched > 1 ? (
+            <LinearProgress
+               sx={styles.progress}
+               variant="determinate"
+               value={video.percentWatched}
+            />
+         ) : null}
          {Boolean(autoPlaying) && (
             <Box sx={styles.muteButton} onClick={handleMuteToggle}>
                <Box
