@@ -1,8 +1,6 @@
-import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { GroupEventActions } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box } from "@mui/material"
 import { TabValue } from "components/views/company-page"
-import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { useCompaniesTracker } from "context/group/CompaniesTrackerProvider"
 import { GetStaticPaths, InferGetStaticPropsType, NextPage } from "next"
 import { useRouter } from "next/router"
@@ -12,7 +10,6 @@ import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../../components/custom-hook/useTrackDetailPageView"
 import SEO from "../../../../components/util/SEO"
 import CompanyPageOverview from "../../../../components/views/company-page"
-import { LivestreamDialogLayout } from "../../../../components/views/livestream-dialog"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import GenericDashboardLayout from "../../../../layouts/GenericDashboardLayout"
 import {
@@ -21,8 +18,6 @@ import {
    mapFromServerSide,
 } from "../../../../util/serverUtil"
 import { getCompanyPageData } from "../[[...livestreamDialog]]"
-
-const PARAMETER_SOURCE = "livestreamDialog"
 
 type TrackProps = {
    id: string
@@ -34,8 +29,6 @@ const SparksPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
    serverSideCustomJobs,
-   livestreamDialogData,
-   customJobDialogData,
    groupCreators,
 }) => {
    const { query, isReady } = useRouter()
@@ -62,42 +55,32 @@ const SparksPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    }) as unknown as React.RefObject<HTMLDivElement>
 
    return (
-      <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
-         <CustomJobDialogLayout
-            customJobDialogData={customJobDialogData}
-            source={{ source: CustomJobApplicationSourceTypes.Group, id: id }}
-            dialogSource={PARAMETER_SOURCE}
-         >
-            <SEO
-               id={`CareerFairy | ${universityName} | Sparks`}
-               title={`CareerFairy | ${universityName} | Sparks`}
-               description={`Discover ${universityName} with CareerFairy sparks`}
-            />
+      <>
+         <SEO
+            id={`CareerFairy | ${universityName} | Sparks`}
+            title={`CareerFairy | ${universityName} | Sparks`}
+            description={`Discover ${universityName} with CareerFairy sparks`}
+         />
 
-            <GenericDashboardLayout pageDisplayName={""}>
-               <Box
-                  sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
-                  ref={viewRef}
-               >
-                  <CompanyPageOverview
-                     group={serverSideGroup}
-                     groupCreators={groupCreators}
-                     upcomingLivestreams={mapFromServerSide(
-                        serverSideUpcomingLivestreams
-                     )}
-                     pastLivestreams={mapFromServerSide(
-                        serverSidePastLivestreams
-                     )}
-                     customJobs={mapCustomJobsFromServerSide(
-                        serverSideCustomJobs
-                     )}
-                     editMode={false}
-                     tab={TabValue.sparks}
-                  />
-               </Box>
-            </GenericDashboardLayout>
-         </CustomJobDialogLayout>
-      </LivestreamDialogLayout>
+         <GenericDashboardLayout pageDisplayName={""}>
+            <Box
+               sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
+               ref={viewRef}
+            >
+               <CompanyPageOverview
+                  group={serverSideGroup}
+                  groupCreators={groupCreators}
+                  upcomingLivestreams={mapFromServerSide(
+                     serverSideUpcomingLivestreams
+                  )}
+                  pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
+                  customJobs={mapCustomJobsFromServerSide(serverSideCustomJobs)}
+                  editMode={false}
+                  tab={TabValue.sparks}
+               />
+            </Box>
+         </GenericDashboardLayout>
+      </>
    )
 }
 

@@ -18,7 +18,9 @@ import {
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import { useCompaniesTracker } from "context/group/CompaniesTrackerProvider"
 import {
+   GetServerSidePropsContext,
    GetStaticPaths,
+   GetStaticPathsContext,
    GetStaticProps,
    InferGetStaticPropsType,
    NextPage,
@@ -142,12 +144,16 @@ type GetCompanyPageDataParams = {
    companyNameSlug: string
    ctx: Parameters<GetStaticProps>[0]
    parameterSource?: string
+   customJobGetter?: (
+      ctx: GetServerSidePropsContext | GetStaticPathsContext
+   ) => Promise<CustomJobDialogData>
 }
 
 export async function getCompanyPageData({
    companyNameSlug,
    ctx,
    parameterSource = PARAMETER_SOURCE,
+   customJobGetter,
 }: GetCompanyPageDataParams): Promise<{
    props?: CompanyPageData
    notFound: boolean
@@ -195,7 +201,9 @@ export async function getCompanyPageData({
          hideHidden: true,
          limit: undefined,
       }),
-      getCustomJobDialogData(ctx, parameterSource),
+      customJobGetter
+         ? customJobGetter(ctx)
+         : getCustomJobDialogData(ctx, parameterSource),
       groupRepo.getCreatorsWithPublicContent(serverSideGroup),
    ])
 
