@@ -1,10 +1,8 @@
 import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
 import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { GroupEventActions } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box } from "@mui/material"
 import { TabValue } from "components/views/company-page"
 import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
-import { useCompaniesTracker } from "context/group/CompaniesTrackerProvider"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import {
    GetServerSidePropsContext,
@@ -14,15 +12,11 @@ import {
    NextPage,
 } from "next"
 import { useRouter } from "next/router"
-import React, { useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { AnalyticsEvents } from "util/analyticsConstants"
-import { dataLayerCompanyEvent } from "util/analyticsUtils"
-import useTrackPageView from "../../../../components/custom-hook/useTrackDetailPageView"
 import SEO from "../../../../components/util/SEO"
 import CompanyPageOverview from "../../../../components/views/company-page"
 import { LivestreamDialogLayout } from "../../../../components/views/livestream-dialog"
-import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import GenericDashboardLayout from "../../../../layouts/GenericDashboardLayout"
 import {
    deserializeGroupClient,
@@ -31,11 +25,6 @@ import {
    mapFromServerSide,
 } from "../../../../util/serverUtil"
 import { getCompanyPageData } from "../[[...livestreamDialog]]"
-
-type TrackProps = {
-   id: string
-   visitorId: string
-}
 
 const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
@@ -46,29 +35,10 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    customJobDialogData,
    groupCreators,
 }) => {
-   const { query, isReady } = useRouter()
-   const { trackCompanyPageView } = useFirebaseService()
-   const { trackEvent } = useCompaniesTracker()
+   const { query } = useRouter()
    const { universityName, id } = deserializeGroupClient(serverSideGroup)
 
-   const interactionSource = query.interactionSource?.toString() || null
-
    const customJobId = query.dialogJobId?.toString() || null
-   useEffect(() => {
-      if (!isReady) return
-      trackEvent(id, GroupEventActions.Page_View, interactionSource)
-   }, [query.interactionSource, isReady, interactionSource, id, trackEvent])
-
-   const viewRef = useTrackPageView({
-      trackDocumentId: id,
-      handleTrack: ({ id, visitorId }: TrackProps) =>
-         trackCompanyPageView(id, visitorId).then(() =>
-            dataLayerCompanyEvent(
-               AnalyticsEvents.CompanyPageVisit,
-               serverSideGroup
-            )
-         ),
-   }) as unknown as React.RefObject<HTMLDivElement>
 
    const serverCustomJob = useMemo(() => {
       const { serverSideCustomJob } = customJobDialogData || {}
@@ -94,10 +64,7 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                />
 
                <GenericDashboardLayout pageDisplayName={""}>
-                  <Box
-                     sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
-                     ref={viewRef}
-                  >
+                  <Box sx={{ backgroundColor: "inherit", minHeight: "100vh" }}>
                      <CompanyPageOverview
                         group={serverSideGroup}
                         groupCreators={groupCreators}
