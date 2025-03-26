@@ -121,40 +121,40 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    )
 }
 
+export const serverCustomJobGetter = async (
+   ctx: GetServerSidePropsContext | GetStaticPropsContext
+) => {
+   try {
+      const customJobId = (ctx.params.dialogJobId as string) || null
+
+      if (customJobId) {
+         const customJob = await getServerSideCustomJob(customJobId)
+
+         return {
+            serverSideCustomJob: customJob
+               ? CustomJobsPresenter.serializeDocument(customJob)
+               : null,
+         }
+      }
+   } catch (e) {
+      errorLogAndNotify(e, {
+         message: "Error getting custom job dialog data",
+         context: "getCustomJobDialogData",
+         extra: {
+            ctx,
+         },
+      })
+   }
+   return null
+}
+
 export const getStaticProps = async (ctx) => {
    const { companyName: companyNameSlug } = ctx.params || {}
-
-   const customJobGetter = async (
-      ctx: GetServerSidePropsContext | GetStaticPropsContext
-   ) => {
-      try {
-         const customJobId = (ctx.params.dialogJobId as string) || null
-
-         if (customJobId) {
-            const customJob = await getServerSideCustomJob(customJobId)
-
-            return {
-               serverSideCustomJob: customJob
-                  ? CustomJobsPresenter.serializeDocument(customJob)
-                  : null,
-            }
-         }
-      } catch (e) {
-         errorLogAndNotify(e, {
-            message: "Error getting custom job dialog data",
-            context: "getCustomJobDialogData",
-            extra: {
-               ctx,
-            },
-         })
-      }
-      return null
-   }
 
    return getCompanyPageData({
       companyNameSlug: companyNameSlug as string,
       ctx,
-      customJobGetter,
+      customJobGetter: serverCustomJobGetter,
    })
 }
 

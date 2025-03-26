@@ -11,12 +11,11 @@ import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
 import { TabValue } from "components/views/company-page"
-import {
-   CustomJobDialogData,
-   CustomJobDialogLayout,
-} from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
+import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
+import { CustomJobDialogData } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import { useCompaniesTracker } from "context/group/CompaniesTrackerProvider"
+import { fromDate } from "data/firebase/FirebaseInstance"
 import {
    GetServerSidePropsContext,
    GetStaticPaths,
@@ -26,7 +25,7 @@ import {
    NextPage,
 } from "next"
 import { useRouter } from "next/router"
-import React, { useEffect } from "react"
+import React, { useEffect, useMemo } from "react"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
@@ -45,6 +44,7 @@ import {
    mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../util/serverUtil"
+import { serverCustomJobGetter } from "./jobs/[[...livestreamDialog]]"
 
 const PARAMETER_SOURCE = "livestreamDialog"
 
@@ -67,6 +67,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    const { trackEvent } = useCompaniesTracker()
    const { universityName, id } = deserializeGroupClient(serverSideGroup)
 
+   const customJobId = query.dialogJobId?.toString() || null
    const interactionSource = query.interactionSource?.toString() || null
 
    useEffect(() => {
@@ -85,12 +86,21 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
          ),
    }) as unknown as React.RefObject<HTMLDivElement>
 
+   const serverCustomJob = useMemo(() => {
+      const { serverSideCustomJob } = customJobDialogData || {}
+      if (!serverSideCustomJob) return null
+      return CustomJobsPresenter.parseDocument(
+         serverSideCustomJob as any,
+         fromDate
+      )
+   }, [customJobDialogData])
+
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
-         <CustomJobDialogLayout
-            customJobDialogData={customJobDialogData}
+         <CustomJobDialogProvider
             source={{ source: CustomJobApplicationSourceTypes.Group, id: id }}
-            dialogSource={PARAMETER_SOURCE}
+            serverSideCustomJob={serverCustomJob}
+            customJobId={customJobId}
          >
             <SEO
                id={`CareerFairy | ${universityName}`}
@@ -119,7 +129,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                   />
                </Box>
             </GenericDashboardLayout>
-         </CustomJobDialogLayout>
+         </CustomJobDialogProvider>
       </LivestreamDialogLayout>
    )
 }
@@ -237,6 +247,7 @@ export const getStaticProps = async (ctx) => {
    return getCompanyPageData({
       companyNameSlug: companyNameSlug as string,
       ctx,
+      customJobGetter: serverCustomJobGetter,
    })
 }
 
