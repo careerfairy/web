@@ -18,31 +18,33 @@ const styles = sxStyles({
 })
 type Props = {
    href: string
+   onClick?: () => void
 }
 
-export const SeeAllLink = ({ href }: Props) => {
+export const SeeAllLink = ({ href, onClick }: Props) => {
    const isMobile = useIsMobile()
    const theme = useTheme()
 
-   return (
-      <Link href={href}>
-         <Stack
-            direction="row"
-            alignItems="center"
-            spacing={"6px"}
-            sx={styles.root}
+   const SeelAll = (
+      <Stack
+         direction="row"
+         alignItems="center"
+         spacing={"6px"}
+         sx={styles.root}
+      >
+         <Typography
+            variant="small"
+            color="neutral.600"
+            sx={isMobile ? styles.mobileSeeAllLink : styles.seeAllLink}
+            onClick={onClick}
          >
-            <Typography
-               variant="small"
-               color="neutral.600"
-               sx={isMobile ? styles.mobileSeeAllLink : styles.seeAllLink}
-            >
-               See all
-            </Typography>
-            {isMobile ? (
-               <ArrowRight size={14} color={theme.brand.black[700]} />
-            ) : null}
-         </Stack>
-      </Link>
+            See all
+         </Typography>
+         {isMobile ? (
+            <ArrowRight size={14} color={theme.brand.black[700]} />
+         ) : null}
+      </Stack>
    )
+
+   return onClick ? SeelAll : <Link href={href}>{SeelAll}</Link>
 }

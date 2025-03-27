@@ -87,6 +87,8 @@ const EventSection = () => {
       pastLivestreams,
       editMode,
       getCompanyPageTabLink,
+      tabMode,
+      setActiveTab,
    } = useCompanyPage()
 
    const query = `companyId=${group.id}`
@@ -147,6 +149,11 @@ const EventSection = () => {
                   events={upcomingLivestreams}
                   type={EventsTypes.COMING_UP}
                   seeMoreLink={upcomingEventsHref}
+                  handleSeeMoreClick={
+                     tabMode
+                        ? () => setActiveTab(TabValue.livesStreams)
+                        : undefined
+                  }
                   styling={eventsCarouselStyling}
                   hideChipLabels={editMode}
                   showManageButton={editMode}
@@ -167,6 +174,11 @@ const EventSection = () => {
                   events={pastLivestreams ?? []}
                   type={EventsTypes.PAST_EVENTS}
                   seeMoreLink={pastEventsHref}
+                  handleSeeMoreClick={
+                     tabMode
+                        ? () => setActiveTab(TabValue.recordings)
+                        : undefined
+                  }
                   styling={eventsCarouselStyling}
                   preventPaddingSlide
                />

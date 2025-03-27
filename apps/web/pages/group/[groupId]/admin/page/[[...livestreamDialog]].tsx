@@ -1,15 +1,18 @@
+import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import {
    PublicCreator,
    pickPublicDataFromCreator,
 } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
 } from "components/views/livestream-dialog"
 import { groupRepo } from "data/RepositoryInstances"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
+import { useRouter } from "next/router"
 import CompanyPageOverview, {
    TabValue,
 } from "../../../../../components/views/company-page"
@@ -31,27 +34,38 @@ const CompanyPage: NextPage<
    livestreamDialogData,
    groupCreators,
 }) => {
+   const { query } = useRouter()
    const { groupId, universityName } = serverSideGroup
+   const customJobId = query.dialogJobId?.toString() || null
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
-         <GroupDashboardLayout
-            titleComponent={"Company Page"}
-            groupId={groupId}
+         <CustomJobDialogProvider
+            source={{
+               source: CustomJobApplicationSourceTypes.Group,
+               id: groupId,
+            }}
+            customJobId={customJobId}
          >
-            <DashboardHead title={`CareerFairy | ${universityName}`} />
-            <CompanyPageOverview
-               group={deserializeGroupClient(serverSideGroup)}
-               groupCreators={groupCreators}
-               upcomingLivestreams={mapFromServerSide(
-                  serverSideUpcomingLivestreams
-               )}
-               pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
-               customJobs={[]}
-               editMode={true}
-               tab={TabValue.overview}
-            />
-         </GroupDashboardLayout>
+            <GroupDashboardLayout
+               titleComponent={"Company Page"}
+               groupId={groupId}
+            >
+               <DashboardHead title={`CareerFairy | ${universityName}`} />
+               <CompanyPageOverview
+                  group={deserializeGroupClient(serverSideGroup)}
+                  groupCreators={groupCreators}
+                  upcomingLivestreams={mapFromServerSide(
+                     serverSideUpcomingLivestreams
+                  )}
+                  pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
+                  customJobs={[]}
+                  editMode={true}
+                  tab={TabValue.overview}
+                  tabMode
+               />
+            </GroupDashboardLayout>
+         </CustomJobDialogProvider>
       </LivestreamDialogLayout>
    )
 }
