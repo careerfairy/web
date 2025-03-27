@@ -129,6 +129,7 @@ export class TrialService {
 
    private adminToSparksTrialData(admin: GroupAdmin): SparksEndOfTrialData {
       const link = `${getWebBaseUrl()}/group/${admin.groupId}/admin/sparks`
+      const group = this.groups.find((g) => g.id === admin.groupId)
 
       return {
          user_name: admin.firstName,
@@ -139,6 +140,8 @@ export class TrialService {
             content: "end-of-trial",
          }),
          userEmail: admin.email,
+         planType: group?.plan?.type,
+         groupName: group?.universityName,
       }
    }
 }

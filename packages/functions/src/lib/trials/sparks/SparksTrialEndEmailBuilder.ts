@@ -10,13 +10,15 @@ export type SparksEndOfTrialData = SparksEndOfTrialTemplateModel & {
    userEmail: string
 }
 
+type TemplateData = EmailNotificationRequestData<
+   typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION
+>
+
 /**
  * Builds a Sparks end of trial email and sends it to the recipients using Customer.io
  */
 export class SparkTrialEndEmailBuilder {
-   private messages: EmailNotificationRequestData<
-      typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION
-   >[] = []
+   private messages: TemplateData[] = []
 
    constructor(
       private readonly notificationService: INotificationService,
@@ -48,8 +50,8 @@ export class SparkTrialEndEmailBuilder {
             email: data.userEmail,
          },
          templateData: {
-            company_name: data.user_name || "", // Adapt as needed
-            company_plan: "Sparks", // Default value, adjust as needed
+            company_name: data.groupName,
+            company_plan: data.planType,
             company_sparks_link: data.company_sparks_link,
          },
       })
