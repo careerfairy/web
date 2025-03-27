@@ -140,7 +140,7 @@ const EventSection = () => {
                      isMobile ? (
                         <EventSectionHeader
                            title="Live streams"
-                           href={`/next-livestreams?${query}`}
+                           href={upcomingEventsHref}
                         />
                      ) : null
                   }
@@ -160,7 +160,7 @@ const EventSection = () => {
                      isMobile ? (
                         <EventSectionHeader
                            title="Recordings"
-                           href={`/recordings?${query}`}
+                           href={pastEventsHref}
                         />
                      ) : null
                   }
