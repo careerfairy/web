@@ -50,8 +50,13 @@ export class TrialService {
    async buildNotifications(): Promise<void> {
       this.logger.info(" - Building notifications")
 
+      if (!this.groups) {
+         this.logger.info(" - No groups with plan expiring")
+         return
+      }
+
       const groupAdminsPromises = this.groups.map((group) =>
-         this.groupRepo.getGroupAdmins(group.groupId)
+         this.groupRepo.getGroupAdmins(group.id)
       )
 
       const groupAdminsCollections = await Promise.all(groupAdminsPromises)
