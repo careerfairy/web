@@ -12,6 +12,7 @@ type Props = {
    sx?: SxProps<Theme>
    headerSx?: SxProps<Theme>
    seeAllHref?: string
+   handleSeeAllClick?: () => void
 }
 
 export const GroupSparksCarousel = ({
@@ -31,7 +32,12 @@ export const GroupSparksCarousel = ({
          containerSx={sx}
          {...props}
          headerSx={headerSx}
-         seeAll={<SeeAllLink href={props.seeAllHref} />}
+         seeAll={
+            <SeeAllLink
+               href={props.seeAllHref}
+               onClick={props.handleSeeAllClick}
+            />
+         }
          disableArrows={isMobile}
       />
    )

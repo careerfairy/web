@@ -21,8 +21,9 @@ import { isLivestreamDialogOpen } from "components/views/livestream-dialog/Lives
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
+
 import { useRouter } from "next/router"
-import React, { ReactNode, useMemo } from "react"
+import React, { ReactNode, useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
@@ -178,6 +179,7 @@ export type EventsProps = {
    events: LivestreamEvent[]
    eventDescription?: string
    seeMoreLink?: string
+   handleSeeMoreClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
    title?: ReactNode | string
    subtitle?: ReactNode | string
    header?: ReactNode
@@ -208,6 +210,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          title,
          subtitle,
          seeMoreLink,
+         handleSeeMoreClick,
          loading = false,
          events,
          hidePreview,
@@ -227,7 +230,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          onCardClick,
          disableTracking,
          header,
-         onClickSeeMore,
          preventPaddingSlide = false,
       } = props
 
@@ -264,6 +266,16 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
       }, [isMedium, isLarge])
       const numLoadingSlides = numSlides + 2
 
+      const handleSeeMoreLinkClick = useCallback(
+         (e: React.MouseEvent<HTMLAnchorElement>) => {
+            if (handleSeeMoreClick) {
+               e.preventDefault()
+               handleSeeMoreClick(e)
+            }
+         },
+         [handleSeeMoreClick]
+      )
+
       React.useImperativeHandle(ref, () => ({
          goNext() {
             emblaApi.scrollNext()
@@ -275,7 +287,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
 
       const seeMoreComponent =
          events?.length > 1 && seeMoreLink !== undefined ? (
-            <Link href={seeMoreLink}>
+            <Link href={seeMoreLink} onClick={handleSeeMoreLinkClick}>
                <Typography sx={allStyles.seeMoreSx}>See all</Typography>
             </Link>
          ) : null
@@ -328,7 +340,11 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         <Box>
                            {seeMoreLink !== undefined &&
                            (allStyles.headerAsLink || isMobile) ? (
-                              <Link href={seeMoreLink} style={styles.titleLink}>
+                              <Link
+                                 href={seeMoreLink}
+                                 style={styles.titleLink}
+                                 onClick={handleSeeMoreLinkClick}
+                              >
                                  {getHeading(
                                     [allStyles.title, styles.underlined],
                                     allStyles.titleVariant

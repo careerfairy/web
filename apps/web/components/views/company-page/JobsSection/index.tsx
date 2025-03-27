@@ -38,6 +38,8 @@ const JobsSection = () => {
       sectionRefs: { jobsSectionRef },
       customJobs,
       getCompanyPageTabLink,
+      tabMode,
+      setActiveTab,
    } = useCompanyPage()
 
    if (!customJobs?.length) return null
@@ -57,7 +59,10 @@ const JobsSection = () => {
                      color="primary"
                      sx={styles.checkAllJobsButton}
                      href={getCompanyPageTabLink(TabValue.jobs)}
-                     LinkComponent={Link}
+                     onClick={
+                        tabMode ? () => setActiveTab(TabValue.jobs) : undefined
+                     }
+                     LinkComponent={tabMode ? "button" : Link}
                   >
                      Check all job openings
                   </Button>

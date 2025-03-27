@@ -30,7 +30,8 @@ const Loader = () => {
 const SparksSection: FC<Props> = ({ groupId }) => {
    const dispatch = useDispatch()
 
-   const { group, getCompanyPageTabLink } = useCompanyPage()
+   const { group, getCompanyPageTabLink, tabMode, setActiveTab } =
+      useCompanyPage()
    const router = useRouter()
    const isMounted = useIsMounted()
 
@@ -61,6 +62,9 @@ const SparksSection: FC<Props> = ({ groupId }) => {
                   groupId={groupId}
                   handleSparksClicked={handleSparksClicked}
                   seeAllHref={getCompanyPageTabLink(TabValue.sparks)}
+                  handleSeeAllClick={
+                     tabMode ? () => setActiveTab(TabValue.sparks) : undefined
+                  }
                   sx={{ pl: 0, mr: -2 }}
                   headerSx={{ mr: 2 }}
                />
