@@ -1,8 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import {
-   InteractionSources,
-   InteractionSourcesType,
-} from "@careerfairy/shared-lib/groups/telemetry"
+import { InteractionSourcesType } from "@careerfairy/shared-lib/groups/telemetry"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import {
    Box,
    Button,
@@ -18,7 +16,6 @@ import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import useCountGroupUpcomingLivestreams from "components/custom-hook/live-stream/useCountGroupUpcomingLivestreams"
 import useIsUserFeaturedCompany from "components/custom-hook/user/useIsUserFeaturedCompany"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import Image from "next/legacy/image"
 import { FC } from "react"
 import { Briefcase, Star } from "react-feather"
@@ -56,6 +53,7 @@ const styles = sxStyles({
          "& .illustration": {
             transform: "scale(1.1)",
          },
+         background: "rgba(0, 0, 0, 0.0005)",
       },
       height: "100%",
       minHeight: "312px",
@@ -65,6 +63,9 @@ const styles = sxStyles({
       textDecoration: "none",
       position: "absolute",
       inset: 0,
+      "& .MuiCardActionArea-focusHighlight": {
+         background: "transparent",
+      },
    },
    media: {
       height: 120,
@@ -163,6 +164,7 @@ const styles = sxStyles({
          background: (theme) => theme.brand.info[100],
       },
       zIndex: 3,
+      width: "100%",
    },
 })
 
@@ -191,7 +193,7 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
       <Card ref={ref} sx={[styles.root]}>
          <CardMedia sx={styles.media} title={company.universityName}>
             <Stack direction={"row"} ml={2} mt={2} spacing={1}>
-               <ConditionalWrapper condition={isFeaturedCompany}>
+               {isFeaturedCompany ? (
                   <Chip
                      key={"featured-company-chip"}
                      icon={
@@ -206,8 +208,8 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
                      color={"info"}
                      label={<Typography>Featured company</Typography>}
                   />
-               </ConditionalWrapper>
-               <ConditionalWrapper condition={isHiringNow}>
+               ) : null}
+               {isHiringNow ? (
                   <Chip
                      key={"hiring-now-chip"}
                      icon={
@@ -217,7 +219,7 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
                      color={"info"}
                      label={<Typography>Hiring now</Typography>}
                   />
-               </ConditionalWrapper>
+               ) : null}
             </Stack>
             <Image
                src={getResizedUrl(company.bannerImageUrl, "md")}
@@ -291,21 +293,26 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
                   />
                </Stack>
                {hasUpcomingLivestreams ? (
-                  <Button
-                     sx={styles.upcomingLivestreamButton}
-                     variant="contained"
-                     href={`${makeGroupCompanyPageUrl(company.universityName, {
-                        interactionSource:
-                           InteractionSources.Companies_Overview_Page,
-                     })}#livesStreams-section`}
+                  <Link
+                     href={`/company/${companyNameSlugify(
+                        company.universityName
+                     )}/livestreams`}
                   >
-                     <Typography variant="medium" color={theme.brand.info[600]}>
-                        {upcomingLivestreamCount} upcoming{" "}
-                        {upcomingLivestreamCount === 1
-                           ? "livestream"
-                           : "livestreams"}
-                     </Typography>
-                  </Button>
+                     <Button
+                        sx={styles.upcomingLivestreamButton}
+                        variant="contained"
+                     >
+                        <Typography
+                           variant="medium"
+                           color={theme.brand.info[600]}
+                        >
+                           {upcomingLivestreamCount} upcoming{" "}
+                           {upcomingLivestreamCount === 1
+                              ? "livestream"
+                              : "livestreams"}
+                        </Typography>
+                     </Button>
+                  </Link>
                ) : null}
             </Stack>
             <LinkToCompanyPage
@@ -405,6 +412,7 @@ const LinkToCompanyPage: FC<{
          })}
          sx={styles.actionArea}
          component={Link}
+         disableRipple
       >
          {children}
       </CardActionArea>

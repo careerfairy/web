@@ -17,6 +17,7 @@ const styles = sxStyles({
    description: {
       fontSize: "14px",
       fontWeight: 400,
+      textAlign: "center",
    },
 })
 
@@ -24,9 +25,15 @@ type Props = {
    title: string
    description: string
    icon?: ReactNode
+   children?: ReactNode
 }
 
-export const EmptyItemsView = ({ title, description, icon }: Props) => {
+export const EmptyItemsView = ({
+   title,
+   description,
+   icon,
+   children,
+}: Props) => {
    return (
       <Box
          sx={styles.root}
@@ -46,6 +53,7 @@ export const EmptyItemsView = ({ title, description, icon }: Props) => {
                {description}
             </Typography>
          </Stack>
+         {children}
       </Box>
    )
 }

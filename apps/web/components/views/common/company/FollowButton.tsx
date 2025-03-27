@@ -48,11 +48,13 @@ const toggleFollowCompany = async (
 type Props = {
    group: Group | CompanySearchResult
    interactionSource?: InteractionSourcesType
+   showStartIcon?: boolean
 } & Omit<ButtonProps, "onClick">
 const AuthedFollowButton: FC<Props> = ({
    group,
    disabled,
    interactionSource,
+   showStartIcon = true,
    ...buttonProps
 }) => {
    const { userData, authenticatedUser } = useAuth()
@@ -112,11 +114,13 @@ const AuthedFollowButton: FC<Props> = ({
          disabled={isMutating || disabled || status === "loading"}
          onClick={handleClick}
          startIcon={
-            companyFollowedData ? (
-               <FollowedIcon fontSize={"small"} />
-            ) : (
-               <FollowIcon fontSize={"small"} />
-            )
+            showStartIcon ? (
+               companyFollowedData ? (
+                  <FollowedIcon fontSize={"small"} />
+               ) : (
+                  <FollowIcon fontSize={"small"} />
+               )
+            ) : null
          }
          {...buttonProps}
          variant={companyFollowedData ? "outlined" : "contained"}
