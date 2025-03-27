@@ -16,6 +16,7 @@ const styles = sxStyles({
       padding: "12px",
       borderRadius: "16px",
       background: (theme) => theme.brand.white[400],
+      flexWrap: "wrap",
    },
    chip: {
       py: "4px",
@@ -96,7 +97,12 @@ const TargetDetails = ({ title, tags }: TargetDetailsProps) => {
          <Typography variant="medium" color={"neutral.900"} fontWeight={600}>
             {title}
          </Typography>
-         <Stack direction={"row"} spacing={"4px"}>
+         <Stack
+            direction={"row"}
+            flexWrap={"wrap"}
+            columnGap={"4px"}
+            rowGap={"8px"}
+         >
             {tags.map((tag) => (
                <Chip key={tag} label={tag} sx={styles.chip} />
             ))}

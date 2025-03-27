@@ -25,13 +25,23 @@ const styles = sxStyles({
          md: "16px",
       },
       borderRadius: "12px",
-      backgroundPosition: "-280px -130px",
-      backgroundSize: "70dvh !important",
+      backgroundPosition: {
+         xs: "-620px -420px",
+         md: "-320px -120px",
+      },
+      backgroundSize: {
+         xs: "100dvh !important",
+         md: "70dvh !important",
+      },
    },
    content: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
+      maxWidth: {
+         xs: "80%",
+         md: "60%",
+      },
    },
 })
 
