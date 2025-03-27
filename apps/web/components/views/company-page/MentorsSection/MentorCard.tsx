@@ -80,6 +80,7 @@ const styles = sxStyles({
       position: "absolute",
       right: 4,
       top: 4,
+      zIndex: 1,
    },
    logoOverlay: {
       position: "absolute",
@@ -159,11 +160,11 @@ export const MentorCard = ({
                />
             </Box>
          ) : null}
-         {Boolean(isEditMode) && (
+         {isEditMode ? (
             <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.brand.white[100]} />
             </IconButton>
-         )}
+         ) : null}
          <Box sx={styles.avatarContainer}>
             <CircularLogo
                size={84}
