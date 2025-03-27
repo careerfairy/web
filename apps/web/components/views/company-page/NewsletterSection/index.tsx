@@ -19,7 +19,14 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      mt: 12,
+      mt: {
+         xs: "12px",
+         sm: "12px",
+         md: "16px",
+      },
+      borderRadius: "12px",
+      backgroundPosition: "-280px -130px",
+      backgroundSize: "70dvh !important",
    },
    content: {
       display: "flex",
@@ -66,9 +73,14 @@ const NewsletterSection = () => {
          styles={styles.wrapper}
          isSmallBackground={true}
          bgColor={"#EFF5F8"}
+         backgroundUrl={`/stay-up-to-date-banner.svg`}
       >
          <Box sx={styles.content}>
-            <Typography variant={"h3"} fontWeight={"600"} color="black">
+            <Typography
+               variant={"brandedH2"}
+               fontWeight={"700"}
+               color="neutral.800"
+            >
                Stay up-to-date. Always.
             </Typography>
             <Typography
@@ -88,10 +100,9 @@ const NewsletterSection = () => {
                   <Button
                      onClick={handleAcceptNewsletter}
                      variant={"contained"}
-                     color={"secondary"}
-                     size={"large"}
+                     color={"primary"}
                   >
-                     SIGN ME UP
+                     Sign me up
                   </Button>
                ) : (
                   <Link

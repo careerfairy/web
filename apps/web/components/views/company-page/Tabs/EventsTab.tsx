@@ -40,8 +40,8 @@ const EMPTY_PAST_EVENTS_TITLE = "There are no recordings available"
 const EMPTY_PAST_EVENTS_DESCRIPTION =
    "Make sure to follow the company to receive their updates on upcoming live streams and new recordings when available!"
 
-const EMPTY_UPCOMING_EVENTS_TITLE = "There are no upcoming live streams"
-const EMPTY_UPCOMING_EVENTS_DESCRIPTION =
+export const EMPTY_UPCOMING_EVENTS_TITLE = "There are no upcoming live streams"
+export const EMPTY_UPCOMING_EVENTS_DESCRIPTION =
    "Make sure to follow the company to receive their updates on upcoming live streams!"
 
 export const PastEventsTab = () => {

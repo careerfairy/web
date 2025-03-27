@@ -16,6 +16,7 @@ import {
 import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGroupAvailableCustomJobs"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import { doc } from "firebase/firestore"
 import Link from "next/link"
 import {
@@ -218,7 +219,7 @@ const CompanyPageOverview = ({
 }: Props) => {
    const featureFlags = useFeatureFlags()
    const isMobile = useIsMobile()
-
+   const isMounted = useIsMounted()
    const groupRef = useMemo(
       () =>
          doc(FirestoreInstance, "careerCenterData", group.id).withConverter(
@@ -368,6 +369,7 @@ const CompanyPageOverview = ({
    const LinkComponent = (props) => (
       <Link {...props} shallow={true} scroll={true} />
    )
+   if (!isMounted) return null
 
    return (
       <CompanyPageContext.Provider value={contextValue}>

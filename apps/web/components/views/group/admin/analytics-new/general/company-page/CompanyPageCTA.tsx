@@ -1,20 +1,19 @@
-import React from "react"
-import CardCustom, { SubheaderLink } from "../../../common/CardCustom"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { Button } from "@mui/material"
+import Box from "@mui/material/Box"
 import CircularProgress, {
    circularProgressClasses,
    CircularProgressProps,
 } from "@mui/material/CircularProgress"
-import Typography from "@mui/material/Typography"
-import Box from "@mui/material/Box"
-import { sxStyles } from "../../../../../../../types/commonTypes"
-import Stack from "@mui/material/Stack"
-import BulletPoints from "../../../../../common/BulletPoints"
-import useGroupCompanyPageProgress from "../../../../../../custom-hook/useGroupCompanyPageProgress"
 import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import useGroupCompanyPageProgress from "../../../../../../custom-hook/useGroupCompanyPageProgress"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
-import { Button } from "@mui/material"
+import { BulletPoints } from "../../../../../common/BulletPoints"
 import Link from "../../../../../common/Link"
+import CardCustom, { SubheaderLink } from "../../../common/CardCustom"
 
 const progressCircleSize = 130
 

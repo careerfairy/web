@@ -16,13 +16,7 @@ type Props = Omit<BoxProps, "dangerouslySetInnerHTML"> & {
  */
 const SanitizedHTML: FC<Props> = ({ htmlString, ...boxProps }) => {
    const sanitizedString = useMemo(() => {
-      const sanitized = DOMPurify.sanitize(htmlString)
-
-      // Then clean up consecutive <p> tags and empty paragraphs
-      return sanitized
-         .replace(/<p>\s*<br>\s*<\/p>/g, "") // Remove paragraphs that only contain <br>
-         .replace(/<p>\s*<\/p>/g, "") // Remove empty paragraphs
-         .replace(/(<\/p>\s*<p>)+/g, "</p><p>") // Collapse multiple p tag pairs into one
+      return DOMPurify.sanitize(htmlString)
    }, [htmlString])
 
    return (
