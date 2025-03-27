@@ -365,6 +365,10 @@ const CompanyPageOverview = ({
       ]
    )
 
+   const LinkComponent = (props) => (
+      <Link {...props} shallow={true} scroll={true} />
+   )
+
    return (
       <CompanyPageContext.Provider value={contextValue}>
          <Box
@@ -415,7 +419,7 @@ const CompanyPageOverview = ({
                                        basePath,
                                        TabValue.overview
                                     ),
-                                    LinkComponent: Link,
+                                    LinkComponent,
                                  })}
                               onClick={() =>
                                  tabMode && setCurrentTab(TabValue.overview)
@@ -427,7 +431,7 @@ const CompanyPageOverview = ({
                               {...(!isTest &&
                                  !tabMode && {
                                     href: getTabLink(basePath, TabValue.jobs),
-                                    LinkComponent: Link,
+                                    LinkComponent,
                                  })}
                               onClick={() =>
                                  tabMode && setCurrentTab(TabValue.jobs)
@@ -443,7 +447,7 @@ const CompanyPageOverview = ({
                                           basePath,
                                           TabValue.sparks
                                        ),
-                                       LinkComponent: Link,
+                                       LinkComponent,
                                     })}
                                  onClick={() =>
                                     tabMode && setCurrentTab(TabValue.sparks)
@@ -459,7 +463,7 @@ const CompanyPageOverview = ({
                                        basePath,
                                        TabValue.livesStreams
                                     ),
-                                    LinkComponent: Link,
+                                    LinkComponent,
                                  })}
                               onClick={() =>
                                  tabMode && setCurrentTab(TabValue.livesStreams)
@@ -474,7 +478,7 @@ const CompanyPageOverview = ({
                                        basePath,
                                        TabValue.recordings
                                     ),
-                                    LinkComponent: Link,
+                                    LinkComponent,
                                  })}
                               onClick={() =>
                                  tabMode && setCurrentTab(TabValue.recordings)
@@ -490,7 +494,7 @@ const CompanyPageOverview = ({
                                           basePath,
                                           TabValue.mentors
                                        ),
-                                       LinkComponent: Link,
+                                       LinkComponent,
                                     })}
                                  onClick={() =>
                                     tabMode && setCurrentTab(TabValue.mentors)
