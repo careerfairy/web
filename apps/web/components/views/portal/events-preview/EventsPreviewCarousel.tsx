@@ -6,6 +6,7 @@ import {
    Button,
    Stack,
    SxProps,
+   Theme,
    Typography,
    TypographyProps,
    useMediaQuery,
@@ -297,20 +298,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             <GenericCarousel.Arrows emblaApi={emblaApi} />
          ) : null
 
-      const getLoadingCard = () => {
-         return (
-            <>
-               {[...Array(numLoadingSlides)].map((_, i) => (
-                  <Box key={i} sx={allStyles.slide}>
-                     <EventPreviewCard
-                        animation={isEmpty ? false : undefined}
-                        loading
-                     />
-                  </Box>
-               ))}
-            </>
-         )
-      }
       const getHeading = (
          headingStyles: SxProps,
          variant?: TypographyProps["variant"]
@@ -339,7 +326,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                      <Box sx={allStyles.eventsHeader}>
                         <Box>
                            {seeMoreLink !== undefined &&
-                           (allStyles.headerAsLink || isMobile) ? (
+                              (allStyles.headerAsLink || isMobile) ? (
                               <Link
                                  href={seeMoreLink}
                                  style={styles.titleLink}
@@ -389,8 +376,8 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                   ) : null}
                   <Stack sx={styles.previewContent}>
                      {!isMobile &&
-                     eventDescription !== undefined &&
-                     eventDescription.length > 0 ? (
+                        eventDescription !== undefined &&
+                        eventDescription.length > 0 ? (
                         <Stack>
                            <Box sx={styles.description}>
                               <Typography
@@ -420,76 +407,84 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                      <Box ref={autoPlayRef}>
                         <Box id={id} sx={allStyles.viewportSx} ref={emblaRef}>
                            <Box sx={[styles.container]}>
-                              {!loading
-                                 ? events?.length > 0
-                                    ? events?.map((event, index, arr) => (
-                                         <Box sx={allStyles.slide} key={event.id}>
-                                            <EventPreviewCard
-                                               loading={loading}
-                                               index={index}
-                                               totalElements={arr.length}
-                                               location={getLocation(type)}
-                                               event={event}
-                                               isRecommended={isRecommended}
-                                               hideChipLabels={hideChipLabels}
-                                               disableClick={disableClick}
-                                               disableTracking={disableTracking}
-                                               onGoNext={moveToNextSlide}
-                                               disableAutoPlay={
-                                                  isLSDialogOpen ||
-                                                  (type === EventsTypes.PAST_EVENTS &&
-                                                     shouldDisableAutoPlay(index))
-                                               }
-                                               muted={muted}
-                                               setMuted={setMuted}
-                                               onCardClick={
-                                                  onCardClick
-                                                     ? () => onCardClick(event)
-                                                     : null
-                                               }
-                                               bottomElement={
-                                                  showManageButton ? (
-                                                     <Box
-                                                        display="flex"
-                                                        justifyContent="center"
-                                                        flexDirection="column"
-                                                        component="span"
-                                                        width="100%"
-                                                        px={1}
-                                                     >
-                                                        <Button
-                                                           variant="contained"
-                                                           component="a"
-                                                           href="#"
-                                                           color="primary"
-                                                           onClick={(e) => {
-                                                              e.stopPropagation()
-                                                              if (
-                                                                 livestreamCreationFlowV2
-                                                              ) {
-                                                                 return editLivestream(
-                                                                    event.id
-                                                                 )
-                                                              } else {
-                                                                 return handleOpenEvent(
-                                                                    event
-                                                                 )
-                                                              }
-                                                           }}
-                                                           fullWidth
-                                                           size="small"
-                                                           sx={styles.manageBtn}
-                                                        >
-                                                           MANAGE LIVE STREAM
-                                                        </Button>
-                                                     </Box>
-                                                  ) : null
-                                               }
-                                            />
-                                         </Box>
-                                      ))
-                                    : children
-                                 : getLoadingCard()}
+                              {!loading ? (
+                                 events?.length > 0 ? (
+                                    events?.map((event, index, arr) => (
+                                       <Box sx={allStyles.slide} key={event.id}>
+                                          <EventPreviewCard
+                                             loading={loading}
+                                             index={index}
+                                             totalElements={arr.length}
+                                             location={getLocation(type)}
+                                             event={event}
+                                             isRecommended={isRecommended}
+                                             hideChipLabels={hideChipLabels}
+                                             disableClick={disableClick}
+                                             disableTracking={disableTracking}
+                                             onGoNext={moveToNextSlide}
+                                             disableAutoPlay={
+                                                isLSDialogOpen ||
+                                                (type === EventsTypes.PAST_EVENTS &&
+                                                   shouldDisableAutoPlay(index))
+                                             }
+                                             muted={muted}
+                                             setMuted={setMuted}
+                                             onCardClick={
+                                                onCardClick
+                                                   ? () => onCardClick(event)
+                                                   : null
+                                             }
+                                             bottomElement={
+                                                showManageButton ? (
+                                                   <Box
+                                                      display="flex"
+                                                      justifyContent="center"
+                                                      flexDirection="column"
+                                                      component="span"
+                                                      width="100%"
+                                                      px={1}
+                                                   >
+                                                      <Button
+                                                         variant="contained"
+                                                         component="a"
+                                                         href="#"
+                                                         color="primary"
+                                                         onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            if (
+                                                               livestreamCreationFlowV2
+                                                            ) {
+                                                               return editLivestream(
+                                                                  event.id
+                                                               )
+                                                            } else {
+                                                               return handleOpenEvent(
+                                                                  event
+                                                               )
+                                                            }
+                                                         }}
+                                                         fullWidth
+                                                         size="small"
+                                                         sx={styles.manageBtn}
+                                                      >
+                                                         MANAGE LIVE STREAM
+                                                      </Button>
+                                                   </Box>
+                                                ) : null
+                                             }
+                                          />
+                                       </Box>
+                                    ))
+                                 ) : (
+                                    children
+                                 )
+                              ) : (
+                                 <LoadingCards
+                                    numSlides={numLoadingSlides}
+                                    isEmpty={isEmpty}
+                                    slideStyle={allStyles.slide}
+                                 />
+                              )}
                               {events?.length > 0 && !preventPaddingSlide ? (
                                  <Box sx={styles.paddingSlide}></Box>
                               ) : null}
@@ -503,6 +498,31 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
       )
    }
 )
+
+type LoadingCardsProps = {
+   numSlides: number
+   isEmpty: boolean
+   slideStyle: SxProps<Theme>
+}
+
+const LoadingCards = ({
+   numSlides,
+   isEmpty,
+   slideStyle,
+}: LoadingCardsProps) => {
+   return (
+      <>
+         {[...Array(numSlides)].map((_, i) => (
+            <Box key={i} sx={slideStyle}>
+               <EventPreviewCard
+                  animation={isEmpty ? false : undefined}
+                  loading
+               />
+            </Box>
+         ))}
+      </>
+   )
+}
 
 const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
    switch (eventType) {
