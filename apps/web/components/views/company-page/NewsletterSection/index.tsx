@@ -26,11 +26,11 @@ const styles = sxStyles({
       },
       borderRadius: "12px",
       backgroundPosition: {
-         xs: "-620px -420px",
+         xs: "-270px -120px",
          md: "-320px -120px",
       },
       backgroundSize: {
-         xs: "100dvh !important",
+         xs: "400px !important",
          md: "70dvh !important",
       },
    },
