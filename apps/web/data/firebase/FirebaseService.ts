@@ -295,9 +295,8 @@ class FirebaseService {
          )
       } else if (livestream.isFaceToFace) {
          return this.sendPhysicalEventEmailRegistrationConfirmation(
-            user,
-            userData,
-            livestream
+            user.uid,
+            livestream.id
          )
       } else {
          return this.sendLivestreamEmailRegistrationConfirmation(
@@ -339,22 +338,16 @@ class FirebaseService {
    }
 
    sendPhysicalEventEmailRegistrationConfirmation = (
-      user: FirebaseReducer.AuthState,
-      userData: UserData,
-      event: LivestreamEvent
+      userUid: string,
+      livestreamId: string
    ) => {
       const sendPhysicalEventRegistrationConfirmation =
          this.functions.httpsCallable(
-            "sendPhysicalEventRegistrationConfirmationEmail_eu"
+            FUNCTION_NAMES.sendPhysicalEventRegistrationConfirmationEmail
          )
       return sendPhysicalEventRegistrationConfirmation({
-         recipientEmail: user.email,
-         user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDateWithoutHour(event.start.toDate()),
-         company_name: event.company,
-         company_logo_url: event.companyLogoUrl,
-         event_title: event.title,
-         event_address: event.address,
+         userUid,
+         livestreamId,
       })
    }
 

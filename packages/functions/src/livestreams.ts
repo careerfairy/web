@@ -7,14 +7,13 @@ import * as functions from "firebase-functions"
 import { client } from "./api/postmark"
 import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
-import { isLocalEnvironment, setCORSHeaders } from "./util"
+import { getWebBaseUrl, isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
-import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import { logger } from "firebase-functions/v2"
 import { onDocumentCreated } from "firebase-functions/v2/firestore"
+import { HttpsError, onCall } from "firebase-functions/v2/https"
 import ical from "ical-generator"
-import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
 import {
    customJobRepo,
@@ -22,16 +21,18 @@ import {
    livestreamsRepo,
    notificationService,
    sparkRepo,
+   userRepo,
 } from "./api/repositories"
+import {
+   formatLivestreamStartDate,
+   prepareEmailJobs,
+   prepareEmailSparks,
+   prepareEmailSpeakers,
+} from "./lib/email/helpers"
 import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailAttachment,
 } from "./lib/notifications/EmailTypes"
-import {
-   getJobEmailData,
-   getSparkEmailData,
-   getSpeakerEmailData,
-} from "./lib/notifications/util"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)
@@ -104,7 +105,6 @@ export const livestreamRegistrationConfirmationEmail = functions
       )
       const group = groupWithoutUniCode ?? eventGroups.at(0)
 
-      const livestreamSpeakers = livestream.speakers ?? []
       const livestreamJobs = livestream.hasJobs
          ? (await customJobRepo.getCustomJobsByLivestreamId(livestream.id)) ??
            []
@@ -113,47 +113,25 @@ export const livestreamRegistrationConfirmationEmail = functions
          ? (await sparkRepo.getPublishedSparksByGroupId(group.id)) ?? []
          : []
 
-      const emailSpeakers = livestreamSpeakers.slice(0, 4).map((speaker) => {
-         return getSpeakerEmailData(speaker, {
-            baseUrl: host,
-            livestreamId: livestream.id,
-            utmParams: {
-               source: "careerfairy",
-               medium: "email",
-               campaign: "eventRegistration",
-               content: livestream.title,
-            },
-         })
-      })
-
-      const emailJobs = livestreamJobs.slice(0, 5).map((job) =>
-         getJobEmailData(job, {
-            baseUrl: host,
-            livestreamId: livestream.id,
-            utmParams: {
-               source: "careerfairy",
-               medium: "email",
-               campaign: "eventRegistration",
-               content: livestream.title,
-            },
-         })
+      const emailSpeakers = prepareEmailSpeakers(
+         livestream,
+         host,
+         "eventRegistration"
       )
 
-      const emailSparks = groupSparks
-         .sort((sparkA, sparkB) => {
-            return sparkB.publishedAt.toMillis() - sparkA.publishedAt.toMillis()
-         })
-         .slice(0, 3)
-         .map((spark) =>
-            getSparkEmailData(spark, {
-               baseUrl: host,
-               interactionSource: SparkInteractionSources.RegistrationEmail,
-               utmParams: {
-                  campaign: "eventRegistration",
-                  content: livestream.title,
-               },
-            })
-         )
+      const emailJobs = prepareEmailJobs(
+         livestream,
+         host,
+         livestreamJobs,
+         "eventRegistration"
+      )
+
+      const emailSparks = prepareEmailSparks(
+         groupSparks,
+         livestream,
+         host,
+         "eventRegistration"
+      )
 
       // Generate ICS file content
       const cal = ical()
@@ -181,15 +159,9 @@ export const livestreamRegistrationConfirmationEmail = functions
          ),
       }
 
-      const livestreamStartDate = DateTime.fromJSDate(
-         livestream.start.toDate(),
-         {
-            zone: data.user_time_zone || "Europe/Zurich",
-         }
-      )
-
-      const formattedStartDate = livestreamStartDate.toFormat(
-         "dd LLLL yyyy 'at' hh:mm a '(GMT' Z')'"
+      const formattedStartDate = formatLivestreamStartDate(
+         livestream,
+         data.user_time_zone
       )
 
       const attachments: EmailAttachment[] = [
@@ -239,33 +211,84 @@ export const livestreamRegistrationConfirmationEmail = functions
       }
    })
 
-export const sendPhysicalEventRegistrationConfirmationEmail = functions
-   .region(config.region)
-   .https.onCall(async (data) => {
-      const email: any = {
-         TemplateId: process.env.POSTMARK_TEMPLATE_F2F_EVENT_REGISTRATION,
-         From: "CareerFairy <noreply@careerfairy.io>",
-         To: data.recipientEmail,
-         TemplateModel: {
-            user_first_name: data.user_first_name,
-            event_date: data.event_date,
-            company_name: data.company_name,
-            company_logo_url: data.company_logo_url,
-            event_title: data.event_title,
-            event_address: data.event_address,
-         },
-      }
+export const sendPhysicalEventRegistrationConfirmationEmail = onCall<{
+   userUid: string
+   livestreamId: string
+}>(async (request) => {
+   const livestream = await livestreamsRepo.getById(request.data.livestreamId)
+   const user = await userRepo.getUserDataByUid(request.data.userUid)
 
-      client.sendEmailWithTemplate(email).then(
-         () => {
-            return { status: 200 }
+   if (!livestream) {
+      logger.error("Livestream not found")
+      throw new HttpsError("not-found", "Livestream not found")
+   }
+
+   if (!user) {
+      logger.error("User not found")
+      throw new HttpsError("not-found", "User not found")
+   }
+
+   const eventGroups = await groupRepo.getGroupsByIds(livestream.groupIds)
+
+   const groupWithoutUniCode = eventGroups.find(
+      (group) => !group.universityCode
+   )
+   const group = groupWithoutUniCode ?? eventGroups.at(0)
+
+   const livestreamJobs = livestream.hasJobs
+      ? (await customJobRepo.getCustomJobsByLivestreamId(livestream.id)) ?? []
+      : []
+   const groupSparks = group.publicSparks
+      ? (await sparkRepo.getPublishedSparksByGroupId(group.id)) ?? []
+      : []
+
+   const host = request.rawRequest.headers.origin || getWebBaseUrl()
+
+   const emailSpeakers = prepareEmailSpeakers(
+      livestream,
+      host,
+      "eventRegistration"
+   )
+
+   const emailJobs = prepareEmailJobs(
+      livestream,
+      host,
+      livestreamJobs,
+      "eventRegistration"
+   )
+
+   const emailSparks = prepareEmailSparks(
+      groupSparks,
+      livestream,
+      host,
+      "eventRegistration"
+   )
+
+   const formattedStartDate = formatLivestreamStartDate(
+      livestream,
+      user.timezone
+   )
+
+   return notificationService.sendEmailNotification({
+      templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_REGISTRATION_F2F,
+      templateData: {
+         livestream: {
+            title: livestream.title,
+            company: livestream.company,
+            start: formattedStartDate,
+            companyBannerImageUrl: livestream.companyLogoUrl,
+            eventAddress: livestream.address,
          },
-         (error) => {
-            console.log("error:" + error)
-            return { status: 500, error: error }
-         }
-      )
+         jobs: emailJobs,
+         speakers: emailSpeakers,
+         sparks: emailSparks,
+      },
+      to: user.userEmail,
+      identifiers: {
+         id: user.authId,
+      },
    })
+})
 
 export const sendHybridEventRegistrationConfirmationEmail = functions
    .region(config.region)
