@@ -9,6 +9,7 @@ import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
 import { RuntimeOptions } from "firebase-functions"
 import { onCall } from "firebase-functions/v2/https"
+import { onSchedule } from "firebase-functions/v2/scheduler"
 import { groupRepo, notificationService } from "./api/repositories"
 import { withMiddlewares } from "./middlewares-gen2/onCall"
 import {
@@ -133,15 +134,13 @@ async function updateExpiredGroupPlans() {
 /**
  * Every day at 9 AM, notify all the groups that are near to the end of their Sparks trial plan creation period and haven't met the publishing criteria yet
  */
-export const sendReminderToNearEndSparksTrialPlanCreationPeriod = functions
-   .region(config.region)
-   .runWith({
-      // when sending large batches, this function can take a while to finish
+export const sendReminderToNearEndSparksTrialPlanCreationPeriod = onSchedule(
+   {
+      schedule: "0 9 * * *",
+      timeZone: "Europe/Zurich",
       timeoutSeconds: 300,
-   })
-   .pubsub.schedule("0 9 * * *")
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+   },
+   async () => {
       try {
          // get all the groups on sparks trial plan
          const groups = await groupRepo.getAllGroupsWithAPlan()
@@ -170,4 +169,5 @@ export const sendReminderToNearEndSparksTrialPlanCreationPeriod = functions
             }
          )
       }
-   })
+   }
+)
