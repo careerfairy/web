@@ -45,7 +45,7 @@ export const BoostedCompanyDialog = ({
          (country) => countriesOptionCodes.find((c) => c.id === country)?.name
       ) ?? []
    const targetAudienceNames =
-      featuredData?.targetAudience.map(
+      featuredData?.targetAudience?.map(
          (audience) => FieldOfStudyCategories[audience].name + " students"
       ) ?? []
 
