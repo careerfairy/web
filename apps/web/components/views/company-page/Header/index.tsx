@@ -1,6 +1,6 @@
 import { CompanySizesCodes } from "@careerfairy/shared-lib/constants/forms"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
-import { Box, Container, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import {
    CompanyCountryTag,
@@ -76,11 +76,7 @@ const Header = () => {
          <Box>
             <Box display={"flex"}>
                <Box bgcolor={NAV_BG_COLOR} flex={1} />
-               <Container
-                  disableGutters
-                  maxWidth={"xl"}
-                  sx={[styles.navigatorWrapper]}
-               >
+               <Box sx={styles.navigatorWrapper}>
                   <Stack
                      alignItems={"flex-end"}
                      justifyContent={"space-between"}
@@ -108,7 +104,7 @@ const Header = () => {
                         {isMobile ? null : <ActionButtons />}
                      </Box>
                   </Box>
-               </Container>
+               </Box>
                <Box flex={1} bgcolor={NAV_BG_COLOR} />
             </Box>
             <Box
