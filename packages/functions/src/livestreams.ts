@@ -276,7 +276,7 @@ export const sendPhysicalEventRegistrationConfirmationEmail = onCall<{
             title: livestream.title,
             company: livestream.company,
             start: formattedStartDate,
-            companyBannerImageUrl: livestream.companyLogoUrl,
+            companyBannerImageUrl: group.bannerImageUrl,
             eventAddress: livestream.address,
          },
          jobs: emailJobs,
