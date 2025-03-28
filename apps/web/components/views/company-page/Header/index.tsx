@@ -8,7 +8,6 @@ import {
    CompanySizeTag,
 } from "components/views/common/company/company-tags"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import { useMountedState } from "react-use"
 import { useCompanyPage } from "../"
 import { companyLogoPlaceholder } from "../../../../constants/images"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -56,7 +55,6 @@ const styles = sxStyles({
 
 const Header = () => {
    const isMobile = useIsMobile()
-   const isMounted = useMountedState()
 
    const [ref] = useElementIsAtTopOfPage({
       offset: isMobile ? -60 : 70,
@@ -65,8 +63,6 @@ const Header = () => {
    const { group } = useCompanyPage()
 
    const { logoUrl, universityName } = group
-
-   if (!isMounted()) return null
 
    return (
       <>
