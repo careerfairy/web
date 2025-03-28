@@ -25,7 +25,7 @@ export const SeeAllLink = ({ href, onClick }: Props) => {
    const isMobile = useIsMobile()
    const theme = useTheme()
 
-   const SeelAll = (
+   const SeeAll = (
       <Stack
          direction="row"
          alignItems="center"
@@ -46,5 +46,5 @@ export const SeeAllLink = ({ href, onClick }: Props) => {
       </Stack>
    )
 
-   return onClick ? SeelAll : <Link href={href}>{SeelAll}</Link>
+   return onClick ? SeeAll : <Link href={href}>{SeeAll}</Link>
 }
