@@ -1,5 +1,6 @@
 import { Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 import { useCompanyPage } from ".."
 import AboutSection from "../AboutSection"
 import EventSection from "../EventSection"
@@ -30,6 +31,7 @@ export const Overview = ({ editMode }: Props) => {
          {showFollowCompanyCta ? <FollowCompany /> : null}
          <MentorsSection />
          <EventSection />
+         <SparkPreviewDialog />
       </Stack>
    )
 }

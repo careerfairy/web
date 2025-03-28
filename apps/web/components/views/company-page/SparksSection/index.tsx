@@ -8,6 +8,7 @@ import { FallbackComponent } from "components/views/portal/sparks/FallbackCompon
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
+import { setSparkToPreview } from "store/reducers/adminSparksReducer"
 import { setCameFromPageLink } from "store/reducers/sparksFeedReducer"
 import { TabValue, useCompanyPage } from ".."
 
@@ -35,22 +36,32 @@ const SparksSection: FC<Props> = ({ groupId }) => {
    const router = useRouter()
    const isMounted = useIsMounted()
 
+   const handleTabModeSparkClick = useCallback(
+      (spark: Spark) => {
+         dispatch(setSparkToPreview(spark.id))
+      },
+      [dispatch]
+   )
    const handleSparksClicked = useCallback(
       (spark: Spark) => {
          if (spark) {
-            dispatch(setCameFromPageLink(router.asPath))
-            router.push({
-               pathname: `/sparks/${spark.id}`,
-               query: {
-                  ...router.query, // spread current query params
-                  groupId: group.id,
-                  interactionSource: SparkInteractionSources.Company_Page,
-               },
-            })
+            if (tabMode) {
+               handleTabModeSparkClick(spark)
+            } else {
+               dispatch(setCameFromPageLink(router.asPath))
+               router.push({
+                  pathname: `/sparks/${spark.id}`,
+                  query: {
+                     ...router.query, // spread current query params
+                     groupId: group.id,
+                     interactionSource: SparkInteractionSources.Company_Page,
+                  },
+               })
+            }
          }
          return
       },
-      [dispatch, group.id, router]
+      [dispatch, group.id, router, tabMode, handleTabModeSparkClick]
    )
 
    return (
