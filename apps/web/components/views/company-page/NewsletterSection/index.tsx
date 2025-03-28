@@ -33,6 +33,7 @@ const styles = sxStyles({
          xs: "400px !important",
          md: "70dvh !important",
       },
+      backgroundColor: (theme) => theme.brand.white[200],
    },
    content: {
       display: "flex",
