@@ -5,6 +5,7 @@ import {
    pickPublicDataFromCreator,
 } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
 import {
    LiveStreamDialogData,
@@ -64,6 +65,7 @@ const CompanyPage: NextPage<
                   tab={TabValue.overview}
                   tabMode
                />
+               <SparkPreviewDialog />
             </GroupDashboardLayout>
          </CustomJobDialogProvider>
       </LivestreamDialogLayout>

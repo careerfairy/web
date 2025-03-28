@@ -8,7 +8,9 @@ import SparkPreviewCard from "components/views/sparks/components/spark-card/Spar
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
+import { setSparkToPreview } from "store/reducers/adminSparksReducer"
 import { setCameFromPageLink } from "store/reducers/sparksFeedReducer"
+import { useCompanyPage } from ".."
 
 type Props = {
    groupId: string
@@ -31,25 +33,36 @@ const SparksGrid = ({ groupId }: SparksGridProps) => {
    const { data: groupSparks } = useSparks({
       groupId,
    })
+   const { tabMode } = useCompanyPage()
    const router = useRouter()
    const dispatch = useDispatch()
 
+   const handleTabModeSparkClick = useCallback(
+      (spark: Spark) => {
+         dispatch(setSparkToPreview(spark.id))
+      },
+      [dispatch]
+   )
    const handleSparksClicked = useCallback(
       (spark: Spark) => {
          if (spark) {
-            dispatch(setCameFromPageLink(router.asPath))
-            router.push({
-               pathname: `/sparks/${spark.id}`,
-               query: {
-                  ...router.query, // spread current query params
-                  groupId: groupId,
-                  interactionSource: SparkInteractionSources.Company_Page,
-               },
-            })
+            if (tabMode) {
+               handleTabModeSparkClick(spark)
+            } else {
+               dispatch(setCameFromPageLink(router.asPath))
+               router.push({
+                  pathname: `/sparks/${spark.id}`,
+                  query: {
+                     ...router.query, // spread current query params
+                     groupId: groupId,
+                     interactionSource: SparkInteractionSources.Company_Page,
+                  },
+               })
+            }
          }
          return
       },
-      [dispatch, groupId, router]
+      [dispatch, groupId, router, tabMode, handleTabModeSparkClick]
    )
 
    return (
