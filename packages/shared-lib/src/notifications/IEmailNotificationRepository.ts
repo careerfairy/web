@@ -1,15 +1,15 @@
+import { FieldValue } from "firebase-admin/firestore"
+import firebase from "firebase/compat/app"
+import { DocumentData } from "firebase/firestore"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
 } from "../BaseFirebaseRepository"
-import { FieldValue } from "firebase-admin/firestore"
+import { chunkArray } from "../utils"
 import {
-   EmailNotificationType,
    EmailNotification,
    EmailNotificationDetails,
+   EmailNotificationType,
 } from "./notifications"
-import firebase from "firebase/compat/app"
-import { DocumentData } from "firebase/firestore"
-import { chunkArray } from "../utils"
 
 export interface IEmailNotificationRepository {
    /**
