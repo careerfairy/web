@@ -31,12 +31,12 @@ export const SeeAllLink = ({ href, onClick }: Props) => {
          alignItems="center"
          spacing={"6px"}
          sx={styles.root}
+         onClick={onClick}
       >
          <Typography
             variant="small"
             color="neutral.600"
             sx={isMobile ? styles.mobileSeeAllLink : styles.seeAllLink}
-            onClick={onClick}
          >
             See all
          </Typography>
