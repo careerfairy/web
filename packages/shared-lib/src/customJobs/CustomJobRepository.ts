@@ -580,16 +580,10 @@ export class FirebaseCustomJobRepository
          .where("isPermanentlyExpired", "==", false)
          .where("deadline", ">=", new Date())
          .where("published", "==", true)
+         .where("deleted", "==", false)
          .get()
 
-      return (
-         !snapshot.empty &&
-         Boolean(
-            mapFirestoreDocuments<CustomJob>(snapshot).find(
-               (job) => !job.deleted
-            )
-         )
-      )
+      return !snapshot.empty
    }
 
    async getCustomJobsByLinkedContentIds(
