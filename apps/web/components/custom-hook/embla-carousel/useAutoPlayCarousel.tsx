@@ -7,15 +7,17 @@ type ReturnType = {
    shouldDisableAutoPlay: (index: number) => boolean
    moveToNextSlide: () => void
    ref: (node?: Element | null) => void
+   muted: boolean
+   setMuted: (muted: boolean) => void
 }
 
-export const useAutoPlaySparks = (
+export const useAutoPlayCarousel = (
    numberOfElementsToPlay: number | null,
    emblaApi: EmblaCarouselType
 ): ReturnType => {
    const isMobile = useIsMobile()
    const [autoPlayingIndex, setAutoPlayingIndex] = useState<number>(0)
-
+   const [muted, setMuted] = useState(true)
    const { ref, inView: areSlidesInView } = useInView()
 
    const [isUserScrolling, setIsUserScrolling] = useState(false)
@@ -48,6 +50,10 @@ export const useAutoPlaySparks = (
       [isMobile, areSlidesInView, autoPlayingIndex, isUserScrolling]
    )
 
+   const handleSetMuted = useCallback((newMuted: boolean) => {
+      setMuted(newMuted)
+   }, [])
+
    useEffect(() => {
       if (!emblaApi) return
 
@@ -77,5 +83,7 @@ export const useAutoPlaySparks = (
       shouldDisableAutoPlay,
       moveToNextSlide,
       ref,
+      muted,
+      setMuted: handleSetMuted,
    }
 }
