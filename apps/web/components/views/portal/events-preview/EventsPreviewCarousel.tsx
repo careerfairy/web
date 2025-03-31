@@ -12,14 +12,17 @@ import {
    useTheme,
 } from "@mui/material"
 import Box from "@mui/material/Box"
+import { useAutoPlayCarousel } from "components/custom-hook/embla-carousel/useAutoPlayCarousel"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
+import { isLivestreamDialogOpen } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import React, { ReactNode, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -195,6 +198,7 @@ export type EventsProps = {
    disableClick?: boolean
    onCardClick?: (event) => void
    disableTracking?: boolean
+   preventPaddingSlide?: boolean
 }
 
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
@@ -221,6 +225,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          disableClick,
          onCardClick,
          disableTracking,
+         preventPaddingSlide = false,
       } = props
 
       const allStyles = { ...defaultStyling, ...styling }
@@ -232,8 +237,18 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
       const [emblaRef, emblaApi] = useEmblaCarousel(options, emblaPlugins)
 
       const isMobile = useIsMobile()
+      const { query } = useRouter()
+      const isLSDialogOpen = isLivestreamDialogOpen(query)
       const { editLivestream, livestreamCreationFlowV2 } =
          useLivestreamRouting()
+
+      const {
+         shouldDisableAutoPlay,
+         moveToNextSlide,
+         ref: autoPlayRef,
+         muted,
+         setMuted,
+      } = useAutoPlayCarousel(events?.length ?? null, emblaApi)
 
       const {
          breakpoints: { up },
@@ -401,82 +416,97 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         </Stack>
                      </ConditionalWrapper>
                      {subtitle}
-                     <Box id={id} sx={allStyles.viewportSx} ref={emblaRef}>
-                        <Box sx={[styles.container]}>
-                           <ConditionalWrapper
-                              condition={!loading}
-                              fallback={getLoadingCard()}
-                           >
+                     <Box ref={autoPlayRef}>
+                        <Box id={id} sx={allStyles.viewportSx} ref={emblaRef}>
+                           <Box sx={[styles.container]}>
                               <ConditionalWrapper
-                                 condition={events?.length > 0}
-                                 fallback={children}
+                                 condition={!loading}
+                                 fallback={getLoadingCard()}
                               >
-                                 {events?.map((event, index, arr) => (
-                                    <Box sx={allStyles.slide} key={event.id}>
-                                       <EventPreviewCard
-                                          loading={loading}
-                                          index={index}
-                                          totalElements={arr.length}
-                                          location={getLocation(type)}
-                                          event={event}
-                                          isRecommended={isRecommended}
-                                          hideChipLabels={hideChipLabels}
-                                          disableClick={disableClick}
-                                          disableTracking={disableTracking}
-                                          onCardClick={
-                                             onCardClick
-                                                ? () => onCardClick(event)
-                                                : null
-                                          }
-                                          bottomElement={
-                                             showManageButton ? (
-                                                <Box
-                                                   display="flex"
-                                                   justifyContent="center"
-                                                   flexDirection="column"
-                                                   component="span"
-                                                   width="100%"
-                                                   px={1}
-                                                >
-                                                   <Button
-                                                      variant="contained"
-                                                      component="a"
-                                                      href="#"
-                                                      color="primary"
-                                                      onClick={(e) => {
-                                                         e.stopPropagation()
-                                                         if (
-                                                            livestreamCreationFlowV2
-                                                         ) {
-                                                            return editLivestream(
-                                                               event.id
-                                                            )
-                                                         } else {
-                                                            return handleOpenEvent(
-                                                               event
-                                                            )
-                                                         }
-                                                      }}
-                                                      fullWidth
-                                                      size="small"
-                                                      sx={styles.manageBtn}
+                                 <ConditionalWrapper
+                                    condition={events?.length > 0}
+                                    fallback={children}
+                                 >
+                                    {events?.map((event, index, arr) => (
+                                       <Box sx={allStyles.slide} key={event.id}>
+                                          <EventPreviewCard
+                                             loading={loading}
+                                             index={index}
+                                             totalElements={arr.length}
+                                             location={getLocation(type)}
+                                             event={event}
+                                             isRecommended={isRecommended}
+                                             hideChipLabels={hideChipLabels}
+                                             disableClick={disableClick}
+                                             disableTracking={disableTracking}
+                                             onGoNext={moveToNextSlide}
+                                             disableAutoPlay={
+                                                isLSDialogOpen ||
+                                                (type ===
+                                                   EventsTypes.PAST_EVENTS &&
+                                                   shouldDisableAutoPlay(index))
+                                             }
+                                             muted={muted}
+                                             setMuted={setMuted}
+                                             onCardClick={
+                                                onCardClick
+                                                   ? () => onCardClick(event)
+                                                   : null
+                                             }
+                                             bottomElement={
+                                                showManageButton ? (
+                                                   <Box
+                                                      display="flex"
+                                                      justifyContent="center"
+                                                      flexDirection="column"
+                                                      component="span"
+                                                      width="100%"
+                                                      px={1}
                                                    >
-                                                      MANAGE LIVE STREAM
-                                                   </Button>
-                                                </Box>
-                                             ) : null
-                                          }
-                                       />
-                                    </Box>
-                                 ))}
+                                                      <Button
+                                                         variant="contained"
+                                                         component="a"
+                                                         href="#"
+                                                         color="primary"
+                                                         onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            if (
+                                                               livestreamCreationFlowV2
+                                                            ) {
+                                                               return editLivestream(
+                                                                  event.id
+                                                               )
+                                                            } else {
+                                                               return handleOpenEvent(
+                                                                  event
+                                                               )
+                                                            }
+                                                         }}
+                                                         fullWidth
+                                                         size="small"
+                                                         sx={styles.manageBtn}
+                                                      >
+                                                         MANAGE LIVE STREAM
+                                                      </Button>
+                                                   </Box>
+                                                ) : null
+                                             }
+                                          />
+                                       </Box>
+                                    ))}
+                                 </ConditionalWrapper>
                               </ConditionalWrapper>
-                           </ConditionalWrapper>
-                           {/**
-                            * This prevents the last slide from touching the right edge of the viewport.
-                            */}
-                           <ConditionalWrapper condition={events?.length > 0}>
-                              <Box sx={styles.paddingSlide}></Box>
-                           </ConditionalWrapper>
+                              {/**
+                               * This prevents the last slide from touching the right edge of the viewport.
+                               */}
+                              <ConditionalWrapper
+                                 condition={
+                                    events?.length > 0 && !preventPaddingSlide
+                                 }
+                              >
+                                 <Box sx={styles.paddingSlide}></Box>
+                              </ConditionalWrapper>
+                           </Box>
                         </Box>
                      </Box>
                   </Stack>

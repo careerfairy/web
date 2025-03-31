@@ -20,15 +20,15 @@ import {
    buildDialogLink,
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
-import { EventPreviewCardProvider } from "./EventPreviewCardContext"
+import {
+   AdditionalContextProps,
+   EventPreviewCardProvider,
+} from "./EventPreviewCardContext"
 import LiveStreamCard from "./LiveStreamCard"
 import RecordingCard from "./RecordingCard"
 
 export type EventPreviewCardProps = {
    event?: LivestreamEvent
-   loading?: boolean
-   // Animate the loading animation, defaults to the "wave" prop
-   animation?: false | "wave" | "pulse"
    isRecommended?: boolean
    // The index of the event in the list
    index?: number
@@ -36,16 +36,13 @@ export type EventPreviewCardProps = {
    totalElements?: number
    location?: ImpressionLocation | string
    ref?: React.Ref<HTMLDivElement>
-   bottomElement?: React.ReactNode
-   // If true, the chip labels will be hidden
-   hideChipLabels?: boolean
    disableClick?: boolean
    /* Overrides the default Link click behavior of the card */
    onCardClick?: (e: React.MouseEvent<HTMLElement>) => void
    selectInput?: React.ReactNode
    selected?: boolean
    disableTracking?: boolean
-}
+} & AdditionalContextProps
 
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (props, ref) => {
@@ -55,6 +52,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       const { inView: cardInView, ref: cardInViewRef } = useInView({
          fallbackInView: true,
+         threshold: 1,
       })
 
       const hasRegistered = useUserIsRegistered(props.event?.id, {
