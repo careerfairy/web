@@ -35,7 +35,7 @@ interface UpdateDocumentsConfig<T = unknown> {
    customDataFilter?: (data: T) => boolean
 }
 
-const DUMMY_RUN = true
+const DUMMY_RUN = false
 const COLLECTION_NAME = "customJobs"
 const FIELD_TO_ORDER_BY = "id"
 
@@ -48,11 +48,11 @@ const config: UpdateDocumentsConfig<CustomJob> = {
       // .where(FIELD_TO_FILTER_BY, "!=", null)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
    updateData: {
-      deleted: true,
+      deleted: false,
       // migrationTrigger: Date.now()
    },
-   batchSize: 100,
-   waitTimeBetweenBatches: 2_000,
+   batchSize: 25,
+   waitTimeBetweenBatches: 20_000,
    dummyRun: DUMMY_RUN,
    customDataFilter: (customJob) => {
       return typeof customJob?.deleted !== "boolean"
