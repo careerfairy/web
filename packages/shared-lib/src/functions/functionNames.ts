@@ -30,6 +30,10 @@ export const FUNCTION_NAMES = {
       "onLivestreamStartScheduleNoShowReminder",
    sendLivestreamNoShowReminder: "sendLivestreamNoShowReminder",
 
+   // Livestream functions
+   sendPhysicalEventRegistrationConfirmationEmail:
+      "sendPhysicalEventRegistrationConfirmationEmail",
+
    // Utility functions
    keepFunctionsWarm: "keepFunctionsWarm",
 } as const
