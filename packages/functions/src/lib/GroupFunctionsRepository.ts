@@ -27,21 +27,24 @@ import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { firestore } from "firebase-admin"
 import { UserRecord } from "firebase-admin/auth"
-import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
 import { cloneDeep, isEmpty, union } from "lodash"
 import { DateTime } from "luxon"
-import { ServerClient } from "postmark"
 import { Timestamp, auth } from "../api/firestoreAdmin"
 import type { FunctionsLogger } from "../util"
+import { getWebBaseUrl } from "../util"
 import BigQueryCreateInsertService from "./bigQuery/BigQueryCreateInsertService"
+import {
+   CUSTOMERIO_EMAIL_TEMPLATES,
+   EmailNotificationRequestData,
+} from "./notifications/EmailTypes"
+import { INotificationService } from "./notifications/NotificationService"
 import {
    addGroupStatsOperations,
    addOperationsToDecrementGroupStatsOperations,
    addOperationsToOnlyIncrementGroupStatsOperations,
 } from "./stats/group"
 import { OperationsToMake } from "./stats/util"
-
 import DocumentSnapshot = firestore.DocumentSnapshot
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
@@ -161,7 +164,11 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @param client - The Postmark client.
     * @returns A promise that resolves when the email was sent.
     */
-   sendTrialWelcomeEmail(groupId: string, client: ServerClient): Promise<void>
+   sendTrialWelcomeEmail(
+      groupId: string,
+      companyName: string,
+      client: INotificationService
+   ): Promise<void>
 
    /**
     * Fetches all groups that are on a plan.
@@ -171,13 +178,16 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    getAllGroupsWithAPlan(): Promise<Group[]>
 
    /**
-    * Retrieves all groups which have a plan expiring, taking into account a number of days as buffer. The retrieves groups shall be
-    * those which have plan.expiresAt <= Now() + days.
-    * @param type Type of plan to restrict groups by
-    * @param ignoreGroupIds List of groups to be ignored from query results (not in)
+    * Retrieves all groups that have a plan expiring within a specific time window.
+    * The query looks for plans expiring exactly N days from now, in a 24-hour window.
+    * For example, if days=7, it will find plans expiring between day 7 and day 8 from now.
+    *
+    * @param days - Number of days from now to check for plan expiration
+    * @param logger - Logger instance used for debugging query parameters
+    * @param ignoreGroupIds - Optional array of group IDs to exclude from results
+    * @returns Promise resolving to array of Group objects with expiring plans
     */
    getAllGroupsWithAPlanExpiring(
-      types: GroupPlanType[],
       days: number,
       logger: Logger,
       ignoreGroupIds?: string[]
@@ -194,7 +204,7 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     */
    sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
-      client: ServerClient
+      client: INotificationService
    ): Promise<void>
 
    trackGroupEvents(events: GroupEventServer[]): Promise<void>
@@ -641,17 +651,17 @@ export class GroupFunctionsRepository
 
    async sendTrialWelcomeEmail(
       groupId: string,
-      client: ServerClient
+      companyName: string,
+      client: INotificationService
    ): Promise<void> {
       const admins = await this.getGroupAdmins(groupId)
 
-      sendSparksTrialPlanEmail({
+      return sendSparksTrialPlanEmail({
          client,
          admins,
-         templateId: process.env.POSTMARK_TEMPLATE_SPARKS_TRIAL_WELCOME,
+         templateId: CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_START_SUBSCRIPTION,
          content: "trial_welcome",
-         successMessage: "Successfully sent batch sparks trial welcome email",
-         errorMessage: "Error sending sparks trial welcome email:",
+         companyName,
       })
    }
 
@@ -666,24 +676,34 @@ export class GroupFunctionsRepository
    }
 
    async getAllGroupsWithAPlanExpiring(
-      types: GroupPlanType[],
       days: number,
       logger: Logger,
       ignoreGroupIds: string[] = []
    ): Promise<Group[]> {
-      const preExpirationDate = DateTime.now().plus({ days: days }).toJSDate()
+      // Calculate the start date (exactly 7 days from now)
+      const startDate = DateTime.now().plus({ days }).startOf("day").toJSDate()
+
+      // Calculate the end date (exactly 8 days from now - exactly 24 hour window)
+      const endDate = DateTime.now()
+         .plus({ days: days + 1 })
+         .startOf("day")
+         .toJSDate()
+
       logger.info(
-         " - getAllGroupsWithAPlanExpiring using expiration date -> ",
-         preExpirationDate
+         ` - getAllGroupsWithAPlanExpiring checking plans expiring exactly ${days} days from now -> `,
+         { startDate, endDate }
       )
+
       const query = this.firestore
          .collection("careerCenterData")
-         .where("plan.type", "in", types)
-         .where("plan.expiresAt", "<=", preExpirationDate)
-      const snaps = await query
+         .where("plan.expiresAt", ">=", startDate)
+         .where("plan.expiresAt", "<", endDate)
          .orderBy("plan.expiresAt")
+
+      const snaps = await query
          .withConverter(createCompatGenericConverter<Group>())
          .get()
+
       return mapFirestoreDocuments<Group>(snaps)?.filter(
          (group) => !ignoreGroupIds.includes(group.groupId)
       )
@@ -691,22 +711,17 @@ export class GroupFunctionsRepository
 
    async sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
-      client: ServerClient
+      client: INotificationService
    ): Promise<void> {
       const admins = await this.getGroupAdmins(group.id)
 
-      sendSparksTrialPlanEmail({
+      return sendSparksTrialPlanEmail({
          client,
          admins,
          templateId:
-            process.env
-               .POSTMARK_TEMPLATE_SPARKS_TRIAL_PLAN_CREATION_PERIOD_NEAR_TO_END,
-         content: "trial_contentcreation_end",
-         successMessage:
-            "Successfully sent batch sparks trial plan creation period near to end reminder",
-         errorMessage:
-            "Error sending sparks trial plan creation period near to end reminder:",
+            CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_CONTENT_CREATION_PERIOD,
          companyName: group.universityName,
+         content: "trial_contentcreation_end",
       })
    }
 
@@ -789,46 +804,47 @@ const formatToOptionArray = (
       .filter(({ id }) => selectedIds?.includes(id))
 }
 
+type ValidTemplateId =
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_START_SUBSCRIPTION
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_CONTENT_CREATION_PERIOD
+
 type SendSparksTrialPlanEmailProps = {
-   client: ServerClient
+   client: INotificationService
    admins: GroupAdmin[]
-   templateId: string | undefined
+   templateId: ValidTemplateId
    content: string
-   successMessage: string
-   errorMessage: string
-   companyName?: string
+   companyName: string
 }
 
-const sendSparksTrialPlanEmail = ({
+const sendSparksTrialPlanEmail = async ({
    client,
    admins,
    templateId,
    content,
-   successMessage,
-   errorMessage,
    companyName,
-}: SendSparksTrialPlanEmailProps): void => {
-   const emails = admins?.map(({ email, firstName, groupId }) => ({
-      TemplateId: Number(templateId),
-      From: "CareerFairy <noreply@careerfairy.io>",
-      To: email,
-      TemplateModel: {
-         user_name: firstName,
-         company_sparks_link: addUtmTagsToLink({
-            link: `https://www.careerfairy.io/group/${groupId}/admin/sparks`,
-            campaign: "sparks",
-            content: content,
-         }),
-         ...(companyName && { company_name: companyName }),
-      },
-   }))
+}: SendSparksTrialPlanEmailProps) => {
+   if (admins) {
+      const emails = admins.map<EmailNotificationRequestData<ValidTemplateId>>(
+         ({ email, groupId }) => ({
+            templateData: {
+               company_sparks_link: addUtmTagsToLink({
+                  link: `${getWebBaseUrl()}/group/${groupId}/admin/sparks`,
+                  campaign: "sparks",
+                  content,
+               }),
+               company_name: companyName,
+               company_plan: "Sparks",
+            },
+            templateId,
+            to: email,
+            identifiers: {
+               email,
+            },
+         })
+      )
 
-   client.sendEmailBatchWithTemplates(emails).then(
-      (responses) => {
-         responses.forEach(() => functions.logger.log(successMessage))
-      },
-      (error) => {
-         functions.logger.error(errorMessage + error)
-      }
-   )
+      await client.sendEmailNotifications(emails)
+   }
+
+   return
 }

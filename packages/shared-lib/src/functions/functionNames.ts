@@ -13,6 +13,11 @@ export const FUNCTION_NAMES = {
 
    // Group Admin functions
    sendNewlyPublishedEventEmail: "sendNewlyPublishedEventEmail",
+   startPlan: "startPlan_v4",
+   sendReminderToNearEndSparksTrialPlanCreationPeriod:
+      "sendReminderToNearEndSparksTrialPlanCreationPeriod_v2",
+   endOfSparksTrialEmails: "endOfSparksTrialEmails_v2",
+   manualEndOfSparksTrialEmails: "manualEndOfSparksTrialEmails",
 
    // Auth functions
    // createNewUserAccount: "createNewUserAccount_v4",

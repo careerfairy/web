@@ -1,64 +1,61 @@
 import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { TemplatedMessage } from "postmark"
-import { PostmarkEmailSender } from "src/api/postmark"
-import { SparksEndOfTrialTag, SparksEndOfTrialTemplateModel } from "../trialEnd"
-
-type EnfOfTrialTemplateData<
-   TemplateModelType,
-   Tag extends SparksEndOfTrialTag
-> = {
-   From: string
-   To: string
-   TemplateId: number
-   TemplateModel: TemplateModelType
-   MessageStream: string
-   Tag: Tag
-}
-
-type SparksEnfOfTrialTemplateData = EnfOfTrialTemplateData<
-   SparksEndOfTrialTemplateModel,
-   "sparks-end-of-trial"
->
+import {
+   CUSTOMERIO_EMAIL_TEMPLATES,
+   EmailNotificationRequestData,
+} from "../../notifications/EmailTypes"
+import { INotificationService } from "../../notifications/NotificationService"
+import { SparksEndOfTrialTemplateModel } from "../trialEnd"
 
 export type SparksEndOfTrialData = SparksEndOfTrialTemplateModel & {
    userEmail: string
 }
 
-const FROM = "CareerFairy <noreply@careerfairy.io>"
+type TemplateData = EmailNotificationRequestData<
+   typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION
+>
+
 /**
- * Builds an Onboarding newsletter email (templated) and each batch, according to its type, to the various recipients
+ * Builds a Sparks end of trial email and sends it to the recipients using Customer.io
  */
 export class SparkTrialEndEmailBuilder {
-   private messages: TemplatedMessage[] = []
+   private messages: TemplateData[] = []
 
    constructor(
-      private readonly sender: PostmarkEmailSender,
+      private readonly notificationService: INotificationService,
       private readonly logger: Logger
    ) {}
-
-   private getEndOfTrialTemplate(
-      model: SparksEndOfTrialData
-   ): SparksEnfOfTrialTemplateData {
-      return {
-         From: FROM,
-         To: model.userEmail,
-         TemplateId: Number(process.env.POSTMARK_TEMPLATE_TRIAL_END_SPARKS),
-         TemplateModel: model,
-         MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "sparks-end-of-trial",
-      }
-   }
 
    /**
     * Adds a recipient to the list of messages
     */
    addRecipient(data: SparksEndOfTrialData): SparkTrialEndEmailBuilder {
-      const duplicateMessage = (m: SparksEnfOfTrialTemplateData) =>
-         m.To == data.userEmail && m.TemplateModel.groupId == data.groupId
+      // We need to adapt our check since the structure changed
+      const duplicateMessage = (
+         m: EmailNotificationRequestData<
+            typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION
+         >
+      ) =>
+         m.to === data.userEmail &&
+         m.templateData.company_sparks_link === data.company_sparks_link
+
       // double check for not sending duplicates even though should not be needed here
       if (this.messages.find(duplicateMessage)) return this
+
       this.logger.info("SparkTrialEndEmailBuilder ~ adding:", data)
-      this.messages.push(this.getEndOfTrialTemplate(data))
+
+      this.messages.push({
+         templateId: CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION,
+         to: data.userEmail,
+         identifiers: {
+            email: data.userEmail,
+         },
+         templateData: {
+            company_name: data.groupName,
+            company_plan: data.planType,
+            company_sparks_link: data.company_sparks_link,
+         },
+      })
+
       return this
    }
 
@@ -71,37 +68,35 @@ export class SparkTrialEndEmailBuilder {
    }
 
    /**
-    * Send the postmark email for the stored messages
+    * Send the Customer.io email for the stored messages
     */
-   send(): Promise<void[]> {
+   async send(): Promise<void> {
       if (!this.messages.length) {
          return null
       }
 
-      return this.sender
-         .sendEmailBatchWithTemplates(this.messages, (err) => {
-            if (err) {
-               this.logger.info(
-                  "error sending end of sparks trial emails:",
-                  err,
-                  this.messages
-               )
-               this.logger.error(
-                  "Unable to send end of sparks trial emails via postmark",
-                  {
-                     error: err,
-                  }
-               )
-               return
-            }
-         })
-         .finally(() => {
-            // Clear items, allowing the object be reused
-            this.messages = []
-         })
+      try {
+         const result = await this.notificationService.sendEmailNotifications(
+            this.messages
+         )
+
+         this.logger.info(
+            `Completed sending end of sparks trial emails: ${result.successful} successful, ${result.failed} failed`
+         )
+      } catch (error) {
+         this.logger.error(
+            "Unable to send end of sparks trial emails via Customer.io",
+            { error }
+         )
+      } finally {
+         // Clear items, allowing the object be reused
+         this.messages = []
+      }
    }
 
-   getRecipients(): TemplatedMessage[] {
+   getRecipients(): EmailNotificationRequestData<
+      typeof CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION
+   >[] {
       return this.messages
    }
 }

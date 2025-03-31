@@ -1,14 +1,10 @@
-import {
-   Group,
-   GroupAdmin,
-   GroupPlanTypes,
-} from "@careerfairy/shared-lib/groups"
+import { Group, GroupAdmin } from "@careerfairy/shared-lib/groups"
 import { IEmailNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 import { EmailNotificationDetails } from "@careerfairy/shared-lib/notifications/notifications"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { getHost } from "@careerfairy/shared-lib/utils/urls"
-import { IGroupFunctionsRepository } from "src/lib/GroupFunctionsRepository"
+import { IGroupFunctionsRepository } from "../../../lib/GroupFunctionsRepository"
+import { getWebBaseUrl } from "../../../util"
 import {
    SparkTrialEndEmailBuilder,
    SparksEndOfTrialData,
@@ -40,23 +36,9 @@ export class TrialService {
    async fetchData(): Promise<void> {
       this.logger.info(" - Retrieving base data")
 
-      const sentTrialNotifications =
-         await this.notificationsRepo.getNotifications("endOfSparksTrial")
-
-      // Checking if at least one group HR has received the notification and if so, ignore those groups
-      const alreadyNotifiedGroups = sentTrialNotifications
-         .filter((notification) => Boolean(notification.details.groupId))
-         .map((notification) => notification.details.groupId)
-
-      const ignoreGroups = [...new Set(alreadyNotifiedGroups)]
-
-      this.logger.info(" - ignore groups: ", ignoreGroups)
-
       this.groups = await this.groupRepo.getAllGroupsWithAPlanExpiring(
-         [GroupPlanTypes.Trial],
          SPARKS_TRIAL_EXPIRE_NOTIFICATION_DAYS,
-         this.logger,
-         ignoreGroups
+         this.logger
       )
    }
 
@@ -68,8 +50,13 @@ export class TrialService {
    async buildNotifications(): Promise<void> {
       this.logger.info(" - Building notifications")
 
+      if (!this.groups) {
+         this.logger.info(" - No groups with plan expiring")
+         return
+      }
+
       const groupAdminsPromises = this.groups.map((group) =>
-         this.groupRepo.getGroupAdmins(group.groupId)
+         this.groupRepo.getGroupAdmins(group.id)
       )
 
       const groupAdminsCollections = await Promise.all(groupAdminsPromises)
@@ -146,7 +133,8 @@ export class TrialService {
    }
 
    private adminToSparksTrialData(admin: GroupAdmin): SparksEndOfTrialData {
-      const link = `${getHost()}/group/${admin.groupId}/admin/sparks`
+      const link = `${getWebBaseUrl()}/group/${admin.groupId}/admin/sparks`
+      const group = this.groups.find((g) => g.id === admin.groupId)
 
       return {
          user_name: admin.firstName,
@@ -157,6 +145,8 @@ export class TrialService {
             content: "end-of-trial",
          }),
          userEmail: admin.email,
+         planType: group?.plan?.type,
+         groupName: group?.universityName,
       }
    }
 }
