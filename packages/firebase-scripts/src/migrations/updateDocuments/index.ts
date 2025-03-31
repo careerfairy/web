@@ -2,7 +2,11 @@ import { CustomJob } from "@careerfairy/shared-lib/src/customJobs/customJobs"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import { firestore } from "../../lib/firebase"
-import { handleBulkWriterError, handleBulkWriterSuccess, writeProgressBar } from "../../util/bulkWriter"
+import {
+   handleBulkWriterError,
+   handleBulkWriterSuccess,
+   writeProgressBar,
+} from "../../util/bulkWriter"
 import { logAction } from "../../util/logger"
 
 interface UpdateDocumentsConfig<T = unknown> {
@@ -10,9 +14,11 @@ interface UpdateDocumentsConfig<T = unknown> {
    updateData: Partial<{ [K in keyof T]: T[K] }>
    batchSize?: number
    waitTimeBetweenBatches?: number
+   dummyRun?: boolean
    customDataFilter?: (data: T) => boolean
 }
 
+const DUMMY_RUN = true
 const COLLECTION_NAME = "customJobs"
 const FIELD_TO_ORDER_BY = "id"
 
@@ -27,7 +33,7 @@ const config: UpdateDocumentsConfig<CustomJob> = {
    updateData: { deleted: true },
    batchSize: 500,
    waitTimeBetweenBatches: 500,
-   // Example of how to use customDataFilter:
+   dummyRun: DUMMY_RUN,
    customDataFilter: (customJob) => {
       return typeof customJob?.deleted !== "boolean"
    },
@@ -85,12 +91,16 @@ export async function run() {
                continue
             }
             console.log(
-               `Processing document ${doc.id} - ${doc.data()?.title}`
+               `Processing document ${doc.id} - ${doc.data()?.title} ${
+                  config.dummyRun ? " - DUMMY RUN" : ""
+               }`
             )
-            bulkWriter
-               .update(doc.ref, config.updateData)
-               .then(() => handleBulkWriterSuccess(counter))
-               .catch((err) => handleBulkWriterError(err, counter))
+            if (!config.dummyRun) {
+               bulkWriter
+                  .update(doc.ref, config.updateData)
+                  .then(() => handleBulkWriterSuccess(counter))
+                  .catch((err) => handleBulkWriterError(err, counter))
+            }
          }
 
          lastDoc = docs[docs.length - 1]
