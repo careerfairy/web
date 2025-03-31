@@ -31,8 +31,8 @@ const config: UpdateDocumentsConfig<CustomJob> = {
       // .where(FIELD_TO_FILTER_BY, "!=", null)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
    updateData: { deleted: true },
-   batchSize: 500,
-   waitTimeBetweenBatches: 500,
+   batchSize: 100,
+   waitTimeBetweenBatches: 2_000,
    dummyRun: DUMMY_RUN,
    customDataFilter: (customJob) => {
       return typeof customJob?.deleted !== "boolean"
@@ -90,11 +90,13 @@ export async function run() {
                skips++
                continue
             }
+
             console.log(
                `Processing document ${doc.id} - ${doc.data()?.title} ${
                   config.dummyRun ? " - DUMMY RUN" : ""
                }`
             )
+
             if (!config.dummyRun) {
                bulkWriter
                   .update(doc.ref, config.updateData)
