@@ -127,7 +127,7 @@ const NewsletterSection = () => {
                   >
                      <Button
                         variant={"contained"}
-                        color={"secondary"}
+                        color={"primary"}
                         size={"large"}
                      >
                         Join CareerFairy
