@@ -372,8 +372,9 @@ export interface RecordingStatsUser extends Identifiable {
    livestreamStartDate?: firebase.firestore.Timestamp
    userId: string
    recordingBought?: boolean
-   minutesWatched: number
+   minutesWatched?: number
    date: firebase.firestore.Timestamp
+   lastSecondWatched?: number
 }
 
 export interface LivestreamJobApplicationDetails extends JobIdentifier {

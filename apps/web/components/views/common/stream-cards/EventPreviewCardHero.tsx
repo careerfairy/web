@@ -10,7 +10,6 @@ import {
    getResizedUrl,
 } from "components/helperFunctions/HelperFunctions"
 import { placeholderBanner } from "constants/images"
-import { livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import Image from "next/image"
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -20,6 +19,7 @@ import { useEventPreviewCardContext } from "./EventPreviewCardContext"
 import { RecordingPlayIcon } from "./RecordingPlayIcon"
 import RecordingPreviewCardContainer from "./RecordingPreviewCardContainer"
 import { RecordingUnavailableIcon } from "./RecordingUnavailableIcon"
+import useRecordingProgressTracker from "./useRecordingProgressTracker"
 const bottomContentHeight = 50
 
 const styles = sxStyles({
@@ -411,23 +411,12 @@ const VideoPreviewHero = ({
    onVideoEnded: () => void
    recordingToken: RecordingToken
 }) => {
-   const { userData } = useAuth()
    const { livestream, startDate, autoPlaying } = useEventPreviewCardContext()
-
-   const onSecondPassed = useCallback(
-      (secondsPassed: number) => {
-         if (Math.round(secondsPassed) % 60 === 0 && userData?.userEmail) {
-            livestreamRepo.updateRecordingStats({
-               livestreamId: livestream.id,
-               livestreamStartDate: livestream.start,
-               minutesWatched: 1,
-               onlyIncrementMinutes: true,
-               userId: userData.userEmail,
-            })
-         }
-      },
-      [livestream.id, livestream.start, userData?.userEmail]
-   )
+   const { currentPercentage, videoStartPosition, onSecondPassed } =
+      useRecordingProgressTracker({
+         livestream,
+         playing: autoPlaying,
+      })
 
    return (
       <>
@@ -441,6 +430,8 @@ const VideoPreviewHero = ({
                      recordingToken.sid
                   ),
                   preview: preview,
+                  startAt: videoStartPosition,
+                  percentWatched: currentPercentage,
                }}
                autoPlaying={autoPlaying}
                onSecondPassed={onSecondPassed}
