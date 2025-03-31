@@ -158,7 +158,7 @@ exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
 // Livestreams
 exports.sendLivestreamRegistrationConfirmationEmail_v6 =
    livestreams.livestreamRegistrationConfirmationEmail
-exports.sendPhysicalEventRegistrationConfirmationEmail_eu =
+exports[FUNCTION_NAMES.sendPhysicalEventRegistrationConfirmationEmail] =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail
 exports.sendHybridEventRegistrationConfirmationEmail_eu =
    livestreams.sendHybridEventRegistrationConfirmationEmail
