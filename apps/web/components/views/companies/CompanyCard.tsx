@@ -53,30 +53,23 @@ const styles = sxStyles({
          "& .illustration": {
             transform: "scale(1.1)",
          },
-         background: "rgba(0, 0, 0, 0.0005)",
       },
       height: "100%",
       minHeight: "312px",
+      border: (theme) => `1px solid ${theme.palette.secondary[50]}`,
+      ".MuiCardActionArea-focusHighlight": {
+         background: "transparent",
+      },
    },
    actionArea: {
       color: "text.primary",
       textDecoration: "none",
       position: "absolute",
       inset: 0,
-      "& .MuiCardActionArea-focusHighlight": {
-         background: "transparent",
-      },
    },
    media: {
       height: 120,
       position: "relative",
-      "&::before": {
-         content: '""',
-         position: "absolute",
-         inset: 0,
-         background: "rgba(0, 0, 0, 0.20)",
-         zIndex: 1,
-      },
       "& a": {
          zIndex: 2,
          cursor: "pointer",
@@ -104,7 +97,6 @@ const styles = sxStyles({
    companyLogoWrapper: {
       position: "absolute",
       top: -LOGO_SIZE / 2,
-      zIndex: 2,
    },
    followButtonWrapper: {
       position: "absolute",
@@ -115,7 +107,7 @@ const styles = sxStyles({
       borderRadius: "18px",
       boxShadow: "none",
       textTransform: "none",
-      zIndex: 1,
+      zIndex: 2,
       textDecoration: "none !important",
       fontWeight: 400,
    },
@@ -154,7 +146,7 @@ const styles = sxStyles({
          width: "14px",
          height: "14px",
       },
-      zIndex: (theme) => theme.zIndex.appBar - 1,
+      zIndex: 1,
    },
    upcomingLivestreamButton: {
       background: (theme) => theme.brand.info[50],
@@ -163,7 +155,7 @@ const styles = sxStyles({
       "&:hover": {
          background: (theme) => theme.brand.info[100],
       },
-      zIndex: 3,
+      zIndex: 1,
       width: "100%",
    },
 })
@@ -190,137 +182,148 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
    const hasUpcomingLivestreams = upcomingLivestreamCount > 0
 
    return (
-      <Card ref={ref} sx={[styles.root]}>
-         <CardMedia sx={styles.media} title={company.universityName}>
-            <Stack direction={"row"} ml={2} mt={2} spacing={1}>
-               {isFeaturedCompany ? (
-                  <Chip
-                     key={"featured-company-chip"}
-                     icon={
-                        <Star
-                           color={theme.palette.warning[600]}
-                           width={14}
-                           height={14}
-                           fill={theme.palette.warning[600]}
-                        />
-                     }
-                     sx={[styles.tag, styles.featuredChip]}
-                     color={"info"}
-                     label={<Typography>Featured company</Typography>}
-                  />
-               ) : null}
-               {isHiringNow ? (
-                  <Chip
-                     key={"hiring-now-chip"}
-                     icon={
-                        <Briefcase color={"#3A70E2"} width={14} height={14} />
-                     }
-                     sx={[styles.tag, styles.hiringChip]}
-                     color={"info"}
-                     label={<Typography>Hiring now</Typography>}
-                  />
-               ) : null}
-            </Stack>
-            <Image
-               src={getResizedUrl(company.bannerImageUrl, "md")}
-               className="illustration"
-               layout="fill"
-               alt={company.universityName}
-               objectFit="cover"
-            />
-            <LinkToCompanyPage
-               companyName={company.universityName}
-               interactionSource={interactionSource}
-            />
-         </CardMedia>
-         <CardContent sx={styles.content}>
-            <Box sx={styles.companyLogoWrapper}>
-               <CircularLogo
-                  src={company.logoUrl}
-                  alt={company.universityName}
-                  size={LOGO_SIZE}
-               />
-            </Box>
-            <Box sx={styles.followButtonWrapper}>
-               {inView ? ( // Only render the follow button when the card is in view, since it does a request to the server
-                  <FollowButton
-                     group={company}
-                     size={"small"}
-                     sx={styles.followButton}
-                     startIcon={null}
-                     interactionSource={interactionSource}
-                  />
-               ) : (
-                  <Skeleton variant="rectangular" width={100} height={30} />
-               )}
-            </Box>
-            <Stack flex={1} spacing={2} mt={2} minWidth={0} width="100%">
-               <Stack flexDirection={"row"} alignItems={"center"}>
-                  <Typography
-                     sx={styles.companyName}
-                     variant="h6"
-                     fontWeight={600}
-                     whiteSpace="pre-line"
-                     component="h2"
-                  >
-                     {company.universityName}
-                  </Typography>
-
-                  {company.publicSparks ? (
-                     <PublicSparksBadge sx={styles.badge} />
+      <CardActionArea
+         sx={{
+            color: theme.palette.action.active,
+            borderRadius: 2,
+         }}
+      >
+         <Card ref={ref} sx={[styles.root]}>
+            <CardMedia sx={styles.media} title={company.universityName}>
+               <Stack direction={"row"} ml={2} mt={2} spacing={1}>
+                  {isFeaturedCompany ? (
+                     <Chip
+                        key={"featured-company-chip"}
+                        icon={
+                           <Star
+                              color={theme.palette.warning[600]}
+                              width={14}
+                              height={14}
+                              fill={theme.palette.warning[600]}
+                           />
+                        }
+                        sx={[styles.tag, styles.featuredChip]}
+                        color={"info"}
+                        label={<Typography>Featured company</Typography>}
+                     />
+                  ) : null}
+                  {isHiringNow ? (
+                     <Chip
+                        key={"hiring-now-chip"}
+                        icon={
+                           <Briefcase
+                              color={"#3A70E2"}
+                              width={14}
+                              height={14}
+                           />
+                        }
+                        sx={[styles.tag, styles.hiringChip]}
+                        color={"info"}
+                        label={<Typography>Hiring now</Typography>}
+                     />
                   ) : null}
                </Stack>
-               <Stack spacing={"6px"} sx={{ width: "100%", minWidth: 0 }}>
-                  <CompanyCountryTag
-                     fontSize="16px"
-                     text={company.companyCountry?.name}
-                     color={theme.palette.neutral[900]}
+               <Image
+                  src={getResizedUrl(company.bannerImageUrl, "md")}
+                  className="illustration"
+                  layout="fill"
+                  alt={company.universityName}
+                  objectFit="cover"
+               />
+               <LinkToCompanyPage
+                  companyName={company.universityName}
+                  interactionSource={interactionSource}
+               />
+            </CardMedia>
+            <CardContent sx={styles.content}>
+               <Box sx={styles.companyLogoWrapper}>
+                  <CircularLogo
+                     src={company.logoUrl}
+                     alt={company.universityName}
+                     size={LOGO_SIZE}
                   />
-                  <CompanyIndustryTag
-                     text={company.companyIndustries
-                        ?.map(({ name }) => name)
-                        .join(", ")}
-                     fontSize="16px"
-                     color={theme.palette.neutral[900]}
-                     // It would make more sense to not be conditional, as cards with long industry names would force
-                     // other cards to be taller even if no upcoming streams, with the ellipsis all card heights would be the same.
-                     disableMultiline={hasUpcomingLivestreams}
-                  />
-                  <CompanySizeTag
-                     text={getCompanySizeLabel(company.companySize)}
-                     fontSize="16px"
-                     color={theme.palette.neutral[900]}
-                  />
-               </Stack>
-               {hasUpcomingLivestreams ? (
-                  <Link
-                     href={`/company/${companyNameSlugify(
-                        company.universityName
-                     )}/livestreams`}
-                  >
-                     <Button
-                        sx={styles.upcomingLivestreamButton}
-                        variant="contained"
+               </Box>
+               <Box sx={styles.followButtonWrapper}>
+                  {inView ? ( // Only render the follow button when the card is in view, since it does a request to the server
+                     <FollowButton
+                        group={company}
+                        size={"small"}
+                        sx={styles.followButton}
+                        startIcon={null}
+                        interactionSource={interactionSource}
+                     />
+                  ) : (
+                     <Skeleton variant="rectangular" width={100} height={30} />
+                  )}
+               </Box>
+               <Stack flex={1} spacing={2} mt={2} minWidth={0} width="100%">
+                  <Stack flexDirection={"row"} alignItems={"center"}>
+                     <Typography
+                        sx={styles.companyName}
+                        variant="h6"
+                        fontWeight={600}
+                        whiteSpace="pre-line"
+                        component="h2"
                      >
-                        <Typography
-                           variant="medium"
-                           color={theme.brand.info[600]}
+                        {company.universityName}
+                     </Typography>
+
+                     {company.publicSparks ? (
+                        <PublicSparksBadge sx={styles.badge} />
+                     ) : null}
+                  </Stack>
+                  <Stack spacing={"6px"} sx={{ width: "100%", minWidth: 0 }}>
+                     <CompanyCountryTag
+                        fontSize="16px"
+                        text={company.companyCountry?.name}
+                        color={theme.palette.neutral[900]}
+                     />
+                     <CompanyIndustryTag
+                        text={company.companyIndustries
+                           ?.map(({ name }) => name)
+                           .join(", ")}
+                        fontSize="16px"
+                        color={theme.palette.neutral[900]}
+                        // It would make more sense to not be conditional, as cards with long industry names would force
+                        // other cards to be taller even if no upcoming streams, with the ellipsis all card heights would be the same.
+                        disableMultiline={hasUpcomingLivestreams}
+                     />
+                     <CompanySizeTag
+                        text={getCompanySizeLabel(company.companySize)}
+                        fontSize="16px"
+                        color={theme.palette.neutral[900]}
+                     />
+                  </Stack>
+                  {hasUpcomingLivestreams ? (
+                     <Link
+                        href={`/company/${companyNameSlugify(
+                           company.universityName
+                        )}/livestreams`}
+                     >
+                        <Button
+                           sx={styles.upcomingLivestreamButton}
+                           variant="contained"
                         >
-                           {upcomingLivestreamCount} upcoming{" "}
-                           {upcomingLivestreamCount === 1
-                              ? "livestream"
-                              : "livestreams"}
-                        </Typography>
-                     </Button>
-                  </Link>
-               ) : null}
-            </Stack>
-            <LinkToCompanyPage
-               companyName={company.universityName}
-               interactionSource={interactionSource}
-            />
-         </CardContent>
-      </Card>
+                           <Typography
+                              variant="medium"
+                              color={theme.brand.info[600]}
+                           >
+                              {upcomingLivestreamCount} upcoming{" "}
+                              {upcomingLivestreamCount === 1
+                                 ? "livestream"
+                                 : "livestreams"}
+                           </Typography>
+                        </Button>
+                     </Link>
+                  ) : null}
+               </Stack>
+               <LinkToCompanyPage
+                  companyName={company.universityName}
+                  interactionSource={interactionSource}
+               />
+            </CardContent>
+         </Card>
+      </CardActionArea>
    )
 }
 

@@ -50,13 +50,21 @@ const isTest = isTestEnvironment()
 
 const styles = sxStyles({
    tabs: {
-      borderRadius: "12px 12px 0 0",
+      borderRadius: {
+         sm: "0",
+         md: "12px 12px 0 0",
+      },
       backgroundColor: "#FEFEFE",
       position: "sticky",
-      top: 0,
+      top: {
+         xs: "calc(var(--app-bar-height, 64px) * var(--app-bar-visible, 0))",
+         sm: "calc(var(--app-bar-height, 64px) * var(--app-bar-visible, 0))",
+         md: "0",
+      },
       zIndex: 10,
       borderBottom: "1px solid",
       borderColor: "divider",
+      transition: "top 0.2s",
       "& .MuiTab-root": {
          textTransform: "none",
          fontFamily: "Poppins",
@@ -377,7 +385,7 @@ const CompanyPageOverview = ({
             height={"100%"}
             pb={5}
             px={isMobile ? 0 : 4}
-            bgcolor={isMobile ? "white" : "transparent"}
+            bgcolor={"transparent"}
             borderRadius={isMobile ? "12px" : "0"}
          >
             {editMode ? <ProgressBanner /> : null}
