@@ -668,7 +668,7 @@ service cloud.firestore {
             }
 
             match /recordingStatsUser/{id} {
-              allow read: if false;
+              allow read: if isSignedIn() && resource.data.userId == request.auth.token.email;
               allow write: if isSignedIn() && request.resource.data.userId == request.auth.token.email;
             }
 
