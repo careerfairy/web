@@ -9,6 +9,23 @@ import {
 } from "../../util/bulkWriter"
 import { logAction } from "../../util/logger"
 
+/**
+ * @param T - The type of the documents to update, defaults to unknown and useful when
+ * applying a custom filter to the documents (when not possible via query).
+ *
+ * @param query - The query to use to get the documents to update.
+ * @param updateData - The data to update the documents with. When a @param T is provided,
+ * the updateData will be typed accordingly. Not providing @param T can be useful when applying
+ * only an update of a non-existing field, example migrationTrigger (Date.now()), which will
+ * update with the current timestamp, thus not affecting the existing documents and allowing
+ * onWriteTriggers to run with the latest data.
+ * @param batchSize - The batch size to use for the update, defaults to 1000.
+ * @param waitTimeBetweenBatches - The wait time between batches, defaults to 5000ms.
+ * @param dummyRun - By default the update is a dummy run, allowing test runs before updating
+ * documents.
+ * @param customDataFilter - A custom filter to apply to the documents, when not possible via
+ * query. Defaults to undefined.
+ */
 interface UpdateDocumentsConfig<T = unknown> {
    query: Query
    updateData: Partial<{ [K in keyof T]: T[K] }>
@@ -30,7 +47,10 @@ const config: UpdateDocumentsConfig<CustomJob> = {
       // Keep this commented out for now as an example
       // .where(FIELD_TO_FILTER_BY, "!=", null)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
-   updateData: { deleted: true },
+   updateData: {
+      deleted: true,
+      // migrationTrigger: Date.now()
+   },
    batchSize: 100,
    waitTimeBetweenBatches: 2_000,
    dummyRun: DUMMY_RUN,
