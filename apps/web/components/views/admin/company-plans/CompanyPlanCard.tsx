@@ -56,7 +56,6 @@ const styles = sxStyles({
       right: 2,
       color: (theme) => theme.palette.warning[500],
       backgroundColor: (theme) => theme.palette.warning[50],
-      // borderRadius: '50%',
       border: (theme) => `1px solid ${theme.palette.warning[500]}`,
       padding: 0.5,
       fontSize: 20,

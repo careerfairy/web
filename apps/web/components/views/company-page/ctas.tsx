@@ -38,13 +38,13 @@ const styles = sxStyles({
    },
    signup: {
       border: "1px solid rgba(42, 186, 165, 0.38)",
-      background: `url('/sign-up-banner.svg'), radial-gradient(278.11% 143.5% at 1.9% -0.11%, rgba(42, 186, 165, 0.14) 0%, rgba(42, 186, 165, 0.00) 100%), radial-gradient(422% 167.87% at 102.92% 99.89%, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.00) 53%), #0E1817`,
+      background: `url('/company-page/sign-up-banner.svg'), radial-gradient(278.11% 143.5% at 1.9% -0.11%, rgba(42, 186, 165, 0.14) 0%, rgba(42, 186, 165, 0.00) 100%), radial-gradient(422% 167.87% at 102.92% 99.89%, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.00) 53%), #0E1817`,
       backgroundSize: "120px, cover, cover",
       backgroundPosition: "right -20px top -150px, center, center",
       backgroundRepeat: "no-repeat, no-repeat, no-repeat",
    },
    follow: {
-      background: `url('/follow-banner.svg')`,
+      background: `url('/company-page/follow-banner.svg')`,
       backgroundSize: "120px, cover, cover",
       backgroundPosition: "right -20px top -150px, center, center",
       backgroundRepeat: "no-repeat, no-repeat, no-repeat",

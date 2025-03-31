@@ -84,7 +84,7 @@ const NewsletterSection = () => {
          styles={styles.wrapper}
          isSmallBackground={true}
          bgColor={"#EFF5F8"}
-         backgroundUrl={`/stay-up-to-date-banner.svg`}
+         backgroundUrl={`/company-page/stay-up-to-date-banner.svg`}
       >
          <Box sx={styles.content}>
             <Typography
