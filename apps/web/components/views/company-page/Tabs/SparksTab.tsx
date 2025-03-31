@@ -81,10 +81,6 @@ const SparksGrid = ({ groupId }: SparksGridProps) => {
                            type="gallery"
                         />
                      )}
-                     sx={{
-                        minWidth: "200px !important",
-                        maxWidth: "232px !important",
-                     }}
                   />
                </Grid>
             ))}

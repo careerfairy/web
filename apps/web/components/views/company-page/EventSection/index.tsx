@@ -1,22 +1,22 @@
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import FollowIcon from "@mui/icons-material/AddRounded"
 import { Box, Button, Link, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { EmptyItemsView } from "components/views/common/EmptyItemsView"
+import FollowButton from "components/views/common/company/FollowButton"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
+import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useCallback, useState } from "react"
+import { Plus, Radio } from "react-feather"
 import { TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
-
-import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { EmptyItemsView } from "components/views/common/EmptyItemsView"
-import FollowButton from "components/views/common/company/FollowButton"
-import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
-import { Plus, Radio } from "react-feather"
 import { SeeAllLink } from "../Overview/SeeAllLink"
 import {
    EMPTY_UPCOMING_EVENTS_DESCRIPTION,
@@ -166,6 +166,7 @@ const EventSection = () => {
                         sx={{ fontSize: "14px", mt: "18px" }}
                         group={group}
                         interactionSource={InteractionSources.Company_Page}
+                        startIcon={<FollowIcon fontSize={"small"} />}
                      />
                   </EmptyItemsView>
                </Stack>

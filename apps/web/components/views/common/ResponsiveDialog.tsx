@@ -42,7 +42,7 @@ const styles = sxStyles({
       background: theme.brand.white[200],
    }),
    drawer: {
-      maxHeight: "90%",
+      maxHeight: "95%",
    },
 })
 

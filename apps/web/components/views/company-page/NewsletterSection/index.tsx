@@ -24,6 +24,7 @@ const styles = sxStyles({
          sm: "12px",
          md: "16px",
       },
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
       borderRadius: "12px",
       backgroundPosition: {
          xs: "-270px -120px",
@@ -91,6 +92,9 @@ const NewsletterSection = () => {
                variant={"brandedH2"}
                fontWeight={"700"}
                color="neutral.800"
+               sx={{
+                  textAlign: "center",
+               }}
             >
                Stay up-to-date. Always.
             </Typography>
@@ -101,6 +105,9 @@ const NewsletterSection = () => {
                mt={2}
                textAlign="center"
                mx={1}
+               sx={{
+                  textAlign: "center",
+               }}
             >
                {isLoggedIn
                   ? "Sign up for our weekly update and receive personalised invitations to career live streams and job openings"

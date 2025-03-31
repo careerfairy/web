@@ -3,8 +3,6 @@ import {
    CustomJobApplicationSource,
    CustomJobApplicationSourceTypes,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { CloseOutlined } from "@mui/icons-material"
-import { Box, IconButton } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import { useRouter } from "next/router"
@@ -172,13 +170,6 @@ export const CustomJobDialogProvider = ({
             isOpen={isJobDialogOpen}
             onClose={handleJobDialogClose}
             source={source}
-            heroContent={
-               <Box display={"flex"} flexDirection={"row-reverse"} p={0} m={0}>
-                  <IconButton onClick={handleJobDialogClose}>
-                     <CloseOutlined />
-                  </IconButton>
-               </Box>
-            }
             heroSx={{ m: 0, py: "0px !important", px: "10px !important" }}
             paperPropsSx={hasPaperProps ? styles.profilePaperProps : null}
             hideApplicationConfirmation={hideApplicationConfirmation}
