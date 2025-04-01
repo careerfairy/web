@@ -1,20 +1,19 @@
 import functions = require("firebase-functions")
+import { onDocumentUpdated } from "firebase-functions/firestore"
 import { FieldValue } from "./api/firestoreAdmin"
-import config from "./config"
 
-export const updateBreakoutRoomStatusOnWrite = functions
-   .region(config.region)
-   .firestore.document("livestreams/{livestream}/breakoutRooms/{breakoutRoom}")
-   .onWrite(async (change) => {
+export const updateBreakoutRoomStatusOnWrite = onDocumentUpdated(
+   "livestreams/{livestream}/breakoutRooms/{breakoutRoom}",
+   async (event) => {
       try {
-         const breakoutRoomId = change.after.id
-         const breakoutRoomAfter = change.after.data()
-         const breakoutRoomBefore = change.before.data()
+         const breakoutRoomId = event.params.breakoutRoom
+         const breakoutRoomAfter = event.data?.after?.data()
+         const breakoutRoomBefore = event.data?.before?.data()
          const oldHasStarted =
             (breakoutRoomBefore && breakoutRoomBefore.hasStarted) || null
          const newHasStarted =
             (breakoutRoomAfter && breakoutRoomAfter.hasStarted) || null
-         const mainLivestreamRef = change.after.ref.parent.parent
+         const mainLivestreamRef = event.data?.after?.ref.parent.parent
 
          if (oldHasStarted === newHasStarted) {
             functions.logger.info(
@@ -53,4 +52,5 @@ export const updateBreakoutRoomStatusOnWrite = functions
             error
          )
       }
-   })
+   }
+)

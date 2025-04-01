@@ -1,9 +1,7 @@
-import { https } from "firebase-functions"
-
-export type CallableContext = https.CallableContext
+import { CallableRequest } from "firebase-functions/https"
 
 export type MiddlewareContext<T extends Record<string, unknown>> =
-   CallableContext & {
+   CallableRequest<T> & {
       /**
        * Allow middlewares to store data for the next middleware to access
        */
@@ -11,10 +9,8 @@ export type MiddlewareContext<T extends Record<string, unknown>> =
    }
 
 export type OnCallMiddleware<
-   T extends Record<string, unknown> = Record<string, unknown>,
-   TData = any
+   T extends Record<string, unknown> = Record<string, unknown>
 > = (
-   data: TData,
    context: MiddlewareContext<T>,
    /**
     * Calls the next middleware in the chain
@@ -27,12 +23,11 @@ export type OnCallMiddleware<
  * @param middlewares
  */
 export const middlewares = <
-   T extends Record<string, unknown> = Record<string, unknown>,
-   TData = any
+   T extends Record<string, unknown> = Record<string, unknown>
 >(
-   ...middlewares: OnCallMiddleware<T, TData>[]
+   ...middlewares: OnCallMiddleware<T>[]
 ) => {
-   return (data: TData, context: MiddlewareContext<T>) => {
+   return (context: MiddlewareContext<T>) => {
       let idx = 0
 
       const next = async () => {
@@ -41,11 +36,11 @@ export const middlewares = <
             throw new Error("No next middleware to call, you're the last one")
          }
 
-         return middlewares[++idx](data, context, next)
+         return middlewares[++idx](context, next)
       }
 
       // always call the first middleware
       // he can call or not next()
-      return middlewares[idx](data, context, next)
+      return middlewares[idx](context, next)
    }
 }

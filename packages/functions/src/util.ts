@@ -21,8 +21,9 @@ import {
 import * as crypto from "crypto"
 import { firestore } from "firebase-admin"
 import type { Change } from "firebase-functions"
-import { https, Request, Response } from "firebase-functions"
-import { CallableRequest } from "firebase-functions/v2/https"
+import { FirestoreEvent } from "firebase-functions/firestore"
+import { type Response } from "firebase-functions/lib/v1/cloud-functions"
+import { CallableRequest, Request } from "firebase-functions/v2/https"
 import { ClientError } from "graphql-request"
 import ical from "ical-generator"
 import { DateTime } from "luxon"
@@ -517,10 +518,7 @@ export const logGraphqlError = (error: ClientError) => {
    })
 }
 
-type onCallFnHandler = (
-   data: any,
-   context: https.CallableContext
-) => any | Promise<any>
+type onCallFnHandler = (context: CallableRequest) => any | Promise<any>
 
 /**
  * Function wrapper
@@ -531,9 +529,9 @@ type onCallFnHandler = (
  * @param handler
  */
 export const onCallWrapper = (handler: onCallFnHandler): onCallFnHandler => {
-   return async (data, context) => {
+   return async (request) => {
       try {
-         return await handler(data, context)
+         return await handler(request)
       } catch (e) {
          if (e.name === "AxiosError") {
             logAxiosError(e)
@@ -688,7 +686,7 @@ export const formatLivestreamDate = (date: Date, timezone: string) => {
 }
 
 export const getChangeTypes = (
-   change: Change<DocumentSnapshot>
+   change: FirestoreEvent<Change<DocumentSnapshot>>
 ): {
    // Is a new document creation
    isCreate: boolean
@@ -697,7 +695,7 @@ export const getChangeTypes = (
    // Is a document deletion
    isDelete: boolean
 } => {
-   const { before, after } = change
+   const { before, after } = change.data
    // check if the document did not exist before but exists now
    const isCreate = !before.exists && after.exists
    // check if the document existed before and still exists now
@@ -714,11 +712,13 @@ export enum ChangeType {
    DELETE,
 }
 
-export const getChangeTypeEnum = (change: Change<DocumentSnapshot>) => {
-   if (!change.after.exists) {
+export const getChangeTypeEnum = (
+   change: FirestoreEvent<Change<DocumentSnapshot>>
+) => {
+   if (!change.data.after.exists) {
       return ChangeType.DELETE
    }
-   if (!change.before.exists) {
+   if (!change.data.before.exists) {
       return ChangeType.CREATE
    }
    return ChangeType.UPDATE
@@ -730,13 +730,11 @@ export type FunctionsLogger = typeof functions.logger
  * Retrieves the country code from the context headers. The "x-appengine-country" header is added by Google App Engine when the function is deployed.
  * It uses the request's IP address to determine the country. This header is not present during local development because the function is not running on Google's servers.
  * Google App Engine can also provide the city and region if needed.
- * @param  context - The context of the function call.
+ * @param  request - The context of the function call.
  * @returns  The country code if it exists, null otherwise.
  */
-export const getCountryCode = (
-   context: functions.https.CallableContext
-): string | null => {
-   const appEngineCountry = context?.rawRequest?.headers["x-appengine-country"]
+export const getCountryCode = (request: CallableRequest): string | null => {
+   const appEngineCountry = request?.rawRequest?.headers["x-appengine-country"]
    return appEngineCountry ? appEngineCountry.toString() : null
 }
 

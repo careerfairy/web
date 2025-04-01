@@ -8,10 +8,10 @@ import {
    UpdateLivestreamPollRequest,
    basePollShape,
 } from "@careerfairy/shared-lib/livestreams"
+import { onCall } from "firebase-functions/https"
 import { v4 as uuid } from "uuid"
 import * as yup from "yup"
 import { livestreamsRepo } from "../../api/repositories"
-import config from "../../config"
 import { middlewares } from "../../middlewares/middlewares"
 import { dataValidation, livestreamExists } from "../../middlewares/validations"
 import { logAndThrow, validateLivestreamToken } from "../validations"
@@ -27,17 +27,17 @@ type Context = {
    livestream: LivestreamEvent
 }
 
-export const createPoll = functions.region(config.region).https.onCall(
-   middlewares<Context, CreateLivestreamPollRequest>(
+export const createPoll = onCall(
+   middlewares<Context & CreateLivestreamPollRequest>(
       dataValidation(createPollSchema),
       livestreamExists(),
-      async (requestData, context) => {
+      async (request) => {
          const { livestreamId, livestreamToken, options, question } =
-            requestData
+            request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 
@@ -69,11 +69,11 @@ const updatePollSchema: yup.SchemaOf<UpdateLivestreamPollRequest> = yup.object({
    question: basePollShape.question.notRequired(),
 })
 
-export const updatePoll = functions.region(config.region).https.onCall(
-   middlewares<Context, UpdateLivestreamPollRequest>(
+export const updatePoll = onCall(
+   middlewares<Context & UpdateLivestreamPollRequest>(
       dataValidation(updatePollSchema),
       livestreamExists(),
-      async (requestData, context) => {
+      async (request) => {
          const {
             livestreamId,
             livestreamToken,
@@ -81,11 +81,11 @@ export const updatePoll = functions.region(config.region).https.onCall(
             question,
             pollId,
             state,
-         } = requestData
+         } = request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 
@@ -95,8 +95,8 @@ export const updatePoll = functions.region(config.region).https.onCall(
             logAndThrow("Poll not found", {
                pollId,
                livestreamId,
-               userId: context.auth?.token?.uid,
-               userEmail: context.auth?.token?.email,
+               userId: request.auth?.token?.uid,
+               userEmail: request.auth?.token?.email,
             })
          }
 
@@ -108,8 +108,8 @@ export const updatePoll = functions.region(config.region).https.onCall(
                   {
                      pollId,
                      livestreamId,
-                     userId: context.auth?.token?.uid,
-                     userEmail: context.auth?.token?.email,
+                     userId: request.auth?.token?.uid,
+                     userEmail: request.auth?.token?.email,
                   }
                )
             }
@@ -119,8 +119,8 @@ export const updatePoll = functions.region(config.region).https.onCall(
                   {
                      pollId,
                      livestreamId,
-                     userId: context.auth?.token?.uid,
-                     userEmail: context.auth?.token?.email,
+                     userId: request.auth?.token?.uid,
+                     userEmail: request.auth?.token?.email,
                   }
                )
             }
@@ -172,16 +172,16 @@ const markPollAsCurrentSchema: yup.SchemaOf<MarkLivestreamPollAsCurrentRequest> 
       livestreamToken: yup.string().nullable(),
    })
 
-export const markPollAsCurrent = functions.region(config.region).https.onCall(
-   middlewares<Context, MarkLivestreamPollAsCurrentRequest>(
+export const markPollAsCurrent = onCall(
+   middlewares<Context & MarkLivestreamPollAsCurrentRequest>(
       dataValidation(markPollAsCurrentSchema),
       livestreamExists(),
-      async (requestData, context) => {
-         const { livestreamId, livestreamToken, pollId } = requestData
+      async (request) => {
+         const { livestreamId, livestreamToken, pollId } = request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 
@@ -206,16 +206,16 @@ const deletePollSchema: yup.SchemaOf<DeleteLivestreamPollRequest> = yup.object({
    livestreamToken: yup.string().nullable(),
 })
 
-export const deletePoll = functions.region(config.region).https.onCall(
-   middlewares<Context, DeleteLivestreamPollRequest>(
+export const deletePoll = onCall(
+   middlewares<Context & DeleteLivestreamPollRequest>(
       dataValidation(deletePollSchema),
       livestreamExists(),
-      async (requestData, context) => {
-         const { livestreamId, livestreamToken, pollId } = requestData
+      async (request) => {
+         const { livestreamId, livestreamToken, pollId } = request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 

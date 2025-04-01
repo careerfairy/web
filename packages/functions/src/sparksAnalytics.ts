@@ -1,12 +1,13 @@
+import { Group } from "@careerfairy/shared-lib/groups"
 import {
    SparksAnalyticsDTO,
    TimePeriodParams,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { Timestamp } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
+import { onCall } from "firebase-functions/https"
 import { string } from "yup"
 import { getSparksAnalyticsRepoInstance, sparkRepo } from "./api/repositories"
-import config from "./config"
 import GroupSparksAnalyticsRepository from "./lib/sparks/analytics/GroupSparksAnalyticsRepository"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
@@ -217,16 +218,16 @@ async function fetchAnalyticsFromBigQuery(
    return SparksAnalyticsPayload
 }
 
-export const getSparkStats = functions.region(config.region).https.onCall(
-   middlewares(
+export const getSparkStats = onCall(
+   middlewares<{ groupId: string; sparkId: string; group?: Group }>(
       dataValidation({
          groupId: string().required(),
          sparkId: string().required(),
       }),
       userShouldBeGroupAdmin(),
-      async (data, context) => {
+      async (request) => {
          try {
-            const { groupId, sparkId } = data
+            const { groupId, sparkId } = request.data
             const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
                groupId,
                sparkRepo
@@ -243,70 +244,64 @@ export const getSparkStats = functions.region(config.region).https.onCall(
             return sparkStatsData
          } catch (error) {
             functions.logger.error("Error fetching sparks stats", {
-               data,
+               request,
                error,
-               context,
             })
             logAndThrow("Error fetching sparks stats", {
-               data,
+               request,
                error,
-               context,
             })
          }
       }
    )
 )
 
-export const getSparksAnalytics = functions
-   .region(config.region)
-   .runWith({
+export const getSparksAnalytics = onCall(
+   {
       timeoutSeconds: 60,
-      memory: "512MB",
-   })
-   .https.onCall(
-      middlewares(
-         dataValidation({
-            groupId: string().required(),
-         }),
-         userShouldBeGroupAdmin(),
-         async (data, context) => {
-            try {
-               const { groupId } = data
-               const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
-                  groupId,
-                  sparkRepo
-               )
+      memory: "512MiB",
+   },
+   middlewares<{ groupId: string; group?: Group }>(
+      dataValidation({
+         groupId: string().required(),
+      }),
+      userShouldBeGroupAdmin(),
+      async (request) => {
+         try {
+            const { groupId } = request.data
+            const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(
+               groupId,
+               sparkRepo
+            )
 
-               functions.logger.info(
-                  `Fetching sparks analytics for group ${groupId}...`
-               )
+            functions.logger.info(
+               `Fetching sparks analytics for group ${groupId}...`
+            )
 
-               const bigQueryAnalyticsData = await fetchAnalyticsFromBigQuery(
-                  sparksAnalyticsRepo
-               )
+            const bigQueryAnalyticsData = await fetchAnalyticsFromBigQuery(
+               sparksAnalyticsRepo
+            )
 
-               await sparksAnalyticsRepo.updateAnalyticsInFirestore({
-                  ...bigQueryAnalyticsData,
-                  id: groupId,
-               })
+            await sparksAnalyticsRepo.updateAnalyticsInFirestore({
+               ...bigQueryAnalyticsData,
+               id: groupId,
+            })
 
-               functions.logger.info(
-                  "Sparks analytics cache updated in Firestore."
-               )
+            functions.logger.info(
+               "Sparks analytics cache updated in Firestore."
+            )
 
-               return bigQueryAnalyticsData
-            } catch (error) {
-               functions.logger.error("Error fetching sparks analytics", {
-                  data,
-                  error,
-                  context,
-               })
-               logAndThrow("Error fetching sparks analytics", {
-                  data,
-                  error,
-                  context,
-               })
-            }
+            return bigQueryAnalyticsData
+         } catch (error) {
+            functions.logger.error("Error fetching sparks analytics", {
+               request,
+               error,
+            })
+            logAndThrow("Error fetching sparks analytics", {
+               request,
+               error,
+            })
          }
-      )
+      }
    )
+)
