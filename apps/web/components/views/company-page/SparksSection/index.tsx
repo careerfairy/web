@@ -9,15 +9,16 @@ import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
 import { setCameFromPageLink } from "store/reducers/sparksFeedReducer"
-import { SectionAnchor, TabValue, useCompanyPage } from ".."
+import { useCompanyPage } from ".."
 
 type Props = {
    groupId: string
+   onSeeAllClick?: () => void
 }
 
 const CarouselHeader = () => {
    return (
-      <Typography variant="h4" fontWeight={"600"} color="black">
+      <Typography variant="brandedH3" fontWeight={"600"} color="black">
          Sparks
       </Typography>
    )
@@ -27,13 +28,10 @@ const Loader = () => {
    return <FallbackComponent header={<CarouselHeader />} />
 }
 
-const SparksSection: FC<Props> = ({ groupId }) => {
+const SparksSection: FC<Props> = ({ groupId, onSeeAllClick }) => {
    const dispatch = useDispatch()
 
-   const {
-      group,
-      sectionRefs: { eventSectionRef },
-   } = useCompanyPage()
+   const { group } = useCompanyPage()
    const router = useRouter()
    const isMounted = useIsMounted()
 
@@ -57,17 +55,15 @@ const SparksSection: FC<Props> = ({ groupId }) => {
 
    return (
       <Box>
-         <SectionAnchor
-            ref={eventSectionRef}
-            tabValue={TabValue.livesStreams}
-         />
          {isMounted ? (
             <SuspenseWithBoundary fallback={<Loader />}>
                <GroupSparksCarousel
                   header={<CarouselHeader />}
                   groupId={groupId}
                   handleSparksClicked={handleSparksClicked}
-                  sx={{ pl: 0 }}
+                  onSeeAllClick={onSeeAllClick}
+                  sx={{ pl: 0, mr: -2 }}
+                  headerSx={{ mr: 2 }}
                />
             </SuspenseWithBoundary>
          ) : (

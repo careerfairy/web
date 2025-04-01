@@ -1,6 +1,6 @@
+import Box, { BoxProps } from "@mui/material/Box"
 import DOMPurify from "isomorphic-dompurify"
 import { FC, useMemo } from "react"
-import Box, { BoxProps } from "@mui/material/Box"
 
 type Props = Omit<BoxProps, "dangerouslySetInnerHTML"> & {
    htmlString: string
@@ -16,7 +16,13 @@ type Props = Omit<BoxProps, "dangerouslySetInnerHTML"> & {
  */
 const SanitizedHTML: FC<Props> = ({ htmlString, ...boxProps }) => {
    const sanitizedString = useMemo(() => {
-      return DOMPurify.sanitize(htmlString)
+      const sanitized = DOMPurify.sanitize(htmlString)
+
+      // Then clean up consecutive <p> tags and empty paragraphs
+      return sanitized
+         .replace(/<p>\s*<br>\s*<\/p>/g, "") // Remove paragraphs that only contain <br>
+         .replace(/<p>\s*<\/p>/g, "") // Remove empty paragraphs
+         .replace(/(<\/p>\s*<p>)+/g, "</p><p>") // Collapse multiple p tag pairs into one
    }, [htmlString])
 
    return (

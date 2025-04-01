@@ -10,7 +10,9 @@ import {
 } from "components/views/livestream-dialog"
 import { groupRepo } from "data/RepositoryInstances"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
-import CompanyPageOverview from "../../../../../components/views/company-page"
+import CompanyPageOverview, {
+   TabValue,
+} from "../../../../../components/views/company-page"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
 import {
@@ -47,6 +49,7 @@ const CompanyPage: NextPage<
                pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
                customJobs={[]}
                editMode={true}
+               tab={TabValue.overview}
             />
          </GroupDashboardLayout>
       </LivestreamDialogLayout>

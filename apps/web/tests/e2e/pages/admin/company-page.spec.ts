@@ -72,7 +72,7 @@ test.describe("Company page creation", () => {
 
       // expect company name to be on the preview page
       await expect(
-         groupPage.page.getByRole("heading", { name: group.universityName })
+         groupPage.page.getByText(group.universityName, { exact: true })
       ).toBeVisible()
 
       // get updated group

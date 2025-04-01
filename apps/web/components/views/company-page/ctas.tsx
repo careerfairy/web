@@ -1,18 +1,19 @@
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
-import { Box, Button, Collapse, Grid, Paper, Typography } from "@mui/material"
+import { Box, Button, Collapse, Paper, Typography } from "@mui/material"
 import Avatar from "@mui/material/Avatar"
 import Stack from "@mui/material/Stack"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import Image from "next/legacy/image"
 import { useRouter } from "next/router"
 import React, { FC, useMemo } from "react"
+import { useAuth } from "../../../HOCs/AuthProvider"
 import { placeholderAvatar } from "../../../constants/images"
 import { userRepo } from "../../../data/RepositoryInstances"
-import { useAuth } from "../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../types/commonTypes"
 import useCollection from "../../custom-hook/useCollection"
 import BulletPoints from "../common/BulletPoints"
-import FollowButton from "../common/company/FollowButton"
 import Link from "../common/Link"
+import FollowButton from "../common/company/FollowButton"
 import { useCompanyPage } from "./index"
 
 const styles = sxStyles({
@@ -21,16 +22,16 @@ const styles = sxStyles({
       flexDirection: "column",
       justifyContent: "center",
       minHeight: "80px",
-      px: 3,
-      py: 2,
+      px: 4,
+      py: 3,
       borderRadius: 3,
-      border: "1px solid #EDE7FD",
+      border: "1px solid rgba(103, 73, 234, 0.30)",
    },
    avatar: {
       bgcolor: "transparent",
-      width: "70%",
+      width: "100px",
+      height: "100px",
       mx: "auto",
-      minHeight: "135px",
    },
 })
 
@@ -81,64 +82,61 @@ export const FollowCompany = () => {
 
 export const SignUp = () => {
    const { asPath } = useRouter()
+   const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
 
    if (isLoggedIn) return null
 
    return (
       <CTACard>
-         <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-               <Avatar sx={styles.avatar}>
-                  <Image
-                     layout={"fill"}
-                     quality={100}
-                     objectFit={"contain"}
-                     alt={"placeholder avatar"}
-                     src={placeholderAvatar}
-                  />
-               </Avatar>
-            </Grid>
-            <Grid item xs={12} sm={8}>
-               <Stack spacing={2}>
-                  <Typography variant="h4" fontWeight={"600"} color="black">
-                     Sign Up Now!
+         <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+            <Avatar sx={styles.avatar}>
+               <Image
+                  layout={"fill"}
+                  quality={100}
+                  objectFit={"contain"}
+                  alt={"placeholder avatar"}
+                  src={placeholderAvatar}
+               />
+            </Avatar>
+            <Stack spacing={2}>
+               <Typography variant="h4" fontWeight={"600"} color="black">
+                  Sign Up Now!
+               </Typography>
+               <BulletPoints points={signupPoints} />
+               <Box>
+                  <span>
+                     <Link
+                        href={{
+                           pathname: "/signup",
+                           query: {
+                              absolutePath: asPath,
+                           },
+                        }}
+                        noLinkStyle
+                     >
+                        <Button variant="contained" color="secondary">
+                           SIGN UP
+                        </Button>
+                     </Link>
+                  </span>
+                  <Typography mt={1} variant="body1" color="black">
+                     Already have an account?{" "}
+                     <Link
+                        href={{
+                           pathname: "/login",
+                           query: {
+                              absolutePath: asPath,
+                           },
+                        }}
+                        noLinkStyle
+                     >
+                        Log in
+                     </Link>
                   </Typography>
-                  <BulletPoints points={signupPoints} />
-                  <Box>
-                     <span>
-                        <Link
-                           href={{
-                              pathname: "/signup",
-                              query: {
-                                 absolutePath: asPath,
-                              },
-                           }}
-                           noLinkStyle
-                        >
-                           <Button variant="contained" color="secondary">
-                              SIGN UP
-                           </Button>
-                        </Link>
-                     </span>
-                     <Typography mt={1} variant="body1" color="black">
-                        Already have an account?{" "}
-                        <Link
-                           href={{
-                              pathname: "/login",
-                              query: {
-                                 absolutePath: asPath,
-                              },
-                           }}
-                           noLinkStyle
-                        >
-                           Log in
-                        </Link>
-                     </Typography>
-                  </Box>
-               </Stack>
-            </Grid>
-         </Grid>
+               </Box>
+            </Stack>
+         </Stack>
       </CTACard>
    )
 }

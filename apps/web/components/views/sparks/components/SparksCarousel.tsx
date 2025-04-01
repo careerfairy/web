@@ -23,20 +23,24 @@ const styles = sxStyles({
 
 type SparksCarouselProps = {
    header?: ReactNode
+   seeAll?: ReactNode
    handleSparksClicked?: (spark: Spark) => void
    containerSx?: SxProps<Theme>
    headerSx?: SxProps<Theme>
    sparks: Spark[]
    disableClick?: boolean
+   disableArrows?: boolean
 }
 
 export const SparksCarousel = ({
    header,
+   seeAll,
    sparks,
    handleSparksClicked,
    containerSx,
    headerSx,
    disableClick = false,
+   disableArrows = false,
 }: SparksCarouselProps) => {
    const [emblaRef, emblaApi] = useEmblaCarousel(
       {
@@ -61,6 +65,8 @@ export const SparksCarousel = ({
             }}
             viewportSx={styles.viewport}
             headerSx={headerSx}
+            seeAll={seeAll}
+            disableArrows={disableArrows}
          >
             {sparks.map((spark, index) => (
                <SparkPreviewCard

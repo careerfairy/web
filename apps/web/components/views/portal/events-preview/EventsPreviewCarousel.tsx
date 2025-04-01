@@ -179,8 +179,10 @@ export type EventsProps = {
    events: LivestreamEvent[]
    eventDescription?: string
    seeMoreLink?: string
+   onClickSeeMore?: () => void
    title?: ReactNode | string
    subtitle?: ReactNode | string
+   header?: ReactNode
    loading?: boolean
    hidePreview?: boolean
    type: EventsTypes
@@ -225,6 +227,8 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          disableClick,
          onCardClick,
          disableTracking,
+         header,
+         onClickSeeMore,
          preventPaddingSlide = false,
       } = props
 
@@ -274,9 +278,15 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          <ConditionalWrapper
             condition={events?.length > 1 && seeMoreLink !== undefined}
          >
-            <Link href={seeMoreLink}>
-               <Typography sx={allStyles.seeMoreSx}>See all</Typography>
-            </Link>
+            {onClickSeeMore ? (
+               <Typography sx={allStyles.seeMoreSx} onClick={onClickSeeMore}>
+                  See all
+               </Typography>
+            ) : (
+               <Link href={seeMoreLink}>
+                  <Typography sx={allStyles.seeMoreSx}>See all</Typography>
+               </Link>
+            )}
          </ConditionalWrapper>
       )
       const arrowsComponent = (
@@ -323,44 +333,53 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          <>
             <ConditionalWrapper condition={!hidePreview}>
                <Box sx={mainBoxSxStyles}>
-                  <ConditionalWrapper
-                     condition={!isEmbedded && allStyles.compact}
-                  >
-                     <Box sx={allStyles.eventsHeader}>
-                        <Box>
-                           <ConditionalWrapper
-                              condition={
-                                 seeMoreLink !== undefined &&
-                                 (allStyles.headerAsLink || isMobile)
-                              }
-                              fallback={getHeading(
-                                 [allStyles.title],
-                                 allStyles.titleVariant
-                              )}
-                           >
-                              <Link href={seeMoreLink} style={styles.titleLink}>
-                                 {getHeading(
-                                    [allStyles.title, styles.underlined],
+                  {header ? (
+                     header
+                  ) : (
+                     <ConditionalWrapper
+                        condition={!isEmbedded && allStyles.compact}
+                     >
+                        <Box sx={allStyles.eventsHeader}>
+                           <Box>
+                              <ConditionalWrapper
+                                 condition={
+                                    seeMoreLink !== undefined &&
+                                    (allStyles.headerAsLink || isMobile)
+                                 }
+                                 fallback={getHeading(
+                                    [allStyles.title],
                                     allStyles.titleVariant
                                  )}
-                              </Link>
-                           </ConditionalWrapper>
-                        </Box>
-                        <Stack
-                           spacing={1}
-                           direction={"row"}
-                           justifyContent="space-between"
-                           alignItems="flex-end"
-                        >
-                           <ConditionalWrapper
-                              condition={!allStyles.headerAsLink && !isMobile}
+                              >
+                                 <Link
+                                    href={seeMoreLink}
+                                    style={styles.titleLink}
+                                 >
+                                    {getHeading(
+                                       [allStyles.title, styles.underlined],
+                                       allStyles.titleVariant
+                                    )}
+                                 </Link>
+                              </ConditionalWrapper>
+                           </Box>
+                           <Stack
+                              spacing={1}
+                              direction={"row"}
+                              justifyContent="space-between"
+                              alignItems="flex-end"
                            >
-                              {seeMoreComponent}
-                           </ConditionalWrapper>
-                           {(!isMobile && arrowsComponent) || null}
-                        </Stack>
-                     </Box>
-                  </ConditionalWrapper>
+                              <ConditionalWrapper
+                                 condition={
+                                    !allStyles.headerAsLink && !isMobile
+                                 }
+                              >
+                                 {seeMoreComponent}
+                              </ConditionalWrapper>
+                              {(!isMobile && arrowsComponent) || null}
+                           </Stack>
+                        </Box>
+                     </ConditionalWrapper>
+                  )}
 
                   <ConditionalWrapper
                      condition={!isEmbedded && !allStyles.compact}
