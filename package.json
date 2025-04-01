@@ -29,7 +29,7 @@
       "lint:functions": "turbo run lint --filter=@careerfairy/functions",
       "deploy:rules": "firebase deploy --only firestore:rules",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
-      "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions",
+      "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions,storage",
       "native": "cd apps/mobile && npm run start",
       "native:cache": "cd apps/mobile && npm run start:cache",
       "native:tunnel": "cd apps/mobile && npm run start:tunnel",
@@ -77,7 +77,7 @@
       "eslint-config-next": "^13.5.6",
       "eslint-config-prettier": "^8.8.0",
       "eslint-plugin-react": "^7.33.2",
-      "firebase-tools": "^12.4.2",
+      "firebase-tools": "^14.0.1",
       "husky": "^7.0.4",
       "jest": "29.7.0",
       "jest-config": "29.7.0",
@@ -97,7 +97,7 @@
       "**/*": "prettier --write --ignore-unknown",
       "**/*.{js,jsx,ts,tsx}": "eslint --max-warnings=0"
    },
-   "packageManager": "npm@10.8.2",
+   "packageManager": "npm@10.9.2",
    "engines": {
       "npm": ">=10"
    }
