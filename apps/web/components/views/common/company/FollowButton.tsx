@@ -130,7 +130,11 @@ const AuthedFollowButton: FC<Props> = ({
    )
 }
 
-const NonAuthedFollowButton: FC<Props> = ({ group, ...buttonProps }) => {
+const NonAuthedFollowButton: FC<Props> = ({
+   group,
+   showStartIcon,
+   ...buttonProps
+}) => {
    const { asPath } = useRouter()
    const isMounted = useMountedState()
 
@@ -145,7 +149,11 @@ const NonAuthedFollowButton: FC<Props> = ({ group, ...buttonProps }) => {
             },
          }}
       >
-         <Button {...buttonProps} variant="contained">
+         <Button
+            startIcon={showStartIcon ? <FollowIcon fontSize={"small"} /> : null}
+            {...buttonProps}
+            variant="contained"
+         >
             Follow
          </Button>
       </Link>
@@ -155,6 +163,7 @@ const NonAuthedFollowButton: FC<Props> = ({ group, ...buttonProps }) => {
 const FollowButton: FC<Props> = ({
    group,
    interactionSource,
+   showStartIcon,
    ...buttonProps
 }) => {
    const { isLoggedIn, isLoadingAuth } = useAuth()
@@ -177,7 +186,13 @@ const FollowButton: FC<Props> = ({
          />
       )
    }
-   return <NonAuthedFollowButton group={group} {...mergedProps} />
+   return (
+      <NonAuthedFollowButton
+         group={group}
+         {...mergedProps}
+         showStartIcon={Boolean(showStartIcon && !isLoggedIn)}
+      />
+   )
 }
 
 const defaultButtonProps: ButtonProps = {
