@@ -229,18 +229,41 @@ const HeaderComponent = ({ children, width }: HeaderProps) => {
       threshold: headerScrollThreshold,
    })
 
+   const isVisible = isMobile ? headerFixed || !isScrolling : true
+
+   // Add effect to update CSS variable based on header visibility
+   useEffect(() => {
+      document.documentElement.style.setProperty(
+         "--app-bar-visible",
+         isVisible ? "1" : "0"
+      )
+   }, [isVisible])
+
    return (
-      <Slide
-         appear={false}
-         direction="down"
-         in={isMobile ? headerFixed || !isScrolling : true}
-      >
+      <Slide appear={false} direction="down" in={isVisible}>
          <AppBar
             enableColorOnDark
             position={headerType || "sticky"}
             color="inherit"
             elevation={0}
-            sx={[width && { width }, styles.header]}
+            sx={[
+               width && { width },
+               styles.header,
+               {
+                  height: "64px", // Set explicit height
+                  "&::after": {
+                     content: '""',
+                     position: "fixed",
+                     top: 0,
+                     left: 0,
+                     right: 0,
+                     height: "64px",
+                     pointerEvents: "none",
+                     transition: "opacity 0.2s",
+                     opacity: isVisible ? 1 : 0,
+                  },
+               },
+            ]}
          >
             <Toolbar sx={styles.header} disableGutters>
                {children}

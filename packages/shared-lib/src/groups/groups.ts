@@ -82,7 +82,7 @@ export interface Group extends Identifiable {
    adminEmail?: string // deprecated
 }
 
-type FeaturedGroup = {
+export type FeaturedGroup = {
    // country iso code
    targetCountries: string[]
    // category, i.e: 'stem' or 'business_plus'

@@ -169,6 +169,7 @@ const ActionButtons = () => {
                size="medium"
                group={group}
                interactionSource={InteractionSources.Company_Page}
+               showStartIcon
             />
          ) : null}
          {showShareButton ? <ShareButton /> : null}

@@ -173,11 +173,18 @@ export const CustomJobDialogProvider = ({
             onClose={handleJobDialogClose}
             source={source}
             heroContent={
-               <Box display={"flex"} flexDirection={"row-reverse"} p={0} m={0}>
-                  <IconButton onClick={handleJobDialogClose}>
-                     <CloseOutlined />
-                  </IconButton>
-               </Box>
+               !isMobile ? (
+                  <Box
+                     display={"flex"}
+                     flexDirection={"row-reverse"}
+                     p={0}
+                     m={0}
+                  >
+                     <IconButton onClick={handleJobDialogClose}>
+                        <CloseOutlined />
+                     </IconButton>
+                  </Box>
+               ) : null
             }
             heroSx={{ m: 0, py: "0px !important", px: "10px !important" }}
             paperPropsSx={hasPaperProps ? styles.profilePaperProps : null}

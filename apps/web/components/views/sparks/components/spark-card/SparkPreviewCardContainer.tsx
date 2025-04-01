@@ -5,7 +5,7 @@ import { sxStyles } from "types/commonTypes"
 import VideoPreview from "./VideoPreview"
 
 export const SPARK_DESKTOP_WIDTH = 232
-export const SPARK_MOBILE_WIDTH = 150
+export const SPARK_MOBILE_WIDTH = 167
 
 const styles = sxStyles({
    root: {

@@ -1,18 +1,21 @@
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
-import { Box, Button, Collapse, Paper, Typography } from "@mui/material"
-import Avatar from "@mui/material/Avatar"
+import {
+   Button,
+   Collapse,
+   Paper,
+   SxProps,
+   Theme,
+   Typography,
+} from "@mui/material"
 import Stack from "@mui/material/Stack"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import Image from "next/legacy/image"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import React, { FC, useMemo } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import { placeholderAvatar } from "../../../constants/images"
 import { userRepo } from "../../../data/RepositoryInstances"
-import { sxStyles } from "../../../types/commonTypes"
+import { combineStyles, sxStyles } from "../../../types/commonTypes"
 import useCollection from "../../custom-hook/useCollection"
-import BulletPoints from "../common/BulletPoints"
-import Link from "../common/Link"
+import { CompanyPageBulletPoints } from "../common/BulletPoints"
 import FollowButton from "../common/company/FollowButton"
 import { useCompanyPage } from "./index"
 
@@ -22,10 +25,10 @@ const styles = sxStyles({
       flexDirection: "column",
       justifyContent: "center",
       minHeight: "80px",
-      px: 4,
-      py: 3,
-      borderRadius: 3,
-      border: "1px solid rgba(103, 73, 234, 0.30)",
+      p: 2,
+      borderRadius: "8px",
+      border: (theme) => `1px solid ${theme.brand.white[400]}`,
+      background: (theme) => theme.brand.white[200],
    },
    avatar: {
       bgcolor: "transparent",
@@ -33,16 +36,31 @@ const styles = sxStyles({
       height: "100px",
       mx: "auto",
    },
+   signup: {
+      border: "1px solid rgba(42, 186, 165, 0.38)",
+      background: `url('/company-page/sign-up-banner.svg'), radial-gradient(278.11% 143.5% at 1.9% -0.11%, rgba(42, 186, 165, 0.14) 0%, rgba(42, 186, 165, 0.00) 100%), radial-gradient(422% 167.87% at 102.92% 99.89%, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.00) 53%), #0E1817`,
+      backgroundSize: "120px, cover, cover",
+      backgroundPosition: "right -20px top -150px, center, center",
+      backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+   },
+   follow: {
+      background: `url('/company-page/follow-banner.svg')`,
+      backgroundSize: "120px, cover, cover",
+      backgroundPosition: "right -20px top -150px, center, center",
+      backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+   },
 })
 
 const commonPoints = [
    "Receive personalised recommendations",
-   "Be invited to their new live streams and open positions",
-   "Get notified when a company publishes a new Spark",
+   "Be notified when new live streams or open positions are published",
 ]
 const followPoints = commonPoints
 
-const signupPoints = [...commonPoints, "Be contacted based on your profile"]
+const signupPoints = [
+   "Be the first to know about job openings",
+   "Get tailored stream recommendations",
+]
 
 export const FollowCompany = () => {
    const { group } = useCompanyPage()
@@ -61,19 +79,33 @@ export const FollowCompany = () => {
 
    return (
       <Collapse unmountOnExit in={showFollow}>
-         <CTACard>
-            <Stack spacing={2}>
-               <Typography variant="h4" fontWeight={"600"} color="black">
-                  Start following companies
+         <CTACard sx={styles.follow}>
+            <Stack spacing={"20px"}>
+               <Typography
+                  variant="brandedH5"
+                  fontWeight={"500"}
+                  color="neutral.800"
+               >
+                  Start following{" "}
+                  <Typography
+                     variant="brandedH5"
+                     color="neutral.800"
+                     fontWeight={700}
+                  >
+                     companies
+                  </Typography>
                </Typography>
-               <BulletPoints points={followPoints} />
-               <span>
-                  <FollowButton
-                     color="primary"
-                     group={group}
-                     interactionSource={InteractionSources.Company_Page}
-                  />
-               </span>
+               <Stack spacing={"24px"}>
+                  <CompanyPageBulletPoints points={followPoints} />
+                  <span>
+                     <FollowButton
+                        color="primary"
+                        group={group}
+                        interactionSource={InteractionSources.Company_Page}
+                        showStartIcon={false}
+                     />
+                  </span>
+               </Stack>
             </Stack>
          </CTACard>
       </Collapse>
@@ -82,59 +114,40 @@ export const FollowCompany = () => {
 
 export const SignUp = () => {
    const { asPath } = useRouter()
-   const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
 
    if (isLoggedIn) return null
 
    return (
-      <CTACard>
-         <Stack direction={isMobile ? "column" : "row"} spacing={2}>
-            <Avatar sx={styles.avatar}>
-               <Image
-                  layout={"fill"}
-                  quality={100}
-                  objectFit={"contain"}
-                  alt={"placeholder avatar"}
-                  src={placeholderAvatar}
-               />
-            </Avatar>
-            <Stack spacing={2}>
-               <Typography variant="h4" fontWeight={"600"} color="black">
-                  Sign Up Now!
+      <CTACard sx={styles.signup}>
+         <Stack spacing={"20px"}>
+            <Typography variant="brandedH5" fontWeight={"500"} color="#fff">
+               Get in First.{" "}
+               <Typography variant="brandedH5" color="#fff" fontWeight={700}>
+                  Stay Ahead.
                </Typography>
-               <BulletPoints points={signupPoints} />
-               <Box>
-                  <span>
-                     <Link
-                        href={{
-                           pathname: "/signup",
-                           query: {
-                              absolutePath: asPath,
-                           },
-                        }}
-                        noLinkStyle
-                     >
-                        <Button variant="contained" color="secondary">
-                           SIGN UP
-                        </Button>
-                     </Link>
-                  </span>
-                  <Typography mt={1} variant="body1" color="black">
-                     Already have an account?{" "}
-                     <Link
-                        href={{
-                           pathname: "/login",
-                           query: {
-                              absolutePath: asPath,
-                           },
-                        }}
-                        noLinkStyle
-                     >
-                        Log in
-                     </Link>
-                  </Typography>
-               </Box>
+            </Typography>
+            <Stack spacing={"24px"}>
+               <CompanyPageBulletPoints
+                  points={signupPoints}
+                  typographySx={{ color: (theme) => theme.brand.white[100] }}
+               />
+               <Link
+                  href={{
+                     pathname: "/signup",
+                     query: {
+                        absolutePath: asPath,
+                     },
+                  }}
+               >
+                  <Button
+                     sx={{ width: "fit-content" }}
+                     variant="contained"
+                     color="primary"
+                  >
+                     Sign up now!
+                  </Button>
+               </Link>
             </Stack>
          </Stack>
       </CTACard>
@@ -143,9 +156,10 @@ export const SignUp = () => {
 
 const CTACard: FC<{
    children: React.ReactNode
-}> = ({ children }) => {
+   sx?: SxProps<Theme>
+}> = ({ children, sx }) => {
    return (
-      <Paper variant={"outlined"} sx={styles.root}>
+      <Paper variant={"outlined"} sx={combineStyles(styles.root, sx)}>
          {children}
       </Paper>
    )

@@ -1,21 +1,27 @@
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import FollowIcon from "@mui/icons-material/AddRounded"
 import { Box, Button, Link, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { EmptyItemsView } from "components/views/common/EmptyItemsView"
+import FollowButton from "components/views/common/company/FollowButton"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
+import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useCallback, useState } from "react"
+import { Plus, Radio } from "react-feather"
 import { TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
-
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
-import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
-import { Plus } from "react-feather"
 import { SeeAllLink } from "../Overview/SeeAllLink"
+import {
+   EMPTY_UPCOMING_EVENTS_DESCRIPTION,
+   EMPTY_UPCOMING_EVENTS_TITLE,
+} from "../Tabs/EventsTab"
 import StayUpToDateBanner from "./StayUpToDateBanner"
 
 const styles = sxStyles({
@@ -91,7 +97,6 @@ const EventSection = () => {
       setActiveTab,
    } = useCompanyPage()
 
-   const query = `companyId=${group.id}`
    const isMobile = useIsMobile()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
@@ -123,19 +128,7 @@ const EventSection = () => {
    return (
       <Box sx={styles.root}>
          <Stack spacing={"8px"} sx={isMobile ? styles.eventsWrapper : null}>
-            <ConditionalWrapper
-               condition={Boolean(upcomingLivestreams?.length)}
-               fallback={
-                  editMode ? (
-                     <CreateStreamButton />
-                  ) : (
-                     <StayUpToDateComponent
-                        title="Next Live Streams"
-                        seeMoreLink={`/next-livestreams?${query}`}
-                     />
-                  )
-               }
-            >
+            {upcomingLivestreams?.length ? (
                <EventsPreviewCarousel
                   title={<SectionTitle title="Live streams" />}
                   header={
@@ -159,8 +152,26 @@ const EventSection = () => {
                   showManageButton={editMode}
                   handleOpenEvent={handleOpenEvent}
                />
-            </ConditionalWrapper>
-            <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
+            ) : editMode ? (
+               <CreateStreamButton />
+            ) : (
+               <Stack spacing={2}>
+                  <SectionTitle title="Live streams" />
+                  <EmptyItemsView
+                     title={EMPTY_UPCOMING_EVENTS_TITLE}
+                     description={EMPTY_UPCOMING_EVENTS_DESCRIPTION}
+                     icon={<Radio width={"44px"} height={"44px"} />}
+                  >
+                     <FollowButton
+                        sx={{ fontSize: "14px", mt: "18px" }}
+                        group={group}
+                        interactionSource={InteractionSources.Company_Page}
+                        startIcon={<FollowIcon fontSize={"small"} />}
+                     />
+                  </EmptyItemsView>
+               </Stack>
+            )}
+            {pastLivestreams?.length ? (
                <EventsPreviewCarousel
                   title={<SectionTitle title="Recordings" />}
                   header={
@@ -182,7 +193,7 @@ const EventSection = () => {
                   styling={eventsCarouselStyling}
                   preventPaddingSlide
                />
-            </ConditionalWrapper>
+            ) : null}
          </Stack>
          {isDialogOpen ? (
             <StreamCreationProvider>
