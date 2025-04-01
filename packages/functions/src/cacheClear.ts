@@ -1,14 +1,15 @@
 import functions = require("firebase-functions")
+import { onSchedule } from "firebase-functions/scheduler"
 import { firestore } from "./api/firestoreAdmin"
-import config from "./config"
 
 const DAY_IN_SECONDS = 24 * 60 * 60
 
-export const periodicallyRemoveCachedDocument = functions
-   .region(config.region)
-   .pubsub.schedule("every 24 hours")
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+export const periodicallyRemoveCachedDocument = onSchedule(
+   {
+      schedule: "every 24 hours",
+      timeZone: "Europe/Zurich",
+   },
+   async () => {
       const results = await Promise.allSettled([
          // remove user recommended events older than 2 days
          removeExpiredCacheDocuments(
@@ -50,7 +51,8 @@ export const periodicallyRemoveCachedDocument = functions
       functions.logger.info(`Removed ${totalRemoved} documents`)
 
       return null
-   })
+   }
+)
 
 const removeExpiredCacheDocuments = (
    collectionPath: string,

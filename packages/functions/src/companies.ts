@@ -10,7 +10,7 @@ import {
    chunkArray,
    isWithinNormalizationLimit,
 } from "@careerfairy/shared-lib/utils/utils"
-import * as functions from "firebase-functions"
+import { onCall } from "firebase-functions/https"
 import { logger } from "firebase-functions/v2"
 import { onSchedule } from "firebase-functions/v2/scheduler"
 import { InferType, SchemaOf, array, boolean, mixed, object, string } from "yup"
@@ -21,7 +21,6 @@ import {
    livestreamsRepo,
    sparkRepo,
 } from "./api/repositories"
-import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation } from "./middlewares/validations"
@@ -46,25 +45,26 @@ const schema = object().shape(FilterCompaniesOptionsSchema)
 
 type FilterCompanyOptions = InferType<typeof schema>
 
-export const fetchCompanies = functions.region(config.region).https.onCall(
-   middlewares(
+export const fetchCompanies = onCall(
+   middlewares<FilterCompanyOptions>(
       dataValidation(FilterCompaniesOptionsSchema),
-      async (data: FilterCompanyOptions) => {
+      async (request) => {
          const {
             companyIndustries = [],
             companyCountries = [],
             companySize = [],
             allCompanyIndustries,
-         } = data
+         } = request.data
+
          const compoundQuery = isWithinNormalizationLimit(
             30,
-            data.companyCountries,
-            data.companyIndustries,
-            data.companySize
+            request.data.companyCountries,
+            request.data.companyIndustries,
+            request.data.companySize
          )
 
          const groups = await groupRepo.fetchCompanies(
-            data,
+            request.data,
             compoundQuery,
             allCompanyIndustries
          )
@@ -194,14 +194,14 @@ const groupEventClientSchema: SchemaOf<GroupClientEventsPayload> =
       ),
    })
 
-export const trackGroupEvents = functions.region(config.region).https.onCall(
-   middlewares(
+export const trackGroupEvents = onCall(
+   middlewares<GroupClientEventsPayload>(
       dataValidation(groupEventClientSchema),
-      async (data: GroupClientEventsPayload, context) => {
+      async (request) => {
          try {
-            const groupEvents: GroupEventServer[] = data.events.map(
+            const groupEvents: GroupEventServer[] = request.data.events.map(
                (groupEvent) => {
-                  const countryCode = getCountryCode(context)
+                  const countryCode = getCountryCode(request)
 
                   let timestamp = new Date(groupEvent.stringTimestamp)
 
@@ -222,9 +222,9 @@ export const trackGroupEvents = functions.region(config.region).https.onCall(
             return groupRepo.trackGroupEvents(groupEvents)
          } catch (error) {
             logAndThrow("Error in tracking group event", {
-               data,
+               data: request.data,
                error,
-               context,
+               context: request,
             })
          }
       }

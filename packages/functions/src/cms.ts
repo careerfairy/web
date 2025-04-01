@@ -1,28 +1,27 @@
 import functions = require("firebase-functions")
+import { onDocumentWritten } from "firebase-functions/firestore"
 import HygraphClient from "./api/hygraph"
-import config from "./config"
 import { isLocalEnvironment, logGraphqlErrorAndThrow } from "./util"
 
-export const syncFieldsOfStudyToHygraph = functions
-   .region(config.region)
-   // Make the secret available to this function
-   .runWith({ secrets: ["HYGRAPH_MUTATION_KEY"] })
-   .firestore.document("fieldsOfStudy/{fieldOfStudyId}")
-   .onWrite(async (change, context) => {
+export const syncFieldsOfStudyToHygraph = onDocumentWritten(
+   "fieldsOfStudy/{fieldOfStudyId}",
+   async (event) => {
       if (isLocalEnvironment()) return // Don't run/sync anything on local environment
 
-      const fieldOfStudyId = context.params.fieldOfStudyId
+      const fieldOfStudyId = event.params.fieldOfStudyId
       const isCreate =
-         change.after.exists === true && change.before.exists === false
+         event.data?.after.exists === true &&
+         event.data?.before.exists === false
       const isDelete =
-         change.after.exists === false && change.before.exists === true
+         event.data?.after.exists === false &&
+         event.data?.before.exists === true
       const isUpdate =
-         change.after.exists === true && change.before.exists === true
+         event.data?.after.exists === true && event.data?.before.exists === true
 
       try {
          const hygraph = new HygraphClient(process.env.HYGRAPH_MUTATION_KEY)
          if (isCreate || isUpdate) {
-            const fieldOfStudy = change.after.data()
+            const fieldOfStudy = event.data?.after.data()
             await hygraph.upsertFieldOfStudy(fieldOfStudyId, fieldOfStudy.name)
 
             functions.logger.log(
@@ -49,4 +48,5 @@ export const syncFieldsOfStudyToHygraph = functions
             e
          )
       }
-   })
+   }
+)

@@ -1,4 +1,3 @@
-import functions = require("firebase-functions")
 import {
    ATSDataPaginationOptions,
    ATSPaginatedResults,
@@ -12,9 +11,10 @@ import {
 } from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
 import { GroupATSAccountDocument } from "@careerfairy/shared-lib/groups"
 import { UserATSRelations, UserData } from "@careerfairy/shared-lib/users"
+import { onCall } from "firebase-functions/https"
+import { DateTime } from "luxon"
 import { boolean, object, string } from "yup"
 import { atsRepo, groupRepo } from "./api/repositories"
-import config from "./config"
 import {
    atsRequestValidation,
    atsRequestValidationWithAccountToken,
@@ -27,7 +27,6 @@ import {
    serializeModels,
    serializePaginatedModels,
 } from "./util"
-import { DateTime } from "luxon"
 
 /*
 |--------------------------------------------------------------------------
@@ -39,13 +38,13 @@ import { DateTime } from "luxon"
  * This function will be called when the group wants to integrate with an ATS system
  * We'll fetch a link_token from Merge that will be used to show the Merge Link dialog (ATS selector)
  */
-export const mergeGenerateLinkToken = functions
-   .region(config.region)
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
+export const mergeGenerateLinkToken = onCall(
+   {
+      secrets: ["MERGE_ACCESS_KEY"],
+   },
+   async (request) => {
       const requestData = await atsRequestValidation({
-         data,
-         context,
+         request,
       })
 
       try {
@@ -65,19 +64,20 @@ export const mergeGenerateLinkToken = functions
             requestData
          )
       }
-   })
+   }
+)
 
 /**
  * This is the second step where we exchange a public token with the final group
  * account token (that should be used when querying the merge data for that group)
  */
-export const mergeGetAccountToken = functions
-   .region(config.region)
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
+export const mergeGetAccountToken = onCall(
+   {
+      secrets: ["MERGE_ACCESS_KEY"],
+   },
+   async (request) => {
       const requestData = await atsRequestValidation<{ publicToken: string }>({
-         data,
-         context,
+         request,
          requiredData: {
             publicToken: string().required(),
          },
@@ -127,21 +127,22 @@ export const mergeGetAccountToken = functions
             requestData
          )
       }
-   })
+   }
+)
 
 /**
  * Fetch the Meta information for a certain entity
  * This is used to show the form fields for the ATS integration
  */
-export const mergeMetaEndpoint = functions
-   .region(config.region)
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
+export const mergeMetaEndpoint = onCall(
+   {
+      secrets: ["MERGE_ACCESS_KEY"],
+   },
+   async (request) => {
       const requestData = await atsRequestValidationWithAccountToken<{
          entity: MergeMetaEntities
       }>({
-         data,
-         context,
+         request,
          requiredData: {
             entity: string().required(),
          },
@@ -161,20 +162,21 @@ export const mergeMetaEndpoint = functions
             requestData
          )
       }
-   })
+   }
+)
 
 /**
  * Fetch Jobs
  */
-export const fetchATSJobs = functions
-   .region(config.region)
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
+export const fetchATSJobs = onCall(
+   {
+      secrets: ["MERGE_ACCESS_KEY"],
+   },
+   async (request) => {
       const requestData = await atsRequestValidationWithAccountToken<
          ATSDataPaginationOptions & { allJobs?: boolean }
       >({
-         data,
-         context,
+         request,
          requiredData: {
             cursor: string().optional().nullable(),
             pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
@@ -209,18 +211,19 @@ export const fetchATSJobs = functions
             requestData
          )
       }
-   })
+   }
+)
 
-export const candidateApplicationTest = functions
-   .region(config.region)
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
+export const candidateApplicationTest = onCall(
+   {
+      secrets: ["MERGE_ACCESS_KEY"],
+   },
+   async (request) => {
       const requestData = await atsRequestValidationWithAccountToken<{
          mergeExtraRequiredData: MergeExtraRequiredData
          jobId: string
       }>({
-         data,
-         context,
+         request,
          requiredData: {
             jobId: string().required(),
             mergeExtraRequiredData: object().required(),
@@ -273,20 +276,21 @@ export const candidateApplicationTest = functions
             requestData
          )
       }
-   })
+   }
+)
 
 /**
  * Fetch Recruiters
  */
-export const fetchATSRecruiters = functions
-   .region(config.region)
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
+export const fetchATSRecruiters = onCall(
+   {
+      secrets: ["MERGE_ACCESS_KEY"],
+   },
+   async (request) => {
       const requestData =
          await atsRequestValidationWithAccountToken<RecruitersFunctionCallOptions>(
             {
-               data,
-               context,
+               request,
                requiredData: {
                   cursor: string().optional().nullable(),
                   pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
@@ -326,18 +330,19 @@ export const fetchATSRecruiters = functions
             requestData
          )
       }
-   })
+   }
+)
 
 /**
  * Sync Status for the multiple entities
  */
-export const fetchATSSyncStatus = functions
-   .region(config.region)
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
+export const fetchATSSyncStatus = onCall(
+   {
+      secrets: ["MERGE_ACCESS_KEY"],
+   },
+   async (request) => {
       const requestData = await atsRequestValidationWithAccountToken({
-         data,
-         context,
+         request,
       })
 
       try {
@@ -354,18 +359,19 @@ export const fetchATSSyncStatus = functions
             requestData
          )
       }
-   })
+   }
+)
 
 /**
  * Remove a linked account from merge
  */
-export const mergeRemoveAccount = functions
-   .region(config.region)
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
+export const mergeRemoveAccount = onCall(
+   {
+      secrets: ["MERGE_ACCESS_KEY"],
+   },
+   async (request) => {
       const requestData = await atsRequestValidationWithAccountToken({
-         data,
-         context,
+         request,
       })
 
       try {
@@ -390,4 +396,5 @@ export const mergeRemoveAccount = functions
       )
 
       return true
-   })
+   }
+)

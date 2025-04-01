@@ -7,9 +7,9 @@ import {
    LivestreamEvent,
    UpsertSpeakerRequest,
 } from "@careerfairy/shared-lib/livestreams"
+import { onCall } from "firebase-functions/https"
 import * as yup from "yup"
 import { groupRepo, livestreamsRepo } from "../../api/repositories"
-import config from "../../config"
 import { middlewares } from "../../middlewares/middlewares"
 import { dataValidation, livestreamExists } from "../../middlewares/validations"
 import { validateLivestreamToken } from "../validations"
@@ -41,73 +41,71 @@ const upsertSpeakerSchema: yup.SchemaOf<UpsertSpeakerRequest> = yup.object({
       .required(),
 })
 
-export const upsertLivestreamSpeaker = functions
-   .region(config.region)
-   .https.onCall(
-      middlewares<Context, UpsertSpeakerRequest>(
-         dataValidation(upsertSpeakerSchema),
-         livestreamExists(),
-         async (requestData, context) => {
-            const { livestreamId, livestreamToken, speaker } = requestData
+type Data = UpsertSpeakerRequest & Context
 
-            functions.logger.info("Upserting livestream speaker", {
+export const upsertLivestreamSpeaker = onCall(
+   middlewares<Data>(
+      dataValidation(upsertSpeakerSchema),
+      livestreamExists(),
+      async (request) => {
+         const { livestreamId, livestreamToken, speaker } = request.data
+
+         functions.logger.info("Upserting livestream speaker", {
+            livestreamId,
+            speaker,
+         })
+
+         await validateLivestreamToken(
+            request.auth?.token?.email,
+            request.middlewares?.livestream,
+            livestreamToken
+         )
+
+         const isEditing = Boolean(speaker.id)
+         if (isEditing) {
+            functions.logger.info("Editing existing speaker", {
+               speakerId: speaker.id,
+            })
+
+            // check if speaker is related to an existing Creator
+            const existingCreator = await groupRepo.getCreatorById(speaker.id)
+
+            if (existingCreator && existingCreator.groupId) {
+               functions.logger.info("Existing creator found", {
+                  existingCreator,
+               })
+               await groupRepo.updateCreatorInGroup(
+                  existingCreator.groupId,
+                  existingCreator.id,
+                  {
+                     avatarUrl: speaker.avatar,
+                     firstName: speaker.firstName,
+                     lastName: speaker.lastName,
+                     id: speaker.id,
+                     story: speaker.background,
+                     linkedInUrl: speaker.linkedInUrl,
+                     position: speaker.position,
+                  }
+               )
+            }
+
+            // Update the livestream speaker
+            functions.logger.info("Updating livestream speaker", {
                livestreamId,
                speaker,
             })
-
-            await validateLivestreamToken(
-               context.auth?.token?.email,
-               context.middlewares.livestream,
-               livestreamToken
+            return livestreamsRepo.updateLivestreamSpeaker(
+               livestreamId,
+               speaker
             )
-
-            const isEditing = Boolean(speaker.id)
-            if (isEditing) {
-               functions.logger.info("Editing existing speaker", {
-                  speakerId: speaker.id,
-               })
-
-               // check if speaker is related to an existing Creator
-               const existingCreator = await groupRepo.getCreatorById(
-                  speaker.id
-               )
-
-               if (existingCreator && existingCreator.groupId) {
-                  functions.logger.info("Existing creator found", {
-                     existingCreator,
-                  })
-                  await groupRepo.updateCreatorInGroup(
-                     existingCreator.groupId,
-                     existingCreator.id,
-                     {
-                        avatarUrl: speaker.avatar,
-                        firstName: speaker.firstName,
-                        lastName: speaker.lastName,
-                        id: speaker.id,
-                        story: speaker.background,
-                        linkedInUrl: speaker.linkedInUrl,
-                        position: speaker.position,
-                     }
-                  )
-               }
-
-               // Update the livestream speaker
-               functions.logger.info("Updating livestream speaker", {
-                  livestreamId,
-                  speaker,
-               })
-               return livestreamsRepo.updateLivestreamSpeaker(
-                  livestreamId,
-                  speaker
-               )
-            } else {
-               functions.logger.info("Adding new ad hoc speaker", {
-                  livestreamId,
-                  speaker,
-               })
-               // Only add Speaker as an adhoc speaker
-               return livestreamsRepo.addAdHocSpeaker(livestreamId, speaker)
-            }
+         } else {
+            functions.logger.info("Adding new ad hoc speaker", {
+               livestreamId,
+               speaker,
+            })
+            // Only add Speaker as an adhoc speaker
+            return livestreamsRepo.addAdHocSpeaker(livestreamId, speaker)
          }
-      )
+      }
    )
+)

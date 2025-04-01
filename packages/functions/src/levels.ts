@@ -1,8 +1,8 @@
 import { CreatorWithContent } from "@careerfairy/shared-lib/groups/creators"
 import * as functions from "firebase-functions"
+import { onCall } from "firebase-functions/https"
 import { uniqBy } from "lodash"
 import { groupRepo, userRepo } from "./api/repositories"
-import config from "./config"
 import { middlewares } from "./middlewares/middlewares"
 import { userAuthExists } from "./middlewares/validations"
 
@@ -21,10 +21,10 @@ export const mapCreatorToLevelsMentors = (
    }
 }
 
-export const getFollowedCreators = functions.region(config.region).https.onCall(
-   middlewares(userAuthExists(), async (_, context) => {
+export const getFollowedCreators = onCall(
+   middlewares(userAuthExists(), async (request) => {
       try {
-         const userEmail = context.auth.token.email
+         const userEmail = request.auth.token.email
 
          const allFollowedCompanies = await userRepo.getCompaniesUserFollows(
             userEmail,
