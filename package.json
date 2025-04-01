@@ -97,7 +97,7 @@
       "**/*": "prettier --write --ignore-unknown",
       "**/*.{js,jsx,ts,tsx}": "eslint --max-warnings=0"
    },
-   "packageManager": "npm@10.9.2",
+   "packageManager": "npm@10.8.2",
    "engines": {
       "npm": ">=10"
    }

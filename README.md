@@ -4,8 +4,8 @@ Monorepo with all the apps, managed by npm workspaces and turborepo.
 
 ### Requirements
 
--  `node` (v22.14.0 - specified in .nvmrc)
--  `npm` (>=v10.9.2)
+-  `node` (v20.19.0 - specified in .nvmrc)
+-  `npm` (>=v10.8.2)
 
 Check our [Development Environment Setup Guide](https://www.notion.so/Development-Environment-Setup-Guide-a5f414de756245aabde5a7d4e9a48350) article for instructions on how to setup your machine.
 
