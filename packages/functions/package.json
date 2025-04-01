@@ -46,7 +46,7 @@
       "yup": "^0.32.11"
    },
    "engines": {
-      "node": "22"
+      "node": "20"
    },
    "devDependencies": {
       "@types/luxon": "^1.22.0",
@@ -61,5 +61,6 @@
       "eslint-plugin-import": "^2.25.4",
       "rimraf": "^3.0.2",
       "typescript": "^5.1.6"
-   }
+   },
+   "fireConfig": {}
 }
