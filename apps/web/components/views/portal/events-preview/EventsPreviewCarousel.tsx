@@ -6,6 +6,7 @@ import {
    Button,
    Stack,
    SxProps,
+   Theme,
    Typography,
    TypographyProps,
    useMediaQuery,
@@ -14,7 +15,6 @@ import {
 import Box from "@mui/material/Box"
 import { useAutoPlayCarousel } from "components/custom-hook/embla-carousel/useAutoPlayCarousel"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
@@ -22,8 +22,9 @@ import { isLivestreamDialogOpen } from "components/views/livestream-dialog/Lives
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
+
 import { useRouter } from "next/router"
-import React, { ReactNode, useMemo } from "react"
+import React, { ReactNode, useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
@@ -179,7 +180,7 @@ export type EventsProps = {
    events: LivestreamEvent[]
    eventDescription?: string
    seeMoreLink?: string
-   onClickSeeMore?: () => void
+   handleSeeMoreClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
    title?: ReactNode | string
    subtitle?: ReactNode | string
    header?: ReactNode
@@ -201,6 +202,7 @@ export type EventsProps = {
    onCardClick?: (event) => void
    disableTracking?: boolean
    preventPaddingSlide?: boolean
+   onClickSeeMore?: () => void
 }
 
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
@@ -209,6 +211,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          title,
          subtitle,
          seeMoreLink,
+         handleSeeMoreClick,
          loading = false,
          events,
          hidePreview,
@@ -228,7 +231,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          onCardClick,
          disableTracking,
          header,
-         onClickSeeMore,
          preventPaddingSlide = false,
       } = props
 
@@ -265,6 +267,16 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
       }, [isMedium, isLarge])
       const numLoadingSlides = numSlides + 2
 
+      const handleSeeMoreLinkClick = useCallback(
+         (e: React.MouseEvent<HTMLAnchorElement>) => {
+            if (handleSeeMoreClick) {
+               e.preventDefault()
+               handleSeeMoreClick(e)
+            }
+         },
+         [handleSeeMoreClick]
+      )
+
       React.useImperativeHandle(ref, () => ({
          goNext() {
             emblaApi.scrollNext()
@@ -274,43 +286,18 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          },
       }))
 
-      const seeMoreComponent = (
-         <ConditionalWrapper
-            condition={events?.length > 1 && seeMoreLink !== undefined}
-         >
-            {onClickSeeMore ? (
-               <Typography sx={allStyles.seeMoreSx} onClick={onClickSeeMore}>
-                  See all
-               </Typography>
-            ) : (
-               <Link href={seeMoreLink}>
-                  <Typography sx={allStyles.seeMoreSx}>See all</Typography>
-               </Link>
-            )}
-         </ConditionalWrapper>
-      )
-      const arrowsComponent = (
-         <ConditionalWrapper
-            condition={emblaApi !== undefined && events?.length > 1}
-         >
-            <GenericCarousel.Arrows emblaApi={emblaApi} />
-         </ConditionalWrapper>
-      )
+      const seeMoreComponent =
+         events?.length > 1 && seeMoreLink !== undefined ? (
+            <Link href={seeMoreLink} onClick={handleSeeMoreLinkClick}>
+               <Typography sx={allStyles.seeMoreSx}>See all</Typography>
+            </Link>
+         ) : null
 
-      const getLoadingCard = () => {
-         return (
-            <>
-               {[...Array(numLoadingSlides)].map((_, i) => (
-                  <Box key={i} sx={allStyles.slide}>
-                     <EventPreviewCard
-                        animation={isEmpty ? false : undefined}
-                        loading
-                     />
-                  </Box>
-               ))}
-            </>
-         )
-      }
+      const arrowsComponent =
+         emblaApi !== undefined && events?.length > 1 ? (
+            <GenericCarousel.Arrows emblaApi={emblaApi} />
+         ) : null
+
       const getHeading = (
          headingStyles: SxProps,
          variant?: TypographyProps["variant"]
@@ -331,59 +318,47 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
 
       return (
          <>
-            <ConditionalWrapper condition={!hidePreview}>
+            {!hidePreview ? (
                <Box sx={mainBoxSxStyles}>
                   {header ? (
                      header
-                  ) : (
-                     <ConditionalWrapper
-                        condition={!isEmbedded && allStyles.compact}
-                     >
-                        <Box sx={allStyles.eventsHeader}>
-                           <Box>
-                              <ConditionalWrapper
-                                 condition={
-                                    seeMoreLink !== undefined &&
-                                    (allStyles.headerAsLink || isMobile)
-                                 }
-                                 fallback={getHeading(
-                                    [allStyles.title],
+                  ) : !isEmbedded && allStyles.compact ? (
+                     <Box sx={allStyles.eventsHeader}>
+                        <Box>
+                           {seeMoreLink !== undefined &&
+                              (allStyles.headerAsLink || isMobile) ? (
+                              <Link
+                                 href={seeMoreLink}
+                                 style={styles.titleLink}
+                                 onClick={handleSeeMoreLinkClick}
+                              >
+                                 {getHeading(
+                                    [allStyles.title, styles.underlined],
                                     allStyles.titleVariant
                                  )}
-                              >
-                                 <Link
-                                    href={seeMoreLink}
-                                    style={styles.titleLink}
-                                 >
-                                    {getHeading(
-                                       [allStyles.title, styles.underlined],
-                                       allStyles.titleVariant
-                                    )}
-                                 </Link>
-                              </ConditionalWrapper>
-                           </Box>
-                           <Stack
-                              spacing={1}
-                              direction={"row"}
-                              justifyContent="space-between"
-                              alignItems="flex-end"
-                           >
-                              <ConditionalWrapper
-                                 condition={
-                                    !allStyles.headerAsLink && !isMobile
-                                 }
-                              >
-                                 {seeMoreComponent}
-                              </ConditionalWrapper>
-                              {(!isMobile && arrowsComponent) || null}
-                           </Stack>
+                              </Link>
+                           ) : (
+                              getHeading(
+                                 [allStyles.title],
+                                 allStyles.titleVariant
+                              )
+                           )}
                         </Box>
-                     </ConditionalWrapper>
-                  )}
+                        <Stack
+                           spacing={1}
+                           direction={"row"}
+                           justifyContent="space-between"
+                           alignItems="flex-end"
+                        >
+                           {!allStyles.headerAsLink && !isMobile
+                              ? seeMoreComponent
+                              : null}
+                           {(!isMobile && arrowsComponent) || null}
+                        </Stack>
+                     </Box>
+                  ) : null}
 
-                  <ConditionalWrapper
-                     condition={!isEmbedded && !allStyles.compact}
-                  >
+                  {!isEmbedded && !allStyles.compact ? (
                      <Box sx={allStyles.eventsHeader}>
                         {typeof title === "string" ? (
                            <Typography
@@ -398,15 +373,11 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            Boolean(title) && title
                         )}
                      </Box>
-                  </ConditionalWrapper>
+                  ) : null}
                   <Stack sx={styles.previewContent}>
-                     <ConditionalWrapper
-                        condition={
-                           !isMobile &&
-                           eventDescription !== undefined &&
-                           eventDescription.length > 0
-                        }
-                     >
+                     {!isMobile &&
+                        eventDescription !== undefined &&
+                        eventDescription.length > 0 ? (
                         <Stack>
                            <Box sx={styles.description}>
                               <Typography
@@ -418,10 +389,8 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               </Typography>
                            </Box>
                         </Stack>
-                     </ConditionalWrapper>
-                     <ConditionalWrapper
-                        condition={!isEmbedded && !allStyles.compact}
-                     >
+                     ) : null}
+                     {!isEmbedded && !allStyles.compact ? (
                         <Stack
                            direction="row"
                            spacing={2}
@@ -433,20 +402,14 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            <Box>{seeMoreComponent}</Box>
                            {arrowsComponent}
                         </Stack>
-                     </ConditionalWrapper>
+                     ) : null}
                      {subtitle}
                      <Box ref={autoPlayRef}>
                         <Box id={id} sx={allStyles.viewportSx} ref={emblaRef}>
                            <Box sx={[styles.container]}>
-                              <ConditionalWrapper
-                                 condition={!loading}
-                                 fallback={getLoadingCard()}
-                              >
-                                 <ConditionalWrapper
-                                    condition={events?.length > 0}
-                                    fallback={children}
-                                 >
-                                    {events?.map((event, index, arr) => (
+                              {!loading ? (
+                                 events?.length > 0 ? (
+                                    events?.map((event, index, arr) => (
                                        <Box sx={allStyles.slide} key={event.id}>
                                           <EventPreviewCard
                                              loading={loading}
@@ -461,8 +424,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                              onGoNext={moveToNextSlide}
                                              disableAutoPlay={
                                                 isLSDialogOpen ||
-                                                (type ===
-                                                   EventsTypes.PAST_EVENTS &&
+                                                (type === EventsTypes.PAST_EVENTS &&
                                                    shouldDisableAutoPlay(index))
                                              }
                                              muted={muted}
@@ -512,29 +474,55 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                              }
                                           />
                                        </Box>
-                                    ))}
-                                 </ConditionalWrapper>
-                              </ConditionalWrapper>
-                              {/**
-                               * This prevents the last slide from touching the right edge of the viewport.
-                               */}
-                              <ConditionalWrapper
-                                 condition={
-                                    events?.length > 0 && !preventPaddingSlide
-                                 }
-                              >
+                                    ))
+                                 ) : (
+                                    children
+                                 )
+                              ) : (
+                                 <LoadingCards
+                                    numSlides={numLoadingSlides}
+                                    isEmpty={isEmpty}
+                                    slideStyle={allStyles.slide}
+                                 />
+                              )}
+                              {events?.length > 0 && !preventPaddingSlide ? (
                                  <Box sx={styles.paddingSlide}></Box>
-                              </ConditionalWrapper>
+                              ) : null}
                            </Box>
                         </Box>
                      </Box>
                   </Stack>
                </Box>
-            </ConditionalWrapper>
+            ) : null}
          </>
       )
    }
 )
+
+type LoadingCardsProps = {
+   numSlides: number
+   isEmpty: boolean
+   slideStyle: SxProps<Theme>
+}
+
+const LoadingCards = ({
+   numSlides,
+   isEmpty,
+   slideStyle,
+}: LoadingCardsProps) => {
+   return (
+      <>
+         {[...Array(numSlides)].map((_, i) => (
+            <Box key={i} sx={slideStyle}>
+               <EventPreviewCard
+                  animation={isEmpty ? false : undefined}
+                  loading
+               />
+            </Box>
+         ))}
+      </>
+   )
+}
 
 const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
    switch (eventType) {

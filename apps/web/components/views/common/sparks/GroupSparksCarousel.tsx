@@ -11,13 +11,13 @@ type Props = {
    handleSparksClicked: (spark: Spark) => void
    sx?: SxProps<Theme>
    headerSx?: SxProps<Theme>
-   onSeeAllClick?: () => void
+   seeAllHref?: string
+   handleSeeAllClick?: () => void
 }
 
 export const GroupSparksCarousel = ({
    sx,
    headerSx,
-   onSeeAllClick,
    ...props
 }: Props & { groupId: string }) => {
    const isMobile = useIsMobile()
@@ -32,7 +32,12 @@ export const GroupSparksCarousel = ({
          containerSx={sx}
          {...props}
          headerSx={headerSx}
-         seeAll={<SeeAllLink handleClick={onSeeAllClick} />}
+         seeAll={
+            <SeeAllLink
+               href={props.seeAllHref}
+               onClick={props.handleSeeAllClick}
+            />
+         }
          disableArrows={isMobile}
       />
    )

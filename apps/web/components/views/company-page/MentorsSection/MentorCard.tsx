@@ -1,5 +1,6 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
 import Link from "next/link"
@@ -70,16 +71,14 @@ const styles = sxStyles({
          paddingBottom: 1,
          marginBottom: -1,
          maxWidth: "100%",
-         display: "-webkit-box",
-         WebkitLineClamp: 2,
-         WebkitBoxOrient: "vertical",
-         overflow: "hidden",
+         ...getMaxLineStyles(2),
       },
    },
    edit: {
       position: "absolute",
       right: 4,
       top: 4,
+      zIndex: 1,
    },
    logoOverlay: {
       position: "absolute",
@@ -159,11 +158,11 @@ export const MentorCard = ({
                />
             </Box>
          ) : null}
-         {Boolean(isEditMode) && (
+         {isEditMode ? (
             <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.brand.white[100]} />
             </IconButton>
-         )}
+         ) : null}
          <Box sx={styles.avatarContainer}>
             <CircularLogo
                size={84}

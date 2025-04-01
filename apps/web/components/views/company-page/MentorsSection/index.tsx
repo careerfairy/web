@@ -13,7 +13,13 @@ import { MentorCard } from "./MentorCard"
 import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
-   const { editMode, groupCreators, setActiveTab } = useCompanyPage()
+   const {
+      editMode,
+      groupCreators,
+      getCompanyPageTabLink,
+      tabMode,
+      setActiveTab,
+   } = useCompanyPage()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
 
@@ -72,7 +78,12 @@ export const MentorsSection = () => {
                </Typography>
             }
             seeAll={
-               <SeeAllLink handleClick={() => setActiveTab(TabValue.mentors)} />
+               <SeeAllLink
+                  href={getCompanyPageTabLink(TabValue.mentors)}
+                  onClick={
+                     tabMode ? () => setActiveTab(TabValue.mentors) : undefined
+                  }
+               />
             }
             viewportSx={{
                // hack to ensure shadows are not cut off

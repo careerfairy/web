@@ -1,6 +1,6 @@
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useEffect } from "react"
+import Link from "next/link"
 import { sxStyles } from "types/commonTypes"
 import { SectionAnchor, TabValue, useCompanyPage } from ".."
 import GroupJobsList from "./GroupJobsList"
@@ -37,15 +37,10 @@ const JobsSection = () => {
    const {
       sectionRefs: { jobsSectionRef },
       customJobs,
+      getCompanyPageTabLink,
+      tabMode,
       setActiveTab,
-      activeTab,
    } = useCompanyPage()
-
-   useEffect(() => {
-      if (activeTab === TabValue.jobs && jobsSectionRef.current) {
-         jobsSectionRef.current.scrollIntoView({ behavior: "smooth" })
-      }
-   }, [activeTab, jobsSectionRef])
 
    if (!customJobs?.length) return null
 
@@ -58,12 +53,16 @@ const JobsSection = () => {
                   <Header />
                </Box>
                <GroupJobsList jobs={customJobs.slice(0, 3)} />
-               {customJobs?.length > 3 ? (
+               {customJobs?.length > 1 ? (
                   <Button
                      variant="outlined"
                      color="primary"
                      sx={styles.checkAllJobsButton}
-                     onClick={() => setActiveTab(TabValue.jobs)}
+                     href={getCompanyPageTabLink(TabValue.jobs)}
+                     onClick={
+                        tabMode ? () => setActiveTab(TabValue.jobs) : undefined
+                     }
+                     LinkComponent={tabMode ? "button" : Link}
                   >
                      Check all job openings
                   </Button>

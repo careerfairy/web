@@ -81,13 +81,18 @@ const SectionTitle = ({ title }: { title: string }) => {
 }
 
 const EventSection = () => {
-   const { group, upcomingLivestreams, pastLivestreams, editMode } =
-      useCompanyPage()
+   const {
+      group,
+      upcomingLivestreams,
+      pastLivestreams,
+      editMode,
+      getCompanyPageTabLink,
+      tabMode,
+      setActiveTab,
+   } = useCompanyPage()
 
    const query = `companyId=${group.id}`
    const isMobile = useIsMobile()
-
-   const { setActiveTab } = useCompanyPage()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -100,6 +105,9 @@ const EventSection = () => {
       },
       [handleOpenDialog]
    )
+
+   const upcomingEventsHref = getCompanyPageTabLink(TabValue.livesStreams)
+   const pastEventsHref = getCompanyPageTabLink(TabValue.recordings)
 
    const eventsCarouselStyling: EventsCarouselStyling = {
       mainWrapperBoxSx: {
@@ -134,18 +142,18 @@ const EventSection = () => {
                      isMobile ? (
                         <EventSectionHeader
                            title="Live streams"
-                           seeAllClick={() =>
-                              setActiveTab?.(TabValue.livesStreams)
-                           }
+                           href={upcomingEventsHref}
                         />
                      ) : null
                   }
                   events={upcomingLivestreams}
                   type={EventsTypes.COMING_UP}
-                  seeMoreLink={""}
-                  onClickSeeMore={() => {
-                     setActiveTab?.(TabValue.livesStreams)
-                  }}
+                  seeMoreLink={upcomingEventsHref}
+                  handleSeeMoreClick={
+                     tabMode
+                        ? () => setActiveTab(TabValue.livesStreams)
+                        : undefined
+                  }
                   styling={eventsCarouselStyling}
                   hideChipLabels={editMode}
                   showManageButton={editMode}
@@ -159,18 +167,18 @@ const EventSection = () => {
                      isMobile ? (
                         <EventSectionHeader
                            title="Recordings"
-                           seeAllClick={() =>
-                              setActiveTab?.(TabValue.recordings)
-                           }
+                           href={pastEventsHref}
                         />
                      ) : null
                   }
                   events={pastLivestreams ?? []}
                   type={EventsTypes.PAST_EVENTS}
-                  seeMoreLink={""}
-                  onClickSeeMore={() => {
-                     setActiveTab?.(TabValue.recordings)
-                  }}
+                  seeMoreLink={pastEventsHref}
+                  handleSeeMoreClick={
+                     tabMode
+                        ? () => setActiveTab(TabValue.recordings)
+                        : undefined
+                  }
                   styling={eventsCarouselStyling}
                   preventPaddingSlide
                />
@@ -197,12 +205,9 @@ const EventSection = () => {
 
 type EventSectionHeaderProps = {
    title: string
-   seeAllClick?: () => void
+   href?: string
 }
-const EventSectionHeader = ({
-   title,
-   seeAllClick,
-}: EventSectionHeaderProps) => {
+const EventSectionHeader = ({ title, href }: EventSectionHeaderProps) => {
    return (
       <Stack
          sx={styles.eventsHeader}
@@ -214,7 +219,7 @@ const EventSectionHeader = ({
             {title}
          </Typography>
          <Box mr={2}>
-            <SeeAllLink handleClick={seeAllClick} />
+            <SeeAllLink href={href} />
          </Box>
       </Stack>
    )

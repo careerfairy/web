@@ -101,10 +101,10 @@ const ProgressBanner = () => {
 
    return (
       <Box sx={styles.root}>
-         <Container disableGutters maxWidth="lg">
+         <Container disableGutters maxWidth="lg" sx={{ ml: 0 }}>
             <Grid container>
                <Grid item xs={12} md={6}>
-                  <Stack px={3} py={3} spacing={2}>
+                  <Stack pr={3} py={3} spacing={2}>
                      <Typography fontWeight={600} variant={"h4"}>
                         {progress.isReady
                            ? "How Appealing Is Your Profile?"
