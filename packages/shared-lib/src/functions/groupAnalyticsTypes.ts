@@ -1,4 +1,3 @@
-import { CallableRequest } from "firebase-functions/https"
 import { UTMParams } from "../commonTypes"
 import { UserLivestreamData } from "../livestreams"
 /**
@@ -57,12 +56,12 @@ export interface GetRegistrationSourcesFnArgs {
  * Generate cache key for the fn call
  */
 export const registrationSourcesCacheKey = (
-   request: CallableRequest<GetRegistrationSourcesFnArgs>
+   request: GetRegistrationSourcesFnArgs
 ) => {
    return [
       "getRegistrationSources",
-      request.data.groupId,
-      request.data.fetchType,
-      request.data.livestreamIds,
+      request.groupId,
+      request.fetchType,
+      request.livestreamIds,
    ]
 }
