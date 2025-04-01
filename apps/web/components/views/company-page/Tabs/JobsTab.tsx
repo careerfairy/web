@@ -1,7 +1,7 @@
-import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { Box, Stack } from "@mui/material"
+import { EmptyItemsView } from "components/views/common/EmptyItemsView"
 import { sxStyles } from "types/commonTypes"
-import { TabValue, useCompanyPage } from ".."
+import { useCompanyPage } from ".."
 import GroupJobsList from "../JobsSection/GroupJobsList"
 
 const styles = sxStyles({
@@ -24,53 +24,21 @@ const styles = sxStyles({
    },
 })
 
-const Header = () => {
-   return (
-      <Typography variant="brandedH3" fontWeight={"600"} color="black">
-         Jobs
-      </Typography>
-   )
-}
-
-const JobsTab = () => {
-   const { customJobs, setActiveTab } = useCompanyPage()
-
-   if (!customJobs?.length) return null
+export const JobsTab = () => {
+   const { customJobs } = useCompanyPage()
 
    return (
       <Box sx={styles.wrapper}>
-         <SuspenseWithBoundary fallback={<JobsSectionDetailsSkeleton />}>
-            <Stack width={"100%"} spacing={2}>
-               <Box sx={styles.titleSection}>
-                  <Header />
-               </Box>
+         <Stack width={"100%"} spacing={2}>
+            {customJobs?.length ? (
                <GroupJobsList jobs={customJobs} />
-               {customJobs?.length ? (
-                  <Button
-                     variant="outlined"
-                     color="primary"
-                     sx={styles.checkAllJobsButton}
-                     onClick={() => setActiveTab(TabValue.jobs)}
-                  >
-                     Check all job openings v2
-                  </Button>
-               ) : null}
-            </Stack>
-         </SuspenseWithBoundary>
+            ) : (
+               <EmptyItemsView
+                  title="There are no jobs at the moment"
+                  description="Make sure to follow the company to receive their latest opportunities and updates."
+               />
+            )}
+         </Stack>
       </Box>
    )
 }
-
-const JobsSectionDetailsSkeleton = () => {
-   return (
-      <Stack>
-         <Header />
-         <Stack>
-            <Skeleton sx={{ m: 2 }} />
-            <Skeleton sx={{ p: 4 }} />
-         </Stack>
-      </Stack>
-   )
-}
-
-export default JobsTab

@@ -14,7 +14,7 @@ import BannerUploadButton from "./BannerUploadButton"
 const styles = sxStyles({
    imageWrapper: {
       width: "100%",
-      height: { xs: "250px", md: "300px" },
+      height: { xs: "94px", md: "194px" },
       position: "relative",
       "& .banner-image": {
          borderRadius: "12px 12px 0 0",

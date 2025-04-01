@@ -57,8 +57,8 @@ const JobsSection = () => {
                <Box sx={styles.titleSection}>
                   <Header />
                </Box>
-               <GroupJobsList jobs={customJobs} />
-               {customJobs?.length ? (
+               <GroupJobsList jobs={customJobs.slice(0, 3)} />
+               {customJobs?.length > 3 ? (
                   <Button
                      variant="outlined"
                      color="primary"

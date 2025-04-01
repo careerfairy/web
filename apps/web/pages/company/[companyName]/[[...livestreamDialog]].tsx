@@ -95,7 +95,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                title={`CareerFairy | ${universityName}`}
             />
 
-            <GenericDashboardLayout pageDisplayName={""} headerFixed>
+            <GenericDashboardLayout pageDisplayName={""}>
                <Box
                   sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
                   ref={viewRef}
