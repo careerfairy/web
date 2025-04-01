@@ -10,6 +10,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
+import { TabValue } from "components/views/company-page"
 import {
    CustomJobDialogData,
    CustomJobDialogLayout,
@@ -112,6 +113,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                         serverSideCustomJobs
                      )}
                      editMode={false}
+                     tab={TabValue.overview}
                   />
                </Box>
             </GenericDashboardLayout>

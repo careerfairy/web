@@ -1,11 +1,17 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { FeatureFlagsState } from "@careerfairy/shared-lib/feature-flags/types"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Container, Grid, Stack } from "@mui/material"
+import {
+   Box,
+   Container,
+   Stack,
+   Tab,
+   TabScrollButton,
+   Tabs,
+} from "@mui/material"
 import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGroupAvailableCustomJobs"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -14,27 +20,70 @@ import {
    MutableRefObject,
    createContext,
    forwardRef,
+   useCallback,
    useContext,
    useEffect,
    useMemo,
    useRef,
+   useState,
 } from "react"
 import { useFirestoreDocData } from "reactfire"
-import { useAuth } from "../../../HOCs/AuthProvider"
+import { sxStyles } from "types/commonTypes"
 import { groupRepo } from "../../../data/RepositoryInstances"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import useListenToStreams from "../../custom-hook/useListenToStreams"
-import AboutSection from "./AboutSection"
-import EventSection from "./EventSection"
 import Header from "./Header"
-import JobsSection from "./JobsSection"
 import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
+import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
-import SparksSection from "./SparksSection"
-import { TestimonialsOrMentorsSection } from "./TestimonialsOrMentorsSection"
-import { FollowCompany, SignUp } from "./ctas"
+import BenefitsTab from "./Tabs/BenefitsTab"
+import EventsTab from "./Tabs/EventsTab"
+import JobsTab from "./Tabs/JobsTab"
+import MentorsTab from "./Tabs/MentorsTab"
+import SparksTab from "./Tabs/SparksTab"
+import TestimonialsTab from "./Tabs/TestimonialsTab"
+
+const styles = sxStyles({
+   tabs: {
+      borderRadius: "12px 12px 0 0",
+      backgroundColor: "#FEFEFE",
+      position: "relative",
+      borderBottom: "1px solid",
+      borderColor: "divider",
+      "& .MuiTab-root": {
+         textTransform: "none",
+         fontFamily: "Poppins",
+         fontSize: "16px",
+         color: (theme) => theme.palette.neutral[500],
+         fontWeight: 400,
+         minWidth: "auto",
+         px: 2,
+      },
+      "& .Mui-selected": {
+         color: (theme) => theme.brand.tq[600],
+         fontWeight: 600,
+      },
+      "& .MuiTabs-indicator": {
+         height: "1px",
+      },
+      "& .MuiTabs-scroller": {
+         zIndex: 0,
+      },
+   },
+   tabContent: {
+      backgroundColor: "#FEFEFE",
+      pt: "20px",
+      pb: "24px",
+      px: 2,
+      borderRadius: {
+         xs: "0 0 8px 8px",
+         sm: "0 0 8px 8px",
+         md: "0 0 12px 12px",
+      },
+   },
+})
 
 type Props = {
    group: Group
@@ -43,46 +92,54 @@ type Props = {
    pastLivestreams: LivestreamEvent[]
    groupCreators: PublicCreator[]
    customJobs: CustomJob[]
+   tab?: TabValueType
 }
 
 export const TabValue = {
-   profile: "profile-section",
-   media: "media-section",
-   testimonialsOrMentors: "testimonials-or-mentors-section",
-   livesStreams: "livesStreams-section",
-   banner: "banner-section",
-   video: "video-section",
+   overview: "overview-section",
    jobs: "jobs-section",
+   sparks: "sparks-section",
+   livesStreams: "livesStreams-section",
+   recordings: "recordings-section",
+   mentors: "mentors-section",
+   testimonials: "testimonials-section",
+   benefits: "benefits-section",
 } as const
 
 export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
 
-export const getTabLabel = (
-   tabId: TabValueType,
-   featureFlags: FeatureFlagsState
-) => {
+export const getTabLabel = (tabId: TabValueType) => {
    switch (tabId) {
-      case TabValue.profile:
-         return "About"
+      case TabValue.overview:
+         return "Overview"
       case TabValue.jobs:
          return "Jobs"
-      case TabValue.media:
-         return "Media"
-      case TabValue.testimonialsOrMentors:
-         return featureFlags.mentorsV1 ? "Mentors" : "Testimonials"
+      case TabValue.sparks:
+         return "Sparks"
       case TabValue.livesStreams:
-         return "Live Streams"
+         return "Live streams"
+      case TabValue.recordings:
+         return "Recordings"
+      case TabValue.mentors:
+         return "Mentors"
+      case TabValue.testimonials:
+         return "Testimonials"
+      case TabValue.benefits:
+         return "Benefits"
       default:
          return ""
    }
 }
 
 export type SectionRefs = {
-   aboutSectionRef: MutableRefObject<HTMLElement>
+   overviewSectionRef: MutableRefObject<HTMLElement>
    jobsSectionRef: MutableRefObject<HTMLElement>
-   testimonialOrMentorsSectionRef: MutableRefObject<HTMLElement>
-   eventSectionRef: MutableRefObject<HTMLElement>
-   mediaSectionRef: MutableRefObject<HTMLElement>
+   sparksSectionRef: MutableRefObject<HTMLElement>
+   livesStreamsSectionRef: MutableRefObject<HTMLElement>
+   recordingsSectionRef: MutableRefObject<HTMLElement>
+   mentorsSectionRef: MutableRefObject<HTMLElement>
+   testimonialsSectionRef: MutableRefObject<HTMLElement>
+   benefitsSectionRef: MutableRefObject<HTMLElement>
 }
 
 type ICompanyPageContext = {
@@ -94,6 +151,8 @@ type ICompanyPageContext = {
    pastLivestreams: LivestreamEvent[]
    customJobs: CustomJob[]
    sectionRefs: SectionRefs
+   activeTab: TabValueType
+   setActiveTab: (tab: TabValueType) => void
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -105,12 +164,17 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
    pastLivestreams: [],
    customJobs: [],
    sectionRefs: {
-      aboutSectionRef: null,
+      overviewSectionRef: null,
       jobsSectionRef: null,
-      eventSectionRef: null,
-      mediaSectionRef: null,
-      testimonialOrMentorsSectionRef: null,
+      sparksSectionRef: null,
+      livesStreamsSectionRef: null,
+      recordingsSectionRef: null,
+      mentorsSectionRef: null,
+      testimonialsSectionRef: null,
+      benefitsSectionRef: null,
    },
+   activeTab: TabValue.overview,
+   setActiveTab: () => {},
 })
 
 const CompanyPageOverview = ({
@@ -120,9 +184,9 @@ const CompanyPageOverview = ({
    pastLivestreams,
    customJobs,
    groupCreators,
+   tab,
 }: Props) => {
    const featureFlags = useFeatureFlags()
-   const { isLoggedIn, isLoggedOut } = useAuth()
    const isMobile = useIsMobile()
    const groupRef = useMemo(
       () =>
@@ -130,6 +194,10 @@ const CompanyPageOverview = ({
             createGenericConverter<Group>()
          ),
       [group.id]
+   )
+
+   const [tabValue, setTabValue] = useState<TabValueType>(
+      tab ?? TabValue.overview
    )
 
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
@@ -147,11 +215,14 @@ const CompanyPageOverview = ({
 
    const contextGroupAvailableJobs = useGroupAvailableCustomJobs(group.groupId)
 
-   const aboutSectionRef = useRef<HTMLElement>(null)
-   const testimonialOrMentorsSectionRef = useRef<HTMLElement>(null)
-   const eventSectionRef = useRef<HTMLElement>(null)
-   const mediaSectionRef = useRef<HTMLElement>(null)
+   const overviewSectionRef = useRef<HTMLElement>(null)
    const jobsSectionRef = useRef<HTMLElement>(null)
+   const sparksSectionRef = useRef<HTMLElement>(null)
+   const livesStreamsSectionRef = useRef<HTMLElement>(null)
+   const recordingsSectionRef = useRef<HTMLElement>(null)
+   const mentorsSectionRef = useRef<HTMLElement>(null)
+   const testimonialsSectionRef = useRef<HTMLElement>(null)
+   const benefitsSectionRef = useRef<HTMLElement>(null)
 
    const presenter = useMemo(() => {
       const presenter = GroupPresenter.createFromDocument(contextGroup)
@@ -189,6 +260,13 @@ const CompanyPageOverview = ({
       }
    }, [contextGroup, editMode, presenter])
 
+   const setActiveTab = useCallback(
+      (tab: TabValueType) => {
+         setTabValue(tab)
+      },
+      [setTabValue]
+   )
+
    const contextValue = useMemo<ICompanyPageContext>(
       () => ({
          group: contextGroup,
@@ -199,12 +277,17 @@ const CompanyPageOverview = ({
          pastLivestreams: contextPastLivestreams || pastLivestreams,
          customJobs: contextGroupAvailableJobs || customJobs,
          sectionRefs: {
-            aboutSectionRef,
+            overviewSectionRef,
             jobsSectionRef,
-            testimonialOrMentorsSectionRef,
-            eventSectionRef,
-            mediaSectionRef,
+            sparksSectionRef,
+            livesStreamsSectionRef,
+            recordingsSectionRef,
+            mentorsSectionRef,
+            testimonialsSectionRef,
+            benefitsSectionRef,
          },
+         activeTab: tabValue,
+         setActiveTab,
       }),
       [
          contextGroup,
@@ -217,53 +300,194 @@ const CompanyPageOverview = ({
          pastLivestreams,
          contextGroupAvailableJobs,
          customJobs,
+         tabValue,
+         setActiveTab,
       ]
    )
 
-   const showFollowCompanyCta = isLoggedIn && !editMode
-   const showSignUpCta = isLoggedOut && !editMode
+   const tabsSectionRefsMap = useMemo(() => {
+      return {
+         [TabValue.overview]: overviewSectionRef,
+         [TabValue.jobs]: jobsSectionRef,
+         [TabValue.sparks]: sparksSectionRef,
+         [TabValue.livesStreams]: livesStreamsSectionRef,
+         [TabValue.recordings]: recordingsSectionRef,
+         [TabValue.mentors]: mentorsSectionRef,
+         [TabValue.testimonials]: testimonialsSectionRef,
+         [TabValue.benefits]: benefitsSectionRef,
+      }
+   }, [
+      overviewSectionRef,
+      jobsSectionRef,
+      sparksSectionRef,
+      livesStreamsSectionRef,
+      recordingsSectionRef,
+      mentorsSectionRef,
+      testimonialsSectionRef,
+      benefitsSectionRef,
+   ])
 
-   const showJobs = featureFlags.jobHubV1 && customJobs?.length
+   useEffect(() => {
+      if (tabValue && tabsSectionRefsMap[tabValue].current) {
+         tabsSectionRefsMap[tabValue].current.scrollIntoView({
+            behavior: "smooth",
+         })
+      }
+   }, [tabValue, tabsSectionRefsMap])
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
-         <Box height={"100%"} pb={5}>
+         <Box
+            height={"100%"}
+            pb={5}
+            px={isMobile ? 0 : 4}
+            bgcolor={isMobile ? "white" : "transparent"}
+            borderRadius={isMobile ? "12px" : "0"}
+         >
             {editMode ? <ProgressBanner /> : null}
-            <Box mb={{ xs: 4, md: 10 }}>
+            <Box
+               mb={{ xs: 1, md: 2 }}
+               sx={{ borderRadius: isMobile ? "12px 12px 0 0" : "12px" }}
+            >
                <Header />
             </Box>
-            <Container disableGutters maxWidth="lg">
-               <Grid container spacing={4}>
-                  <Grid item xs={12} md={6}>
-                     <Stack px={3} spacing={{ xs: 2, md: 5 }}>
-                        <AboutSection />
-                        {showJobs ? <JobsSection /> : null}
-                        {group.publicSparks ? (
-                           <SparksSection key={group.id} groupId={group.id} />
-                        ) : null}
-                        {showFollowCompanyCta ? <FollowCompany /> : null}
-                        {showSignUpCta ? <SignUp /> : null}
-                        {isMobile && !editMode ? (
-                           <>
-                              <EventSection />
-                              <TestimonialsOrMentorsSection />
-                           </>
-                        ) : (
-                           <>
-                              <TestimonialsOrMentorsSection />
-                              <EventSection />
-                           </>
-                        )}
-                     </Stack>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                     <MediaSection />
-                  </Grid>
-               </Grid>
+            <Container disableGutters maxWidth="xl">
+               <Stack
+                  direction={isMobile ? "column" : "row"}
+                  spacing={2}
+                  justifyItems={"space-between"}
+                  width={"100%"}
+                  bgcolor={isMobile ? "#F7F8FC" : "transparent"}
+               >
+                  <Box
+                     maxWidth={
+                        isMobile || tabValue !== TabValue.overview
+                           ? "100%"
+                           : "50%"
+                     }
+                     width={"100%"}
+                  >
+                     <Box sx={{ position: "relative" }}>
+                        <Tabs
+                           variant="scrollable"
+                           scrollButtons
+                           allowScrollButtonsMobile
+                           value={tabValue}
+                           onChange={(_, newValue) => setActiveTab(newValue)}
+                           ScrollButtonComponent={CustomScrollButton}
+                           sx={styles.tabs}
+                        >
+                           <Tab
+                              label={getTabLabel(TabValue.overview)}
+                              value={TabValue.overview}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.jobs)}
+                              value={TabValue.jobs}
+                           />
+                           {group.publicProfile && group.hasSparks ? (
+                              <Tab
+                                 label={getTabLabel(TabValue.sparks)}
+                                 value={TabValue.sparks}
+                              />
+                           ) : null}
+                           <Tab
+                              label={getTabLabel(TabValue.livesStreams)}
+                              value={TabValue.livesStreams}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.recordings)}
+                              value={TabValue.recordings}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.mentors)}
+                              value={TabValue.mentors}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.testimonials)}
+                              value={TabValue.testimonials}
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.benefits)}
+                              value={TabValue.benefits}
+                           />
+                        </Tabs>
+                        <Box sx={styles.tabContent}>
+                           {tabValue !== TabValue.overview && (
+                              <SectionAnchor
+                                 ref={tabsSectionRefsMap[tabValue]}
+                                 tabValue={tabValue}
+                              />
+                           )}
+                           {tabValue === TabValue.overview && (
+                              <Overview editMode={editMode} />
+                           )}
+                           {tabValue === TabValue.jobs && <JobsTab />}
+                           {tabValue === TabValue.sparks && (
+                              <SparksTab key={group.id} groupId={group.id} />
+                           )}
+                           {tabValue === TabValue.livesStreams && <EventsTab />}
+                           {tabValue === TabValue.recordings && <EventsTab />}
+                           {tabValue === TabValue.mentors && <MentorsTab />}
+                           {tabValue === TabValue.testimonials && (
+                              <TestimonialsTab />
+                           )}
+                           {tabValue === TabValue.benefits && <BenefitsTab />}
+                        </Box>
+                     </Box>
+                  </Box>
+                  {tabValue === TabValue.overview ? (
+                     <Box mt={0} width={"100%"}>
+                        <MediaSection />
+                     </Box>
+                  ) : null}
+               </Stack>
             </Container>
             <NewsletterSection />
          </Box>
       </CompanyPageContext.Provider>
+   )
+}
+
+const CustomScrollButton = ({
+   direction,
+   onClick,
+   disabled,
+}: {
+   direction: "left" | "right"
+   onClick: () => void
+   disabled: boolean
+}) => {
+   return (
+      <Box
+         sx={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            [direction]: 0,
+            display: "flex",
+            alignItems: "center",
+            background: `linear-gradient(to ${
+               direction === "left" ? "right" : "left"
+            }, #FEFEFE 30%, rgba(254, 254, 254, 0.8) 75%, rgba(254, 254, 254, 0.4) 85%, transparent)`,
+            opacity: disabled ? 0 : 1,
+            transition: "opacity 0.2s ease",
+            zIndex: 1,
+            pointerEvents: disabled ? "none" : "auto",
+         }}
+      >
+         <TabScrollButton
+            direction={direction}
+            orientation="horizontal"
+            onClick={onClick}
+            disabled={disabled}
+            sx={{
+               px: 1,
+               justifyContent: direction === "left" ? "flex-start" : "flex-end",
+               width: "70px",
+            }}
+         />
+      </Box>
    )
 }
 

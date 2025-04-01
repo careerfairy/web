@@ -8,9 +8,10 @@ import { useCompanyPage } from "../index"
 const styles = sxStyles({
    wrapper: {
       backgroundColor: "white",
-      border: "1px solid #EDE7FD",
+      border: "1px solid rgba(103, 73, 234, 0.30)",
       borderRadius: "12px",
       p: 4,
+      mt: 1,
    },
 })
 

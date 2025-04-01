@@ -2,6 +2,7 @@ import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import Image from "next/image"
 import Link from "next/link"
 import { ReactNode, SyntheticEvent } from "react"
 import { Edit2 } from "react-feather"
@@ -29,11 +30,33 @@ const styles = sxStyles({
       cursor: "pointer",
       textDecoration: "none",
       color: "inherit",
+      overflow: "hidden",
+      transform: "translateZ(0)",
    }),
+   bannerContainer: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "66px",
+      overflow: "hidden",
+      zIndex: 1,
+      "&::after": {
+         content: '""',
+         position: "absolute",
+         top: 0,
+         left: 0,
+         width: "100%",
+         height: "100%",
+         background: "rgba(142, 142, 142, 0.10)",
+         WebkitBackdropFilter: "blur(10px)",
+         backdropFilter: "blur(10px)",
+      },
+   },
    creator: {
       name: {
          width: "100%",
-         fontWeight: 600,
+         fontWeight: 700,
          textAlign: "center",
          textOverflow: "ellipsis",
          overflow: "hidden",
@@ -44,17 +67,29 @@ const styles = sxStyles({
          fontWeight: 400,
          lineHeight: "21px",
          textAlign: "center",
-         color: "neutral.400",
-         ...getMaxLineStyles(2),
-         // css hack to ensure text is not cut off
+         color: "neutral.600",
          paddingBottom: 1,
          marginBottom: -1,
+         ...getMaxLineStyles(2),
       },
    },
    edit: {
       position: "absolute",
       right: 4,
       top: 4,
+   },
+   logoOverlay: {
+      position: "absolute",
+      bottom: 1,
+      right: 2,
+      zIndex: 3,
+      border: (theme) => `2px solid ${theme.brand.white[100]}`,
+      borderRadius: "50%",
+   },
+   avatarContainer: {
+      position: "relative",
+      zIndex: 2,
+      transform: "translateZ(0)",
    },
 })
 
@@ -94,6 +129,7 @@ export const MentorCard = ({
 }: MentorCardProps) => {
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
+   const { group } = useCompanyPage()
 
    const _handleEdit = (ev: SyntheticEvent) => {
       ev.preventDefault()
@@ -103,23 +139,59 @@ export const MentorCard = ({
 
    return (
       <Container creator={creator}>
+         {group?.bannerImageUrl ? (
+            <Box sx={styles.bannerContainer}>
+               <Image
+                  src={group.bannerImageUrl}
+                  alt=""
+                  objectFit="cover"
+                  className="bannerImage"
+                  priority
+                  fill
+                  style={{
+                     width: "100%",
+                     height: "100%",
+                     objectFit: "cover",
+                  }}
+               />
+            </Box>
+         ) : null}
          {Boolean(isEditMode) && (
             <IconButton sx={styles.edit} onClick={_handleEdit}>
-               <Edit2 size={20} color={theme.palette.neutral[700]} />
+               <Edit2 size={20} color={theme.brand.white[100]} />
             </IconButton>
          )}
-         <CircularLogo
-            size={80}
-            src={creator.avatarUrl}
-            alt={`Picture of creator ${creatorName}`}
-            objectFit="cover"
-            key={creator.avatarUrl}
-         />
-         <Typography variant="brandedH4" sx={styles.creator.name}>
+         <Box sx={styles.avatarContainer}>
+            <CircularLogo
+               size={84}
+               src={creator.avatarUrl}
+               alt={`Picture of creator ${creatorName}`}
+               objectFit="cover"
+               key={creator.avatarUrl}
+            />
+            {group?.logoUrl ? (
+               <CircularLogo
+                  size={28}
+                  src={group.logoUrl}
+                  alt={`Logo of ${group.universityName}`}
+                  objectFit="cover"
+                  sx={styles.logoOverlay}
+               />
+            ) : null}
+         </Box>
+         <Typography
+            variant="brandedH5"
+            sx={[styles.creator.name, { position: "relative", zIndex: 1 }]}
+         >
             {creatorName}
          </Typography>
-         <Typography sx={styles.creator.position}>
-            {creator.position}
+         <Typography
+            sx={[styles.creator.position, { position: "relative", zIndex: 1 }]}
+         >
+            {creator.position.concat(" at ")}
+            <Typography fontWeight={600} color={"neutral.600"}>
+               {group?.universityName}
+            </Typography>
          </Typography>
       </Container>
    )

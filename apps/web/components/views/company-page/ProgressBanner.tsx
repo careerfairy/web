@@ -13,7 +13,7 @@ import {
 import { useCallback, useMemo } from "react"
 import { useSessionStorage } from "react-use"
 import { sxStyles } from "../../../types/commonTypes"
-import { TabValue, TabValueType, useCompanyPage } from "./index"
+import { useCompanyPage } from "./index"
 
 const styles = sxStyles({
    root: {
@@ -93,32 +93,6 @@ const ProgressBanner = () => {
       return groupPresenter.getCompanyPageProgress()
    }, [groupPresenter])
 
-   const getSectionId = useCallback(
-      (
-         step: ReturnType<
-            typeof groupPresenter.getCompanyPageSteps
-         >[number]["section"]
-      ): TabValueType => {
-         switch (step) {
-            case "profile":
-               return TabValue.profile
-            case "banner":
-               return TabValue.banner
-            case "photos":
-               return TabValue.media
-            case "videos":
-               return TabValue.video
-            case "testimonialsOrMentors":
-               return TabValue.testimonialsOrMentors
-            case "livestreams":
-               return TabValue.livesStreams
-            default:
-               return TabValue.profile
-         }
-      },
-      [groupPresenter]
-   )
-
    const handleDismiss = useCallback(() => {
       setHasDismissedBanner("true")
    }, [setHasDismissedBanner])
@@ -161,11 +135,7 @@ const ProgressBanner = () => {
                               component="li"
                               key={point.label}
                            >
-                              <Box
-                                 component={"a"}
-                                 href={`#${getSectionId(point.section)}`}
-                                 sx={styles.listItemContent}
-                              >
+                              <Box component={"a"} sx={styles.listItemContent}>
                                  <Typography variant="body1" color="black">
                                     {point.label}
                                  </Typography>

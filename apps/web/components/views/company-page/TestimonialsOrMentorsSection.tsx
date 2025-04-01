@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useMountedState } from "react-use"
-import { SectionAnchor, TabValue, useCompanyPage } from "."
+import { useCompanyPage } from "."
 import { MentorsSection } from "./MentorsSection"
 import TestimonialSection from "./TestimonialSection"
 
@@ -15,12 +15,7 @@ import TestimonialSection from "./TestimonialSection"
 export const TestimonialsOrMentorsSection = () => {
    const { mentorsV1 } = useFeatureFlags()
 
-   const {
-      group,
-      editMode,
-      groupCreators,
-      sectionRefs: { testimonialOrMentorsSectionRef },
-   } = useCompanyPage()
+   const { group, editMode, groupCreators } = useCompanyPage()
    const isMounted = useMountedState()
 
    if (
@@ -32,10 +27,6 @@ export const TestimonialsOrMentorsSection = () => {
 
    return (
       <Box sx={{ position: "relative" }}>
-         <SectionAnchor
-            ref={testimonialOrMentorsSectionRef}
-            tabValue={TabValue.testimonialsOrMentors}
-         />
          {mentorsV1 ? <MentorsSection /> : <TestimonialSection />}
       </Box>
    )

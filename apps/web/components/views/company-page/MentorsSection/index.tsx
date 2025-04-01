@@ -6,18 +6,16 @@ import { Box, Typography } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { useCallback, useEffect, useState } from "react"
-import { useMountedState } from "react-use"
-import { useCompanyPage } from ".."
+import { TabValue, useCompanyPage } from ".."
+import { SeeAllLink } from "../Overview/SeeAllLink"
 import { CreatorFormLayout } from "./CreatorFormLayout"
 import { MentorCard } from "./MentorCard"
 import { MentorForm } from "./MentorForm"
 
 export const MentorsSection = () => {
-   const { editMode, groupCreators } = useCompanyPage()
+   const { editMode, groupCreators, setActiveTab } = useCompanyPage()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
-
-   const isMounted = useMountedState()
 
    const [mentors, setMentors] = useState<PublicCreator[]>(groupCreators)
    const [selectedMentor, setSelectedMentor] = useState<PublicCreator | null>(
@@ -64,22 +62,29 @@ export const MentorsSection = () => {
 
    if (!groupCreators?.length) return null
 
-   if (!isMounted()) return null
-
    return (
       <Box>
          <ContentCarousel
             slideWidth={MentorCard.width}
             headerTitle={
-               <Typography variant="h4" fontWeight={"600"} color="black" mb={1}>
+               <Typography variant="brandedH3" fontWeight={"600"} color="black">
                   Mentors
                </Typography>
+            }
+            seeAll={
+               <SeeAllLink handleClick={() => setActiveTab(TabValue.mentors)} />
             }
             viewportSx={{
                // hack to ensure shadows are not cut off
                padding: "16px",
                margin: "-16px",
                width: "calc(100% + 16px)",
+            }}
+            headerRightSx={{
+               mr: "16px",
+            }}
+            rootSx={{
+               mr: "-16px",
             }}
             emblaProps={{
                emblaOptions: {
