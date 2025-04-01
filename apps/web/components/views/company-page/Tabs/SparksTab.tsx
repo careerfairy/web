@@ -78,7 +78,7 @@ const SparksGrid = ({ groupId }: SparksGridProps) => {
             spacing={2}
             sx={{
                display: "grid",
-               gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+               gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))",
                gap: 2,
                width: "100%",
                margin: "0 auto",
