@@ -7,12 +7,12 @@ import {
 } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
-import { useColor } from "color-thief-react"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/legacy/image"
 import React, { useMemo } from "react"
+import useColor from "use-color-thief"
 import { combineStyles, sxStyles } from "../../../../types/commonTypes"
 
 const COMPANY_LOGO_SIZE = 63
@@ -120,23 +120,23 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
    ) => {
       const isMobile = useIsMobile()
 
-      const { data } = useColor(backgroundImageUrl, "rgbArray", {
-         crossOrigin: "anonymous",
+      const { palette } = useColor(backgroundImageUrl, {
+         format: "rgb",
       })
       const gradientMobile = useMemo(
          () =>
-            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${data?.join(
+            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${palette?.join(
                ","
-            )}, 0.00) 10.49%, rgba(${data?.join(",")}, 0.85) 52.63%)`,
-         [data]
+            )}, 0.00) 10.49%, rgba(${palette?.join(",")}, 0.85) 52.63%)`,
+         [palette]
       )
 
       const gradientDesktop = useMemo(
          () =>
-            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${data?.join(
+            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${palette?.join(
                ","
-            )}, 0.00) 10.49%, rgba(${data?.join(",")}, 0.80) 70.32%)`,
-         [data]
+            )}, 0.00) 10.49%, rgba(${palette?.join(",")}, 0.80) 70.32%)`,
+         [palette]
       )
 
       const gradient = isMobile ? gradientMobile : gradientDesktop
