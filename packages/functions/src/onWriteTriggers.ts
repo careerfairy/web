@@ -20,7 +20,6 @@ import { levelsOfStudyOrderMap } from "@careerfairy/shared-lib/fieldOfStudy"
 import { University } from "@careerfairy/shared-lib/universities/universities"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { DateTime } from "luxon"
-import config from "./config"
 import { handleUserStatsBadges } from "./lib/badge"
 import { rewardSideEffectsUserStats } from "./lib/reward"
 import { handleEventStartDateChangeTrigger } from "./lib/sparks/notifications/publicNotifications"
@@ -35,16 +34,19 @@ import { logAndThrow } from "./lib/validations"
 import { ChangeType, getChangeTypeEnum, getChangeTypes } from "./util"
 import { validateGroupSparks } from "./util/sparks"
 
-export const syncLivestreams = functions
-   .runWith({ ...defaultTriggerRunTimeConfig, memory: "2GB" })
-   .region(config.region)
-   .firestore.document("livestreams/{livestreamId}")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+export const syncLivestreams = onDocumentWritten(
+   {
+      ...defaultTriggerRunTimeConfig,
+      memory: "2GiB",
+      document: "livestreams/{livestreamId}",
+   },
+   async (event) => {
+      event.params
+      const changeTypes = getChangeTypes(event)
 
       logStart({
          changeTypes,
-         context,
+         event,
          message: "syncLivestreamsOnWrite",
       })
 
@@ -53,12 +55,12 @@ export const syncLivestreams = functions
 
       // Run side effects for all livestream changes
       sideEffectPromises.push(
-         livestreamsRepo.syncLiveStreamStatsWithLivestream(change)
+         livestreamsRepo.syncLiveStreamStatsWithLivestream(event.data)
       )
 
       if (changeTypes.isUpdate) {
-         const newValue = change.after?.data() as LivestreamEvent
-         const previousValue = change.before?.data() as LivestreamEvent
+         const newValue = event.data.after?.data() as LivestreamEvent
+         const previousValue = event.data.before?.data() as LivestreamEvent
 
          // We must delete all notifications for this event's groupIds because of the Notification creation process.
          // Check comment of mapEventsToNotifications.
@@ -97,7 +99,7 @@ export const syncLivestreams = functions
       }
 
       if (changeTypes.isDelete) {
-         const deletedValue = change.before?.data() as LivestreamEvent
+         const deletedValue = event.data.before?.data() as LivestreamEvent
 
          sideEffectPromises.push(
             customJobRepo.removeLinkedLivestream(deletedValue.id)
@@ -105,24 +107,26 @@ export const syncLivestreams = functions
       }
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const syncLivestreamStartNotifications = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("livestreams/{livestreamId}")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+export const syncLivestreamStartNotifications = onDocumentWritten(
+   {
+      ...defaultTriggerRunTimeConfig,
+      document: "livestreams/{livestreamId}",
+   },
+   async (event) => {
+      const changeTypes = getChangeTypes(event)
 
       logStart({
          changeTypes,
-         context,
+         event,
          message: "handleLivestreamStartNotificationsOnWrite",
       })
 
       if (changeTypes.isUpdate) {
-         const newValue = change.after?.data() as LivestreamEvent
-         const previousValue = change.before?.data() as LivestreamEvent
+         const newValue = event.data.after?.data() as LivestreamEvent
+         const previousValue = event.data.before?.data() as LivestreamEvent
 
          if (newValue.hasStarted && !previousValue.hasStarted) {
             // Notify every registered user of the live stream start
@@ -133,22 +137,24 @@ export const syncLivestreamStartNotifications = functions
       }
 
       return null
-   })
+   }
+)
 
-export const syncUserLivestreamData = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("livestreams/{livestreamId}/userLivestreamData/{userId}")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+export const syncUserLivestreamData = onDocumentWritten(
+   {
+      ...defaultTriggerRunTimeConfig,
+      document: "livestreams/{livestreamId}/userLivestreamData/{userId}",
+   },
+   async (event) => {
+      const changeTypes = getChangeTypes(event)
 
       logStart({
          changeTypes,
-         context,
+         event,
          message: "syncUserLivestreamDataOnWrite",
       })
 
-      const { livestreamId } = context.params
+      const { livestreamId } = event.params
 
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
@@ -156,25 +162,27 @@ export const syncUserLivestreamData = functions
       // Run side effects for all userLivestreamData changes
       sideEffectPromises.push(
          livestreamsRepo.addOperationsToLiveStreamStats(
-            change,
+            event.data,
             livestreamId,
             functions.logger
          )
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const syncLivestreamStats = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("livestreams/{livestreamId}/stats/livestreamStats")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+export const syncLivestreamStats = onDocumentWritten(
+   {
+      ...defaultTriggerRunTimeConfig,
+      document: "livestreams/{livestreamId}/stats/livestreamStats",
+   },
+   async (event) => {
+      const changeTypes = getChangeTypes(event)
 
       logStart({
          changeTypes,
-         context,
+         event,
          message: "syncLivestreamStatsOnWrite",
       })
 
@@ -183,23 +191,25 @@ export const syncLivestreamStats = functions
 
       // Run side effects for all livestreamStats changes
       sideEffectPromises.push(
-         groupRepo.addOperationsToGroupStats(change, functions.logger)
+         groupRepo.addOperationsToGroupStats(event.data, functions.logger)
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const syncUserStats = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("userData/{userEmail}/stats/stats")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
-      const userEmail = context.params.userEmail
+export const syncUserStats = onDocumentWritten(
+   {
+      ...defaultTriggerRunTimeConfig,
+      document: "userData/{userEmail}/stats/stats",
+   },
+   async (event) => {
+      const changeTypes = getChangeTypes(event)
+      const userEmail = event.params.userEmail
 
       logStart({
          changeTypes,
-         context,
+         event,
          message: "syncUserStatsOnWrite",
       })
 
@@ -207,24 +217,26 @@ export const syncUserStats = functions
       const sideEffectPromises: Promise<unknown>[] = []
 
       // Run side effects for all livestreamStats changes
-      sideEffectPromises.push(rewardSideEffectsUserStats(userEmail, change))
+      sideEffectPromises.push(rewardSideEffectsUserStats(userEmail, event.data))
       sideEffectPromises.push(
-         handleUserStatsBadges(userEmail, change.after.data() as UserStats)
+         handleUserStatsBadges(userEmail, event.data.after.data() as UserStats)
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const onWriteCreator = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("careerCenterData/{groupId}/creators/{creatorId}")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+export const onWriteCreator = onDocumentWritten(
+   {
+      ...defaultTriggerRunTimeConfig,
+      document: "careerCenterData/{groupId}/creators/{creatorId}",
+   },
+   async (event) => {
+      const changeTypes = getChangeTypes(event)
 
       logStart({
          changeTypes,
-         context,
+         event,
          message: "syncUserStatsOnWrite",
       })
 
@@ -232,30 +244,32 @@ export const onWriteCreator = functions
       const sideEffectPromises: Promise<unknown>[] = []
 
       // Run side effects for all creator changes
-      sideEffectPromises.push(sparkRepo.syncCreatorDataToSpark(change))
+      sideEffectPromises.push(sparkRepo.syncCreatorDataToSpark(event.data))
 
       if (changeTypes.isUpdate) {
          sideEffectPromises.push(
-            livestreamsRepo.syncCreatorDataToLivestreamSpeaker(change)
+            livestreamsRepo.syncCreatorDataToLivestreamSpeaker(event.data)
          )
       }
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const onWriteGroup = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("careerCenterData/{groupId}")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+export const onWriteGroup = onDocumentWritten(
+   {
+      ...defaultTriggerRunTimeConfig,
+      document: "careerCenterData/{groupId}",
+   },
+   async (event) => {
+      const changeTypes = getChangeTypes(event)
 
       // We need the groupId from here since some groups don't have an id field
-      const groupId = context.params.groupId
+      const groupId = event.params.groupId
 
       logStart({
          changeTypes,
-         context,
+         event,
          message: "syncGroupOnWrite",
       })
 
@@ -263,10 +277,12 @@ export const onWriteGroup = functions
       const sideEffectPromises: Promise<unknown>[] = []
 
       // Run side effects for all creator changes
-      sideEffectPromises.push(sparkRepo.syncGroupDataToSpark(change, groupId))
+      sideEffectPromises.push(
+         sparkRepo.syncGroupDataToSpark(event.data, groupId)
+      )
 
-      const newValue = change.after?.data() as Group
-      const previousValue = change.before?.data() as Group
+      const newValue = event.data.after?.data() as Group
+      const previousValue = event.data.before?.data() as Group
 
       if (changeTypes.isUpdate) {
          // In case the publicProfile flag changes we must validate the group sparks
@@ -293,7 +309,8 @@ export const onWriteGroup = functions
       }
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
 export const syncGroupFollowingUserDataOnChange = onDocumentWritten(
    "careerCenterData/{groupId}",
@@ -368,29 +385,31 @@ export const syncGroupFollowingUserDataOnChange = onDocumentWritten(
    }
 )
 
-export const onWriteSpark = functions
-   .runWith({ ...defaultTriggerRunTimeConfig, memory: "1GB" })
-   .region(config.region)
-   .firestore.document("sparks/{sparkId}")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+export const onWriteSpark = onDocumentWritten(
+   {
+      ...defaultTriggerRunTimeConfig,
+      memory: "1GiB",
+      document: "sparks/{sparkId}",
+   },
+   async (event) => {
+      const changeTypes = getChangeTypes(event)
 
       // We need the groupId from here since some groups don't have an id field
-      const sparkId = context.params.sparkId
+      const sparkId = event.params.sparkId
 
       logStart({
          changeTypes,
-         context,
+         event,
          message: "syncSparkOnWrite",
       })
 
       const afterData = {
-         ...change.after.data(),
+         ...event.data.after?.data(),
          id: sparkId,
       } as Spark
 
       const beforeData = {
-         ...change.before?.data(),
+         ...event.data.before?.data(),
          id: sparkId,
       } as Spark
 
@@ -435,7 +454,8 @@ export const onWriteSpark = functions
       }
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
 export const onWriteCustomJobs = onDocumentWritten(
    "customJobs/{jobId}",
@@ -536,16 +556,18 @@ export const onWriteCustomJobs = onDocumentWritten(
    }
 )
 
-export const onWriteCustomJobsSendNotifications = functions
-   .runWith({ ...defaultTriggerRunTimeConfig, memory: "1GB" })
-   .region(config.region)
-   .firestore.document("customJobs/{jobId}")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+export const onWriteCustomJobsSendNotifications = onDocumentWritten(
+   {
+      ...defaultTriggerRunTimeConfig,
+      memory: "1GiB",
+      document: "customJobs/{jobId}",
+   },
+   async (event) => {
+      const changeTypes = getChangeTypes(event)
 
       logStart({
          changeTypes,
-         context,
+         event,
          message: "syncCustomJobsNotificationsOnWrite",
       })
 
@@ -553,8 +575,8 @@ export const onWriteCustomJobsSendNotifications = functions
       const sideEffectPromises: Promise<unknown>[] = []
 
       if (changeTypes.isCreate || changeTypes.isUpdate) {
-         const newCustomJob = change.after.data() as CustomJob
-         const oldCustomJob = change.before.data() as CustomJob
+         const newCustomJob = event.data.after?.data() as CustomJob
+         const oldCustomJob = event.data.before?.data() as CustomJob
 
          if (!oldCustomJob?.published && newCustomJob?.published) {
             sideEffectPromises.push(
@@ -568,7 +590,8 @@ export const onWriteCustomJobsSendNotifications = functions
       }
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
 export const onWriteStudyBackground = onDocumentWritten(
    "userData/{userId}/studyBackgrounds/{studyBackgroundId}",
@@ -603,7 +626,8 @@ export const onWriteStudyBackground = onDocumentWritten(
          changeTypes.isCreate || changeTypes.isUpdate
             ? allUserStudyBackgrounds
             : allUserStudyBackgrounds.filter(
-                 (studyBackground) => studyBackground.id !== change.before.id
+                 (studyBackground) =>
+                    studyBackground.id !== event.data.before?.id
               )
 
       // Sort the study backgrounds by the endedAt date and then by the level of study

@@ -1,5 +1,4 @@
-import config from "../config"
-import * as functions from "firebase-functions"
+import { onRequest } from "firebase-functions/https"
 import { firestore } from "../api/firestoreAdmin"
 
 export type BundleQueryFetcher = (
@@ -33,13 +32,11 @@ export function generateFunctionsFromBundles(bundles: Record<string, Bundle>) {
    for (const bundleName in bundles) {
       const bundle = bundles[bundleName]
 
-      exports[bundleName] = functions
-         .region(config.region)
-         .runWith({
-            // big bundles, require more memory to generate them faster
-            memory: "512MB",
-         })
-         .https.onRequest(async (_, res) => {
+      exports[bundleName] = onRequest(
+         {
+            memory: "512MiB",
+         },
+         async (_, res) => {
             // Build the bundle from the query results
             const bundleCreator = firestore.bundle(bundleName)
 
@@ -60,7 +57,8 @@ export function generateFunctionsFromBundles(bundles: Record<string, Bundle>) {
             res.set("Cache-Control", bundle.cacheControl)
 
             res.end(bundleCreator.build())
-         })
+         }
+      )
    }
 
    return exports

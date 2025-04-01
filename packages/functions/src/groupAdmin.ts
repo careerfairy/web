@@ -26,7 +26,6 @@ import { logger } from "firebase-functions/v2"
 import { HttpsError, onCall } from "firebase-functions/v2/https"
 import { array, boolean, InferType, mixed, object, string } from "yup"
 import { auth, firestore } from "./api/firestoreAdmin"
-import config from "./config"
 import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import {
    logAndThrow,
@@ -101,19 +100,17 @@ export const sendNewlyPublishedEventEmail = onCall(
       }
    )
 )
-
-export const getLivestreamReportData = functions
-   .region(config.region)
-   .runWith({
+export const getLivestreamReportData = onCall(
+   {
       timeoutSeconds: 540, // 9 minutes (max)
-      memory: "512MB",
-   })
-   .https.onCall(async (data, context) => {
-      const { targetStreamId, targetGroupId, userEmail } = data
+      memory: "512MiB",
+   },
+   async (request) => {
+      const { targetStreamId, targetGroupId, userEmail } = request.data
       const hostsData: PdfReportData["hostsData"] = []
       let nonUniversityChartData: PdfCategoryChartData = null
 
-      const authEmail = context.auth.token.email || null
+      const authEmail = request.auth.token.email || null
 
       if (!targetStreamId || !targetGroupId || !userEmail) {
          throw new functions.https.HttpsError(
@@ -370,7 +367,8 @@ export const getLivestreamReportData = functions
       }
       // fetch all cc docs in the groupIds of the streamDoc
       // If use users stats only once per report data, once a users stats are used, flag them as already used
-   })
+   }
+)
 
 const schema = object({
    recipientEmail: string().email().required(),
@@ -451,133 +449,121 @@ export const sendDashboardInviteEmail = onCall<SendDashboardInviteEmailData>(
    })
 )
 
-export const joinGroupDashboard = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      let response: Group = null
-      try {
-         const token = await validateUserAuthExists(context)
+export const joinGroupDashboard = onCall(async (request) => {
+   let response: Group = null
+   try {
+      const token = await validateUserAuthExists(request)
 
-         const { inviteId } = data
+      const { inviteId } = request.data
 
-         const currentUserEmail = token.email
+      const currentUserEmail = token.email
 
-         // fetch and validate the invite
-         const { groupDashboardInvite, group, isAlreadyGroupMember } =
-            await validateGroupDashboardInvite(inviteId, currentUserEmail)
+      // fetch and validate the invite
+      const { groupDashboardInvite, group, isAlreadyGroupMember } =
+         await validateGroupDashboardInvite(inviteId, currentUserEmail)
 
-         if (!isAlreadyGroupMember) {
-            // If the user is not already a member of the group, add them to the group
-            const role = groupDashboardInvite.role
+      if (!isAlreadyGroupMember) {
+         // If the user is not already a member of the group, add them to the group
+         const role = groupDashboardInvite.role
 
-            // Make the user an admin of the group
-            await groupRepo.setAdminRole(currentUserEmail, group, role)
-         }
-
-         // delete the invite
-         await groupRepo.deleteGroupDashboardInviteById(inviteId)
-
-         response = group
-      } catch (e) {
-         logAndThrow(e)
+         // Make the user an admin of the group
+         await groupRepo.setAdminRole(currentUserEmail, group, role)
       }
-      return response // return the group id so the client can redirect to the group dashboard
-   })
 
-export const createGroup = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      let newGroup: Group = null
-      try {
-         const token = await validateUserAuthExists(context)
-         await validateData(
-            data,
-            object({
-               group: object({
-                  universityName: string().required(),
-                  logoUrl: string().required(),
-                  description: string().required(),
-                  universityCode: string().optional(),
-               }),
-               groupQuestions: array().of(
-                  object({
-                     name: string().required(),
-                     hidden: boolean().optional(),
-                     questionType: string()
-                        .oneOf(["levelOfStudy", "fieldOfStudy", "custom"])
-                        .required(),
-                     options: object().optional(), // Yup has no support for validating dictionaries
-                  })
-               ),
-            })
-         )
-         const { group, groupQuestions } = data
-         newGroup = await groupRepo.createGroup(
-            group,
-            token.email,
-            groupQuestions
-         )
-      } catch (e) {
-         logAndThrow(e)
-      }
-      return newGroup
-   })
+      // delete the invite
+      await groupRepo.deleteGroupDashboardInviteById(inviteId)
 
-export const changeRole = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      try {
-         await validateData(
-            data,
-            object({
-               groupId: string().required(),
-               email: string().email().required(),
-               newRole: string()
-                  .oneOf(Object.values(GROUP_DASHBOARD_ROLE))
-                  .required(),
-            })
-         )
-         const { groupId, email, newRole } = data
+      response = group
+   } catch (e) {
+      logAndThrow(e)
+   }
+   return response // return the group id so the client can redirect to the group dashboard
+})
 
-         const { group } = await validateUserIsGroupAdminOwnerRole(
-            context.auth.token.email,
-            groupId
-         )
+export const createGroup = onCall(async (request) => {
+   let newGroup: Group = null
+   try {
+      const token = await validateUserAuthExists(request)
+      await validateData(
+         request.data,
+         object({
+            group: object({
+               universityName: string().required(),
+               logoUrl: string().required(),
+               description: string().required(),
+               universityCode: string().optional(),
+            }),
+            groupQuestions: array().of(
+               object({
+                  name: string().required(),
+                  hidden: boolean().optional(),
+                  questionType: string()
+                     .oneOf(["levelOfStudy", "fieldOfStudy", "custom"])
+                     .required(),
+                  options: object().optional(), // Yup has no support for validating dictionaries
+               })
+            ),
+         })
+      )
+      const { group, groupQuestions } = request.data
+      newGroup = await groupRepo.createGroup(group, token.email, groupQuestions)
+   } catch (e) {
+      logAndThrow(e)
+   }
+   return newGroup
+})
 
-         await groupRepo.setAdminRole(email, group, newRole)
-      } catch (e) {
-         logAndThrow(e)
-      }
-      return null
-   })
+export const changeRole = onCall(async (request) => {
+   try {
+      await validateData(
+         request.data,
+         object({
+            groupId: string().required(),
+            email: string().email().required(),
+            newRole: string()
+               .oneOf(Object.values(GROUP_DASHBOARD_ROLE))
+               .required(),
+         })
+      )
+      const { groupId, email, newRole } = request.data
+
+      const { group } = await validateUserIsGroupAdminOwnerRole(
+         request.auth.token.email,
+         groupId
+      )
+
+      await groupRepo.setAdminRole(email, group, newRole)
+   } catch (e) {
+      logAndThrow(e)
+   }
+   return null
+})
 
 /*
  * Keep the kick and change role functions separate, to avoid the wrong user being kicked
  * */
-export const kickFromDashboard = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      try {
-         await validateData(
-            data,
-            object({
-               groupId: string().required(),
-               email: string().email().required(),
-            })
-         )
-         const { groupId, email } = data
+export const kickFromDashboard = onCall(async (request) => {
+   try {
+      await validateData(
+         request.data,
+         object({
+            groupId: string().required(),
+            email: string().email().required(),
+         })
+      )
+      const { groupId, email } = request.data
 
-         const { group } = await validateUserIsGroupAdminOwnerRole(
-            context.auth.token.email,
-            groupId
-         )
+      const { group } = await validateUserIsGroupAdminOwnerRole(
+         request.auth.token.email,
+         groupId
+      )
 
-         await groupRepo.setAdminRole(email, group, null)
-      } catch (e) {
-         logAndThrow(e)
-      }
-      return null
-   })
+      await groupRepo.setAdminRole(email, group, null)
+   } catch (e) {
+      logAndThrow(e)
+   }
+   return null
+})
 
 /**
  * Validates if the invite is valid

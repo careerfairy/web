@@ -11,8 +11,11 @@ import { getWebBaseUrl, isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import { logger } from "firebase-functions/v2"
-import { onDocumentCreated } from "firebase-functions/v2/firestore"
-import { HttpsError, onCall } from "firebase-functions/v2/https"
+import {
+   onDocumentCreated,
+   onDocumentUpdated,
+} from "firebase-functions/v2/firestore"
+import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https"
 import ical from "ical-generator"
 import { firestore } from "./api/firestoreAdmin"
 import {
@@ -34,61 +37,59 @@ import {
    EmailAttachment,
 } from "./lib/notifications/EmailTypes"
 
-export const getLivestreamICalendarEvent = functions
-   .region(config.region)
-   .https.onRequest(async (req, res) => {
-      setCORSHeaders(req, res)
-      const livestreamId = req.query.eventId as string
-      const campaign = req.query.utm_campaign as string
-      if (livestreamId) {
-         try {
-            // get the live stream
-            const querySnapshot = await firestore
-               .collection("livestreams")
-               .doc(livestreamId)
-               .get()
+export const getLivestreamICalendarEvent = onRequest(async (req, res) => {
+   setCORSHeaders(req, res)
+   const livestreamId = req.query.eventId as string
+   const campaign = req.query.utm_campaign as string
+   if (livestreamId) {
+      try {
+         // get the live stream
+         const querySnapshot = await firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .get()
 
-            if (querySnapshot.exists) {
-               const livestream = querySnapshot.data() as LivestreamEvent
+         if (querySnapshot.exists) {
+            const livestream = querySnapshot.data() as LivestreamEvent
 
-               // create calendar event
-               const calendarEventProperties = generateCalendarEventProperties(
-                  livestream,
-                  campaign
-                     ? {
-                          campaign,
-                       }
-                     : undefined
-               )
-
-               const cal = ical({
-                  events: [calendarEventProperties],
-               })
-               cal.serve(res)
-            } else {
-               res.status(404).send("Live stream not found")
-            }
-         } catch (e) {
-            functions.logger.warn(
-               `An error has occurred creating the ICalendar event from the live stream ${livestreamId}`,
-               e
+            // create calendar event
+            const calendarEventProperties = generateCalendarEventProperties(
+               livestream,
+               campaign
+                  ? {
+                       campaign,
+                    }
+                  : undefined
             )
-            res.sendStatus(500)
-         }
-      } else {
-         res.status(400).send("Missing eventId parameter")
-      }
-   })
 
-export const livestreamRegistrationConfirmationEmail = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
+            const cal = ical({
+               events: [calendarEventProperties],
+            })
+            cal.serve(res)
+         } else {
+            res.status(404).send("Live stream not found")
+         }
+      } catch (e) {
+         functions.logger.warn(
+            `An error has occurred creating the ICalendar event from the live stream ${livestreamId}`,
+            e
+         )
+         res.sendStatus(500)
+      }
+   } else {
+      res.status(400).send("Missing eventId parameter")
+   }
+})
+
+export const livestreamRegistrationConfirmationEmail = onCall(
+   async (request) => {
       logger.info("🚀 ~ Livestream registration confirmation email: v6.0")
-      const host =
-         context?.rawRequest?.headers?.origin || "https://careerfairy.io"
-      const userAuthId = context?.auth?.uid
+      const host = request.rawRequest.headers.origin || "https://careerfairy.io"
+      const userAuthId = request.auth?.uid
       // Fetch the live stream data
-      const livestream = await livestreamsRepo.getById(data.livestream_id)
+      const livestream = await livestreamsRepo.getById(
+         request.data.livestream_id
+      )
 
       if (!livestream) {
          logger.error("Livestream not found")
@@ -148,8 +149,8 @@ export const livestreamRegistrationConfirmationEmail = functions
       const icsContent = cal.toString()
 
       const emailCalendar = {
-         google: data.eventCalendarUrls.google,
-         outlook: data.eventCalendarUrls.outlook,
+         google: request.data.eventCalendarUrls.google,
+         outlook: request.data.eventCalendarUrls.outlook,
          apple: getLivestreamICSDownloadUrl(
             livestream.id,
             isLocalEnvironment(),
@@ -161,7 +162,7 @@ export const livestreamRegistrationConfirmationEmail = functions
 
       const formattedStartDate = formatLivestreamStartDate(
          livestream,
-         data.user_time_zone
+         request.data.user_time_zone
       )
 
       const attachments: EmailAttachment[] = [
@@ -192,7 +193,7 @@ export const livestreamRegistrationConfirmationEmail = functions
                identifiers: {
                   id: userAuthId,
                },
-               to: data.recipientEmail,
+               to: request.data.recipientEmail,
                attachments,
             },
          ])
@@ -209,7 +210,8 @@ export const livestreamRegistrationConfirmationEmail = functions
          logger.error("Error sending registration confirmation email", error)
          return { status: 500, error: error }
       }
-   })
+   }
+)
 
 export const sendPhysicalEventRegistrationConfirmationEmail = onCall<{
    userUid: string
@@ -290,9 +292,8 @@ export const sendPhysicalEventRegistrationConfirmationEmail = onCall<{
    })
 })
 
-export const sendHybridEventRegistrationConfirmationEmail = functions
-   .region(config.region)
-   .https.onCall(async (data) => {
+export const sendHybridEventRegistrationConfirmationEmail = onCall(
+   async ({ data }) => {
       console.log("Starting")
       const email: any = {
          TemplateId:
@@ -329,14 +330,14 @@ export const sendHybridEventRegistrationConfirmationEmail = functions
             return { status: 500, error: error }
          }
       )
-   })
+   }
+)
 
-export const notifySlackWhenALivestreamStarts = functions
-   .region(config.region)
-   .firestore.document("livestreams/{livestreamId}")
-   .onUpdate(async (change) => {
-      const previousValue = change.before.data()
-      const newValue = change.after.data()
+export const notifySlackWhenALivestreamStarts = onDocumentUpdated(
+   "livestreams/{livestreamId}",
+   async (event) => {
+      const previousValue = event.data.before.data()
+      const newValue = event.data.after.data()
 
       if (!newValue.test && !previousValue.hasStarted && newValue.hasStarted) {
          functions.logger.log("Detected the livestream has started")
@@ -361,7 +362,8 @@ export const notifySlackWhenALivestreamStarts = functions
       } else {
          functions.logger.log("The livestream has not started yet")
       }
-   })
+   }
+)
 
 export const notifySlackWhenALivestreamIsCreated = onDocumentCreated(
    "livestreams/{livestreamId}",

@@ -1,22 +1,21 @@
 import functions = require("firebase-functions")
-import config from "./config"
 import { Rating, Wish } from "@careerfairy/shared-lib/wishes"
+import { onDocumentWritten } from "firebase-functions/firestore"
 import { FieldValue, firestore } from "./api/firestoreAdmin"
 
 // Listen for changes in all documents in the 'users' collection
 const maxNumberOfUpvoterUids = 50
-export const onUserRateWish = functions
-   .region(config.region)
-   .firestore.document("wishes/{wishId}/ratings/{userId}")
-   .onWrite((change, context) => {
-      const document = change.after.exists
-         ? (change.after.data() as Rating)
+export const onUserRateWish = onDocumentWritten(
+   "wishes/{wishId}/ratings/{userId}",
+   async (event) => {
+      const document = event.data?.after.exists
+         ? (event.data?.after.data() as Rating)
          : null
-      const oldDocument = change.before.data() as Rating
-      const userId = change.after.id
+      const oldDocument = event.data?.before.data() as Rating
+      const userId = event.data?.after.id
       const prevRatingType = oldDocument?.type || null
       const currentRatingType = document?.type || null
-      const wishRef = firestore.collection("wishes").doc(context.params.wishId)
+      const wishRef = firestore.collection("wishes").doc(event.params.wishId)
       let wishUpdateData: Partial<Wish> = {}
       // if the rating hasn't changed, do nothing
       if (prevRatingType === currentRatingType) return null
@@ -69,4 +68,5 @@ export const onUserRateWish = functions
             transaction.update(wishRef, wishUpdateData)
          }
       })
-   })
+   }
+)

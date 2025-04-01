@@ -3,9 +3,9 @@ import {
    LivestreamEvent,
    ToggleHandRaiseRequest,
 } from "@careerfairy/shared-lib/livestreams"
+import { onCall } from "firebase-functions/https"
 import * as yup from "yup"
 import { livestreamsRepo } from "../../api/repositories"
-import config from "../../config"
 import { middlewares } from "../../middlewares/middlewares"
 import { dataValidation, livestreamExists } from "../../middlewares/validations"
 import { validateLivestreamToken } from "../validations"
@@ -19,18 +19,18 @@ type Context = {
    livestream: LivestreamEvent
 }
 
-export const toggleHandRaise = functions.region(config.region).https.onCall(
-   middlewares<Context, ToggleHandRaiseRequest>(
+export const toggleHandRaise = onCall(
+   middlewares<Context & ToggleHandRaiseRequest>(
       dataValidation(toggleHandRaiseSchema),
       livestreamExists(),
-      async (requestData, context) => {
-         const { livestreamId, livestreamToken } = requestData
+      async (request) => {
+         const { livestreamId, livestreamToken } = request.data
 
-         const livestream = context.middlewares.livestream
+         const livestream = request.middlewares.livestream
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            livestream,
             livestreamToken
          )
 
