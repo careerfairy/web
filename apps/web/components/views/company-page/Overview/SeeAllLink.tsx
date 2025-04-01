@@ -1,5 +1,6 @@
 import { Stack, Typography, useTheme } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import Link from "next/link"
 import { ArrowRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -16,22 +17,21 @@ const styles = sxStyles({
    },
 })
 type Props = {
-   handleClick?: () => void
+   href: string
+   onClick?: () => void
 }
 
-export const SeeAllLink = ({ handleClick }: Props) => {
+export const SeeAllLink = ({ href, onClick }: Props) => {
    const isMobile = useIsMobile()
    const theme = useTheme()
 
-   return (
+   const SeeAll = (
       <Stack
          direction="row"
          alignItems="center"
          spacing={"6px"}
-         onClick={() => {
-            handleClick?.()
-         }}
          sx={styles.root}
+         onClick={onClick}
       >
          <Typography
             variant="small"
@@ -45,4 +45,6 @@ export const SeeAllLink = ({ handleClick }: Props) => {
          ) : null}
       </Stack>
    )
+
+   return onClick ? SeeAll : <Link href={href}>{SeeAll}</Link>
 }

@@ -4,6 +4,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import {
    Box,
    Container,
@@ -16,6 +17,7 @@ import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGr
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { doc } from "firebase/firestore"
+import Link from "next/link"
 import {
    MutableRefObject,
    createContext,
@@ -31,7 +33,7 @@ import { useFirestoreDocData } from "reactfire"
 import { sxStyles } from "types/commonTypes"
 import { groupRepo } from "../../../data/RepositoryInstances"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { errorLogAndNotify } from "../../../util/CommonUtil"
+import { errorLogAndNotify, isTestEnvironment } from "../../../util/CommonUtil"
 import useListenToStreams from "../../custom-hook/useListenToStreams"
 import Header from "./Header"
 import MediaSection from "./MediaSection"
@@ -42,6 +44,8 @@ import { PastEventsTab, UpcomingEventsTab } from "./Tabs/EventsTab"
 import { JobsTab } from "./Tabs/JobsTab"
 import MentorsTab from "./Tabs/MentorsTab"
 import SparksTab from "./Tabs/SparksTab"
+
+const isTest = isTestEnvironment()
 
 const styles = sxStyles({
    tabs: {
@@ -93,6 +97,7 @@ type Props = {
    groupCreators: PublicCreator[]
    customJobs: CustomJob[]
    tab?: TabValueType
+   tabMode?: boolean
 }
 
 export const TabValue = {
@@ -131,6 +136,28 @@ export const getTabLabel = (tabId: TabValueType) => {
    }
 }
 
+const getTabLink = (basePath: string, tab: TabValueType) => {
+   switch (tab) {
+      case TabValue.overview:
+         return `${basePath}`
+      case TabValue.jobs:
+         return `${basePath}/jobs`
+      case TabValue.sparks:
+         return `${basePath}/sparks`
+      case TabValue.livesStreams:
+         return `${basePath}/livestreams`
+      case TabValue.recordings:
+         return `${basePath}/recordings`
+      case TabValue.mentors:
+         return `${basePath}/mentors`
+      // TBD: Benefits tab in the future
+      case TabValue.benefits:
+         return `${basePath}/benefits`
+      default:
+         return ""
+   }
+}
+
 export type SectionRefs = {
    overviewSectionRef: MutableRefObject<HTMLElement>
    jobsSectionRef: MutableRefObject<HTMLElement>
@@ -151,8 +178,9 @@ type ICompanyPageContext = {
    pastLivestreams: LivestreamEvent[]
    customJobs: CustomJob[]
    sectionRefs: SectionRefs
-   activeTab: TabValueType
+   getCompanyPageTabLink: (tab: TabValueType) => string
    setActiveTab: (tab: TabValueType) => void
+   tabMode: boolean
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -173,8 +201,9 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
       testimonialsSectionRef: null,
       benefitsSectionRef: null,
    },
-   activeTab: TabValue.overview,
-   setActiveTab: () => {},
+   getCompanyPageTabLink: (tab: TabValueType) => tab,
+   setActiveTab: (tab: TabValueType) => tab,
+   tabMode: false,
 })
 
 const CompanyPageOverview = ({
@@ -185,9 +214,11 @@ const CompanyPageOverview = ({
    customJobs,
    groupCreators,
    tab,
+   tabMode,
 }: Props) => {
    const featureFlags = useFeatureFlags()
    const isMobile = useIsMobile()
+
    const groupRef = useMemo(
       () =>
          doc(FirestoreInstance, "careerCenterData", group.id).withConverter(
@@ -196,9 +227,10 @@ const CompanyPageOverview = ({
       [group.id]
    )
 
-   const [tabValue, setTabValue] = useState<TabValueType>(
-      tab ?? TabValue.overview
-   )
+   const [currentTab, setCurrentTab] = useState<TabValueType>(tab)
+   const tabValue = tabMode ? currentTab : tab
+
+   const basePath = `/company/${companyNameSlugify(group.universityName)}`
 
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
       initialData: group,
@@ -240,6 +272,31 @@ const CompanyPageOverview = ({
       upcomingLivestreams,
    ])
 
+   const getCompanyPageTabLink = useCallback(
+      (tab: TabValueType) => {
+         return getTabLink(basePath, tab)
+      },
+      [basePath]
+   )
+
+   const tabSectionRefsMap = useMemo(() => {
+      return {
+         [TabValue.overview]: overviewSectionRef,
+         [TabValue.jobs]: jobsSectionRef,
+         [TabValue.sparks]: sparksSectionRef,
+         [TabValue.livesStreams]: livesStreamsSectionRef,
+         [TabValue.recordings]: recordingsSectionRef,
+         [TabValue.mentors]: mentorsSectionRef,
+      }
+   }, [
+      overviewSectionRef,
+      jobsSectionRef,
+      sparksSectionRef,
+      livesStreamsSectionRef,
+      recordingsSectionRef,
+      mentorsSectionRef,
+   ])
+
    useEffect(() => {
       const isPublicProfile = presenter.companyPageIsReady()
 
@@ -260,12 +317,13 @@ const CompanyPageOverview = ({
       }
    }, [contextGroup, editMode, presenter])
 
-   const setActiveTab = useCallback(
-      (tab: TabValueType) => {
-         setTabValue(tab)
-      },
-      [setTabValue]
-   )
+   useEffect(() => {
+      if (tabMode && tabValue && tabSectionRefsMap[tabValue]?.current) {
+         tabSectionRefsMap[tabValue].current.scrollIntoView({
+            behavior: "smooth",
+         })
+      }
+   }, [tabValue, tabSectionRefsMap, tabMode])
 
    const contextValue = useMemo<ICompanyPageContext>(
       () => ({
@@ -286,8 +344,9 @@ const CompanyPageOverview = ({
             testimonialsSectionRef,
             benefitsSectionRef,
          },
-         activeTab: tabValue,
-         setActiveTab,
+         getCompanyPageTabLink,
+         setActiveTab: setCurrentTab,
+         tabMode,
       }),
       [
          contextGroup,
@@ -300,40 +359,15 @@ const CompanyPageOverview = ({
          pastLivestreams,
          contextGroupAvailableJobs,
          customJobs,
-         tabValue,
-         setActiveTab,
+         getCompanyPageTabLink,
+         setCurrentTab,
+         tabMode,
       ]
    )
 
-   const tabsSectionRefsMap = useMemo(() => {
-      return {
-         [TabValue.overview]: overviewSectionRef,
-         [TabValue.jobs]: jobsSectionRef,
-         [TabValue.sparks]: sparksSectionRef,
-         [TabValue.livesStreams]: livesStreamsSectionRef,
-         [TabValue.recordings]: recordingsSectionRef,
-         [TabValue.mentors]: mentorsSectionRef,
-         [TabValue.testimonials]: testimonialsSectionRef,
-         [TabValue.benefits]: benefitsSectionRef,
-      }
-   }, [
-      overviewSectionRef,
-      jobsSectionRef,
-      sparksSectionRef,
-      livesStreamsSectionRef,
-      recordingsSectionRef,
-      mentorsSectionRef,
-      testimonialsSectionRef,
-      benefitsSectionRef,
-   ])
-
-   useEffect(() => {
-      if (tabValue && tabsSectionRefsMap[tabValue].current) {
-         tabsSectionRefsMap[tabValue].current.scrollIntoView({
-            behavior: "smooth",
-         })
-      }
-   }, [tabValue, tabsSectionRefsMap])
+   const LinkComponent = (props) => (
+      <Link {...props} shallow={true} scroll={true} />
+   )
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
@@ -373,61 +407,127 @@ const CompanyPageOverview = ({
                            scrollButtons
                            allowScrollButtonsMobile
                            value={tabValue}
-                           onChange={(_, newValue) => setActiveTab(newValue)}
                            ScrollButtonComponent={CustomScrollButton}
                            sx={styles.tabs}
                         >
                            <Tab
                               label={getTabLabel(TabValue.overview)}
                               value={TabValue.overview}
+                              {...(!isTest &&
+                                 !tabMode && {
+                                    href: getTabLink(
+                                       basePath,
+                                       TabValue.overview
+                                    ),
+                                    LinkComponent,
+                                 })}
+                              onClick={() =>
+                                 tabMode && setCurrentTab(TabValue.overview)
+                              }
                            />
                            <Tab
                               label={getTabLabel(TabValue.jobs)}
                               value={TabValue.jobs}
+                              {...(!isTest &&
+                                 !tabMode && {
+                                    href: getTabLink(basePath, TabValue.jobs),
+                                    LinkComponent,
+                                 })}
+                              onClick={() =>
+                                 tabMode && setCurrentTab(TabValue.jobs)
+                              }
                            />
                            {group.publicProfile && group.hasSparks ? (
                               <Tab
                                  label={getTabLabel(TabValue.sparks)}
                                  value={TabValue.sparks}
+                                 {...(!isTest &&
+                                    !tabMode && {
+                                       href: getTabLink(
+                                          basePath,
+                                          TabValue.sparks
+                                       ),
+                                       LinkComponent,
+                                    })}
+                                 onClick={() =>
+                                    tabMode && setCurrentTab(TabValue.sparks)
+                                 }
                               />
                            ) : null}
                            <Tab
                               label={getTabLabel(TabValue.livesStreams)}
                               value={TabValue.livesStreams}
+                              {...(!isTest &&
+                                 !tabMode && {
+                                    href: getTabLink(
+                                       basePath,
+                                       TabValue.livesStreams
+                                    ),
+                                    LinkComponent,
+                                 })}
+                              onClick={() =>
+                                 tabMode && setCurrentTab(TabValue.livesStreams)
+                              }
                            />
                            <Tab
                               label={getTabLabel(TabValue.recordings)}
                               value={TabValue.recordings}
+                              {...(!isTest &&
+                                 !tabMode && {
+                                    href: getTabLink(
+                                       basePath,
+                                       TabValue.recordings
+                                    ),
+                                    LinkComponent,
+                                 })}
+                              onClick={() =>
+                                 tabMode && setCurrentTab(TabValue.recordings)
+                              }
                            />
                            {groupCreators?.length ? (
                               <Tab
                                  label={getTabLabel(TabValue.mentors)}
                                  value={TabValue.mentors}
+                                 {...(!isTest &&
+                                    !tabMode && {
+                                       href: getTabLink(
+                                          basePath,
+                                          TabValue.mentors
+                                       ),
+                                       LinkComponent,
+                                    })}
+                                 onClick={() =>
+                                    tabMode && setCurrentTab(TabValue.mentors)
+                                 }
                               />
                            ) : null}
                         </Tabs>
 
                         <Box sx={styles.tabContent}>
-                           {tabValue !== TabValue.overview && (
+                           {tabMode &&
+                           tabValue &&
+                           tabSectionRefsMap[tabValue] ? (
                               <SectionAnchor
-                                 ref={tabsSectionRefsMap[tabValue]}
                                  tabValue={tabValue}
+                                 ref={tabSectionRefsMap[tabValue]}
                               />
-                           )}
-                           {tabValue === TabValue.overview && (
+                           ) : null}
+                           {tabValue === TabValue.overview ? (
                               <Overview editMode={editMode} />
-                           )}
-                           {tabValue === TabValue.jobs && <JobsTab />}
-                           {tabValue === TabValue.sparks && (
+                           ) : null}
+                           {tabValue === TabValue.jobs ? <JobsTab /> : null}
+                           {tabValue === TabValue.sparks ? (
                               <SparksTab key={group.id} groupId={group.id} />
-                           )}
-                           {tabValue === TabValue.livesStreams && (
+                           ) : null}
+                           {tabValue === TabValue.livesStreams ? (
                               <UpcomingEventsTab />
-                           )}
-                           {tabValue === TabValue.recordings && (
+                           ) : null}
+                           {tabValue === TabValue.recordings ? (
                               <PastEventsTab />
-                           )}
-                           {tabValue === TabValue.mentors && <MentorsTab />}
+                           ) : null}
+                           {tabValue === TabValue.mentors ? (
+                              <MentorsTab />
+                           ) : null}
                         </Box>
                      </Box>
                   </Box>
