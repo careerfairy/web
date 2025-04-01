@@ -49,13 +49,21 @@ const isTest = isTestEnvironment()
 
 const styles = sxStyles({
    tabs: {
-      borderRadius: "12px 12px 0 0",
+      borderRadius: {
+         sm: "0",
+         md: "12px 12px 0 0",
+      },
       backgroundColor: "#FEFEFE",
       position: "sticky",
-      top: 0,
+      top: {
+         xs: "calc(var(--app-bar-height, 64px) * var(--app-bar-visible, 0))",
+         sm: "calc(var(--app-bar-height, 64px) * var(--app-bar-visible, 0))",
+         md: "0",
+      },
       zIndex: 10,
       borderBottom: "1px solid",
       borderColor: "divider",
+      transition: "top 0.2s",
       "& .MuiTab-root": {
          textTransform: "none",
          fontFamily: "Poppins",
@@ -218,7 +226,6 @@ const CompanyPageOverview = ({
 }: Props) => {
    const featureFlags = useFeatureFlags()
    const isMobile = useIsMobile()
-
    const groupRef = useMemo(
       () =>
          doc(FirestoreInstance, "careerCenterData", group.id).withConverter(
@@ -375,16 +382,18 @@ const CompanyPageOverview = ({
             height={"100%"}
             pb={5}
             px={isMobile ? 0 : 4}
-            bgcolor={isMobile ? "white" : "transparent"}
+            bgcolor={"transparent"}
             borderRadius={isMobile ? "12px" : "0"}
          >
             {editMode ? <ProgressBanner /> : null}
-            <Box
-               mb={{ xs: 1, md: 2 }}
-               sx={{ borderRadius: isMobile ? "12px 12px 0 0" : "12px" }}
-            >
-               <Header />
-            </Box>
+            <Container disableGutters maxWidth="xl">
+               <Box
+                  mb={{ xs: 1, md: 2 }}
+                  sx={{ borderRadius: isMobile ? "12px 12px 0 0" : "12px" }}
+               >
+                  <Header />
+               </Box>
+            </Container>
             <Container disableGutters maxWidth="xl">
                <Stack
                   direction={isMobile ? "column" : "row"}
@@ -538,7 +547,9 @@ const CompanyPageOverview = ({
                   ) : null}
                </Stack>
             </Container>
-            <NewsletterSection />
+            <Container disableGutters maxWidth="xl">
+               <NewsletterSection />
+            </Container>
          </Box>
       </CompanyPageContext.Provider>
    )

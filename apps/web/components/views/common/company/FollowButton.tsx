@@ -48,11 +48,13 @@ const toggleFollowCompany = async (
 type Props = {
    group: Group | CompanySearchResult
    interactionSource?: InteractionSourcesType
+   showStartIcon?: boolean
 } & Omit<ButtonProps, "onClick">
 const AuthedFollowButton: FC<Props> = ({
    group,
    disabled,
    interactionSource,
+   showStartIcon = true,
    ...buttonProps
 }) => {
    const { userData, authenticatedUser } = useAuth()
@@ -112,11 +114,13 @@ const AuthedFollowButton: FC<Props> = ({
          disabled={isMutating || disabled || status === "loading"}
          onClick={handleClick}
          startIcon={
-            companyFollowedData ? (
-               <FollowedIcon fontSize={"small"} />
-            ) : (
-               <FollowIcon fontSize={"small"} />
-            )
+            showStartIcon ? (
+               companyFollowedData ? (
+                  <FollowedIcon fontSize={"small"} />
+               ) : (
+                  <FollowIcon fontSize={"small"} />
+               )
+            ) : null
          }
          {...buttonProps}
          variant={companyFollowedData ? "outlined" : "contained"}
@@ -126,7 +130,11 @@ const AuthedFollowButton: FC<Props> = ({
    )
 }
 
-const NonAuthedFollowButton: FC<Props> = ({ group, ...buttonProps }) => {
+const NonAuthedFollowButton: FC<Props> = ({
+   group,
+   showStartIcon,
+   ...buttonProps
+}) => {
    const { asPath } = useRouter()
    const isMounted = useMountedState()
 
@@ -141,7 +149,11 @@ const NonAuthedFollowButton: FC<Props> = ({ group, ...buttonProps }) => {
             },
          }}
       >
-         <Button {...buttonProps} variant="contained">
+         <Button
+            startIcon={showStartIcon ? <FollowIcon fontSize={"small"} /> : null}
+            {...buttonProps}
+            variant="contained"
+         >
             Follow
          </Button>
       </Link>
@@ -151,6 +163,7 @@ const NonAuthedFollowButton: FC<Props> = ({ group, ...buttonProps }) => {
 const FollowButton: FC<Props> = ({
    group,
    interactionSource,
+   showStartIcon,
    ...buttonProps
 }) => {
    const { isLoggedIn, isLoadingAuth } = useAuth()
@@ -173,7 +186,13 @@ const FollowButton: FC<Props> = ({
          />
       )
    }
-   return <NonAuthedFollowButton group={group} {...mergedProps} />
+   return (
+      <NonAuthedFollowButton
+         group={group}
+         {...mergedProps}
+         showStartIcon={Boolean(showStartIcon && !isLoggedIn)}
+      />
+   )
 }
 
 const defaultButtonProps: ButtonProps = {

@@ -16,7 +16,7 @@ const styles = sxStyles({
       bottom: 0,
       width: "100%",
       left: 0,
-      zIndex: (theme) => theme.zIndex.modal,
+      zIndex: (theme) => theme.zIndex.appBar,
       background: "white",
       borderTop: "1px solid #F3F3F3",
       justifyContent: "center",
