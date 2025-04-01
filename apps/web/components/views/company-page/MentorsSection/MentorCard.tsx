@@ -1,6 +1,5 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
-import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
 import Link from "next/link"
@@ -10,7 +9,7 @@ import { sxStyles } from "types/commonTypes"
 import { buildMentorPageLink } from "util/routes"
 import { useCompanyPage } from ".."
 
-const CARD_WIDTH = 214
+const CARD_WIDTH = 240
 
 const styles = sxStyles({
    container: (theme) => ({
@@ -48,19 +47,19 @@ const styles = sxStyles({
          left: 0,
          width: "100%",
          height: "100%",
-         background: "rgba(142, 142, 142, 0.10)",
+         background: "rgba(142, 142, 142, 0.50)",
          WebkitBackdropFilter: "blur(10px)",
          backdropFilter: "blur(10px)",
       },
    },
    creator: {
       name: {
-         width: "100%",
+         maxWidth: "200px",
          fontWeight: 700,
          textAlign: "center",
          textOverflow: "ellipsis",
-         overflow: "hidden",
          whiteSpace: "nowrap",
+         overflow: "hidden",
       },
       position: {
          fontSize: "14px",
@@ -70,7 +69,11 @@ const styles = sxStyles({
          color: "neutral.600",
          paddingBottom: 1,
          marginBottom: -1,
-         ...getMaxLineStyles(2),
+         maxWidth: "100%",
+         display: "-webkit-box",
+         WebkitLineClamp: 2,
+         WebkitBoxOrient: "vertical",
+         overflow: "hidden",
       },
    },
    edit: {
@@ -189,7 +192,7 @@ export const MentorCard = ({
             sx={[styles.creator.position, { position: "relative", zIndex: 1 }]}
          >
             {creator.position.concat(" at ")}
-            <Typography fontWeight={600} color={"neutral.600"}>
+            <Typography component="span" fontWeight={600} color={"neutral.600"}>
                {group?.universityName}
             </Typography>
          </Typography>

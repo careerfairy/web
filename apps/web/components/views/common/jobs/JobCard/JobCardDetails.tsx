@@ -153,16 +153,16 @@ const JobCardDetails = ({
       jobName = job.name
       jobType = job.getDepartment()
    } else {
-      jobName = job.title
-      jobType = job.jobType
-      jobDeadline = job.deadline
-      jobPostingUrl = job.postingUrl
-      jobPublished = job.published
-      jobBusinessTags = (job.businessFunctionsTagIds || [])
+      jobName = job?.title
+      jobType = job?.jobType
+      jobDeadline = job?.deadline
+      jobPostingUrl = job?.postingUrl
+      jobPublished = job?.published
+      jobBusinessTags = (job?.businessFunctionsTagIds || [])
          .map((tagId) => TagValuesLookup[tagId])
          .join(", ")
 
-      jobIsPermanentlyExpired = job.isPermanentlyExpired
+      jobIsPermanentlyExpired = job?.isPermanentlyExpired
    }
 
    const published =

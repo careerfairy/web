@@ -38,18 +38,18 @@ import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
 import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
-import BenefitsTab from "./Tabs/BenefitsTab"
-import EventsTab from "./Tabs/EventsTab"
-import JobsTab from "./Tabs/JobsTab"
+import { PastEventsTab, UpcomingEventsTab } from "./Tabs/EventsTab"
+import { JobsTab } from "./Tabs/JobsTab"
 import MentorsTab from "./Tabs/MentorsTab"
 import SparksTab from "./Tabs/SparksTab"
-import TestimonialsTab from "./Tabs/TestimonialsTab"
 
 const styles = sxStyles({
    tabs: {
       borderRadius: "12px 12px 0 0",
       backgroundColor: "#FEFEFE",
-      position: "relative",
+      position: "sticky",
+      top: 0,
+      zIndex: 10,
       borderBottom: "1px solid",
       borderColor: "divider",
       "& .MuiTab-root": {
@@ -399,19 +399,14 @@ const CompanyPageOverview = ({
                               label={getTabLabel(TabValue.recordings)}
                               value={TabValue.recordings}
                            />
-                           <Tab
-                              label={getTabLabel(TabValue.mentors)}
-                              value={TabValue.mentors}
-                           />
-                           <Tab
-                              label={getTabLabel(TabValue.testimonials)}
-                              value={TabValue.testimonials}
-                           />
-                           <Tab
-                              label={getTabLabel(TabValue.benefits)}
-                              value={TabValue.benefits}
-                           />
+                           {groupCreators?.length ? (
+                              <Tab
+                                 label={getTabLabel(TabValue.mentors)}
+                                 value={TabValue.mentors}
+                              />
+                           ) : null}
                         </Tabs>
+
                         <Box sx={styles.tabContent}>
                            {tabValue !== TabValue.overview && (
                               <SectionAnchor
@@ -426,13 +421,13 @@ const CompanyPageOverview = ({
                            {tabValue === TabValue.sparks && (
                               <SparksTab key={group.id} groupId={group.id} />
                            )}
-                           {tabValue === TabValue.livesStreams && <EventsTab />}
-                           {tabValue === TabValue.recordings && <EventsTab />}
-                           {tabValue === TabValue.mentors && <MentorsTab />}
-                           {tabValue === TabValue.testimonials && (
-                              <TestimonialsTab />
+                           {tabValue === TabValue.livesStreams && (
+                              <UpcomingEventsTab />
                            )}
-                           {tabValue === TabValue.benefits && <BenefitsTab />}
+                           {tabValue === TabValue.recordings && (
+                              <PastEventsTab />
+                           )}
+                           {tabValue === TabValue.mentors && <MentorsTab />}
                         </Box>
                      </Box>
                   </Box>
