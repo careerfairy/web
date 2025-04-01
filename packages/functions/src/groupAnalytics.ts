@@ -44,7 +44,7 @@ export const getRegistrationSources = onCall(
             .optional(),
       }),
       userShouldBeGroupAdmin(),
-      cache((data) => registrationSourcesCacheKey({ ...data })),
+      cache((request) => registrationSourcesCacheKey(request.data)),
       async (
          request: CallableRequest<{
             groupId: string
