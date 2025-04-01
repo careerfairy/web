@@ -120,23 +120,26 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
    ) => {
       const isMobile = useIsMobile()
 
-      const { palette } = useColor(backgroundImageUrl, {
+      const { color } = useColor(backgroundImageUrl, {
          format: "rgb",
       })
+
+      const rgb = useMemo(() => [color?.[0], color?.[1], color?.[2]], [color])
+
       const gradientMobile = useMemo(
          () =>
-            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${palette?.join(
+            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${rgb.join(
                ","
-            )}, 0.00) 10.49%, rgba(${palette?.join(",")}, 0.85) 52.63%)`,
-         [palette]
+            )}, 0.00) 10.49%, rgba(${rgb.join(",")}, 0.85) 52.63%)`,
+         [rgb]
       )
 
       const gradientDesktop = useMemo(
          () =>
-            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${palette?.join(
+            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${rgb?.join(
                ","
-            )}, 0.00) 10.49%, rgba(${palette?.join(",")}, 0.80) 70.32%)`,
-         [palette]
+            )}, 0.00) 10.49%, rgba(${rgb?.join(",")}, 0.80) 70.32%)`,
+         [rgb]
       )
 
       const gradient = isMobile ? gradientMobile : gradientDesktop
@@ -149,13 +152,13 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
                   sx={[
                      styles.background,
                      withBackgroundOverlay &&
-                        data && {
+                        color && {
                            "&:after": {
                               background: gradient,
                            },
                         },
                      backgroundImageUrl &&
-                        data && {
+                        color && {
                            "&:before": {
                               background: `${gradient}, url(${backgroundImageUrl})`,
                               backgroundSize: "cover",
