@@ -4,12 +4,12 @@ import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import {
    AddSparkSparkData,
    DeleteSparkData,
-   UpdateSparkData,
    sparksCategoriesArray,
+   UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
+import { onCall } from "firebase-functions/https"
 import { boolean, number, object, string } from "yup"
 import { groupRepo, sparkRepo } from "./api/repositories"
-import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 import {
@@ -43,107 +43,107 @@ const videoDataValidator = {
       .required(),
 } as const
 
-export const createSpark = functions.region(config.region).https.onCall(
-   middlewares(
+export const createSpark = onCall(
+   middlewares<AddSparkSparkData & { group: Group }>(
       dataValidation({
          ...sparkDataValidator,
          ...videoDataValidator,
       }),
       userShouldBeGroupAdmin(),
-      async (data: AddSparkSparkData, context) => {
+      async (request) => {
          try {
-            const group = context.middlewares.group as Group
+            const group = request.middlewares.group
 
             const creator = await groupRepo.getCreatorByGroupAndId(
                group.id,
-               data.creatorId
+               request.data.creatorId
             )
 
             if (!creator) {
                logAndThrow("Creator not found", {
-                  data,
-                  context,
+                  data: request.data,
+                  context: request,
                })
             }
 
-            await sparkRepo.create(data, group, creator)
+            await sparkRepo.create(request.data, group, creator)
 
             functions.logger.log(
-               `Create Spark '${data.question}' completed, start validation`
+               `Create Spark '${request.data.question}' completed, start validation`
             )
             return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in creating spark", {
-               data,
+               data: request.data,
                error,
-               context,
+               context: request,
             })
          }
       }
    )
 )
 
-export const updateSpark = functions.region(config.region).https.onCall(
-   middlewares(
+export const updateSpark = onCall(
+   middlewares<UpdateSparkData & { group: Group }>(
       dataValidation({
          ...sparkDataValidator,
          id: string().required(),
       }),
       userShouldBeGroupAdmin(),
-      async (data: UpdateSparkData, context) => {
+      async (request) => {
          try {
-            const group = context.middlewares.group as Group
+            const group = request.middlewares.group as Group
 
             const creator = await groupRepo.getCreatorByGroupAndId(
                group.id,
-               data.creatorId
+               request.data.creatorId
             )
 
             if (!creator) {
                logAndThrow("Creator not found", {
-                  data,
-                  context,
+                  data: request.data,
+                  context: request,
                })
             }
 
-            await sparkRepo.update(data, creator)
+            await sparkRepo.update(request.data, creator)
 
             functions.logger.log(
-               `Update Spark '${data.id}' completed, start validation`
+               `Update Spark '${request.data.id}' completed, start validation`
             )
             return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in updating spark", {
-               data,
+               data: request.data,
                error,
-               context,
+               context: request,
             })
          }
       }
    )
 )
 
-export const deleteSpark = functions.region(config.region).https.onCall(
-   middlewares(
+export const deleteSpark = onCall(
+   middlewares<DeleteSparkData & { group: Group }>(
       dataValidation({
          id: string().required(),
          groupId: string().required(),
       }),
       userShouldBeGroupAdmin(),
-      async (data: DeleteSparkData, context) => {
+      async (request) => {
          try {
-            const group = context.middlewares.group as Group
-            await sparkRepo.delete(data.id)
+            const group = request.middlewares.group as Group
+            await sparkRepo.delete(request.data.id)
 
             functions.logger.log(
-               `Delete Spark '${data.id}' completed, start validation`
+               `Delete Spark '${request.data.id}' completed, start validation`
             )
             return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in deleting spark", {
-               data,
+               data: request.data,
                error,
-               context,
+               context: request,
             })
          }
       }

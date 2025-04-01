@@ -1,3 +1,8 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { object } from "yup"
+import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import {
    validateData,
    validateLivestreamExists,
@@ -6,11 +11,6 @@ import {
    validateUserIsGroupAdmin as validateUserIsGroupAdminFn,
 } from "../lib/validations"
 import { OnCallMiddleware } from "./middlewares"
-import ObjectSchema, { ObjectShape } from "yup/lib/object"
-import { object } from "yup"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 /**
  * Validate if the user is authed, is group admin or is cf admin
@@ -22,12 +22,13 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 export const userShouldBeGroupAdmin = (): OnCallMiddleware<{
    group?: Group
    userData?: UserData
+   groupId: string
 }> => {
-   return async (data, context, next) => {
+   return async (context, next) => {
       const idToken = await validateUserAuthExists(context)
 
       const { group, userData } = await validateUserIsGroupAdminFn(
-         data.groupId,
+         context.data.groupId,
          idToken.email
       )
 
@@ -48,7 +49,7 @@ export const userShouldBeGroupAdmin = (): OnCallMiddleware<{
  * Throws an exception if is not allowed
  */
 export const userShouldBeCFAdmin = (): OnCallMiddleware => {
-   return async (_, context, next) => {
+   return async (context, next) => {
       const idToken = await validateUserAuthExists(context)
 
       // throws if user is not a CF Admin
@@ -62,7 +63,7 @@ export const userShouldBeCFAdmin = (): OnCallMiddleware => {
  * Validate the user auth exists
  */
 export const userAuthExists = (): OnCallMiddleware => {
-   return async (data, context, next) => {
+   return async (context, next) => {
       // throws if auth isn't present
       await validateUserAuthExists(context)
 
@@ -78,12 +79,12 @@ export const userAuthExists = (): OnCallMiddleware => {
 export const dataValidation = <T extends ObjectShape>(
    objectSchema: ObjectShape | ObjectSchema<T>
 ): OnCallMiddleware => {
-   return async (data, context, next) => {
+   return async (context, next) => {
       // throws if not valid
       if (objectSchema instanceof ObjectSchema) {
-         await validateData(data, objectSchema)
+         await validateData(context.data, objectSchema)
       } else {
-         await validateData(data, object(objectSchema))
+         await validateData(context.data, object(objectSchema))
       }
 
       return next()
@@ -92,9 +93,12 @@ export const dataValidation = <T extends ObjectShape>(
 
 export const livestreamExists = (): OnCallMiddleware<{
    livestream: LivestreamEvent
+   livestreamId: string
 }> => {
-   return async (data, context, next) => {
-      const livestream = await validateLivestreamExists(data.livestreamId)
+   return async (context, next) => {
+      const livestream = await validateLivestreamExists(
+         context.data.livestreamId
+      )
 
       context.middlewares = {
          ...context.middlewares,

@@ -6,10 +6,9 @@ import {
 } from "@careerfairy/shared-lib/countries/types"
 
 import { City, Country, State } from "country-state-city"
-import * as functions from "firebase-functions"
+import { onCall } from "firebase-functions/https"
 import Fuse from "fuse.js"
 import { InferType, object, string } from "yup"
-import config from "./config"
 
 const CountryCitiesOptionsSchema = {
    countryCode: string().required(),
@@ -74,67 +73,56 @@ const performFuzzySearch = <T>(items: T[], searchValue: string): T[] => {
    return searchResults.map((result) => result.item)
 }
 
-export const searchCountries = functions
-   .region(config.region)
-   .https.onCall((data: SearchCountryOptions) => {
-      const { searchValue } = data
+export const searchCountries = onCall<SearchCountryOptions>((request) => {
+   const { searchValue } = request.data
 
-      const countries: CountryOption[] = Country.getAllCountries()
-         .map((country) => ({
-            name: country.name,
-            id: country.isoCode,
-         }))
-         .sort((countryA, countryB) =>
-            countryA.name.localeCompare(countryB.name)
-         )
+   const countries: CountryOption[] = Country.getAllCountries()
+      .map((country) => ({
+         name: country.name,
+         id: country.isoCode,
+      }))
+      .sort((countryA, countryB) => countryA.name.localeCompare(countryB.name))
 
-      return performFuzzySearch(countries, searchValue)
-   })
+   return performFuzzySearch(countries, searchValue)
+})
 
-export const fetchCountriesList = functions
-   .region(config.region)
-   .https.onCall(() => {
-      const countries: CountryOption[] = Country.getAllCountries()
-         .map((country) => ({
-            name: country.name,
-            id: country.isoCode,
-         }))
-         .sort((countryA, countryB) =>
-            countryA.name.localeCompare(countryB.name)
-         )
+export const fetchCountriesList = onCall(() => {
+   const countries: CountryOption[] = Country.getAllCountries()
+      .map((country) => ({
+         name: country.name,
+         id: country.isoCode,
+      }))
+      .sort((countryA, countryB) => countryA.name.localeCompare(countryB.name))
 
-      const countriesMap: Record<string, CountryOption> = countries.reduce(
-         (acc, country) => ({
-            ...acc,
-            [country.id]: country,
-         }),
-         {} as Record<string, CountryOption>
-      )
+   const countriesMap: Record<string, CountryOption> = countries.reduce(
+      (acc, country) => ({
+         ...acc,
+         [country.id]: country,
+      }),
+      {} as Record<string, CountryOption>
+   )
 
-      return countriesMap
-   })
+   return countriesMap
+})
 
-export const searchCities = functions
-   .region(config.region)
-   .https.onCall((data: SearchCityOptions) => {
-      const { searchValue, countryId } = data
+export const searchCities = onCall<SearchCityOptions>((request) => {
+   const { searchValue, countryId } = request.data
 
-      const states = State.getStatesOfCountry(countryId)
-      const cities: CityOption[] = states
-         .map((state) => ({
-            name: state.name,
-            id: state.isoCode,
-            stateIsoCode: state.isoCode,
-         }))
-         .sort((cityA, cityB) => cityA.name.localeCompare(cityB.name))
+   const states = State.getStatesOfCountry(countryId)
+   const cities: CityOption[] = states
+      .map((state) => ({
+         name: state.name,
+         id: state.isoCode,
+         stateIsoCode: state.isoCode,
+      }))
+      .sort((cityA, cityB) => cityA.name.localeCompare(cityB.name))
 
-      return performFuzzySearch(cities, searchValue)
-   })
+   return performFuzzySearch(cities, searchValue)
+})
 
-export const fetchCountryCitiesList = functions
-   .region(config.region)
-   .https.onCall((data: CountryCitiesOptions) => {
-      const { countryCode } = data
+export const fetchCountryCitiesList = onCall<CountryCitiesOptions>(
+   (request) => {
+      const { countryCode } = request.data
 
       const states = State.getStatesOfCountry(countryCode)
 
@@ -161,12 +149,12 @@ export const fetchCountryCitiesList = functions
          )
 
       return citiesMap
-   })
+   }
+)
 
-export const fetchCountryStatesList = functions
-   .region(config.region)
-   .https.onCall((data: CountryCitiesOptions) => {
-      const { countryCode } = data
+export const fetchCountryStatesList = onCall<CountryCitiesOptions>(
+   (request) => {
+      const { countryCode } = request.data
 
       const states = State.getStatesOfCountry(countryCode)
 
@@ -186,14 +174,13 @@ export const fetchCountryStatesList = functions
             }),
             {} as Record<string, CityOption>
          )
-
       return citiesMap
-   })
+   }
+)
 
-export const fetchCountryCityData = functions
-   .region(config.region)
-   .https.onCall((data: CountryCityDataOptions) => {
-      const { countryIsoCode, generatedCityId } = data
+export const fetchCountryCityData = onCall<CountryCityDataOptions>(
+   (request) => {
+      const { countryIsoCode, generatedCityId } = request.data
 
       let countryResult: CountryOption | undefined
       let cityResult: CityOption | undefined
@@ -222,48 +209,44 @@ export const fetchCountryCityData = functions
       }
 
       return { country: countryResult, city: cityResult }
-   })
+   }
+)
 
-export const fetchCityData = functions
-   .region(config.region)
-   .https.onCall((data: CityDataOptions) => {
-      const { generatedCityId } = data
+export const fetchCityData = onCall<CityDataOptions>((request) => {
+   const { generatedCityId } = request.data
 
-      let cityResult: CityOption | null = null
+   let cityResult: CityOption | null = null
 
-      if (generatedCityId) {
-         const { countryCode, stateCode, cityName } =
-            getCityCodes(generatedCityId)
+   if (generatedCityId) {
+      const { countryCode, stateCode, cityName } = getCityCodes(generatedCityId)
 
-         const city = City.getCitiesOfState(countryCode, stateCode)?.find(
-            (city) => city.name === cityName
-         )
+      const city = City.getCitiesOfState(countryCode, stateCode)?.find(
+         (city) => city.name === cityName
+      )
 
-         cityResult = {
-            name: city.name,
-            id: generateCityId(city),
-            stateIsoCode: stateCode,
-         }
+      cityResult = {
+         name: city.name,
+         id: generateCityId(city),
+         stateIsoCode: stateCode,
       }
+   }
 
-      return cityResult
-   })
+   return cityResult
+})
 
-export const fetchCountryData = functions
-   .region(config.region)
-   .https.onCall((data: CountryDataOptions) => {
-      const { countryIsoCode } = data
+export const fetchCountryData = onCall<CountryDataOptions>((request) => {
+   const { countryIsoCode } = request.data
 
-      let countryResult: CountryOption | null = null
+   let countryResult: CountryOption | null = null
 
-      if (countryIsoCode) {
-         const country = Country.getCountryByCode(countryIsoCode)
+   if (countryIsoCode) {
+      const country = Country.getCountryByCode(countryIsoCode)
 
-         countryResult = {
-            name: country.name,
-            id: country.isoCode,
-         }
+      countryResult = {
+         name: country.name,
+         id: country.isoCode,
       }
+   }
 
-      return countryResult
-   })
+   return countryResult
+})

@@ -11,7 +11,7 @@ import {
 
 import { SearchIndex } from "algoliasearch"
 import { DocumentSnapshot, Query } from "firebase-admin/firestore"
-import config from "../../config"
+import { onDocumentWritten } from "firebase-functions/firestore"
 import { defaultTriggerRunTimeConfig } from "../triggers/util"
 
 type DocumentTransformer<DataType = any, DataTypeTransformed = DataType> = (
@@ -223,26 +223,27 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
 
       const documentPath = collectionPath + "/{docId}"
 
-      exports[indexName] = functions
-         .runWith(defaultTriggerRunTimeConfig)
-         .region(config.region)
-         .firestore.document(documentPath)
-         .onWrite(async (change) => {
+      exports[indexName] = onDocumentWritten(
+         {
+            document: documentPath,
+            ...defaultTriggerRunTimeConfig,
+         },
+         async (event) => {
             if (settings) {
                await configureSettings(settings, indexClient)
             }
 
-            const changeType = getChangeTypeEnum(change)
+            const changeType = getChangeTypeEnum(event)
             // Get the document data
-            const docData = change.after.exists
-               ? change.after.data()
-               : change.before.data()
+            const docData = event.data.after.exists
+               ? event.data.after.data()
+               : event.data.before.data()
 
             // If shouldIndex is defined and returns false, skip indexing
             if (shouldIndex && !shouldIndex(docData)) {
                functions.logger.debug(
                   `Skipping indexing for document ${
-                     change.after.id || change.before.id
+                     event.data.after.id || event.data.before.id
                   }`
                )
                return
@@ -251,7 +252,7 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
             switch (changeType) {
                case ChangeType.CREATE:
                   await handleCreateDocument(
-                     change.after,
+                     event.data.after,
                      fields,
                      indexClient,
                      transformData
@@ -259,20 +260,21 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
                   break
                case ChangeType.UPDATE:
                   await handleUpdateDocument(
-                     change.before,
-                     change.after,
+                     event.data.before,
+                     event.data.after,
                      fields,
                      indexClient,
                      transformData
                   )
                   break
                case ChangeType.DELETE:
-                  await handleDeleteDocument(change.before, indexClient)
+                  await handleDeleteDocument(event.data.before, indexClient)
                   break
                default:
                   throw new Error(`Unknown change type ${changeType}`)
             }
-         })
+         }
+      )
    }
 
    return exports

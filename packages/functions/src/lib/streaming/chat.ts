@@ -1,16 +1,15 @@
-import functions = require("firebase-functions")
 import {
    DeleteLivestreamChatEntryRequest,
    LivestreamChatEntry,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { isDefinedAndEqual } from "@careerfairy/shared-lib/utils"
+import { onCall } from "firebase-functions/https"
 import { SchemaOf, boolean, object, string } from "yup"
-import config from "../../config"
-import { validateLivestreamToken } from "../validations"
+import { livestreamsRepo } from "../../api/repositories"
 import { middlewares } from "../../middlewares/middlewares"
 import { dataValidation, livestreamExists } from "../../middlewares/validations"
-import { livestreamsRepo } from "../../api/repositories"
+import { validateLivestreamToken } from "../validations"
 
 const deleteLivestreamChatEntrySchema: SchemaOf<DeleteLivestreamChatEntryRequest> =
    object()
@@ -37,61 +36,61 @@ type DeleteContext = {
    livestream: LivestreamEvent
 }
 
-export const deleteLivestreamChatEntry = functions
-   .region(config.region)
-   .https.onCall(
-      middlewares<DeleteContext, DeleteLivestreamChatEntryRequest>(
-         dataValidation(deleteLivestreamChatEntrySchema),
-         livestreamExists(),
-         async (requestData, context) => {
-            const {
-               agoraUserId,
+type DeleteLivestreamChatEntryContext = DeleteContext &
+   DeleteLivestreamChatEntryRequest
+
+export const deleteLivestreamChatEntry = onCall(
+   middlewares<DeleteLivestreamChatEntryContext>(
+      dataValidation(deleteLivestreamChatEntrySchema),
+      livestreamExists(),
+      async (request) => {
+         const {
+            agoraUserId,
+            livestreamId,
+            livestreamToken,
+            deleteAll,
+            entryId,
+         } = request.data
+
+         const userEmail = request.auth?.token?.email || ""
+         const userUid = request.auth?.token?.uid || ""
+
+         if (deleteAll) {
+            await validateLivestreamToken(
+               userEmail,
+               request.middlewares.livestream,
+               livestreamToken
+            )
+
+            return await deleteAllEntries(livestreamId)
+         } else {
+            const entryToDelete = await livestreamsRepo.getLivestreamChatEntry(
                livestreamId,
-               livestreamToken,
-               deleteAll,
-               entryId,
-            } = requestData
+               entryId
+            )
 
-            const userEmail = context.auth?.token?.email || ""
-            const userUid = context.auth?.token?.uid || ""
+            if (!entryToDelete) return
 
-            if (deleteAll) {
+            const isAuthor = await checkIfIsAuthor(
+               agoraUserId,
+               userEmail,
+               userUid,
+               entryToDelete
+            )
+
+            if (!isAuthor) {
                await validateLivestreamToken(
                   userEmail,
-                  context.middlewares.livestream,
+                  request.middlewares.livestream,
                   livestreamToken
                )
-
-               return await deleteAllEntries(livestreamId)
-            } else {
-               const entryToDelete =
-                  await livestreamsRepo.getLivestreamChatEntry(
-                     livestreamId,
-                     entryId
-                  )
-
-               if (!entryToDelete) return
-
-               const isAuthor = await checkIfIsAuthor(
-                  agoraUserId,
-                  userEmail,
-                  userUid,
-                  entryToDelete
-               )
-
-               if (!isAuthor) {
-                  await validateLivestreamToken(
-                     userEmail,
-                     context.middlewares.livestream,
-                     livestreamToken
-                  )
-               }
-
-               return await deleteSingleEntry(livestreamId, entryId)
             }
+
+            return await deleteSingleEntry(livestreamId, entryId)
          }
-      )
+      }
    )
+)
 
 const deleteAllEntries = async (livestreamId: string) => {
    return livestreamsRepo.deleteAllLivestreamChatEntries(livestreamId)

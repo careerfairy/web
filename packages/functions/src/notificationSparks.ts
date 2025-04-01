@@ -1,9 +1,9 @@
 import functions = require("firebase-functions")
 import { RemoveNotificationFromUserData } from "@careerfairy/shared-lib/sparks/sparks"
-import { RuntimeOptions } from "firebase-functions"
+import { onCall } from "firebase-functions/https"
+import { onSchedule } from "firebase-functions/scheduler"
 import { string } from "yup"
 import { firestore } from "./api/firestoreAdmin"
-import config from "./config"
 import { handleCreatePublicSparksNotifications } from "./lib/sparks/notifications/publicNotifications"
 import {
    handleCreateUsersSparksNotifications,
@@ -21,21 +21,23 @@ const removeNotificationFromUserValidator = {
 /**
  * Runtime settings
  */
-const runtimeSettings: RuntimeOptions = {
+const runtimeSettings: functions.GlobalOptions = {
    // we may load some data
-   memory: "1GB",
+   memory: "1GiB",
 }
 
 /**
  * Every day at 9 AM, check all user's sparksFeed and confirms if any of them needs to have an event sparks notification.
  */
-export const createSparksFeedEventNotifications = functions
-   .region(config.region)
-   .pubsub.schedule("0 9 * * *")
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+export const createSparksFeedEventNotifications = onSchedule(
+   {
+      ...runtimeSettings,
+      schedule: "0 9 * * *",
+      timeZone: "Europe/Zurich",
+   },
+   async () => {
       try {
-         return Promise.allSettled([
+         await Promise.allSettled([
             handleCreateUsersSparksNotifications(
                firestore,
                functions.logger.log
@@ -71,47 +73,44 @@ export const createSparksFeedEventNotifications = functions
             error
          )
       }
-   })
+   }
+)
 
 /**
  * To remove a single notification from user
  */
-export const removeAndSyncUserSparkNotification = functions
-   .region(config.region)
-   .runWith(runtimeSettings)
-   .https.onCall(
-      middlewares(
-         dataValidation({
-            ...removeNotificationFromUserValidator,
-         }),
-         async (data: RemoveNotificationFromUserData, context) => {
-            try {
-               const { userId, groupId } = data
-               return removeUserNotificationsAndSyncSparksNotifications(
-                  firestore,
-                  functions.logger.log,
-                  userId,
-                  groupId
-               )
-            } catch (error) {
-               logAndThrow(
-                  "Error during removing a single spark notification from a user",
-                  error,
-                  context,
-                  data
-               )
-            }
+export const removeAndSyncUserSparkNotification = onCall(
+   middlewares<RemoveNotificationFromUserData>(
+      dataValidation({
+         ...removeNotificationFromUserValidator,
+      }),
+      async (request) => {
+         try {
+            const { userId, groupId } = request.data
+            return removeUserNotificationsAndSyncSparksNotifications(
+               firestore,
+               functions.logger.log,
+               userId,
+               groupId
+            )
+         } catch (error) {
+            logAndThrow(
+               "Error during removing a single spark notification from a user",
+               error,
+               request.data
+            )
          }
-      )
+      }
    )
+)
 
 /**
  * To create Sparks event notifications to a single User
  */
-export const createUserSparksFeedEventNotifications = functions
-   .region(config.region)
-   .https.onCall(async (userId) => {
+export const createUserSparksFeedEventNotifications = onCall(
+   async (request) => {
       try {
+         const userId = request.data
          return handleCreateUsersSparksNotifications(
             firestore,
             functions.logger.log,
@@ -121,7 +120,8 @@ export const createUserSparksFeedEventNotifications = functions
          logAndThrow(
             "Error during the creation of a single User Sparks Feed event notifications",
             error,
-            userId
+            request.data
          )
       }
-   })
+   }
+)

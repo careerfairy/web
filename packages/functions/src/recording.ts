@@ -4,8 +4,10 @@ import {
    MAX_RECORDING_HOURS,
    S3_ROOT_PATH,
 } from "@careerfairy/shared-lib/livestreams/recordings"
+import { onDocumentUpdated } from "firebase-functions/firestore"
+import { onCall } from "firebase-functions/https"
+import { onSchedule } from "firebase-functions/scheduler"
 import AgoraClient from "./api/agora"
-import config from "./config"
 import {
    livestreamGetRecordingToken,
    livestreamGetSecureToken,
@@ -22,19 +24,19 @@ import functions = require("firebase-functions")
  * Starts when the live stream starts
  * Stops when the live stream ends
  */
-export const automaticallyRecordLivestream = functions
-   .region(config.region)
-   .firestore.document("livestreams/{livestreamId}")
-   .onUpdate(async (change, context) => {
-      const previousValue = change.before.data() as LivestreamEvent
-      const newValue = change.after.data() as LivestreamEvent
+export const automaticallyRecordLivestream = onDocumentUpdated(
+   "livestreams/{livestreamId}",
+   async (event) => {
+      const previousValue = event.data?.before?.data() as LivestreamEvent
+      const newValue = event.data?.after?.data() as LivestreamEvent
 
       await automaticallyRecord(
-         context.params.livestreamId,
+         event.params.livestreamId,
          previousValue,
          newValue
       )
-   })
+   }
+)
 
 /**
  * Automatically record a live stream breakout room
@@ -42,52 +44,46 @@ export const automaticallyRecordLivestream = functions
  * Starts when the breakout room starts/is opened
  * Stops when the breakout room is closed
  */
-export const automaticallyRecordLivestreamBreakoutRoom = functions
-   .region(config.region)
-   .firestore.document(
-      "livestreams/{livestreamId}/breakoutRooms/{breakoutRoomId}"
-   )
-   .onUpdate(async (change, context) => {
-      const previousValue = change.before.data() as LivestreamEvent
-      const newValue = change.after.data() as LivestreamEvent
+export const automaticallyRecordLivestreamBreakoutRoom = onDocumentUpdated(
+   "livestreams/{livestreamId}/breakoutRooms/{breakoutRoomId}",
+   async (event) => {
+      const previousValue = event.data?.before?.data() as LivestreamEvent
+      const newValue = event.data?.after?.data() as LivestreamEvent
 
       await automaticallyRecord(
-         context.params.livestreamId,
+         event.params.livestreamId,
          previousValue,
          newValue,
-         context.params.breakoutRoomId
+         event.params.breakoutRoomId
       )
-   })
+   }
+)
 
 /**
  * Manually start a recording
  *
  * Works for both live streams and breakout rooms
  */
-export const startRecordingLivestream = functions
-   .region(config.region)
-   .https.onCall(async (data) => {
-      functions.logger.info(
-         `Manually starting recording for stream: ${data.streamId}`,
-         { breakoutRoomId: data.breakoutRoomId }
-      )
-      await startRecording(data.streamId, data.token, data.breakoutRoomId)
-   })
+export const startRecordingLivestream = onCall(async ({ data }) => {
+   functions.logger.info(
+      `Manually starting recording for stream: ${data.streamId}`,
+      { breakoutRoomId: data.breakoutRoomId }
+   )
+   await startRecording(data.streamId, data.token, data.breakoutRoomId)
+})
 
 /**
  * Manually stop a recording
  *
  * Works for both live streams and breakout rooms
  */
-export const stopRecordingLivestream = functions
-   .region(config.region)
-   .https.onCall(async (data) => {
-      functions.logger.info(
-         `Manually stopping recording for stream: ${data.streamId}`,
-         { breakoutRoomId: data.breakoutRoomId }
-      )
-      await stopRecording(data.streamId, data.token, data.breakoutRoomId)
-   })
+export const stopRecordingLivestream = onCall(async ({ data }) => {
+   functions.logger.info(
+      `Manually stopping recording for stream: ${data.streamId}`,
+      { breakoutRoomId: data.breakoutRoomId }
+   )
+   await stopRecording(data.streamId, data.token, data.breakoutRoomId)
+})
 
 // Business Logic
 
@@ -329,11 +325,12 @@ const stopRecording = async (
 /**
  * Every 30 minutes, it searches for live streams that have started but have not finished after { MAX_RECORDING_HOURS }
  */
-export const checkForUnfinishedLivestreamsAndStopRecording = functions
-   .region(config.region)
-   .pubsub.schedule("every 30 minutes")
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+export const checkForUnfinishedLivestreamsAndStopRecording = onSchedule(
+   {
+      schedule: "every 30 minutes",
+      timeZone: "Europe/Zurich",
+   },
+   async () => {
       functions.logger.info("Checking for unfinished live streams")
       try {
          const updatedLivestreams = await updateUnfinishedLivestreams()
@@ -347,4 +344,5 @@ export const checkForUnfinishedLivestreamsAndStopRecording = functions
             e
          )
       }
-   })
+   }
+)

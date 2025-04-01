@@ -2,7 +2,6 @@ import functions = require("firebase-functions")
 import { SchemaOf, array, mixed, number, object, string } from "yup"
 
 import { sparkRepo, userRepo } from "./api/repositories"
-import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 
@@ -22,143 +21,134 @@ import {
    SparkSecondWatchedClient,
    SparkSecondsWatchedClientPayload,
 } from "@careerfairy/shared-lib/sparks/telemetry"
+import { CallableRequest, onCall } from "firebase-functions/https"
 import { dataValidation, userAuthExists } from "./middlewares/validations"
 import { getCountryCode } from "./util"
 
-export const getSparksFeed = functions
-   .region(config.region)
-   .runWith({
-      // Avoid cold starts, but costs ≈ CHF 5-10 per mont
+export const getSparksFeed = onCall(
+   {
       minInstances: 1,
-   })
-   .https.onCall(
-      middlewares(
-         dataValidation({
-            userId: string().trim().min(1).optional().nullable(),
-            groupId: string().trim().min(1).optional().nullable(),
-            creatorId: string().trim().min(1).optional().nullable(),
-            numberOfSparks: number().min(1).optional(),
-            contentTopicIds: array().of(string()).optional(),
-         }),
-         async (data: GetFeedData, context) => {
-            try {
-               const anonymousUserCountryCode = getCountryCode(context)
+   },
+   middlewares<GetFeedData>(
+      dataValidation({
+         userId: string().trim().min(1).optional().nullable(),
+         groupId: string().trim().min(1).optional().nullable(),
+         creatorId: string().trim().min(1).optional().nullable(),
+         numberOfSparks: number().min(1).optional(),
+         contentTopicIds: array().of(string()).optional(),
+      }),
+      async (request) => {
+         try {
+            const anonymousUserCountryCode = getCountryCode(request)
 
-               const anonymousUserCountry = getCountryOptionByCountryCode(
-                  anonymousUserCountryCode
-               )
+            const anonymousUserCountry = getCountryOptionByCountryCode(
+               anonymousUserCountryCode
+            )
 
-               if ("creatorId" in data && "groupId" in data) {
-                  if (data.creatorId && data.groupId) {
-                     return {
-                        sparks:
-                           await sparkRepo.getGroupSparksFeedWithoutCreator(
-                              data.groupId as string,
-                              data.creatorId,
-                              data.numberOfSparks
-                           ),
-                     }
-                  }
-               }
-
-               if ("creatorId" in data) {
-                  if (data.creatorId) {
-                     return {
-                        sparks: await sparkRepo.getCreatorSparksFeed(
-                           data.creatorId,
-                           data.numberOfSparks
-                        ),
-                        anonymousUserCountryCode,
-                     }
-                  }
-               }
-
-               if ("groupId" in data) {
-                  if (data.groupId) {
-                     return {
-                        sparks: await sparkRepo.getGroupSparksFeed(
-                           data.groupId,
-                           data.contentTopicIds,
-                           data.numberOfSparks
-                        ),
-                        anonymousUserCountryCode,
-                     }
-                  }
-               }
-
-               if ("userId" in data) {
-                  if (data.userId && !data.contentTopicIds?.length) {
-                     return {
-                        sparks: await sparkRepo.getUserSparksFeed(
-                           data.userId,
-                           data.numberOfSparks
-                        ),
-                     }
-                  }
-
+            if ("creatorId" in request.data && "groupId" in request.data) {
+               if (request.data.creatorId && request.data.groupId) {
                   return {
-                     sparks: await sparkRepo.getPublicSparksFeed(
-                        data.contentTopicIds,
-                        data.numberOfSparks,
-                        anonymousUserCountry
+                     sparks: await sparkRepo.getGroupSparksFeedWithoutCreator(
+                        request.data.groupId as string,
+                        request.data.creatorId,
+                        request.data.numberOfSparks
+                     ),
+                  }
+               }
+            }
+
+            if ("creatorId" in request.data) {
+               if (request.data.creatorId) {
+                  return {
+                     sparks: await sparkRepo.getCreatorSparksFeed(
+                        request.data.creatorId,
+                        request.data.numberOfSparks
                      ),
                      anonymousUserCountryCode,
                   }
                }
-
-               throw new functions.https.HttpsError(
-                  "invalid-argument",
-                  "No userId or groupId provided"
-               )
-            } catch (error) {
-               functions.logger.error("Error in generating user feed:", error)
-               logAndThrow("Error in generating user feed", {
-                  data,
-                  error,
-                  context,
-               })
             }
-         }
-      )
-   )
 
-export const markSparkAsSeenByUser = functions
-   .region(config.region)
-   .https.onCall(
-      middlewares(
-         dataValidation({
-            sparkId: string().required(),
-         }),
-         userAuthExists(),
-         async (
-            data: {
-               sparkId: string
-            },
-            context
-         ) => {
-            try {
-               const userEmail = context.auth.token.email
-               const sparkId = data.sparkId
-
-               await sparkRepo.markSparkAsSeenByUser(userEmail, sparkId)
-
-               await sparkRepo.removeSparkFromUserFeed(userEmail, sparkId)
-
-               await sparkRepo.replenishUserFeed(userEmail)
-
-               functions.logger.info(
-                  `Marked spark ${sparkId} as seen by user ${userEmail}`
-               )
-            } catch (error) {
-               logAndThrow("Error in marking spark as seen by user", {
-                  data,
-                  error,
-                  context,
-               })
+            if ("groupId" in request.data) {
+               if (request.data.groupId) {
+                  return {
+                     sparks: await sparkRepo.getGroupSparksFeed(
+                        request.data.groupId,
+                        request.data.contentTopicIds,
+                        request.data.numberOfSparks
+                     ),
+                     anonymousUserCountryCode,
+                  }
+               }
             }
+
+            if ("userId" in request.data) {
+               if (
+                  request.data.userId &&
+                  !request.data.contentTopicIds?.length
+               ) {
+                  return {
+                     sparks: await sparkRepo.getUserSparksFeed(
+                        request.data.userId,
+                        request.data.numberOfSparks
+                     ),
+                  }
+               }
+
+               return {
+                  sparks: await sparkRepo.getPublicSparksFeed(
+                     request.data.contentTopicIds,
+                     request.data.numberOfSparks,
+                     anonymousUserCountry
+                  ),
+                  anonymousUserCountryCode,
+               }
+            }
+
+            throw new functions.https.HttpsError(
+               "invalid-argument",
+               "No userId or groupId provided"
+            )
+         } catch (error) {
+            functions.logger.error("Error in generating user feed:", error)
+            logAndThrow("Error in generating user feed", {
+               error,
+               request,
+            })
          }
-      )
+      }
    )
+)
+
+export const markSparkAsSeenByUser = onCall(
+   middlewares<{ sparkId: string }>(
+      dataValidation({
+         sparkId: string().required(),
+      }),
+      userAuthExists(),
+      async (request) => {
+         try {
+            const userEmail = request.auth.token.email
+            const sparkId = request.data.sparkId
+
+            await sparkRepo.markSparkAsSeenByUser(userEmail, sparkId)
+
+            await sparkRepo.removeSparkFromUserFeed(userEmail, sparkId)
+
+            await sparkRepo.replenishUserFeed(userEmail)
+
+            functions.logger.info(
+               `Marked spark ${sparkId} as seen by user ${userEmail}`
+            )
+         } catch (error) {
+            logAndThrow("Error in marking spark as seen by user", {
+               error,
+               request,
+            })
+         }
+      }
+   )
+)
 
 const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
    object().shape({
@@ -191,24 +181,23 @@ const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
       ),
    })
 
-export const trackSparkEvents = functions.region(config.region).https.onCall(
-   middlewares(
+export const trackSparkEvents = onCall(
+   middlewares<SparkClientEventsPayload>(
       dataValidation(sparkEventClientSchema),
-      async (data: SparkClientEventsPayload, context) => {
+      async (request) => {
          try {
-            const sparkEvents = data.events.map((sparkEvent) =>
+            const sparkEvents = request.data.events.map((sparkEvent) =>
                mapClientPayloadToServerPayload<SparkEventClient, SparkEvent>(
                   sparkEvent,
-                  context
+                  request
                )
             )
 
             return sparkRepo.trackSparkEvents(sparkEvents)
          } catch (error) {
             logAndThrow("Error in tracking spark event", {
-               data,
                error,
-               context,
+               request,
             })
          }
       }
@@ -235,31 +224,28 @@ const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClientPayload
       ),
    })
 
-export const trackSparkSecondsWatched = functions
-   .region(config.region)
-   .https.onCall(
-      middlewares(
-         dataValidation(sparkSecondsWatchedClientSchema),
-         async (data: SparkSecondsWatchedClientPayload, context) => {
-            try {
-               const sparkSecondsWatched = data.events.map((sparkEvent) =>
-                  mapClientPayloadToServerPayload<
-                     SparkSecondWatchedClient,
-                     SparkSecondWatched
-                  >(sparkEvent, context)
-               )
+export const trackSparkSecondsWatched = onCall(
+   middlewares<SparkSecondsWatchedClientPayload>(
+      dataValidation(sparkSecondsWatchedClientSchema),
+      async (request) => {
+         try {
+            const sparkSecondsWatched = request.data.events.map((sparkEvent) =>
+               mapClientPayloadToServerPayload<
+                  SparkSecondWatchedClient,
+                  SparkSecondWatched
+               >(sparkEvent, request)
+            )
 
-               return sparkRepo.trackSparkSecondsWatched(sparkSecondsWatched)
-            } catch (error) {
-               logAndThrow("Error in tracking spark seconds watched", {
-                  data,
-                  error,
-                  context,
-               })
-            }
+            return sparkRepo.trackSparkSecondsWatched(sparkSecondsWatched)
+         } catch (error) {
+            logAndThrow("Error in tracking spark seconds watched", {
+               error,
+               request,
+            })
          }
-      )
+      }
    )
+)
 
 export const getUserWatchedSparks = async (
    userEmail: string,
@@ -296,7 +282,7 @@ const getValidEventTimestamp = (stringTimestamp: string): Date => {
 /**
  * Maps client payload to server payload by adding the userId, timestamp, and countryCode fields from the server's callable context.
  * @param clientPayload - The client payload.
- * @param context - The callable context.
+ * @param request - The callable context.
  * @returns  The server payload.
  */
 const mapClientPayloadToServerPayload = <
@@ -310,10 +296,10 @@ const mapClientPayloadToServerPayload = <
    }
 >(
    { stringTimestamp, ...rest }: TClientPayload,
-   context: functions.https.CallableContext
+   request: CallableRequest
 ): TServerPayload => {
-   const countryCode = getCountryCode(context)
-   const userId = context.auth?.uid ?? null
+   const countryCode = getCountryCode(request)
+   const userId = request.auth?.uid ?? null
 
    return {
       ...rest,
