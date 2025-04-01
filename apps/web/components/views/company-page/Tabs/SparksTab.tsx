@@ -66,23 +66,36 @@ const SparksGrid = ({ groupId }: SparksGridProps) => {
    )
 
    return (
-      <Box alignItems="center" justifyContent="center">
-         <Grid container spacing={2}>
+      <Box
+         sx={{
+            width: "100%",
+            margin: "0 auto",
+            maxWidth: "100%",
+         }}
+      >
+         <Grid
+            container
+            spacing={2}
+            sx={{
+               display: "grid",
+               gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+               gap: 2,
+               width: "100%",
+               margin: "0 auto",
+               padding: 0,
+            }}
+         >
             {groupSparks?.map((spark) => (
-               <Grid item key={spark.id} xs={6} sm={4} md={3} lg={2} xl={2}>
-                  <Box
-                     component={() => (
-                        <SparkPreviewCard
-                           key={spark.id}
-                           spark={spark}
-                           questionLimitLines={true}
-                           onClick={handleSparksClicked}
-                           muted
-                           type="gallery"
-                        />
-                     )}
+               <Box key={spark.id} sx={{ width: "100%" }}>
+                  <SparkPreviewCard
+                     key={spark.id}
+                     spark={spark}
+                     questionLimitLines={true}
+                     onClick={handleSparksClicked}
+                     muted
+                     type="gallery"
                   />
-               </Grid>
+               </Box>
             ))}
          </Grid>
       </Box>

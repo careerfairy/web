@@ -389,12 +389,14 @@ const CompanyPageOverview = ({
             borderRadius={isMobile ? "12px" : "0"}
          >
             {editMode ? <ProgressBanner /> : null}
-            <Box
-               mb={{ xs: 1, md: 2 }}
-               sx={{ borderRadius: isMobile ? "12px 12px 0 0" : "12px" }}
-            >
-               <Header />
-            </Box>
+            <Container disableGutters maxWidth="xl">
+               <Box
+                  mb={{ xs: 1, md: 2 }}
+                  sx={{ borderRadius: isMobile ? "12px 12px 0 0" : "12px" }}
+               >
+                  <Header />
+               </Box>
+            </Container>
             <Container disableGutters maxWidth="xl">
                <Stack
                   direction={isMobile ? "column" : "row"}
@@ -548,7 +550,9 @@ const CompanyPageOverview = ({
                   ) : null}
                </Stack>
             </Container>
-            <NewsletterSection />
+            <Container disableGutters maxWidth="xl">
+               <NewsletterSection />
+            </Container>
          </Box>
       </CompanyPageContext.Provider>
    )
