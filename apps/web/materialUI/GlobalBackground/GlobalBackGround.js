@@ -65,12 +65,17 @@ const styles = {
       isOnDialog = false,
       isSmallBackground = false,
       bgColor = "",
+      backgroundUrl = undefined,
    }) => ({
       height: "100%",
       background: (theme) =>
          bgColor
-            ? `url(${pillsBackgroundTransparent}) top left no-repeat, ${bgColor}`
-            : `url(${alternateStudentBackground}) top left no-repeat, ${theme.palette.common.white}`,
+            ? `url(${
+                 backgroundUrl || pillsBackgroundTransparent
+              }) top left no-repeat, ${bgColor}`
+            : `url(${
+                 backgroundUrl || alternateStudentBackground
+              }) top left no-repeat, ${theme.palette.common.white}`,
       backgroundSize: `auto ${
          isOnDialog ? "60vh" : isSmallBackground ? "40vh" : "120vh"
       }, auto 100vh !important`,
@@ -107,6 +112,7 @@ export const PaperBackground = ({ ...props }) => {
 export const PillsBackground = ({
    isSmallBackground = undefined,
    bgColor = "",
+   backgroundUrl = undefined,
    ...props
 }) => {
    return (
@@ -116,6 +122,7 @@ export const PillsBackground = ({
                isOnDialog: props?.isOnDialog,
                isSmallBackground: isSmallBackground,
                bgColor: bgColor,
+               backgroundUrl: backgroundUrl,
             }),
             props?.styles,
          ]}

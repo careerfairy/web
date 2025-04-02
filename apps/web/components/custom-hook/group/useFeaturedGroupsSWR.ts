@@ -60,6 +60,7 @@ export const useFeaturedGroupsSWR = (
       },
       {
          ...reducedRemoteCallsOptions,
+         fallbackData: [],
          onError: (error, key) => {
             errorLogAndNotify(error, {
                key,

@@ -5,7 +5,7 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import SparkPreviewCard from "./spark-card/SparkPreviewCard"
 
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { useAutoPlaySparks } from "components/custom-hook/spark/useAutoPlaySparks"
+import { useAutoPlayCarousel } from "components/custom-hook/embla-carousel/useAutoPlayCarousel"
 import { ReactNode } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
@@ -23,20 +23,24 @@ const styles = sxStyles({
 
 type SparksCarouselProps = {
    header?: ReactNode
+   seeAll?: ReactNode
    handleSparksClicked?: (spark: Spark) => void
    containerSx?: SxProps<Theme>
    headerSx?: SxProps<Theme>
    sparks: Spark[]
    disableClick?: boolean
+   disableArrows?: boolean
 }
 
 export const SparksCarousel = ({
    header,
+   seeAll,
    sparks,
    handleSparksClicked,
    containerSx,
    headerSx,
    disableClick = false,
+   disableArrows = false,
 }: SparksCarouselProps) => {
    const [emblaRef, emblaApi] = useEmblaCarousel(
       {
@@ -46,7 +50,7 @@ export const SparksCarousel = ({
       [WheelGesturesPlugin()]
    )
 
-   const { shouldDisableAutoPlay, moveToNextSlide, ref } = useAutoPlaySparks(
+   const { shouldDisableAutoPlay, moveToNextSlide, ref } = useAutoPlayCarousel(
       sparks.length,
       emblaApi
    )
@@ -61,6 +65,8 @@ export const SparksCarousel = ({
             }}
             viewportSx={styles.viewport}
             headerSx={headerSx}
+            seeAll={seeAll}
+            disableArrows={disableArrows}
          >
             {sparks.map((spark, index) => (
                <SparkPreviewCard

@@ -31,7 +31,10 @@ export interface UserData extends Identifiable {
       questions?: UserReadableGroupQuestionsWithAnswerMap
    }
    badges?: string[]
-   groupIds: string[]
+   /**
+    * @deprecated
+    */
+   groupIds?: string[]
    /**
     * @deprecated
     * We have to migrate off expo-push-notifications and use the new customer.io push notifications
@@ -54,6 +57,12 @@ export interface UserData extends Identifiable {
    talentPools?: string[]
    validationPin: number
    interestsIds?: string[]
+
+   /**
+    * Timestamp when the user's email was verified
+    * Used to trigger CustomerIO sync
+    */
+   emailVerified?: boolean
 
    /**
     * Content Tag IDs

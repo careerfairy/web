@@ -1,6 +1,6 @@
+import Box, { BoxProps } from "@mui/material/Box"
 import DOMPurify from "isomorphic-dompurify"
 import { FC, useMemo } from "react"
-import Box, { BoxProps } from "@mui/material/Box"
 
 type Props = Omit<BoxProps, "dangerouslySetInnerHTML"> & {
    htmlString: string

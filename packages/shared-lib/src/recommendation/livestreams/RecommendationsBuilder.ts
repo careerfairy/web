@@ -11,10 +11,16 @@ export class RecommendationsBuilder {
       this.results = this.results.concat(livestreams)
    }
 
-   public get(): RankedLivestreamEvent[] {
+   public get(
+      applyCustomPoints?: (rankedLivestream: RankedLivestreamEvent) => void
+   ): RankedLivestreamEvent[] {
       const uniqueEvents = removeDuplicateDocuments(
          this.results.filter(Boolean).flat()
       )
+
+      if (applyCustomPoints) {
+         uniqueEvents.forEach(applyCustomPoints)
+      }
 
       // return the list already sorted
       const rankedLivestreams = sortRankedByPoints<RankedLivestreamEvent>(

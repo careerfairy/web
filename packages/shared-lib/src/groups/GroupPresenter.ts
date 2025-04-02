@@ -6,6 +6,7 @@ import { UserData } from "../users"
 import { IMAGE_CONSTANTS } from "../utils/image"
 import { GroupATSAccount } from "./GroupATSAccount"
 import {
+   FeaturedGroup,
    Group,
    GroupOption,
    GroupPhoto,
@@ -80,7 +81,8 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
          type: GroupPlan["type"]
          expiresAt: Date | null
          startedAt: Date | null
-      } | null
+      } | null,
+      public readonly featured: FeaturedGroup
    ) {}
 
    setFeatureFlags(featureFlags: FeatureFlagsState): void {
@@ -116,7 +118,15 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
          group.logo || null,
          group.banner || null,
          getPlanConstants(group.plan?.type),
-         createPlanObject(group.plan)
+         createPlanObject(group.plan),
+         group.featured
+      )
+   }
+
+   isFeaturedGroup(): boolean {
+      return Boolean(
+         this.featured?.targetAudience?.length &&
+            this.featured?.targetCountries?.length
       )
    }
 

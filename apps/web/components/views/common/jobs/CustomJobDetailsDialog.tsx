@@ -8,7 +8,6 @@ import { CloseOutlined } from "@mui/icons-material"
 import {
    Box,
    Button,
-   Dialog,
    DialogActions,
    DialogContent,
    IconButton,
@@ -18,7 +17,6 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJob from "components/custom-hook/custom-job/useCustomJob"
 import useGroupsByIds from "components/custom-hook/useGroupsByIds"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
@@ -26,7 +24,7 @@ import { ProfileRemoveCustomJobConfirmation } from "components/views/jobs/compon
 import CustomJobDetailsSkeleton from "components/views/jobs/components/custom-jobs/skeletons/CustomJobDetailsSkeleton"
 import { Fragment, ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
-import { SlideUpTransition } from "../transitions"
+import { ResponsiveDialogLayout } from "../ResponsiveDialog"
 import {
    CustomJobDetailsProvider,
    useCustomJobDetailsDialog,
@@ -65,23 +63,14 @@ type Props = {
 }
 
 const CustomJobDetailsDialog = (props: Props) => {
-   const isMobile = useIsMobile()
+   const handleClose = () => {
+      props.onClose?.()
+   }
 
    return (
-      <Dialog
-         maxWidth={"md"}
-         scroll="paper"
-         fullWidth
-         fullScreen={isMobile}
-         TransitionComponent={SlideUpTransition}
-         open={props.isOpen}
-         onClose={props.onClose}
-         PaperProps={{
-            sx: props.paperPropsSx,
-         }}
-      >
+      <ResponsiveDialogLayout open={props.isOpen} handleClose={handleClose}>
          {props.customJobId ? <DialogDetails {...props} /> : null}
-      </Dialog>
+      </ResponsiveDialogLayout>
    )
 }
 

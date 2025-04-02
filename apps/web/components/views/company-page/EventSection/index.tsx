@@ -1,19 +1,26 @@
-import { Box, Link, Stack, Typography } from "@mui/material"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Box, Button, Link, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { EmptyItemsView } from "components/views/common/EmptyItemsView"
+import FollowButton from "components/views/common/company/FollowButton"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
+import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { FC, useCallback, useMemo, useState } from "react"
-import { useMountedState } from "react-use"
-import { SectionAnchor, TabValue, useCompanyPage } from "../"
+import { FC, useCallback, useState } from "react"
+import { Plus, Radio } from "react-feather"
+import { TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
-
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { SeeAllLink } from "../Overview/SeeAllLink"
+import {
+   EMPTY_UPCOMING_EVENTS_DESCRIPTION,
+   EMPTY_UPCOMING_EVENTS_TITLE,
+} from "../Tabs/EventsTab"
 import StayUpToDateBanner from "./StayUpToDateBanner"
 
 const styles = sxStyles({
@@ -22,49 +29,23 @@ const styles = sxStyles({
       minHeight: (theme) => theme.spacing(50),
    },
    eventsWrapper: {
-      mt: 2,
+      mt: 1,
       mb: 2,
-   },
-   titleSection: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-   },
-   addEvent: {
-      borderRadius: "10px",
-      height: (theme) => theme.spacing(40),
-      width: (theme) => theme.spacing(35),
-      border: "dashed",
-      borderColor: (theme) => theme.palette.grey.A400,
-      fontSize: "16px",
-
-      "&:hover": {
-         border: "dashed",
-      },
-   },
-   eventTitle: {
-      fontFamily: "Poppins",
-      fontStyle: "normal",
-      fontWeight: "600",
-      color: "black",
-      lineHeight: "27px",
    },
    eventsHeader: {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
       pr: 0,
-      pb: 2,
+      pb: 1,
    },
    seeMoreText: {
       textDecoration: "underline",
-      color: "#2ABAA5",
-   },
-   description: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingTop: 2,
+      fontSize: "14px",
+      mr: 1,
+      color: "neutral.600",
+      fontWeight: "400",
+      cursor: "pointer",
    },
    titleLink: {
       color: "#000",
@@ -78,18 +59,43 @@ const styles = sxStyles({
    stayUpWrapper: {
       pb: 1,
    },
+   createStreamButton: {
+      mt: 2,
+      backgroundColor: (theme) => theme.brand.white[200],
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
+      borderRadius: "16px",
+      width: "360px",
+      height: "322px",
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.white[400],
+      },
+   },
+   createStreamIcon: {
+      color: (theme) => theme.palette.secondary.main,
+      width: "44px !important",
+      height: "44px !important",
+   },
 })
+
+const SectionTitle = ({ title }: { title: string }) => {
+   return (
+      <Typography variant="brandedH3" fontWeight={"600"} color="black">
+         {title}
+      </Typography>
+   )
+}
 
 const EventSection = () => {
    const {
       group,
       upcomingLivestreams,
       pastLivestreams,
-      sectionRefs: { eventSectionRef },
       editMode,
+      getCompanyPageTabLink,
+      tabMode,
+      setActiveTab,
    } = useCompanyPage()
-   const query = `companyId=${group.id}`
-   const isMounted = useMountedState()
+
    const isMobile = useIsMobile()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
@@ -104,69 +110,89 @@ const EventSection = () => {
       [handleOpenDialog]
    )
 
-   const upcomingEventsDescription = useMemo(() => {
-      if (editMode) {
-         return "Below are your published live streams, these will be shown on your company page."
-      }
-      return "Watch live streams. Discover new career ideas, interesting jobs, internships and programmes for students. Get hired."
-   }, [editMode])
-   const pastEventsDescription = useMemo(() => {
-      if (editMode) {
-         return "Here are the recordings of your previous live streams, which will be featured on your company page."
-      }
-      return `Have you missed a live stream from ${group.universityName}? Don't worry, you can re-watch them all here.`
-   }, [editMode, group.universityName])
+   const upcomingEventsHref = getCompanyPageTabLink(TabValue.livesStreams)
+   const pastEventsHref = getCompanyPageTabLink(TabValue.recordings)
 
    const eventsCarouselStyling: EventsCarouselStyling = {
-      compact: isMobile,
-      seeMoreSx: styles.seeMoreText,
+      mainWrapperBoxSx: {
+         mt: 2,
+         mr: "-16px !important",
+         ml: "-16px !important",
+      },
       showArrows: isMobile,
-      headerAsLink: isMobile,
-      title: styles.eventTitle,
-      eventsHeader: styles.eventsHeader,
-      padding: false,
+      seeMoreSx: styles.seeMoreText,
+      headerAsLink: false,
    }
 
-   return isMounted() ? (
+   return (
       <Box sx={styles.root}>
-         <SectionAnchor
-            ref={eventSectionRef}
-            tabValue={TabValue.livesStreams}
-         />
-         <Stack spacing={4} sx={isMobile ? styles.eventsWrapper : null}>
-            <ConditionalWrapper
-               condition={Boolean(upcomingLivestreams?.length)}
-               fallback={
-                  <StayUpToDateComponent
-                     title="Next Live Streams"
-                     description={upcomingEventsDescription}
-                     seeMoreLink={`/next-livestreams?${query}`}
-                     titleAsLink={isMobile}
-                  />
-               }
-            >
+         <Stack spacing={"8px"} sx={isMobile ? styles.eventsWrapper : null}>
+            {upcomingLivestreams?.length ? (
                <EventsPreviewCarousel
-                  title="Next Live Streams"
-                  events={upcomingLivestreams ?? []}
-                  eventDescription={upcomingEventsDescription}
+                  title={<SectionTitle title="Live streams" />}
+                  header={
+                     isMobile ? (
+                        <EventSectionHeader
+                           title="Live streams"
+                           href={upcomingEventsHref}
+                        />
+                     ) : null
+                  }
+                  events={upcomingLivestreams}
                   type={EventsTypes.COMING_UP}
-                  seeMoreLink={`/next-livestreams?${query}`}
+                  seeMoreLink={upcomingEventsHref}
+                  handleSeeMoreClick={
+                     tabMode
+                        ? () => setActiveTab(TabValue.livesStreams)
+                        : undefined
+                  }
                   styling={eventsCarouselStyling}
                   hideChipLabels={editMode}
                   showManageButton={editMode}
                   handleOpenEvent={handleOpenEvent}
                />
-            </ConditionalWrapper>
-            <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
+            ) : editMode ? (
+               <CreateStreamButton />
+            ) : (
+               <Stack spacing={2}>
+                  <SectionTitle title="Live streams" />
+                  <EmptyItemsView
+                     title={EMPTY_UPCOMING_EVENTS_TITLE}
+                     description={EMPTY_UPCOMING_EVENTS_DESCRIPTION}
+                     icon={<Radio width={"44px"} height={"44px"} />}
+                  >
+                     <FollowButton
+                        sx={{ fontSize: "14px", mt: "18px" }}
+                        group={group}
+                        interactionSource={InteractionSources.Company_Page}
+                        showStartIcon
+                     />
+                  </EmptyItemsView>
+               </Stack>
+            )}
+            {pastLivestreams?.length ? (
                <EventsPreviewCarousel
-                  title="Past Live Streams"
+                  title={<SectionTitle title="Recordings" />}
+                  header={
+                     isMobile ? (
+                        <EventSectionHeader
+                           title="Recordings"
+                           href={pastEventsHref}
+                        />
+                     ) : null
+                  }
                   events={pastLivestreams ?? []}
-                  eventDescription={pastEventsDescription}
                   type={EventsTypes.PAST_EVENTS}
-                  seeMoreLink={`/past-livestreams?${query}`}
+                  seeMoreLink={pastEventsHref}
+                  handleSeeMoreClick={
+                     tabMode
+                        ? () => setActiveTab(TabValue.recordings)
+                        : undefined
+                  }
                   styling={eventsCarouselStyling}
+                  preventPaddingSlide
                />
-            </ConditionalWrapper>
+            ) : null}
          </Stack>
          {isDialogOpen ? (
             <StreamCreationProvider>
@@ -184,11 +210,33 @@ const EventSection = () => {
             </StreamCreationProvider>
          ) : null}
       </Box>
-   ) : null
+   )
+}
+
+type EventSectionHeaderProps = {
+   title: string
+   href?: string
+}
+const EventSectionHeader = ({ title, href }: EventSectionHeaderProps) => {
+   return (
+      <Stack
+         sx={styles.eventsHeader}
+         direction="row"
+         justifyContent="space-between"
+         alignItems="center"
+      >
+         <Typography variant="brandedH3" fontWeight={"600"} color="black">
+            {title}
+         </Typography>
+         <Box mr={2}>
+            <SeeAllLink href={href} />
+         </Box>
+      </Stack>
+   )
 }
 type StayUpToDateProps = {
    title: string
-   description: string
+   description?: string
    titleAsLink?: boolean
    seeMoreLink?: string
 }
@@ -199,7 +247,6 @@ type StayUpToDateProps = {
  */
 export const StayUpToDateComponent: FC<StayUpToDateProps> = ({
    title,
-   description,
    titleAsLink,
    seeMoreLink,
 }) => {
@@ -207,8 +254,8 @@ export const StayUpToDateComponent: FC<StayUpToDateProps> = ({
 
    const titleComponent = (
       <Typography
-         variant={"h4"}
-         sx={[styles.eventTitle, showTitleAsLink ? styles.underlined : null]}
+         variant={"brandedH3"}
+         sx={showTitleAsLink ? styles.underlined : null}
          fontWeight={"600"}
          color="black"
       >
@@ -226,23 +273,31 @@ export const StayUpToDateComponent: FC<StayUpToDateProps> = ({
                titleComponent
             )}
          </Box>
-
-         {(!showTitleAsLink && (
-            <Stack mb={2}>
-               <Box sx={styles.description}>
-                  <Typography
-                     variant="h6"
-                     fontWeight={"400"}
-                     color="textSecondary"
-                  >
-                     {description}
-                  </Typography>
-               </Box>
-            </Stack>
-         )) ||
-            null}
          <StayUpToDateBanner />
       </Box>
+   )
+}
+
+const CreateStreamButton = () => {
+   const { createDraftLivestream } = useLivestreamRouting()
+
+   return (
+      <Stack>
+         <SectionTitle title="Live streams" />
+         <Button
+            variant="contained"
+            color="primary"
+            onClick={createDraftLivestream}
+            sx={styles.createStreamButton}
+         >
+            <Stack alignItems="center">
+               <Box component={Plus} sx={styles.createStreamIcon} />
+               <Typography variant="medium" color={"neutral.800"}>
+                  Create new live stream
+               </Typography>
+            </Stack>
+         </Button>
+      </Stack>
    )
 }
 export const MAX_UPCOMING_STREAMS = 10

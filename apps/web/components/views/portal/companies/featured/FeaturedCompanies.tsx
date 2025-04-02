@@ -2,7 +2,6 @@ import { FieldOfStudyCategoryMap } from "@careerfairy/shared-lib/fieldOfStudy"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Divider, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useUserCountryCode from "components/custom-hook/useUserCountryCode"
@@ -56,11 +55,7 @@ const carouselEmblaOptions: EmblaOptionsType = {
 }
 
 export const FeaturedCompanies = () => {
-   return (
-      <SuspenseWithBoundary fallback={<></>}>
-         <FeaturedCompaniesView />
-      </SuspenseWithBoundary>
-   )
+   return <FeaturedCompaniesView />
 }
 
 export const FeaturedCompaniesView = () => {

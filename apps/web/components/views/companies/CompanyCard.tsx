@@ -1,36 +1,42 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { InteractionSourcesType } from "@careerfairy/shared-lib/groups/telemetry"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import {
    Box,
+   Button,
    Card,
    CardActionArea,
    CardContent,
    CardMedia,
+   Chip,
    Typography,
+   useTheme,
 } from "@mui/material"
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
+import useCountGroupUpcomingLivestreams from "components/custom-hook/live-stream/useCountGroupUpcomingLivestreams"
+import useIsUserFeaturedCompany from "components/custom-hook/user/useIsUserFeaturedCompany"
 import Image from "next/legacy/image"
 import { FC } from "react"
+import { Briefcase, Star } from "react-feather"
 import { useInView } from "react-intersection-observer"
 import { CompanySearchResult } from "types/algolia"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { sxStyles } from "../../../types/commonTypes"
-import { SuspenseWithBoundary } from "../../ErrorBoundary"
 import {
    getMaxLineStyles,
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions"
+import Link from "../common/Link"
+import FollowButton from "../common/company/FollowButton"
 import {
    CompanyCountryTag,
    CompanyIndustryTag,
    CompanySizeTag,
 } from "../common/company/company-tags"
-import FollowButton from "../common/company/FollowButton"
 import PublicSparksBadge from "../common/icons/PublicSparksBadge"
-import Link from "../common/Link"
 import CircularLogo from "../common/logos/CircularLogo"
-import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
+import { getCompanySizeLabel } from "../company-page/Header"
 
 const LOGO_SIZE = 75
 
@@ -48,6 +54,12 @@ const styles = sxStyles({
             transform: "scale(1.1)",
          },
       },
+      height: "100%",
+      minHeight: "312px",
+      border: (theme) => `1px solid ${theme.palette.secondary[50]}`,
+      ".MuiCardActionArea-focusHighlight": {
+         background: "transparent",
+      },
    },
    actionArea: {
       color: "text.primary",
@@ -58,13 +70,18 @@ const styles = sxStyles({
    media: {
       height: 120,
       position: "relative",
+      "& a": {
+         zIndex: 2,
+         cursor: "pointer",
+      },
    },
    content: {
-      px: 3,
+      px: 2,
       flex: 1,
       display: "flex",
       position: "relative",
       pt: 5,
+      pb: "16px !important",
    },
    companyName: {
       ...getMaxLineStyles(1),
@@ -80,29 +97,66 @@ const styles = sxStyles({
    companyLogoWrapper: {
       position: "absolute",
       top: -LOGO_SIZE / 2,
-      zIndex: 2,
    },
    followButtonWrapper: {
       position: "absolute",
       top: "-15px",
       right: (theme) => theme.spacing(3),
-      background: (theme) => theme.palette.background.paper,
-      borderRadius: 1.2,
    },
    followButton: {
-      borderRadius: 1,
-      py: 0.5,
-      px: 2.25,
+      borderRadius: "18px",
       boxShadow: "none",
       textTransform: "none",
-      zIndex: 1,
+      zIndex: 2,
       textDecoration: "none !important",
-      fontWeight: "bold",
+      fontWeight: 400,
    },
    badge: {
-      height: 32,
-      width: 32,
+      height: 24,
+      width: 24,
       ml: 1,
+   },
+   companyTag: {
+      color: (theme) => theme.palette.neutral[900],
+      fontSize: "16px !important",
+   },
+   hiringChip: {
+      color: (theme) => theme.palette.neutral[700],
+   },
+   featuredChip: {
+      color: (theme) => theme.palette.warning[600],
+      border: (theme) => `1px solid ${theme.palette.warning[600]}`,
+   },
+   tag: {
+      padding: "4px 8px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: "4px",
+      height: "unset",
+      backgroundColor: (theme) => theme.brand.white[200],
+      "& .MuiChip-label, p": {
+         fontSize: "12px",
+         fontWeight: 400,
+         lineHeight: "16px",
+         padding: 0,
+      },
+      "& .MuiChip-icon": {
+         margin: 0,
+         width: "14px",
+         height: "14px",
+      },
+      zIndex: 1,
+   },
+   upcomingLivestreamButton: {
+      background: (theme) => theme.brand.info[50],
+      p: "8px 2px",
+      borderRadius: "8px",
+      "&:hover": {
+         background: (theme) => theme.brand.info[100],
+      },
+      zIndex: 1,
+      width: "100%",
    },
 })
 
@@ -116,117 +170,160 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
       triggerOnce: true, // Only fetch the next livestreams when the card is in view
    })
 
-   return (
-      <Card ref={ref} sx={[styles.root]}>
-         <CardMedia sx={styles.media} title={company.universityName}>
-            <Image
-               src={getResizedUrl(company.bannerImageUrl, "md")}
-               className="illustration"
-               layout="fill"
-               alt={company.universityName}
-               objectFit="cover"
-            />
-            <LinkToCompanyPage
-               companyName={company.universityName}
-               interactionSource={interactionSource}
-            />
-         </CardMedia>
-         <CardContent sx={styles.content}>
-            <Box sx={styles.companyLogoWrapper}>
-               <CircularLogo
-                  src={company.logoUrl}
-                  alt={company.universityName}
-                  size={LOGO_SIZE}
-               />
-            </Box>
-            <Box sx={styles.followButtonWrapper}>
-               {inView ? ( // Only render the follow button when the card is in view, since it does a request to the server
-                  <FollowButton
-                     group={company}
-                     size={"small"}
-                     sx={styles.followButton}
-                     startIcon={null}
-                     interactionSource={interactionSource}
-                  />
-               ) : (
-                  <Skeleton variant="rectangular" width={100} height={30} />
-               )}
-            </Box>
-            <Stack flex={1} justifyContent="space-between" spacing={2}>
-               <Stack flexDirection={"row"} alignItems={"center"}>
-                  <Typography
-                     sx={styles.companyName}
-                     variant="h6"
-                     fontWeight={600}
-                     whiteSpace="pre-line"
-                     component="h2"
-                  >
-                     {company.universityName}
-                  </Typography>
+   const theme = useTheme()
 
-                  {company.publicSparks ? (
-                     <PublicSparksBadge sx={styles.badge} />
+   const isHiringNow = company?.hasJobs
+   const isFeaturedCompany = useIsUserFeaturedCompany(company)
+
+   const { count: upcomingLivestreamCount } = useCountGroupUpcomingLivestreams(
+      company.id
+   )
+
+   const hasUpcomingLivestreams = upcomingLivestreamCount > 0
+
+   return (
+      <CardActionArea
+         sx={{
+            color: theme.palette.action.active,
+            borderRadius: 2,
+         }}
+      >
+         <Card ref={ref} sx={[styles.root]}>
+            <CardMedia sx={styles.media} title={company.universityName}>
+               <Stack direction={"row"} ml={2} mt={2} spacing={1}>
+                  {isFeaturedCompany ? (
+                     <Chip
+                        key={"featured-company-chip"}
+                        icon={
+                           <Star
+                              color={theme.palette.warning[600]}
+                              width={14}
+                              height={14}
+                              fill={theme.palette.warning[600]}
+                           />
+                        }
+                        sx={[styles.tag, styles.featuredChip]}
+                        color={"info"}
+                        label={<Typography>Featured company</Typography>}
+                     />
+                  ) : null}
+                  {isHiringNow ? (
+                     <Chip
+                        key={"hiring-now-chip"}
+                        icon={
+                           <Briefcase
+                              color={"#3A70E2"}
+                              width={14}
+                              height={14}
+                           />
+                        }
+                        sx={[styles.tag, styles.hiringChip]}
+                        color={"info"}
+                        label={<Typography>Hiring now</Typography>}
+                     />
                   ) : null}
                </Stack>
-               <Stack spacing={1}>
-                  <CompanyCountryTag text={company.companyCountry?.name} />
-                  <CompanyIndustryTag
-                     text={company.companyIndustries
-                        ?.map(({ name }) => name)
-                        .join(", ")}
+               <Image
+                  src={getResizedUrl(company.bannerImageUrl, "md")}
+                  className="illustration"
+                  layout="fill"
+                  alt={company.universityName}
+                  objectFit="cover"
+               />
+               <LinkToCompanyPage
+                  companyName={company.universityName}
+                  interactionSource={interactionSource}
+               />
+            </CardMedia>
+            <CardContent sx={styles.content}>
+               <Box sx={styles.companyLogoWrapper}>
+                  <CircularLogo
+                     src={company.logoUrl}
+                     alt={company.universityName}
+                     size={LOGO_SIZE}
                   />
-                  <CompanySizeTag text={company.companySize} />
-               </Stack>
-               {inView ? ( // Only fetch the next livestreams when the card is in view
-                  <SuspenseWithBoundary
-                     fallback={<UpcomingLivestreamSkeleton />}
-                  >
-                     <UpcomingLivestream
-                        groupName={company.universityName}
-                        groupId={company.id}
+               </Box>
+               <Box sx={styles.followButtonWrapper}>
+                  {inView ? ( // Only render the follow button when the card is in view, since it does a request to the server
+                     <FollowButton
+                        group={company}
+                        size={"small"}
+                        sx={styles.followButton}
+                        startIcon={null}
+                        interactionSource={interactionSource}
                      />
-                  </SuspenseWithBoundary>
-               ) : (
-                  <UpcomingLivestreamSkeleton />
-               )}
-            </Stack>
-            <LinkToCompanyPage
-               companyName={company.universityName}
-               interactionSource={interactionSource}
-            />
-         </CardContent>
-         {/*<script*/}
-         {/*   type="application/ld+json"*/}
-         {/*   dangerouslySetInnerHTML={generateCompanyJsonLd(company)}*/}
-         {/*   key="company-jsonld"*/}
-         {/*/>*/}
-      </Card>
-   )
-}
+                  ) : (
+                     <Skeleton variant="rectangular" width={100} height={30} />
+                  )}
+               </Box>
+               <Stack flex={1} spacing={2} mt={2} minWidth={0} width="100%">
+                  <Stack flexDirection={"row"} alignItems={"center"}>
+                     <Typography
+                        sx={styles.companyName}
+                        variant="h6"
+                        fontWeight={600}
+                        whiteSpace="pre-line"
+                        component="h2"
+                     >
+                        {company.universityName}
+                     </Typography>
 
-type UpcomingLivestreamProps = {
-   groupId: string
-   groupName: string
-}
-const UpcomingLivestream: FC<UpcomingLivestreamProps> = ({
-   groupId,
-   groupName,
-}) => {
-   const { data: livestreams } = useCompanyUpcomingLivestream(groupId)
-   const livestream = livestreams?.[0]
-
-   return (
-      <Stack spacing={1}>
-         <LivestreamHeader>
-            {livestream ? "Upcoming Live Stream" : "No Upcoming Live Stream"}
-         </LivestreamHeader>
-
-         <LivestreamTitle italic={!livestream}>
-            {livestream
-               ? livestream.title
-               : `Follow ${groupName} to be notified about new live streams.`}
-         </LivestreamTitle>
-      </Stack>
+                     {company.publicSparks ? (
+                        <PublicSparksBadge sx={styles.badge} />
+                     ) : null}
+                  </Stack>
+                  <Stack spacing={"6px"} sx={{ width: "100%", minWidth: 0 }}>
+                     <CompanyCountryTag
+                        fontSize="16px"
+                        text={company.companyCountry?.name}
+                        color={theme.palette.neutral[900]}
+                     />
+                     <CompanyIndustryTag
+                        text={company.companyIndustries
+                           ?.map(({ name }) => name)
+                           .join(", ")}
+                        fontSize="16px"
+                        color={theme.palette.neutral[900]}
+                        // It would make more sense to not be conditional, as cards with long industry names would force
+                        // other cards to be taller even if no upcoming streams, with the ellipsis all card heights would be the same.
+                        disableMultiline={hasUpcomingLivestreams}
+                     />
+                     <CompanySizeTag
+                        text={getCompanySizeLabel(company.companySize)}
+                        fontSize="16px"
+                        color={theme.palette.neutral[900]}
+                     />
+                  </Stack>
+                  {hasUpcomingLivestreams ? (
+                     <Link
+                        href={`/company/${companyNameSlugify(
+                           company.universityName
+                        )}/livestreams`}
+                     >
+                        <Button
+                           sx={styles.upcomingLivestreamButton}
+                           variant="contained"
+                        >
+                           <Typography
+                              variant="medium"
+                              color={theme.brand.info[600]}
+                           >
+                              {upcomingLivestreamCount} upcoming{" "}
+                              {upcomingLivestreamCount === 1
+                                 ? "livestream"
+                                 : "livestreams"}
+                           </Typography>
+                        </Button>
+                     </Link>
+                  ) : null}
+               </Stack>
+               <LinkToCompanyPage
+                  companyName={company.universityName}
+                  interactionSource={interactionSource}
+               />
+            </CardContent>
+         </Card>
+      </CardActionArea>
    )
 }
 
@@ -318,6 +415,7 @@ const LinkToCompanyPage: FC<{
          })}
          sx={styles.actionArea}
          component={Link}
+         disableRipple
       >
          {children}
       </CardActionArea>

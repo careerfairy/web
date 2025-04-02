@@ -1,32 +1,33 @@
-import React, { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 
-import MicIcon from "@mui/icons-material/Mic"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter"
+import MicIcon from "@mui/icons-material/Mic"
 import CircularProgress from "@mui/material/CircularProgress"
 
-import { useRouter } from "next/router"
 import { Formik, FormikValues } from "formik"
+import { useRouter } from "next/router"
 
-import Head from "next/head"
-import { useAuth } from "../HOCs/AuthProvider"
+import { mainProductionDomainWithProtocol } from "@careerfairy/shared-lib/utils/urls"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
+import Collapse from "@mui/material/Collapse"
 import Container from "@mui/material/Container"
 import FormHelperText from "@mui/material/FormHelperText"
+import Paper from "@mui/material/Paper"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
-import { getBaseUrl } from "../components/helperFunctions/HelperFunctions"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { FormikHelpers } from "formik/dist/types"
-import Paper from "@mui/material/Paper"
+import Head from "next/head"
+import * as yup from "yup"
 import { MainLogo } from "../components/logos"
-import Collapse from "@mui/material/Collapse"
+import { useAuth } from "../HOCs/AuthProvider"
+import { HeaderLogoWrapper } from "../materialUI"
 import { PillsBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { sxStyles } from "../types/commonTypes"
-import { HeaderLogoWrapper } from "../materialUI"
 import { errorLogAndNotify } from "../util/CommonUtil"
-import * as yup from "yup"
 
 const styles = sxStyles({
    formWrapper: {
@@ -60,6 +61,8 @@ const styles = sxStyles({
       margin: "0 10px",
    },
 })
+
+const isPreview = process.env.NEXT_PUBLIC_IS_VERCEL_PREVIEW === "true"
 
 function ResetPasswordPage() {
    const { authenticatedUser: user } = useAuth()
@@ -109,7 +112,13 @@ export function ResetPasswordBase() {
          firebase
             .sendPasswordResetEmail({
                recipientEmail: values.email,
-               redirectLink: `${getBaseUrl()}/login`,
+               /**
+                * Firebase auth only whitelisting of fixed domains for redirect urls, eg localhost:3000 or careerfairy.io,
+                * custom PRs are not supported because they don't support wildcards
+                */
+               redirectLink: `${
+                  isPreview ? mainProductionDomainWithProtocol : getBaseUrl()
+               }/login`,
             })
             .catch(errorLogAndNotify)
             .finally(() => {
@@ -195,7 +204,7 @@ export function ResetPasswordBase() {
                            sx={{ mt: 2 }}
                            disabled={isSubmitting}
                            startIcon={
-                              isSubmitting && (
+                              Boolean(isSubmitting) && (
                                  <CircularProgress
                                     color={"inherit"}
                                     size={15}

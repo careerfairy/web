@@ -6,7 +6,9 @@ import {
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
 import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
+import { SendNewlyPublishedEventEmailFnArgs } from "@careerfairy/shared-lib/functions/types"
 import {
    GROUP_DASHBOARD_ROLE,
    Group,
@@ -70,7 +72,6 @@ import { recommendationServiceInstance } from "./RecommendationService"
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
-
 class FirebaseService {
    public readonly app: firebase.app.App
    public readonly firestore: firebase.firestore.Firestore
@@ -133,7 +134,7 @@ class FirebaseService {
       additionalData?: UserAccountCreationAdditionalData
    ) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
-         "createNewUserAccount_v3"
+         "createNewUserAccount_v4"
       )
       return createUserInAuthAndFirebase({ userData, additionalData })
    }
@@ -148,7 +149,7 @@ class FirebaseService {
    }): Promise<{
       readonly data: Group
    }> => {
-      return this.functions.httpsCallable("createNewGroupAdminUserAccount_eu")(
+      return this.functions.httpsCallable("createNewGroupAdminUserAccount")(
          args
       )
    }
@@ -171,9 +172,11 @@ class FirebaseService {
       return this.functions.httpsCallable("kickFromDashboard_eu")(args)
    }
 
-   sendNewlyPublishedEventEmail = async (emailData) => {
+   sendNewlyPublishedEventEmail = async (
+      emailData: SendNewlyPublishedEventEmailFnArgs
+   ) => {
       const sendNewlyPublishedEventEmail = this.functions.httpsCallable(
-         "sendNewlyPublishedEventEmail_v2"
+         FUNCTION_NAMES.sendNewlyPublishedEventEmail
       )
       return sendNewlyPublishedEventEmail(emailData)
    }
@@ -184,35 +187,39 @@ class FirebaseService {
       return sendDraftApprovalRequestEmail(data)
    }
 
-   validateUserEmailWithPin = async (userInfo) => {
+   validateUserEmailWithPin = async (userInfo: {
+      recipientEmail: string
+      pinCode: number
+      fingerPrintId: string
+   }) => {
       const validateUserEmailWithPin = this.functions.httpsCallable(
-         "validateUserEmailWithPin_eu"
+         "validateUserEmailWithPin_v2"
       )
-      return validateUserEmailWithPin({ userInfo })
+      return validateUserEmailWithPin(userInfo)
    }
    sendPasswordResetEmail = async (data: {
       recipientEmail: string
       redirectLink: string
    }) => {
       const sendPasswordResetEmail = this.functions.httpsCallable(
-         "sendPostmarkResetPasswordEmail_eu"
+         "sendPasswordResetEmail"
       )
       return sendPasswordResetEmail(data)
    }
-   resendPostmarkEmailVerificationEmailWithPin = async (data: {
+   resendEmailVerificationEmailWithPin = async (data: {
       recipientEmail: string
+      recipientAuthId: string
    }) => {
-      const resendPostmarkEmailVerificationEmailWithPin =
-         this.functions.httpsCallable(
-            "resendPostmarkEmailVerificationEmailWithPin_eu"
-         )
-      return resendPostmarkEmailVerificationEmailWithPin(data)
+      const resendEmailVerificationEmailWithPin = this.functions.httpsCallable(
+         "resendEmailVerificationEmailWithPin"
+      )
+      return resendEmailVerificationEmailWithPin(data)
    }
 
    sendReminderEmailAboutApplicationLink = async (data) => {
       const sendReminderEmailAboutApplicationLink =
          this.functions.httpsCallable(
-            "sendReminderEmailAboutApplicationLink_eu"
+            "sendReminderEmailAboutApplicationLink_v2"
          )
       return sendReminderEmailAboutApplicationLink(data)
    }
@@ -224,7 +231,7 @@ class FirebaseService {
       groupId: string
       role: GROUP_DASHBOARD_ROLE
    }) => {
-      return this.functions.httpsCallable("sendDashboardInviteEmail_eu")(args)
+      return this.functions.httpsCallable("sendDashboardInviteEmail")(args)
    }
 
    sendBasicTemplateEmail = async ({
@@ -288,9 +295,8 @@ class FirebaseService {
          )
       } else if (livestream.isFaceToFace) {
          return this.sendPhysicalEventEmailRegistrationConfirmation(
-            user,
-            userData,
-            livestream
+            user.uid,
+            livestream.id
          )
       } else {
          return this.sendLivestreamEmailRegistrationConfirmation(
@@ -332,22 +338,16 @@ class FirebaseService {
    }
 
    sendPhysicalEventEmailRegistrationConfirmation = (
-      user: FirebaseReducer.AuthState,
-      userData: UserData,
-      event: LivestreamEvent
+      userUid: string,
+      livestreamId: string
    ) => {
       const sendPhysicalEventRegistrationConfirmation =
          this.functions.httpsCallable(
-            "sendPhysicalEventRegistrationConfirmationEmail_eu"
+            FUNCTION_NAMES.sendPhysicalEventRegistrationConfirmationEmail
          )
       return sendPhysicalEventRegistrationConfirmation({
-         recipientEmail: user.email,
-         user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDateWithoutHour(event.start.toDate()),
-         company_name: event.company,
-         company_logo_url: event.companyLogoUrl,
-         event_title: event.title,
-         event_address: event.address,
+         userUid,
+         livestreamId,
       })
    }
 
@@ -3248,7 +3248,7 @@ class FirebaseService {
 
    // Backfill user data
    backfillUserData = async ({ timezone }: Pick<UserData, "timezone">) => {
-      return this.functions.httpsCallable("backfillUserData_eu")({ timezone })
+      return this.functions.httpsCallable("backfillUserData")({ timezone })
    }
 
    // DB functions

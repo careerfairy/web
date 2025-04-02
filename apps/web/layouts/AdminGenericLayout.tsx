@@ -229,6 +229,15 @@ const HeaderComponent = ({ children, width }: HeaderProps) => {
       threshold: headerScrollThreshold,
    })
 
+   const isVisible = isMobile ? headerFixed || !isScrolling : true
+   // Add effect to update CSS variable based on header visibility
+   useEffect(() => {
+      document.documentElement.style.setProperty(
+         "--app-bar-visible",
+         isVisible ? "1" : "0"
+      )
+   }, [isVisible])
+
    return (
       <Slide
          appear={false}

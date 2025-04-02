@@ -1,11 +1,13 @@
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { Rocket } from "@mui/icons-material"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import Link from "components/views/common/Link"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import React, { Dispatch, SetStateAction } from "react"
+import React, { Dispatch, SetStateAction, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import ActionButton from "./ActionButton"
+import { BoostedCompanyDialog } from "./BoostedCompanyDialog"
 import StatusChips from "./StatusChips"
 
 const styles = sxStyles({
@@ -43,6 +45,23 @@ const styles = sxStyles({
    actions: {
       width: "100%",
    },
+   logoContainer: {
+      position: "relative",
+      width: 64,
+      height: 64,
+   },
+   rocketIcon: {
+      position: "absolute",
+      bottom: 4,
+      right: 2,
+      color: (theme) => theme.palette.warning[500],
+      backgroundColor: (theme) => theme.palette.warning[50],
+      border: (theme) => `1px solid ${theme.palette.warning[500]}`,
+      padding: 0.5,
+      fontSize: 20,
+      borderRadius: "48px",
+      cursor: "pointer",
+   },
 })
 
 type Props = {
@@ -51,13 +70,26 @@ type Props = {
 }
 
 const CompanyPlanCard = React.memo(({ presenter, setGroupToManage }: Props) => {
+   const [isBoostedDialogOpen, setIsBoostedDialogOpen] = useState(false)
+   const isFeaturedGroup = presenter.isFeaturedGroup()
+
    return (
       <Box sx={styles.root}>
-         <CircularLogo
-            src={presenter.getCompanyLogoUrl()}
-            alt={presenter.universityName}
-            size={64}
-         />
+         <Box sx={styles.logoContainer}>
+            <CircularLogo
+               src={presenter.getCompanyLogoUrl()}
+               alt={presenter.universityName}
+               size={64}
+            />
+            {isFeaturedGroup ? (
+               <Rocket
+                  onClick={() => {
+                     setIsBoostedDialogOpen(true)
+                  }}
+                  sx={styles.rocketIcon}
+               />
+            ) : null}
+         </Box>
          <Box pt={1.5} />
          <Typography variant={"h6"} sx={styles.name}>
             {presenter.universityName}
@@ -82,6 +114,11 @@ const CompanyPlanCard = React.memo(({ presenter, setGroupToManage }: Props) => {
                View dashboard
             </Button>
          </Stack>
+         <BoostedCompanyDialog
+            featuredData={presenter.featured}
+            open={isBoostedDialogOpen}
+            onClose={() => setIsBoostedDialogOpen(false)}
+         />
       </Box>
    )
 })

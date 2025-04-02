@@ -11,6 +11,10 @@ export class RecommendationsBuilder {
       this.results = this.results.concat(sparks)
    }
 
+   protected setResults(sparks: RankedSpark[]) {
+      this.results = sparks
+   }
+
    public get(): RankedSpark[] {
       const uniqueEvents = removeDuplicateDocuments(
          this.results.filter(Boolean).flat()

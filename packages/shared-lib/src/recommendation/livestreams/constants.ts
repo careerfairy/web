@@ -43,4 +43,7 @@ export const RECOMMENDATION_POINTS = {
       POINTS_PER_APPLIED_JOB_COMPANY_INDUSTRY_MATCH: 4,
       POINTS_PER_APPLIED_JOB_COMPANY_SIZE_MATCH: 1,
    },
+
+   // Multiplies live stream points if the user is in the featured group target (implies live stream is from a featured group)
+   FEATURED_GROUP_LIVESTREAM_POINTS_MULTIPLIER: 1.25,
 }

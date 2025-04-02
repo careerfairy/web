@@ -1,7 +1,15 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import useCustomJobsCount from "components/custom-hook/custom-job/useCustomJobsCount"
 import { useUserHasParticipated } from "components/custom-hook/live-stream/useUserHasParticipated"
-import { FC, ReactNode, createContext, useContext, useMemo } from "react"
+import {
+   FC,
+   ReactNode,
+   createContext,
+   useContext,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 
 type EventPreviewCardContextProps = {
    livestream: LivestreamEvent
@@ -18,6 +26,12 @@ type EventPreviewCardContextProps = {
    hasRegistered?: boolean
    cardInView?: boolean
    cardInViewRef?: (node?: Element | null) => void
+   autoPlaying?: boolean
+   setAutoPlaying?: (autoPlaying: boolean) => void
+   onGoNext?: () => void
+   disableAutoPlay?: boolean
+   muted?: boolean
+   setMuted?: (muted: boolean) => void
 }
 
 const EventPreviewCardContext = createContext<
@@ -27,6 +41,14 @@ const EventPreviewCardContext = createContext<
 type EventPreviewCardProviderProps = {
    livestream: LivestreamEvent
    children: ReactNode
+   isPlaceholderEvent?: boolean
+   hasRegistered: boolean
+   cardInView?: boolean
+   cardInViewRef?: (node?: Element | null) => void
+   isPast?: boolean
+} & AdditionalContextProps
+
+export type AdditionalContextProps = {
    loading?: boolean
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
@@ -34,11 +56,16 @@ type EventPreviewCardProviderProps = {
    bottomElement?: React.ReactNode
    // If true, the chip labels will be hidden
    hideChipLabels?: boolean
-   isPlaceholderEvent?: boolean
-   hasRegistered: boolean
-   cardInView?: boolean
-   cardInViewRef?: (node?: Element | null) => void
-   isPast?: boolean
+   // Defaults to true, disables auto play
+   disableAutoPlay?: boolean
+   // Callback for when auto play is enabled
+   onGoNext?: () => void
+   // Callback for when the card is in view
+   onViewChange?: (inView: boolean) => void
+   // Whether the autoplay is muted
+   muted?: boolean
+   // Function to set the muted state
+   setMuted?: (muted: boolean) => void
 }
 
 export const EventPreviewCardProvider: FC<EventPreviewCardProviderProps> = ({
@@ -53,7 +80,14 @@ export const EventPreviewCardProvider: FC<EventPreviewCardProviderProps> = ({
    cardInView,
    cardInViewRef,
    isPast,
+   disableAutoPlay = true,
+   onGoNext,
+   onViewChange,
+   muted,
+   setMuted,
 }) => {
+   const [autoPlaying, setAutoPlaying] = useState(false)
+
    const hasParticipated = useUserHasParticipated(livestream?.id, {
       disabled: !cardInView, // Helps Reduce the number of listeners
    })
@@ -61,6 +95,7 @@ export const EventPreviewCardProvider: FC<EventPreviewCardProviderProps> = ({
    const { count: jobsCount } = useCustomJobsCount({
       businessFunctionTagIds: [],
       livestreamId: livestream?.id,
+      disabled: !cardInView,
    })
 
    const hasJobsToApply = useMemo<boolean>(() => {
@@ -81,13 +116,17 @@ export const EventPreviewCardProvider: FC<EventPreviewCardProviderProps> = ({
       [livestream?.start, livestream?.startDate]
    )
 
+   useEffect(() => {
+      onViewChange?.(cardInView)
+   }, [cardInView, onViewChange])
+
    const value = useMemo<EventPreviewCardContextProps>(
       () => ({
          livestream,
          loading,
          animation,
          bottomElement,
-         hideChipLabels,
+         hideChipLabels: autoPlaying ?? hideChipLabels,
          isPast,
          isLive,
          startDate,
@@ -97,6 +136,12 @@ export const EventPreviewCardProvider: FC<EventPreviewCardProviderProps> = ({
          cardInView,
          cardInViewRef,
          hasRegistered,
+         autoPlaying,
+         setAutoPlaying,
+         disableAutoPlay,
+         onGoNext,
+         muted,
+         setMuted,
       }),
       [
          livestream,
@@ -113,6 +158,12 @@ export const EventPreviewCardProvider: FC<EventPreviewCardProviderProps> = ({
          cardInView,
          cardInViewRef,
          hasRegistered,
+         autoPlaying,
+         setAutoPlaying,
+         disableAutoPlay,
+         onGoNext,
+         muted,
+         setMuted,
       ]
    )
 

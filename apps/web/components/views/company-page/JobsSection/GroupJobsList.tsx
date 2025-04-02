@@ -2,6 +2,7 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { ListItem, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import JobCard from "components/views/common/jobs/JobCard"
+import { DIALOG_JOB_ID_QUERY_PARAM } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { sxStyles } from "types/commonTypes"
@@ -22,7 +23,6 @@ type Props = {
 
 const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
    const router = useRouter()
-
    const isMobile = useIsMobile("lg")
 
    if (!groupCustomJobs?.length) return null
@@ -32,8 +32,13 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
          {groupCustomJobs.map((customJob, idx) => {
             return (
                <Link
-                  href={`/company/${router.query.companyName}/jobs/${customJob.id}`}
-                  // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+                  href={{
+                     pathname: router.pathname,
+                     query: {
+                        ...router.query,
+                        [DIALOG_JOB_ID_QUERY_PARAM]: customJob.id,
+                     },
+                  }}
                   shallow
                   passHref
                   // Prevents the page from scrolling to the top when the link is clicked

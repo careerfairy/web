@@ -3,17 +3,20 @@ import { SchemaOf, mixed, object, string } from "yup"
 
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
-import { middlewares } from "./middlewares/middlewares"
 
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
-import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
-import { dataValidation, userShouldBeCFAdmin } from "./middlewares/validations"
-import { groupRepo } from "./api/repositories"
-import { client } from "./api/postmark"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { validateGroupSparks } from "./util/sparks"
+import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
 import { RuntimeOptions } from "firebase-functions"
-
+import { onCall } from "firebase-functions/v2/https"
+import { onSchedule } from "firebase-functions/v2/scheduler"
+import { groupRepo, notificationService } from "./api/repositories"
+import { withMiddlewares } from "./middlewares-gen2/onCall"
+import {
+   dataValidationMiddleware,
+   userIsCFAdminMiddleware,
+} from "./middlewares-gen2/onCall/validations"
+import { validateGroupSparks } from "./util/sparks"
 
 /**
  * functions runtime settings
@@ -22,35 +25,46 @@ const runtimeSettings: RuntimeOptions = {
    memory: "256MB",
 }
 
-
-
 const setGroupPlanSchema: SchemaOf<StartPlanData> = object().shape({
    planType: mixed().oneOf(Object.values(GroupPlanTypes)).required(),
    groupId: string().required(),
 })
 
-export const startPlan = functions.region(config.region).https.onCall(
-   middlewares(
-      dataValidation(setGroupPlanSchema),
-      userShouldBeCFAdmin(),
-      async (data: StartPlanData, context) => {
+export const startPlan = onCall(
+   withMiddlewares(
+      [
+         dataValidationMiddleware<StartPlanData>(setGroupPlanSchema),
+         userIsCFAdminMiddleware<StartPlanData>(),
+      ],
+      async (request) => {
          try {
-            await groupRepo.startPlan(data.groupId, data.planType)
+            const group = await groupRepo.getGroupById(request.data.groupId)
 
-            functions.logger.info(
-               `Successfully set group plan for group ${data.groupId} to ${data.planType}`
+            const adminName = request.data.userData.firstName
+
+            await groupRepo.startPlan(
+               request.data.groupId,
+               request.data.planType
             )
 
-            if (data.planType === GroupPlanTypes.Trial) {
+            functions.logger.info(
+               `Successfully set group plan for group ${request.data.groupId} to ${request.data.planType} by ${adminName}`
+            )
+
+            if (request.data.planType === GroupPlanTypes.Trial) {
                functions.logger.info("Sending out trial welcome emails")
 
-               await groupRepo.sendTrialWelcomeEmail(data.groupId, client)
+               await groupRepo.sendTrialWelcomeEmail(
+                  request.data.groupId,
+                  group.universityName,
+                  notificationService
+               )
             }
          } catch (error) {
             logAndThrow("Error in setting group plan", {
-               data,
+               data: request.data,
                error,
-               context,
+               context: request,
             })
          }
       }
@@ -87,16 +101,8 @@ export const manualCheckExpiredPlans = functions
    })
 
 async function updateExpiredGroupPlans() {
-   const types = [
-      GroupPlanTypes.Trial,
-      GroupPlanTypes.Tier1, 
-      GroupPlanTypes.Tier2,
-      GroupPlanTypes.Tier3
-   ]
-
    try {
       const expiringGroups = await groupRepo.getAllGroupsWithAPlanExpiring(
-         types,
          0,
          functions.logger
       )
@@ -124,18 +130,17 @@ async function updateExpiredGroupPlans() {
       )
    }
 }
+
 /**
  * Every day at 9 AM, notify all the groups that are near to the end of their Sparks trial plan creation period and haven't met the publishing criteria yet
  */
-export const sendReminderToNearEndSparksTrialPlanCreationPeriod = functions
-   .region(config.region)
-   .runWith({
-      // when sending large batches, this function can take a while to finish
+export const sendReminderToNearEndSparksTrialPlanCreationPeriod = onSchedule(
+   {
+      schedule: "0 9 * * *",
+      timeZone: "Europe/Zurich",
       timeoutSeconds: 300,
-   })
-   .pubsub.schedule("0 9 * * *")
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+   },
+   async () => {
       try {
          // get all the groups on sparks trial plan
          const groups = await groupRepo.getAllGroupsWithAPlan()
@@ -153,7 +158,7 @@ export const sendReminderToNearEndSparksTrialPlanCreationPeriod = functions
          filteredGroups.forEach((group) => {
             void groupRepo.sendTrialPlanCreationPeriodInCriticalStateReminder(
                group,
-               client
+               notificationService
             )
          })
       } catch (error) {
@@ -164,4 +169,5 @@ export const sendReminderToNearEndSparksTrialPlanCreationPeriod = functions
             }
          )
       }
-   })
+   }
+)

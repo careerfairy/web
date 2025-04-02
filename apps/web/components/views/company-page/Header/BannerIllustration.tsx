@@ -1,21 +1,24 @@
-import { sxStyles } from "../../../../types/commonTypes"
-import { SectionAnchor, TabValue, useCompanyPage } from "../index"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import { placeholderBanner } from "../../../../constants/images"
-import BackgroundImage from "../../../views/common/BackgroundImage"
 import { Box, LinearProgress } from "@mui/material"
-import BannerUploadButton from "./BannerUploadButton"
-import useFirebaseUpload from "../../../custom-hook/useFirebaseUpload"
-import { groupRepo } from "../../../../data/RepositoryInstances"
 import useSWRMutation from "swr/mutation"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { v4 as uuid } from "uuid"
+import { placeholderBanner } from "../../../../constants/images"
+import { groupRepo } from "../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../types/commonTypes"
+import useFirebaseUpload from "../../../custom-hook/useFirebaseUpload"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import BackgroundImage from "../../../views/common/BackgroundImage"
+import { useCompanyPage } from "../index"
+import BannerUploadButton from "./BannerUploadButton"
 
 const styles = sxStyles({
    imageWrapper: {
       width: "100%",
-      height: { xs: "250px", md: "300px" },
+      height: { xs: "94px", md: "194px" },
       position: "relative",
+      "& .banner-image": {
+         borderRadius: "12px 12px 0 0",
+      },
    },
    buttonWrapper: {
       position: "absolute",
@@ -60,7 +63,6 @@ const BannerIllustration = () => {
 
    return (
       <Box sx={styles.imageWrapper}>
-         <SectionAnchor tabValue={TabValue.banner} />
          {isUploading ? (
             <LinearProgress
                sx={styles.progress}
@@ -74,7 +76,7 @@ const BannerIllustration = () => {
             }
             opacity={0.8}
             repeat={false}
-            className={undefined}
+            className={"banner-image"}
             backgroundImageSx={undefined}
          />
          <Box sx={styles.buttonWrapper}>
