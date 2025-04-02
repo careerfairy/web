@@ -18,6 +18,7 @@ import {
 
 import { levelsOfStudyOrderMap } from "@careerfairy/shared-lib/fieldOfStudy"
 import { University } from "@careerfairy/shared-lib/universities/universities"
+import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { DateTime } from "luxon"
 import config from "./config"
 import { handleUserStatsBadges } from "./lib/badge"
@@ -31,7 +32,14 @@ import {
    logStart,
 } from "./lib/triggers/util"
 import { logAndThrow } from "./lib/validations"
-import { ChangeType, getChangeTypeEnum, getChangeTypes } from "./util"
+import {
+   ChangeType,
+   getChangeTypeEnum,
+   getChangeTypes,
+   handleDocumentUpdateError,
+   handleDocumentUpdateErrors,
+   logDocumentNotFoundUpdateError,
+} from "./util"
 import { validateGroupSparks } from "./util/sparks"
 
 export const syncLivestreams = functions
@@ -294,17 +302,15 @@ export const onWriteGroup = functions
       return handleSideEffects(sideEffectPromises)
    })
 
-export const syncGroupFollowingUserDataOnChange = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("careerCenterData/{groupId}")
-   .onWrite(async (change, context) => {
-      const changeType = getChangeTypeEnum(change)
+export const syncGroupFollowingUserDataOnChange = onDocumentWritten(
+   "careerCenterData/{groupId}",
+   async (event) => {
+      const changeType = getChangeTypeEnum(event.data)
 
       try {
-         const groupId = context.params.groupId
+         const groupId = event.params.groupId
 
-         const newValue = change.after?.data() as Group
+         const newValue = event.data.after?.data() as Group
 
          // An array of promise side effects to be executed in parallel
          const sideEffectPromises: Promise<unknown>[] = []
@@ -357,15 +363,27 @@ export const syncGroupFollowingUserDataOnChange = functions
             }
          }
 
-         return handleSideEffects(sideEffectPromises)
+         return handleSideEffects(
+            handleDocumentUpdateErrors(
+               sideEffectPromises,
+               ["5"],
+               (_, error) => {
+                  logDocumentNotFoundUpdateError(
+                     `Group ${event.params.groupId} sync users resulted in not found. Skipping update`,
+                     error
+                  )
+               }
+            )
+         )
       } catch (error) {
          logAndThrow(
-            `🚀 ~ Error synchronizing group[${context.params.groupId}] data for following users: `,
+            `🚀 ~ Error synchronizing group[${event.params.groupId}] data for following users: `,
             error,
-            context
+            event
          )
       }
-   })
+   }
+)
 
 export const onWriteSpark = functions
    .runWith({ ...defaultTriggerRunTimeConfig, memory: "1GB" })
@@ -436,16 +454,14 @@ export const onWriteSpark = functions
       return handleSideEffects(sideEffectPromises)
    })
 
-export const onWriteCustomJobs = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("customJobs/{jobId}")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
+export const onWriteCustomJobs = onDocumentWritten(
+   "customJobs/{jobId}",
+   async (event) => {
+      const changeTypes = getChangeTypes(event.data)
 
       logStart({
          changeTypes,
-         context,
+         context: event,
          message: "syncCustomJobsOnWrite",
       })
 
@@ -453,7 +469,7 @@ export const onWriteCustomJobs = functions
       const sideEffectPromises: Promise<unknown>[] = []
 
       if (changeTypes.isCreate) {
-         const newCustomJob = change.after.data() as CustomJob
+         const newCustomJob = event.data.after.data() as CustomJob
          sideEffectPromises.push(
             customJobRepo.createCustomJobStats(newCustomJob)
          )
@@ -461,7 +477,7 @@ export const onWriteCustomJobs = functions
 
       // Run side effects for all custom jobs changes
       if (changeTypes.isUpdate) {
-         const updatedCustomJob = change.after.data() as CustomJob
+         const updatedCustomJob = event.data.after.data() as CustomJob
 
          sideEffectPromises.push(
             customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
@@ -484,7 +500,7 @@ export const onWriteCustomJobs = functions
       }
 
       if (changeTypes.isDelete) {
-         const deletedCustomJob = change.before.data() as CustomJob
+         const deletedCustomJob = event.data.before.data() as CustomJob
 
          sideEffectPromises.push(
             customJobRepo.syncDeletedCustomJobDataToCustomJobStats(
@@ -511,8 +527,8 @@ export const onWriteCustomJobs = functions
       }
 
       if (changeTypes.isCreate || changeTypes.isUpdate) {
-         const newCustomJob = change.after.data() as CustomJob
-         const oldCustomJob = change.before.data() as CustomJob
+         const newCustomJob = event.data.after.data() as CustomJob
+         const oldCustomJob = event.data.before.data() as CustomJob
 
          sideEffectPromises.push(
             livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
@@ -533,8 +549,20 @@ export const onWriteCustomJobs = functions
          )
       }
 
-      return handleSideEffects(sideEffectPromises)
-   })
+      return handleSideEffects(
+         handleDocumentUpdateErrors(
+            sideEffectPromises,
+            ["5", "failed-precondition"],
+            (_, error) => {
+               logDocumentNotFoundUpdateError(
+                  `Custom job ${event.params.jobId} sync resulted in not found. Skipping update`,
+                  error
+               )
+            }
+         )
+      )
+   }
+)
 
 export const onWriteCustomJobsSendNotifications = functions
    .runWith({ ...defaultTriggerRunTimeConfig, memory: "1GB" })
@@ -570,20 +598,21 @@ export const onWriteCustomJobsSendNotifications = functions
       return handleSideEffects(sideEffectPromises)
    })
 
-export const onWriteStudyBackground = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("userData/{userId}/studyBackgrounds/{studyBackgroundId}")
-   .onWrite(async (change, context) => {
-      const { userId } = context.params
-      const changeTypes = getChangeTypes(change)
+export const onWriteStudyBackground = onDocumentWritten(
+   "userData/{userId}/studyBackgrounds/{studyBackgroundId}",
+   async (event) => {
+      const { userId } = event.params
+      const changeTypes = getChangeTypes(event.data)
+
+      const change = event.data
 
       logStart({
          changeTypes,
-         context,
+         context: event,
          message: "syncStudyBackgroundOnWrite",
       })
 
+      // TODO: Check error here
       // Get current study backgrounds
       const allUserStudyBackgrounds =
          (await userRepo.getUserStudyBackgrounds(userId)) || []
@@ -659,7 +688,7 @@ export const onWriteStudyBackground = functions
 
          functions.logger.log("🚀 ~ Effective university:", userId, university)
 
-         await userRepo.updateUserData(userId, {
+         const updateUserDataPromise = userRepo.updateUserData(userId + "123", {
             fieldOfStudy: effectiveStudyBackground.fieldOfStudy,
             levelOfStudy: effectiveStudyBackground.levelOfStudy,
             universityCountryCode:
@@ -671,5 +700,17 @@ export const onWriteStudyBackground = functions
             studyBackgroundStartedAt: effectiveStudyBackground.startedAt,
             studyBackgroundEndedAt: effectiveStudyBackground.endedAt,
          })
+
+         await handleDocumentUpdateError(
+            updateUserDataPromise,
+            "5",
+            (_, error) => {
+               logDocumentNotFoundUpdateError(
+                  `updateUserData - User ${userId} not found. Skipping update.`,
+                  error
+               )
+            }
+         )
       }
-   })
+   }
+)
