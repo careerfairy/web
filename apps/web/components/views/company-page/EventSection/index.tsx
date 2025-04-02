@@ -1,6 +1,5 @@
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import FollowIcon from "@mui/icons-material/AddRounded"
 import { Box, Button, Link, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { EmptyItemsView } from "components/views/common/EmptyItemsView"
@@ -166,7 +165,7 @@ const EventSection = () => {
                         sx={{ fontSize: "14px", mt: "18px" }}
                         group={group}
                         interactionSource={InteractionSources.Company_Page}
-                        startIcon={<FollowIcon fontSize={"small"} />}
+                        showStartIcon
                      />
                   </EmptyItemsView>
                </Stack>

@@ -157,6 +157,7 @@ export const SparkInteractionSources = {
    PortalBanner: "portal_banner",
    RegistrationEmail: "registration-email",
    Livestream_Follow_Up: "livestream_follow_up",
+   Group_Admin_Events_Table: "group_admin_events_table",
 } as const
 
 export type SparkInteractionSource =
