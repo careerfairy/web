@@ -144,7 +144,10 @@ export interface IGroupRepository {
     * */
    setGroupAdminRoleInFirestore(
       group: Group,
-      userData: Pick<UserData, "id" | "userEmail" | "firstName" | "lastName">,
+      userData: Pick<
+         UserData,
+         "id" | "userEmail" | "firstName" | "lastName" | "emailVerified"
+      >,
       role?: GROUP_DASHBOARD_ROLE
    ): Promise<void>
 
@@ -336,6 +339,8 @@ export interface IGroupRepository {
    getFollowingUsers(groupId: string): Promise<string[]>
 
    updateGroupData(groupId: string, data: Partial<Group>)
+
+   getFeaturedGroups(countryIsoCode: string): Promise<Group[]>
 }
 
 export class FirebaseGroupRepository
@@ -418,6 +423,14 @@ export class FirebaseGroupRepository
          .collection("careerCenterData")
          .doc(groupId)
          .update(data)
+   }
+
+   getFeaturedGroups(countryIsoCode: string): Promise<Group[]> {
+      return this.firestore
+         .collection("careerCenterData")
+         .where("featured.targetCountries", "array-contains", countryIsoCode)
+         .get()
+         .then((snaps) => mapFirestoreDocuments<Group>(snaps))
    }
 
    /*

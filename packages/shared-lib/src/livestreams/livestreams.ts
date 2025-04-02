@@ -190,6 +190,7 @@ export interface LivestreamEvent extends Identifiable {
    timezone?: string
    isFaceToFace?: boolean
    reminderEmailsSent?: IEmailSent
+   reminderEmailsStatus?: Record<string, ReminderEmailStatus>
 
    /*
     * Breakout rooms
@@ -371,8 +372,9 @@ export interface RecordingStatsUser extends Identifiable {
    livestreamStartDate?: firebase.firestore.Timestamp
    userId: string
    recordingBought?: boolean
-   minutesWatched: number
+   minutesWatched?: number
    date: firebase.firestore.Timestamp
+   lastSecondWatched?: number
 }
 
 export interface LivestreamJobApplicationDetails extends JobIdentifier {
@@ -421,6 +423,35 @@ export interface IEmailSent {
    reminder5Minutes: boolean
    reminder1Hour: boolean
    reminder24Hours: boolean
+}
+
+/**
+ * Status of an email reminder
+ */
+export interface ReminderEmailStatus {
+   templateId: string
+   /**
+    * Timestamp when the reminder was sent
+    */
+   scheduledAt: FirebaseFirestore.Timestamp
+   /**
+    * Total number of recipients the reminder was sent to
+    */
+   totalRecipients: number
+   /**
+    * Number of successful email deliveries
+    */
+   successful: number
+   /**
+    * Number of failed email deliveries
+    */
+   failed: number
+   /**
+    * Overall status of the reminder
+    */
+   status: "complete" | "partial" | "failed"
+
+   livestreamId: string
 }
 
 export interface LiveStreamEventWithUsersLivestreamData
@@ -654,6 +685,12 @@ export const pickPublicDataFromLivestream = (
    }
 }
 
+export const getAuthUidFromUserLivestreamData = (
+   userLivestreamData: UserLivestreamData
+) => {
+   return userLivestreamData.user.authId ?? userLivestreamData.userId
+}
+
 export interface LivestreamEventSerialized
    extends Omit<
       LivestreamEvent,
@@ -742,6 +779,45 @@ export enum ImpressionLocation {
    endOfStreamLivestreams = "endOfStreamLivestreams",
    mentorPageCarousel = "mentorPageCarousel",
    unknown = "unknown",
+}
+
+/**
+ * Reminder task for livestream join reminders
+ * Document Path: livestreams/{livestreamId}/reminderTasks/joinReminder
+ */
+export interface LivestreamReminderTask extends Identifiable {
+   /**
+    * Current status of the reminder task
+    */
+   status: "waiting" | "completed" | "cancelled"
+
+   /**
+    * When the reminder is scheduled to be sent
+    */
+   scheduledFor: Timestamp
+
+   /**
+    * When the reminder task was created
+    */
+   createdAt: Timestamp
+
+   /**
+    * When the reminder task was completed (only present if status is "completed")
+    */
+   completedAt: Timestamp | null
+
+   /**
+    * When the reminder task was cancelled (only present if status is "cancelled")
+    */
+   cancelledAt: Timestamp | null
+
+   /**
+    * Results of sending the reminders (only present if status is "completed")
+    */
+   results: null | {
+      successful: number
+      failed: number
+   }
 }
 
 export function getEarliestEventBufferTime() {

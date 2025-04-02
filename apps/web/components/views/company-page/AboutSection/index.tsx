@@ -1,19 +1,13 @@
-import { useCallback, useMemo } from "react"
 import { Box, Button, CircularProgress, Typography } from "@mui/material"
-import { SectionAnchor, TabValue, useCompanyPage } from "../index"
+import { useCompanyPage } from "../index"
 
 import { sxStyles } from "../../../../types/commonTypes"
 // react feather
-import {
-   Edit2 as EditIcon,
-   MapPin as MapPinIcon,
-   Tag as TagIcon,
-   Users as UsersIcon,
-} from "react-feather"
-import EditDialog from "../EditDialog"
-import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import SanitizedHTML from "components/util/SanitizedHTML"
 import dynamic from "next/dynamic"
+import { Edit2 as EditIcon } from "react-feather"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import EditDialog from "../EditDialog"
 
 const styles = sxStyles({
    wrapper: {
@@ -38,66 +32,24 @@ const styles = sxStyles({
    },
 })
 
-const AboutDialog = dynamic(() => import('./AboutDialog'), { ssr: false, loading: () => <CircularProgress /> });
-
+const AboutDialog = dynamic(() => import("./AboutDialog"), {
+   ssr: false,
+   loading: () => <CircularProgress />,
+})
 
 const AboutSection = () => {
-   const {
-      group,
-      editMode,
-      sectionRefs: { aboutSectionRef },
-   } = useCompanyPage()
+   const { group, editMode } = useCompanyPage()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
 
-   const { companyCountry, companyIndustries, companySize, extraInfo } = group
-
-   const showIcons = useMemo(
-      () => companySize || companyIndustries?.length || companyCountry?.name,
-      [companyCountry?.name, companyIndustries?.length, companySize]
-   )
-
-   const renderIcons = useCallback(
-      () => (
-         <Box sx={styles.iconsWrapper}>
-            {companyCountry?.name ? (
-               <Box sx={styles.tag}>
-                  <MapPinIcon size={20} />
-                  <Typography variant="body1" color="black" ml={1}>
-                     {companyCountry.name}
-                  </Typography>
-               </Box>
-            ) : null}
-
-            {companyIndustries?.length ? (
-               <Box sx={styles.tag}>
-                  <TagIcon size={20} />
-                  <Typography variant="body1" color="black" ml={1}>
-                     {companyIndustries.map(({ name }) => name).join(", ")}
-                  </Typography>
-               </Box>
-            ) : null}
-
-            {companySize ? (
-               <Box sx={styles.tag}>
-                  <UsersIcon size={20} />
-                  <Typography variant="body1" color="black" ml={1}>
-                     {companySize}
-                  </Typography>
-               </Box>
-            ) : null}
-         </Box>
-      ),
-      [companyCountry?.name, companyIndustries, companySize]
-   )
+   const { extraInfo } = group
 
    return (
       <>
          <Box sx={styles.wrapper}>
-            <SectionAnchor ref={aboutSectionRef} tabValue={TabValue.profile} />
             <Box sx={styles.titleSection}>
-               <Typography variant="h4" fontWeight={"600"} color="black">
+               <Typography variant="brandedH3" fontWeight={"600"} color="black">
                   About
                </Typography>
                {editMode ? (
@@ -112,7 +64,6 @@ const AboutSection = () => {
                   </Button>
                ) : null}
             </Box>
-            {showIcons ? renderIcons() : null}
             <Box mt={2}>
                <Typography variant="h6" fontWeight={"400"} color="black">
                   <SanitizedHTML htmlString={extraInfo} />

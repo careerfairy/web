@@ -15,15 +15,16 @@ import {
 } from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
 import { alpha } from "@mui/material/styles"
+import useRecordingProgressTracker from "components/views/common/stream-cards/useRecordingProgressTracker"
 import { useRouter } from "next/router"
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import ReactPlayer from "react-player"
+import { OnProgressProps } from "react-player/base"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { livestreamRepo } from "../../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
-import useCountTime from "../../../../custom-hook/useCountTime"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { useFirestoreDocument } from "../../../../custom-hook/utils/useFirestoreDocument"
 
@@ -145,11 +146,15 @@ export const PlayerSkeleton: FC = () => {
 const Player = ({ stream, livestreamPresenter }: Props) => {
    const { isLoggedIn } = useAuth()
    const router = useRouter()
-
-   const { handlePreviewPlay, handlePause, handlePlay } =
-      useRecordingControls(stream)
-
+   const playerRef = useRef<ReactPlayer | null>(null)
+   const hasLoadedProgress = useRef(false)
    const { data: recordingToken } = useRecordingToken(stream.id)
+   const { handlePreviewPlay, handlePause, handlePlay, videoPaused } =
+      useRecordingControls(stream)
+   const { videoStartPosition, onSecondPassed } = useRecordingProgressTracker({
+      livestream: stream,
+      playing: !videoPaused,
+   })
 
    const redirectToLogin = useCallback(() => {
       return router.push({
@@ -165,6 +170,20 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
          handlePlay()
       }
    }, [handlePlay, isLoggedIn, redirectToLogin])
+
+   const handleProgress = useCallback(
+      (progress: OnProgressProps) => {
+         onSecondPassed(progress.playedSeconds)
+      },
+      [onSecondPassed]
+   )
+
+   const handleReady = useCallback(() => {
+      if (videoStartPosition && !hasLoadedProgress.current) {
+         playerRef.current?.seekTo(videoStartPosition)
+         hasLoadedProgress.current = true
+      }
+   }, [videoStartPosition])
 
    const SignUpButton = () => {
       return (
@@ -196,6 +215,7 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
       <Box sx={styles.root}>
          <Box sx={styles.playerWrapper} mt={1}>
             <ReactPlayer
+               ref={playerRef}
                className="react-player"
                playIcon={<PlayIconElement />}
                width="100%"
@@ -208,10 +228,13 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
                )}
                onPlay={handleClickPlay}
                onPause={handlePause}
+               onReady={handleReady}
                playing={isLoggedIn}
                config={{ file: { attributes: { controlsList: "nodownload" } } }}
                light={livestreamPresenter.backgroundImageUrl}
                onClickPreview={handlePreviewPlay}
+               onProgress={handleProgress}
+               progressInterval={1000}
             />
          </Box>
       </Box>
@@ -274,40 +297,18 @@ export const useRecordingControls = (
    const isMobile = useIsMobile()
    const { userData, isLoggedIn } = useAuth()
 
-   const {
-      timeWatched: minutesWatched,
-      startCounting,
-      pauseCounting,
-   } = useCountTime()
-
-   /**
-    * Each minute watched the field minutesWatched will be increased and we need do increment it on our DB
-    */
-   useEffect(() => {
-      if (minutesWatched > 0) {
-         void livestreamRepo.updateRecordingStats({
-            livestreamId: stream.id,
-            minutesWatched: 1,
-            onlyIncrementMinutes: true,
-            userId: userData?.userEmail,
-         })
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [minutesWatched, userData?.userEmail])
-
    const [videoPaused, setVideoPaused] = useState(true)
 
    const [showBigVideoPlayer, setShowBigVideoPlayer] = useState(false)
 
    // handle play recording click
    const handleRecordingPlay = useCallback(() => {
-      startCounting()
       setVideoPaused(false)
       if (!isMobile) {
          // update to a bigger screen on desktop
          setShowBigVideoPlayer(true)
       }
-   }, [isMobile, startCounting])
+   }, [isMobile])
 
    const handleCloseRecordingPlayer = useCallback(() => {
       setShowBigVideoPlayer(false)
@@ -335,9 +336,8 @@ export const useRecordingControls = (
    ])
 
    const handlePause = useCallback(() => {
-      pauseCounting()
       setVideoPaused(true)
-   }, [pauseCounting])
+   }, [])
 
    return useMemo(
       () => ({

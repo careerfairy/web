@@ -2,6 +2,7 @@ import functions = require("firebase-functions")
 import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import RecommendationServiceCore, {
    IRecommendationService,
+   applyFeaturedGroupPoints,
 } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
 import {
    AdditionalUserRecommendationInfo,
@@ -9,6 +10,7 @@ import {
    UserData,
 } from "@careerfairy/shared-lib/users"
 
+import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
@@ -29,6 +31,12 @@ export default class UserEventRecommendationService
    implements IRecommendationService
 {
    private additionalUserData: AdditionalUserRecommendationInfo
+   private featuredGroups?: { [groupId: string]: Group }
+   /**
+    * The filtered livestreams to consider for recommendations
+    * This is the futureLivestreams filtered out of ended livestreams and registered livestreams
+    */
+   private filteredLivestreams: LivestreamEvent[] = []
 
    constructor(
       private readonly user: UserData,
@@ -50,6 +58,24 @@ export default class UserEventRecommendationService
     * @returns A promise that resolves to an array of recommended event IDs
     */
    async getRecommendations(limit = 10): Promise<string[]> {
+      // Filter out ended livestreams and registered livestreams
+      this.filteredLivestreams = this.futureLivestreams.filter((livestream) => {
+         // Filter out livestreams that have ended
+         if (livestream.hasEnded) {
+            return false
+         }
+
+         // Filter out registered livestreams if there are any
+         if (
+            this.registeredLivestreams?.registeredLivestreams &&
+            this.registeredLivestreams.registeredLivestreams[livestream.id]
+         ) {
+            return false
+         }
+
+         return true
+      })
+
       const promises: Promise<RankedLivestreamEvent[]>[] = []
 
       if (this.user) {
@@ -58,10 +84,11 @@ export default class UserEventRecommendationService
             Promise.resolve(
                this.getRecommendedEventsBasedOnUserData(
                   this.user,
-                  this.futureLivestreams,
+                  this.filteredLivestreams,
                   limit,
                   this.implicitData,
-                  this.additionalUserData
+                  this.additionalUserData,
+                  this.featuredGroups
                )
             )
          ),
@@ -78,9 +105,16 @@ export default class UserEventRecommendationService
       return this.process(
          recommendedEvents,
          limit,
-         this.futureLivestreams,
+         this.filteredLivestreams,
          this.user
       )
+   }
+
+   public setFeaturedGroups(featuredGroups: {
+      [groupId: string]: Group
+   }): UserEventRecommendationService {
+      this.featuredGroups = featuredGroups
+      return this
    }
 
    public setAdditionalData(
@@ -136,7 +170,7 @@ export default class UserEventRecommendationService
          new LivestreamBasedRecommendationsBuilder(
             limit,
             livestreamsUserRegistered,
-            new RankedLivestreamRepository(this.futureLivestreams)
+            new RankedLivestreamRepository(this.filteredLivestreams)
          )
 
       return livestreamBasedRecommendations
@@ -145,7 +179,12 @@ export default class UserEventRecommendationService
          .mostCommonCountries()
          .mostCommonIndustries()
          .mostCommonCompanySizes()
-         .get()
+         .get((rankedLivestream) => {
+            return applyFeaturedGroupPoints(
+               rankedLivestream,
+               this.featuredGroups
+            )
+         })
    }
 
    static async create(
@@ -167,13 +206,24 @@ export default class UserEventRecommendationService
          dataFetcher.getUserLanguages(),
       ])
 
-      const [watchedSparks, interactedEvents, appliedJobs, followedCompanies] =
-         await Promise.all([
-            dataFetcher.getWatchedSparks(user.userEmail),
-            dataFetcher.getInteractedLivestreams(user.userEmail),
-            dataFetcher.getAppliedJobs(user.userEmail),
-            dataFetcher.getFollowedCompanies(user.userEmail),
-         ])
+      const [
+         watchedSparks,
+         interactedEvents,
+         appliedJobs,
+         followedCompanies,
+         featuredGroups,
+      ] = await Promise.all([
+         dataFetcher.getWatchedSparks(user.userEmail),
+         dataFetcher.getInteractedLivestreams(user.userEmail),
+         dataFetcher.getAppliedJobs(user.userEmail),
+         dataFetcher.getFollowedCompanies(user.userEmail),
+         dataFetcher.getUserFeaturedGroups(user),
+      ])
+
+      const userFeaturedGroups = featuredGroups.reduce(
+         (acc, group) => ({ ...acc, [group.id]: group }),
+         {}
+      )
 
       const implicitData: ImplicitLivestreamRecommendationData = {
          watchedSparks: watchedSparks,
@@ -190,6 +240,8 @@ export default class UserEventRecommendationService
          registeredLivestreams
       )
 
-      return instance.setAdditionalData({ studyBackgrounds, languages })
+      return instance
+         .setAdditionalData({ studyBackgrounds, languages })
+         .setFeaturedGroups(userFeaturedGroups)
    }
 }

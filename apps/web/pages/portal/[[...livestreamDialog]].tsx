@@ -163,6 +163,7 @@ const PortalPage = ({
                                  type={EventsTypes.PAST_EVENTS}
                                  events={events}
                                  seeMoreLink={"/past-livestreams"}
+                                 preventPaddingSlide
                               />
                            </ConditionalWrapper>
                         </PortalTags>

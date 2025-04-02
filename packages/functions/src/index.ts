@@ -31,6 +31,7 @@ setGlobalOptions({
    region: config.region,
 })
 
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import { bundles } from "./bundles"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
@@ -38,6 +39,7 @@ import * as customerio from "./lib/customerio"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import * as streaming from "./lib/streaming"
+import * as warming from "./lib/warming"
 
 // Imported Individual Cloud functions
 import auth = require("./auth")
@@ -46,6 +48,7 @@ import backup = require("./backup")
 import groupAdmin = require("./groupAdmin")
 import admin = require("./admin")
 import reminders = require("./reminders")
+import remindersNoShow = require("./reminders-no-show")
 import livestreams = require("./livestreams")
 import analytics = require("./analytics")
 import breakoutRooms = require("./breakoutRooms")
@@ -83,15 +86,16 @@ import notificationOnboardings = require("./notificationOnboarding")
 import user = require("./user")
 import countries = require("./countries")
 import levels = require("./levels")
-
+import remindersNew = require("./reminders-new")
+import followups = require("./followups")
 // Auth
-exports.createNewUserAccount_v3 = auth.createNewUserAccount
-exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
-exports.backfillUserData_eu = auth.backfillUserData
-exports.validateUserEmailWithPin_eu = auth.validateUserEmailWithPin
-exports.sendPostmarkResetPasswordEmail_eu = auth.sendPostmarkResetPasswordEmail
-exports.resendPostmarkEmailVerificationEmailWithPin_eu =
-   auth.resendPostmarkEmailVerificationEmailWithPin
+exports.createNewUserAccount_v4 = auth.createNewUserAccount
+exports.createNewGroupAdminUserAccount = auth.createNewGroupAdminUserAccount
+exports.backfillUserData = auth.backfillUserData
+exports.validateUserEmailWithPin_v2 = auth.validateUserEmailWithPin
+exports.sendPasswordResetEmail = auth.sendPasswordResetEmail
+exports.resendEmailVerificationEmailWithPin =
+   auth.resendEmailVerificationEmailWithPin
 exports.deleteLoggedInUserAccount_v2 = auth.deleteLoggedInUserAccount
 exports.verifyToken = auth.verifyToken
 
@@ -107,41 +111,27 @@ exports.sendBasicTemplateEmail_v3 = admin.sendBasicTemplateEmail
 exports.unsubscribeFromMarketingEmails_eu = admin.unsubscribeFromMarketingEmails
 
 // Group Admin
-exports.sendDraftApprovalRequestEmail_eu =
-   groupAdmin.sendDraftApprovalRequestEmail
-exports.sendNewlyPublishedEventEmail_v2 =
+exports[FUNCTION_NAMES.sendNewlyPublishedEventEmail] =
    groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_v2 = groupAdmin.getLivestreamReportData
-exports.sendDashboardInviteEmail_eu = groupAdmin.sendDashboardInviteEmail
+exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
 exports.joinGroupDashboard_eu = groupAdmin.joinGroupDashboard
 exports.createGroup_eu = groupAdmin.createGroup
 exports.changeRole_eu = groupAdmin.changeRole
 exports.kickFromDashboard_eu = groupAdmin.kickFromDashboard
 
-// Reminders
-exports.sendReminderEmailToRegistrants =
-   reminders.sendReminderEmailToRegistrants
-exports.sendReminderEmailAboutApplicationLink_eu =
-   reminders.sendReminderEmailAboutApplicationLink
+// Reminders (Old) TODO: delete functions in file after testing new reminders
 exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
-// Not to be deployed
-exports.manualReminderEmails = reminders.manualReminderEmails
-exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
-exports.sendReminderToAttendees = reminders.sendReminderToAttendees
-// Not to be deployed
-exports.testSendReminderToNonAttendees =
-   reminders.testSendReminderToNonAttendees
-exports.sendReminderForNonAttendeesByStreamId =
-   reminders.sendReminderForNonAttendeesByStreamId
 
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
 exports.onboardingNewsletter = onboardingNewsletter.onboardingNewsletter
 exports.manualOnboardingNewsletter =
    onboardingNewsletter.manualOnboardingNewsletter
-exports.manualEndOfSparksTrialEmails =
+exports[FUNCTION_NAMES.manualEndOfSparksTrialEmails] =
    endOfSparksTrials.manualEndOfSparksTrialEmails
-exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
+exports[FUNCTION_NAMES.endOfSparksTrialEmails] =
+   endOfSparksTrials.endOfSparksTrialEmails
 exports.manualTemplatedEmail = newsletter.manualTemplatedEmail
 
 // Notification Livestreams
@@ -168,7 +158,7 @@ exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
 // Livestreams
 exports.sendLivestreamRegistrationConfirmationEmail_v6 =
    livestreams.livestreamRegistrationConfirmationEmail
-exports.sendPhysicalEventRegistrationConfirmationEmail_eu =
+exports[FUNCTION_NAMES.sendPhysicalEventRegistrationConfirmationEmail] =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail
 exports.sendHybridEventRegistrationConfirmationEmail_eu =
    livestreams.sendHybridEventRegistrationConfirmationEmail
@@ -258,7 +248,7 @@ exports.periodicallyRemoveCachedDocument =
 // exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
-exports.getRecommendedEvents_v5 = recommendation.getRecommendedEvents
+exports.getRecommendedEvents_v6 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
@@ -282,7 +272,7 @@ exports.onCreateLivestreamPopularityEvents =
    onCreateTriggers.onCreateLivestreamPopularityEvents
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
-exports.onCreateUserData = onCreateTriggers.onCreateUserData
+exports.onCreateUserData_v2 = onCreateTriggers.onCreateUserData
 exports.onUpdateUserData = onCreateTriggers.onUpdateUserData
 exports.onCreateReward = onCreateTriggers.onCreateReward
 exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
@@ -309,8 +299,8 @@ exports.removeAndSyncUserSparkNotification_v2 =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
-exports.getSparksFeed_v9 = userSparks.getSparksFeed
-exports.markSparkAsSeenByUser_v5 = userSparks.markSparkAsSeenByUser
+exports.getSparksFeed_v10 = userSparks.getSparksFeed
+exports.markSparkAsSeenByUser_v6 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
 exports.trackSparkEvents_v6 = userSparks.trackSparkEvents
@@ -333,8 +323,8 @@ exports.fetchCustomJobGroupNames = customJobs.getCustomJobGroupNames
 exports.setRemoveUserJobApplication = customJobs.setRemoveUserJobApplication
 
 // Group Subscription Plan Functions
-exports.startPlan_v3 = groupPlans.startPlan
-exports.sendReminderToNearEndSparksTrialPlanCreationPeriod =
+exports[FUNCTION_NAMES.startPlan] = groupPlans.startPlan
+exports[FUNCTION_NAMES.sendReminderToNearEndSparksTrialPlanCreationPeriod] =
    groupPlans.sendReminderToNearEndSparksTrialPlanCreationPeriod
 exports.checkExpiredPlans = groupPlans.checkExpiredPlans
 exports.manualCheckExpiredPlans = groupPlans.manualCheckExpiredPlans
@@ -387,3 +377,32 @@ exports.getFollowedCreators = levels.getFollowedCreators
 // CustomerIO
 exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
 exports.customerIOWebhook = customerio.customerIOWebhook
+exports[FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook] =
+   customerio.customerIORecommendedLivestreamsWebhook
+exports[FUNCTION_NAMES.customerIORecommendedSparksWebhook] =
+   customerio.customerIORecommendedSparksWebhook
+
+// Reminders
+exports.schedule5MinutesReminderEmails =
+   remindersNew.schedule5MinutesReminderEmails
+exports.schedule1HourReminderEmails = remindersNew.schedule1HourReminderEmails
+exports.schedule24HoursReminderEmails =
+   remindersNew.schedule24HoursReminderEmails
+// For testing Reminders
+exports.manualReminderEmails = remindersNew.manualReminderEmails
+
+// Followups
+exports.sendFollowupToNonAttendees = followups.sendFollowupToNonAttendees
+exports.sendFollowupToAttendees = followups.sendFollowupToAttendees
+exports.sendManualFollowup = followups.sendManualFollowup
+exports.sendReminderEmailAboutApplicationLink_v2 =
+   followups.sendReminderEmailAboutApplicationLink
+
+// Reminders Post
+exports[FUNCTION_NAMES.onLivestreamStartScheduleNoShowReminder] =
+   remindersNoShow.onLivestreamStartScheduleNoShowReminder
+exports[FUNCTION_NAMES.sendLivestreamNoShowReminder] =
+   remindersNoShow.sendLivestreamNoShowReminder
+
+// Keep-warm function
+exports[FUNCTION_NAMES.keepFunctionsWarm] = warming.keepFunctionsWarm

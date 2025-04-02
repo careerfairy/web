@@ -42,6 +42,10 @@ export const COMPANY_FIELDS_TO_INDEX = [
    "companySize",
    "publicProfile",
    "featuredCompanyPriority",
+   "hasJobs",
+   "hasUpcomingEvents",
+   "hasSparks",
+   "featured",
 ] satisfies (keyof TransformedGroup)[]
 
 export type CompanyFieldToIndexType = (typeof COMPANY_FIELDS_TO_INDEX)[number]

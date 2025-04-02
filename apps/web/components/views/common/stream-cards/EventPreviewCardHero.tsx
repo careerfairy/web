@@ -1,17 +1,25 @@
+import { SECONDS_TO_AUTO_PLAY_LIVESTREAM } from "@careerfairy/shared-lib/livestreams/constants"
+import { RecordingToken } from "@careerfairy/shared-lib/livestreams/livestreams"
+import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Skeleton, Stack, Typography } from "@mui/material"
+import { useRecordingTokenSWR } from "components/custom-hook/recordings/useRecordingTokenSWR"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import {
    addMinutes,
    getResizedUrl,
 } from "components/helperFunctions/HelperFunctions"
 import { placeholderBanner } from "constants/images"
+import { useAuth } from "HOCs/AuthProvider"
 import Image from "next/image"
-import { useMemo } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import DateUtil from "util/DateUtil"
 import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
 import { useEventPreviewCardContext } from "./EventPreviewCardContext"
 import { RecordingPlayIcon } from "./RecordingPlayIcon"
+import RecordingPreviewCardContainer from "./RecordingPreviewCardContainer"
 import { RecordingUnavailableIcon } from "./RecordingUnavailableIcon"
+import useRecordingProgressTracker from "./useRecordingProgressTracker"
 const bottomContentHeight = 50
 
 const styles = sxStyles({
@@ -40,23 +48,13 @@ const styles = sxStyles({
       position: "absolute",
       inset: 0,
       height: "auto",
+      borderRadius: "8px",
    },
    recordingWrapper: {
       overflow: "hidden",
       position: "relative",
       width: "100%",
       height: "100%",
-      "&::after": {
-         content: '""',
-         position: "absolute",
-         top: 0,
-         left: 0,
-         right: 0,
-         bottom: 0,
-         borderRadius: "8px",
-         background:
-            "linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%)",
-      },
    },
    noRecordingWrapper: {
       overflow: "hidden",
@@ -237,8 +235,111 @@ export const HeroRecording = () => {
       animation,
       bottomElement,
       hideChipLabels,
-      startDate,
+      autoPlaying,
+      setAutoPlaying,
+      onGoNext,
+      disableAutoPlay,
+      cardInView,
    } = useEventPreviewCardContext()
+   const { isLoggedIn, isLoadingAuth } = useAuth()
+   const isMobile = useIsMobile()
+   const { data: recordingToken, isLoading: recordingTokenLoading } =
+      useRecordingTokenSWR(livestream.id)
+   const [preview, setPreview] = useState(false)
+
+   const recordingNotAvailable =
+      livestream.denyRecordingAccess || !recordingToken
+
+   /**
+    * Auto-plays recordings on mobile when they become visible.
+    * Uses intersection observer to detect when card is 100% in viewport.
+    *
+    * Flow:
+    * 1. Card enters view -> Start playing after 200ms delay
+    * 2. Card exits view -> Stop playing
+    * 3. After auto-play duration -> Go to next recording
+    *
+    * @param disableAutoPlay - Disables auto-play if true
+    * @param isMobile - Is mobile device
+    * @param inView - Is card visible
+    * @param onGoNext - Handler for going to next recording
+    */
+   useEffect(() => {
+      let timeout: NodeJS.Timeout
+
+      if (isMobile && cardInView && !disableAutoPlay) {
+         if (recordingNotAvailable) {
+            timeout = setTimeout(() => {
+               onGoNext?.()
+            }, 5000)
+         } else {
+            timeout = setTimeout(() => {
+               setAutoPlaying(true)
+            }, 200)
+         }
+      } else if (!cardInView) {
+         setAutoPlaying(false)
+      }
+
+      return () => clearTimeout(timeout)
+   }, [
+      isMobile,
+      cardInView,
+      setAutoPlaying,
+      disableAutoPlay,
+      recordingNotAvailable,
+      onGoNext,
+   ])
+
+   // Set up auto-playing timeout for mobile experience
+   useEffect(() => {
+      if (disableAutoPlay || recordingNotAvailable) return
+
+      let timeout: NodeJS.Timeout
+
+      if (!disableAutoPlay && autoPlaying && preview) {
+         // After auto-play we should transition to the next recording
+         timeout = setTimeout(() => {
+            setAutoPlaying(false)
+            if (isMobile && autoPlaying) {
+               onGoNext?.()
+            }
+         }, SECONDS_TO_AUTO_PLAY_LIVESTREAM)
+      }
+
+      return () => {
+         clearTimeout(timeout)
+      }
+   }, [
+      autoPlaying,
+      disableAutoPlay,
+      isMobile,
+      onGoNext,
+      setAutoPlaying,
+      recordingNotAvailable,
+      preview,
+   ])
+
+   // changes autoplay mode to preview (plays only 20 seconds)
+   useEffect(() => {
+      if (!isLoadingAuth && !isLoggedIn) {
+         setPreview(true)
+      }
+   }, [isLoggedIn, isLoadingAuth, isMobile])
+
+   // disables auto play if it changes while already playing (e.g open LS dialog)
+   useEffect(() => {
+      if (disableAutoPlay) {
+         setAutoPlaying(false)
+      }
+   }, [disableAutoPlay, setAutoPlaying])
+
+   const onVideoEnded = useCallback(() => {
+      // only move if card is still playing, avoids edge-case where new elements come
+      // into view while card is still playing
+      autoPlaying && onGoNext?.()
+   }, [onGoNext, autoPlaying])
+
    return (
       <>
          <Box
@@ -248,82 +349,122 @@ export const HeroRecording = () => {
                bottomElement && styles.backgroundImageWrapperWithBottomContent,
             ]}
          >
-            {loading ? (
+            {loading || recordingTokenLoading ? (
                <Skeleton
                   animation={animation ?? "wave"}
                   variant="rectangular"
                   sx={styles.backgroundImageLoader}
                />
+            ) : recordingNotAvailable ? (
+               <NoRecordingHero />
             ) : (
-               <>
-                  <Box
-                     sx={
-                        livestream.denyRecordingAccess
-                           ? styles.noRecordingWrapper
-                           : styles.recordingWrapper
-                     }
-                  >
-                     <Image
-                        alt="Recording Image"
-                        src={
-                           getResizedUrl(
-                              livestream?.backgroundImageUrl,
-                              "lg"
-                           ) || placeholderBanner
-                        }
-                        fill
-                        priority
-                        className="backgroundImage"
-                        sizes="(max-width: 647px) 100vw, (max-width: 1279px) 50vw, 33vw"
-                        style={{
-                           objectFit: "cover",
-                           borderRadius: "8px",
-                        }}
-                     />
-                  </Box>
-                  {livestream.denyRecordingAccess ? (
-                     <Stack sx={styles.noRecordingText}>
-                        <Box
-                           sx={styles.frownIcon}
-                           component={RecordingUnavailableIcon}
-                        />
-                        <Typography variant="small">
-                           Recording unavailable
-                        </Typography>
-                        <Typography variant="xsmall" mt={"-2px"}>
-                           Live {DateUtil.getTimeAgo(startDate)}
-                        </Typography>
-                     </Stack>
-                  ) : (
-                     <>
-                        <Box
-                           sx={styles.recordingPlayIcon}
-                           component={RecordingPlayIcon}
-                        />
-                        <Box sx={styles.timestamp}>
-                           <Typography variant="small">
-                              {DateUtil.getTimeAgo(startDate)}
-                           </Typography>
-                        </Box>
-                        <Box sx={styles.duration}>
-                           <Typography variant="small">
-                              {livestream.endedAt
-                                 ? DateUtil.formatElapsedTime(
-                                      startDate,
-                                      livestream.endedAt.toDate()
-                                   )
-                                 : DateUtil.formatElapsedTime(
-                                      startDate,
-                                      addMinutes(startDate, livestream.duration)
-                                   )}
-                           </Typography>
-                        </Box>
-                     </>
-                  )}
-               </>
+               <VideoPreviewHero
+                  preview={preview}
+                  onVideoEnded={onVideoEnded}
+                  recordingToken={recordingToken}
+               />
             )}
          </Box>
          {hideChipLabels || loading ? null : <EventPreviewCardChipLabels />}
+      </>
+   )
+}
+
+const NoRecordingHero = () => {
+   const { livestream, startDate } = useEventPreviewCardContext()
+   return (
+      <>
+         <Box sx={styles.noRecordingWrapper}>
+            <Image
+               alt="Recording Image"
+               src={
+                  getResizedUrl(livestream?.backgroundImageUrl, "lg") ||
+                  placeholderBanner
+               }
+               fill
+               priority
+               className="backgroundImage"
+               sizes="(max-width: 647px) 100vw, (max-width: 1279px) 50vw, 33vw"
+               style={{
+                  objectFit: "cover",
+                  borderRadius: "8px",
+               }}
+            />
+         </Box>
+         <Stack sx={styles.noRecordingText}>
+            <Box sx={styles.frownIcon} component={RecordingUnavailableIcon} />
+            <Typography variant="small">Recording unavailable</Typography>
+            <Typography variant="xsmall" mt={"-2px"}>
+               Live {DateUtil.getTimeAgo(startDate)}
+            </Typography>
+         </Stack>
+      </>
+   )
+}
+
+const VideoPreviewHero = ({
+   preview,
+   onVideoEnded,
+   recordingToken,
+}: {
+   preview: boolean
+   onVideoEnded: () => void
+   recordingToken: RecordingToken
+}) => {
+   const { livestream, startDate, autoPlaying } = useEventPreviewCardContext()
+   const { currentPercentage, videoStartPosition, onSecondPassed } =
+      useRecordingProgressTracker({
+         livestream,
+         playing: autoPlaying,
+      })
+
+   return (
+      <>
+         <Box sx={styles.recordingWrapper}>
+            <RecordingPreviewCardContainer
+               video={{
+                  thumbnailUrl: livestream.backgroundImageUrl,
+                  url: downloadLinkWithDate(
+                     livestream.startDate,
+                     livestream.id,
+                     recordingToken.sid
+                  ),
+                  preview: preview,
+                  startAt: videoStartPosition,
+                  percentWatched: currentPercentage,
+               }}
+               autoPlaying={autoPlaying}
+               onSecondPassed={onSecondPassed}
+               onVideoEnded={onVideoEnded}
+            />
+         </Box>
+
+         {!autoPlaying && (
+            <>
+               <Box
+                  sx={styles.recordingPlayIcon}
+                  component={RecordingPlayIcon}
+               />
+               <Box sx={styles.timestamp}>
+                  <Typography variant="small">
+                     {DateUtil.getTimeAgo(startDate)}
+                  </Typography>
+               </Box>
+               <Box sx={styles.duration}>
+                  <Typography variant="small">
+                     {livestream.endedAt
+                        ? DateUtil.formatElapsedTime(
+                             startDate,
+                             livestream.endedAt.toDate()
+                          )
+                        : DateUtil.formatElapsedTime(
+                             startDate,
+                             addMinutes(startDate, livestream.duration)
+                          )}
+                  </Typography>
+               </Box>
+            </>
+         )}
       </>
    )
 }

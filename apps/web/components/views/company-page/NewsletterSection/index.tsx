@@ -19,12 +19,31 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      mt: 12,
+      mt: {
+         xs: "12px",
+         sm: "12px",
+         md: "16px",
+      },
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
+      borderRadius: "12px",
+      backgroundPosition: {
+         xs: "-270px -120px",
+         md: "-320px -120px",
+      },
+      backgroundSize: {
+         xs: "400px !important",
+         md: "70dvh !important",
+      },
+      backgroundColor: (theme) => theme.brand.white[200],
    },
    content: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
+      maxWidth: {
+         xs: "80%",
+         md: "60%",
+      },
    },
 })
 
@@ -66,9 +85,17 @@ const NewsletterSection = () => {
          styles={styles.wrapper}
          isSmallBackground={true}
          bgColor={"#EFF5F8"}
+         backgroundUrl={`/company-page/stay-up-to-date-banner.svg`}
       >
          <Box sx={styles.content}>
-            <Typography variant={"h3"} fontWeight={"600"} color="black">
+            <Typography
+               variant={"brandedH2"}
+               fontWeight={"700"}
+               color="neutral.800"
+               sx={{
+                  textAlign: "center",
+               }}
+            >
                Stay up-to-date. Always.
             </Typography>
             <Typography
@@ -78,6 +105,9 @@ const NewsletterSection = () => {
                mt={2}
                textAlign="center"
                mx={1}
+               sx={{
+                  textAlign: "center",
+               }}
             >
                {isLoggedIn
                   ? "Sign up for our weekly update and receive personalised invitations to career live streams and job openings"
@@ -88,10 +118,9 @@ const NewsletterSection = () => {
                   <Button
                      onClick={handleAcceptNewsletter}
                      variant={"contained"}
-                     color={"secondary"}
-                     size={"large"}
+                     color={"primary"}
                   >
-                     SIGN ME UP
+                     Sign me up
                   </Button>
                ) : (
                   <Link
@@ -105,7 +134,7 @@ const NewsletterSection = () => {
                   >
                      <Button
                         variant={"contained"}
-                        color={"secondary"}
+                        color={"primary"}
                         size={"large"}
                      >
                         Join CareerFairy

@@ -8,11 +8,11 @@ import {
 } from "firebase-admin/firestore"
 import { IndexName, indexNames, knownIndexes } from "./lib/search/searchIndexes"
 
+import { onRequest } from "firebase-functions/v2/https"
 import { firestore } from "./api/firestoreAdmin"
-import config from "./config"
 import { getData } from "./lib/search/searchIndexGenerator"
 import { configureSettings, initAlgoliaIndex } from "./lib/search/util"
-import { defaultTriggerRunTimeConfig } from "./lib/triggers/util"
+import { defaultTriggerRunTimeConfigV2 } from "./lib/triggers/util"
 
 const DOCS_PER_INDEXING = 250
 
@@ -29,10 +29,9 @@ const DOCS_PER_INDEXING = 250
  * Where to get the secret key:
  * 1. ALGOLIA_FULL_SYNC_SECRET_KEY in the .env file in functions package
  */
-export const fullIndexSync = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .https.onRequest(async (req, res) => {
+export const fullIndexSync = onRequest(
+   defaultTriggerRunTimeConfigV2,
+   async (req, res) => {
       if (req.method !== "GET") {
          res.status(405).send("Method Not Allowed")
          return
@@ -132,4 +131,5 @@ export const fullIndexSync = functions
       } while (documentSnapshots.size === DOCS_PER_INDEXING)
 
       res.status(200).send("Index sync completed")
-   })
+   }
+)

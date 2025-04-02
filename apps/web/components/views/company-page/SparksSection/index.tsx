@@ -8,8 +8,9 @@ import { FallbackComponent } from "components/views/portal/sparks/FallbackCompon
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
+import { setSparkToPreview } from "store/reducers/adminSparksReducer"
 import { setCameFromPageLink } from "store/reducers/sparksFeedReducer"
-import { SectionAnchor, TabValue, useCompanyPage } from ".."
+import { TabValue, useCompanyPage } from ".."
 
 type Props = {
    groupId: string
@@ -17,7 +18,7 @@ type Props = {
 
 const CarouselHeader = () => {
    return (
-      <Typography variant="h4" fontWeight={"600"} color="black">
+      <Typography variant="brandedH3" fontWeight={"600"} color="black">
          Sparks
       </Typography>
    )
@@ -30,44 +31,53 @@ const Loader = () => {
 const SparksSection: FC<Props> = ({ groupId }) => {
    const dispatch = useDispatch()
 
-   const {
-      group,
-      sectionRefs: { eventSectionRef },
-   } = useCompanyPage()
+   const { group, getCompanyPageTabLink, tabMode, setActiveTab } =
+      useCompanyPage()
    const router = useRouter()
    const isMounted = useIsMounted()
 
+   const handleTabModeSparkClick = useCallback(
+      (spark: Spark) => {
+         dispatch(setSparkToPreview(spark.id))
+      },
+      [dispatch]
+   )
    const handleSparksClicked = useCallback(
       (spark: Spark) => {
          if (spark) {
-            dispatch(setCameFromPageLink(router.asPath))
-            router.push({
-               pathname: `/sparks/${spark.id}`,
-               query: {
-                  ...router.query, // spread current query params
-                  groupId: group.id,
-                  interactionSource: SparkInteractionSources.Company_Page,
-               },
-            })
+            if (tabMode) {
+               handleTabModeSparkClick(spark)
+            } else {
+               dispatch(setCameFromPageLink(router.asPath))
+               router.push({
+                  pathname: `/sparks/${spark.id}`,
+                  query: {
+                     ...router.query, // spread current query params
+                     groupId: group.id,
+                     interactionSource: SparkInteractionSources.Company_Page,
+                  },
+               })
+            }
          }
          return
       },
-      [dispatch, group.id, router]
+      [dispatch, group.id, router, tabMode, handleTabModeSparkClick]
    )
 
    return (
       <Box>
-         <SectionAnchor
-            ref={eventSectionRef}
-            tabValue={TabValue.livesStreams}
-         />
          {isMounted ? (
             <SuspenseWithBoundary fallback={<Loader />}>
                <GroupSparksCarousel
                   header={<CarouselHeader />}
                   groupId={groupId}
                   handleSparksClicked={handleSparksClicked}
-                  sx={{ pl: 0 }}
+                  seeAllHref={getCompanyPageTabLink(TabValue.sparks)}
+                  handleSeeAllClick={
+                     tabMode ? () => setActiveTab(TabValue.sparks) : undefined
+                  }
+                  sx={{ pl: 0, mr: -2 }}
+                  headerSx={{ mr: 2 }}
                />
             </SuspenseWithBoundary>
          ) : (

@@ -159,3 +159,6 @@ export const SparkInteractionSources = {
    Livestream_Follow_Up: "livestream_follow_up",
    Group_Admin_Events_Table: "group_admin_events_table",
 } as const
+
+export type SparkInteractionSource =
+   (typeof SparkInteractionSources)[keyof typeof SparkInteractionSources]

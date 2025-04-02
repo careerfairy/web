@@ -41,14 +41,7 @@ export type PushNotificationRequestData<T extends CustomerIoPushMessageType> = {
     * Custom data you would like to send to the message template
     */
    templateData: CustomerIoPushMessageData[T]
-   /**
-    * The users auth ID to send the notification to
-    */
-   userAuthId: string
-} & Omit<
-   SendPushRequestOptions,
-   "transactional_message_id" | "message_data" | "identifiers"
->
+} & Omit<SendPushRequestOptions, "transactional_message_id" | "message_data">
 
 /**
  * Type-safe function to create a push notification request
@@ -63,15 +56,11 @@ export function createPushNotificationRequestData<
 >({
    templateId,
    templateData,
-   userAuthId,
    ...rest
 }: PushNotificationRequestData<T>): SendPushRequestOptions {
    return {
       ...rest,
       transactional_message_id: templateId,
       message_data: templateData,
-      identifiers: {
-         id: userAuthId,
-      },
    }
 }

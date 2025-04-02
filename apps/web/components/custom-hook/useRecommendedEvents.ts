@@ -1,10 +1,9 @@
-import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useEffect, useMemo } from "react"
 import useSWR, { preload } from "swr"
 import { useAuth } from "../../HOCs/AuthProvider"
-import useFeatureFlags from "./useFeatureFlags"
 import { reducedRemoteCallsOptions } from "./utils/useFunctionsSWRFetcher"
 
 type Config = {
@@ -13,7 +12,6 @@ type Config = {
 }
 
 const useRecommendedEvents = (config?: Config) => {
-   const { talentProfileV1 } = useFeatureFlags()
    const { authenticatedUser } = useAuth()
 
    const limit = config?.limit || 10
@@ -24,11 +22,7 @@ const useRecommendedEvents = (config?: Config) => {
          ? ["getRecommendedEvents", limit, authenticatedUser.email]
          : null,
       async () =>
-         livestreamService.getRecommendedEvents(
-            limit,
-            authenticatedUser.email,
-            talentProfileV1
-         ),
+         livestreamService.getRecommendedEvents(limit, authenticatedUser.email),
       {
          ...reducedRemoteCallsOptions,
          suspense,
@@ -54,7 +48,6 @@ export const usePreFetchRecommendedEvents = (config?: PreFetchConfig) => {
    const limit = config?.limit || 10
    const { isLoggedIn } = useAuth()
    const { authenticatedUser } = useAuth()
-   const { talentProfileV1 } = useFeatureFlags()
 
    useEffect(() => {
       // Only preload if the user is logged in, otherwise the function will throw a not authed error
@@ -62,12 +55,11 @@ export const usePreFetchRecommendedEvents = (config?: PreFetchConfig) => {
          preload(["getRecommendedEvents", limit, authenticatedUser.email], () =>
             livestreamService.getRecommendedEvents(
                limit,
-               authenticatedUser.email,
-               talentProfileV1
+               authenticatedUser.email
             )
          )
       }
-   }, [limit, isLoggedIn, authenticatedUser.email, talentProfileV1])
+   }, [limit, isLoggedIn, authenticatedUser.email])
 
    return null
 }

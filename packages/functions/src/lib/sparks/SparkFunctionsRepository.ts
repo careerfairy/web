@@ -38,7 +38,6 @@ import { DocumentSnapshot } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
-import { FunctionsLogger, getChangeTypes } from "src/util"
 import {
    FieldValue,
    Firestore,
@@ -51,6 +50,7 @@ import {
    sparkRepo,
    userRepo,
 } from "../../api/repositories"
+import { FunctionsLogger, getChangeTypes } from "../../util"
 import { createGenericConverter } from "../../util/firestore-admin"
 import { addAddedToFeedAt } from "../../util/sparks"
 import BigQueryCreateInsertService from "../bigQuery/BigQueryCreateInsertService"
@@ -236,6 +236,13 @@ export interface ISparkFunctionsRepository {
    ): Promise<void>
 
    getSparksByGroupId(groupId: string): Promise<Spark[]>
+
+   /**
+    * Get all published sparks for a group
+    * @param groupId The id of the group
+    * @returns An array of published sparks
+    */
+   getPublishedSparksByGroupId(groupId: string): Promise<Spark[]>
 
    groupHasPublishedSparks(groupId: string, limit?: number): Promise<boolean>
    /**
@@ -946,13 +953,28 @@ export class SparkFunctionsRepository
       return snapshot.docs.map((doc) => doc.data())
    }
 
+   async getPublishedSparksByGroupId(groupId: string): Promise<Spark[]> {
+      const snapshot = await this.firestore
+         .collection("sparks")
+         .withConverter<Spark>(createGenericConverter())
+         .where("group.id", "==", groupId)
+         .where("group.publicSparks", "==", true)
+         .where("published", "==", true)
+         .orderBy("createdAt", "desc")
+         .get()
+
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
    async groupHasPublishedSparks(groupId: string, limit = 1): Promise<boolean> {
       const snapshot = await this.firestore
          .collection("sparks")
          .withConverter<Spark>(createGenericConverter())
          .where("group.id", "==", groupId)
-         .limit(limit)
+         .where("group.publicSparks", "==", true)
+         .where("published", "==", true)
          .orderBy("createdAt", "desc")
+         .limit(limit)
          .get()
 
       return !snapshot.empty

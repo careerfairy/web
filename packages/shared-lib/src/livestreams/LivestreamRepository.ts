@@ -45,6 +45,7 @@ type UpdateRecordingStatsProps = {
    userId?: string
    onlyIncrementMinutes?: boolean
    usedCredits?: boolean
+   lastSecondWatched?: number
 }
 
 export type PastEventsOptions = {
@@ -136,6 +137,8 @@ export interface ILivestreamRepository {
       elapsedMinutes: number
    ): Promise<void>
 
+   getLivestreamNoShowUsers(livestreamId: string): Promise<UserLivestreamData[]>
+
    getLivestreamUsers(
       eventId: string,
       userType: LivestreamUserAction
@@ -216,6 +219,16 @@ export interface ILivestreamRepository {
       userId,
       onlyIncrementMinutes,
       usedCredits,
+      lastSecondWatched,
+   }: UpdateRecordingStatsProps): Promise<void>
+
+   updateUserRecordingStats({
+      livestreamId,
+      livestreamStartDate,
+      minutesWatched,
+      userId,
+      usedCredits,
+      lastSecondWatched,
    }: UpdateRecordingStatsProps): Promise<void>
 
    getLivestreamRecordingTokenAndIncrementViewStat(
@@ -939,6 +952,15 @@ export class FirebaseLivestreamRepository
       }
    }
 
+   async getLivestreamNoShowUsers(
+      livestreamId: string
+   ): Promise<UserLivestreamData[]> {
+      return this.livestreamUsersQuery(livestreamId, "registered")
+         .where("participated", "==", null)
+         .get()
+         .then(mapFirestoreDocuments<UserLivestreamData>)
+   }
+
    async getLivestreamUsers(
       eventId: string,
       userType: LivestreamUserAction
@@ -1134,6 +1156,7 @@ export class FirebaseLivestreamRepository
       userId,
       onlyIncrementMinutes = false,
       usedCredits = false,
+      lastSecondWatched,
    }: UpdateRecordingStatsProps): Promise<void> {
       const promises = [
          // update global recordingStats/stats doc
@@ -1156,6 +1179,7 @@ export class FirebaseLivestreamRepository
                livestreamStartDate,
                minutesWatched,
                usedCredits,
+               lastSecondWatched,
             })
          )
       }
@@ -1163,12 +1187,13 @@ export class FirebaseLivestreamRepository
       await Promise.all(promises)
    }
 
-   private async updateUserRecordingStats({
+   async updateUserRecordingStats({
       livestreamId,
       livestreamStartDate,
       minutesWatched,
       userId,
-      usedCredits,
+      usedCredits = false,
+      lastSecondWatched,
    }: UpdateRecordingStatsProps) {
       /**
        * 1 document per hour per user views
@@ -1188,15 +1213,22 @@ export class FirebaseLivestreamRepository
          documentType: "recordingStatsUser",
          livestreamId,
          userId,
-         minutesWatched: this.fieldValue.increment(
-            minutesWatched
-         ) as unknown as number,
          recordingBought: usedCredits,
          date: this.fieldValue.serverTimestamp() as unknown as Timestamp,
       }
 
       if (livestreamStartDate) {
          details.livestreamStartDate = livestreamStartDate
+      }
+
+      if (minutesWatched) {
+         details.minutesWatched = this.fieldValue.increment(
+            minutesWatched
+         ) as unknown as number
+      }
+
+      if (lastSecondWatched) {
+         details.lastSecondWatched = lastSecondWatched
       }
 
       return docRef.set(details, { merge: true })

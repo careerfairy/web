@@ -1,40 +1,101 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { FeatureFlagsState } from "@careerfairy/shared-lib/feature-flags/types"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Container, Grid, Stack } from "@mui/material"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import {
+   Box,
+   Container,
+   Stack,
+   Tab,
+   TabScrollButton,
+   Tabs,
+} from "@mui/material"
 import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGroupAvailableCustomJobs"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { doc } from "firebase/firestore"
+import Link from "next/link"
 import {
    MutableRefObject,
    createContext,
    forwardRef,
+   useCallback,
    useContext,
    useEffect,
    useMemo,
    useRef,
+   useState,
 } from "react"
 import { useFirestoreDocData } from "reactfire"
-import { useAuth } from "../../../HOCs/AuthProvider"
+import { sxStyles } from "types/commonTypes"
 import { groupRepo } from "../../../data/RepositoryInstances"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { errorLogAndNotify } from "../../../util/CommonUtil"
+import { errorLogAndNotify, isTestEnvironment } from "../../../util/CommonUtil"
 import useListenToStreams from "../../custom-hook/useListenToStreams"
-import AboutSection from "./AboutSection"
-import EventSection from "./EventSection"
 import Header from "./Header"
-import JobsSection from "./JobsSection"
 import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
+import { Overview } from "./Overview"
 import ProgressBanner from "./ProgressBanner"
-import SparksSection from "./SparksSection"
-import { TestimonialsOrMentorsSection } from "./TestimonialsOrMentorsSection"
-import { FollowCompany, SignUp } from "./ctas"
+import { PastEventsTab, UpcomingEventsTab } from "./Tabs/EventsTab"
+import { JobsTab } from "./Tabs/JobsTab"
+import MentorsTab from "./Tabs/MentorsTab"
+import SparksTab from "./Tabs/SparksTab"
+
+const isTest = isTestEnvironment()
+
+const styles = sxStyles({
+   tabs: {
+      borderRadius: {
+         sm: "0",
+         md: "12px 12px 0 0",
+      },
+      backgroundColor: "#FEFEFE",
+      position: "sticky",
+      top: {
+         xs: "calc(var(--app-bar-height, 64px) * var(--app-bar-visible, 0))",
+         sm: "calc(var(--app-bar-height, 64px) * var(--app-bar-visible, 0))",
+         md: "0",
+      },
+      zIndex: 10,
+      borderBottom: "1px solid",
+      borderColor: "divider",
+      transition: "top 0.2s",
+      "& .MuiTab-root": {
+         textTransform: "none",
+         fontFamily: "Poppins",
+         fontSize: "16px",
+         color: (theme) => theme.palette.neutral[500],
+         fontWeight: 400,
+         minWidth: "auto",
+         px: 2,
+      },
+      "& .Mui-selected": {
+         color: (theme) => theme.brand.tq[600],
+         fontWeight: 600,
+      },
+      "& .MuiTabs-indicator": {
+         height: "1px",
+      },
+      "& .MuiTabs-scroller": {
+         zIndex: 0,
+      },
+   },
+   tabContent: {
+      backgroundColor: "#FEFEFE",
+      pt: "20px",
+      pb: "24px",
+      px: 2,
+      borderRadius: {
+         xs: "0 0 8px 8px",
+         sm: "0 0 8px 8px",
+         md: "0 0 12px 12px",
+      },
+   },
+})
 
 type Props = {
    group: Group
@@ -43,46 +104,77 @@ type Props = {
    pastLivestreams: LivestreamEvent[]
    groupCreators: PublicCreator[]
    customJobs: CustomJob[]
+   tab?: TabValueType
+   tabMode?: boolean
 }
 
 export const TabValue = {
-   profile: "profile-section",
-   media: "media-section",
-   testimonialsOrMentors: "testimonials-or-mentors-section",
-   livesStreams: "livesStreams-section",
-   banner: "banner-section",
-   video: "video-section",
+   overview: "overview-section",
    jobs: "jobs-section",
+   sparks: "sparks-section",
+   livesStreams: "livesStreams-section",
+   recordings: "recordings-section",
+   mentors: "mentors-section",
+   testimonials: "testimonials-section",
+   benefits: "benefits-section",
 } as const
 
 export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
 
-export const getTabLabel = (
-   tabId: TabValueType,
-   featureFlags: FeatureFlagsState
-) => {
+export const getTabLabel = (tabId: TabValueType) => {
    switch (tabId) {
-      case TabValue.profile:
-         return "About"
+      case TabValue.overview:
+         return "Overview"
       case TabValue.jobs:
          return "Jobs"
-      case TabValue.media:
-         return "Media"
-      case TabValue.testimonialsOrMentors:
-         return featureFlags.mentorsV1 ? "Mentors" : "Testimonials"
+      case TabValue.sparks:
+         return "Sparks"
       case TabValue.livesStreams:
-         return "Live Streams"
+         return "Live streams"
+      case TabValue.recordings:
+         return "Recordings"
+      case TabValue.mentors:
+         return "Mentors"
+      case TabValue.testimonials:
+         return "Testimonials"
+      case TabValue.benefits:
+         return "Benefits"
+      default:
+         return ""
+   }
+}
+
+const getTabLink = (basePath: string, tab: TabValueType) => {
+   switch (tab) {
+      case TabValue.overview:
+         return `${basePath}`
+      case TabValue.jobs:
+         return `${basePath}/jobs`
+      case TabValue.sparks:
+         return `${basePath}/sparks`
+      case TabValue.livesStreams:
+         return `${basePath}/livestreams`
+      case TabValue.recordings:
+         return `${basePath}/recordings`
+      case TabValue.mentors:
+         return `${basePath}/mentors`
+      // TBD: Benefits tab in the future
+      case TabValue.benefits:
+         return `${basePath}/benefits`
       default:
          return ""
    }
 }
 
 export type SectionRefs = {
-   aboutSectionRef: MutableRefObject<HTMLElement>
+   overviewSectionRef: MutableRefObject<HTMLElement>
    jobsSectionRef: MutableRefObject<HTMLElement>
-   testimonialOrMentorsSectionRef: MutableRefObject<HTMLElement>
-   eventSectionRef: MutableRefObject<HTMLElement>
-   mediaSectionRef: MutableRefObject<HTMLElement>
+   sparksSectionRef: MutableRefObject<HTMLElement>
+   livesStreamsSectionRef: MutableRefObject<HTMLElement>
+   recordingsSectionRef: MutableRefObject<HTMLElement>
+   mentorsSectionRef: MutableRefObject<HTMLElement>
+   testimonialsSectionRef: MutableRefObject<HTMLElement>
+   benefitsSectionRef: MutableRefObject<HTMLElement>
 }
 
 type ICompanyPageContext = {
@@ -94,6 +186,9 @@ type ICompanyPageContext = {
    pastLivestreams: LivestreamEvent[]
    customJobs: CustomJob[]
    sectionRefs: SectionRefs
+   getCompanyPageTabLink: (tab: TabValueType) => string
+   setActiveTab: (tab: TabValueType) => void
+   tabMode: boolean
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -105,12 +200,18 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
    pastLivestreams: [],
    customJobs: [],
    sectionRefs: {
-      aboutSectionRef: null,
+      overviewSectionRef: null,
       jobsSectionRef: null,
-      eventSectionRef: null,
-      mediaSectionRef: null,
-      testimonialOrMentorsSectionRef: null,
+      sparksSectionRef: null,
+      livesStreamsSectionRef: null,
+      recordingsSectionRef: null,
+      mentorsSectionRef: null,
+      testimonialsSectionRef: null,
+      benefitsSectionRef: null,
    },
+   getCompanyPageTabLink: (tab: TabValueType) => tab,
+   setActiveTab: (tab: TabValueType) => tab,
+   tabMode: false,
 })
 
 const CompanyPageOverview = ({
@@ -120,9 +221,10 @@ const CompanyPageOverview = ({
    pastLivestreams,
    customJobs,
    groupCreators,
+   tab,
+   tabMode,
 }: Props) => {
    const featureFlags = useFeatureFlags()
-   const { isLoggedIn, isLoggedOut } = useAuth()
    const isMobile = useIsMobile()
    const groupRef = useMemo(
       () =>
@@ -131,6 +233,11 @@ const CompanyPageOverview = ({
          ),
       [group.id]
    )
+
+   const [currentTab, setCurrentTab] = useState<TabValueType>(tab)
+   const tabValue = tabMode ? currentTab : tab
+
+   const basePath = `/company/${companyNameSlugify(group.universityName)}`
 
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
       initialData: group,
@@ -147,11 +254,14 @@ const CompanyPageOverview = ({
 
    const contextGroupAvailableJobs = useGroupAvailableCustomJobs(group.groupId)
 
-   const aboutSectionRef = useRef<HTMLElement>(null)
-   const testimonialOrMentorsSectionRef = useRef<HTMLElement>(null)
-   const eventSectionRef = useRef<HTMLElement>(null)
-   const mediaSectionRef = useRef<HTMLElement>(null)
+   const overviewSectionRef = useRef<HTMLElement>(null)
    const jobsSectionRef = useRef<HTMLElement>(null)
+   const sparksSectionRef = useRef<HTMLElement>(null)
+   const livesStreamsSectionRef = useRef<HTMLElement>(null)
+   const recordingsSectionRef = useRef<HTMLElement>(null)
+   const mentorsSectionRef = useRef<HTMLElement>(null)
+   const testimonialsSectionRef = useRef<HTMLElement>(null)
+   const benefitsSectionRef = useRef<HTMLElement>(null)
 
    const presenter = useMemo(() => {
       const presenter = GroupPresenter.createFromDocument(contextGroup)
@@ -167,6 +277,31 @@ const CompanyPageOverview = ({
       featureFlags,
       groupCreators?.length,
       upcomingLivestreams,
+   ])
+
+   const getCompanyPageTabLink = useCallback(
+      (tab: TabValueType) => {
+         return getTabLink(basePath, tab)
+      },
+      [basePath]
+   )
+
+   const tabSectionRefsMap = useMemo(() => {
+      return {
+         [TabValue.overview]: overviewSectionRef,
+         [TabValue.jobs]: jobsSectionRef,
+         [TabValue.sparks]: sparksSectionRef,
+         [TabValue.livesStreams]: livesStreamsSectionRef,
+         [TabValue.recordings]: recordingsSectionRef,
+         [TabValue.mentors]: mentorsSectionRef,
+      }
+   }, [
+      overviewSectionRef,
+      jobsSectionRef,
+      sparksSectionRef,
+      livesStreamsSectionRef,
+      recordingsSectionRef,
+      mentorsSectionRef,
    ])
 
    useEffect(() => {
@@ -189,6 +324,14 @@ const CompanyPageOverview = ({
       }
    }, [contextGroup, editMode, presenter])
 
+   useEffect(() => {
+      if (tabMode && tabValue && tabSectionRefsMap[tabValue]?.current) {
+         tabSectionRefsMap[tabValue].current.scrollIntoView({
+            behavior: "smooth",
+         })
+      }
+   }, [tabValue, tabSectionRefsMap, tabMode])
+
    const contextValue = useMemo<ICompanyPageContext>(
       () => ({
          group: contextGroup,
@@ -199,12 +342,18 @@ const CompanyPageOverview = ({
          pastLivestreams: contextPastLivestreams || pastLivestreams,
          customJobs: contextGroupAvailableJobs || customJobs,
          sectionRefs: {
-            aboutSectionRef,
+            overviewSectionRef,
             jobsSectionRef,
-            testimonialOrMentorsSectionRef,
-            eventSectionRef,
-            mediaSectionRef,
+            sparksSectionRef,
+            livesStreamsSectionRef,
+            recordingsSectionRef,
+            mentorsSectionRef,
+            testimonialsSectionRef,
+            benefitsSectionRef,
          },
+         getCompanyPageTabLink,
+         setActiveTab: setCurrentTab,
+         tabMode,
       }),
       [
          contextGroup,
@@ -217,53 +366,234 @@ const CompanyPageOverview = ({
          pastLivestreams,
          contextGroupAvailableJobs,
          customJobs,
+         getCompanyPageTabLink,
+         setCurrentTab,
+         tabMode,
       ]
    )
 
-   const showFollowCompanyCta = isLoggedIn && !editMode
-   const showSignUpCta = isLoggedOut && !editMode
-
-   const showJobs = featureFlags.jobHubV1 && customJobs?.length
+   const LinkComponent = (props) => (
+      <Link {...props} shallow={true} scroll={true} />
+   )
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
-         <Box height={"100%"} pb={5}>
+         <Box
+            height={"100%"}
+            pb={5}
+            px={isMobile ? 0 : 4}
+            bgcolor={"transparent"}
+            borderRadius={isMobile ? "12px" : "0"}
+         >
             {editMode ? <ProgressBanner /> : null}
-            <Box mb={{ xs: 4, md: 10 }}>
-               <Header />
-            </Box>
-            <Container disableGutters maxWidth="lg">
-               <Grid container spacing={4}>
-                  <Grid item xs={12} md={6}>
-                     <Stack px={3} spacing={{ xs: 2, md: 5 }}>
-                        <AboutSection />
-                        {showJobs ? <JobsSection /> : null}
-                        {group.publicSparks ? (
-                           <SparksSection key={group.id} groupId={group.id} />
-                        ) : null}
-                        {showFollowCompanyCta ? <FollowCompany /> : null}
-                        {showSignUpCta ? <SignUp /> : null}
-                        {isMobile && !editMode ? (
-                           <>
-                              <EventSection />
-                              <TestimonialsOrMentorsSection />
-                           </>
-                        ) : (
-                           <>
-                              <TestimonialsOrMentorsSection />
-                              <EventSection />
-                           </>
-                        )}
-                     </Stack>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                     <MediaSection />
-                  </Grid>
-               </Grid>
+            <Container disableGutters maxWidth="xl">
+               <Box
+                  mb={{ xs: 1, md: 2 }}
+                  sx={{ borderRadius: isMobile ? "12px 12px 0 0" : "12px" }}
+               >
+                  <Header />
+               </Box>
             </Container>
-            <NewsletterSection />
+            <Container disableGutters maxWidth="xl">
+               <Stack
+                  direction={isMobile ? "column" : "row"}
+                  spacing={2}
+                  justifyItems={"space-between"}
+                  width={"100%"}
+                  bgcolor={isMobile ? "#F7F8FC" : "transparent"}
+               >
+                  <Box
+                     maxWidth={
+                        isMobile || tabValue !== TabValue.overview
+                           ? "100%"
+                           : "50%"
+                     }
+                     width={"100%"}
+                  >
+                     <Box sx={{ position: "relative" }}>
+                        <Tabs
+                           variant="scrollable"
+                           scrollButtons
+                           allowScrollButtonsMobile
+                           value={tabValue}
+                           ScrollButtonComponent={CustomScrollButton}
+                           sx={styles.tabs}
+                        >
+                           <Tab
+                              label={getTabLabel(TabValue.overview)}
+                              value={TabValue.overview}
+                              {...(!isTest &&
+                                 !tabMode && {
+                                    href: getTabLink(
+                                       basePath,
+                                       TabValue.overview
+                                    ),
+                                    LinkComponent,
+                                 })}
+                              onClick={() =>
+                                 tabMode && setCurrentTab(TabValue.overview)
+                              }
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.jobs)}
+                              value={TabValue.jobs}
+                              {...(!isTest &&
+                                 !tabMode && {
+                                    href: getTabLink(basePath, TabValue.jobs),
+                                    LinkComponent,
+                                 })}
+                              onClick={() =>
+                                 tabMode && setCurrentTab(TabValue.jobs)
+                              }
+                           />
+                           {group.publicProfile && group.hasSparks ? (
+                              <Tab
+                                 label={getTabLabel(TabValue.sparks)}
+                                 value={TabValue.sparks}
+                                 {...(!isTest &&
+                                    !tabMode && {
+                                       href: getTabLink(
+                                          basePath,
+                                          TabValue.sparks
+                                       ),
+                                       LinkComponent,
+                                    })}
+                                 onClick={() =>
+                                    tabMode && setCurrentTab(TabValue.sparks)
+                                 }
+                              />
+                           ) : null}
+                           <Tab
+                              label={getTabLabel(TabValue.livesStreams)}
+                              value={TabValue.livesStreams}
+                              {...(!isTest &&
+                                 !tabMode && {
+                                    href: getTabLink(
+                                       basePath,
+                                       TabValue.livesStreams
+                                    ),
+                                    LinkComponent,
+                                 })}
+                              onClick={() =>
+                                 tabMode && setCurrentTab(TabValue.livesStreams)
+                              }
+                           />
+                           <Tab
+                              label={getTabLabel(TabValue.recordings)}
+                              value={TabValue.recordings}
+                              {...(!isTest &&
+                                 !tabMode && {
+                                    href: getTabLink(
+                                       basePath,
+                                       TabValue.recordings
+                                    ),
+                                    LinkComponent,
+                                 })}
+                              onClick={() =>
+                                 tabMode && setCurrentTab(TabValue.recordings)
+                              }
+                           />
+                           {groupCreators?.length ? (
+                              <Tab
+                                 label={getTabLabel(TabValue.mentors)}
+                                 value={TabValue.mentors}
+                                 {...(!isTest &&
+                                    !tabMode && {
+                                       href: getTabLink(
+                                          basePath,
+                                          TabValue.mentors
+                                       ),
+                                       LinkComponent,
+                                    })}
+                                 onClick={() =>
+                                    tabMode && setCurrentTab(TabValue.mentors)
+                                 }
+                              />
+                           ) : null}
+                        </Tabs>
+
+                        <Box sx={styles.tabContent}>
+                           {tabMode &&
+                           tabValue &&
+                           tabSectionRefsMap[tabValue] ? (
+                              <SectionAnchor
+                                 tabValue={tabValue}
+                                 ref={tabSectionRefsMap[tabValue]}
+                              />
+                           ) : null}
+                           {tabValue === TabValue.overview ? (
+                              <Overview editMode={editMode} />
+                           ) : null}
+                           {tabValue === TabValue.jobs ? <JobsTab /> : null}
+                           {tabValue === TabValue.sparks ? (
+                              <SparksTab key={group.id} groupId={group.id} />
+                           ) : null}
+                           {tabValue === TabValue.livesStreams ? (
+                              <UpcomingEventsTab />
+                           ) : null}
+                           {tabValue === TabValue.recordings ? (
+                              <PastEventsTab />
+                           ) : null}
+                           {tabValue === TabValue.mentors ? (
+                              <MentorsTab />
+                           ) : null}
+                        </Box>
+                     </Box>
+                  </Box>
+                  {tabValue === TabValue.overview ? (
+                     <Box mt={0} width={"100%"}>
+                        <MediaSection />
+                     </Box>
+                  ) : null}
+               </Stack>
+            </Container>
+            <Container disableGutters maxWidth="xl">
+               <NewsletterSection />
+            </Container>
          </Box>
       </CompanyPageContext.Provider>
+   )
+}
+
+const CustomScrollButton = ({
+   direction,
+   onClick,
+   disabled,
+}: {
+   direction: "left" | "right"
+   onClick: () => void
+   disabled: boolean
+}) => {
+   return (
+      <Box
+         sx={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            [direction]: 0,
+            display: "flex",
+            alignItems: "center",
+            background: `linear-gradient(to ${
+               direction === "left" ? "right" : "left"
+            }, #FEFEFE 30%, rgba(254, 254, 254, 0.8) 75%, rgba(254, 254, 254, 0.4) 85%, transparent)`,
+            opacity: disabled ? 0 : 1,
+            transition: "opacity 0.2s ease",
+            zIndex: 1,
+            pointerEvents: disabled ? "none" : "auto",
+         }}
+      >
+         <TabScrollButton
+            direction={direction}
+            orientation="horizontal"
+            onClick={onClick}
+            disabled={disabled}
+            sx={{
+               px: 1,
+               justifyContent: direction === "left" ? "flex-start" : "flex-end",
+               width: "70px",
+            }}
+         />
+      </Box>
    )
 }
 

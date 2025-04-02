@@ -4,11 +4,14 @@ import {
    transformUserDataForCustomerIO,
 } from "@careerfairy/shared-lib/customerio"
 import { UserData } from "@careerfairy/shared-lib/users"
-import * as crypto from "crypto"
 import { logger } from "firebase-functions/v2"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
 import { userRepo } from "../../api/repositories"
+import {
+   customerIOWebhookSignatureMiddleware,
+   withMiddlewares,
+} from "../../middlewares-gen2/onRequest"
 import { isLocalEnvironment } from "../../util"
 import { trackingClient } from "./client"
 import { CustomerIOWebhookEvent } from "./types"
@@ -26,7 +29,9 @@ export const syncUserToCustomerIO = onDocumentWritten(
    },
    async (event) => {
       if (isLocalEnvironment()) {
-         logger.info("Skipping CustomerIO sync in local environment")
+         logger.info(
+            "Skipping CustomerIO sync in local environment, remove this check if you want to sync to CustomerIO dev workspace"
+         )
          return
       }
 
@@ -96,7 +101,8 @@ export const syncUserToCustomerIO = onDocumentWritten(
 const shouldSyncUser = (user: UserData) => {
    return (
       user.lastActivityAt && // User has an activity date
-      user.lastActivityAt.toDate() >= CUTOFF_DATE // User is active since before Sept 2023
+      user.lastActivityAt.toDate() >= CUTOFF_DATE && // User is active since before Sept 2023
+      user.emailVerified
    )
 }
 
@@ -128,80 +134,59 @@ const hasCustomerIODataChanged = (
  * Handles Customer.io webhook events for unsubscribes, subscribes. To add other events, go to:
  * https://fly.customer.io/workspaces/175425/journeys/integrations/reporting-webhooks
  */
-export const customerIOWebhook = onRequest(async (request, response) => {
-   if (request.method !== "POST") {
-      response.status(405).send("Method Not Allowed")
-      return
-   }
-
-   // Verify webhook signature
-   const signature = request.headers["x-cio-signature"] as string
-   const timestamp = request.headers["x-cio-timestamp"] as string
-
-   if (!signature || !timestamp) {
-      logger.error("Missing required headers")
-      response.status(401).send("Unauthorized")
-      return
-   }
-
-   if (!process.env.CUSTOMERIO_SIGNING_KEY) {
-      logger.error("Missing CUSTOMERIO_SIGNING_KEY environment variable")
-      response.status(500).send("Server configuration error")
-      return
-   }
-
-   // Verify the webhook signature using the signing key according to the Customer.io docs
-   // https://docs.customer.io/journeys/webhooks-action/#securely-verify-requests
-   const payload = request.rawBody
-   const stringToSign = `v0:${timestamp}:${payload}`
-
-   const hmac = crypto.createHmac("sha256", process.env.CUSTOMERIO_SIGNING_KEY)
-   const calculatedSignature = hmac.update(stringToSign).digest("hex")
-
-   if (calculatedSignature !== signature) {
-      logger.error("Invalid webhook signature")
-      response.status(401).send("Invalid signature")
-      return
-   }
-
-   const event = request.body as CustomerIOWebhookEvent
-
-   try {
-      switch (event.metric) {
-         case "subscribed":
-         case "unsubscribed": {
-            const userEmail = event.data.identifiers.email
-            logger.info(
-               `Updating subscription status for user ${userEmail} to ${event.metric}`
-            )
-            try {
-               await userRepo.updateUserData(userEmail, {
-                  unsubscribed: event.metric === "unsubscribed",
-               })
-               logger.info(
-                  `Updated subscription status for user ${userEmail} to ${event.metric}`
-               )
-            } catch (error) {
-               logger.warn(
-                  `Failed to update subscription status for user ${userEmail}`,
-                  error
-               )
-            }
-            response.status(200).send("OK")
-            break
+export const customerIOWebhook = onRequest(
+   withMiddlewares(
+      [
+         customerIOWebhookSignatureMiddleware(
+            process.env.CUSTOMERIO_REPORTING_SIGNING_KEY
+         ),
+      ],
+      async (request, response) => {
+         if (request.method !== "POST") {
+            response.status(405).send("Method Not Allowed")
+            return
          }
-         default: {
-            // Acknowledge other events but don't process them
-            logger.info(`Received unhandled event type: ${event.metric}`)
-            response.status(200).send("OK")
+
+         const event = request.body as CustomerIOWebhookEvent
+
+         try {
+            switch (event.metric) {
+               case "subscribed":
+               case "unsubscribed": {
+                  const userEmail = event.data.identifiers.email
+                  logger.info(
+                     `Updating subscription status for user ${userEmail} to ${event.metric}`
+                  )
+                  try {
+                     await userRepo.updateUserData(userEmail, {
+                        unsubscribed: event.metric === "unsubscribed",
+                     })
+                     logger.info(
+                        `Updated subscription status for user ${userEmail} to ${event.metric}`
+                     )
+                  } catch (error) {
+                     logger.warn(
+                        `Failed to update subscription status for user ${userEmail}`,
+                        error
+                     )
+                  }
+                  response.status(200).send("OK")
+                  break
+               }
+               default: {
+                  // Acknowledge other events but don't process them
+                  logger.info(`Received unhandled event type: ${event.metric}`)
+                  response.status(200).send("OK")
+               }
+            }
+         } catch (error) {
+            logger.error(
+               `Error processing ${event.metric} webhook for user ${event.data?.identifiers?.email}`,
+               event,
+               error
+            )
+            response.status(500).send("Internal Server Error")
          }
       }
-   } catch (error) {
-      logger.error(
-         `Error processing ${event.metric} webhook for user ${event.data?.identifiers?.email}`,
-         event,
-         error
-      )
-      response.status(500).send("Internal Server Error")
-   }
-})
+   )
+)

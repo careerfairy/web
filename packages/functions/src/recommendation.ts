@@ -1,6 +1,11 @@
 import functions = require("firebase-functions")
 import { number } from "yup"
-import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
+import {
+   groupRepo,
+   livestreamsRepo,
+   sparkRepo,
+   userRepo,
+} from "./api/repositories"
 import config from "./config"
 import UserEventRecommendationService from "./lib/recommendation/UserEventRecommendationService"
 import { UserDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
@@ -34,7 +39,8 @@ export const getRecommendedEvents = functions
                   context.auth.token.email,
                   livestreamsRepo,
                   userRepo,
-                  sparkRepo
+                  sparkRepo,
+                  groupRepo
                )
 
                const recommendationService =
