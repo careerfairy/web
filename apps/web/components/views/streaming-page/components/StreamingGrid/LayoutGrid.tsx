@@ -18,7 +18,6 @@ const styles = sxStyles({
       flex: "none !important",
       height: "100%",
       aspectRatio: "16 / 9",
-      pt: "0 !important",
    },
 })
 

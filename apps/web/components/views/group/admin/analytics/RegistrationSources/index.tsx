@@ -1,12 +1,12 @@
-import Box from "@mui/material/Box"
-import RegistrationSourcesProvider from "./RegistrationSourcesContext"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { Grid, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import CircularLoader from "../../../../loader/CircularLoader"
-import LivestreamsTable from "./LivestreamsTable"
-import { Grid, Typography } from "@mui/material"
 import AggregatedSourcesChart from "./AggregatedSourcesChart"
+import LivestreamsTable from "./LivestreamsTable"
+import RegistrationSourcesProvider from "./RegistrationSourcesContext"
 
 type Props = {
    group: Group
@@ -26,7 +26,7 @@ const Sources = (props: Props) => {
             group={props.group}
             streamsFromTimeFrameAndFuture={props.streamsFromTimeFrameAndFuture}
          >
-            <Box p={3} pr={0}>
+            <Box p={3} pr={0} width="100%">
                <Grid container spacing={3}>
                   <Grid item xs={12}>
                      <AggregatedSourcesChart />
