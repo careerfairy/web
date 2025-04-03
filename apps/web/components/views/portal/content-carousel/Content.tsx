@@ -124,21 +124,20 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
          format: "rgb",
       })
 
-      const rgb = useMemo(() => [color?.[0], color?.[1], color?.[2]], [color])
+      const rgb = useMemo(
+         () => (Array.isArray(color) ? color.join(",") : "0, 0, 0"),
+         [color]
+      )
 
       const gradientMobile = useMemo(
          () =>
-            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${rgb.join(
-               ","
-            )}, 0.00) 10.49%, rgba(${rgb.join(",")}, 0.85) 52.63%)`,
+            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${rgb}, 0.00) 10.49%, rgba(${rgb}, 0.85) 52.63%)`,
          [rgb]
       )
 
       const gradientDesktop = useMemo(
          () =>
-            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${rgb?.join(
-               ","
-            )}, 0.00) 10.49%, rgba(${rgb?.join(",")}, 0.80) 70.32%)`,
+            `linear-gradient(to top,rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.45)), linear-gradient(270deg, rgba(${rgb}, 0.00) 10.49%, rgba(${rgb}, 0.80) 70.32%)`,
          [rgb]
       )
 
