@@ -1,21 +1,21 @@
-import { Box, Card, CardContent, Divider, Typography } from "@mui/material"
-import { Line } from "react-chartjs-2"
-import { useTheme } from "@mui/material/styles"
-import { useUtmData } from "./RegistrationSourcesContext"
+import {
+   RegistrationSource,
+   VALID_SOURCES,
+} from "@careerfairy/shared-lib/livestreams/sources/sources"
 import {
    RegistrationSourceWithDates,
    rollupByDay,
    sourcesByDate,
 } from "@careerfairy/shared-lib/livestreams/sources/transformations"
-import React, { useCallback, useMemo, useState } from "react"
-import {
-   RegistrationSource,
-   VALID_SOURCES,
-} from "@careerfairy/shared-lib/livestreams/sources/sources"
-import { StyledCheckbox } from "../../common/inputs"
+import { Box, Card, CardContent, Divider, Typography } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { useCallback, useMemo, useState } from "react"
+import { Line } from "react-chartjs-2"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
-import { useGroup } from "layouts/GroupDashboardLayout"
+import { StyledCheckbox } from "../../common/inputs"
+import { useUtmData } from "./RegistrationSourcesContext"
 
 type ISourceFilter = RegistrationSource & {
    active: boolean
@@ -196,7 +196,7 @@ const Chart = ({ stats, filters }: Props) => {
          datasets: [],
       }
 
-      for (let entry of stats) {
+      for (const entry of stats) {
          // to validate which sources are active from the filter
          const isSourceActive =
             filters.find(

@@ -145,6 +145,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          !isInTalentGuidePage &&
          props.event &&
          !props.onCardClick &&
+         !props.disableClick &&
          !isPlaceholderEvent
 
       if (isLink) {

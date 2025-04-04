@@ -44,9 +44,9 @@ export const getSparksFeed = functions
             try {
                const anonymousUserCountryCode = getCountryCode(context)
 
-               const anonymousUserCountry = getCountryOptionByCountryCode(
-                  anonymousUserCountryCode
-               )
+               const anonymousUserCountry = anonymousUserCountryCode
+                  ? getCountryOptionByCountryCode(anonymousUserCountryCode)
+                  : undefined
 
                if ("creatorId" in data && "groupId" in data) {
                   if (data.creatorId && data.groupId) {
