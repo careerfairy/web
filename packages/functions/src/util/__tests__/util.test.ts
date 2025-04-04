@@ -1,62 +1,110 @@
-// import { FirestoreErrorCodeMap, handleDocumentUpdateError, handleDocumentUpdateErrors } from "../../util"
+import {
+   handleDocumentUpdateError,
+   handleDocumentUpdateErrors,
+} from "../../util"
 
-// test("hanFirestoreErrorCodeMap, dleDocumentUpdateError should trigger the error handler only for the rejected promise that matches the error code", async () => {
-//     // Mock error handler
-//     const errorHandler = jest.fn()
+describe("Document Update Error Handlers: Util function handleDocumentUpdateError", () => {
+   test("should only catch specified error codes", async () => {
+      // arrange
+      const notFoundError = new Error("NOT_FOUND")
+      notFoundError["code"] = "5"
 
-//     // Create a promise that rejects with a Firestore error
-//     const notFoundError = { code: 5, message: "Document not found" }
-//     const updatePromise = Promise.reject(notFoundError)
+      const permissionError = new Error("PERMISSION_DENIED")
+      permissionError["code"] = "7"
 
-//     // Test handling NOT_FOUND error
-//     await handleDocumentUpdateError(updatePromise, "NOT_FOUND", errorHandler)
-//     expect(errorHandler).toHaveBeenCalledWith([FirestoreErrorCodeMap.NOT_FOUND], notFoundError)
+      const errorHandler = jest.fn()
 
-//     // Test that other errors are thrown
-//     const permissionError = { code: 7, message: "Permission denied" }
-//     const updatePromise2 = Promise.reject(permissionError)
+      // act & assert - single error code
+      await expect(
+         handleDocumentUpdateError(
+            Promise.reject(notFoundError),
+            "5",
+            errorHandler
+         )
+      ).resolves.toBeUndefined()
+      expect(errorHandler).toHaveBeenCalledWith(["5"], notFoundError)
 
-//     await expect(
-//         handleDocumentUpdateError(updatePromise2, "NOT_FOUND", errorHandler)
-//     ).rejects.toEqual(permissionError)
-// })
+      // act & assert - array of error codes
+      await expect(
+         handleDocumentUpdateError(
+            Promise.reject(permissionError),
+            ["5", "7"],
+            errorHandler
+         )
+      ).resolves.toBeUndefined()
+      expect(errorHandler).toHaveBeenCalledWith(["5", "7"], permissionError)
 
-// test("handleDocumentUpdateErrors should handle multiple promises and their errors correctly", async () => {
-//     // Mock error handler
-//     const errorHandler = jest.fn()
+      // Should throw for unspecified error code
+      const otherError = new Error("OTHER")
+      otherError["code"] = "9"
+      await expect(
+         handleDocumentUpdateError(
+            Promise.reject(otherError),
+            "5",
+            errorHandler
+         )
+      ).rejects.toEqual(otherError)
+   })
 
-//     // Create test promises
-//     const notFoundError = { code: 5, message: "Document not found" }
-//     const permissionError = { code: 7, message: "Permission denied" }
-//     const otherError = { code: 1, message: "Other error" }
+   test("should handle array of promises and only catch specified errors", async () => {
+      // arrange
+      const notFoundError = new Error("NOT_FOUND")
+      const permissionError = new Error("PERMISSION_DENIED")
+      const otherError = new Error("OTHER")
 
-//     const promises = [
-//         Promise.reject(notFoundError),
-//         Promise.reject(permissionError),
-//         Promise.reject(otherError)
-//     ]
+      notFoundError["code"] = "5"
+      permissionError["code"] = "7"
+      otherError["code"] = "9"
 
-//     // Test handling multiple error codes
-//     const results = handleDocumentUpdateErrors(
-//         promises,
-//         ["NOT_FOUND", "PERMISSION_DENIED"],
-//         errorHandler
-//     )
+      const promises = [
+         Promise.reject(notFoundError),
+         Promise.resolve("success"),
+         Promise.reject(permissionError),
+         Promise.reject(otherError),
+      ]
 
-//     // Wait for all promises to settle
-//     await Promise.allSettled(results)
+      const errorHandler = jest.fn()
 
-//     // Error handler should be called twice (for NOT_FOUND and PERMISSION_DENIED)
-//     expect(errorHandler).toHaveBeenCalledTimes(2)
-//     expect(errorHandler).toHaveBeenCalledWith(
-//         [FirestoreErrorCodeMap.NOT_FOUND, FirestoreErrorCodeMap.PERMISSION_DENIED],
-//         notFoundError
-//     )
-//     expect(errorHandler).toHaveBeenCalledWith(
-//         [FirestoreErrorCodeMap.NOT_FOUND, FirestoreErrorCodeMap.PERMISSION_DENIED],
-//         permissionError
-//     )
+      // act
+      const results = handleDocumentUpdateErrors(
+         promises,
+         ["5", "7"],
+         errorHandler
+      )
 
-//     // The other error should be thrown
-//     await expect(results[2]).rejects.toEqual(otherError)
-// })
+      // assert
+      await expect(results[0]).resolves.toBeUndefined() // notFoundError should be caught
+      await expect(results[1]).resolves.toBe("success") // success should pass through
+      await expect(results[2]).resolves.toBeUndefined() // permissionError should be caught
+      await expect(results[3]).rejects.toEqual(otherError) // otherError should be thrown
+
+      expect(errorHandler).toHaveBeenCalledTimes(2)
+      expect(errorHandler).toHaveBeenCalledWith(["5", "7"], notFoundError)
+      expect(errorHandler).toHaveBeenCalledWith(["5", "7"], permissionError)
+   })
+
+   test("should throw when no error codes match", async () => {
+      // arrange
+      const error1 = new Error("ERROR_1")
+      const error2 = new Error("ERROR_2")
+
+      error1["code"] = "8"
+      error2["code"] = "9"
+
+      const promises = [Promise.reject(error1), Promise.reject(error2)]
+
+      const errorHandler = jest.fn()
+
+      // act
+      const results = handleDocumentUpdateErrors(
+         promises,
+         ["5", "7"],
+         errorHandler
+      )
+
+      // assert
+      await expect(results[0]).rejects.toEqual(error1)
+      await expect(results[1]).rejects.toEqual(error2)
+      expect(errorHandler).not.toHaveBeenCalled()
+   })
+})

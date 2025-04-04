@@ -518,10 +518,19 @@ export const onWriteCustomJobs = onDocumentWritten(
                deletedCustomJob,
                changeTypes
             ),
-            livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
-               deletedCustomJob,
-               deletedCustomJob,
-               changeTypes
+            // Error here
+            handleDocumentUpdateError(
+               livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+                  deletedCustomJob,
+                  deletedCustomJob,
+                  changeTypes
+               ),
+               ["5", "failed-precondition"],
+               (_, error) =>
+                  logDocumentNotFoundUpdateError(
+                     `syncCustomJobBusinessFunctionTagsToLivestreams for custom job ${event.params.jobId} sync resulted in not found. Skipping update. This probably means the associated live streams have been deleted.`,
+                     error
+                  )
             )
          )
       }
@@ -541,14 +550,33 @@ export const onWriteCustomJobs = onDocumentWritten(
                oldCustomJob,
                changeTypes
             ),
-            livestreamsRepo.syncGroupLivestreamsHasJobsFlag(
-               newCustomJob,
-               oldCustomJob
+            // Error here
+            handleDocumentUpdateError(
+               livestreamsRepo.syncGroupLivestreamsHasJobsFlag(
+                  newCustomJob,
+                  oldCustomJob
+               ),
+               ["5", "failed-precondition"],
+               (_, error) =>
+                  logDocumentNotFoundUpdateError(
+                     `syncGroupLivestreamsHasJobsFlag for custom job ${event.params.jobId} sync resulted in not found. Skipping update. This probably means the associated live streams have been deleted.`,
+                     error
+                  )
             ),
-            sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob)
+            // Error here
+            handleDocumentUpdateError(
+               sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob),
+               ["5", "failed-precondition"],
+               (_, error) =>
+                  logDocumentNotFoundUpdateError(
+                     `syncGroupSparksHasJobsFlag for custom job ${event.params.jobId} sync resulted in not found. Skipping update. This probably means the associated sparks have been deleted.`,
+                     error
+                  )
+            )
          )
       }
 
+      return handleSideEffects(sideEffectPromises)
       return handleSideEffects(
          handleDocumentUpdateErrors(
             sideEffectPromises,
@@ -612,7 +640,15 @@ export const onWriteStudyBackground = onDocumentWritten(
          message: "syncStudyBackgroundOnWrite",
       })
 
-      // TODO: Check error here
+      const userData = await userRepo.getUserDataById(userId)
+
+      if (!userData) {
+         functions.logger.log(
+            `🚀 ~ User ${userId} not found. Skipping update. No study backgrounds found.`
+         )
+         return
+      }
+
       // Get current study backgrounds
       const allUserStudyBackgrounds =
          (await userRepo.getUserStudyBackgrounds(userId)) || []
@@ -688,7 +724,7 @@ export const onWriteStudyBackground = onDocumentWritten(
 
          functions.logger.log("🚀 ~ Effective university:", userId, university)
 
-         const updateUserDataPromise = userRepo.updateUserData(userId + "123", {
+         await userRepo.updateUserData(userId, {
             fieldOfStudy: effectiveStudyBackground.fieldOfStudy,
             levelOfStudy: effectiveStudyBackground.levelOfStudy,
             universityCountryCode:
@@ -700,17 +736,6 @@ export const onWriteStudyBackground = onDocumentWritten(
             studyBackgroundStartedAt: effectiveStudyBackground.startedAt,
             studyBackgroundEndedAt: effectiveStudyBackground.endedAt,
          })
-
-         await handleDocumentUpdateError(
-            updateUserDataPromise,
-            "5",
-            (_, error) => {
-               logDocumentNotFoundUpdateError(
-                  `updateUserData - User ${userId} not found. Skipping update.`,
-                  error
-               )
-            }
-         )
       }
    }
 )
