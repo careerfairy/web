@@ -1,8 +1,11 @@
+import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"
+import { VALID_SOURCES } from "@careerfairy/shared-lib/livestreams/sources/sources"
+import {
+   sourcesByLivestream,
+   UTMsPercentage,
+} from "@careerfairy/shared-lib/livestreams/sources/transformations"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import MaterialTable from "@material-table/core"
-import React, { useCallback, useMemo } from "react"
-import { useUtmData } from "./RegistrationSourcesContext"
-import Card from "@mui/material/Card"
-import { TableTitle } from "../../ats-integration/AccountJobs"
 import {
    LinearProgress,
    Table,
@@ -12,17 +15,14 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
-import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"
-import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
-import useIsMobile from "../../../../../custom-hook/useIsMobile"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import {
-   sourcesByLivestream,
-   UTMsPercentage,
-} from "@careerfairy/shared-lib/livestreams/sources/transformations"
-import { VALID_SOURCES } from "@careerfairy/shared-lib/livestreams/sources/sources"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import Card from "@mui/material/Card"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { useCallback, useMemo } from "react"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
+import { TableTitle } from "../../ats-integration/AccountJobs"
+import { useUtmData } from "./RegistrationSourcesContext"
 
 const LivestreamsTable = () => {
    const { livestreams, utmData } = useUtmData()
@@ -38,6 +38,10 @@ const LivestreamsTable = () => {
          window.open(makeLivestreamEventDetailsUrl(rowData.id), "_blank")
       }
    }, [])
+
+   if (!livestreams?.length || !utmData) {
+      return null
+   }
 
    return (
       <Card>

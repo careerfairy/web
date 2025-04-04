@@ -16,6 +16,7 @@ const styles = sxStyles({
       flex: 1,
       display: "flex",
       position: "relative",
+      mt: "-8px !important",
    },
    content: {
       width: "100%",
