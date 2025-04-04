@@ -1397,6 +1397,11 @@ export class FirebaseUserRepository
                group: group,
             }
 
+            const snap = await ref.get()
+            if (!snap.exists) {
+               continue
+            }
+
             batch.update(ref, toUpdatePublicGroup)
          }
 

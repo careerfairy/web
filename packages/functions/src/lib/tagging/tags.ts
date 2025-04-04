@@ -121,7 +121,9 @@ export const syncCustomJobLinkedContentTags = async <
          // Update content tags for all events still on the customJob (update or create)
          // Filter the snapshots as the query includes also removed content from the customJob
          contentData
-            ?.filter((content) => contentToUpdate.includes(content.id))
+            ?.filter(
+               (content) => content?.id && contentToUpdate.includes(content.id)
+            )
             ?.map((contentDoc) => {
                // Forces refresh of tags based on latest data
                const contentTagsExcludingCurrentJob =
@@ -143,7 +145,7 @@ export const syncCustomJobLinkedContentTags = async <
       if (removedContent.length) {
          contentData
             ?.filter((content) => {
-               return removedContent.includes(content.id)
+               return content?.id && removedContent.includes(content.id)
             })
             ?.map((contentDoc) => {
                // When removing, keep only tags which were inferred by other custom jobs (other the one being updated)
