@@ -27,7 +27,7 @@ test.describe("Livestream Registration Signed In", () => {
          .getByTestId(`livestream-card-${livestream.id}`)
          .first()
 
-      await page.reload()
+      await livestreamCard.scrollIntoViewIfNeeded()
 
       await expect(livestreamCard.getByText("Registered")).toBeVisible()
       await expect(livestreamCard.getByText(livestream.title)).toBeVisible()
