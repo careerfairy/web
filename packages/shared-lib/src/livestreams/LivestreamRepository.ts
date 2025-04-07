@@ -201,6 +201,8 @@ export interface ILivestreamRepository {
     * */
    getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
 
+   getDraftLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
+
    getLivestreamRecordingToken(livestreamId: string): Promise<RecordingToken>
 
    getLivestreamRecordingStats(
@@ -1077,14 +1079,17 @@ export class FirebaseLivestreamRepository
       return !snaps.empty
    }
 
-   async getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
+   async getLivestreamsByIds(
+      ids: string[],
+      isDraft = false
+   ): Promise<LivestreamEvent[]> {
       const chunks = chunkArray(ids, 10)
       const promises = []
 
       for (const chunk of chunks) {
          promises.push(
             this.firestore
-               .collection("livestreams")
+               .collection(isDraft ? "draftLivestreams" : "livestreams")
                .where("id", "in", chunk)
                .get()
                .then(mapFirestoreDocuments)
@@ -1106,6 +1111,10 @@ export class FirebaseLivestreamRepository
          })
          .map((r) => (r as PromiseFulfilledResult<LivestreamEvent[]>).value)
          .flat()
+   }
+
+   async getDraftLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
+      return this.getLivestreamsByIds(ids, true)
    }
 
    async getLivestreamRecordingToken(

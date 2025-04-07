@@ -1275,26 +1275,36 @@ export class SparkFunctionsRepository
 
       const batch = this.firestore.batch()
 
+      const allSparks = await this.getSparksByIds([
+         ...sparksWithoutJobs,
+         ...sparksWithNewJobAssignment,
+      ])
+
+      const allSparksMap = new Map(allSparks.map((spark) => [spark.id, true]))
       // Update the sparks without jobs to have hasJob: false
-      sparksWithoutJobs.forEach((sparkId) => {
-         functions.logger.log(
-            `Update spark ${sparkId} to be with hasJobs flag as false`
-         )
-         batch.update(this.firestore.collection("sparks").doc(sparkId), {
-            hasJobs: false,
+      sparksWithoutJobs
+         .filter((sparkId) => allSparksMap.has(sparkId))
+         .forEach((sparkId) => {
+            functions.logger.log(
+               `Update spark ${sparkId} to be with hasJobs flag as false`
+            )
+            batch.update(this.firestore.collection("sparks").doc(sparkId), {
+               hasJobs: false,
+            })
          })
-      })
 
       // Update the sparks with new job assignment to have hasJob: true
-      sparksWithNewJobAssignment.forEach((sparkId) => {
-         functions.logger.log(
-            `Update spark ${sparkId} to be with hasJobs flag as true`
-         )
+      sparksWithNewJobAssignment
+         .filter((sparkId) => allSparksMap.has(sparkId))
+         .forEach((sparkId) => {
+            functions.logger.log(
+               `Update spark ${sparkId} to be with hasJobs flag as true`
+            )
 
-         batch.update(this.firestore.collection("sparks").doc(sparkId), {
-            hasJobs: true,
+            batch.update(this.firestore.collection("sparks").doc(sparkId), {
+               hasJobs: true,
+            })
          })
-      })
 
       await batch.commit()
    }

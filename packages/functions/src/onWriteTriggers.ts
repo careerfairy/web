@@ -32,14 +32,7 @@ import {
    logStart,
 } from "./lib/triggers/util"
 import { logAndThrow } from "./lib/validations"
-import {
-   ChangeType,
-   getChangeTypeEnum,
-   getChangeTypes,
-   handleDocumentUpdateError,
-   handleDocumentUpdateErrors,
-   logDocumentNotFoundUpdateError,
-} from "./util"
+import { ChangeType, getChangeTypeEnum, getChangeTypes } from "./util"
 import { validateGroupSparks } from "./util/sparks"
 
 export const syncLivestreams = functions
@@ -363,18 +356,7 @@ export const syncGroupFollowingUserDataOnChange = onDocumentWritten(
             }
          }
 
-         return handleSideEffects(
-            handleDocumentUpdateErrors(
-               sideEffectPromises,
-               ["5"],
-               (_, error) => {
-                  logDocumentNotFoundUpdateError(
-                     `Group ${event.params.groupId} sync users resulted in not found. Skipping update`,
-                     error
-                  )
-               }
-            )
-         )
+         return handleSideEffects(sideEffectPromises)
       } catch (error) {
          logAndThrow(
             `🚀 ~ Error synchronizing group[${event.params.groupId}] data for following users: `,
@@ -519,18 +501,10 @@ export const onWriteCustomJobs = onDocumentWritten(
                changeTypes
             ),
             // Error here
-            handleDocumentUpdateError(
-               livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
-                  deletedCustomJob,
-                  deletedCustomJob,
-                  changeTypes
-               ),
-               ["5", "failed-precondition"],
-               (_, error) =>
-                  logDocumentNotFoundUpdateError(
-                     `syncCustomJobBusinessFunctionTagsToLivestreams for custom job ${event.params.jobId} sync resulted in not found. Skipping update. This probably means the associated live streams have been deleted.`,
-                     error
-                  )
+            livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
+               deletedCustomJob,
+               deletedCustomJob,
+               changeTypes
             )
          )
       }
@@ -551,44 +525,16 @@ export const onWriteCustomJobs = onDocumentWritten(
                changeTypes
             ),
             // Error here
-            handleDocumentUpdateError(
-               livestreamsRepo.syncGroupLivestreamsHasJobsFlag(
-                  newCustomJob,
-                  oldCustomJob
-               ),
-               ["5", "failed-precondition"],
-               (_, error) =>
-                  logDocumentNotFoundUpdateError(
-                     `syncGroupLivestreamsHasJobsFlag for custom job ${event.params.jobId} sync resulted in not found. Skipping update. This probably means the associated live streams have been deleted.`,
-                     error
-                  )
+            livestreamsRepo.syncGroupLivestreamsHasJobsFlag(
+               newCustomJob,
+               oldCustomJob
             ),
             // Error here
-            handleDocumentUpdateError(
-               sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob),
-               ["5", "failed-precondition"],
-               (_, error) =>
-                  logDocumentNotFoundUpdateError(
-                     `syncGroupSparksHasJobsFlag for custom job ${event.params.jobId} sync resulted in not found. Skipping update. This probably means the associated sparks have been deleted.`,
-                     error
-                  )
-            )
+            sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob)
          )
       }
 
       return handleSideEffects(sideEffectPromises)
-      return handleSideEffects(
-         handleDocumentUpdateErrors(
-            sideEffectPromises,
-            ["5", "failed-precondition"],
-            (_, error) => {
-               logDocumentNotFoundUpdateError(
-                  `Custom job ${event.params.jobId} sync resulted in not found. Skipping update`,
-                  error
-               )
-            }
-         )
-      )
    }
 )
 

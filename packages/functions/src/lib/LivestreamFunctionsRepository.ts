@@ -990,7 +990,30 @@ export class LivestreamFunctionsRepository
             )
       )
 
+      const allEventIds = updatedEvents
+         .filter((event) => !event.isDraft)
+         .map((event) => event.id)
+      const allDraftEventIds = updatedEvents
+         .filter((event) => event.isDraft)
+         .map((event) => event.id)
+
+      const allEvents = await this.getLivestreamsByIds(allEventIds)
+      const allDraftEvents = await this.getDraftLivestreamsByIds(
+         allDraftEventIds
+      )
+
+      const allEventsMap = new Map(allEvents.map((event) => [event.id, true]))
+
+      const allDraftEventsMap = new Map(
+         allDraftEvents.map((event) => [event.id, true])
+      )
+
       updatedEvents
+         .filter((event) =>
+            event.isDraft
+               ? allDraftEventsMap.has(event.id)
+               : allEventsMap.has(event.id)
+         )
          .map((event) => {
             const collectionToUpdate = event.isDraft
                ? "draftLivestreams"
@@ -1229,32 +1252,43 @@ export class LivestreamFunctionsRepository
 
       const batch = this.firestore.batch()
 
+      const allEvents = await this.getLivestreamsByIds([
+         ...livestreamsWithoutJobs,
+         ...livestreamsWithNewJobAssignment,
+      ])
+
+      const allEventsMap = new Map(allEvents.map((event) => [event.id, true]))
+
       // Update the livestreams without jobs to have hasJobs: false
-      livestreamsWithoutJobs.forEach((livestreamId) => {
-         functions.logger.log(
-            `Update live stream ${livestreamId} to be with hasJobs flag as false`
-         )
-         batch.update(
-            this.firestore.collection("livestreams").doc(livestreamId),
-            {
-               hasJobs: false,
-            }
-         )
-      })
+      livestreamsWithoutJobs
+         .filter((livestreamId) => allEventsMap.has(livestreamId))
+         .forEach((livestreamId) => {
+            functions.logger.log(
+               `Update live stream ${livestreamId} to be with hasJobs flag as false`
+            )
+            batch.update(
+               this.firestore.collection("livestreams").doc(livestreamId),
+               {
+                  hasJobs: false,
+               }
+            )
+         })
 
       // Update the livestreams with new job assignment to have hasJobs: true
-      livestreamsWithNewJobAssignment.forEach((livestreamId) => {
-         functions.logger.log(
-            `Update live stream ${livestreamId} to be with hasJobs flag as true`
-         )
+      livestreamsWithNewJobAssignment
+         .filter((livestreamId) => allEventsMap.has(livestreamId))
+         .forEach((livestreamId) => {
+            functions.logger.log(
+               `Update live stream ${livestreamId} to be with hasJobs flag as true`
+            )
 
-         batch.update(
-            this.firestore.collection("livestreams").doc(livestreamId),
-            {
-               hasJobs: true,
-            }
-         )
-      })
+            batch.update(
+               this.firestore.collection("livestreams").doc(livestreamId),
+               {
+                  hasJobs: true,
+               }
+            )
+         })
 
       await batch.commit()
    }
