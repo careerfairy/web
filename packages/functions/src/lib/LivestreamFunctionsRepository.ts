@@ -1009,11 +1009,19 @@ export class LivestreamFunctionsRepository
       )
 
       updatedEvents
-         .filter((event) =>
-            event.isDraft
+         .filter((event) => {
+            const exists = event.isDraft
                ? allDraftEventsMap.has(event.id)
                : allEventsMap.has(event.id)
-         )
+            if (!exists) {
+               functions.logger.warn(
+                  `Live stream ${event.id} ${
+                     event.isDraft ? "(draft)" : ""
+                  }) does not exist, skipping update`
+               )
+            }
+            return exists
+         })
          .map((event) => {
             const collectionToUpdate = event.isDraft
                ? "draftLivestreams"
@@ -1252,16 +1260,30 @@ export class LivestreamFunctionsRepository
 
       const batch = this.firestore.batch()
 
-      const allEvents = await this.getLivestreamsByIds([
-         ...livestreamsWithoutJobs,
-         ...livestreamsWithNewJobAssignment,
-      ])
+      const allEventIds = Array.from(
+         new Set([
+            ...livestreamsWithoutJobs,
+            ...livestreamsWithNewJobAssignment,
+         ])
+      )
 
-      const allEventsMap = new Map(allEvents.map((event) => [event.id, true]))
+      const allEvents = await this.getLivestreamsByIds(allEventIds)
+
+      const allEventsMap = new Map(
+         allEvents.filter((event) => event).map((event) => [event.id, true])
+      )
 
       // Update the livestreams without jobs to have hasJobs: false
       livestreamsWithoutJobs
-         .filter((livestreamId) => allEventsMap.has(livestreamId))
+         .filter((livestreamId) => {
+            const exists = allEventsMap.has(livestreamId)
+            if (!exists) {
+               functions.logger.warn(
+                  `Live stream ${livestreamId} does not exist, skipping update`
+               )
+            }
+            return exists
+         })
          .forEach((livestreamId) => {
             functions.logger.log(
                `Update live stream ${livestreamId} to be with hasJobs flag as false`

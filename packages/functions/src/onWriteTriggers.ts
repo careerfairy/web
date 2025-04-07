@@ -332,7 +332,8 @@ export const syncGroupFollowingUserDataOnChange = onDocumentWritten(
                      sideEffectPromises.push(
                         userRepo.batchUpdateFollowingUsersGroup(
                            publicGroup,
-                           followingUsers
+                           followingUsers,
+                           functions.logger
                         )
                      )
 
@@ -500,7 +501,6 @@ export const onWriteCustomJobs = onDocumentWritten(
                deletedCustomJob,
                changeTypes
             ),
-            // Error here
             livestreamsRepo.syncCustomJobBusinessFunctionTagsToLivestreams(
                deletedCustomJob,
                deletedCustomJob,
@@ -524,12 +524,10 @@ export const onWriteCustomJobs = onDocumentWritten(
                oldCustomJob,
                changeTypes
             ),
-            // Error here
             livestreamsRepo.syncGroupLivestreamsHasJobsFlag(
                newCustomJob,
                oldCustomJob
             ),
-            // Error here
             sparkRepo.syncGroupSparksHasJobsFlag(newCustomJob, oldCustomJob)
          )
       }
@@ -589,8 +587,8 @@ export const onWriteStudyBackground = onDocumentWritten(
       const userData = await userRepo.getUserDataById(userId)
 
       if (!userData) {
-         functions.logger.log(
-            `🚀 ~ User ${userId} not found. Skipping update. No study backgrounds found.`
+         functions.logger.warn(
+            `🚀 ~ User ${userId} not found. Skipping update.`
          )
          return
       }

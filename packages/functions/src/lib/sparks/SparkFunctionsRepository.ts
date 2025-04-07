@@ -1283,7 +1283,15 @@ export class SparkFunctionsRepository
       const allSparksMap = new Map(allSparks.map((spark) => [spark.id, true]))
       // Update the sparks without jobs to have hasJob: false
       sparksWithoutJobs
-         .filter((sparkId) => allSparksMap.has(sparkId))
+         .filter((sparkId) => {
+            const exists = allSparksMap.has(sparkId)
+            if (!exists) {
+               functions.logger.warn(
+                  `Spark ${sparkId} does not exist, skipping update`
+               )
+            }
+            return exists
+         })
          .forEach((sparkId) => {
             functions.logger.log(
                `Update spark ${sparkId} to be with hasJobs flag as false`
