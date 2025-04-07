@@ -83,6 +83,8 @@ test.describe("Group Analytics", () => {
          await groupPage.goToAnalyticsPage()
          await groupPage.goToLivestreamAnalyticsPage()
 
+         await groupPage.page.reload()
+
          await verifyAnalyticsCard(groupPage, "Registrations", "1", true)
          await groupPage.assertUserIsInAnalyticsTable(user)
       }
