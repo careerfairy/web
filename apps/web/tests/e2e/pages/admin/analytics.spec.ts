@@ -1,6 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { BrowserContext, expect } from "@playwright/test"
-import { livestreamRepo } from "data/RepositoryInstances"
 import { groupAdminFixture as test } from "../../fixtures"
 import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
 import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"
@@ -84,15 +83,8 @@ test.describe("Group Analytics", () => {
          await groupPage.goToAnalyticsPage()
          await groupPage.goToLivestreamAnalyticsPage()
 
-         const stats = await livestreamRepo.getLivestreamStats(livestream.id)
-
-         const regData = await livestreamRepo.getLivestreamUser(
-            livestream.id,
-            user.id
-         )
-
-         expect(regData.registered.date).toBeDefined()
-         expect(stats.generalStats.numberOfRegistrations).toBe(1)
+         await verifyAnalyticsCard(groupPage, "Registrations", "1", true)
+         await groupPage.assertUserIsInAnalyticsTable(user)
       }
    )
 
