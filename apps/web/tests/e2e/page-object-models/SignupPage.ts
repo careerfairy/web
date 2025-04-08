@@ -89,7 +89,7 @@ export class SignupPage extends CommonPage {
       )
       this.interestsTitle = page.locator("text=What are your interests?")
       this.referralCodeTextField = page.locator("id=referralCode")
-      this.termsOfConditionsCheckBox = page.locator('input[name="agreeTerm"]')
+      this.termsOfConditionsCheckBox = page.getByLabel("I agree to the Terms &")
       this.subscribeEmailsCheckBox = page.locator('input[name="subscribed"]')
       this.signupButton = page.locator("data-testid=signup-button")
       this.userRegistrationContinueButton = page.locator(
