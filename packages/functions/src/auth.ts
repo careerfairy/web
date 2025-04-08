@@ -180,7 +180,7 @@ export const createNewUserAccount = onCall(async (request) => {
          `Error creating user ${recipientEmail} in firebase auth`,
          error
       )
-      throw new functions.https.HttpsError("internal", error)
+      throw new functions.https.HttpsError("invalid-argument", error)
    }
 })
 
