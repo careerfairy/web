@@ -62,7 +62,8 @@ const createSparkNotificationForSingleUser = ({
 export const handleCreateUsersSparksNotifications = async (
    firestore: Firestore,
    logger: any,
-   userId?: string
+   userId?: string,
+   skimData = false
 ) => {
    const startDate = new Date()
    const endDate = addDaysDate(
@@ -72,11 +73,15 @@ export const handleCreateUsersSparksNotifications = async (
 
    const bulkWriter = firestore.bulkWriter()
 
-   // to get all the upcoming events that will start on the next X days
-   const upcomingEventsWithRegisteredStudents =
-      await getStreamsByDateWithRegisteredStudents(startDate, endDate, {
-         excludeHidden: true,
-      })
+   const [upcomingEventsWithRegisteredStudents, userSparksFeedMetrics] =
+      await Promise.all([
+         // to get all the upcoming events that will start on the next X days
+         getStreamsByDateWithRegisteredStudents(startDate, endDate, {
+            excludeHidden: true,
+            skimData,
+         }),
+         sparkRepo.getAllUserSparksFeedMetrics(),
+      ])
 
    logger(
       `In next ${SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS} days, ${upcomingEventsWithRegisteredStudents.length} events will take place`
@@ -93,8 +98,6 @@ export const handleCreateUsersSparksNotifications = async (
       })
       return bulkWriter.close()
    }
-
-   const userSparksFeedMetrics = await sparkRepo.getAllUserSparksFeedMetrics()
 
    userSparksFeedMetrics.forEach(({ userId }) => {
       createSparkNotificationForSingleUser({
@@ -116,7 +119,7 @@ export const removeGroupNotificationsAndSyncSparksNotifications = async (
 ) => {
    logger(`Removing all spark notifications of group ${groupId}`)
    await sparkRepo.removeAllSparkNotificationsByGroup(groupId)
-   return handleCreateUsersSparksNotifications(firestore, logger)
+   return handleCreateUsersSparksNotifications(firestore, logger, null, true)
 }
 
 export const removeUserNotificationsAndSyncSparksNotifications = async (
@@ -129,5 +132,5 @@ export const removeUserNotificationsAndSyncSparksNotifications = async (
       `Remove spark notification related to the group ${groupId} for the user ${userId}`
    )
    await sparkRepo.removeUserSparkNotification(userId, groupId)
-   return handleCreateUsersSparksNotifications(firestore, logger)
+   return handleCreateUsersSparksNotifications(firestore, logger, null, true)
 }
