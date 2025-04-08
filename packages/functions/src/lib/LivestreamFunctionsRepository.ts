@@ -1017,7 +1017,7 @@ export class LivestreamFunctionsRepository
                functions.logger.warn(
                   `Live stream ${event.id} ${
                      event.isDraft ? "(draft)" : ""
-                  }) does not exist, skipping update`
+                  } does not exist, skipping update`
                )
             }
             return exists
