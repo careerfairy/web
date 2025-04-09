@@ -158,6 +158,8 @@ export const dataLayerCustomJobEvent = (
       ...optionalVariables,
       groupId: job.groupId,
       jobId: job.id,
+      jobName: job.title,
+      deadline: job.deadline?.toDate()?.toISOString(),
    })
 }
 

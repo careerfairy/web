@@ -116,7 +116,6 @@ export const CustomJobDetails = ({
    useEffectOnce(() => {
       dataLayerCustomJobEvent(AnalyticsEvents.CustomJobView, job, {
          companyName,
-         companyLogoUrl,
       })
    })
 
