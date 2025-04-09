@@ -1079,42 +1079,32 @@ export class FirebaseLivestreamRepository
       return !snaps.empty
    }
 
-   async getLivestreamsByIds(
-      ids: string[],
-      isDraft = false
-   ): Promise<LivestreamEvent[]> {
+   async getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
       const chunks = chunkArray(ids, 10)
-      const promises = []
 
-      for (const chunk of chunks) {
-         promises.push(
-            this.firestore
-               .collection(isDraft ? "draftLivestreams" : "livestreams")
-               .where("id", "in", chunk)
-               .get()
-               .then(mapFirestoreDocuments)
-         )
-      }
+      const promises = chunks.map((chunk) =>
+         this.firestore
+            .collection("livestreams")
+            .where("id", "in", chunk)
+            .get()
+            .then(mapFirestoreDocuments<LivestreamEvent>)
+      )
 
-      const responses = await Promise.allSettled(promises)
-
-      return responses
-         .filter((r) => {
-            if (r.status === "fulfilled") {
-               return true
-            } else {
-               // only log for debugging purposes
-               console.error("Promise failed", r)
-            }
-
-            return false
-         })
-         .map((r) => (r as PromiseFulfilledResult<LivestreamEvent[]>).value)
-         .flat()
+      return this.handlePromiseAllSettled<LivestreamEvent>(promises)
    }
 
    async getDraftLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
-      return this.getLivestreamsByIds(ids, true)
+      const chunks = chunkArray(ids, 10)
+
+      const promises = chunks.map((chunk) =>
+         this.firestore
+            .collection("draftLivestreams")
+            .where("id", "in", chunk)
+            .get()
+            .then(mapFirestoreDocuments<LivestreamEvent>)
+      )
+
+      return this.handlePromiseAllSettled<LivestreamEvent>(promises)
    }
 
    async getLivestreamRecordingToken(
@@ -1771,6 +1761,26 @@ export class FirebaseLivestreamRepository
       return livestreamRef.update({
          smsEnabled: enabled,
       })
+   }
+
+   private async handlePromiseAllSettled<T>(
+      promises: Promise<T[]>[]
+   ): Promise<T[]> {
+      const responses = await Promise.allSettled(promises)
+
+      return responses
+         .filter((r) => {
+            if (r.status === "fulfilled") {
+               return true
+            } else {
+               // only log for debugging purposes
+               console.error("Promise failed", r)
+            }
+
+            return false
+         })
+         .map((r) => (r as PromiseFulfilledResult<T[]>).value)
+         .flat()
    }
 }
 
