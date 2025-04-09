@@ -118,7 +118,6 @@
       "redux-thunk": "^2.3.0",
       "reselect": "^4.0.0",
       "schema-dts": "^1.1.0",
-      "sharp": "^0.32.6",
       "sitemap-links": "^1.0.3",
       "slick-carousel": "^1.8.1",
       "swr": "^2.2.0",
@@ -153,7 +152,7 @@
       "webpack": "^5.88.1"
    },
    "engines": {
-      "node": "22.x"
+      "node": "20.x"
    },
    "copyFiles": [
       {

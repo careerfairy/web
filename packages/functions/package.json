@@ -46,7 +46,7 @@
       "yup": "^0.32.11"
    },
    "engines": {
-      "node": "22"
+      "node": "20"
    },
    "devDependencies": {
       "@types/luxon": "^1.22.0",
