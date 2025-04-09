@@ -60,6 +60,8 @@ export const AnalyticsEvents = {
    CustomJobApplicationComplete: "custom_job_application_complete",
    CustomJobApplicationRemovalComplete:
       "custom_job_application_removal_complete",
+   CustomJobView: "custom_job_view",
+   CustomJobApplicationInitiated: "custom_job_application_initiated",
    EventShare: "event_share",
    SparksShare: "sparks_share",
    ReferralCopyLink: "referral_copy_link",

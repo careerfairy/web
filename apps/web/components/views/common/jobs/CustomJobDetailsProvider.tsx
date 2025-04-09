@@ -51,6 +51,7 @@ export const CustomJobDetailsProvider: React.FC<
 
    const { userData } = useAuth()
 
+   // Can add group data to the custom job
    const { applicationInitiatedOnly: shouldOpenApplyConfirmation } =
       useUserJobApplication(userData?.id || fingerPrintId, customJob.id)
    const [

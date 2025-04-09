@@ -10,7 +10,10 @@ import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { customJobRepo } from "../../../data/RepositoryInstances"
 import { customJobServiceInstance } from "../../../data/firebase/CustomJobService"
-import { dataLayerEvent } from "../../../util/analyticsUtils"
+import {
+   dataLayerCustomJobEvent,
+   dataLayerEvent,
+} from "../../../util/analyticsUtils"
 import { useAppDispatch } from "../store"
 import useFingerPrint from "../useFingerPrint"
 import useSnackbarNotifications from "../useSnackbarNotifications"
@@ -107,7 +110,12 @@ const useCustomJobApply = (
             return await Promise.all([
                customJobRepo.incrementCustomJobClicks(job.id),
                jobApplication,
-            ])
+            ]).then(() => {
+               dataLayerCustomJobEvent(
+                  AnalyticsEvents.CustomJobApplicationInitiated,
+                  job
+               )
+            })
          }
       )
 
