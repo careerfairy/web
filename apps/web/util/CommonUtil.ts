@@ -1,5 +1,6 @@
 /* eslint-disable no-var */
 import * as Sentry from "@sentry/nextjs"
+import getConfig from "next/config"
 import { v4 as uuid } from "uuid"
 import LocalStorageUtil from "./LocalStorageUtil"
 
@@ -238,8 +239,9 @@ export const shouldUseEmulators = () => {
  * solving issues related to Docker deployments and environment variables.
  */
 export const getWorkflowId = (): string => {
+   const { publicRuntimeConfig } = getConfig()
    return (
-      process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
+      publicRuntimeConfig.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
       process.env.NEXT_PUBLIC_DEV_NAME ||
       "unknown"
    )
