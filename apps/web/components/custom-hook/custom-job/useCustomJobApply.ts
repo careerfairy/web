@@ -10,10 +10,8 @@ import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { customJobRepo } from "../../../data/RepositoryInstances"
 import { customJobServiceInstance } from "../../../data/firebase/CustomJobService"
-import {
-   dataLayerCustomJobEvent,
-   dataLayerEvent,
-} from "../../../util/analyticsUtils"
+import { dataLayerCustomJobEvent } from "../../../util/analyticsUtils"
+import useGroupFields from "../group/useGroupFields"
 import { useAppDispatch } from "../store"
 import useFingerPrint from "../useFingerPrint"
 import useSnackbarNotifications from "../useSnackbarNotifications"
@@ -37,6 +35,9 @@ const useCustomJobApply = (
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { push, asPath } = useRouter()
    const customJob = useCustomJob(job.id)
+   const { data: groupFields } = useGroupFields(customJob.groupId, [
+      "universityName",
+   ])
 
    const { trigger: handleConfirmApply, isMutating: isApplying } =
       useSWRMutation(
@@ -67,10 +68,13 @@ const useCustomJobApply = (
                   "Congrats"
                )
 
-               dataLayerEvent(AnalyticsEvents.CustomJobApplicationComplete, {
-                  jobId: job.id,
-                  jobName: job.title,
-               })
+               dataLayerCustomJobEvent(
+                  AnalyticsEvents.CustomJobApplicationComplete,
+                  job,
+                  {
+                     companyName: groupFields?.universityName,
+                  }
+               )
 
                if (isInTalentGuide) {
                   dispatch(
@@ -113,7 +117,10 @@ const useCustomJobApply = (
             ]).then(() => {
                dataLayerCustomJobEvent(
                   AnalyticsEvents.CustomJobApplicationInitiated,
-                  job
+                  job,
+                  {
+                     companyName: groupFields?.universityName,
+                  }
                )
             })
          }
