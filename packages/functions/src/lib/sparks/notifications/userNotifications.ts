@@ -62,9 +62,12 @@ const createSparkNotificationForSingleUser = ({
 export const handleCreateUsersSparksNotifications = async (
    firestore: Firestore,
    logger: any,
-   userId?: string,
-   skimData = false
+   options?: {
+      userId?: string
+      skimData?: boolean
+   }
 ) => {
+   const { userId, skimData } = options || {}
    const startDate = new Date()
    const endDate = addDaysDate(
       new Date(),
@@ -119,7 +122,9 @@ export const removeGroupNotificationsAndSyncSparksNotifications = async (
 ) => {
    logger(`Removing all spark notifications of group ${groupId}`)
    await sparkRepo.removeAllSparkNotificationsByGroup(groupId)
-   return handleCreateUsersSparksNotifications(firestore, logger, null, true)
+   return handleCreateUsersSparksNotifications(firestore, logger, {
+      skimData: true,
+   })
 }
 
 export const removeUserNotificationsAndSyncSparksNotifications = async (
@@ -132,5 +137,7 @@ export const removeUserNotificationsAndSyncSparksNotifications = async (
       `Remove spark notification related to the group ${groupId} for the user ${userId}`
    )
    await sparkRepo.removeUserSparkNotification(userId, groupId)
-   return handleCreateUsersSparksNotifications(firestore, logger, null, true)
+   return handleCreateUsersSparksNotifications(firestore, logger, {
+      skimData: true,
+   })
 }
