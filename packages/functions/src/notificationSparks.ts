@@ -34,12 +34,9 @@ export const createSparksFeedEventNotifications = onSchedule(
    },
    async () => {
       await Promise.allSettled([
-         handleCreateUsersSparksNotifications(
-            firestore,
-            functions.logger.log,
-            null,
-            true
-         )
+         handleCreateUsersSparksNotifications(firestore, functions.logger.log, {
+            skimData: true,
+         })
             .then(() => {
                functions.logger.log(
                   "Finished creating user sparks notifications."
@@ -68,9 +65,11 @@ export const createSparksFeedEventNotifications = onSchedule(
 /**
  * To remove a single notification from user
  */
-export const removeAndSyncUserSparkNotification = onCall(
+export const removeAndSyncUserSparkNotification = onCall<{
+   userId: string
+   groupId: string
+}>(
    {
-      region: config.region,
       memory: "1GiB",
       timeoutSeconds: 60 * 9,
    },
@@ -106,23 +105,22 @@ export const removeAndSyncUserSparkNotification = onCall(
 /**
  * To create Sparks event notifications to a single User
  */
-export const createUserSparksFeedEventNotifications = onCall(
-   async (request) => {
-      const { userId } = request.data as { userId: string }
+export const createUserSparksFeedEventNotifications = onCall<{
+   userId: string
+}>(async (request) => {
+   const { userId } = request.data as { userId: string }
 
-      try {
-         return handleCreateUsersSparksNotifications(
-            firestore,
-            functions.logger.log,
-            userId,
-            true
-         )
-      } catch (error) {
-         logAndThrow(
-            "Error during the creation of a single User Sparks Feed event notifications",
-            error,
-            userId
-         )
-      }
+   try {
+      return handleCreateUsersSparksNotifications(
+         firestore,
+         functions.logger.log,
+         { userId, skimData: true }
+      )
+   } catch (error) {
+      logAndThrow(
+         "Error during the creation of a single User Sparks Feed event notifications",
+         error,
+         userId
+      )
    }
-)
+})

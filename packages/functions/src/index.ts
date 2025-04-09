@@ -291,11 +291,11 @@ exports.updateSpark_v4 = groupSparks.updateSpark
 exports.deleteSpark_v3 = groupSparks.deleteSpark
 
 // User Spark Notification Functions
-exports.createSparksFeedEventNotifications =
+exports[FUNCTION_NAMES.createSparksFeedEventNotifications] =
    notificationSparks.createSparksFeedEventNotifications
-exports.createUserSparksFeedEventNotifications_v3 =
+exports[FUNCTION_NAMES.createUserSparksFeedEventNotifications] =
    notificationSparks.createUserSparksFeedEventNotifications
-exports.removeAndSyncUserSparkNotification_v3 =
+exports[FUNCTION_NAMES.removeAndSyncUserSparkNotification] =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions

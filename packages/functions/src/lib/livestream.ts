@@ -173,7 +173,6 @@ export const getStreamsByDateWithRegisteredStudents = async (
 
 /**
  * Add all registered students to the correspondent streams
- * PROBLEMO!!
  */
 const addUsersDataOnStreams = async (
    streams: LivestreamEvent[] = [],
@@ -193,20 +192,20 @@ const addUsersDataOnStreams = async (
 
       const collection = await query.get()
 
-      const usersLivestreamData: UserLivestreamData[] = collection.docs?.map(
-         (doc) => {
-            if (skimData) {
-               return {
-                  id: doc.get("id"),
-                  registered: doc.get("registered"),
-                  userId: doc.get("userId"),
-                  livestreamId: doc.get("livestreamId"),
-                  user: null,
-               }
+      const usersLivestreamData = collection.docs?.map<
+         Partial<UserLivestreamData>
+      >((doc) => {
+         if (skimData) {
+            return {
+               id: doc.get("id"),
+               registered: doc.get("registered"),
+               userId: doc.get("userId"),
+               livestreamId: doc.get("livestreamId"),
+               user: null,
             }
-            return doc.data() as UserLivestreamData
          }
-      )
+         return doc.data()
+      })
 
       formattedStreams.push({ ...stream, usersLivestreamData })
    }
