@@ -3,7 +3,8 @@ import { doc, FirestoreDataConverter } from "firebase/firestore"
 import { ReactFireOptions, useFirestore, useFirestoreDocData } from "reactfire"
 
 /**
- * Custom hook to get specific fields from a group document
+ * Custom hook to get specific fields from a Group document (collection 'careerCenterData').
+ *
  * @param groupId - The ID of the group to fetch
  * @param fields - Array of field names to fetch from the group document
  * @param options - Optional ReactFire options

@@ -152,14 +152,16 @@ export const dataLayerSparkEvent = (
 export const dataLayerCustomJobEvent = (
    eventName: AnalyticsEvent,
    job: PublicCustomJob,
+   companyName: string,
    optionalVariables = {}
 ) => {
    dataLayerEvent(eventName, {
       ...optionalVariables,
-      groupId: job.groupId,
-      jobId: job.id,
-      jobName: job.title,
-      deadline: job.deadline?.toDate()?.toISOString(),
+      groupId: job.groupId, // GTM Variable
+      jobId: job.id, // GTM Variable
+      jobName: job.title, // GTM Variable
+      deadline: job.deadline?.toDate()?.toISOString(), // GTM Variable
+      companyName: companyName, // GTM Variable
    })
 }
 
