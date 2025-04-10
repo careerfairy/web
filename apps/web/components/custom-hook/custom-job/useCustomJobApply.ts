@@ -71,9 +71,7 @@ const useCustomJobApply = (
                dataLayerCustomJobEvent(
                   AnalyticsEvents.CustomJobApplicationComplete,
                   job,
-                  {
-                     companyName: groupFields?.universityName,
-                  }
+                  groupFields?.universityName
                )
 
                if (isInTalentGuide) {
@@ -118,9 +116,7 @@ const useCustomJobApply = (
                dataLayerCustomJobEvent(
                   AnalyticsEvents.CustomJobApplicationInitiated,
                   job,
-                  {
-                     companyName: groupFields?.universityName,
-                  }
+                  groupFields?.universityName
                )
             })
          }

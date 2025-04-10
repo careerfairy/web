@@ -114,9 +114,7 @@ export const CustomJobDetails = ({
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
    useEffectOnce(() => {
-      dataLayerCustomJobEvent(AnalyticsEvents.CustomJobView, job, {
-         companyName,
-      })
+      dataLayerCustomJobEvent(AnalyticsEvents.CustomJobView, job, companyName)
    })
 
    return (
