@@ -36,7 +36,7 @@ const config: PlaywrightTestConfig = {
    /* Retry on CI only */
    retries: process.env.CI ? 2 : 0,
    /* Opt out of parallel tests on CI. */
-   // workers: process.env.CI ? 1 : undefined,
+   // workers: process.env.CI ? 1 : undefined,π
    /* Reporter to use. See https://playwright.dev/docs/test-reporters */
    reporter: "html",
    /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -54,9 +54,20 @@ const config: PlaywrightTestConfig = {
       // Set the base URL and pass the workflow ID via HTTP headers
       // This ensures the server-side code can access the workflow ID
       contextOptions: {
-         baseURL: "http://localhost:3000",
-         extraHTTPHeaders: {
-            "x-workflow-id": process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID || "",
+         storageState: {
+            cookies: [],
+            origins: [
+               {
+                  origin: "http://localhost:3000",
+                  localStorage: [
+                     {
+                        name: "x-workflow-id",
+                        value:
+                           process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID || "test",
+                     },
+                  ],
+               },
+            ],
          },
       },
    },
