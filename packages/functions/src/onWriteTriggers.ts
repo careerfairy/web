@@ -18,7 +18,7 @@ import {
 
 import { levelsOfStudyOrderMap } from "@careerfairy/shared-lib/fieldOfStudy"
 import { University } from "@careerfairy/shared-lib/universities/universities"
-import { onDocumentWritten } from "firebase-functions/v2/firestore"
+import { onDocumentWritten } from "firebase-functions/firestore"
 import { DateTime } from "luxon"
 import { handleUserStatsBadges } from "./lib/badge"
 import { rewardSideEffectsUserStats } from "./lib/reward"
@@ -315,7 +315,7 @@ export const onWriteGroup = onDocumentWritten(
 export const syncGroupFollowingUserDataOnChange = onDocumentWritten(
    "careerCenterData/{groupId}",
    async (event) => {
-      const changeType = getChangeTypeEnum(event.data)
+      const changeType = getChangeTypeEnum(event)
 
       try {
          const groupId = event.params.groupId
@@ -460,11 +460,11 @@ export const onWriteSpark = onDocumentWritten(
 export const onWriteCustomJobs = onDocumentWritten(
    "customJobs/{jobId}",
    async (event) => {
-      const changeTypes = getChangeTypes(event.data)
+      const changeTypes = getChangeTypes(event)
 
       logStart({
          changeTypes,
-         context: event,
+         event,
          message: "syncCustomJobsOnWrite",
       })
 
@@ -597,13 +597,11 @@ export const onWriteStudyBackground = onDocumentWritten(
    "userData/{userId}/studyBackgrounds/{studyBackgroundId}",
    async (event) => {
       const { userId } = event.params
-      const changeTypes = getChangeTypes(event.data)
-
-      const change = event.data
+      const changeTypes = getChangeTypes(event)
 
       logStart({
          changeTypes,
-         context: event,
+         event,
          message: "syncStudyBackgroundOnWrite",
       })
 
