@@ -785,3 +785,45 @@ export const getWebBaseUrl = () => {
    }
    return mainProductionDomainWithProtocol
 }
+
+export const handleDocumentUpdateError = async (
+   updateHandler: Promise<unknown>,
+   errorCode: string | string[],
+   errorHandler: (errorCode: string | string[], error?: Error) => void,
+   errorCodeChecker?: (code) => boolean
+): Promise<unknown> => {
+   return updateHandler.catch((firestoreError) => {
+      const codes = Array.isArray(errorCode) ? errorCode : [errorCode]
+
+      if (
+         errorCodeChecker
+            ? errorCodeChecker(firestoreError)
+            : codes.includes(firestoreError?.code + "")
+      ) {
+         errorHandler(codes, firestoreError)
+         return
+      }
+
+      throw firestoreError
+   })
+}
+
+export const handleDocumentUpdateErrors = (
+   updateHandlers: Promise<unknown>[],
+   errorCode: string | string[],
+   errorHandler: (errorCode: string | string[], error?: Error) => void
+): Promise<unknown>[] => {
+   return updateHandlers?.map((handler) =>
+      handleDocumentUpdateError(handler, errorCode, errorHandler)
+   )
+}
+
+export const logDocumentNotFoundUpdateError = (
+   customMessage: string,
+   error: Error
+) => {
+   functions.logger.warn(
+      `🚀 [NOT_FOUND] - Document not found. ${customMessage}`,
+      error.message
+   )
+}

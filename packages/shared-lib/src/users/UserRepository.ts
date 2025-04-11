@@ -17,6 +17,7 @@ import { Group, PublicGroup } from "../groups"
 import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import { SeenSparks } from "../sparks/sparks"
 import { chunkArray } from "../utils"
+import { Logger } from "../utils/types"
 import {
    CompanyFollowed,
    IUserReminder,
@@ -318,7 +319,8 @@ export interface IUserRepository {
     */
    batchUpdateFollowingUsersGroup(
       group: PublicGroup,
-      followingUsers: string[]
+      followingUsers: string[],
+      logger?: Logger
    ): Promise<void>
 
    /**
@@ -1375,7 +1377,8 @@ export class FirebaseUserRepository
 
    async batchUpdateFollowingUsersGroup(
       group: PublicGroup,
-      followingUsers: string[]
+      followingUsers: string[],
+      logger?: Logger
    ): Promise<void> {
       if (!followingUsers?.length) return
 
@@ -1395,6 +1398,14 @@ export class FirebaseUserRepository
 
             const toUpdatePublicGroup: Pick<CompanyFollowed, "group"> = {
                group: group,
+            }
+
+            const snap = await ref.get()
+            if (!snap.exists) {
+               logger.warn(
+                  `Company followed ${group.id} for user ${userId} does not exist, skipping update`
+               )
+               continue
             }
 
             batch.update(ref, toUpdatePublicGroup)
