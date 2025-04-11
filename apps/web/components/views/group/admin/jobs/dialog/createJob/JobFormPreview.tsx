@@ -2,7 +2,6 @@ import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box } from "@mui/material"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import CustomJobAdminDetails from "components/views/jobs/components/b2b/CustomJobAdminDetails"
 import SteppedDialog, {
@@ -56,7 +55,6 @@ const JobFormPreview = () => {
    const { goToStep } = useStepper()
    const { handleSubmit, isSubmitting } = useCustomJobForm()
    const { getValues } = useFormContext()
-   const { jobHubV1 } = useFeatureFlags()
 
    const fieldsValues = getValues([
       "basicInfo.title",
@@ -95,15 +93,6 @@ const JobFormPreview = () => {
          goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
       }
    }, [goToStep, group.publicSparks, groupHasUpcomingLivestreams])
-
-   const handlePrevClick = useCallback(() => {
-      if (jobHubV1) {
-         handlePrevClickV2()
-         return
-      }
-
-      goToStep(JobDialogStep.FORM_ADDITIONAL_DETAILS.key)
-   }, [goToStep, handlePrevClickV2, jobHubV1])
 
    const previewJob = useMemo<CustomJob>(() => {
       const { deadline, jobType, businessTags, livestreamIds, sparkIds } =
@@ -162,7 +151,7 @@ const JobFormPreview = () => {
                <SteppedDialog.Button
                   variant="outlined"
                   color="grey"
-                  onClick={handlePrevClick}
+                  onClick={handlePrevClickV2}
                   sx={styles.cancelBtn}
                   disabled={isSubmitting}
                >

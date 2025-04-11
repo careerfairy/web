@@ -5,7 +5,6 @@ import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetr
 import { Box, Stack, Typography } from "@mui/material"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import EventsPreviewCarousel, {
    EventsTypes,
@@ -42,7 +41,6 @@ const CustomJobLinkedContents = ({
    hideLinkedLivestreams,
    hideLinkedSparks,
 }: CustomJobLinkedContentsProps) => {
-   const { jobHubV1 } = useFeatureFlags()
    const { sparks, groupId } = job
    const { publishedLivestreams: jobLivestreams } =
       useCustomJobLinkedLivestreams(job)
@@ -64,7 +62,7 @@ const CustomJobLinkedContents = ({
                disableEventClick={disableEventClick}
             />
          )}
-         {jobHubV1 && !hideLinkedSparks ? (
+         {!hideLinkedSparks ? (
             <CustomJobLinkedSparks
                disableSparkClick={disableEventClick}
                sparks={jobSparks}
