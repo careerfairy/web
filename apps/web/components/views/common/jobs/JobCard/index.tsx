@@ -6,7 +6,6 @@ import {
 import { Box, ButtonBase, Grid, SxProps, useTheme } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useCallback } from "react"
@@ -83,11 +82,9 @@ const JobCard = ({
    applied,
 }: Props) => {
    const isJobExpired = useIsJobExpired(job as PublicCustomJob)
-
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const theme = useTheme()
-   const { jobHubV1 } = useFeatureFlags()
    const showAdditionalInfo = clicks !== undefined && applicants !== undefined
 
    const getStateColor = useCallback(
@@ -123,7 +120,7 @@ const JobCard = ({
       >
          <Grid container>
             <Box sx={styles.listItemContainer}>
-               {isAtsJob || !jobHubV1 ? null : (
+               {isAtsJob ? null : (
                   <Box
                      sx={[styles.jobState, { background: getStateColor(job) }]}
                   />

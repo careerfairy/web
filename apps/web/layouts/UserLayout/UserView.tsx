@@ -7,7 +7,6 @@ import Tab from "@mui/material/Tab"
 import Tabs from "@mui/material/Tabs"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import Link from "../../components/views/common/Link"
 import CareerSkills from "../../components/views/profile/career-skills/CareerSkills"
 import ProfileCustomJobs from "../../components/views/profile/custom-jobs/ProfileCustomJobs"
@@ -100,11 +99,6 @@ type Props = {
 const UserView = ({ currentPath }: Props) => {
    const theme = useTheme()
    const native = useMediaQuery(theme.breakpoints.down("sm"))
-   const { jobHubV1 } = useFeatureFlags()
-
-   if (!jobHubV1) {
-      delete pages["/profile/my-jobs"]
-   }
 
    const views = Object.entries(pages).map(([key, value], index) => (
       <TabPanel

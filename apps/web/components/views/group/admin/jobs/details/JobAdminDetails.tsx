@@ -3,7 +3,6 @@ import ChevronLeft from "@mui/icons-material/ChevronLeft"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 import { Box, Tab, Tabs, Tooltip, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { AlertCircle } from "react-feather"
@@ -95,7 +94,6 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
    const { push } = useRouter()
-   const { jobHubV1 } = useFeatureFlags()
 
    const allowToDisplayApplicantsData = group.privacyPolicyActive
 
@@ -122,7 +120,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   <NoApplicantsData />
                ),
          },
-         ...(jobHubV1 && !job.isPermanentlyExpired
+         ...(!job.isPermanentlyExpired
             ? [
                  {
                     label: "Linked content",
@@ -135,7 +133,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             component: () => <JobPosting job={job} group={group} />,
          },
       ],
-      [allowToDisplayApplicantsData, group, job, jobHubV1]
+      [allowToDisplayApplicantsData, group, job]
    )
 
    if (!job) {
@@ -164,7 +162,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             TabIndicatorProps={{
                sx: [
                   styles.indicator,
-                  ...(jobHubV1 && !job.isPermanentlyExpired
+                  ...(!job.isPermanentlyExpired
                      ? [
                           activeTabIndex === TabsEnum.LINKED_CONTENT &&
                              jobHasNoContent &&
@@ -200,7 +198,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                }
             />
 
-            {jobHubV1 && !job.isPermanentlyExpired ? (
+            {!job.isPermanentlyExpired ? (
                <Tab
                   key={"Linked content"}
                   label={
