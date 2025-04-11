@@ -594,12 +594,14 @@ export const deleteLoggedInUserAccount = functions
       try {
          const userDocRef = firestore.collection("userData").doc(userEmail)
 
-         // Try to delete sub-collections but continue if it fails
-         await deleteUserSubCollections(userDocRef)
-
          // Critical deletions
          await auth.deleteUser(userId)
          await userDocRef.delete()
+
+         // Try to delete sub-collections but continue if it fails
+         // Delete sub collections after deleting the user as to prevent triggering the onWriteTriggers
+         // on sub collections
+         await deleteUserSubCollections(userDocRef)
 
          // add userId and timestamp on analytics collection
          await firestore

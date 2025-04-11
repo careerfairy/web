@@ -201,6 +201,8 @@ export interface ILivestreamRepository {
     * */
    getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
 
+   getDraftLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
+
    getLivestreamRecordingToken(livestreamId: string): Promise<RecordingToken>
 
    getLivestreamRecordingStats(
@@ -1079,33 +1081,30 @@ export class FirebaseLivestreamRepository
 
    async getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
       const chunks = chunkArray(ids, 10)
-      const promises = []
 
-      for (const chunk of chunks) {
-         promises.push(
-            this.firestore
-               .collection("livestreams")
-               .where("id", "in", chunk)
-               .get()
-               .then(mapFirestoreDocuments)
-         )
-      }
+      const promises = chunks.map((chunk) =>
+         this.firestore
+            .collection("livestreams")
+            .where("id", "in", chunk)
+            .get()
+            .then(mapFirestoreDocuments<LivestreamEvent>)
+      )
 
-      const responses = await Promise.allSettled(promises)
+      return this.handlePromiseAllSettled<LivestreamEvent>(promises)
+   }
 
-      return responses
-         .filter((r) => {
-            if (r.status === "fulfilled") {
-               return true
-            } else {
-               // only log for debugging purposes
-               console.error("Promise failed", r)
-            }
+   async getDraftLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
+      const chunks = chunkArray(ids, 10)
 
-            return false
-         })
-         .map((r) => (r as PromiseFulfilledResult<LivestreamEvent[]>).value)
-         .flat()
+      const promises = chunks.map((chunk) =>
+         this.firestore
+            .collection("draftLivestreams")
+            .where("id", "in", chunk)
+            .get()
+            .then(mapFirestoreDocuments<LivestreamEvent>)
+      )
+
+      return this.handlePromiseAllSettled<LivestreamEvent>(promises)
    }
 
    async getLivestreamRecordingToken(
@@ -1762,6 +1761,26 @@ export class FirebaseLivestreamRepository
       return livestreamRef.update({
          smsEnabled: enabled,
       })
+   }
+
+   private async handlePromiseAllSettled<T>(
+      promises: Promise<T[]>[]
+   ): Promise<T[]> {
+      const responses = await Promise.allSettled(promises)
+
+      return responses
+         .filter((r) => {
+            if (r.status === "fulfilled") {
+               return true
+            } else {
+               // only log for debugging purposes
+               console.error("Promise failed", r)
+            }
+
+            return false
+         })
+         .map((r) => (r as PromiseFulfilledResult<T[]>).value)
+         .flat()
    }
 }
 
