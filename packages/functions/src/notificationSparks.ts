@@ -4,7 +4,6 @@ import { onSchedule } from "firebase-functions/v2/scheduler"
 import * as yup from "yup"
 import { string } from "yup"
 import { firestore } from "./api/firestoreAdmin"
-import config from "./config"
 import { handleCreatePublicSparksNotifications } from "./lib/sparks/notifications/publicNotifications"
 import {
    handleCreateUsersSparksNotifications,
@@ -29,7 +28,6 @@ export const createSparksFeedEventNotifications = onSchedule(
    {
       schedule: "0 9 * * *",
       timeZone: "Europe/Zurich",
-      region: config.region,
       memory: "1GiB",
    },
    async () => {
