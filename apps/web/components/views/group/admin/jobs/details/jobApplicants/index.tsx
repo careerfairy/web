@@ -1,23 +1,24 @@
-import { Box, Grid, Typography } from "@mui/material"
-import { sxStyles } from "../../../../../../../types/commonTypes"
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
-import React, { FC, useCallback, useMemo } from "react"
-import JobApplicantsList from "./JobApplicantsList"
-import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
-import { StyledPagination } from "../../../common/CardCustom"
+import { Box, Grid, Typography } from "@mui/material"
+import React, { FC, useCallback, useMemo } from "react"
+import { sxStyles } from "../../../../../../../types/commonTypes"
 import useCustomJobStats from "../../../../../../custom-hook/custom-job/useCustomJobStats"
 import usePaginatedJobApplicants from "../../../../../../custom-hook/custom-job/usePaginatedJobApplicants"
+import { StyledPagination } from "../../../common/CardCustom"
+import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
+import JobApplicantsList from "./JobApplicantsList"
 
 const styles = sxStyles({
    statsSection: {
       display: "flex",
       flexDirection: "column",
-      px: 2,
+      px: "12px",
       py: 1,
       borderRadius: 2,
       background: "white",
       border: "1px solid #F0EDFD",
+      height: "100%",
    },
    statsLabel: {
       fontSize: { xs: "12px", md: "14px" },
@@ -25,6 +26,7 @@ const styles = sxStyles({
    statsValue: {
       fontSize: "20px",
       fontWeight: "bold",
+      lineHeight: "30px",
    },
    pagination: {
       display: "flex",
@@ -40,6 +42,7 @@ type Props = {
 const JobApplicants: FC<Props> = ({ jobId }) => {
    const jobStats = useCustomJobStats(jobId)
 
+   const totalViews = jobStats.views || jobStats.applicants + jobStats.clicks
    const paginatedResults = usePaginatedJobApplicants(jobId)
 
    const applicants = useMemo(() => {
@@ -64,11 +67,25 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
    return (
       <>
          <Grid container spacing={1}>
-            <Grid item xs={6}>
+            <Grid item xs={4}>
                <Box sx={styles.statsSection}>
                   <Typography
                      variant={"subtitle1"}
-                     color={"grey"}
+                     color={"neutral.700"}
+                     sx={styles.statsLabel}
+                  >
+                     Job posting views
+                  </Typography>
+                  <Typography variant={"body1"} sx={styles.statsValue}>
+                     {totalViews}
+                  </Typography>
+               </Box>
+            </Grid>
+            <Grid item xs={4}>
+               <Box sx={styles.statsSection}>
+                  <Typography
+                     variant={"subtitle1"}
+                     color={"neutral.700"}
                      sx={styles.statsLabel}
                   >
                      Initiated applications
@@ -79,11 +96,11 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
                </Box>
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid item xs={4}>
                <Box sx={styles.statsSection}>
                   <Typography
                      variant={"subtitle1"}
-                     color={"grey"}
+                     color={"neutral.700"}
                      sx={styles.statsLabel}
                   >
                      Confirmed applicants

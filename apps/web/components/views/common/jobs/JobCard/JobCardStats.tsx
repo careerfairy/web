@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { CheckCircle, User } from "react-feather"
+import { CheckCircle, Eye, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -33,6 +33,15 @@ const styles = sxStyles({
          mr: 1,
       },
    },
+   views: {
+      display: "flex",
+      alignItems: "center",
+
+      "& svg": {
+         color: "grey",
+         mr: 1,
+      },
+   },
    mobileStats: (theme) => ({
       display: "flex",
       flexDirection: "column",
@@ -51,27 +60,32 @@ const styles = sxStyles({
 type Props = {
    clicks: number
    applicants: number
+   views: number
 }
-const JobCardStats = ({ clicks, applicants }: Props) => {
+const JobCardStats = ({ clicks, applicants, views }: Props) => {
    const isMobile = useIsMobile()
 
    return isMobile ? (
       <MobileStats clicks={clicks} applicants={applicants} />
    ) : (
       <Stack spacing={2} sx={styles.stats} direction="row">
-         <Typography sx={styles.statsLabel}>Applications:</Typography>
-
+         <Box sx={styles.views}>
+            <Eye size={16} />
+            <Typography variant={"subtitle1"} color={"text.secondary"}>
+               {views}
+            </Typography>
+         </Box>
          <Box sx={styles.initialized}>
             <User size={16} />
             <Typography variant={"subtitle1"} color={"text.secondary"}>
-               {clicks} Initiated
+               {clicks}
             </Typography>
          </Box>
 
          <Box sx={styles.applications}>
             <CheckCircle size={16} />
             <Typography variant={"subtitle1"} color={"secondary.main"}>
-               {applicants} Confirmed
+               {applicants}
             </Typography>
          </Box>
       </Stack>
