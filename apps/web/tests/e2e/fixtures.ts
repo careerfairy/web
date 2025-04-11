@@ -16,6 +16,7 @@ import { loadTestEnv } from "envConfig"
 import { credentials } from "../constants"
 import { GroupDashboardPage } from "./page-object-models/GroupDashboardPage"
 import { LoginPage } from "./page-object-models/LoginPage"
+
 type GroupAdminFixtureOptions = {
    /**
     * give the option for tests to not create a user
@@ -39,8 +40,20 @@ type GroupAdminFixtureOptions = {
    privacyPolicy?: boolean
 }
 
-base.beforeEach(async () => {
+base.beforeEach(async ({ page }) => {
    loadTestEnv()
+
+   // Ensure the workflow ID is set for each test
+   if (process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID) {
+      // Set it in localStorage for client-side access
+      await page.evaluate((workflowId) => {
+         localStorage.setItem("x-workflow-id", workflowId)
+      }, process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID)
+
+      console.log(
+         `Setting workflow ID in localStorage: ${process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID}`
+      )
+   }
 })
 
 /**

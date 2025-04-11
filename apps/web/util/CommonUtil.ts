@@ -231,17 +231,31 @@ export const shouldUseEmulators = () => {
  * Get the workflow ID for isolating test data and operations
  *
  * This function prioritizes:
- * 1. The NEXT_PUBLIC_UNIQUE_WORKFLOW_ID set at build time (available through env.test or process.env in CI)
- * 2. The NEXT_PUBLIC_DEV_NAME environment variable (for local development)
- * 3. "unknown" as a fallback
+ * 1. The workflow ID from localStorage (set by tests)
+ * 2. The NEXT_PUBLIC_UNIQUE_WORKFLOW_ID set at build time
+ * 3. The NEXT_PUBLIC_DEV_NAME environment variable (for local development)
+ * 4. "unknown" as a fallback
  *
  * Using next/config ensures consistent values across server and client-side rendering,
  * solving issues related to Docker deployments and environment variables.
  */
 export const getWorkflowId = (): string => {
+   // For browser-side code, check for workflow ID in localStorage
+   if (typeof window !== "undefined") {
+      try {
+         const workflowIdFromStorage = localStorage.getItem("x-workflow-id")
+         if (workflowIdFromStorage) {
+            return workflowIdFromStorage
+         }
+      } catch (e) {
+         // localStorage might be unavailable in some contexts
+         console.error("Error accessing localStorage:", e)
+      }
+   }
+
    const { publicRuntimeConfig } = getConfig()
    return (
-      publicRuntimeConfig.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
+      publicRuntimeConfig?.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
       process.env.NEXT_PUBLIC_DEV_NAME ||
       "unknown"
    )

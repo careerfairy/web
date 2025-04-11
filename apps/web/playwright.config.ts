@@ -50,6 +50,15 @@ const config: PlaywrightTestConfig = {
       trace: process.env.CI ? "on-first-retry" : "retain-on-failure",
       screenshot: "only-on-failure",
       video: "retain-on-failure",
+
+      // Set the base URL and pass the workflow ID via HTTP headers
+      // This ensures the server-side code can access the workflow ID
+      contextOptions: {
+         baseURL: "http://localhost:3000",
+         extraHTTPHeaders: {
+            "x-workflow-id": process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID || "",
+         },
+      },
    },
    globalTeardown: "./playwright.teardown",
    globalSetup: "./playwright.setup",
