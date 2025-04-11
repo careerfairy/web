@@ -1,6 +1,7 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 import { getCountryOptionByCountryCode } from "@careerfairy/shared-lib/constants/forms"
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
    SerializedSpark,
@@ -342,14 +343,14 @@ export class SparksService {
    ) {
       return httpsCallable<RemoveNotificationFromUserData, void>(
          this.functions,
-         "removeAndSyncUserSparkNotification_v2"
+         FUNCTION_NAMES.removeAndSyncUserSparkNotification
       )(data)
    }
 
    async createUserSparksFeedEventNotifications(userId: string) {
       return httpsCallable<string, void>(
          this.functions,
-         "createUserSparksFeedEventNotifications_v2"
+         FUNCTION_NAMES.createUserSparksFeedEventNotifications
       )(userId)
    }
 

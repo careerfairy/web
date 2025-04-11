@@ -34,6 +34,12 @@ export const FUNCTION_NAMES = {
    sendPhysicalEventRegistrationConfirmationEmail:
       "sendPhysicalEventRegistrationConfirmationEmail",
 
+   // Sparks functions
+   removeAndSyncUserSparkNotification: "removeAndSyncUserSparkNotification_v3",
+   createUserSparksFeedEventNotifications:
+      "createUserSparksFeedEventNotifications_v3",
+   createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
+
    // Utility functions
    keepFunctionsWarm: "keepFunctionsWarm",
 } as const
