@@ -179,7 +179,7 @@ const JobCardDetails = ({
                      titleSx
                   )}
                >
-                  {jobName}
+                  WG {jobName}
                </Typography>
                {showTooltip ? (
                   <Box sx={styles.warningContainer}>

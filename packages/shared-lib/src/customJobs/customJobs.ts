@@ -121,6 +121,8 @@ export interface CustomJobStats extends Identifiable {
    clicks: number
    // increases every time an application is created related to this job
    applicants: number
+   // increases every time a talent views the job
+   views: number
    job: CustomJob
    deleted: boolean
    deletedAt: firebase.firestore.Timestamp | null
