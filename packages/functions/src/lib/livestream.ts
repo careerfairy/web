@@ -2,6 +2,7 @@ import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
    LivestreamSecureToken,
+   UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
 import { WriteBatch } from "firebase-admin/firestore"
@@ -132,6 +133,10 @@ type GetStreamsByDateWithRegisteredStudentsOptions = {
     * If true, hidden streams will be excluded.
     */
    excludeHidden?: boolean
+   /**
+    * If true, the data will be skimmed to only include the needed fields.
+    */
+   skimData?: boolean
 }
 
 /**
@@ -162,26 +167,45 @@ export const getStreamsByDateWithRegisteredStudents = async (
             } as LivestreamEvent)
       )
 
-      return addUsersDataOnStreams(streams)
+      return addUsersDataOnStreams(streams, options?.skimData)
    })
 }
 
 /**
  * Add all registered students to the correspondent streams
- *
  */
 const addUsersDataOnStreams = async (
-   streams: LivestreamEvent[] = []
+   streams: LivestreamEvent[] = [],
+   skimData = false
 ): Promise<LiveStreamEventWithUsersLivestreamData[]> => {
    const formattedStreams = []
+
    for (const stream of streams) {
-      const collection = await firestore
+      const collectionRef = firestore
          .collection("livestreams")
          .doc(stream.id)
          .collection("userLivestreamData")
-         .get()
 
-      const usersLivestreamData = collection.docs?.map((doc) => doc.data())
+      const query = skimData
+         ? collectionRef.select("id", "registered", "userId", "livestreamId")
+         : collectionRef
+
+      const collection = await query.get()
+
+      const usersLivestreamData = collection.docs?.map<
+         Partial<UserLivestreamData>
+      >((doc) => {
+         if (skimData) {
+            return {
+               id: doc.get("id"),
+               registered: doc.get("registered"),
+               userId: doc.get("userId"),
+               livestreamId: doc.get("livestreamId"),
+               user: null,
+            }
+         }
+         return doc.data()
+      })
 
       formattedStreams.push({ ...stream, usersLivestreamData })
    }
