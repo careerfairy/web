@@ -122,28 +122,23 @@ type Props = {
    appear?: boolean
 }
 
-export type ViewKey =
-   | "livestream-details"
-   | "register-data-consent"
-   | "register-ask-questions"
-   | "register-success"
-   | "ask-phone-number"
-   | "job-details"
-   | "speaker-details"
-
-type ViewProps = {
-   key: ViewKey
+type ViewProps<T extends string> = {
+   key: T
    viewPath: string
    loadingComponent?: LoadableOptions["loading"]
 }
 
-type View = {
-   key: ViewKey
+type View<T extends string = string> = {
+   key: T
    component: ComponentType
    skeleton: LoadableOptions["loading"]
 }
 
-const createView = ({ key, viewPath, loadingComponent }: ViewProps): View => ({
+const createView = <T extends string = string>({
+   key,
+   viewPath,
+   loadingComponent,
+}: ViewProps<T>): View<T> => ({
    key,
    component: dynamic(() => import(`./views/${viewPath}`), {
       loading: loadingComponent || (() => <CircularProgress />),
@@ -151,7 +146,7 @@ const createView = ({ key, viewPath, loadingComponent }: ViewProps): View => ({
    skeleton: loadingComponent || (() => <CircularProgress />), // new
 })
 
-const views: View[] = [
+const views = [
    createView({
       key: "livestream-details",
       viewPath: "livestream-details/LivestreamDetailsView",
@@ -187,7 +182,9 @@ const views: View[] = [
       viewPath: "speaker-details/SpeakerDetailsView",
       loadingComponent: () => <SpeakerDetailsViewSkeleton />,
    }),
-]
+] as const satisfies View[]
+
+export type ViewKey = (typeof views)[number]["key"]
 
 const LivestreamDialog: FC<Props> = ({
    handleClose,
@@ -262,7 +259,6 @@ const Content: FC<ContentProps> = ({
    const theme = useTheme()
 
    const [value, setValue] = useState<number>(getPageIndex(page))
-   console.log("🚀 ~ value:", value)
    const [currentJobId, setCurrentJobId] = useState<string | null>(jobId)
    const [currentSpeakerId, setCurrentSpeakerId] = useState<string | null>(
       speakerId
