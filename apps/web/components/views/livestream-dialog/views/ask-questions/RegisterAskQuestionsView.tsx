@@ -1,31 +1,31 @@
+import {
+   maxQuestionLength,
+   minQuestionLength,
+} from "@careerfairy/shared-lib/constants/forms"
+import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
+import { LoadingButton } from "@mui/lab"
+import { InputBase } from "@mui/material"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import { livestreamService } from "data/firebase/LivestreamService"
+import { Field, Form, Formik } from "formik"
 import { useEffect, useState } from "react"
+import * as Yup from "yup"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { sxStyles } from "../../../../../types/commonTypes"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import BaseDialogView, {
    HeroContent,
    HeroTitle,
    MainContent,
 } from "../../BaseDialogView"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import { useLiveStreamDialog } from "../../LivestreamDialog"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
-import Typography from "@mui/material/Typography"
-import { sxStyles } from "../../../../../types/commonTypes"
-import Box from "@mui/material/Box"
-import Stack from "@mui/material/Stack"
-import { InputBase } from "@mui/material"
-import { LoadingButton } from "@mui/lab"
-import { Field, Form, Formik } from "formik"
-import * as Yup from "yup"
-import {
-   maxQuestionLength,
-   minQuestionLength,
-} from "@careerfairy/shared-lib/constants/forms"
+import { useLiveStreamDialog, ViewKey } from "../../LivestreamDialog"
 import { QuestionsComponent } from "../livestream-details/main-content/Questions"
-import Button from "@mui/material/Button"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
 import RegisterAskQuestionsViewSkeleton from "./RegisterAskQuestionsViewSkeleton"
-import CircularLogo from "components/views/common/logos/CircularLogo"
-import { livestreamService } from "data/firebase/LivestreamService"
 
 const styles = sxStyles({
    questionForm: {
@@ -83,6 +83,8 @@ const styles = sxStyles({
    },
 })
 
+const NEXT_VIEW: ViewKey = "register-success"
+
 const RegisterAskQuestionsView = () => {
    const { livestream, goToView } = useLiveStreamDialog()
    const { userPresenter, authenticatedUser } = useAuth()
@@ -95,7 +97,7 @@ const RegisterAskQuestionsView = () => {
 
    useEffect(() => {
       if (livestream.questionsDisabled) {
-         goToView("register-join-talent-pool")
+         goToView(NEXT_VIEW)
       }
    }, [livestream.questionsDisabled, goToView])
 
@@ -217,7 +219,7 @@ const RegisterAskQuestionsView = () => {
                disableElevation
                size="medium"
                fullWidth={isMobile}
-               onClick={() => goToView("register-join-talent-pool")}
+               onClick={() => goToView(NEXT_VIEW)}
                color="secondary"
             >
                Next
