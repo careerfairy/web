@@ -38,6 +38,7 @@ type Props = {
    jobWithStats: CustomJobStats[]
    handCLick: (job: CustomJob) => void
 }
+
 const JobList: FC<Props> = ({ jobWithStats, handCLick }) => {
    const isMobile = useIsMobile()
 
@@ -52,7 +53,6 @@ const JobList: FC<Props> = ({ jobWithStats, handCLick }) => {
             {isMobile ? <CreateJobButton sx={styles.createButton} /> : null}
             <JobSearch options={jobsOptions} />
          </Stack>
-
          <Stack spacing={2}>
             {jobWithStats.map(({ job, clicks, applicants, views }) => (
                <ListItem key={job.id} sx={styles.listItem}>
