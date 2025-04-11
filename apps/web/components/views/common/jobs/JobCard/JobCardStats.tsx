@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Stack, Tooltip, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { CheckCircle, Eye, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -55,6 +55,12 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "space-evenly",
    },
+   tooltip: {
+      fontSize: "12px",
+      fontWeight: 400,
+      color: (theme) => theme.palette.neutral[700],
+      p: 1,
+   },
 })
 
 type Props = {
@@ -62,15 +68,65 @@ type Props = {
    applicants: number
    views: number
 }
+
 const JobCardStats = ({ clicks, applicants, views }: Props) => {
    const isMobile = useIsMobile()
 
    return isMobile ? (
-      <MobileStats clicks={clicks} applicants={applicants} />
+      <MobileStats clicks={clicks} applicants={applicants} views={views} />
    ) : (
       <Stack spacing={2} sx={styles.stats} direction="row">
+         <Tooltip
+            title="Job views"
+            placement="top"
+            slotProps={{ tooltip: { sx: styles.tooltip } }}
+         >
+            <Box sx={styles.views}>
+               <Eye size={16} />
+               <Typography variant={"subtitle1"} color={"text.secondary"}>
+                  {views}
+               </Typography>
+            </Box>
+         </Tooltip>
+         <Tooltip
+            title="Initiated applications"
+            placement="top"
+            slotProps={{ tooltip: { sx: styles.tooltip } }}
+         >
+            <Box sx={styles.initialized}>
+               <User size={16} />
+               <Typography variant={"subtitle1"} color={"text.secondary"}>
+                  {clicks}
+               </Typography>
+            </Box>
+         </Tooltip>
+         <Tooltip
+            title="Confirmed applications"
+            placement="top"
+            slotProps={{ tooltip: { sx: styles.tooltip } }}
+         >
+            <Box sx={styles.applications}>
+               <CheckCircle size={16} />
+               <Typography variant={"subtitle1"} color={"secondary.main"}>
+                  {applicants}
+               </Typography>
+            </Box>
+         </Tooltip>
+      </Stack>
+   )
+}
+
+type MobileStatsProps = {
+   clicks: number
+   applicants: number
+   views: number
+}
+
+const MobileStats = ({ clicks, applicants, views }: MobileStatsProps) => (
+   <Box sx={styles.mobileStats}>
+      <Box sx={styles.mobileStatsValues}>
          <Box sx={styles.views}>
-            <Eye size={16} />
+            <User size={16} />
             <Typography variant={"subtitle1"} color={"text.secondary"}>
                {views}
             </Typography>
@@ -81,35 +137,10 @@ const JobCardStats = ({ clicks, applicants, views }: Props) => {
                {clicks}
             </Typography>
          </Box>
-
          <Box sx={styles.applications}>
             <CheckCircle size={16} />
             <Typography variant={"subtitle1"} color={"secondary.main"}>
                {applicants}
-            </Typography>
-         </Box>
-      </Stack>
-   )
-}
-
-type MobileStatsProps = {
-   clicks: number
-   applicants: number
-}
-const MobileStats = ({ clicks, applicants }: MobileStatsProps) => (
-   <Box sx={styles.mobileStats}>
-      <Box sx={styles.mobileStatsValues}>
-         <Box sx={styles.initialized}>
-            <User size={16} />
-            <Typography variant={"subtitle1"} color={"text.secondary"}>
-               {clicks} Initiated
-            </Typography>
-         </Box>
-
-         <Box sx={styles.applications}>
-            <CheckCircle size={16} />
-            <Typography variant={"subtitle1"} color={"secondary.main"}>
-               {applicants} Confirmed
             </Typography>
          </Box>
       </Box>

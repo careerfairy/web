@@ -1,6 +1,5 @@
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
-import counterConstants from "../../lib/Counter/constants"
 import { firestore } from "../../lib/firebase"
 import {
    handleBulkWriterError,
@@ -15,23 +14,21 @@ interface UpdateDocumentsConfig {
    updateData: Record<string, any>
    batchSize?: number
    waitTimeBetweenBatches?: number
-   dryRun?: boolean
 }
 
-const FIELD_TO_ORDER_BY = "universityName"
+const FIELD_TO_ORDER_BY = "jobId"
 
 // Configure your update here
 const config: UpdateDocumentsConfig = {
    // Example: collection query
    query: firestore
-      .collection("careerCenterData")
+      .collection("customJobStats")
       // Keep this commented out for now as an example
       // .where(FIELD_TO_ORDER_BY, "!=", true)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
-   updateData: { migrationTrigger: Date.now() },
+   updateData: { migrationTrigger: Date.now(), views: 0 },
    batchSize: 25,
-   waitTimeBetweenBatches: 3_000,
-   dryRun: false, // Set to false to run the migration
+   waitTimeBetweenBatches: 5_000,
 }
 
 const getTotalDocumentCount = async (query: Query) => {
@@ -48,18 +45,7 @@ export async function run() {
    let processedDocuments = 0
    const totalDocumentsCounts = await getTotalDocumentCount(config.query)
 
-   // Set up counter for progress tracking
-   counter.setCustomCount(counterConstants.totalNumDocs, totalDocumentsCounts)
-   counter.setCustomCount(counterConstants.currentDocIndex, 0)
-   counter.setCustomCount(counterConstants.numSuccessfulWrites, 0)
-   counter.setCustomCount(counterConstants.numFailedWrites, 0)
-
    console.log(`Total documents to process: ${totalDocumentsCounts}`)
-   if (config.dryRun) {
-      console.log("DRY RUN MODE: No documents will be updated")
-   } else {
-      writeProgressBar.start(totalDocumentsCounts, 0)
-   }
 
    try {
       let lastDoc = null
@@ -86,20 +72,10 @@ export async function run() {
          processedDocuments += docs.length
 
          for (const doc of docs) {
-            // Update current document index for progress tracking
-            counter.customCountIncrement(counterConstants.currentDocIndex)
-
-            if (!config.dryRun) {
-               bulkWriter
-                  .update(doc.ref, config.updateData)
-                  .then(() => handleBulkWriterSuccess(counter))
-                  .catch((err) => handleBulkWriterError(err, counter))
-            } else {
-               // In dry run mode, just increment success counter without actual updates
-               counter.customCountIncrement(
-                  counterConstants.numSuccessfulWrites
-               )
-            }
+            bulkWriter
+               .update(doc.ref, config.updateData)
+               .then(() => handleBulkWriterSuccess(counter))
+               .catch((err) => handleBulkWriterError(err, counter))
          }
 
          lastDoc = docs[docs.length - 1]
@@ -112,19 +88,13 @@ export async function run() {
             )}%)`
          )
 
-         if (!config.dryRun) {
-            await bulkWriter.flush()
-         }
-
+         await bulkWriter.flush()
          await wait(config.waitTimeBetweenBatches ?? 5000)
       }
 
-      if (!config.dryRun) {
-         await bulkWriter.close()
-         writeProgressBar.stop()
-      }
-
-      Counter.log(config.dryRun ? "Finished dry run" : "Finished processing")
+      await bulkWriter.close()
+      writeProgressBar.stop()
+      Counter.log("Finished processing")
    } catch (error) {
       console.error("Error:", error)
    } finally {

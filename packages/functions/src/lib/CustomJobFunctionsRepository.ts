@@ -136,6 +136,7 @@ export class CustomJobFunctionsRepository
          applicants: 0,
          deleted: false,
          deletedAt: null,
+         views: 0,
       }
 
       return ref.set(newJobStat, { merge: true })
