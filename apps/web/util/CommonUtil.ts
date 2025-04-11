@@ -242,14 +242,9 @@ export const shouldUseEmulators = () => {
 export const getWorkflowId = (): string => {
    // For browser-side code, check for workflow ID in localStorage
    if (typeof window !== "undefined") {
-      try {
-         const workflowIdFromStorage = localStorage.getItem("x-workflow-id")
-         if (workflowIdFromStorage) {
-            return workflowIdFromStorage
-         }
-      } catch (e) {
-         // localStorage might be unavailable in some contexts
-         console.error("Error accessing localStorage:", e)
+      const workflowIdFromStorage = localStorage.getItem("x-workflow-id")
+      if (workflowIdFromStorage) {
+         return workflowIdFromStorage
       }
    }
 

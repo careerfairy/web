@@ -51,8 +51,7 @@ const config: PlaywrightTestConfig = {
       screenshot: "only-on-failure",
       video: "retain-on-failure",
 
-      // Set the base URL and pass the workflow ID via HTTP headers
-      // This ensures the server-side code can access the workflow ID
+      // set the workflow ID into local storage for our frontend tests
       contextOptions: {
          storageState: {
             cookies: [],
