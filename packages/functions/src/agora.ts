@@ -1,18 +1,17 @@
-import { RtcRole, RtcTokenBuilder, RtmTokenBuilder } from "agora-token"
-import functions = require("firebase-functions")
-import { agoraCredentials } from "./api/agora"
-import { firestore } from "./api/firestoreAdmin"
-import config from "./config"
 import {
    AgoraRTCTokenRequest,
    AgoraRTMTokenRequest,
 } from "@careerfairy/shared-lib/agora/token"
+import { RtcRole, RtcTokenBuilder, RtmTokenBuilder } from "agora-token"
+import { CallableRequest } from "firebase-functions/lib/common/providers/https"
+import { agoraCredentials } from "./api/agora"
+import { firestore } from "./api/firestoreAdmin"
+import functions = require("firebase-functions")
 
-export const fetchAgoraRtcToken = functions
-   .region(config.region)
-   .https.onCall(async (data: AgoraRTCTokenRequest) => {
+export const fetchAgoraRtcToken = functions.https.onCall(
+   async (request: CallableRequest<AgoraRTCTokenRequest>) => {
       const { isStreamer, uid, sentToken, channelName, streamDocumentPath } =
-         data
+         request.data
       const rtcRole = isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER
 
       const expirationTimeInSeconds = 21600
@@ -65,12 +64,12 @@ export const fetchAgoraRtcToken = functions
             token: { rtcToken: rtcToken },
          }
       }
-   })
+   }
+)
 
-export const fetchAgoraRtmToken = functions
-   .region(config.region)
-   .https.onCall(async (data: AgoraRTMTokenRequest) => {
-      const { uid } = data
+export const fetchAgoraRtmToken = functions.https.onCall(
+   async (request: CallableRequest<AgoraRTMTokenRequest>) => {
+      const { uid } = request.data
       const expirationTimeInSeconds = 21600
       const currentTimestamp = Math.floor(Date.now() / 1000)
       const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
@@ -90,4 +89,5 @@ export const fetchAgoraRtmToken = functions
          status: 200,
          token: { rtmToken: rtmToken },
       }
-   })
+   }
+)

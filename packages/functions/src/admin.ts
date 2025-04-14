@@ -1,27 +1,27 @@
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { onCall } from "firebase-functions/https"
+import { type TemplatedMessage } from "postmark"
+import { object, string } from "yup"
+import { client } from "./api/postmark"
 import { bigQueryRepo, userRepo } from "./api/repositories"
 import {
    logAndThrow,
    userIsSignedInAndIsCFAdmin,
    validateData,
 } from "./lib/validations"
-import { createNestedArrayOfTemplates, generateSignature } from "./util"
 import { emailsToRemove } from "./misc/emailsToRemove"
+import { createNestedArrayOfTemplates, generateSignature } from "./util"
 import functions = require("firebase-functions")
-import { object, string } from "yup"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import config from "./config"
-import { client } from "./api/postmark"
-import { type TemplatedMessage } from "postmark"
 
-export const sendBasicTemplateEmail = functions
-   .region(config.region)
-   .runWith({
+export const sendBasicTemplateEmail = onCall(
+   {
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
       secrets: ["SIGNATURE_SECRET"],
-   })
-   .https.onCall(async (data, context) => {
+   },
+   async (request) => {
+      const { data } = request
       const {
          title,
          summary,
@@ -56,7 +56,7 @@ export const sendBasicTemplateEmail = functions
          emailsArray.push(senderEmail)
       }
       if (isForRealEmails === true) {
-         await userIsSignedInAndIsCFAdmin(context)
+         await userIsSignedInAndIsCFAdmin(request)
          const users = await bigQueryRepo.getUsers(
             queryOptions.page,
             false,
@@ -113,7 +113,7 @@ export const sendBasicTemplateEmail = functions
                link: getNewsletterUnsubscribeLink(
                   email,
                   process.env.SIGNATURE_SECRET,
-                  context?.rawRequest?.headers?.origin
+                  request?.rawRequest?.headers?.origin
                ),
             }),
          },
@@ -156,17 +156,17 @@ export const sendBasicTemplateEmail = functions
             )
          }
       }
-   })
+   }
+)
 
-export const unsubscribeFromMarketingEmails = functions
-   .region(config.region)
-   .runWith({
+export const unsubscribeFromMarketingEmails = onCall(
+   {
       secrets: ["SIGNATURE_SECRET"],
-   })
-   .https.onCall(async (data) => {
+   },
+   async (request) => {
       try {
          const { email, signature } = await validateData(
-            data,
+            request.data,
             object({
                email: string().email().required(),
                signature: string().required(),
@@ -188,11 +188,12 @@ export const unsubscribeFromMarketingEmails = functions
          }
       } catch (e) {
          logAndThrow("Failed to unsubscribe email", {
-            data,
+            data: request.data,
             error: e,
          })
       }
-   })
+   }
+)
 
 const getNewsletterUnsubscribeLink = (
    email: string,

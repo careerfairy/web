@@ -36,7 +36,7 @@ const config: PlaywrightTestConfig = {
    /* Retry on CI only */
    retries: process.env.CI ? 2 : 0,
    /* Opt out of parallel tests on CI. */
-   // workers: process.env.CI ? 1 : undefined,
+   // workers: process.env.CI ? 1 : undefined,π
    /* Reporter to use. See https://playwright.dev/docs/test-reporters */
    reporter: "html",
    /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -50,6 +50,25 @@ const config: PlaywrightTestConfig = {
       trace: process.env.CI ? "on-first-retry" : "retain-on-failure",
       screenshot: "only-on-failure",
       video: "retain-on-failure",
+
+      // set the workflow ID into local storage for our frontend tests
+      contextOptions: {
+         storageState: {
+            cookies: [],
+            origins: [
+               {
+                  origin: "http://localhost:3000",
+                  localStorage: [
+                     {
+                        name: "x-workflow-id",
+                        value:
+                           process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID || "test",
+                     },
+                  ],
+               },
+            ],
+         },
+      },
    },
    globalTeardown: "./playwright.teardown",
    globalSetup: "./playwright.setup",

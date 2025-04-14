@@ -1,3 +1,4 @@
+import { CreatorRoles } from "@careerfairy/shared-lib/dist/groups/creators"
 import {
    EventRating,
    LivestreamEvent,
@@ -5,8 +6,7 @@ import {
    Speaker,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
-
-import { CreatorRoles } from "@careerfairy/shared-lib/dist/groups/creators"
+import { createLiveStreamStatsDoc } from "@careerfairy/shared-lib/dist/livestreams/stats"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { livestreamTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
 import { faker } from "@faker-js/faker"
@@ -259,6 +259,10 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       })
 
       const livestreamRef = firestore.collection("livestreams").doc(data.id)
+
+      const statsRef = livestreamRef.collection("stats").doc("livestreamStats")
+
+      batch.set(statsRef, createLiveStreamStatsDoc(data, statsRef.id))
 
       batch.set(livestreamRef, data)
 

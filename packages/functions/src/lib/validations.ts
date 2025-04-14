@@ -37,9 +37,7 @@ export async function validateData<T extends ObjectShape>(
  * Validate the user is authenticated when calling a function
  * @param context
  */
-export function validateUserAuthExists(
-   context: functions.https.CallableContext
-) {
+export function validateUserAuthExists(context: CallableContext) {
    if (!context.auth) {
       logAndThrow("The user calling the function is not authenticated")
    }
@@ -119,9 +117,7 @@ export async function validateUserIsCFAdmin(email: string) {
 
    return userData
 }
-export function validateUserAuthNotExistent(
-   context: functions.https.CallableContext
-) {
+export function validateUserAuthNotExistent(context: CallableContext) {
    if (context.auth) {
       logAndThrow("The user calling the function is authenticated")
    }

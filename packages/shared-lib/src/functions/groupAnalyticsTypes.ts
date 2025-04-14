@@ -1,6 +1,5 @@
 import { UTMParams } from "../commonTypes"
 import { UserLivestreamData } from "../livestreams"
-
 /**
  * Response type for the getRegistrationSources function
  * groupAnalytics.ts
@@ -57,12 +56,12 @@ export interface GetRegistrationSourcesFnArgs {
  * Generate cache key for the fn call
  */
 export const registrationSourcesCacheKey = (
-   args: GetRegistrationSourcesFnArgs
+   request: GetRegistrationSourcesFnArgs
 ) => {
    return [
       "getRegistrationSources",
-      args.groupId,
-      args.fetchType,
-      args.livestreamIds,
+      request.groupId,
+      request.fetchType,
+      request.livestreamIds,
    ]
 }

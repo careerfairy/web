@@ -1,22 +1,17 @@
-import * as functions from "firebase-functions"
-import {
-   handleSideEffects,
-   defaultTriggerRunTimeConfig,
-} from "./lib/triggers/util"
-import config from "./config"
-import { customJobRepo, livestreamsRepo, sparkRepo } from "./api/repositories"
 import { PopularityEventData } from "@careerfairy/shared-lib/livestreams/popularity"
+import * as functions from "firebase-functions"
+import { onDocumentDeleted } from "firebase-functions/firestore"
+import { customJobRepo, livestreamsRepo, sparkRepo } from "./api/repositories"
+import { handleSideEffects } from "./lib/triggers/util"
 
-export const onDeleteLivestreamPopularityEvents = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("livestreams/{livestreamId}/popularityEvents/{eventId}")
-   .onDelete(async (snapshot, context) => {
-      functions.logger.info(context.params)
+export const onDeleteLivestreamPopularityEvents = onDocumentDeleted(
+   "livestreams/{livestreamId}/popularityEvents/{eventId}",
+   async (event) => {
+      functions.logger.info(event.params)
 
       const popularityDoc: PopularityEventData = {
-         ...(snapshot.data() as PopularityEventData),
-         id: snapshot.id,
+         ...(event.data?.data() as PopularityEventData),
+         id: event.data?.id,
       }
 
       // An array of promise side effects to be executed in parallel
@@ -28,17 +23,16 @@ export const onDeleteLivestreamPopularityEvents = functions
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const onDeleteUserSparkFeed = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("userData/{userEmail}/sparksFeed/{sparkId}")
-   .onDelete(async (change, context) => {
-      functions.logger.info(context.params)
+export const onDeleteUserSparkFeed = onDocumentDeleted(
+   "userData/{userEmail}/sparksFeed/{sparkId}",
+   async (event) => {
+      functions.logger.info(event.params)
 
-      const userEmail = context.params.userEmail
-      const sparkId = context.params.sparkId
+      const userEmail = event.params.userEmail
+      const sparkId = event.params.sparkId
 
       functions.logger.info(`Spark ${sparkId} was deleted for ${userEmail}`)
 
@@ -50,16 +44,15 @@ export const onDeleteUserSparkFeed = functions
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const onDeleteDraft = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("draftLivestreams/{livestreamId}")
-   .onDelete(async (change, context) => {
-      functions.logger.info(context.params)
+export const onDeleteDraft = onDocumentDeleted(
+   "draftLivestreams/{livestreamId}",
+   async (event) => {
+      functions.logger.info(event.params)
 
-      const livestreamId = context.params.livestreamId
+      const livestreamId = event.params.livestreamId
 
       functions.logger.info(`Draft ${livestreamId} was deleted`)
 
@@ -71,4 +64,5 @@ export const onDeleteDraft = functions
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)

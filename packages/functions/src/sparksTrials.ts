@@ -37,7 +37,7 @@ export const endOfSparksTrialEmails = onSchedule(
 export const manualEndOfSparksTrialEmails = onRequest(
    runtimeSettings,
    async (req, res) => {
-      logger.info("Starting MANUAL execution of endOfSparksTrialEmails v2")
+      logger.info("Starting MANUAL execution of endOfSparksTrialEmails v3")
 
       if (req.method !== "POST") {
          res.status(400).send("Only POST requests are allowed")
