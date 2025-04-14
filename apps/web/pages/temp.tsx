@@ -1,6 +1,7 @@
-import { Button } from "@mui/material"
+import { Button, SvgIcon, SvgIconProps } from "@mui/material"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { AnimatePresence } from "framer-motion"
 import { NextPage } from "next"
 import { useState } from "react"
@@ -9,6 +10,9 @@ import FramerBox from "../components/views/common/FramerBox"
 const TempPage: NextPage = () => {
    const [animationPhase, setAnimationPhase] = useState(0) // 0: not started, 1: first phase, 2: second phase
    const [isAnimating, setIsAnimating] = useState(false)
+
+   const isMobile = useIsMobile()
+   console.log("🚀 ~ isMobile:", isMobile)
 
    const startAnimation = () => {
       setIsAnimating(true)
@@ -30,7 +34,7 @@ const TempPage: NextPage = () => {
             }, 3000)
             break
          case 2:
-            // resetAnimation()
+            resetAnimation()
             break
       }
    }
@@ -80,22 +84,17 @@ const TempPage: NextPage = () => {
                      }}
                      transition={{
                         y: {
-                           duration: animationPhase === 1 ? 0.5 : 0.8,
+                           duration: animationPhase === 1 ? 0.1 : 0.8,
                            ease: animationPhase === 1 ? "easeOut" : "easeInOut",
                            type: "tween", // Added for consistent motion
                         },
                         opacity: { duration: 0.3 }, // Added for smoother fade
                      }}
-                     onAnimationComplete={() => {
-                        console.log(
-                           `Animation complete for phase: ${animationPhase}`
-                        )
-                        handleAnimationComplete()
-                     }}
+                     onAnimationComplete={handleAnimationComplete}
                      sx={{
                         position: "absolute",
-                        width: { xs: 280, md: 380 },
-                        height: { xs: 280, md: 380 },
+                        width: "100%",
+                        height: "100%",
                         borderRadius: "5px",
                         overflow: "hidden",
                         background:
@@ -117,14 +116,15 @@ const TempPage: NextPage = () => {
                         }}
                         sx={{
                            position: "absolute",
-                           width: 80,
-                           height: 80,
+                           width: "100%",
+                           height: "100%",
                            display: "flex",
                            justifyContent: "center",
                            alignItems: "center",
                         }}
                      >
-                        <svg
+                        <MainStar sx={{ width: "100%", height: "auto" }} />
+                        {/* <svg
                            width="60"
                            height="60"
                            viewBox="0 0 2014 1918"
@@ -135,7 +135,7 @@ const TempPage: NextPage = () => {
                               d="M976.561 22.113C986.145 -7.3701 1027.86 -7.37005 1037.44 22.1131L1253.22 685.965C1257.51 699.15 1269.8 708.077 1283.66 708.077H1981.93C2012.94 708.077 2025.83 747.76 2000.74 765.981L1435.85 1176.23C1424.63 1184.38 1419.93 1198.83 1424.22 1212.02L1639.99 1875.84C1649.58 1905.32 1615.83 1929.85 1590.75 1911.63L1025.81 1501.34C1014.59 1493.2 999.408 1493.2 988.192 1501.34L423.253 1911.63C398.166 1929.85 364.421 1905.32 374.006 1875.84L589.78 1212.02C594.067 1198.83 589.371 1184.38 578.149 1176.23L13.2593 765.981C-11.8307 747.76 1.05859 708.077 32.0672 708.077H730.337C744.201 708.077 756.49 699.15 760.776 685.965L976.561 22.113Z"
                               fill="#2ABAA5"
                            />
-                        </svg>
+                        </svg> */}
                      </FramerBox>
 
                      {/* Decorative star 1 */}
@@ -284,6 +284,46 @@ const TempPage: NextPage = () => {
             </Typography>
          </Box>
       </div>
+   )
+}
+
+const MainStar = (props: SvgIconProps) => {
+   const isMobile = useIsMobile()
+
+   if (isMobile) {
+      return (
+         <SvgIcon viewBox="0 0 375 358" {...props}>
+            <svg
+               width="375"
+               height="358"
+               viewBox="0 0 375 358"
+               fill="none"
+               xmlns="http://www.w3.org/2000/svg"
+            >
+               <path
+                  d="M172.283 11.8328C177.073 -2.90821 197.927 -2.90815 202.717 11.8328L235.883 113.907C238.025 120.499 244.168 124.963 251.1 124.963H358.427C373.926 124.963 380.371 144.796 367.831 153.907L281.002 216.992C275.394 221.066 273.048 228.288 275.19 234.881L308.355 336.955C313.145 351.696 296.273 363.954 283.734 354.843L196.905 291.758C191.297 287.684 183.703 287.684 178.095 291.758L91.2661 354.843C78.7267 363.954 61.855 351.696 66.6446 336.955L99.8105 234.881C101.952 228.288 99.6059 221.066 93.9981 216.992L7.16875 153.907C-5.37067 144.796 1.07378 124.963 16.5734 124.963H123.9C130.832 124.963 136.975 120.499 139.117 113.907L172.283 11.8328Z"
+                  fill="#2ABAA5"
+               />
+            </svg>
+         </SvgIcon>
+      )
+   }
+
+   return (
+      <SvgIcon viewBox="0 0 914 960" {...props}>
+         <svg
+            width="914"
+            height="960"
+            viewBox="0 0 914 960"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+         >
+            <path
+               d="M441.784 11.8178C446.574 -2.92144 467.427 -2.92143 472.217 11.8178L580.088 343.714C582.23 350.305 588.373 354.768 595.305 354.768H944.373C959.873 354.768 966.317 374.604 953.775 383.714L671.381 588.825C665.772 592.899 663.425 600.122 665.568 606.716L773.435 938.598C778.225 953.339 761.356 965.598 748.815 956.49L466.403 751.365C460.796 747.293 453.205 747.293 447.598 751.365L165.186 956.49C152.645 965.598 135.776 953.339 140.567 938.598L248.433 606.716C250.576 600.122 248.229 592.899 242.62 588.825L-39.7744 383.714C-52.316 374.604 -45.8723 354.768 -30.3716 354.768H318.697C325.628 354.768 331.771 350.305 333.913 343.714L441.784 11.8178Z"
+               fill="#2ABAA5"
+            />
+         </svg>
+      </SvgIcon>
    )
 }
 
