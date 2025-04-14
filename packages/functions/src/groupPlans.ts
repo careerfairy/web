@@ -1,14 +1,13 @@
 import functions = require("firebase-functions")
 import { SchemaOf, mixed, object, string } from "yup"
 
-import config from "./config"
 import { logAndThrow } from "./lib/validations"
 
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
-import { RuntimeOptions } from "firebase-functions"
-import { onCall } from "firebase-functions/v2/https"
+import { GlobalOptions } from "firebase-functions"
+import { onCall, onRequest } from "firebase-functions/v2/https"
 import { onSchedule } from "firebase-functions/v2/scheduler"
 import { groupRepo, notificationService } from "./api/repositories"
 import { withMiddlewares } from "./middlewares-gen2/onCall"
@@ -21,8 +20,8 @@ import { validateGroupSparks } from "./util/sparks"
 /**
  * functions runtime settings
  */
-const runtimeSettings: RuntimeOptions = {
-   memory: "256MB",
+const runtimeSettings: GlobalOptions = {
+   memory: "256MiB",
 }
 
 const setGroupPlanSchema: SchemaOf<StartPlanData> = object().shape({
@@ -74,21 +73,20 @@ export const startPlan = onCall(
 /**
  * Check all groups with expiring plans and update Sparks data accordingly
  */
-export const checkExpiredPlans = functions
-   .region(config.region)
-   .runWith(runtimeSettings)
-   .pubsub.schedule("0 6 * * *") // everyday at 06:00 am
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+export const checkExpiredPlans = onSchedule(
+   {
+      schedule: "0 6 * * *",
+      timeZone: "Europe/Zurich",
+   },
+   async () => {
       functions.logger.info("Starting execution of checkExpiredPlans")
-
       await updateExpiredGroupPlans()
-   })
+   }
+)
 
-export const manualCheckExpiredPlans = functions
-   .region(config.region)
-   .runWith(runtimeSettings)
-   .https.onRequest(async (req, res) => {
+export const manualCheckExpiredPlans = onRequest(
+   runtimeSettings,
+   async (req, res) => {
       functions.logger.info("Starting execution of manualCheckExpiredPlans")
 
       if (req.method !== "POST") {
@@ -98,7 +96,8 @@ export const manualCheckExpiredPlans = functions
       await updateExpiredGroupPlans()
 
       res.status(200).send("Check expired plans complete!")
-   })
+   }
+)
 
 async function updateExpiredGroupPlans() {
    try {

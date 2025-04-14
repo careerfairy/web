@@ -7,25 +7,25 @@ import { RewardDoc } from "@careerfairy/shared-lib/rewards"
 import { UserData, pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import * as functions from "firebase-functions"
 import { logger } from "firebase-functions/v2"
-import { onDocumentCreated } from "firebase-functions/v2/firestore"
+import {
+   onDocumentCreated,
+   onDocumentUpdated,
+} from "firebase-functions/v2/firestore"
 import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
-import config from "./config"
 import { rewardApply, rewardLivestreamRegistrant } from "./lib/reward"
 import {
    defaultTriggerRunTimeConfig,
    handleSideEffects,
 } from "./lib/triggers/util"
 
-export const onCreateLivestreamPopularityEvents = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("livestreams/{livestreamId}/popularityEvents/{eventId}")
-   .onCreate(async (snapshot, context) => {
-      functions.logger.info(context.params)
+export const onCreateLivestreamPopularityEvents = onDocumentCreated(
+   "livestreams/{livestreamId}/popularityEvents/{eventId}",
+   async (event) => {
+      functions.logger.info(event.params)
 
       const popularityDoc: PopularityEventData = {
-         ...(snapshot.data() as PopularityEventData),
-         id: snapshot.id,
+         ...(event.data.data() as PopularityEventData),
+         id: event.data.id,
       }
 
       // An array of promise side effects to be executed in parallel
@@ -35,24 +35,20 @@ export const onCreateLivestreamPopularityEvents = functions
       sideEffectPromises.push(
          livestreamsRepo.updateLivestreamPopularity(popularityDoc)
       )
-
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const onCreateLivestreamRatingAnswer = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document(
-      "livestreams/{livestreamId}/rating/{ratingName}/voters/{userEmail}"
-   )
-   .onCreate(async (snapshot, context) => {
-      functions.logger.info(context.params)
+export const onCreateLivestreamRatingAnswer = onDocumentCreated(
+   "livestreams/{livestreamId}/rating/{ratingName}/voters/{userEmail}",
+   async (event) => {
+      functions.logger.info(event.params)
 
-      const { livestreamId, ratingName } = context.params
+      const { livestreamId, ratingName } = event.params
 
       const ratingDoc: EventRatingAnswer = {
-         ...(snapshot.data() as EventRatingAnswer),
-         id: snapshot.id,
+         ...(event.data.data() as EventRatingAnswer),
+         id: event.data.id,
       }
 
       // An array of promise side effects to be executed in parallel
@@ -68,7 +64,8 @@ export const onCreateLivestreamRatingAnswer = functions
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
 export const onCreateUserData = onDocumentCreated(
    "userData/{userId}",
@@ -102,14 +99,15 @@ export const onCreateUserData = onDocumentCreated(
    }
 )
 
-export const onUpdateUserData = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("userData/{userId}")
-   .onUpdate(async (snapshot, context) => {
-      functions.logger.info(context.params)
+export const onUpdateUserData = onDocumentUpdated(
+   {
+      ...defaultTriggerRunTimeConfig,
+      document: "userData/{userId}",
+   },
+   async (event) => {
+      functions.logger.info(event.params)
 
-      const userData: UserData = snapshot.after.data() as UserData
+      const userData: UserData = event.data.after.data() as UserData
 
       if (!userData) return
 
@@ -119,22 +117,19 @@ export const onUpdateUserData = functions
       sideEffectPromises.push(userRepo.updateJobApplicationsUserData(userData))
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const onCreateUserLivestreamData = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document(
-      "livestreams/{livestreamId}/userLivestreamData/{userEmail}"
-   )
-   .onCreate(async (snapshot, context) => {
-      functions.logger.info(context.params)
+export const onCreateUserLivestreamData = onDocumentCreated(
+   "livestreams/{livestreamId}/userLivestreamData/{userEmail}",
+   async (event) => {
+      functions.logger.info(event.params)
 
-      const livestreamId = context.params.livestreamId
-      const userEmail = context.params.userEmail
+      const livestreamId = event.params.livestreamId
+      const userEmail = event.params.userEmail
       const doc: UserLivestreamData = {
-         ...(snapshot.data() as UserLivestreamData),
-         id: snapshot.id,
+         ...(event.data.data() as UserLivestreamData),
+         id: event.data.id,
       }
 
       // An array of promise side effects to be executed in parallel
@@ -146,19 +141,18 @@ export const onCreateUserLivestreamData = functions
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const onCreateReward = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("userData/{userEmail}/rewards/{rewardId}")
-   .onCreate(async (snapshot, context) => {
-      functions.logger.info(context.params)
+export const onCreateReward = onDocumentCreated(
+   "userData/{userEmail}/rewards/{rewardId}",
+   async (event) => {
+      functions.logger.info(event.params)
 
-      const email = context.params.userEmail
+      const email = event.params.userEmail
       const rewardDoc: RewardDoc = {
-         ...(snapshot.data() as RewardDoc),
-         id: snapshot.id,
+         ...(event.data.data() as RewardDoc),
+         id: event.data.id,
       }
 
       // An array of promise side effects to be executed in parallel
@@ -168,17 +162,16 @@ export const onCreateReward = functions
       sideEffectPromises.push(rewardApply(rewardDoc, email))
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const onCreateUserSparkFeed = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("userData/{userEmail}/sparksFeed/{sparkId}")
-   .onCreate(async (change, context) => {
-      functions.logger.info(context.params)
+export const onCreateUserSparkFeed = onDocumentCreated(
+   "userData/{userEmail}/sparksFeed/{sparkId}",
+   async (event) => {
+      functions.logger.info(event.params)
 
-      const userEmail = context.params.userEmail
-      const sparkId = context.params.sparkId
+      const userEmail = event.params.userEmail
+      const sparkId = event.params.sparkId
 
       functions.logger.info(
          `SparkId: ${sparkId} was added to ${userEmail} feed`
@@ -192,16 +185,15 @@ export const onCreateUserSparkFeed = functions
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)
 
-export const onCreateSparkStats = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("sparkStats/{sparkId}")
-   .onCreate(async (snapShot, context) => {
-      functions.logger.info(context.params)
+export const onCreateSparkStats = onDocumentCreated(
+   "sparkStats/{sparkId}",
+   async (event) => {
+      functions.logger.info(event.params)
 
-      const sparkId = context.params.sparkId
+      const sparkId = event.params.sparkId
 
       functions.logger.info(`Spark Stats for SparkId: ${sparkId} was created.`)
 
@@ -209,8 +201,9 @@ export const onCreateSparkStats = functions
       const sideEffectPromises: Promise<unknown>[] = []
 
       sideEffectPromises.push(
-         sparkRepo.addSparkToSparkStatsDocument(sparkId, snapShot)
+         sparkRepo.addSparkToSparkStatsDocument(sparkId, event.data)
       )
 
       return handleSideEffects(sideEffectPromises)
-   })
+   }
+)

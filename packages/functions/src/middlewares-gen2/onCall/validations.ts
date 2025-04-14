@@ -74,6 +74,24 @@ export function userIsCFAdminMiddleware<
    }
 }
 
+export function userAuthExistsMiddleware<
+   TInput = Record<string, any>
+>(): Middleware<TInput, TInput> {
+   return async (request, next) => {
+      // Check if user is authenticated
+      // Could be separated into single function and reused in other middlewares
+      if (!request.auth) {
+         logger.error("User is not authenticated")
+         throw new HttpsError("unauthenticated", "User must be authenticated")
+      }
+
+      return next({
+         ...request,
+         data: request.data,
+      })
+   }
+}
+
 /**
  * Middleware to validate data against a schema in a type-safe manner
  * @param objectSchema - The schema to validate against

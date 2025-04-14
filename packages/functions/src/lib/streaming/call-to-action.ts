@@ -8,9 +8,9 @@ import {
    UpdateLivestreamCTARequest,
    baseCTAShape,
 } from "@careerfairy/shared-lib/livestreams"
+import { onCall } from "firebase-functions/https"
 import * as yup from "yup"
 import { livestreamsRepo } from "../../api/repositories"
-import config from "../../config"
 import { middlewares } from "../../middlewares/middlewares"
 import { dataValidation, livestreamExists } from "../../middlewares/validations"
 import { validateCTAExists, validateLivestreamToken } from "../validations"
@@ -27,22 +27,22 @@ type Context = {
    livestream: LivestreamEvent
 }
 
-export const createCTA = functions.region(config.region).https.onCall(
-   middlewares<Context, CreateLivestreamCTARequest>(
+export const createCTA = onCall(
+   middlewares<Context & CreateLivestreamCTARequest>(
       dataValidation(createCTASchema),
       livestreamExists(),
-      async (requestData, context) => {
+      async (request) => {
          const {
             livestreamId,
             livestreamToken,
             message,
             buttonText,
             buttonURL,
-         } = requestData
+         } = request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 
@@ -75,11 +75,11 @@ const updateCTASchema: yup.SchemaOf<UpdateLivestreamCTARequest> = yup.object({
    buttonURL: baseCTAShape.buttonURL.notRequired(),
 })
 
-export const updateCTA = functions.region(config.region).https.onCall(
-   middlewares<Context, UpdateLivestreamCTARequest>(
+export const updateCTA = onCall(
+   middlewares<Context & UpdateLivestreamCTARequest>(
       dataValidation(updateCTASchema),
       livestreamExists(),
-      async (requestData, context) => {
+      async (request) => {
          const {
             livestreamId,
             livestreamToken,
@@ -87,11 +87,11 @@ export const updateCTA = functions.region(config.region).https.onCall(
             buttonText,
             buttonURL,
             ctaId,
-         } = requestData
+         } = request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 
@@ -139,16 +139,16 @@ const toggleActiveCTASchema: yup.SchemaOf<ToggleActiveCTARequest> = yup.object({
    livestreamToken: yup.string().nullable(),
 })
 
-export const toggleActiveCTA = functions.region(config.region).https.onCall(
-   middlewares<Context, ToggleActiveCTARequest>(
+export const toggleActiveCTA = onCall(
+   middlewares<Context & ToggleActiveCTARequest>(
       dataValidation(toggleActiveCTASchema),
       livestreamExists(),
-      async (requestData, context) => {
-         const { livestreamId, livestreamToken, ctaId } = requestData
+      async (request) => {
+         const { livestreamId, livestreamToken, ctaId } = request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 
@@ -175,16 +175,16 @@ const deleteCTASchema: yup.SchemaOf<DeleteLivestreamCTARequest> = yup.object({
    livestreamToken: yup.string().nullable(),
 })
 
-export const deleteCTA = functions.region(config.region).https.onCall(
-   middlewares<Context, DeleteLivestreamCTARequest>(
+export const deleteCTA = onCall(
+   middlewares<Context & DeleteLivestreamCTARequest>(
       dataValidation(deleteCTASchema),
       livestreamExists(),
-      async (requestData, context) => {
-         const { livestreamId, livestreamToken, ctaId } = requestData
+      async (request) => {
+         const { livestreamId, livestreamToken, ctaId } = request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 

@@ -19,7 +19,6 @@ import {
    notificationService,
    userRepo,
 } from "./api/repositories"
-import config from "./config"
 import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 import { userUpdateFields } from "./lib/user"
 import { logAndThrow } from "./lib/validations"
@@ -184,10 +183,9 @@ export const createNewUserAccount = onCall(async (request) => {
    }
 })
 
-export const createNewGroupAdminUserAccount = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      if (context.auth) {
+export const createNewGroupAdminUserAccount = functions.https.onCall(
+   async (request) => {
+      if (request.auth) {
          // Throwing an HttpsError so that the client gets the error details.
          throw new functions.https.HttpsError(
             "failed-precondition",
@@ -196,7 +194,7 @@ export const createNewGroupAdminUserAccount = functions
       }
       let uidToDelete = null
       let emailToDelete = null
-      const userData = data.userData
+      const userData = request.data.userData
       const recipientEmail = userData.email.toLowerCase().trim()
 
       const { password, firstName, lastName, subscribed } = userData
@@ -313,7 +311,8 @@ export const createNewGroupAdminUserAccount = functions
          // Throw the original critical error
          throw new functions.https.HttpsError("internal", error)
       }
-   })
+   }
+)
 
 export const resendEmailVerificationEmailWithPin = onCall(async (request) => {
    const { recipientEmail, recipientAuthId } = request.data
@@ -505,50 +504,48 @@ export const sendPasswordResetEmail = onCall<{
    }
 })
 
-export const backfillUserData = functions
-   .region(config.region)
-   .https.onCall(async ({ timezone }, context) => {
-      const email = context?.auth?.token?.email
-      functions.logger.debug(email, context?.auth)
+export const backfillUserData = functions.https.onCall(async (request) => {
+   const email = request.auth?.token?.email
+   functions.logger.debug(email, request.auth)
 
-      if (!email) {
-         functions.logger.error(
-            "The user calling the function is not authenticated"
-         )
-         throw new functions.https.HttpsError(
-            "invalid-argument",
-            "Something wrong happened"
-         )
-      }
+   if (!email) {
+      functions.logger.error(
+         "The user calling the function is not authenticated"
+      )
+      throw new functions.https.HttpsError(
+         "invalid-argument",
+         "Something wrong happened"
+      )
+   }
 
-      const userData = await userRepo.getUserDataById(email)
-      const userRecord = await auth.getUserByEmail(email)
-      const dataToUpdate: Partial<UserData> = {}
+   const userData = await userRepo.getUserDataById(email)
+   const userRecord = await auth.getUserByEmail(email)
+   const dataToUpdate: Partial<UserData> = {}
 
-      if (!userData.referralCode) {
-         dataToUpdate.referralCode = generateReferralCode()
-         functions.logger.info("Adding referralCode to user")
-      }
+   if (!userData.referralCode) {
+      dataToUpdate.referralCode = generateReferralCode()
+      functions.logger.info("Adding referralCode to user")
+   }
 
-      // if there's no timezone it will save the current timezone provided by the browser
-      if (!userData.timezone) {
-         dataToUpdate.timezone = timezone
-         functions.logger.info("Adding time zone to user")
-      }
+   // if there's no timezone it will save the current timezone provided by the browser
+   if (!userData.timezone) {
+      dataToUpdate.timezone = request.data.timezone
+      functions.logger.info("Adding time zone to user")
+   }
 
-      if (userData.emailVerified === undefined) {
-         dataToUpdate.emailVerified = userRecord.emailVerified
-         functions.logger.info("Adding emailVerifiedAt to user")
-      }
+   if (userData.emailVerified === undefined) {
+      dataToUpdate.emailVerified = userRecord.emailVerified
+      functions.logger.info("Adding emailVerifiedAt to user")
+   }
 
-      if (Object.keys(dataToUpdate).length > 0) {
-         await userUpdateFields(email, dataToUpdate)
-         functions.logger.info(
-            "User updated with the following fields",
-            dataToUpdate
-         )
-      }
-   })
+   if (Object.keys(dataToUpdate).length > 0) {
+      await userUpdateFields(email, dataToUpdate)
+      functions.logger.info(
+         "User updated with the following fields",
+         dataToUpdate
+      )
+   }
+})
 
 const deleteUserSubCollections = async (
    userDocRef: FirebaseFirestore.DocumentReference
@@ -575,10 +572,9 @@ const deleteUserSubCollections = async (
    }
 }
 
-export const deleteLoggedInUserAccount = functions
-   .region(config.region)
-   .https.onCall(async (_, context) => {
-      const { auth: authContext } = context
+export const deleteLoggedInUserAccount = functions.https.onCall(
+   async (request) => {
+      const authContext = request.auth
       const {
          token: { email: userEmail, uid: userId },
       } = authContext
@@ -594,12 +590,14 @@ export const deleteLoggedInUserAccount = functions
       try {
          const userDocRef = firestore.collection("userData").doc(userEmail)
 
-         // Try to delete sub-collections but continue if it fails
-         await deleteUserSubCollections(userDocRef)
-
          // Critical deletions
          await auth.deleteUser(userId)
          await userDocRef.delete()
+
+         // Try to delete sub-collections but continue if it fails
+         // Delete sub collections after deleting the user as to prevent triggering the onWriteTriggers
+         // on sub collections
+         await deleteUserSubCollections(userDocRef)
 
          // add userId and timestamp on analytics collection
          await firestore
@@ -622,7 +620,8 @@ export const deleteLoggedInUserAccount = functions
          )
          throw new functions.https.HttpsError(error.code, error.message)
       }
-   })
+   }
+)
 
 const getRandomInt = (max: number) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -633,25 +632,23 @@ const getRandomInt = (max: number) => {
    }
 }
 
-export const verifyToken = functions
-   .region(config.region)
-   .https.onRequest(async (req, res) => {
-      try {
-         const { idToken } = req.body
-         functions.logger.info("starting verifyToken", idToken)
-         const decodedToken = await auth.verifyIdToken(idToken)
-         functions.logger.info("decoded token", decodedToken)
-         const customToken = await auth.createCustomToken(decodedToken.uid)
-         functions.logger.info("customToken", customToken)
+export const verifyToken = functions.https.onRequest(async (req, res) => {
+   try {
+      const { idToken } = req.body
+      functions.logger.info("starting verifyToken", idToken)
+      const decodedToken = await auth.verifyIdToken(idToken)
+      functions.logger.info("decoded token", decodedToken)
+      const customToken = await auth.createCustomToken(decodedToken.uid)
+      functions.logger.info("customToken", customToken)
 
-         res.json({
-            uid: decodedToken.uid,
-            email: decodedToken.email,
-            claims: decodedToken.customClaims || {},
-            customToken,
-         })
-      } catch (error) {
-         functions.logger.info("error verifying token", error)
-         res.status(401).json(JSON.stringify(error))
-      }
-   })
+      res.json({
+         uid: decodedToken.uid,
+         email: decodedToken.email,
+         claims: decodedToken.customClaims || {},
+         customToken,
+      })
+   } catch (error) {
+      functions.logger.info("error verifying token", error)
+      res.status(401).json(JSON.stringify(error))
+   }
+})

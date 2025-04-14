@@ -12,9 +12,11 @@ import { GROUP_DASHBOARD_ROLE, Group } from "@careerfairy/shared-lib/groups"
 import { Interest } from "@careerfairy/shared-lib/interests"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { test as base } from "@playwright/test"
+import { loadTestEnv } from "envConfig"
 import { credentials } from "../constants"
 import { GroupDashboardPage } from "./page-object-models/GroupDashboardPage"
 import { LoginPage } from "./page-object-models/LoginPage"
+
 type GroupAdminFixtureOptions = {
    /**
     * give the option for tests to not create a user
@@ -37,6 +39,10 @@ type GroupAdminFixtureOptions = {
     */
    privacyPolicy?: boolean
 }
+
+base.beforeEach(async () => {
+   loadTestEnv()
+})
 
 /**
  * Group Admin Test Fixture
