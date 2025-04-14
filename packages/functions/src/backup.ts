@@ -1,20 +1,20 @@
-import functions = require("firebase-functions")
 import firestore = require("@google-cloud/firestore")
-import config from "./config"
 
 import {
    type ProjectCollectionId,
    ALL_PROJECT_COLLECTION_IDS,
 } from "@careerfairy/shared-lib/constants/collections"
+import { onSchedule } from "firebase-functions/scheduler"
 
 const collectionsToExclude: ProjectCollectionId[] = ["impressions"]
 
 // Run this function every hour
-export const exportFirestoreBackup = functions
-   .region(config.region)
-   .pubsub.schedule("0 0,12 * * *") // midnight and noon every day
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+export const exportFirestoreBackup = onSchedule(
+   {
+      schedule: "0 0,12 * * *",
+      timeZone: "Europe/Zurich",
+   },
+   async () => {
       const client = new firestore.v1.FirestoreAdminClient()
 
       const dateNow = new Date(Date.now())
@@ -37,4 +37,5 @@ export const exportFirestoreBackup = functions
          console.error(err)
          throw new Error("Export operation failed")
       }
-   })
+   }
+)

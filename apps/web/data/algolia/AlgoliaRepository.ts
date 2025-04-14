@@ -165,6 +165,8 @@ const handleSearch = <AlgoliaResponseType>(
       console.log(`🚀 - Workflow ID: ${workflowId}`)
    }
 
+   // Use the workflow ID to filter Algolia results
+   // This ensures each test run gets isolated data
    return index.search<AlgoliaResponseType>(query, {
       hitsPerPage: itemsPerPage,
       filters: (isTest ? `workflowId:${workflowId} AND ` : "") + filters,
