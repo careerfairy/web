@@ -3,34 +3,12 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { AnimatePresence } from "framer-motion"
 import { NextPage } from "next"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import FramerBox from "../components/views/common/FramerBox"
 
 const TempPage: NextPage = () => {
    const [animationPhase, setAnimationPhase] = useState(0) // 0: not started, 1: first phase, 2: second phase
    const [isAnimating, setIsAnimating] = useState(false)
-
-   // Control the animation flow
-   useEffect(() => {
-      let timer: NodeJS.Timeout
-
-      if (animationPhase === 1) {
-         // After the card is visible and animation has played, transition to phase 2
-         timer = setTimeout(() => {
-            setAnimationPhase(2)
-         }, 3000)
-      } else if (animationPhase === 2) {
-         // After the exit animation is done, reset everything
-         timer = setTimeout(() => {
-            setAnimationPhase(0)
-            setIsAnimating(false)
-         }, 800) // Match the exit animation duration
-      }
-
-      return () => {
-         if (timer) clearTimeout(timer)
-      }
-   }, [animationPhase])
 
    const startAnimation = () => {
       setIsAnimating(true)
@@ -40,6 +18,21 @@ const TempPage: NextPage = () => {
    const resetAnimation = () => {
       setAnimationPhase(0)
       setIsAnimating(false)
+   }
+
+   // Handle animation phase transition
+   const handleAnimationComplete = () => {
+      switch (animationPhase) {
+         case 1:
+            // When phase 1 animation completes, move to phase 2 after delay
+            setTimeout(() => {
+               setAnimationPhase(2)
+            }, 3000)
+            break
+         case 2:
+            // resetAnimation()
+            break
+      }
    }
 
    return (
@@ -69,10 +62,7 @@ const TempPage: NextPage = () => {
                backgroundColor: "#f5f5f5",
             }}
          >
-            <AnimatePresence
-               mode="wait"
-               onExitComplete={() => console.log("Animation exit complete")}
-            >
+            <AnimatePresence mode="wait">
                {animationPhase > 0 && (
                   <FramerBox
                      key="success-container"
@@ -82,17 +72,25 @@ const TempPage: NextPage = () => {
                      }}
                      animate={{
                         opacity: 1,
-                        y: animationPhase === 1 ? 0 : "-100%", // Phase 1: center, Phase 2: exit up
+                        y: animationPhase === 1 ? 0 : "-120%", // Increased from -100% to -120% for complete exit
                      }}
                      exit={{
                         opacity: 0,
-                        y: "-100%",
+                        y: "-120%", // Increased from -100% to -120% for complete exit
                      }}
                      transition={{
                         y: {
                            duration: animationPhase === 1 ? 0.5 : 0.8,
                            ease: animationPhase === 1 ? "easeOut" : "easeInOut",
+                           type: "tween", // Added for consistent motion
                         },
+                        opacity: { duration: 0.3 }, // Added for smoother fade
+                     }}
+                     onAnimationComplete={() => {
+                        console.log(
+                           `Animation complete for phase: ${animationPhase}`
+                        )
+                        handleAnimationComplete()
                      }}
                      sx={{
                         position: "absolute",
