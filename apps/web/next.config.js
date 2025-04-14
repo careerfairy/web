@@ -263,6 +263,10 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const moduleExports = {
+   publicRuntimeConfig: {
+      NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
+         process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
+   },
    env: {
       REACT_APP_FIREBASE_API_KEY: "AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0",
       REACT_APP_FIREBASE_AUTH_DOMAIN: "careerfairy-e1fd9.firebaseapp.com",

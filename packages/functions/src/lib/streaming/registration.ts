@@ -96,7 +96,7 @@ export const syncUserInRegisteredLivestreams = onDocumentWritten(
       const { params } = event
       const { userEmail } = params
 
-      const changeType = getChangeTypeEnum(event.data)
+      const changeType = getChangeTypeEnum(event)
 
       if (
          changeType === ChangeType.UPDATE ||

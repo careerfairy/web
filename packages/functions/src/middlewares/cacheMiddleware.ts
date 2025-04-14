@@ -1,13 +1,13 @@
-import * as functions from "firebase-functions"
-import { https } from "firebase-functions"
-import { OnCallMiddleware } from "./middlewares"
-import { compress, decompress, sha1 } from "../util"
 import {
    CacheEntryDocument,
    CacheKey,
    generateCacheKey,
 } from "@careerfairy/shared-lib/functions/cache"
+import * as functions from "firebase-functions"
+import { CallableRequest } from "firebase-functions/https"
 import { firestore, Timestamp } from "../api/firestoreAdmin"
+import { compress, decompress, sha1 } from "../util"
+import { OnCallMiddleware } from "./middlewares"
 
 /**
  * Function to extract the cache key from the request data/context
@@ -17,10 +17,7 @@ import { firestore, Timestamp } from "../api/firestoreAdmin"
  *
  * This array will be concatenated and used as cache key
  */
-export type CacheKeyOnCallFn = (
-   data: any,
-   context: https.CallableContext
-) => any[]
+export type CacheKeyOnCallFn = (request: CallableRequest) => any[]
 
 /**
  * Cache Middleware for onCall functions
@@ -37,8 +34,8 @@ export const cacheOnCallValues = (
    cacheKeyFn: CacheKeyOnCallFn,
    ttlSeconds: number
 ): OnCallMiddleware => {
-   return async (data, context, next) => {
-      const cacheKey = await generateCacheKey(cacheKeyFn(data, context), sha1)
+   return async (request, next) => {
+      const cacheKey = await generateCacheKey(cacheKeyFn(request), sha1)
 
       // Try to fetch from cache
       const cachedDocument = await getFirestoreCacheDocument(
@@ -49,11 +46,11 @@ export const cacheOnCallValues = (
       // cache exists and is not expired (still valid)
       if (cachedDocument && isCacheEntryValid(cachedDocument)) {
          // response headers for us to easily identify cached responses
-         context.rawRequest.res?.header(
+         request.rawRequest.res?.header(
             "X-Cache-Expires",
             cachedDocument.expiresAt.toDate().toISOString()
          )
-         context.rawRequest.res?.header(
+         request.rawRequest.res?.header(
             "X-Cached-At",
             cachedDocument.cachedAt.toDate().toISOString()
          )

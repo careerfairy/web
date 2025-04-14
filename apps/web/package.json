@@ -50,6 +50,7 @@
       "chart.js": "^2.9.4",
       "chartjs-plugin-labels": "^1.1.0",
       "cheerio": "^1.0.0-rc.12",
+      "color-thief-react": "^2.1.0",
       "dayjs": "^1.11.7",
       "embla-carousel-auto-height": "^8.0.0-rc17",
       "embla-carousel-react": "^8.0.0-rc12",
@@ -151,7 +152,7 @@
       "webpack": "^5.88.1"
    },
    "engines": {
-      "node": "18.x"
+      "node": "22.x"
    },
    "copyFiles": [
       {

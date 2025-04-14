@@ -1,19 +1,18 @@
-import functions = require("firebase-functions")
+import { logger } from "firebase-functions/v2"
+import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { FieldValue, firestore } from "./api/firestoreAdmin"
-import config from "./config"
 
-export const updateUserDataAnalyticsOnWrite = functions
-   .region(config.region)
-   .firestore.document("userData/{userId}")
-   .onWrite(async (change) => {
-      const newValue = change.after.data()
-      const previousValue = change.before.data()
+export const updateUserDataAnalyticsOnWrite = onDocumentWritten(
+   "userData/{userId}",
+   async (change) => {
+      const newValue = change.data?.after.data()
+      const previousValue = change.data?.before.data()
       const oldUniCountryCode =
          (previousValue && previousValue.universityCountryCode) || null
       const newUniCountryCode =
          (newValue && newValue.universityCountryCode) || null
-      functions.logger.log("oldUniCountryCode:", oldUniCountryCode)
-      functions.logger.log("newUniCountryCode:", newUniCountryCode)
+      logger.log("oldUniCountryCode:", oldUniCountryCode)
+      logger.log("newUniCountryCode:", newUniCountryCode)
       try {
          const universityCountryCodeHasChanged =
             newUniCountryCode !== oldUniCountryCode
@@ -54,14 +53,12 @@ export const updateUserDataAnalyticsOnWrite = functions
                }
             }
             await analyticsUserDataRef.update(newData)
-            functions.logger.info(
+            logger.info(
                `successfully updated userData country analytics, OLD:${oldUniCountryCode}, NEW:${newUniCountryCode}`
             )
          }
       } catch (error) {
-         functions.logger.error(
-            "failed to update userData analytics with error:",
-            error
-         )
+         logger.error("failed to update userData analytics with error:", error)
       }
-   })
+   }
+)
