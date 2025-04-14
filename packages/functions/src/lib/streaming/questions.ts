@@ -5,9 +5,9 @@ import {
    MarkLivestreamQuestionAsDoneRequest,
    ResetLivestreamQuestionRequest,
 } from "@careerfairy/shared-lib/livestreams"
+import { onCall } from "firebase-functions/https"
 import * as yup from "yup"
 import { livestreamsRepo } from "../../api/repositories"
-import config from "../../config"
 import { middlewares } from "../../middlewares/middlewares"
 import { dataValidation, livestreamExists } from "../../middlewares/validations"
 import { validateLivestreamToken } from "../validations"
@@ -37,45 +37,43 @@ type Context = {
    livestream: LivestreamEvent
 }
 
-export const markQuestionAsCurrent = functions
-   .region(config.region)
-   .https.onCall(
-      middlewares<Context, MarkLivestreamQuestionAsCurrentRequest>(
-         dataValidation(markQuestionAsCurrentSchema),
-         livestreamExists(),
-         async (requestData, context) => {
-            const { livestreamId, livestreamToken, questionId } = requestData
-
-            await validateLivestreamToken(
-               context.auth?.token?.email,
-               context.middlewares.livestream,
-               livestreamToken
-            )
-
-            functions.logger.info("Marking question as current", {
-               livestreamId,
-               questionId,
-            })
-
-            await livestreamsRepo.answerQuestion(livestreamId, questionId)
-
-            functions.logger.info("Question marked as current", {
-               livestreamId,
-            })
-         }
-      )
-   )
-
-export const markQuestionAsDone = functions.region(config.region).https.onCall(
-   middlewares<Context, MarkLivestreamQuestionAsDoneRequest>(
-      dataValidation(markQuestionAsDoneSchema),
+export const markQuestionAsCurrent = onCall(
+   middlewares<Context & MarkLivestreamQuestionAsCurrentRequest>(
+      dataValidation(markQuestionAsCurrentSchema),
       livestreamExists(),
-      async (requestData, context) => {
-         const { livestreamId, livestreamToken, questionId } = requestData
+      async (request) => {
+         const { livestreamId, livestreamToken, questionId } = request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
+            livestreamToken
+         )
+
+         functions.logger.info("Marking question as current", {
+            livestreamId,
+            questionId,
+         })
+
+         await livestreamsRepo.answerQuestion(livestreamId, questionId)
+
+         functions.logger.info("Question marked as current", {
+            livestreamId,
+         })
+      }
+   )
+)
+
+export const markQuestionAsDone = onCall(
+   middlewares<Context & MarkLivestreamQuestionAsDoneRequest>(
+      dataValidation(markQuestionAsDoneSchema),
+      livestreamExists(),
+      async (request) => {
+         const { livestreamId, livestreamToken, questionId } = request.data
+
+         await validateLivestreamToken(
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 
@@ -94,16 +92,16 @@ export const markQuestionAsDone = functions.region(config.region).https.onCall(
    )
 )
 
-export const resetQuestion = functions.region(config.region).https.onCall(
-   middlewares<Context, ResetLivestreamQuestionRequest>(
+export const resetQuestion = onCall(
+   middlewares<Context & ResetLivestreamQuestionRequest>(
       dataValidation(resetQuestionSchema),
       livestreamExists(),
-      async (requestData, context) => {
-         const { livestreamId, livestreamToken, questionId } = requestData
+      async (request) => {
+         const { livestreamId, livestreamToken, questionId } = request.data
 
          await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
+            request.auth?.token?.email,
+            request.middlewares.livestream,
             livestreamToken
          )
 

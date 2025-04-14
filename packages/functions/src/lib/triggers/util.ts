@@ -1,14 +1,19 @@
-import functions = require("firebase-functions")
-import { RuntimeOptions } from "firebase-functions"
+import {
+   Change,
+   DocumentSnapshot,
+   FirestoreEvent,
+} from "firebase-functions/firestore"
+import { GlobalOptions } from "firebase-functions/options"
+import { logger } from "firebase-functions/v2"
 import { getChangeTypes } from "../../util"
 
-export const defaultTriggerRunTimeConfig: RuntimeOptions = {
+export const defaultTriggerRunTimeConfig: GlobalOptions = {
    // Ensure that the function has enough time to finish all side effects
    timeoutSeconds: 540, // 9 minutes (max)
    /*
     * 256 MB (default) to 8 GB (max) pricing can be found here: https://cloud.google.com/functions/pricing#compute_time
     * */
-   memory: "256MB",
+   memory: "256MiB",
 }
 
 export const defaultTriggerRunTimeConfigV2 = {
@@ -24,7 +29,7 @@ export const handleSideEffects = (sideEffectPromises: Promise<unknown>[]) => {
    return Promise.allSettled(sideEffectPromises).then((results) => {
       results.forEach((result) => {
          if (result.status === "rejected") {
-            functions.logger.error(result.reason)
+            logger.error(result.reason)
          }
       })
    })
@@ -32,15 +37,15 @@ export const handleSideEffects = (sideEffectPromises: Promise<unknown>[]) => {
 
 export const logStart = ({
    message,
-   context,
+   event,
    changeTypes,
 }: {
    message: string
-   context: Pick<functions.EventContext, "params">
+   event: FirestoreEvent<Change<DocumentSnapshot>>
    changeTypes: ReturnType<typeof getChangeTypes>
 }) => {
-   functions.logger.info(message, {
+   logger.info(message, {
       changeTypes,
-      params: context.params,
+      params: event.params,
    })
 }

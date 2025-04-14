@@ -8,7 +8,7 @@ import {
 import * as functions from "firebase-functions"
 import _ from "lodash"
 
-import config from "../../config"
+import { onCall } from "firebase-functions/https"
 import {
    CacheKeyOnCallFn,
    cacheOnCallValues,
@@ -256,7 +256,7 @@ const contentCustomJobsExcludingMap = (
  * Counts all tags (business functions, content topics and languages) based on linked content, namely
  * Sparks and livestreams, calculating how many hits each tag has in terms of content.
  */
-export const fetchContentHits = functions.region(config.region).https.onCall(
+export const fetchContentHits = onCall(
    middlewares(
       cacheTagHits(() => cacheKey()),
       async () => {

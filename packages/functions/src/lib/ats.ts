@@ -1,24 +1,24 @@
-import { object, string } from "yup"
+import { Candidate } from "@careerfairy/shared-lib/ats/Candidate"
+import { getIntegrationSpecifics } from "@careerfairy/shared-lib/ats/IntegrationSpecifics"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    Group,
    GroupATSIntegrationTokensDocument,
 } from "@careerfairy/shared-lib/groups"
-import { CallableContext } from "firebase-functions/lib/common/providers/https"
+import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
+import { UserATSRelations, UserData } from "@careerfairy/shared-lib/users"
+import { auth } from "firebase-admin"
+import { CallableRequest } from "firebase-functions/lib/common/providers/https"
+import { object, string } from "yup"
+import { groupRepo } from "../api/repositories"
+import { IATSRepository } from "./IATSRepository"
 import {
    logAndThrow,
    validateData,
    validateUserAuthExists,
    validateUserIsGroupAdmin,
 } from "./validations"
-import { groupRepo } from "../api/repositories"
-import { auth } from "firebase-admin"
 import DecodedIdToken = auth.DecodedIdToken
-import { IATSRepository } from "./IATSRepository"
-import { Candidate } from "@careerfairy/shared-lib/ats/Candidate"
-import { UserATSRelations, UserData } from "@careerfairy/shared-lib/users"
-import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
-import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { getIntegrationSpecifics } from "@careerfairy/shared-lib/ats/IntegrationSpecifics"
 
 type AlwaysPresentData = {
    groupId: string
@@ -31,8 +31,7 @@ type AlwaysPresentArgs = AlwaysPresentData & {
 }
 
 type Options<T extends object> = {
-   data: T & AlwaysPresentData
-   context: CallableContext
+   request: CallableRequest<T & AlwaysPresentData>
    requiredData?: object
 }
 
@@ -56,9 +55,9 @@ export async function atsRequestValidation<T extends object>(
    )
 
    // validations that throw exceptions
-   const idToken = await validateUserAuthExists(options.context)
+   const idToken = await validateUserAuthExists(options.request)
    const inputValidationResult = (await validateData(
-      options.data,
+      options.request.data,
       inputSchema
    )) as T & AlwaysPresentData
 

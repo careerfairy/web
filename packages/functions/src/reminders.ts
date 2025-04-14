@@ -16,6 +16,7 @@ import {
    companyNameSlugify,
 } from "@careerfairy/shared-lib/utils"
 import { WriteBatch } from "firebase-admin/firestore"
+import { onSchedule } from "firebase-functions/scheduler"
 import { onRequest } from "firebase-functions/v2/https"
 import { DateTime } from "luxon"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
@@ -29,7 +30,6 @@ import {
    livestreamsRepo,
    sparkRepo,
 } from "./api/repositories"
-import config from "./config"
 import {
    getStreamsByDateWithRegisteredStudents,
    updateLiveStreamsWithEmailSent,
@@ -122,16 +122,12 @@ const ReminderTodayMorning: ReminderData = {
  *
  * So we will be looking for streams that start on current date + {reminderDateDelay}
  */
-export const scheduleReminderEmails = functions
-   .region(config.region)
-   .runWith({
-      // when sending large batches, this function can take a while to finish
-      timeoutSeconds: 540,
-      memory: "8GB",
-   })
-   .pubsub.schedule("every 15 minutes")
-   .timeZone("Europe/Zurich")
-   .onRun(() => {
+export const scheduleReminderEmails = onSchedule(
+   {
+      schedule: "every 15 minutes",
+      timeZone: "Europe/Zurich",
+   },
+   async () => {
       const batch = firestore.batch()
       functions.logger.log(
          `Running reminder check at ${new Date().toLocaleString()}`
@@ -196,36 +192,31 @@ export const scheduleReminderEmails = functions
             throw new Error(errorMessage)
          }
       })
-   })
+   }
+)
 
 /**
  * Every day at 9 AM, check all the livestreams that ended the day before and send a reminder to all the non-attendees at 11 AM.
  */
-export const sendReminderToNonAttendees = functions
-   .region(config.region)
-   .runWith({
-      // when sending large batches, this function can take a while to finish
-      timeoutSeconds: 540,
-      memory: "8GB",
-   })
-   .pubsub.schedule("0 11 * * *")
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+export const sendReminderToNonAttendees = onSchedule(
+   {
+      schedule: "0 11 * * *",
+      timeZone: "Europe/Zurich",
+   },
+   async () => {
       await sendAttendeesReminder(ReminderTodayMorning)
-   })
+   }
+)
 
-export const sendReminderToAttendees = functions
-   .region(config.region)
-   .runWith({
-      // when sending large batches, this function can take a while to finish
-      timeoutSeconds: 540,
-      memory: "8GB",
-   })
-   .pubsub.schedule("0 11 * * *")
-   .timeZone("Europe/Zurich")
-   .onRun(async () => {
+export const sendReminderToAttendees = onSchedule(
+   {
+      schedule: "0 11 * * *",
+      timeZone: "Europe/Zurich",
+   },
+   async () => {
       await sendAttendeesReminder(ReminderTodayMorning, true)
-   })
+   }
+)
 
 export const testSendReminderToNonAttendees = onRequest(async (req, res) => {
    // Update ids according to testing data

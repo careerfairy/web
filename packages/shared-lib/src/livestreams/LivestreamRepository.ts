@@ -249,6 +249,8 @@ export interface ILivestreamRepository {
       limit?: number,
       fromDate?: Date
    ): firebase.firestore.Query
+
+   getLivestreamStats(livestreamId: string): Promise<LiveStreamStats>
    getClosestFutureLivestreamStatsFromDate(
       groupId: string,
       fromDate?: Date
@@ -511,6 +513,17 @@ export class FirebaseLivestreamRepository
          .get()
 
       return snap.docs[0]?.data() || null
+   }
+
+   async getLivestreamStats(livestreamId: string): Promise<LiveStreamStats> {
+      const snap = await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("stats")
+         .doc("livestreamStats")
+         .get()
+
+      return this.addIdToDoc<LiveStreamStats>(snap)
    }
 
    async getClosestPastLivestreamStatsFromDate(
