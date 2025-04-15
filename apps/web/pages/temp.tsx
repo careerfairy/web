@@ -25,7 +25,7 @@ enum AnimationPhase {
 }
 
 const ANIMATION_SLOWNESS = 10
-const PAUSE_MID_ANIMATION = false
+const PAUSE_MID_ANIMATION = true
 
 const TempPage: NextPage = () => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
@@ -139,6 +139,7 @@ const TempPage: NextPage = () => {
                         flexDirection: "column",
                         justifyContent: "center",
                         alignItems: "center",
+                        zIndex: 1,
                      }}
                   >
                      {/* Main star at the top of container */}
@@ -163,8 +164,9 @@ const TempPage: NextPage = () => {
                         transition={{ delay: 0.8, duration: 0.7 }}
                         sx={{
                            position: "absolute",
-                           top: "30%",
-                           left: "25%",
+                           top: "50%",
+                           left: "45%",
+                           zIndex: 2,
                         }}
                      >
                         <DecorativeStar />
@@ -177,8 +179,9 @@ const TempPage: NextPage = () => {
                         transition={{ delay: 1.0, duration: 0.7 }}
                         sx={{
                            position: "absolute",
-                           top: "25%",
-                           right: "25%",
+                           top: "50%",
+                           right: "50%",
+                           zIndex: 2,
                         }}
                      >
                         <DecorativeStar />
@@ -191,8 +194,9 @@ const TempPage: NextPage = () => {
                         transition={{ delay: 1.2, duration: 0.7 }}
                         sx={{
                            position: "absolute",
-                           bottom: "30%",
-                           right: "35%",
+                           bottom: "50%",
+                           right: "55%",
+                           zIndex: 2,
                         }}
                      >
                         <DecorativeStar />
@@ -244,7 +248,11 @@ const TempPage: NextPage = () => {
          {/* Controls */}
          <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
             <Grow in={!isAnimating}>
-               <Button onClick={startAnimation} variant="contained">
+               <Button
+                  onClick={startAnimation}
+                  startIcon={<DecorativeStar />}
+                  variant="contained"
+               >
                   Show Success Animation
                </Button>
             </Grow>
@@ -295,34 +303,18 @@ const MainStar = (props: SvgIconProps) => {
 
 const DecorativeStar = (props: SvgIconProps) => {
    return (
-      <SvgIcon viewBox="0 0 375 736" {...props}>
+      <SvgIcon id="decorative-star" viewBox="0 0 215 197" {...props}>
          <svg
-            width="375"
-            height="736"
-            viewBox="0 0 375 736"
+            width="28"
+            height="28"
+            viewBox="0 0 215 197"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
          >
-            <circle
-               opacity="0.11"
-               cx="178"
-               cy="368"
-               r="368"
-               fill="url(#paint0_radial_18887_31869)"
+            <path
+               d="M214.578 119.94C214.578 119.94 214.577 119.94 214.577 119.939L158.894 72.6C155.847 70.0098 154.289 66.073 154.738 62.0993L160.245 13.3897C161.39 3.26239 150.196 -3.59908 141.691 2.01668L100.784 29.0271C97.4468 31.2306 93.2318 31.6288 89.541 30.0891L43.9355 11.0641C34.8607 7.27846 25.3302 15.4046 27.6337 24.9637L39.2968 73.3628C40.2215 77.2002 39.2019 81.2469 36.5693 84.188L3.08201 121.599C-3.71125 129.188 1.43113 141.256 11.6103 141.614L63.339 143.43C67.751 143.585 71.7224 146.148 73.6815 150.104L93.5968 190.319C98.1588 199.531 111.432 199.129 115.428 189.658L134.655 144.087C136.141 140.565 139.214 137.961 142.931 137.073L214.575 119.956C214.583 119.954 214.584 119.944 214.578 119.94Z"
+               fill="#3EB9A7"
             />
-            <defs>
-               <radialGradient
-                  id="paint0_radial_18887_31869"
-                  cx="0"
-                  cy="0"
-                  r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform="translate(178 368) rotate(90) scale(368)"
-               >
-                  <stop stop-color="white" />
-                  <stop offset="1" stop-color="white" stop-opacity="0" />
-               </radialGradient>
-            </defs>
          </svg>
       </SvgIcon>
    )
