@@ -1,4 +1,4 @@
-import { Button, Grow, SvgIcon, SvgIconProps } from "@mui/material"
+import { Button, SvgIcon, SvgIconProps } from "@mui/material"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -29,7 +29,6 @@ const TempPage: NextPage = () => {
       AnimationPhase.NOT_STARTED
    )
    const [isAnimating, setIsAnimating] = useState(false)
-   const [animationKey, setAnimationKey] = useState(0)
 
    const startAnimation = () => {
       setIsAnimating(true)
@@ -39,7 +38,12 @@ const TempPage: NextPage = () => {
    const resetAnimation = () => {
       setAnimationPhase(AnimationPhase.NOT_STARTED)
       setIsAnimating(false)
-      setAnimationKey((prev) => prev + 1)
+   }
+
+   // Debugging function with debugger statement
+   const debugAnimation = () => {
+      // eslint-disable-next-line no-debugger
+      debugger // This will pause execution when DevTools are open
    }
 
    // Handle animation phase transition
@@ -83,7 +87,6 @@ const TempPage: NextPage = () => {
                alignItems: "center",
                backgroundColor: "#f5f5f5",
             }}
-            key={animationKey}
          >
             <AnimatePresence mode="wait">
                {animationPhase > AnimationPhase.NOT_STARTED && (
@@ -133,27 +136,20 @@ const TempPage: NextPage = () => {
                         alignItems: "center",
                      }}
                   >
-                     {/* Main star */}
-                     <FramerBox
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1.2 }}
-                        transition={{
-                           duration: 0.5,
-                           ease: "easeOut",
-                           delay: 0.5,
-                        }}
+                     {/* Main star at the top of container */}
+                     <Box
                         sx={{
                            position: "absolute",
-                           width: "100%",
-                           height: "100%",
-                           display: "flex",
-                           justifyContent: "center",
-                           alignItems: "center",
+                           top: "-5%",
+                           left: "50%",
+                           transform: "translateX(-50%)",
+                           width: { xs: "80px", md: "120px" },
+                           height: "auto",
                            zIndex: 1,
                         }}
                      >
                         <MainStar sx={{ width: "100%", height: "auto" }} />
-                     </FramerBox>
+                     </Box>
 
                      {/* Decorative star 1 */}
                      <FramerBox
@@ -285,12 +281,20 @@ const TempPage: NextPage = () => {
          </Box>
 
          {/* Controls */}
-         <Box sx={{ mt: 2 }}>
-            <Grow in={!isAnimating}>
+         <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
+            {isAnimating ? (
+               <Button
+                  onClick={debugAnimation}
+                  variant="outlined"
+                  color="primary"
+               >
+                  Pause
+               </Button>
+            ) : (
                <Button onClick={startAnimation} variant="contained">
                   Show Success Animation
                </Button>
-            </Grow>
+            )}
          </Box>
       </div>
    )
