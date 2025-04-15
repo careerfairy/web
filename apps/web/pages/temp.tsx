@@ -24,8 +24,24 @@ enum AnimationPhase {
    SECOND_PHASE,
 }
 
-const ANIMATION_SLOWNESS = 10
-const PAUSE_MID_ANIMATION = true
+const PAUSE_MID_ANIMATION = false
+
+const ANIMATION_CONFIG = {
+   container: {
+      slideIn: 0.3,
+      slideOut: 0.8,
+      opacity: 0.3,
+      delayBeforeExit: 3000,
+   },
+   lightEffect: {
+      delay: 0.6,
+      duration: 0.6,
+   },
+   text: {
+      duration: 0.5,
+      delay: 0.3,
+   },
+}
 
 type RotatingDecorativeStarProps = {
    top?: string | number
@@ -99,7 +115,7 @@ const TempPage: NextPage = () => {
                // When phase 1 animation completes, move to phase 2 after delay
                setTimeout(() => {
                   setAnimationPhase(AnimationPhase.SECOND_PHASE)
-               }, 3000)
+               }, ANIMATION_CONFIG.container.delayBeforeExit)
             }
             break
          case AnimationPhase.SECOND_PHASE:
@@ -162,15 +178,17 @@ const TempPage: NextPage = () => {
                         y: {
                            duration:
                               animationPhase === AnimationPhase.FIRST_PHASE
-                                 ? 0.3 * ANIMATION_SLOWNESS
-                                 : 0.8,
+                                 ? ANIMATION_CONFIG.container.slideIn
+                                 : ANIMATION_CONFIG.container.slideOut,
                            ease:
                               animationPhase === AnimationPhase.FIRST_PHASE
                                  ? "easeOut"
                                  : "easeInOut",
                            type: "tween", // Added for consistent motion
                         },
-                        opacity: { duration: 0.3 }, // Added for smoother fade
+                        opacity: {
+                           duration: ANIMATION_CONFIG.container.opacity,
+                        }, // Added for smoother fade
                      }}
                      onAnimationComplete={handleAnimationComplete}
                      sx={{
@@ -190,7 +208,7 @@ const TempPage: NextPage = () => {
                      <Box
                         sx={{
                            position: "absolute",
-                           top: isMobile ? -150 : -350,
+                           top: isMobile ? -150 : -400,
                            left: "50%",
                            transform: "translateX(-50%)",
                            width: "100%",
@@ -200,28 +218,14 @@ const TempPage: NextPage = () => {
                         <MainStar sx={{ width: "100%", height: "auto" }} />
                      </Box>
 
-                     {/* Text */}
-                     <Typography
-                        variant="h4"
-                        sx={{
-                           fontWeight: 900,
-                           color: "common.white",
-                           textTransform: "uppercase",
-                           fontSize: { xs: "2.714rem", md: "4.571rem" },
-                           lineHeight: { xs: "2.429rem", md: "5rem" },
-                           textAlign: "center",
-                        }}
-                     >
-                        Registration
-                        <br />
-                        successful
-                     </Typography>
-
                      {/* Light effect */}
                      <FramerBox
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 0.1 }}
-                        transition={{ delay: 0.6, duration: 0.6 }}
+                        transition={{
+                           delay: ANIMATION_CONFIG.lightEffect.delay,
+                           duration: ANIMATION_CONFIG.lightEffect.duration,
+                        }}
                         sx={{
                            position: "absolute",
                            width: "100%",
@@ -263,12 +267,39 @@ const TempPage: NextPage = () => {
                opacity={0.3}
             />
 
-            {/* Container label */}
-            {animationPhase === AnimationPhase.NOT_STARTED && !isAnimating && (
-               <Typography variant="body2" color="text.secondary">
-                  Animation Container
+            {/* Text */}
+            <FramerBox
+               zIndex={1}
+               initial={{
+                  opacity: 0,
+                  y: 50,
+               }}
+               animate={{
+                  opacity: animationPhase > AnimationPhase.NOT_STARTED ? 1 : 0,
+                  y: animationPhase > AnimationPhase.NOT_STARTED ? 0 : 50,
+               }}
+               transition={{
+                  duration: ANIMATION_CONFIG.text.duration,
+                  delay: ANIMATION_CONFIG.text.delay,
+                  ease: "easeOut",
+               }}
+            >
+               <Typography
+                  variant="h4"
+                  sx={{
+                     fontWeight: 900,
+                     color: "common.white",
+                     textTransform: "uppercase",
+                     fontSize: { xs: "2.714rem", md: "4.571rem" },
+                     lineHeight: { xs: "2.429rem", md: "5rem" },
+                     textAlign: "center",
+                  }}
+               >
+                  Registration
+                  <br />
+                  successful
                </Typography>
-            )}
+            </FramerBox>
          </Box>
 
          {/* Controls */}
