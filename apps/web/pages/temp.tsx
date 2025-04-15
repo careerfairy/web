@@ -1,4 +1,4 @@
-import { Button, SvgIcon, SvgIconProps } from "@mui/material"
+import { Button, Grow, SvgIcon, SvgIconProps } from "@mui/material"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -29,6 +29,7 @@ const TempPage: NextPage = () => {
       AnimationPhase.NOT_STARTED
    )
    const [isAnimating, setIsAnimating] = useState(false)
+   const isMobile = useIsMobile()
 
    const startAnimation = () => {
       setIsAnimating(true)
@@ -38,12 +39,6 @@ const TempPage: NextPage = () => {
    const resetAnimation = () => {
       setAnimationPhase(AnimationPhase.NOT_STARTED)
       setIsAnimating(false)
-   }
-
-   // Debugging function with debugger statement
-   const debugAnimation = () => {
-      // eslint-disable-next-line no-debugger
-      debugger // This will pause execution when DevTools are open
    }
 
    // Handle animation phase transition
@@ -65,19 +60,19 @@ const TempPage: NextPage = () => {
       <div
          style={{
             width: "100%",
-            height: "100vh",
+            minHeight: "100vh",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            gap: "20px",
+            gap: "10px",
          }}
       >
          {/* Container with visible borders */}
          <Box
             sx={{
                width: { xs: "100%", md: 914 },
-               height: { xs: "100%", md: 907 },
+               height: { md: 907 },
                border: "2px dashed #ccc",
                borderRadius: "20px",
                position: "relative",
@@ -86,6 +81,10 @@ const TempPage: NextPage = () => {
                justifyContent: "center",
                alignItems: "center",
                backgroundColor: "#f5f5f5",
+               ...(isMobile && {
+                  display: "flex",
+                  flex: 1,
+               }),
             }}
          >
             <AnimatePresence mode="wait">
@@ -111,7 +110,7 @@ const TempPage: NextPage = () => {
                         y: {
                            duration:
                               animationPhase === AnimationPhase.FIRST_PHASE
-                                 ? 0.1
+                                 ? 4
                                  : 0.8,
                            ease:
                               animationPhase === AnimationPhase.FIRST_PHASE
@@ -125,9 +124,8 @@ const TempPage: NextPage = () => {
                      sx={{
                         position: "absolute",
                         width: "100%",
-                        height: "100%",
+                        height: "200%",
                         borderRadius: "5px",
-                        overflow: "hidden",
                         background:
                            "linear-gradient(to bottom, #46C3B0, #ADE3DB)",
                         display: "flex",
@@ -140,10 +138,10 @@ const TempPage: NextPage = () => {
                      <Box
                         sx={{
                            position: "absolute",
-                           top: "-5%",
+                           top: isMobile ? -150 : -350,
                            left: "50%",
                            transform: "translateX(-50%)",
-                           width: { xs: "80px", md: "120px" },
+                           width: "100%",
                            height: "auto",
                            zIndex: 1,
                         }}
@@ -232,7 +230,6 @@ const TempPage: NextPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.4, duration: 0.5 }}
                         sx={{
-                           marginTop: 20,
                            textAlign: "center",
                            position: "relative",
                            zIndex: 2,
@@ -282,19 +279,11 @@ const TempPage: NextPage = () => {
 
          {/* Controls */}
          <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-            {isAnimating ? (
-               <Button
-                  onClick={debugAnimation}
-                  variant="outlined"
-                  color="primary"
-               >
-                  Pause
-               </Button>
-            ) : (
+            <Grow in={!isAnimating}>
                <Button onClick={startAnimation} variant="contained">
                   Show Success Animation
                </Button>
-            )}
+            </Grow>
          </Box>
       </div>
    )
