@@ -1,4 +1,4 @@
-import { Button, SvgIcon, SvgIconProps } from "@mui/material"
+import { Button, Grow, SvgIcon, SvgIconProps } from "@mui/material"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -7,33 +7,51 @@ import { NextPage } from "next"
 import { useState } from "react"
 import FramerBox from "../components/views/common/FramerBox"
 
-const TempPage: NextPage = () => {
-   const [animationPhase, setAnimationPhase] = useState(0) // 0: not started, 1: first phase, 2: second phase
-   const [isAnimating, setIsAnimating] = useState(false)
+enum AnimationPhase {
+   /**
+    * Initial state - no animation is playing and the container is empty
+    */
+   NOT_STARTED,
+   /**
+    * First animation phase - success animation slides up into the container and plays
+    * with star and text elements appearing with various effects
+    */
+   FIRST_PHASE,
+   /**
+    * Second animation phase - after a delay, the animation slides up and out of the container
+    * returning to the initial state once complete
+    */
+   SECOND_PHASE,
+}
 
-   const isMobile = useIsMobile()
-   console.log("🚀 ~ isMobile:", isMobile)
+const TempPage: NextPage = () => {
+   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
+      AnimationPhase.NOT_STARTED
+   )
+   const [isAnimating, setIsAnimating] = useState(false)
+   const [animationKey, setAnimationKey] = useState(0)
 
    const startAnimation = () => {
       setIsAnimating(true)
-      setAnimationPhase(1)
+      setAnimationPhase(AnimationPhase.FIRST_PHASE)
    }
 
    const resetAnimation = () => {
-      setAnimationPhase(0)
+      setAnimationPhase(AnimationPhase.NOT_STARTED)
       setIsAnimating(false)
+      setAnimationKey((prev) => prev + 1)
    }
 
    // Handle animation phase transition
    const handleAnimationComplete = () => {
       switch (animationPhase) {
-         case 1:
+         case AnimationPhase.FIRST_PHASE:
             // When phase 1 animation completes, move to phase 2 after delay
             setTimeout(() => {
-               setAnimationPhase(2)
+               setAnimationPhase(AnimationPhase.SECOND_PHASE)
             }, 3000)
             break
-         case 2:
+         case AnimationPhase.SECOND_PHASE:
             resetAnimation()
             break
       }
@@ -54,10 +72,10 @@ const TempPage: NextPage = () => {
          {/* Container with visible borders */}
          <Box
             sx={{
-               width: { xs: 320, md: 420 },
-               height: { xs: 320, md: 420 },
+               width: { xs: "100%", md: 914 },
+               height: { xs: "100%", md: 907 },
                border: "2px dashed #ccc",
-               borderRadius: "8px",
+               borderRadius: "20px",
                position: "relative",
                overflow: "hidden", // Important to clip content
                display: "flex",
@@ -65,9 +83,10 @@ const TempPage: NextPage = () => {
                alignItems: "center",
                backgroundColor: "#f5f5f5",
             }}
+            key={animationKey}
          >
             <AnimatePresence mode="wait">
-               {animationPhase > 0 && (
+               {animationPhase > AnimationPhase.NOT_STARTED && (
                   <FramerBox
                      key="success-container"
                      initial={{
@@ -76,7 +95,10 @@ const TempPage: NextPage = () => {
                      }}
                      animate={{
                         opacity: 1,
-                        y: animationPhase === 1 ? 0 : "-120%", // Increased from -100% to -120% for complete exit
+                        y:
+                           animationPhase === AnimationPhase.FIRST_PHASE
+                              ? 0
+                              : "-120%", // Increased from -100% to -120% for complete exit
                      }}
                      exit={{
                         opacity: 0,
@@ -84,8 +106,14 @@ const TempPage: NextPage = () => {
                      }}
                      transition={{
                         y: {
-                           duration: animationPhase === 1 ? 0.1 : 0.8,
-                           ease: animationPhase === 1 ? "easeOut" : "easeInOut",
+                           duration:
+                              animationPhase === AnimationPhase.FIRST_PHASE
+                                 ? 0.1
+                                 : 0.8,
+                           ease:
+                              animationPhase === AnimationPhase.FIRST_PHASE
+                                 ? "easeOut"
+                                 : "easeInOut",
                            type: "tween", // Added for consistent motion
                         },
                         opacity: { duration: 0.3 }, // Added for smoother fade
@@ -121,21 +149,10 @@ const TempPage: NextPage = () => {
                            display: "flex",
                            justifyContent: "center",
                            alignItems: "center",
+                           zIndex: 1,
                         }}
                      >
                         <MainStar sx={{ width: "100%", height: "auto" }} />
-                        {/* <svg
-                           width="60"
-                           height="60"
-                           viewBox="0 0 2014 1918"
-                           fill="none"
-                           xmlns="http://www.w3.org/2000/svg"
-                        >
-                           <path
-                              d="M976.561 22.113C986.145 -7.3701 1027.86 -7.37005 1037.44 22.1131L1253.22 685.965C1257.51 699.15 1269.8 708.077 1283.66 708.077H1981.93C2012.94 708.077 2025.83 747.76 2000.74 765.981L1435.85 1176.23C1424.63 1184.38 1419.93 1198.83 1424.22 1212.02L1639.99 1875.84C1649.58 1905.32 1615.83 1929.85 1590.75 1911.63L1025.81 1501.34C1014.59 1493.2 999.408 1493.2 988.192 1501.34L423.253 1911.63C398.166 1929.85 364.421 1905.32 374.006 1875.84L589.78 1212.02C594.067 1198.83 589.371 1184.38 578.149 1176.23L13.2593 765.981C-11.8307 747.76 1.05859 708.077 32.0672 708.077H730.337C744.201 708.077 756.49 699.15 760.776 685.965L976.561 22.113Z"
-                              fill="#2ABAA5"
-                           />
-                        </svg> */}
                      </FramerBox>
 
                      {/* Decorative star 1 */}
@@ -218,7 +235,12 @@ const TempPage: NextPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.4, duration: 0.5 }}
-                        sx={{ marginTop: 20, textAlign: "center" }}
+                        sx={{
+                           marginTop: 20,
+                           textAlign: "center",
+                           position: "relative",
+                           zIndex: 2,
+                        }}
                      >
                         <Typography
                            variant="h4"
@@ -255,7 +277,7 @@ const TempPage: NextPage = () => {
             </AnimatePresence>
 
             {/* Container label */}
-            {animationPhase === 0 && !isAnimating && (
+            {animationPhase === AnimationPhase.NOT_STARTED && !isAnimating && (
                <Typography variant="body2" color="text.secondary">
                   Animation Container
                </Typography>
@@ -264,24 +286,11 @@ const TempPage: NextPage = () => {
 
          {/* Controls */}
          <Box sx={{ mt: 2 }}>
-            {!isAnimating ? (
+            <Grow in={!isAnimating}>
                <Button onClick={startAnimation} variant="contained">
                   Show Success Animation
                </Button>
-            ) : (
-               <Button onClick={resetAnimation} variant="contained">
-                  Reset Animation
-               </Button>
-            )}
-         </Box>
-
-         {/* Description */}
-         <Box sx={{ mt: 1, p: 2, maxWidth: "500px", textAlign: "center" }}>
-            <Typography variant="body2" color="text.secondary">
-               Phase 1: Animation slides up into container and plays
-               <br />
-               Phase 2: Animation slides up and out of container
-            </Typography>
+            </Grow>
          </Box>
       </div>
    )
