@@ -247,8 +247,8 @@ const TempPage: NextPage = () => {
 
             {/* Decorative star 2 */}
             <RotatingDecorativeStar
-               bottom={"-17%"}
-               right={"-23%"}
+               bottom={"-28%"}
+               right={"-26%"}
                color="#1FA692"
                size={575}
                opacity={0.3}
