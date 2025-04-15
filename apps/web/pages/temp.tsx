@@ -24,6 +24,8 @@ enum AnimationPhase {
    SECOND_PHASE,
 }
 
+const ANIMATION_SLOWNESS = 10
+
 const TempPage: NextPage = () => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
       AnimationPhase.NOT_STARTED
@@ -110,7 +112,7 @@ const TempPage: NextPage = () => {
                         y: {
                            duration:
                               animationPhase === AnimationPhase.FIRST_PHASE
-                                 ? 4
+                                 ? 0.3 * ANIMATION_SLOWNESS
                                  : 0.8,
                            ease:
                               animationPhase === AnimationPhase.FIRST_PHASE
@@ -124,7 +126,7 @@ const TempPage: NextPage = () => {
                      sx={{
                         position: "absolute",
                         width: "100%",
-                        height: "200%",
+                        height: "300%",
                         borderRadius: "5px",
                         background:
                            "linear-gradient(to bottom, #46C3B0, #ADE3DB)",
@@ -231,7 +233,9 @@ const TempPage: NextPage = () => {
                         transition={{ delay: 1.4, duration: 0.5 }}
                         sx={{
                            textAlign: "center",
-                           position: "relative",
+                           position: "absolute",
+                           top: "50%",
+                           transform: "translate(-50%, -50%)",
                            zIndex: 2,
                         }}
                      >
@@ -239,10 +243,12 @@ const TempPage: NextPage = () => {
                            variant="h4"
                            sx={{
                               fontWeight: 900,
-                              color: "#FFFFFF",
+                              color: "common.white",
                               textTransform: "uppercase",
-                              fontSize: { xs: "1.8rem", md: "2.5rem" },
-                              lineHeight: "1em",
+                              fontSize: { xs: "2.714rem", md: "4.571rem" },
+                              lineHeight: { xs: "2.429rem", md: "5rem" },
+                              textAlign: "center",
+                              verticalAlign: "middle",
                            }}
                         >
                            Registration
