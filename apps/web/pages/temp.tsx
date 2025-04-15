@@ -25,6 +25,7 @@ enum AnimationPhase {
 }
 
 const ANIMATION_SLOWNESS = 10
+const PAUSE_MID_ANIMATION = true
 
 const TempPage: NextPage = () => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
@@ -47,10 +48,14 @@ const TempPage: NextPage = () => {
    const handleAnimationComplete = () => {
       switch (animationPhase) {
          case AnimationPhase.FIRST_PHASE:
-            // When phase 1 animation completes, move to phase 2 after delay
-            setTimeout(() => {
-               setAnimationPhase(AnimationPhase.SECOND_PHASE)
-            }, 3000)
+            if (PAUSE_MID_ANIMATION) {
+               // Do nothing
+            } else {
+               // When phase 1 animation completes, move to phase 2 after delay
+               setTimeout(() => {
+                  setAnimationPhase(AnimationPhase.SECOND_PHASE)
+               }, 3000)
+            }
             break
          case AnimationPhase.SECOND_PHASE:
             resetAnimation()
@@ -187,18 +192,7 @@ const TempPage: NextPage = () => {
                            right: "25%",
                         }}
                      >
-                        <svg
-                           width="25"
-                           height="25"
-                           viewBox="0 0 354 379"
-                           fill="none"
-                           xmlns="http://www.w3.org/2000/svg"
-                        >
-                           <path
-                              d="M218.831 0.00590551C218.83 0.00653743 218.83 0.00710974 218.829 0.00765631L130.21 94.9027C127.48 97.8261 123.474 99.199 119.525 98.5649L13.9484 81.6132C3.88334 79.9972 -3.49403 90.8614 1.72031 99.6208L56.4158 191.502C58.4618 194.939 58.6631 199.169 56.9527 202.785L11.5565 298.753C7.35099 307.643 15.0257 317.545 24.6839 315.689L129.497 295.548C133.374 294.803 137.37 296.011 140.186 298.778L217.834 375.094C225.1 382.235 237.398 377.66 238.229 367.507L247.384 255.732C247.745 251.331 250.49 247.483 254.534 245.71L346.809 205.254C356.226 201.126 356.443 187.846 347.166 183.412L249.874 136.906C246.425 135.257 243.966 132.066 243.252 128.311L218.857 0.0113503C218.855 -0.00138191 218.838 -0.00483705 218.831 0.00590551Z"
-                              fill="#1FB6A0"
-                           />
-                        </svg>
+                        <DecorativeStar />
                      </FramerBox>
 
                      {/* Decorative star 3 */}
@@ -212,18 +206,7 @@ const TempPage: NextPage = () => {
                            right: "35%",
                         }}
                      >
-                        <svg
-                           width="28"
-                           height="28"
-                           viewBox="0 0 215 197"
-                           fill="none"
-                           xmlns="http://www.w3.org/2000/svg"
-                        >
-                           <path
-                              d="M214.578 119.94C214.578 119.94 214.577 119.94 214.577 119.939L158.894 72.6C155.847 70.0098 154.289 66.073 154.738 62.0993L160.245 13.3897C161.39 3.26239 150.196 -3.59908 141.691 2.01668L100.784 29.0271C97.4468 31.2306 93.2318 31.6288 89.541 30.0891L43.9355 11.0641C34.8607 7.27846 25.3302 15.4046 27.6337 24.9637L39.2968 73.3628C40.2215 77.2002 39.2019 81.2469 36.5693 84.188L3.08201 121.599C-3.71125 129.188 1.43113 141.256 11.6103 141.614L63.339 143.43C67.751 143.585 71.7224 146.148 73.6815 150.104L93.5968 190.319C98.1588 199.531 111.432 199.129 115.428 189.658L134.655 144.087C136.141 140.565 139.214 137.961 142.931 137.073L214.575 119.956C214.583 119.954 214.584 119.944 214.578 119.94Z"
-                              fill="#3EB9A7"
-                           />
-                        </svg>
+                        <DecorativeStar />
                      </FramerBox>
 
                      {/* Text */}
@@ -232,11 +215,8 @@ const TempPage: NextPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.4, duration: 0.5 }}
                         sx={{
-                           textAlign: "center",
                            position: "absolute",
-                           top: "50%",
                            transform: "translate(-50%, -50%)",
-                           zIndex: 2,
                         }}
                      >
                         <Typography
@@ -248,7 +228,6 @@ const TempPage: NextPage = () => {
                               fontSize: { xs: "2.714rem", md: "4.571rem" },
                               lineHeight: { xs: "2.429rem", md: "5rem" },
                               textAlign: "center",
-                              verticalAlign: "middle",
                            }}
                         >
                            Registration
@@ -330,6 +309,41 @@ const MainStar = (props: SvgIconProps) => {
                d="M441.784 11.8178C446.574 -2.92144 467.427 -2.92143 472.217 11.8178L580.088 343.714C582.23 350.305 588.373 354.768 595.305 354.768H944.373C959.873 354.768 966.317 374.604 953.775 383.714L671.381 588.825C665.772 592.899 663.425 600.122 665.568 606.716L773.435 938.598C778.225 953.339 761.356 965.598 748.815 956.49L466.403 751.365C460.796 747.293 453.205 747.293 447.598 751.365L165.186 956.49C152.645 965.598 135.776 953.339 140.567 938.598L248.433 606.716C250.576 600.122 248.229 592.899 242.62 588.825L-39.7744 383.714C-52.316 374.604 -45.8723 354.768 -30.3716 354.768H318.697C325.628 354.768 331.771 350.305 333.913 343.714L441.784 11.8178Z"
                fill="#2ABAA5"
             />
+         </svg>
+      </SvgIcon>
+   )
+}
+
+const DecorativeStar = (props: SvgIconProps) => {
+   return (
+      <SvgIcon viewBox="0 0 375 736" {...props}>
+         <svg
+            width="375"
+            height="736"
+            viewBox="0 0 375 736"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+         >
+            <circle
+               opacity="0.11"
+               cx="178"
+               cy="368"
+               r="368"
+               fill="url(#paint0_radial_18887_31869)"
+            />
+            <defs>
+               <radialGradient
+                  id="paint0_radial_18887_31869"
+                  cx="0"
+                  cy="0"
+                  r="1"
+                  gradientUnits="userSpaceOnUse"
+                  gradientTransform="translate(178 368) rotate(90) scale(368)"
+               >
+                  <stop stop-color="white" />
+                  <stop offset="1" stop-color="white" stop-opacity="0" />
+               </radialGradient>
+            </defs>
          </svg>
       </SvgIcon>
    )
