@@ -25,7 +25,7 @@ enum AnimationPhase {
 }
 
 const ANIMATION_SLOWNESS = 10
-const PAUSE_MID_ANIMATION = true
+const PAUSE_MID_ANIMATION = false
 
 const TempPage: NextPage = () => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
@@ -199,31 +199,21 @@ const TempPage: NextPage = () => {
                      </FramerBox>
 
                      {/* Text */}
-                     <FramerBox
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1.4, duration: 0.5 }}
+                     <Typography
+                        variant="h4"
                         sx={{
-                           position: "absolute",
-                           transform: "translate(-50%, -50%)",
+                           fontWeight: 900,
+                           color: "common.white",
+                           textTransform: "uppercase",
+                           fontSize: { xs: "2.714rem", md: "4.571rem" },
+                           lineHeight: { xs: "2.429rem", md: "5rem" },
+                           textAlign: "center",
                         }}
                      >
-                        <Typography
-                           variant="h4"
-                           sx={{
-                              fontWeight: 900,
-                              color: "common.white",
-                              textTransform: "uppercase",
-                              fontSize: { xs: "2.714rem", md: "4.571rem" },
-                              lineHeight: { xs: "2.429rem", md: "5rem" },
-                              textAlign: "center",
-                           }}
-                        >
-                           Registration
-                           <br />
-                           successful
-                        </Typography>
-                     </FramerBox>
+                        Registration
+                        <br />
+                        successful
+                     </Typography>
 
                      {/* Light effect */}
                      <FramerBox
