@@ -14,8 +14,10 @@ export const ANIMATION_CONFIG = {
       delay: 0.3,
    },
    stars: {
-      duration: 0.6,
-      delay: 0.15,
+      duration: 0.4,
+      delay: 0.3,
       staggerDelay: 0.1,
+      rotationDuration: 1.5,
+      swipingDuration: 0.3,
    },
 }

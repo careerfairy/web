@@ -211,6 +211,8 @@ export const RegistrationSuccessAnimation = ({
                         <MainStar sx={styles.mainStar} />
                      </Box>
                   </FramerBox>
+
+                  {/* Mid left star: decorative-star-1 */}
                   <RotatingDecorativeStar
                      key="decorative-star-1"
                      top={isMobile ? "-10%" : "-17%"}
@@ -223,8 +225,16 @@ export const RegistrationSuccessAnimation = ({
                      exitAnimation={
                         animationPhase === AnimationPhase.SECOND_PHASE
                      }
+                     // Starting and ending rotation for mid left star
+                     startRotation={13.87}
+                     endRotation={-24.28}
+                     rotationDuration={1500} // 1500ms for rotation
+                     animationEasing="easeOut"
+                     appearDelay={300} // Appears 300ms after turquoise screen
+                     appearDuration={400} // 400ms to full opacity/scale
                   />
 
+                  {/* Bottom right star: decorative-star-2 */}
                   <RotatingDecorativeStar
                      key="decorative-star-2"
                      bottom={isMobile ? "-17%" : "-28%"}
@@ -237,8 +247,16 @@ export const RegistrationSuccessAnimation = ({
                      exitAnimation={
                         animationPhase === AnimationPhase.SECOND_PHASE
                      }
+                     // Starting and ending rotation for bottom right star
+                     startRotation={-15}
+                     endRotation={45.3}
+                     rotationDuration={1500} // 1500ms for rotation
+                     animationEasing="easeOut"
+                     appearDelay={300} // Appears 300ms after turquoise screen
+                     appearDuration={400} // 400ms to full opacity/scale
                   />
 
+                  {/* Top right star: decorative-star-3 */}
                   <RotatingDecorativeStar
                      key="decorative-star-3"
                      top={isMobile ? "-7%" : "-17%"}
@@ -251,6 +269,13 @@ export const RegistrationSuccessAnimation = ({
                      exitAnimation={
                         animationPhase === AnimationPhase.SECOND_PHASE
                      }
+                     // Starting and ending rotation for top right star
+                     startRotation={14.99}
+                     endRotation={-31.5}
+                     rotationDuration={1500} // 1500ms for rotation
+                     animationEasing="easeOut"
+                     appearDelay={300} // Appears 300ms after turquoise screen
+                     appearDuration={400} // 400ms to full opacity/scale
                   />
 
                   {/* Text */}
