@@ -215,7 +215,7 @@ const TempPage: NextPage = () => {
                }),
             }}
          >
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="sync">
                {animationPhase > AnimationPhase.NOT_STARTED && (
                   <FramerBox
                      key="success-container"
