@@ -2,7 +2,7 @@ import FramerBox from "components/views/common/FramerBox"
 import { DecorativeStar } from "./DecorativeStar"
 import { ANIMATION_CONFIG } from "./animationConfig"
 
-export type RotatingDecorativeStarProps = {
+export type Props = {
    top?: string | number
    left?: string | number
    right?: string | number
@@ -10,6 +10,9 @@ export type RotatingDecorativeStarProps = {
    color?: string
    size?: number
    opacity?: number | string
+   /**
+    * Used to stagger the animation of the stars
+    */
    index?: number
    isAnimating?: boolean
    exitAnimation?: boolean
@@ -26,7 +29,7 @@ export const RotatingDecorativeStar = ({
    index = 0,
    isAnimating = false,
    exitAnimation = false,
-}: RotatingDecorativeStarProps) => {
+}: Props) => {
    // Calculate starting position based on placement
    // Stars will slide in from the direction they're positioned
    const getInitialOffset = () => {
@@ -88,15 +91,13 @@ export const RotatingDecorativeStar = ({
          }}
          sx={{
             position: "absolute",
-            top: top,
-            left: left,
-            right: right,
-            bottom: bottom,
+            top,
+            left,
+            right,
+            bottom,
          }}
       >
-         <DecorativeStar
-            sx={{ color, width: size, height: size, opacity: 1 }}
-         />
+         <DecorativeStar sx={{ color, width: size, height: size }} />
       </FramerBox>
    )
 }

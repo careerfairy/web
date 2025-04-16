@@ -26,6 +26,36 @@ const styles = sxStyles({
       right: 16,
       zIndex: 10,
    },
+   successContainer: {
+      position: "absolute",
+      width: "100%",
+      height: "300%",
+      borderRadius: "5px",
+      background: "linear-gradient(180deg, #46C3B0 16.87%, #ADE3DB 100%)",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+   mainStarContainer: {
+      position: "absolute",
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: "100%",
+      height: "auto",
+   },
+   mainStar: {
+      width: "100%",
+      height: "auto",
+   },
+   successText: {
+      fontWeight: 900,
+      color: "common.white",
+      textTransform: "uppercase",
+      fontSize: { xs: "2.714rem", md: "4.571rem" },
+      lineHeight: { xs: "2.429rem", md: "5rem" },
+      textAlign: "center",
+   },
 })
 
 enum AnimationPhase {
@@ -74,7 +104,7 @@ type Props = {
  * @example
  * ```tsx
  * // In LivestreamDialog.tsx
- * {Boolean(shouldTriggerSuccessAnimation) && (
+ * {activeView === "register-success" && (
  *   <RegistrationSuccessAnimation
  *     onAnimationComplete={() => doSomethingAfterAnimation()}
  *   />
@@ -143,11 +173,11 @@ export const RegistrationSuccessAnimation = ({
                         y:
                            animationPhase === AnimationPhase.FIRST_PHASE
                               ? 0
-                              : "-120%", // Increased from -100% to -120% to completly exit the container
+                              : "-120%", // Increased from -100% to -120% to completely exit the container
                      }}
                      exit={{
                         opacity: 0,
-                        y: "-120%", // Increased from -100% to -120% to completly exit the container
+                        y: "-120%", // Increased from -100% to -120% to completely exit the container
                      }}
                      transition={{
                         y: {
@@ -166,50 +196,14 @@ export const RegistrationSuccessAnimation = ({
                         }, // Added for smoother fade
                      }}
                      onAnimationComplete={handleAnimationComplete}
-                     sx={{
-                        position: "absolute",
-                        width: "100%",
-                        height: "300%",
-                        borderRadius: "5px",
-                        background:
-                           "linear-gradient(to bottom, #46C3B0, #ADE3DB)",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                     }}
+                     sx={styles.successContainer}
                   >
-                     {/* Main star at the top of container */}
                      <Box
-                        sx={{
-                           position: "absolute",
-                           top: isMobile ? -150 : -400,
-                           left: "50%",
-                           transform: "translateX(-50%)",
-                           width: "100%",
-                           height: "auto",
-                        }}
+                        sx={styles.mainStarContainer}
+                        top={isMobile ? -150 : -400}
                      >
-                        <MainStar sx={{ width: "100%", height: "auto" }} />
+                        <MainStar sx={styles.mainStar} />
                      </Box>
-
-                     {/* Light effect */}
-                     <FramerBox
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 0.1 }}
-                        transition={{
-                           delay: ANIMATION_CONFIG.lightEffect.delay,
-                           duration: ANIMATION_CONFIG.lightEffect.duration,
-                        }}
-                        sx={{
-                           position: "absolute",
-                           width: "100%",
-                           height: "100%",
-                           borderRadius: "50%",
-                           background:
-                              "radial-gradient(circle, white 0%, rgba(255,255,255,0) 70%)",
-                        }}
-                     />
                   </FramerBox>
                   <RotatingDecorativeStar
                      key="decorative-star-1"
@@ -225,7 +219,6 @@ export const RegistrationSuccessAnimation = ({
                      }
                   />
 
-                  {/* Decorative star 2 */}
                   <RotatingDecorativeStar
                      key="decorative-star-2"
                      bottom={isMobile ? "-17%" : "-28%"}
@@ -240,7 +233,6 @@ export const RegistrationSuccessAnimation = ({
                      }
                   />
 
-                  {/* Decorative star 3 */}
                   <RotatingDecorativeStar
                      key="decorative-star-3"
                      top={isMobile ? "-7%" : "-17%"}
@@ -304,17 +296,7 @@ export const RegistrationSuccessAnimation = ({
                         },
                      }}
                   >
-                     <Typography
-                        variant="h4"
-                        sx={{
-                           fontWeight: 900,
-                           color: "common.white",
-                           textTransform: "uppercase",
-                           fontSize: { xs: "2.714rem", md: "4.571rem" },
-                           lineHeight: { xs: "2.429rem", md: "5rem" },
-                           textAlign: "center",
-                        }}
-                     >
+                     <Typography component="h4" sx={styles.successText}>
                         Registration
                         <br />
                         successful
