@@ -58,6 +58,7 @@ type RotatingDecorativeStarProps = {
    opacity?: number | string
    index?: number
    isAnimating?: boolean
+   exitAnimation?: boolean
 }
 
 const RotatingDecorativeStar = ({
@@ -70,11 +71,12 @@ const RotatingDecorativeStar = ({
    opacity,
    index = 0,
    isAnimating = false,
+   exitAnimation = false,
 }: RotatingDecorativeStarProps) => {
    // Calculate starting position based on placement
    // Stars will slide in from the direction they're positioned
    const getInitialOffset = () => {
-      const offset = "10%"
+      const offset = "10%" // How far the stars will slide in from the direction they're positioned
       if (left !== undefined) return { x: `-${offset}`, y: 0 }
       if (right !== undefined) return { x: offset, y: 0 }
       if (top !== undefined) return { x: 0, y: `-${offset}` }
@@ -92,17 +94,20 @@ const RotatingDecorativeStar = ({
             y: initialOffset.y,
          }}
          animate={{
-            opacity: isAnimating ? opacity : 0,
+            opacity: exitAnimation ? 0 : isAnimating ? opacity : 0,
             x: 0,
-            y: 0,
-            rotate: 360,
+            y: exitAnimation ? "-120%" : 0,
+            rotate: exitAnimation ? 360 : 360,
          }}
          transition={{
             opacity: {
-               duration: ANIMATION_CONFIG.stars.duration,
-               delay:
-                  ANIMATION_CONFIG.stars.delay +
-                  index * ANIMATION_CONFIG.stars.staggerDelay,
+               duration: exitAnimation
+                  ? ANIMATION_CONFIG.container.slideOut
+                  : ANIMATION_CONFIG.stars.duration,
+               delay: exitAnimation
+                  ? 0
+                  : ANIMATION_CONFIG.stars.delay +
+                    index * ANIMATION_CONFIG.stars.staggerDelay,
             },
             x: {
                duration: ANIMATION_CONFIG.stars.duration,
@@ -112,11 +117,14 @@ const RotatingDecorativeStar = ({
                ease: "easeOut",
             },
             y: {
-               duration: ANIMATION_CONFIG.stars.duration,
-               delay:
-                  ANIMATION_CONFIG.stars.delay +
-                  index * ANIMATION_CONFIG.stars.staggerDelay,
-               ease: "easeOut",
+               duration: exitAnimation
+                  ? ANIMATION_CONFIG.container.slideOut
+                  : ANIMATION_CONFIG.stars.duration,
+               delay: exitAnimation
+                  ? 0
+                  : ANIMATION_CONFIG.stars.delay +
+                    index * ANIMATION_CONFIG.stars.staggerDelay,
+               ease: exitAnimation ? "easeInOut" : "easeOut",
             },
             rotate: {
                duration: 6,
@@ -203,6 +211,7 @@ const TempPage: NextPage = () => {
                ...(isMobile && {
                   display: "flex",
                   flex: 1,
+                  borderRadius: 0,
                }),
             }}
          >
@@ -292,39 +301,46 @@ const TempPage: NextPage = () => {
                {/* Stars positioned directly in the container */}
                {/* Decorative star 1 */}
                <RotatingDecorativeStar
-                  top={"-17%"}
-                  left={"-23%"}
+                  key="decorative-star-1"
+                  top={isMobile ? "-10%" : "-17%"}
+                  left={isMobile ? "-13%" : "-23%"}
                   color="#1FB6A0"
-                  size={471}
+                  size={isMobile ? 193 : 471}
                   opacity={0.2}
                   index={0}
                   isAnimating={animationPhase > AnimationPhase.NOT_STARTED}
+                  exitAnimation={animationPhase === AnimationPhase.SECOND_PHASE}
                />
 
                {/* Decorative star 2 */}
                <RotatingDecorativeStar
-                  bottom={"-28%"}
-                  right={"-26%"}
+                  key="decorative-star-2"
+                  bottom={isMobile ? "-17%" : "-28%"}
+                  right={isMobile ? "-13%" : "-26%"}
                   color="#1FA692"
-                  size={575}
+                  size={isMobile ? 236 : 575}
                   opacity={0.3}
                   index={1}
                   isAnimating={animationPhase > AnimationPhase.NOT_STARTED}
+                  exitAnimation={animationPhase === AnimationPhase.SECOND_PHASE}
                />
 
                {/* Decorative star 3 */}
                <RotatingDecorativeStar
-                  top={"-17%"}
-                  right={"-10%"}
+                  key="decorative-star-3"
+                  top={isMobile ? "-7%" : "-17%"}
+                  right={isMobile ? "-6%" : "-10%"}
                   color="#3EB9A7"
-                  size={275}
+                  size={isMobile ? 112 : 275}
                   opacity={0.3}
                   index={2}
                   isAnimating={animationPhase > AnimationPhase.NOT_STARTED}
+                  exitAnimation={animationPhase === AnimationPhase.SECOND_PHASE}
                />
 
                {/* Text */}
                <FramerBox
+                  key="text"
                   zIndex={1}
                   initial={{
                      opacity: 0,
@@ -332,13 +348,43 @@ const TempPage: NextPage = () => {
                   }}
                   animate={{
                      opacity:
-                        animationPhase > AnimationPhase.NOT_STARTED ? 1 : 0,
-                     y: animationPhase > AnimationPhase.NOT_STARTED ? 0 : 50,
+                        animationPhase === AnimationPhase.SECOND_PHASE
+                           ? 0
+                           : animationPhase > AnimationPhase.NOT_STARTED
+                           ? 1
+                           : 0,
+                     y:
+                        animationPhase === AnimationPhase.SECOND_PHASE
+                           ? "-120%"
+                           : animationPhase > AnimationPhase.NOT_STARTED
+                           ? 0
+                           : 50,
                   }}
                   transition={{
-                     duration: ANIMATION_CONFIG.text.duration,
-                     delay: ANIMATION_CONFIG.text.delay,
-                     ease: "easeOut",
+                     opacity: {
+                        duration:
+                           animationPhase === AnimationPhase.SECOND_PHASE
+                              ? ANIMATION_CONFIG.container.slideOut
+                              : ANIMATION_CONFIG.text.duration,
+                        delay:
+                           animationPhase === AnimationPhase.SECOND_PHASE
+                              ? 0
+                              : ANIMATION_CONFIG.text.delay,
+                     },
+                     y: {
+                        duration:
+                           animationPhase === AnimationPhase.SECOND_PHASE
+                              ? ANIMATION_CONFIG.container.slideOut
+                              : ANIMATION_CONFIG.text.duration,
+                        delay:
+                           animationPhase === AnimationPhase.SECOND_PHASE
+                              ? 0
+                              : ANIMATION_CONFIG.text.delay,
+                        ease:
+                           animationPhase === AnimationPhase.SECOND_PHASE
+                              ? "easeInOut"
+                              : "easeOut",
+                     },
                   }}
                >
                   <Typography
