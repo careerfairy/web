@@ -83,7 +83,7 @@ const styles = sxStyles({
    },
 })
 
-const NEXT_VIEW: ViewKey = "register-success" as const
+const NEXT_VIEW = "register-success" satisfies ViewKey
 
 const RegisterAskQuestionsView = () => {
    const { livestream, goToView } = useLiveStreamDialog()
@@ -222,7 +222,7 @@ const RegisterAskQuestionsView = () => {
                onClick={() => goToView(NEXT_VIEW)}
                color="secondary"
             >
-               Next
+               Finish registration
             </Button>
          }
       />
