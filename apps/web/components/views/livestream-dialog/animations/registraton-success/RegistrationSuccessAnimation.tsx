@@ -1,13 +1,32 @@
-import { Fab, Grow, SvgIcon } from "@mui/material"
+import { Fab } from "@mui/material"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
+import PlayIcon from "components/views/common/icons/PlayIcon"
 import { AnimatePresence } from "framer-motion"
 import { Fragment, useState } from "react"
+import { sxStyles } from "types/commonTypes"
 import { MainStar } from "./MainStar"
 import { RotatingDecorativeStar } from "./RotatingDecorativeStar"
 import { ANIMATION_CONFIG } from "./animationConfig"
+
+const styles = sxStyles({
+   root: {
+      overflow: "hidden",
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+   debugButton: {
+      position: "absolute",
+      top: 16,
+      right: 16,
+      zIndex: 10,
+   },
+})
 
 enum AnimationPhase {
    /**
@@ -28,21 +47,26 @@ enum AnimationPhase {
 
 const PAUSE_MID_ANIMATION = false
 
-export const RegistrationSuccessAnimation = () => {
+type Props = {
+   onAnimationComplete?: () => void
+   debug?: boolean
+}
+
+export const RegistrationSuccessAnimation = ({
+   onAnimationComplete,
+   debug = false,
+}: Props) => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
       AnimationPhase.NOT_STARTED
    )
-   const [isAnimating, setIsAnimating] = useState(false)
    const isMobile = useIsMobile()
 
    const startAnimation = () => {
-      setIsAnimating(true)
       setAnimationPhase(AnimationPhase.FIRST_PHASE)
    }
 
    const resetAnimation = () => {
       setAnimationPhase(AnimationPhase.NOT_STARTED)
-      setIsAnimating(false)
    }
 
    // Handle animation phase transition
@@ -66,13 +90,18 @@ export const RegistrationSuccessAnimation = () => {
 
    return (
       <Box
-         display="flex"
-         justifyContent="center"
-         alignItems="center"
-         width="100%"
-         height="100%"
+         sx={[
+            styles.root,
+            {
+               pointerEvents: debug
+                  ? "auto"
+                  : animationPhase === AnimationPhase.NOT_STARTED
+                  ? "none"
+                  : "auto",
+            },
+         ]}
       >
-         <AnimatePresence mode="sync">
+         <AnimatePresence onExitComplete={onAnimationComplete} mode="sync">
             {animationPhase > AnimationPhase.NOT_STARTED && (
                <Fragment>
                   <FramerBox
@@ -267,35 +296,16 @@ export const RegistrationSuccessAnimation = () => {
             )}
          </AnimatePresence>
 
-         {/* Floating Action Button */}
-         <Grow in={!isAnimating}>
+         {Boolean(debug) && (
             <Fab
                color="primary"
                aria-label="show success animation"
                onClick={startAnimation}
-               sx={{
-                  position: "absolute",
-                  top: 16,
-                  right: 16,
-                  zIndex: 10,
-               }}
+               sx={styles.debugButton}
             >
-               <PlayArrowIcon />
+               <PlayIcon />
             </Fab>
-         </Grow>
+         )}
       </Box>
    )
 }
-
-const PlayArrowIcon = () => (
-   <SvgIcon>
-      <svg
-         xmlns="http://www.w3.org/2000/svg"
-         height="24"
-         viewBox="0 -960 960 960"
-         width="24"
-      >
-         <path d="M320-203v-560l440 280-440 280Z" fill="currentColor" />
-      </svg>
-   </SvgIcon>
-)
