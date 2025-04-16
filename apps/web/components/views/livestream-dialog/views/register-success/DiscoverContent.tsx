@@ -19,14 +19,13 @@ import { FallbackComponent } from "components/views/portal/sparks/FallbackCompon
 import SparkPreviewCard from "components/views/sparks/components/spark-card/SparkPreviewCard"
 import Image from "next/legacy/image"
 import { useRouter } from "next/router"
-import { FC, useCallback, useEffect } from "react"
+import { FC, useCallback } from "react"
 import { MessageSquare } from "react-feather"
 import { useSelector } from "react-redux"
 import { confetti } from "../../../../../constants/images"
 import { eventDetailsDialogVisibilitySelector } from "../../../../../store/selectors/sparksFeedSelectors"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
-import { responsiveConfetti } from "../../../../util/confetti"
 import { AddToCalendar } from "../../../common/AddToCalendar"
 import BaseDialogView, { MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
@@ -125,17 +124,10 @@ const styles = sxStyles({
 export const DiscoverContent: FC = () => {
    const {
       closeDialog,
-      activeView,
       isDiscoverCompanySparksOpen,
       handleDiscoverCompanySparks,
    } = useLiveStreamDialog()
    const isMobile = useIsMobile()
-
-   useEffect(() => {
-      if (activeView !== "register-success") return
-
-      responsiveConfetti(isMobile)
-   }, [isMobile, activeView])
 
    return (
       <BaseDialogView
@@ -394,6 +386,7 @@ const SparksGrid = ({ livestream, handleSparkClick }) => {
    const { data: publicSparks } = useGroupSparks(livestream.groupIds[0], {
       isPublished: true,
    })
+
    return (
       <Box sx={styles.sparksWrapper} gap={1.2}>
          <Typography

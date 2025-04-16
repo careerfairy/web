@@ -30,7 +30,7 @@ const styles = sxStyles({
 
 enum AnimationPhase {
    /**
-    * Initial state - no animation is playing and the container is empty
+    * Initial/Final state - no animation is playing and the container is empty
     */
    NOT_STARTED,
    /**
@@ -45,19 +45,48 @@ enum AnimationPhase {
    SECOND_PHASE,
 }
 
-const PAUSE_MID_ANIMATION = false
+/**
+ * Used for development and debugging purposes.
+ */
+const PAUSE_AFTER_FIRST_PHASE = false
 
 type Props = {
+   /**
+    * Callback fired when animation completes
+    */
    onAnimationComplete?: () => void
+   /**
+    * When true, enables debugging control
+    */
    debug?: boolean
 }
 
+/**
+ * A celebratory animation shown after successful registration.
+ *
+ * The animation has two phases:
+ * 1. Entry: Stars and text slide up with various effects
+ * 2. Exit: After a delay, animation slides out of view
+ *
+ * @param onAnimationComplete - Callback fired when animation completes
+ * @param debug - When true, enables debugging controls
+ *
+ * @example
+ * ```tsx
+ * // In LivestreamDialog.tsx
+ * {Boolean(shouldTriggerSuccessAnimation) && (
+ *   <RegistrationSuccessAnimation
+ *     onAnimationComplete={() => doSomethingAfterAnimation()}
+ *   />
+ * )}
+ * ```
+ */
 export const RegistrationSuccessAnimation = ({
    onAnimationComplete,
    debug = false,
 }: Props) => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
-      AnimationPhase.NOT_STARTED
+      AnimationPhase.FIRST_PHASE
    )
    const isMobile = useIsMobile()
 
@@ -69,11 +98,10 @@ export const RegistrationSuccessAnimation = ({
       setAnimationPhase(AnimationPhase.NOT_STARTED)
    }
 
-   // Handle animation phase transition
    const handleAnimationComplete = () => {
       switch (animationPhase) {
          case AnimationPhase.FIRST_PHASE:
-            if (PAUSE_MID_ANIMATION) {
+            if (PAUSE_AFTER_FIRST_PHASE) {
                // Do nothing
             } else {
                // When phase 1 animation completes, move to phase 2 after delay
@@ -115,11 +143,11 @@ export const RegistrationSuccessAnimation = ({
                         y:
                            animationPhase === AnimationPhase.FIRST_PHASE
                               ? 0
-                              : "-120%", // Increased from -100% to -120% for complete exit
+                              : "-120%", // Increased from -100% to -120% to completly exit the container
                      }}
                      exit={{
                         opacity: 0,
-                        y: "-120%", // Increased from -100% to -120% for complete exit
+                        y: "-120%", // Increased from -100% to -120% to completly exit the container
                      }}
                      transition={{
                         y: {

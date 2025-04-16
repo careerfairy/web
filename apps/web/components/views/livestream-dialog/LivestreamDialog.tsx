@@ -20,6 +20,7 @@ import {
    useState,
 } from "react"
 import SwipeableViews from "react-swipeable-views"
+import { usePrevious } from "react-use"
 import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { sxStyles } from "../../../types/commonTypes"
@@ -28,6 +29,7 @@ import useLivestream from "../../custom-hook/live-stream/useLivestream"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
+import { RegistrationSuccessAnimation } from "./animations/registraton-success/RegistrationSuccessAnimation"
 import {
    RegistrationAction,
    RegistrationState,
@@ -182,7 +184,7 @@ const views = [
       viewPath: "speaker-details/SpeakerDetailsView",
       loadingComponent: () => <SpeakerDetailsViewSkeleton />,
    }),
-] as const satisfies View[]
+] as const
 
 export type ViewKey = (typeof views)[number]["key"]
 
@@ -259,6 +261,18 @@ const Content: FC<ContentProps> = ({
    const theme = useTheme()
 
    const [value, setValue] = useState<number>(getPageIndex(page))
+   const previousValue = usePrevious(value)
+   const activeViewKey = views[value].key
+   const previousViewKey =
+      previousValue !== undefined ? views[previousValue].key : undefined
+
+   const shouldTriggerSuccessAnimation = activeViewKey === "register-success"
+   console.log("🚀", {
+      activeViewKey,
+      previousViewKey,
+      shouldTriggerSuccessAnimation,
+   })
+
    const [currentJobId, setCurrentJobId] = useState<string | null>(jobId)
    const [currentSpeakerId, setCurrentSpeakerId] = useState<string | null>(
       speakerId
@@ -482,6 +496,9 @@ const Content: FC<ContentProps> = ({
                   )
                )}
             </SwipeableViews>
+         )}
+         {Boolean(shouldTriggerSuccessAnimation) && (
+            <RegistrationSuccessAnimation />
          )}
       </DialogContext.Provider>
    )
