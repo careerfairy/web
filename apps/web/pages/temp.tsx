@@ -151,6 +151,7 @@ const TempPage: NextPage = () => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
       AnimationPhase.NOT_STARTED
    )
+   console.log("🚀 ~ animationPhase:", animationPhase)
    const [isAnimating, setIsAnimating] = useState(false)
    const isMobile = useIsMobile()
 
