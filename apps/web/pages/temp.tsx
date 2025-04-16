@@ -1,4 +1,4 @@
-import { Button, Grow, SvgIcon, SvgIconProps } from "@mui/material"
+import { Fab, Grow, SvgIcon, SvgIconProps } from "@mui/material"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -41,6 +41,11 @@ const ANIMATION_CONFIG = {
       duration: 0.5,
       delay: 0.3,
    },
+   stars: {
+      duration: 0.6,
+      delay: 0.15,
+      staggerDelay: 0.1,
+   },
 }
 
 type RotatingDecorativeStarProps = {
@@ -51,6 +56,8 @@ type RotatingDecorativeStarProps = {
    color?: string
    size?: number
    opacity?: number | string
+   index?: number
+   isAnimating?: boolean
 }
 
 const RotatingDecorativeStar = ({
@@ -61,32 +68,76 @@ const RotatingDecorativeStar = ({
    color,
    size,
    opacity,
-}: RotatingDecorativeStarProps) => (
-   <FramerBox
-      animate={{
-         x: 0,
-         y: 0,
-         rotate: 360,
-      }}
-      transition={{
-         duration: 0.7,
-         rotate: {
-            duration: 6,
-            repeat: Infinity,
-            ease: "linear",
-         },
-      }}
-      sx={{
-         position: "absolute",
-         top: top,
-         left: left,
-         right: right,
-         bottom: bottom,
-      }}
-   >
-      <DecorativeStar sx={{ color, width: size, height: size, opacity }} />
-   </FramerBox>
-)
+   index = 0,
+   isAnimating = false,
+}: RotatingDecorativeStarProps) => {
+   // Calculate starting position based on placement
+   // Stars will slide in from the direction they're positioned
+   const getInitialOffset = () => {
+      const offset = "10%"
+      if (left !== undefined) return { x: `-${offset}`, y: 0 }
+      if (right !== undefined) return { x: offset, y: 0 }
+      if (top !== undefined) return { x: 0, y: `-${offset}` }
+      if (bottom !== undefined) return { x: 0, y: offset }
+      return { x: 0, y: 0 }
+   }
+
+   const initialOffset = getInitialOffset()
+
+   return (
+      <FramerBox
+         initial={{
+            opacity: 0,
+            x: initialOffset.x,
+            y: initialOffset.y,
+         }}
+         animate={{
+            opacity: isAnimating ? opacity : 0,
+            x: 0,
+            y: 0,
+            rotate: 360,
+         }}
+         transition={{
+            opacity: {
+               duration: ANIMATION_CONFIG.stars.duration,
+               delay:
+                  ANIMATION_CONFIG.stars.delay +
+                  index * ANIMATION_CONFIG.stars.staggerDelay,
+            },
+            x: {
+               duration: ANIMATION_CONFIG.stars.duration,
+               delay:
+                  ANIMATION_CONFIG.stars.delay +
+                  index * ANIMATION_CONFIG.stars.staggerDelay,
+               ease: "easeOut",
+            },
+            y: {
+               duration: ANIMATION_CONFIG.stars.duration,
+               delay:
+                  ANIMATION_CONFIG.stars.delay +
+                  index * ANIMATION_CONFIG.stars.staggerDelay,
+               ease: "easeOut",
+            },
+            rotate: {
+               duration: 6,
+               repeat: Infinity,
+               ease: "linear",
+            },
+         }}
+         sx={{
+            position: "absolute",
+            top: top,
+            left: left,
+            right: right,
+            bottom: bottom,
+         }}
+      >
+         <DecorativeStar
+            sx={{ color, width: size, height: size, opacity: 1 }}
+         />
+      </FramerBox>
+   )
+}
 
 const TempPage: NextPage = () => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
@@ -237,79 +288,94 @@ const TempPage: NextPage = () => {
                      />
                   </FramerBox>
                )}
-            </AnimatePresence>
 
-            {/* Stars positioned directly in the container */}
-            {/* Decorative star 1 */}
-            <RotatingDecorativeStar
-               top={"-17%"}
-               left={"-23%"}
-               color="#1FB6A0"
-               size={471}
-               opacity={0.2}
-            />
+               {/* Stars positioned directly in the container */}
+               {/* Decorative star 1 */}
+               <RotatingDecorativeStar
+                  top={"-17%"}
+                  left={"-23%"}
+                  color="#1FB6A0"
+                  size={471}
+                  opacity={0.2}
+                  index={0}
+                  isAnimating={animationPhase > AnimationPhase.NOT_STARTED}
+               />
 
-            {/* Decorative star 2 */}
-            <RotatingDecorativeStar
-               bottom={"-28%"}
-               right={"-26%"}
-               color="#1FA692"
-               size={575}
-               opacity={0.3}
-            />
+               {/* Decorative star 2 */}
+               <RotatingDecorativeStar
+                  bottom={"-28%"}
+                  right={"-26%"}
+                  color="#1FA692"
+                  size={575}
+                  opacity={0.3}
+                  index={1}
+                  isAnimating={animationPhase > AnimationPhase.NOT_STARTED}
+               />
 
-            {/* Decorative star 3 */}
-            <RotatingDecorativeStar
-               top={"-17%"}
-               right={"-10%"}
-               color="#3EB9A7"
-               size={275}
-               opacity={0.3}
-            />
+               {/* Decorative star 3 */}
+               <RotatingDecorativeStar
+                  top={"-17%"}
+                  right={"-10%"}
+                  color="#3EB9A7"
+                  size={275}
+                  opacity={0.3}
+                  index={2}
+                  isAnimating={animationPhase > AnimationPhase.NOT_STARTED}
+               />
 
-            {/* Text */}
-            <FramerBox
-               zIndex={1}
-               initial={{
-                  opacity: 0,
-                  y: 50,
-               }}
-               animate={{
-                  opacity: animationPhase > AnimationPhase.NOT_STARTED ? 1 : 0,
-                  y: animationPhase > AnimationPhase.NOT_STARTED ? 0 : 50,
-               }}
-               transition={{
-                  duration: ANIMATION_CONFIG.text.duration,
-                  delay: ANIMATION_CONFIG.text.delay,
-                  ease: "easeOut",
-               }}
-            >
-               <Typography
-                  variant="h4"
-                  sx={{
-                     fontWeight: 900,
-                     color: "common.white",
-                     textTransform: "uppercase",
-                     fontSize: { xs: "2.714rem", md: "4.571rem" },
-                     lineHeight: { xs: "2.429rem", md: "5rem" },
-                     textAlign: "center",
+               {/* Text */}
+               <FramerBox
+                  zIndex={1}
+                  initial={{
+                     opacity: 0,
+                     y: 50,
+                  }}
+                  animate={{
+                     opacity:
+                        animationPhase > AnimationPhase.NOT_STARTED ? 1 : 0,
+                     y: animationPhase > AnimationPhase.NOT_STARTED ? 0 : 50,
+                  }}
+                  transition={{
+                     duration: ANIMATION_CONFIG.text.duration,
+                     delay: ANIMATION_CONFIG.text.delay,
+                     ease: "easeOut",
                   }}
                >
-                  Registration
-                  <br />
-                  successful
-               </Typography>
-            </FramerBox>
+                  <Typography
+                     variant="h4"
+                     sx={{
+                        fontWeight: 900,
+                        color: "common.white",
+                        textTransform: "uppercase",
+                        fontSize: { xs: "2.714rem", md: "4.571rem" },
+                        lineHeight: { xs: "2.429rem", md: "5rem" },
+                        textAlign: "center",
+                     }}
+                  >
+                     Registration
+                     <br />
+                     successful
+                  </Typography>
+               </FramerBox>
+            </AnimatePresence>
          </Box>
 
-         {/* Controls */}
-         <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-            <Grow in={!isAnimating}>
-               <Button onClick={startAnimation} variant="contained">
-                  Show Success Animation
-               </Button>
-            </Grow>
-         </Box>
+         {/* Floating Action Button */}
+         <Grow in={!isAnimating}>
+            <Fab
+               color="primary"
+               aria-label="show success animation"
+               onClick={startAnimation}
+               sx={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  zIndex: 10,
+               }}
+            >
+               <PlayArrowIcon />
+            </Fab>
+         </Grow>
       </div>
    )
 }
@@ -372,5 +438,18 @@ const DecorativeStar = (props: SvgIconProps) => {
       </SvgIcon>
    )
 }
+
+const PlayArrowIcon = () => (
+   <SvgIcon>
+      <svg
+         xmlns="http://www.w3.org/2000/svg"
+         height="24"
+         viewBox="0 -960 960 960"
+         width="24"
+      >
+         <path d="M320-203v-560l440 280-440 280Z" fill="currentColor" />
+      </svg>
+   </SvgIcon>
+)
 
 export default TempPage
