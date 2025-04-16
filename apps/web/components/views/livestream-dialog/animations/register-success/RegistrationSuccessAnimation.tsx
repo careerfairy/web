@@ -43,9 +43,11 @@ const styles = sxStyles({
       transform: "translateX(-50%)",
       width: "100%",
       height: "auto",
+      display: "flex",
+      justifyContent: "center",
    },
    mainStar: {
-      width: "100%",
+      width: "105%",
       height: "auto",
    },
    successText: {
@@ -118,10 +120,13 @@ export const RegistrationSuccessAnimation = ({
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
       AnimationPhase.FIRST_PHASE
    )
+   const [animationResetKey, setAnimationResetKey] = useState(0)
+
    const isMobile = useIsMobile()
 
-   const startAnimation = () => {
+   const triggerAnimation = () => {
       setAnimationPhase(AnimationPhase.FIRST_PHASE)
+      setAnimationResetKey((prevKey) => prevKey + 1)
    }
 
    const resetAnimation = () => {
@@ -148,6 +153,7 @@ export const RegistrationSuccessAnimation = ({
 
    return (
       <Box
+         key={animationResetKey}
          sx={[
             styles.root,
             {
@@ -200,7 +206,7 @@ export const RegistrationSuccessAnimation = ({
                   >
                      <Box
                         sx={styles.mainStarContainer}
-                        top={isMobile ? -150 : -400}
+                        top={isMobile ? -150 : -320}
                      >
                         <MainStar sx={styles.mainStar} />
                      </Box>
@@ -310,7 +316,7 @@ export const RegistrationSuccessAnimation = ({
             <Fab
                color="primary"
                aria-label="show success animation"
-               onClick={startAnimation}
+               onClick={triggerAnimation}
                sx={styles.debugButton}
             >
                <PlayIcon />
