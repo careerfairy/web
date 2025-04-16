@@ -52,7 +52,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       const { inView: cardInView, ref: cardInViewRef } = useInView({
          fallbackInView: true,
-         threshold: 1,
+         threshold: 0.9,
       })
 
       const hasRegistered = useUserIsRegistered(props.event?.id, {
