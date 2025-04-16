@@ -22,8 +22,8 @@ const styles = sxStyles({
    },
    debugButton: {
       position: "absolute",
-      top: 16,
-      right: 16,
+      bottom: 16,
+      left: 16,
       zIndex: 10,
    },
    successContainer: {
