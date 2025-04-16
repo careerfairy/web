@@ -1,4 +1,5 @@
 import FramerBox from "components/views/common/FramerBox"
+import { Easing } from "framer-motion"
 import { DecorativeStar } from "./DecorativeStar"
 import { ANIMATION_CONFIG } from "./animationConfig"
 
@@ -31,7 +32,7 @@ export type Props = {
    /**
     * Easing function for the animation
     */
-   animationEasing?: "easeOut" | "easeIn" | "easeInOut" | "linear"
+   animationEasing?: Easing
    /**
     * Delay before the star appears after the turquoise screen is shown (in ms)
     */

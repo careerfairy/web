@@ -115,7 +115,7 @@ type Props = {
  */
 export const RegistrationSuccessAnimation = ({
    onAnimationComplete,
-   debug = true,
+   debug = false,
 }: Props) => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
       AnimationPhase.FIRST_PHASE
@@ -225,13 +225,16 @@ export const RegistrationSuccessAnimation = ({
                      exitAnimation={
                         animationPhase === AnimationPhase.SECOND_PHASE
                      }
-                     // Starting and ending rotation for mid left star
-                     startRotation={13.87}
-                     endRotation={-24.28}
-                     rotationDuration={1500} // 1500ms for rotation
+                     startRotation={
+                        ANIMATION_CONFIG.stars.midLeft.startRotation
+                     }
+                     endRotation={ANIMATION_CONFIG.stars.midLeft.endRotation}
+                     rotationDuration={
+                        ANIMATION_CONFIG.stars.rotationDuration * 1000
+                     }
                      animationEasing="easeOut"
-                     appearDelay={300} // Appears 300ms after turquoise screen
-                     appearDuration={400} // 400ms to full opacity/scale
+                     appearDelay={ANIMATION_CONFIG.stars.delay * 1000}
+                     appearDuration={ANIMATION_CONFIG.stars.duration * 1000}
                   />
 
                   {/* Bottom right star: decorative-star-2 */}
@@ -247,13 +250,19 @@ export const RegistrationSuccessAnimation = ({
                      exitAnimation={
                         animationPhase === AnimationPhase.SECOND_PHASE
                      }
-                     // Starting and ending rotation for bottom right star
-                     startRotation={-15}
-                     endRotation={45.3}
-                     rotationDuration={1500} // 1500ms for rotation
+                     // Star-specific rotation values from config
+                     startRotation={
+                        ANIMATION_CONFIG.stars.bottomRight.startRotation
+                     }
+                     endRotation={
+                        ANIMATION_CONFIG.stars.bottomRight.endRotation
+                     }
+                     rotationDuration={
+                        ANIMATION_CONFIG.stars.rotationDuration * 1000
+                     }
                      animationEasing="easeOut"
-                     appearDelay={300} // Appears 300ms after turquoise screen
-                     appearDuration={400} // 400ms to full opacity/scale
+                     appearDelay={ANIMATION_CONFIG.stars.delay * 1000}
+                     appearDuration={ANIMATION_CONFIG.stars.duration * 1000}
                   />
 
                   {/* Top right star: decorative-star-3 */}
@@ -269,13 +278,16 @@ export const RegistrationSuccessAnimation = ({
                      exitAnimation={
                         animationPhase === AnimationPhase.SECOND_PHASE
                      }
-                     // Starting and ending rotation for top right star
-                     startRotation={14.99}
-                     endRotation={-31.5}
-                     rotationDuration={1500} // 1500ms for rotation
+                     startRotation={
+                        ANIMATION_CONFIG.stars.topRight.startRotation
+                     }
+                     endRotation={ANIMATION_CONFIG.stars.topRight.endRotation}
+                     rotationDuration={
+                        ANIMATION_CONFIG.stars.rotationDuration * 1000
+                     }
                      animationEasing="easeOut"
-                     appearDelay={300} // Appears 300ms after turquoise screen
-                     appearDuration={400} // 400ms to full opacity/scale
+                     appearDelay={ANIMATION_CONFIG.stars.delay * 1000}
+                     appearDuration={ANIMATION_CONFIG.stars.duration * 1000}
                   />
 
                   {/* Text */}

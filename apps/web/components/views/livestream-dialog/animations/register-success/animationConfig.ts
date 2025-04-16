@@ -19,5 +19,17 @@ export const ANIMATION_CONFIG = {
       staggerDelay: 0.1,
       rotationDuration: 1.5,
       swipingDuration: 0.3,
+      topRight: {
+         startRotation: 14.99,
+         endRotation: -31.5,
+      },
+      midLeft: {
+         startRotation: 13.87,
+         endRotation: -24.28,
+      },
+      bottomRight: {
+         startRotation: -15,
+         endRotation: 45.3,
+      },
    },
 }

@@ -486,7 +486,11 @@ const Content: FC<ContentProps> = ({
                )}
             </SwipeableViews>
          )}
-         {activeView === "register-success" && <RegistrationSuccessAnimation />}
+         {activeView === "register-success" && (
+            <RegistrationSuccessAnimation
+               debug // Leaving true for Colleague to test animations
+            />
+         )}
       </DialogContext.Provider>
    )
 }
