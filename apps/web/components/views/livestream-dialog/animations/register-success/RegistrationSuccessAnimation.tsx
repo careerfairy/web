@@ -115,7 +115,7 @@ type Props = {
  */
 export const RegistrationSuccessAnimation = ({
    onAnimationComplete,
-   debug = false,
+   debug = true,
 }: Props) => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
       AnimationPhase.FIRST_PHASE
