@@ -27,6 +27,7 @@ const RecommendationsView = () => {
          mainContent={
             <Layout>
                <AnimatedBackground />
+               <GetNotifiedCard isAppDownloaded />
                <GetNotifiedCard />
                {Boolean(isMobile) && <RecommendationsNav />}
             </Layout>

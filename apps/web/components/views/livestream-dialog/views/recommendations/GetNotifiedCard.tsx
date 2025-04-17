@@ -56,11 +56,24 @@ const CloseButton = styled(Box)(({ theme }) => ({
    zIndex: 1,
 }))
 
-export const GetNotifiedCard = () => {
+interface GetNotifiedCardProps {
+   /** If true, shows only calendar button. If false, shows download app and calendar buttons */
+   isAppDownloaded?: boolean
+   /** Optional callback when close button is clicked */
+   onClose?: () => void
+}
+
+export const GetNotifiedCard = ({
+   isAppDownloaded = false,
+   onClose,
+}: GetNotifiedCardProps) => {
    // Dummy handler functions
    const handleDownloadApp = () => console.log("Download app clicked")
    const handleAddToCalendar = () => console.log("Add to calendar clicked")
-   const handleClose = () => console.log("Close clicked")
+   const handleClose = () => {
+      console.log("Close clicked")
+      onClose?.()
+   }
 
    return (
       <StyledCard>
@@ -148,34 +161,39 @@ export const GetNotifiedCard = () => {
                      color="text.primary"
                      gutterBottom
                   >
-                     Get Notified!
+                     {isAppDownloaded ? "Get Notified! 🎉" : "Get Notified!"}
                   </Typography>
                   <Typography variant="medium" color="text.secondary">
-                     Download our mobile app to get notified when this live
-                     stream starts and stay updated on future job opportunities!
+                     {isAppDownloaded
+                        ? "Stay updated on this live stream and future job opportunities by adding this event to your calendar."
+                        : "Download our mobile app to get notified when this live stream starts and stay updated on future job opportunities!"}
                   </Typography>
                </Box>
 
                {/* Buttons */}
                <Box sx={{ px: 2 }}>
                   <Stack spacing={1.5}>
+                     {!isAppDownloaded && (
+                        <Button
+                           fullWidth
+                           variant="contained"
+                           color="primary"
+                           startIcon={<DownloadIcon size={16} />}
+                           onClick={handleDownloadApp}
+                        >
+                           Download app
+                        </Button>
+                     )}
                      <Button
                         fullWidth
-                        variant="contained"
-                        color="primary"
-                        startIcon={<DownloadIcon size={16} />}
-                        onClick={handleDownloadApp}
-                     >
-                        Download app
-                     </Button>
-                     <Button
-                        fullWidth
-                        variant="outlined"
+                        variant={isAppDownloaded ? "contained" : "outlined"}
                         color="primary"
                         startIcon={<CalendarIcon size={16} />}
                         onClick={handleAddToCalendar}
                      >
-                        Add live stream to calendar
+                        {isAppDownloaded
+                           ? "Add to calendar"
+                           : "Add live stream to calendar"}
                      </Button>
                   </Stack>
                </Box>
