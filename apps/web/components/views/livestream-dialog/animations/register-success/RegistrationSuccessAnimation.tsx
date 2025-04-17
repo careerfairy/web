@@ -326,7 +326,7 @@ export const RegistrationSuccessAnimation = ({
                         y: {
                            duration:
                               animationPhase === AnimationPhase.SECOND_PHASE
-                                 ? ANIMATION_CONFIG.container.slideOut
+                                 ? ANIMATION_CONFIG.container.slideOut * 0.5
                                  : ANIMATION_CONFIG.text.duration,
                            delay:
                               animationPhase === AnimationPhase.SECOND_PHASE

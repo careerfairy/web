@@ -98,7 +98,7 @@ export const RotatingDecorativeStar = ({
          transition={{
             opacity: {
                duration: exitAnimation
-                  ? ANIMATION_CONFIG.container.slideOut
+                  ? ANIMATION_CONFIG.container.slideOut * 0.5
                   : appearDurationSeconds,
                delay: exitAnimation
                   ? 0

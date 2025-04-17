@@ -5,10 +5,6 @@ export const ANIMATION_CONFIG = {
       opacity: 0.3,
       delayBeforeExit: 3000,
    },
-   lightEffect: {
-      delay: 0.6,
-      duration: 0.6,
-   },
    text: {
       duration: 0.5,
       delay: 0.3,
